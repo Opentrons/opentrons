@@ -3,6 +3,7 @@
 
 
 * [Overview](#overview)
+* [Container](#container)
 * [Running Container](#runtime)
 * [Flashing a device](#flashing)
 * [Deploying a container](#deployment)
@@ -39,7 +40,33 @@ Each application has an associated git endpoint, which follows the syntax <USERN
 In the top-right corner of your application page, you'll find the command to add this endpoint as a git remote.
 
 
+## Container
+
+See `/Dockerfile` for details.
+
+Directory structure:
+  * `avahi_tools` — avahi D-Bus client to advertise over mdns
+  * `conf` — service configuration files (see `Dockerfile` for destinations on container image)
+  * `scripts` — copied to `/usr/local/bin` on container image
+  * `static` — static pages to support auto-update
+
+Services:
+  * `dumb-init` (init system, PID 1) — setup (`scripts/setup.sh`) and start (`scripts/start.sh`) robot services
+  * `nginx` — serve update page (static/) and proxy `POST` to `/upload`
+  * `inetd` — dispatch connections to local ssh server and update uploads (`updates.sh`)
+  * `ssh` (dropbear) — passwordless ssh on ethernet port 22
+  * `announce_mdns.sh` — send mdns announcements using host OS avahi over D-Bus
+  * `radvd` — Router Advertisement service to support IPv6 SLAAC over Ethernet (USB)
+
+Tools:
+  * `nmcli` — manage network connections (https://fedoraproject.org/wiki/Networking/CLI)
+  * `python -m opentrons.cli.main` — factory calibration
+  * `make -C api push` (from host machine with USB connected) — package and upload latest API to a connected robot
+
+Ethernet over USB static IPv6 address `fd00:0:cafe:fefe::1`
+
 ## Running Container
+
 There are a few small things to note about the runtime environment of compute device
 such as enviornment variables in the `OT` and `RESIN` namespaces.
 
