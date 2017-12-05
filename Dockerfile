@@ -13,8 +13,9 @@ RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profi
     echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile
 
 RUN apk add --update \
-      avahi \
+      avahi-tools \
       dumb-init \
+      radvd \
       dropbear \
       dropbear-scp \
       gnupg \
@@ -43,15 +44,11 @@ RUN gpg --import opentrons.asc && rm opentrons.asc
 
 COPY ./compute/scripts/* /usr/local/bin/
 
-COPY ./compute/conf/inetd.conf /etc/inetd.conf
+COPY ./compute/conf/radvd.conf /etc/
+COPY ./compute/conf/inetd.conf /etc/
 
 COPY ./compute/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/static /usr/share/nginx/html
-
-# Install mdns service that would advertise on eth0 only (USB)
-RUN rm /etc/avahi/services/*
-COPY ./compute/conf/api.service /etc/avahi/services/
-COPY ./compute/conf/avahi-daemon.conf /etc/avahi/
 
 # All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages

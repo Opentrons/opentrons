@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-
 # Network Manager Setup
 nmcli connection add \
   save no \
@@ -10,10 +8,10 @@ nmcli connection add \
   type ethernet \
   ifname eth0 \
   ipv6.method manual \
-  ipv6.address fe80::cafe:fefe/64 \
-  ipv4.method link-local
+  ipv6.address fd00:0000:cafe:fefe::1/64 \
+  ipv4.method disabled
 
-echo "fe80::cafe:fefe%eth0 local-ethernet" >> /etc/hosts
+echo "fd00:0000:cafe:fefe::1 local-ethernet" >> /etc/hosts
 
 # Dropbear config
 if [ ! -e /etc/dropbear/ ] ; then
