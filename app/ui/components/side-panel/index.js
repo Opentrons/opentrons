@@ -18,13 +18,6 @@ import ConnectedSetupPanel from '../../containers/ConnectedSetupPanel'
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavPanel)
 
-// TODO(mc, 2017-11-09): move to central location (interface/index.js?)
-// const PANELS = [
-//   {name: 'upload', title: 'Upload File'},
-//   {name: 'setup', title: 'Prep for Run'},
-//   {name: 'connect', title: 'Connect to a Robot'}
-// ]
-
 const PANELS_BY_NAME = {
   connect: Connection,
   upload: UploadProtocol,
