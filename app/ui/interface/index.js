@@ -4,12 +4,18 @@ import {makeActionName} from '../util'
 
 export const NAME = 'interface'
 
+export const PANELS = [
+  {name: 'upload', title: 'Upload File'},
+  {name: 'setup', title: 'Prep for Run'},
+  {name: 'connect', title: 'Connect Robot'}
+]
+
 const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
   isPanelOpen: false,
-  currentPanel: ''
+  currentPanel: 'connect'
 }
 
 export const selectors = {

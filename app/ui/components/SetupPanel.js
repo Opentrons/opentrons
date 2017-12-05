@@ -163,7 +163,6 @@ export default function SetupPanel (props) {
 
   return (
     <div className={styles.setup_panel}>
-      <h2 className={styles.title}>Prepare Robot for RUN</h2>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
           <h3>Pipette Setup</h3>

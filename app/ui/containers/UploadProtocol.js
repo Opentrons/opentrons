@@ -2,25 +2,17 @@
 import {connect} from 'react-redux'
 
 import {
-  actions as interfaceActions,
-  selectors as interfaceSelectors
-} from '../interface'
-
-import {
   actions as robotActions,
   selectors as robotSelectors
 } from '../robot'
 
-import SideBar from '../components/SideBar'
+import UploadPanel from '../components/UploadPanel'
 
 const mapStateToProps = (state) => ({
-  isOpen: interfaceSelectors.getIsPanelOpen(state),
-  currentPanel: interfaceSelectors.getCurrentPanel(state),
   isSessionLoaded: robotSelectors.getSessionIsLoaded(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  close: () => dispatch(interfaceActions.closePanel()),
 
   onUpload: (event) => {
     let files
@@ -35,4 +27,4 @@ const mapDispatchToProps = (dispatch) => ({
   }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(SideBar)
+export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
