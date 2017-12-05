@@ -1,0 +1,49 @@
+.empty_slot {
+  fill: lightgray;
+}
+
+.empty_slot text {
+  fill: white;
+  font-size: 2rem;
+}
+
+.slot_overlay > rect {
+  fill: rgb(100, 100, 100);
+  width: 100%;
+  height: 100%;
+}
+
+.slot_overlay text {
+  fill: white;
+}
+
+.slot_overlay_name_it {
+  composes: slot_overlay;
+}
+
+.slot_overlay_name_it > rect {
+  fill: black;
+  opacity: 0.75;
+  height: 80%;
+  transform: translate(0, 10%);
+}
+
+.appear_on_mouseover > * {
+  opacity: 0;
+}
+
+.appear_on_mouseover:hover > * {
+  opacity: inherit;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  fill: lightgray;
+}
+
+.pass_thru_mouse {
+  pointer-events: none;
+}

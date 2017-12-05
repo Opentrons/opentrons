@@ -11,7 +11,7 @@ export default function Deck (props) {
     // TODO css not inline style on svg
     <svg viewBox={`0 0 ${DECK_WIDTH} ${DECK_HEIGHT}`} style={{maxHeight: '55vw'}}>
       {/* Deck rect */}
-      <rect x='0' y='0' width='100%' height='100%' fill='rgba(0,0,0,0.25)' />
+      <rect x='0' y='0' width='100%' height='100%' fill='transparent' stroke='black' />
 
       {/* All containers */}
       {SLOTNAME_MATRIX.reduce((acc, slotRow, row) => {

@@ -1,6 +1,7 @@
 import React from 'react'
-
+import cx from 'classnames'
 import styles from '../css/style.css'
+import componentStyles from './LabwareContainer.css'
 import { nonFillableContainers } from '../constants.js'
 import { humanize } from '../utils.js'
 
@@ -17,9 +18,9 @@ import CopyIcon from '../svg/CopyIcon.js'
 // * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
 
 // TODO: factor this out... is there a better way? Can't use CSS for x / y / text-anchor.
-function CenteredTextSvg ({text}) {
+function CenteredTextSvg ({text, className}) {
   return (
-    <text x='50%' y='50%' textAnchor='middle'>
+    <text x='50%' y='50%' textAnchor='middle' {...{className}}>
       {text}
     </text>
   )
@@ -38,10 +39,11 @@ function NameThisLabwareOverlay ({
 
   return (
     // <div className={styles.container_overlay_name_it}>
-    <g>
-      <text x='0' y='0'>Name this labware:</text>
-      <text x='0' y='25%'>"TODO name here"</text>
-      <text x='0' y='50%' onClick={() => modifyContainer(
+    <g className={componentStyles.slot_overlay_name_it}>
+      <rect x='0' y='0' width='100%' height='100%' />
+      <text className={componentStyles.clickable} x='0' y='0'>Name this labware:</text>
+      <text x='0' y='25%'>"TODO name here"</text> {/* TODO: this should be text box input */}
+      <text className={componentStyles.clickable} x='0' y='50%' onClick={() => modifyContainer(
         {
           containerId,
           modify: {
@@ -52,11 +54,12 @@ function NameThisLabwareOverlay ({
       )}>
         Save
       </text>
-      <text x='0' y='75%'
+      <text className={componentStyles.clickable} x='0' y='75%'
         onClick={() => deleteContainer({containerId, slotName, containerType})}
       >
           Delete
       </text>
+
       {/* <input id={containerNameInputId}
         placeholder={humanize(containerType)}
         // Quick HACK to have enter key submit the rename action
@@ -113,18 +116,21 @@ function OccupiedDeckSlotOverlay ({
     //     }>
     //     <p>Remove {containerName}</p>
     //   </div>
-    <g>
+    <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
       {/* Overlay Background */}
-      <rect fill='rgba(0,0,0,0.5)' width='100%' height='100%' />
+      <rect x='0' y='0' className={componentStyles.slot_overlay} />
       {// canAddIngreds && // TODO add back canAddIngreds conditional
-        <text x='0' y='25%'
+        <text x='0' y='25%' className={componentStyles.clickable}
           onClick={() => openIngredientSelector({containerId, slotName, containerType})}
           >
             Add Ingredients
           </text>
       }
-      <text x='0' y='50%' onClick={() => setCopyLabwareMode(containerId)}>Copy Labware</text>
-      <text x='0' y='75%'
+
+      <text x='0' y='50%' className={componentStyles.clickable}
+        onClick={() => setCopyLabwareMode(containerId)}>Copy Labware</text>
+
+      <text x='0' y='75%' className={componentStyles.clickable}
         onClick={() =>
             window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
             deleteContainer({containerId, slotName, containerType})
@@ -143,11 +149,11 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      <g className={styles.name_overlay}>
+      {containerName && <g className={styles.name_overlay}>
         <rect x='0' y='0' height='50%' width='100%' fill='rgba(0,0,0,0.8)' />
         <text fill='white' x='0' y='25%'>{humanize(containerType)}</text>
         <text fill='white' x='0' y='50%' className={styles.container_name}>{containerName}</text>
-      </g>
+      </g>}
     </g>
   )
 }
@@ -189,10 +195,29 @@ export default function LabwareContainer ({
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
         // Empty slot
-        : <g>
-          <rect fill='rgba(255,0,0,0.25)' stroke='black' width='100%' height='100%' />
+        : <g className={componentStyles.empty_slot}>
+          <rect width='100%' height='100%' />
           <CenteredTextSvg text={slotName} />
         </g>}
+
+      {!slotIsOccupied && (activeModals.labwareSelection
+        // "Add Labware" labware selection dropdown menu
+        ? null /* (slotName === canAdd) && <LabwareDropdown
+              onClose={e => closeLabwareSelector({slotName})}
+              onContainerChoose={containerType => createContainer({slotName, containerType})}
+            /> */
+        : (labwareToCopy
+            // Mouseover empty slot -- Add (or Copy if in copy mode)
+            ? <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
+              <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
+              <CenteredTextSvg className={componentStyles.pass_thru_mouse} text='Place Copy' />
+            </g>
+            : <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
+              <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
+              <CenteredTextSvg className={componentStyles.pass_thru_mouse} text='Add Labware' />
+            </g>
+        )
+      )}
 
       {slotIsOccupied && hasName &&
         <OccupiedDeckSlotOverlay {...{
@@ -205,25 +230,6 @@ export default function LabwareContainer ({
           setCopyLabwareMode,
           deleteContainer
         }} />}
-
-      {!slotIsOccupied && (activeModals.labwareSelection
-        // "Add Labware" labware selection dropdown menu
-        ? null /* (slotName === canAdd) && <LabwareDropdown
-              onClose={e => closeLabwareSelector({slotName})}
-              onContainerChoose={containerType => createContainer({slotName, containerType})}
-            /> */
-        : (labwareToCopy
-            // Mouseover empty slot -- Add (or Copy if in copy mode)
-            ? <g>
-              <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
-              <CenteredTextSvg text='Place Copy' />
-            </g>
-            : <g>
-              <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
-              <CenteredTextSvg text='Add Labware' />
-            </g>
-        )
-      )}
 
       {!hasName && <NameThisLabwareOverlay {...{
         containerType,
