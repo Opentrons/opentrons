@@ -156,7 +156,7 @@ class SmoothieDriver_3_0_0:
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
         speed = value * SEC_PER_MIN
-        command += GCODES['SET_SPEED'] + str(speed)
+        command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
     def default_speed(self):
@@ -342,7 +342,7 @@ class SmoothieDriver_3_0_0:
         that distance away from the homing switch. Then finish with home.
         '''
         # move some mm distance away from the target axes endstop switch(es)
-        self.set_speed()
+        self.default_speed()
         destination = {
             ax: HOMED_POSITION.get(ax) - abs(safety_margin)
             for ax in axis.upper()
