@@ -37,12 +37,13 @@ def calibrate_container_with_delta(
     return pose_tree
 
 
-def probe_instrument(instrument, robot) -> Point:
+def probe_instrument(instrument, robot, tip_length=None) -> Point:
     from statistics import mean
 
     robot.home()
 
-    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+    if tip_length is None:
+        tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     instrument._add_tip(tip_length)
 
     size_x, size_y, size_z = robot.config.probe_dimensions
