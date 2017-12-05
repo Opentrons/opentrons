@@ -381,18 +381,6 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles PICKUP_AND_HOME failure during home', () => {
-      const action = actions.pickupAndHome('left', 5)
-      const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
-
-      calibrationManager.pick_up_tip.mockReturnValue(
-        Promise.reject(new Error('AH')))
-
-      return sendConnect()
-        .then(() => sendToClient(state, action))
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
-    })
-
     test('handles DROP_TIP_AND_HOME success', () => {
       const action = actions.dropTipAndHome('right', 9)
       const expectedResponse = actions.dropTipAndHomeResponse()
