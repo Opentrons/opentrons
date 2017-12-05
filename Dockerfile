@@ -4,9 +4,11 @@
 # Use this for running on a robot
 FROM resin/raspberrypi3-alpine-python:3.6-slim
 
-ENV RUNNING_ON_PI 1
+ENV RUNNING_ON_PI=1
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-ENV PYTHONPATH $PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
+ENV PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
+#port name for connecting to smoothie over serial
+ENV OT_SMOOTHIE_ID=AMA
 
 RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
     echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
