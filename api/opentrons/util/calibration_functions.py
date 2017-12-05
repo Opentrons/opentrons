@@ -12,11 +12,11 @@ X_SWITCH_OFFSET_MM = 5.0
 Y_SWITCH_OFFSET_MM = 2.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_OFFSET_DURING_PROBE = 5.0
+Z_HEIGHT_DURING_XY_PROBE = 15.0
 
 BOUNCE_DISTANCE_MM = 5.0
-XY_CLEARANCE = 7.5
-Z_CROSSOVER_CLEARANCE = 80  # Z mm between nozzle and probe
+SWITCH_CLEARANCE = 7.5
+Z_CROSSOVER_CLEARANCE = 20  # Z mm between tip and probe
 
 
 def calibrate_container_with_delta(
@@ -40,26 +40,27 @@ def calibrate_container_with_delta(
 def probe_instrument(instrument, robot) -> Point:
     from statistics import mean
 
+    robot.home()
+
+    tip_length = robot.config.tip_length[instrument.mount][instrument.type]
+    instrument._add_tip(tip_length)
+
     size_x, size_y, size_z = robot.config.probe_dimensions
     center = Point(*robot.config.probe_center)
 
-    rel_x_start = (size_x / 2) + XY_CLEARANCE
-    rel_y_start = (size_y / 2) + XY_CLEARANCE
-    rel_z_start = Z_CROSSOVER_CLEARANCE
+    rel_x_start = (size_x / 2) + SWITCH_CLEARANCE
+    rel_y_start = (size_y / 2) + SWITCH_CLEARANCE
+    rel_z_start = center.z - Z_HEIGHT_DURING_XY_PROBE
 
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM, Z_OFFSET_DURING_PROBE,                 size_x),  # NOQA
-        ('x',        rel_x_start, X_SWITCH_OFFSET_MM, Z_OFFSET_DURING_PROBE,                -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start, Z_OFFSET_DURING_PROBE,                 size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start, Z_OFFSET_DURING_PROBE,                -size_y),  # NOQA
-        ('z',                0.0, Z_SWITCH_OFFSET_MM,          rel_z_start, -Z_CROSSOVER_CLEARANCE)   # NOQA
+        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,          -rel_z_start,  size_x),  # NOQA
+        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,          -rel_z_start, -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,          -rel_z_start,  size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,          -rel_z_start, -size_y),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_CROSSOVER_CLEARANCE, -size_z)   # NOQA
     ]
-
-    # TODO (andy) we physically have a tip attached during probe
-    #    so it would seem to make more sense to probe also with a virtual tip
-    #    attached to the pipette
 
     acc = []
 
@@ -69,7 +70,6 @@ def probe_instrument(instrument, robot) -> Point:
 
     safe_height = center.z + Z_CROSSOVER_CLEARANCE
 
-    robot.home()
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
     for axis, *probing_vector, distance in hot_spots:
@@ -105,6 +105,8 @@ def probe_instrument(instrument, robot) -> Point:
         robot.poses = instrument._move(robot.poses, **{axis: bounce})
         robot.poses = instrument._move(robot.poses, z=safe_height)
 
+    instrument._remove_tip(tip_length)
+
     return center._replace(**{
         axis: mean(values)
         for axis, values in res.items()
@@ -130,7 +132,8 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
     tip_length = deepcopy(config.tip_length)
 
     instrument_offset[instrument.mount][instrument.type] = (-dx, -dy, z)
-    tip_length[instrument.mount][instrument.type] = dz
+    tip_length[instrument.mount][instrument.type] = \
+        tip_length[instrument.mount][instrument.type] + dz
 
     config = config \
         ._replace(instrument_offset=instrument_offset) \
