@@ -11,7 +11,7 @@ export default class NameThisLabwareOverlay extends React.Component {
     this.defaultName = humanize(this.props.containerType)
     this.state = {
       pristine: true,
-      inputValue: null
+      inputValue: ''
     }
   }
 

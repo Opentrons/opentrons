@@ -10,12 +10,13 @@ import { getCollidingWells } from '../utils.js'
 export default connect(
   (state, ownProps) => {
     // containerId prop overrides default behavior of using the 'selected' containerId
-    const { containerId } = ownProps
+    const containerId = ownProps.containerId || selectors.selectedContainer(state).containerId
 
     return {
       wellMatrix: containerId
         ? selectors.allWellMatricesById(state)[containerId]
-        : selectors.wellMatrixSelectedContainer(state)
+        : selectors.wellMatrixSelectedContainer(state),
+      containerType: selectors.containerById(containerId)(state).type
     }
   },
   {

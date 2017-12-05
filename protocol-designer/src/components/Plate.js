@@ -47,10 +47,7 @@ class Plate extends React.Component {
   render () {
     // TODO Ian 2017-12-04 use these again! Hard-coded for now...
     // const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
-
-    // TODO Ian 2017-12-4: 1) make sure containerType matches API container names  2) Pass containerType into Plate
-    const containerType = '96-flat'
-    // const containerType = 'trough-12row'
+    const { containerType } = this.props
 
     const containerData = defaultContainers.containers[containerType]
     const firstWell = containerData.locations['A1']
@@ -80,6 +77,7 @@ class Plate extends React.Component {
             // flip x and y coordinates for landscape (default-containers.json is in portrait)
             ? <rect
               key={wellName}
+              data-wellName={wellName}
               fill='transparent'
               stroke='black' // TODO: style for real
               x={wellData.y + svgOffset.y}
@@ -88,6 +86,7 @@ class Plate extends React.Component {
               height={wellData.width} />
             : <circle
               key={wellName}
+              data-wellName={wellName}
               fill='transparent'
               stroke='black' // TODO: style for real
               cx={wellData.y + svgOffset.y}

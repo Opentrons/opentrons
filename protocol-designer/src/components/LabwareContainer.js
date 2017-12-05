@@ -18,7 +18,7 @@ import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
 // * Renders a SelectablePlate in the slot
 // * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
 
-// TODO: factor this out... is there a better way? Can't use CSS for x / y / text-anchor.
+// TODO: factor CenteredTextSvg out...??? is there a better way? Can't use CSS for x / y / text-anchor.
 function CenteredTextSvg ({text, className}) {
   return (
     <text x='50%' y='50%' textAnchor='middle' {...{className}}>
@@ -38,32 +38,10 @@ function OccupiedDeckSlotOverlay ({
   deleteContainer
 }) {
   return (
-    // <div className={styles.container_overlay}>
-    //
-    //   {canAddIngreds && <div className={styles.container_overlay_add_ingred}
-    //     onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
-    //     Add Ingredients
-    //   </div>}
-    //
-    //   <div className={styles.container_overlay_copy}
-    //     onClick={() => setCopyLabwareMode(containerId)}
-    //   >
-    //     <div>Copy Labware</div>
-    //     <CopyIcon style={{width: '20px', height: '20px'}} />
-    //   </div>
-    //
-    //   <div className={styles.container_overlay_remove}
-    //     style={canAddIngreds ? {} : {bottom: 0, position: 'absolute'}}
-    //     onClick={() =>
-    //       window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
-    //       deleteContainer({containerId, slotName, containerType})
-    //     }>
-    //     <p>Remove {containerName}</p>
-    //   </div>
     <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
       {/* Overlay Background */}
       <rect x='0' y='0' className={componentStyles.slot_overlay} />
-      {// canAddIngreds && // TODO add back canAddIngreds conditional
+      {canAddIngreds && // TODO add back canAddIngreds conditional
         <text x='0' y='25%' className={componentStyles.clickable}
           onClick={() => openIngredientSelector({containerId, slotName, containerType})}
           >
