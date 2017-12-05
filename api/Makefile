@@ -2,7 +2,7 @@
 
 SHELL := /bin/bash
 
-.PHONY: test docs publish clean install exe dev
+.PHONY: test docs publish clean install exe dev push
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -25,6 +25,17 @@ publish:
 
 dev:
 	python opentrons/server/main.py -P 31950
+
+dist/update.base64:
+	rm -rf dist/* && \
+	python setup.py bdist_wheel && \
+	tar -C dist -cf /tmp/update . && \
+	echo -e "---OT UPDATE BEGIN---" > dist/update.base64 && \
+	base64 -b 50 -i /tmp/update >> dist/update.base64 && \
+	echo -e "\n---OT UPDATE END---" >> dist/update.base64
+
+push: dist/update.base64
+	curl -F 'data=@dist/update.base64' http://\[fd00:0:cafe:fefe::1\]/upload
 
 
 ########## [START] RESIN DEVICE ##########
