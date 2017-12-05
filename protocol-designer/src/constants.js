@@ -44,34 +44,6 @@ export const getMaxVolumes = containerType => {
   return {default: 300}
 }
 
-export const containerDims = containerType => {
-  const maxVolumes = getMaxVolumes(containerType)
-
-  if (containerType.startsWith('96-')) {
-    // maxVolumes also can have wellName keys, eg A3: 120
-    return {rows: 12, columns: 8, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType.startsWith('384-')) {
-    return {rows: 24, columns: 16, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType.startsWith('tube-rack-')) {
-    return {rows: 6, columns: 4, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType === 'trough-12row') {
-    return {rows: 12, columns: 1, wellShape: 'rectangle', maxVolumes}
-  }
-
-  // if (containerType.startsWith('PCR-strip')) {
-  //   return {rows: 1, columns: 8, wellShape: 'circle'}
-  // }
-
-  console.warn(`Warning: no container type ${containerType} not in containerDims. Defaulting to 12x8`)
-  return {rows: 12, columns: 8, wellShape: 'circle', maxVolumes: {default: 400}}
-}
-
 // The '.ot-selectable' classname is used to find collisions with SelectionRect
 export const SELECTABLE_WELL_CLASS = 'ot-selectable-well'
 

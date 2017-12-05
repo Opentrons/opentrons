@@ -7,11 +7,11 @@ import get from 'lodash/get'
 import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
-import range from 'lodash/range'
+// import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
-import { containerDims, getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
+import { getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
 import { uuid, toWellName, wellKeyToXYList } from '../utils.js'
 
 // UTILS
@@ -237,10 +237,9 @@ const selectedContainerType = createSelector(
   (slotName, allContainers) => allContainers[slotName]
 )
 
-// Given ingredientsForContainer obj and rowNum, colNum,
+// Given ingredientsForContainer obj and wellName (eg 'A1'),
 // returns the ingred data for that well, or `undefined`
-const _ingredAtWell = ingredientsForContainer => ({rowNum, colNum}) => {
-  const wellName = toWellName({rowNum, colNum})
+const _ingredAtWell = ingredientsForContainer => (wellName) => {
   const matchedKey = findKey(ingredientsForContainer, ingred => ingred.wells.includes(wellName))
   const matchedIngred = ingredientsForContainer[matchedKey]
 
@@ -340,8 +339,6 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
     return undefined
   }
   console.log('bloas', {containerType, ingredientsForContainer, selectedWells, highlightedWells}) // TODO REMOVE
-  // TODO: remove containerDims
-  // const { rows, columns, wellShape, maxVolumes } = containerDims(containerType)
 
   const defaultVolume = 1234 // TODO use defaultContainers data... is there a default volume?
 
@@ -351,11 +348,11 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
     return []
   }
   const allLocations = containerData.locations
-  console.log({containerData, allLocations})
+  console.log({containerData, allLocations, selectedWells, highlightedWells})
 
   return reduce(allLocations, (acc, location, wellName) => {
     // get ingred data, or set to null if the well is empty
-    const ingredData = null // _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null // TODO _ingredAtWell take wellName not rowNum colNum
+    const ingredData = _ingredAtWell(ingredientsForContainer)(wellName) || null
     const isHighlighted = highlightedWells ? wellName in highlightedWells : false
 
     return {
@@ -370,36 +367,13 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
       }
     }
   }, {})
-
-  // return range(rows - 1, -1, -1).map(
-  //   rowNum => range(columns).map(
-  //     colNum => {
-  //       const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
-  //
-  //       // get ingred data, or set to null if the well is empty
-  //       const ingredData = _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null
-  //
-  //       const isHighlighted = highlightedWells ? wellKey in highlightedWells : false
-  //
-  //       return {
-  //         wellShape,
-  //         preselected: selectedWells ? wellKey in selectedWells.preselected : false,
-  //         highlighted: isHighlighted,
-  //         maxVolume: maxVolumes[ingredData.wellName] || maxVolumes.default,
-  //         hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-  //         selected: selectedWells ? wellKey in selectedWells.selected : false,
-  //         ...ingredData // TODO later: nest this so it looks cleaner?
-  //       }
-  //     }
-  //   )
-  // )
 }
 
 const allWellMatricesById = createSelector(
   allIngredients,
   state => rootSelector(state).containers,
   (allIngredients, containers, selectedWells) => reduce(containers, (acc, container, containerId) => {
-    const wellMatrix = _getWellContents(
+    const wellContents = _getWellContents(
       container.type,
       _ingredientsForContainerId(allIngredients, containerId),
       null, // selectedWells is only for the selected container, so treat as empty selection.
@@ -408,15 +382,25 @@ const allWellMatricesById = createSelector(
 
     return {
       ...acc,
-      [containerId]: wellMatrix
+      [containerId]: wellContents
     }
   }, {})
 )
 
-const wellMatrixSelectedContainer = createSelector(
+const stoopidSelectedWellsSelector = createSelector(
+  rootSelector,
+  function (s) {
+    const res = s.selectedWells
+    console.log('stoopidSelectedWellsSelector sez', res)
+    return res
+  }
+)
+
+const wellContentsSelectedContainer = createSelector(
   selectedContainerType,
   ingredientsForContainer,
-  state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
+  stoopidSelectedWellsSelector,
+  // state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
   state => rootSelector(state).highlightedIngredients.wells,
   _getWellContents
 )
@@ -446,7 +430,7 @@ export const selectors = {
   containersBySlot,
   labwareToCopy,
   canAdd,
-  wellMatrixSelectedContainer,
+  wellContentsSelectedContainer,
   numWellsSelected,
   selectedWellsMaxVolume,
   selectedWellNames,

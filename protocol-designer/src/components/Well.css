@@ -1,0 +1,13 @@
+@value colors: './Util.css';
+@value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
+
+.well {
+  stroke-width: 0.4;
+  stroke: black;
+  fill: var(--fill-color);
+}
+
+.selected {
+  stroke-width: 1;
+  stroke: blue;
+}

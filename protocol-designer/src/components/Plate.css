@@ -3,19 +3,6 @@
 @value labelColor: gray;
 @value rowLabelWidth: 1.5rem;
 
-/* Well styles */
-
-.well {
-  stroke-width: 0.4;
-  stroke: black;
-  fill: var(--fill-color);
-}
-
-.selected {
-  stroke-width: 1;
-  stroke: blue;
-}
-
 /* TODO: RE-EVALUATE ALL BELOW FOR SVG */
 
 .aspect_ratio {
