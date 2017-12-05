@@ -75,14 +75,26 @@ class Mover:
 
         return update(pose_tree, self, point)
 
+    def fast_home(self, pose_tree, safety_margin):
+        position = self._driver.fast_home(
+            axis=''.join(self._axis_mapping.values()),
+            safety_margin=safety_margin
+        )
+        # map from driver axis names to xyz and expand position
+        # into point object
+        point = Point(
+            x=position.get(self._axis_mapping.get('x', ''), 0.0),
+            y=position.get(self._axis_mapping.get('y', ''), 0.0),
+            z=position.get(self._axis_mapping.get('z', ''), 0.0)
+        )
+
+        return update(pose_tree, self, point)
+
     def set_speed(self, value):
-        pass
-        # TODO (artyom 20171105): uncomment once proper plunger speeds are
-        # defined
-        # self._driver.set_speed({
-        #     axis: value
-        #     for axis in self._axis_mapping.values()
-        # })
+        self._driver.set_speed(value)
+
+    def default_speed(self):
+        self._driver.default_speed()
 
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis

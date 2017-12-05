@@ -1,23 +1,8 @@
 from unittest import mock
 from functools import partial
-from tests.opentrons.conftest import state, log_by_axis
+from tests.opentrons.conftest import state
 
 state = partial(state, 'calibration')
-
-
-async def test_tip_probe_functional(main_router, model):
-    robot = model.robot
-
-    robot._driver.log.clear()
-    main_router.calibration_manager.tip_probe(model.instrument)
-    by_axis = log_by_axis(robot._driver.log, 'XYA')
-    coords = [
-        (x, y, z)
-        for x, y, z
-        in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
-    ]
-
-    assert coords
 
 
 async def test_tip_probe(main_router, model):
@@ -80,7 +65,7 @@ async def test_drop_tip(main_router, model):
             model.container)
 
         drop_tip.assert_called_with(
-            model.container._container[0], home_after=False)
+            model.container._container[0], home_after=True)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
