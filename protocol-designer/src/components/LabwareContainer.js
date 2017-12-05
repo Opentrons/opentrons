@@ -7,7 +7,8 @@ import { humanize } from '../utils.js'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 
-import CopyIcon from '../svg/CopyIcon.js'
+// import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
+import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
 
 // On an empty slot:
 // * Renders a slot on the deck
@@ -23,63 +24,6 @@ function CenteredTextSvg ({text, className}) {
     <text x='50%' y='50%' textAnchor='middle' {...{className}}>
       {text}
     </text>
-  )
-}
-
-function NameThisLabwareOverlay ({
-  containerType,
-  containerId,
-  slotName,
-  modifyContainer,
-  deleteContainer
-}) {
-  // HACK: should use a stateful input component
-  // TODO Ian 2017-12-04 bring in pure SVG input box
-  // const containerNameInputId = slotName
-
-  return (
-    // <div className={styles.container_overlay_name_it}>
-    <g className={componentStyles.slot_overlay_name_it}>
-      <rect x='0' y='0' width='100%' height='100%' />
-      <text className={componentStyles.clickable} x='0' y='0'>Name this labware:</text>
-      <text x='0' y='25%'>"TODO name here"</text> {/* TODO: this should be text box input */}
-      <text className={componentStyles.clickable} x='0' y='50%' onClick={() => modifyContainer(
-        {
-          containerId,
-          modify: {
-            name: 'TODO: name'
-            // name: document.getElementById(containerNameInputId).value || humanize(containerType)
-          }
-        }
-      )}>
-        Save
-      </text>
-      <text className={componentStyles.clickable} x='0' y='75%'
-        onClick={() => deleteContainer({containerId, slotName, containerType})}
-      >
-          Delete
-      </text>
-
-      {/* <input id={containerNameInputId}
-        placeholder={humanize(containerType)}
-        // Quick HACK to have enter key submit the rename action
-        onKeyDown={e =>
-          e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
-        }
-      />
-      {/* HACK: using id selector instead of stateful input field... */}
-      {/* <div className={styles.btn} onClick={() => modifyContainer(
-        {
-          containerId,
-          modify: {
-            name: document.getElementById(containerNameInputId).value || humanize(containerType)
-          }
-        }
-      )}>Save</div>
-      <div className={styles.btn} onClick={() => deleteContainer({containerId, slotName, containerType})}>
-        Delete
-      </div> */}
-    </g>
   )
 }
 

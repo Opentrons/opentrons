@@ -1,7 +1,7 @@
 import React from 'react'
 import Plate from './Plate.js'
 
-import SelectionRect from '../components/SelectionRect.js'
+// import SelectionRect from '../components/SelectionRect.js' // TODO bring back
 import HoverableWell from '../containers/HoverableWell.js'
 
 export default function SelectablePlate ({wellMatrix, onSelectionMove, onSelectionDone, containerId, selectable, ...otherProps}) {

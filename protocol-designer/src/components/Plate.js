@@ -45,7 +45,8 @@ class Plate extends React.Component {
   }
 
   render () {
-    const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
+    // TODO Ian 2017-12-04 use these again! Hard-coded for now...
+    // const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
 
     // TODO Ian 2017-12-4: 1) make sure containerType matches API container names  2) Pass containerType into Plate
     const containerType = '96-flat'
