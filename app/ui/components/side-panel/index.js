@@ -13,14 +13,14 @@ import {
 import SidePanel from './SidePanel'
 // TODO (ka 2017-12-5) refactor individual panels in subsequent PRs
 // naming and organization refactors to follow
-import Connection from '../../containers/Connection'
+import ConnectPanel from '../connect-panel'
 import UploadProtocol from '../../containers/UploadProtocol'
 import ConnectedSetupPanel from '../../containers/ConnectedSetupPanel'
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavPanel)
 
 const PANELS_BY_NAME = {
-  connect: Connection,
+  connect: ConnectPanel,
   upload: UploadProtocol,
   setup: ConnectedSetupPanel
 }
