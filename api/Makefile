@@ -2,7 +2,7 @@
 
 SHELL := /bin/bash
 
-.PHONY: test docs publish clean install exe dev
+.PHONY: test docs publish clean install exe dev push
 
 install:
 	pip install -r requirements.txt && pip install -e .
