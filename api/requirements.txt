@@ -1,9 +1,9 @@
-pylama
+pylama==7.4.3
 pyserial==3.2.1
 pytest==3.2.5
-pytest-cov
-pytest-aiohttp
-dill
+pytest-cov==2.5.1
+pytest-aiohttp==0.2.0
+dill==0.2.7.1
 numpydoc==0.6.0
 Sphinx==1.4.8
 twine==1.8.1
