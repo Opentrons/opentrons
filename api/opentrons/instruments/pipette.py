@@ -17,6 +17,9 @@ PLUNGER_POSITIONS = {
     'drop_tip': -7
 }
 
+DEFAULT_ASPIRATE_SPEED = 20
+DEFAULT_DISPENSE_SPEED = 40
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -100,8 +103,8 @@ class Pipette:
             ul_per_mm=18.51,
             trash_container=None,
             tip_racks=[],
-            aspirate_speed=20,
-            dispense_speed=40):
+            aspirate_speed=DEFAULT_ASPIRATE_SPEED,
+            dispense_speed=DEFAULT_DISPENSE_SPEED):
 
         self.robot = robot
         self.mount = mount
