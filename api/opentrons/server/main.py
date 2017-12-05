@@ -46,11 +46,18 @@ def log_init():
     dictConfig(logging_config)
 
 
+async def health(request):
+    return web.Response()
+
+
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli  # NOQA
 def init(argv):
     log_init()
     server = Server(MainRouter())
+    # TODO (artyom, 20171205): find a better place for health check
+    # as requirements evolve
+    server.app.router.add_get('/health', health)
     return server.app
 
 

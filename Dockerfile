@@ -9,10 +9,12 @@ ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 ENV PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
 #port name for connecting to smoothie over serial
 ENV OT_SMOOTHIE_ID=AMA
+ENV OT_SERVER_PORT=31950
 
 RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
     echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
-    echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile
+    echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile && \
+    echo "export OT_SMOOTHIE_ID=AMA=$OT_SMOOTHIE_ID=AMA" >> /etc/profile
 
 RUN apk add --update \
       avahi-tools \
