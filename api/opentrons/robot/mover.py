@@ -93,6 +93,9 @@ class Mover:
     def set_speed(self, value):
         self._driver.set_speed(value)
 
+    def default_speed(self):
+        self._driver.default_speed()
+
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
