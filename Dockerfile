@@ -103,5 +103,5 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 # For interactive one-off use:
 #   docker run opentrons dumb-init python -c 'while True: pass'
 # or uncomment:
-CMD ["python", "-c", "while True: pass"]
-# CMD ["bash", "-c", "setup.sh && exec start.sh"]
+# CMD ["python", "-c", "while True: pass"]
+CMD ["bash", "-c", "setup.sh && exec start.sh"]
