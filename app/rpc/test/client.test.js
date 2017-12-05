@@ -288,7 +288,6 @@ describe('rpc client', () => {
     const mockRemote = {foo: 'bar', baz: 'qux'}
 
     sendControlAndResolveRemote()
-    setTimeout(() => ws.send(notification), 10)
     RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
 
     Client(url)
@@ -298,6 +297,8 @@ describe('rpc client', () => {
           expect(message).toEqual(mockRemote)
           done()
         })
+
+        setTimeout(() => ws.send(notification), 10)
       })
   })
 
