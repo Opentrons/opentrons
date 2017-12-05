@@ -47,7 +47,10 @@ def log_init():
 
 
 async def health(request):
-    return web.Response()
+    return web.json_response(
+        headers={
+            'Access-Control-Allow-Origin': '*'
+        })
 
 
 # Support for running using aiohttp CLI.
