@@ -2,16 +2,16 @@
 
 API_PORT_NUMBER=31950
 
-radvd --nodaemon --logmethod=stderr_syslog &
+radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
 # mdns announcement
 announce_mdns.py &
 
 # serve static pages and proxy HTTP services
-nginx &
+nginx
 
 # SSH, updates, etc
-inetd -fe /etc/inetd.conf &
+inetd -e /etc/inetd.conf
 
 # Opentrons API Server
 python -m opentrons.server.main -H :: -P $API_PORT_NUMBER
