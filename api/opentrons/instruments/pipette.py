@@ -20,6 +20,8 @@ PLUNGER_POSITIONS = {
 DEFAULT_ASPIRATE_SPEED = 20
 DEFAULT_DISPENSE_SPEED = 40
 
+DEFAULT_TIP_PRESS_MM = -10
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -352,7 +354,7 @@ class Pipette:
             self.robot.poses,
             x=mm_position
         )
-        self.instrument_actuator.set_speed('default')
+        self.instrument_actuator.default_speed()
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -438,7 +440,7 @@ class Pipette:
             self.robot.poses,
             x=mm_position
         )
-        self.instrument_actuator.set_speed('default')
+        self.instrument_actuator.default_speed()
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -832,7 +834,10 @@ class Pipette:
             return self
 
         return _pick_up_tip(
-            self, location=location, presses=presses, plunge_depth=-10)
+            self,
+            location=location,
+            presses=presses,
+            plunge_depth=DEFAULT_TIP_PRESS_MM)
 
     def drop_tip(self, location=None, home_after=True):
         """
