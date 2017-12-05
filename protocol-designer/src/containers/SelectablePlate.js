@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-// import range from 'lodash/range'
 
 import SelectablePlate from '../components/SelectablePlate.js'
 import { selectors } from '../reducers'

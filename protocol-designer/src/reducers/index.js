@@ -11,7 +11,7 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 
-import { containerDims, getMaxVolumes, sortedSlotnames } from '../constants.js'
+import { containerDims, getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
 import { uuid, toWellName, wellKeyToXYList } from '../utils.js'
 
 // UTILS
@@ -278,11 +278,7 @@ const selectedIngredientProperties = createSelector(
 
 const selectedWellNames = createSelector(
   state => rootSelector(state).selectedWells.selected,
-  selectedWells => Object.values(selectedWells).map(well => {
-    const col = well[0]
-    const row = well[1]
-    return toWellName({colNum: col, rowNum: row})
-  }) // TODO factor to util
+  selectedWells => Object.values(selectedWells)
 )
 
 const numWellsSelected = createSelector(
@@ -336,47 +332,78 @@ const ingredientsForContainer = createSelector(
   }
 )
 
-const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
+const _getWellContents = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
   if (!containerType) {
+    console.warn('_getWellContents called with no containerType, skipping')
     return undefined
   }
-  const { rows, columns, wellShape, maxVolumes } = containerDims(containerType)
+  console.log('bloas', {containerType, ingredientsForContainer, selectedWells, highlightedWells}) // TODO REMOVE
+  // TODO: remove containerDims
+  // const { rows, columns, wellShape, maxVolumes } = containerDims(containerType)
 
-  return range(rows - 1, -1, -1).map(
-    rowNum => range(columns).map(
-      colNum => {
-        const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+  const defaultVolume = 1234 // TODO use defaultContainers data... is there a default volume?
 
-        // get ingred data, or set to null if the well is empty
-        const ingredData = _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null
+  const containerData = defaultContainers.containers[containerType]
+  if (!containerData) {
+    console.warn('No data for container type ' + containerType)
+    return []
+  }
+  const allLocations = containerData.locations
+  console.log({containerData, allLocations})
 
-        const isHighlighted = highlightedWells ? wellKey in highlightedWells : false
+  return reduce(allLocations, (acc, location, wellName) => {
+    // get ingred data, or set to null if the well is empty
+    const ingredData = null // _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null // TODO _ingredAtWell take wellName not rowNum colNum
+    const isHighlighted = highlightedWells ? wellName in highlightedWells : false
 
-        return {
-          wellShape,
-          preselected: selectedWells ? wellKey in selectedWells.preselected : false,
-          highlighted: isHighlighted,
-          maxVolume: maxVolumes[ingredData.wellName] || maxVolumes.default,
-          hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-          selected: selectedWells ? wellKey in selectedWells.selected : false,
-          ...ingredData // TODO later: nest this so it looks cleaner?
-        }
+    return {
+      ...acc,
+      [wellName]: {
+        preselected: selectedWells ? wellName in selectedWells.preselected : false,
+        selected: selectedWells ? wellName in selectedWells.selected : false,
+        highlighted: isHighlighted, // TODO remove 'highlighted' state?
+        maxVolume: location['total-liquid-volume'] || defaultVolume,
+        hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
+        ...ingredData // TODO don't spread, for more readability
       }
-    )
-  )
+    }
+  }, {})
+
+  // return range(rows - 1, -1, -1).map(
+  //   rowNum => range(columns).map(
+  //     colNum => {
+  //       const wellKey = colNum + ',' + rowNum // Key in selectedWells from getCollidingWells fn
+  //
+  //       // get ingred data, or set to null if the well is empty
+  //       const ingredData = _ingredAtWell(ingredientsForContainer)({rowNum, colNum}) || null
+  //
+  //       const isHighlighted = highlightedWells ? wellKey in highlightedWells : false
+  //
+  //       return {
+  //         wellShape,
+  //         preselected: selectedWells ? wellKey in selectedWells.preselected : false,
+  //         highlighted: isHighlighted,
+  //         maxVolume: maxVolumes[ingredData.wellName] || maxVolumes.default,
+  //         hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
+  //         selected: selectedWells ? wellKey in selectedWells.selected : false,
+  //         ...ingredData // TODO later: nest this so it looks cleaner?
+  //       }
+  //     }
+  //   )
+  // )
 }
 
 const allWellMatricesById = createSelector(
   allIngredients,
   state => rootSelector(state).containers,
   (allIngredients, containers, selectedWells) => reduce(containers, (acc, container, containerId) => {
-    const wellMatrix = _getWellMatrix(
+    const wellMatrix = _getWellContents(
       container.type,
       _ingredientsForContainerId(allIngredients, containerId),
       null, // selectedWells is only for the selected container, so treat as empty selection.
-      null // so ig highlightedWells
+      null // so is highlightedWells
     )
 
     return {
@@ -391,7 +418,7 @@ const wellMatrixSelectedContainer = createSelector(
   ingredientsForContainer,
   state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
   state => rootSelector(state).highlightedIngredients.wells,
-  _getWellMatrix
+  _getWellContents
 )
 
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'

@@ -1,3 +1,4 @@
+// TODO: remove. No longer used in SVG deckmap.
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'

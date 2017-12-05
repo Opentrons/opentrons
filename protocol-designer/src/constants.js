@@ -1,6 +1,8 @@
 import reduce from 'lodash/reduce'
 import defaultContainers from './default-containers.json'
 
+export { defaultContainers }
+
 export const SLOTNAME_MATRIX = [ // used for deckmap
   ['10', '11', '12'],
   ['7', '8', '9'],
