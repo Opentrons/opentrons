@@ -12,6 +12,12 @@ from opentrons.util.calibration_functions import probe_instrument
 from opentrons.cli.solve import solve
 
 
+# TODO (andy - 2017/12/05) Run deck calibration (XYZ) seperately from Probe
+#     After calibrating the Z axis and 3 points on deck, quit and restart
+#     this CLI tool before running tip-probe ('p')
+#     Without restarting, pipette collides with probe
+
+
 # Distance increments for jog
 steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
 # Index of selected step
