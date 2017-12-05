@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-API_PORT_NUMBER=31950
-
 radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
 # mdns announcement
@@ -14,4 +12,4 @@ nginx
 inetd -e /etc/inetd.conf
 
 # Opentrons API Server
-python -m opentrons.server.main -H :: -P $API_PORT_NUMBER
+python -m opentrons.server.main -H :: -P $OT_API_PORT_NUMBER
