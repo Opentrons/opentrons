@@ -4,11 +4,17 @@ import {makeActionName} from '../util'
 
 export const NAME = 'interface'
 
-export const PANELS = [
-  {name: 'upload', title: 'Upload File'},
-  {name: 'setup', title: 'Prep for Run'},
-  {name: 'connect', title: 'Connect Robot'}
-]
+export const PANEL_NAMES = ['upload', 'setup', 'connect']
+export const PANEL_PROPS_BY_NAME = {
+  upload: {title: 'Upload File'},
+  setup: {title: 'Prep for Run'},
+  connect: {title: 'Connect Robot'}
+}
+
+export const PANELS = PANEL_NAMES.map((name) => ({
+  name,
+  ...PANEL_PROPS_BY_NAME[name]
+}))
 
 const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]

@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
 import {
-  PANELS,
+  PANEL_NAMES,
+  PANEL_PROPS_BY_NAME,
   actions as interfaceActions,
   selectors as interfaceSelectors
 } from '../../interface'
@@ -25,7 +26,7 @@ const PANELS_BY_NAME = {
 }
 
 NavPanel.propTypes = {
-  panel: PropTypes.oneOf(['upload', 'connect', 'setup']).isRequired,
+  panel: PropTypes.oneOf(PANEL_NAMES).isRequired,
   isOpen: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired
 }
@@ -33,7 +34,7 @@ NavPanel.propTypes = {
 function NavPanel (props) {
   const {panel, isOpen, close} = props
   const PanelContents = PANELS_BY_NAME[panel]
-  const panelProps = PANELS.find((p) => p.name === panel) || {}
+  const panelProps = PANEL_PROPS_BY_NAME[panel]
 
   return (
     <SidePanel isOpen={isOpen} close={close} title={panelProps.title}>
