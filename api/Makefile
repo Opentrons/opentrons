@@ -32,7 +32,7 @@ dist/update.base64:
 	tar -C dist -cf /tmp/update . && \
 	echo -e "---OT UPDATE BEGIN---" > dist/update.base64 && \
 	base64 -b 50 -i /tmp/update >> dist/update.base64 && \
-  echo -e "\n---OT UPDATE END---" >> dist/update.base64
+	echo -e "\n---OT UPDATE END---" >> dist/update.base64
 
 push: dist/update.base64
 	curl -F 'data=@dist/update.base64' http://\[fd00:0:cafe:fefe::1\]/upload

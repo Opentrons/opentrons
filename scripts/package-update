@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-echo '---OT UPDATE BEGIN---' > ot2-firmware
-makeself.sh --nox11 $1 /tmp/ot2-firmware "OT-2 Firmware" ./install
-gpg -o - --sign /tmp/ot2-firmware | base64 -b 80 >> ot2-firmware
-echo '---OT UPDATE END---' >> ot2-firmware
