@@ -9,6 +9,8 @@ import {actions} from '../'
 jest.mock('bonjour')
 jest.useFakeTimers()
 
+const EXPECTED_DISCOVERY_MS = 30000
+
 // custom delay function to deal with fake timers
 const delay = (time) => {
   const wait = _delay(time)
@@ -22,6 +24,17 @@ describe('api client - discovery', () => {
   let browser
   let dispatch
   let sendToClient
+  let _oldFetch
+
+  beforeAll(() => {
+    // mock fetch
+    _oldFetch = global.fetch
+    global.fetch = jest.fn(() => Promise.resolve({ok: false}))
+  })
+
+  afterAll(() => {
+    global.fetch = _oldFetch
+  })
 
   beforeEach(() => {
     // mock mdns browser
@@ -30,6 +43,8 @@ describe('api client - discovery', () => {
 
     bonjour = {find: jest.fn(() => browser)}
     Bonjour.mockReturnValue(bonjour)
+
+    global.fetch.mockClear()
 
     dispatch = jest.fn()
     const _receive = client(dispatch)
@@ -40,6 +55,8 @@ describe('api client - discovery', () => {
     }
   })
 
+  afterEach(() => delay(EXPECTED_DISCOVERY_MS))
+
   test('searches for SSH services', () => {
     return sendToClient({}, actions.discover())
       .then(() => expect(bonjour.find).toHaveBeenCalledWith({type: 'http'}))
@@ -49,7 +66,7 @@ describe('api client - discovery', () => {
     const expectedFinish = actions.discoverFinish()
 
     return sendToClient({}, actions.discover())
-      .then(() => jest.runTimersToTime(30000))
+      .then(() => jest.runTimersToTime(EXPECTED_DISCOVERY_MS))
       .then(() => {
         expect(browser.stop).toHaveBeenCalled()
         expect(dispatch).toHaveBeenCalledWith(expectedFinish)
@@ -87,7 +104,7 @@ describe('api client - discovery', () => {
 
   test('will not dispatch ADD_DISCOVERED after discovery period', () => {
     return sendToClient({}, actions.discover())
-      .then(() => jest.runTimersToTime(30000))
+      .then(() => jest.runTimersToTime(EXPECTED_DISCOVERY_MS))
       .then(() => browser.emit('up', {
         name: 'opentrons-1',
         host: 'ot-1.local',
@@ -101,7 +118,7 @@ describe('api client - discovery', () => {
 
   test('will not dispatch REMOVE_DISCOVERED after discovery period', () => {
     return sendToClient({}, actions.discover())
-      .then(() => jest.runTimersToTime(30000))
+      .then(() => jest.runTimersToTime(EXPECTED_DISCOVERY_MS))
       .then(() => browser.emit('down', {
         name: 'opentrons-1',
         host: 'ot-1.local',
@@ -129,5 +146,42 @@ describe('api client - discovery', () => {
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
         actions.removeDiscovered('nope.local')
       ))
+  })
+
+  test('polls directly connected host every second and adds it', () => {
+    const expectedEndpoint = 'http://[fd00:0:cafe:fefe::1]:31950/health'
+    const expectedDispatch = actions.addDiscovered({
+      name: 'Opentrons USB',
+      host: '[fd00:0:cafe:fefe::1]',
+      port: 31950
+    })
+
+    global.fetch.mockReturnValue(Promise.resolve({ok: true}))
+
+    return sendToClient({}, actions.discover())
+      .then(() => delay(EXPECTED_DISCOVERY_MS))
+      .then(() => {
+        expect(global.fetch).toHaveBeenCalledTimes(30)
+        expect(global.fetch).toHaveBeenCalledWith(expectedEndpoint)
+      })
+      .then(() => expect(dispatch).toHaveBeenCalledWith(expectedDispatch))
+  })
+
+  test('does not add a direct service if fetch fails', () => {
+    global.fetch.mockReturnValue(Promise.resolve({ok: false}))
+
+    return sendToClient({}, actions.discover())
+      .then(() => delay(1000))
+      .then(() => expect(global.fetch).toHaveBeenCalled())
+      .then(() => expect(dispatch).not.toHaveBeenCalled())
+  })
+
+  test('does not add a direct service if fetch errors', () => {
+    global.fetch.mockReturnValue(Promise.reject(new Error('network error')))
+
+    return sendToClient({}, actions.discover())
+      .then(() => delay(1000))
+      .then(() => expect(global.fetch).toHaveBeenCalled())
+      .then(() => expect(dispatch).not.toHaveBeenCalled())
   })
 })
