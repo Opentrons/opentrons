@@ -28,7 +28,7 @@ RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
 
 COPY ./api /tmp/api
-COPY ./compute/alpine/avahi_tools /tmp/avahi_tools
+COPY ./compute/avahi_tools /tmp/avahi_tools
 RUN pip install /tmp/api && \
     pip install /tmp/avahi_tools && \
     rm -rf /tmp/api && \
@@ -38,16 +38,20 @@ RUN pip install /tmp/api && \
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY ./compute/alpine/opentrons.asc .
+COPY ./compute/opentrons.asc .
 RUN gpg --import opentrons.asc && rm opentrons.asc
 
-COPY ./compute/alpine/scripts/* /usr/local/bin/
 COPY ./compute/scripts/* /usr/local/bin/
 
-COPY ./compute/alpine/conf/inetd.conf /etc/inetd.conf
+COPY ./compute/conf/inetd.conf /etc/inetd.conf
 
-COPY ./compute/alpine/conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./compute/alpine/static /usr/share/nginx/html
+COPY ./compute/conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./compute/static /usr/share/nginx/html
+
+# Install mdns service that would advertise on eth0 only (USB)
+RUN rm /etc/avahi/services/*
+COPY ./compute/conf/api.service /etc/avahi/services/
+COPY ./compute/conf/avahi-daemon.conf /etc/avahi/
 
 # All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages
