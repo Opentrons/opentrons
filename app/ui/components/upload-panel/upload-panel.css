@@ -1,0 +1,45 @@
+/* TODO:(ka 11-28-17) revisit svg icon buttons styles after component standardization */
+.btn_upload {
+  display: inline-block;
+  width: 16rem;
+  height: 2.5rem;
+  margin: 1rem;
+  line-height: 2.5rem;
+  padding-left: 2rem;
+  text-align: left;
+  background-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: 0.5rem center;
+  background-color: #999;
+  color: white;
+  background-image: url(../../img/icon_fileupload.png);
+}
+
+.file {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}
+
+.file_drop {
+  display: block;
+  width: 16rem;
+  margin: 0 1rem;
+  padding: 10rem 1rem 1rem;
+  background-color: transparent;
+  background-image: url(../../img/icon_filedrop.svg);
+  background-size: 4rem;
+  background-repeat: no-repeat;
+  background-position: center 2rem;
+  border: 2px dashed silver;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: silver;
+  text-align: center;
+}
+
+.upload_warning {
+  margin: 1rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: black;
+}
