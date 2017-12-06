@@ -40,4 +40,7 @@
 
 .panel_contents {
   width: width;
+  height: calc(100vh - 2.625rem);
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
