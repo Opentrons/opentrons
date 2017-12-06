@@ -153,3 +153,31 @@ def test_pause_resume(model):
     coords = pose_tracker.absolute(robot.poses, pipette)
     expected_coords = (100, 0, 0)
     assert isclose(coords, expected_coords).all()
+
+
+def test_speed_change(model, monkeypatch):
+
+    pipette = model.instrument._instrument
+    robot = model.robot
+    robot._driver.simulating = False
+
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    command_log = []
+
+    def write_with_log(command, connection, timeout):
+        if 'G0F' in command:
+            command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+
+    pipette.tip_attached = True
+    pipette.aspirate().dispense()
+    expected = [
+        ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
+        ['G0F9000 M400'],
+        ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
+        ['G0F9000 M400']
+    ]
+    fuzzy_assert(result=command_log, expected=expected)
