@@ -423,20 +423,12 @@ textarea {
 
 /* shows container name on deck */
 .name_overlay {
-  /* TODO */
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 2rem;
-  background-color: overlayColor;
-  color: white;
-  text-align: left;
-  padding: 0.2rem;
-  z-index: 10;
+  font-size: 0.75rem;
+  fill: white;
 }
 
 .name_overlay .container_name {
-  font-size: 2rem;
+  font-size: 1rem;
 }
 
 .deck_slot:hover .name_overlay {

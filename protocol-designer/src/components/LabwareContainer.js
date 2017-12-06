@@ -65,6 +65,10 @@ function OccupiedDeckSlotOverlay ({
 }
 
 function SlotWithContainer ({containerType, containerName, containerId}) {
+  // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
+  const paddingLeft = 5
+  const paddingTop = 0
+  const boxHeight = 30
   return (
     <g>
       {nonFillableContainers.includes(containerType)
@@ -76,9 +80,13 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
       {containerName && <g className={styles.name_overlay}>
-        <rect x='0' y='0' height='50%' width='100%' fill='rgba(0,0,0,0.8)' />
-        <text fill='white' x='0' y='25%'>{humanize(containerType)}</text>
-        <text fill='white' x='0' y='50%' className={styles.container_name}>{containerName}</text>
+        <rect x='0' y='0' height={boxHeight} width='100%' fill='rgba(0,0,0,0.8)' />
+        <text x={paddingLeft} y={0.4 * boxHeight + paddingTop}>
+          {humanize(containerType)}
+        </text>
+        <text x={paddingLeft} y={0.9 * boxHeight + paddingTop} className={styles.container_name}>
+          {containerName}
+        </text>
       </g>}
     </g>
   )
