@@ -1,4 +1,4 @@
-@value blue from '../App.global.css';
+@value blue, grey, dark_grey from '../App.global.css';
 @value border from '../side-panel/side-panel.css';
 
 .robot_list {
@@ -58,16 +58,28 @@
   text-align: center;
 }
 
-/*
- * TODO(mc, 2017-11-13): button.scan_button because of global .btn and the fact
- * that scan_button is a text button instead of SVG. Remove when able
-*/
-.scan_button,
-button.scan_button {
+.scan_button {
   display: block;
   width: 5rem;
   height: auto;
   font-size: 5rem;
   line-height: 1;
   margin: 0.5rem auto;
+}
+
+.refresh {
+  color: dark_grey;
+}
+
+.refresh:hover {
+  color: #888;
+}
+
+.title_button {
+  position: absolute;
+  right: 2rem;
+  top: -3.25rem;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
 }

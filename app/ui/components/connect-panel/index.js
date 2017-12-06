@@ -6,6 +6,7 @@ import {
   actions as robotActions
 } from '../../robot'
 
+import ScanButton from './ScanButton'
 import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
@@ -15,6 +16,7 @@ export default connect(mapStateToProps, null, mergeProps)(ConnectPanel)
 function ConnectPanel (props) {
   return (
     <div>
+      <ScanButton {...props} titleBtn />
       <RobotList>
         {props.robots.map((robot) => (
           <RobotItem key={robot.name} {...robot} />

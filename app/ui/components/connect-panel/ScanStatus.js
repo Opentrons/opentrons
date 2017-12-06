@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import Button from '../Button'
 import {Spinner} from '../icons'
+import ScanButton from './ScanButton'
+
 import styles from './connect-panel.css'
 
 ScanStatus.propTypes = {
@@ -20,28 +20,14 @@ export default function ScanStatus (props) {
       <p>Connect a robot via USB and click the scan button</p>
     </div>
   )
+  const scanBtn = !isScanning
+    ? <ScanButton {...props} />
+    : <Spinner className={styles.scan_button} />
 
   return (
     <div className={styles.scan_status}>
       {notFoundMessage}
-      <ScanButton {...props} />
+      {scanBtn}
     </div>
-  )
-}
-
-function ScanButton (props) {
-  const {isScanning, onScanClick} = props
-
-  if (isScanning) return (<Spinner className={styles.scan_button} />)
-
-  // TODO(mc, 2017-11-13): use a proper SVG icon
-  return (
-    <Button
-      style={styles.scan_button}
-      onClick={onScanClick}
-      title='Scan for robots'
-    >
-      &#x21ba;
-    </Button>
   )
 }
