@@ -25,6 +25,8 @@ HOMED_POSITION = {
 }
 
 PLUNGER_BACKLASH_MM = 0.3
+LOW_POWER_Z_SPEED = 30
+POWER_CHANGE_DELAY = 0.05
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
@@ -42,6 +44,8 @@ GCODES = {'HOME': 'G28.2',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
+          'PUSH_SPEED': 'M120',
+          'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
           'SET_CURRENT': 'M907'}
 
@@ -54,7 +58,9 @@ def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.split(' ')
     parsed_values = parsed_values[2:]
     return {
-        s.split(':')[0].upper(): float(s.split(':')[1])
+        s.split(':')[0].upper(): round(
+            float(s.split(':')[1]),
+            GCODE_ROUNDING_PRECISION)
         for s in parsed_values
     }
 
@@ -148,9 +154,17 @@ class SmoothieDriver_3_0_0:
         pass
 
     def set_speed(self, value):
-        ''' set total movement speed in mm/second'''
+        ''' set total axes movement speed in mm/second'''
         speed = value * SEC_PER_MIN
         command = GCODES['SET_SPEED'] + str(speed)
+        self._send_command(command)
+
+    def default_speed(self):
+        ''' set total axes movement speed in mm/second back to default'''
+        # POP will always return speed to the default robot_config speed
+        command = GCODES['POP_SPEED']
+        # PUSH to save the current speed as default (from robot_config)
+        command += ' ' + GCODES['PUSH_SPEED']
         self._send_command(command)
 
     def set_power(self, settings):
@@ -167,7 +181,7 @@ class SmoothieDriver_3_0_0:
             ' '.join(values)
         )
         self._send_command(command)
-        self.delay(0.05)
+        self.delay(POWER_CHANGE_DELAY)
 
     # ----------- Private functions --------------- #
 
@@ -205,6 +219,10 @@ class SmoothieDriver_3_0_0:
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
+            if ret_code and 'alarm' in ret_code.lower():
+                self._reset_from_error()
+                raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
+
             if moving_plunger:
                 self.set_power({axis: self._config.plunger_current_low
                                for axis in 'BC'})
@@ -218,6 +236,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.max_speeds)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
+        self.update_position(default=HOMED_POSITION)
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
@@ -230,7 +249,7 @@ class SmoothieDriver_3_0_0:
             return not (
                 (axis in DISABLE_AXES) or
                 (coords is None) or
-                isclose(coords, self._position[axis])
+                isclose(coords, self.position[axis])
             )
 
         def create_coords_list(coords_dict):
@@ -244,7 +263,7 @@ class SmoothieDriver_3_0_0:
         backlash_target.update({
             axis: value + PLUNGER_BACKLASH_MM
             for axis, value in sorted(target.items())
-            if axis in 'BC' and self._position[axis] < value
+            if axis in 'BC' and self.position[axis] < value
         })
 
         target_coords = create_coords_list(target)
@@ -259,6 +278,7 @@ class SmoothieDriver_3_0_0:
             new_power = {axis: 0.1
                          for axis in low_power_axes}
             self.set_power(new_power)
+            self.set_speed(LOW_POWER_Z_SPEED)
 
         if target_coords:
             command = ''
@@ -270,6 +290,7 @@ class SmoothieDriver_3_0_0:
 
         if low_power_z:
             self.set_power(prior_power)
+            self.default_speed()
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
@@ -304,17 +325,33 @@ class SmoothieDriver_3_0_0:
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
 
-        position = HOMED_POSITION
-
         # Only update axes that have been selected for homing
         homed = {
-            ax: position[ax]
+            ax: HOMED_POSITION.get(ax)
             for ax in ''.join(home_sequence)
         }
 
         self.update_position(default=homed)
 
         return homed
+
+    def fast_home(self, axis, safety_margin):
+        ''' home after a controlled motor stall
+
+        Given a known distance we have just stalled along an axis, move
+        that distance away from the homing switch. Then finish with home.
+        '''
+        # move some mm distance away from the target axes endstop switch(es)
+        self.default_speed()
+        destination = {
+            ax: HOMED_POSITION.get(ax) - abs(safety_margin)
+            for ax in axis.upper()
+        }
+        self.move(destination)
+
+        # then home once we're closer to the endstop(s)
+        disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
+        return self.home(axis=axis, disabled=disabled)
 
     def pause(self):
         self.run_flag.clear()
@@ -335,8 +372,8 @@ class SmoothieDriver_3_0_0:
         if axis.upper() in AXES:
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
-            self.update_position(self._position)
-            return self._position
+            self.update_position(self.position)
+            return self.position
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 

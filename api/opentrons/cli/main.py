@@ -9,9 +9,14 @@ from numpy import dot, array, insert
 from opentrons import robot, instruments
 from opentrons.robot import robot_configs
 from opentrons.util.calibration_functions import probe_instrument
-from opentrons.solve import solve
+from opentrons.cli.solve import solve
 
-pipette = instruments.Pipette(mount='right')
+
+# TODO (andy - 2017/12/05) Run deck calibration (XYZ) seperately from Probe
+#     After calibrating the Z axis and 3 points on deck, quit and restart
+#     this CLI tool before running tip-probe ('p')
+#     Without restarting, pipette collides with probe
+
 
 # Distance increments for jog
 steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
@@ -33,7 +38,7 @@ current_position = (0, 0, 0)
 TIP_LENGTH = 51.7
 
 # Reference point being calibrated
-point_number = 0
+point_number = -1
 
 # (0, 0) is in bottom-left corner
 # Expected reference points
@@ -60,10 +65,6 @@ test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
 T = robot.config.gantry_calibration
 XY = None
 
-# 3rd row, 4th column corresponds to Z-shift in
-# heterogeneous 4x4 matrix T
-Z_OFFSET = T[2][3]
-
 
 # Add fixed Z offset which is known so we don't have to calibrate for height
 # during calibration process
@@ -71,7 +72,7 @@ def add_z(XY):
     return insert(
         insert(XY, 2, [0, 0, 0], axis=1),
         2,
-        [0, 0, 1, Z_OFFSET],
+        [0, 0, 1, T[2][3]],
         axis=0)
 
 
@@ -166,30 +167,45 @@ def key_pressed(key):
         status('skipped #{0}'.format(point_number))
     # run tip probe
     elif key == 'p':
-        probe_center = probe_instrument(pipette, robot)
+
+        robot.reset()
+
+        pipette = instruments.Pipette(mount='right', channels=1)
+        probe_center = tuple(probe_instrument(
+            pipette, robot, tip_length=TIP_LENGTH))
         robot.config = robot.config._replace(
             probe_center=probe_center
         )
         status('Tip probe')
     # save calibration point and move to next
     elif key == 'enter':
-        actual[point_number] = position()[:-1]
-        if (point_number < len(actual) - 1):
+        if point_number >= len(actual):
+            return
+
+        if point_number < 0:
+            actual_z = position()[-1]
+            expected_z = T[2][3] + TIP_LENGTH
+            T[2][3] += actual_z - expected_z
             point_number += 1
+            status('saved Z-Offset: {0}'.format(T[2][3]))
+            return
+
+        actual[point_number] = position()[:-1]
+        point_number += 1
+        status('saved #{0}: {1}'.format(point_number, actual[point_number-1]))
 
         # On last point update gantry calibration
-        if point_number == 3:
+        if point_number == len(actual):
             XY = solve(expected, actual)
             T = add_z(XY)
             robot.config = robot.config._replace(
-                    gantry_calibration=T,
+                    gantry_calibration=list(map(lambda i: list(i), T)),
                 )
-            robot.reset()
+            status(str(robot.config))
 
-        status('saved #{0}: {1}'.format(point_number, actual[point_number]))
     # move to previous calibration point
     elif key == 'backspace':
-        if (point_number > 0):
+        if point_number > 0:
             point_number -= 1
         status('')
     # home

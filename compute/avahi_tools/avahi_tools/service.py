@@ -3,12 +3,10 @@
 
 import dbus
 from time import sleep
+from avahi_tools.server import AvahiServer
 
-from .server import AvahiServer
 
 class AvahiService:
-
-
     def __init__(self, service_name, service_type, port, txt=[], keep_alive=False):
         """Announce a service over Avahi through dbus
 

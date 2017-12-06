@@ -56,7 +56,6 @@ export default function ConnectPanel (props) {
 
   return (
     <div className={styles.connect_panel}>
-      <h1>Connect to a Robot</h1>
       <button className={styles.refresh_icon} onClick={onScanClick}>
         &#x21ba;
       </button>

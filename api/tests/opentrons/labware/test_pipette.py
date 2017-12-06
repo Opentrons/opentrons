@@ -1467,8 +1467,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
 
         assert self.p200.move_to.mock_calls == \
-            self.build_move_to_bottom(self.tiprack1[0]) + \
-            self.build_move_to_bottom(self.tiprack1[1])
+            self.build_pick_up_tip(self.tiprack1[0]) + \
+            self.build_pick_up_tip(self.tiprack1[1])
 
     def test_simulate_plunger_while_enqueing(self):
 
@@ -1536,9 +1536,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_move_to_bottom(self.tiprack1[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_move_to_bottom(self.tiprack2[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack2[i]))
 
         # from pprint import pprint
         # print('Mock calls')
@@ -1591,9 +1591,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_move_to_bottom(self.tiprack1.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack1.rows[i]))
         for i in range(0, 12):
-            expected.extend(self.build_move_to_bottom(self.tiprack2.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack2.rows[i]))
 
         # print('Mock calls')
         # pprint(p200_multi.move_to.mock_calls)
@@ -1630,14 +1630,16 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(self.p200.drop_tip.mock_calls, expected)
 
-    def build_move_to_bottom(self, well):
-        plunge = -7
+    def build_pick_up_tip(self, well):
+        plunge = -10
         return [
             mock.call(well.top(), strategy='arc'),
-            mock.call(well.top(plunge), strategy='direct'),
-            mock.call(well.top(), low_power_z=False, strategy='direct'),
-            mock.call(well.top(plunge), strategy='direct'),
-            mock.call(well.top(), low_power_z=False, strategy='direct')
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(), strategy='direct'),
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(), strategy='direct'),
+            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(), strategy='direct')
         ]
 
     def test_drop_tip_to_trash(self):

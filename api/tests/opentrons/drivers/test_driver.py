@@ -33,23 +33,23 @@ def test_plunger_commands(smoothie, monkeypatch):
         'A': 3,
         'B': 4,
         'C': 5})
-    fuzzy_assert(
-        result=command_log,
-        expected=[
-            ['M907 B0.5 C0.5 M400'],              # Set plunger current high
-            ['G4P0.05 M400'],                     # Dwell
-            ['G28.2[ABCZ]+ G28.2X G28.2Y M400'],  # Home
-            ['M907 B0.1 C0.1 M400'],              # Set plunger current low
-            ['G4P0.05 M400'],                     # Dwell
-            ['M114.2 M400'],                      # Get position
-            ['G0.+ M400'],                        # Move (non-plunger)
-            ['M907 B0.5 C0.5 M400'],              # Set plunger current high
-            ['G4P0.05 M400'],                     # Dwell
-            ['G0.+[BC].+ M400'],                  # Move (including BC)
-            ['M907 B0.1 C0.1 M400'],              # Set plunger current low
-            ['G4P0.05 M400']                      # Dwell
-        ]
-    )
+    expected = [
+        ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+        ['G4P0.05 M400'],                      # Dwell
+        ['G28.2[ABCZ]+ G28.2X G28.2Y M400'],  # Home
+        ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+        ['G4P0.05 M400'],                      # Dwell
+        ['M114.2 M400'],                      # Get position
+        ['G0.+ M400'],                        # Move (non-plunger)
+        ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+        ['G4P0.05 M400'],                      # Dwell
+        ['G0.+[BC].+ M400'],                  # Move (including BC)
+        ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+        ['G4P0.05 M400']                       # Dwell
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
 
 
 def test_functional(smoothie):
@@ -99,6 +99,27 @@ def test_low_power_z(model):
 
     driver.move({'A': 10}, low_power_z=True)
     assert power == [{'A': 0.1}, DEFAULT_POWER]
+
+
+def test_fast_home(model):
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
+    import types
+    driver = model.robot._driver
+
+    move = driver.move
+    coords = []
+
+    def move_mock(self, target):
+        nonlocal coords
+        coords.append(target)
+        move(target)
+
+    driver.move = types.MethodType(move_mock, driver)
+
+    assert coords == []
+    driver.fast_home(axis='X', safety_margin=12)
+    assert coords == [{'X': HOMED_POSITION['X'] - 12}]
+    assert driver.position['X'] == HOMED_POSITION['X']
 
 
 def test_pause_resume(model):

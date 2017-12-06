@@ -56,26 +56,26 @@ robot_config = namedtuple(
 default = robot_config(
     name='Ada Lovelace',
     steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
-    max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
-    acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
+    max_speeds='M203.1 X300 Y200 Z90 A90 B40 C40',
+    acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
     current='M907 ' + DEFAULT_POWER_STRING,
     probe_center=(295.0, 300.0, 55.0),
     probe_dimensions=(35.0, 40.0, 60.0),
-    gantry_calibration=[
+    gantry_calibration=[  # "safe" offset, overwrote in factory calibration
         [ 1.00, 0.00, 0.00,  -27.0],
-        [ 0.00, 1.00, 0.00,   -7.5],
-        [ 0.00, 0.00, 1.00,  -22.3],
+        [ 0.00, 1.00, 0.00,   -10],
+        [ 0.00, 0.00, 1.00,  -10],
         [ 0.00, 0.00, 0.00,   1.00]
     ],
     # left relative to right
     instrument_offset={
         'right': {
-            'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, 31.6, -27.5)
+            'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+            'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
         },
         'left': {
-            'single': (-31.8, 0.0, 0.0),
-            'multi': (-31.8,  31.6, -27.5)
+            'single': (-34, 0.0, 0.0),        # numbers are from CAD
+            'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
         }
     },
     tip_length={

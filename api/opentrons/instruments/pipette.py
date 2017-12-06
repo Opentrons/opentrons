@@ -17,6 +17,11 @@ PLUNGER_POSITIONS = {
     'drop_tip': -7
 }
 
+DEFAULT_ASPIRATE_SPEED = 20
+DEFAULT_DISPENSE_SPEED = 40
+
+DEFAULT_TIP_PRESS_MM = -10
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -100,8 +105,8 @@ class Pipette:
             ul_per_mm=18.51,
             trash_container=None,
             tip_racks=[],
-            aspirate_speed=300,
-            dispense_speed=500):
+            aspirate_speed=DEFAULT_ASPIRATE_SPEED,
+            dispense_speed=DEFAULT_DISPENSE_SPEED):
 
         self.robot = robot
         self.mount = mount
@@ -349,6 +354,7 @@ class Pipette:
             self.robot.poses,
             x=mm_position
         )
+        self.instrument_actuator.default_speed()
         self.current_volume += volume  # update after actual aspirate
         return self
 
@@ -432,7 +438,9 @@ class Pipette:
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=mm_position)
+            x=mm_position
+        )
+        self.instrument_actuator.default_speed()
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -736,7 +744,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, low_power_z=False):
+    def pick_up_tip(self, location=None, presses=3, low_power_z=True):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -794,9 +802,6 @@ class Pipette:
             placeable, _ = unpack_location(location)
             self.current_tip(placeable)
 
-        if isinstance(location, Placeable):
-            location = location.bottom()
-
         presses = (1 if not helpers.is_number(presses) else presses)
 
         @commands.publish.both(command=commands.pick_up_tip)
@@ -809,24 +814,30 @@ class Pipette:
             self.current_volume = 0
             self.move_to(self.current_tip().top(0), strategy='arc')
 
-            for i in range(int(presses) - 1):
+            for i in range(int(presses)):
+                # move nozzle down into the tip
                 self.move_to(
                     self.current_tip().top(plunge_depth),
-                    strategy='direct')
-                # add power setting here
-                self.move_to(
-                    self.current_tip().top(0),
                     strategy='direct',
                     low_power_z=low_power_z)
+                # move nozzle back up
+                self.move_to(
+                    self.current_tip().top(0),
+                    strategy='direct')
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            stall_distance = abs(plunge_depth)
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, safety_margin=stall_distance)
 
             return self
 
         return _pick_up_tip(
-            self, location=location, presses=presses, plunge_depth=-7)
+            self,
+            location=location,
+            presses=presses,
+            plunge_depth=DEFAULT_TIP_PRESS_MM)
 
     def drop_tip(self, location=None, home_after=True):
         """
@@ -884,16 +895,24 @@ class Pipette:
 
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
-                x=self._get_plunger_position('drop_tip'))
-            if home_after:
-                self.robot.poses = self.instrument_actuator.home(
-                    self.robot.poses
-                )
-
-            self.robot.poses = self.instrument_actuator.move(
-                self.robot.poses,
                 x=self._get_plunger_position('bottom')
             )
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=self._get_plunger_position('drop_tip')
+            )
+
+            b = self._get_plunger_position('bottom')
+            d = self._get_plunger_position('drop_tip')
+            stall_distance = abs(b - d)
+            if home_after:
+                self.robot.poses = self.instrument_actuator.fast_home(
+                    self.robot.poses, safety_margin=stall_distance)
+
+                self.robot.poses = self.instrument_actuator.move(
+                    self.robot.poses,
+                    x=self._get_plunger_position('bottom')
+                )
 
             self.current_volume = 0
             self.current_tip(None)
@@ -927,7 +946,8 @@ class Pipette:
         @commands.publish.both(command=commands.home)
         def _home(mount):
             self.current_volume = 0
-            self.robot.poses = self.instrument_actuator.home(self.robot.poses)
+            self.robot.poses = self.instrument_actuator.home(
+                self.robot.poses)
             # TODO(artyom, 20171103): confirm expected behavior on pipette.home
             # Are we homing stage and plunger or plunger only?
             # self.robot.poses = self.instrument_mover.home(self.robot.poses)

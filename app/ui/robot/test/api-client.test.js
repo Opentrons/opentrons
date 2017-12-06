@@ -365,8 +365,6 @@ describe('api client', () => {
         .then(() => {
           expect(calibrationManager.pick_up_tip)
             .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
-          expect(calibrationManager.home)
-            .toHaveBeenCalledWith({_id: 'inst-2'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -376,19 +374,6 @@ describe('api client', () => {
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
       calibrationManager.pick_up_tip
-        .mockReturnValue(Promise.reject(new Error('AH')))
-
-      return sendConnect()
-        .then(() => sendToClient(state, action))
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
-    })
-
-    test('handles PICKUP_AND_HOME failure during home', () => {
-      const action = actions.pickupAndHome('left', 5)
-      const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
-
-      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
-      calibrationManager.home
         .mockReturnValue(Promise.reject(new Error('AH')))
 
       return sendConnect()

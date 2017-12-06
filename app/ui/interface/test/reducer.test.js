@@ -8,7 +8,7 @@ describe('interface reducer', () => {
 
     expect(state).toEqual({
       isPanelOpen: false,
-      currentPanel: ''
+      currentPanel: 'connect'
     })
   })
 

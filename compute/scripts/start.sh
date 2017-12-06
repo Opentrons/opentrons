@@ -1,10 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
-echo "[BOOT] Starting server"
-cd /usr/src/api
-python /usr/src/api/opentrons/server/main.py '0.0.0.0':31950 &
+# mdns announcement
+announce_mdns.py &
 
-echo "[BOOT] Advertising local service"
-python /usr/src/compute/scripts/announce_mdns.py
+# serve static pages and proxy HTTP services
+nginx
+
+# SSH, updates, etc
+inetd -e /etc/inetd.conf
+
+# Opentrons API Server
+python -m opentrons.server.main -H :: -P $OT_API_PORT_NUMBER
