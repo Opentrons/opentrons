@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import {Spinner} from '../icons'
 import ScanButton from './ScanButton'
 
@@ -31,3 +32,5 @@ export default function ScanStatus (props) {
     </div>
   )
 }
+
+
