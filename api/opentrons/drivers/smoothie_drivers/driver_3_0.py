@@ -157,14 +157,13 @@ class SmoothieDriver_3_0_0:
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
-        speed = value * SEC_PER_MIN
+        speed = int(value * SEC_PER_MIN)
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
     def default_speed(self):
         ''' set total axes movement speed in mm/second back to default'''
-        command = GCODES['SET_SPEED'] + ' ' + str(DEFAULT_AXES_SPEED)
-        self._send_command(command)
+        self.set_speed(DEFAULT_AXES_SPEED)
 
     def set_power(self, settings):
         ''' set total movement speed in mm/second
