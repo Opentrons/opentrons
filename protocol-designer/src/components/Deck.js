@@ -1,17 +1,16 @@
 import React from 'react'
-
 import { SLOTNAME_MATRIX, DECK_WIDTH, DECK_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT, SLOT_SPACING } from '../constants.js'
-// import styles from '../css/style.css'
 
+import styles from './Deck.css'
 import LabwareContainer from '../containers/LabwareContainer.js'
 
 export default function Deck (props) {
   return (
-    // <div className={styles.deck}>
     // TODO css not inline style on svg
-    <svg viewBox={`0 0 ${DECK_WIDTH} ${DECK_HEIGHT}`} style={{maxHeight: '90vh'}}>
-      {/* Deck rect */}
-      <rect x='0' y='0' width='100%' height='100%' fill='transparent' stroke='black' />
+    <svg viewBox={`0 0 ${DECK_WIDTH} ${DECK_HEIGHT}`} className={styles.deck}>
+
+      {/* Deck outline rect */}
+      <rect x='0' y='0' className={styles.deck_outline} />
 
       {/* All containers */}
       {SLOTNAME_MATRIX.reduce((acc, slotRow, row) => {
@@ -30,6 +29,5 @@ export default function Deck (props) {
       }, [])}
 
     </svg>
-    // {/* </div> */}
   )
 }

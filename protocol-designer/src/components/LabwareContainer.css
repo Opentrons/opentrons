@@ -47,3 +47,19 @@
 .pass_thru_mouse {
   pointer-events: none;
 }
+
+/* ----------- */
+
+/* shows container name on deck */
+.name_overlay {
+  font-size: 0.75rem;
+  fill: white;
+}
+
+.name_overlay .container_name {
+  font-size: 1rem;
+}
+
+.deck_slot:hover .name_overlay {
+  display: none;
+}

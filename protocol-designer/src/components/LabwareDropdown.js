@@ -1,6 +1,6 @@
 import React from 'react'
+import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
-import styles from '../css/style.css'
 
 function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
   return (
@@ -31,7 +31,7 @@ export default function LabwareDropdown ({onClose, onContainerChoose, slotName})
   return (
     <div className={styles.labware_dropdown}>
       <label>Add Labware to Slot {slotName}</label>
-      <div className='close' onClick={onClose}>X</div>
+      <div className={styles.close} onClick={onClose}>X</div>
       <ul>
         <Accordion title='Tip Rack'>
           {[

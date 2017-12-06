@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import styles from '../css/style.css'
-import componentStyles from './LabwareContainer.css'
+import styles from './LabwareContainer.css'
 import { nonFillableContainers } from '../constants.js'
 import { humanize } from '../utils.js'
 
@@ -38,21 +37,21 @@ function OccupiedDeckSlotOverlay ({
   deleteContainer
 }) {
   return (
-    <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
+    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       {/* Overlay Background */}
-      <rect x='0' y='0' className={componentStyles.slot_overlay} />
+      <rect x='0' y='0' className={styles.slot_overlay} />
       {canAddIngreds && // TODO add back canAddIngreds conditional
-        <text x='0' y='25%' className={componentStyles.clickable}
+        <text x='0' y='25%' className={styles.clickable}
           onClick={() => openIngredientSelector({containerId, slotName, containerType})}
           >
             Add Ingredients
           </text>
       }
 
-      <text x='0' y='50%' className={componentStyles.clickable}
+      <text x='0' y='50%' className={styles.clickable}
         onClick={() => setCopyLabwareMode(containerId)}>Copy Labware</text>
 
-      <text x='0' y='75%' className={componentStyles.clickable}
+      <text x='0' y='75%' className={styles.clickable}
         onClick={() =>
             window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
             deleteContainer({containerId, slotName, containerType})
@@ -129,7 +128,7 @@ export default function LabwareContainer ({
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
         // Empty slot
-        : <g className={componentStyles.empty_slot}>
+        : <g className={styles.empty_slot}>
           <rect width='100%' height='100%' />
           <CenteredTextSvg text={slotName} />
         </g>}
@@ -142,13 +141,13 @@ export default function LabwareContainer ({
             /> */
         : (labwareToCopy
             // Mouseover empty slot -- Add (or Copy if in copy mode)
-            ? <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
+            ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
               <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
-              <CenteredTextSvg className={componentStyles.pass_thru_mouse} text='Place Copy' />
+              <CenteredTextSvg className={styles.pass_thru_mouse} text='Place Copy' />
             </g>
-            : <g className={cx(componentStyles.slot_overlay, componentStyles.appear_on_mouseover)}>
+            : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
               <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
-              <CenteredTextSvg className={componentStyles.pass_thru_mouse} text='Add Labware' />
+              <CenteredTextSvg className={styles.pass_thru_mouse} text='Add Labware' />
             </g>
         )
       )}

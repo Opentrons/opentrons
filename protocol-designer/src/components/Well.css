@@ -1,4 +1,4 @@
-@value colors: './Util.css';
+@value colors: '../css/colors.css';
 @value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
 
 .well {

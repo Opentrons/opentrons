@@ -1,6 +1,6 @@
 import React from 'react'
 import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
-import styles from '../css/style.css'
+import styles from './IngredientSelectionModal.css'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientsList from '../containers/IngredientsList.js'

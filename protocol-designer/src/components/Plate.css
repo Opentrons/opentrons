@@ -1,5 +1,5 @@
-@value colors: './Util.css';
-@value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
+@value colors: "./colors.css";
+@value * from colors;
 @value labelColor: gray;
 @value rowLabelWidth: 1.5rem;
 

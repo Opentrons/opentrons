@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import style from './SelectionRect.css'
+import styles from './SelectionRect.css'
 
 class SelectionRect extends React.Component {
   static propTypes = {
@@ -41,13 +41,13 @@ class SelectionRect extends React.Component {
         y={(top - clientRect.top) * yScale}
         width={width * xScale}
         height={height * yScale}
-        className={style.selection_rect}
+        className={styles.selection_rect}
       />
     }
 
     return <div
-      className={style.selection_rect}
-      style={{
+      className={styles.selection_rect}
+      styles={{
         left: left + 'px',
         top: top + 'px',
         width: width + 'px',
