@@ -28,6 +28,8 @@ PLUNGER_BACKLASH_MM = 0.3
 LOW_POWER_Z_SPEED = 30
 POWER_CHANGE_DELAY = 0.05
 
+DEFAULT_AXES_SPEED = 150
+
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
@@ -161,10 +163,7 @@ class SmoothieDriver_3_0_0:
 
     def default_speed(self):
         ''' set total axes movement speed in mm/second back to default'''
-        # POP will always return speed to the default robot_config speed
-        command = GCODES['POP_SPEED']
-        # PUSH to save the current speed as default (from robot_config)
-        command += ' ' + GCODES['PUSH_SPEED']
+        command = GCODES['SET_SPEED'] + ' ' + str(DEFAULT_AXES_SPEED)
         self._send_command(command)
 
     def set_power(self, settings):
@@ -237,6 +236,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)
+        self.default_speed()
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
