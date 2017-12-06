@@ -38,6 +38,10 @@
   cursor: pointer;
 }
 
+/*
+TODO (ka 2017-12-6) bring back overflow hidden once
+title refresh button design confirmed
+*/
 .panel_contents {
   width: width;
   height: calc(100vh - 2.625rem);
