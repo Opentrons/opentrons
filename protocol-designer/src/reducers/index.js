@@ -7,12 +7,12 @@ import get from 'lodash/get'
 import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
-// import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
+import uniq from 'lodash/uniq'
 
 import { getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
-import { uuid, toWellName, wellKeyToXYList } from '../utils.js'
+import { uuid, wellKeyToXYList } from '../utils.js'
 
 // UTILS
 const nextEmptySlot = loadedContainersSubstate => {
@@ -74,7 +74,7 @@ export const containers = handleActions({
   'default-trash': {
     type: 'trash-box',
     name: 'Trash',
-    slotName: 'E3'
+    slotName: '12'
   }
 })
 
@@ -105,7 +105,7 @@ const highlightedIngredients = handleActions({
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
     const editableIngredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize']
-    const { groupId, containerId } = action.payload
+    const { groupId, containerId, copyGroupId } = action.payload
     if (!isNil(groupId)) {
       // GroupId was given, edit existing ingredient
       return set(
@@ -119,16 +119,40 @@ export const ingredients = handleActions({
       )
     }
     // No groupId, create new ingredient groupId by adding 1 to the highest ID
-    // TODO: use uuid
+    // TODO: use uuid, use an array of uuids to give order to ingreds.
     const newGroupId = Object.keys(state).length === 0
       ? 0
       : Math.max(...Object.keys(state).map(key => parseInt(key))) + 1
 
+    const isUnchangedClone = state[copyGroupId] && editableIngredFields.every(field =>
+        state[copyGroupId][field] === action.payload[field])
+
+    if (isUnchangedClone) {
+      // for an unchanged clone, just add the new wells.
+      // TODO: make this more concise
+      return {
+        ...state,
+        [copyGroupId]: {
+          ...state[copyGroupId],
+          locations: {
+            ...state[copyGroupId].locations,
+            [containerId]: state[copyGroupId].locations[containerId]
+              ? uniq(state[copyGroupId].locations[containerId].concat(action.payload.wells))
+              : action.payload.wells
+          }
+        }
+      }
+    }
+
+    // otherwise, create a new ingredient group
     return {
       ...state,
       [newGroupId]: {
         ...pick(action.payload, editableIngredFields),
-        locations: { [containerId]: action.payload.wells }
+        locations: { [containerId]: action.payload.wells },
+        name: state[copyGroupId] && state[copyGroupId].name === action.payload.name
+          ? state[copyGroupId].name + ' copy' // todo: copy 2, copy 3 etc.
+          : action.payload.name
       }
     }
   },
@@ -260,19 +284,29 @@ const selectedIngredientGroupId = createSelector(
   state => get(state, ['selectedIngredientGroup', 'groupId'])
 )
 
-const _selectedIngredientGroupObj = createSelector(
-  selectedIngredientGroupId,
-  allIngredients,
-  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
-    ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
-    : null
-)
+// const _selectedIngredientGroupObj = createSelector(
+//   selectedIngredientGroupId,
+//   allIngredients,
+//   (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
+//     ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
+//     : null
+// )
+//
+// const selectedIngredientProperties = createSelector(
+//   _selectedIngredientGroupObj,
+//   ingredGroup => (!isNil(ingredGroup))
+//     ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
+//     : null
+// )
 
-const selectedIngredientProperties = createSelector(
-  _selectedIngredientGroupObj,
-  ingredGroup => (!isNil(ingredGroup))
-    ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
-    : null
+const ingredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId']
+
+const allIngredientGroupFields = createSelector(
+  allIngredients,
+  allIngredients => reduce(allIngredients, (acc, ingredGroup, ingredGroupId) => ({
+    ...acc,
+    [ingredGroupId]: pick(ingredGroup, ingredFields)
+  }), {})
 )
 
 const selectedWellNames = createSelector(
@@ -331,6 +365,13 @@ const ingredientsForContainer = createSelector(
   }
 )
 
+// [{ingredientId, name}]
+const allIngredientNamesIds = createSelector(
+  allIngredients,
+  allIngreds => Object.keys(allIngreds).map(ingredId =>
+      ({ingredientId: ingredId, name: allIngreds[ingredId].name}))
+)
+
 const _getWellContents = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
@@ -387,20 +428,10 @@ const allWellMatricesById = createSelector(
   }, {})
 )
 
-const stoopidSelectedWellsSelector = createSelector(
-  rootSelector,
-  function (s) {
-    const res = s.selectedWells
-    console.log('stoopidSelectedWellsSelector sez', res)
-    return res
-  }
-)
-
 const wellContentsSelectedContainer = createSelector(
   selectedContainerType,
   ingredientsForContainer,
-  stoopidSelectedWellsSelector,
-  // state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
+  state => rootSelector(state).selectedWells, // wells are selected only for the selected container.
   state => rootSelector(state).highlightedIngredients.wells,
   _getWellContents
 )
@@ -425,6 +456,8 @@ const labwareToCopy = state => rootSelector(state).copyLabwareMode
 // TODO: prune selectors
 export const selectors = {
   activeModals,
+  allIngredientGroupFields,
+  allIngredientNamesIds,
   allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
@@ -438,7 +471,7 @@ export const selectors = {
   selectedContainer: selectedContainerSelector,
   containerById,
   ingredientsForContainer,
-  selectedIngredientProperties,
+  // selectedIngredientProperties,
   selectedIngredientGroupId
 }
 
