@@ -121,3 +121,8 @@ def save(config, filename=None):
     with open(filename, 'w') as file:
         json.dump(diff, file, sort_keys=True, indent=4)
         return diff
+
+def clear(filename=None):
+    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if os.path.exists(filename):
+        os.remove(filename)
