@@ -68,7 +68,11 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
   return (
     <g>
       {nonFillableContainers.includes(containerType)
-        ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+        ? <image // TODO do real styles and maybe get SVG landscape images
+          href={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`}
+          width='120' height='120'
+          transform='translate(125 -15) rotate(90)'
+        />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
       {containerName && <g className={styles.name_overlay}>
