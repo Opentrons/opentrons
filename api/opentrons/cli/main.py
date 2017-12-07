@@ -2,20 +2,20 @@
 
 # pylama:ignore=C901
 
-import asyncio
-import urwid
-from numpy.linalg import inv
-from numpy import dot, array, insert
-from opentrons import robot, instruments
+# erase previous calibration file before opentrons.robot instantiates
+from opentrons import robot
 from opentrons.robot import robot_configs
-from opentrons.util.calibration_functions import probe_instrument
-from opentrons.cli.solve import solve
+robot_configs.clear()
+robot.config = robot_configs.load()
+robot.reset()
 
-
-# TODO (andy - 2017/12/05) Run deck calibration (XYZ) seperately from Probe
-#     After calibrating the Z axis and 3 points on deck, quit and restart
-#     this CLI tool before running tip-probe ('p')
-#     Without restarting, pipette collides with probe
+import asyncio                                                          # NOQA
+import urwid                                                            # NOQA
+from numpy.linalg import inv                                            # NOQA
+from numpy import dot, array, insert                                    # NOQA
+from opentrons import robot, instruments                                # NOQA
+from opentrons.util.calibration_functions import probe_instrument       # NOQA
+from opentrons.cli.solve import solve                                   # NOQA
 
 
 # Distance increments for jog
