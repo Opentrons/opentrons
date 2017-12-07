@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
 import {
@@ -8,7 +9,13 @@ import {
 
 import UploadInput from './UploadInput'
 import UploadWarning from './UploadWarning'
+
 export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
+
+UploadPanel.propTypes = {
+  isSessionLoaded: PropTypes.bool.isRequired,
+  onUpload: PropTypes.func.isRequired
+}
 
 function UploadPanel (props) {
   const warning = props.isSessionLoaded
