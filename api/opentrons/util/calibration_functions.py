@@ -8,14 +8,22 @@ from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
 
 
-X_SWITCH_OFFSET_MM = 5.0
-Y_SWITCH_OFFSET_MM = 2.0
+# The X and Y switch offsets are to position relative to the *opposite* axes
+# during calibration, to make the tip hit the raised end of the switch plate,
+# which requires less pressure to activate. E.g.: when probing in the x
+# direction, the tip will be moved by X_SWITCH_OFFSET in the y axis, and when
+# probing in y, it will be adjusted by the Y_SWITCH_OFFSET in the x axis.
+# When probing in z, it will be adjusted by the Z_SWITCH_OFFSET in the y axis.
+X_SWITCH_OFFSET_MM = 2.0
+Y_SWITCH_OFFSET_MM = 5.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_HEIGHT_DURING_XY_PROBE = 15.0
+Z_DECK_CLEARANCE = 15.0
+Z_PROBE_CLEARANCE = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
-SWITCH_CLEARANCE = 7.5
+
+SWITCH_CLEARANCE = 7.5  # How far to move outside the probe box before probing
 Z_CROSSOVER_CLEARANCE = 20  # Z mm between tip and probe
 
 
@@ -46,12 +54,17 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         tip_length = robot.config.tip_length[instrument.mount][instrument.type]
     instrument._add_tip(tip_length)
 
+    # probe_dimensions is the external bounding box of the probe unit
     size_x, size_y, size_z = robot.config.probe_dimensions
+    # probe_center is the point at the center of the switch pcb
     center = Point(*robot.config.probe_center)
 
     rel_x_start = (size_x / 2) + SWITCH_CLEARANCE
     rel_y_start = (size_y / 2) + SWITCH_CLEARANCE
-    rel_z_start = center.z - Z_HEIGHT_DURING_XY_PROBE
+
+    # Ensure that the nozzle will clear the probe unit and tip will clear deck
+    nozzle_safe_z = (size_z - tip_length) + Z_PROBE_CLEARANCE
+    rel_z_start = center.z - max(Z_DECK_CLEARANCE, nozzle_safe_z)
 
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
