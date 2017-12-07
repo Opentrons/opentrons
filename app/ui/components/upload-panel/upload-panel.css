@@ -1,13 +1,9 @@
-/* Upload */
-.upload_panel {
-  position: relative;
-  padding: 1rem;
-}
-
+/* TODO:(ka 11-28-17) revisit svg icon buttons styles after component standardization */
 .btn_upload {
-  display: block;
-  width: 100%;
+  display: inline-block;
+  width: 16rem;
   height: 2.5rem;
+  margin: 1rem;
   line-height: 2.5rem;
   padding-left: 2rem;
   text-align: left;
@@ -16,7 +12,7 @@
   background-position: 0.5rem center;
   background-color: #999;
   color: white;
-  background-image: url(../../ui/img/icon_fileupload.png);
+  background-image: url(../../img/icon_fileupload.png);
 }
 
 .file {
@@ -24,31 +20,25 @@
   clip: rect(1px 1px 1px 1px);
 }
 
-.title {
-  font-size: 1rem;
-  line-height: 4rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  padding: 0;
-}
-
 .file_drop {
   display: block;
-  width: 100%;
-  margin-top: 2rem;
-  padding: 8rem 1rem 1rem;
-  background-image: url(../../ui/img/icon_filedrop.svg);
+  width: 16rem;
+  margin: 0 1rem;
+  padding: 10rem 1rem 1rem;
+  background-color: transparent;
+  background-image: url(../../img/icon_filedrop.svg);
   background-size: 4rem;
   background-repeat: no-repeat;
   background-position: center 2rem;
   border: 2px dashed silver;
   border-radius: 6px;
   font-size: 1rem;
+  color: silver;
   text-align: center;
 }
 
-.confirm_reupload {
-  margin-top: 1rem;
+.upload_warning {
+  margin: 1rem;
   font-size: 0.75rem;
   text-transform: uppercase;
   color: black;
