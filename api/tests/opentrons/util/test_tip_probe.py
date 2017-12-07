@@ -2,15 +2,15 @@ import pytest
 from opentrons.robot import robot_configs
 from opentrons.util import environment
 from opentrons.util.calibration_functions import (
-    probe_instrument,
+    # probe_instrument,
     update_instrument_config,
-    BOUNCE_DISTANCE_MM,
-    X_SWITCH_OFFSET_MM,
-    Y_SWITCH_OFFSET_MM,
-    Z_SWITCH_OFFSET_MM,
-    Z_CLEARANCE,
-    Z_CROSSOVER_CLEARANCE,
-    SWITCH_CLEARANCE
+    # BOUNCE_DISTANCE_MM,
+    # X_SWITCH_OFFSET_MM,
+    # Y_SWITCH_OFFSET_MM,
+    # Z_SWITCH_OFFSET_MM,
+    # Z_CLEARANCE,
+    # Z_CROSSOVER_CLEARANCE,
+    # SWITCH_CLEARANCE
 )
 
 
@@ -106,10 +106,15 @@ def fixture(config, monkeypatch):
         )
 
 
+# TODO (andy): The below test is overly brittle and reinforced
+# development assumptions, while failing to help identify behavioral failures
+# on the robot. A refactor of tip probe should break up that functionality
+# into components that can be unit tested properly
+
 # def test_tip_probe(fixture):
 #     robot = fixture.robot
 
-#     res = probe_instrument(instrument=fixture.instrument, robot=fixture.robot)
+#     r = probe_instrument(instrument=fixture.instrument, robot=fixture.robot)
 #     center_x, center_y, center_z = robot.config.probe_center
 #     size_x, size_y, size_z = robot.config.probe_dimensions
 #     min_x, max_x = fixture.X
@@ -214,7 +219,7 @@ def fixture(config, monkeypatch):
 #     ]
 
 #     assert fixture.log == expected_log
-#     assert res == (0.0, 0.0, 50.0)
+#     assert r == (0.0, 0.0, 50.0)
 
 
 def test_update_instrument_config(fixture, monkeypatch):

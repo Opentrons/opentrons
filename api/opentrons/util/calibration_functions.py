@@ -18,7 +18,8 @@ X_SWITCH_OFFSET_MM = 2.0
 Y_SWITCH_OFFSET_MM = 5.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_CLEARANCE = 15.0
+Z_DECK_CLEARANCE = 15.0
+Z_PROBE_CLEARANCE = 5.0
 
 BOUNCE_DISTANCE_MM = 5.0
 
@@ -58,13 +59,12 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     # probe_center is the point at the center of the switch pcb
     center = Point(*robot.config.probe_center)
 
-
     rel_x_start = (size_x / 2) + SWITCH_CLEARANCE
     rel_y_start = (size_y / 2) + SWITCH_CLEARANCE
 
     # Ensure that the nozzle will clear the probe unit and tip will clear deck
-    nozzle_safe_z = (size_z - tip_length) + Z_CLEARANCE
-    rel_z_start = center.z - max(Z_CLEARANCE, nozzle_safe_z)
+    nozzle_safe_z = (size_z - tip_length) + Z_PROBE_CLEARANCE
+    rel_z_start = center.z - max(Z_DECK_CLEARANCE, nozzle_safe_z)
 
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
