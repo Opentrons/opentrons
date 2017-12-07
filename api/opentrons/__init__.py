@@ -48,7 +48,7 @@ class InstrumentsWrapper(object):
         return inst.Magbead(self.robot, *args, **kwargs)
 
     def TemperaturePlate(self,  *args, **kwargs):
-        return inst.TemperaturePlate(*args, **kwargs)
+        return inst.TemperaturePlate(self.robot, *args, **kwargs)
 
 
 instruments = InstrumentsWrapper(robot)

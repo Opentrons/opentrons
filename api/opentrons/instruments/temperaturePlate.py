@@ -5,35 +5,46 @@ from opentrons.drivers.temperaturePlateDriver import TemperaturePlateDriver as D
 TEMP_THRESHOLD = 1
 MANUF_ID = 'Arduino'
 
+def _is_valid_temp(tempPlate, temp):
+    if temp > tempPlate.max_temp or temp < tempPlate.min_temp:
+        raise UserWarning(
+            "Temperature {temp} is out of range. Valid temperature "
+            "range is {min} to {max}".format(
+                temp=temp, min=tempPlate.min_temp, max=tempPlate.max_temp)
+        )
+        return False
+    else:
+        return True
+
+def _wait_for_temp(tempPlate):
+    cur_temp = tempPlate.driver.get_temp()
+    while (abs(temp - cur_temp) > TEMP_THRESHOLD):
+        time.sleep(.5)
+        temp = tempPlate.get_temp()
+
 
 class TemperaturePlate:
-    def __init__(self):
+    def __init__(self, robot):
+        self.robot = robot
         self.min_temp = 10
         self.max_temp = 70
         self.driver = Driver()
 
+    @property
+    def simulating(self):
+        return self.robot.is_simulating()
+
     #change connection to envvar
     def connect(self):
-        self.driver.connect(manuf_id=MANUF_ID)
+        self.driver.connect(MANUF_ID, self.simulating)
 
-    def disconnect(self):
-        self.simulating = True
 
     # ----------- Public interface ---------------- #
     def set_temp(self, temp, wait=False):
-        if temp > self.max_temp or temp < self.min_temp:
-            raise UserWarning(
-                "Temperature {temp} is out of range. Valid temperature "
-                "range is {min} to {max}".format(
-                    temp=temp, min=self.min_temp, max=self.max_temp)
-            )
-        else:
+        if _is_valid_temp(self, temp):
             self.driver.set_temp(temp)
         if wait:
-            cur_temp = self.driver.get_temp()
-            while(abs(temp - cur_temp) > TEMP_THRESHOLD):
-                time.sleep(.5)
-                temp = self.get_temp()
+            _wait_for_temp(self)
 
     def get_temp(self):
         return self.driver.get_temp()
