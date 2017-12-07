@@ -3,7 +3,6 @@ import os, sys
 import time
 import datetime
 import optparse
-
 import serial
 import serial_communication as SC
 import driver_3_0
@@ -30,7 +29,7 @@ def hourglass_pattern(velocity,X_max,Y_max):
 if __name__ == '__main__':
     #options to pick from
     parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    parser.add_option("-s", "--speed", dest = "speed", default = 150, help = "Speed Value")
+    parser.add_option("-s", "--speed", dest = "speed", default = 600, help = "Speed Value")
     parser.add_option("-c", "--cycles", dest = "cycles", default = 2, help = "Number of Cycles to run")
     parser.add_option("-x", "--x_max", dest = "x_max", default = 350, help = "X max distance")
     parser.add_option("-y", "--y_max", dest = "y_max", default = 320, help = "Y max distance")
@@ -57,15 +56,13 @@ if __name__ == '__main__':
             robot.home('x')
             robot.home('y')
             robot._send_command('M999')
-            set_relative(robot)
-            robot.move(y = -1.5)
             set_absolute(robot)
             #Series of moves executed
-            for cycle in (0,options.cycles+1):    
+            for cycle in range(options.cycles+1):    
                 print('Cycle = ', cycle)
                 bowtie_pattern(speed, options.x_max, options.y_max)
                 hourglass_pattern(speed, options.x_max, options.y_max)
-                test_data['cycles'] = cycles
+                test_data['cycles'] = cycle
                 test_data['time'] = this_time
                 log_file.writerow(test_data)
                 print(test_data)
@@ -74,7 +71,12 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print("Test Cancelled")
             f.flush
+            
+        except Exception as e:
+            test_data['Errors'] = e
+            f.flush
+            
         finally:
-            print("Test done"))
+            print("Test done")
             f.flush
             

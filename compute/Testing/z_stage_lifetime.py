@@ -15,6 +15,7 @@ def set_absolute(driver):
     
 def set_relative(driver):
     driver._send_command('G91')
+    
 
 def Z_Pattern(velocity,z_max,a_max,b = b_max, c = c_max):
     robot.move(z = 0, a = 0, speed = velocity)
@@ -66,14 +67,16 @@ if __name__ == '__main__':
                 log_file.writerow(test_data)
                 print(test_data)
                 f.flush
-                
+            
         except KeyboardInterrupt:
             print("Test Cancelled")
+            robot.disable_motors()
             f.flush
         except Exception as e:
             test_data['Errors'] = e
             f.flush
         finally:
             print("Test done")
+            robot.disable_motors()
             f.flush
             

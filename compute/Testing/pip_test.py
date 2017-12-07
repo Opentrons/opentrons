@@ -5,7 +5,7 @@ The goal of this test is to determine if motor backlash compensation
 is working for our dynamic fluid measurements. If backlash improves
 with the new algorithm, we can determine a more accurate solution measurement.
 
-Created by: Carlos Fernandez, Jared Greene
+Created by: Carlos Fernandez
 Branch: systems_testing
 date: 11/7/2017
 
@@ -29,11 +29,11 @@ import GB_Scale_Framework as SC
 initial_position = 2
 pipette_speed = 5
 dispense_speed = 50
-descend_position = 62#80 Single CHannel
-#descend_position = 90 #Multi Channel
+#descend_position = 54#80 Single CHannel
+descend_position = 67#80
 A_axis_speed = 50
-#raise_position = 95 #Multi Channel
-raise_position = 70 #Single Channel
+raise_position = 80
+#raise_position = 60 Single Channel
 PIP_VOLUME = 300
 PIP_TOP = 17
 PIP_BOTTOM = 2
@@ -72,7 +72,7 @@ def aspirate_action(aspirate_dist, backlash, relative=False):
         robot.move( c = PIP_BOTTOM)
         robot.move( c = backlash)
         robot.move( a = descend_position, speed = A_axis_speed) #enter liquid
-        robot.move( c = aspirate_dist, speed = 5)
+        robot.move( c = aspirate_dist, speed = pipette_speed)
         robot.move( a = raise_position, speed = A_axis_speed) #exit liquid
         
     
@@ -97,8 +97,9 @@ def connect():
 
 def setup_pipette():
     robot._reset_from_error()
-    robot.home('AC')
-    #robot.move( c = initial_position, speed = pipette_speed)
+    robot.home('A')
+    robot.home('C')
+    #robot.move( b = initial_position, speed = pipette_speed)
     robot.move( c = PIP_BOTTOM)
 
 def record_data(i_mass, f_mass, log_file, test_data):
@@ -148,17 +149,19 @@ def prewet():
         #Despense
         robot.move(c = PIP_BOTTOM, speed = dispense_speed)
         robot.move(c = BLOWOUT, speed = dispense_speed)
+    robot.home('A')
+    robot.home('C')
         
 def routine_1():
     print('In routine 1')
     #set to abs mode
     set_absolute(robot)
     #pip motor(bottom position)
-    robot.move(b=PIP_BOTTOM)
+    robot.move(c=PIP_BOTTOM)
     #set relative
     set_relative(robot)
     #backlash compensation
-    robot.move(b= 0.5)
+    robot.move(c= 0.5)
     #set to abs mode
     set_absolute(robot)
     #descend position on Z axis
@@ -183,7 +186,7 @@ def routine_2():
     #set to abs mode(might have to change this line)
     set_relative(robot)
     #pip motor(second bottom pos)
-    robot.move(b=disp - backlash)
+    robot.move(c=disp - backlash)
     #set to abs mode
     set_absolute(robot)
     #raise position on Z axis
@@ -197,7 +200,7 @@ def routine_3():
     #set to abs mode
     set_absolute(robot)
     #pip motor(bottom position)
-    robot.move(b=PIP_BOTTOM - 1)
+    robot.move(c=PIP_BOTTOM - 1)
     #set to abs mode
     set_absolute(robot)
     #raise position on Z axis
@@ -208,18 +211,22 @@ def routine_3():
     time.sleep(0.5)
 
 #Aspirate by increments
-def Gravimetric(Max_Distance, backlash=0, blowout_backlash=0, aspirate_increment = 0.4):
+def Gravimetric(max_distance, backlash=0, blowout_backlash=0, aspirate_increment = 0.4, offset = 0):
+    #Home Pipette Axis and Z Axis
     setup_pipette()
+    #Create a Name for CSV File
     file_name = "results/Pipette_Data_%s.csv" % (datetime.datetime.now().strftime("%m-%d-%y_%H-%M"))
+    #Open file and create Headers
     with open(file_name, 'w', newline='') as f:
         test_data = {'Weight(g)':None,'final Weight(g)':None, 'delta_weight':None, 'Volume(uL)':None, 'time':None}
         log_file = csv.DictWriter(f, test_data)
         log_file.writeheader()
-        Cycles = int(Max_Distance/aspirate_increment)
-        #aspirate_increment = aspirate_dist / cycles #0.1
-        #current_aspirate_dist = aspirate_increment #+ 0.63
-        current_aspirate_dist = aspirate_increment + 0.4
-        for cycle in range(Cycles):
+        #Number of cycles to Run Formula
+        cycles = max_distance/aspirate_increment
+        #Increment Value
+        current_aspirate_dist = aspirate_dist + offset
+        #Series of moves
+        for cycle in range(cycles):
             print('current distance = ', current_aspirate_dist)
             time.sleep(0.25)
             initial = GB_Scale.read_mass()
@@ -229,7 +236,7 @@ def Gravimetric(Max_Distance, backlash=0, blowout_backlash=0, aspirate_increment
             dispense_action(disp_dist=current_aspirate_dist + 1, backlash=backlash, relative=False)
             record_data(initial, final, log_file, test_data)    
             #current_aspirate_dist += aspirate_increment         
-            current_aspirate_dist += aspirate_increment
+            current_aspirate_dist += aspirate_dist
                 
 #Aspirate with constant Volumes
 def const_vol(cycles, backlash=0, blowout_backlash=0, aspirate_dist=10):
@@ -249,7 +256,7 @@ def const_vol(cycles, backlash=0, blowout_backlash=0, aspirate_dist=10):
             aspirate_action(current_aspirate_dist, backlash=backlash, relative=True)
             time.sleep(1)
             final = GB_Scale.read_mass()
-            dispense_action(disp_dist=current_aspirate_dist + 1, backlash=backlash, relative=False)
+            dispense_action(disp_dist = current_aspirate_dist + 1, backlash=backlash, relative=False)
             record_data(initial, final, log_file, test_data)    
             #current_aspirate_dist += aspirate_increment
             
@@ -280,74 +287,35 @@ def run_2(cycles):
             print('final = ', final)
             record_data_2(initial,middle, final, log_file, test_data)    
             
+if __name__ == '__main__':
+    
+    #options to pick from
+    parser = optparse.OptionParser(usage='usage: %prog [options] ')
+    parser.add_option("-s", "--speed", dest = "speed", default = 30, help = "Speed Value")
+    parser.add_option("-c", "--cycles", dest = "cycles", default = 100, help = "Number of Cycles to run")
+    parser.add_option("-p", "--port", dest = "robot", default = 'COM', help = "Robot Com Port")
+    parser.add_option("-S", "--scale_port", dest = "scale_port", default = 'COM6', type = str, help = "Scale COM Port")
+    (options, args) = parser.parse_args(args = None, values = None)
+    #print(options.scale_port)
+    GB_Scale = SC.Scale(port = options.scale_port)
+    #Create a variable to read Scale Readings
+    reading = GB_Scale.read_mass()
+    
+    robot = driver_3_0.SmoothieDriver_3_0_0()
+    
+    try:
+        robot.connect()
+        print("Start test")       
+        #Gravimetric(max_distance, backlash=0, blowout_backlash=0, aspirate_increment = 0.4, offset = 0)
+        #const_vol(cycles, backlash=0, blowout_backlash=0, aspirate_dist=10):
+        
+    except KeyboardInterrupt:
+        print("Test Cancelled")
+        f.flush
+    except Exception as e:
+        test_data['Errors'] = e
+        f.flush
+    finally:
+        print("Test done")
+        f.flush
             
-            
-# if __name__ == '__main__':
-    
-    # #options to pick from
-    # parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    # parser.add_option("-s", "--speed", dest = "speed", default = 30, help = "Speed Value")
-    # parser.add_option("-c", "--cycles", dest = "cycles", default = 100, help = "Number of Cycles to run")
-    # parser.add_option("-p", "--port", dest = "robot", default = 'COM', help = "Robot Com Port")
-    # parser.add_option("-S", "--scale_port", dest = "scale_port", default = 'COM6', type = str, help = "Scale COM Port")
-    # (options, args) = parser.parse_args(args = None, values = None)
-    # #print(options.scale_port)
-    # GB_Scale = SC.Scale(port = options.scale_port)
-    # #Create a variable to read Scale Readings
-    # reading = GB_Scale.read_mass()
-    
-    # robot = driver_3_0.SmoothieDriver_3_0_0()
-    
-    # #File name + directory to record
-    # print(file_name)
-    # #Open file with created Headers
-
-        # try:
-            # robot.connect()
-            # print("Start test")
-        # '''          
-            
-            # for cycles in range(0,options.cycles+1):
-                # # SETUP PIPETTE
-                # time.sleep(5)
-
-                # initial_reading = GB_Scale.read_mass()
-                # print('initial reading = ', initial_reading)
-                # time.sleep(5)
-                # #backlash move reverse
-                # #move Z axis on single channel pipette
-                # time.sleep(5)
-                # #aspirate motion
-                # robot.move( c = aspirate, speed = pipette_speed)
-                # time.sleep(5)
-                # #move Z Axis on single channel pippette 
-                # after_reading = GB_Scale.read_mass()
-                # print('after_reading = ', after_reading)
-                # #move plunger
-                # #robot.move_axis(3,0,10,relative = False)
-                # #time.sleep(10)
-                # delta_weight = initial_reading - after_reading
-                # #conversion to mircoliters, Volume = mass/density
-                # volume = delta_weight*1000 #uL
-                # test_data['Weight(g)'] = initial_reading
-                # test_data['Weight After(g)'] = after_reading
-                # test_data['delta_weight'] = delta_weight
-                # test_data['Volume(uL)'] = volume
-                # log_file.writerow(test_data)
-                # print(test_data)
-                # f.flush
-        # '''    
-        # except KeyboardInterrupt:
-            # print("Test Cancelled")
-            
-            
-        # finally:
-            # print("Test done")
-            
-    
-    
-    
-    
-    
-    
-    

@@ -10,13 +10,13 @@ DEFAULT_WRITE_TIMEOUT = 30
 
 SMOOTHIE_PORT_ID = 'COM7'
 
-if os.environ.get('RUNNING_ON_PI'):
-    SMOOTHIE_PORT_ID = 'AMA'
+#if os.environ.get('RUNNING_ON_PI'):
+#SMOOTHIE_PORT_ID = 'AMA'
 
 ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
 
-BAUDRATE = 14400
+BAUDRATE = 115200
 
 
 def get_ports(device_name):

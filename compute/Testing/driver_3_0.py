@@ -6,7 +6,7 @@ PLUNGER_CURRENT_LOW = 0.1
 
 DEFAULT_ACCELERATION = 'M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000'
 DEFAULT_CURRENT = 'M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW)
-DEFAULT_MAX_SPEEDS = 'M203.1 X300 Y200 Z50 A50 B8 C8'
+DEFAULT_MAX_SPEEDS = 'M203.1 X300 Y200 Z100 A100 B8 C8'
 DEFAULT_STEPS_PER_MM = 'M92 X80.0254 Y80.16 Z400 A400 B768 C768'
 
 
@@ -34,7 +34,9 @@ GCODES = {'HOME': 'G28.2',
           'ABSOLUTE_COORDS': 'G90',
           'RESET_FROM_ERROR': 'M999',
           'SET_SPEED': 'G0F',
-          'SET_CURRENT': 'M907'}
+          'SET_CURRENT': 'M907',
+          'Enable_Motors': 'M17',
+          'Disable_Motors': 'M18'}
 
 
 def _parse_axis_values(raw_axis_values):
@@ -96,7 +98,7 @@ class SmoothieDriver_3_0_0:
 
     def disconnect(self):
         self.simulating = True
-
+    
     @property
     def position(self):
         return {k.upper(): v for k, v in self._position.items()}
@@ -112,7 +114,15 @@ class SmoothieDriver_3_0_0:
         speed = value * SEC_PER_MIN
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
-
+    
+    def enable_motors(self):
+        #Enable motors
+        return self._send_command(GCODES['Enable_Motors'])
+    
+    def disable_motors(self):
+        #Enable motors
+        return self._send_command(GCODES['Disable_Motors'])
+    
     def set_current(self, axes, value):
         ''' set total movement speed in mm/second'''
         values = ['{}{}'.format(axis, value) for axis in axes]
@@ -180,7 +190,7 @@ class SmoothieDriver_3_0_0:
 
         movement_speed = ''
         if speed:
-            movement_speed = 'F'+str(speed)
+            movement_speed = 'F'+str(speed * 60)
 
         if coords:
             command = GCODES['MOVE'] + ''.join(coords) + movement_speed
