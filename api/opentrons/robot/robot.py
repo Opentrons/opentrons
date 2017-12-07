@@ -103,6 +103,37 @@ class InstrumentMotor(object):
         self.robot._driver.set_plunger_speed(rate, self.axis)
         return self
 
+def _setup_container(container_name, label):
+    if not label:
+        label = container_name
+    container = database.load_container(container_name)
+    container.properties['type'] = container_name
+
+    container_x, container_y, container_z = container._coordinates
+
+    # infer z from height
+    if container_z == 0 and 'height' in container[0].properties:
+        container_z = container[0].properties['height']
+
+    from opentrons.util.vector import Vector
+    container._coordinates = Vector(
+        container_x,
+        container_y,
+        container_z)
+
+    return container
+
+def _get_placement_location(slot, deck):
+    location = None
+    if isinstance(slot, str): #If target location is a slot, it will be passed as a string
+        location = deck[slot]
+    elif getattr(slot, 'stackable', False):
+        location = slot
+
+    return location
+
+
+
 
 class Robot(object):
     """
@@ -705,33 +736,31 @@ class Robot(object):
         return self._deck.containers()
 
     def add_container(self, container_name, slot, label=None, share=False):
-        if not label:
-            label = container_name
-        container = database.load_container(container_name)
-        container.properties['type'] = container_name
+        container = _setup_container(container_name, label)
+        location = _get_placement_location(slot, self._deck)
 
-        container_x, container_y, container_z = container._coordinates
-
-        # infer z from height
-        if container_z == 0 and 'height' in container[0].properties:
-            container_z = container[0].properties['height']
-
-        from opentrons.util.vector import Vector
-        container._coordinates = Vector(
-            container_x,
-            container_y,
-            container_z)
-
-        if self._deck[slot].has_children() and not share:
+        if pose_tracker.has_children(self.poses, location) and not share:
             raise RuntimeWarning(
                 'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
                     slot, container_name, slot))
         else:
-            self._deck[slot].add(container, label)
-        self.add_container_to_pose_tracker(container)
+            location.add(container, label)
+
+        self.add_container_to_pose_tracker(location, container)
         return container
 
-    def add_container_to_pose_tracker(self, container: Container):
+    def add_module(self, module, slot):
+        location = _get_placement_location(slot, self._deck)
+        location.add(module)
+        self.poses = pose_tracker.add(
+            self.poses,
+            module,
+            location,
+            pose_tracker.Point(*module._coordinates))
+
+
+
+    def add_container_to_pose_tracker(self, location, container: Container):
         """
         Add container and child wells to pose tracker. Sets container.parent
         (slot) as pose tracker parent

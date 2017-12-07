@@ -1,6 +1,7 @@
 import time
 
 from opentrons.drivers.temperaturePlateDriver import TemperaturePlateDriver as Driver
+from opentrons.containers.placeable  import Placeable
 
 TEMP_THRESHOLD = 1
 MANUF_ID = 'Arduino'
@@ -23,12 +24,15 @@ def _wait_for_temp(tempPlate):
         temp = tempPlate.get_temp()
 
 
-class TemperaturePlate:
-    def __init__(self, robot):
+class TemperaturePlate(Placeable):
+    def __init__(self, robot, slot):
+        super(TemperaturePlate, self).__init__()
         self.robot = robot
         self.min_temp = 10
         self.max_temp = 70
+        self.stackable = True
         self.driver = Driver()
+        robot.add_module(self, slot)
 
     @property
     def simulating(self):

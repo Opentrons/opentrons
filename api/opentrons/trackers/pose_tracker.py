@@ -117,6 +117,8 @@ def descendants(state, obj, level=0):
         for child in state[obj].children
     ], [])
 
+def has_children(state, obj):
+    return True if len(descendants(state, obj)) > 0 else False
 
 def ascend(state, start, finish=ROOT) -> List[Node]:
     if start is finish:
