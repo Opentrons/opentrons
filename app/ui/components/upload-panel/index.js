@@ -18,9 +18,7 @@ UploadPanel.propTypes = {
 }
 
 function UploadPanel (props) {
-  const warning = props.isSessionLoaded
-    ? <UploadWarning />
-    : null
+  const warning = props.isSessionLoaded && (<UploadWarning />)
   return (
     <div>
       <UploadInput {...props} isButton />
