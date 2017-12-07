@@ -3,19 +3,23 @@ import {NavLink} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import capitalize from 'lodash/capitalize'
-import ToolTip from './ToolTip'
-import styles from './SetupPanel.css'
 
 import {constants as robotConstants} from '../robot'
+import ToolTip, {TOP, BOTTOM_RIGHT} from './ToolTip'
+import InfoBox from './InfoBox'
+import styles from './SetupPanel.css'
+import tooltipStyles from './ToolTip.css'
 
 function PipetteLinks (props) {
-  const {axis, name, volume, channels, calibration, onClick} = props
+  const {axis, name, volume, channels, probed, isRunning, onClick} = props
   const isDisabled = name == null
-  const url = `/setup-instruments/${axis}`
+  const url = isRunning
+    ? '#'
+    : `/setup-instruments/${axis}`
 
   const linkStyle = classnames({[styles.disabled]: isDisabled})
 
-  const statusStyle = isDisabled || calibration === robotConstants.PROBED
+  const statusStyle = isDisabled || probed
     ? styles.confirmed
     : styles.alert
 
@@ -32,8 +36,8 @@ function PipetteLinks (props) {
         activeClassName={styles.active}
         disabled={isDisabled}
       >
-        <span className={classnames(statusStyle, 'tooltip_parent')}>
-          <ToolTip msg='Tip not found' pos='bottom' />
+        <span className={classnames(statusStyle, tooltipStyles.parent)}>
+          <ToolTip style={BOTTOM_RIGHT}>Tip not found</ToolTip>
         </span>
         <span className={styles.axis}>{axis}</span>
         <span className={styles.type}>{description}</span>
@@ -43,17 +47,25 @@ function PipetteLinks (props) {
 }
 
 function LabwareLinks (props) {
-  const {name, calibration, isTiprack, tipracksConfirmed, onClick} = props
-  const isDisabled = !isTiprack && !tipracksConfirmed
-  const isConfirmed = calibration === robotConstants.CONFIRMED
+  const {
+    name,
+    confirmed,
+    isTiprack,
+    instrumentsCalibrated,
+    tipracksConfirmed,
+    onClick
+  } = props
+
+  const isDisabled = !instrumentsCalibrated || !(isTiprack || tipracksConfirmed)
 
   const buttonStyle = classnames(styles.btn_labware, {
-    [styles.disabled]: isDisabled
+    // tipracks can only be confirmed once because of the whole pick-up process
+    [styles.disabled]: isDisabled || (isTiprack && confirmed)
   })
 
   const statusStyle = classnames({
-    [styles.confirmed]: isConfirmed,
-    [styles.alert]: !isConfirmed
+    [styles.confirmed]: confirmed,
+    [styles.alert]: !confirmed
   })
 
   return (
@@ -63,8 +75,8 @@ function LabwareLinks (props) {
         onClick={onClick}
         disabled={isDisabled}
       >
-        <span className={classnames(statusStyle, 'tooltip_parent')}>
-          <ToolTip msg='Position unconfirmed' pos='bottom' />
+        <span className={classnames(statusStyle, tooltipStyles.parent)}>
+          <ToolTip style={BOTTOM_RIGHT}>Position unconfirmed</ToolTip>
         </span>
         {name}
       </button>
@@ -80,11 +92,18 @@ export default function SetupPanel (props) {
     labwareConfirmed,
     tipracksConfirmed,
     setLabware,
-    clearLabwareReviewed
+    clearLabwareReviewed,
+    isRunning,
+    run
   } = props
 
   const instrumentList = instruments.map((i) => (
-    <PipetteLinks {...i} key={i.axis} onClick={clearLabwareReviewed} />
+    <PipetteLinks
+      {...i}
+      key={i.axis}
+      isRunning={isRunning}
+      onClick={!isRunning && clearLabwareReviewed}
+    />
   ))
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
@@ -95,8 +114,9 @@ export default function SetupPanel (props) {
       <LabwareLinks
         {...lab}
         key={slot}
+        instrumentsCalibrated={instrumentsCalibrated}
         tipracksConfirmed={tipracksConfirmed}
-        onClick={onClick}
+        onClick={!isRunning && onClick}
       />
     )
 
@@ -110,14 +130,14 @@ export default function SetupPanel (props) {
   }, {tiprackList: [], labwareList: []})
 
   const runLinkStyles = classnames(
-    'tooltip_parent',
     'btn',
     'btn_dark',
     styles.run_link,
+    tooltipStyles.parent,
     {[styles.inactive]: !labwareConfirmed}
   )
 
-  const runLinkWarning = 'Pipette and labware setup must be complete before you can RUN protocol'
+  const runLinkWarning = 'Pipette and labware setup\nmust be complete before\nyou can RUN protocol'
   const labwareMsg = !instrumentsCalibrated
     ? <p className={styles.labware_alert}>Labware setup is disabled until pipette setup is complete.</p>
     : null
@@ -126,11 +146,23 @@ export default function SetupPanel (props) {
     : null
 
   const runWarning = !labwareConfirmed
-    ? <ToolTip msg={runLinkWarning} pos='top' />
+    ? <ToolTip style={TOP}>{runLinkWarning}</ToolTip>
     : null
+
+  const runLinkUrl = labwareConfirmed
+    ? '/run'
+    : '#'
+
+  const runMessage = labwareConfirmed
+    ? <RunMessage />
+    : null
+
+  const onRunClick = labwareConfirmed && !isRunning
+    ? run
+    : null
+
   return (
     <div className={styles.setup_panel}>
-      <h2 className={styles.title}>Prepare Robot for RUN</h2>
       <section className={styles.links}>
         <section className={styles.pipette_group}>
           <h3>Pipette Setup</h3>
@@ -140,19 +172,34 @@ export default function SetupPanel (props) {
         </section>
         <section className={styles.labware_group}>
           <h3>Labware Setup</h3>
-          <ul className={classnames({[styles.unavailable]: !instrumentsCalibrated}, styles.step_list)}>
+          <ul className={styles.step_list}>
             {tiprackList}
             {labwareList}
           </ul>
           {pipetteMsg}
           {labwareMsg}
+          {runMessage}
         </section>
       </section>
-      <NavLink to='/run' className={runLinkStyles}>
+      <NavLink to={runLinkUrl} className={runLinkStyles} onClick={onRunClick}>
         Run Protocol
         {runWarning}
       </NavLink>
     </div>
+  )
+}
+
+function RunMessage () {
+  return (
+    <InfoBox className={styles.run_message}>
+      <p className={styles.run_message_item}>
+        Hurray, your robot is now ready! Click [RUN PROTOCOL] to start your run.
+      </p>
+      <p className={styles.run_message_item}>
+        Tip: Try a dry run prior to adding your samples and re-agents to avoid
+        wasting materials.
+      </p>
+    </InfoBox>
   )
 }
 
@@ -162,28 +209,19 @@ SetupPanel.propTypes = {
     name: PropTypes.string,
     channels: PropTypes.string,
     volume: PropTypes.number,
-    calibration: PropTypes.oneOf([
-      robotConstants.UNPROBED,
-      robotConstants.PREPARING_TO_PROBE,
-      robotConstants.READY_TO_PROBE,
-      robotConstants.PROBING,
-      robotConstants.PROBED
-    ])
+    calibration: robotConstants.INSTRUMENT_CALIBRATION_TYPE
   })).isRequired,
   labware: PropTypes.arrayOf(PropTypes.shape({
     slot: PropTypes.number.isRequired,
     name: PropTypes.string,
     type: PropTypes.string,
     isTiprack: PropTypes.bool,
-    calibration: PropTypes.oneOf([
-      robotConstants.UNCONFIRMED,
-      robotConstants.MOVING_TO_SLOT,
-      robotConstants.OVER_SLOT,
-      robotConstants.CONFIRMED
-    ])
+    calibration: robotConstants.LABWARE_CONFIRMATION_TYPE
   })).isRequired,
   clearLabwareReviewed: PropTypes.func.isRequired,
   instrumentsCalibrated: PropTypes.bool.isRequired,
   tipracksConfirmed: PropTypes.bool.isRequired,
-  labwareConfirmed: PropTypes.bool.isRequired
+  labwareConfirmed: PropTypes.bool.isRequired,
+  isRunning: PropTypes.bool.isRequired,
+  run: PropTypes.func.isRequired
 }

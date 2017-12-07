@@ -14,7 +14,12 @@ self.onmessage = function handleIncoming (event) {
 function dispatchFromWorker (action) {
   // webworkers cannot post Error objects, so convert them to plain objects
   if (action.error === true) {
-    action.payload = {message: action.payload.message}
+    const {payload} = action
+
+    action.payload = Object.assign(
+      {name: payload.name, message: payload.message},
+      payload
+    )
   }
 
   self.postMessage(action)

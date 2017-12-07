@@ -15,8 +15,6 @@ import {
   FINISHED,
   STOPPED,
   UNPROBED,
-  PROBED,
-  CONFIRMED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
   DECK_SLOTS,
@@ -36,13 +34,13 @@ export function getIsScanning (state) {
 export function getDiscovered (state) {
   const {
     discovered,
-    discoveredByHostname,
+    discoveredByHost,
     connectedTo
   } = getConnectionState(state)
 
-  return discovered.map((hostname) => ({
-    ...discoveredByHostname[hostname],
-    isConnected: connectedTo === hostname
+  return discovered.map((host) => ({
+    ...discoveredByHost[host],
+    isConnected: connectedTo === host
   }))
 }
 
@@ -128,12 +126,20 @@ export function getCommands (state) {
   }
 }
 
-// TODO(mc, 2017-10-17): base this value on leaves rather than top level nodes
 export function getRunProgress (state) {
-  const commands = getCommands(state)
-  const currentCommand = commands.find((c) => c.isCurrent)
+  const leaves = getCommands(state).reduce(countLeaves, {handled: 0, total: 0})
 
-  return 100 * (commands.indexOf(currentCommand) + 1) / commands.length
+  if (!leaves.total) return 0
+
+  return 100 * (leaves.handled / leaves.total)
+
+  function countLeaves (result, cmd) {
+    if (cmd.children.length) return cmd.children.reduce(countLeaves, result)
+    if (cmd.handledAt) result.handled++
+    result.total++
+
+    return result
+  }
 }
 
 export function getStartTime (state) {
@@ -163,7 +169,10 @@ export function getInstrumentsByAxis (state) {
 
 export function getInstruments (state) {
   const protocolInstrumentsByAxis = getInstrumentsByAxis(state)
-  const {instrumentsByAxis: calibrationByAxis} = getCalibrationState(state)
+  const {
+    instrumentsByAxis: calibrationByAxis,
+    probedByAxis
+  } = getCalibrationState(state)
 
   return INSTRUMENT_AXES.map((axis) => {
     let instrument = protocolInstrumentsByAxis[axis] || {axis}
@@ -177,7 +186,8 @@ export function getInstruments (state) {
     if (instrument.name) {
       instrument = {
         ...instrument,
-        calibration: calibrationByAxis[axis] || UNPROBED
+        calibration: calibrationByAxis[axis] || UNPROBED,
+        probed: probedByAxis[axis] || false
       }
     }
 
@@ -185,11 +195,16 @@ export function getInstruments (state) {
   })
 }
 
+export function getSingleChannel (state) {
+  return getInstruments(state)
+    .find((instrument) => instrument.channels === SINGLE_CHANNEL)
+}
+
 export function getInstrumentsCalibrated (state) {
   const instruments = getInstruments(state)
 
   return instruments
-    .every((i) => i.name == null || i.calibration === PROBED)
+    .every((i) => i.name == null || i.probed)
 }
 
 export function getLabwareBySlot (state) {
@@ -198,15 +213,19 @@ export function getLabwareBySlot (state) {
 
 export function getLabware (state) {
   const protocolLabwareBySlot = getLabwareBySlot(state)
-  const {labwareBySlot: calibrationBySlot} = getCalibrationState(state)
+  const {
+    confirmedBySlot,
+    labwareBySlot: calibrationBySlot
+  } = getCalibrationState(state)
 
   return DECK_SLOTS.map((slot) => {
     let labware = protocolLabwareBySlot[slot] || {slot}
 
-    if (labware.name) {
+    if (labware.type) {
       labware = {
         ...labware,
-        calibration: calibrationBySlot[slot] || UNCONFIRMED
+        calibration: calibrationBySlot[slot] || UNCONFIRMED,
+        confirmed: confirmedBySlot[slot] || false
       }
     }
 
@@ -219,14 +238,15 @@ export function getLabwareReviewed (state) {
 }
 
 export function getUnconfirmedLabware (state) {
-  return getLabware(state).filter((lw) => (
-    lw.type != null &&
-    lw.calibration !== CONFIRMED
-  ))
+  return getLabware(state).filter((lw) => (lw.type != null && !lw.confirmed))
 }
 
 export function getUnconfirmedTipracks (state) {
   return getUnconfirmedLabware(state).filter((lw) => lw.isTiprack)
+}
+
+export function getNextLabware (state) {
+  return getUnconfirmedTipracks(state)[0] || getUnconfirmedLabware(state)[0]
 }
 
 export function getTipracksConfirmed (state) {
@@ -243,4 +263,8 @@ export function getJogInProgress (state) {
 
 export function getOffsetUpdateInProgress (state) {
   return getCalibrationState(state).updateOffsetRequest.inProgress
+}
+
+export function getJogDistance (state) {
+  return getCalibrationState(state).jogDistance
 }

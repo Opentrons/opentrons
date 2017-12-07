@@ -1,29 +1,21 @@
 import os
-from threading import Event
-
-
-from opentrons.drivers.smoothie_drivers.v3_0_0 import driver_3_0
-from . import gantry
+from functools import lru_cache
 
 import opentrons.util.calibration_functions as calib
-
-from opentrons import containers, drivers
-from opentrons.containers import Container
-from opentrons.util.log import get_logger
-from opentrons.trackers import pose_tracker
-from opentrons.data_storage import database
-from opentrons import helpers
-from opentrons import commands
-from opentrons.broker import subscribe
-from .robot_configs import config
-
 from numpy import add, subtract
-from functools import lru_cache
+from opentrons import commands, containers, drivers, helpers
+from opentrons.broker import subscribe
+from opentrons.containers import Container
+from opentrons.data_storage import database
+from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.robot.mover import Mover
+from opentrons.robot.robot_configs import load
+from opentrons.trackers import pose_tracker
+from opentrons.util.log import get_logger
 
 log = get_logger(__name__)
 
-DECK_OFFSET = config.deck_offset
-MAX_INSTRUMENT_HEIGHT = 220.0000
+TIP_CLEARANCE = 42
 
 
 class InstrumentMosfet(object):
@@ -153,7 +145,7 @@ class Robot(object):
     ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
-    def __init__(self):
+    def __init__(self, config=None):
         """
         Initializes a robot instance.
 
@@ -163,39 +155,15 @@ class Robot(object):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self._driver = driver_3_0.SmoothieDriver_3_0_0()
+        self.config = config or load()
+        self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
+
+        # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
-        self.can_pop_command = Event()
-        self.can_pop_command.set()
-
-        self.mode = None
-        self._smoothie_drivers = {
-            'live': None,
-            'simulate': drivers.get_virtual_driver(
-                options={'limit_switches': False}
-            ),
-            'simulate_switches': drivers.get_virtual_driver(
-                options={'limit_switches': True}
-            )
-        }
-
-        null_driver = drivers.get_virtual_driver()
-
-        def _null(*args, **kwargs):
-            return
-
-        null_driver.move = _null
-        null_driver.home = _null
-        self._smoothie_drivers['null'] = null_driver
-
-        # self._driver = drivers.get_virtual_driver()
-        # self.disconnect()
-        self.arc_height = 5
-
-        # self.set_connection('simulate')
+        self.arc_height = TIP_CLEARANCE
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -214,6 +182,34 @@ class Robot(object):
             * Runtime warnings
 
         """
+
+        self._actuators = {
+            'left': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(self.config.gantry_calibration),
+                    axis_mapping={'z': 'Z'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-left',
+                    axis_mapping={'x': 'B'})
+            },
+            'right': {
+                'carriage': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst=id(self.config.gantry_calibration),
+                    axis_mapping={'z': 'A'}),
+                'plunger': Mover(
+                    driver=self._driver,
+                    src=pose_tracker.ROOT,
+                    dst='volume-calibration-right',
+                    axis_mapping={'x': 'C'})
+            }
+        }
+
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
@@ -233,13 +229,44 @@ class Robot(object):
         return self
 
     def setup_gantry(self):
-        self.gantry = gantry.Gantry(self._driver)
+        driver = self._driver
 
-        self.poses = pose_tracker.add(
-            self.poses,
-            self.gantry,
+        left_carriage = self._actuators['left']['carriage']
+        right_carriage = self._actuators['right']['carriage']
+
+        left_plunger = self._actuators['left']['plunger']
+        right_plunger = self._actuators['right']['plunger']
+
+        self.gantry = Mover(
+            driver=driver,
+            axis_mapping={'x': 'X', 'y': 'Y'},
+            src=pose_tracker.ROOT,
+            dst=id(self.config.gantry_calibration)
         )
-        self.poses = self.gantry._setup_mounts(self.poses)
+
+        # Extract only transformation component
+        inverse_transform = pose_tracker.inverse(
+            pose_tracker.extract_transform(self.config.gantry_calibration))
+
+        self.poses = pose_tracker.bind(self.poses) \
+            .add(
+                obj=id(self.config.gantry_calibration),
+                transform=self.config.gantry_calibration) \
+            .add(obj=self.gantry, parent=id(self.config.gantry_calibration)) \
+            .add(obj=left_carriage, parent=self.gantry) \
+            .add(obj=right_carriage, parent=self.gantry) \
+            .add(
+                obj='left',
+                parent=left_carriage,
+                transform=inverse_transform) \
+            .add(
+                obj='right',
+                parent=right_carriage,
+                transform=inverse_transform) \
+            .add(obj='volume-calibration-left') \
+            .add(obj='volume-calibration-right') \
+            .add(obj=left_plunger, parent='volume-calibration-left') \
+            .add(obj=right_plunger, parent='volume-calibration-right')
 
     def add_instrument(self, mount, instrument):
         """
@@ -247,8 +274,9 @@ class Robot(object):
 
         Parameters
         ----------
-        axis : str
+        mount : str
             Specifies which axis the instruments is attached to.
+            Valid options are "left" or "right".
         instrument : Instrument
             An instance of a :class:`Pipette` to attached to the axis.
 
@@ -259,14 +287,24 @@ class Robot(object):
         ::
 
             from opentrons.instruments.pipette import Pipette
-            p200 = Pipette(axis='a')
+            p200 = Pipette(mount='left')
 
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
         """
         self._instruments[mount] = instrument
-        self.poses = self.gantry.mount_instrument(
-            self.poses, instrument, mount)
+        instrument.instrument_actuator = self._actuators[mount]['plunger']
+        instrument.instrument_mover = self._actuators[mount]['carriage']
+        # We are creating two pose_tracker entries for instrument
+        # one id(instrument) to store it's offset vector and another
+        # with zero offset, which can be increased/decreased by
+        # tip length for pickup and drop tip
+        self.poses = pose_tracker.add(
+            self.poses,
+            instrument,
+            parent=mount,
+            point=self.config.instrument_offset[mount][instrument.type]
+        )
 
     def add_warning(self, warning_msg):
         """
@@ -400,12 +438,22 @@ class Robot(object):
         >>> robot.connect('Virtual Smoothie')
         >>> robot.home()
         """
+
+        # Home pipettes first to avoid colliding with labware
+        # and to make sure tips are not in the liquid while
+        # homing plungers
+        self.poses = self._actuators['left']['carriage'].home(self.poses)
+        self.poses = self._actuators['right']['carriage'].home(self.poses)
+        # Then plungers
+        self.poses = self._actuators['left']['plunger'].home(self.poses)
+        self.poses = self._actuators['right']['plunger'].home(self.poses)
+        # Gantry goes last to avoid any further movement while
+        # close to XY switches so we are don't accidentally hit them
         self.poses = self.gantry.home(self.poses)
 
     # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
-        self.poses = self.gantry._update_pose(self.poses)
 
     # DEPRECATED
     def move_plunger(self, *args, **kwargs):
@@ -432,7 +480,13 @@ class Robot(object):
         """
         self._driver.set_speed(*args, **kwargs)
 
-    def move_to(self, location, instrument, strategy='arc', **kwargs):
+    def move_to(
+            self,
+            location,
+            instrument,
+            strategy='arc',
+            low_power_z=False,
+            **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
         a container.
@@ -457,6 +511,11 @@ class Robot(object):
 
             ``direct`` : move to the point in a straight line.
 
+        low_power_z : bool
+            Setting this to True will cause the instrument to move at a low
+            power setting for vertical motions, primarily to prevent damage to
+            the pipette in case of collision during calibration.
+
         Examples
         --------
         >>> from opentrons import Robot
@@ -474,7 +533,6 @@ class Robot(object):
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
-
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -485,26 +543,33 @@ class Robot(object):
             ),
             offset.coordinates
         )
-
-        # use max_z instead
         other_instrument = {instrument} ^ set(self._instruments.values())
         if other_instrument:
-            z = MAX_INSTRUMENT_HEIGHT
-            self.poses = other_instrument.pop()._move(self.poses, z=z)
+            other = other_instrument.pop()
+            _, _, z = pose_tracker.absolute(self.poses, other)
+            safe_height = self.max_deck_height() + TIP_CLEARANCE
+            if z < safe_height:
+                self.poses = other._move(self.poses, z=safe_height)
 
         if strategy == 'arc':
-            arc_coords = self._create_arc(target, instrument, placeable)
+            arc_coords = self._create_arc(target, placeable)
             for coord in arc_coords:
-                self.poses = instrument._move(self.poses, **coord)
+                self.poses = instrument._move(
+                    self.poses,
+                    low_power_z=low_power_z,
+                    **coord)
 
         elif strategy == 'direct':
             position = {'x': target[0], 'y': target[1], 'z': target[2]}
-            self.poses = instrument._move(self.poses, **position)
+            self.poses = instrument._move(
+                self.poses,
+                low_power_z=low_power_z,
+                **position)
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-    def _create_arc(self, destination, instrument, placeable=None):
+    def _create_arc(self, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -531,28 +596,6 @@ class Robot(object):
         ]
 
         return strategy
-
-    # DEPRECATED
-    def set_connection(self, mode):
-        if mode not in self._smoothie_drivers:
-            raise ValueError(
-                'mode expected to be "live", "simulate_switches", '
-                'or "simulate", {} provided'.format(mode)
-            )
-
-        d = self._smoothie_drivers[mode]
-
-        # set VirtualSmoothie's coordinates to be the same as physical robot
-        if d and d.is_simulating():
-            if self._driver and self._driver.is_connected():
-                d.connection.serial_port.set_position_from_arguments({
-                    ax.upper(): val
-                    for ax, val in self._driver.get_current_position().items()
-                })
-
-        self._driver = d
-        if self._driver and not self._driver.is_connected():
-            self._driver.toggle_port()
 
     # DEPRECATED
     def disconnect(self):
@@ -622,8 +665,7 @@ class Robot(object):
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
-            self._deck,
-            point=pose_tracker.Point(*DECK_OFFSET)
+            self._deck
         )
 
         for slot in self._deck:
@@ -704,7 +746,6 @@ class Robot(object):
             # TODO JG 10/6/17: Stop tracking wells inconsistently
             center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
-
             self.poses = pose_tracker.add(
                 self.poses,
                 well,
@@ -720,29 +761,27 @@ class Robot(object):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
-        self.can_pop_command.clear()
         self._driver.pause()
 
     def stop(self):
         """
         Stops execution of the protocol.
         """
-        self._driver.stop()
-        self.can_pop_command.set()
+        self._driver.pause()
+        self.reset()
 
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
         """
-        self.can_pop_command.set()
         self._driver.resume()
 
     def halt(self):
         """
         Stops execution of both the protocol and the Smoothie board immediately
         """
-        self._driver.halt()
-        self.can_pop_command.set()
+        # TODO (ben 20171116): make smoothie actions interruptable (no M400)
+        raise NotImplementedError
 
     def get_serial_ports_list(self):
         ports = []
@@ -752,6 +791,7 @@ class Robot(object):
         ports.extend(drivers.get_serial_ports_list())
         return ports
 
+    # TODO (ben 2017/11/13): rip out or implement these three methods
     def is_connected(self):
         if not self._driver:
             return False
@@ -839,11 +879,11 @@ class Robot(object):
         '''Calibrates a container using the bottom of the first well'''
         well = container[0]
 
-        # calibrate will well bottom, but track top of well
-        delta = pose_tracker.relative(
+        # Get the relative position of well with respect to instrument
+        delta = pose_tracker.change_base(
             self.poses,
-            well,
-            instrument
+            src=instrument,
+            dst=well
         )
 
         self.poses = calib.calibrate_container_with_delta(

@@ -2,7 +2,7 @@
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
-import {NAME, actions} from '../'
+import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
@@ -65,7 +65,8 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  const sendConnect = () => sendToClient({}, actions.connect())
+  const HOST = 'ot.local'
+  const sendConnect = () => sendToClient({}, actions.connect(HOST))
   const sendDisconnect = () => sendToClient({}, actions.disconnect())
 
   describe('connect and disconnect', () => {
@@ -76,7 +77,7 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => {
-          expect(RpcClient).toHaveBeenCalledTimes(1)
+          expect(RpcClient).toHaveBeenCalledWith(`ws://${HOST}:31950`)
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -251,15 +252,20 @@ describe('api client', () => {
     beforeEach(() => {
       state = {
         [NAME]: {
+          calibration: {
+            confirmedBySlot: {},
+            labwareBySlot: {},
+            jogDistance: constants.JOG_DISTANCE_FAST_MM
+          },
           session: {
             protocolInstrumentsByAxis: {
               left: {_id: 'inst-2'},
               right: {_id: 'inst-1'}
             },
             protocolLabwareBySlot: {
-              1: {_id: 'lab-1'},
-              5: {_id: 'lab-2'},
-              9: {_id: 'lab-3'}
+              1: {_id: 'lab-1', type: '96-flat'},
+              5: {_id: 'lab-2', type: 'tiprack-200ul', isTiprack: true},
+              9: {_id: 'lab-3', type: 'tiprack-200ul', isTiprack: true}
             }
           }
         }
@@ -347,6 +353,118 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
+    test('handles PICKUP_AND_HOME success', () => {
+      const action = actions.pickupAndHome('left', 5)
+      const expectedResponse = actions.pickupAndHomeResponse()
+
+      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.pick_up_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles PICKUP_AND_HOME failure during pickup', () => {
+      const action = actions.pickupAndHome('left', 5)
+      const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
+
+      calibrationManager.pick_up_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles DROP_TIP_AND_HOME success', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse()
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.drop_tip)
+            .toHaveBeenCalledWith({_id: 'inst-1'}, {_id: 'lab-3'})
+          expect(calibrationManager.home).toHaveBeenCalledWith({_id: 'inst-1'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles DROP_TIP_AND_HOME failure in drop_tip', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
+
+      calibrationManager.drop_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('handles DROP_TIP_AND_HOME failure in home', () => {
+      const action = actions.dropTipAndHome('right', 9)
+      const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('CONFIRM_TIPRACK drops tip if not last tiprack', () => {
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse()
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.drop_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-3'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('CONFIRM_TIPRACK noops if last tiprack', () => {
+      state[NAME].calibration.confirmedBySlot[5] = true
+
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse()
+
+      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.drop_tip).not.toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles CONFIRM_TIPRACK drop tip failure', () => {
+      const action = actions.confirmTiprack('left', 9)
+      const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
+
+      calibrationManager.drop_tip
+        .mockReturnValue(Promise.reject(new Error('AH')))
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
     test('handles JOG success', () => {
       const action = actions.jog('left', 'y', -1)
       const expectedResponse = actions.jogResponse()
@@ -356,8 +474,11 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.jog)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, -0.25, 'y')
+          expect(calibrationManager.jog).toHaveBeenCalledWith(
+            {_id: 'inst-2'},
+            -constants.JOG_DISTANCE_FAST_MM,
+            'y'
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -373,9 +494,9 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles UPDATE_OFFSET success', () => {
-      const action = actions.updateOffset('left', 9)
-      const expectedResponse = actions.updateOffsetResponse()
+    test('handles UPDATE_OFFSET success with labware', () => {
+      const action = actions.updateOffset('left', 1)
+      const expectedResponse = actions.updateOffsetResponse(null, false)
 
       calibrationManager.update_container_offset
         .mockReturnValue(Promise.resolve())
@@ -384,7 +505,29 @@ describe('api client', () => {
         .then(() => sendToClient(state, action))
         .then(() => {
           expect(calibrationManager.update_container_offset)
+            .toHaveBeenCalledWith({_id: 'lab-1'}, {_id: 'inst-2'})
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
+    })
+
+    test('handles UPDATE_OFFSET success with tiprack', () => {
+      const action = actions.updateOffset('left', 9)
+      const expectedResponse = actions.updateOffsetResponse(null, true)
+
+      calibrationManager.update_container_offset
+        .mockReturnValue(Promise.resolve())
+      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
+      calibrationManager.home.mockReturnValue(Promise.resolve())
+
+      return sendConnect()
+        .then(() => sendToClient(state, action))
+        .then(() => {
+          expect(calibrationManager.update_container_offset)
             .toHaveBeenCalledWith({_id: 'lab-3'}, {_id: 'inst-2'})
+          expect(calibrationManager.pick_up_tip)
+            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-3'})
+          expect(calibrationManager.home)
+            .toHaveBeenCalledWith({_id: 'inst-2'})
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })

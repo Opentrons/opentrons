@@ -1,11 +1,12 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .wrapper {
   width: 1024px;
-  height: 768px;
+  height: 100vh;
   display: flex;
   flex-direction: row;
   font-family: 'sans';

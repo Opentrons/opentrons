@@ -31,8 +31,9 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'pyserial==3.2.1',
-    'aiohttp==2.2.3',
-    'numpy==1.13.0']
+    'aiohttp==2.3.2',
+    'numpy==1.12.1',
+    'urwid==1.3.1']
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -48,6 +49,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
+        python_requires='>=3.5',
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,

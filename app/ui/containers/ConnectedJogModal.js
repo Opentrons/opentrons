@@ -7,20 +7,31 @@ import {
 
 import JogModal from '../components/JogModal'
 
-const mapStateToProps = (state) => ({
-  isJogging: robotSelectors.getJogInProgress(state),
-  isUpdating: robotSelectors.getOffsetUpdateInProgress(state)
-})
+export default connect(mapStateToProps, null, mergeProps)(JogModal)
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  const {slot} = ownProps
+function mapStateToProps (state) {
   return {
-    jog: (axis, direction) => () => {
-      // TODO(mc, 2017-10-06): don't hardcode the pipette
-      dispatch(robotActions.jog('right', axis, direction))
-    },
-    updateOffset: () => dispatch(robotActions.updateOffset('right', slot))
+    jogDistance: robotSelectors.getJogDistance(state),
+    isJogging: robotSelectors.getJogInProgress(state),
+    isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
+    singleChannel: robotSelectors.getSingleChannel(state)
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(JogModal)
+function mergeProps (stateProps, dispatchProps, ownProps) {
+  const {singleChannel: {axis: instrument}} = stateProps
+  const {dispatch} = dispatchProps
+  const {slot} = ownProps
+
+  return {
+    ...ownProps,
+    ...stateProps,
+    // TODO(mc, 2017-11-27): make jog button container to remove currying
+    jog: (axis, direction) => () => {
+      dispatch(robotActions.jog(instrument, axis, direction))
+    },
+    // TODO(mc, 2017-11-27): refactor to remove double-dispatch
+    onConfirmClick: () => dispatch(robotActions.updateOffset(instrument, slot)),
+    toggleJogDistance: () => dispatch(robotActions.toggleJogDistance())
+  }
+}

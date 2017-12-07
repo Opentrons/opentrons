@@ -2,117 +2,144 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {constants as robotConstants} from '../robot'
+import {Spinner, Warning} from './icons'
+import InfoBox from './InfoBox'
+
 import styles from './TipProbe.css'
-import {Spinner} from './icons'
 
-function PrepareForProbe (props) {
-  const {volume, onProbeTipClick} = props
-  return (
-    <span className={styles.info}>
-      <p>Complete the following steps prior to clicking [CONTINUE]</p>
-      <ol>
-        <li>Remove all labware from deck.</li>
-        <li>Remove trash bin to reveal Tip Probe tool.</li>
-        <li>Place a previously used or otherwise discarded <strong>{volume} ul</strong> tip on the pipette.</li>
-      </ol>
-      <button className={styles.btn_probe} onClick={onProbeTipClick}>
-        Continue
-      </button>
-    </span>
-  )
-}
+const {
+  UNPROBED,
+  PREPARING_TO_PROBE,
+  READY_TO_PROBE,
+  PROBING,
+  PROBED,
+  MULTI_CHANNEL
+} = robotConstants
 
-PrepareForProbe.propTypes = {
-  volume: PropTypes.number.isRequired
-}
-
-function RobotIsMoving (props) {
-  return (
-    <span className={styles.info}>
-      <h3 className={styles.title}>Robot is Moving</h3>
-      <Spinner className={styles.progress} />
-    </span>
-  )
-}
-
-function ProbeSuccess (props) {
-  const {volume} = props
-  return (
-    <span className={styles.info}>
-      <p>Tip dimensions for <strong>{volume} ul</strong> tips are now defined.</p>
-      <ol>
-        <li>Remove tip by hand and discard.</li>
-        <li>Replace trash bin on top of Tip Probe tool once all tips have been defined.</li>
-      </ol>
-    </span>
-  )
-}
-
-function DefaultMessage (props) {
-  const {onPrepareClick, calibration, name} = props
-  const isProbed = calibration === robotConstants.PROBED
-
-  const infoIcon = isProbed || name == null
-    ? '✓'
-    : '!'
-
-  const infoMessage = isProbed
-    ? (<p>Instrument has been calibrated successfully by Tip Probe</p>)
-    : (<p>Tip dimensions must be defined using the Tip Probe tool</p>)
-
-  return (
-    <span>
-      <span className={styles.info}>
-        <span className={styles.alert}>{infoIcon}</span>
-        {infoMessage}
-        <button className={styles.btn_probe} onClick={onPrepareClick}>
-          Start Tip Probe
-        </button>
-      </span>
-      <p className={styles.warning}>ATTENTION:  REMOVE ALL LABWARE AND TRASH BIN FROM DECK BEFORE STARTING TIP PROBE.</p>
-    </span>
-  )
-}
-
-ProbeSuccess.propTypes = {
-  volume: PropTypes.number.isRequired
+TipProbe.propTypes = {
+  instrument: PropTypes.shape({
+    name: PropTypes.string,
+    volume: PropTypes.number,
+    probed: PropTypes.bool,
+    calibration: PropTypes.oneOf([
+      UNPROBED,
+      PREPARING_TO_PROBE,
+      READY_TO_PROBE,
+      PROBING,
+      PROBED
+    ])
+  }).isRequired,
+  onPrepareClick: PropTypes.func.isRequired,
+  onProbeTipClick: PropTypes.func.isRequired,
+  onCancelClick: PropTypes.func.isRequired
 }
 
 export default function TipProbe (props) {
-  const {onPrepareClick, onProbeTipClick, instrument} = props
-  const status = instrument.calibration
+  const {instrument: {calibration}} = props
+  let onCancelClick
 
-  let probeMessage = null
-  if (status === robotConstants.READY_TO_PROBE) {
-    probeMessage = (
-      <PrepareForProbe {...instrument} onProbeTipClick={onProbeTipClick} />
+  if (calibration === READY_TO_PROBE || calibration === PROBED) {
+    onCancelClick = props.onCancelClick
+  }
+
+  return (
+    <InfoBox onCancelClick={onCancelClick} className={styles.info}>
+      <TipProbeMessage {...props} />
+      <TipProbeButtonOrSpinner {...props} />
+      <TipProbeWarning {...props} />
+    </InfoBox>
+  )
+}
+
+function TipProbeMessage (props) {
+  const {instrument: {probed, calibration, volume, channels}} = props
+  let icon = null
+  let message = ''
+
+  if (calibration === UNPROBED || calibration === PREPARING_TO_PROBE) {
+    if (!probed) {
+      icon = (
+        <Warning className={styles.alert} />
+      )
+      message = (
+        'For accuracy, you must define tip dimensions using the Tip Probe tool'
+      )
+    }
+  } else if (calibration === READY_TO_PROBE) {
+    const tipLocation = channels === MULTI_CHANNEL
+      ? 'pipette channel closest to the rear of the robot'
+      : 'pipette'
+
+    message = (
+      <span>
+        Place a previously used or otherwise discarded
+        <strong>{` ${volume} uL `}</strong>
+        tip on the {tipLocation} and click [CONTINUE].
+      </span>
     )
-  } else if (
-    status === robotConstants.PREPARING_TO_PROBE ||
-    status === robotConstants.PROBING
-  ) {
-    probeMessage = (
-      <RobotIsMoving />
+  } else if (calibration === PROBING) {
+    message = (
+      <span className={styles.important}>
+        Tip Probe is finding tip...
+      </span>
     )
-  } else {
-    probeMessage = (
-      <DefaultMessage {...instrument} onPrepareClick={onPrepareClick} />
+  } else if (calibration === PROBED) {
+    message = (
+      <span>
+        <p className={styles.submessage}>
+          Tip dimensions are now defined.
+        </p>
+        <p className={styles.submessage}>
+          <strong>Remove tip by hand and discard.</strong>
+        </p>
+        <p className={styles.submessage}>
+          <strong>
+            Replace trash bin on top of Tip Probe tool once all tips have been defined.
+          </strong>
+        </p>
+      </span>
     )
   }
 
-  return probeMessage
+  return (
+    <div className={message && styles.message}>{icon}{message}</div>
+  )
 }
 
-TipProbe.propTypes = {
-  onProbeTipClick: PropTypes.func.isRequired,
-  instrument: PropTypes.shape({
-    volume: PropTypes.number,
-    calibration: PropTypes.oneOf([
-      robotConstants.UNPROBED,
-      robotConstants.PREPARING_TO_PROBE,
-      robotConstants.READY_TO_PROBE,
-      robotConstants.PROBING,
-      robotConstants.PROBED
-    ])
-  })
+function TipProbeButtonOrSpinner (props) {
+  const {instrument: {calibration}, onPrepareClick, onProbeTipClick} = props
+
+  switch (calibration) {
+    case UNPROBED: return (
+      <button className={styles.btn_probe} onClick={onPrepareClick}>
+        Start Tip Probe
+      </button>
+    )
+
+    case READY_TO_PROBE: return (
+      <button className={styles.btn_probe} onClick={onProbeTipClick}>
+        Continue
+      </button>
+    )
+
+    case PREPARING_TO_PROBE:
+    case PROBING:
+      return (<Spinner className={styles.progress} />)
+  }
+
+  return null
+}
+
+function TipProbeWarning (props) {
+  const {instrument: {calibration}} = props
+
+  if (calibration === UNPROBED) {
+    return (
+      <p className={styles.warning}>
+        ATTENTION:  REMOVE ALL LABWARE AND TRASH BIN FROM DECK BEFORE STARTING TIP PROBE.
+      </p>
+    )
+  }
+
+  return null
 }

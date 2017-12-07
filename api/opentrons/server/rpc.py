@@ -41,6 +41,7 @@ class Server(object):
 
         self.app = web.Application()
         self.app.router.add_get('/', self.handler)
+        self.app.on_shutdown.append(self.on_shutdown)
 
     @property
     def root(self):
@@ -55,7 +56,6 @@ class Server(object):
         self._root = value
 
     def start(self, host, port):
-        self.app.on_shutdown.append(self.on_shutdown)
         # This call will block while server is running
         # run_app is capable of catching SIGINT and shutting down
         web.run_app(self.app, host=host, port=port)
@@ -65,7 +65,7 @@ class Server(object):
         self.monitor_events_task.cancel()
 
     async def on_shutdown(self, app):
-        for ws in self.clients:
+        for ws in self.clients.copy():
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
         self.shutdown()

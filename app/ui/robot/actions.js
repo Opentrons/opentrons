@@ -1,10 +1,12 @@
 // robot actions and action types
 // action helpers
 import {makeActionName} from '../util'
+import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
 
+// TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = (action) => makeActionName(NAME, action)
-const makeRobotAction = (action) => ({...action, meta: {robotCommand: true}})
+const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 export const actionTypes = {
   // discovery, connect, and disconnect
@@ -25,14 +27,20 @@ export const actionTypes = {
   SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
-  // HOME: makeRobotActionName('HOME'),
-  // HOME_RESPONSE: makeRobotActionName('HOME_RESPONSE'),
+  PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
+  PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
+  DROP_TIP_AND_HOME: makeRobotActionName('DROP_TIP_AND_HOME'),
+  DROP_TIP_AND_HOME_RESPONSE: makeRobotActionName('DROP_TIP_AND_HOME_RESPONSE'),
+  CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
+  CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
   PROBE_TIP_RESPONSE: makeRobotActionName('PROBE_TIP_RESPONSE'),
+  RESET_TIP_PROBE: makeRobotActionName('RESET_TIP_PROBE'),
   MOVE_TO: makeRobotActionName('MOVE_TO'),
   MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
+  TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
   JOG: makeRobotActionName('JOG'),
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
   UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
@@ -54,27 +62,28 @@ export const actionTypes = {
 
 export const actions = {
   discover () {
-    return makeRobotAction({type: actionTypes.DISCOVER})
+    return tagForRobotApi({type: actionTypes.DISCOVER})
   },
 
   discoverFinish () {
     return {type: actionTypes.DISCOVER_FINISH}
   },
 
-  connect (hostname) {
-    return makeRobotAction({type: actionTypes.CONNECT, payload: {hostname}})
+  connect (host) {
+    return tagForRobotApi({type: actionTypes.CONNECT, payload: {host}})
   },
 
   connectResponse (error) {
     const didError = error != null
     const action = {type: actionTypes.CONNECT_RESPONSE, error: didError}
-    if (didError) action.payload = error
 
-    return action
+    if (didError) return {...action, payload: error}
+
+    return tagForAnalytics(action)
   },
 
   disconnect () {
-    return makeRobotAction({type: actionTypes.DISCONNECT})
+    return tagForRobotApi({type: actionTypes.DISCONNECT})
   },
 
   disconnectResponse (error) {
@@ -85,20 +94,19 @@ export const actions = {
     return action
   },
 
-  addDiscovered (hostname) {
-    return {type: actionTypes.ADD_DISCOVERED, payload: {hostname}}
+  addDiscovered (service) {
+    return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (hostname) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: {hostname}}
+  removeDiscovered (host) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: {host}}
   },
 
   // get session or make new session with protocol file
   session (file) {
-    return makeRobotAction({type: actionTypes.SESSION, payload: {file}})
+    return tagForRobotApi({type: actionTypes.SESSION, payload: {file}})
   },
 
-  // TODO(mc, 2017-10-04): make this action FSA compliant (error [=] bool)
   sessionResponse (error, session) {
     const didError = error != null
 
@@ -115,8 +123,64 @@ export const actions = {
     return {type: actionTypes.SET_LABWARE_REVIEWED, payload}
   },
 
+  pickupAndHome (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.PICKUP_AND_HOME,
+      payload: {instrument, labware}
+    })
+  },
+
+  pickupAndHomeResponse (error = null) {
+    const action = {
+      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // TODO(mc, 2017-11-22): dropTipAndHome takes a slot at the moment because
+  // this action is performed in the context of confirming a tiprack labware.
+  // This is confusing though, so refactor these actions + state-management
+  // as necessary
+  dropTipAndHome (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.DROP_TIP_AND_HOME,
+      payload: {instrument, labware}
+    })
+  },
+
+  dropTipAndHomeResponse (error = null) {
+    const action = {
+      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
+  // confirm tiprack action drops the tip unless the tiprack is last
+  confirmTiprack (instrument, labware) {
+    return tagForRobotApi({
+      type: actionTypes.CONFIRM_TIPRACK,
+      payload: {instrument, labware}
+    })
+  },
+
+  confirmTiprackResponse (error = null) {
+    const action = {
+      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
+  },
+
   moveToFront (instrument) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
       payload: {instrument}
     })
@@ -133,7 +197,7 @@ export const actions = {
   },
 
   probeTip (instrument) {
-    return makeRobotAction({type: actionTypes.PROBE_TIP, payload: {instrument}})
+    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {instrument}})
   },
 
   probeTipResponse (error = null) {
@@ -143,8 +207,12 @@ export const actions = {
     return action
   },
 
+  resetTipProbe (instrument) {
+    return {type: actionTypes.RESET_TIP_PROBE, payload: {instrument}}
+  },
+
   moveTo (instrument, labware) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.MOVE_TO,
       payload: {instrument, labware}
     })
@@ -157,8 +225,12 @@ export const actions = {
     return action
   },
 
+  toggleJogDistance () {
+    return {type: actionTypes.TOGGLE_JOG_DISTANCE}
+  },
+
   jog (instrument, axis, direction) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.JOG,
       payload: {instrument, axis, direction}
     })
@@ -172,20 +244,18 @@ export const actions = {
   },
 
   updateOffset (instrument, labware) {
-    return makeRobotAction({
+    return tagForRobotApi({
       type: actionTypes.UPDATE_OFFSET,
       payload: {instrument, labware}
     })
   },
 
-  updateOffsetResponse (error = null) {
-    const action = {
+  updateOffsetResponse (error = null, isTiprack) {
+    return {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
-      error: error != null
+      error: error != null,
+      payload: error || {isTiprack}
     }
-    if (error) action.payload = error
-
-    return action
   },
 
   confirmLabware (labware) {
@@ -193,7 +263,7 @@ export const actions = {
   },
 
   run () {
-    return makeRobotAction({type: actionTypes.RUN})
+    return tagForRobotApi({type: actionTypes.RUN})
   },
 
   runResponse (error) {
@@ -205,7 +275,7 @@ export const actions = {
   },
 
   pause () {
-    return makeRobotAction({type: actionTypes.PAUSE})
+    return tagForRobotApi({type: actionTypes.PAUSE})
   },
 
   pauseResponse (error) {
@@ -217,7 +287,7 @@ export const actions = {
   },
 
   resume () {
-    return makeRobotAction({type: actionTypes.RESUME})
+    return tagForRobotApi({type: actionTypes.RESUME})
   },
 
   resumeResponse (error) {
@@ -229,7 +299,7 @@ export const actions = {
   },
 
   cancel () {
-    return makeRobotAction({type: actionTypes.CANCEL})
+    return tagForRobotApi({type: actionTypes.CANCEL})
   },
 
   cancelResponse (error) {

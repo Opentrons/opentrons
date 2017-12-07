@@ -3,17 +3,17 @@
 # from logging.config import dictConfig
 
 import asyncio
-import pytest
 import os
-import shutil
 import re
-
+import shutil
 from collections import namedtuple
 from functools import partial
-from opentrons.server import rpc
 from uuid import uuid4 as uuid
-from opentrons.data_storage import database
 
+import pytest
+from opentrons.api import models
+from opentrons.data_storage import database
+from opentrons.server import rpc
 
 # Uncomment to enable logging during tests
 
@@ -58,6 +58,28 @@ MAIN_TESTER_DB = str(os.path.join(
     os.path.dirname(
         globals()["__file__"]), 'testing_database.db')
 )
+
+
+def state(topic, state):
+    def _match(item):
+        return \
+            item['name'] == 'state' and \
+            item['topic'] == topic and \
+            item['payload'].state == state
+
+    return _match
+
+
+def log_by_axis(log, axis):
+    from functools import reduce
+
+    def reducer(e1, e2):
+        return {
+            axis: e1[axis] + [round(e2[axis])]
+            for axis in axis
+        }
+
+    return reduce(reducer, log, {axis: [] for axis in axis})
 
 
 def print_db_path(db):
@@ -196,12 +218,45 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
         done, pending = await asyncio.wait([coro], timeout=timeout)
 
         if pending:
+            [task.cancel() for task in pending]
             raise TimeoutError('Notifications: {0}'.format(result))
 
         result += [done.pop().result()]
 
         if matcher(result[-1]):
             return result
+
+
+@pytest.fixture
+def model(robot):
+    from opentrons.containers import load
+    from opentrons.instruments.pipette import Pipette
+
+    pipette = Pipette(robot, mount='right')
+    plate = load(robot, '96-flat', 'A1')
+
+    instrument = models.Instrument(pipette)
+    container = models.Container(plate)
+
+    return namedtuple('model', 'robot instrument container')(
+            robot=robot,
+            instrument=instrument,
+            container=container
+        )
+
+
+@pytest.fixture
+def smoothie(monkeypatch):
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+         SmoothieDriver_3_0_0 as SmoothieDriver
+    from opentrons.robot import robot_configs
+
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    driver = SmoothieDriver(robot_configs.load())
+    driver.connect()
+    yield driver
+    driver.disconnect()
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
 setup_testing_env()

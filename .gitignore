@@ -1,5 +1,3 @@
-.*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -12,15 +10,9 @@ __pycache__/
 .Python
 venv/
 env/
-build/
-app-shell/release-assets/*
-!app-shell/release-assets/index.html
-#!build/
-#build/*
-#!build/html/
-#build/html/*
-#!build/html/_static/
+.env/
 
+api/docs/build/
 develop-eggs/
 dist/
 downloads/
@@ -87,16 +79,7 @@ calibrations/
 *.log
 *.log.*
 
-
-# JS
-.nvm
-
-app/test/coverage
-
 # app api assets
-api/opentrons/server/templates/
 *.pid
 
-# build process assets
-app/bin/
-app/dll/
+*.DS_Store

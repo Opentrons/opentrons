@@ -115,9 +115,6 @@ class Session(object):
             # once robot / driver simulation flow is fixed
             robot._driver.disconnect()
             exec(self._protocol, {})
-        except Exception as e:
-            self.error_append(e)
-            raise e
         finally:
             robot._driver.connect()
             unsubscribe()
@@ -135,19 +132,16 @@ class Session(object):
     def refresh(self):
         self._reset()
 
-        try:
-            parsed = ast.parse(self.protocol_text)
-            self._protocol = compile(parsed, filename=self.name, mode='exec')
-            commands = self._simulate()
-            self.commands = tree.from_list(commands)
-        finally:
-            if self.errors:
-                raise Exception(*self.errors)
+        parsed = ast.parse(self.protocol_text)
+        self._protocol = compile(parsed, filename=self.name, mode='exec')
+        commands = self._simulate()
+        self.commands = tree.from_list(commands)
 
-            self.containers = self.get_containers()
-            self.instruments = self.get_instruments()
+        self.containers = self.get_containers()
+        self.instruments = self.get_instruments()
 
-            self.set_state('loaded')
+        self.set_state('loaded')
+
         return self
 
     def stop(self):
@@ -176,6 +170,7 @@ class Session(object):
         self.set_state('running')
 
         try:
+            self.resume()
             robot.home()
             exec(self._protocol, {})
         except Exception as e:

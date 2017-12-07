@@ -11,8 +11,6 @@ import styles from './Upload.css'
 const UPLOAD_ERROR_MESSAGE = 'Something went wrong while uploading your file.'
 const UPLOAD_SUCCESS_MESSAGE = 'Your file has uploaded successfully.'
 
-const STATUS_BAR_STYLE = 'flex flex__items_center'
-
 Upload.propTypes = {
   name: PropTypes.string.isRequired,
   inProgress: PropTypes.bool.isRequired,
@@ -53,10 +51,13 @@ function UploadResults (props) {
     // instructions for an unsuccessful upload
     instructions = (
       <div className={styles.details}>
+        <p className={styles.error}>
+          {error.message}
+        </p>
         <p>
           Looks like there might be a problem with your protocol file. Please
           check your file for errors. If you need help, contact support
-          and provide them with your protocol file.
+          and provide them with your protocol file and the error message above.
         </p>
       </div>
     )
@@ -106,7 +107,7 @@ function StatusBar (props) {
     : Warning
 
   return (
-    <div className={STATUS_BAR_STYLE}>
+    <div className={styles.status_bar}>
       <StatusIcon className={styles.status_icon} />
       {props.children}
     </div>

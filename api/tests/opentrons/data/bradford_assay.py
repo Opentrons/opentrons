@@ -1,11 +1,13 @@
 from opentrons import containers, instruments
 
+# containers.robot.connect()
+# containers.robot.home()
 
-tiprack = containers.load('tiprack-200ul', 'B1')
-tiprack2 = containers.load('tiprack-200ul', 'B2')
-trash = containers.load('trash-box', 'C2')
+tiprack = containers.load('tiprack-200ul', 'C3')
+tiprack2 = containers.load('tiprack-200ul', 'B4')
+trash = containers.load('trash-box', 'C4')
 
-trough = containers.load('trough-12row', 'C1')
+trough = containers.load('trough-12row', 'B2')
 plate = containers.load('96-PCR-flat', 'A1')
 tuberack = containers.load('tube-rack-2ml', 'A2')
 
@@ -14,7 +16,7 @@ m50 = instruments.Pipette(
     trash_container=trash,
     tip_racks=[tiprack, tiprack2],
     max_volume=50,
-    mount="right",
+    mount="left",
     channels=8
 )
 
@@ -22,8 +24,8 @@ p200 = instruments.Pipette(
     name="p200S",
     trash_container=trash,
     tip_racks=[tiprack],
-    max_volume=200,
-    mount="left"
+    max_volume=300,
+    mount="right"
 )
 
 # dispense 6 standards from tube racks (A1, B1, C1, D1, A2, B2)

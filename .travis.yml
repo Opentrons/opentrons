@@ -11,7 +11,6 @@ matrix:
       sudo: false
       python: "3.5"
       env:
-        - DEPLOY_DIR="linux"
         - PUBLIC_REPO="$(git remote -v | tail -n 1 | sed s/.*opentrons\.git.*/true/g)"
       addons:
         apt:
@@ -22,21 +21,17 @@ matrix:
             - icnsutils # electron-builder dependency
             - graphicsmagick # electron-builder dependency
             - xvfb
-    # TODO(mc, 2017-08-25): Disabled osx build in travis for now. Be sure to
-    # revisit OSX CI in the near future
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - DEPLOY_DIR="mac"
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
   pip: true
   directories:
-    - app/node_modules
     - $HOME/.pyenv
     - $HOME/.cache/brew
-    - .nvm
+    # location of npm cache - preferable to cache this rather than node_modules
+    # because we have one cache for all npm projects plus caching node_modules
+    # can cause issues with native deps
+    - $HOME/.npm
 
 before_install:
   - >  # load keys needed to publish to pypa only when building from public repo
@@ -52,16 +47,18 @@ script:
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C api test exe
+  - make -C api test
   - make -C api lint
   # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
   # TODO(mc, 2017-08-28): use top level `make test`
-  # TODO(mc, 2017-09-13): handle cross-platform distributables
-  - make -C app package test && make -C app dist-${TRAVIS_OS_NAME}
+  - make -C app package test && make -C app dist-posix
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+  # protocol designer
+  # TODO(ian, 2017-11-06): use makefile
+  - cd protocol-designer; npm install && npm run test && npm run lint && npm run build; cd ..
 
 after_success:
   - make coverage
@@ -74,11 +71,11 @@ deploy:
     bucket: ot-app-builds
     skip_cleanup: true
     local-dir: $(pwd)/app/dist
-    upload-dir: $DEPLOY_DIR
+    upload-dir: ci-builds
     acl: public_read
     on:
       condition: $TRAVIS_TEST_RESULT = 0
-      repo: OpenTrons/opentrons
+      repo: Opentrons/opentrons
       all_branches: true
 
   # Publish API to PyPI and Anaconda
@@ -88,10 +85,23 @@ deploy:
     on:
       tags: true
 
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: opentrons-protocol-designer
+    skip_cleanup: true
+    local-dir: $(pwd)/protocol-designer/dist/
+    upload-dir: $TRAVIS_BRANCH
+    acl: public_read
+    region: us-west-2
+    on:
+      condition: $TRAVIS_TEST_RESULT = 0
+      repo: Opentrons/opentrons
+      all_branches: true
+
 env:
   global:
   - OT_PYTHON_VERSION: '3.5.3'
-  - OT_NODE_VERSION: '6.11.5'
   - ENCRYPTION_LABEL: c6cefc96bb2c
   - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
   - secure: XBRwYt3Bowc3klVy6FyXIfeyOBzFzrzMwRJbIz54L8Ov7o2qV8l+5M16iyOy8O8C1qTFMVyCmW3K+xHPQaMstq7rPeVACwJ9VpyQciaDAWVujhyhuN94hU0YtmB1KtmPUHdYCuD25eL5HJ2GDjmYqq/XUYyuX67rrPxT5b5z7Yf4kdkPyBIa5c+KyklYmJLdHGBJUuOfM7qvxOo7nlMyzU+LfgvtqM15g7eQIvXGDydi59lT6FOpW9J9h4Z2Nwmc2lHjxCxi5SI2NIR7K5DsqjtRi0eMcr1m098CA/T1Oh4c5qlG8Uoi+KpOcfcTuAP3VSFdbMgRFmtQ3gwJ71ZPB7GeqvLXSgriACl12n0uienOYrb6/X1Nujsl7Pxjh8KMiIBRcX2/46ecyeN+gP+6u9ic5mPRMFky1e2dqbbUTIeAw7397ufvtIPb0qW4mUMdu4NMkiRg01aF5ZmgVMXvnvQm/xyF+SC0Qtj9uOjZUzsj5DVnLuLHekP3OYpxRzFFzpjBZmdwCsEtwHH8PmuG/owa6Jmf4aXN50dgCL6oRPjWoH213jOdjplGI7ZMZXAigGrN9sT9Om67ZWNuN/TYgy+K3QIp2ELC6MmpJNuH9n8M1pCtynitSyvuW5YhG/j7VH3TKDogID3FOgPYAjfC0EshHt+Kl2GddaR3bpCa3XA=

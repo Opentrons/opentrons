@@ -34,6 +34,7 @@ class PersistedContainersTestCase(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(environment.get_path('APP_DATA_DIR'))
         del os.environ['APP_DATA_DIR']
+        environment.refresh()
 
     def test_get_custom_container_files(self):
         old_container_loading.get_custom_container_files()
@@ -76,7 +77,7 @@ class PersistedContainersTestCase(unittest.TestCase):
     def test_load_all_persisted_containers(self):
         all_persisted_containers = \
             old_container_loading.load_all_containers()
-        self.assertEqual(len(all_persisted_containers), 42)
+        self.assertEqual(len(all_persisted_containers), 43)
 
     def test_create_container_obj_from_dict(self):
         container_data = """{

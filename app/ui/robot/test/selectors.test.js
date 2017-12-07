@@ -20,10 +20,13 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
+  getSingleChannel,
   getInstrumentsCalibrated,
   getLabware,
   getUnconfirmedTipracks,
-  getUnconfirmedLabware
+  getUnconfirmedLabware,
+  getNextLabware,
+  getJogDistance
 } = selectors
 
 describe('robot selectors', () => {
@@ -40,16 +43,16 @@ describe('robot selectors', () => {
       connection: {
         connectedTo: 'abcdef.local',
         discovered: ['abcdef.local', '123456.local'],
-        discoveredByHostname: {
-          'abcdef.local': {hostname: 'abcdef.local'},
-          '123456.local': {hostname: '123456.local'}
+        discoveredByHost: {
+          'abcdef.local': {host: 'abcdef.local', name: 'foo'},
+          '123456.local': {host: '123456.local', name: 'bar'}
         }
       }
     }
 
     expect(getDiscovered(makeState(state))).toEqual([
-      {hostname: 'abcdef.local', isConnected: true},
-      {hostname: '123456.local', isConnected: false}
+      {host: 'abcdef.local', name: 'foo', isConnected: true},
+      {host: '123456.local', name: 'bar', isConnected: false}
     ])
   })
 
@@ -224,7 +227,16 @@ describe('robot selectors', () => {
     })
 
     test('getRunProgress', () => {
-      expect(getRunProgress(state)).toEqual(50)
+      // leaves: 2, 3, 4; processed: 2
+      expect(getRunProgress(state)).toEqual(1 / 3 * 100)
+    })
+
+    test('getRunProgress with no commands', () => {
+      const state = makeState({
+        session: {protocolCommands: [], protocolCommandsById: {}}
+      })
+
+      expect(getRunProgress(state)).toEqual(0)
     })
 
     test('getStartTime', () => {
@@ -324,6 +336,9 @@ describe('robot selectors', () => {
       calibration: {
         instrumentsByAxis: {
           left: constants.PROBING
+        },
+        probedByAxis: {
+          left: true
         }
       }
     })
@@ -334,16 +349,50 @@ describe('robot selectors', () => {
         name: 'p200m',
         channels: 'multi',
         volume: 200,
-        calibration: constants.PROBING
+        calibration: constants.PROBING,
+        probed: true
       },
       {
         axis: 'right',
         name: 'p50s',
         channels: 'single',
         volume: 50,
-        calibration: constants.UNPROBED
+        calibration: constants.UNPROBED,
+        probed: false
       }
     ])
+  })
+
+  test('get jog distance', () => {
+    const state = makeState({
+      calibration: {jogDistance: constants.JOG_DISTANCE_SLOW_MM}
+    })
+
+    expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
+  })
+
+  test('get single channel', () => {
+    const state = makeState({
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {axis: 'right', name: 'p50s', channels: 1, volume: 50}
+        }
+      },
+      calibration: {
+        instrumentsByAxis: {},
+        probedByAxis: {}
+      }
+    })
+
+    expect(getSingleChannel(state)).toEqual({
+      axis: 'right',
+      name: 'p50s',
+      channels: 'single',
+      volume: 50,
+      calibration: constants.UNPROBED,
+      probed: false
+    })
   })
 
   test('get instruments are calibrated', () => {
@@ -355,10 +404,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.PROBED,
-          right: constants.PROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {left: true, right: true}
       }
     })
 
@@ -370,10 +417,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.UNPROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {left: false, right: false}
       }
     })
 
@@ -384,9 +429,8 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          right: constants.PROBED
-        }
+        instrumentsByAxis: {},
+        probedByAxis: {right: true}
       }
     })
 
@@ -410,7 +454,11 @@ describe('robot selectors', () => {
         calibration: {
           labwareBySlot: {
             1: constants.UNCONFIRMED,
-            5: constants.CONFIRMED
+            5: constants.OVER_SLOT
+          },
+          confirmedBySlot: {
+            1: false,
+            5: true
           }
         }
       })
@@ -424,7 +472,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {slot: 2},
         {slot: 3},
@@ -435,7 +484,8 @@ describe('robot selectors', () => {
           name: 'b2',
           type: 'b',
           isTiprack: false,
-          calibration: constants.CONFIRMED
+          calibration: constants.OVER_SLOT,
+          confirmed: true
         },
         {slot: 6},
         {slot: 7},
@@ -446,7 +496,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {slot: 10},
         {slot: 11}
@@ -461,7 +512,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         }
       ])
     })
@@ -474,7 +526,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         },
         {
           slot: 9,
@@ -482,9 +535,34 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED
+          calibration: constants.UNCONFIRMED,
+          confirmed: false
         }
       ])
+    })
+
+    test('get next labware', () => {
+      expect(getNextLabware(state)).toEqual({
+        slot: 1,
+        id: 'A1',
+        name: 'a1',
+        type: 'a',
+        isTiprack: true,
+        calibration: constants.UNCONFIRMED,
+        confirmed: false
+      })
+
+      state[NAME].calibration.confirmedBySlot[1] = true
+
+      expect(getNextLabware(state)).toEqual({
+        slot: 9,
+        id: 'C3',
+        name: 'c3',
+        type: 'c',
+        isTiprack: false,
+        calibration: constants.UNCONFIRMED,
+        confirmed: false
+      })
     })
   })
 })

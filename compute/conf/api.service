@@ -1,0 +1,7 @@
+<service-group>
+  <name replace-wildcards="yes">opentrons-usb</name>
+  <service>
+    <type>_http._tcp</type>
+    <port>31950</port>
+  </service>
+</service-group>

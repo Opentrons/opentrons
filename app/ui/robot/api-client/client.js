@@ -20,8 +20,6 @@ const INSTRUMENT_AXES = {
   a: 'right'
 }
 
-const DEFAULT_JOG_DISTANCE_MM = '0.25'
-
 export default function client (dispatch) {
   let rpcClient
   let remote
@@ -38,7 +36,9 @@ export default function client (dispatch) {
       case actionTypes.CONNECT: return connect(state, action)
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
-      // case actionTypes.HOME: return home(state, action)
+      case actionTypes.PICKUP_AND_HOME: return pickupAndHome(state, action)
+      case actionTypes.DROP_TIP_AND_HOME: return dropTipAndHome(state, action)
+      case actionTypes.CONFIRM_TIPRACK: return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
@@ -54,7 +54,7 @@ export default function client (dispatch) {
   function connect (state, action) {
     if (rpcClient) return dispatch(actions.connectResponse())
 
-    RpcClient(`ws://${action.payload.hostname}:${PORT}`)
+    RpcClient(`ws://${action.payload.host}:${PORT}`)
       .then((c) => {
         rpcClient = c
         rpcClient
@@ -110,7 +110,7 @@ export default function client (dispatch) {
 
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
@@ -120,9 +120,45 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.moveToFrontResponse(error)))
   }
 
+  function pickupAndHome (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
+
+    remote.calibration_manager.pick_up_tip(instrument, labware)
+      .then(() => dispatch(actions.pickupAndHomeResponse()))
+      .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
+  }
+
+  function dropTipAndHome (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
+
+    remote.calibration_manager.drop_tip(instrument, labware)
+      .then(() => remote.calibration_manager.home(instrument))
+      .then(() => dispatch(actions.dropTipAndHomeResponse()))
+      .catch((error) => dispatch(actions.dropTipAndHomeResponse(error)))
+  }
+
+  // drop the tip unless the tiprack is the last one to be confirmed
+  function confirmTiprack (state, action) {
+    const {payload: {instrument: axis, labware: slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
+
+    if (selectors.getUnconfirmedTipracks(state).length === 1) {
+      return dispatch(actions.confirmTiprackResponse())
+    }
+
+    remote.calibration_manager.drop_tip(instrument, labware)
+      .then(() => dispatch(actions.confirmTiprackResponse()))
+      .catch((error) => dispatch(actions.confirmTiprackResponse(error)))
+  }
+
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
@@ -134,14 +170,13 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
-    const labware = selectors.getLabwareBySlot(state)[slot]
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
 
     remote.calibration_manager.move_to(instrument, labware)
-
       .then(() => dispatch(actions.moveToResponse()))
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
@@ -151,7 +186,7 @@ export default function client (dispatch) {
   function jog (state, action) {
     const {payload: {instrument: instrumentAxis, axis, direction}} = action
     const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
-    const distance = DEFAULT_JOG_DISTANCE_MM * direction
+    const distance = selectors.getJogDistance(state) * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.jogResponse()), 1000)
@@ -163,8 +198,11 @@ export default function client (dispatch) {
 
   function updateOffset (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[axis]
-    const labware = selectors.getLabwareBySlot(state)[slot]
+    const labwareObject = selectors.getLabwareBySlot(state)[slot]
+
+    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const labware = {_id: labwareObject._id}
+    const isTiprack = labwareObject.isTiprack || false
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => {
@@ -172,13 +210,18 @@ export default function client (dispatch) {
     //   dispatch(push(`/setup-deck/${slot}`))
     // }, 2000)
 
-    remote.calibration_manager.update_container_offset(labware, instrument)
-      .then(() => {
-        // TODO(mc, 2017-10-06): do this without a double dispatch
-        // also this hardcoded URL is a bad idea™
-        dispatch(actions.updateOffsetResponse())
-        dispatch(push(`/setup-deck/${slot}`))
-      })
+    let request = remote.calibration_manager
+      .update_container_offset(labware, instrument)
+
+    // TODO(mc, 2017-11-29): DRY this up (reuses logic from pickup and home)
+    if (isTiprack) {
+      request = request
+        .then(() => remote.calibration_manager.pick_up_tip(instrument, labware))
+        .then(() => remote.calibration_manager.home(instrument))
+    }
+
+    request
+      .then(() => dispatch(actions.updateOffsetResponse(null, isTiprack)))
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 

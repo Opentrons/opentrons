@@ -1,11 +1,6 @@
 .info {
-  display: block;
-  border: 2px solid silver;
-  border-radius: 0.25rem;
   margin-top: 1rem;
-  padding: 0.5rem;
   font-size: 0.75rem;
-  min-height: 7.1rem;
 }
 
 .alert {
@@ -13,10 +8,7 @@
   color: white;
   height: 1rem;
   width: 1rem;
-  margin: 0.5rem;
-  text-align: center;
-  border-radius: 0.5rem;
-  display: block;
+  margin: 0.5rem 0.5rem 0.5rem 0;
   float: left;
 }
 
@@ -27,7 +19,6 @@
   padding: 0 3rem;
   display: block;
   margin: 0 auto;
-  margin-top: 1rem;
   line-height: 3rem;
   font-size: 1rem;
   font-family: 'trons';
@@ -37,13 +28,15 @@
 }
 
 .warning {
+  position: absolute;
+  top: 100%;
   visibility: hidden;
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   text-transform: capitalize;
 }
 
-.info:hover + .warning {
+.info:hover .warning {
   visibility: visible;
 }
 
@@ -51,13 +44,37 @@
   pointer-events: none;
 }
 
-h3.title {
-  text-align: center;
+.important {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.message {
+  margin-bottom: 1rem;
+}
+
+.submessage {
+  margin-bottom: 1rem;
+}
+
+.message:last-child,
+.submessage:last-child {
+  margin-bottom: 0;
 }
 
 .progress {
   width: 4rem;
   height: 3rem;
   display: block;
-  margin: 0 auto;
+  margin: 1rem auto;
+}
+
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 1rem;
 }

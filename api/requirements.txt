@@ -1,11 +1,10 @@
-pylama
+pylama==7.4.3
 pyserial==3.2.1
-pytest
-pytest-cov
-pytest-aiohttp
-dill
+pytest==3.2.5
+pytest-cov==2.5.1
+pytest-aiohttp==0.2.0
+dill==0.2.7.1
 numpydoc==0.6.0
-# June 15 2017 (artyom) : https://github.com/pyinstaller/pyinstaller/issues/2434
-git+https://github.com/pyinstaller/pyinstaller.git@7e814646474efc868206beb8fb9dfe45af527109
 Sphinx==1.4.8
 twine==1.8.1
+urwid==1.3.1
