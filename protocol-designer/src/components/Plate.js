@@ -7,6 +7,9 @@ import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
 
 import defaultContainers from '../default-containers.json'
 
+const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
+// TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
+
 class Plate extends React.Component {
   static propTypes = {
     selectable: PropTypes.bool,
@@ -69,7 +72,7 @@ class Plate extends React.Component {
     return (
       <g>
         {/* Debug: plate boundary */}
-        <rect x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
+        <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
         {/* The wells: */}
         {map(wellContents, createWell)}
       </g>

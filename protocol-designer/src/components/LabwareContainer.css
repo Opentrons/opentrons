@@ -1,10 +1,31 @@
+@value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
+
+/*
+NOTE: available defs are:
+  #roundSlotClipPath
+*/
+
+.round_slot {
+  clip-path: url(#roundSlotClipPath);
+}
+
+.highlighted {
+  fill: none;
+  stroke: blue;
+}
+
 .empty_slot {
-  fill: lightgray;
+  composes: round_slot;
+  fill: plateBg;
 }
 
 .empty_slot text {
   fill: white;
   font-size: 2rem;
+}
+
+.slot_overlay {
+  composes: round_slot;
 }
 
 .slot_overlay > rect {
@@ -45,6 +66,7 @@
 }
 
 .pass_thru_mouse {
+  /* TODO Ian 2017-12-07 move to mixins.css ? */
   pointer-events: none;
 }
 
@@ -52,6 +74,7 @@
 
 /* shows container name on deck */
 .name_overlay {
+  composes: round_slot;
   font-size: 0.75rem;
   fill: white;
 }

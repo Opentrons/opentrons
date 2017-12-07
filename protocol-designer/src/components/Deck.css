@@ -1,10 +1,31 @@
+@value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
+
 .deck {
   max-height: 90vh;
 }
 
+.deck_element {
+  fill: white;
+}
+
 .deck_outline {
+  composes: deck_element;
   width: 100%;
   height: 100%;
-  fill: transparent;
-  stroke: black;
+  stroke: plateBg;
+}
+
+.trash_outer {
+  composes: deck_element;
+  stroke: plateBg;
+}
+
+.trash_inner {
+  fill: plateBg;
+}
+
+.trash text {
+  font-size: 3rem;
+  text-anchor: middle;
+  fill: white;
 }

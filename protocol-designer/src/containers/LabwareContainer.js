@@ -27,7 +27,8 @@ export default connect(
       ...containerInfo,
       canAdd: selectors.canAdd(state),
       activeModals: selectors.activeModals(state),
-      labwareToCopy: selectors.labwareToCopy(state)
+      labwareToCopy: selectors.labwareToCopy(state),
+      highlighted: selectors.selectedContainerSlot(state) === ownProps.slotName
     }
   },
   {

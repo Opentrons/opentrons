@@ -79,7 +79,7 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
       {containerName && <g className={styles.name_overlay}>
-        <rect x='0' y='0' height={boxHeight} width='100%' fill='rgba(0,0,0,0.8)' />
+        <rect x='0' y='0' height={boxHeight} width='100%' fill='rgba(0,0,0,0.8)' /> {/* TODO don't inline fill? */}
         <text x={paddingLeft} y={0.4 * boxHeight + paddingTop}>
           {humanize(containerType)}
         </text>
@@ -115,62 +115,78 @@ export default function LabwareContainer ({
   copyLabware,
 
   height,
-  width
+  width,
+  highlighted
 }) {
   const hasName = containerName !== null
   const slotIsOccupied = !!containerType
 
   const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
 
+  const defs = {roundSlotClipPath: 'roundSlotClipPath'}
+
   return (
-    <svg {...{height, width}} className={styles.deck_slot}>
-      {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
-      {slotIsOccupied
-        ? <SlotWithContainer {...{containerType, containerName, containerId}} />
-        // Empty slot
-        : <g className={styles.empty_slot}>
-          <rect width='100%' height='100%' />
-          <CenteredTextSvg text={slotName} />
-        </g>}
+    <g>
+      <svg {...{height, width}} className={styles.deck_slot}>
+        {/* Defs for anything inside this SVG. TODO: how to better organize IDs and defined elements? */}
+        <defs>
+          <clipPath id={defs.roundSlotClipPath}>
+            <rect rx='6' width='100%' height='100%' />
+          </clipPath>
+        </defs>
 
-      {!slotIsOccupied && (activeModals.labwareSelection
-        // "Add Labware" labware selection dropdown menu
-        ? null /* (slotName === canAdd) && <LabwareDropdown
-              onClose={e => closeLabwareSelector({slotName})}
-              onContainerChoose={containerType => createContainer({slotName, containerType})}
-            /> */
-        : (labwareToCopy
-            // Mouseover empty slot -- Add (or Copy if in copy mode)
-            ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
-              <CenteredTextSvg className={styles.pass_thru_mouse} text='Place Copy' />
-            </g>
-            : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
-              <CenteredTextSvg className={styles.pass_thru_mouse} text='Add Labware' />
-            </g>
-        )
-      )}
+        {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
+        {slotIsOccupied
+          ? <SlotWithContainer {...{containerType, containerName, containerId}} />
+          // Empty slot
+          : <g className={styles.empty_slot}>
+            <rect width='100%' height='100%' />
+            <CenteredTextSvg text={slotName} />
+          </g>}
 
-      {slotIsOccupied && hasName &&
-        <OccupiedDeckSlotOverlay {...{
-          canAddIngreds,
+        {!slotIsOccupied && (activeModals.labwareSelection
+          // "Add Labware" labware selection dropdown menu
+          ? null /* (slotName === canAdd) && <LabwareDropdown
+                onClose={e => closeLabwareSelector({slotName})}
+                onContainerChoose={containerType => createContainer({slotName, containerType})}
+              /> */
+          : (labwareToCopy
+              // Mouseover empty slot -- Add (or Copy if in copy mode)
+              ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+                <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
+                <CenteredTextSvg className={styles.pass_thru_mouse} text='Place Copy' />
+              </g>
+              : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+                <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
+                <CenteredTextSvg className={styles.pass_thru_mouse} text='Add Labware' />
+              </g>
+          )
+        )}
+
+        {slotIsOccupied && hasName &&
+          <OccupiedDeckSlotOverlay {...{
+            canAddIngreds,
+            containerId,
+            slotName,
+            containerType,
+            containerName,
+            openIngredientSelector,
+            setCopyLabwareMode,
+            deleteContainer
+          }} />}
+
+        {!hasName && <NameThisLabwareOverlay {...{
+          containerType,
           containerId,
           slotName,
-          containerType,
-          containerName,
-          openIngredientSelector,
-          setCopyLabwareMode,
+          modifyContainer,
           deleteContainer
         }} />}
 
-      {!hasName && <NameThisLabwareOverlay {...{
-        containerType,
-        containerId,
-        slotName,
-        modifyContainer,
-        deleteContainer
-      }} />}
-    </svg>
+      </svg>
+      {/* Highlight border goes outside the SVG so it doesn't get clipped... */}
+      {highlighted &&
+        <rect className={styles.highlighted} x='0' y='0' width={width} height={height} rx='6' />}
+    </g>
   )
 }
