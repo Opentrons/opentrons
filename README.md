@@ -95,8 +95,8 @@ $ make install
 # verify
 $ python -c 'import opentrons; print(opentrons.__version__)' # > prints version
 
-# run with a real robot
-$ OT_ROBOT_CONFIG=[your_robot_serial_number] make dev
+# push API to a USB connected robot
+$ make push
 
 # run with a virtual robot
 $ ENABLE_VIRTUAL_SMOOTHIE=true make dev

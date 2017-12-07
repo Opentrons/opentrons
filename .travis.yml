@@ -21,10 +21,6 @@ matrix:
             - icnsutils # electron-builder dependency
             - graphicsmagick # electron-builder dependency
             - xvfb
-    # TODO(mc, 2017-08-25): Disabled osx build in travis for now. Be sure to
-    # revisit OSX CI in the near future
-    # - os: osx
-    #   language: generic
 
 # More: https://docs.travis-ci.com/user/caching/
 cache:
