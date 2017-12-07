@@ -1,7 +1,7 @@
 import pytest
 from opentrons.trackers.pose_tracker import (
     Point, Node, add, descendants, ascend, change_base, max_z,
-    update, remove, translate, init, ROOT
+    update, remove, translate, init, ROOT, has_children
 )
 from numpy import isclose, array, ndarray
 
@@ -82,6 +82,11 @@ def test_descendants(state):
         ('2-2', 1)
     ]
     assert descendants(state, '1-1-1') == []
+
+
+def test_has_children(state):
+    assert has_children('2-2') == False
+    assert has_children('2') == True
 
 
 def test_ascend(state):
