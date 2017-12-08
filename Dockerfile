@@ -30,7 +30,7 @@ RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profi
 
 # See compute/README.md for details. Make sure to keep them in sync
 RUN apk add --update \
-      avahi-tools \
+      util-linux \
       dumb-init \
       radvd \
       dropbear \
@@ -85,6 +85,10 @@ RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.c
 ENV PIP_ROOT /data/packages
 RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
 
+# Generate the id that we will later check to see if that's the
+# new container and that local Opentrons API package should be deleted
+ENV CONTAINER_ID=$(uuidgen)
+
 # Updates, HTTPS (for future use), API, SSH for link-local over USB
 EXPOSE 80 443 31950
 
@@ -104,4 +108,4 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 #   docker run opentrons dumb-init python -c 'while True: pass'
 # or uncomment:
 # CMD ["python", "-c", "while True: pass"]
-CMD ["bash", "-c", "( setup.sh && exec start.sh ) 2>&1 | tee /var/opentrons.log"]
+CMD ["bash", "-c", "setup.sh && exec start.sh"]

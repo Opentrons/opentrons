@@ -16,6 +16,18 @@ echo 1 > /proc/sys/net/ipv6/conf/eth0/keep_addr_on_down
 # because host computer remembers it being used and reports collision.
 echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_dad
 
+# Cleanup any connections. This will leave only wlan0
+nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(--)/\1/p' | xargs nmcli connection del
+nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p' | xargs nmcli connection del
+
+# Clean up opentrons package dir if it's a first start of a new container
+touch /data/id
+if [ $(cat /data/id) != $CONTAINER_ID ] ; then 
+  echo 'First start of a new container. Deleting local Opentrons API installation'
+  rm -rf /data/packages/usr/local/lib/python3.6/site-packages/opentrons*
+  echo $CONTAINER_ID > /data/id
+fi
+
 # Set static address so we can find the device from host computer over
 # USB without using Bojnjour or any kind of service discovery, making
 # overall solution more cross-platform compatible
