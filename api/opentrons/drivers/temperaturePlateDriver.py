@@ -1,4 +1,4 @@
-from opentrons.drivers.smoothie_drivers.v3_0_0 import serial_communication as sc
+from opentrons.drivers.smoothie_drivers import serial_communication as sc
 from serial.tools import list_ports
 
 from os import environ
