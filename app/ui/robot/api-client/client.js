@@ -62,9 +62,18 @@ export default function client (dispatch) {
           .on('error', handleClientError)
 
         remote = rpcClient.remote
+        const session = remote.session_manager.session
 
-        if (remote.session_manager.session) {
-          handleApiSession(remote.session_manager.session)
+        // TODO(mc, 2017-12-07): handle this with fewer dispatches
+        if (session) {
+          handleApiSession(session)
+
+          if (
+            session.state === constants.RUNNING ||
+            session.state === constants.PAUSED
+          ) {
+            dispatch(push('/run'))
+          }
         }
 
         dispatch(actions.connectResponse())
