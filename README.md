@@ -1,6 +1,7 @@
 # Opentrons Platform
 
 [![Travis CI][travis-badge]][travis]
+[![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
 
 * [Overview](#overview)
@@ -65,11 +66,12 @@ $ env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
 $ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.3
 ```
 
-* Node v6 LTS Boron ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
+* Node v8 LTS (Carbon) ([nvm](https://github.com/creationix/nvm) is optional, but recommended)
 
 ```shell
 # nvm on macOS and Linux
-$ nvm install lts/boron
+# installs version from .nvmrc ("8")
+$ nvm install && nvm use
 ```
 
 * GNU Make: both the API and app manage their builds with [Makefiles](https://en.wikipedia.org/wiki/Makefile)
@@ -93,8 +95,8 @@ $ make install
 # verify
 $ python -c 'import opentrons; print(opentrons.__version__)' # > prints version
 
-# run with a real robot
-$ OT_ROBOT_CONFIG=[your_robot_serial_number] make dev
+# push API to a USB connected robot
+$ make push
 
 # run with a virtual robot
 $ ENABLE_VIRTUAL_SMOOTHIE=true make dev
@@ -117,7 +119,9 @@ See the [App README][app-readme] for instructions.
 Enjoy!
 
 [travis]: https://travis-ci.org/Opentrons/opentrons/branches
-[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
+[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600&label=*nix%20build
+[appveyor]: https://ci.appveyor.com/project/Opentrons/opentrons
+[appveyor-badge]: https://img.shields.io/appveyor/ci/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600&label=windows%20build
 [codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
 [codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
 [app-readme]: ./app/README.md

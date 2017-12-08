@@ -8,9 +8,8 @@ environment:
 platform: x64
 
 cache:
-  - app\node_modules        # local npm modules
   - '%APPDATA%\npm-cache'   # npm cache
-    
+
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH% # Activate Python 3.5
   - git config --global core.autocrlf false # don't convert LFs to CRLFs since we are running Cygwin
@@ -25,9 +24,15 @@ init:
 #   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
-  - ps: Install-Product node 6.11.0 x64
-  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make install"'
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app && make install"'
+  # read node version from the first line of .nvmrc
+  - ps: $env:nodejs_version = (Get-Content -Path $env:APPVEYOR_BUILD_FOLDER\.nvmrc)[0]
+  - ps: Install-Product node $env:nodejs_version x64
+  # upgrade to npm v5.6.0 and verify npm cache to work around weird npm issues
+  # https://github.com/npm/npm/releases/tag/v5.6.0
+  - ps: npm install -g npm@5.6.0
+  - ps: npm cache verify
+  # install dev dependencies
+  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER && make install"'
 
 build: false # No need to run MSBuild
 

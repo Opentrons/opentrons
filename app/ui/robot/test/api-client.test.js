@@ -1,4 +1,6 @@
 // tests for the api client
+import {push} from 'react-router-redux'
+
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
@@ -131,6 +133,22 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => sendDisconnect())
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('dispatch push to /run if connect to running session', () => {
+      const expected = push('/run')
+      session.state = constants.RUNNING
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('dispatch push to /run if connect to paused session', () => {
+      const expected = push('/run')
+      session.state = constants.PAUSED
+
+      return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
