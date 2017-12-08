@@ -1,4 +1,5 @@
 @value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
+@value overlay_transparency from '../css/globals.css';
 
 /*
 NOTE: available defs are:
@@ -26,10 +27,10 @@ NOTE: available defs are:
 
 .slot_overlay {
   composes: round_slot;
+  fill: black;
 }
 
 .slot_overlay > rect {
-  fill: rgb(100, 100, 100);
   width: 100%;
   height: 100%;
 }
@@ -43,8 +44,6 @@ NOTE: available defs are:
 }
 
 .slot_overlay_name_it > rect {
-  fill: black;
-  opacity: 0.75;
   height: 80%;
   transform: translate(0, 10%);
 }
@@ -54,9 +53,10 @@ NOTE: available defs are:
 }
 
 .appear_on_mouseover:hover > * {
-  opacity: inherit;
+  opacity: 0.75;
 }
 
+/* Clickable text / icons */
 .clickable {
   cursor: pointer;
 }
@@ -75,12 +75,17 @@ NOTE: available defs are:
 /* shows container name on deck */
 .name_overlay {
   composes: round_slot;
-  font-size: 0.75rem;
+  font-size: 0.5rem;
   fill: white;
 }
 
-.name_overlay .container_name {
-  font-size: 1rem;
+.name_overlay rect {
+  fill: black;
+  opacity: 0.75;
+}
+
+.name_overlay .container_type {
+  font-weight: bold;
 }
 
 .deck_slot:hover .name_overlay {

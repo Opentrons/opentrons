@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './LabwareContainer.css'
-import { nonFillableContainers } from '../constants.js'
+import { nonFillableContainers, SLOT_HEIGHT } from '../constants.js'
 import { humanize } from '../utils.js'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
@@ -65,9 +65,9 @@ function OccupiedDeckSlotOverlay ({
 
 function SlotWithContainer ({containerType, containerName, containerId}) {
   // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
-  const paddingLeft = 5
+  const paddingLeft = 4
   const paddingTop = 0
-  const boxHeight = 30
+  const boxHeight = 25
   return (
     <g>
       {nonFillableContainers.includes(containerType)
@@ -79,13 +79,15 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
       {containerName && <g className={styles.name_overlay}>
-        <rect x='0' y='0' height={boxHeight} width='100%' fill='rgba(0,0,0,0.8)' /> {/* TODO don't inline fill? */}
-        <text x={paddingLeft} y={0.4 * boxHeight + paddingTop}>
-          {humanize(containerType)}
-        </text>
-        <text x={paddingLeft} y={0.9 * boxHeight + paddingTop} className={styles.container_name}>
-          {containerName}
-        </text>
+        <g transform={`translate(0 ${SLOT_HEIGHT - boxHeight})`}>
+          <rect x='0' y='0' height={boxHeight} width='100%' />
+          <text x={paddingLeft} y={0.4 * boxHeight + paddingTop} className={styles.container_type}>
+            {humanize(containerType).toUpperCase()}
+          </text>
+          <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>
+            {containerName}
+          </text>
+        </g>
       </g>}
     </g>
   )
