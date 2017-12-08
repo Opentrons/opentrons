@@ -32,6 +32,7 @@ RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profi
 RUN apk add --update \
       util-linux \
       dumb-init \
+      vim \
       radvd \
       dropbear \
       dropbear-scp \
