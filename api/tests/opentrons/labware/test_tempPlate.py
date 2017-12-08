@@ -1,9 +1,9 @@
 import pytest
-from opentrons import instruments
+from opentrons.instruments.temperaturePlate import TemperaturePlate
 
 @pytest.fixture
-def plate():
-    return instruments.TemperaturePlate()
+def plate(robot):
+    return TemperaturePlate(robot, 'A1')
 
 def test_set_temp(plate):
     plate.set_temp(20)

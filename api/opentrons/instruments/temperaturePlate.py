@@ -25,12 +25,14 @@ def _wait_for_temp(tempPlate):
 
 
 class TemperaturePlate(Placeable):
+    stackable = True
+    module_name = 'temperature_plate'
+
     def __init__(self, robot, slot):
         super(TemperaturePlate, self).__init__()
         self.robot = robot
         self.min_temp = 10
         self.max_temp = 70
-        self.stackable = True
         self.driver = Driver()
         robot.add_module(self, slot)
 
@@ -38,23 +40,25 @@ class TemperaturePlate(Placeable):
     def simulating(self):
         return self.robot.is_simulating()
 
-    #change connection to envvar
     def connect(self):
         self.driver.connect(MANUF_ID, self.simulating)
+
+    def disconnect(self):
+        self.driver.disconnect()
 
 
     # ----------- Public interface ---------------- #
     def set_temp(self, temp, wait=False):
         if _is_valid_temp(self, temp):
-            self.driver.set_temp(temp)
+            self.driver.set_temp(temp, self.simulating)
         if wait:
             _wait_for_temp(self)
 
     def get_temp(self):
-        return self.driver.get_temp()
+        return self.driver.get_temp(self.simulating)
 
     def shutdown(self):
-        self.driver.shutdown()
+        self.driver.shutdown(self.simulating)
 
 
     # ----------- END Public interface ------------ #

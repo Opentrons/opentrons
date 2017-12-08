@@ -42,6 +42,16 @@ def humanize_location(location):
     well, _ = unpack_location(location)
     return repr(well)
 
+def _stackable_children(items):
+     if items == []:
+         return []
+     stackable_children =  filter(
+        lambda child: getattr(child, 'stackable', False),
+        items)
+
+     retir
+
+
 
 class Placeable(object):
     """
@@ -431,14 +441,20 @@ class Deck(Placeable):
     """
     This class implements behaviour specific to the Deck
     """
-
     def containers(self) -> list:
         """
         Returns all containers on a deck as a list
         """
+
         all_containers = list()
         for slot in self:
+            children = slot.get_children_list()
             all_containers += slot.get_children_list()
+
+        for container in all_containers:
+            if getattr(container, 'stackable', False):
+                all_containers += container.get_children_list()
+
         return all_containers
 
     def has_container(self, container_instance):
@@ -459,6 +475,7 @@ class Slot(Placeable):
     """
     Class representing a Slot
     """
+    stackable = True
     pass
 
 

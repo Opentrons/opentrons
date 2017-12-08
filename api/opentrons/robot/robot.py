@@ -123,16 +123,29 @@ def _setup_container(container_name, label):
 
     return container
 
+#TODO jmg 12/8/17: Should be loading modules with relavent info (dimensions, offsets, etc)
+#First thoughts of implementation are to have a 'modules' config file / db table
+def _setup_module(module):
+    return module
+
+
 def _get_placement_location(slot, deck):
     location = None
-    if isinstance(slot, str): #If target location is a slot, it will be passed as a string
+    # If target location is a slot, it will be passed as a string
+    if isinstance(slot, str):
         location = deck[slot]
     elif getattr(slot, 'stackable', False):
         location = slot
 
     return location
 
-
+def _is_available_slot(poses, location, share, slot, container_name):
+    if pose_tracker.has_children(poses, location) and not share:
+        raise RuntimeWarning(
+            'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
+                slot, container_name, slot))
+    else:
+        return True
 
 
 class Robot(object):
@@ -188,7 +201,7 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-
+        self.modules = []
         # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
 
@@ -423,6 +436,8 @@ class Robot(object):
         """
 
         self._driver.connect()
+        for module in self.modules:
+            module.connect()
 
         # device = None
         # if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
@@ -628,13 +643,15 @@ class Robot(object):
 
         return strategy
 
-    # DEPRECATED
     def disconnect(self):
         """
         Disconnects from the robot.
         """
         if self._driver:
             self._driver.disconnect()
+
+        for module in self.modules:
+            module.disconnect()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
@@ -738,20 +755,16 @@ class Robot(object):
     def add_container(self, container_name, slot, label=None, share=False):
         container = _setup_container(container_name, label)
         location = _get_placement_location(slot, self._deck)
-
-        if pose_tracker.has_children(self.poses, location) and not share:
-            raise RuntimeWarning(
-                'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
-                    slot, container_name, slot))
-        else:
+        if _is_available_slot(self.poses, location, share, slot, container_name):
             location.add(container, label)
-
         self.add_container_to_pose_tracker(location, container)
         return container
 
     def add_module(self, module, slot):
+        module = _setup_module(module)
         location = _get_placement_location(slot, self._deck)
         location.add(module)
+        self.modules.append(module)
         self.poses = pose_tracker.add(
             self.poses,
             module,
@@ -829,7 +842,7 @@ class Robot(object):
     def is_simulating(self):
         if not self._driver:
             return False
-        return self._driver.is_simulating()
+        return self._driver.simulating
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
