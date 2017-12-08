@@ -2,8 +2,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import {PrimaryButton} from '@opentrons/components'
 
-import Button from '../Button'
 import Icon, {USB} from '../Icon'
 import styles from './connect-panel.css'
 
@@ -37,7 +37,6 @@ function RobotItemIcon (props) {
 
 function RobotItemControls (props) {
   const {name, isConnected, onConnectClick, onDisconnectClick} = props
-  const buttonStyle = classnames('btn', 'btn_dark', styles.connect_button)
   const buttonOnClick = (isConnected && onDisconnectClick) || onConnectClick
   const buttonText = (isConnected && 'Disconnect Robot') || 'Connect to Robot'
 
@@ -45,9 +44,9 @@ function RobotItemControls (props) {
     <div className={styles.robot_controls}>
       <p className={styles.robot_name}>{name}</p>
       <div>
-        <Button style={buttonStyle} onClick={buttonOnClick}>
+        <PrimaryButton onClick={buttonOnClick}>
           {buttonText}
-        </Button>
+        </PrimaryButton>
       </div>
     </div>
   )

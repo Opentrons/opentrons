@@ -36,15 +36,6 @@
   text-overflow: ellipsis;
 }
 
-.connect_button {
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.connect_button:hover {
-  background-color: #777;
-}
-
 .disconnected {
   color: dark_grey;
 }

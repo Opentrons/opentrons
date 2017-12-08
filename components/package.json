@@ -1,0 +1,70 @@
+{
+  "name": "@opentrons/components",
+  "version": "0.0.0",
+  "description": "React components library for Opentrons' projects",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Opentrons/opentrons.git"
+  },
+  "author": "Opentrons Labworks <engineering@opentrons.com> (https://opentrons.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css)$": "identity-obj-proxy"
+    }
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "plugins": [
+      "flowtype"
+    ],
+    "globals": [
+      "SyntheticEvent"
+    ],
+    "env": [
+      "browser",
+      "jest"
+    ]
+  },
+  "stylelint": {
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-css-modules"
+    ],
+    "ignoreFiles": [
+      "**/coverage/**"
+    ]
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.3",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.1",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "flow-bin": "^0.60.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^21.2.1",
+    "react-test-renderer": "^16.2.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
+    "stylelint": "^8.3.1",
+    "stylelint-config-css-modules": "^1.1.0",
+    "stylelint-config-standard": "^18.0.0"
+  },
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "react": "^16.2.0"
+  }
+}
