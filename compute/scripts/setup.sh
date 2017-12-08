@@ -22,14 +22,14 @@ nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p
 
 # Clean up opentrons package dir if it's a first start of a new container
 touch /data/id
-if [ $(cat /data/id) != $CONTAINER_ID ] ; then 
+if [ '$(cat /data/id)' != $CONTAINER_ID ] ; then
   echo 'First start of a new container. Deleting local Opentrons API installation'
   rm -rf /data/packages/usr/local/lib/python3.6/site-packages/opentrons*
   echo $CONTAINER_ID > /data/id
 fi
 
 # Set static address so we can find the device from host computer over
-# USB without using Bojnjour or any kind of service discovery, making
+# ethernet without using Bojnjour or any kind of service discovery, making
 # overall solution more cross-platform compatible
 ip address flush dev eth0
 ip address \
