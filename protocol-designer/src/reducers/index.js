@@ -12,7 +12,7 @@ import set from 'lodash/set' // <- careful, this mutates the object
 import uniq from 'lodash/uniq'
 
 import { getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
-import { uuid, wellKeyToXYList } from '../utils.js'
+import { uuid } from '../utils.js'
 
 // UTILS
 const nextEmptySlot = loadedContainersSubstate => {

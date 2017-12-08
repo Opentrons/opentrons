@@ -2,11 +2,12 @@
 
 .labware_dropdown {
   position: absolute;
+  top: 20%;
+  left: 39%;
   border-radius: 5px;
-  top: 0;
   text-align: left;
   font-size: 1rem;
-  width: 15%;
+  width: 25%;
   background-color: lightgray;
   border: 3px solid darkgray;
   z-index: 500;
