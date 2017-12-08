@@ -25,8 +25,8 @@ export const wellKeyToXYList = wellKey => {
   return toWellName({rowNum: parseInt(y), colNum: x})
 }
 
-export const wellNameToXY = wellName => {
-  // Eg B9 => [1, 8]
+export const wellNameSplit = wellName => {
+  // Eg B9 => ['B', '9']
   const raw = wellName.split(/(\D+)(\d+)/)
 
   if (raw.length !== 4) {
@@ -39,8 +39,17 @@ export const wellNameToXY = wellName => {
     throw Error('expected 1 letter in wellName, got ' + letters + ' in wellName: ' + wellName)
   }
 
+  const numbers = raw[2]
+
+  return [letters, numbers]
+}
+
+export const wellNameToXY = wellName => {
+  // Eg B9 => [1, 8]
+  const [letters, numbers] = wellNameSplit(wellName)
+
   const letterNum = letters.toUpperCase().charCodeAt(0) - 65
-  const numberNum = parseInt(raw[2], 10) - 1
+  const numberNum = parseInt(numbers, 10) - 1
   return [letterNum, numberNum]
 }
 
