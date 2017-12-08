@@ -86,6 +86,9 @@ RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.c
 ENV PIP_ROOT /data/packages
 RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
 
+# Generate keys for dropbear
+RUN ssh_key_gen.sh
+
 # Generate the id that we will later check to see if that's the
 # new container and that local Opentrons API package should be deleted
 ENV CONTAINER_ID=$(uuidgen)
