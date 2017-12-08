@@ -27,8 +27,9 @@ install:
   # read node version from the first line of .nvmrc
   - ps: $env:nodejs_version = (Get-Content -Path $env:APPVEYOR_BUILD_FOLDER\.nvmrc)[0]
   - ps: Install-Product node $env:nodejs_version x64
-  # verify npm cache to work around weird npm issues
-  # https://github.com/npm/npm/issues/17747#issuecomment-328342295
+  # upgrade to npm v5.6.0 and verify npm cache to work around weird npm issues
+  # https://github.com/npm/npm/releases/tag/v5.6.0
+  - ps: npm install -g npm@5.6.0
   - ps: npm cache verify
   # install dev dependencies
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER && make install"'

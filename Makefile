@@ -4,6 +4,7 @@
 SHELL := /bin/bash
 
 API_DIR := api
+COMPONENTS_DIR := components
 APP_DIR := app
 
 .PHONY: install test coverage
@@ -11,11 +12,13 @@ APP_DIR := app
 # install project dependencies for both api and app
 install:
 	$(MAKE) -C $(API_DIR) install
+	$(MAKE) -C $(COMPONENTS_DIR) install
 	$(MAKE) -C $(APP_DIR) install
 
 # run api and app tests
 test:
 	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(COMPONENTS_DIR) test
 	$(MAKE) -C $(APP_DIR) test
 
 # upload coverage reports
