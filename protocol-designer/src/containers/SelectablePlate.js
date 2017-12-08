@@ -14,8 +14,6 @@ export default connect(
 
     const isSelectedContainer = containerId === selectedContainerId
 
-    console.log('id borken', containerId, selectors.containerById(containerId)(state))
-
     return {
       wellContents: isSelectedContainer
         ? selectors.wellContentsSelectedContainer(state)

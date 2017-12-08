@@ -83,8 +83,6 @@ class Plate extends React.Component {
     const rowLetters = uniq(allWellNames.map(([letters, numbers]) => letters))
     const colNumbers = uniq(allWellNames.map(([letters, numbers]) => numbers))
 
-    console.log({allWellNames, rowLetters, colNumbers, locations})
-
     return <g>
       {
         // Letters of Rows. Aligned with rows on Y, fixed place on X

@@ -322,11 +322,11 @@ const selectedWellsMaxVolume = createSelector(
   state => rootSelector(state).selectedWells,
   selectedContainerType,
   (selectedWells, selectedContainerType) => {
-    const selectedWellsXY = Object.keys(selectedWells.selected).map(wellKeyToXYList)
+    const selectedWellNames = Object.keys(selectedWells.selected)
     const maxVolumesByWell = getMaxVolumes(selectedContainerType)
-    const maxVolumesList = (selectedWellsXY.length > 0)
+    const maxVolumesList = (selectedWellNames.length > 0)
       // when wells are selected, only look at vols of selected wells
-      ? Object.values(pick(maxVolumesByWell, selectedWellsXY))
+      ? Object.values(pick(maxVolumesByWell, selectedWellNames))
       // when no wells selected (eg editing ingred group), look at all volumes.
       // TODO LATER: look at filled wells, not all wells.
       : Object.values(maxVolumesByWell)
@@ -379,9 +379,6 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
     console.warn('_getWellContents called with no containerType, skipping')
     return undefined
   }
-  console.log('bloas', {containerType, ingredientsForContainer, selectedWells, highlightedWells}) // TODO REMOVE
-
-  const defaultVolume = 1234 // TODO use defaultContainers data... is there a default volume?
 
   const containerData = defaultContainers.containers[containerType]
   if (!containerData) {
@@ -389,7 +386,6 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
     return []
   }
   const allLocations = containerData.locations
-  console.log({containerData, allLocations, selectedWells, highlightedWells})
 
   return reduce(allLocations, (acc, location, wellName) => {
     // get ingred data, or set to null if the well is empty
@@ -402,9 +398,9 @@ const _getWellContents = (containerType, ingredientsForContainer, selectedWells,
         preselected: selectedWells ? wellName in selectedWells.preselected : false,
         selected: selectedWells ? wellName in selectedWells.selected : false,
         highlighted: isHighlighted, // TODO remove 'highlighted' state?
-        maxVolume: location['total-liquid-volume'] || defaultVolume,
+        maxVolume: location['total-liquid-volume'] || Infinity,
         hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-        ...ingredData // TODO don't spread, for more readability
+        ...ingredData // TODO contents of ingredData (_ingredAtWell) is hard to follow, needs to be cleaned up
       }
     }
   }, {})
