@@ -78,6 +78,9 @@ COPY ./compute/conf/inetd.conf /etc/
 COPY ./compute/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/static /usr/share/nginx/html
 
+# Logo for login shell
+COPY ./compute/opentrons.motd /etc/motd
+
 # Replace placeholders with actual environment variable values
 RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.conf && \
     sed -i "s/{ETHERNET_NETWORK_PREFIX_LENGTH}/$ETHERNET_NETWORK_PREFIX_LENGTH/g" /etc/radvd.conf
