@@ -13,7 +13,7 @@ export default function UploadInput (props) {
     ? styles.btn_upload
     : styles.file_drop
   const label = isButton
-    ? 'Upload'
+    ? 'Open'
     : 'Drag and drop protocol file here.'
 
   return (
