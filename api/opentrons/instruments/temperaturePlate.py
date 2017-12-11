@@ -32,13 +32,22 @@ class TemperaturePlate(Placeable):
     stackable = True
     module_name = 'temperature_plate'
 
-    def __init__(self, robot, slot):
+    def __init__(self, robot, slot, label=None):
         super(TemperaturePlate, self).__init__()
         self.robot = robot
         self.min_temp = 10
         self.max_temp = 70
         self.driver = Driver()
+        self.label = label
         robot.add_module(self, slot)
+
+
+    def __str__(self):
+        if not self.parent:
+            return '<{}>'.format(self.__class__.__name__)
+        return '<{} {}>'.format(
+            self.__class__.__name__, self.label or '')
+
 
     def connect(self):
         self.driver.connect(manuf_id=MANUF_ID)

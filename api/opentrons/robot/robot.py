@@ -103,9 +103,7 @@ class InstrumentMotor(object):
         self.robot._driver.set_plunger_speed(rate, self.axis)
         return self
 
-def _setup_container(container_name, label):
-    if not label:
-        label = container_name
+def _setup_container(container_name):
     container = database.load_container(container_name)
     container.properties['type'] = container_name
 
@@ -753,17 +751,17 @@ class Robot(object):
         return self._deck.containers()
 
     def add_container(self, container_name, slot, label=None, share=False):
-        container = _setup_container(container_name, label)
+        container = _setup_container(container_name)
         location = _get_placement_location(slot, self._deck)
         if _is_available_slot(self.poses, location, share, slot, container_name):
-            location.add(container, label)
+            location.add(container, label or container_name)
         self.add_container_to_pose_tracker(location, container)
         return container
 
-    def add_module(self, module, slot):
+    def add_module(self, module, slot, label=None):
         module = _setup_module(module)
         location = _get_placement_location(slot, self._deck)
-        location.add(module)
+        location.add(module, label or module.__class__.__name__)
         self.modules.append(module)
         self.poses = pose_tracker.add(
             self.poses,

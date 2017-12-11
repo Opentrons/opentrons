@@ -1,11 +1,12 @@
 import itertools
 import math
 import numbers
-from collections import OrderedDict
-from opentrons.util.vector import Vector
-
 import re
 import functools
+
+from collections import OrderedDict
+
+from opentrons.util.vector import Vector
 
 
 def unpack_location(location):
@@ -41,16 +42,6 @@ def get_container(location):
 def humanize_location(location):
     well, _ = unpack_location(location)
     return repr(well)
-
-def _stackable_children(items):
-     if items == []:
-         return []
-     stackable_children =  filter(
-        lambda child: getattr(child, 'stackable', False),
-        items)
-
-     retir
-
 
 
 class Placeable(object):
@@ -258,14 +249,6 @@ class Placeable(object):
 
         # Pop last (and hopefully only Deck) or None if there is no deck
         return res.pop()
-
-    def remove_child(self, name):
-        """
-        Removes child by :name:
-        """
-        child = self.children_by_name[name]
-        del self.children_by_name[name]
-        del self.children_by_reference[child]
 
     def get_parent(self):
         """
