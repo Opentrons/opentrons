@@ -17,8 +17,8 @@ echo 1 > /proc/sys/net/ipv6/conf/eth0/keep_addr_on_down
 echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_dad
 
 # Cleanup any connections. This will leave only wlan0
-nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(--)/\1/p' | xargs nmcli connection del
-nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p' | xargs nmcli connection del
+nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(--)/\1/p' | xargs nmcli connection del || true
+nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p' | xargs nmcli connection del || true
 
 # Clean up opentrons package dir if it's a first start of a new container
 touch /data/id
