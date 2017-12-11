@@ -1,6 +1,6 @@
 from opentrons.instruments.magbead import Magbead
 from opentrons.instruments.pipette import Pipette
-from opentrons.instruments.temperaturePlate import TemperaturePlate
+from opentrons.instruments.temp_plate import TemperaturePlate
 
 
 __all__ = [

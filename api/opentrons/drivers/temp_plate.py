@@ -11,16 +11,19 @@ BAUD_RATE = 9600
 TEMP_THRESHOLD = 1
 SHUTDOWN_TEMP = 0
 
+
 def _parse_temp(raw_temp):
     print(raw_temp)
     parsed_values = raw_temp.split(':')
     return float(parsed_values[1])
+
 
 def get_ports(device_name):
     '''Returns all serial devices with a given name'''
     for d in list_ports.comports():
         if d.manufacturer is not None and device_name in d.manufacturer:
             return d[0]
+
 
 class TemperaturePlateDriver:
     def __init__(self):
@@ -33,7 +36,6 @@ class TemperaturePlateDriver:
             self.simulating = True
             return
 
-        #TODO jg 11/29: connect() in serial should be able to parse for different port attributes
         self._connection = sc._connect(
             get_ports(manuf_id),
             baudrate=BAUD_RATE
@@ -54,7 +56,6 @@ class TemperaturePlateDriver:
     def set_temp(self, temp, wait=False):
         self.target_temp = temp
         self._send_command(GCODES['SET_TEMP'].format(temp=temp))
-
 
     def get_temp(self):
         if self.simulating:

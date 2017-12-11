@@ -431,7 +431,6 @@ class Deck(Placeable):
 
         all_containers = list()
         for slot in self:
-            children = slot.get_children_list()
             all_containers += slot.get_children_list()
 
         for container in all_containers:

@@ -85,8 +85,8 @@ def test_descendants(state):
 
 
 def test_has_children(state):
-    assert has_children(state, '2-2') == False
-    assert has_children(state, '2') == True
+    assert not has_children(state, '2-2')
+    assert has_children(state, '2')
 
 
 def test_ascend(state):

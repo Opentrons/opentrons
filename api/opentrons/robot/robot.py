@@ -103,6 +103,7 @@ class InstrumentMotor(object):
         self.robot._driver.set_plunger_speed(rate, self.axis)
         return self
 
+
 def _setup_container(container_name):
     container = database.load_container(container_name)
     container.properties['type'] = container_name
@@ -121,8 +122,8 @@ def _setup_container(container_name):
 
     return container
 
-#TODO jmg 12/8/17: Should be loading modules with relavent info (dimensions, offsets, etc)
-#First thoughts of implementation are to have a 'modules' config file / db table
+
+# TODO jmg 12/8: Load dimensions from a 'modules' config file or db table
 def _setup_module(module):
     return module
 
@@ -136,6 +137,7 @@ def _get_placement_location(slot, deck):
         location = slot
 
     return location
+
 
 def _is_available_slot(poses, location, share, slot, container_name):
     if pose_tracker.has_children(poses, location) and not share:
@@ -750,11 +752,11 @@ class Robot(object):
         """
         return self._deck.containers()
 
-    def add_container(self, container_name, slot, label=None, share=False):
-        container = _setup_container(container_name)
+    def add_container(self, name, slot, label=None, share=False):
+        container = _setup_container(name)
         location = _get_placement_location(slot, self._deck)
-        if _is_available_slot(self.poses, location, share, slot, container_name):
-            location.add(container, label or container_name)
+        if _is_available_slot(self.poses, location, share, slot, name):
+            location.add(container, label or name)
         self.add_container_to_pose_tracker(location, container)
         return container
 
@@ -768,8 +770,6 @@ class Robot(object):
             module,
             location,
             pose_tracker.Point(*module._coordinates))
-
-
 
     def add_container_to_pose_tracker(self, location, container: Container):
         """

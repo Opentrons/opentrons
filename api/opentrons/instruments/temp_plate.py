@@ -1,12 +1,10 @@
 import time
 
-from opentrons.drivers.temperaturePlateDriver import TemperaturePlateDriver as Driver
-from opentrons.containers.placeable  import Placeable
+from opentrons.drivers.temp_plate import TemperaturePlateDriver as Driver
+from opentrons.containers.placeable import Placeable
 
 TEMP_THRESHOLD = 1
 MANUF_ID = 'Arduino'
-
-
 
 
 def _is_valid_temp(tempPlate, temp):
@@ -41,13 +39,11 @@ class TemperaturePlate(Placeable):
         self.label = label
         robot.add_module(self, slot)
 
-
     def __str__(self):
         if not self.parent:
             return '<{}>'.format(self.__class__.__name__)
         return '<{} {}>'.format(
             self.__class__.__name__, self.label or '')
-
 
     def connect(self):
         self.driver.connect(manuf_id=MANUF_ID)
@@ -67,6 +63,5 @@ class TemperaturePlate(Placeable):
 
     def shutdown(self):
         self.driver.shutdown()
-
 
     # ----------- END Public interface ------------ #
