@@ -11,7 +11,7 @@ ERROR_KEYWORD = b'error'
 ALARM_KEYWORD = b'ALARM'
 
 
-def get_ports(device_name):
+def get_ports_by_name(device_name):
     '''Returns all serial devices with a given name'''
     filtered_devices = filter(
         lambda device: device_name in device[1],
@@ -19,6 +19,13 @@ def get_ports(device_name):
     )
     device_ports = [device[0] for device in filtered_devices]
     return device_ports
+
+
+def get_port_by_VID(vid):
+    '''Returns first serial device with a given VID'''
+    for d in list_ports.comports():
+        if d.vid == vid:
+            return d[0]
 
 
 @contextlib.contextmanager
@@ -98,5 +105,5 @@ def connect(device_name, baudrate=115200):
     :param baudrate: integer frequency for serial communication
     :return: serial.Serial connection
     '''
-    smoothie_port = get_ports(device_name=device_name)[0]
+    smoothie_port = get_ports_by_name(device_name=device_name)[0]
     return _connect(port_name=smoothie_port, baudrate=baudrate)

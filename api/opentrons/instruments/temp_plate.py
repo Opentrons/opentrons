@@ -4,7 +4,7 @@ from opentrons.drivers.temp_plate import TemperaturePlateDriver as Driver
 from opentrons.containers.placeable import Placeable
 
 TEMP_THRESHOLD = 1
-MANUF_ID = 'Arduino'
+VID = 6790
 
 
 def _is_valid_temp(tempPlate, temp):
@@ -46,7 +46,7 @@ class TemperaturePlate(Placeable):
             self.__class__.__name__, self.label or '')
 
     def connect(self):
-        self.driver.connect(manuf_id=MANUF_ID)
+        self.driver.connect(vid=VID)
 
     def disconnect(self):
         self.driver.disconnect()

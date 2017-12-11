@@ -1,5 +1,4 @@
 from opentrons.drivers.smoothie_drivers import serial_communication as sc
-from serial.tools import list_ports
 
 from os import environ
 
@@ -13,16 +12,8 @@ SHUTDOWN_TEMP = 0
 
 
 def _parse_temp(raw_temp):
-    print(raw_temp)
     parsed_values = raw_temp.split(':')
     return float(parsed_values[1])
-
-
-def get_ports(device_name):
-    '''Returns all serial devices with a given name'''
-    for d in list_ports.comports():
-        if d.manufacturer is not None and device_name in d.manufacturer:
-            return d[0]
 
 
 class TemperaturePlateDriver:
@@ -30,16 +21,15 @@ class TemperaturePlateDriver:
         self.target_temp = None
         self.simulating = True
 
-    def connect(self, manuf_id):
+    def connect(self, vid):
         self.simulating = False
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-
-        self._connection = sc._connect(
-            get_ports(manuf_id),
-            baudrate=BAUD_RATE
-        )
+        port = sc.get_port_by_VID(vid)
+        if port is None:
+            raise RuntimeError("No valid port found for connection")
+        self._connection = sc._connect(port, baudrate=BAUD_RATE)
 
     def disconnect(self):
         self.simulating = True
