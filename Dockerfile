@@ -30,8 +30,9 @@ RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profi
 
 # See compute/README.md for details. Make sure to keep them in sync
 RUN apk add --update \
-      avahi-tools \
+      util-linux \
       dumb-init \
+      vim \
       radvd \
       dropbear \
       dropbear-scp \
@@ -77,6 +78,9 @@ COPY ./compute/conf/inetd.conf /etc/
 COPY ./compute/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/static /usr/share/nginx/html
 
+# Logo for login shell
+COPY ./compute/opentrons.motd /etc/motd
+
 # Replace placeholders with actual environment variable values
 RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.conf && \
     sed -i "s/{ETHERNET_NETWORK_PREFIX_LENGTH}/$ETHERNET_NETWORK_PREFIX_LENGTH/g" /etc/radvd.conf
@@ -84,6 +88,13 @@ RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.c
 # All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages
 RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
+
+# Generate keys for dropbear
+RUN ssh_key_gen.sh
+
+# Generate the id that we will later check to see if that's the
+# new container and that local Opentrons API package should be deleted
+ENV CONTAINER_ID=$(uuidgen)
 
 # Updates, HTTPS (for future use), API, SSH for link-local over USB
 EXPOSE 80 443 31950

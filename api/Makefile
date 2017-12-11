@@ -26,7 +26,7 @@ publish:
 dev:
 	python opentrons/server/main.py -P 31950
 
-dist/update.base64:
+dist/update.base64: clean
 	rm -rf dist/* && \
 	python setup.py bdist_wheel && \
 	tar -C dist -cf /tmp/update . && \
@@ -36,6 +36,9 @@ dist/update.base64:
 
 push: dist/update.base64
 	curl -F 'data=@dist/update.base64' http://\[fd00:0:cafe:fefe::1\]/upload
+
+term:
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@fd00:0:cafe:fefe::1
 
 
 ########## [START] RESIN DEVICE ##########
