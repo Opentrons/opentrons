@@ -1,13 +1,13 @@
 import React from 'react'
-
-import styles from '../css/style.css'
+import cx from 'classnames'
+import styles from './LabwareContainer.css'
 import { nonFillableContainers } from '../constants.js'
 import { humanize } from '../utils.js'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
-import LabwareDropdown from '../components/LabwareDropdown.js'
 
-import CopyIcon from '../svg/CopyIcon.js'
+// import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
+import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
 
 // On an empty slot:
 // * Renders a slot on the deck
@@ -17,39 +17,12 @@ import CopyIcon from '../svg/CopyIcon.js'
 // * Renders a SelectablePlate in the slot
 // * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
 
-function NameThisLabwareOverlay ({
-  containerType,
-  containerId,
-  slotName,
-  modifyContainer,
-  deleteContainer
-}) {
-  // HACK: should use a stateful input component
-  const containerNameInputId = slotName
-
+// TODO: factor CenteredTextSvg out...??? is there a better way? Can't use CSS for x / y / text-anchor.
+function CenteredTextSvg ({text, className}) {
   return (
-    <div className={styles.container_overlay_name_it}>
-      <label>Name this labware:</label>
-      <input id={containerNameInputId}
-        placeholder={humanize(containerType)}
-        // Quick HACK to have enter key submit the rename action
-        onKeyDown={e =>
-          e.key === 'Enter' && modifyContainer({containerId, modify: {name: e.target.value}})
-        }
-      />
-      {/* HACK: using id selector instead of stateful input field... */}
-      <div className={styles.btn} onClick={() => modifyContainer(
-        {
-          containerId,
-          modify: {
-            name: document.getElementById(containerNameInputId).value || humanize(containerType)
-          }
-        }
-      )}>Save</div>
-      <div className={styles.btn} onClick={() => deleteContainer({containerId, slotName, containerType})}>
-        Delete
-      </div>
-    </div>
+    <text x='50%' y='50%' textAnchor='middle' {...{className}}>
+      {text}
+    </text>
   )
 }
 
@@ -64,46 +37,57 @@ function OccupiedDeckSlotOverlay ({
   deleteContainer
 }) {
   return (
-    <div className={styles.container_overlay}>
+    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+      {/* Overlay Background */}
+      <rect x='0' y='0' className={styles.slot_overlay} />
+      {canAddIngreds && // TODO add back canAddIngreds conditional
+        <text x='0' y='25%' className={styles.clickable}
+          onClick={() => openIngredientSelector({containerId, slotName, containerType})}
+          >
+            Add Ingredients
+          </text>
+      }
 
-      {canAddIngreds && <div className={styles.container_overlay_add_ingred}
-        onClick={() => openIngredientSelector({containerId, slotName, containerType})}>
-        Add Ingredients
-      </div>}
+      <text x='0' y='50%' className={styles.clickable}
+        onClick={() => setCopyLabwareMode(containerId)}>Copy Labware</text>
 
-      <div className={styles.container_overlay_copy}
-        onClick={() => setCopyLabwareMode(containerId)}
-      >
-        <div>Copy Labware</div>
-        {/* TODO: icon CSS class, diff sizes? */}
-        <CopyIcon style={{width: '20px', height: '20px'}} />
-      </div>
-
-      <div className={styles.container_overlay_remove}
-        style={canAddIngreds ? {} : {bottom: 0, position: 'absolute'}}
+      <text x='0' y='75%' className={styles.clickable}
         onClick={() =>
-          window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
-          deleteContainer({containerId, slotName, containerType})
-        }>
-        <p>Remove {containerName}</p>
-      </div>
-
-    </div>
+            window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
+            deleteContainer({containerId, slotName, containerType})
+        }
+      >
+        Remove {containerName}
+      </text>
+    </g>
   )
 }
 
 function SlotWithContainer ({containerType, containerName, containerId}) {
+  // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
+  const paddingLeft = 5
+  const paddingTop = 0
+  const boxHeight = 30
   return (
-    <div>
-      <div className={styles.name_overlay}>
-        <div>{humanize(containerType)}</div>
-        <div className={styles.container_name}>{containerName}</div>
-      </div>
+    <g>
       {nonFillableContainers.includes(containerType)
-        ? <img src={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`} />
+        ? <image // TODO do real styles and maybe get SVG landscape images
+          href={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`}
+          width='120' height='120'
+          transform='translate(125 -15) rotate(90)'
+        />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-    </div>
+      {containerName && <g className={styles.name_overlay}>
+        <rect x='0' y='0' height={boxHeight} width='100%' fill='rgba(0,0,0,0.8)' /> {/* TODO don't inline fill? */}
+        <text x={paddingLeft} y={0.4 * boxHeight + paddingTop}>
+          {humanize(containerType)}
+        </text>
+        <text x={paddingLeft} y={0.9 * boxHeight + paddingTop} className={styles.container_name}>
+          {containerName}
+        </text>
+      </g>}
+    </g>
   )
 }
 
@@ -128,56 +112,81 @@ export default function LabwareContainer ({
 
   setCopyLabwareMode,
   labwareToCopy,
-  copyLabware
+  copyLabware,
+
+  height,
+  width,
+  highlighted
 }) {
   const hasName = containerName !== null
   const slotIsOccupied = !!containerType
 
   const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
 
+  const defs = {roundSlotClipPath: 'roundSlotClipPath'}
+
   return (
-    <div className={styles.deck_slot}>
+    <g>
+      <svg {...{height, width}} className={styles.deck_slot}>
+        {/* Defs for anything inside this SVG. TODO: how to better organize IDs and defined elements? */}
+        <defs>
+          <clipPath id={defs.roundSlotClipPath}>
+            <rect rx='6' width='100%' height='100%' />
+          </clipPath>
+        </defs>
 
-      {!hasName && <NameThisLabwareOverlay {...{
-        containerType,
-        containerId,
-        slotName,
-        modifyContainer,
-        deleteContainer
-      }} />}
+        {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
+        {slotIsOccupied
+          ? <SlotWithContainer {...{containerType, containerName, containerId}} />
+          // Empty slot
+          : <g className={styles.empty_slot}>
+            <rect width='100%' height='100%' />
+            <CenteredTextSvg text={slotName} />
+          </g>}
 
-      {slotIsOccupied &&
-        <OccupiedDeckSlotOverlay {...{
-          canAddIngreds,
+        {!slotIsOccupied && (activeModals.labwareSelection
+          // "Add Labware" labware selection dropdown menu
+          ? null /* (slotName === canAdd) && <LabwareDropdown
+                onClose={e => closeLabwareSelector({slotName})}
+                onContainerChoose={containerType => createContainer({slotName, containerType})}
+              /> */
+          : (labwareToCopy
+              // Mouseover empty slot -- Add (or Copy if in copy mode)
+              ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+                <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
+                <CenteredTextSvg className={styles.pass_thru_mouse} text='Place Copy' />
+              </g>
+              : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+                <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
+                <CenteredTextSvg className={styles.pass_thru_mouse} text='Add Labware' />
+              </g>
+          )
+        )}
+
+        {slotIsOccupied && hasName &&
+          <OccupiedDeckSlotOverlay {...{
+            canAddIngreds,
+            containerId,
+            slotName,
+            containerType,
+            containerName,
+            openIngredientSelector,
+            setCopyLabwareMode,
+            deleteContainer
+          }} />}
+
+        {!hasName && <NameThisLabwareOverlay {...{
+          containerType,
           containerId,
           slotName,
-          containerType,
-          containerName,
-          openIngredientSelector,
-          setCopyLabwareMode,
+          modifyContainer,
           deleteContainer
         }} />}
 
-      {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
-      {slotIsOccupied
-        ? <SlotWithContainer {...{containerType, containerName, containerId}} />
-        // Empty slot
-        : <label>{slotName}</label>}
-
-      {!slotIsOccupied && (activeModals.labwareSelection
-        // "Add Labware" labware selection dropdown menu
-        ? (slotName === canAdd) && <LabwareDropdown
-          onClose={e => closeLabwareSelector({slotName})}
-          onContainerChoose={containerType => createContainer({slotName, containerType})}
-        />
-        : (labwareToCopy
-            // Mouseover empty slot -- Add (or Copy if in copy mode)
-            ? <div className={styles.add_labware} onClick={() => copyLabware(slotName)}>Place Copy</div>
-            : <div className={styles.add_labware} onClick={e => openLabwareSelector({slotName})}>
-            Add Labware
-          </div>
-        )
-      )}
-    </div>
+      </svg>
+      {/* Highlight border goes outside the SVG so it doesn't get clipped... */}
+      {highlighted &&
+        <rect className={styles.highlighted} x='0' y='0' width={width} height={height} rx='6' />}
+    </g>
   )
 }

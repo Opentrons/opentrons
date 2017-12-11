@@ -1,0 +1,59 @@
+@value disable_select, close from '../css/mixins.css';
+
+.labware_dropdown {
+  position: absolute;
+  border-radius: 5px;
+  top: 0;
+  text-align: left;
+  font-size: 1rem;
+  width: 15%;
+  background-color: lightgray;
+  border: 3px solid darkgray;
+  z-index: 500;
+  color: darkgray;
+  composes: disable_select;
+}
+
+.labware_dropdown label {
+  text-transform: none;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.labware_dropdown > ul {
+  background-color: white;
+
+  /* Overflowing, even just y, messes with tooltips... */
+
+  /* overflow-y: scroll; */
+}
+
+.labware_dropdown > ul li ul li:hover {
+  font-weight: bold;
+}
+
+/* ----- */
+
+.labware_list_item {
+  position: relative;
+  width: 100%;
+}
+
+.labware_list_item:hover::after {
+  content: var(--image-url);
+  background-size: 80px 60px;
+  border: 2px solid darkgray;
+  position: absolute;
+
+  /* Images too large, and need to be cropped from left */
+  zoom: 0.5;
+  clip-path: inset(0 0 0 360px);
+  top: 0;
+
+  /* left: calc(slotWidth * slotScale * 1); */
+  left: 0;
+
+  /* width: 200px;
+  height: 200px; */
+  z-index: 5000;
+}

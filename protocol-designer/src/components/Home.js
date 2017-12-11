@@ -6,21 +6,28 @@ import {
 } from '../actions'
 
 import { selectors } from '../reducers'
-import Deck from './Deck.js'
+import Deck from '../components/Deck.js'
+import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
+import LabwareDropdown from '../containers/LabwareDropdown.js'
 
-const ConnectedDeck = connect(
+const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slotName
+
+// TODO Ian 2017-12-04 make proper component
+const ConnectedIngredSelModal = connect(
   state => ({
-    activeModals: selectors.activeModals(state)
+    visible: ingredSelModIsVisible(selectors.activeModals(state))
   }),
   {
-    closeIngredientSelector
+    onClose: closeIngredientSelector
   }
-)(Deck)
+)(IngredientSelectionModal)
 
 export default function Home () {
   return (
     <div>
-      <ConnectedDeck />
+      <LabwareDropdown />
+      <ConnectedIngredSelModal />
+      <Deck />
       <h2>Select labware you wish to add ingredients to</h2>
     </div>
   )

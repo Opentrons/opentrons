@@ -1,6 +1,6 @@
 import React from 'react'
+import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
-import styles from '../css/style.css'
 
 function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
   return (
@@ -14,7 +14,10 @@ function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displa
   )
 }
 
-export default function LabwareDropdown ({onClose, onContainerChoose}) {
+export default function LabwareDropdown ({onClose, onContainerChoose, slotName}) {
+  // do not render without a slotName
+  if (!slotName) return null
+
   const labwareItemMapper = (item, key) => (
     // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
     <LabwareItem key={key}
@@ -27,8 +30,8 @@ export default function LabwareDropdown ({onClose, onContainerChoose}) {
 
   return (
     <div className={styles.labware_dropdown}>
-      <label>Labware Type</label>
-      <div className='close' onClick={onClose}>X</div>
+      <label>Add Labware to Slot {slotName}</label>
+      <div className={styles.close} onClick={onClose}>X</div>
       <ul>
         <Accordion title='Tip Rack'>
           {[
@@ -50,7 +53,7 @@ export default function LabwareDropdown ({onClose, onContainerChoose}) {
             ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
             ['96-PCR-tall', '96 Well PCR Plate (Tall)', '96-PCR-Tall'],
             ['96-PCR-flat', '96 Well PCR Plate (Flat)', '96-PCR-Flatt'],
-            ['96-custom', '96 Well Plate (CUSTOM)', '96-PCR-Flatt'],
+            ['96-flat', '96 Flat', '96-PCR-Flatt'],
             ['384-plate', '384 Well Plate', '384-plate']
           ].map(labwareItemMapper)}
         </Accordion>

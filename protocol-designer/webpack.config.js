@@ -58,7 +58,7 @@ module.exports = {
     // new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
     new GoogleFontsPlugin({
-      fonts: [{ family: 'Roboto' }]
+      fonts: [{ family: 'Open Sans' }]
     })
   ]
 }

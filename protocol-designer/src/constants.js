@@ -1,11 +1,23 @@
 import reduce from 'lodash/reduce'
 import defaultContainers from './default-containers.json'
 
-export const slotnames = [
-  'A3', 'B3', 'C3', 'D3', 'E3',
-  'A2', 'B2', 'C2', 'D2', 'E2',
-  'A1', 'B1', 'C1', 'D1', 'E1'
+export { defaultContainers }
+
+export const SLOTNAME_MATRIX = [ // used for deckmap
+  ['10', '11', '12'],
+  ['7', '8', '9'],
+  ['4', '5', '6'],
+  ['1', '2', '3']
 ]
+
+export const sortedSlotnames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+
+// Slot dims in mm
+export const SLOT_WIDTH = 127.8
+export const SLOT_HEIGHT = 85.5
+export const SLOT_SPACING = 5
+export const DECK_WIDTH = SLOT_WIDTH * 3 + SLOT_SPACING * 4
+export const DECK_HEIGHT = SLOT_HEIGHT * 4 + SLOT_SPACING * 5
 
 // These 'nonfillable' container types render on the deck as an image instead of Wells
 export const nonFillableContainers = [
@@ -30,34 +42,6 @@ export const getMaxVolumes = containerType => {
   }
   console.warn(`Container type ${containerType} not in default-containers.json, max vol defaults to 30000`)
   return {default: 300}
-}
-
-export const containerDims = containerType => {
-  const maxVolumes = getMaxVolumes(containerType)
-
-  if (containerType.startsWith('96-')) {
-    // maxVolumes also can have wellName keys, eg A3: 120
-    return {rows: 12, columns: 8, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType.startsWith('384-')) {
-    return {rows: 24, columns: 16, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType.startsWith('tube-rack-')) {
-    return {rows: 6, columns: 4, wellShape: 'circle', maxVolumes}
-  }
-
-  if (containerType === 'trough-12row') {
-    return {rows: 12, columns: 1, wellShape: 'rectangle', maxVolumes}
-  }
-
-  // if (containerType.startsWith('PCR-strip')) {
-  //   return {rows: 1, columns: 8, wellShape: 'circle'}
-  // }
-
-  console.warn(`Warning: no container type ${containerType} not in containerDims. Defaulting to 12x8`)
-  return {rows: 12, columns: 8, wellShape: 'circle', maxVolumes: {default: 400}}
 }
 
 // The '.ot-selectable' classname is used to find collisions with SelectionRect

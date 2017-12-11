@@ -1,11 +1,15 @@
-@value colors: './Util.css';
-@value blue, lightGrey, medGrey, darkGrey, plateBg from colors;
+@value colors: "./colors.css";
+@value * from colors;
 @value labelColor: gray;
 @value rowLabelWidth: 1.5rem;
 
+/* TODO: RE-EVALUATE ALL BELOW FOR SVG */
+
 .aspect_ratio {
+  /*
   height: 50vh;
   width: calc(50vh * 86 / 127);
+  */
 
   /* overflow: hidden; */
   background: transparent;
@@ -14,8 +18,11 @@
   box-sizing: border-box;
   margin: 0 auto;
   padding: 0;
+
+  /*
   border: 3px solid darkgray;
   border-radius: 10px;
+  */
   background-color: white;
 
   /* text selection messes up drag & drop */
