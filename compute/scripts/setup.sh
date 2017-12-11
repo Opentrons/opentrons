@@ -31,6 +31,7 @@ fi
 # Set static address so we can find the device from host computer over
 # ethernet without using Bojnjour or any kind of service discovery, making
 # overall solution more cross-platform compatible
+ip link set dev eth0 down
 ip address flush dev eth0
 ip address \
   add $ETHERNET_STATIC_IP/$ETHERNET_NETWORK_PREFIX_LENGTH \
