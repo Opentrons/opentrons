@@ -94,7 +94,7 @@ RUN ssh_key_gen.sh
 
 # Generate the id that we will later check to see if that's the
 # new container and that local Opentrons API package should be deleted
-ENV CONTAINER_ID=$(uuidgen)
+RUN echo "export CONTAINER_ID=$(uuidgen)" >> /etc/profile
 
 # Updates, HTTPS (for future use), API, SSH for link-local over USB
 EXPOSE 80 443 31950
@@ -114,5 +114,5 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 # For interactive one-off use:
 #   docker run opentrons dumb-init python -c 'while True: pass'
 # or uncomment:
-# CMD ["python", "-c", "while True: pass"]
-CMD ["bash", "-c", "setup.sh && exec start.sh"]
+# CMD ["python", "-c", "source /etc/profile && while True: pass"]
+CMD ["bash", "-c", "source /etc/profile && setup.sh && exec start.sh"]

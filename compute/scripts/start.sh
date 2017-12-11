@@ -12,7 +12,15 @@ nginx
 inetd -e /etc/inetd.conf
 
 # Home robot
+echo "Homing Robot... this may take a few seconds."
 python -c "from opentrons import robot; robot.connect(); robot.home()"
 
-# Opentrons API Server
+# Check if config exists, and alert if not found
+config_path=`python -c "from opentrons.util import environment; print(environment.get_path('APP_DATA_DIR') + 'config.json')"`
+
+if [ ! -e "$config_path" ]; then
+    echo "Config file does not found. Please perform factory calibration and then restart robot"
+    while true; do sleep 1; done
+fi
+echo "Starting Opentrons API server"
 python -m opentrons.server.main -H :: -P $OT_API_PORT_NUMBER
