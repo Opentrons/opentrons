@@ -1,4 +1,6 @@
 import sqlite3
+import os
+
 from opentrons.data_storage import database
 from opentrons.data_storage.old_container_loading import \
     load_all_containers_from_disk, \
@@ -77,6 +79,8 @@ def check_version_and_perform_necessary_migrations():
     conn = sqlite3.connect(db_path)
     db_version = database.get_version()
     if db_version == 0:
+        os.remove(db_path)
+        conn = sqlite3.connect(db_path)
         execute_schema_change(conn, create_table_ContainerWells)
         execute_schema_change(conn, create_table_Containers)
         migrate_containers_and_wells()
