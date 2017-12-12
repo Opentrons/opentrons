@@ -21,7 +21,7 @@ def _is_valid_temp(tempPlate, temp):
 
 class TemperaturePlate(Placeable):
     stackable = True
-    module_name = 'temperature_plate'
+    name = 'temperature-plate'
 
     def __init__(
             self,

@@ -458,7 +458,6 @@ class Slot(Placeable):
     Class representing a Slot
     """
     stackable = True
-    pass
 
 
 class Container(Placeable):

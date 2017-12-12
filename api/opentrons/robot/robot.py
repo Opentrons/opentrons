@@ -123,8 +123,11 @@ def _setup_container(container_name):
     return container
 
 
-# TODO jmg 12/8: Load dimensions from a 'modules' config file or db table
+# NOTE: modules are currently stored in the Containers db table
 def _setup_module(module):
+    x, y, z = database.load_module(module.name)
+    from opentrons.util.vector import Vector
+    module._coordinates = Vector(x, y, z)
     return module
 
 
