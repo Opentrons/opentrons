@@ -20,7 +20,9 @@
     "start": "webpack-dev-server --hot"
   },
   "jest": {
-    "transformIgnorePatterns": ["/node_modules/(?!@opentrons/components/src/.*\\.js)"],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@opentrons/)"
+    ],
     "moduleNameMapper": {
       "\\.(css)$": "identity-obj-proxy"
     }
