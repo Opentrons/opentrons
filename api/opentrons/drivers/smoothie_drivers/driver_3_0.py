@@ -49,7 +49,8 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
-          'SET_CURRENT': 'M907'}
+          'SET_CURRENT': 'M907',
+          'SCAN_INSTRUMENTS': 'M369'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -110,6 +111,17 @@ class SmoothieDriver_3_0_0:
                     self.update_position(default=default, is_retry=True)
 
         self._update_position(updated_position)
+
+    def scan_instruments(self):
+        res = self._send_command(GCODES['SCAN_INSTRUMENTS'])
+        return {
+            line.strip()[0]: {
+                pair.split(':')[0]: bytearray.fromhex(pair.split(':')[1])
+                for pair in line.strip().split(' ')[1:]
+            }
+            for line in res.split('\n')
+            if line
+        }
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
