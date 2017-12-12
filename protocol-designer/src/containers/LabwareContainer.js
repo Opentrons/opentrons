@@ -15,7 +15,7 @@ import {
   copyLabware
 } from '../actions'
 
-import { LabwareContainer } from '@opentrons/components'
+import { LabwareOnDeck } from '../components/LabwareOnDeck'
 
 export default connect(
   (state, ownProps) => {
@@ -44,4 +44,4 @@ export default connect(
     setCopyLabwareMode,
     copyLabware
   }
-)(LabwareContainer)
+)(LabwareOnDeck)
