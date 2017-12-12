@@ -22,10 +22,12 @@ nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p
 
 # Clean up opentrons package dir if it's a first start of a new container
 touch /data/id
-if [ '$(cat /data/id)' != $CONTAINER_ID ] ; then
+previous_id="$(cat /data/id)"
+current_id="$CONTAINER_ID"
+if [ $previous_id != $current_id ] ; then
   echo 'First start of a new container. Deleting local Opentrons API installation'
   rm -rf /data/packages/usr/local/lib/python3.6/site-packages/opentrons*
-  echo $CONTAINER_ID > /data/id
+  echo $current_id > /data/id
 fi
 
 # Set static address so we can find the device from host computer over
