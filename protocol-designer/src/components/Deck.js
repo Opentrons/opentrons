@@ -1,5 +1,6 @@
 import React from 'react'
-import { SLOTNAME_MATRIX, DECK_WIDTH, DECK_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT, SLOT_SPACING } from '../constants.js'
+import flatMap from 'lodash/flatMap'
+import { SLOTNAME_MATRIX, DECK_WIDTH, DECK_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT, SLOT_SPACING, TRASH_SLOTNAME } from '../constants.js'
 
 import styles from './Deck.css'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -16,7 +17,6 @@ export default function Deck (props) {
 
         {/* Trash */}
         <g transform='translate(424 0)' className={styles.trash}>
-          {/* TODO: do real styles */}
           <rect x='0' y='0' width='216' height='152' rx='11' className={styles.trash_outer} />
           <path
             transform='translate(8 8)'
@@ -28,22 +28,19 @@ export default function Deck (props) {
 
       {/* All containers */}
       <g transform={`translate(${slotOffset} ${slotOffset})`}>
-        {SLOTNAME_MATRIX.reduce((acc, slotRow, row) => {
-          slotRow.forEach((slotName, col) =>
-            (slotName === '12')
-            ? acc // no LabwareContainer for Trash in slot 12
-            : acc.push(
-              <g key={slotName}
-                transform={`translate(${
-                  SLOT_WIDTH * col + SLOT_SPACING * (col + 1)}, ${
-                  SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)})`}
-              >
-                <LabwareContainer slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
-              </g>
-            )
+        {flatMap(SLOTNAME_MATRIX, (slotRow, row) =>
+          slotRow.map((slotName, col) =>
+            (slotName === TRASH_SLOTNAME)
+            ? null // no LabwareContainer for Trash in slot 12
+            : <g key={slotName}
+              transform={`translate(${
+              SLOT_WIDTH * col + SLOT_SPACING * (col + 1)}, ${
+              SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)})`}
+            >
+              <LabwareContainer slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
+            </g>
           )
-          return acc
-        }, [])}
+        )}
       </g>
 
     </svg>
