@@ -1,7 +1,18 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
 import ListItem from './ListItem'
+
+InstrumentListItem.propTypes = {
+  isRunning: PropTypes.bool.isRequired,
+  name: PropTypes.string,
+  axis: PropTypes.string,
+  volume: PropTypes.number,
+  channels: PropTypes.string,
+  probed: PropTypes.bool,
+  clearLabwareReviewed: PropTypes.func
+}
 
 export default function InstrumentListItem (props) {
   const {isRunning, name, axis, volume, channels, probed, clearLabwareReviewed} = props

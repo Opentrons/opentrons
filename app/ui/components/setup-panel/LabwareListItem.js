@@ -1,5 +1,18 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import ListItem from './ListItem'
+
+// TODO: condense booleans to some more logical isDisabled selector
+LabwareListItem.propTypes = {
+  name: PropTypes.string,
+  slot: PropTypes.number.isRequired,
+  confirmed: PropTypes.bool,
+  isTiprack: PropTypes.bool,
+  instrumentsCalibrated: PropTypes.bool,
+  tipracksConfirmed: PropTypes.bool,
+  isRunning: PropTypes.bool.isRequired,
+  onClick: PropTypes.func
+}
 
 export default function LabwareListItem (props) {
   const {

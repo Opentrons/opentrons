@@ -15,7 +15,7 @@ function InstrumentList (props) {
   return (
     <TitledList title={title}>
       {props.instruments.map((instrument) => (
-        <InstrumentListItem key={instrument.name} {...props} {...instrument} />
+        <InstrumentListItem key={instrument.axis} {...props} {...instrument} />
       ))}
     </TitledList>
   )

@@ -1,10 +1,18 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import classnames from 'classnames'
 import styles from './link-list.css'
 
-export default function LinkItem (props) {
-  const {url, isDisabled, onClick, confirmed} = props
+ListItem.propTypes = {
+  url: PropTypes.string,
+  isDisabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  confirmed: PropTypes.bool
+}
+
+export default function ListItem (props) {
+  const {key, url, isDisabled, onClick, confirmed} = props
   // TODO(ka 2017-12-12) replace span with icon style with icon from comp lib
   const iconStyle = confirmed
     ? classnames(styles.icon, styles.confirmed)
@@ -12,7 +20,7 @@ export default function LinkItem (props) {
 
   if (url) {
     return (
-      <li>
+      <li key={key}>
         <Link
           to={url}
           onClick={onClick}
