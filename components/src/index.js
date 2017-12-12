@@ -1,4 +1,5 @@
-// opentrons components library
 // @flow
+// opentrons components library
 
-export {PrimaryButton} from './buttons'
+export * from './buttons'
+export * from './icons'
