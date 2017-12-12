@@ -7,7 +7,7 @@ export const defs = {roundSlotClipPath: 'roundSlotClipPath'} // TODO: import the
 type Props = {
   height: number, // TODO
   width: number,
-  highlighted?: boolean,
+  highlighted: boolean,
   children: React.Node
 }
 

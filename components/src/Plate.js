@@ -1,5 +1,5 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
@@ -13,14 +13,30 @@ import { Well } from './Well'
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
-export class Plate extends React.Component {
-  constructor (props) {
+type Props = {
+  containerType: string,
+  wellContents: *, // TODO list 2nd-level keys. First key is wellName.
+  showLabels: boolean,
+  selectable: boolean
+}
+
+export class Plate extends React.Component<Props> {
+  constructor (props: Props) {
     super(props)
-    this.createLabels = this.createLabels.bind(this)
-    this.createWell = this.createWell.bind(this)
+    // TODO Ian 2017-12-12 A prettier way to bind `this` w/ flow still happy? https://github.com/facebook/flow/issues/1517
+    const self: any = this
+    self.createLabels = this.createLabels.bind(this)
+    self.createWell = this.createWell.bind(this)
   }
 
-  createWell (singleWellContents, wellName) {
+  createWell (
+    singleWellContents: {
+      preselected: boolean,
+      selected: boolean,
+      groupId: string
+    },
+    wellName: string
+  ) {
     const { containerType, selectable } = this.props
 
     if (!(containerType in defaultContainers.containers)) {
@@ -125,11 +141,4 @@ export class Plate extends React.Component {
       </g>
     )
   }
-}
-
-Plate.propTypes = {
-  selectable: PropTypes.bool,
-  containerType: PropTypes.string.isRequired,
-  wellContents: PropTypes.object.isRequired, // TODO list 2nd-level keys. First key is wellName.
-  showLabels: PropTypes.bool // TODO bring back labels
 }

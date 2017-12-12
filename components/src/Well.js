@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import cx from 'classnames'
 import isNil from 'lodash/isNil'
@@ -6,16 +7,38 @@ import styles from './Well.css'
 import { SELECTABLE_WELL_CLASS, swatchColors } from './constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
-export function Well ({
-  wellName,
-  groupId,
-  selectable,
-  selected,
-  preselected,
-  hasRectWells,
-  wellLocation,
-  svgOffset
-}) {
+type Props = {
+  wellName: string,
+  groupId: string,
+  selectable: boolean,
+  selected: boolean,
+  preselected: boolean,
+  hasRectWells: boolean,
+  wellLocation: {
+    x: number,
+    y: number,
+    length?: number,
+    width?: number,
+    diameter?: number
+  },
+  svgOffset: {
+    x: number,
+    y: number
+  }
+}
+
+export function Well (props: Props) {
+  const {
+    wellName,
+    groupId,
+    selectable,
+    selected,
+    preselected,
+    hasRectWells,
+    wellLocation,
+    svgOffset
+  } = props
+
   const isFilled = !isNil(groupId)
 
   const className = cx(styles.well, {
@@ -36,7 +59,7 @@ export function Well ({
     style
   }
 
-  return hasRectWells
+  return (hasRectWells)
     // flip x and y coordinates for landscape (default-containers.json is in portrait)
     ? <rect
       {...commonProps}
@@ -49,6 +72,6 @@ export function Well ({
       {...commonProps}
       cx={wellLocation.y + svgOffset.y}
       cy={wellLocation.x + svgOffset.x}
-      r={wellLocation.diameter / 2}
+      r={wellLocation.diameter || 0 / 2}
     />
 }

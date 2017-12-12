@@ -110,7 +110,7 @@ type LabwareOnDeckProps = {
   containerType: string,
   containerName: string,
 
-  // canAdd?: bool,
+  // canAdd: boolean,
 
   activeModals: any, // TODO
   openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => mixed,
@@ -128,7 +128,7 @@ type LabwareOnDeckProps = {
 
   height: number,
   width: number,
-  highlighted?: boolean
+  highlighted: boolean
 }
 
 export function LabwareOnDeck (props: LabwareOnDeckProps) {
