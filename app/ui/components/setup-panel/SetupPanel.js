@@ -13,6 +13,8 @@ import LabwareListItem from './LabwareListItem'
 import styles from './setup-panel.css'
 import tooltipStyles from '../ToolTip.css'
 
+// TODO(ka 2017-12-12) break down setup panel into 3 containers
+// InstrumentList LabwareList and Run
 export default function SetupPanel (props) {
   const {
     instruments,

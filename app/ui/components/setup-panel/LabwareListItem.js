@@ -34,7 +34,8 @@ export default function LabwareListItem (props) {
     [styles.confirmed]: confirmed,
     [styles.alert]: !confirmed
   })
-
+  // TODO(ka 2017-12-12) convert labware items to navlink and wrap component lib list item
+  // leaving this here for now to avoid lapse in functionality
   return (
     <li>
       <button
