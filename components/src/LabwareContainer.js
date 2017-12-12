@@ -1,13 +1,13 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './LabwareContainer.css'
-import { nonFillableContainers, SLOT_HEIGHT } from '../constants.js'
-import { humanize } from '../utils.js'
+import { nonFillableContainers, SLOT_HEIGHT } from './constants'
+import { humanize } from './utils'
 
-import SelectablePlate from '../containers/SelectablePlate.js'
+import SelectablePlate from '../../protocol-designer/src/containers/SelectablePlate.js' // TODO FIX IMMEDIATELY
 
 // import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
-import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
+import NameThisLabwareOverlay from '../../protocol-designer/src/components/NameThisLabwareOverlay.js' // TODO FIX IMMEDIATELY
 
 // On an empty slot:
 // * Renders a slot on the deck
@@ -93,7 +93,7 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
   )
 }
 
-export default function LabwareContainer ({
+export function LabwareContainer ({
   slotName,
 
   containerId,

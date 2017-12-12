@@ -1,5 +1,6 @@
-@value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
-@value overlay_transparency from '../css/globals.css';
+@value blue, lightGrey, medGrey, darkGrey, plateBg from './colors.css';
+
+/* @value overlay_transparency from '../globals.css'; */
 
 /*
 NOTE: available defs are:

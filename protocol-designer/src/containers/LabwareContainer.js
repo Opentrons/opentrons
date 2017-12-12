@@ -15,7 +15,7 @@ import {
   copyLabware
 } from '../actions'
 
-import LabwareContainer from '../components/LabwareContainer.js'
+import { LabwareContainer } from '@opentrons/components'
 
 export default connect(
   (state, ownProps) => {

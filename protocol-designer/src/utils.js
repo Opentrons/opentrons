@@ -1,9 +1,6 @@
-export const humanize = s =>
-  s.toLowerCase().split(/-|_|\./)
-    .filter(s => s) // only truthy
-    .map(substring =>
-      substring[0].toUpperCase() + substring.slice(1)
-    ).join(' ')
+import { utils as componentLibraryUtils } from '@opentrons/components'
+
+export const { humanize } = componentLibraryUtils
 
 // Not really a UUID, but close enough...?
 export const uuid = () => new Date().getTime() + '.' + Math.random()

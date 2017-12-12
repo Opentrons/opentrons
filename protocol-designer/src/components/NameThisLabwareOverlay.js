@@ -1,7 +1,7 @@
 import React from 'react'
 
 // NOTE: uses LabwareContainer.css, there's no NameThisLabwareOverlay.css
-import componentStyles from './LabwareContainer.css'
+import componentStyles from '../../../components/src/LabwareContainer.css' // TODO FIX IMMEDIATELY
 import { humanize } from '../utils.js'
 import ForeignDiv from '../components/ForeignDiv.js'
 
