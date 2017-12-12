@@ -128,13 +128,13 @@ def _setup_module(module):
     return module
 
 
-def _get_placement_location(slot, deck):
+def _get_placement_location(placement, deck):
     location = None
     # If target location is a slot, it will be passed as a string
-    if isinstance(slot, str):
-        location = deck[slot]
-    elif getattr(slot, 'stackable', False):
-        location = slot
+    if isinstance(placement, str):
+        location = deck[placement]
+    elif getattr(placement, 'stackable', False):
+        location = placement
 
     return location
 

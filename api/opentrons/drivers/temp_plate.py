@@ -22,14 +22,12 @@ class TemperaturePlateDriver:
         self.simulating = True
 
     def connect(self, vid):
-        self.simulating = False
-        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            self.simulating = True
-            return
-        port = sc.get_port_by_VID(vid)
-        if port is None:
-            raise RuntimeError("No valid port found for connection")
-        self._connection = sc._connect(port, baudrate=BAUD_RATE)
+        if not environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+            self.simulating = False
+            port = sc.get_port_by_VID(vid)
+            if port is None:
+                raise RuntimeError("No valid port found for connection")
+            self._connection = sc._connect(port, baudrate=BAUD_RATE)
 
     def disconnect(self):
         self.simulating = True
@@ -43,7 +41,7 @@ class TemperaturePlateDriver:
 
             return ret_code
 
-    def set_temp(self, temp, wait=False):
+    def set_temp(self, temp):
         self.target_temp = temp
         self._send_command(GCODES['SET_TEMP'].format(temp=temp))
 

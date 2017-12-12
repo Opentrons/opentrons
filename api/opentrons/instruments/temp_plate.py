@@ -1,10 +1,10 @@
-import time
-
 from opentrons.drivers.temp_plate import TemperaturePlateDriver as Driver
 from opentrons.containers.placeable import Placeable
 
 TEMP_THRESHOLD = 1
 VID = 6790
+MAX_TEMP = 70
+MIN_TEMP = 4
 
 
 def _is_valid_temp(tempPlate, temp):
@@ -19,22 +19,22 @@ def _is_valid_temp(tempPlate, temp):
         return True
 
 
-def _wait_for_temp(tempPlate, target_temp):
-    cur_temp = tempPlate.driver.get_temp()
-    while (abs(target_temp - cur_temp) > TEMP_THRESHOLD):
-        time.sleep(.5)
-        cur_temp = tempPlate.get_temp()
-
-
 class TemperaturePlate(Placeable):
     stackable = True
     module_name = 'temperature_plate'
 
-    def __init__(self, robot, slot, label=None):
+    def __init__(
+            self,
+            robot,
+            slot,
+            label=None,
+            max_temp=MAX_TEMP,
+            min_temp=MIN_TEMP
+    ):
         super(TemperaturePlate, self).__init__()
         self.robot = robot
-        self.min_temp = 10
-        self.max_temp = 70
+        self.min_temp = min_temp
+        self.max_temp = max_temp
         self.driver = Driver()
         self.label = label
         robot.add_module(self, slot)
@@ -52,11 +52,9 @@ class TemperaturePlate(Placeable):
         self.driver.disconnect()
 
     # ----------- Public interface ---------------- #
-    def set_temp(self, temp, wait=False):
+    def set_temp(self, temp):
         if _is_valid_temp(self, temp):
             self.driver.set_temp(temp)
-        if wait:
-            _wait_for_temp(self, temp)
 
     def get_temp(self):
         return self.driver.get_temp()
