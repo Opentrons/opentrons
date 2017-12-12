@@ -6,7 +6,7 @@ export const NAME = 'interface'
 
 export const PANEL_NAMES = ['upload', 'setup', 'connect']
 export const PANEL_PROPS_BY_NAME = {
-  upload: {title: 'Upload File'},
+  upload: {title: 'Open Protocol'},
   setup: {title: 'Prep for Run'},
   connect: {title: 'Connect Robot'}
 }

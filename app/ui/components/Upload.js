@@ -8,8 +8,8 @@ import {Spinner, Success, Warning} from './icons'
 
 import styles from './Upload.css'
 
-const UPLOAD_ERROR_MESSAGE = 'Something went wrong while uploading your file.'
-const UPLOAD_SUCCESS_MESSAGE = 'Your file has uploaded successfully.'
+const UPLOAD_ERROR_MESSAGE = 'Your protocol could not be opened.'
+const UPLOAD_SUCCESS_MESSAGE = 'Your protocol has successfully loaded.'
 
 Upload.propTypes = {
   name: PropTypes.string.isRequired,

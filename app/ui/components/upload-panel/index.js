@@ -19,6 +19,7 @@ UploadPanel.propTypes = {
 
 function UploadPanel (props) {
   const warning = props.isSessionLoaded && (<UploadWarning />)
+
   return (
     <div>
       <UploadInput {...props} isButton />
@@ -46,6 +47,9 @@ function mapDispatchToProps (dispatch) {
       }
 
       dispatch(robotActions.session(files[0]))
+
+      // reset the state of the input to allow file re-uploads
+      event.target.value = null
     }
   }
 }
