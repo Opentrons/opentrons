@@ -14,6 +14,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "flow": "flow check",
     "lint": "standard; stylelint '**/*.css'",
     "build": "NODE_ENV=production webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
@@ -65,10 +66,12 @@
     "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.4",
+    "flow-bin": "^0.61.0",
     "jest": "^21.2.1",
     "react-hot-loader": "^3.0.0-beta.7",
     "standard": "^10.0.3",

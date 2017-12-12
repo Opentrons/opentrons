@@ -1,3 +1,13 @@
+// @flow
+
+// On an empty slot:
+// * Renders a slot on the deck
+// * Renders Add Labware mouseover button
+//
+// On a slot with a container:
+// * Renders a SelectablePlate in the slot
+// * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
+
 import React from 'react'
 import cx from 'classnames'
 import { LabwareContainer, allStyles } from '@opentrons/components'
@@ -11,16 +21,14 @@ import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
 
 const styles = allStyles.LabwareContainer
 
-// On an empty slot:
-// * Renders a slot on the deck
-// * Renders Add Labware mouseover button
-//
-// On a slot with a container:
-// * Renders a SelectablePlate in the slot
-// * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
-
 // TODO: factor CenteredTextSvg out...??? is there a better way? Can't use CSS for x / y / text-anchor.
-function CenteredTextSvg ({text, className}) {
+type CenteredTextSvgProps = {
+  text: string,
+  className?: string
+}
+
+function CenteredTextSvg (props: CenteredTextSvgProps) {
+  const { text, className } = props
   return (
     <text x='50%' y='50%' textAnchor='middle' {...{className}}>
       {text}
@@ -95,33 +103,63 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
   )
 }
 
-export function LabwareOnDeck ({
-  slotName,
+type LabwareOnDeckProps = {
+  slotName: string,
 
-  containerId,
-  containerType,
-  containerName,
+  containerId: string,
+  containerType: string,
+  containerName: string,
 
-  canAdd,
+  // canAdd?: bool,
 
-  activeModals,
-  openIngredientSelector,
+  activeModals: any, // TODO
+  openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => mixed,
 
-  createContainer,
-  deleteContainer,
-  modifyContainer,
+  // createContainer: ({slotName: string, containerType: string}) => mixed,
+  deleteContainer: ({containerId: string, slotName: string, containerType: string}) => mixed,
+  modifyContainer: ({containerId: string, modify: mixed}) => mixed, // eg modify = {name: 'newName'}
 
-  openLabwareSelector,
-  closeLabwareSelector,
+  openLabwareSelector: ({slotName: string}) => mixed,
+  // closeLabwareSelector: ({slotName: string}) => mixed,
 
-  setCopyLabwareMode,
-  labwareToCopy,
-  copyLabware,
+  setCopyLabwareMode: (containerId: string) => mixed,
+  labwareToCopy: string, // ?
+  copyLabware : (slotName: string) => mixed,
 
-  height,
-  width,
-  highlighted
-}) {
+  height: number,
+  width: number,
+  highlighted?: boolean
+}
+
+export function LabwareOnDeck (props: LabwareOnDeckProps) {
+  const {
+    slotName,
+
+    containerId,
+    containerType,
+    containerName,
+
+    // canAdd,
+
+    activeModals,
+    openIngredientSelector,
+
+    // createContainer,
+    deleteContainer,
+    modifyContainer,
+
+    openLabwareSelector,
+    // closeLabwareSelector,
+
+    setCopyLabwareMode,
+    labwareToCopy,
+    copyLabware,
+
+    height,
+    width,
+    highlighted
+  } = props
+
   const hasName = containerName !== null
   const slotIsOccupied = !!containerType
 

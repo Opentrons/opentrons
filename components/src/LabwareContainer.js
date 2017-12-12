@@ -1,9 +1,18 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 import styles from './LabwareContainer.css'
 
 export const defs = {roundSlotClipPath: 'roundSlotClipPath'} // TODO: import these defs instead of hard-coding in applications?
 
-export function LabwareContainer ({height, width, highlighted, children}) {
+type Props = {
+  height: number, // TODO
+  width: number,
+  highlighted?: boolean,
+  children: React.Node
+}
+
+export function LabwareContainer (props: Props) {
+  const { height, width, highlighted, children } = props
   return (
     <g>
       <svg {...{height, width}} className={styles.deck_slot}>
