@@ -19,6 +19,12 @@
     "build": "NODE_ENV=production webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
   },
+  "jest": {
+    "transformIgnorePatterns": ["/node_modules/(?!@opentrons/components/src/.*\\.js)"],
+    "moduleNameMapper": {
+      "\\.(css)$": "identity-obj-proxy"
+    }
+  },
   "bugs": {
     "url": "https://github.com/OpenTrons/opentrons/issues"
   },
