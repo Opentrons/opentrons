@@ -1,0 +1,6 @@
+/* NOTE: Ian 2017-12-06 These rem sizes are arbitrary, intention here is for semantic font size names */
+@value fontSizeHuge: 2rem;
+@value fontSizeHeader: 1.75rem;
+@value fontSizeBody2: 1.5rem;
+@value fontSizeBody1: 1rem;
+@value fontSizeCaption: 0.25rem;

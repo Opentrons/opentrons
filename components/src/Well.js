@@ -1,12 +1,12 @@
 import React from 'react'
-// import PropTypes from 'prop-types' // TODO
 import cx from 'classnames'
+import isNil from 'lodash/isNil'
 
 import styles from './Well.css'
-import { SELECTABLE_WELL_CLASS, swatchColors } from '../constants.js'
+import { SELECTABLE_WELL_CLASS, swatchColors } from './constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
-export default function Well ({
+export function Well ({
   wellName,
   groupId,
   selectable,
@@ -16,7 +16,7 @@ export default function Well ({
   wellLocation,
   svgOffset
 }) {
-  const isFilled = (groupId !== null && groupId !== undefined) // TODO use !isNil(groupId)
+  const isFilled = !isNil(groupId)
 
   const className = cx(styles.well, {
     [SELECTABLE_WELL_CLASS]: selectable,

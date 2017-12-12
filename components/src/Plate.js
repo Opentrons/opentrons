@@ -4,25 +4,23 @@ import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 
-import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
-import { wellNameSplit } from '../utils.js'
-import defaultContainers from '../default-containers.json'
-import styles from './Plate.css'
+import { defaultContainers, SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
+import { wellNameSplit } from './utils.js'
 
-import Well from '../components/Well.js'
+import styles from './Plate.css'
+import { Well } from './Well'
 
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
-class Plate extends React.Component {
-  static propTypes = {
-    selectable: PropTypes.bool,
-    containerType: PropTypes.string.isRequired,
-    wellContents: PropTypes.object.isRequired, // TODO list 2nd-level keys. First key is wellName.
-    showLabels: PropTypes.bool // TODO bring back labels
+export class Plate extends React.Component {
+  constructor (props) {
+    super(props)
+    this.createLabels = this.createLabels.bind(this)
+    this.createWell = this.createWell.bind(this)
   }
 
-  createWell = (singleWellContents, wellName) => {
+  createWell (singleWellContents, wellName) {
     const { containerType, selectable } = this.props
 
     if (!(containerType in defaultContainers.containers)) {
@@ -67,7 +65,7 @@ class Plate extends React.Component {
     } />
   }
 
-  createLabels = () => {
+  createLabels () {
     const { containerType } = this.props
 
     // TODO this is duplicated in createWell
@@ -129,4 +127,9 @@ class Plate extends React.Component {
   }
 }
 
-export default Plate
+Plate.propTypes = {
+  selectable: PropTypes.bool,
+  containerType: PropTypes.string.isRequired,
+  wellContents: PropTypes.object.isRequired, // TODO list 2nd-level keys. First key is wellName.
+  showLabels: PropTypes.bool // TODO bring back labels
+}

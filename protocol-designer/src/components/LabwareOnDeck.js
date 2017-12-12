@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import { LabwareContainer } from '@opentrons/components'
-import styles from '../../../components/src/LabwareContainer.css' // TODO FIX IMMEDIATELY
+import { LabwareContainer, allStyles } from '@opentrons/components'
 
 import { nonFillableContainers, SLOT_HEIGHT } from '../constants'
 import { humanize } from '../utils'
@@ -9,6 +8,8 @@ import { humanize } from '../utils'
 // import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
 import SelectablePlate from '../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
+
+const styles = allStyles.LabwareContainer
 
 // On an empty slot:
 // * Renders a slot on the deck

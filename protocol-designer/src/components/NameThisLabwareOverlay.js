@@ -1,9 +1,10 @@
 import React from 'react'
 
-// NOTE: uses LabwareContainer.css, there's no NameThisLabwareOverlay.css
-import componentStyles from '../../../components/src/LabwareContainer.css' // TODO FIX IMMEDIATELY
+import { allStyles } from '@opentrons/components'
 import { humanize } from '../utils.js'
 import ForeignDiv from '../components/ForeignDiv.js'
+
+const componentStyles = allStyles.LabwareContainer
 
 export default class NameThisLabwareOverlay extends React.Component {
   constructor (props) {
