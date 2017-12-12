@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
 import styles from './IngredientSelectionModal.css'
 

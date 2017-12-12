@@ -6,9 +6,12 @@ import {
 } from '../actions'
 
 import { selectors } from '../reducers'
-import Deck from '../components/Deck.js'
+import { DeckFactory } from '@opentrons/components'
+import LabwareContainer from '../containers/LabwareContainer.js'
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareDropdown from '../containers/LabwareDropdown.js'
+
+const Deck = DeckFactory(LabwareContainer)
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slotName
 

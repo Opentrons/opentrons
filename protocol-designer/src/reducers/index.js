@@ -11,7 +11,7 @@ import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 import uniq from 'lodash/uniq'
 
-import { getMaxVolumes, sortedSlotnames, defaultContainers } from '../constants.js'
+import { getMaxVolumes, defaultContainers, sortedSlotnames } from '../constants.js'
 import { uuid } from '../utils.js'
 
 // UTILS

@@ -1,12 +1,20 @@
 import React from 'react'
 import flatMap from 'lodash/flatMap'
-import { SLOTNAME_MATRIX, DECK_WIDTH, DECK_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT, SLOT_SPACING, TRASH_SLOTNAME } from '../constants.js'
+import {
+  SLOTNAME_MATRIX,
+  DECK_WIDTH,
+  DECK_HEIGHT,
+  SLOT_WIDTH,
+  SLOT_HEIGHT,
+  SLOT_SPACING,
+  TRASH_SLOTNAME
+} from './constants'
 
 import styles from './Deck.css'
-import LabwareContainer from '../containers/LabwareContainer.js'
 
-export default function Deck (props) {
+export const DeckFactory = (LabwareContainer) => () => {
   const slotOffset = 10
+
   return (
     // TODO css not inline style on svg
     <svg viewBox={`${-slotOffset} ${-slotOffset} ${DECK_WIDTH + slotOffset * 2} ${DECK_HEIGHT + slotOffset * 4}`} className={styles.deck}>
