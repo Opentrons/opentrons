@@ -1,3 +1,5 @@
+// @flow
+
 // ========= CONTAINERS =========
 import defaultContainers from './default-containers.json'
 export { defaultContainers }
@@ -34,7 +36,7 @@ export const DECK_HEIGHT = SLOT_HEIGHT * 4 + SLOT_SPACING * 5
 // ========= STYLE ================
 
 // TODO factor into CSS or constants or elsewhere
-export const swatchColors = n => {
+export const swatchColors = (n: number) => {
   const colors = [
     '#e6194b',
     '#3cb44b',

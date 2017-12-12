@@ -1,5 +1,9 @@
-import React from 'react'
+// @flow
+
+import * as React from 'react'
+
 import flatMap from 'lodash/flatMap'
+
 import {
   SLOTNAME_MATRIX,
   DECK_WIDTH,
@@ -12,7 +16,13 @@ import {
 
 import styles from './Deck.css'
 
-export const DeckFactory = (LabwareContainer) => () => {
+type LabwareProps = {
+  slotName: string,
+  width: number,
+  height: number
+}
+
+export const DeckFactory = (LabwareContainer: React.ComponentType<LabwareProps>) => () => {
   const slotOffset = 10
 
   return (
