@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {PrimaryButton} from '../buttons'
+import {PrimaryButton} from '..'
 
 describe('PrimaryButton', () => {
   test('creates a button with props', () => {

@@ -1,5 +1,5 @@
-// button components
 // @flow
+// button components
 
 import * as React from 'react'
 import classnames from 'classnames'
