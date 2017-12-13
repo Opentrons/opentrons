@@ -7,10 +7,7 @@ LabwareListItem.propTypes = {
   name: PropTypes.string,
   slot: PropTypes.number.isRequired,
   confirmed: PropTypes.bool,
-  isTiprack: PropTypes.bool,
-  instrumentsCalibrated: PropTypes.bool,
-  tipracksConfirmed: PropTypes.bool,
-  isRunning: PropTypes.bool.isRequired,
+  isDisabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func
 }
 
@@ -19,22 +16,17 @@ export default function LabwareListItem (props) {
     name,
     slot,
     confirmed,
-    isTiprack,
-    instrumentsCalibrated,
-    tipracksConfirmed,
-    isRunning,
+    isDisabled,
     onClick
   } = props
 
-  const url = isRunning
+  const url = isDisabled
     ? '#'
     : `/setup-deck/${slot}`
 
-  // TODO(ka 2017-12-12) move this into a selector, fix boolean logic
-  const isDisabled = !instrumentsCalibrated || !(isTiprack || tipracksConfirmed) || (isTiprack && confirmed)
   return (
     <ListItem
-      isDisabled={isDisabled || isRunning}
+      isDisabled={isDisabled}
       url={url}
       onClick={onClick}
       confirmed={confirmed}

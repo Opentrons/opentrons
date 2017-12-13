@@ -77,19 +77,33 @@ function mapStateToProps (state) {
 }
 
 function mergeProps (stateProps, dispatchProps) {
-  const {singleChannel: {axis}, labwareReviewed} = stateProps
+  const {
+    singleChannel: {axis},
+    labwareReviewed,
+    instrumentsCalibrated,
+    tipracksConfirmed,
+    isRunning
+  } = stateProps
   const {dispatch} = dispatchProps
-  const labware = stateProps.labware.map(lw => ({
-    ...lw,
-    setLabware: () => {
-      if (labwareReviewed) {
-        if (lw.isTiprack) {
-          return dispatch(robotActions.pickupAndHome(axis, lw.slot))
+  const labware = stateProps.labware.map(lw => {
+    const isDisabled = !instrumentsCalibrated ||
+    (lw.isTiprack && lw.confirmed) ||
+    !(lw.isTiprack || tipracksConfirmed) ||
+    isRunning
+
+    return {
+      ...lw,
+      isDisabled,
+      setLabware: () => {
+        if (labwareReviewed) {
+          if (lw.isTiprack) {
+            return dispatch(robotActions.pickupAndHome(axis, lw.slot))
+          }
+          dispatch(robotActions.moveTo(axis, lw.slot))
         }
-        dispatch(robotActions.moveTo(axis, lw.slot))
       }
     }
-  }))
+  })
   return {
     ...stateProps,
     labware
