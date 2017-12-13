@@ -157,6 +157,7 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
+        self.turn_on_button_light()
 
         # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
@@ -227,6 +228,12 @@ class Robot(object):
         self.clear_commands()
 
         return self
+
+    def turn_on_button_light(self):
+        self._driver.turn_on_button_light()
+
+    def turn_off_button_light(self):
+        self._driver.turn_off_button_light()
 
     def setup_gantry(self):
         driver = self._driver
@@ -765,10 +772,9 @@ class Robot(object):
 
     def stop(self):
         """
-        Stops execution of the protocol.
+        Stops execution of the protocol. (alias for `halt`)
         """
-        self._driver.pause()
-        self.reset()
+        self.halt()
 
     def resume(self):
         """
@@ -780,8 +786,9 @@ class Robot(object):
         """
         Stops execution of both the protocol and the Smoothie board immediately
         """
-        # TODO (ben 20171116): make smoothie actions interruptable (no M400)
-        raise NotImplementedError
+        self._driver.kill()
+        self.reset()
+        self.home()
 
     def get_serial_ports_list(self):
         ports = []
@@ -800,7 +807,7 @@ class Robot(object):
     def is_simulating(self):
         if not self._driver:
             return False
-        return self._driver.is_simulating()
+        return self._driver.simulating
 
     def get_connected_port(self):
         return self._driver.get_connected_port()
