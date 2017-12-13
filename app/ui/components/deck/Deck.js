@@ -8,10 +8,7 @@ import styles from './deck.css'
 const DeckComponent = DeckFactory(ConnectedLabwareItem)
 
 export default function Deck () {
-  // const {labware, tipracksConfirmed, labwareReviewed} = props
-  return <div style={{width: '100%'}} >
-    <DeckComponent className={styles.deck} />
-  </div>
+  return <DeckComponent className={styles.deck} />
 }
 
 // TODO remove this once refactoring is done
