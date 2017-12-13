@@ -46,8 +46,8 @@ export const DeckFactory = (LabwareContainer: React.ComponentType<LabwareProps>)
 
       {/* All containers */}
       <g transform={`translate(${slotOffset} ${slotOffset})`}>
-        {flatMap(SLOTNAME_MATRIX, (slotRow, row) =>
-          slotRow.map((slotName, col) =>
+        {flatMap(SLOTNAME_MATRIX, (slotRow: Array<string>, row: number): Array<React.Node> =>
+          slotRow.map((slotName: string, col: number): React.Node =>
             (slotName === TRASH_SLOTNAME)
             ? null // no LabwareContainer for Trash in slot 12
             : <g key={slotName}

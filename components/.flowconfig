@@ -4,10 +4,12 @@
 
 [libs]
 flow-typed
+src/interfaces/
 
 [lints]
 
 [options]
 module.name_mapper.extension='css' -> '<PROJECT_ROOT>/types/CSSModule.js'
+
 
 [strict]

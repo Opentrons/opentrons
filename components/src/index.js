@@ -14,6 +14,7 @@ export {
   utils
 }
 
+// TODO: settle on one import format
 export {Plate} from './Plate'
 export * from './buttons'
 export {DeckFactory} from './DeckFactory'
