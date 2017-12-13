@@ -15,7 +15,7 @@ import SidePanel from './SidePanel'
 // naming and organization refactors to follow
 import ConnectPanel from '../connect-panel'
 import UploadPanel from '../upload-panel'
-import ConnectedSetupPanel from '../../containers/ConnectedSetupPanel'
+import ConnectedSetupPanel from '../setup-panel'
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavPanel)
 

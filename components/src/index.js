@@ -1,5 +1,5 @@
-// opentrons components library
 // @flow
+// opentrons components library
 
 import * as constants from './constants'
 import * as utils from './utils'
@@ -15,7 +15,7 @@ export {
 }
 
 export {Plate} from './Plate'
-export {PrimaryButton} from './buttons'
+export * from './buttons'
 export {DeckFactory} from './DeckFactory'
 export {LabwareContainer} from './LabwareContainer'
-export {Well} from './Well'
+export * from './icons'

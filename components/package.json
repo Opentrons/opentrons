@@ -27,7 +27,8 @@
       "flowtype"
     ],
     "globals": [
-      "SyntheticEvent"
+      "SyntheticEvent",
+      "$Keys"
     ],
     "env": [
       "browser",
@@ -54,6 +55,7 @@
     "cross-env": "^5.1.1",
     "eslint-plugin-flowtype": "^2.39.1",
     "flow-bin": "^0.60.1",
+    "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "react-test-renderer": "^16.2.0",
