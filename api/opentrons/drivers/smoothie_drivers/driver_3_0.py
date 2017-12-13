@@ -50,7 +50,8 @@ GCODES = {'HOME': 'G28.2',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
           'SET_CURRENT': 'M907',
-          'SCAN_INSTRUMENTS': 'M369'}
+          'SCAN_INSTRUMENTS': 'M369',
+          'WRITE_INSTRUMENT': 'M370'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -66,6 +67,16 @@ def _parse_axis_values(raw_axis_values):
             GCODE_ROUNDING_PRECISION)
         for s in parsed_values
     }
+
+
+def _parse_instrument_values(hex_str):
+    return {
+        pair.split(':')[0]: bytearray.fromhex(pair.split(':')[1])
+        for pair in hex_str.strip().split(' ')[1:]
+    }
+
+def _byte_array_to_hex_string(byte_array):
+    return ''.join('%02x' % b for b in byte_array)
 
 
 class SmoothieDriver_3_0_0:
@@ -115,13 +126,21 @@ class SmoothieDriver_3_0_0:
     def scan_instruments(self):
         res = self._send_command(GCODES['SCAN_INSTRUMENTS'])
         return {
-            line.strip()[0]: {
-                pair.split(':')[0]: bytearray.fromhex(pair.split(':')[1])
-                for pair in line.strip().split(' ')[1:]
-            }
+            line.strip()[0]: _parse_instrument_values(line)
             for line in res.split('\n')
             if line
         }
+
+    def write_instrument(self, mount, byte_array):
+        if not isinstance(byte_array, bytearray):
+            raise ValueError(
+                'Expected {0}, not {1}'.format(bytearray, type(byte_array)))
+        byte_string = _byte_array_to_hex_string(byte_array)
+        command = GCODES['WRITE_INSTRUMENT'] + mount + byte_string
+        res = self._send_command(command)
+        print(res)
+        res = _parse_instrument_values(res)
+        assert res['data'] == byte_array
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
