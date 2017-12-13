@@ -15,7 +15,11 @@ from opentrons.util.log import get_logger
 
 log = get_logger(__name__)
 
-TIP_CLEARANCE = 42
+# TODO (andy) this is the height the tip will travel above the deck's tallest
+# container. This should not be a single value, but should be optimized given
+# the movements context (ie sterility vs speed). This is being set to 20mm
+# to allow containers >150mm to be usable on the deck for the tiem being.
+TIP_CLEARANCE = 20
 
 
 class InstrumentMosfet(object):
