@@ -8,5 +8,6 @@ export type DeckSlotProps = {
   width: number,
   height: number,
   highlighted?: boolean,
+  containerType?: string,
   children?: React.Node
 }

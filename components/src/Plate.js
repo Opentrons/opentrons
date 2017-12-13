@@ -31,15 +31,15 @@ type wellDims = { // TODO similar to type in Well.js. DRY it up
   maxVolume: number
 }
 
-type Props = {
+export type PlateProps = {
   containerType: string,
   wellContents: {[string]: singleWell}, // Keyed by wellName, eg 'A1'
-  showLabels: boolean,
-  selectable: boolean
+  showLabels?: boolean,
+  selectable?: boolean
 }
 
-export class Plate extends React.Component<Props> {
-  constructor (props: Props) {
+export class Plate extends React.Component<PlateProps> {
+  constructor (props: PlateProps) {
     super(props)
     // TODO Ian 2017-12-12 A prettier way to bind `this` w/ flow still happy? https://github.com/facebook/flow/issues/1517
     const self: any = this

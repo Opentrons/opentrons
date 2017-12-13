@@ -1,46 +1,21 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
 
-import {DeckFactory, LabwareContainer, Plate, EmptyDeckSlot, types} from '@opentrons/components'
+import {DeckFactory} from '@opentrons/components'
+import ConnectedLabwareItem from './ConnectedLabwareItem'
 import styles from './deck.css'
 
-import {
-  selectors as robotSelectors
-//   actions as robotActions
-} from '../../robot'
+const DeckComponent = DeckFactory(ConnectedLabwareItem)
 
-function LabwarePlate (props: types.DeckSlotProps) {
-  const {height, width, slotName, containerType, wellContents} = props
-  return <LabwareContainer slotName={slotName}>
-    {containerType
-      ? <Plate {...{containerType, wellContents}} />
-      : <EmptyDeckSlot {...{height, width, slotName}} />
-    }
-  </LabwareContainer>
-}
-
-// TODO factor out
-const mapStateToProps = (state, ownProps) => {
-  const {slotName} = ownProps
-  const labware = robotSelectors.getLabware(state)
-  const containerType = slotName in labware && labware[slotName].type
-  const wellContents = {'A1': {selected: true}} // TODO: what will this look like for App?
-  return {containerType, wellContents}
-}
-
-const ConnectedLabware = connect(mapStateToProps)(LabwarePlate)
-// -------------
-
-const DeckComponent = DeckFactory(ConnectedLabware)
-
-export default function Deck (props) {
+export default function Deck () {
   // const {labware, tipracksConfirmed, labwareReviewed} = props
   return <div style={{width: '100%'}} >
     <DeckComponent className={styles.deck} />
   </div>
 }
 
+// TODO remove this once refactoring is done
+//
 // // deck map container
 // import {connect} from 'react-redux'
 //
