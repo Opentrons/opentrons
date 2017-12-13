@@ -2,9 +2,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {PrimaryButton} from '@opentrons/components'
+import {PrimaryButton, Icon, USB} from '@opentrons/components'
 
-import Icon, {USB} from '../Icon'
 import styles from './connect-panel.css'
 
 RobotItem.propTypes = {
