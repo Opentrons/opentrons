@@ -19,7 +19,8 @@ def config(monkeypatch, tmpdir):
 def test_clear_config(config):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
-    from opentrons.cli.main import main  # NOQA
+    from opentrons.cli import main
+    main.clear_configuration_and_reload()
 
     from opentrons import robot
     from opentrons.robot.robot_configs import default

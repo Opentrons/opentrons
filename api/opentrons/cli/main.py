@@ -3,19 +3,17 @@
 # pylama:ignore=C901
 
 # erase previous calibration file before opentrons.robot instantiates
-from opentrons import robot
+import asyncio
+import urwid
+import atexit
+import os
+import sys
+from numpy.linalg import inv
+from numpy import dot, array, insert
 from opentrons.robot import robot_configs
-robot_configs.clear()
-robot.config = robot_configs.load()
-robot.reset()
-
-import asyncio                                                          # NOQA
-import urwid                                                            # NOQA
-from numpy.linalg import inv                                            # NOQA
-from numpy import dot, array, insert                                    # NOQA
-from opentrons import robot, instruments                                # NOQA
-from opentrons.util.calibration_functions import probe_instrument       # NOQA
-from opentrons.cli.solve import solve                                   # NOQA
+from opentrons import robot, instruments
+from opentrons.util.calibration_functions import probe_instrument
+from opentrons.cli.solve import solve
 
 
 # Distance increments for jog
@@ -245,7 +243,20 @@ def validate(index):
     robot._driver.move({current_pipette: z})
 
 
+def clear_configuration_and_reload():
+    robot_configs.clear()
+    robot.config = robot_configs.load()
+    robot.reset()
+
+
 def main():
+    prompt = input(
+        ">>> Warning! Running this tool will delete any previous calibration data. Proceed (y/n)? ")  # NOQA
+    if prompt not in ['y', 'Y', 'yes']:
+        print('Exiting--prior configuration data not deleted')
+        sys.exit()
+    clear_configuration_and_reload()
+
     robot.connect()
     tip = urwid.Text(u"X/Y/Z: left,right/up,down/q,a; Pipette (swap): z; Steps: -/=; Test points: 1, 2, 3")   # NOQA
     pile = urwid.Pile([tip, status_text])
@@ -264,5 +275,14 @@ def main():
     print('Robot config: \n', robot.config)
 
 
+def notify_and_restart():
+    print('Exiting configuration tool and restarting system')
+    os.system("kill 1")
+
+
 if __name__ == "__main__":
+    # Register hook to reboot the robot after exiting this tool (regardless of
+    # whether this process exits normally or not)
+    atexit.register(notify_and_restart)
+
     main()
