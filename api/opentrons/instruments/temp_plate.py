@@ -7,18 +7,6 @@ MAX_TEMP = 70
 MIN_TEMP = 4
 
 
-def _is_valid_temp(tempPlate, temp):
-    if temp > tempPlate.max_temp or temp < tempPlate.min_temp:
-        raise UserWarning(
-            "Temperature {temp} is out of range. Valid temperature "
-            "range is {min} to {max}".format(
-                temp=temp, min=tempPlate.min_temp, max=tempPlate.max_temp)
-        )
-        return False
-    else:
-        return True
-
-
 class TemperaturePlate(Placeable):
     stackable = True
     name = 'temperature-plate'
@@ -45,6 +33,16 @@ class TemperaturePlate(Placeable):
         return '<{} {}>'.format(
             self.__class__.__name__, self.label or '')
 
+    def _is_valid_temp(self, temp):
+        if temp > self.max_temp or temp < self.min_temp:
+            raise UserWarning(
+                "Temperature {temp} is out of range. Valid temperature "
+                "range is {min} to {max}".format(
+                    temp=temp, min=self.min_temp, max=self.max_temp)
+            )
+        else:
+            return True
+
     def connect(self):
         self.driver.connect(vid=VID)
 
@@ -53,7 +51,7 @@ class TemperaturePlate(Placeable):
 
     # ----------- Public interface ---------------- #
     def set_temp(self, temp):
-        if _is_valid_temp(self, temp):
+        if self._is_valid_temp(temp):
             self.driver.set_temp(temp)
 
     def get_temp(self):

@@ -117,7 +117,7 @@ def _load_module_dict_from_db(db, module_name):
             "No module with name {} found in Containers database table"
             .format(module_name)
         )
-    container_type, *rel_coords = db_data
+    _, *rel_coords = db_data
     return rel_coords
 
 

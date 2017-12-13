@@ -123,32 +123,12 @@ def _setup_container(container_name):
     return container
 
 
-# NOTE: modules are currently stored in the Containers db table
+# NOTE: modules are stored in the Containers db table
 def _setup_module(module):
     x, y, z = database.load_module(module.name)
     from opentrons.util.vector import Vector
     module._coordinates = Vector(x, y, z)
     return module
-
-
-def _get_placement_location(placement, deck):
-    location = None
-    # If target location is a slot, it will be passed as a string
-    if isinstance(placement, str):
-        location = deck[placement]
-    elif getattr(placement, 'stackable', False):
-        location = placement
-
-    return location
-
-
-def _is_available_slot(poses, location, share, slot, container_name):
-    if pose_tracker.has_children(poses, location) and not share:
-        raise RuntimeWarning(
-            'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
-                slot, container_name, slot))
-    else:
-        return True
 
 
 class Robot(object):
@@ -219,6 +199,23 @@ class Robot(object):
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
+
+    def _get_placement_location(self, placement):
+        location = None
+        # If `placement` is a string, assume it is a slot
+        if isinstance(placement, str):
+            location = self._deck[placement]
+        elif getattr(placement, 'stackable', False):
+            location = placement
+        return location
+
+    def _is_available_slot(self, location, share, slot, container_name):
+        if pose_tracker.has_children(self.poses, location) and not share:
+            raise RuntimeWarning(
+                'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
+                    slot, container_name, slot))
+        else:
+            return True
 
     def reset(self):
         """
@@ -757,15 +754,15 @@ class Robot(object):
 
     def add_container(self, name, slot, label=None, share=False):
         container = _setup_container(name)
-        location = _get_placement_location(slot, self._deck)
-        if _is_available_slot(self.poses, location, share, slot, name):
+        location = self._get_placement_location(slot)
+        if self._is_available_slot(location, share, slot, name):
             location.add(container, label or name)
         self.add_container_to_pose_tracker(location, container)
         return container
 
     def add_module(self, module, slot, label=None):
         module = _setup_module(module)
-        location = _get_placement_location(slot, self._deck)
+        location = self._get_placement_location(slot)
         location.add(module, label or module.__class__.__name__)
         self.modules.append(module)
         self.poses = pose_tracker.add(

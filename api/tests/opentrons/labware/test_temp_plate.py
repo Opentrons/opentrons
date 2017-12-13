@@ -16,20 +16,21 @@ def plate(robot):
     temp_plate = TemperaturePlate(robot, 'A1', min_temp=4, max_temp=70)
     setattr(temp_plate.driver, '_send_command', buffer_gcodes)
     setattr(temp_plate, 'test_buffer', gcode_buffer)
+    temp_plate.driver.simulating = False
     return temp_plate
 
 
-@pytest.mark.parametrize("temp, gcode", [
-    (10, [GCODES['SET_TEMP'].format(temp=10)]),
-    (20, [GCODES['SET_TEMP'].format(temp=20)]),
-    (50, [GCODES['SET_TEMP'].format(temp=50)]),
-    (50.52, [GCODES['SET_TEMP'].format(temp=50.52)]),
-    (70, [GCODES['SET_TEMP'].format(temp=70)]),
-    (4, [GCODES['SET_TEMP'].format(temp=4)])
-])
-def test_set_temp(plate, temp, gcode):
+@pytest.fixture
+def sim_plate(robot):
+    temp_plate = TemperaturePlate(robot, 'A1', min_temp=4, max_temp=70)
+    return temp_plate
+
+
+@pytest.mark.parametrize("temp, gcode", (
+        (temp, [GCODES['SET_TEMP'].format(temp=temp)])
+        for temp in [10, 20, 50, 50.52, 70, 4]))
+def test_set_temp_gcode(plate, temp, gcode):
     plate.set_temp(temp)
-    assert plate.get_temp() == temp
     assert plate.test_buffer == gcode
 
 
@@ -42,6 +43,11 @@ def test_set_invalid_temp(plate, temp):
 
 def test_shutdown(plate):
     plate.shutdown()
-
     # Firmware interprets setting the temp to 0 as a shutdown
     assert plate.test_buffer == [GCODES['SET_TEMP'].format(temp=0)]
+
+
+@pytest.mark.parametrize("temp", [10, 20, 50, 50.52, 70, 4])
+def test_set_temp_sim(sim_plate, temp):
+    sim_plate.set_temp(temp)
+    assert sim_plate.get_temp() == temp

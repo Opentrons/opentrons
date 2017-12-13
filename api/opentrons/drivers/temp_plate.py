@@ -20,6 +20,12 @@ class TemperaturePlateDriver:
     def __init__(self):
         self.target_temp = None
         self.simulating = True
+        self._connection = None
+
+    def _send_command(self, command, timeout=None):
+        ret_code = sc.write_and_return(
+            command, self._connection, timeout)
+        return ret_code
 
     def connect(self, vid):
         if not environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
@@ -32,17 +38,10 @@ class TemperaturePlateDriver:
     def disconnect(self):
         self.simulating = True
 
-    def _send_command(self, command, timeout=None):
-        if self.simulating:
-            pass
-        else:
-            ret_code = sc.write_and_return(
-                command, self._connection, timeout)
-
-            return ret_code
-
     def set_temp(self, temp):
         self.target_temp = temp
+        if self.simulating:
+            return
         self._send_command(GCODES['SET_TEMP'].format(temp=temp))
 
     def get_temp(self):
@@ -53,4 +52,6 @@ class TemperaturePlateDriver:
             return _parse_temp(raw_temp)
 
     def shutdown(self):
+        if self.simulating:
+            return
         self._send_command(GCODES['SET_TEMP'].format(temp=SHUTDOWN_TEMP))
