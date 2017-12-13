@@ -10,6 +10,4 @@ extract_update.py | base64 -d | tar -xv -C $UPDATE_DIR
 pip install --upgrade --no-deps $(ls $UPDATE_DIR/*.whl)
 rm -rf $UPDATE_DIR
 
-sleep 10
-
-kill 1
+sleep 1 && kill 1 &
