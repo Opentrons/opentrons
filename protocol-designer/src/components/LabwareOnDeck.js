@@ -97,7 +97,13 @@ type LabwareOnDeckProps = {
 
   // canAdd: boolean,
 
-  activeModals: any, // TODO
+  activeModals: {
+    ingredientSelection: ?{
+      containerName: string,
+      slotName: string
+    },
+    labwareSelection: boolean
+  },
   openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => mixed,
 
   // createContainer: ({slotName: string, containerType: string}) => mixed,
@@ -151,7 +157,7 @@ export function LabwareOnDeck (props: LabwareOnDeckProps) {
   const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
 
   return (
-    <LabwareContainer {...{height, width, highlighted}}>
+    <LabwareContainer {...{height, width, highlighted, slotName}}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
