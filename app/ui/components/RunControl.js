@@ -18,8 +18,8 @@ export default function RunControl (props) {
     runProgress,
     onRunClick,
     onPauseClick,
-    onResumeClick
-    // onCancelClick
+    onResumeClick,
+    onCancelClick
   } = props
 
   const hasError = errors.length > 0
@@ -54,14 +54,15 @@ export default function RunControl (props) {
         {pauseResumeText}
       </button>
     )
-    // cancelButton =
-    //   <button
-    //     onClick={onCancelClick}
-    //     className={classnames('btn', 'btn_light', styles.btn_cancel)}
-    //     disabled={!isRunning}
-    //   >
-    //     Cancel Job
-    //   </button>
+    cancelButton = (
+      <button
+        onClick={onCancelClick}
+        className={classnames('btn', 'btn_light', styles.btn_cancel)}
+        disabled={!isRunning}
+      >
+        Cancel Job
+      </button>
+    )
   }
 
   let startTimeStamp

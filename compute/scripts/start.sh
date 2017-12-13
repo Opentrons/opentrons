@@ -16,7 +16,8 @@ echo "Homing Robot... this may take a few seconds."
 python -c "from opentrons import robot; robot.connect(); robot.home()"
 
 # Check if config exists, and alert if not found
-config_path=`python -c "from opentrons.util import environment; print(environment.get_path('APP_DATA_DIR') + 'config.json')"`
+echo "Checking for deck calibration data..."
+config_path=`python -c "from opentrons.util import environment; print(environment.get_path('OT_CONFIG_FILE'))"`
 
 if [ ! -e "$config_path" ]; then
     echo "Config file not found. Please perform factory calibration and then restart robot"

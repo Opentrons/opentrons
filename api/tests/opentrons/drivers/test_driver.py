@@ -53,7 +53,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_functional(smoothie):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION  # NOQA
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
