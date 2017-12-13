@@ -2,16 +2,17 @@
 import * as React from 'react'
 import styles from './LabwareContainer.css'
 
-export const defs = {roundSlotClipPath: 'roundSlotClipPath'} // TODO: import these defs instead of hard-coding in applications?
+import type {DeckSlotProps} from './types'
+export const defs = {roundSlotClipPath: 'roundSlotClipPath'} // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?
 
-type Props = {
-  height: number, // TODO
-  width: number,
-  highlighted: boolean,
-  children: React.Node
-}
+// type Props = {
+//   height: number, // TODO
+//   width: number,
+//   highlighted: boolean,
+//   children: React.Node
+// }
 
-export function LabwareContainer (props: Props) {
+export function LabwareContainer (props: DeckSlotProps) {
   const { height, width, highlighted, children } = props
   return (
     <g>

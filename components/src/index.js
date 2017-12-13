@@ -2,6 +2,7 @@
 // opentrons components library
 
 import * as constants from './constants'
+import * as types from './types'
 import * as utils from './utils'
 
 import LabwareContainerStyles from './LabwareContainer.css'
@@ -11,12 +12,13 @@ export const allStyles = {
 
 export {
   constants,
+  types,
   utils
 }
 
-// TODO: settle on one import format
-export {Plate} from './Plate'
 export * from './buttons'
-export {DeckFactory} from './DeckFactory'
-export {LabwareContainer} from './LabwareContainer'
+export * from './DeckFactory'
+export * from './EmptyDeckSlot'
 export * from './icons'
+export * from './LabwareContainer'
+export * from './Plate'

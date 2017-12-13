@@ -10,7 +10,7 @@
 
 import React from 'react'
 import cx from 'classnames'
-import { LabwareContainer, allStyles } from '@opentrons/components'
+import { CenteredTextSvg, LabwareContainer, allStyles } from '@opentrons/components'
 
 import { nonFillableContainers, SLOT_HEIGHT } from '../constants'
 import { humanize } from '../utils'
@@ -20,21 +20,6 @@ import SelectablePlate from '../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
 
 const styles = allStyles.LabwareContainer
-
-// TODO: factor CenteredTextSvg out...??? is there a better way? Can't use CSS for x / y / text-anchor.
-type CenteredTextSvgProps = {
-  text: string,
-  className?: string
-}
-
-function CenteredTextSvg (props: CenteredTextSvgProps) {
-  const { text, className } = props
-  return (
-    <text x='50%' y='50%' textAnchor='middle' {...{className}}>
-      {text}
-    </text>
-  )
-}
 
 function OccupiedDeckSlotOverlay ({
   canAddIngreds,
@@ -170,7 +155,7 @@ export function LabwareOnDeck (props: LabwareOnDeckProps) {
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
-        // Empty slot
+        // Empty slot TODO Ian 2017-12-13 use EmptyDeckSlot from component lib
         : <g className={styles.empty_slot}>
           <rect width='100%' height='100%' />
           <CenteredTextSvg text={slotName} />

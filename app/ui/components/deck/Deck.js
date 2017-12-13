@@ -1,19 +1,30 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {DeckFactory, LabwareContainer, Plate} from '@opentrons/components'
 
-function LabwarePlate ({slotName, containerType, wellContents}) {
+import {DeckFactory, LabwareContainer, Plate, EmptyDeckSlot, types} from '@opentrons/components'
+import styles from './deck.css'
+
+import {
+  selectors as robotSelectors
+//   actions as robotActions
+} from '../../robot'
+
+function LabwarePlate (props: types.DeckSlotProps) {
+  const {height, width, slotName, containerType, wellContents} = props
   return <LabwareContainer slotName={slotName}>
-    {containerType &&
-      <Plate {...{containerType, wellContents}} />}
+    {containerType
+      ? <Plate {...{containerType, wellContents}} />
+      : <EmptyDeckSlot {...{height, width, slotName}} />
+    }
   </LabwareContainer>
 }
 
 // TODO factor out
 const mapStateToProps = (state, ownProps) => {
   const {slotName} = ownProps
-  const containerType = slotName === '1' ? '96-flat' : null // TODO
+  const labware = robotSelectors.getLabware(state)
+  const containerType = slotName in labware && labware[slotName].type
   const wellContents = {'A1': {selected: true}} // TODO: what will this look like for App?
   return {containerType, wellContents}
 }
@@ -26,7 +37,7 @@ const DeckComponent = DeckFactory(ConnectedLabware)
 export default function Deck (props) {
   // const {labware, tipracksConfirmed, labwareReviewed} = props
   return <div style={{width: '100%'}} >
-    <DeckComponent />
+    <DeckComponent className={styles.deck} />
   </div>
 }
 

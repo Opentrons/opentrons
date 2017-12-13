@@ -1,8 +1,9 @@
 // @flow
 
 import * as React from 'react'
-
+import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
+import type {DeckSlotProps} from './types'
 
 import {
   SLOTNAME_MATRIX,
@@ -16,18 +17,16 @@ import {
 
 import styles from './Deck.css'
 
-type LabwareProps = {
-  slotName: string,
-  width: number,
-  height: number
+type Props = {
+  className: string
 }
 
-export const DeckFactory = (LabwareContainer: React.ComponentType<LabwareProps>) => () => {
+export const DeckFactory = (LabwareContainer: React.ComponentType<DeckSlotProps>) => (props: Props) => {
   const slotOffset = 10
 
   return (
     // TODO css not inline style on svg
-    <svg viewBox={`${-slotOffset} ${-slotOffset} ${DECK_WIDTH + slotOffset * 2} ${DECK_HEIGHT + slotOffset * 4}`} className={styles.deck}>
+    <svg viewBox={`${-slotOffset} ${-slotOffset} ${DECK_WIDTH + slotOffset * 2} ${DECK_HEIGHT + slotOffset * 4}`} className={cx(styles.deck, props.className)}>
 
       {/* Deck outline */}
       <g transform='scale(0.666)' className={styles.deck_outline}>

@@ -53,7 +53,7 @@ export function Well (props: Props) {
 
   const commonProps = {
     className,
-    'data-wellName': wellName,
+    'data-wellName': wellName, // TODO Ian 2017-12-13: should be lowercase data-wellname (Warning: React does not recognize the `data-wellName` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `data-wellname` instead.)
     style
   }
 
