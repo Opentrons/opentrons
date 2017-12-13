@@ -13,9 +13,27 @@ import { Well } from './Well'
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
+type singleWell = {
+  highlighted: boolean,
+  preselected: boolean,
+  selected: boolean,
+  wellName: string,
+  maxVolume: number,
+  groupId? : string
+}
+
+type wellDims = { // TODO similar to type in Well.js. DRY it up
+  x: number,
+  y: number,
+  length?: number,
+  width?: number,
+  diameter?: number,
+  maxVolume: number
+}
+
 type Props = {
   containerType: string,
-  wellContents: *, // TODO list 2nd-level keys. First key is wellName.
+  wellContents: {[string]: singleWell}, // Keyed by wellName, eg 'A1'
   showLabels: boolean,
   selectable: boolean
 }
@@ -27,33 +45,39 @@ export class Plate extends React.Component<Props> {
     const self: any = this
     self.createLabels = this.createLabels.bind(this)
     self.createWell = this.createWell.bind(this)
+    self.getContainerData = this.getContainerData.bind(this)
   }
 
-  createWell (
-    singleWellContents: {
-      preselected: boolean,
-      selected: boolean,
-      groupId: string
-    },
-    wellName: string
-  ) {
-    const { containerType, selectable } = this.props
+  getContainerData (): {
+    originOffset: {x: number, y: number},
+    firstWell: wellDims,
+    containerLocations: any,
+    allWellNames: Array<string>
+  } {
+    const { containerType } = this.props
 
     if (!(containerType in defaultContainers.containers)) {
-      console.warn(`No container type "${containerType}" in defaultContainers`)
-      return null
+      throw new Error(`No container type "${containerType}" in defaultContainers`)
     }
 
     const infoForContainerType = defaultContainers.containers[containerType]
     const originOffset = infoForContainerType['origin-offset']
     const containerLocations = infoForContainerType.locations
-    const firstWell = containerLocations['A1']
-    // use existence of 'diameter' key to determine circle vs rect
-    const hasRectWells = firstWell.diameter === undefined
+    const firstWell: wellDims = containerLocations['A1']
 
-    const svgOffset = hasRectWells
+    const allWellNames = Object.keys(containerLocations)
+
+    return { originOffset, firstWell, containerLocations, allWellNames }
+  }
+
+  createWell (wellName: string) {
+    const { selectable, wellContents } = this.props
+    const { originOffset, firstWell, containerLocations } = this.getContainerData()
+    const singleWellContents: singleWell = wellContents[wellName]
+
+    // rectangular wells are centered around x, y
+    const svgOffset = (typeof firstWell.width === 'number' && typeof firstWell.length === 'number')
       ? {
-        // rectangular wells are centered around x, y
         x: (SLOT_HEIGHT - firstWell.width) / 2,
         y: originOffset.y - firstWell.length / 2
       }
@@ -64,7 +88,7 @@ export class Plate extends React.Component<Props> {
 
     const wellLocation = containerLocations[wellName]
 
-    const { preselected, selected, groupId } = singleWellContents // ignored/removed: highlighed, hovered
+    const { preselected = false, selected = false, groupId = undefined } = (singleWellContents || {}) // ignored/removed: highlighed, hovered
 
     return <Well
       key={wellName}
@@ -74,7 +98,6 @@ export class Plate extends React.Component<Props> {
         selectable,
         selected,
         preselected,
-        hasRectWells,
         wellLocation,
         svgOffset
       }
@@ -82,20 +105,12 @@ export class Plate extends React.Component<Props> {
   }
 
   createLabels () {
-    const { containerType } = this.props
+    const { originOffset, containerLocations, allWellNames } = this.getContainerData()
 
-    // TODO this is duplicated in createWell
-    if (!(containerType in defaultContainers.containers)) {
-      console.warn(`No container type "${containerType}" in defaultContainers`)
-      return null
-    }
-    const locations = defaultContainers.containers[containerType].locations
-    const originOffset = defaultContainers.containers[containerType]['origin-offset']
-
+    const allWellsSplit = allWellNames.map(wellNameSplit)
     // NOTE: can definitely be optimized
-    const allWellNames = Object.keys(locations).map(wellNameSplit)
-    const rowLetters = uniq(allWellNames.map(([letters, numbers]) => letters))
-    const colNumbers = uniq(allWellNames.map(([letters, numbers]) => numbers))
+    const rowLetters = uniq(allWellsSplit.map(([letters, numbers]) => letters))
+    const colNumbers = uniq(allWellsSplit.map(([letters, numbers]) => numbers))
 
     return <g>
       {
@@ -104,7 +119,7 @@ export class Plate extends React.Component<Props> {
           <text key={letter}
             // Remember: X and Y and switched in default-containers.json
             x={originOffset.y / 2.5}
-            y={locations[letter + '1'].x + originOffset.x + 1.5}
+            y={containerLocations[letter + '1'].x + originOffset.x + 1.5}
             className={cx(styles.plate_label, {[styles.tiny_labels]: rowLetters.length > 8})}
           >
             {letter}
@@ -117,7 +132,7 @@ export class Plate extends React.Component<Props> {
         colNumbers.map(number =>
           <text key={number}
             // Remember: X and Y and switched in default-containers.json
-            x={locations['A' + number].y + originOffset.y}
+            x={containerLocations['A' + number].y + originOffset.y}
             y={6}
             className={cx(styles.plate_label, {[styles.tiny_labels]: colNumbers.length > 12})}
           >
@@ -129,14 +144,15 @@ export class Plate extends React.Component<Props> {
   }
 
   render () {
-    const { wellContents, showLabels } = this.props
+    const { showLabels } = this.props
+    const { allWellNames } = this.getContainerData()
 
     return (
       <g>
         {/* Debug: plate boundary */}
         <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
         {/* The wells: */}
-        {map(wellContents, this.createWell)}
+        {map(allWellNames, this.createWell)}
         {showLabels && this.createLabels()}
       </g>
     )
