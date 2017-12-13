@@ -1,0 +1,39 @@
+/* TitleBar styles */
+
+/* TODO(mc, 2017-12-13): move colors to colors.css */
+@value color_dark_grey: #4a4a4a;
+
+/* TODO(mc, 2017-12-13): move font sizes and weights to typography.css */
+@value font_size_header: 1.125rem;
+@value font_weight_semibold: 600;
+
+.title_bar {
+  padding: 1rem;
+  text-transform: uppercase;
+  background-color: color_dark_grey;
+}
+
+.title_bar,
+.title_bar a {
+  color: white;
+}
+
+.title,
+.subtitle,
+.separator {
+  display: inline-block;
+  font-size: font_size_header;
+}
+
+.title,
+.separator {
+  font-weight: font_weight_semibold;
+}
+
+.subtitle {
+  font-weight: normal;
+}
+
+.separator {
+  padding: 0 1.75rem;
+}
