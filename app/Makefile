@@ -121,3 +121,7 @@ lint-js:
 .PHONY: lint-css
 lint-css:
 	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+
+.PHONY: check
+check:
+	$(bin)/flow
