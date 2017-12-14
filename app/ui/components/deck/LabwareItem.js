@@ -10,7 +10,7 @@ import {
 
 type LabwareItemProps = {
   highlighted?: boolean,
-  unconfirmed?: boolean,
+  confirmed?: boolean,
   height: number,
   width: number,
   slotName: string,
@@ -20,16 +20,16 @@ type LabwareItemProps = {
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {height, width, slotName, containerName, containerType, wellContents, highlighted, unconfirmed} = props
+  const {height, width, slotName, containerName, containerType, wellContents, highlighted, confirmed} = props
 
   const PlateWithOverlay = (
     <g>
       <Plate {...{containerType, wellContents}} />
 
-      {!unconfirmed && <ContainerNameOverlay {...{containerName, containerType}} />}
+      {(confirmed || highlighted) && <ContainerNameOverlay {...{containerName, containerType}} />}
 
       {/* TODO: need (!) warning icon */}
-      {unconfirmed && !highlighted && <SlotOverlay text='Position Unconfirmed' icon='wifi' />}
+      {!confirmed && <SlotOverlay text='Position Unconfirmed' icon='wifi' />}
     </g>
   )
 

@@ -63,7 +63,7 @@ const mapStateToProps = (state, ownProps) => {
     containerName,
     wellContents,
     highlighted,
-    unconfirmed: unconfirmedLabware.some(l => labwareToSlotName(l) === slotName)
+    confirmed: unconfirmedLabware.every(l => labwareToSlotName(l) !== slotName)
   }
 }
 
