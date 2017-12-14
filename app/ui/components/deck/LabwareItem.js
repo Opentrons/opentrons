@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+// import {NavLink} from 'react-router-dom'
 import {
   ContainerNameOverlay,
   EmptyDeckSlot,
@@ -11,6 +12,8 @@ import {
 type LabwareItemProps = {
   highlighted?: boolean,
   confirmed?: boolean,
+  isMoving?: boolean,
+  labwareReviewed?: boolean, // `labwareReviewed` is false the first time a user is looking at the deck, true once they click "Continue" to proceed with calibration
   height: number,
   width: number,
   slotName: string,
@@ -20,20 +23,37 @@ type LabwareItemProps = {
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {height, width, slotName, containerName, containerType, wellContents, highlighted, confirmed} = props
+  const {
+    height,
+    width,
+    slotName,
+    containerName,
+    containerType,
+    wellContents,
+    highlighted,
+    confirmed,
+    labwareReviewed,
+    isMoving
+  } = props
+
+  const showNameOverlay = !labwareReviewed || confirmed || highlighted
+  const showUnconfirmed = labwareReviewed && !confirmed && !isMoving
 
   const PlateWithOverlay = (
     <g>
       <Plate {...{containerType, wellContents}} />
 
-      {(confirmed || highlighted) && <ContainerNameOverlay {...{containerName, containerType}} />}
+      {showNameOverlay && <ContainerNameOverlay {...{containerName, containerType}} />}
 
       {/* TODO: need (!) warning icon */}
-      {!confirmed && <SlotOverlay text='Position Unconfirmed' icon='wifi' />}
+      {showUnconfirmed && <SlotOverlay text='Position Unconfirmed' icon='wifi' />}
+
+      {/* TODO */}
+      {isMoving && highlighted && <text x='5%' y='50%' fill='red'>TODO SPINNER</text>}
     </g>
   )
 
-  return <LabwareContainer {...{slotName, height, width, highlighted}}>
+  return <LabwareContainer highlighted={labwareReviewed && highlighted} {...{slotName, height, width}}>
     {containerType
       ? PlateWithOverlay
       : <EmptyDeckSlot {...{height, width, slotName}} />
