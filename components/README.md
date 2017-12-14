@@ -162,6 +162,21 @@ name      | BACK &#124; REFRESH &#124; ... | yes      | icon name
 className | string                         | no       | additional class names
 
 
+### structure
+
+#### TitleBar
+
+Top title bar with optional subtitle
+
+```js
+import {TitleBar} from '@opentrons/components'
+```
+
+prop      | flow type  | required | description
+--------- | ---------- | -------- | ------------
+title     | React.Node | yes      | h1 child
+subtitle  | React.Node | no       | h2 child
+
 ## contributing
 
 ### flow

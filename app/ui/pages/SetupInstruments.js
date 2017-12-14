@@ -11,7 +11,7 @@ export default function SetupInstrumentsPage (props) {
   const side = match.params.side || DEFAULT_SIDE
   return (
     <Page>
-      <SessionHeader />
+      <SessionHeader subtitle='Setup Instruments' />
       <ConnectedPipetteConfig side={side} />
     </Page>
   )
