@@ -10,23 +10,32 @@ import {
 
 type LabwareItemProps = {
   highlighted?: boolean,
+  unconfirmed?: boolean,
   height: number,
   width: number,
   slotName: string,
+  containerName: string,
   containerType: string,
   wellContents: any // TODO
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {height, width, slotName, containerType, wellContents, highlighted} = props
+  const {height, width, slotName, containerName, containerType, wellContents, highlighted, unconfirmed} = props
+
+  const PlateWithOverlay = (
+    <g>
+      <Plate {...{containerType, wellContents}} />
+
+      {!unconfirmed && <ContainerNameOverlay {...{containerName, containerType}} />}
+
+      {/* TODO: need (!) warning icon */}
+      {unconfirmed && !highlighted && <SlotOverlay text='Position Unconfirmed' icon='wifi' />}
+    </g>
+  )
+
   return <LabwareContainer {...{slotName, height, width, highlighted}}>
     {containerType
-      ? <g>
-        <Plate {...{containerType, wellContents}} />
-        {/* Overlay. TODO: multiple types of overlay depending on state */}
-        <ContainerNameOverlay {...{containerName: 'TODO name', containerType}} />
-        <SlotOverlay text='Position Unconfirmed' icon='wifi' /> {/* TODO: need (!) warning icon */}
-      </g>
+      ? PlateWithOverlay
       : <EmptyDeckSlot {...{height, width, slotName}} />
     }
   </LabwareContainer>
