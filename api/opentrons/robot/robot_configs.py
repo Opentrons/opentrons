@@ -16,9 +16,9 @@ log = logging.getLogger(__name__)
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
 MOUNT_CURRENT_LOW = 0.1
-MOUNT_CURRENT_HIGH = 0.8
-X_CURRENT_HIGH = 1.2
-Y_CURRENT_HIGH = 1.5
+MOUNT_CURRENT_HIGH = 1.0
+X_CURRENT_HIGH = 1.5
+Y_CURRENT_HIGH = 1.7
 
 DEFAULT_POWER = {
     'X': X_CURRENT_HIGH,
@@ -56,7 +56,7 @@ robot_config = namedtuple(
 default = robot_config(
     name='Ada Lovelace',
     steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
-    max_speeds='M203.1 X300 Y200 Z90 A90 B40 C40',
+    max_speeds='M203.1 X550 Y400 Z120 A120 B40 C40',
     acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
     current='M907 ' + DEFAULT_POWER_STRING,
     probe_center=(295.0, 300.0, 55.0),
