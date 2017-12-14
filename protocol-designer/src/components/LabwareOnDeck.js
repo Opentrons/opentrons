@@ -10,10 +10,9 @@
 
 import React from 'react'
 import cx from 'classnames'
-import { CenteredTextSvg, LabwareContainer, allStyles } from '@opentrons/components'
+import { CenteredTextSvg, LabwareContainer, ContainerNameOverlay, allStyles } from '@opentrons/components'
 
-import { nonFillableContainers, SLOT_HEIGHT } from '../constants'
-import { humanize } from '../utils'
+import { nonFillableContainers } from '../constants'
 
 // import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
 import SelectablePlate from '../containers/SelectablePlate.js'
@@ -60,9 +59,7 @@ function OccupiedDeckSlotOverlay ({
 
 function SlotWithContainer ({containerType, containerName, containerId}) {
   // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
-  const paddingLeft = 4
-  const paddingTop = 0
-  const boxHeight = 25
+
   return (
     <g>
       {nonFillableContainers.includes(containerType)
@@ -73,17 +70,7 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      {containerName && <g className={styles.name_overlay}>
-        <g transform={`translate(0 ${SLOT_HEIGHT - boxHeight})`}>
-          <rect x='0' y='0' height={boxHeight} width='100%' />
-          <text x={paddingLeft} y={0.4 * boxHeight + paddingTop} className={styles.container_type}>
-            {humanize(containerType).toUpperCase()}
-          </text>
-          <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>
-            {containerName}
-          </text>
-        </g>
-      </g>}
+      {containerName && <ContainerNameOverlay {...{containerType, containerName}} />}
     </g>
   )
 }

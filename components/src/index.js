@@ -17,6 +17,7 @@ export {
 }
 
 export * from './buttons'
+export * from './ContainerNameOverlay'
 export * from './CenteredTextSvg'
 export * from './DeckFactory'
 export * from './EmptyDeckSlot'
