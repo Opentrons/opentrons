@@ -182,7 +182,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.delay(POWER_CHANGE_DELAY)
 
-    def default_power(self, settings):
+    def default_power(self):
         self.set_power(self._default_power_settings)
 
     # ----------- Private functions --------------- #
@@ -210,6 +210,16 @@ class SmoothieDriver_3_0_0:
             pass
         else:
 
+            # TODO (ben 20171117): modify all axes to dwell at low current
+            moving_plunger = ('B' in command or 'C' in command) \
+                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+
+            if moving_plunger:
+                self.set_power({
+                    axis: self._config.plunger_current_high
+                    for axis in 'BC'
+                })
+
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
@@ -217,6 +227,12 @@ class SmoothieDriver_3_0_0:
             if ret_code and 'alarm' in ret_code.lower():
                 self._reset_from_error()
                 raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
+
+            if moving_plunger:
+                self.set_power({
+                    axis: self._config.plunger_current_low
+                    for axis in 'BC'
+                })
 
             return ret_code
 
@@ -261,14 +277,6 @@ class SmoothieDriver_3_0_0:
         target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
-        # TODO (ben 20171117): modify all axes to dwell at low current
-        moving_plunger = ('B' in command or 'C' in command) \
-            and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
-
-        if moving_plunger:
-            self.set_power({axis: self._config.plunger_current_high
-                           for axis in 'BC'})
-
         if target_coords:
             command = ''
             if backlash_coords != target_coords:
@@ -276,10 +284,6 @@ class SmoothieDriver_3_0_0:
             command += GCODES['MOVE'] + ''.join(target_coords)
             self._send_command(command)
             self._update_position(target)
-
-        if moving_plunger:
-            self.set_power({axis: self._config.plunger_current_low
-                           for axis in 'BC'})
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
