@@ -22,6 +22,9 @@ DEFAULT_DISPENSE_SPEED = 40
 
 DEFAULT_TIP_PRESS_MM = -10
 
+SINGLE_PLUNGE_CURRENT = 0.1
+MULTI_PLUNGE_CURRENT = 0.4
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -226,7 +229,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc', low_power_z=False):
+    def move_to(self, location, strategy='arc'):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -247,11 +250,6 @@ class Pipette:
             "direct" strategies will simply move in a straight line from
             the current position
 
-        low_power_z : bool
-            Setting this to True will cause the pipette to move at a low power
-            setting **in the Z axis only**, primarily to prevent damage to the
-            pipette in case of collision during calibration.
-
         Returns
         -------
 
@@ -264,8 +262,7 @@ class Pipette:
         self.robot.move_to(
             location,
             instrument=self,
-            strategy=strategy,
-            low_power_z=low_power_z)
+            strategy=strategy)
 
         return self
 
@@ -744,7 +741,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, low_power_z=True):
+    def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -765,11 +762,6 @@ class Pipette:
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
             not desireable, but could be used for dry-run)
-        low_power_z: : :any:bool
-            The power setting for picking up a tip. Should be False for normal
-            operation. Should be set to True for calibration where it is
-            possible for the pipette to collide with the tip rack, which could
-            damate the pipette.
 
         Returns
         -------
@@ -816,11 +808,14 @@ class Pipette:
 
             for i in range(int(presses)):
                 # move nozzle down into the tip
+                self.instrument_mover.set_power(self._pick_up_current)
+                self.instrument_mover.set_speed(30)
                 self.move_to(
                     self.current_tip().top(plunge_depth),
-                    strategy='direct',
-                    low_power_z=low_power_z)
+                    strategy='direct')
                 # move nozzle back up
+                self.instrument_mover.default_power()
+                self.instrument_mover.default_speed()
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
@@ -1465,7 +1460,7 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, pose_tree, x=None, y=None, z=None, low_power_z=False):
+    def _move(self, pose_tree, x=None, y=None, z=None):
         current_x, current_y, current_z = pose_tracker.absolute(
             pose_tree,
             self)
@@ -1490,8 +1485,7 @@ class Pipette:
         if z is not None:
             pose_tree = self.instrument_mover.move(
                 pose_tree,
-                z=_z,
-                low_power_z=low_power_z)
+                z=_z)
 
         return pose_tree
 
@@ -1538,3 +1532,10 @@ class Pipette:
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
+
+    @property
+    def _pick_up_current(self):
+        if self.type == 'single':
+            return SINGLE_PLUNGE_CURRENT
+        else:
+            return MULTI_PLUNGE_CURRENT

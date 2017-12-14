@@ -63,7 +63,7 @@ class CalibrationManager:
         log.debug('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.pick_up_tip(container._container[0], low_power_z=True)
+        inst.pick_up_tip(container._container[0])
         self._set_state('ready')
 
     def drop_tip(self, instrument, container):

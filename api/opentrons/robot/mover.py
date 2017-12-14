@@ -24,7 +24,7 @@ class Mover:
 
         return self.move(pose_tree, **target)
 
-    def move(self, pose_tree, x=None, y=None, z=None, low_power_z=False):
+    def move(self, pose_tree, x=None, y=None, z=None):
         """
         Dispatch move command to the driver changing base of
         x, y and z from source coordinate system to destination.
@@ -57,7 +57,7 @@ class Mover:
             assert z is not None, "Value must be set for each axis mapped"
             driver_target[self._axis_mapping['z']] = dst_z
 
-        self._driver.move(driver_target, low_power_z)
+        self._driver.move(driver_target)
 
         # Update pose with the new value. Since stepper motors are open loop
         # there is no need to to query diver for position
