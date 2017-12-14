@@ -14,7 +14,7 @@ export default function SetupDeckPage (props) {
 
   return (
     <Page>
-      <SessionHeader />
+      <SessionHeader subtitle='Setup Deck' />
       <DeckConfig slot={slot} />
       <Route path={`${url}/jog`} render={() => (
         <ConnectedJogModal slot={slot} />

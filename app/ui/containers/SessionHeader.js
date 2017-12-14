@@ -1,13 +1,28 @@
+import React from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
+import {TitleBar} from '@opentrons/components'
 
 import {
   selectors as robotSelectors
 } from '../robot'
 
-import Header from '../components/Header'
+export default connect(mapStateToProps)(SessionHeader)
 
-const mapStateToProps = (state) => ({
-  sessionName: robotSelectors.getSessionName(state)
-})
+function SessionHeader (props) {
+  const title = (
+    <Link to='/upload'>
+      {props.sessionName}
+    </Link>
+  )
 
-export default connect(mapStateToProps)(Header)
+  return (
+    <TitleBar title={title} subtitle={props.subtitle} />
+  )
+}
+
+function mapStateToProps (state) {
+  return {
+    sessionName: robotSelectors.getSessionName(state)
+  }
+}

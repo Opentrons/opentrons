@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TitleBar renders TitleBar with subtitle correctly 1`] = `
+<header
+  className="title_bar"
+>
+  <h1
+    className="title"
+  >
+    foo
+  </h1>
+  <span
+    className="separator"
+  >
+    |
+  </span>
+  <h2
+    className="subtitle"
+  >
+    bar
+  </h2>
+</header>
+`;
+
+exports[`TitleBar renders TitleBar without subtitle correctly 1`] = `
+<header
+  className="title_bar"
+>
+  <h1
+    className="title"
+  >
+    foo
+  </h1>
+</header>
+`;
