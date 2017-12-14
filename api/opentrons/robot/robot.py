@@ -19,7 +19,7 @@ log = get_logger(__name__)
 # container. This should not be a single value, but should be optimized given
 # the movements context (ie sterility vs speed). This is being set to 20mm
 # to allow containers >150mm to be usable on the deck for the tiem being.
-TIP_CLEARANCE = 20
+TIP_CLEARANCE = 5
 
 
 class InstrumentMosfet(object):
@@ -578,6 +578,8 @@ class Robot(object):
             this_container = placeable
 
         travel_height = self.max_deck_height() + self.arc_height
+        if self._previous_container == this_container:
+            travel_height = this_container[0].top()[-1][1] + self.arc_height
 
         _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
