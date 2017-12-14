@@ -577,9 +577,10 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        travel_height = self.max_deck_height() + self.arc_height
-        if self._previous_container == this_container:
-            travel_height = this_container[0].top()[-1][1] + self.arc_height
+        travel_height = self.max_deck_height()
+        if self._previous_container and self._previous_container == this_container:
+            travel_height = self.max_placeable_height(this_container)
+        travel_height += self.arc_height
 
         _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
@@ -893,3 +894,6 @@ class Robot(object):
     @lru_cache()
     def max_deck_height(self):
         return pose_tracker.max_z(self.poses, self._deck)
+
+    def max_placeable_height(self, placeable):
+        return pose_tracker.max_z(self.poses, placeable)
