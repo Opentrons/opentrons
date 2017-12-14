@@ -47,6 +47,10 @@
     "ignore": [
       "dist/"
     ],
+    "globals": [
+      "SyntheticEvent",
+      "$Keys"
+    ],
     "env": [
       "node",
       "browser",

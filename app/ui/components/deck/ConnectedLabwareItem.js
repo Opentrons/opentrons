@@ -6,8 +6,8 @@ import LabwareItem from './LabwareItem'
 
 import {
   constants as robotConstants,
-  selectors as robotSelectors
-  // actions as robotActions
+  selectors as robotSelectors,
+  actions as robotActions
 } from '../../robot'
 
 const {
@@ -19,32 +19,6 @@ const {
   CONFIRMING
   // CONFIRMED
 } = robotConstants
-
-// TODO: actions
-// const mergeProps = (stateProps, dispatchProps, ownProps) => {
-//   const {singleChannel: {axis}} = stateProps
-//   const {dispatch} = dispatchProps
-//   const {slot} = ownProps || {}
-//   const labware = stateProps.labware.map(lw => ({
-//     ...lw,
-//     isCurrent: (lw.slot === slot),
-//     // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
-//     // Deck, and ConnectedSetupPanel); could also move logic to the API client
-//     moveToLabware: () => {
-//       if (lw.isTiprack) {
-//         return dispatch(robotActions.pickupAndHome(axis, lw.slot))
-//       }
-//       dispatch(robotActions.moveTo(axis, lw.slot))
-//     },
-//     setLabwareConfirmed: () => dispatch(robotActions.confirmLabware(lw.slot))
-//   }))
-//
-//   return {
-//     ...stateProps,
-//     ...ownProps,
-//     labware
-//   }
-// }
 
 const mapStateToProps = (state, ownProps) => {
   const {slotName} = ownProps
@@ -65,15 +39,22 @@ const mapStateToProps = (state, ownProps) => {
   // TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
   const labwareToSlotName = labwareObj => labwareObj && labwareObj.slot && labwareObj.slot.toString()
 
-  const highlighted = labwareToSlotName(nextLabware) === slotName
+  // TODO: Ian 2017-12-14 do selector HACK HACK HACK
+  const routeSlot = state.router.location.pathname.split('/').slice(-1)[0]
+  const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
+  console.log({routeSlot, highlighted, r: state.router.location.pathname.split('/')})
 
   // NOTE: this is a hacky carryover from Protocol Designer.
   // TODO Ian 2017-12-14 allow alternative to wellContents for setting well styles.
   const wellContents = highlighted ? {'A1': {selected: true, groupId: 6}} : {}
 
-  // TODO Ian 2017-12-14 this is ugly, needs selector
+  // TODO Ian 2017-12-14 this is ugly, sorry, probably should happen in selector soon
   const allLabwareCalibrationStuff = robotSelectors.getLabware(state)
-  const calibration = allLabwareCalibrationStuff && allLabwareCalibrationStuff[labware.slot - 1] && allLabwareCalibrationStuff[labware.slot - 1].calibration
+  const thisLabwareCalibrationStuff = (
+    allLabwareCalibrationStuff &&
+    allLabwareCalibrationStuff[labware.slot - 1]
+  ) || {}
+  const calibration = thisLabwareCalibrationStuff.calibration
 
   const isMoving = ( // TODO Ian 2017-12-14 another selector candidate
     calibration === MOVING_TO_SLOT ||
@@ -83,6 +64,8 @@ const mapStateToProps = (state, ownProps) => {
     calibration === CONFIRMING
   )
 
+  console.log(slotName, {thisLabwareCalibrationStuff, allLabwareCalibrationStuff, nextLabware})
+
   return {
     containerType,
     containerName,
@@ -90,10 +73,43 @@ const mapStateToProps = (state, ownProps) => {
     highlighted,
     labwareReviewed,
     isMoving,
-    confirmed: unconfirmedLabware.every(l => labwareToSlotName(l) !== slotName)
+    confirmed: unconfirmedLabware.every(l => labwareToSlotName(l) !== slotName),
+
+    // Data to pass to mergeProps but not to component
+    _stateData: {
+      axis: robotSelectors.getSingleChannel(state).axis,
+      isTiprack: thisLabwareCalibrationStuff.isTiprack
+    }
   }
 }
 
-const ConnectedLabwareItem = connect(mapStateToProps)(LabwareItem)
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  const {dispatch} = dispatchProps
+
+  const slot = (ownProps && ownProps.slotName) ? parseInt(ownProps.slotName) : undefined
+  const _stateData = stateProps._stateData || {}
+  const {axis, isTiprack} = _stateData
+
+  const onLabwareClick = (e) => {
+    if (isTiprack) {
+      dispatch(robotActions.pickupAndHome(axis, slot))
+      return
+    }
+    dispatch(robotActions.moveTo(axis, slot))
+  }
+
+  const setLabwareConfirmed = (e) => dispatch(robotActions.confirmLabware(slot))
+
+  return {
+    onLabwareClick,
+    setLabwareConfirmed,
+
+    ...ownProps,
+    ...stateProps,
+    _stateData: undefined // don't pass to component
+  }
+}
+
+const ConnectedLabwareItem = connect(mapStateToProps, null, mergeProps)(LabwareItem)
 
 export default ConnectedLabwareItem
