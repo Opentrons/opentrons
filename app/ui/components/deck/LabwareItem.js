@@ -1,8 +1,15 @@
 // @flow
 import * as React from 'react'
-import {ContainerNameOverlay, LabwareContainer, Plate, EmptyDeckSlot} from '@opentrons/components'
+import {
+  ContainerNameOverlay,
+  EmptyDeckSlot,
+  SlotOverlay,
+  LabwareContainer,
+  Plate
+} from '@opentrons/components'
 
 type LabwareItemProps = {
+  highlighted?: boolean,
   height: number,
   width: number,
   slotName: string,
@@ -11,13 +18,14 @@ type LabwareItemProps = {
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {height, width, slotName, containerType, wellContents} = props
-  return <LabwareContainer {...{slotName, height, width}}>
+  const {height, width, slotName, containerType, wellContents, highlighted} = props
+  return <LabwareContainer {...{slotName, height, width, highlighted}}>
     {containerType
       ? <g>
         <Plate {...{containerType, wellContents}} />
         {/* Overlay. TODO: multiple types of overlay depending on state */}
         <ContainerNameOverlay {...{containerName: 'TODO name', containerType}} />
+        <SlotOverlay text='Position Unconfirmed' icon='wifi' /> {/* TODO: need (!) warning icon */}
       </g>
       : <EmptyDeckSlot {...{height, width, slotName}} />
     }

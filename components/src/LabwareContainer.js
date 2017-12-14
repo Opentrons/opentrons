@@ -5,13 +5,6 @@ import styles from './LabwareContainer.css'
 import type {DeckSlotProps} from './types'
 export const defs = {roundSlotClipPath: 'roundSlotClipPath'} // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?
 
-// type Props = {
-//   height: number, // TODO
-//   width: number,
-//   highlighted: boolean,
-//   children: React.Node
-// }
-
 export function LabwareContainer (props: DeckSlotProps) {
   const { height, width, highlighted, children } = props
   return (
@@ -27,7 +20,8 @@ export function LabwareContainer (props: DeckSlotProps) {
       </svg>
       {/* Highlight border goes outside the SVG so it doesn't get clipped... */}
       {highlighted &&
-        <rect className={styles.highlighted} x='0' y='0' width={width} height={height} rx='6' />}
+        <rect className={styles.highlighted}
+          x='0.5' y='0.5' width={width - 1} height={height - 1} rx='6' />}
     </g>
   )
 }

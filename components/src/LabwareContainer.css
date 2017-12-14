@@ -14,6 +14,7 @@ NOTE: available defs are:
 .highlighted {
   fill: none;
   stroke: blue;
+  stroke-width: 2.5;
 }
 
 .empty_slot {

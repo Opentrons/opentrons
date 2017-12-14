@@ -30,8 +30,10 @@ const ICON_DATA_BY_NAME = {
   }
 }
 
+export type IconNames = $Keys<typeof ICON_DATA_BY_NAME>
+
 type Props = {
-  name: $Keys<typeof ICON_DATA_BY_NAME>,
+  name: IconNames,
   className?: string
 }
 
