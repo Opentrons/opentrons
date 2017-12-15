@@ -85,6 +85,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.1",
     "css-loader": "^0.28.4",
     "eslint-plugin-flowtype": "^2.40.1",
     "flow-bin": "^0.61.0",

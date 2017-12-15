@@ -9,7 +9,7 @@ bin := node_modules/.bin
 env := $(bin)/cross-env NODE_ENV
 
 # dev server port
-port ?= 8082
+port ?= 8080
 
 # watch, coverage, and fix variables for tests and linting
 watch ?= false
@@ -20,7 +20,7 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
-# stardard targets
+# standard targets
 #####################################################################
 
 .PHONY: install

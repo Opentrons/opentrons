@@ -1,6 +1,6 @@
-import { utils as componentLibraryUtils } from '@opentrons/components'
+import * as componentLibrary from '@opentrons/components'
 
-export const { humanize, wellNameSplit } = componentLibraryUtils
+export const { humanize, wellNameSplit } = componentLibrary
 
 // Not really a UUID, but close enough...?
 export const uuid = () => new Date().getTime() + '.' + Math.random()

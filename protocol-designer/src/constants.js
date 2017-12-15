@@ -1,5 +1,5 @@
 import reduce from 'lodash/reduce'
-import { constants as componentLibConstants } from '@opentrons/components'
+import * as componentLib from '@opentrons/components'
 
 export const {
   // CONTAINER INFO
@@ -18,7 +18,7 @@ export const {
   swatchColors,
   // SPECIAL SELECTORS
   SELECTABLE_WELL_CLASS
-} = componentLibConstants
+} = componentLib
 
 export const getMaxVolumes = containerType => {
   const cont = defaultContainers.containers[containerType]

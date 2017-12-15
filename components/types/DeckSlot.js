@@ -1,6 +1,4 @@
 // @flow
-// Reusable types.
-// TODO: should this file live here?
 import * as React from 'react'
 
 export type DeckSlotProps = {
@@ -11,3 +9,5 @@ export type DeckSlotProps = {
   containerType?: string,
   children?: React.Node
 }
+
+export type DeckSlot = React.ComponentType<DeckSlotProps>

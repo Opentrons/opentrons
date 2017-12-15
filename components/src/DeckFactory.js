@@ -3,7 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
-import type {DeckSlotProps} from './types'
+import type {DeckSlot} from '../types/DeckSlot'
 
 import {
   SLOTNAME_MATRIX,
@@ -21,7 +21,7 @@ type Props = {
   className: string
 }
 
-export const DeckFactory = (LabwareContainer: React.ComponentType<DeckSlotProps>) => (props: Props) => {
+export const DeckFactory = (LabwareContainer: DeckSlot) => (props: Props) => {
   const slotOffset = 10
 
   return (

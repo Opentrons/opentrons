@@ -3,11 +3,10 @@
 [include]
 
 [libs]
-flow-typed
 
 [lints]
 
 [options]
-module.name_mapper.extension='css' -> '<PROJECT_ROOT>/types/CSSModule.js'
+module.name_mapper.extension='css' -> '@opentrons/components/types/CSSModule.js'
 
 [strict]
