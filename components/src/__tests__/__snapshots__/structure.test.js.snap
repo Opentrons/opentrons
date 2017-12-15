@@ -1,5 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PageTabs renders PageTabs correctly 1`] = `
+<nav
+  className="page_tabs"
+>
+  <a
+    className="active_tab_link"
+    href="/page1"
+    onClick={[Function]}
+  >
+    <h3
+      className="tab_title"
+    >
+      Page1
+    </h3>
+  </a>
+  <span
+    className="tab_link"
+    to="/page2"
+  >
+    <h3
+      className="tab_title"
+    >
+      Page2
+    </h3>
+  </span>
+</nav>
+`;
+
 exports[`TitleBar renders TitleBar with subtitle correctly 1`] = `
 <header
   className="title_bar"

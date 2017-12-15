@@ -2,10 +2,13 @@
 
 /* TODO(mc, 2017-12-13): move colors to colors.css */
 @value color_dark_grey: #4a4a4a;
+@value color_mid_grey: #9b9b9b;
 
 /* TODO(mc, 2017-12-13): move font sizes and weights to typography.css */
+@value font_size_huge: 3rem;
 @value font_size_header: 1.125rem;
 @value font_weight_semibold: 600;
+@value font_weight_bold: 700;
 
 .title_bar {
   padding: 1rem;
@@ -36,4 +39,33 @@
 
 .separator {
   padding: 0 1.75rem;
+}
+
+.page_tabs {
+  width: 100%;
+  text-align: center;
+}
+
+.tab_link {
+  display: inline-block;
+  width: 50%;
+  padding: 0.25rem 0;
+  font-size: font_size_huge;
+  opacity: 0.2;
+  background-color: color_mid_grey;
+  color: white;
+  text-transform: uppercase;
+}
+
+.active_tab_link {
+  composes: tab_link;
+  opacity: 1;
+}
+
+.tab_title {
+  font-weight: normal;
+}
+
+.active_tab_link .tab_title {
+  font-weight: font_weight_bold;
 }

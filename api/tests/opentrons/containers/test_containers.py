@@ -106,11 +106,6 @@ class ContainerTestCase(unittest.TestCase):
         self.assertRaises(
             Exception, next, c)
 
-    def test_remove_child(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        c.remove_child('A2')
-        self.assertEquals(len(c), 3)
-
     def test_back_container_getitem(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         self.assertRaises(TypeError, c.__getitem__, (1, 1))

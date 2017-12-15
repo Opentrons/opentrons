@@ -14,7 +14,7 @@ PLUNGER_POSITIONS = {
     'top': 18.5,
     'bottom': 2,
     'blow_out': 0,
-    'drop_tip': -7
+    'drop_tip': -3.5
 }
 
 DEFAULT_ASPIRATE_SPEED = 5
@@ -822,7 +822,8 @@ class Pipette:
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, plunge_depth)
 
             return self
 
@@ -886,18 +887,22 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
+            pos_bottom = self._get_plunger_position('bottom')
+            pos_drop_tip = self._get_plunger_position('drop_tip')
+
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
-                x=self._get_plunger_position('bottom')
+                x=pos_bottom
             )
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
-                x=self._get_plunger_position('drop_tip')
+                x=pos_drop_tip
             )
 
             if home_after:
-                self.robot.poses = self.instrument_actuator.home(
-                    self.robot.poses)
+                safety_margin = abs(pos_bottom - pos_drop_tip)
+                self.robot.poses = self.instrument_actuator.fast_home(
+                    self.robot.poses, safety_margin)
                 self.robot.poses = self.instrument_actuator.move(
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')
@@ -1528,8 +1533,6 @@ class Pipette:
             self.robot.poses, self, pose_tracker.Point(
                 x, y, z + length))
         self.tip_attached = False
-
-    def _fast_home(self, safety_margin):
 
     @property
     def type(self):

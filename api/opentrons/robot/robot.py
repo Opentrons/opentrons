@@ -108,6 +108,33 @@ class InstrumentMotor(object):
         return self
 
 
+def _setup_container(container_name):
+    container = database.load_container(container_name)
+    container.properties['type'] = container_name
+
+    container_x, container_y, container_z = container._coordinates
+
+    # infer z from height
+    if container_z == 0 and 'height' in container[0].properties:
+        container_z = container[0].properties['height']
+
+    from opentrons.util.vector import Vector
+    container._coordinates = Vector(
+        container_x,
+        container_y,
+        container_z)
+
+    return container
+
+
+# NOTE: modules are stored in the Containers db table
+def _setup_module(module):
+    x, y, z = database.load_module(module.name)
+    from opentrons.util.vector import Vector
+    module._coordinates = Vector(x, y, z)
+    return module
+
+
 class Robot(object):
     """
     This class is the main interface to the robot.
@@ -161,7 +188,7 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-
+        self.modules = []
         # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
 
@@ -176,6 +203,23 @@ class Robot(object):
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
+
+    def _get_placement_location(self, placement):
+        location = None
+        # If `placement` is a string, assume it is a slot
+        if isinstance(placement, str):
+            location = self._deck[placement]
+        elif getattr(placement, 'stackable', False):
+            location = placement
+        return location
+
+    def _is_available_slot(self, location, share, slot, container_name):
+        if pose_tracker.has_children(self.poses, location) and not share:
+            raise RuntimeWarning(
+                'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
+                    slot, container_name, slot))
+        else:
+            return True
 
     def reset(self):
         """
@@ -396,6 +440,8 @@ class Robot(object):
         """
 
         self._driver.connect()
+        for module in self.modules:
+            module.connect()
 
         # device = None
         # if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
@@ -544,12 +590,10 @@ class Robot(object):
         other_instrument = {instrument} ^ set(self._instruments.values())
         if other_instrument:
             other = other_instrument.pop()
-            self.poses = other.instrument_mover.fast_home(self.poses, 10)
-            # other = other_instrument.pop()
-            # _, _, z = pose_tracker.absolute(self.poses, other)
-            # safe_height = self.max_deck_height() + TIP_CLEARANCE
-            # if z < safe_height:
-            #     self.poses = other._move(self.poses, z=safe_height)
+            _, _, z = pose_tracker.absolute(self.poses, other)
+            safe_height = self.max_deck_height() + TIP_CLEARANCE
+            if z < safe_height:
+                self.poses = other.instrument_mover.fast_home(self.poses, 10)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
@@ -598,13 +642,15 @@ class Robot(object):
 
         return strategy
 
-    # DEPRECATED
     def disconnect(self):
         """
         Disconnects from the robot.
         """
         if self._driver:
             self._driver.disconnect()
+
+        for module in self.modules:
+            module.disconnect()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
@@ -705,34 +751,26 @@ class Robot(object):
         """
         return self._deck.containers()
 
-    def add_container(self, container_name, slot, label=None, share=False):
-        if not label:
-            label = container_name
-        container = database.load_container(container_name)
-        container.properties['type'] = container_name
-
-        container_x, container_y, container_z = container._coordinates
-
-        # infer z from height
-        if container_z == 0 and 'height' in container[0].properties:
-            container_z = container[0].properties['height']
-
-        from opentrons.util.vector import Vector
-        container._coordinates = Vector(
-            container_x,
-            container_y,
-            container_z)
-
-        if self._deck[slot].has_children() and not share:
-            raise RuntimeWarning(
-                'Slot {0} has child. Use "containers.load(\'{1}\', \'{2}\', share=True)"'.format(  # NOQA
-                    slot, container_name, slot))
-        else:
-            self._deck[slot].add(container, label)
-        self.add_container_to_pose_tracker(container)
+    def add_container(self, name, slot, label=None, share=False):
+        container = _setup_container(name)
+        location = self._get_placement_location(slot)
+        if self._is_available_slot(location, share, slot, name):
+            location.add(container, label or name)
+        self.add_container_to_pose_tracker(location, container)
         return container
 
-    def add_container_to_pose_tracker(self, container: Container):
+    def add_module(self, module, slot, label=None):
+        module = _setup_module(module)
+        location = self._get_placement_location(slot)
+        location.add(module, label or module.__class__.__name__)
+        self.modules.append(module)
+        self.poses = pose_tracker.add(
+            self.poses,
+            module,
+            location,
+            pose_tracker.Point(*module._coordinates))
+
+    def add_container_to_pose_tracker(self, location, container: Container):
         """
         Add container and child wells to pose tracker. Sets container.parent
         (slot) as pose tracker parent
@@ -801,7 +839,7 @@ class Robot(object):
     def is_simulating(self):
         if not self._driver:
             return False
-        return self._driver.is_simulating()
+        return self._driver.simulating
 
     def get_connected_port(self):
         return self._driver.get_connected_port()

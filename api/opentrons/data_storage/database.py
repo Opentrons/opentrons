@@ -110,6 +110,17 @@ def _list_all_containers_by_name(db):
     return clean_list
 
 
+def _load_module_dict_from_db(db, module_name):
+    db_data = db_queries.get_container_by_name(db, module_name)
+    if not db_data:
+        raise ValueError(
+            "No module with name {} found in Containers database table"
+            .format(module_name)
+        )
+    _, *rel_coords = db_data
+    return rel_coords
+
+
 def _get_db_version(db):
     version = db_queries.get_user_version(db)[0]
     return version
@@ -141,6 +152,11 @@ def delete_container(container_name):
 def list_all_containers():
     db_conn = sqlite3.connect(database_path)
     return _list_all_containers_by_name(db_conn)
+
+
+def load_module(module_name: str):
+    db_conn = sqlite3.connect(database_path)
+    return _load_module_dict_from_db(db_conn, module_name)
 
 
 def change_database(db_path: str):
