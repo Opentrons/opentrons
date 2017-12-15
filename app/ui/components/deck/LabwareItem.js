@@ -52,7 +52,6 @@ export default function LabwareItem (props: LabwareItemProps) {
 
       {showUnconfirmed && <SlotOverlay text='Position Unconfirmed' icon={ALERT} />}
 
-      {/* TODO: should this be */}
       {isMoving && <g>
         <rect x='0' y='0' width='100%' height='100%' fill='rgba(0, 0, 0, 0.5)' />
         <g>

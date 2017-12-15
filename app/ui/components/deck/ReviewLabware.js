@@ -21,11 +21,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  // const {currentLabware: {isTiprack}, singleChannel: {axis}} = stateProps
-  // TODO HACK WIP -- Replacing Deck messes with stateProps --------------
-  const isTiprack = true
-  const axis = 'left'
-  // ----------------------------
+  const {currentLabware: {isTiprack}, singleChannel: {axis}} = stateProps
   const {dispatch} = dispatchProps
   const {slot} = ownProps
 
