@@ -60,6 +60,7 @@ export default function client (dispatch) {
         rpcClient
           .on('notification', handleRobotNotification)
           .on('error', handleClientError)
+          .on('close', handleClientDisconnect)
 
         remote = rpcClient.remote
         const session = remote.session_manager.session
@@ -70,7 +71,8 @@ export default function client (dispatch) {
 
           if (
             session.state === constants.RUNNING ||
-            session.state === constants.PAUSED
+            session.state === constants.PAUSED ||
+            session.state === constants.FINISHED
           ) {
             dispatch(push('/run'))
           }
@@ -85,16 +87,16 @@ export default function client (dispatch) {
     if (!rpcClient) return dispatch(actions.disconnectResponse())
 
     rpcClient.close()
-      .then(() => {
-        // null out saved client and remote
-        rpcClient = null
-        remote = null
+  }
 
-        clearRunTimerInterval()
-        dispatch(actions.disconnectResponse())
-        dispatch(push('/'))
-      })
-      .catch((error) => dispatch(actions.disconnectResponse(error)))
+  function handleClientDisconnect () {
+    clearRunTimerInterval()
+    // null out saved client and remote
+    rpcClient = null
+    remote = null
+
+    dispatch(actions.disconnectResponse())
+    dispatch(push('/'))
   }
 
   function createSession (state, action) {

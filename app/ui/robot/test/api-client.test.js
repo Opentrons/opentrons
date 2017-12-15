@@ -116,23 +116,24 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('disconnect RPC on DISCONNECT message', () => {
-      const expected = actions.disconnectResponse()
-
-      rpcClient.close.mockReturnValueOnce(Promise.resolve())
-
+    test('disconnects RPC client on DISCONNECT message', () => {
       return sendConnect()
         .then(() => sendDisconnect())
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+        .then(() => expect(rpcClient.close).toHaveBeenCalled())
     })
 
-    test('dispatch DISCONNECT_RESPONSE if close errors', () => {
-      const expected = actions.disconnectResponse(new Error('AH'))
-
-      rpcClient.close.mockReturnValueOnce(Promise.reject(new Error('AH')))
+    test('dispatch DISCONNECT_RESPONSE if rpcClient closes', () => {
+      const expected = actions.disconnectResponse()
+      let emitDisconnect
 
       return sendConnect()
-        .then(() => sendDisconnect())
+        .then(() => {
+          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
+            args[0] === 'close'
+          ))[1]
+          expect(typeof emitDisconnect).toBe('function')
+        })
+        .then(() => emitDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 

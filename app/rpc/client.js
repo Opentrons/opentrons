@@ -21,11 +21,10 @@ let _uniqueId = 0
 const uuid = () => `id-${_uniqueId++}`
 
 // timeouts
-const HANDSHAKE_TIMEOUT = 5000
-const RECEIVE_CONTROL_TIMEOUT = 3000
-const CLOSE_TIMEOUT = 1000
-const CALL_ACK_TIMEOUT = 3000
-const CALL_RESULT_TIMEOUT = 240000
+const HANDSHAKE_TIMEOUT = 10000
+const RECEIVE_CONTROL_TIMEOUT = 10000
+const CALL_ACK_TIMEOUT = 10000
+// const CALL_RESULT_TIMEOUT = 240000
 
 // metadata constants
 const REMOTE_TARGET_OBJECT = 0
@@ -52,6 +51,7 @@ class RpcContext extends EventEmitter {
 
     ws.on('error', this._handleError.bind(this))
     ws.on('message', this._handleMessage.bind(this))
+    ws.on('close', this._handleClose.bind(this))
   }
 
   callRemote (id, name, args = []) {
@@ -75,10 +75,13 @@ class RpcContext extends EventEmitter {
 
       const handleAck = () => {
         clearTimeout(timeout)
-        timeout = setTimeout(
-          () => handleError('Result timeout'),
-          CALL_RESULT_TIMEOUT
-        )
+        // TODO(mc, 2017-12-15): result timeouts have been causing too many
+        // many problems, so we've disabled them. Figure out a better system
+        // because lockups could still be a thing
+        // timeout = setTimeout(
+        //   () => handleError('Result timeout'),
+        //   CALL_RESULT_TIMEOUT
+        // )
 
         this.once(resultEvent, handleSuccess)
         this.once(failureEvent, handleFailure)
@@ -132,40 +135,7 @@ class RpcContext extends EventEmitter {
 
   // close the websocket
   close () {
-    const self = this
-
-    return new Promise((resolve, reject) => {
-      if (this._ws.readyState === this._ws.CLOSED) {
-        return resolve()
-      }
-
-      let closeTimeout
-      const finish = (error) => {
-        cleanup()
-
-        if (this._ws.readyState === this._ws.CLOSED) {
-          return resolve()
-        }
-
-        reject(error || new Error('WebSocket is not closed'))
-      }
-
-      const handleClose = () => finish()
-
-      function cleanup () {
-        clearTimeout(closeTimeout)
-        self._ws.removeListener('close', handleClose)
-        self._ws.removeListener('error', finish)
-      }
-
-      this._ws.once('close', handleClose)
-      this._ws.once('error', finish)
-      this._ws.close()
-      closeTimeout = setTimeout(
-        () => finish(new Error('Timed out closing RPC client')),
-        CLOSE_TIMEOUT
-      )
-    })
+    this._ws.close()
   }
 
   // cache required metadata from call results
@@ -196,6 +166,10 @@ class RpcContext extends EventEmitter {
   _send (message) {
     // log.debug('Sending: %j', message)
     this._ws.send(message)
+  }
+
+  _handleClose () {
+    this.emit('close')
   }
 
   _handleError (error) {
