@@ -156,10 +156,24 @@ SVG icons that take `color` from their parent.
 import {Icon, BACK, REFRESH, USB, WIFI} from '@opentrons/components'
 ```
 
-prop      | flow type                      | required | description
---------- | ------------------------------ | -------- | ----------------------
-name      | BACK &#124; REFRESH &#124; ... | yes      | icon name
-className | string                         | no       | additional class names
+ prop      | flow type | required | description
+---------- | --------- | -------- | ------------------------
+ name      | IconName  | yes      | icon name
+ className | string    | no       | additional class names
+ spin      | bool      | no       | if set, icon will spin!
+
+#### icon names
+
+```js
+import type {IconName} from '@opentrons/components'
+```
+
+*   `ALERT`
+*   `BACK`
+*   `REFRESH`
+*   `SPINNER`
+*   `USB`
+*   `WIFI`
 
 
 ### structure
@@ -205,7 +219,7 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
 * Render tests
     * Snapshot tests using [jest's snapshot functionality][jest-snapshots]
     * To regenerate snapshots after an intentional rendering change, run:
-    
+
     ``` shell
     make test updateSnapshot=true
     ```

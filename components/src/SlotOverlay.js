@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from './icons'
-import type {IconNames} from './icons'
+import {Icon} from '.'
+import type {IconName} from './icons/icon-data' // ???
 
 import styles from './SlotOverlay.css'
 
 type SlotOverlayProps = {
   text?: string,
-  icon?: IconNames,
+  icon?: IconName,
   className?: string
 }
 
