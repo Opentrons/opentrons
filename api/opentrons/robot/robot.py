@@ -544,10 +544,12 @@ class Robot(object):
         other_instrument = {instrument} ^ set(self._instruments.values())
         if other_instrument:
             other = other_instrument.pop()
-            _, _, z = pose_tracker.absolute(self.poses, other)
-            safe_height = self.max_deck_height() + TIP_CLEARANCE
-            if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+            self.poses = other.instrument_mover.fast_home(self.poses, 10)
+            # other = other_instrument.pop()
+            # _, _, z = pose_tracker.absolute(self.poses, other)
+            # safe_height = self.max_deck_height() + TIP_CLEARANCE
+            # if z < safe_height:
+            #     self.poses = other._move(self.poses, z=safe_height)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
@@ -579,8 +581,7 @@ class Robot(object):
 
         travel_height = self.max_deck_height()
         if this_container and self._previous_container == this_container:
-            # travel_height = self.max_placeable_height_on_deck(this_container)
-            pass
+            travel_height = self.max_placeable_height_on_deck(this_container)
         travel_height += self.arc_height
 
         _, _, robot_max_z = self.dimensions  # TODO: Check what this does
@@ -897,7 +898,7 @@ class Robot(object):
         return pose_tracker.max_z(self.poses, self._deck)
 
     def max_placeable_height_on_deck(self, placeable):
-        offset = placeable.top()[2]
+        offset = placeable.top()[1]
         placeable_coordinate = add(
             pose_tracker.absolute(
                 self.poses,

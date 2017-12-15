@@ -1529,6 +1529,8 @@ class Pipette:
                 x, y, z + length))
         self.tip_attached = False
 
+    def _fast_home(self, safety_margin):
+
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
