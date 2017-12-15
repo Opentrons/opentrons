@@ -65,6 +65,7 @@ function LabwareList (props) {
 }
 function mapStateToProps (state) {
   return {
+    currentLabware: robotSelectors.getCurrentLabware(state),
     labware: robotSelectors.getLabware(state),
     labwareBySlot: robotSelectors.getLabwareBySlot(state),
     labwareReviewed: robotSelectors.getLabwareReviewed(state),
@@ -78,6 +79,7 @@ function mapStateToProps (state) {
 
 function mergeProps (stateProps, dispatchProps) {
   const {
+    currentLabware,
     singleChannel: {axis},
     labwareReviewed,
     instrumentsCalibrated,
@@ -90,10 +92,12 @@ function mergeProps (stateProps, dispatchProps) {
     (lw.isTiprack && lw.confirmed) ||
     !(lw.isTiprack || tipracksConfirmed) ||
     isRunning
+    const isActive = lw.slot === currentLabware
 
     return {
       ...lw,
       isDisabled,
+      isActive,
       setLabware: () => {
         if (labwareReviewed) {
           if (lw.isTiprack) {

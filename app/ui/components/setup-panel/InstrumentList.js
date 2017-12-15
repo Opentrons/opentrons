@@ -8,7 +8,7 @@ import {
 import TitledList from './TitledList'
 import InstrumentListItem from './InstrumentListItem'
 
-export default connect(mapStateToProps, mapDispatchToProps)(InstrumentList)
+export default connect(mapStateToProps, null, mergeProps)(InstrumentList)
 
 function InstrumentList (props) {
   const title = 'Pipette Setup'
@@ -23,13 +23,27 @@ function InstrumentList (props) {
 
 function mapStateToProps (state, ownProps) {
   return {
+    currentInstrument: robotSelectors.getCurrentInstrument(state),
     instruments: robotSelectors.getInstruments(state),
     isRunning: robotSelectors.getIsRunning(state)
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mergeProps (stateProps, dispatchProps) {
+  const {currentInstrument} = stateProps
+  const {dispatch} = dispatchProps
+  const instruments = stateProps.instruments.map(inst => {
+    const isActive = inst.axis === currentInstrument
+    return {
+      ...inst,
+      isActive,
+      setInstrument: () => {
+        dispatch(robotActions.setCurrentInstrument(inst.axis))
+      }
+    }
+  })
   return {
-    clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false))
+    ...stateProps,
+    instruments
   }
 }

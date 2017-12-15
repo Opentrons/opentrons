@@ -120,6 +120,15 @@ describe('robot actions', () => {
     expect(actions.sessionResponse(error)).toEqual(failure)
   })
 
+  test('set current instrument action', () => {
+    const expected = {
+      type: actionTypes.SET_CURRENT_INSTRUMENT,
+      payload: 'right'
+    }
+
+    expect(actions.setCurrentInstrument('right')).toEqual(expected)
+  })
+
   test('set labware reviewed action', () => {
     const expected = {
       type: actionTypes.SET_LABWARE_REVIEWED,

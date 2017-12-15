@@ -26,6 +26,7 @@ import {
 const {
   SESSION,
   DISCONNECT_RESPONSE,
+  SET_CURRENT_INSTRUMENT,
   SET_LABWARE_REVIEWED,
   PICKUP_AND_HOME,
   PICKUP_AND_HOME_RESPONSE,
@@ -55,12 +56,14 @@ const INITIAL_STATE = {
   // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
   // axis. probedByAxis holds a flag for whether the instrument has been
   // probed at least once by axis. Rethink or combine these states
+  currentInstrument: null,
   instrumentsByAxis: {},
   probedByAxis: {},
 
   // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
   // slot. confirmedBySlot holds a flag for whether the labware has been
   // confirmed at least once. Rethink or combine these states
+  currentLabware: null,
   labwareBySlot: {},
   confirmedBySlot: {},
 
@@ -81,6 +84,7 @@ export default function calibrationReducer (state = INITIAL_STATE, action) {
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
+    case SET_CURRENT_INSTRUMENT: return handleSetCurrentInstrument(state, action)
     case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
@@ -115,6 +119,16 @@ function handleDisconnectResponse (state, action) {
 
 function handleSession (state, action) {
   return INITIAL_STATE
+}
+
+function handleSetCurrentInstrument (state, action) {
+  const {payload: {instrument: axis}} = action
+  return {
+    ...state,
+    currentInstrument: axis,
+    labwareReviewed: false,
+    currentLabware: null
+  }
 }
 
 function handleSetLabwareReviewed (state, action) {
@@ -224,6 +238,7 @@ function handleMoveToResponse (state, action) {
 
   return {
     ...state,
+    currentLabware: slot,
     moveToRequest: {
       ...state.moveToRequest,
       inProgress: false,

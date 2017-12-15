@@ -233,6 +233,14 @@ export function getLabware (state) {
   })
 }
 
+export function getCurrentInstrument (state) {
+  return getCalibrationState(state).currentInstrument
+}
+
+export function getCurrentLabware (state) {
+  return getCalibrationState(state).currentLabware
+}
+
 export function getLabwareReviewed (state) {
   return getCalibrationState(state).labwareReviewed
 }
