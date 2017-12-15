@@ -24,4 +24,4 @@ if [ ! -e "$config_path" ]; then
 fi
 
 echo "Starting Opentrons API server"
-python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH
+python -m opentrons.server.main -P $OT_SERVER_PORT -U $OT_SERVER_UNIX_SOCKET_PATH
