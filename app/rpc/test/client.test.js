@@ -1,4 +1,5 @@
 // RPC client tests
+import util from 'util'
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'
@@ -32,6 +33,17 @@ const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
 const makeCallResponse = (token, status, data) => ({
   $: {type: RESULT, token, status},
   data
+})
+
+const waitAndTry = (delay, handler) => util.promisify((done) => {
+  setTimeout(() => {
+    try {
+      handler()
+      done()
+    } catch (e) {
+      done(e)
+    }
+  }, delay)
 })
 
 describe('rpc client', () => {
@@ -82,11 +94,13 @@ describe('rpc client', () => {
   })
 
   beforeEach(() => {
+    jest.useRealTimers()
     listeners = []
   })
 
   afterEach(() => {
     listeners.forEach(removeListener)
+    jest.clearAllTimers()
   })
 
   function sendControlAndResolveRemote (handleMessage) {
@@ -101,9 +115,13 @@ describe('rpc client', () => {
     RemoteObject.mockReturnValueOnce(Promise.resolve(MOCK_REMOTE))
   }
 
-  // TODO(mc, 2017-09-28): use fake timers for this test
   test('rejects if control message never comes', () => {
+    jest.useFakeTimers()
+
     const result = Client(url)
+
+    jest.runAllTimers()
+    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 10000)
 
     return expect(result).rejects.toMatchObject({
       message: expect.stringMatching(/timeout/i)
@@ -307,25 +325,9 @@ describe('rpc client', () => {
 
     return Client(url)
       .then((client) => client.close())
-      .then(() => expect(
+      .then(() => waitAndTry(100, () => expect(
         ws.readyState === global.WebSocket.CLOSING ||
         ws.readyState === global.WebSocket.CLOSED
-      ).toBe(true))
-  })
-
-  test('client.close resolves if the socket is already closed', () => {
-    let client
-    sendControlAndResolveRemote()
-
-    return Client(url)
-      .then((c) => {
-        client = c
-        return client.close()
-      })
-      .then(() => client.close())
-      .then(() => expect(
-        ws.readyState === global.WebSocket.CLOSING ||
-        ws.readyState === global.WebSocket.CLOSED
-      ).toBe(true))
+      ).toBe(true)))
   })
 })
