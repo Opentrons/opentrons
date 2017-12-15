@@ -578,8 +578,9 @@ class Robot(object):
             this_container = placeable
 
         travel_height = self.max_deck_height()
-        if self._previous_container and self._previous_container == this_container:
-            travel_height = self.max_placeable_height(this_container)
+        if this_container and self._previous_container == this_container:
+            # travel_height = self.max_placeable_height_on_deck(this_container)
+            pass
         travel_height += self.arc_height
 
         _, _, robot_max_z = self.dimensions  # TODO: Check what this does
@@ -895,5 +896,14 @@ class Robot(object):
     def max_deck_height(self):
         return pose_tracker.max_z(self.poses, self._deck)
 
-    def max_placeable_height(self, placeable):
-        return pose_tracker.max_z(self.poses, placeable)
+    def max_placeable_height_on_deck(self, placeable):
+        offset = placeable.top()[2]
+        placeable_coordinate = add(
+            pose_tracker.absolute(
+                self.poses,
+                placeable
+            ),
+            offset.coordinates
+        )
+        placeable_tallest_point = pose_tracker.max_z(self.poses, placeable)
+        return placeable_coordinate[2] + placeable_tallest_point
