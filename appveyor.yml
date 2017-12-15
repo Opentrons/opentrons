@@ -36,6 +36,9 @@ install:
 
 build: false # No need to run MSBuild
 
+# do not run automatic test discovery
+test: off
+
 build_script:
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test"'
   # Note: we are not running test-e2e on Windows due to problems with ChromeDriver

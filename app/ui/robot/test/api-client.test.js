@@ -4,6 +4,7 @@ import {push} from 'react-router-redux'
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
+import {tagAlertAction} from '../../interface'
 import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
@@ -116,23 +117,43 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('disconnect RPC on DISCONNECT message', () => {
-      const expected = actions.disconnectResponse()
-
-      rpcClient.close.mockReturnValueOnce(Promise.resolve())
-
+    test('disconnects RPC client on DISCONNECT message', () => {
       return sendConnect()
         .then(() => sendDisconnect())
+        .then(() => expect(rpcClient.close).toHaveBeenCalled())
+    })
+
+    test('dispatch DISCONNECT_RESPONSE if rpcClient closes', () => {
+      const expected = actions.disconnectResponse()
+      let emitDisconnect
+
+      return sendConnect()
+        .then(() => {
+          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
+            args[0] === 'close'
+          ))[1]
+          expect(typeof emitDisconnect).toBe('function')
+        })
+        .then(() => sendDisconnect())
+        .then(() => emitDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('dispatch DISCONNECT_RESPONSE if close errors', () => {
-      const expected = actions.disconnectResponse(new Error('AH'))
-
-      rpcClient.close.mockReturnValueOnce(Promise.reject(new Error('AH')))
+    test('dispatch DISCONNECT_RESPONSE w/ alert if unexpected close', () => {
+      const expected = tagAlertAction(
+        actions.disconnectResponse(),
+        expect.stringMatching(/unexpected/i)
+      )
+      let emitDisconnect
 
       return sendConnect()
-        .then(() => sendDisconnect())
+        .then(() => {
+          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
+            args[0] === 'close'
+          ))[1]
+          expect(typeof emitDisconnect).toBe('function')
+        })
+        .then(() => emitDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
