@@ -59,3 +59,25 @@ const mapDispatchToProps = (dispatch) => ({
 action                     | args | description
 ---------------------------|------|-----------------------------------------
 `actions.toggleNavPanel()` | none | Toggles the open state of the nav panel
+
+## middleware
+
+### alert middleware
+
+Simple middleware to call `window.alert` for a given action.
+
+```js
+// entry point
+import {alertMiddleware} from './interface'
+// snip...
+const middleware = applyMiddleware(
+  // ...
+  alertMiddleware(window),
+  // ...
+)
+// snip...
+
+// action creator
+import {tagAlertAction} from './interface'
+const action = tagAlertAction({type: 'some-type'}, 'some alert message')
+```

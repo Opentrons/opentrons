@@ -3,6 +3,7 @@
 import {push} from 'react-router-redux'
 
 import RpcClient from '../../../rpc/client'
+import {tagAlertAction} from '../../interface'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
@@ -20,9 +21,12 @@ const INSTRUMENT_AXES = {
   a: 'right'
 }
 
+const UNEXPECTED_CLOSE_MESSAGE = "Uh oh, it looks like the connection to your robot has been lost. If this was unexpected, please try reconnecting. Contact support if this happens frequently or if you're unable to reconnect"
+
 export default function client (dispatch) {
   let rpcClient
   let remote
+  let isDisconnecting = false
 
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
@@ -60,6 +64,7 @@ export default function client (dispatch) {
         rpcClient
           .on('notification', handleRobotNotification)
           .on('error', handleClientError)
+          .on('close', handleClientDisconnect)
 
         remote = rpcClient.remote
         const session = remote.session_manager.session
@@ -70,7 +75,8 @@ export default function client (dispatch) {
 
           if (
             session.state === constants.RUNNING ||
-            session.state === constants.PAUSED
+            session.state === constants.PAUSED ||
+            session.state === constants.FINISHED
           ) {
             dispatch(push('/run'))
           }
@@ -84,17 +90,23 @@ export default function client (dispatch) {
   function disconnect () {
     if (!rpcClient) return dispatch(actions.disconnectResponse())
 
+    isDisconnecting = true
     rpcClient.close()
-      .then(() => {
-        // null out saved client and remote
-        rpcClient = null
-        remote = null
+  }
 
-        clearRunTimerInterval()
-        dispatch(actions.disconnectResponse())
-        dispatch(push('/'))
-      })
-      .catch((error) => dispatch(actions.disconnectResponse(error)))
+  function handleClientDisconnect () {
+    const response = isDisconnecting
+      ? actions.disconnectResponse()
+      : tagAlertAction(actions.disconnectResponse(), UNEXPECTED_CLOSE_MESSAGE)
+
+    // stop run timer and null out saved client and remote
+    clearRunTimerInterval()
+    rpcClient = null
+    remote = null
+    isDisconnecting = false
+
+    dispatch(push('/'))
+    dispatch(response)
   }
 
   function createSession (state, action) {
