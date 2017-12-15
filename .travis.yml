@@ -58,7 +58,7 @@ script:
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
   # protocol designer
   # TODO(ian, 2017-11-06): use makefile
-  - cd protocol-designer; npm install && npm run test && npm run flow && npm run lint && npm run build; cd ..
+  - make -C protocol-designer install test build
   # components library
   # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
   - make -C components test

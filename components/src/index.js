@@ -1,7 +1,7 @@
 // @flow
 // opentrons components library
 
-import LabwareContainerStyles from './LabwareContainer.css'
+import LabwareContainerStyles from './deck/LabwareContainer.css'
 export const allStyles = {
   LabwareContainer: LabwareContainerStyles
 }

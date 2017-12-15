@@ -12,7 +12,6 @@ type SlotOverlayProps = {
   className?: string
 }
 
-// TODO rename b/c the icon is optional...
 export function SlotOverlay (props: SlotOverlayProps) {
   const {icon, text, className} = props
   const leftRightPadding = 3 // LR padding as %

@@ -31,6 +31,14 @@ install:
 uninstall:
 	rm -rf node_modules
 
+# artifacts
+#####################################################################
+
+.PHONY: build
+build:
+	$(env)=production $(bin)/webpack -p
+	cp index.html dist/
+
 # development
 #####################################################################
 
