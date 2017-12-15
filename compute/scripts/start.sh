@@ -19,8 +19,9 @@ python -c "from opentrons import robot; robot.connect(); robot.home()"
 config_path=`python -c "from opentrons.util import environment; print(environment.get_path('APP_DATA_DIR') + 'config.json')"`
 
 if [ ! -e "$config_path" ]; then
-    echo "Config file does not found. Please perform factory calibration and then restart robot"
+    echo "Config file not found. Please perform factory calibration and then restart robot"
     while true; do sleep 1; done
 fi
+
 echo "Starting Opentrons API server"
 python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH
