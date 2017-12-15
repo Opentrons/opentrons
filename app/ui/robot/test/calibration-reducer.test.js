@@ -397,6 +397,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      currentInstrument: null,
       labwareReviewed: true,
       moveToRequest: {inProgress: true, error: null, slot: 3},
       labwareBySlot: {3: constants.MOVING_TO_SLOT, 5: constants.UNCONFIRMED}

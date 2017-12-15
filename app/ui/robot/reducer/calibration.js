@@ -122,10 +122,9 @@ function handleSession (state, action) {
 }
 
 function handleSetCurrentInstrument (state, action) {
-  const {payload: {instrument: axis}} = action
   return {
     ...state,
-    currentInstrument: axis,
+    currentInstrument: action.payload,
     labwareReviewed: false,
     currentLabware: null
   }
@@ -226,6 +225,7 @@ function handleMoveTo (state, action) {
 
   return {
     ...state,
+    currentInstrument: null,
     labwareReviewed: true,
     moveToRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: MOVING_TO_SLOT}

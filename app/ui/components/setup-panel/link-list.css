@@ -28,11 +28,11 @@
 }
 
 .labeled_list a:hover,
-.active {
+.labeled_list a.active_item {
   background-color: #eee;
 }
 
-li.active {
+.active {
   background-color: blue;
 }
 

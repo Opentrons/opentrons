@@ -17,6 +17,7 @@ export default function LabwareListItem (props) {
     slot,
     confirmed,
     isDisabled,
+    isActive,
     onClick
   } = props
 
@@ -30,6 +31,7 @@ export default function LabwareListItem (props) {
       url={url}
       onClick={onClick}
       confirmed={confirmed}
+      active={isActive}
     >
       <span>{name}</span>
     </ListItem>

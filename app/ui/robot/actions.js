@@ -119,8 +119,8 @@ export const actions = {
     }
   },
 
-  setCurrentInstrument (payload) {
-    return {type: actionTypes.SET_CURRENT_INSTRUMENT, payload}
+  setCurrentInstrument (axis) {
+    return {type: actionTypes.SET_CURRENT_INSTRUMENT, payload: axis}
   },
 
   setLabwareReviewed (payload) {
