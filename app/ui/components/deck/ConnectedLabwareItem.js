@@ -42,7 +42,6 @@ const mapStateToProps = (state, ownProps) => {
   // TODO: Ian 2017-12-14 do selector HACK HACK HACK
   const routeSlot = state.router.location.pathname.split('/').slice(-1)[0]
   const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
-  console.log({routeSlot, highlighted, r: state.router.location.pathname.split('/')})
 
   // NOTE: this is a hacky carryover from Protocol Designer.
   // TODO Ian 2017-12-14 allow alternative to wellContents for setting well styles.
@@ -63,8 +62,6 @@ const mapStateToProps = (state, ownProps) => {
     calibration === UPDATING ||
     calibration === CONFIRMING
   )
-
-  console.log(slotName, {thisLabwareCalibrationStuff, allLabwareCalibrationStuff, nextLabware})
 
   return {
     containerType,
