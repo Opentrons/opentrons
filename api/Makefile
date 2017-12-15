@@ -31,7 +31,7 @@ dist/update.base64: clean
 	python setup.py bdist_wheel && \
 	tar -C dist -cf /tmp/update . && \
 	echo -e "---OT UPDATE BEGIN---" > dist/update.base64 && \
-	base64 -b 50 -i /tmp/update >> dist/update.base64 && \
+	base64 -i /tmp/update | sed -e "s/.\{50\}/&\n/g" >> dist/update.base64 && \
 	echo -e "\n---OT UPDATE END---" >> dist/update.base64
 
 push: dist/update.base64
