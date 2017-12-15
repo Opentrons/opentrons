@@ -1,5 +1,14 @@
 {
      "containers": {
+          "temperature-plate": {
+               "origin-offset": {
+                    "x": 11.24,
+                    "y": 14.34,
+                    "z": 97
+               },
+               "locations":{}
+          },
+
           "tube-rack-5ml-96": {
                "locations": {
                     "A1": {
