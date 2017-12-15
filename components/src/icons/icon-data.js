@@ -1,17 +1,20 @@
 // @flow
-// icon component and library
-
-import * as React from 'react'
-import classnames from 'classnames'
+// icon name constants and SVG data
 
 // icon names
+export const ALERT = 'alert'
 export const BACK = 'back'
 export const REFRESH = 'refresh'
+export const SPINNER = 'spinner'
 export const USB = 'usb'
 export const WIFI = 'wifi'
 
 // icon data
 const ICON_DATA_BY_NAME = {
+  [ALERT]: {
+    viewBox: '0 0 24 24',
+    path: 'M13.2 13.2h-2.4V6h2.4v7.2zm0 4.8h-2.4v-2.4h2.4V18zM12 0C5.373 0 0 5.373 0 12A12 12 0 1 0 12 0z'
+  },
   [BACK]: {
     viewBox: '0 0 24 24',
     path: 'M18 11.242v1.516H8.91l4.166 4.166L12 18l-6-6 6-6 1.076 1.076-4.167 4.166z'
@@ -19,6 +22,10 @@ const ICON_DATA_BY_NAME = {
   [REFRESH]: {
     viewBox: '0 0 200 200',
     path: 'M121.9,31.3L129,4.6l56.7,56.7l-77.5,20.8c0,0,7.7-28.6,7.7-28.6c-5.7-1.8-11.7-2.7-17.9-2.7 c-33.5,0-60.8,27.3-60.8,60.8c0,33.5,27.3,60.8,60.8,60.8c26.5,0,50.5-17.7,58.1-43.1l22,6.7c-5.1,16.8-15.7,32-29.8,42.6 c-14.6,11-32,16.8-50.3,16.8c-46.2,0-83.8-37.6-83.8-83.8S51.8,27.9,98,27.9C106.1,27.9,114.1,29.1,121.9,31.3'
+  },
+  [SPINNER]: {
+    viewBox: '0 0 512 512',
+    path: 'M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z'
   },
   [USB]: {
     viewBox: '0 0 24 24',
@@ -30,24 +37,6 @@ const ICON_DATA_BY_NAME = {
   }
 }
 
-type Props = {
-  name: $Keys<typeof ICON_DATA_BY_NAME>,
-  className?: string
-}
+export default ICON_DATA_BY_NAME
 
-export function Icon (props: Props) {
-  const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
-  const className = classnames(props.className)
-
-  return (
-    <svg
-      version='1.1'
-      aria-hidden='true'
-      viewBox={viewBox}
-      className={className}
-      fill='currentColor'
-    >
-      <path fillRule='evenodd' d={path} />
-    </svg>
-  )
-}
+export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
