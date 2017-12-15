@@ -1,4 +1,4 @@
-@value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from './fontSizes.css';
+@value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../fontSizes.css';
 
 .plate_label {
   pointer-events: none;

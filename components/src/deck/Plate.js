@@ -4,8 +4,8 @@ import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 
-import { defaultContainers, SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
-import { wellNameSplit } from './utils.js'
+import { defaultContainers, SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
+import { wellNameSplit } from '../utils.js'
 
 import styles from './Plate.css'
 import { Well } from './Well'

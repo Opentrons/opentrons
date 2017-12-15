@@ -4,7 +4,7 @@ import cx from 'classnames'
 import isNil from 'lodash/isNil'
 
 import styles from './Well.css'
-import { SELECTABLE_WELL_CLASS, swatchColors } from './constants.js'
+import { SELECTABLE_WELL_CLASS, swatchColors } from '../constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
 type Props = {

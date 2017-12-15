@@ -1,4 +1,4 @@
-@value blue, lightGrey, medGrey, darkGrey, plateBg from './colors.css';
+@value blue, lightGrey, medGrey, darkGrey, plateBg from '../colors.css';
 
 .deck {
   max-height: 90vh;

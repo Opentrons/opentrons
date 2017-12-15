@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '.'
-import type {IconName} from './icons/icon-data' // ???
+import {Icon} from '../icons'
+import type {IconName} from '../icons/icon-data' // ???
 
 import styles from './SlotOverlay.css'
 
