@@ -15,7 +15,8 @@ import {
 // interface state
 import {
   NAME as INTERFACE_NAME,
-  reducer as interfaceReducer
+  reducer as interfaceReducer,
+  alertMiddleware
 } from './interface'
 
 // robot state
@@ -51,6 +52,7 @@ const history = createHistory()
 const middleware = applyMiddleware(
   robotApiMiddleware,
   analyticsMiddleware(analyticsEventsMap),
+  alertMiddleware(window),
   routerMiddleware(history),
   // TODO(mc): log to file instead of console in prod
   createLogger()

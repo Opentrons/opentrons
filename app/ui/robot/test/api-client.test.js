@@ -4,6 +4,7 @@ import {push} from 'react-router-redux'
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../../rpc/client'
+import {tagAlertAction} from '../../interface'
 import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
@@ -124,6 +125,25 @@ describe('api client', () => {
 
     test('dispatch DISCONNECT_RESPONSE if rpcClient closes', () => {
       const expected = actions.disconnectResponse()
+      let emitDisconnect
+
+      return sendConnect()
+        .then(() => {
+          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
+            args[0] === 'close'
+          ))[1]
+          expect(typeof emitDisconnect).toBe('function')
+        })
+        .then(() => sendDisconnect())
+        .then(() => emitDisconnect())
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('dispatch DISCONNECT_RESPONSE w/ alert if unexpected close', () => {
+      const expected = tagAlertAction(
+        actions.disconnectResponse(),
+        expect.stringMatching(/unexpected/i)
+      )
       let emitDisconnect
 
       return sendConnect()
