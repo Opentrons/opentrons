@@ -18,12 +18,12 @@ export default function CowButton (props) {
 
 Requirements:
 
-* Node lts/carbon (v8) and npm v5.6.0
-* React v16
-* `babel-loader` configured to run `babel-preset-react` on `.js` files
-* `jest` configured to:
-    * proxy `.css` imports to `identity-obj-proxy`
-    * transform `.js` files in `node_modules/@opentrons`
+*   Node lts/carbon (v8) and npm v5.6.0
+*   React v16
+*   `babel-loader` configured to run `babel-preset-react` on `.js` files
+*   `jest` configured to:
+    *   proxy `.css` imports to `identity-obj-proxy`
+    *   transform `.js` files in `node_modules/@opentrons`
 
 ### node/npm setup
 
@@ -105,7 +105,7 @@ npm install --save-dev babel-preset-react babel-preset-env babel-plugin-transfor
 }
 ```
 
-**example packkage.json**
+**example package.json**
 
 ```shell
 npm install --save-dev jest babel-jest identity-obj-proxy
@@ -138,13 +138,13 @@ Primary application button with dark background and white text
 import {PrimaryButton} from '@opentrons/components'
 ```
 
-prop      | flow type                  | required | description
---------- | -------------------------- | -------- | ----------------------
-onClick   | (SyntheticEvent<>) => void | yes      | click event handler
-title     | string                     | no       | element title
-disabled  | bool                       | no       | disabled flag
-className | string                     | no       | additional class names
-children  | React.Node                 | no       | contents of the button
+ prop      | flow type                  | required | description
+---------- | -------------------------- | -------- | ----------------------
+ onClick   | (SyntheticEvent<>) => void | yes      | click event handler
+ title     | string                     | no       | element title
+ disabled  | bool                       | no       | disabled flag
+ className | string                     | no       | additional class names
+ children  | React.Node                 | no       | contents of the button
 
 ### icons
 
@@ -156,13 +156,48 @@ SVG icons that take `color` from their parent.
 import {Icon, BACK, REFRESH, USB, WIFI} from '@opentrons/components'
 ```
 
-prop      | flow type                      | required | description
---------- | ------------------------------ | -------- | ----------------------
-name      | BACK &#124; REFRESH &#124; ... | yes      | icon name
-className | string                         | no       | additional class names
+ prop      | flow type | required | description
+---------- | --------- | -------- | ------------------------
+ name      | IconName  | yes      | icon name
+ className | string    | no       | additional class names
+ spin      | bool      | no       | if set, icon will spin!
 
+#### icon names
+
+```js
+import type {IconName} from '@opentrons/components'
+```
+
+*   `ALERT`
+*   `BACK`
+*   `REFRESH`
+*   `SPINNER`
+*   `USB`
+*   `WIFI`
 
 ### structure
+
+#### PageTabs
+
+Sub-page tabs to sit underneath the title bar
+
+```js
+import {PageTabs} from '@opentrons/components'
+```
+
+ prop      | flow type              | required | description
+---------- | ---------------------- | -------- | ------------------------------
+ pages     | Array&lt;TabProps&gt; | yes      | Array of pages that need tabs
+
+**TabProps**
+
+ prop       | flow type | required | description
+----------- | --------- | -------- | ------------------------------
+ title      | string    | yes      | Link title (displayed on tab)
+ href       | string    | yes      | Link target
+ isDisabled | bool      | yes      | Is the link disabled?
+ isActive   | bool      | yes      | Is the link active?
+
 
 #### TitleBar
 
@@ -172,18 +207,18 @@ Top title bar with optional subtitle
 import {TitleBar} from '@opentrons/components'
 ```
 
-prop      | flow type  | required | description
---------- | ---------- | -------- | ------------
-title     | React.Node | yes      | h1 child
-subtitle  | React.Node | no       | h2 child
+ prop      | flow type  | required | description
+---------- | ---------- | -------- | ------------
+ title     | React.Node | yes      | h1 child
+ subtitle  | React.Node | no       | h2 child
 
 ## contributing
 
 ### flow
 
-We use [flow] for static type checking of our components. See flow's documentation for usage instructions and type definitions.
+We use [flow][] for static type checking of our components. See flow's documentation for usage instructions and type definitions.
 
-If you need to add an external dependency to the components library for a component, it probably won't come with type definitions (for example, `classnames`). In that case, [flow-typed] probably has the type definitions you're looking for.
+If you need to add an external dependency to the components library for a component, it probably won't come with type definitions (for example, `classnames`). In that case, [flow-typed][] probably has the type definitions you're looking for.
 
 ```
 # install some dependency
@@ -198,14 +233,14 @@ You also may want to check out good [editor setups for flow][flow-editors].
 
 Unit tests live in a `__tests__` directory in the same directory as the module under test. When writing unit tests for components, we've found the following tests to be the most useful:
 
-* DOM tests
-    * Make sure the component renders the correct node type
-    * Make sure DOM attributes are mapped correctly
-    * Make sure handlers fire correctly
-* Render tests
-    * Snapshot tests using [jest's snapshot functionality][jest-snapshots]
-    * To regenerate snapshots after an intentional rendering change, run:
-    
+*   DOM tests
+    *   Make sure the component renders the correct node type
+    *   Make sure DOM attributes are mapped correctly
+    *   Make sure handlers fire correctly
+*   Render tests
+    *   Snapshot tests using [jest's snapshot functionality][jest-snapshots]
+    *   To regenerate snapshots after an intentional rendering change, run:
+
     ``` shell
     make test updateSnapshot=true
     ```

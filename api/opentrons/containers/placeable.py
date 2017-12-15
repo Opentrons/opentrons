@@ -1,11 +1,12 @@
 import itertools
 import math
 import numbers
-from collections import OrderedDict
-from opentrons.util.vector import Vector
-
 import re
 import functools
+
+from collections import OrderedDict
+
+from opentrons.util.vector import Vector
 
 
 def unpack_location(location):
@@ -249,14 +250,6 @@ class Placeable(object):
         # Pop last (and hopefully only Deck) or None if there is no deck
         return res.pop()
 
-    def remove_child(self, name):
-        """
-        Removes child by :name:
-        """
-        child = self.children_by_name[name]
-        del self.children_by_name[name]
-        del self.children_by_reference[child]
-
     def get_parent(self):
         """
         Returns parent
@@ -431,14 +424,19 @@ class Deck(Placeable):
     """
     This class implements behaviour specific to the Deck
     """
-
     def containers(self) -> list:
         """
         Returns all containers on a deck as a list
         """
+
         all_containers = list()
         for slot in self:
             all_containers += slot.get_children_list()
+
+        for container in all_containers:
+            if getattr(container, 'stackable', False):
+                all_containers += container.get_children_list()
+
         return all_containers
 
     def has_container(self, container_instance):
@@ -459,7 +457,7 @@ class Slot(Placeable):
     """
     Class representing a Slot
     """
-    pass
+    stackable = True
 
 
 class Container(Placeable):

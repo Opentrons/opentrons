@@ -18,7 +18,7 @@ describe('PrimaryButton', () => {
     ).root.findByType('button')
 
     button.props.onClick()
-    expect(button.props.className).toMatch(/class/)
+    expect(button.props.className).toMatch(/\bclass\b/)
     expect(button.props.title).toBe('title')
     expect(button.props.disabled).toBe(false)
     expect(button.children).toEqual(['children'])

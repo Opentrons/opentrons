@@ -1,10 +1,11 @@
 // upload summary component
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Icon, SPINNER} from '@opentrons/components'
 
 import CenteredContent from './CenteredContent'
 import Splash from './Splash'
-import {Spinner, Success, Warning} from './icons'
+import {Success, Warning} from './icons'
 
 import styles from './Upload.css'
 
@@ -29,7 +30,7 @@ export default function Upload (props) {
   }
 
   const content = inProgress
-    ? (<Spinner className={styles.spinner} />)
+    ? (<Icon name={SPINNER} spin className={styles.spinner} />)
     : (<UploadResults {...props} />)
 
   return (
