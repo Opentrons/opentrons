@@ -52,6 +52,9 @@ script:
   # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
+  # components library
+  # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
+  - make -C components test
   # TODO(mc, 2017-08-28): use top level `make test`
   - make -C app package test && make -C app dist-posix
   # Clean up. This will leave only single-file build artifacts
@@ -59,9 +62,6 @@ script:
   # protocol designer
   # TODO(ian, 2017-11-06): use makefile
   - make -C protocol-designer install test build
-  # components library
-  # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
-  - make -C components test
 
 after_success:
   - make coverage
