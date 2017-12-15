@@ -1,8 +1,9 @@
 // structure components tests
 import React from 'react'
+import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {TitleBar} from '..'
+import {PageTabs, TitleBar} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -34,6 +35,73 @@ describe('TitleBar', () => {
   test('renders TitleBar with subtitle correctly', () => {
     const tree = Renderer.create(
       <TitleBar title='foo' subtitle='bar' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('PageTabs', () => {
+  test('renders h3 links for each page', () => {
+    const pages = [
+      {title: 'Page1', href: '/page1', isActive: false, isDisabled: false},
+      {title: 'Page2', href: '/page2', isActive: false, isDisabled: false}
+    ]
+
+    const root = Renderer.create(
+      <MemoryRouter>
+        <PageTabs pages={pages} />
+      </MemoryRouter>
+    ).root
+
+    const links = root.findAllByType('a')
+    expect(links).toHaveLength(2)
+
+    links.forEach((link, index) => {
+      const {title, href} = pages[index]
+      expect(link.props.href).toBe(href)
+      expect(link.findByType('h3').children).toEqual([title])
+    })
+  })
+
+  test('does not create a link if disabled', () => {
+    const pages = [
+      {title: 'Page1', href: '/page1', isActive: false, isDisabled: true}
+    ]
+
+    const notLink = Renderer.create(
+      <MemoryRouter>
+        <PageTabs pages={pages} />
+      </MemoryRouter>
+    ).root.findByType('span')
+
+    expect(notLink.findByType('h3').children).toEqual([pages[0].title])
+  })
+
+  test('adds active class if active', () => {
+    const pages = [
+      {title: 'Page1', href: '/page1', isActive: true, isDisabled: false}
+    ]
+
+    const link = Renderer.create(
+      <MemoryRouter>
+        <PageTabs pages={pages} />
+      </MemoryRouter>
+    ).root.findByType('a')
+
+    expect(link.props.className).toMatch(/active/)
+  })
+
+  test('renders PageTabs correctly', () => {
+    const pages = [
+      {title: 'Page1', href: '/page1', isActive: true, isDisabled: false},
+      {title: 'Page2', href: '/page2', isActive: false, isDisabled: true}
+    ]
+
+    const tree = Renderer.create(
+      <MemoryRouter>
+        <PageTabs pages={pages} />
+      </MemoryRouter>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
