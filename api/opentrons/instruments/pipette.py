@@ -645,7 +645,9 @@ class Pipette:
         # Apply vertical offset to well edges
         well_edges = map(lambda x: x + v_offset, well_edges)
 
+        self.robot.gantry.set_speed(100)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
+        self.robot.gantry.default_speed()
 
         return self
 
@@ -807,6 +809,7 @@ class Pipette:
             self.move_to(self.current_tip().top(0), strategy='arc')
 
             for i in range(int(presses)):
+                plunge_depth = plunge_depth + 1
                 # move nozzle down into the tip
                 self.instrument_mover.set_power(self._pick_up_current)
                 self.instrument_mover.set_speed(30)

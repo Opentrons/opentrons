@@ -1,10 +1,12 @@
 from copy import copy
 from os import environ
+import logging
+from time import sleep
 from threading import Event
 from typing import Dict
 
 from opentrons.drivers.smoothie_drivers import serial_communication
-
+from opentrons.drivers.rpi_drivers import gpio
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -13,6 +15,8 @@ from opentrons.drivers.smoothie_drivers import serial_communication
 - Driver is NOT responsible interpreting the motions in any way
   or knowing anything about what the axes are used for
 '''
+
+log = logging.getLogger(__name__)
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
@@ -80,6 +84,7 @@ class SmoothieDriver_3_0_0:
         self._config = config
         self._default_power_settings = config.default_power
         self._current_power_settings =  self._default_power_settings.copy()
+        gpio.initialize()
 
     def _update_position(self, target):
         self._position.update({
@@ -96,8 +101,7 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             updated_position = self._position.copy()
             updated_position.update(**default)
-
-        if not self.simulating:
+        else:
             try:
                 position_response = \
                     self._send_command(GCODES['CURRENT_POSITION'])
@@ -190,9 +194,14 @@ class SmoothieDriver_3_0_0:
     def _reset_from_error(self):
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
-    # TODO: Write GPIO low
-    def _reboot(self):
-        self._setup()
+    def _hard_reset_smoothie(self):
+        log.debug('Halting Smoothie (simulating: {})'.format(self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
+            sleep(0.1)
+            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
@@ -370,8 +379,33 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
-    # TODO: Write GPIO low
+    def turn_on_button_light(self):
+        log.debug("Turning on the button")
+        gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_off_button_light(self):
+        log.debug("Turning off the button")
+        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_on_frame_light(self):
+        log.debug("Turning on the LED strip")
+        gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
+    def turn_off_frame_light(self):
+        log.debug("Turning off the LED strip")
+        gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
     def kill(self):
-        pass
+        """
+        In order to terminate Smoothie motion immediately (including
+        interrupting a command in progress, we set the reset pin low and then
+        back to high, then call `_setup` method to send the RESET_FROM_ERROR
+        Smoothie code to return Smoothie to a normal waiting state and reset
+        any other state needed for the driver.
+        """
+        self._hard_reset_smoothie()
+        sleep(0.1)
+        self._reset_from_error()
+        self._setup()
 
     # ----------- END Public interface ------------ #
