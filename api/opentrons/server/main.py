@@ -40,6 +40,10 @@ def log_init():
             'opentrons.api': {
                 'handlers': ['debug'],
                 'level': logging.DEBUG
+            },
+            'opentrons.drivers.smoothie_drivers.driver_3_0': {
+                'handlers': ['debug'],
+                'level': logging.DEBUG
             }
         }
     )

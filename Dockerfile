@@ -112,7 +112,7 @@ STOPSIGNAL SIGTERM
 # More: https://github.com/Yelp/dumb-init
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 # For interactive one-off use:
-#   docker run opentrons dumb-init python -c 'while True: pass'
+#   docker run --name opentrons -it opentrons /bin/sh
 # or uncomment:
-# CMD ["python", "-c", "source /etc/profile && while True: pass"]
+# CMD ["python", "-c", "while True: pass"]
 CMD ["bash", "-c", "source /etc/profile && setup.sh && exec start.sh"]
