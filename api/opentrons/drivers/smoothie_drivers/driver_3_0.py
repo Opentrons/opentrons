@@ -362,10 +362,12 @@ class SmoothieDriver_3_0_0:
         return self.home(axis=axis, disabled=disabled)
 
     def pause(self):
-        self.run_flag.clear()
+        if not self.simulating:
+            self.run_flag.clear()
 
     def resume(self):
-        self.run_flag.set()
+        if not self.simulating:
+            self.run_flag.set()
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:
