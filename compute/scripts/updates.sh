@@ -1,15 +1,35 @@
 #!/usr/bin/env bash
 
-printf 'HTTP/1.1 200 OK\n\n'
+read request
 
-# extract_update.py | base64 -d | gpg -o - --verify > /tmp/update
-# chmod +x /tmp/update && /tmp/update
+while /bin/true; do
+    read header
+    [ "$header" == $'\r' ] && break;
+done
 
+echo -e "HTTP/1.1 200 OK\r"
+echo -e "Content-Type: text/plain\r"
+echo -e "\r"
+
+echo "Update log: "
+
+echo "Extracting update"
 UPDATE_DIR=$(mktemp -d)
 extract_update.py | base64 -d | tar -xv -C $UPDATE_DIR
-pip install --upgrade --no-deps $(ls $UPDATE_DIR/*.whl)
+
+echo "Contents:"
+ls -la $UPDATE_DIR
+
+echo "Installing packages"
+for wheel in $UPDATE_DIR/*.whl; do
+    echo "Extracting $wheel"
+    pip install --upgrade --no-deps $wheel
+done
+
 rm -rf $UPDATE_DIR
 
-sleep 10
+echo "Updates successfully installed"
+echo -e "\r"
 
+# Restart container by killing init process
 kill 1
