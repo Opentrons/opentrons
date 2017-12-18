@@ -3,7 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
-import type {DeckSlot} from '../../types/DeckSlot'
+import type {DeckSlot} from '../../interfaces/DeckSlot'
 
 import {
   SLOTNAME_MATRIX,
@@ -13,7 +13,7 @@ import {
   SLOT_HEIGHT,
   SLOT_SPACING,
   TRASH_SLOTNAME
-} from '../constants'
+} from './constants'
 
 import styles from './Deck.css'
 

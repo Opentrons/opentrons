@@ -5,7 +5,7 @@ import {CenteredTextSvg} from '../CenteredTextSvg'
 import {LabwareContainer} from './LabwareContainer'
 import styles from './LabwareContainer.css'
 
-import type {DeckSlotProps} from '../../types/DeckSlot'
+import type {DeckSlotProps} from '../../interfaces/DeckSlot'
 
 export function EmptyDeckSlot (props: DeckSlotProps) {
   const {slotName} = props

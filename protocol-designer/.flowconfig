@@ -7,6 +7,6 @@
 [lints]
 
 [options]
-module.name_mapper.extension='css' -> '@opentrons/components/types/CSSModule.js'
+module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
 
 [strict]

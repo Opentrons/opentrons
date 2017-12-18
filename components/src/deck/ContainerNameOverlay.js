@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import {SLOT_HEIGHT} from '../constants'
 import {humanize} from '../utils'
+import {SLOT_HEIGHT} from './constants'
 import styles from './LabwareContainer.css'
 
 type Props = {
