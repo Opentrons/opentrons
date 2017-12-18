@@ -15,7 +15,9 @@ ENV PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
 # Port name for connecting to smoothie over serial, i.e. /dev/ttyAMA0
 ENV OT_SMOOTHIE_ID=AMA
 ENV OT_SERVER_PORT=31950
-ENV OT_API_PORT_NUMBER=31950
+# File path to unix socket API server is listening
+ENV OT_SERVER_UNIX_SOCKET_PATH=/tmp/aiohttp.sock
+
 # Static IPv6 used on Ethernet interface for USB connectivity
 ENV ETHERNET_STATIC_IP=fd00:0000:cafe:fefe::1
 ENV ETHERNET_NETWORK_PREFIX=fd00:0000:cafe:fefe::
@@ -83,7 +85,9 @@ COPY ./compute/opentrons.motd /etc/motd
 
 # Replace placeholders with actual environment variable values
 RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.conf && \
-    sed -i "s/{ETHERNET_NETWORK_PREFIX_LENGTH}/$ETHERNET_NETWORK_PREFIX_LENGTH/g" /etc/radvd.conf
+    sed -i "s/{ETHERNET_NETWORK_PREFIX_LENGTH}/$ETHERNET_NETWORK_PREFIX_LENGTH/g" /etc/radvd.conf && \
+    sed -i "s/{OT_SERVER_PORT}/$OT_SERVER_PORT/g" /etc/nginx/nginx.conf && \
+    sed -i "s#{OT_SERVER_UNIX_SOCKET_PATH}#$OT_SERVER_UNIX_SOCKET_PATH#g" /etc/nginx/nginx.conf
 
 # All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages
@@ -114,5 +118,5 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 # For interactive one-off use:
 #   docker run opentrons dumb-init python -c 'while True: pass'
 # or uncomment:
-# CMD ["python", "-c", "source /etc/profile && while True: pass"]
+# CMD ["python", "-c", "while True: pass"]
 CMD ["bash", "-c", "source /etc/profile && setup.sh && exec start.sh"]
