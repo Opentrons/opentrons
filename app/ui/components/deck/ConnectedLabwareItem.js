@@ -20,7 +20,9 @@ const {
   // CONFIRMED
 } = robotConstants
 
-const mapStateToProps = (state, ownProps) => {
+export default connect(mapStateToProps, null, mergeProps)(LabwareItem)
+
+function mapStateToProps (state, ownProps) {
   const {slotName} = ownProps
   const labware = robotSelectors.getLabwareBySlot(state)[slotName]
 
@@ -80,7 +82,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => {
+function mergeProps (stateProps, dispatchProps, ownProps) {
   const {dispatch} = dispatchProps
 
   const slot = (ownProps && ownProps.slotName) ? parseInt(ownProps.slotName) : undefined
@@ -106,7 +108,3 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     _stateData: undefined // don't pass to component
   }
 }
-
-const ConnectedLabwareItem = connect(mapStateToProps, null, mergeProps)(LabwareItem)
-
-export default ConnectedLabwareItem

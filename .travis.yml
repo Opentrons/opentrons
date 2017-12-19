@@ -60,8 +60,7 @@ script:
   # Clean up. This will leave only single-file build artifacts
   - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
   # protocol designer
-  # TODO(ian, 2017-11-06): use makefile
-  - make -C protocol-designer install test build
+  - make -C protocol-designer test build
 
 after_success:
   - make coverage

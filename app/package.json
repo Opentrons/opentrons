@@ -55,6 +55,9 @@
       "node",
       "browser",
       "jest"
+    ],
+    "plugins": [
+      "flowtype"
     ]
   },
   "stylelint": {
