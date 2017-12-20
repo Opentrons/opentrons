@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
+import {NavLink} from 'react-router-dom'
 import classnames from 'classnames'
 import styles from './link-list.css'
 
@@ -21,14 +21,15 @@ export default function ListItem (props) {
   if (url) {
     return (
       <li key={key}>
-        <Link
+        <NavLink
           to={url}
           onClick={onClick}
           disabled={isDisabled}
+          activeClassName={styles.active}
           >
           <span className={iconStyle} />
           <span className={styles.info}>{props.children}</span>
-        </Link>
+        </NavLink>
       </li>
     )
   }
