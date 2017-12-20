@@ -86,7 +86,6 @@ dev: clean
 		"$(MAKE) dev-mdns" \
 		"sleep 3 && $(MAKE) dev-app" \
 
-
 .PHONY: dev-server
 dev-server:
 	$(env)=development PORT=$(port) $(bin)/webpack-dev-server --hot
@@ -105,19 +104,25 @@ dev-mdns:
 
 .PHONY: test
 test: test-unit
-	$(MAKE) lint
+	$(MAKE) check lint
 
 .PHONY: test-unit
 test-unit:
 	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
+.PHONY: check
+check:
+	$(bin)/flow
+
+.PHONY: install-types
+install-types:
+	$(bin)/flow-typed install
+
+.PHONY: uninstall-types
+uninstall-types:
+	rm -rf flow-typed
+
 .PHONY: lint
-lint: lint-js lint-css
-
-.PHONY: lint-js
-lint-js:
+lint:
 	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-
-.PHONY: lint-css
-lint-css:
 	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose

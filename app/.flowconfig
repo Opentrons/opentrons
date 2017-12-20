@@ -1,0 +1,16 @@
+[ignore]
+<PROJECT_ROOT>/scripts/.*
+<PROJECT_ROOT>/shell/.*
+.*/dist/.*
+.*/test/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js.flow'
+
+[strict]

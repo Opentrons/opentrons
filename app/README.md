@@ -12,7 +12,7 @@ The Opentrons desktop application is built with [Electron][].
 
 ## developing
 
-To get started once you've cloned the opentrons/opentrons repository and set up your computer for development as specified in the [project readme][project-readme-setup]:
+To get started once you've cloned the Opentrons/opentrons repository and set up your computer for development as specified in the [project readme][project-readme-setup]:
 
 ``` shell
 # change into the app directory
@@ -52,7 +52,7 @@ Our files are organized into:
 * `app/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
 * `app/webpack` - Webpack configuration helpers
 
-## testing and linting
+## testing, checking, and linting
 
 To run tests:
 
@@ -66,11 +66,16 @@ arg   | default | description             | example
 watch | false   | Run tests in watch mode | `$ make test-unit watch=true`
 cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true`
 
+We use [flow] to typecheck some of our app code. To run typechecks:
+
+* `$ make install-types` - Install flow type definitions for npm dependencies
+    * Run this command once and then after every new dependency installation
+    * Undo this command with `$ make uninstall-types`
+* `$ make check` - Run typechecks
+
 To lint JS (with [standard][]) and CSS (with [stylelint][]):
 
 * `$ make lint` - Lint both JS and CSS
-* `$ make lint-js` - Lint JS
-* `$ make lint-css` - List CSS
 
 Lint tasks can also be run with the following arguments:
 
@@ -97,6 +102,7 @@ $ sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-ut
 * `$ make package` - Package the app for inspection (does not create a distributable)
 * `$ make dist-mac` - Create an OSX distributable of the app
 * `$ make dist-linux` - Create a Linux distributable of the app
+* `$ make dist-posix` - Create OSX and Linux distributables simultaneously
 * `$ make dist-win` - Create a Windows distributable of the app
 
 All artifacts will be placed in:
@@ -149,6 +155,7 @@ For example, if you wanted to analyze the production JS bundle:
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/
 [webpack]: https://webpack.js.org/
+[flow]: https://flow.org/
 [standard]: https://standardjs.com/
 [styelint]: https://stylelint.io/
 [bundle-analyzer]: https://github.com/th0r/webpack-bundle-analyzer
