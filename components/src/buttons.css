@@ -3,7 +3,6 @@
   color_font_light,
   color_font_disabled
   from './styles/typography.css';
-
 @value color_btn_dark: #4a4a4a;
 @value color_btn_dark_hover: #333;
 @value color_btn_dark_active: #6c6c6c;
