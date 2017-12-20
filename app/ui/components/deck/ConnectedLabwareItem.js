@@ -35,7 +35,6 @@ function mapStateToProps (state, ownProps) {
   const containerName = labware.name
 
   const nextLabware = robotSelectors.getNextLabware(state)
-  const unconfirmedLabware = robotSelectors.getUnconfirmedLabware(state)
   const labwareReviewed = robotSelectors.getLabwareReviewed(state)
 
   // TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
@@ -55,7 +54,8 @@ function mapStateToProps (state, ownProps) {
     allLabwareCalibrationStuff &&
     allLabwareCalibrationStuff[labware.slot - 1]
   ) || {}
-  const calibration = thisLabwareCalibrationStuff.calibration
+
+  const {calibration, confirmed, isTiprack} = thisLabwareCalibrationStuff
 
   const isMoving = ( // TODO Ian 2017-12-14 another selector candidate
     calibration === MOVING_TO_SLOT ||
@@ -71,18 +71,20 @@ function mapStateToProps (state, ownProps) {
     wellContents,
     highlighted,
     labwareReviewed,
+    canRevisit: labwareReviewed && !(isTiprack && confirmed), // user cannot revisit a confirmed tiprack
     isMoving,
-    confirmed: unconfirmedLabware.every(l => labwareToSlotName(l) !== slotName),
+    confirmed,
 
     // Data to pass to mergeProps but not to component
     _stateData: {
       axis: robotSelectors.getSingleChannel(state).axis,
-      isTiprack: thisLabwareCalibrationStuff.isTiprack
+      isTiprack
     }
   }
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
+  console.log({stateProps, ownProps})
   const {dispatch} = dispatchProps
 
   const slot = (ownProps && ownProps.slotName) ? parseInt(ownProps.slotName) : undefined
@@ -91,10 +93,12 @@ function mergeProps (stateProps, dispatchProps, ownProps) {
 
   const onLabwareClick = (e) => {
     if (isTiprack) {
-      dispatch(robotActions.pickupAndHome(axis, slot))
-      return
+      if (!stateProps.confirmed) {
+        dispatch(robotActions.pickupAndHome(axis, slot))
+      }
+    } else {
+      dispatch(robotActions.moveTo(axis, slot))
     }
-    dispatch(robotActions.moveTo(axis, slot))
   }
 
   const setLabwareConfirmed = (e) => dispatch(robotActions.confirmLabware(slot))

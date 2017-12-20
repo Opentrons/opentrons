@@ -17,6 +17,7 @@ type LabwareItemProps = {
   confirmed?: boolean,
   isMoving?: boolean,
   labwareReviewed?: boolean, // `labwareReviewed` is false the first time a user is looking at the deck, true once they click "Continue" to proceed with calibration
+  canRevisit?: boolean, // if true, wrap labware in a Link
   height: number,
   width: number,
   slotName: string,
@@ -28,16 +29,17 @@ type LabwareItemProps = {
 
 export default function LabwareItem (props: LabwareItemProps) {
   const {
+    highlighted,
+    confirmed,
+    isMoving,
+    labwareReviewed,
+    canRevisit,
     height,
     width,
     slotName,
     containerName,
     containerType,
     wellContents,
-    highlighted,
-    confirmed,
-    labwareReviewed,
-    isMoving,
     onLabwareClick
   } = props
 
@@ -70,14 +72,14 @@ export default function LabwareItem (props: LabwareItemProps) {
     </g>
   )
 
-  const finalLabwareItem = <LabwareContainer highlighted={labwareReviewed && highlighted} {...{slotName, height, width}}>
+  const finalLabwareItem = <LabwareContainer {...{highlighted, slotName, height, width}}>
     {containerType
       ? PlateWithOverlay
       : <EmptyDeckSlot {...{height, width, slotName}} />
     }
   </LabwareContainer>
 
-  return labwareReviewed
+  return canRevisit
     ? <Link to={`/setup-deck/${slotName}`} onClick={onLabwareClick}>
       {finalLabwareItem}
     </Link>
