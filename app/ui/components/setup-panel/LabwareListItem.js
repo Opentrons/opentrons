@@ -31,7 +31,7 @@ export default function LabwareListItem (props) {
       onClick={onClick}
       confirmed={confirmed}
     >
-      <span>{name}</span>
+      <span>{name} </span>
     </ListItem>
   )
 }

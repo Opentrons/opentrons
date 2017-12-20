@@ -32,10 +32,6 @@
   background-color: #eee;
 }
 
-li.active {
-  background-color: blue;
-}
-
 .labeled_list a {
   color: black;
   display: block;
