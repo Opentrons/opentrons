@@ -9,10 +9,10 @@ from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
 '''
 - Driver is responsible for providing an interface for motion control
-- Driver is the only system component that knows about GCODES or how smoothie
+- Driver is the only system component that knows about GCODES or smoothie
   communications
 
-- Driver is NOT responsible interpreting the motions in any way
+- Driver is NOT responsible for interpreting the motions in any way
   or knowing anything about what the axes are used for
 '''
 
@@ -93,6 +93,9 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
+    """
+    Is self.simulating still needed?
+    """
     def update_position(self, default=None, is_retry=False):
         if default is None:
             default = self._position
@@ -200,6 +203,10 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
 
     # Potential place for command optimization (buffering, flushing, etc)
+    """
+    Make moving_plunger it's own function? Appears to be the only commands
+    issued here
+    """
     def _send_command(self, command, timeout=None):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
@@ -248,6 +255,13 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
+    """
+    Why does move have nested functions
+    ->Can we make low_power_z a func instead of
+    multiple if statements
+    ->ideally would like to pass in target coordinates
+    with backlash incorporated and simply send move command
+    """
     def move(self, target, low_power_z=False):
         from numpy import isclose
 
