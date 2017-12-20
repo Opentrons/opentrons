@@ -8,7 +8,7 @@ export default function SetupPanel (props) {
   return (
     <div>
       <Route path='/setup-instruments/:side' children={renderInstrumentList} />
-      <Route path='/setup-labware/:slot' children={renderLabwareList} />
+      <Route path='/setup-labware/:slots' children={renderLabwareList} />
       <RunPanel />
     </div>
   )

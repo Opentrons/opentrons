@@ -12,8 +12,9 @@ ListItem.propTypes = {
 }
 
 export default function ListItem (props) {
-  const {key, url, isDisabled, onClick, confirmed} = props
+  const {key, url, isDisabled, onClick, confirmed, active} = props
   // TODO(ka 2017-12-12) replace span with icon style with icon from comp lib
+  const style = active && styles.active
   const iconStyle = confirmed
     ? classnames(styles.icon, styles.confirmed)
     : styles.icon
@@ -35,7 +36,7 @@ export default function ListItem (props) {
   }
 
   return (
-    <li onClick={onClick}>
+    <li onClick={onClick} className={style}>
       <span className={iconStyle} />
       <span className={styles.info}>
         {props.children}

@@ -26,7 +26,6 @@ function LabwareList (props) {
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack, setLabware} = lab
-
     const links = (
       <LabwareListItem
         {...lab}
@@ -63,7 +62,7 @@ function LabwareList (props) {
     </TitledList>
   )
 }
-function mapStateToProps (state) {
+function mapStateToProps (state, ownProps) {
   return {
     labware: robotSelectors.getLabware(state),
     labwareBySlot: robotSelectors.getLabwareBySlot(state),
