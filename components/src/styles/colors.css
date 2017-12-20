@@ -1,0 +1,14 @@
+/* ot brand */
+@value color_blue: #006fff;
+@value color_teal: #05c1b3;
+@value color_mustard: #ffd252;
+
+/* greys */
+@value color_dark_grey: #4a4a4a;
+@value color_med_grey: #9B9B9B;
+@value color_light_grey: #e5e2e2;
+
+/* background colors */
+@value color_bg_light: #d1d1d1;
+@value color_bg_dark: #4a4a4a;
+@value color_bg_selected: #d1d1d1;
