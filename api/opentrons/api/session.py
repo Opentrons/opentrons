@@ -1,4 +1,5 @@
 import ast
+import logging
 from copy import copy
 from datetime import datetime
 from functools import reduce
@@ -10,6 +11,7 @@ from opentrons import robot
 
 from .models import Container, Instrument
 
+log = logging.getLogger(__name__)
 
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 
@@ -145,16 +147,19 @@ class Session(object):
         return self
 
     def stop(self):
+        log.info("Stop Initiated")
         robot.stop()
         self.set_state('stopped')
         return self
 
     def pause(self):
+        log.info("Pause Initiated")
         robot.pause()
         self.set_state('paused')
         return self
 
     def resume(self):
+        log.info("Resume Initiated")
         robot.resume()
         self.set_state('running')
         return self
