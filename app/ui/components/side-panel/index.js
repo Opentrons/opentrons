@@ -1,5 +1,6 @@
 // side nav panel container
 import React from 'react'
+import {withRouter} from 'react-router'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
@@ -15,14 +16,16 @@ import SidePanel from './SidePanel'
 // naming and organization refactors to follow
 import ConnectPanel from '../connect-panel'
 import UploadPanel from '../upload-panel'
-import ConnectedSetupPanel from '../setup-panel'
+import SetupPanel from '../setup-panel'
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavPanel)
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(NavPanel)
+)
 
 const PANELS_BY_NAME = {
   connect: ConnectPanel,
   upload: UploadPanel,
-  setup: ConnectedSetupPanel
+  setup: SetupPanel
 }
 
 NavPanel.propTypes = {
