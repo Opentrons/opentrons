@@ -11,12 +11,14 @@ describe('robot reducer - calibration', () => {
       // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
       // axis. probedByAxis holds a flag for whether the instrument has been
       // probed at least once by axis. Rethink or combine these states
+      currentInstrument: null,
       instrumentsByAxis: {},
       probedByAxis: {},
 
       // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
       // slot. confirmedBySlot holds a flag for whether the labware has been
-      // confirmed at least once. Rethink or combine these states
+      // confirmed at least once. Rethink or combine these states,
+      currentLabware: null,
       labwareBySlot: {},
       confirmedBySlot: {},
 
@@ -395,6 +397,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      currentInstrument: null,
       labwareReviewed: true,
       moveToRequest: {inProgress: true, error: null, slot: 3},
       labwareBySlot: {3: constants.MOVING_TO_SLOT, 5: constants.UNCONFIRMED}
@@ -404,12 +407,13 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_RESPONSE action', () => {
     const state = {
       calibration: {
+        currentLabware: 5,
         moveToRequest: {inProgress: true, error: null, slot: 5},
         labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.MOVING_TO_SLOT}
       }
     }
 
-    const success = {type: actionTypes.MOVE_TO_RESPONSE, error: false}
+    const success = {type: actionTypes.MOVE_TO_RESPONSE, payload: {labware: 5}, error: false}
     const failure = {
       type: actionTypes.MOVE_TO_RESPONSE,
       error: true,
@@ -417,10 +421,12 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, success).calibration).toEqual({
+      currentLabware: 5,
       moveToRequest: {inProgress: false, error: null, slot: 5},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.OVER_SLOT}
     })
     expect(reducer(state, failure).calibration).toEqual({
+      currentLabware: 5,
       moveToRequest: {inProgress: false, error: new Error('AH'), slot: 5},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED}
     })

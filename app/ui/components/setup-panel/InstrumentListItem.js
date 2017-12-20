@@ -11,11 +11,11 @@ InstrumentListItem.propTypes = {
   volume: PropTypes.number,
   channels: PropTypes.string,
   probed: PropTypes.bool,
-  clearLabwareReviewed: PropTypes.func
+  onClick: PropTypes.func
 }
 
 export default function InstrumentListItem (props) {
-  const {isRunning, name, axis, volume, channels, probed, clearLabwareReviewed} = props
+  const {isRunning, name, axis, volume, channels, probed, isActive, setInstrument} = props
   const isDisabled = name == null
   const url = isRunning
   ? '#'
@@ -32,8 +32,9 @@ export default function InstrumentListItem (props) {
     <ListItem
       isDisabled={isDisabled || isRunning}
       url={url}
-      onClick={!isRunning && clearLabwareReviewed}
+      onClick={!isRunning && setInstrument}
       confirmed={confirmed}
+      active={isActive}
     >
       <span>{axis}</span>
       <span>{description}</span>
