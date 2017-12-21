@@ -37,6 +37,6 @@ const ICON_DATA_BY_NAME = {
   }
 }
 
-export default ICON_DATA_BY_NAME
-
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
+
+export default ICON_DATA_BY_NAME
