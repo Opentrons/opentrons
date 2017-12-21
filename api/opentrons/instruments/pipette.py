@@ -154,6 +154,11 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
 
+        if self.type == 'single':
+            self._pick_up_current = SINGLE_PLUNGE_CURRENT
+        else:
+            self._pick_up_current = MULTI_PLUNGE_CURRENT
+
     def reset(self):
         """
         Resets the state of this pipette, removing associated placeables,
@@ -1540,10 +1545,3 @@ class Pipette:
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
-
-    @property
-    def _pick_up_current(self):
-        if self.type == 'single':
-            return SINGLE_PLUNGE_CURRENT
-        else:
-            return MULTI_PLUNGE_CURRENT
