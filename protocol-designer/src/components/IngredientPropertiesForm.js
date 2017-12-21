@@ -49,22 +49,43 @@ class IngredientPropertiesForm extends React.Component {
         serializeName: this.props.individualize
           ? this.props.serializeName || this.props.name || null
           : null
-      }
+      },
+      copyGroupId: null
     }
 
     this.Field = makeInputField({
       setSubstate: (inputKey, inputValue) => {
-        this.setState({input: {...this.state.input, [inputKey]: inputValue}})
+        this.setState({...this.state, input: {...this.state.input, [inputKey]: inputValue}})
       },
       getSubstate: inputKey => this.state.input[inputKey]
     })
   }
 
-  componentWillReceiveProps (nextProps) {
-    const { name, volume, description, concentration, individualize, serializeName } = this.state.input
+  resetInputState = (ingredGroupId, nextIngredGroupFields, cb) => {
+    // with a valid ingredGroupId, reset fields to values from that group.
+    // otherwise, clear all fields
 
-    if (!nextProps.selectedIngredientProperties) {
+    // nextIngredGroupFields allows you to update with nextProps
+    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields)
+
+    if (ingredGroupId in allIngredientGroupFields) {
+      const { name, volume, description, concentration, individualize, serializeName } = this.state.input
+      const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
+        ...this.state,
+        input: {
+          name: newIngredFields.name || name,
+          volume: newIngredFields.volume || volume,
+          description: newIngredFields.description || description,
+          concentration: newIngredFields.concentration || concentration,
+          individualize: newIngredFields.individualize || individualize,
+          serializeName: newIngredFields.serializeName || serializeName
+        }
+      }, cb)
+    } else {
+      // No/invalid ingredGroupId, set inputs to "blank" state
+      this.setState({
+        ...this.state,
         input: {
           name: null,
           volume: null,
@@ -73,40 +94,42 @@ class IngredientPropertiesForm extends React.Component {
           individualize: false,
           serializeName: null
         }
-      })
-    } else {
-      this.setState({
-        input: {
-          name: nextProps.selectedIngredientProperties.name || name,
-          volume: nextProps.selectedIngredientProperties.volume || volume,
-          description: nextProps.selectedIngredientProperties.description || description,
-          concentration: nextProps.selectedIngredientProperties.concentration || concentration,
-          individualize: nextProps.selectedIngredientProperties.individualize || individualize,
-          serializeName: nextProps.selectedIngredientProperties.serializeName || serializeName
-        }
-      })
+      }, cb)
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
+  }
+
+  selectExistingIngred = ingredGroupId => {
+    this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
+  }
+
   render () {
-    const { numWellsSelected, onSave, onCancel, onDelete, selectedIngredientProperties, selectedWellsMaxVolume } = this.props
+    const {
+      numWellsSelected,
+      onSave,
+      onCancel,
+      onDelete,
+      allIngredientNamesIds,
+      allIngredientGroupFields,
+      editingIngredGroupId,
+      selectedWellsMaxVolume
+    } = this.props
+
+    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId]
     const { volume, individualize } = this.state.input
+
+    const editMode = selectedIngredientFields
+    const addMode = !editMode && numWellsSelected > 0
 
     const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
-    if (!selectedIngredientProperties && numWellsSelected <= 0) {
-      return null // (
-        // TODO: style this properly
-        // <div style={{margin: '0 20%'}}>
-        //   <Button style={{color: 'gray'}} disabled>
-        //     Select Wells to Add an Ingredient
-        //   </Button>
-        //   <div style={{textAlign: 'center', color: 'white', 'paddingTop': '1rem'}}>
-        //     You can select multiple wells by dragging your mouse or holding shift.
-        //   </div>
-        // </div>
-      // )
+    if (!editMode && !addMode) {
+      // Don't show anything, we're not editing or adding
+      return null
     }
 
     return (
@@ -122,6 +145,15 @@ class IngredientPropertiesForm extends React.Component {
               <label>Name</label>
               <Field accessor='name' />
             </span>
+            {!editMode && <span>
+              {/* TODO make this a Field??? */}
+              <select onChange={e => this.selectExistingIngred(parseInt(e.target.value, 10))}>
+                <option value=''>Select existing ingredient</option>
+                {allIngredientNamesIds.map(({ingredientId, name}, i) =>
+                  <option key={i} value={ingredientId}>{name}</option>
+                )}
+              </select>
+            </span>}
           </div>
           <div className={styles.middle_row}>
             <span>
@@ -155,20 +187,24 @@ class IngredientPropertiesForm extends React.Component {
           </div>
         </form>
 
-        {/* selectedIngredientProperties &&
-          <div><label>Editing: "{selectedIngredientProperties.name}"</label></div> */}
+        {/* editMode &&
+          <div><label>Editing: "{selectedIngredientFields.name}"</label></div> */}
 
         {/* <span>
           <label>Color Swatch</label>
           <div className={styles.circle} style={{backgroundColor: 'red'}} />
         </span> */}
         <div className={styles.button_row}>
-          <Button /* disabled={TODO: validate input here} */ onClick={e => onSave(this.state.input)}>Save</Button>
+          <Button /* disabled={TODO: validate input here} */
+            onClick={e => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+          >
+            Save
+          </Button>
           <Button onClick={onCancel}>Cancel</Button>
-          {selectedIngredientProperties && selectedIngredientProperties.groupId &&
+          {editMode &&
             <Button className={styles.delete_ingred} onClick={() =>
               window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-              onDelete(selectedIngredientProperties.groupId)
+              onDelete(selectedIngredientFields.groupId)
             }>Delete Ingredient</Button>
           }
         </div>

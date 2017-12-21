@@ -10,10 +10,15 @@ import styles from './icons.css'
 type Props = {
   name: IconName,
   className?: string,
-  spin?: bool
+  spin?: boolean,
+  x?: number | string,
+  y?: number | string,
+  height?: number | string,
+  width?: number | string
 }
 
 export default function Icon (props: Props) {
+  const {x, y, height, width} = props
   const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin
@@ -26,6 +31,7 @@ export default function Icon (props: Props) {
       viewBox={viewBox}
       className={className}
       fill='currentColor'
+      {...{x, y, height, width}}
     >
       <path fillRule='evenodd' d={path} />
     </svg>
