@@ -55,15 +55,20 @@ function mapStateToProps (state, ownProps) {
     allLabwareCalibrationStuff[labware.slot - 1]
   ) || {}
 
-  const {calibration, confirmed, isTiprack} = thisLabwareCalibrationStuff
+  const {confirmed, isTiprack} = thisLabwareCalibrationStuff
 
-  const isMoving = ( // TODO Ian 2017-12-14 another selector candidate
-    calibration === MOVING_TO_SLOT ||
-    calibration === PICKING_UP ||
-    calibration === HOMING ||
-    calibration === UPDATING ||
-    calibration === CONFIRMING
+  // TODO Ian 2017-12-14 another selector candidate
+  const isMoving = allLabwareCalibrationStuff.some(l =>
+    l.calibration === MOVING_TO_SLOT ||
+    l.calibration === PICKING_UP ||
+    l.calibration === HOMING ||
+    l.calibration === UPDATING ||
+    l.calibration === CONFIRMING
   )
+
+  // another selector candidate?
+  const allTipracksConfirmed = allLabwareCalibrationStuff.every(labwareItem =>
+    labwareItem.isTiprack ? labwareItem.confirmed : true)
 
   return {
     containerType,
@@ -71,7 +76,9 @@ function mapStateToProps (state, ownProps) {
     wellContents,
     highlighted,
     labwareReviewed,
-    canRevisit: labwareReviewed && !(isTiprack && confirmed), // user cannot revisit a confirmed tiprack
+    canRevisit: labwareReviewed && !isMoving &&
+      allTipracksConfirmed &&
+      !(isTiprack && confirmed), // user cannot revisit a confirmed tiprack
     isMoving,
     confirmed,
 
