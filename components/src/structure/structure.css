@@ -1,12 +1,6 @@
 /* TitleBar styles */
-@value color_dark_grey,
-  color_med_grey
-  from '../styles/colors.css';
-@value font_size_huge,
-  font_size_header,
-  font_weight_semibold,
-  font_weight_bold
-  from '../styles/typography.css';
+@value color_dark_grey, color_med_grey from '../styles/colors.css';
+@value font_size_huge, font_size_header, font_weight_semibold, font_weight_bold from '../styles/typography.css';
 
 .title_bar {
   padding: 1rem;
@@ -45,13 +39,12 @@
 }
 
 .tab_link {
+  composes: font_huge_light from '../styles/typography.css';
   display: inline-block;
   width: 50%;
   padding: 0.25rem 0;
-  font-size: font_size_huge;
   opacity: 0.2;
   background-color: color_med_grey;
-  color: white;
   text-transform: uppercase;
 }
 
