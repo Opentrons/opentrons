@@ -50,7 +50,7 @@ const reducer = combineReducers({
 const history = createHistory()
 
 const middleware = applyMiddleware(
-  robotApiMiddleware,
+  robotApiMiddleware(),
   analyticsMiddleware(analyticsEventsMap),
   alertMiddleware(window),
   routerMiddleware(history),
