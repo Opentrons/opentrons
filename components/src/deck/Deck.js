@@ -12,21 +12,23 @@ import {
   SLOT_WIDTH,
   SLOT_HEIGHT,
   SLOT_SPACING,
+  SLOT_OFFSET,
   TRASH_SLOTNAME
 } from './constants'
 
 import styles from './Deck.css'
 
 type Props = {
-  className: string
+  className: string,
+  LabwareComponent: DeckSlot
 }
 
-export const DeckFactory = (LabwareContainer: DeckSlot) => (props: Props) => {
-  const slotOffset = 10
+export const Deck = (props: Props) => {
+  const {className, LabwareComponent} = props
 
   return (
     // TODO css not inline style on svg
-    <svg viewBox={`${-slotOffset} ${-slotOffset} ${DECK_WIDTH + slotOffset * 2} ${DECK_HEIGHT + slotOffset * 4}`} className={cx(styles.deck, props.className)}>
+    <svg viewBox={`${-SLOT_OFFSET} ${-SLOT_OFFSET} ${DECK_WIDTH + SLOT_OFFSET * 2} ${DECK_HEIGHT + SLOT_OFFSET * 4}`} className={cx(styles.deck, className)}>
 
       {/* Deck outline */}
       <g transform='scale(0.666)' className={styles.deck_outline}>
@@ -44,17 +46,17 @@ export const DeckFactory = (LabwareContainer: DeckSlot) => (props: Props) => {
       </g>
 
       {/* All containers */}
-      <g transform={`translate(${slotOffset} ${slotOffset})`}>
+      <g transform={`translate(${SLOT_OFFSET} ${SLOT_OFFSET})`}>
         {flatMap(SLOTNAME_MATRIX, (slotRow: Array<string>, row: number): Array<React.Node> =>
           slotRow.map((slotName: string, col: number): React.Node =>
             (slotName === TRASH_SLOTNAME)
-            ? null // no LabwareContainer for Trash in slot 12
+            ? null // no LabwareComponent for Trash in slot 12
             : <g key={slotName}
               transform={`translate(${
               SLOT_WIDTH * col + SLOT_SPACING * (col + 1)}, ${
               SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)})`}
             >
-              <LabwareContainer slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
+              <LabwareComponent slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
             </g>
           )
         )}

@@ -2,7 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import Deck from './Deck'
+import {Deck} from '@opentrons/components'
+import ConnectedLabwareItem from './ConnectedLabwareItem'
+
 import ReviewLabware from './ReviewLabware'
 import CalibrationPrompt from './CalibrationPrompt'
 import styles from './deck.css'
@@ -21,7 +23,7 @@ export default function CalibrateDeck (props) {
 
   return (
     <section className={style}>
-      <Deck slot={slot} />
+      <Deck LabwareComponent={ConnectedLabwareItem} className={styles.deck} />
       <Prompt slot={slot} />
     </section>
   )
