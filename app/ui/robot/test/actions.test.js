@@ -32,23 +32,23 @@ describe('robot actions', () => {
   })
 
   test('REMOVE_DISCOVERED action', () => {
-    const host = '123456.local'
+    const name = 'ot'
     const expected = {
       type: actionTypes.REMOVE_DISCOVERED,
-      payload: {host}
+      payload: {name}
     }
 
-    expect(actions.removeDiscovered(host)).toEqual(expected)
+    expect(actions.removeDiscovered(name)).toEqual(expected)
   })
 
   test('CONNECT action', () => {
     const expected = {
       type: actionTypes.CONNECT,
-      payload: {host: 'ot.local'},
+      payload: {name: 'ot'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.connect('ot.local')).toEqual(expected)
+    expect(actions.connect('ot')).toEqual(expected)
   })
 
   test('CONNECT_RESPONSE action', () => {

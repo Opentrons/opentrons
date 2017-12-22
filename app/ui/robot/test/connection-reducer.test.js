@@ -10,9 +10,9 @@ describe('robot reducer - connection', () => {
     expect(getState(state)).toEqual({
       isScanning: false,
       discovered: [],
-      discoveredByHost: {},
+      discoveredByName: {},
       connectedTo: '',
-      connectRequest: {inProgress: false, error: null, host: ''},
+      connectRequest: {inProgress: false, error: null, name: ''},
       disconnectRequest: {inProgress: false, error: null}
     })
   })
@@ -46,18 +46,18 @@ describe('robot reducer - connection', () => {
         connectRequest: {
           inProgress: false,
           error: new Error('AH'),
-          host: ''
+          name: ''
         }
       }
     }
     const action = {
       type: actionTypes.CONNECT,
-      payload: {host: 'ot.local'}
+      payload: {name: 'ot'}
     }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: '',
-      connectRequest: {inProgress: true, error: null, host: 'ot.local'}
+      connectRequest: {inProgress: true, error: null, name: 'ot'}
     })
   })
 
@@ -68,15 +68,15 @@ describe('robot reducer - connection', () => {
         connectRequest: {
           inProgress: true,
           error: null,
-          host: 'ot.local'
+          name: 'ot'
         }
       }
     }
     const action = {type: actionTypes.CONNECT_RESPONSE, error: false}
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: 'ot.local',
-      connectRequest: {inProgress: false, error: null, host: ''}
+      connectedTo: 'ot',
+      connectRequest: {inProgress: false, error: null, name: ''}
     })
   })
 
@@ -87,7 +87,7 @@ describe('robot reducer - connection', () => {
         connectRequest: {
           inProgress: true,
           error: null,
-          host: 'ot.local'
+          name: 'ot'
         }
       }
     }
@@ -102,7 +102,7 @@ describe('robot reducer - connection', () => {
       connectRequest: {
         inProgress: false,
         error: new Error('AH'),
-        host: 'ot.local'
+        name: 'ot'
       }
     })
   })
@@ -110,18 +110,18 @@ describe('robot reducer - connection', () => {
   test('handles DISCONNECT action', () => {
     const state = {
       connection: {
-        connectedTo: 'ot.local',
+        connectedTo: 'ot',
         disconnectRequest: {
           inProgress: false,
           error: new Error('AH'),
-          host: ''
+          name: ''
         }
       }
     }
     const action = {type: actionTypes.DISCONNECT}
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: 'ot.local',
+      connectedTo: 'ot',
       disconnectRequest: {inProgress: true, error: null}
     })
   })
@@ -129,7 +129,7 @@ describe('robot reducer - connection', () => {
   test('handles DISCONNECT_RESPONSE success', () => {
     const state = {
       connection: {
-        connectedTo: 'ot.local',
+        connectedTo: 'ot',
         disconnectRequest: {inProgress: true, error: null}
       }
     }
@@ -144,7 +144,7 @@ describe('robot reducer - connection', () => {
   test('handles DISCONNECT_RESPONSE failure', () => {
     const state = {
       connection: {
-        connectedTo: 'ot.local',
+        connectedTo: 'ot',
         disconnectRequest: {inProgress: true, error: null}
       }
     }
@@ -155,7 +155,7 @@ describe('robot reducer - connection', () => {
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: 'ot.local',
+      connectedTo: 'ot',
       disconnectRequest: {inProgress: false, error: new Error('AH')}
     })
   })
@@ -163,9 +163,9 @@ describe('robot reducer - connection', () => {
   test('handles ADD_DISCOVERED action', () => {
     const state = {
       connection: {
-        discovered: ['abcdef.local'],
-        discoveredByHost: {
-          'abcdef.local': {host: 'abcdef.local', name: 'foo'}
+        discovered: ['foo'],
+        discoveredByName: {
+          foo: {host: 'abcdef.local', name: 'foo'}
         }
       }
     }
@@ -175,10 +175,10 @@ describe('robot reducer - connection', () => {
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      discovered: ['abcdef.local', '123456.local'],
-      discoveredByHost: {
-        'abcdef.local': {host: 'abcdef.local', name: 'foo'},
-        '123456.local': {host: '123456.local', name: 'bar'}
+      discovered: ['foo', 'bar'],
+      discoveredByName: {
+        foo: {host: 'abcdef.local', name: 'foo'},
+        bar: {host: '123456.local', name: 'bar'}
       }
     })
   })
@@ -186,9 +186,9 @@ describe('robot reducer - connection', () => {
   test('handles ADD_DISCOVERED action when robot is already present', () => {
     const state = {
       connection: {
-        discovered: ['abcdef.local'],
-        discoveredByHost: {
-          'abcdef.local': {host: 'abcdef.local', name: 'foo'}
+        discovered: ['foo'],
+        discoveredByName: {
+          foo: {host: 'abcdef.local', name: 'foo'}
         }
       }
     }
@@ -198,9 +198,9 @@ describe('robot reducer - connection', () => {
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      discovered: ['abcdef.local'],
-      discoveredByHost: {
-        'abcdef.local': {host: 'abcdef.local', name: 'foo'}
+      discovered: ['foo'],
+      discoveredByName: {
+        foo: {host: 'abcdef.local', name: 'foo'}
       }
     })
   })
@@ -208,22 +208,22 @@ describe('robot reducer - connection', () => {
   test('handles REMOVE_DISCOVERED action', () => {
     const state = {
       connection: {
-        discovered: ['abcdef.local', '123456.local'],
-        discoveredByHost: {
-          'abcdef.local': {host: 'abcdef.local', name: 'foo'},
-          '123456.local': {host: '123456.local', name: 'bar'}
+        discovered: ['foo', 'bar'],
+        discoveredByName: {
+          foo: {host: 'abcdef.local', name: 'foo'},
+          bar: {host: '123456.local', name: 'bar'}
         }
       }
     }
     const action = {
       type: actionTypes.REMOVE_DISCOVERED,
-      payload: {host: 'abcdef.local'}
+      payload: {name: 'foo'}
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      discovered: ['123456.local'],
-      discoveredByHost: {
-        '123456.local': {host: '123456.local', name: 'bar'}
+      discovered: ['bar'],
+      discoveredByName: {
+        bar: {host: '123456.local', name: 'bar'}
       }
     })
   })

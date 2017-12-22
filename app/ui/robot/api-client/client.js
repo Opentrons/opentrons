@@ -9,8 +9,6 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
-// TODO(mc, 2017-11-01): get port from MDNS once API advertises proper port
-const PORT = 31950
 const RUN_TIME_TICK_INTERVAL_MS = 200
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
@@ -63,7 +61,11 @@ export default function client (dispatch) {
   function connect (state, action) {
     if (rpcClient) return dispatch(actions.connectResponse())
 
-    RpcClient(`ws://${action.payload.host}:${PORT}`)
+    const name = action.payload.name
+    const target = state[constants._NAME].connection.discoveredByName[name]
+    const {ip, port} = target
+
+    RpcClient(`ws://${ip}:${port}`)
       .then((c) => {
         rpcClient = c
         rpcClient

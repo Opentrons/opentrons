@@ -69,8 +69,8 @@ export const actions = {
     return {type: actionTypes.DISCOVER_FINISH}
   },
 
-  connect (host) {
-    return tagForRobotApi({type: actionTypes.CONNECT, payload: {host}})
+  connect (name) {
+    return tagForRobotApi({type: actionTypes.CONNECT, payload: {name}})
   },
 
   connectResponse (error) {
@@ -98,8 +98,8 @@ export const actions = {
     return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (host) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: {host}}
+  removeDiscovered (name) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: {name}}
   },
 
   // get session or make new session with protocol file

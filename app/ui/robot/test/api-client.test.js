@@ -68,9 +68,20 @@ describe('api client', () => {
     RpcClient.mockReset()
   })
 
-  const HOST = 'ot.local'
-  const sendConnect = () => sendToClient({}, actions.connect(HOST))
-  const sendDisconnect = () => sendToClient({}, actions.disconnect())
+  const ROBOT_NAME = 'ot'
+  const ROBOT_IP = '127.0.0.01'
+  const STATE = {
+    [NAME]: {
+      connection: {
+        discoveredByName: {
+          [ROBOT_NAME]: {ip: ROBOT_IP, port: 31950}
+        }
+      }
+    }
+  }
+
+  const sendConnect = () => sendToClient(STATE, actions.connect(ROBOT_NAME))
+  const sendDisconnect = () => sendToClient(STATE, actions.disconnect())
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
@@ -80,7 +91,7 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => {
-          expect(RpcClient).toHaveBeenCalledWith(`ws://${HOST}:31950`)
+          expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
