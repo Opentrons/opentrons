@@ -1,13 +1,8 @@
 <!--
-  Thanks for taking the time to file an issue. Before continuing, please
-  consider the following questions:
+  Thanks for taking the time to file an issue! Please make sure you've read the
+  "Opening Issues" section of our Contributing Guide:
 
-  - Is this issue for a bug, a feature request, or something else?
-  - Has this issue already been filed in another issue ticket?
-    - If yes, please comment on the existing thread instead
-  - Is this a support request?
-    - If yes, please check our support page and/or contact our support team
-    - https://support.opentrons.com/
+  https://github.com/Opentrons/opentrons/blob/v3a/CONTRIBUTING.md#opening-issues
 
   To ensure your issue can be addressed quickly, please fill out the sections
   below to the best of your ability!

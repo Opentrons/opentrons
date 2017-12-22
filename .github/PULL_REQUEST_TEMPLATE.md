@@ -1,14 +1,8 @@
 <!--
-  Thanks for taking the time to open a pull request. Before continuing, please
-  consider the following questions:
+  Thanks for taking the time to open a pull request! Please make sure you've
+  read the "Opening Pull Requests" section of our Contributing Guide:
 
-  - Does this PR address an already open issue?
-    - If not, please consider opening an issue first to ensure you don't end up
-      duplicating work or wasting time on a PR that won't be accepted
-  - Does this PR incorporate many different changes?
-    - If yes, would the PR work better as a series of smaller PRs?
-  - Does this PR include code changes without test and/or documentation updates?
-    - If yes, the PR may not be ready to open
+  https://github.com/Opentrons/opentrons/blob/v3a/CONTRIBUTING.md#opening-pull-requests
 
   To ensure your code is reviewed quickly and thoroughly, please fill out the
   sections below to the best of your ability!
