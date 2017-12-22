@@ -1,0 +1,15 @@
+@value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../fontSizes.css';
+
+.plate_label {
+  pointer-events: none;
+  font-size: fontSizeCaption;
+  text-anchor: middle;
+}
+
+.tiny_labels {
+  font-size: 0.2rem;
+}
+
+.tiny_labels:nth-child(odd) {
+  fill: gray;
+}

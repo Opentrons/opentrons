@@ -15,7 +15,7 @@ import {
   copyLabware
 } from '../actions'
 
-import LabwareContainer from '../components/LabwareContainer.js'
+import { LabwareOnDeck } from '../components/LabwareOnDeck'
 
 export default connect(
   (state, ownProps) => {
@@ -27,7 +27,8 @@ export default connect(
       ...containerInfo,
       canAdd: selectors.canAdd(state),
       activeModals: selectors.activeModals(state),
-      labwareToCopy: selectors.labwareToCopy(state)
+      labwareToCopy: selectors.labwareToCopy(state),
+      highlighted: selectors.selectedContainerSlot(state) === ownProps.slotName || selectors.canAdd(state) === ownProps.slotName
     }
   },
   {
@@ -43,4 +44,4 @@ export default connect(
     setCopyLabwareMode,
     copyLabware
   }
-)(LabwareContainer)
+)(LabwareOnDeck)

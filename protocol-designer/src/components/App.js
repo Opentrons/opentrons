@@ -7,6 +7,7 @@ import About from './About'
 // to clarify: normalize.css is an npm module
 // with a dot in its name, not a .css file in src/
 import 'normalize.css'
+import '../css/globals.css'
 
 export default function App () {
   return (

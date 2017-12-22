@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import styles from './SelectionRect.css'
+
 class SelectionRect extends React.Component {
   static propTypes = {
     // callbacks with (event, rect)
@@ -20,24 +22,43 @@ class SelectionRect extends React.Component {
   }
 
   renderRect ({xStart, yStart, xDynamic, yDynamic}) {
+    const left = Math.min(xStart, xDynamic)
+    const top = Math.min(yStart, yDynamic)
+    const width = Math.abs(xDynamic - xStart)
+    const height = Math.abs(yDynamic - yStart)
+
+    if (this.props.svg) {
+      // calculate ratio btw clientRect bounding box vs svg parent viewBox
+      // WARNING: May not work right if you're nesting SVGs!
+      const clientRect = this.refs.parentRect.getBoundingClientRect()
+      const viewBox = this.refs.parentRect.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
+
+      const xScale = viewBox.width / clientRect.width
+      const yScale = viewBox.height / clientRect.height
+
+      return <rect
+        x={(left - clientRect.left) * xScale}
+        y={(top - clientRect.top) * yScale}
+        width={width * xScale}
+        height={height * yScale}
+        className={styles.selection_rect}
+      />
+    }
+
     return <div
-      style={{
-        position: 'fixed',
-        pointerEvents: 'none', // prevents this div from occluding wells during document.elementFromPoint sampling
-        zIndex: 1000,
-        borderRadius: 0,
-        border: '1px gray dashed',
-        left: Math.min(xStart, xDynamic) + 'px',
-        top: Math.min(yStart, yDynamic) + 'px',
-        width: Math.abs(xDynamic - xStart) + 'px',
-        height: Math.abs(yDynamic - yStart) + 'px',
-        backgroundColor: 'rgba(0, 120, 255, 0.2)' // <- TODO: use css for colors
+      className={styles.selection_rect}
+      styles={{
+        left: left + 'px',
+        top: top + 'px',
+        width: width + 'px',
+        height: height + 'px'
       }}
     />
   }
 
   getRect ({xStart, yStart, xDynamic, yDynamic}) {
     // convert internal rect position to more generic form
+    // TODO should this be used in renderRect?
     return {
       x0: Math.min(xStart, xDynamic),
       x1: Math.max(xStart, xDynamic),
@@ -74,14 +95,17 @@ class SelectionRect extends React.Component {
   }
 
   render () {
-    const { children } = this.props
+    const { svg, children } = this.props
 
-    return (
-      <div onMouseDown={this.handleMouseDown}>
+    return svg
+      ? <g onMouseDown={this.handleMouseDown} ref='parentRect'>
+        {children}
+        {this.state.positions && this.renderRect(this.state.positions)}
+      </g>
+      : <div onMouseDown={this.handleMouseDown} ref='parentRect'>
         {this.state.positions && this.renderRect(this.state.positions)}
         {children}
       </div>
-    )
   }
 }
 

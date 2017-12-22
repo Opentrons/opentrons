@@ -19,6 +19,8 @@ To get started once you've cloned the opentrons/opentrons repository and set up 
 $ cd app
 # install dependencies
 $ make install
+# install flow-types for testing in development
+$ make install-types
 # launch the dev server / electron app in dev mode
 $ make dev
 ```
@@ -52,11 +54,11 @@ Our files are organized into:
 * `app/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
 * `app/webpack` - Webpack configuration helpers
 
-## testing and linting
+## testing, type checking, and linting
 
 To run tests:
 
-* `$ make test` - Run all tests and then lints
+* `$ make test` - Run all tests (including Flow type checking) and then lints
 * `$ make test-unit` - Run all unit tests
 
 Test tasks can also be run with the following arguments:
@@ -77,6 +79,10 @@ Lint tasks can also be run with the following arguments:
 arg   | default | description                   | example
 ----- | ------- | ----------------------------- | -------------------------
 fix   | false   | Automatically fix lint errors | `$ make lint-js fix=true`
+
+To check types with Flow:
+
+* `$ make check`
 
 ## building
 

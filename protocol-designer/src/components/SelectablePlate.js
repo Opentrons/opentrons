@@ -1,19 +1,30 @@
+// Wrap Plate with a SelectionRect.
 import React from 'react'
-import Plate from './Plate.js'
+import { Plate } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
-import HoverableWell from '../containers/HoverableWell.js'
 
-export default function SelectablePlate ({wellMatrix, onSelectionMove, onSelectionDone, containerId, selectable, ...otherProps}) {
+export default function SelectablePlate ({
+  wellContents,
+  containerType,
+  onSelectionMove,
+  onSelectionDone,
+  containerId,
+  selectable,
+  ...otherProps
+}) {
+  const plate = <Plate
+    selectable={selectable}
+    wellContents={wellContents}
+    containerType={containerType}
+    {...otherProps}
+  />
+
+  if (!selectable) return plate // don't wrap plate with SelectionRect
+
   return (
-    // containerId not passed into Plate, so don't unpack into otherProps --------^
-    <SelectionRect {...{onSelectionMove, onSelectionDone}}>
-      <Plate
-        selectable={selectable}
-        Well={HoverableWell}
-        wellMatrix={wellMatrix}
-        {...otherProps}
-      />
+    <SelectionRect svg {...{onSelectionMove, onSelectionDone}}>
+      {plate}
     </SelectionRect>
   )
 }
