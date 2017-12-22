@@ -1,4 +1,5 @@
 from os import system
+from sys import platform
 """
 Raspberry Pi GPIO control module
 
@@ -69,7 +70,14 @@ def _write_value(value, path):
     :param value: The value to write (usually a number or string)
     :param path: A valid system path
     """
-    system("echo '{0}' > {1}".format(value, path))
+    base_command = "echo '{0}' > {1}"
+    # There is no common method for redirecting stderr to a null sink, so the
+    # command string is platform-dependent
+    if platform == 'win32':
+        command = "{0} > NUL".format(base_command)
+    else:
+        command = "exec 2> /dev/null; {0}".format(base_command)
+    system(command.format(value, path))
 
 
 def set_high(pin):

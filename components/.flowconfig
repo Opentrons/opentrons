@@ -7,6 +7,7 @@
 [lints]
 
 [options]
-module.name_mapper.extension='css' -> '<PROJECT_ROOT>/types/CSSModule.js'
+module.name_mapper='^default\-containers\.json$' -> '<PROJECT_ROOT>/interfaces/default-containers.json.js'
+module.name_mapper.extension='css' -> '<PROJECT_ROOT>/interfaces/CSSModule.js'
 
 [strict]

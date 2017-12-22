@@ -42,7 +42,7 @@ def test_aspirate_move_to(robot):
                    tip_racks=[tip_rack],
                    max_volume=200)
 
-    x, y, z = (161.0, 116.7, 0)
+    x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
@@ -92,34 +92,25 @@ def test_dispense_move_to(robot):
                    tip_racks=[tip_rack],
                    max_volume=200)
 
+    x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
-    x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
 
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
-
     robot.calibrate_container_with_instrument(plate, p200, False)
-
-    robot.home()
 
     p200.pick_up_tip()
     p200.aspirate(100, location)
     p200.dispense(100, location)
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200.instrument_actuator)
+    assert (current_pos == (2.0, 0.0, 0.0)).all()
 
-    # driver = robot._driver
-
-    # TODO (artyom, 20171102):  uncomment once calibration is fixed
-    # current_plunger_pos = driver.get_plunger_positions()['current']
-    # current_head_pos = pose_tracker.relative(
-    #     robot.poses,
-    #     src=robot.deck,
-    #     dst=p200
-    # )
-
-    # assert (current_head_pos == (172.24, 131.04, 3.0)).all()
-    # assert current_plunger_pos == {'a': 0, 'b': 10.0}
+    current_pos = pose_tracker.absolute(robot.poses, p200)
+    assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
 
 
 class PipetteTest(unittest.TestCase):

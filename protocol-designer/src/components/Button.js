@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import styles from '../css/style.css'
+
+const styles = {} // HACK Ian 2017-12-06 until we get Button component in component library
 
 // Disables onClick behavior if props.disabled is true.
 Button.propTypes = {

@@ -1,6 +1,6 @@
 import React from 'react'
+import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
-import styles from '../css/style.css'
 
 function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
   return (
@@ -14,7 +14,10 @@ function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displa
   )
 }
 
-export default function LabwareDropdown ({onClose, onContainerChoose}) {
+export default function LabwareDropdown ({onClose, onContainerChoose, slotName}) {
+  // do not render without a slotName
+  if (!slotName) return null
+
   const labwareItemMapper = (item, key) => (
     // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
     <LabwareItem key={key}
@@ -27,8 +30,8 @@ export default function LabwareDropdown ({onClose, onContainerChoose}) {
 
   return (
     <div className={styles.labware_dropdown}>
-      <label>Labware Type</label>
-      <div className='close' onClick={onClose}>X</div>
+      <label>Add Labware to Slot {slotName}</label>
+      <div className={styles.close} onClick={onClose}>X</div>
       <ul>
         <Accordion title='Tip Rack'>
           {[
@@ -42,16 +45,20 @@ export default function LabwareDropdown ({onClose, onContainerChoose}) {
           {[
             ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
             ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
+            ['24-vial-rack', '3.5mL Tube Rack'],
             ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml']
           ].map(labwareItemMapper)}
         </Accordion>
         <Accordion title='Well Plate'>
           {[
             ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
-            ['96-PCR-tall', '96 Well PCR Plate (Tall)', '96-PCR-Tall'],
+            ['96-flat', '96 Flat', '96-PCR-Flatt'],
             ['96-PCR-flat', '96 Well PCR Plate (Flat)', '96-PCR-Flatt'],
-            ['96-custom', '96 Well Plate (CUSTOM)', '96-PCR-Flatt'],
-            ['384-plate', '384 Well Plate', '384-plate']
+            ['96-PCR-tall', '96 Well PCR Plate (Tall)', '96-PCR-Tall'],
+            ['384-plate', '384 Well Plate', '384-plate'],
+            ['12-well-plate', '12 Well Plate'],
+            ['24-well-plate', '24 Well Plate']
+            // ['rigaku-compact-crystallization-plate', 'Rigaku Compact Crystallization Plate']
           ].map(labwareItemMapper)}
         </Accordion>
         <Accordion title='Trough'>

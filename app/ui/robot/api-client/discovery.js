@@ -2,6 +2,7 @@
 import Bonjour from 'bonjour'
 
 import {actions} from '../actions'
+import {getIsScanning} from '../selectors'
 
 // mdns discovery constants
 const NAME_RE = /^opentrons/i
@@ -22,6 +23,9 @@ const DIRECT_SERVICE = {
 const DIRECT_POLL_INTERVAL_MS = 1000
 
 export function handleDiscover (dispatch, state, action) {
+  // don't duplicate discovery requests
+  if (getIsScanning(state)) return
+
   // TODO(mc, 2017-10-26): we're relying right now on the fact that resin
   // advertises an SSH service. Instead, we should be registering an HTTP
   // service on port 31950 and listening for that instead

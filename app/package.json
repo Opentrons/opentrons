@@ -35,7 +35,8 @@
       "!**/webpack*",
       "!**/webpack/**",
       "!**/coverage/**",
-      "!**/test/**"
+      "!**/test/**",
+      "!**/flow-typed/**"
     ],
     "coverageReporters": [
       "lcov",
@@ -45,12 +46,20 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "dist/"
+      "dist/",
+      "flow-typed/"
+    ],
+    "globals": [
+      "SyntheticEvent",
+      "$Keys"
     ],
     "env": [
       "node",
       "browser",
       "jest"
+    ],
+    "plugins": [
+      "flowtype"
     ]
   },
   "stylelint": {
@@ -84,8 +93,11 @@
     "electron": "1.6.11",
     "electron-builder": "~19.27.3",
     "electron-builder-squirrel-windows": "~19.27.3",
+    "eslint-plugin-flowtype": "^2.39.1",
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^1.1.5",
+    "flow-bin": "^0.60.1",
+    "flow-typed": "^2.2.3",
     "handlebars-loader": "^1.6.0",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.28.0",

@@ -32,7 +32,7 @@ set_package_env := $(bin)/cross-env \
 	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
 	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
 
-# stardard targets
+# standard targets
 #####################################################################
 
 .PHONY: all
@@ -105,11 +105,15 @@ dev-mdns:
 
 .PHONY: test
 test: test-unit
-	$(MAKE) lint
+	$(MAKE) check lint
 
 .PHONY: test-unit
 test-unit:
 	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
+
+.PHONY: check
+check:
+	$(bin)/flow
 
 .PHONY: lint
 lint: lint-js lint-css
@@ -121,3 +125,11 @@ lint-js:
 .PHONY: lint-css
 lint-css:
 	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+
+.PHONY: install-types
+install-types:
+	$(bin)/flow-typed install
+
+.PHONY: uninstall-types
+uninstall-types:
+	rm -rf flow-typed
