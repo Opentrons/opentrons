@@ -40,7 +40,7 @@ function mapStateToProps (state, ownProps) {
   // TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
   const labwareToSlotName = labwareObj => labwareObj && labwareObj.slot && labwareObj.slot.toString()
 
-  const routeSlot = ownProps.location.pathname.split('/').slice(-1)[0]
+  const routeSlot = ownProps.match.params.slot
 
   const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
 
