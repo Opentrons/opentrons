@@ -1,6 +1,7 @@
 // @flow
 // import * as React from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import LabwareItem from './LabwareItem'
 
@@ -20,7 +21,7 @@ const {
   // CONFIRMED
 } = robotConstants
 
-export default connect(mapStateToProps, null, mergeProps)(LabwareItem)
+export default withRouter(connect(mapStateToProps, null, mergeProps)(LabwareItem))
 
 function mapStateToProps (state, ownProps) {
   const {slotName} = ownProps
@@ -40,8 +41,8 @@ function mapStateToProps (state, ownProps) {
   // TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
   const labwareToSlotName = labwareObj => labwareObj && labwareObj.slot && labwareObj.slot.toString()
 
-  // TODO: Ian 2017-12-14 do selector HACK HACK HACK
-  const routeSlot = state.router.location.pathname.split('/').slice(-1)[0]
+  const routeSlot = ownProps.location.pathname.split('/').slice(-1)[0]
+
   const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
 
   // NOTE: this is a hacky carryover from Protocol Designer.
@@ -91,7 +92,6 @@ function mapStateToProps (state, ownProps) {
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
-  console.log({stateProps, ownProps})
   const {dispatch} = dispatchProps
 
   const slot = (ownProps && ownProps.slotName) ? parseInt(ownProps.slotName) : undefined
