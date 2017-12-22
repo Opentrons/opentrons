@@ -1,4 +1,5 @@
 import ast
+import logging
 from copy import copy
 from datetime import datetime
 from functools import reduce
@@ -10,6 +11,7 @@ from opentrons import robot
 
 from .models import Container, Instrument
 
+log = logging.getLogger(__name__)
 
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
 
@@ -155,6 +157,7 @@ class Session(object):
         return self
 
     def resume(self):
+
         robot.resume()
         self.set_state('running')
         return self
@@ -183,6 +186,7 @@ class Session(object):
         return self
 
     def set_state(self, state):
+        log.info("State set to {}".format(state))
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
