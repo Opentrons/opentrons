@@ -2,10 +2,13 @@
 // handles message stringification and destructuring
 import client from './client'
 
-// client function takes a dispatch function and returns a receive handler
-const receive = client(dispatchFromWorker)
+let receive
 
 self.onmessage = function handleIncoming (event) {
+  // client function takes a dispatch function and returns a receive handler
+  // receive function is lazy loaded for efficiency + modularity
+  if (!receive) receive = client(dispatchFromWorker)
+
   const {state, action} = event.data
 
   receive(state, action)

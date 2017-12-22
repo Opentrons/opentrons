@@ -1,4 +1,7 @@
 [ignore]
+<PROJECT_ROOT>/scripts/.*
+.*/dist/.*
+.*/test/.*
 
 [include]
 

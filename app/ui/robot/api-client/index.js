@@ -1,25 +1,31 @@
 // robot api client redux middleware
 // wraps the api client worker to handle API side effects in a different thread
 
-import Worker from './worker.js'
+import Worker from './worker'
 
-export default function apiClientMiddleware (store) {
-  const {getState, dispatch} = store
+export default function apiClientMiddleware () {
   const worker = new Worker()
 
-  worker.onmessage = function handleWorkerMessage (event) {
-    dispatch(event.data)
-  }
+  return (store) => {
+    const {getState, dispatch} = store
 
-  return (next) => (action) => {
-    const {meta} = action
-
-    if (meta && meta.robotCommand) {
-      const state = getState()
-
-      worker.postMessage({state, action})
+    worker.onmessage = function handleWorkerMessage (event) {
+      dispatch(event.data)
     }
 
-    return next(action)
+    // initialize worker
+    worker.postMessage({})
+
+    return (next) => (action) => {
+      const {meta} = action
+
+      if (meta && meta.robotCommand) {
+        const state = getState()
+
+        worker.postMessage({state, action})
+      }
+
+      return next(action)
+    }
   }
 }
