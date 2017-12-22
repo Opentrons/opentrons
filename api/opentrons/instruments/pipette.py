@@ -273,12 +273,18 @@ class Pipette:
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
+        from the specified location
 
         Notes
         -----
-        If no `location` is passed, the pipette will aspirate
-        from it's current position. If no `volume` is passed,
-        `aspirate` will default to it's `max_volume`
+        If only a volume is passed, the pipette will aspirate
+        from it's current position. If only a location is passed,
+        `aspirate` will default to it's `max_volume`.
+
+        The location may be a Well, or a specific position in relation to a
+        Well, such as `Well.top()`. If a Well is specified without calling a
+        a position method (such as .top or .bottom), this method will default
+        to the bottom of the well.
 
         Parameters
         ----------
@@ -345,10 +351,11 @@ class Pipette:
                     self.current_volume + volume)
             )
 
+        self._position_for_aspirate(location)
+
         mm_position = self._ul_to_mm(self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
-        self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
@@ -356,6 +363,7 @@ class Pipette:
         )
         self.instrument_actuator.default_speed()
         self.current_volume += volume  # update after actual aspirate
+
         return self
 
     @commands.publish.both(command=commands.dispense)
@@ -368,9 +376,14 @@ class Pipette:
 
         Notes
         -----
-        If no `location` is passed, the pipette will dispense
-        from it's current position. If no `volume` is passed,
+        If only a volume is passed, the pipette will dispense
+        from it's current position. If only a location is passed,
         `dispense` will default to it's `current_volume`
+
+        The location may be a Well, or a specific position in relation to a
+        Well, such as `Well.top()`. If a Well is specified without calling a
+        a position method (such as .top or .bottom), this method will default
+        to the bottom of the well.
 
         Parameters
         ----------
@@ -418,6 +431,8 @@ class Pipette:
         """
         assert self.tip_attached
 
+        # Note: volume positional argument may not be passed. if it isn't then
+        # assume the first positional argument is the location
         if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
@@ -430,7 +445,7 @@ class Pipette:
         if volume == 0:
             return self
 
-        self.move_to(location, strategy='arc')  # position robot above location
+        self._position_for_dispense(location)
 
         mm_position = self._ul_to_mm(self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
@@ -463,6 +478,23 @@ class Pipette:
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
             )
+
+        # then go inside the location
+        if location:
+            if isinstance(location, Placeable):
+                location = location.bottom(min(location.z_size(), 1))
+            self.move_to(location, strategy='direct')
+
+    def _position_for_dispense(self, location=None):
+        """
+        Position this :any:`Pipette` for an dispense
+        """
+        assert self.tip_attached
+
+        # first go to the destination
+        if location:
+            placeable, _ = unpack_location(location)
+            self.move_to(placeable.top(), strategy='arc')
 
         # then go inside the location
         if location:
