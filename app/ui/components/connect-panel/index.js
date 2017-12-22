@@ -42,7 +42,7 @@ function mergeProps (stateProps, dispatchProps) {
   // TODO(mc, 2017-11-13): memoize with reselect
   const robots = stateProps.robots.map((robot) => ({
     ...robot,
-    onConnectClick: () => dispatch(robotActions.connect(robot.host)),
+    onConnectClick: () => dispatch(robotActions.connect(robot.name)),
     onDisconnectClick: () => dispatch(robotActions.disconnect())
   }))
 

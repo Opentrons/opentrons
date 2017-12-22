@@ -41,18 +41,18 @@ describe('robot selectors', () => {
   test('getDiscovered', () => {
     const state = {
       connection: {
-        connectedTo: 'abcdef.local',
-        discovered: ['abcdef.local', '123456.local'],
-        discoveredByHost: {
-          'abcdef.local': {host: 'abcdef.local', name: 'foo'},
-          '123456.local': {host: '123456.local', name: 'bar'}
+        connectedTo: 'foo',
+        discovered: ['foo', 'bar'],
+        discoveredByName: {
+          foo: {host: 'abcdef.local', name: 'foo'},
+          bar: {host: '123456.local', name: 'bar'}
         }
       }
     }
 
     expect(getDiscovered(makeState(state))).toEqual([
-      {host: 'abcdef.local', name: 'foo', isConnected: true},
-      {host: '123456.local', name: 'bar', isConnected: false}
+      {name: 'foo', host: 'abcdef.local', isConnected: true},
+      {name: 'bar', host: '123456.local', isConnected: false}
     ])
   })
 
@@ -74,14 +74,14 @@ describe('robot selectors', () => {
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
 
     state.connection = {
-      connectedTo: 'ot.local',
+      connectedTo: 'ot',
       connectRequest: {inProgress: false},
       disconnectRequest: {inProgress: false}
     }
     expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
 
     state.connection = {
-      connectedTo: 'ot.local',
+      connectedTo: 'ot',
       connectRequest: {inProgress: false},
       disconnectRequest: {inProgress: true}
     }

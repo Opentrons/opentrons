@@ -18,9 +18,9 @@ const {
 const INITIAL_STATE = {
   isScanning: false,
   discovered: [],
-  discoveredByHost: {},
+  discoveredByName: {},
   connectedTo: '',
-  connectRequest: {inProgress: false, error: null, host: ''},
+  connectRequest: {inProgress: false, error: null, name: ''},
   disconnectRequest: {inProgress: false, error: null}
 }
 
@@ -55,56 +55,56 @@ function handleDiscoverFinish (state, action) {
 
 function handleAddDiscovered (state, action) {
   const {payload} = action
-  const {host} = payload
-  let {discovered, discoveredByHost} = state
+  const {name} = payload
+  let {discovered, discoveredByName} = state
 
-  if (discovered.indexOf(host) < 0) {
-    discovered = discovered.concat(host)
+  if (discovered.indexOf(name) < 0) {
+    discovered = discovered.concat(name)
   }
 
-  discoveredByHost = {
-    ...discoveredByHost,
-    [host]: {
-      ...discoveredByHost[host],
+  discoveredByName = {
+    ...discoveredByName,
+    [name]: {
+      ...discoveredByName[name],
       ...payload
     }
   }
 
-  return {...state, discovered, discoveredByHost}
+  return {...state, discovered, discoveredByName}
 }
 
 function handleRemoveDiscovered (state, action) {
-  const {payload: {host}} = action
+  const {payload: {name}} = action
 
   return {
     ...state,
-    discovered: without(state.discovered, host),
-    discoveredByHost: omit(state.discoveredByHost, host)
+    discovered: without(state.discovered, name),
+    discoveredByName: omit(state.discoveredByName, name)
   }
 }
 
 function handleConnect (state, action) {
-  const {payload: {host}} = action
+  const {payload: {name}} = action
 
-  return {...state, connectRequest: {inProgress: true, error: null, host}}
+  return {...state, connectRequest: {inProgress: true, error: null, name}}
 }
 
 function handleConnectResponse (state, action) {
   const {error: didError} = action
-  let connectedTo = state.connectRequest.host
+  let connectedTo = state.connectRequest.name
   let error = null
-  let requestHost = ''
+  let requestName = ''
 
   if (didError) {
     error = action.payload
-    requestHost = connectedTo
+    requestName = connectedTo
     connectedTo = ''
   }
 
   return {
     ...state,
     connectedTo,
-    connectRequest: {error, inProgress: false, host: requestHost}
+    connectRequest: {error, inProgress: false, name: requestName}
   }
 }
 

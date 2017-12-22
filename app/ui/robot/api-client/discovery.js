@@ -1,4 +1,6 @@
 // mdns-based api server discovery with direct ethernet connection discovery
+import os from 'os'
+import net from 'net'
 import Bonjour from 'bonjour'
 
 import {actions} from '../actions'
@@ -12,12 +14,12 @@ const DOWN_EVENT = 'down'
 
 // direct discovery constants
 // see compute/scripts/setup.sh
-const DIRECT_HOST = '[fd00:0:cafe:fefe::1]'
+const DIRECT_IP = '[fd00:0:cafe:fefe::1]'
 const DIRECT_PORT = 31950
-const DIRECT_HEALTH_URL = `http://${DIRECT_HOST}:${DIRECT_PORT}/health`
+const DIRECT_HEALTH_URL = `http://${DIRECT_IP}:${DIRECT_PORT}/health`
 const DIRECT_SERVICE = {
   name: 'Opentrons USB',
-  host: DIRECT_HOST,
+  ip: DIRECT_IP,
   port: DIRECT_PORT
 }
 const DIRECT_POLL_INTERVAL_MS = 1000
@@ -39,13 +41,13 @@ export function handleDiscover (dispatch, state, action) {
 
   function handleServiceUp (service) {
     if (NAME_RE.test(service.name)) {
-      dispatch(actions.addDiscovered(service))
+      dispatch(actions.addDiscovered(serviceWithIp(service)))
     }
   }
 
   function handleServiceDown (service) {
     if (NAME_RE.test(service.name)) {
-      dispatch(actions.removeDiscovered(service.host))
+      dispatch(actions.removeDiscovered(service.name))
     }
   }
 
@@ -64,4 +66,19 @@ export function handleDiscover (dispatch, state, action) {
       })
       .catch(() => {})
   }
+}
+
+// grab IP address from service
+// prefer IPv4, then IPv6, then hostname (with override for localhost)
+function serviceWithIp (service) {
+  const addresses = service.addresses || []
+  let ip = addresses.find((address) => net.isIPv4(address))
+  if (!ip) ip = addresses.find((address) => net.isIP(address))
+  if (!ip) ip = service.host
+
+  // API doesn't listen on all interfaces when running locally
+  // this hostname check is only for handling that situation
+  if (service.host === os.hostname()) ip = 'localhost'
+
+  return Object.assign({ip}, service)
 }

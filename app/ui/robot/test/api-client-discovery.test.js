@@ -69,7 +69,7 @@ describe('api client - discovery', () => {
     expect(dispatch).toHaveBeenCalledWith(actions.discover())
   })
 
-  test('searches for SSH services', () => {
+  test('searches for HTTP services', () => {
     return sendToClient(notScanningState, actions.discover())
       .then(() => expect(bonjour.find).toHaveBeenCalledWith({type: 'http'}))
   })
@@ -87,15 +87,16 @@ describe('api client - discovery', () => {
 
   test('dispatches ADD_DISCOVEREDs on new services', () => {
     const services = [
-      {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'http'},
-      {name: 'opentrons-2', host: 'ot-2.local', port: '31950', type: 'http'},
-      {name: 'opentrons-3', host: 'ot-3.local', port: '31950', type: 'http'}
+      {name: 'opentrons-1', port: '31950', addresses: ['192.168.1.1']},
+      {name: 'opentrons-2', port: '31950', addresses: ['192.168.1.2']},
+      {name: 'opentrons-3', port: '31950', addresses: ['192.168.1.3']}
     ]
 
     return sendToClient(notScanningState, actions.discover())
       .then(() => services.forEach((s) => browser.emit('up', s)))
       .then(() => services.forEach((s) => {
-        expect(dispatch).toHaveBeenCalledWith(actions.addDiscovered(s))
+        const robot = Object.assign({}, s, {ip: s.addresses[0]})
+        expect(dispatch).toHaveBeenCalledWith(actions.addDiscovered(robot))
       }))
   })
 
@@ -110,7 +111,7 @@ describe('api client - discovery', () => {
       .then(() => services.forEach((s) => browser.emit('down', s)))
       .then(() => services.forEach((s) => {
         expect(dispatch)
-          .toHaveBeenCalledWith(actions.removeDiscovered(s.host))
+          .toHaveBeenCalledWith(actions.removeDiscovered(s.name))
       }))
   })
 
@@ -142,7 +143,7 @@ describe('api client - discovery', () => {
       ))
   })
 
-  test('only dispatches for hosts with "ot" in the name', () => {
+  test('only dispatches for hosts with "opentrons" in the name', () => {
     const services = [
       {name: 'opentrons-1', host: 'ot-1.local', port: '31950', type: 'http'},
       {name: 'nope', host: 'nope.local', port: '31950', type: 'http'},
@@ -164,7 +165,7 @@ describe('api client - discovery', () => {
     const expectedEndpoint = 'http://[fd00:0:cafe:fefe::1]:31950/health'
     const expectedDispatch = actions.addDiscovered({
       name: 'Opentrons USB',
-      host: '[fd00:0:cafe:fefe::1]',
+      ip: '[fd00:0:cafe:fefe::1]',
       port: 31950
     })
 
