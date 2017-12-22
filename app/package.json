@@ -35,7 +35,8 @@
       "!**/webpack*",
       "!**/webpack/**",
       "!**/coverage/**",
-      "!**/test/**"
+      "!**/test/**",
+      "!**/flow-typed/**"
     ],
     "coverageReporters": [
       "lcov",
@@ -45,7 +46,8 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "dist/"
+      "dist/",
+      "flow-typed/"
     ],
     "globals": [
       "SyntheticEvent",

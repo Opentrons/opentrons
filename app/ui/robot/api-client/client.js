@@ -31,8 +31,13 @@ export default function client (dispatch) {
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
 
+  // kickoff a discovery run immediately
+  // dispatching a discover action (rather than calling handleDiscover) ensures
+  // proper state handling (action will run thru the full middleware pipeline)
+  dispatch(actions.discover())
+
   // return an action handler
-  return function receive (state, action) {
+  return function receive (state = {}, action = {}) {
     const {type} = action
 
     switch (type) {
