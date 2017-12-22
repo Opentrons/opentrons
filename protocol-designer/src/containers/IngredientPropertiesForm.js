@@ -6,8 +6,10 @@ import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 export default connect(
   state => ({
     numWellsSelected: selectors.numWellsSelected(state),
-    selectedIngredientProperties: selectors.selectedIngredientProperties(state),
-    selectedWellsMaxVolume: selectors.selectedWellsMaxVolume(state)
+    selectedWellsMaxVolume: selectors.selectedWellsMaxVolume(state),
+    allIngredientNamesIds: selectors.allIngredientNamesIds(state),
+    editingIngredGroupId: selectors.selectedIngredientGroupId(state), // TODO should this be renamed? inconsistent prop vs selector
+    allIngredientGroupFields: selectors.allIngredientGroupFields(state)
   }),
   {
     onSave: editIngredient,

@@ -1,0 +1,12 @@
+[ignore]
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
+
+[strict]

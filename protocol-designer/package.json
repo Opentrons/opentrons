@@ -14,9 +14,18 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "flow": "flow check",
     "lint": "standard; stylelint '**/*.css'",
     "build": "NODE_ENV=production webpack -p && cp index.html dist/",
     "start": "webpack-dev-server --hot"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@opentrons/)"
+    ],
+    "moduleNameMapper": {
+      "\\.(css)$": "identity-obj-proxy"
+    }
   },
   "bugs": {
     "url": "https://github.com/OpenTrons/opentrons/issues"
@@ -25,6 +34,13 @@
   "license": "UNLICENSED",
   "standard": {
     "parser": "babel-eslint",
+    "plugins": [
+      "flowtype"
+    ],
+    "globals": [
+      "SyntheticEvent",
+      "$Keys"
+    ],
     "env": [
       "jest"
     ]
@@ -65,12 +81,18 @@
     "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.1",
     "css-loader": "^0.28.4",
+    "eslint-plugin-flowtype": "^2.40.1",
+    "flow-bin": "^0.61.0",
+    "flow-typed": "^2.2.3",
     "jest": "^21.2.1",
     "react-hot-loader": "^3.0.0-beta.7",
+    "snazzy": "^7.0.0",
     "standard": "^10.0.3",
     "style-loader": "^0.18.2",
     "stylelint": "^8.2.0",

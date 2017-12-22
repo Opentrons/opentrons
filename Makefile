@@ -6,6 +6,7 @@ SHELL := /bin/bash
 API_DIR := api
 COMPONENTS_DIR := components
 APP_DIR := app
+PROTOCOL_DESIGNER_DIR := protocol-designer
 
 .PHONY: install test coverage
 
@@ -14,12 +15,14 @@ install:
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(COMPONENTS_DIR) install
 	$(MAKE) -C $(APP_DIR) install
+	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install
 
 # run api and app tests
 test:
 	$(MAKE) -C $(API_DIR) test
 	$(MAKE) -C $(COMPONENTS_DIR) test
 	$(MAKE) -C $(APP_DIR) test
+	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
 
 # upload coverage reports
 # uses codecov's bash upload script

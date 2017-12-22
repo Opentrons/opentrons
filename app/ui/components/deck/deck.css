@@ -1,5 +1,7 @@
 @value blue from '../App.global.css';
 
+/* TODO Ian 2017-12-13 Review what classes are used or not with SVG Deck component */
+
 .review_deck {
   background-color: rgba(0, 0, 0, 0.8);
   position: absolute;
@@ -24,14 +26,6 @@
   margin: 0 auto;
   width: 38rem;
   height: 33rem;
-  display: grid;
-  grid-gap: 0.5rem;
-  grid-auto-columns: 1fr;
-  grid-template:
-    'slot-10 slot-11 .' 1fr
-    'slot-7 slot-8 slot-9' 1fr
-    'slot-4 slot-5 slot-6' 1fr
-    'slot-1 slot-2 slot-3' 1fr;
 }
 
 .prompt {
