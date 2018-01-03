@@ -70,14 +70,14 @@ function mapStateToProps (state, ownProps) {
     instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
     tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
     labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-    singleChannel: robotSelectors.getSingleChannel(state),
-    isRunning: robotSelectors.getIsRunning(state)
+    isRunning: robotSelectors.getIsRunning(state),
+    _calibrator: robotSelectors.getCalibratorMount(state)
   }
 }
 
 function mergeProps (stateProps, dispatchProps) {
   const {
-    singleChannel: {axis},
+    _calibrator,
     labwareReviewed,
     instrumentsCalibrated,
     tipracksConfirmed,
@@ -85,10 +85,12 @@ function mergeProps (stateProps, dispatchProps) {
   } = stateProps
   const {dispatch} = dispatchProps
   const labware = stateProps.labware.map(lw => {
-    const isDisabled = !instrumentsCalibrated ||
-    (lw.isTiprack && lw.confirmed) ||
-    !(lw.isTiprack || tipracksConfirmed) ||
-    isRunning
+    const isDisabled = (
+      !instrumentsCalibrated ||
+      (lw.isTiprack && lw.confirmed) ||
+      !(lw.isTiprack || tipracksConfirmed) ||
+      isRunning
+    )
 
     return {
       ...lw,
@@ -96,13 +98,14 @@ function mergeProps (stateProps, dispatchProps) {
       setLabware: () => {
         if (labwareReviewed) {
           if (lw.isTiprack) {
-            return dispatch(robotActions.pickupAndHome(axis, lw.slot))
+            return dispatch(robotActions.pickupAndHome(_calibrator, lw.slot))
           }
-          dispatch(robotActions.moveTo(axis, lw.slot))
+          dispatch(robotActions.moveTo(_calibrator, lw.slot))
         }
       }
     }
   })
+
   return {
     ...stateProps,
     labware

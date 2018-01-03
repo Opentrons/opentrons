@@ -14,12 +14,12 @@ function mapStateToProps (state) {
     jogDistance: robotSelectors.getJogDistance(state),
     isJogging: robotSelectors.getJogInProgress(state),
     isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
-    singleChannel: robotSelectors.getSingleChannel(state)
+    _calibrator: robotSelectors.getCalibratorMount(state)
   }
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
-  const {singleChannel: {axis: instrument}} = stateProps
+  const {_calibrator} = stateProps
   const {dispatch} = dispatchProps
   const {slot} = ownProps
 
@@ -28,10 +28,9 @@ function mergeProps (stateProps, dispatchProps, ownProps) {
     ...stateProps,
     // TODO(mc, 2017-11-27): make jog button container to remove currying
     jog: (axis, direction) => () => {
-      dispatch(robotActions.jog(instrument, axis, direction))
+      dispatch(robotActions.jog(_calibrator, axis, direction))
     },
-    // TODO(mc, 2017-11-27): refactor to remove double-dispatch
-    onConfirmClick: () => dispatch(robotActions.updateOffset(instrument, slot)),
+    onConfirmClick: () => dispatch(robotActions.updateOffset(_calibrator, slot)),
     toggleJogDistance: () => dispatch(robotActions.toggleJogDistance())
   }
 }

@@ -40,27 +40,27 @@ function mapStateToProps (state, ownProps) {
   // confirm tiprack action needs the instrument being used for confirmation
   // for now, hardcode this to the single-channel
   if (isTiprack) {
-    props.singleChannel = robotSelectors.getSingleChannel(state)
+    props._calibrator = robotSelectors.getCalibratorMount(state)
   }
 
   return props
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
-  const {isTiprack, singleChannel} = stateProps
+  const {isTiprack, _calibrator} = stateProps
   const {dispatch} = dispatchProps
   const {slot} = ownProps
 
   const props = {
     slot,
     onYesClick: isTiprack
-      ? () => dispatch(robotActions.confirmTiprack(singleChannel.axis, slot))
+      ? () => dispatch(robotActions.confirmTiprack(_calibrator, slot))
       : () => dispatch(robotActions.confirmLabware(slot))
   }
 
   if (isTiprack) {
     props.onNoClick = () => {
-      dispatch(robotActions.dropTipAndHome(singleChannel.axis, slot))
+      dispatch(robotActions.dropTipAndHome(_calibrator, slot))
     }
   }
 

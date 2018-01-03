@@ -974,9 +974,7 @@ class Pipette:
             self.current_volume = 0
             self.robot.poses = self.instrument_actuator.home(
                 self.robot.poses)
-            # TODO(artyom, 20171103): confirm expected behavior on pipette.home
-            # Are we homing stage and plunger or plunger only?
-            # self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
 
         _home(self.mount)
         return self

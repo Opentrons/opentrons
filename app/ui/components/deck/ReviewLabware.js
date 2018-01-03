@@ -16,12 +16,12 @@ const mapStateToProps = (state, ownProps) => {
   return {
     currentLabware,
     labware,
-    singleChannel: robotSelectors.getSingleChannel(state)
+    _calibrator: robotSelectors.getCalibratorMount(state)
   }
 }
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  const {currentLabware: {isTiprack}, singleChannel: {axis}} = stateProps
+  const {_calibrator, currentLabware: {isTiprack}} = stateProps
   const {dispatch} = dispatchProps
   const {slot} = ownProps
 
@@ -32,8 +32,11 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
     // Deck, and ConnectedSetupPanel); could also move logic to the API client
     moveToLabware: () => {
-      if (isTiprack) return dispatch(robotActions.pickupAndHome(axis, slot))
-      dispatch(robotActions.moveTo(axis, slot))
+      if (isTiprack) {
+        return dispatch(robotActions.pickupAndHome(_calibrator, slot))
+      }
+
+      dispatch(robotActions.moveTo(_calibrator, slot))
     }
   }
 }

@@ -20,27 +20,25 @@ const {
   // CONFIRMED
 } = robotConstants
 
+// TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
+const labwareToSlotName = (lw) => lw && lw.slot && `${lw.slot}`
+
 export default withRouter(connect(mapStateToProps, null, mergeProps)(LabwareItem))
 
 function mapStateToProps (state, ownProps) {
   const {slotName} = ownProps
+  const routeSlot = ownProps.match.params.slot
   const labware = robotSelectors.getLabwareBySlot(state)[slotName]
 
-  if (labware === undefined) {
-    // bail out, it's an empty slot
-    return {}
-  }
+  // bail out if it's an empty slot
+  if (labware === undefined) return {}
 
   const containerType = labware.type
   const containerName = labware.name
 
   const nextLabware = robotSelectors.getNextLabware(state)
   const labwareReviewed = robotSelectors.getLabwareReviewed(state)
-
-  // TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
-  const labwareToSlotName = labwareObj => labwareObj && labwareObj.slot && labwareObj.slot.toString()
-
-  const routeSlot = ownProps.match.params.slot
+  const allTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
 
   const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
 
@@ -66,10 +64,6 @@ function mapStateToProps (state, ownProps) {
     l.calibration === CONFIRMING
   )
 
-  // another selector candidate?
-  const allTipracksConfirmed = allLabwareCalibrationStuff.every(labwareItem =>
-    labwareItem.isTiprack ? labwareItem.confirmed : true)
-
   return {
     containerType,
     containerName,
@@ -84,7 +78,7 @@ function mapStateToProps (state, ownProps) {
 
     // Data to pass to mergeProps but not to component
     _stateData: {
-      axis: robotSelectors.getSingleChannel(state).axis,
+      calibrator: robotSelectors.getCalibratorMount(state),
       isTiprack
     }
   }
@@ -93,17 +87,17 @@ function mapStateToProps (state, ownProps) {
 function mergeProps (stateProps, dispatchProps, ownProps) {
   const {dispatch} = dispatchProps
 
-  const slot = (ownProps && ownProps.slotName) ? parseInt(ownProps.slotName) : undefined
+  const slot = ownProps && ownProps.slotName && parseInt(ownProps.slotName)
   const _stateData = stateProps._stateData || {}
-  const {axis, isTiprack} = _stateData
+  const {calibrator, isTiprack} = _stateData
 
   const onLabwareClick = (e) => {
     if (isTiprack) {
       if (!stateProps.confirmed) {
-        dispatch(robotActions.pickupAndHome(axis, slot))
+        dispatch(robotActions.pickupAndHome(calibrator, slot))
       }
     } else {
-      dispatch(robotActions.moveTo(axis, slot))
+      dispatch(robotActions.moveTo(calibrator, slot))
     }
   }
 
@@ -112,9 +106,7 @@ function mergeProps (stateProps, dispatchProps, ownProps) {
   return {
     onLabwareClick,
     setLabwareConfirmed,
-
     ...ownProps,
-    ...stateProps,
-    _stateData: undefined // don't pass to component
+    ...stateProps
   }
 }
