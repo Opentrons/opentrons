@@ -1,7 +1,6 @@
 # Inspired by:
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
 import codecs
-import versioneer
 import os
 from setuptools import setup, find_packages
 
@@ -54,7 +53,19 @@ def read(*parts):
         return f.read()
 
 
+def write_version_file(filename='opentrons/_version.py'):
+    contents = """
+# This file is generated during setup--do not edit manually
+
+__version__ = '{version}'
+"""
+    with open(filename, 'w') as version_file:
+        version_file.write(contents.format(version=VERSION))
+
+
 if __name__ == "__main__":
+    write_version_file()
+
     setup(
         python_requires='>=3.5',
         name=DISTNAME,
@@ -74,6 +85,5 @@ if __name__ == "__main__":
         install_requires=INSTALL_REQUIRES,
         setup_requires=['pytest-runner'],
         tests_require=['pytest'],
-        cmdclass=versioneer.get_cmdclass(),
         include_package_data=True
     )
