@@ -3,9 +3,7 @@ import sys
 from opentrons.robot.robot import Robot
 from opentrons import instruments as inst, containers as cnt
 from opentrons.data_storage import database_migration
-
-from ._version import get_versions
-
+from opentrons._version import __version__
 
 version = sys.version_info[0:2]
 if version < (3, 5):
@@ -54,8 +52,4 @@ class InstrumentsWrapper(object):
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 
-__all__ = [containers, instruments, robot, reset]
-
-
-__version__ = get_versions()['version']
-del get_versions
+__all__ = [containers, instruments, robot, reset, __version__]
