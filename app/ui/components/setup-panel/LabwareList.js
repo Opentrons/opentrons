@@ -5,9 +5,9 @@ import {
   selectors as robotSelectors,
   actions as robotActions
 } from '../../robot'
-import TitledList from './TitledList'
+
+import {TitledList, ListAlert} from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
-import ListAlert from './ListAlert'
 
 export default connect(
   mapStateToProps,

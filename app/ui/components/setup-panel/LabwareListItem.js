@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ListItem from './ListItem'
+import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
 
-// TODO: condense booleans to some more logical isDisabled selector
 LabwareListItem.propTypes = {
   name: PropTypes.string,
   slot: PropTypes.number.isRequired,
@@ -24,14 +23,18 @@ export default function LabwareListItem (props) {
     ? '#'
     : `/setup-deck/${slot}`
 
+  const iconName = confirmed
+    ? CHECKED
+    : UNCHECKED
+
   return (
     <ListItem
       isDisabled={isDisabled}
       url={url}
       onClick={onClick}
-      confirmed={confirmed}
+      iconName={iconName}
     >
-      <span>{name} </span>
+      <span>{name}</span>
     </ListItem>
   )
 }

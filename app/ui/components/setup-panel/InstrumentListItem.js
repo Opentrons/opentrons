@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
-import ListItem from './ListItem'
+import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
 
 InstrumentListItem.propTypes = {
   isRunning: PropTypes.bool.isRequired,
@@ -22,6 +22,9 @@ export default function InstrumentListItem (props) {
   : `/setup-instruments/${axis}`
 
   const confirmed = probed
+  const iconName = confirmed
+    ? CHECKED
+    : UNCHECKED
 
   const description = !isDisabled
     ? `${capitalize(channels)}-channel`
@@ -34,6 +37,7 @@ export default function InstrumentListItem (props) {
       url={url}
       onClick={!isRunning && clearLabwareReviewed}
       confirmed={confirmed}
+      iconName={iconName}
     >
       <span>{axis}</span>
       <span>{description}</span>

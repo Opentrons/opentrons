@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Icon, ALERT, BACK, REFRESH, SPINNER, USB, WIFI} from '..'
+import {Icon, ALERT, BACK, REFRESH, SPINNER, USB, WIFI, FLASK} from '..'
 
 describe('icons', () => {
   test('alert icon renders correctly', () => {
@@ -59,5 +59,13 @@ describe('icons', () => {
     ).root.findByType('svg')
 
     expect(icon.props.className).toMatch(/\bspin\b/)
+  })
+
+  test('flask icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={FLASK} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
   })
 })
