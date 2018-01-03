@@ -5,7 +5,16 @@ import versioneer
 import os
 from setuptools import setup, find_packages
 
-VERSION = versioneer.get_version()
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_version():
+    with open(os.path.join(HERE, 'version')) as version:
+        return version.readline().strip()
+
+
+VERSION = get_version()
 
 DISTNAME = 'opentrons'
 LICENSE = 'Apache 2.0'
@@ -34,8 +43,6 @@ INSTALL_REQUIRES = [
     'aiohttp==2.3.2',
     'numpy==1.12.1',
     'urwid==1.3.1']
-
-HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*parts):
