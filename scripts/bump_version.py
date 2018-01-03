@@ -34,13 +34,16 @@ def main():
     group.add_argument('--sync', action='store_true')
     args = parser.parse_args()
 
-    ver_file = os.path.join(REPO_DIR, "version.json")
+    ver_file = os.path.join(REPO_DIR, "package.json")
 
     with open(ver_file, 'r') as version_data:
-        vd = json.load(version_data)
+        current_version = json.load(version_data)
 
-    current_version = "{}.{}.{}".format(
-        vd["major"], vd["minor"], vd["bugfix"])
+    split_ver = current_version['version'].split('-')
+    major, minor, bugfix = [int(x) for x in split_ver[0].split('.')]
+    tags = ''
+    if len(split_ver) > 1:
+        tags = ''.join(['-{}'.format(tag) for tag in split_ver[1:]])
 
     # # For branch-dependent operations
     # current_branch = run(
@@ -62,27 +65,21 @@ def main():
 
     print("Prior version: {}".format(current_version))
     if args.major:
-        vd['major'] = vd['major'] + 1
-        vd['minor'] = 0
-        vd['bugfix'] = 0
+        major = major + 1
+        minor = 0
+        bugfix = 0
     if args.minor:
-        vd['major'] = vd['major']
-        vd['minor'] = vd['minor'] + 1
-        vd['bugfix'] = 0
+        minor = minor + 1
+        bugfix = 0
     if args.bugfix:
-        vd['major'] = vd['major']
-        vd['minor'] = vd['minor']
-        vd['bugfix'] = vd['bugfix'] + 1
-    if args.sync:
-        vd['major'] = vd['major']
-        vd['minor'] = vd['minor']
-        vd['bugfix'] = vd['bugfix']
+        bugfix = bugfix + 1
 
-    new_version = "{}.{}.{}".format(vd['major'], vd['minor'], vd['bugfix'])
+    new_version = "{}.{}.{}{}".format(major, minor, bugfix, tags)
     print("Setting all sub-projects to version: {}".format(new_version))
+    current_version["version"] = new_version
 
     with open(ver_file, 'w') as version_data:
-        json.dump(vd, version_data, indent=2)
+        json.dump(current_version, version_data, indent=2)
 
     # JS sub-projects
     for project in ['components', 'app', 'protocol-designer']:
