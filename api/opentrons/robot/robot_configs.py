@@ -20,7 +20,7 @@ MOUNT_CURRENT_HIGH = 0.8
 X_CURRENT_HIGH = 1.2
 Y_CURRENT_HIGH = 1.5
 
-DEFAULT_POWER = {
+DEFAULT_CURRENT = {
     'X': X_CURRENT_HIGH,
     'Y': Y_CURRENT_HIGH,
     'Z': MOUNT_CURRENT_HIGH,
@@ -29,8 +29,8 @@ DEFAULT_POWER = {
     'C': PLUNGER_CURRENT_LOW
 }
 
-DEFAULT_POWER_STRING = ' '.join(
-    ['{}{}'.format(key, value) for key, value in DEFAULT_POWER.items()])
+DEFAULT_CURRENT_STRING = ' '.join(
+    ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
 robot_config = namedtuple(
     'robot_config',
@@ -48,7 +48,7 @@ robot_config = namedtuple(
         'plunger_current_low',
         'plunger_current_high',
         'tip_length',
-        'default_power'
+        'default_current'
     ]
 )
 
@@ -58,7 +58,7 @@ default = robot_config(
     steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z90 A90 B40 C40',
     acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-    current='M907 ' + DEFAULT_POWER_STRING,
+    current='M907 ' + DEFAULT_CURRENT_STRING,
     probe_center=(295.0, 300.0, 55.0),
     probe_dimensions=(35.0, 40.0, 60.0),
     gantry_calibration=[  # "safe" offset, overwrote in factory calibration
@@ -89,7 +89,7 @@ default = robot_config(
         }
     },
     serial_speed=115200,
-    default_power=DEFAULT_POWER,
+    default_current=DEFAULT_CURRENT,
     plunger_current_low=PLUNGER_CURRENT_LOW,
     plunger_current_high=PLUNGER_CURRENT_HIGH
 )

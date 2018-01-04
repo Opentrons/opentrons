@@ -1310,71 +1310,71 @@ class PipetteTest(unittest.TestCase):
         expected = [
             mock.call(self.plate[0],
                       instrument=self.p200,
-                      low_power_z=False,
+                      low_current_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(self.plate[1],
                       instrument=self.p200,
-                      low_power_z=False,
+                      low_current_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[1], (4.80, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (1.60, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 4.80, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 1.60, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
+                low_current_z=False,
                 strategy='direct')
         ]
 
@@ -1625,11 +1625,11 @@ class PipetteTest(unittest.TestCase):
         plunge = -10
         return [
             mock.call(well.top(), strategy='arc'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
 
