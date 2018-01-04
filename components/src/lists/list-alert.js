@@ -10,7 +10,7 @@ type ListAlertProps = {
 }
 
 export default function ListAlert (props: ListAlertProps) {
-const className = classnames(styles.alert, props.className)
+  const className = classnames(styles.alert, props.className)
   return (
     <li className={className}>{props.children}</li>
   )
