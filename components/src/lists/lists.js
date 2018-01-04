@@ -8,11 +8,11 @@ import styles from './lists.css'
 import {type IconName, Icon} from '../icons'
 
 type ListProps = {
-  onClick?: (event: SyntheticEvent<>) => void,
+  title: string,
+  children: React.Node,
   className?: string,
   iconName?: IconName,
-  title?: string,
-  children?: React.Node
+  onClick?: (event: SyntheticEvent<>) => void
 }
 
 function List (props: ListProps) {

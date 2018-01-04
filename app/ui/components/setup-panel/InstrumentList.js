@@ -5,17 +5,15 @@ import {
   selectors as robotSelectors
 } from '../../robot'
 
-import {TitledList, FLASK} from '@opentrons/components'
+import {TitledList} from '@opentrons/components'
 import InstrumentListItem from './InstrumentListItem'
 
 export default connect(mapStateToProps, mapDispatchToProps)(InstrumentList)
 
 function InstrumentList (props) {
   const title = 'Pipette Setup'
-  // PROOF OF CONCEPT: titled list with icon
-  const iconName = FLASK
   return (
-    <TitledList title={title} iconName={iconName}>
+    <TitledList title={title}>
       {props.instruments.map((instrument) => (
         <InstrumentListItem key={instrument.axis} {...props} {...instrument} />
       ))}

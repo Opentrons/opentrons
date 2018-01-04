@@ -1,6 +1,7 @@
 // @flow
 // list alert items
 import * as React from 'react'
+import classnames from 'classnames'
 import styles from './lists.css'
 
 type ListAlertProps = {
@@ -9,7 +10,8 @@ type ListAlertProps = {
 }
 
 export default function ListAlert (props: ListAlertProps) {
+const className = classnames(styles.alert, props.className)
   return (
-    <li className={styles.alert}>{props.children}</li>
+    <li className={className}>{props.children}</li>
   )
 }

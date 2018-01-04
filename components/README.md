@@ -153,7 +153,7 @@ import {PrimaryButton} from '@opentrons/components'
 SVG icons that take `color` from their parent.
 
 ```js
-import {Icon, BACK, REFRESH, USB, WIFI} from '@opentrons/components'
+import {Icon, BACK, REFRESH, USB, WIFI, FLASK, CHECKED, UNCHECKED} from '@opentrons/components'
 ```
 
  prop      | flow type | required | description
@@ -174,6 +174,9 @@ import type {IconName} from '@opentrons/components'
 *   `SPINNER`
 *   `USB`
 *   `WIFI`
+*   `FLASK`
+*   `CHECKED`
+*   `UNCHECKED`
 
 ### structure
 
@@ -211,6 +214,53 @@ import {TitleBar} from '@opentrons/components'
 ---------- | ---------- | -------- | ------------
  title     | React.Node | yes      | h1 child
  subtitle  | React.Node | no       | h2 child
+
+### lists
+
+#### TitledList
+
+Titled ordered list wrapper with optional title icon
+
+```js
+import {TitledList} from '@opentrons/components'
+```
+
+ prop      | flow type                 | required | description
+---------- | ------------------------- | -------- | -----------------------
+ title     | React.Node                | yes      | h3 child
+ children  | React.Node                | yes      | li children
+ classname | string                    | yes      | additional class names
+ iconName  | iconName                  | no       | optional icon before h3
+ onClick   | (SyntheticEvent<>) => void| no       | optional click action
+
+#### ListItem
+
+List item with optional icon, link, and action
+
+```js
+import {Listitem} from '@opentrons/components'
+```
+
+ prop      | flow type                 | required | description
+---------- | ------------------------- | -------- | -----------------------------
+ children  | React.Node                | yes      | span(s) children
+ classname | string                    | no       | additional class names
+ url       | string                    | no       | optional NavLink url
+ iconName  | iconName                  | no       | optional icon before children
+ onClick   | (SyntheticEvent<>) => void| no       | optional click action
+
+#### ListItem
+
+List item alert
+
+```js
+import {ListAlert} from '@opentrons/components'
+```
+
+ prop      | flow type   | required | description
+---------- | ----------- | -------- | ----------------------
+ children  | React.Node  | yes      | span(s) children
+ classname | string      | no       | additional class names
 
 ## contributing
 
