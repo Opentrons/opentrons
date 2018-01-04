@@ -4,7 +4,7 @@
   }
 }
 
-.spin path {
-  animation: spin 1.5s linear infinite;
+.spin > * {
+  animation: spin 1.5s steps(8) infinite;
   transform-origin: center;
 }
