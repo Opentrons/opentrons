@@ -83,7 +83,6 @@ class SmoothieDriver_3_0_0:
         self._connection = None
         self._config = config
         self._current_settings = config.default_current
-        gpio.initialize()
 
     def _update_position(self, target):
         self._position.update({
