@@ -195,9 +195,14 @@ export function getInstruments (state) {
   })
 }
 
-export function getSingleChannel (state) {
-  return getInstruments(state)
-    .find((instrument) => instrument.channels === SINGLE_CHANNEL)
+// returns the mount of the pipette to use for deckware calibration
+// TODO(mc, 2018-01-03): select pipette based on deckware props
+export function getCalibratorMount (state) {
+  const instruments = getInstruments(state)
+  const singleChannel = instruments.find((i) => i.channels === SINGLE_CHANNEL)
+  const calibrator = singleChannel || instruments[0] || {axis: ''}
+
+  return calibrator.axis
 }
 
 export function getInstrumentsCalibrated (state) {

@@ -20,7 +20,7 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
-  getSingleChannel,
+  getCalibratorMount,
   getInstrumentsCalibrated,
   getLabware,
   getUnconfirmedTipracks,
@@ -371,7 +371,7 @@ describe('robot selectors', () => {
     expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
   })
 
-  test('get single channel', () => {
+  test('get calibrator mount with single channel installed', () => {
     const state = makeState({
       session: {
         protocolInstrumentsByAxis: {
@@ -385,14 +385,23 @@ describe('robot selectors', () => {
       }
     })
 
-    expect(getSingleChannel(state)).toEqual({
-      axis: 'right',
-      name: 'p50s',
-      channels: 'single',
-      volume: 50,
-      calibration: constants.UNPROBED,
-      probed: false
+    expect(getCalibratorMount(state)).toBe('right')
+  })
+
+  test('get calibrator mount with only multi channel installed', () => {
+    const state = makeState({
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200}
+        }
+      },
+      calibration: {
+        instrumentsByAxis: {},
+        probedByAxis: {}
+      }
     })
+
+    expect(getCalibratorMount(state)).toBe('left')
   })
 
   test('get instruments are calibrated', () => {
