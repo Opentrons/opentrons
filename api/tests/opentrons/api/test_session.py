@@ -1,7 +1,6 @@
 import itertools
 import pytest
 
-from datetime import datetime
 from opentrons.broker import publish
 from opentrons.api import Session
 from opentrons.api.session import _accumulate, _get_labware, _dedupe
