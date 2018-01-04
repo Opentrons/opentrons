@@ -1,7 +1,7 @@
 import ast
 import logging
 from copy import copy
-from datetime import datetime
+from time import time
 from functools import reduce
 
 from opentrons.broker import publish, subscribe
@@ -197,7 +197,7 @@ class Session(object):
     def log_append(self):
         self.command_log.update({
             len(self.command_log): {
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': int(time() * 1000)
             }
         })
         self._on_state_changed()
@@ -205,7 +205,7 @@ class Session(object):
     def error_append(self, error):
         self.errors.append(
             {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': int(time() * 1000),
                 'error': error
             }
         )

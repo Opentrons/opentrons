@@ -141,7 +141,7 @@ def test_log_append(run_session):
     run_log = {
         _id: value
         for _id, value in run_session.command_log.items()
-        if datetime.strptime(value.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%f')
+        if isinstance(value.pop('timestamp'), int)
     }
 
     assert run_log == {0: {}, 1: {}, 2: {}}
@@ -156,7 +156,7 @@ def test_error_append(run_session):
     errors = [
         value
         for value in run_session.errors
-        if datetime.strptime(value.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%f')
+        if isinstance(value.pop('timestamp'), int)
     ]
 
     assert errors == [
