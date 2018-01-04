@@ -188,7 +188,6 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-        self.turn_on_button_light()
         self.modules = []
 
         # TODO (andy) should come from a config file
