@@ -1,49 +1,49 @@
-/* button styling */
+@value font_size_body_2, font_weight_semibold, color_font_light, color_font_disabled from './styles/typography.css';
+@value color_btn_dark: #4a4a4a;
+@value color_btn_dark_hover: #333;
+@value color_btn_dark_active: #6c6c6c;
+@value color_btn_dark_disabled: #d2d2d2;
 
+/* TODO (ka 2017 12-20) move this to util.css? */
+@value shadow_small: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.24);
+@value shadow_large: 0 0 8px rgba(0, 0, 0, 0.12), 0 8px 8px rgba(0, 0, 0, 0.24);
+
+/* button styling */
 .button {
   padding: 0.5rem 1.5rem;
   text-transform: uppercase;
 }
 
+.button_dark {
+  font-size: font_size_body_2;
+  font-weight: font_weight_semibold;
+  color: color_font_light;
+  background-color: color_btn_dark;
+}
+
 .button_primary {
-  composes: button;
+  composes: button button_dark;
   width: 100%;
   border-radius: 2px;
-
-  /* TODO(mc, 2017-12-07): pull typeography out to central file */
   text-align: center;
   line-height: 1.4;
-  font-size: 0.875rem;
-  font-weight: 600;
-
-  /* TODO(mc, 2017-12-07): pull colors out to central file */
-  color: white;
-  background-color: #4a4a4a;
-
-  /* TODO(mc, 2017-12-07): pull shadows out to central file */
-  box-shadow:
-    0 0 2px rgba(0, 0, 0, 0.12),
-    0 2px 2px rgba(0, 0, 0, 0.24);
+  box-shadow: shadow_small;
 }
 
 .button_primary:hover {
-  background-color: #333;
+  background-color: color_btn_dark_hover;
 }
 
 .button_primary:active {
-  font-weight: normal;
-  background-color: #6c6c6c;
-
-  /* TODO(mc, 2017-12-07): pull shadows out to central file */
-  box-shadow:
-    0 0 8px rgba(0, 0, 0, 0.12),
-    0 8px 8px rgba(0, 0, 0, 0.24);
+  font-weight: font_weight_regular;
+  background-color: color_btn_dark_active;
+  box-shadow: shadow_large;
 }
 
 .button_primary[disabled],
 .button_primary.disabled {
   font-weight: normal;
-  color: #9c9c9c;
-  background-color: #d2d2d2;
+  color: color_font_disabled;
+  background-color: color_btn_dark_disabled;
   box-shadow: none;
 }
