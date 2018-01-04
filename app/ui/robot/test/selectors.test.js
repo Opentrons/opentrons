@@ -195,31 +195,31 @@ describe('robot selectors', () => {
           0: {
             id: 0,
             description: 'foo',
-            handledAt: '2017-08-30T12:00:00Z',
+            handledAt: 42,
             children: [1]
           },
           1: {
             id: 1,
             description: 'bar',
-            handledAt: '2017-08-30T12:00:01Z',
+            handledAt: 43,
             children: [2, 3]
           },
           2: {
             id: 2,
             description: 'baz',
-            handledAt: '2017-08-30T12:00:02Z',
+            handledAt: 44,
             children: []
           },
           3: {
             id: 3,
             description: 'qux',
-            handledAt: '',
+            handledAt: null,
             children: []
           },
           4: {
             id: 4,
             description: 'fizzbuzz',
-            handledAt: '',
+            handledAt: null,
             children: []
           }
         }
@@ -240,12 +240,12 @@ describe('robot selectors', () => {
     })
 
     test('getStartTime', () => {
-      expect(getStartTime(state)).toEqual('2017-08-30T12:00:00Z')
+      expect(getStartTime(state)).toEqual(42)
     })
 
     test('getStartTime without commands', () => {
       expect(getStartTime(makeState({session: {protocolCommands: []}})))
-        .toEqual('')
+        .toEqual(null)
     })
 
     test('getRunTime', () => {
@@ -254,7 +254,7 @@ describe('robot selectors', () => {
           [NAME]: {
             session: {
               ...state[NAME].session,
-              runTime: Date.parse('2017-08-30T12:00:00.123Z') + (1000 * seconds)
+              runTime: 42 + (1000 * seconds)
             }
           }
         }
@@ -282,21 +282,21 @@ describe('robot selectors', () => {
         {
           id: 0,
           description: 'foo',
-          handledAt: '2017-08-30T12:00:00Z',
+          handledAt: 42,
           isCurrent: true,
           isLast: false,
           children: [
             {
               id: 1,
               description: 'bar',
-              handledAt: '2017-08-30T12:00:01Z',
+              handledAt: 43,
               isCurrent: true,
               isLast: false,
               children: [
                 {
                   id: 2,
                   description: 'baz',
-                  handledAt: '2017-08-30T12:00:02Z',
+                  handledAt: 44,
                   isCurrent: true,
                   isLast: true,
                   children: []
@@ -304,7 +304,7 @@ describe('robot selectors', () => {
                 {
                   id: 3,
                   description: 'qux',
-                  handledAt: '',
+                  handledAt: null,
                   isCurrent: false,
                   isLast: false,
                   children: []
@@ -316,7 +316,7 @@ describe('robot selectors', () => {
         {
           id: 4,
           description: 'fizzbuzz',
-          handledAt: '',
+          handledAt: null,
           isCurrent: false,
           isLast: false,
           children: []
