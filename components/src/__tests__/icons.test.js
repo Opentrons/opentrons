@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Icon, ALERT, BACK, REFRESH, SPINNER, USB, WIFI, FLASK} from '..'
+import {Icon, ALERT, BACK, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED, EXPAND} from '..'
 
 describe('icons', () => {
   test('alert icon renders correctly', () => {
@@ -64,6 +64,30 @@ describe('icons', () => {
   test('flask icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={FLASK} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('checked icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CHECKED} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('unchecked icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={UNCHECKED} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('expand caret icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={EXPAND} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

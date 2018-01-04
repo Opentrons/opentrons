@@ -10,7 +10,7 @@ type ListItemProps = {
   onClick?: (event: SyntheticEvent<>) => void,
   url?: string,
   className?: string,
-  isDisabled?: boolean,
+  isDisabled: boolean,
   iconName?: IconName,
   children: React.Node
 }
@@ -24,7 +24,7 @@ export default function ListItem (props: ListItemProps) {
       <li>
         <NavLink
           to={url}
-          onClick={onClick}
+          onClick={!isDisabled && onClick}
           disabled={isDisabled}
           activeClassName={styles.active}
           >
