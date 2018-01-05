@@ -5,7 +5,7 @@ import {
   selectors as robotSelectors
 } from '../../robot'
 
-import TitledList from './TitledList'
+import {TitledList} from '@opentrons/components'
 import InstrumentListItem from './InstrumentListItem'
 
 export default connect(mapStateToProps, mapDispatchToProps)(InstrumentList)

@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ListAlert list alert renders correctly 1`] = `
+<li
+  className="alert"
+>
+   alert alert
+</li>
+`;
+
+exports[`ListItem renders ListItem with icon correctly 1`] = `
+<li
+  onClick={undefined}
+>
+  <svg
+    aria-hidden="true"
+    className="icon"
+    fill="currentColor"
+    height={undefined}
+    version="1.1"
+    viewBox="0 0 24 24"
+    width={undefined}
+    x={undefined}
+    y={undefined}
+  >
+    <path
+      d="M9.6,18 L3.6,12 L5.292,10.296 L9.6,14.604 L18.708,5.496 L20.4,7.2 L9.6,18 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
+      fillRule="evenodd"
+    />
+  </svg>
+  <span
+    className="info"
+  />
+</li>
+`;
+
+exports[`ListItem renders ListItem without icon correctly 1`] = `
+<li
+  onClick={undefined}
+>
+  <span
+    className="info"
+  />
+</li>
+`;
+
+exports[`TitledList renders TitledList with optional icon correctly 1`] = `
+<ol
+  className="titled_list"
+>
+  <div
+    className="list_title_bar"
+  >
+    <h3
+      className="list_title"
+    >
+      foo
+    </h3>
+  </div>
+</ol>
+`;
+
+exports[`TitledList renders TitledList without icon correctly 1`] = `
+<ol
+  className="titled_list"
+>
+  <div
+    className="list_title_bar"
+  >
+    <h3
+      className="list_title"
+    >
+      foo
+    </h3>
+  </div>
+</ol>
+`;
