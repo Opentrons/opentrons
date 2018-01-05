@@ -1,7 +1,5 @@
 @value blue from '../App.global.css';
 
-/* TODO Ian 2017-12-13 Review what classes are used or not with SVG Deck component */
-
 .review_deck {
   background-color: rgba(0, 0, 0, 0.8);
   position: absolute;

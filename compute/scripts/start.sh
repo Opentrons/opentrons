@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+python setup_gpio.py
+
 radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
 # mdns announcement

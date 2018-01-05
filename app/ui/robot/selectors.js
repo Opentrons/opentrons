@@ -142,18 +142,21 @@ export function getRunProgress (state) {
   }
 }
 
+// TODO(mc, 2018-01-04): inferring start time from handledAt of first command
+// is inadequate; robot starts moving before this timestamp is set
 export function getStartTime (state) {
   const commands = getCommands(state)
 
-  if (!commands.length) return ''
+  if (!commands.length) return null
   return commands[0].handledAt
 }
 
 export function getRunTime (state) {
   const {runTime} = getSessionState(state)
   const startTime = getStartTime(state)
-  const runTimeSeconds = (runTime && startTime)
-    ? Math.floor((runTime - Date.parse(startTime)) / 1000)
+  // TODO(mc, 2018-01-04): gt check is required because of the TODO above
+  const runTimeSeconds = (runTime && startTime && runTime > startTime)
+    ? Math.floor((runTime - startTime) / 1000)
     : 0
 
   const hours = padStart(Math.floor(runTimeSeconds / 3600), 2, '0')
@@ -195,9 +198,14 @@ export function getInstruments (state) {
   })
 }
 
-export function getSingleChannel (state) {
-  return getInstruments(state)
-    .find((instrument) => instrument.channels === SINGLE_CHANNEL)
+// returns the mount of the pipette to use for deckware calibration
+// TODO(mc, 2018-01-03): select pipette based on deckware props
+export function getCalibratorMount (state) {
+  const instruments = getInstruments(state)
+  const singleChannel = instruments.find((i) => i.channels === SINGLE_CHANNEL)
+  const calibrator = singleChannel || instruments[0] || {axis: ''}
+
+  return calibrator.axis
 }
 
 export function getInstrumentsCalibrated (state) {

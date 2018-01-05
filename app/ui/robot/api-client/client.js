@@ -338,7 +338,7 @@ export default function client (dispatch) {
         const {id, description} = command
         const logEntry = command_log[id]
         const children = Array.from(command.children)
-        let handledAt = ''
+        let handledAt = null
 
         if (logEntry) handledAt = logEntry.timestamp
         if (depth === 0) protocolCommands.push(id)

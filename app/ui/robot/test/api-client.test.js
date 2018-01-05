@@ -228,8 +228,8 @@ describe('api client', () => {
           0: {id: 0, description: 'a', handledAt: 0, children: [1]},
           1: {id: 1, description: 'b', handledAt: 1, children: [2, 3]},
           2: {id: 2, description: 'c', handledAt: 2, children: []},
-          3: {id: 3, description: 'd', handledAt: '', children: []},
-          4: {id: 4, description: 'e', handledAt: '', children: []}
+          3: {id: 3, description: 'd', handledAt: null, children: []},
+          4: {id: 4, description: 'e', handledAt: null, children: []}
         }
       }))
 

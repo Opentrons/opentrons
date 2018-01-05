@@ -20,7 +20,7 @@ const {
   getIsDone,
   getRunTime,
   getInstruments,
-  getSingleChannel,
+  getCalibratorMount,
   getInstrumentsCalibrated,
   getLabware,
   getUnconfirmedTipracks,
@@ -195,31 +195,31 @@ describe('robot selectors', () => {
           0: {
             id: 0,
             description: 'foo',
-            handledAt: '2017-08-30T12:00:00Z',
+            handledAt: 42,
             children: [1]
           },
           1: {
             id: 1,
             description: 'bar',
-            handledAt: '2017-08-30T12:00:01Z',
+            handledAt: 43,
             children: [2, 3]
           },
           2: {
             id: 2,
             description: 'baz',
-            handledAt: '2017-08-30T12:00:02Z',
+            handledAt: 44,
             children: []
           },
           3: {
             id: 3,
             description: 'qux',
-            handledAt: '',
+            handledAt: null,
             children: []
           },
           4: {
             id: 4,
             description: 'fizzbuzz',
-            handledAt: '',
+            handledAt: null,
             children: []
           }
         }
@@ -240,12 +240,12 @@ describe('robot selectors', () => {
     })
 
     test('getStartTime', () => {
-      expect(getStartTime(state)).toEqual('2017-08-30T12:00:00Z')
+      expect(getStartTime(state)).toEqual(42)
     })
 
     test('getStartTime without commands', () => {
       expect(getStartTime(makeState({session: {protocolCommands: []}})))
-        .toEqual('')
+        .toEqual(null)
     })
 
     test('getRunTime', () => {
@@ -254,7 +254,7 @@ describe('robot selectors', () => {
           [NAME]: {
             session: {
               ...state[NAME].session,
-              runTime: Date.parse('2017-08-30T12:00:00.123Z') + (1000 * seconds)
+              runTime: 42 + (1000 * seconds)
             }
           }
         }
@@ -282,21 +282,21 @@ describe('robot selectors', () => {
         {
           id: 0,
           description: 'foo',
-          handledAt: '2017-08-30T12:00:00Z',
+          handledAt: 42,
           isCurrent: true,
           isLast: false,
           children: [
             {
               id: 1,
               description: 'bar',
-              handledAt: '2017-08-30T12:00:01Z',
+              handledAt: 43,
               isCurrent: true,
               isLast: false,
               children: [
                 {
                   id: 2,
                   description: 'baz',
-                  handledAt: '2017-08-30T12:00:02Z',
+                  handledAt: 44,
                   isCurrent: true,
                   isLast: true,
                   children: []
@@ -304,7 +304,7 @@ describe('robot selectors', () => {
                 {
                   id: 3,
                   description: 'qux',
-                  handledAt: '',
+                  handledAt: null,
                   isCurrent: false,
                   isLast: false,
                   children: []
@@ -316,7 +316,7 @@ describe('robot selectors', () => {
         {
           id: 4,
           description: 'fizzbuzz',
-          handledAt: '',
+          handledAt: null,
           isCurrent: false,
           isLast: false,
           children: []
@@ -371,7 +371,7 @@ describe('robot selectors', () => {
     expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
   })
 
-  test('get single channel', () => {
+  test('get calibrator mount with single channel installed', () => {
     const state = makeState({
       session: {
         protocolInstrumentsByAxis: {
@@ -385,14 +385,23 @@ describe('robot selectors', () => {
       }
     })
 
-    expect(getSingleChannel(state)).toEqual({
-      axis: 'right',
-      name: 'p50s',
-      channels: 'single',
-      volume: 50,
-      calibration: constants.UNPROBED,
-      probed: false
+    expect(getCalibratorMount(state)).toBe('right')
+  })
+
+  test('get calibrator mount with only multi channel installed', () => {
+    const state = makeState({
+      session: {
+        protocolInstrumentsByAxis: {
+          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200}
+        }
+      },
+      calibration: {
+        instrumentsByAxis: {},
+        probedByAxis: {}
+      }
     })
+
+    expect(getCalibratorMount(state)).toBe('left')
   })
 
   test('get instruments are calibrated', () => {

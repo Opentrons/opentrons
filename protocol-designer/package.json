@@ -9,7 +9,7 @@
   },
   "name": "protocol-designer",
   "private": true,
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Protocol designer app",
   "main": "index.js",
   "scripts": {
