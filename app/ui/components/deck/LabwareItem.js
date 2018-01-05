@@ -56,17 +56,7 @@ export default function LabwareItem (props: LabwareItemProps) {
 
       {isMoving && <g>
         <rect x='0' y='0' width='100%' height='100%' fill='rgba(0, 0, 0, 0.5)' />
-        <g>
-          <animateTransform
-            attributeName='transform'
-            attributeType='XML' type='rotate'
-            from={`0 ${width / 2} ${height / 2}`}
-            to={`360 ${width / 2} ${height / 2}`}
-            dur='1.5s'
-            repeatCount='indefinite'
-          />
-          <Icon name={SPINNER} x='10%' y='10%' width='80%' height='80%' /> // TODO Ian 2017-12-15 Icon spin prop doesn't spin, does CSS animation not work inside an SVG?
-        </g>
+        <Icon name={SPINNER} x='10%' y='10%' width='80%' height='80%' spin />
       </g>
       }
     </g>
