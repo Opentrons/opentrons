@@ -2,7 +2,7 @@
 // takes a dispatch (send) function and returns a receive handler
 import {push} from 'react-router-redux'
 
-import RpcClient from '../../../rpc/client'
+import RpcClient from '../../rpc/client'
 import {tagAlertAction} from '../../interface'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'

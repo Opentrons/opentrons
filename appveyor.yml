@@ -42,12 +42,12 @@ test: off
 build_script:
   - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test"'
   # Note: we are not running test-e2e on Windows due to problems with ChromeDriver
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && make -C app package test && make -C app dist-win"'
+  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && make -C app test && make -C app-shell dist-win"'
   - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app/dist/win && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
+    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app-shell/dist/squirrel-windows && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
 
 before_deploy:
-  - ps: Get-ChildItem .\app\dist\win | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+  - ps: Get-ChildItem .\app-shell\dist\squirrel-windows | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 deploy:
   - provider: S3

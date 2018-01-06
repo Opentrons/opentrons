@@ -56,9 +56,9 @@ script:
   # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
   - make -C components test
   # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C app package test && make -C app dist-posix
+  - make -C app test && make -C app-shell dist-posix
   # Clean up. This will leave only single-file build artifacts
-  - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+  - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
   # protocol designer
   - make -C protocol-designer test build
 
@@ -72,7 +72,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(pwd)/app/dist
+    local-dir: $(pwd)/app-shell/dist
     upload-dir: ci-builds
     acl: public_read
     on:
