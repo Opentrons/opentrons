@@ -59,7 +59,7 @@
     ]
   },
   "dependencies": {
-    "@opentrons/components": "file:../components",
+    "@opentrons/components": "^3.0.0",
     "classnames": "^2.2.5",
     "google-fonts-webpack-plugin": "^0.4.3",
     "lodash": "^4.17.4",

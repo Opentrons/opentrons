@@ -112,7 +112,7 @@
     "ws": "^3.1.0"
   },
   "dependencies": {
-    "@opentrons/components": "file:../components",
+    "@opentrons/components": "^3.0.0",
     "bonjour": "^3.5.0",
     "classnames": "^2.2.5",
     "history": "^4.7.2",

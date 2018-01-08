@@ -25,7 +25,7 @@ all: clean package
 
 .PHONY: install
 install:
-	npm install
+	yarn
 
 .PHONY: uninstall
 uninstall:

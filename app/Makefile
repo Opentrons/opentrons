@@ -32,7 +32,7 @@ all: clean dist
 
 .PHONY: install
 install:
-	npm install
+	yarn
 
 .PHONY: uninstall
 uninstall:
