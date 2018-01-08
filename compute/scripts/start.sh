@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-python setup_gpio.py
+python /usr/local/bin/setup_gpio.py
 
 radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
