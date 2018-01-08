@@ -30,14 +30,14 @@ pipette.aspirate(tube_1).dispense(tube_2)
 That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
 
 *   [Documentation](http://docs.opentrons.com)
-*   [Source code](https://github.com/OpenTrons/opentrons/tree/v3a/api)
+*   [Source code](https://github.com/Opentrons/opentrons/tree/v3a/api)
 
 ## Opentrons App
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
 *   [Documentation](https://support.opentrons.com/)
-*   [Source code](https://github.com/OpenTrons/opentrons/tree/v3a/app)
+*   [Source code](https://github.com/Opentrons/opentrons/tree/v3a/app)
 
 ![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
 
@@ -45,7 +45,7 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 
 We love contributors! Here is the best way to work with us:
 
-1.  Filing a [bug report](https://github.com/OpenTrons/opentrons/issues). We will fix these as quickly as we can, and appreciate your help uncovering bugs in our code.
+1.  Filing a [bug report](https://github.com/Opentrons/opentrons/issues). We will fix these as quickly as we can, and appreciate your help uncovering bugs in our code.
 
 2.  Submit a pull request with any new features you've added to a branch of the API or App. We will reach out to talk with you about integration testing and launching it into our product!
 
@@ -85,7 +85,7 @@ Your computer will need the following tools installed to be able to develop with
 Once you're set up, clone the repository, install all project dependencies, and run the tests to get started:
 
 ```shell
-git clone https://github.com/OpenTrons/opentrons.git
+git clone https://github.com/Opentrons/opentrons.git
 cd opentrons
 make install
 make test

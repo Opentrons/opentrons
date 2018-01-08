@@ -1,5 +1,6 @@
 [ignore]
- .*/test/.*
+.*/dist/.*
+.*/test/.*
 
 [include]
 
@@ -8,6 +9,7 @@
 [lints]
 
 [options]
+module.name_mapper='^default\-containers\.json$' -> '@opentrons/components/interfaces/default-containers.json.js'
 module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
 
 [strict]

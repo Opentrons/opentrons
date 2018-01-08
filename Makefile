@@ -10,13 +10,14 @@ APP_SHELL_DIR := app-shell
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
 # install project dependencies for both api and app
+# front-end dependecies handled by yarn
+# TODO(mc, 2018-01-06): remove separate install for app-shell when
+#   electron-builder can resolve yarn workspace deps
+#   https://github.com/electron-userland/electron-builder/issues/2222
 .PHONY: install
 install:
 	$(MAKE) -C $(API_DIR) install
-	# front-end dependecies handled by yarn
 	yarn
-	# TODO(mc, 2018-01-06): remove when electron-builder resolves yarn ws deps
-	# https://github.com/electron-userland/electron-builder/issues/2222
 	$(MAKE) -C $(APP_SHELL_DIR) install
 
 # run api and app tests

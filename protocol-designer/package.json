@@ -42,7 +42,13 @@
       "$Keys"
     ],
     "env": [
+      "node",
+      "browser",
       "jest"
+    ],
+    "ignore": [
+      "**/dist/**",
+      "**/flow-typed/**"
     ]
   },
   "stylelint": {
@@ -77,7 +83,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
-    "babel-eslint": "^8.0.1",
+    "babel-eslint": "8.0.3",
     "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -87,8 +93,8 @@
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.4",
-    "eslint-plugin-flowtype": "^2.40.1",
-    "flow-bin": "^0.61.0",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "jest": "^21.2.1",
     "react-hot-loader": "^3.0.0-beta.7",

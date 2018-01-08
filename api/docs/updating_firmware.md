@@ -7,7 +7,7 @@ To summarize, there are two files on your Smoothie that must be replaced; `FIRMW
 ##Step 1
 ###Download Files
 
-[Download the zipped files from here](https://github.com/OpenTrons/smoothie-config/archive/1.2.0.zip). After downloading, unpack the zip file to view its contents.
+[Download the zipped files from here](https://github.com/Opentrons/smoothie-config/archive/1.2.0.zip). After downloading, unpack the zip file to view its contents.
 
 ##Step 2
 ###Open the Smoothie's Drive

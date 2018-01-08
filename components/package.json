@@ -23,9 +23,6 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "ignore": [
-      "flow-typed/"
-    ],
     "plugins": [
       "flowtype"
     ],
@@ -34,8 +31,13 @@
       "$Keys"
     ],
     "env": [
+      "node",
       "browser",
       "jest"
+    ],
+    "ignore": [
+      "**/dist/**",
+      "**/flow-typed/**"
     ]
   },
   "stylelint": {
@@ -49,15 +51,15 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.3",
+    "babel-eslint": "8.0.3",
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.1.1",
-    "eslint-plugin-flowtype": "^2.39.1",
-    "flow-bin": "^0.60.1",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
