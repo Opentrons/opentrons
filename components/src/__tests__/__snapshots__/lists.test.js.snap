@@ -45,11 +45,12 @@ exports[`ListItem renders ListItem without icon correctly 1`] = `
 `;
 
 exports[`TitledList renders TitledList with optional icon correctly 1`] = `
-<ol
-  className="titled_list"
+<div
+  className=""
 >
   <div
     className="list_title_bar"
+    onClick={undefined}
   >
     <h3
       className="list_title"
@@ -57,15 +58,19 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
       foo
     </h3>
   </div>
-</ol>
+  <ol
+    className="titled_list"
+  />
+</div>
 `;
 
 exports[`TitledList renders TitledList without icon correctly 1`] = `
-<ol
-  className="titled_list"
+<div
+  className=""
 >
   <div
     className="list_title_bar"
+    onClick={undefined}
   >
     <h3
       className="list_title"
@@ -73,5 +78,8 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
       foo
     </h3>
   </div>
-</ol>
+  <ol
+    className="titled_list"
+  />
+</div>
 `;
