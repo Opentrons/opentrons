@@ -249,13 +249,16 @@ Titled ordered list wrapper with optional title icon
 import {TitledList} from '@opentrons/components'
 ```
 
- prop      | flow type                  | required | description
----------- | -------------------------- | -------- | -----------------------
- title     | React.Node                 | yes      | h3 child
- children  | React.Node                 | yes      | li children
- classname | string                     | yes      | additional class names
- iconName  | iconName                   | no       | optional icon before h3
- onClick   | (SyntheticEvent<>) => void | no       | optional click action
+ prop        | flow type                 | required | description
+----------   | ------------------------- | -------- | -----------------------
+ title       | React.Node                | yes      | text of title
+ children    | React.Node                | yes      | children: must all be li
+ classname   | string                    | yes      | additional class names
+ collapsed   | boolean                   | no       | if true/false, sets collapsed appearance. if undefined, TitledList will not be collapsible.
+ description | React.Node                | no       | component with descriptive text about the list
+ iconName    | iconName                  | no       | optional icon before h3
+ onClick     | (SyntheticEvent<>) => void| no       | optional click action (on title div, not children)
+ selected    | boolean                   | no       | highlights the whole TitledList if true
 
 #### ListItem
 
