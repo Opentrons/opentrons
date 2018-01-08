@@ -2,7 +2,23 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Icon, ALERT, BACK, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED, EXPAND} from '..'
+import {
+  Icon,
+  ALERT,
+  BACK,
+  REFRESH,
+  SPINNER,
+  USB,
+  WIFI,
+  FLASK,
+  CHECKED,
+  UNCHECKED,
+  EXPAND,
+  COLLAPSE,
+  PROTOCOL,
+  COG,
+  CONNECT
+} from '..'
 
 describe('icons', () => {
   test('alert icon renders correctly', () => {
@@ -88,6 +104,38 @@ describe('icons', () => {
   test('expand caret icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={EXPAND} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('collapse caret icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={COLLAPSE} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('protocol file icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={PROTOCOL} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('setup cog icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={COG} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('connect icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CONNECT} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

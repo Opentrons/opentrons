@@ -2,46 +2,11 @@
 @value border: 2px solid grey;
 
 .navbar {
-  position: relative;
   flex: none;
+  position: relative;
   width: 5rem;
   height: 100%;
   background-color: light_grey;
   border-right: border;
 }
 
-.button {
-  composes: parent from '../ToolTip.css';
-  display: block;
-  width: 100%;
-  height: 5rem;
-  background-color: transparent;
-  border-bottom: border;
-  cursor: pointer;
-}
-
-.button:last-child {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  border-bottom-width: 0;
-  border-top: border;
-}
-
-.button[disabled] {
-  cursor: default;
-}
-
-.button[disabled] .icon {
-  opacity: 0.3;
-}
-
-.active {
-  background-color: grey;
-}
-
-.icon {
-  max-width: 100%;
-  height: 100%;
-  padding: 1.25rem;
-}

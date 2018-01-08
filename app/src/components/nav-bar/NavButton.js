@@ -11,14 +11,9 @@ import {
   constants as robotConstants
 } from '../../robot'
 
-import SideBarButton from './SideBarButton'
+import {NavButton, PROTOCOL, COG, CONNECT, USB} from '@opentrons/components'
 
-import uploadIconSrc from '../../img/icon_file.png'
-import setupIconSrc from '../../img/icon_setup.svg'
-import controlledUSBSrc from '../../img/icon_usb_controlled.png'
-import discoverSrc from '../../img/icon_discover.png'
-
-export default connect(mapStateToProps, null, mergeProps)(SideBarButton)
+export default connect(mapStateToProps, null, mergeProps)(NavButton)
 
 function mapStateToProps (state, ownProps) {
   const {name} = ownProps
@@ -30,22 +25,24 @@ function mapStateToProps (state, ownProps) {
   )
 
   let disabled = false
-  let src
+  let iconName, isBottom
 
   if (name === 'upload') {
     disabled = !isConnected
-    src = uploadIconSrc
+    iconName = PROTOCOL
   } else if (name === 'setup') {
     disabled = !isSessionLoaded
-    src = setupIconSrc
+    iconName = COG
   } else if (name === 'connect') {
-    src = isConnected
-      ? controlledUSBSrc
-      : discoverSrc
+    iconName = isConnected
+      ? USB
+      : CONNECT
+    isBottom = true
   }
 
   return {
-    src,
+    iconName,
+    isBottom,
     disabled,
     isCurrent: isPanelOpen && name === currentPanel
   }
