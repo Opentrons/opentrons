@@ -6,136 +6,106 @@
 
 ## overview
 
-The Opentrons desktop application lets you use and configure your [Opentrons personal pipetting robot][robots]. This directory contains the application's source code. If you're looking to download or for help with the app, please click one of the links above.
+The Opentrons desktop application lets you use and configure your [Opentrons personal pipetting robot][robots]. This directory contains the application's UI source code. If you're looking for support or to download the app, please click one of the links above.
 
-The Opentrons desktop application is built with [Electron][].
+This desktop application is built with [Electron][]. You can find the Electron wrapper code in the [`app-shell`](../app-shell) directory.
 
 ## developing
 
-To get started once you've cloned the opentrons/opentrons repository and set up your computer for development as specified in the [project readme][project-readme-setup]:
+To get started: clone the Opentrons/opentrons repository, set up your computer for development as specified in the [project readme][project-readme-setup], and then:
 
 ``` shell
+# prerequisite: install dependencies as specified in project setup
+make install
 # change into the app directory
-$ cd app
-# install dependencies
-$ make install
+cd app
 # install flow-types for testing in development
-$ make install-types
+make install-types
 # launch the dev server / electron app in dev mode
-$ make dev
+make dev
 ```
 
-At this point, the Electron app will be running with [HMR] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
+At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
-variable   | default      | description
----------- | ------------ | -------------------------------------------------
-`NODE_ENV` | `production` | Run environment: production, development, or test
-`DEBUG`    | unset        | Runs the app in debug mode
-`PORT`     | `8090`       | Development server port
+ variable   | default      | description
+----------- | ------------ | -------------------------------------------------
+ `NODE_ENV` | `production` | Run environment: production, development, or test
+ `DEBUG`    | unset        | Runs the app in debug mode
+ `PORT`     | `8090`       | Development server port
 
-**Note:** you may want to be running the Opentrons API in a different shell while developing the app. Please see [project readme][project-readme-server] for API specific instructions.
+**Note:** you may want to be running the Opentrons API in a different terminal while developing the app. Please see [project readme][project-readme-server] for API specific instructions.
 
 ## stack and structure
 
-The stack / build-chain runs on:
+The UI stack is built using:
 
-* [Electron][]
-* [Electron Builder][electron-builder]
-* [React][]
-* [Redux][]
-* [CSS modules][css-modules]
-* [Babel][]
-* [Webpack][]
+*   [React][]
+*   [Redux][]
+*   [CSS modules][css-modules]
+*   [Babel][]
+*   [Webpack][]
 
-Our files are organized into:
+Some important directories:
 
-* `app/ui` — Front-end webapp run in Electron's renderer process
-* `app/shell` — Electron's main process
-* `app/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
-* `app/webpack` - Webpack configuration helpers
+*   `app/src` — Client-side React app run in Electron's [renderer process][electron-renderer]
+*   `app/src/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
+*   `app/webpack` - Webpack configuration helpers
 
 ## testing, type checking, and linting
 
 To run tests:
 
-* `$ make test` - Run all tests (including Flow type checking) and then lints
-* `$ make test-unit` - Run all unit tests
+*   `make test` - Run all tests (including Flow type checking) and then lints
+*   `make test-unit` - Run all unit tests
 
 Test tasks can also be run with the following arguments:
 
-arg   | default | description             | example
------ | ------- | ----------------------- | -----------------------------------
-watch | false   | Run tests in watch mode | `$ make test-unit watch=true`
-cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true`
+ arg   | default | description             | example
+------ | ------- | ----------------------- | -----------------------------------
+ watch | false   | Run tests in watch mode | `$ make test-unit watch=true`
+ cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true`
 
 To lint JS (with [standard][]) and CSS (with [stylelint][]):
 
-* `$ make lint` - Lint both JS and CSS
-* `$ make lint-js` - Lint JS
-* `$ make lint-css` - List CSS
+*   `make lint` - Lint both JS and CSS
+*   `make lint-js` - Lint JS
+*   `make lint-css` - List CSS
 
 Lint tasks can also be run with the following arguments:
 
-arg   | default | description                   | example
+ arg  | default | description                   | example
 ----- | ------- | ----------------------------- | -------------------------
-fix   | false   | Automatically fix lint errors | `$ make lint-js fix=true`
+ fix  | false   | Automatically fix lint errors | `$ make lint-js fix=true`
 
 To check types with Flow:
 
-* `$ make check`
+*   `make check`
 
 ## building
 
-### build dependencies
+If you'd like to build the Electron desktop app, see the [app shell's build instructions][app-shell-readme-build].
 
-`electron-builder` requires some native dependencies to build and package the app (see [the electron-builder docs][electron-builder-platforms]).
-
-* macOS - None
-* Linux - icnsutils, graphicsmagick, and xz-utils
+The UI bundle can be built by itself with:
 
 ```shell
-$ sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils
+# default target is "clean dist"
+make
+# build without cleaning
+make dist
 ```
-* Windows - None
-
-### build tasks
-
-* `$ make package` - Package the app for inspection (does not create a distributable)
-* `$ make dist-mac` - Create an OSX distributable of the app
-* `$ make dist-linux` - Create a Linux distributable of the app
-* `$ make dist-win` - Create a Windows distributable of the app
-
-All artifacts will be placed in:
-
-* `app/dist` - Application packages and/or distributables
-* `app/ui/dist` - Intermediate UI artifacts:
-    * `bundle.js` - Javascript bundle
-    * `style.css` - CSS bundle
-    * Fonts that weren't inlined
-    * Images that weren't inlined
-
-After running `make package`, you can launch the production app with:
-
-* macOS: `$ ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons`
-* Linux: `$ ./dist/linux-unpacked/opentrons-app`
-* Windows: `TODO`
-
-### building UI
-
-The UI can be built by itself with:
-
-`$ make ui/dist/bundle.js`
 
 The UI build process looks for the following environment variables:
 
-variable   | default      | description
----------- | ------------ | ---------------------------------------------------
-`NODE_ENV` | `production` | Build environment: production, development, or test
-`ANALYZER` | unset        | Launches the [bundle analyzer][bundle-analyzer]
+ variable   | default      | description
+----------- | ------------ | ---------------------------------------------------
+ `NODE_ENV` | `production` | Build environment: production, development, or test
+ `ANALYZER` | unset        | Launches the [bundle analyzer][bundle-analyzer]
 
 For example, if you wanted to analyze the production JS bundle:
 
-`$ ANALYZER=true make clean ui/dist/bundle.js`
+```shell
+ANALYZER=true make
+```
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
@@ -145,10 +115,9 @@ For example, if you wanted to analyze the production JS bundle:
 [robots]: http://opentrons.com/robots
 [project-readme-setup]: ../README.md#set-up-your-development-environment
 [project-readme-server]: ../README.md#start-the-opentrons-api
-
+[app-shell-readme-build]: ../app-shell/README.md#building
 [electron]: https://electron.atom.io/
-[electron-builder]: https://www.electron.build/
-[electron-builder-platforms]: https://www.electron.build/multi-platform-build
+[electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
 [react]: https://facebook.github.io/react/
 [redux]: http://redux.js.org/
@@ -156,5 +125,5 @@ For example, if you wanted to analyze the production JS bundle:
 [babel]: https://babeljs.io/
 [webpack]: https://webpack.js.org/
 [standard]: https://standardjs.com/
-[styelint]: https://stylelint.io/
+[stylelint]: https://stylelint.io/
 [bundle-analyzer]: https://github.com/th0r/webpack-bundle-analyzer

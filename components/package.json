@@ -23,6 +23,9 @@
   },
   "standard": {
     "parser": "babel-eslint",
+    "ignore": [
+      "flow-typed/"
+    ],
     "plugins": [
       "flowtype"
     ],

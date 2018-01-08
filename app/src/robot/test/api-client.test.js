@@ -3,14 +3,14 @@ import {push} from 'react-router-redux'
 
 import {delay} from '../../util'
 import client from '../api-client/client'
-import RpcClient from '../../../rpc/client'
+import RpcClient from '../../rpc/client'
 import {tagAlertAction} from '../../interface'
 import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
 
-jest.mock('../../../rpc/client')
+jest.mock('../../rpc/client')
 
 describe('api client', () => {
   let dispatch

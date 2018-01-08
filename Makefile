@@ -6,6 +6,7 @@ SHELL := /bin/bash
 API_DIR := api
 COMPONENTS_DIR := components
 APP_DIR := app
+APP_SHELL_DIR := app-shell
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
 .PHONY: install test coverage
@@ -14,6 +15,7 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 install:
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(COMPONENTS_DIR) install
+	$(MAKE) -C $(APP_SHELL_DIR) install
 	$(MAKE) -C $(APP_DIR) install
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install
 
