@@ -36,6 +36,11 @@
   margin-right: 1rem;
 }
 
+.accordion_carat svg {
+  height: 2rem;
+  width: 2rem;
+}
+
 /* List Items */
 .titled_list li {
   margin: 0;

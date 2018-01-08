@@ -6,7 +6,7 @@ import cx from 'classnames'
 
 import styles from './lists.css'
 import styleIndex from '../styles/index.css'
-import {type IconName, Icon} from '../icons'
+import {type IconName, Icon, EXPAND} from '../icons'
 
 type ListProps = {
   title: string,
@@ -49,8 +49,11 @@ export default function TitledList (props: ListProps) {
         {titleIcon}
         <h3 className={styles.list_title}>{props.title}</h3>
         {collapsible &&
-          <div onClick={handleCollapseToggle} className={styles.accordion_carat}>
-            {props.collapsed ? '^' : 'v'}
+          <div onClick={handleCollapseToggle}
+            className={styles.accordion_carat}
+          >
+            {/* TODO Ian 2018-01-08 make separate up and down carat icons */}
+            {<Icon name={EXPAND} className={props.collapsed && styleIndex.rotated} />}
           </div>
         }
       </div>
