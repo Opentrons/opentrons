@@ -13,8 +13,8 @@ import {
   FLASK,
   CHECKED,
   UNCHECKED,
-  EXPAND,
-  COLLAPSE,
+  CHEVRON_UP,
+  CHEVRON_DOWN,
   PROTOCOL,
   COG,
   CONNECT
@@ -103,7 +103,7 @@ describe('icons', () => {
 
   test('expand caret icon renders correctly', () => {
     const tree = Renderer.create(
-      <Icon name={EXPAND} className='foo' />
+      <Icon name={CHEVRON_UP} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -111,7 +111,7 @@ describe('icons', () => {
 
   test('collapse caret icon renders correctly', () => {
     const tree = Renderer.create(
-      <Icon name={COLLAPSE} className='foo' />
+      <Icon name={CHEVRON_DOWN} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
