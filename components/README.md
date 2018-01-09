@@ -146,7 +146,8 @@ import {PrimaryButton} from '@opentrons/components'
 SVG icons that take `color` from their parent.
 
 ```js
-import {Icon, BACK, REFRESH, USB, WIFI, FLASK, CHECKED, UNCHECKED} from '@opentrons/components'
+import {Icon, BACK, CLOSE, REFRESH, USB, WIFI, FLASK, CHECKED, UNCHECKED,
+CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, PROTOCOL, COG, CONNECT } from '@opentrons/components'
 ```
 
  prop      | flow type | required | description
@@ -207,6 +208,36 @@ import {TitleBar} from '@opentrons/components'
 ---------- | ---------- | -------- | ------------
  title     | React.Node | yes      | h1 child
  subtitle  | React.Node | no       | h2 child
+
+#### VerticalNavBar
+
+Side nav bar wrapper which receives NavButtons as children and optional className
+
+```js
+import {VerticalNavBar} from '@opentrons/components'
+```
+
+ prop      | flow type  | required | description
+---------- | ---------- | -------- | ------------
+ className | string     | no       | additional class names
+ children  | React.Node | no       | NavButton chidren
+
+#### NavButton
+
+Side nav bar wrapper which receives NavButtons as children and optional className
+
+```js
+import {NavButton} from '@opentrons/components'
+```
+
+ prop       | flow type                 | required | description
+----------- | ------------------------- | -------- | ------------------------------------
+ onClick    | (SyntheticEvent<>) => void| yes      | click action
+ iconName   | iconName                  | yes      | icon as button content
+ isCurrent  | bool                      | no       | is button current content?
+ disabled   | bool                      | no       | is button disabled?
+ isBottom   | bool                      | no       | is button fixed to bottom of navbar?
+ className  | string                    | no       | additional class names
 
 ### lists
 

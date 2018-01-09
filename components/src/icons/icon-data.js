@@ -4,6 +4,7 @@
 // icon names
 export const ALERT = 'alert'
 export const BACK = 'back'
+export const CLOSE = 'close'
 export const REFRESH = 'refresh'
 export const SPINNER = 'spinner'
 export const USB = 'usb'
@@ -13,6 +14,8 @@ export const CHECKED = 'checked'
 export const UNCHECKED = 'unchecked'
 export const CHEVRON_UP = 'chevron up'
 export const CHEVRON_DOWN = 'chevron down'
+export const CHEVRON_LEFT = 'chevron left'
+export const CHEVRON_RIGHT = 'chevron right'
 export const PROTOCOL = 'protocol'
 export const COG = 'cog'
 export const CONNECT = 'connect'
@@ -26,6 +29,10 @@ const ICON_DATA_BY_NAME = {
   [BACK]: {
     viewBox: '0 0 24 24',
     path: 'M18 11.242v1.516H8.91l4.166 4.166L12 18l-6-6 6-6 1.076 1.076-4.167 4.166z'
+  },
+  [CLOSE]: {
+    viewBox: '0 0 24 24',
+    path: 'M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z'
   },
   [REFRESH]: {
     viewBox: '0 0 200 200',
@@ -62,6 +69,14 @@ const ICON_DATA_BY_NAME = {
   [CHEVRON_DOWN]: {
     viewBox: '0 0 24 24',
     path: 'M7.41 15.857L12 11.615l4.59 4.242L18 14.545 12 9l-6 5.545z'
+  },
+  [CHEVRON_LEFT]: {
+    viewBox: '0 0 24 24',
+    path: 'M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z'
+  },
+  [CHEVRON_RIGHT]: {
+    viewBox: '0 0 24 24',
+    path: 'M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z'
   },
   [CONNECT]: {
     viewBox: '0 0 110 110',

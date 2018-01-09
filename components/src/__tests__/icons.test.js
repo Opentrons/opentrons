@@ -6,6 +6,7 @@ import {
   Icon,
   ALERT,
   BACK,
+  CLOSE,
   REFRESH,
   SPINNER,
   USB,
@@ -15,6 +16,8 @@ import {
   UNCHECKED,
   CHEVRON_UP,
   CHEVRON_DOWN,
+  CHEVRON_LEFT,
+  CHEVRON_RIGHT,
   PROTOCOL,
   COG,
   CONNECT
@@ -32,6 +35,14 @@ describe('icons', () => {
   test('back icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={BACK} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('close icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CLOSE} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -112,6 +123,22 @@ describe('icons', () => {
   test('collapse caret icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHEVRON_DOWN} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('left caret icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CHEVRON_LEFT} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('right caret icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CHEVRON_RIGHT} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

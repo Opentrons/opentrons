@@ -57,6 +57,25 @@ exports[`icons checked icon renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons close icon renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons collapse caret icon renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -133,6 +152,25 @@ exports[`icons flask icon renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons left caret icon renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons protocol file icon renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -166,6 +204,25 @@ exports[`icons refresh icon renders correctly 1`] = `
 >
   <path
     d="M121.9,31.3L129,4.6l56.7,56.7l-77.5,20.8c0,0,7.7-28.6,7.7-28.6c-5.7-1.8-11.7-2.7-17.9-2.7 c-33.5,0-60.8,27.3-60.8,60.8c0,33.5,27.3,60.8,60.8,60.8c26.5,0,50.5-17.7,58.1-43.1l22,6.7c-5.1,16.8-15.7,32-29.8,42.6 c-14.6,11-32,16.8-50.3,16.8c-46.2,0-83.8-37.6-83.8-83.8S51.8,27.9,98,27.9C106.1,27.9,114.1,29.1,121.9,31.3"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons right caret icon renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
     fillRule="evenodd"
   />
 </svg>

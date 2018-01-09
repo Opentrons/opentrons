@@ -7,10 +7,10 @@ import {type IconName, Icon} from '../icons'
 
 type NavButtonProps= {
   onClick?: (event: SyntheticEvent<>) => void,
-  className: string,
   isBottom?: boolean,
-  disabled: boolean,
-  isCurrent: boolean,
+  className?: string,
+  disabled?: boolean,
+  isCurrent?: boolean,
   iconName: IconName
 }
 
