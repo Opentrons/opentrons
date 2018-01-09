@@ -3,7 +3,7 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {PageTabs, TitleBar, VerticalNavBar, NavButton, PROTOCOL} from '..'
+import {PageTabs, TitleBar, VerticalNavBar, NavButton, FILE} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -129,7 +129,7 @@ describe('NavButton', () => {
         onClick={onClick}
         disabled={false}
         isCurrent
-        iconName={PROTOCOL}
+        iconName={FILE}
       />
     ).root.findByType('button')
 
@@ -141,7 +141,7 @@ describe('NavButton', () => {
 
   test('adds svg icon to button by name', () => {
     const icon = Renderer.create(
-      <NavButton iconName={PROTOCOL} />
+      <NavButton iconName={FILE} />
     ).root.findByType('svg')
 
     expect(icon).toBeDefined()
@@ -149,7 +149,7 @@ describe('NavButton', () => {
 
   test('renders nav button with icon correctly', () => {
     const tree = Renderer.create(
-      <NavButton iconName={PROTOCOL} disabled='false' />
+      <NavButton iconName={FILE} disabled='false' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

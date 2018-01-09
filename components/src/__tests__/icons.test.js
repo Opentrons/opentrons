@@ -18,7 +18,7 @@ import {
   CHEVRON_DOWN,
   CHEVRON_LEFT,
   CHEVRON_RIGHT,
-  PROTOCOL,
+  FILE,
   COG,
   CONNECT
 } from '..'
@@ -146,7 +146,7 @@ describe('icons', () => {
 
   test('protocol file icon renders correctly', () => {
     const tree = Renderer.create(
-      <Icon name={PROTOCOL} className='foo' />
+      <Icon name={FILE} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

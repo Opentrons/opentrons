@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import classnames from 'classnames'
-import styles from './nav-bar.css'
+import styles from './navbar.css'
 
 type NavProps= {
   className?: string,

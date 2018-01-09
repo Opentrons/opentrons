@@ -231,12 +231,12 @@ import {NavButton} from '@opentrons/components'
 ```
 
  prop       | flow type                 | required | description
------------ | ------------------------- | -------- | ------------------------------------
+----------- | ------------------------- | -------- | -------------------------------------------------
  onClick    | (SyntheticEvent<>) => void| yes      | click action
  iconName   | iconName                  | yes      | icon as button content
  isCurrent  | bool                      | no       | is button current content?
  disabled   | bool                      | no       | is button disabled?
- isBottom   | bool                      | no       | is button fixed to bottom of navbar?
+ isBottom   | bool                      | no       | is button fixed to bottom of navbar? (1 per navbar)
  className  | string                    | no       | additional class names
 
 ### lists
