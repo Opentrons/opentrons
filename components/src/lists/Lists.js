@@ -29,15 +29,16 @@ function List (props: ListProps) {
 }
 
 export default function TitledList (props: ListProps) {
+  const {onCollapseToggle} = props
   const titleIcon = props.iconName && (<Icon className={styles.list_title_icon} name={props.iconName} />)
+  const collapsible = onCollapseToggle !== undefined
 
-  const collapsible = props.collapsed !== undefined && (props.description || props.children)
-
-  // clicking on the carat will not call props.onClick, so prevent bubbling up if there is an onCollapseToggle fn
+  // clicking on the carat will not call props.onClick,
+  // so prevent bubbling up if there is an onCollapseToggle fn
   const handleCollapseToggle = e => {
-    if (props.onCollapseToggle) {
+    if (onCollapseToggle) {
       e.stopPropagation()
-      props.onCollapseToggle()
+      onCollapseToggle(e)
     }
   }
 
@@ -53,7 +54,7 @@ export default function TitledList (props: ListProps) {
             className={styles.accordion_carat}
           >
             {/* TODO Ian 2018-01-08 make separate up and down carat icons */}
-            {<Icon name={EXPAND} className={props.collapsed && styleIndex.rotated} />}
+            {<Icon name={EXPAND} className={props.collapsed ? styleIndex.rotated : undefined} />}
           </div>
         }
       </div>
