@@ -32,7 +32,7 @@ all: clean dist
 
 .PHONY: install
 install:
-	npm install
+	yarn
 
 .PHONY: uninstall
 uninstall:
@@ -72,7 +72,8 @@ dev-mdns:
 #####################################################################
 
 .PHONY: test
-test: test-unit check lint
+test: test-unit
+	$(MAKE) check lint
 
 .PHONY: test-unit
 test-unit:
@@ -83,19 +84,13 @@ check:
 	$(bin)/flow
 
 .PHONY: lint
-lint: lint-js lint-css
-
-.PHONY: lint-js
-lint-js:
+lint:
 	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-
-.PHONY: lint-css
-lint-css:
 	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install
+	$(bin)/flow-typed install --ignoreDeps dev
 
 .PHONY: uninstall-types
 uninstall-types:

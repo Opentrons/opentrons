@@ -1,3 +1,13 @@
 {
-  "version": "3.0.0"
+  "version": "3.0.0",
+  "private": true,
+  "workspaces": [
+    "app",
+    "components",
+    "protocol-designer"
+  ],
+  "devDependencies": {
+    "flow-bin": "^0.63.0",
+    "flow-typed": "^2.2.3"
+  }
 }

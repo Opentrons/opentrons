@@ -94,7 +94,7 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 *   [Kibana Contributing Guide][kibana-contributing]
 
 [repo]: https://github.com/Opentrons/opentrons
-[easyfix]: https://github.com/OpenTrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
+[easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
 [support]: https://support.opentrons.com/
 [fork-and-pull]: https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/
 [how-to-write-pr]: https://github.com/blog/1943-how-to-write-the-perfect-pull-request

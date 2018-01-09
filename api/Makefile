@@ -2,11 +2,11 @@
 
 SHELL := /bin/bash
 
-.PHONY: test docs publish clean install exe dev push
-
+.PHONY: install
 install:
 	pip install -r requirements.txt && pip install -e .
 
+.PHONY: test
 test:
 	python -m pytest \
 		--cov=opentrons \
@@ -14,15 +14,19 @@ test:
 		--cov-report xml:coverage.xml \
 		tests
 
+.PHONY: lint
 lint:
 	python -m pylama opentrons tests
 
+.PHONY: docs
 docs:
 	cd docs && make html && make doctest
 
+.PHONY: publish
 publish:
 	cd scripts && publish.sh && doc-deploy.sh
 
+.PHONY: dev
 dev:
 	python opentrons/server/main.py -P 31950
 
@@ -34,12 +38,13 @@ dist/update.base64: clean
 	base64 -i /tmp/update | sed -e "s/.\{50\}/&\n/g" >> dist/update.base64 && \
 	echo -e "\n---OT UPDATE END---" >> dist/update.base64
 
+.PHONY: push
 push: dist/update.base64
 	curl -F 'data=@dist/update.base64' http://\[fd00:0:cafe:fefe::1\]/upload
 
+.PHONY: term
 term:
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@fd00:0:cafe:fefe::1
-
 
 ########## [START] RESIN DEVICE ##########
 
@@ -65,7 +70,7 @@ ssh_device:
 
 ########## [END] RESIN DEVICE ##########
 
-
+.PHONY: clean
 clean:
 	rm -rf \
 		__pycache__ \

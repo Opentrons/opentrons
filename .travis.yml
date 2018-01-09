@@ -25,13 +25,10 @@ matrix:
 # More: https://docs.travis-ci.com/user/caching/
 cache:
   pip: true
+  yarn: true
   directories:
     - $HOME/.pyenv
     - $HOME/.cache/brew
-    # location of npm cache - preferable to cache this rather than node_modules
-    # because we have one cache for all npm projects plus caching node_modules
-    # can cause issues with native deps
-    - $HOME/.npm
 
 before_install:
   - >  # load keys needed to publish to pypa only when building from public repo

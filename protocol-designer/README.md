@@ -1,11 +1,11 @@
 # Protocol Designer Prototype
 
-## Use with `npm`
+## Use with `yarn`
 
 ```bash
-npm install # Installing dependencies.
-npm run build # Building the application.
-npm start # Starts the app on http://localhost:8080/
+yarn # Installing dependencies.
+yarn run build # Building the application.
+yarn run start # Starts the app on http://localhost:8080/
 ```
 
 # Internal Ingredient state shape
