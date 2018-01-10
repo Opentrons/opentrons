@@ -15,6 +15,10 @@ import {
   FINISHED,
   STOPPED,
   UNPROBED,
+  PREPARING_TO_PROBE,
+  READY_TO_PROBE,
+  PROBING,
+  PROBED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
   DECK_SLOTS,
@@ -173,12 +177,13 @@ export function getInstrumentsByAxis (state) {
 export function getInstruments (state) {
   const protocolInstrumentsByAxis = getInstrumentsByAxis(state)
   const {
-    instrumentsByAxis: calibrationByAxis,
+    calibrationRequest,
     probedByAxis
   } = getCalibrationState(state)
 
-  return INSTRUMENT_AXES.map((axis) => {
-    let instrument = protocolInstrumentsByAxis[axis] || {axis}
+  return INSTRUMENT_AXES.map((mount) => {
+    let instrument = protocolInstrumentsByAxis[mount] || {axis: mount}
+    let calibration = UNPROBED
 
     if (instrument.channels === 1) {
       instrument = {...instrument, channels: SINGLE_CHANNEL}
@@ -186,11 +191,24 @@ export function getInstruments (state) {
       instrument = {...instrument, channels: MULTI_CHANNEL}
     }
 
+    // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
+    if (calibrationRequest.mount === mount && !calibrationRequest.error) {
+      if (calibrationRequest.type === 'MOVE_TO_FRONT') {
+        calibration = calibrationRequest.inProgress
+          ? PREPARING_TO_PROBE
+          : READY_TO_PROBE
+      } else if (calibrationRequest.type === 'PROBE_TIP') {
+        calibration = calibrationRequest.inProgress
+          ? PROBING
+          : PROBED
+      }
+    }
+
     if (instrument.name) {
       instrument = {
         ...instrument,
-        calibration: calibrationByAxis[axis] || UNPROBED,
-        probed: probedByAxis[axis] || false
+        calibration,
+        probed: probedByAxis[mount] || false
       }
     }
 
