@@ -31,7 +31,9 @@ test:
 # upload coverage reports
 # uses codecov's bash upload script
 # TODO(mc, 2018-08-28): add test as a task dependency once travis is setup to
-# use this Makefile for tests
+#   use this Makefile for tests
+# TODO(mc, 2018-01-09): using the codecov bash reporter is not cross-platform
+#   friendly; evaluate whether this is ok, because only CI uses this target
 .PHONY: coverage
 coverage:
 	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy

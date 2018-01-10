@@ -1,12 +1,7 @@
 # opentrons protocol designer makefile
 
-# use bash
-SHELL := bash
-
-# use devDependency CLIs with $(bin)/command
-# set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
+# add node_modules/.bin to the path
+PATH := $(shell yarn bin):$(PATH)
 
 # dev server port
 port ?= 8080
@@ -19,6 +14,9 @@ fix ?= false
 ifeq ($(watch), true)
 	cover := false
 endif
+
+# set NODE_ENV for a command with $(env)=environment
+env := cross-env NODE_ENV
 
 # standard targets
 #####################################################################
@@ -34,9 +32,10 @@ uninstall:
 # artifacts
 #####################################################################
 
+# TODO(mc, 2018-01-09): use html-webpack-plugin for index.html
 .PHONY: build
 build:
-	$(env)=production $(bin)/webpack -p
+	$(env)=production webpack -p
 	cp index.html dist/
 
 # development
@@ -49,7 +48,7 @@ build:
 
 .PHONY: test
 test:
-	$(env)=test $(bin)/jest \
+	$(env)=test jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
@@ -57,17 +56,18 @@ test:
 
 .PHONY: check
 check:
-	$(bin)/flow
+	flow
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps dev
+	flow-typed install --ignoreDeps dev
 
+# TODO(mc, 2018-01-09): rm -rf is not cross-platform
 .PHONY: uninstall-types
 uninstall-types:
 	rm -rf flow-typed
 
 .PHONY: lint
 lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+	standard --verbose --fix=$(fix) | snazzy
+	stylelint '**/*.css' --fix=$(fix) --verbose
