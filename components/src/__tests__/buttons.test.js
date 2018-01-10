@@ -25,14 +25,14 @@ describe('PrimaryButton', () => {
     expect(onClick).toHaveBeenCalled()
   })
 
-  test('disabled sets onClick to false', () => {
+  test('disabled sets onClick to undefined', () => {
     const onClick = () => {}
     const button = Renderer.create(
       <PrimaryButton onClick={onClick} disabled />
     ).root.findByType('button')
 
     expect(button.props.disabled).toBe(true)
-    expect(button.props.onClick).toBe(false)
+    expect(button.props.onClick).toBe(undefined)
   })
 
   test('renders correctly', () => {
