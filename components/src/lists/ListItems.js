@@ -24,7 +24,7 @@ export default function ListItem (props: ListItemProps) {
       <li>
         <NavLink
           to={url}
-          onClick={!isDisabled && onClick}
+          onClick={onClick}
           disabled={isDisabled}
           activeClassName={styles.active}
           >
