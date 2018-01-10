@@ -1,4 +1,4 @@
-.overlayBackground {
+.overlay_background {
   /* TODO: use a mixin for this transparent overlay style */
   fill: black;
   opacity: 0.75;
