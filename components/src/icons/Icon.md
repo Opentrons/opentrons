@@ -4,7 +4,7 @@ All available icons:
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
   ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED, CHEVRON_UP,
-  CHEVRON_DOWN, CHEVRON_LEFT, CCHEVRON_RIGHT, FILE, COG, CONNECT,
+  CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT,
 } = require('./icon-data')
 
 ;<div>
