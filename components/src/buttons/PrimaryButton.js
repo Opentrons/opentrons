@@ -15,7 +15,7 @@ export default function PrimaryButton (props: ButtonProps) {
 
   return (
     <Button {...props} className={className}>
-      {props.iconName && <Icon name={props.iconName} className={styles.buttonIcon} />}
+      {props.iconName && <Icon name={props.iconName} className={styles.button_icon} />}
       {props.children}
     </Button>
   )
