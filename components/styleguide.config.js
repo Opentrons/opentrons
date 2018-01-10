@@ -22,6 +22,10 @@ module.exports = {
     {
       name: 'Icons',
       components: 'src/icons/[A-Z]*.js'
+    },
+    {
+      name: 'Lists',
+      components: 'src/lists/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {
