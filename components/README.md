@@ -249,13 +249,17 @@ Titled ordered list wrapper with optional title icon
 import {TitledList} from '@opentrons/components'
 ```
 
- prop      | flow type                  | required | description
----------- | -------------------------- | -------- | -----------------------
- title     | React.Node                 | yes      | h3 child
- children  | React.Node                 | yes      | li children
- classname | string                     | yes      | additional class names
- iconName  | iconName                   | no       | optional icon before h3
- onClick   | (SyntheticEvent<>) => void | no       | optional click action
+ prop        | flow type                 | required | description
+----------   | ------------------------- | -------- | -----------------------
+ title       | React.Node                | yes      | text of title
+ children    | React.Node                | yes      | children: must all be li
+ className   | string                    | yes      | additional class names
+ collapsed   | boolean                   | no       | sets collapsed appearance. List is expanded by default.
+ description | React.Node                | no       | component with descriptive text about the list
+ iconName    | iconName                  | no       | optional icon before h3
+ onClick     | (SyntheticEvent<>) => void| no       | optional click action (on title div, not children)
+onCollapseToggle | (SyntheticEvent<>) => void| no   | optional click action (on carat click only, not rest of title div). If defined, the TitledList is expandable and the carat is visible
+ selected    | boolean                   | no       | highlights the whole TitledList if true
 
 #### ListItem
 
@@ -268,7 +272,7 @@ import {Listitem} from '@opentrons/components'
  prop      | flow type                  | required | description
 ---------- | -------------------------- | -------- | -----------------------------
  children  | React.Node                 | yes      | span(s) children
- classname | string                     | no       | additional class names
+ className | string                     | no       | additional class names
  url       | string                     | no       | optional NavLink url
  iconName  | iconName                   | no       | optional icon before children
  onClick   | (SyntheticEvent<>) => void | no       | optional click action
@@ -284,7 +288,7 @@ import {ListAlert} from '@opentrons/components'
  prop      | flow type   | required | description
 ---------- | ----------- | -------- | ----------------------
  children  | React.Node  | yes      | span(s) children
- classname | string      | no       | additional class names
+ className | string      | no       | additional class names
 
 ## contributing
 

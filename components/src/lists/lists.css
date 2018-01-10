@@ -1,4 +1,4 @@
-@value color_bg_light, color_bg_selected, color_light_grey, color_med_grey, color_dark_grey from '../styles/colors.css';
+@value color_bg_light, color_bg_selected, color_blue, color_light_grey, color_med_grey, color_dark_grey from '../styles/colors.css';
 @value color_font_dark, color_font_disabled, font_size_body_2, font_size_body_1 from '../styles/typography.css';
 
 .titled_list {
@@ -25,6 +25,20 @@
 
 .list_title {
   padding-left: 0.5rem;
+}
+
+.list_selected {
+  border: 2px solid color_blue;
+}
+
+.accordion_carat {
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.accordion_carat svg {
+  height: 2rem;
+  width: 2rem;
 }
 
 /* List Items */
@@ -79,4 +93,3 @@ a[disabled] {
   line-height: 1rem;
   font-style: italic;
 }
-
