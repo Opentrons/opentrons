@@ -83,3 +83,88 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
   />
 </div>
 `;
+
+exports[`TitledList renders collapsed TitledList correctly 1`] = `
+<div
+  className=""
+>
+  <div
+    className="list_title_bar"
+    onClick={undefined}
+  >
+    <h3
+      className="list_title"
+    />
+    <div
+      className="accordion_carat"
+      onClick={[Function]}
+    >
+      <svg
+        aria-hidden="true"
+        className=""
+        fill="currentColor"
+        height={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width={undefined}
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M7.41 9L12 13.242 16.59 9 18 10.312l-6 5.545-6-5.545z"
+          fillRule="evenodd"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`TitledList renders expanded TitledList correctly 1`] = `
+<div
+  className=""
+>
+  <div
+    className="list_title_bar"
+    onClick={undefined}
+  >
+    <h3
+      className="list_title"
+    />
+    <div
+      className="accordion_carat"
+      onClick={[Function]}
+    >
+      <svg
+        aria-hidden="true"
+        className=""
+        fill="currentColor"
+        height={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width={undefined}
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
+          fillRule="evenodd"
+        />
+      </svg>
+    </div>
+  </div>
+  <span>
+    Description
+  </span>
+  <ol
+    className="titled_list"
+  >
+    <li>
+      1
+    </li>
+    <li>
+      2
+    </li>
+  </ol>
+</div>
+`;

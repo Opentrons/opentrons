@@ -38,6 +38,28 @@ describe('TitledList', () => {
 
     expect(tree).toMatchSnapshot()
   })
+
+  test('renders expanded TitledList correctly', () => {
+    const tree = Renderer.create(
+      <TitledList onCollapseToggle={e => {}} description={<span>Description</span>} >
+        <li>1</li>
+        <li>2</li>
+      </TitledList>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders collapsed TitledList correctly', () => {
+    const tree = Renderer.create(
+      <TitledList onCollapseToggle={e => {}} description={<span>Description</span>} collapsed>
+        <li>1</li>
+        <li>2</li>
+      </TitledList>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
 })
 
 describe('ListItem', () => {

@@ -67,7 +67,6 @@ export default function TitledList (props: ListProps) {
           <div onClick={handleCollapseToggle}
             className={styles.accordion_carat}
           >
-            {/* TODO Ian 2018-01-08 make separate up and down carat icons */}
             <Icon name={props.collapsed ? CHEVRON_DOWN : CHEVRON_RIGHT} />
           </div>
         }
