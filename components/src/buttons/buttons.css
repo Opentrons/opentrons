@@ -53,3 +53,10 @@
   float: left;
   height: 1rem;
 }
+
+.button_close {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: red;
+}

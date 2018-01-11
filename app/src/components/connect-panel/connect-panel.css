@@ -1,5 +1,5 @@
 @value blue, grey, dark_grey from '../App.global.css';
-@value border from '../side-panel/side-panel.css';
+@value border: 2px solid #e5e2e2;
 
 .robot_list {
   list-style: none;
