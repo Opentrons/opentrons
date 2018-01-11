@@ -12,7 +12,7 @@ type ListProps = {
   /** text of title */
   title: string,
   /** children must all be `<li>` */
-  children: React.Node,
+  children?: React.Node,
   /** additional classnames */
   className?: string,
   /** sets collapsed appearance. List is expanded by default. */
