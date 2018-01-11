@@ -1,0 +1,52 @@
+/* TODO Ian 2018-01-11 Use shades of gray for arrows and text */
+
+.step_item ol {
+  margin: 0;
+  padding: 0;
+}
+
+.step_item h3 {
+  text-transform: uppercase;
+}
+
+.emphasized_cell {
+  font-weight: bold;
+}
+
+/* TODO Ian 2018-01-11 replace with real SidePanel */
+.fake_sidepanel_standin {
+  height: 100%;
+  float: left;
+  width: 25%;
+}
+
+/* Step Subitem */
+
+.step_subitem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+.step_subitem > * {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.step_subitem svg {
+  flex: 1;
+  height: 1.5rem;
+}
+
+/* Step Subitem Column Header */
+
+.step_subitem_column_header {
+  composes: step_subitem;
+}
+
+.step_subitem_column_header > * {
+  flex: 2;
+}
