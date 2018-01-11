@@ -1,13 +1,9 @@
+// @flow
 // robot calibration state and reducer
+// TODO(mc, 2018-01-10): refactor to use combineReducers
 import {actionTypes} from '../actions'
 
 import {
-  UNPROBED,
-  PREPARING_TO_PROBE,
-  READY_TO_PROBE,
-  PROBING,
-  PROBED,
-
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
@@ -22,6 +18,56 @@ import {
   JOG_DISTANCE_SLOW_MM,
   JOG_DISTANCE_FAST_MM
 } from '../constants'
+
+// calibration request types
+// TODO(mc, 2018-01-10): these should match up with the request actions;
+//   explore how to link these concepts effectively
+type CalibrationRequestType =
+  | ''
+  | 'MOVE_TO_FRONT'
+  | 'PROBE_TIP'
+
+type CalibrationRequest = {
+  type: CalibrationRequestType,
+  mount: string,
+  inProgress: boolean,
+  error: ?{message: string},
+}
+
+// TODO(mc, 2018-01-10): replace with CalibrationRequest
+type LabwareConfirmationRequest = {
+  inProgress: boolean,
+  axis?: string,
+  slot?: number,
+  error: ?{message: string},
+}
+
+type State = {
+  labwareReviewed: boolean,
+  jogDistance: number,
+
+  probedByAxis: {[string]: boolean},
+
+  labwareBySlot: {[number]: {}},
+  confirmedBySlot: {[number]: boolean},
+
+  calibrationRequest: CalibrationRequest,
+
+  pickupRequest: LabwareConfirmationRequest,
+  homeRequest: LabwareConfirmationRequest,
+  confirmTiprackRequest: LabwareConfirmationRequest,
+  moveToRequest: LabwareConfirmationRequest,
+  jogRequest: LabwareConfirmationRequest,
+  updateOffsetRequest: LabwareConfirmationRequest,
+}
+
+// TODO(mc, 2018-01-10): import this from elsewhere
+type Action = {
+  type: string,
+  payload?: any,
+  error?: boolean,
+  meta?: {}
+}
 
 const {
   SESSION,
@@ -48,14 +94,10 @@ const {
   CONFIRM_LABWARE
 } = actionTypes
 
-const INITIAL_STATE = {
+const INITIAL_STATE: State = {
   labwareReviewed: false,
   jogDistance: JOG_DISTANCE_SLOW_MM,
 
-  // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
-  // axis. probedByAxis holds a flag for whether the instrument has been
-  // probed at least once by axis. Rethink or combine these states
-  instrumentsByAxis: {},
   probedByAxis: {},
 
   // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
@@ -64,20 +106,23 @@ const INITIAL_STATE = {
   labwareBySlot: {},
   confirmedBySlot: {},
 
+  calibrationRequest: {type: '', inProgress: false, mount: '', error: null},
+
   // TODO(mc, 2017-11-22): collapse all these into a single
   // instrumentRequest object. We can't have simultaneous instrument
   // movements so split state hurts us without benefit
   pickupRequest: {inProgress: false, error: null, slot: 0},
   homeRequest: {inProgress: false, error: null, slot: 0},
   confirmTiprackRequest: {inProgress: false, error: null, slot: 0},
-  moveToFrontRequest: {inProgress: false, error: null, axis: ''},
-  probeTipRequest: {inProgress: false, error: null},
   moveToRequest: {inProgress: false, error: null},
   jogRequest: {inProgress: false, error: null},
   updateOffsetRequest: {inProgress: false, error: null}
 }
 
-export default function calibrationReducer (state = INITIAL_STATE, action) {
+export default function calibrationReducer (
+  state: State = INITIAL_STATE,
+  action: Action
+) {
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
@@ -122,92 +167,82 @@ function handleSetLabwareReviewed (state, action) {
 }
 
 function handleMoveToFront (state, action) {
-  const {payload: {instrument: axis}} = action
-  const instrumentsByAxis = Object.keys(state.instrumentsByAxis)
-    .filter((targetAxis) => targetAxis !== axis)
-    .reduce((calibration, targetAxis) => {
-      calibration[targetAxis] = UNPROBED
-      return calibration
-    }, {
-      ...state.instrumentsByAxis,
-      [axis]: PREPARING_TO_PROBE
-    })
+  if (!action.payload || !action.payload.instrument) return state
+
+  const {payload: {instrument}} = action
 
   return {
     ...state,
-    instrumentsByAxis,
-    moveToFrontRequest: {inProgress: true, error: null, axis}
+    calibrationRequest: {
+      type: 'MOVE_TO_FRONT',
+      mount: instrument,
+      inProgress: true,
+      error: null
+    }
   }
 }
 
 function handleMoveToFrontResponse (state, action) {
-  const {moveToFrontRequest: {axis}} = state
   const {payload, error} = action
 
   return {
     ...state,
-    moveToFrontRequest: {
-      ...state.moveToFrontRequest,
+    calibrationRequest: {
+      ...state.calibrationRequest,
       inProgress: false,
       error: error
         ? payload
         : null
-    },
-    instrumentsByAxis: {
-      ...state.instrumentsByAxis,
-      [axis]: !error
-        ? READY_TO_PROBE
-        : UNPROBED
     }
   }
 }
 
 function handleProbeTip (state, action) {
-  const {payload: {instrument: axis}} = action
+  if (!action.payload || !action.payload.instrument) return state
+
+  const {payload: {instrument}} = action
 
   return {
     ...state,
-    probeTipRequest: {inProgress: true, error: null, axis},
-    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: PROBING}
+    calibrationRequest: {
+      type: 'PROBE_TIP',
+      mount: instrument,
+      inProgress: true,
+      error: null
+    }
   }
 }
 
 function handleProbeTipResponse (state, action) {
-  const {probeTipRequest: {axis}} = state
+  const {calibrationRequest: {mount}} = state
   const {payload, error} = action
 
   return {
     ...state,
-    probeTipRequest: {
-      ...state.probeTipRequest,
+    calibrationRequest: {
+      ...state.calibrationRequest,
       inProgress: false,
       error: error
         ? payload
         : null
     },
-    instrumentsByAxis: {
-      ...state.instrumentsByAxis,
-      [axis]: !error
-        ? PROBED
-        : UNPROBED
-    },
     probedByAxis: {
       ...state.probedByAxis,
-      [axis]: state.probedByAxis[axis] || !error
+      [mount]: state.probedByAxis[mount] || !error
     }
   }
 }
 
 function handleResetTipProbe (state, action) {
-  const {payload: {instrument: axis}} = action
-
   return {
     ...state,
-    instrumentsByAxis: {...state.instrumentsByAxis, [axis]: UNPROBED}
+    calibrationRequest: {...state.calibrationRequest, mount: ''}
   }
 }
 
 function handleMoveTo (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {
@@ -220,6 +255,8 @@ function handleMoveTo (state, action) {
 
 function handleMoveToResponse (state, action) {
   const {moveToRequest: {slot}} = state
+  if (!slot) return state
+
   const {payload, error} = action
 
   return {
@@ -243,6 +280,8 @@ function handleMoveToResponse (state, action) {
 // TODO(mc, 2017-11-22): collapse all these calibration handlers into one
 // See state TODO above
 function handlePickupAndHome (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {
@@ -255,6 +294,8 @@ function handlePickupAndHome (state, action) {
 
 function handlePickupAndHomeResponse (state, action) {
   const {pickupRequest: {slot}} = state
+  if (!slot) return state
+
   const {payload, error} = action
 
   return {
@@ -276,6 +317,8 @@ function handlePickupAndHomeResponse (state, action) {
 }
 
 function handleHomeInstrument (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {
@@ -287,6 +330,8 @@ function handleHomeInstrument (state, action) {
 
 function handleHomeInstrumentResponse (state, action) {
   const {homeRequest: {slot}} = state
+  if (!slot) return state
+
   const {payload, error} = action
 
   return {
@@ -308,6 +353,8 @@ function handleHomeInstrumentResponse (state, action) {
 }
 
 function handleConfirmTiprack (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {
@@ -319,6 +366,8 @@ function handleConfirmTiprack (state, action) {
 
 function handleConfirmTiprackResponse (state, action) {
   const {confirmTiprackRequest: {slot}} = state
+  if (!slot) return state
+
   const {payload, error} = action
 
   return {
@@ -371,6 +420,8 @@ function handleJogResponse (state, action) {
 }
 
 function handleUpdateOffset (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {
@@ -385,13 +436,15 @@ function handleUpdateOffset (state, action) {
 
 function handleUpdateResponse (state, action) {
   const {updateOffsetRequest: {slot}} = state
+  if (!slot) return state
+
   const {error, payload} = action
   let labwareBySlot = {...state.labwareBySlot}
   let confirmedBySlot = {...state.confirmedBySlot}
 
   // set status and confirmed flag for non-tipracks
   // tipracks are handled by confirmTiprack so we don't want to touch them here
-  if (!payload.isTiprack) {
+  if (payload && !payload.isTiprack) {
     confirmedBySlot[slot] = !error
     labwareBySlot[slot] = !error
       ? CONFIRMED
@@ -417,6 +470,8 @@ function handleUpdateResponse (state, action) {
 }
 
 function handleConfirmLabware (state, action) {
+  if (!action.payload || !action.payload.labware) return state
+
   const {payload: {labware: slot}} = action
 
   return {

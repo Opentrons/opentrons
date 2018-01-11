@@ -325,6 +325,7 @@ describe('robot selectors', () => {
     })
   })
 
+  // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
   test('get instruments', () => {
     const state = makeState({
       session: {
@@ -334,8 +335,11 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {
-          left: constants.PROBING
+        calibrationRequest: {
+          type: 'PROBE_TIP',
+          mount: 'left',
+          inProgress: true,
+          error: null
         },
         probedByAxis: {
           left: true
@@ -380,7 +384,7 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {},
+        calibrationRequest: {},
         probedByAxis: {}
       }
     })
@@ -396,7 +400,7 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {},
+        calibrationRequest: {},
         probedByAxis: {}
       }
     })
@@ -413,7 +417,7 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {},
+        calibrationRequest: {},
         probedByAxis: {left: true, right: true}
       }
     })
@@ -426,7 +430,7 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {},
+        calibrationRequest: {},
         probedByAxis: {left: false, right: false}
       }
     })
@@ -438,7 +442,7 @@ describe('robot selectors', () => {
         }
       },
       calibration: {
-        instrumentsByAxis: {},
+        calibrationRequest: {},
         probedByAxis: {right: true}
       }
     })

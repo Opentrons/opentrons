@@ -8,10 +8,7 @@ describe('robot reducer - calibration', () => {
     expect(state).toEqual({
       labwareReviewed: false,
       jogDistance: constants.JOG_DISTANCE_SLOW_MM,
-      // TODO(mc, 2017-11-03): instrumentsByAxis holds calibration status by
-      // axis. probedByAxis holds a flag for whether the instrument has been
-      // probed at least once by axis. Rethink or combine these states
-      instrumentsByAxis: {},
+
       probedByAxis: {},
 
       // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
@@ -20,15 +17,12 @@ describe('robot reducer - calibration', () => {
       labwareBySlot: {},
       confirmedBySlot: {},
 
-      // TODO(mc, 2017-11-22): collapse all these into a single request atom
-      // with enum for request type rather than inProgress flag. We can't have
-      // simultaneous instrument movements so split state doesn't help
+      calibrationRequest: {type: '', inProgress: false, mount: '', error: null},
+
+      // TODO(mc, 2018-01-10): collapse all these into calibrationRequest
       pickupRequest: {inProgress: false, error: null, slot: 0},
       homeRequest: {inProgress: false, error: null, slot: 0},
       confirmTiprackRequest: {inProgress: false, error: null, slot: 0},
-
-      moveToFrontRequest: {inProgress: false, error: null, axis: ''},
-      probeTipRequest: {inProgress: false, error: null},
       moveToRequest: {inProgress: false, error: null},
       jogRequest: {inProgress: false, error: null},
       updateOffsetRequest: {inProgress: false, error: null}
@@ -227,10 +221,11 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_FRONT action', () => {
     const state = {
       calibration: {
-        moveToFrontRequest: {inProgress: false, error: new Error()},
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.READY_TO_PROBE
+        calibrationRequest: {
+          type: '',
+          mount: '',
+          inProgress: false,
+          error: new Error()
         }
       }
     }
@@ -240,10 +235,11 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      moveToFrontRequest: {inProgress: true, error: null, axis: 'left'},
-      instrumentsByAxis: {
-        left: constants.PREPARING_TO_PROBE,
-        right: constants.UNPROBED
+      calibrationRequest: {
+        type: 'MOVE_TO_FRONT',
+        mount: 'left',
+        inProgress: true,
+        error: null
       }
     })
   })
@@ -251,10 +247,11 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_FRONT_RESPONSE action', () => {
     const state = {
       calibration: {
-        moveToFrontRequest: {inProgress: true, error: null, axis: 'right'},
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.PREPARING_TO_PROBE
+        calibrationRequest: {
+          type: 'MOVE_TO_FRONT',
+          mount: 'right',
+          inProgress: true,
+          error: null
         }
       }
     }
@@ -267,22 +264,20 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, success).calibration).toEqual({
-      moveToFrontRequest: {inProgress: false, error: null, axis: 'right'},
-      instrumentsByAxis: {
-        left: constants.UNPROBED,
-        right: constants.READY_TO_PROBE
+      calibrationRequest: {
+        type: 'MOVE_TO_FRONT',
+        mount: 'right',
+        inProgress: false,
+        error: null
       }
     })
 
     expect(reducer(state, failure).calibration).toEqual({
-      moveToFrontRequest: {
+      calibrationRequest: {
+        type: 'MOVE_TO_FRONT',
+        mount: 'right',
         inProgress: false,
-        error: new Error('AH'),
-        axis: 'right'
-      },
-      instrumentsByAxis: {
-        left: constants.UNPROBED,
-        right: constants.UNPROBED
+        error: new Error('AH')
       }
     })
   })
@@ -290,10 +285,11 @@ describe('robot reducer - calibration', () => {
   test('handles PROBE_TIP action', () => {
     const state = {
       calibration: {
-        probeTipRequest: {inProgress: false, error: new Error(), axis: 'right'},
-        instrumentsByAxis: {
-          left: constants.READY_TO_PROBE,
-          right: constants.UNPROBED
+        calibrationRequest: {
+          type: '',
+          mount: 'left',
+          inProgress: false,
+          error: new Error('AH')
         }
       }
     }
@@ -303,10 +299,11 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      probeTipRequest: {inProgress: true, error: null, axis: 'left'},
-      instrumentsByAxis: {
-        left: constants.PROBING,
-        right: constants.UNPROBED
+      calibrationRequest: {
+        type: 'PROBE_TIP',
+        mount: 'left',
+        inProgress: true,
+        error: null
       }
     })
   })
@@ -314,10 +311,11 @@ describe('robot reducer - calibration', () => {
   test('handles PROBE_TIP_RESPONSE action', () => {
     const state = {
       calibration: {
-        probeTipRequest: {inProgress: true, error: null, axis: 'right'},
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.PROBING
+        calibrationRequest: {
+          type: 'PROBE_TIP',
+          mount: 'right',
+          inProgress: true,
+          error: null
         },
         probedByAxis: {}
       }
@@ -330,28 +328,22 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, success).calibration).toEqual({
-      probeTipRequest: {
+      calibrationRequest: {
+        type: 'PROBE_TIP',
+        mount: 'right',
         inProgress: false,
-        error: null,
-        axis: 'right'
-      },
-      instrumentsByAxis: {
-        left: constants.UNPROBED,
-        right: constants.PROBED
+        error: null
       },
       probedByAxis: {
         right: true
       }
     })
     expect(reducer(state, failure).calibration).toEqual({
-      probeTipRequest: {
+      calibrationRequest: {
+        type: 'PROBE_TIP',
+        mount: 'right',
         inProgress: false,
-        error: new Error('AH'),
-        axis: 'right'
-      },
-      instrumentsByAxis: {
-        left: constants.UNPROBED,
-        right: constants.UNPROBED
+        error: new Error('AH')
       },
       probedByAxis: {
         right: false
@@ -362,22 +354,15 @@ describe('robot reducer - calibration', () => {
   test('handles RESET_TIP_PROBE', () => {
     const state = {
       calibration: {
-        instrumentsByAxis: {
-          left: constants.UNPROBED,
-          right: constants.PROBED
-        }
+        calibrationRequest: {mount: 'left'}
       }
     }
     const action = {
-      type: actionTypes.RESET_TIP_PROBE,
-      payload: {instrument: 'right'}
+      type: actionTypes.RESET_TIP_PROBE
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      instrumentsByAxis: {
-        left: constants.UNPROBED,
-        right: constants.UNPROBED
-      }
+      calibrationRequest: {mount: ''}
     })
   })
 

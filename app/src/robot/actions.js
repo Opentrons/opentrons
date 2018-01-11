@@ -33,6 +33,7 @@ export const actionTypes = {
   DROP_TIP_AND_HOME_RESPONSE: makeRobotActionName('DROP_TIP_AND_HOME_RESPONSE'),
   CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
   CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
+  // TODO(mc, 2018-01-10): rename MOVE_TO_FRONT to PREPARE_TO_PROBE?
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
