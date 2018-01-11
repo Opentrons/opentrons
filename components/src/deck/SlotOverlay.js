@@ -22,7 +22,7 @@ export function SlotOverlay (props: SlotOverlayProps) {
 
   return <g className={cx(styles.overlay, className)}>
     <rect
-      className={styles.overlayBackground}
+      className={styles.overlay_background}
       x={leftRightPadding + '%'}
       y={topPadding + '%'}
       height='33%'

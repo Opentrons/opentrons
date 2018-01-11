@@ -4,7 +4,8 @@ All available icons:
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
   ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED, CHEVRON_UP,
-  CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT,
+  CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT, CONDENSE, DISTRIBUTE,
+  MIX, PAUSE, ARROW_RIGHT
 } = require('./icon-data')
 
 ;<div>
@@ -25,6 +26,11 @@ const {
   <Icon width='64px' name={FILE} />
   <Icon width='64px' name={COG} />
   <Icon width='64px' name={CONNECT} />
+  <Icon width='64px' name={CONDENSE} />
+  <Icon width='64px' name={DISTRIBUTE} />
+  <Icon width='64px' name={MIX} />
+  <Icon width='64px' name={PAUSE} />
+  <Icon width='64px' name={ARROW_RIGHT} />
 </div>
 ```
 

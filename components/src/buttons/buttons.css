@@ -48,3 +48,8 @@
   background-color: #d2d2d2;
   box-shadow: none;
 }
+
+.button_icon {
+  float: left;
+  height: 1rem;
+}

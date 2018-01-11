@@ -138,6 +138,7 @@ import {PrimaryButton} from '@opentrons/components'
  disabled  | bool                       | no       | disabled flag
  className | string                     | no       | additional class names
  children  | React.Node                 | no       | contents of the button
+ iconName  | string                     | no       | adds icon in left side of button
 
 ### icons
 

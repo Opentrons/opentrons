@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {type IconName} from '../icons'
 
 export type ButtonProps = {
   /** click handler */
@@ -8,6 +9,8 @@ export type ButtonProps = {
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
   disabled?: bool,
+  /** optional Icon name */
+  iconName?: IconName,
   /** classes to apply */
   className?: string,
   /** contents of the button */
@@ -25,7 +28,7 @@ export type ButtonProps = {
  */
 export default function Button (props: ButtonProps) {
   const {disabled} = props
-  const onClick = !disabled && props.onClick
+  const onClick = disabled ? undefined : props.onClick
 
   return (
     <button
