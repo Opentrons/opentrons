@@ -55,7 +55,7 @@ exports[`PageTabs renders PageTabs correctly 1`] = `
 
 exports[`SidePanel renders SidePanel correctly 1`] = `
 <div
-  className="panel"
+  className="panel closed"
 >
   <div
     className="title_bar"

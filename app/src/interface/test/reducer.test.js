@@ -8,40 +8,40 @@ describe('interface reducer', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
-      isPanelOpen: false,
+      isPanelClosed: true,
       currentPanel: 'connect'
     })
   })
 
   test('handles closePanel', () => {
-    const state = {isPanelOpen: true, currentPanel: 'upload'}
+    const state = {isPanelClosed: false, currentPanel: 'upload'}
     const action = {type: actionTypes.CLOSE_PANEL}
 
     expect(reducer(state, action)).toEqual({
-      isPanelOpen: false,
+      isPanelClosed: true,
       currentPanel: 'upload'
     })
   })
 
   test('handles setCurrentPanel', () => {
-    const state = {isPanelOpen: false, currentPanel: 'upload'}
+    const state = {isPanelClosed: true, currentPanel: 'upload'}
     const action = {
       type: actionTypes.SET_CURRENT_PANEL,
       payload: {panel: 'connect'}
     }
 
     expect(reducer(state, action)).toEqual({
-      isPanelOpen: true,
+      isPanelClosed: false,
       currentPanel: 'connect'
     })
   })
 
   test('handles robot:DISCONNECT_RESPONSE', () => {
-    const state = {isPanelOpen: false, currentPanel: 'upload'}
+    const state = {isPanelClosed: true, currentPanel: 'upload'}
     const action = {type: robotActionTypes.DISCONNECT_RESPONSE}
 
     expect(reducer(state, action)).toEqual({
-      isPanelOpen: false,
+      isPanelClosed: true,
       currentPanel: 'connect'
     })
   })

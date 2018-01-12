@@ -168,24 +168,27 @@ describe('SidePanel', () => {
   test('renders close button when onClick is present', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
-      <SidePanel title={'title'} onClick={onClick} />
+      <SidePanel title={'title'} onCloseClick={onClick} />
     ).root.findByType('button')
 
     expect(button).toBeDefined()
+    button.props.onClick()
+    expect(onClick).toHaveBeenCalled()
   })
 
-  test('renders open panel when onClick is null', () => {
+  test('renders closed panel when onClick present and isOpen is false', () => {
+    const onClick = jest.fn()
     const panel = Renderer.create(
-      <SidePanel title={'title'} />
+      <SidePanel title={'title'} isClosed='true' onCloseClick={onClick} />
     ).root.findByType('div')
 
-    expect(panel.props.className).toEqual('panel')
+    expect(panel.props.className).toEqual('panel closed')
   })
 
   test('renders SidePanel correctly', () => {
     const onClick = jest.fn()
     const tree = Renderer.create(
-      <SidePanel title={'title'} onClick={onClick} isOpen>
+      <SidePanel title={'title'} onCloseClick={onClick} isClosed='true'>
         children
       </SidePanel>
     ).toJSON()

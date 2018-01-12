@@ -28,17 +28,17 @@ const PANELS_BY_NAME = {
 
 NavPanel.propTypes = {
   panel: PropTypes.oneOf(PANEL_NAMES).isRequired,
-  isOpen: PropTypes.bool.isRequired,
+  isClosed: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired
 }
 
 function NavPanel (props) {
-  const {panel, isOpen, close} = props
+  const {panel, isClosed, close} = props
   const PanelContents = PANELS_BY_NAME[panel]
   const panelProps = PANEL_PROPS_BY_NAME[panel]
 
   return (
-    <SidePanel isOpen={isOpen} onClick={close} title={panelProps.title}>
+    <SidePanel isClosed={isClosed} onCloseClick={close} title={panelProps.title}>
       <PanelContents />
     </SidePanel>
   )
@@ -46,7 +46,7 @@ function NavPanel (props) {
 
 function mapStateToProps (state) {
   return {
-    isOpen: interfaceSelectors.getIsPanelOpen(state),
+    isClosed: interfaceSelectors.getIsPanelClosed(state),
     panel: interfaceSelectors.getCurrentPanel(state)
   }
 }

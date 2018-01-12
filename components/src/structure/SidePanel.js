@@ -10,19 +10,17 @@ import styles from './sidepanel.css'
 type SidePanelProps= {
   title: string,
   children: React.Node,
-  isOpen?: boolean,
-  onClick?: (event: SyntheticEvent<>) => void
+  isClosed?: boolean,
+  onCloseClick?: (event: SyntheticEvent<>) => void
 }
 
 export default function SidePanel (props: SidePanelProps) {
-  const open = props.onClick
-    ? props.isOpen
-    : true
-  const closeButton = props.onClick && (
+  const open = !props.isClosed || props.onCloseClick == null
+  const closeButton = props.onCloseClick && (
     <IconButton
       className={styles.button_close}
       iconName={CLOSE}
-      onClick={props.onClick}
+      onClick={props.onCloseClick}
     />
   )
   const className = classnames(styles.panel, {[styles.closed]: !open})
