@@ -53,6 +53,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
+          'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907'}
 
 # Number of digits after the decimal point for coordinates being sent
@@ -83,6 +84,9 @@ class SmoothieDriver_3_0_0:
         self._connection = None
         self._config = config
         self._current_settings = config.default_current
+        self._max_speed_settings = config.default_max_speed
+
+        self._default_axes_speed = DEFAULT_AXES_SPEED
 
     def _update_position(self, target):
         self._position.update({
@@ -164,9 +168,28 @@ class SmoothieDriver_3_0_0:
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
-    def default_speed(self):
+    def default_speed(self, new_default=None):
         ''' set total axes movement speed in mm/second back to default'''
-        self.set_speed(DEFAULT_AXES_SPEED)
+        if new_default:
+            self._default_axes_speed = int(new_default)
+        self.set_speed(self._default_axes_speed)
+
+    def set_axis_max_speed(self, settings):
+        '''
+        Sets the maximum speed (mm/sec) that a given axis will move
+
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for millimeters per second (mm/sec)
+        '''
+        self._max_speed_settings.update(settings)
+        values = ['{}{}'.format(axis, value)
+                  for axis, value in sorted(settings.items())]
+        command = '{} {}'.format(
+            GCODES['SET_MAX_SPEED'],
+            ' '.join(values)
+        )
+        self._send_command(command)
 
     def set_current(self, settings):
         '''
