@@ -17,7 +17,7 @@ export default connect(mapStateToProps, null, mergeProps)(NavButton)
 
 function mapStateToProps (state, ownProps) {
   const {name} = ownProps
-  const isPanelOpen = interfaceSelectors.getIsPanelOpen(state)
+  const isPanelClosed = interfaceSelectors.getIsPanelClosed(state)
   const currentPanel = interfaceSelectors.getCurrentPanel(state)
   const isSessionLoaded = robotSelectors.getSessionIsLoaded(state)
   const isConnected = (
@@ -44,7 +44,7 @@ function mapStateToProps (state, ownProps) {
     iconName,
     isBottom,
     disabled,
-    isCurrent: isPanelOpen && name === currentPanel
+    isCurrent: !isPanelClosed && name === currentPanel
   }
 }
 

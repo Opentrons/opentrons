@@ -1,10 +1,10 @@
-@value grey, dark_grey from '../App.global.css';
+@value color_light_grey, color_med_grey , color_dark_grey from '../styles/colors.css';
+@value border: 2px solid color_light_grey;
 @value width: 18rem;
-@value border: 2px solid grey;
 
 .panel {
   overflow: hidden;
-  width: width;
+  width: 18rem;
   border-right: border;
   transition: all 0.5s ease-in-out;
   position: relative;
@@ -26,25 +26,22 @@
   margin: 0 auto 0 1rem;
   font-size: 1rem;
   font-weight: normal;
-  color: dark_grey;
+  color: color_dark_grey;
+  line-height: 2.5;
 }
 
-.close_button {
-  font-size: 0.75rem;
-  border-width: 0;
-  padding: 0.75rem 1rem;
-  background-color: transparent;
-  color: dark_grey;
-  cursor: pointer;
-}
-
-/*
-TODO (ka 2017-12-6) bring back overflow hidden once
-title refresh button design confirmed
-*/
 .panel_contents {
   width: width;
   height: calc(100vh - 2.625rem);
   overflow-x: hidden;
   overflow-y: scroll;
+}
+
+.button_close {
+  border-width: 0;
+  background-color: transparent;
+  color: color_med_grey;
+  cursor: pointer;
+  height: 2rem;
+  width: 2rem;
 }

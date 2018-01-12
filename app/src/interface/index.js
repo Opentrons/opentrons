@@ -25,13 +25,13 @@ const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
-  isPanelOpen: false,
+  isPanelClosed: true,
   currentPanel: DEFAULT_PANEL
 }
 
 export const selectors = {
-  getIsPanelOpen (state) {
-    return getModuleState(state).isPanelOpen
+  getIsPanelClosed (state) {
+    return getModuleState(state).isPanelClosed
   },
 
   getCurrentPanel (state) {
@@ -59,10 +59,10 @@ export function reducer (state = INITIAL_STATE, action) {
 
   switch (type) {
     case actionTypes.CLOSE_PANEL:
-      return {...state, isPanelOpen: false}
+      return {...state, isPanelClosed: true}
 
     case actionTypes.SET_CURRENT_PANEL:
-      return {...state, isPanelOpen: true, currentPanel: payload.panel}
+      return {...state, isPanelClosed: false, currentPanel: payload.panel}
 
     case robotActionTypes.DISCONNECT_RESPONSE:
       return {...state, currentPanel: DEFAULT_PANEL}

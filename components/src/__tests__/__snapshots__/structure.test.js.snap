@@ -53,6 +53,50 @@ exports[`PageTabs renders PageTabs correctly 1`] = `
 </nav>
 `;
 
+exports[`SidePanel renders SidePanel correctly 1`] = `
+<div
+  className="panel closed"
+>
+  <div
+    className="title_bar"
+  >
+    <h2
+      className="title"
+    >
+      title
+    </h2>
+    <button
+      className="button_icon button_close"
+      disabled={undefined}
+      onClick={[Function]}
+      title={undefined}
+    >
+      <svg
+        aria-hidden="true"
+        className=""
+        fill="currentColor"
+        height={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width={undefined}
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z"
+          fillRule="evenodd"
+        />
+      </svg>
+    </button>
+  </div>
+  <div
+    className="panel_contents"
+  >
+    children
+  </div>
+</div>
+`;
+
 exports[`TitleBar renders TitleBar with subtitle correctly 1`] = `
 <header
   className="title_bar"

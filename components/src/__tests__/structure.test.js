@@ -3,7 +3,7 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {PageTabs, TitleBar, VerticalNavBar, NavButton, FILE} from '..'
+import {PageTabs, TitleBar, VerticalNavBar, NavButton, SidePanel, FILE} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -150,6 +150,47 @@ describe('NavButton', () => {
   test('renders nav button with icon correctly', () => {
     const tree = Renderer.create(
       <NavButton iconName={FILE} disabled='false' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('SidePanel', () => {
+  test('renders sidebar with title', () => {
+    const heading = Renderer.create(
+      <SidePanel title={'title'} />
+    ).root.findByType('h2')
+    expect(heading).toBeDefined()
+    expect(heading.children).toEqual(['title'])
+  })
+
+  test('renders close button when onClick is present', () => {
+    const onClick = jest.fn()
+    const button = Renderer.create(
+      <SidePanel title={'title'} onCloseClick={onClick} />
+    ).root.findByType('button')
+
+    expect(button).toBeDefined()
+    button.props.onClick()
+    expect(onClick).toHaveBeenCalled()
+  })
+
+  test('renders closed panel when onClick present and isOpen is false', () => {
+    const onClick = jest.fn()
+    const panel = Renderer.create(
+      <SidePanel title={'title'} isClosed='true' onCloseClick={onClick} />
+    ).root.findByType('div')
+
+    expect(panel.props.className).toEqual('panel closed')
+  })
+
+  test('renders SidePanel correctly', () => {
+    const onClick = jest.fn()
+    const tree = Renderer.create(
+      <SidePanel title={'title'} onCloseClick={onClick} isClosed='true'>
+        children
+      </SidePanel>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
