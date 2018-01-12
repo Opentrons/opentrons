@@ -516,26 +516,13 @@ class Robot(object):
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
-    def head_speed(self, *args, **kwargs):
+    def head_speed(self, combined_speed=None, **kwargs):
         """
-        Set the XY axis speeds of the robot, set in millimeters per minute
-
-        Parameters
-        ----------
-        rate : int
-            An integer setting the mm/minute rate of the X and Y axis.
-            Speeds too fast (around 6000 and higher) will cause the robot
-            to skip step, be careful when using this method
-
-        Examples
-        --------
-        >>> from opentrons import robot
-        >>> robot.connect('Virtual Smoothie')
-        >>> robot.home()
-        >>> robot.head_speed(4500)
-        >>> robot.move_head(x=200, y=200)
+        Set the XY axis speeds of the robot, set in millimeters per second
         """
-        self._driver.set_speed(*args, **kwargs)
+        if combined_speed:
+            self._driver.default_speed(new_default=combined_speed)
+        self._driver.set_axis_max_speed(**kwargs)
 
     def move_to(
             self,
