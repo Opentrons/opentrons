@@ -264,7 +264,6 @@ class SmoothieDriver_3_0_0:
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.current)
-        self._send_command(self._config.max_speeds)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)

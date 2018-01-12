@@ -53,7 +53,6 @@ robot_config = namedtuple(
     [
         'name',
         'steps_per_mm',
-        'max_speeds',
         'acceleration',
         'current',
         'gantry_calibration',
