@@ -20,11 +20,16 @@ import {
   CHEVRON_RIGHT,
   FILE,
   COG,
-  CONNECT
+  CONNECT,
+  CONDENSE,
+  DISTRIBUTE,
+  MIX,
+  PAUSE,
+  ARROW_RIGHT
 } from '..'
 
 describe('icons', () => {
-  test('alert icon renders correctly', () => {
+  test('ALERT icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={ALERT} className='foo' />
     ).toJSON()
@@ -32,7 +37,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('back icon renders correctly', () => {
+  test('BACK icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={BACK} className='foo' />
     ).toJSON()
@@ -40,7 +45,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('close icon renders correctly', () => {
+  test('CLOSE icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CLOSE} className='foo' />
     ).toJSON()
@@ -48,7 +53,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('refresh icon renders correctly', () => {
+  test('REFRESH icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={REFRESH} className='foo' />
     ).toJSON()
@@ -56,7 +61,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('spinner icon renders correctly', () => {
+  test('SPINNER icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={SPINNER} className='foo' />
     ).toJSON()
@@ -64,23 +69,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('usb icon renders correctly', () => {
-    const tree = Renderer.create(
-      <Icon name={USB} className='foo' />
-    ).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-
-  test('wifi icon renders correctly', () => {
-    const tree = Renderer.create(
-      <Icon name={WIFI} className='foo' />
-    ).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-
-  test('spin option adds spin class', () => {
+  test('spin prop adds spin class', () => {
     const icon = Renderer.create(
       <Icon name={SPINNER} spin />
     ).root.findByType('svg')
@@ -88,7 +77,23 @@ describe('icons', () => {
     expect(icon.props.className).toMatch(/\bspin\b/)
   })
 
-  test('flask icon renders correctly', () => {
+  test('USB icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={USB} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('WIFI icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={WIFI} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('FLASK icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={FLASK} className='foo' />
     ).toJSON()
@@ -96,7 +101,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('checked icon renders correctly', () => {
+  test('CHECKED icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHECKED} className='foo' />
     ).toJSON()
@@ -104,7 +109,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('unchecked icon renders correctly', () => {
+  test('UNCHECKED icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={UNCHECKED} className='foo' />
     ).toJSON()
@@ -112,7 +117,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('expand caret icon renders correctly', () => {
+  test('CHEVRON_UP icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHEVRON_UP} className='foo' />
     ).toJSON()
@@ -120,7 +125,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('collapse caret icon renders correctly', () => {
+  test('CHEVRON_DOWN icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHEVRON_DOWN} className='foo' />
     ).toJSON()
@@ -128,7 +133,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('left caret icon renders correctly', () => {
+  test('CHEVRON_LEFT icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHEVRON_LEFT} className='foo' />
     ).toJSON()
@@ -136,7 +141,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('right caret icon renders correctly', () => {
+  test('CHEVRON_RIGHT icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CHEVRON_RIGHT} className='foo' />
     ).toJSON()
@@ -144,7 +149,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('protocol file icon renders correctly', () => {
+  test('FILE icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={FILE} className='foo' />
     ).toJSON()
@@ -152,7 +157,7 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('setup cog icon renders correctly', () => {
+  test('COG icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={COG} className='foo' />
     ).toJSON()
@@ -160,9 +165,49 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('connect icon renders correctly', () => {
+  test('CONNECT icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CONNECT} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('ARROW_RIGHT icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={ARROW_RIGHT} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('PAUSE icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={PAUSE} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('MIX icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={MIX} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('DISTRIBUTE icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={DISTRIBUTE} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('CONDENSE icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CONDENSE} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
