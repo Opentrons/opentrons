@@ -106,7 +106,9 @@ class Pipette:
             trash_container=None,
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
-            dispense_speed=DEFAULT_DISPENSE_SPEED):
+            dispense_speed=DEFAULT_DISPENSE_SPEED,
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
 
         self.robot = robot
         self.mount = mount
@@ -138,11 +140,6 @@ class Pipette:
         self.previous_placeable = None
         self.current_volume = 0
 
-        self.speeds = {
-            'aspirate': aspirate_speed,
-            'dispense': dispense_speed
-        }
-
         self.plunger_positions = PLUNGER_POSITIONS.copy()
 
         self.ul_per_mm = ul_per_mm
@@ -150,6 +147,14 @@ class Pipette:
         t = self._get_plunger_position('top')
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
+
+        self.speeds = {
+            'aspirate': aspirate_speed,
+            'dispense': dispense_speed
+        }
+
+        self.set_flow_rate(
+            aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
     def reset(self):
         """
@@ -1479,7 +1484,7 @@ class Pipette:
             tips -= 1
         return tips
 
-    def set_speed(self, **kwargs):
+    def set_speed(self, aspirate=None, dispense=None):
         """
         Set the speed (mm/minute) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
@@ -1490,10 +1495,19 @@ class Pipette:
             A dictionary who's keys are either "aspirate" or "dispense",
             and who's values are int or float (Example: `{"aspirate": 300}`)
         """
-        keys = {'aspirate', 'dispense'} & kwargs.keys()
-        for key in keys:
-            self.speeds[key] = kwargs.get(key)
+        if aspirate:
+            self.speeds['aspirate'] = aspirate
+        if dispense:
+            self.speeds['dispense'] = dispense
         return self
+
+    def set_flow_rate(self, aspirate=None, dispense=None):
+        if aspirate:
+            self.set_speed(
+                aspirate=self._ul_to_mm(aspirate))
+        if dispense:
+            self.set_speed(
+                dispense=self._ul_to_mm(dispense))
 
     def _move(self, pose_tree, x=None, y=None, z=None, low_current_z=False):
         current_x, current_y, current_z = pose_tracker.absolute(
