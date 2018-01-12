@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import noop from 'lodash/noop'
 
 import {Icon, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import styles from './StepItem.css'
-
-function noop () {} // a do-nothing function
 
 const stepIconsByType = { // TODO Ian 2018-01-11 revisit this
   'transfer': 'arrow right',

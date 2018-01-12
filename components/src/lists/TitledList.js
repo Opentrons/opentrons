@@ -18,7 +18,7 @@ type ListProps = {
   /** sets collapsed appearance. List is expanded by default. */
   collapsed?: boolean,
   /** component with descriptive text about the list */
-  description?: string,
+  description?: React.Node,
   /** optional icon before h3 */
   iconName?: IconName,
   /** optional click action (on title div, not children) */

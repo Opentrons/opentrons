@@ -6,6 +6,7 @@
 .titled_list {
   list-style-type: none;
   margin: 1rem;
+  padding-left: 0;
 }
 
 .list_title_bar {
