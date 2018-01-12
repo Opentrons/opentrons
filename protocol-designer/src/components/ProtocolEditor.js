@@ -21,7 +21,7 @@ export default function ProtocolEditor () {
         <h3>Protocol Step List</h3> {/* TODO: Ian 2018-01-11 <-- this h3 will be SidePanel title. */}
         <TitledList className={styles.step_item} iconName='flask' title='Labware & Ingredient Setup' />
 
-        <StepItem title='Transfer 1' stepType='transfer' sourceLabwareName='DNA Plate' destLabwareName='Output Plate'>
+        <StepItem title='Transfer 1' stepType='transfer' sourceLabwareName='DNA Plate' destLabwareName='Output Plate' description='This is a transfer. Lorem ipsum delorom sic blah blah blaaaah.'>
           <StepSubItem
             sourceIngredientName='DNA'
             sourceWell='B1'
@@ -68,6 +68,8 @@ export default function ProtocolEditor () {
             destWell='B4'
           />
         </StepItem>
+
+        <StepItem title='Pause 2' stepType='pause' description='Wait until operator adds new tip rack.' />
 
         <StepItem title='Consolidate 1' stepType='consolidate' sourceLabwareName='Labware 1' destLabwareName='Labware 2'>
           <StepSubItem

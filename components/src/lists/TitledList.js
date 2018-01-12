@@ -31,14 +31,6 @@ type ListProps = {
   selected?: boolean
 }
 
-function List (props: ListProps) {
-  return (
-    <ol className={props.className}>
-      {props.children}
-    </ol>
-  )
-}
-
 /**
  * An ordered list with optional title, icon, and description.
  */
@@ -56,6 +48,8 @@ export default function TitledList (props: ListProps) {
     }
   }
 
+  const hasValidChildren = React.Children.toArray(props.children).some(child => child)
+
   return (
     <div className={cx({[styles.list_selected]: props.selected}, props.className)}>
       <div onClick={props.onClick}
@@ -72,10 +66,10 @@ export default function TitledList (props: ListProps) {
         }
       </div>
       {!props.collapsed && props.description}
-      {!props.collapsed &&
-        <List {...props} className={styles.titled_list}>
+      {!props.collapsed && hasValidChildren &&
+        <ol className={styles.titled_list}>
           {props.children}
-        </List>
+        </ol>
       }
     </div>
   )

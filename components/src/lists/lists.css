@@ -29,7 +29,7 @@
   padding-left: 0.5rem;
 }
 
-.list_selected {
+div.list_selected {
   border: 2px solid color_blue;
 }
 
