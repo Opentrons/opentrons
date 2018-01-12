@@ -520,9 +520,10 @@ class Robot(object):
         """
         Set the XY axis speeds of the robot, set in millimeters per second
         """
+        if kwargs:
+            self._driver.set_axis_max_speed(kwargs)
         if combined_speed:
             self._driver.default_speed(new_default=combined_speed)
-        self._driver.set_axis_max_speed(**kwargs)
 
     def move_to(
             self,

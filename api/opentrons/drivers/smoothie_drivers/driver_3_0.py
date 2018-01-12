@@ -183,7 +183,7 @@ class SmoothieDriver_3_0_0:
             and floating point number for millimeters per second (mm/sec)
         '''
         self._max_speed_settings.update(settings)
-        values = ['{}{}'.format(axis, value)
+        values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
             GCODES['SET_MAX_SPEED'],

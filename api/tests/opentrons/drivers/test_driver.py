@@ -193,6 +193,40 @@ def test_speed_change(model, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+def test_max_speed_change(model, monkeypatch):
+
+    robot = model.robot
+    robot._driver.simulating = False
+
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    command_log = []
+
+    def write_with_log(command, connection, timeout):
+        if 'M203.1' in command or 'G0F' in command:
+            command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+
+    robot.head_speed(555)
+    robot.head_speed(x=1, y=2, z=3, a=4, b=5, c=6)
+    robot.head_speed(123, x=7)
+    robot._driver.set_speed(321)
+    robot._driver.default_speed()
+    expected = [
+        ['G0F{} M400'.format(555 * 60)],
+        ['M203.1 A4 B5 C6 X1 Y2 Z3 M400'],
+        ['M203.1 X7 M400'],
+        ['G0F{} M400'.format(123 * 60)],
+        ['G0F{} M400'.format(321 * 60)],
+        ['G0F{} M400'.format(123 * 60)]
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_pause_in_protocol(model):
     model.robot._driver.simulating = True
 
