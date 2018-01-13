@@ -1,4 +1,6 @@
-@value color_light_grey, color_med_grey , color_dark_grey from '../styles/colors.css';
+@import '..';
+
+@value color_light_grey, color_med_grey from '../styles/colors.css';
 @value border: 2px solid color_light_grey;
 @value width: 18rem;
 
@@ -26,7 +28,7 @@
   margin: 0 auto 0 1rem;
   font-size: 1rem;
   font-weight: normal;
-  color: color_dark_grey;
+  color: var(--c-dark-gray);
   line-height: 2.5;
 }
 

@@ -3,8 +3,9 @@
   "version": "3.0.0",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
+  "style": "src/index.css",
   "scripts": {
-    "test": "jest"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -53,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@opentrons/webpack-config": "^3.0.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "8.0.3",
     "babel-jest": "^21.2.0",
@@ -67,6 +69,10 @@
     "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
+    "postcss": "^6.0.16",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-import": "^11.0.0",
+    "postcss-loader": "^2.0.10",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-styleguidist": "^6.1.0",

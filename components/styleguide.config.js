@@ -3,12 +3,15 @@
 const path = require('path')
 
 // TODO(mc, 2017-12-22): Create common webpack config
-const {babel, localCss} = require('../app/webpack/rules')
+const {rules} = require('@opentrons/webpack-config')
 
 module.exports = {
   webpackConfig: {
     module: {
-      rules: [babel, localCss]
+      rules: [
+        rules.js,
+        rules.localCss
+      ]
     }
   },
   showUsage: true,

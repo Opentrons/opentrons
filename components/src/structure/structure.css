@@ -1,7 +1,7 @@
 /* TitleBar styles */
+@import '..';
 
 /* TODO(mc, 2017-12-13): move colors to colors.css */
-@value color_dark_grey: #4a4a4a;
 @value color_mid_grey: #9b9b9b;
 
 /* TODO(mc, 2017-12-13): move font sizes and weights to typography.css */
@@ -13,7 +13,7 @@
 .title_bar {
   padding: 1rem;
   text-transform: uppercase;
-  background-color: color_dark_grey;
+  background-color: var(--c-dark-gray);
 }
 
 .title_bar,

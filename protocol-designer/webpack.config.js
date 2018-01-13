@@ -1,12 +1,16 @@
-const webpack = require('webpack')
-const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
+'use strict'
+
 const path = require('path')
+const webpack = require('webpack')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
+
+const {rules} = require('@opentrons/webpack-config')
+
+const DEV = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   entry: [
-    'react-hot-loader/patch',
-    // 'webpack-dev-server/client?http://localhost:8080',
-    // 'webpack/hot/only-dev-server',
     './src/index.js'
   ],
 
@@ -17,48 +21,43 @@ module.exports = {
 
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        use: 'babel-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
-        use: {
-          loader: 'url-loader'
-          // options: {
-          //   limit: DATA_URL_BYTE_LIMIT
-          // }
-        }
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: '[path][name]__[local]--[hash:base64:5]'
-            }
-          }
-        ]
-      }
+      rules.js,
+      rules.localCss,
+      rules.images
     ]
   },
 
   devServer: {
     historyApiFallback: true
-    // hot: true
   },
 
-  devtool: process.env.NODE_ENV !== 'production' ? 'eval-source-map' : false,
+  devtool: DEV ? 'eval-source-map' : 'source-map',
 
   plugins: [
-    // new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      DEBUG: false
+    }),
+
+    new ExtractTextPlugin({
+      filename: 'bundle.css',
+      disable: DEV,
+      ignoreOrder: true
+    }),
+
     new GoogleFontsPlugin({
       fonts: [{ family: 'Open Sans' }]
     })
   ]
+}
+
+if (DEV) {
+  module.exports.entry.unshift(
+    'react-hot-loader/patch'
+  )
+
+  module.exports.plugins.push(
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.NamedModulesPlugin()
+  )
 }
