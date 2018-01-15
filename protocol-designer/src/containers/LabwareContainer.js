@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { selectors } from '../reducers'
+import { selectors } from '../labware-ingred/reducers'
 import {
   openIngredientSelector,
 
@@ -13,7 +13,7 @@ import {
 
   setCopyLabwareMode,
   copyLabware
-} from '../actions'
+} from '../labware-ingred/actions'
 
 import { LabwareOnDeck } from '../components/LabwareOnDeck'
 

@@ -1,4 +1,4 @@
-import { ingredients } from '../reducers'
+import { ingredients } from './reducers'
 
 const ingredientsInitialState = {}
 

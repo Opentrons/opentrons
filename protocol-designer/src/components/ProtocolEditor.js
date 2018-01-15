@@ -4,6 +4,7 @@ import * as React from 'react'
 import {Icon, TitledList, VerticalNavBar} from '@opentrons/components'
 import StepItem from './StepItem'
 import StepSubItem from './StepSubItem'
+import StepCreationButton from '../containers/StepCreationButton'
 
 import styles from './StepItem.css' // TODO: Ian 2018-01-11 This is just for "Labware & Ingredient Setup" right now, can remove later
 
@@ -87,7 +88,7 @@ export default function ProtocolEditor () {
             destWell='H1'
           />
         </StepItem>
-
+        <StepCreationButton />
       </div>
     </div>
   )

@@ -1,9 +1,16 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import rootReducer from './reducers/index'
+
+import labwareIngredRootReducer from './labware-ingred/reducers'
+// import steplistRootReducer from './steplist/reducers'
 
 export default function configureStore () {
-  const reducer = rootReducer
+  const reducer = labwareIngredRootReducer
+  // TODO: also use steplist reducer
+  // const reducer = combineReducers({
+  //   labwareIngred: labwareIngredRootReducer,
+  //   steplist: steplistRootReducer
+  // })
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   const store = createStore(
     reducer,
@@ -13,8 +20,9 @@ export default function configureStore () {
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('./reducers/index', () => {
-      const nextRootReducer = combineReducers(require('./reducers/index'))
+    // TODO: also use steplist reducer
+    module.hot.accept('./labware-ingred/reducers', () => {
+      const nextRootReducer = combineReducers(require('./labware-ingred/reducers'))
       store.replaceReducer(nextRootReducer)
     })
   }
