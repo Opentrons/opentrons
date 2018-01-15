@@ -24,29 +24,6 @@ const nextEmptySlot = loadedContainersSubstate => {
 
 // REDUCERS
 
-// ===== STEP LIST REDUCERS
-
-const steps = handleActions({
-  ADD_STEP: (state, action) => ({...state, [action.payload.id]: action.payload})
-}, {})
-
-const orderedSteps = handleActions({
-  ADD_STEP: (state, action) => [...state, action.payload.id]
-}, [])
-
-const selectedStep = handleActions({
-  ADD_STEP: (state, action) => action.payload.id
-}, null)
-
-// ===== OTHER STEP
-
-const stepCreationButtonExpanded = handleActions({
-  ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: () => true
-}, false)
-
-// ===== INGRED/LABWARE REDUCERS
-
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
 const modeLabwareSelection = handleActions({
@@ -214,28 +191,19 @@ export const ingredients = handleActions({
 
 // TODO Ian 2018-01-15 factor into separate files
 const rootReducer = combineReducers({
-  labware: combineReducers({
-    modeLabwareSelection,
-    copyLabwareMode,
-    selectedContainer,
-    selectedIngredientGroup,
-    containers,
-    selectedWells,
-    ingredients,
-    highlightedIngredients
-  }),
-  // == STEP LIST ==
-  steplist: combineReducers({
-    steps,
-    orderedSteps,
-    selectedStep,
-    stepCreationButtonExpanded
-  })
+  modeLabwareSelection,
+  copyLabwareMode,
+  selectedContainer,
+  selectedIngredientGroup,
+  containers,
+  selectedWells,
+  ingredients,
+  highlightedIngredients
 })
 
 // SELECTORS
 
-const rootSelector = state => state.labware
+const rootSelector = state => state.labwareIngred // TODO
 
 const _loadedContainersBySlot = containers =>
   reduce(containers, (acc, container, containerId) => (container.slotName)

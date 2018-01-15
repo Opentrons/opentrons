@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 
 import {PrimaryButton} from '@opentrons/components'
 import {addStep, expandAddStepButton} from '../steplist/actions'
+import {selectors} from '../steplist/reducers'
 
 // TODO factor out
 type StepType = 'transfer'
@@ -40,7 +41,7 @@ function StepCreationButton (props: StepCreationButtonProps) {
 
 function mapStateToProps (state) {
   return ({
-    expanded: state.steplist.stepCreationButtonExpanded // TODO use selector after factoring redux state
+    expanded: selectors.stepCreationButtonExpanded(state)
   })
 }
 
