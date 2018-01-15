@@ -1,3 +1,23 @@
+/* common typography styles */
+
+:root {
+  /* colors */
+  --c-font-dark: #4a4a4a;
+  --c-font-light: white;
+
+  /* sizes */
+  --fs-huge: 3rem;
+  --fs-header: 1.125rem;
+  --fs-body-2: 0.875rem;
+  --fs-body-1: 0.75rem;
+  --fs-caption: 0.635rem;
+
+  /* weights */
+  --fw-bold: 700;
+  --fw-semibold: 600;
+  --fw-regular: 400;
+}
+
 /* font colors */
 @value color_font_dark: #4a4a4a;
 @value color_font_light: white;

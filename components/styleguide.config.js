@@ -29,11 +29,31 @@ module.exports = {
     {
       name: 'Lists',
       components: 'src/lists/[A-Z]*.js'
+    },
+    {
+      name: 'Modals',
+      components: 'src/modals/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {
     const name = path.basename(componentPath, '.js')
 
     return `import {${name}} from '@opentrons/components'`
+  },
+  styles: {
+    StyleGuide: {
+      '@global .display-block': {
+        display: 'block'
+      },
+      '@global .width-auto': {
+        width: 'auto !important'
+      },
+      '@global .width-3-rem': {
+        width: '3rem'
+      },
+      '@global .height-3-rem': {
+        height: '3rem'
+      }
+    }
   }
 }
