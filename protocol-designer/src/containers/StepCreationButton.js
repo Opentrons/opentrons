@@ -5,7 +5,7 @@ import {PrimaryButton} from '@opentrons/components'
 import {addStep, expandAddStepButton} from '../steplist/actions'
 import {selectors} from '../steplist/reducers'
 
-// TODO factor out
+// TODO factor out Step types
 type StepType = 'transfer'
   | 'distribute'
   | 'consolidate'
@@ -16,27 +16,51 @@ type StepType = 'transfer'
 type StepCreationButtonProps = {
   onStepClick?: StepType => (event?: SyntheticEvent<>) => void,
   onExpandClick?: (event?: SyntheticEvent<>) => void,
+  onClickAway?: (event?: SyntheticEvent<>) => void,
   expanded?: boolean
 }
 
-function StepCreationButton (props: StepCreationButtonProps) {
-  return (
-    props.expanded
-    ? <div>
-      <PrimaryButton
-        onClick={props.onStepClick('transfer')}
-        iconName='arrow right'
-      >
-        Transfer
-      </PrimaryButton>
-      <PrimaryButton
-        onClick={props.onStepClick('distribute')}
-        iconName='distribute'
-      >Distribute
-      </PrimaryButton>
-    </div>
-    : <PrimaryButton onClick={props.onExpandClick}>+ Add Action</PrimaryButton>
-  )
+class StepCreationButton extends React.Component<StepCreationButtonProps> {
+  constructor (props) {
+    super(props)
+    this.handleAllClicks = this.handleAllClicks.bind(this)
+  }
+
+  handleAllClicks (e) {
+    if (this.ref && !this.ref.contains(e.target)) {
+      this.props.onClickAway(e)
+    }
+  }
+
+  componentDidMount () {
+    document.addEventListener('click', this.handleAllClicks, true)
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('click', this.handleAllClicks, true)
+  }
+
+  render () {
+    const {expanded, onExpandClick, onStepClick} = this.props
+    return (
+      <div ref={ref => { this.ref = ref }}>{expanded
+        ? <React.Fragment>
+          <PrimaryButton
+            onClick={onStepClick('transfer')}
+            iconName='arrow right'
+            >
+              Transfer
+          </PrimaryButton>
+          <PrimaryButton
+            onClick={onStepClick('distribute')}
+            iconName='distribute'
+            >Distribute
+          </PrimaryButton>
+        </React.Fragment>
+          : <PrimaryButton onClick={onExpandClick}>+ Add Action</PrimaryButton>
+        }</div>
+    )
+  }
 }
 
 function mapStateToProps (state) {
@@ -48,7 +72,8 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     onStepClick: stepType => e => dispatch(addStep({type: stepType, collapsed: false})),
-    onExpandClick: () => dispatch(expandAddStepButton)
+    onExpandClick: e => dispatch(expandAddStepButton(true)),
+    onClickAway: e => dispatch(expandAddStepButton(false))
   }
 }
 

@@ -16,7 +16,7 @@ const selectedStep = handleActions({
 
 const stepCreationButtonExpanded = handleActions({
   ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: () => true
+  EXPAND_ADD_STEP_BUTTON: (state, action) => action.payload
 }, false)
 
 const rootReducer = combineReducers({
@@ -26,12 +26,20 @@ const rootReducer = combineReducers({
   stepCreationButtonExpanded
 })
 
-const rootSelector = state => state.steplist // TODO
+const rootSelector = state => state.steplist // TODO LATER
 
 export const selectors = {
   stepCreationButtonExpanded: createSelector(
     rootSelector,
     state => state.stepCreationButtonExpanded
+  ),
+  allSteps: createSelector(
+    state => rootSelector(state).steps,
+    state => rootSelector(state).orderedSteps,
+    (steps, orderedSteps) => orderedSteps.map(id => steps[id])
+  ),
+  selectedStep: createSelector(
+    state => rootReducer(state).selectedStep
   )
 }
 

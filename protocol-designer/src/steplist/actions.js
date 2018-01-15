@@ -11,4 +11,4 @@ export const addStep = payload => (dispatch, getState) => {
   stepIdCounter += 1
 }
 
-export const expandAddStepButton = ({type: 'EXPAND_ADD_STEP_BUTTON', payload: null})
+export const expandAddStepButton = payload => ({type: 'EXPAND_ADD_STEP_BUTTON', payload}) // TODO use action creator helper
