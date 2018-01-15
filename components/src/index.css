@@ -1,1 +1,4 @@
-@value colors: './styles/colors.css';
+/* opentrons style library */
+
+@import './styles/colors.css';
+@import './styles/typography.css';

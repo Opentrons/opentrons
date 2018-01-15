@@ -5,19 +5,36 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const DEV = process.env.NODE_ENV !== 'production'
 
-const CSS_MODULE_LOADER = {
+const CSS_LOADER = {
   loader: 'css-loader',
   options: {
+    importLoaders: 1
+  }
+}
+
+const CSS_MODULE_LOADER = Object.assign({}, CSS_LOADER, {
+  options: Object.assign({}, CSS_LOADER.options, {
     modules: true,
     sourceMap: true,
     localIdentName: '[name]__[local]__[hash:base64:5]'
+  })
+})
+
+const POSTCSS_LOADER = {
+  loader: 'postcss-loader',
+  options: {
+    ident: 'postcss',
+    plugins: (loader) => [
+      require('postcss-import')({root: loader.resourcePath}),
+      require('postcss-cssnext')()
+    ]
   }
 }
 
 module.exports = {
-  // babel loader for JSX
-  babel: {
-    test: /\.jsx?$/,
+  // babel loader for JS
+  js: {
+    test: /\.js$/,
     exclude: /node_modules/,
     use: {
       loader: 'babel-loader',
@@ -44,16 +61,26 @@ module.exports = {
   globalCss: {
     test: /\.global\.css$/,
     use: DEV
-      ? ['style-loader', 'css-loader']
-      : ExtractTextPlugin.extract({use: 'css-loader', fallback: 'style-loader'})
+      ? ['style-loader', CSS_LOADER, POSTCSS_LOADER]
+      : ExtractTextPlugin.extract({
+        use: [
+          CSS_LOADER,
+          POSTCSS_LOADER
+        ]
+      })
   },
 
   // local CSS (CSS module) files
   localCss: {
     test: /^((?!\.global).)*\.css$/,
     use: DEV
-      ? ['style-loader', CSS_MODULE_LOADER]
-      : ExtractTextPlugin.extract({use: CSS_MODULE_LOADER})
+      ? ['style-loader', CSS_MODULE_LOADER, POSTCSS_LOADER]
+      : ExtractTextPlugin.extract({
+        use: [
+          CSS_MODULE_LOADER,
+          POSTCSS_LOADER
+        ]
+      })
   },
 
   // handlebars HTML templates
