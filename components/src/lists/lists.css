@@ -6,6 +6,7 @@
 .titled_list {
   list-style-type: none;
   margin: 1rem;
+  padding-left: 0;
 }
 
 .list_title_bar {
@@ -29,7 +30,7 @@
   padding-left: 0.5rem;
 }
 
-.list_selected {
+div.list_selected {
   border: 2px solid color_blue;
 }
 

@@ -21,7 +21,7 @@ import {
   FILE,
   COG,
   CONNECT,
-  CONDENSE,
+  CONSOLIDATE,
   DISTRIBUTE,
   MIX,
   PAUSE,
@@ -205,9 +205,9 @@ describe('icons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('CONDENSE icon renders correctly', () => {
+  test('CONSOLIDATE icon renders correctly', () => {
     const tree = Renderer.create(
-      <Icon name={CONDENSE} className='foo' />
+      <Icon name={CONSOLIDATE} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
