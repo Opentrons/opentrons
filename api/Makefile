@@ -1,7 +1,5 @@
 # opentrons api makefile
 
-SHELL := /bin/bash
-
 .PHONY: install
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -48,6 +46,9 @@ term:
 
 ########## [START] RESIN DEVICE ##########
 
+# TODO(mc, 2018-01-09): resin cli may not be cross-platform compatible
+#   see https://github.com/resin-io/resin-cli#windows-support
+#   also, the resin cli isn't listed as a dependency anywhere
 .PHONY: info_device
 info_device:
 	resin device $(OT_DEVICE_ID)

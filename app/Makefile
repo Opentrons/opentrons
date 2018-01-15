@@ -1,21 +1,18 @@
 # opentrons app makefile
 
-# use bash
-SHELL := bash
+# add node_modules/.bin to the path
+PATH := $(shell yarn bin):$(PATH)
 
-# source files
-source := $(shell find src -type f -name '*')
+# desktop shell directory for running the app in development
 shell_dir := ../app-shell
 
-# use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
+env := cross-env NODE_ENV
 
 # dev server port
 port ?= 8090
 
-# watch, coverage, and fix variables for tests and linting
+# test and lint options
 watch ?= false
 cover ?= true
 fix ?= false
@@ -46,22 +43,22 @@ clean:
 #####################################################################
 
 .PHONY: dist
-dist: $(source)
-	$(env)=production $(bin)/webpack --profile
+dist:
+	$(env)=production webpack --profile
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	$(bin)/concurrently \
+	concurrently \
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-mdns" \
-		"sleep 3 && $(MAKE) -C $(shell_dir) dev port=$(port)"
+		"wait-on http-get://localhost:$(port) && $(MAKE) -C $(shell_dir) dev port=$(port)"
 
 .PHONY: dev-server
 dev-server:
-	$(env)=development PORT=$(port) $(bin)/webpack-dev-server --hot
+	$(env)=development PORT=$(port) webpack-dev-server --hot
 
 # TODO(mc, 2017-10-31): remove when API is capable of advertising itself
 .PHONY: dev-mdns
@@ -77,21 +74,22 @@ test: test-unit
 
 .PHONY: test-unit
 test-unit:
-	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
+	$(env)=test jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
 .PHONY: check
 check:
-	$(bin)/flow
+	flow
 
 .PHONY: lint
 lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+	standard --verbose --fix=$(fix) | snazzy
+	stylelint '**/*.css' --fix=$(fix) --verbose
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps dev
+	flow-typed install --ignoreDeps dev
 
+# TODO(mc, 2018-01-09): rm -rf is not cross-platform
 .PHONY: uninstall-types
 uninstall-types:
 	rm -rf flow-typed

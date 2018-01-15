@@ -1,18 +1,16 @@
 # opentrons app desktop shell makefile
 
-# use bash
-SHELL := bash
+# add node_modules/.bin to the path
+PATH := $(shell yarn bin):$(PATH)
 
-# source files
-source := $(shell find lib -type f -name '*.js')
+# ui directory to build bundle for app shell distributable
 ui_dir := ../app
 
-# use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
+env := cross-env NODE_ENV
 
-set_package_env := $(bin)/cross-env \
+set_package_env := cross-env \
+	NODE_ENV=production \
 	OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) \
 	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
 	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
@@ -43,35 +41,35 @@ ui:
 	$(MAKE) -C $(ui_dir)
 
 .PHONY: package
-package: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --dir
+package: ui
+	$(set_package_env) electron-builder --dir
 
 .PHONY: dist-posix
-dist-posix: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --linux --mac --publish never
+dist-posix: ui
+	$(set_package_env) electron-builder --linux --mac --publish never
 
 .PHONY: dist-osx
-dist-osx: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --mac --publish never
+dist-osx: ui
+	$(set_package_env) electron-builder --mac --publish never
 
 .PHONY: dist-linux
-dist-linux: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --linux --publish never
+dist-linux: ui
+	$(set_package_env) electron-builder --linux --publish never
 
 .PHONY: dist-win
 dist-win: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --win --x64 --publish never
+	$(set_package_env) electron-builder --win --x64 --publish never
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	$(env)=development PORT=$(port) $(bin)/electron lib/main.js
+	$(env)=development PORT=$(port) electron lib/main.js
 
 # checks
 #####################################################################
 
 .PHONY: lint
 lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
+	standard --verbose --fix=$(fix) | snazzy

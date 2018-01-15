@@ -1,12 +1,7 @@
 # opentrons component library makefile
 
-# use bash
-SHELL := bash
-
-# use devDependency CLIs with $(bin)/command
-# set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
+# add node_modules/.bin to the path
+PATH := $(shell yarn bin):$(PATH)
 
 # dev server port
 port ?= 8081
@@ -19,6 +14,9 @@ fix ?= false
 ifeq ($(watch), true)
 	cover := false
 endif
+
+# set NODE_ENV for a command with $(env)=environment
+env := cross-env NODE_ENV
 
 # stardard targets
 #####################################################################
@@ -36,14 +34,14 @@ uninstall:
 
 .PHONY: dev
 dev:
-	$(env)=development $(bin)/styleguidist server
+	$(env)=development styleguidist server
 
 # checks
 #####################################################################
 
 .PHONY: test
 test:
-	$(env)=test $(bin)/jest \
+	$(env)=test jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
@@ -51,11 +49,11 @@ test:
 
 .PHONY: check
 check:
-	$(bin)/flow
+	flow
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps dev
+	flow-typed install --ignoreDeps dev
 
 .PHONY: uninstall-types
 uninstall-types:
@@ -63,5 +61,5 @@ uninstall-types:
 
 .PHONY: lint
 lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+	standard --verbose --fix=$(fix) | snazzy
+	stylelint '**/*.css' --fix=$(fix) --verbose
