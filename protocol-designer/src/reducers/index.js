@@ -202,7 +202,7 @@ const rootReducer = combineReducers({
 
 // SELECTORS
 
-const rootSelector = state => state.default
+const rootSelector = state => state // TODO: Ian 2018-01-15 No longer necessary?
 
 const _loadedContainersBySlot = containers =>
   reduce(containers, (acc, container, containerId) => (container.slotName)
