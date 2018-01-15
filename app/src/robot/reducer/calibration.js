@@ -4,6 +4,7 @@
 import {actionTypes} from '../actions'
 
 import {
+  type InstrumentMount,
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
@@ -29,7 +30,7 @@ type CalibrationRequestType =
 
 type CalibrationRequest = {
   type: CalibrationRequestType,
-  mount: string,
+  mount: InstrumentMount | '',
   inProgress: boolean,
   error: ?{message: string},
 }
@@ -42,11 +43,11 @@ type LabwareConfirmationRequest = {
   error: ?{message: string},
 }
 
-type State = {
+export type State = {
   labwareReviewed: boolean,
   jogDistance: number,
 
-  probedByAxis: {[string]: boolean},
+  probedByAxis: {[InstrumentMount]: boolean},
 
   labwareBySlot: {[number]: {}},
   confirmedBySlot: {[number]: boolean},
@@ -61,7 +62,7 @@ type State = {
   updateOffsetRequest: LabwareConfirmationRequest,
 }
 
-// TODO(mc, 2018-01-10): import this from elsewhere
+// TODO(mc, 2018-01-11): import union of discrete action types from actions
 type Action = {
   type: string,
   payload?: any,
@@ -69,6 +70,7 @@ type Action = {
   meta?: {}
 }
 
+// TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
   SESSION,
   DISCONNECT_RESPONSE,
@@ -122,7 +124,7 @@ const INITIAL_STATE: State = {
 export default function calibrationReducer (
   state: State = INITIAL_STATE,
   action: Action
-) {
+): State {
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
@@ -216,6 +218,8 @@ function handleProbeTip (state, action) {
 function handleProbeTipResponse (state, action) {
   const {calibrationRequest: {mount}} = state
   const {payload, error} = action
+
+  if (mount !== 'left' && mount !== 'right') return state
 
   return {
     ...state,

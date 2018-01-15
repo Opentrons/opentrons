@@ -1,8 +1,40 @@
+// @flow
 // robot connection state and reducer
 import omit from 'lodash/omit'
 import without from 'lodash/without'
 
 import {actionTypes} from '../actions'
+
+export type State = {
+  isScanning: boolean,
+  discovered: string[],
+  discoveredByName: {
+    [string]: {
+      name: String,
+      ip: String,
+      host: String,
+      port: number
+    }
+  },
+  connectedTo: string,
+  connectRequest: {
+    inProgress: boolean,
+    error: ?{message: string},
+    name: string
+  },
+  disconnectRequest: {
+    inProgress: boolean,
+    error: ?{message: string}
+  },
+}
+
+// TODO(mc, 2018-01-11): import union of discrete action types from actions
+type Action = {
+  type: string,
+  payload?: any,
+  error?: boolean,
+  meta?: {}
+}
 
 const {
   DISCOVER,
@@ -15,7 +47,7 @@ const {
   DISCONNECT_RESPONSE
 } = actionTypes
 
-const INITIAL_STATE = {
+const INITIAL_STATE: State = {
   isScanning: false,
   discovered: [],
   discoveredByName: {},
@@ -24,7 +56,10 @@ const INITIAL_STATE = {
   disconnectRequest: {inProgress: false, error: null}
 }
 
-export default function connectionReducer (state = INITIAL_STATE, action) {
+export default function connectionReducer (
+  state: State = INITIAL_STATE,
+  action: Action
+): State {
   switch (action.type) {
     case DISCOVER: return handleDiscover(state, action)
     case DISCOVER_FINISH: return handleDiscoverFinish(state, action)
@@ -54,6 +89,8 @@ function handleDiscoverFinish (state, action) {
 }
 
 function handleAddDiscovered (state, action) {
+  if (!action.payload) return state
+
   const {payload} = action
   const {name} = payload
   let {discovered, discoveredByName} = state
@@ -74,6 +111,8 @@ function handleAddDiscovered (state, action) {
 }
 
 function handleRemoveDiscovered (state, action) {
+  if (!action.payload) return state
+
   const {payload: {name}} = action
 
   return {
@@ -84,6 +123,8 @@ function handleRemoveDiscovered (state, action) {
 }
 
 function handleConnect (state, action) {
+  if (!action.payload) return state
+
   const {payload: {name}} = action
 
   return {...state, connectRequest: {inProgress: true, error: null, name}}
