@@ -114,8 +114,45 @@ Installing Opentrons API
 ------------------------
 If you are just starting with Python it is recommended to install Jupyter notebook to run Opentrons API. Please refer to `Full API Documentation`_ for detailed instructions.
 
-If you are familiar with python and comfortable running ``pip``, you can install Opentrons API by running:
+If you are familiar with python and comfortable running ``git`` and ``pip``, first, check out the repository and install `pipenv`:
 
 .. code-block:: bash
 
-  pip install opentrons
+  git clone https://github.com/Opentrons/opentrons.git
+  cd opentrons/api
+  pip install pipenv
+
+Then, to intall Opentrons in a virtual environment (separate from your global Python installation):
+
+.. code-block:: bash
+
+  pipenv install
+  pipenv shell
+
+Or install globally by running:
+
+.. code-block:: bash
+
+  pipenv install --system
+
+Or, if you do not want to use `pipenv`:
+
+  git clone https://github.com/Opentrons/opentrons.git
+  cd opentrons/api
+  pip install -r requirements.txt
+  pip install -r requirements-dev.txt
+  pip install .
+
+Finally, if you are a developer and wish to be able to modify the code and reload it, either use:
+
+.. code-block:: bash
+
+  pipenv install '-e .'
+
+or replace the last "pip install" with:
+
+.. code-block:: bash
+
+  pip install -e .
+
+In any case, you can now open a Python shell and `import opentrons`.
