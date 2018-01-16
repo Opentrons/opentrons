@@ -2,23 +2,24 @@
 import React from 'react'
 
 import Page from '../components/Page'
-import {InstrumentTabs} from '../components/setup-instruments'
+import ConnectedTipProbe from '../containers/ConnectedTipProbe'
+import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
 import SessionHeader from '../containers/SessionHeader'
-import ConnectedPipetteConfig from '../containers/ConnectedPipetteConfig'
+
 
 const PAGE_TITLE = 'Setup Instruments'
-const DEFAULT_SIDE = 'left'
 
 export default function SetupInstrumentsPage (props) {
   const {match} = props
-  const side = match.params.side || DEFAULT_SIDE
+  const mount = match.params.mount
 
   return (
     <Page>
       <SessionHeader subtitle={PAGE_TITLE} />
-      <InstrumentTabs side={side} />
-      <ConnectedPipetteConfig side={side} />
+      <InstrumentTabs mount={mount} />
+      <Instruments mount={mount} />
+      <ConnectedTipProbe mount={mount} />
     </Page>
   )
 }

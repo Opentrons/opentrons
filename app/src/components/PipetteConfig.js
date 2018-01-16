@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
-import ConnectedTipProbe from '../containers/ConnectedTipProbe'
+// import ConnectedTipProbe from '../containers/ConnectedTipProbe'
 import styles from './PipetteConfig.css'
 import singlePipetteSrc from '../img/pipette_single.png'
 import multiPipetteSrc from '../img/pipette_multi.png'
@@ -21,7 +21,7 @@ PipetteConfig.propTypes = {
 }
 
 export default function PipetteConfig (props) {
-  const {instruments, side} = props
+  const {instruments, mount} = props
 
   const pipettes = instruments.map((instrument) => {
     const {name, axis, channels, volume} = instrument
@@ -33,7 +33,7 @@ export default function PipetteConfig (props) {
 
     const style = classnames(styles.pipette, styles[axis], {
       [styles.disabled]: !isUsed,
-      [styles.inactive]: axis !== side
+      [styles.inactive]: axis !== mount
     })
 
     const description = isUsed
@@ -59,9 +59,7 @@ export default function PipetteConfig (props) {
           <h3>
             {tipType}
           </h3>
-          <ConnectedTipProbe instrument={instrument} />
         </div>
-
         <div className={styles.pipette_icon}>
           <img src={img} />
         </div>

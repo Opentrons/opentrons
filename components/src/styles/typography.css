@@ -1,3 +1,67 @@
+:root {
+  --fc-dark: #4a4a4a;
+  --fc-light: white;
+  --fc-disabled: #9c9c9c;
+  --fs-huge: 3rem;
+  --fs-header: 1.125rem;
+  --fs-body-2: 0.875rem;
+  --fs-body-1: 0.75rem;
+  --fs-caption: 0.625rem;
+  --fw-bold: 800;
+  --fw-semibold: 500;
+  --fw-regular: 400;
+
+  --font-huge-dark: {
+    font-size: var(--fs-huge);
+    font-weight: var(--fw-bold);
+    color: var(--fc-dark);
+  };
+
+  --font-huge-light: {
+    font-size: var(--fs-huge);
+    font-weight: var(--fw-bold);
+    color: var(--fc-light);
+  };
+
+  --font-header-dark: {
+    font-size: var(--fs-header);
+    font-weight: var(--fw-semibold);
+    color: var(--fc-dark);
+  };
+
+  --font-header-light: {
+    font-size: var(--fs-header);
+    font-weight: var(--fw-semibold);
+    color: var(--fc-light);
+  };
+
+  --font-body-2-dark: {
+    font-size: var(--fs-body-2);
+    font-weight: var(--fw-regular);
+    color: var(--fc-dark);
+  };
+
+  --font-body-2-light: {
+    font-size: var(--fs-body-2);
+    font-weight: var(--fw-regular);
+    color: var(--fc-light);
+  };
+
+  --font-body-1-dark: {
+    font-size: var(--fs-body-1);
+    font-weight: var(--fw-regular);
+    color: var(--fc-dark);
+  };
+
+  --font-body-1-light: {
+    font-size: var(--fs-body-1);
+    font-weight: var(--fw-regular);
+    color: var(--fc-light);
+  };
+}
+
+/* TODO ka 2018-1-16: remove @values completely */
+
 /* font colors */
 @value color_font_dark: #4a4a4a;
 @value color_font_light: white;
@@ -15,38 +79,3 @@
 @value font_weight_semibold: 500;
 @value font_weight_regular: 400;
 
-.font_huge_dark {
-  font-size: font_size_huge;
-  font-weight: font_weight_bold;
-  color: color_font_dark;
-}
-
-.font_huge_light {
-  font-size: font_size_huge;
-  font-weight: font_weight_bold;
-  color: color_font_light;
-}
-
-.font_header_dark {
-  font-size: font_size_header;
-  font-weight: font_weight_semibold;
-  color: color_font_dark;
-}
-
-.font_header_light {
-  font-size: font_size_header;
-  font-weight: font_weight_semibold;
-  color: color_font_light;
-}
-
-.font_body_2_dark {
-  font-size: font_size_body_2;
-  font-weight: font_weight_regular;
-  color: color_font_dark;
-}
-
-.font_body_2_light {
-  font-size: font_size_body_2;
-  font-weight: font_weight_regular;
-  color: color_font_light;
-}

@@ -1,0 +1,67 @@
+@import '@opentrons/components';
+
+.pipette_group {
+  margin: 0 auto;
+  min-width: 40rem;
+  max-width: 45rem;
+  padding: 0rem 1rem 2rem;
+  display: grid;
+  grid-column-gap: 0.25rem;
+  grid-template-columns: 50% 50%;
+  grid-template-areas: 'left right';
+}
+
+.pipette {
+  display: grid;
+  vertical-align: top;
+}
+
+.left {
+  grid-area: left;
+  grid-template-columns: 80% 20%;
+  grid-template-areas:
+    'info img';
+}
+
+.right {
+  grid-area: right;
+  grid-template-columns: 20% 80%;
+  grid-template-areas:
+    'img info';
+}
+
+.inactive,
+.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.pipette_info {
+  grid-area: info;
+  min-height: 8rem;
+}
+
+.pipette_icon {
+  grid-area: img;
+  text-align: center;
+}
+
+.title {
+  font-size: var(--fs-body-2);
+  text-transform: uppercase;
+  margin: 2rem 0 0.25rem;
+}
+
+.value {
+  font-size: var(--fs-body-2);
+  margin-left: 1rem;
+}
+
+.info {
+  border: 2px solid silver;
+  border-radius: 0.25rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  min-height: 7.1rem;
+}

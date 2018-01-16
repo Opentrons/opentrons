@@ -17,7 +17,7 @@ const {
 } = robotConstants
 
 TipProbe.propTypes = {
-  instrument: PropTypes.shape({
+  currentInstrument: PropTypes.shape({
     name: PropTypes.string,
     volume: PropTypes.number,
     probed: PropTypes.bool,
@@ -35,7 +35,7 @@ TipProbe.propTypes = {
 }
 
 export default function TipProbe (props) {
-  const {instrument: {calibration}} = props
+  const {currentInstrument: {calibration}} = props
   let onCancelClick
 
   if (calibration === READY_TO_PROBE || calibration === PROBED) {
@@ -52,7 +52,7 @@ export default function TipProbe (props) {
 }
 
 function TipProbeMessage (props) {
-  const {instrument: {probed, calibration, volume, channels}} = props
+  const {currentInstrument: {probed, calibration, volume, channels}} = props
   let icon = null
   let message = ''
 
@@ -107,7 +107,7 @@ function TipProbeMessage (props) {
 }
 
 function TipProbeButtonOrSpinner (props) {
-  const {instrument: {calibration}, onPrepareClick, onProbeTipClick} = props
+  const {currentInstrument: {calibration}, onPrepareClick, onProbeTipClick} = props
 
   switch (calibration) {
     case UNPROBED: return (
@@ -131,7 +131,7 @@ function TipProbeButtonOrSpinner (props) {
 }
 
 function TipProbeWarning (props) {
-  const {instrument: {calibration}} = props
+  const {currentInstrument: {calibration}} = props
 
   if (calibration === UNPROBED) {
     return (
