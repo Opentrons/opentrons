@@ -222,8 +222,8 @@ def test_max_speed_change(model, monkeypatch):
         ['G0F{} M400'.format(321 * 60)],
         ['G0F{} M400'.format(123 * 60)]
     ]
-    # from pprint import pprint
-    # pprint(command_log)
+    from pprint import pprint
+    pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
