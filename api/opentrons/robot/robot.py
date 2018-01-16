@@ -516,14 +516,33 @@ class Robot(object):
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
-    def head_speed(self, combined_speed=None, **kwargs):
+    def head_speed(self, default_speed=None, x=None, y=None, z=None, a=None, b=None, c=None):
         """
-        Set the XY axis speeds of the robot, set in millimeters per second
+        Set the speeds (mm/sec) of the robot
+
+        Parameters
+        ----------
+        speed : number setting the current combined-axes speed
+        default_speed : number specifying a default combined-axes speed
+        <axis> : key/value pair, specifying the maximum speed of that axis
+
+        Examples
+        ---------
+        >>> from opentrons import robot
+        >>> robot.head_speed(300)  # default axes speed is 300 mm/sec
+        >>> robot.head_speed(default_speed=400) # default speed is 400 mm/sec
+        >>> robot.head_speed(x=400, y=200) # sets max speeds of X and Y
         """
-        if kwargs:
-            self._driver.set_axis_max_speed(kwargs)
-        if combined_speed:
-            self._driver.default_speed(new_default=combined_speed)
+        user_set_speeds = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
+        axis_max_speeds = {
+            axis: value
+            for axis, value in user_set_speeds.items()
+            if value
+        }
+        if axis_max_speeds:
+            self._driver.set_axis_max_speed(axis_max_speeds)
+        if default_speed:
+            self._driver.default_speed(new_default=default_speed)
 
     def move_to(
             self,
