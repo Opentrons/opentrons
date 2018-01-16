@@ -36,12 +36,13 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
   }
 
   render () {
-    const {expanded, onExpandClick, onStepClick} = this.props
+    const {expanded, onExpandClick, onStepClick, onClickAway} = this.props
     return (
       <div ref={ref => { this.ref = ref }}>
-        <PrimaryButton onClick={onExpandClick}>+ Add Action</PrimaryButton>
+        <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Action</PrimaryButton>
         {expanded && map(stepIconsByType, (iconName, stepType) =>
           <PrimaryButton
+            key={stepType}
             onClick={onStepClick(stepType)}
             iconName={iconName}
           >
