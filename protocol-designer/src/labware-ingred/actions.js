@@ -1,5 +1,5 @@
 import { createActions } from 'redux-actions'
-import { selectors } from '../reducers'
+import { selectors } from './reducers'
 import { uuid } from '../utils.js'
 
 // Payload mappers
