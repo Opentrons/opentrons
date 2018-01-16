@@ -9,7 +9,7 @@ InstrumentListItem.propTypes = {
   name: PropTypes.string,
   axis: PropTypes.string,
   volume: PropTypes.number,
-  channels: PropTypes.string,
+  channels: PropTypes.number,
   probed: PropTypes.bool,
   clearLabwareReviewed: PropTypes.func
 }

@@ -4,7 +4,11 @@
   margin: 0 auto;
   min-width: 40rem;
   max-width: 45rem;
+<<<<<<< HEAD
   padding: 0rem 1rem 2rem;
+=======
+  padding: 0 1rem 2rem;
+>>>>>>> Split tip probe from instrument info
   display: grid;
   grid-column-gap: 0.25rem;
   grid-template-columns: 50% 50%;
@@ -19,18 +23,15 @@
 .left {
   grid-area: left;
   grid-template-columns: 80% 20%;
-  grid-template-areas:
-    'info img';
+  grid-template-areas: 'info img';
 }
 
 .right {
   grid-area: right;
   grid-template-columns: 20% 80%;
-  grid-template-areas:
-    'img info';
+  grid-template-areas: 'img info';
 }
 
-.inactive,
 .disabled {
   opacity: 0.3;
   pointer-events: none;
@@ -56,6 +57,7 @@
   font-size: var(--fs-body-2);
   margin-left: 1rem;
 }
+<<<<<<< HEAD
 
 .info {
   border: 2px solid silver;
@@ -65,3 +67,5 @@
   font-size: 0.75rem;
   min-height: 7.1rem;
 }
+=======
+>>>>>>> Split tip probe from instrument info

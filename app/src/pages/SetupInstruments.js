@@ -7,7 +7,6 @@ import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
 import SessionHeader from '../containers/SessionHeader'
 
-
 const PAGE_TITLE = 'Setup Instruments'
 
 export default function SetupInstrumentsPage (props) {
