@@ -4,7 +4,7 @@ import * as React from 'react'
 import {Icon} from '@opentrons/components'
 import styles from './StepItem.css'
 
-type StepSubItemProps = {
+export type StepSubItemProps = {
   sourceIngredientName?: string,
   destIngredientName?: string,
   sourceWell?: string,

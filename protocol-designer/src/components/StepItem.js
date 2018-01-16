@@ -15,7 +15,7 @@ const stepIconsByType = { // TODO Ian 2018-01-11 revisit this
   'mix': 'mix'
 }
 
-type StepItemProps = {
+export type StepItemProps = {
   stepType: $Keys<typeof stepIconsByType>,
   title?: string,
   description?: string,
