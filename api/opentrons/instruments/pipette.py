@@ -1,4 +1,5 @@
 import itertools
+import warnings
 
 from opentrons import commands
 
@@ -144,6 +145,12 @@ class Pipette:
         }
 
         self.plunger_positions = PLUNGER_POSITIONS.copy()
+
+        if max_volume:
+            warnings.warn(
+                "Pipette 'max_volume' argument is ignored for the OT2",
+                DeprecationWarning
+            )
 
         self.ul_per_mm = ul_per_mm
         self.min_volume = min_volume
