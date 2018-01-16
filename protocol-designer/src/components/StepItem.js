@@ -7,16 +7,11 @@ import {Icon, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import styles from './StepItem.css'
 
-const stepIconsByType = { // TODO Ian 2018-01-11 revisit this
-  'transfer': 'arrow right',
-  'consolidate': 'consolidate',
-  'distribute': 'distribute',
-  'pause': 'pause',
-  'mix': 'mix'
-}
+import {stepIconsByType} from '../steplist/types'
+import type {StepType} from '../steplist/types'
 
-export type StepItemProps = {
-  stepType: $Keys<typeof stepIconsByType>,
+type StepItemProps = {
+  stepType: StepType,
   title?: string,
   description?: string,
   collapsed?: boolean,
@@ -43,7 +38,9 @@ export default function StepItem (props: StepItemProps) {
   } = props
 
   const iconName = stepIconsByType[stepType]
-  const showHeader = ['transfer', 'distribute', 'consolidate'].includes(stepType)
+  const showLabwareHeader = ['transfer', 'distribute', 'consolidate'].includes(stepType) &&
+    sourceLabwareName &&
+    destLabwareName
 
   const Description = <StepDescription description={description} />
 
@@ -53,7 +50,7 @@ export default function StepItem (props: StepItemProps) {
       description={Description}
       {...{iconName, title, selected, onClick, onCollapseToggle: onCollapseToggle || noop, collapsed}}
     >
-      {showHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
+      {showLabwareHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <span>{sourceLabwareName}</span>
         <Icon name={iconName} />
         <span>{destLabwareName}</span>
