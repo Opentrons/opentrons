@@ -25,7 +25,7 @@ endif
 
 .PHONY: install
 install:
-	npm install
+	yarn
 
 .PHONY: uninstall
 uninstall:
@@ -34,7 +34,9 @@ uninstall:
 # development
 #####################################################################
 
-
+.PHONY: dev
+dev:
+	$(env)=development $(bin)/styleguidist server
 
 # checks
 #####################################################################

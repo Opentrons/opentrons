@@ -1,0 +1,83 @@
+@value blue, lightGrey, medGrey, plateBg from '../css/colors.css';
+@value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../css/fontSizes.css';
+@value close from '../css/mixins.css';
+
+:root {
+  --ingredient_panel_sidebar_width: 40%;
+}
+
+.ingredient_modal {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  bottom: 18%;
+  background-color: rgba(100, 100, 100, 0.8);
+  z-index: 1000;
+  border-radius: 0;
+  border: 3px solid gray;
+}
+
+.ingredient_modal .top_bar {
+  color: white;
+  font-size: 14pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-right: 10pt;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredient_modal .info {
+  margin-left: 1em;
+}
+
+.ingredient_modal .close {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ingredient_modal .close p {
+  margin-right: 10pt;
+}
+
+.ingredient_modal .close:hover {
+  /* color: lightgray; */
+  -webkit-filter: brightness(0.75);
+  filter: brightness(0.75);
+  cursor: pointer;
+}
+
+.ingredient_panel_sidebar {
+  float: left;
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  width: var(--ingredient_panel_sidebar_width);
+  border-right: 3px solid gray;
+}
+
+.ingredient_panel_content {
+  border-radius: 0;
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: calc(100% - var(--ingredient_panel_sidebar_width) - 3px);
+}
+
+.container_detail {
+  margin: 0 2%;
+}
+
+.container_detail::after {
+  /* Horizontal line */
+  content: ' ';
+  display: block;
+  background-color: lightgray;
+  width: 70%;
+  height: 3px;
+  margin: 30px auto;
+}

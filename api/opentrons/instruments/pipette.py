@@ -226,7 +226,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc', low_power_z=False):
+    def move_to(self, location, strategy='arc', low_current_z=False):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -247,8 +247,8 @@ class Pipette:
             "direct" strategies will simply move in a straight line from
             the current position
 
-        low_power_z : bool
-            Setting this to True will cause the pipette to move at a low power
+        low_current_z : bool
+            Setting this to True will cause the pipette to move at low current
             setting **in the Z axis only**, primarily to prevent damage to the
             pipette in case of collision during calibration.
 
@@ -265,7 +265,7 @@ class Pipette:
             location,
             instrument=self,
             strategy=strategy,
-            low_power_z=low_power_z)
+            low_current_z=low_current_z)
 
         return self
 
@@ -273,12 +273,18 @@ class Pipette:
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
+        from the specified location
 
         Notes
         -----
-        If no `location` is passed, the pipette will aspirate
-        from it's current position. If no `volume` is passed,
-        `aspirate` will default to it's `max_volume`
+        If only a volume is passed, the pipette will aspirate
+        from it's current position. If only a location is passed,
+        `aspirate` will default to it's `max_volume`.
+
+        The location may be a Well, or a specific position in relation to a
+        Well, such as `Well.top()`. If a Well is specified without calling a
+        a position method (such as .top or .bottom), this method will default
+        to the bottom of the well.
 
         Parameters
         ----------
@@ -345,10 +351,11 @@ class Pipette:
                     self.current_volume + volume)
             )
 
+        self._position_for_aspirate(location)
+
         mm_position = self._ul_to_mm(self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
-        self._position_for_aspirate(location)
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
@@ -356,6 +363,7 @@ class Pipette:
         )
         self.instrument_actuator.default_speed()
         self.current_volume += volume  # update after actual aspirate
+
         return self
 
     @commands.publish.both(command=commands.dispense)
@@ -368,9 +376,14 @@ class Pipette:
 
         Notes
         -----
-        If no `location` is passed, the pipette will dispense
-        from it's current position. If no `volume` is passed,
+        If only a volume is passed, the pipette will dispense
+        from it's current position. If only a location is passed,
         `dispense` will default to it's `current_volume`
+
+        The location may be a Well, or a specific position in relation to a
+        Well, such as `Well.top()`. If a Well is specified without calling a
+        a position method (such as .top or .bottom), this method will default
+        to the bottom of the well.
 
         Parameters
         ----------
@@ -418,6 +431,8 @@ class Pipette:
         """
         assert self.tip_attached
 
+        # Note: volume positional argument may not be passed. if it isn't then
+        # assume the first positional argument is the location
         if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
@@ -430,7 +445,7 @@ class Pipette:
         if volume == 0:
             return self
 
-        self.move_to(location, strategy='arc')  # position robot above location
+        self._position_for_dispense(location)
 
         mm_position = self._ul_to_mm(self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
@@ -463,6 +478,23 @@ class Pipette:
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
             )
+
+        # then go inside the location
+        if location:
+            if isinstance(location, Placeable):
+                location = location.bottom(min(location.z_size(), 1))
+            self.move_to(location, strategy='direct')
+
+    def _position_for_dispense(self, location=None):
+        """
+        Position this :any:`Pipette` for an dispense
+        """
+        assert self.tip_attached
+
+        # first go to the destination
+        if location:
+            placeable, _ = unpack_location(location)
+            self.move_to(placeable.top(), strategy='arc')
 
         # then go inside the location
         if location:
@@ -744,7 +776,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, low_power_z=True):
+    def pick_up_tip(self, location=None, presses=3, low_current_z=True):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -765,8 +797,8 @@ class Pipette:
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
             not desireable, but could be used for dry-run)
-        low_power_z: : :any:bool
-            The power setting for picking up a tip. Should be False for normal
+        low_current_z: : :any:bool
+            The current setting for picking up tip. Should be False for normal
             operation. Should be set to True for calibration where it is
             possible for the pipette to collide with the tip rack, which could
             damate the pipette.
@@ -819,7 +851,7 @@ class Pipette:
                 self.move_to(
                     self.current_tip().top(plunge_depth),
                     strategy='direct',
-                    low_power_z=low_power_z)
+                    low_current_z=low_current_z)
                 # move nozzle back up
                 self.move_to(
                     self.current_tip().top(0),
@@ -942,9 +974,7 @@ class Pipette:
             self.current_volume = 0
             self.robot.poses = self.instrument_actuator.home(
                 self.robot.poses)
-            # TODO(artyom, 20171103): confirm expected behavior on pipette.home
-            # Are we homing stage and plunger or plunger only?
-            # self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
 
         _home(self.mount)
         return self
@@ -1465,7 +1495,7 @@ class Pipette:
             self.speeds[key] = kwargs.get(key)
         return self
 
-    def _move(self, pose_tree, x=None, y=None, z=None, low_power_z=False):
+    def _move(self, pose_tree, x=None, y=None, z=None, low_current_z=False):
         current_x, current_y, current_z = pose_tracker.absolute(
             pose_tree,
             self)
@@ -1491,7 +1521,7 @@ class Pipette:
             pose_tree = self.instrument_mover.move(
                 pose_tree,
                 z=_z,
-                low_power_z=low_power_z)
+                low_current_z=low_current_z)
 
         return pose_tree
 

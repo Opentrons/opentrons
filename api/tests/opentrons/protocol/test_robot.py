@@ -100,7 +100,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 52.5},
+        {'z': 30.5},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -115,7 +115,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 52.5},
+        {'z': 30.5},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]

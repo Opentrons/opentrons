@@ -25,13 +25,10 @@ matrix:
 # More: https://docs.travis-ci.com/user/caching/
 cache:
   pip: true
+  yarn: true
   directories:
     - $HOME/.pyenv
     - $HOME/.cache/brew
-    # location of npm cache - preferable to cache this rather than node_modules
-    # because we have one cache for all npm projects plus caching node_modules
-    # can cause issues with native deps
-    - $HOME/.npm
 
 before_install:
   - >  # load keys needed to publish to pypa only when building from public repo
@@ -52,16 +49,15 @@ script:
   # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
-  # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C app package test && make -C app dist-posix
-  # Clean up. This will leave only single-file build artifacts
-  - find ./app/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
-  # protocol designer
-  # TODO(ian, 2017-11-06): use makefile
-  - cd protocol-designer; npm install && npm run test && npm run lint && npm run build; cd ..
   # components library
   # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
   - make -C components test
+  # TODO(mc, 2017-08-28): use top level `make test`
+  - make -C app test && make -C app-shell dist-posix
+  # Clean up. This will leave only single-file build artifacts
+  - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
+  # protocol designer
+  - make -C protocol-designer test build
 
 after_success:
   - make coverage
@@ -73,7 +69,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(pwd)/app/dist
+    local-dir: $(pwd)/app-shell/dist
     upload-dir: ci-builds
     acl: public_read
     on:

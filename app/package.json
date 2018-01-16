@@ -1,17 +1,16 @@
 {
   "name": "ot-app",
   "private": true,
-  "version": "3.0.0-alpha",
-  "description": "Opentrons desktop application",
-  "main": "shell/main.js",
+  "version": "3.0.0",
+  "description": "Opentrons desktop application UI",
+  "main": "src/index.js",
   "scripts": {
     "test": "make test",
-    "start": "make dev",
-    "postinstall": "electron-builder install-app-deps"
+    "start": "make dev"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenTrons/opentrons.git"
+    "url": "https://github.com/Opentrons/opentrons.git"
   },
   "author": {
     "name": "Opentrons Labworks",
@@ -19,9 +18,9 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/OpenTrons/opentrons/issues"
+    "url": "https://github.com/Opentrons/opentrons/issues"
   },
-  "homepage": "https://github.com/OpenTrons/opentrons",
+  "homepage": "https://github.com/Opentrons/opentrons",
   "jest": {
     "moduleNameMapper": {
       "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/ui/__mocks__/file.js",
@@ -35,7 +34,8 @@
       "!**/webpack*",
       "!**/webpack/**",
       "!**/coverage/**",
-      "!**/test/**"
+      "!**/test/**",
+      "!**/flow-typed/**"
     ],
     "coverageReporters": [
       "lcov",
@@ -44,13 +44,21 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "ignore": [
-      "dist/"
+    "plugins": [
+      "flowtype"
+    ],
+    "globals": [
+      "SyntheticEvent",
+      "$Keys"
     ],
     "env": [
       "node",
       "browser",
       "jest"
+    ],
+    "ignore": [
+      "**/dist/**",
+      "**/flow-typed/**"
     ]
   },
   "stylelint": {
@@ -64,11 +72,11 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/components": "file:../components",
-    "babel-core": "^6.24.1",
-    "babel-eslint": "^7.2.3",
+    "@opentrons/webpack-config": "^3.0.0",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "8.0.3",
     "babel-jest": "^20.0.3",
-    "babel-loader": "^7.0.0",
+    "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -76,25 +84,46 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-react-optimize": "^1.0.1",
     "babel-register": "^6.24.1",
-    "bonjour": "^3.5.0",
-    "classnames": "^2.2.5",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
-    "electron": "1.6.11",
-    "electron-builder": "~19.27.3",
-    "electron-builder-squirrel-windows": "~19.27.3",
-    "extract-text-webpack-plugin": "^2.1.2",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
+    "flow-bin": "^0.63.0",
+    "flow-typed": "^2.2.3",
     "handlebars-loader": "^1.6.0",
-    "history": "^4.7.2",
     "html-webpack-plugin": "^2.28.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
-    "lodash": "^4.17.4",
     "portfinder": "^1.0.13",
+    "postcss": "^6.0.16",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-import": "^11.0.0",
+    "postcss-loader": "^2.0.10",
+    "script-ext-html-webpack-plugin": "^1.8.5",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
+    "style-loader": "^0.18.2",
+    "stylelint": "~8.0.0",
+    "stylelint-config-css-modules": "^1.1.0",
+    "stylelint-config-standard": "^17.0.0",
+    "superagent": "^3.8.1",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.1.0",
+    "webpack-bundle-analyzer": "^2.8.2",
+    "webpack-dev-server": "^2.5.1",
+    "worker-loader": "^1.1.0",
+    "ws": "3.1.0"
+  },
+  "dependencies": {
+    "@opentrons/components": "^3.0.0",
+    "bonjour": "^3.5.0",
+    "classnames": "^2.2.5",
+    "history": "^4.7.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.1",
     "prop-types": "^15.5.10",
-    "randomstring": "^1.1.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-hot-loader": "^3.0.0-beta.7",
@@ -105,31 +134,7 @@
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "script-ext-html-webpack-plugin": "^1.8.5",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3",
-    "style-loader": "^0.18.1",
-    "stylelint": "~8.0.0",
-    "stylelint-config-css-modules": "^1.1.0",
-    "stylelint-config-standard": "^17.0.0",
-    "superagent": "^3.8.1",
-    "url-loader": "^0.6.2",
-    "webpack": "~2.6.1",
-    "webpack-bundle-analyzer": "^2.8.2",
-    "webpack-dev-server": "~2.4.5",
-    "winston": "^2.2.0",
-    "worker-loader": "^1.1.0",
-    "ws": "^3.1.0"
-  },
-  "dependencies": {
-    "electron-debug": "^1.1.0",
-    "electron-devtools-installer": "^2.2.0",
-    "electron-json-storage": "^2.0.0",
-    "electron-log": "^2.2.9",
-    "electron-settings": "^2.2.4",
-    "electron-squirrel-startup": "^1.0.0",
-    "moment": "^2.19.1",
-    "shelljs": "^0.7.8",
-    "zip-folder": "^1.0.0"
+    "reselect": "^3.0.1",
+    "winston": "^2.2.0"
   }
 }

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 
-import { selectors } from '../reducers'
-import { editModeIngredientGroup, deleteIngredient } from '../actions'
+import { selectors } from '../labware-ingred/reducers'
+import { editModeIngredientGroup, deleteIngredient } from '../labware-ingred/actions'
 
 import IngredientsList from '../components/IngredientsList.js'
 

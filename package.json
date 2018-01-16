@@ -1,0 +1,14 @@
+{
+  "version": "3.0.0",
+  "private": true,
+  "workspaces": [
+    "app",
+    "components",
+    "protocol-designer",
+    "webpack-config"
+  ],
+  "devDependencies": {
+    "flow-bin": "^0.63.0",
+    "flow-typed": "^2.2.3"
+  }
+}

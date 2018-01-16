@@ -1,0 +1,49 @@
+@import '..';
+
+@value color_light_grey, color_med_grey from '../styles/colors.css';
+@value border: 2px solid color_light_grey;
+@value width: 18rem;
+
+.panel {
+  overflow: hidden;
+  width: 18rem;
+  border-right: border;
+  transition: all 0.5s ease-in-out;
+  position: relative;
+}
+
+.closed {
+  width: 0;
+  border-right-width: 0;
+}
+
+.title_bar {
+  display: flex;
+  align-items: center;
+  width: width;
+  border-bottom: border;
+}
+
+.title {
+  margin: 0 auto 0 1rem;
+  font-size: 1rem;
+  font-weight: normal;
+  color: var(--c-dark-gray);
+  line-height: 2.5;
+}
+
+.panel_contents {
+  width: width;
+  height: calc(100vh - 2.625rem);
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.button_close {
+  border-width: 0;
+  background-color: transparent;
+  color: color_med_grey;
+  cursor: pointer;
+  height: 2rem;
+  width: 2rem;
+}

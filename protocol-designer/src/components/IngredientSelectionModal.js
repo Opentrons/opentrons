@@ -1,11 +1,15 @@
 import React from 'react'
-import styles from '../css/style.css'
+
+import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
+import styles from './IngredientSelectionModal.css'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 
-export default function IngredientSelectionModal ({onClose}) {
+export default function IngredientSelectionModal ({onClose, visible}) {
+  if (!visible) return null
+
   return (
     <div className={styles.ingredient_modal}>
 
@@ -22,7 +26,9 @@ export default function IngredientSelectionModal ({onClose}) {
           </div>
         </div>
         <div className={styles.container_detail}>
-          <SelectablePlate showLabels selectable />
+          <svg width='100%' height='100%' viewBox={`0 0 ${SLOT_WIDTH} ${SLOT_HEIGHT}`}>
+            <SelectablePlate showLabels selectable />
+          </svg>
         </div>
 
         <IngredientPropertiesForm />

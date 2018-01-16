@@ -1,0 +1,80 @@
+@import '@opentrons/components';
+
+@value blue, grey '../App.global.css';
+@value border: 2px solid #e5e2e2;
+
+.robot_list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.robot_item {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-bottom: border;
+}
+
+.robot_icon {
+  flex: none;
+  width: 1.5rem;
+  height: 2rem;
+}
+
+/* min-width: 0 needed to allow .robot_name truncation */
+.robot_controls {
+  flex: 1;
+  margin-left: 0.5rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.robot_name {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.disconnected {
+  color: var(--c-dark-gray);
+}
+
+.connected {
+  color: blue;
+}
+
+.scan_status {
+  padding: 1rem;
+  text-align: center;
+}
+
+.scan_button {
+  display: block;
+  width: 5rem;
+  height: auto;
+  font-size: 5rem;
+  line-height: 1;
+  margin: 0.5rem auto;
+}
+
+.refresh {
+  color: var(--c-dark-gray);
+}
+
+.refresh:hover {
+  color: #888;
+}
+
+.title_button {
+  position: absolute;
+  right: 2rem;
+  top: -0.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.5rem;
+  line-height: 0.5;
+  cursor: pointer;
+}

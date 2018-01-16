@@ -53,7 +53,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_functional(smoothie):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION  # NOQA
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
 
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
@@ -74,31 +74,31 @@ def test_functional(smoothie):
     assert smoothie.position == HOMED_POSITION
 
 
-power = []
+current = []
 
 
-def test_low_power_z(model):
-    from opentrons.robot.robot_configs import DEFAULT_POWER
+def test_low_current_z(model):
+    from opentrons.robot.robot_configs import DEFAULT_CURRENT
     import types
     driver = model.robot._driver
 
-    set_power = driver.set_power
+    set_current = driver.set_current
 
-    def set_power_mock(self, target):
-        global power
-        power.append(target)
+    def set_current_mock(self, target):
+        global current
+        current.append(target)
 
-        set_power(target)
+        set_current(target)
 
-    driver.set_power = types.MethodType(set_power_mock, driver)
+    driver.set_current = types.MethodType(set_current_mock, driver)
 
-    driver.move({'A': 100}, low_power_z=False)
+    driver.move({'A': 100}, low_current_z=False)
     # Instrument in `model` is configured to right mount, which is the A axis
     # on the Smoothie (see `Robot._actuators`)
-    assert power == []
+    assert current == []
 
-    driver.move({'A': 10}, low_power_z=True)
-    assert power == [{'A': 0.1}, DEFAULT_POWER]
+    driver.move({'A': 10}, low_current_z=True)
+    assert current == [{'A': 0.1}, DEFAULT_CURRENT]
 
 
 def test_fast_home(model):
@@ -123,6 +123,12 @@ def test_fast_home(model):
 
 
 def test_pause_resume(model):
+    """
+    This test has to use an ugly work-around with the `simulating` member of
+    the driver. When issuing movement commands in test, `simulating` should be
+    True, but when testing whether `pause` actually pauses and `resume`
+    resumes, `simulating` must be False.
+    """
     from numpy import isclose
     from opentrons.trackers import pose_tracker
     from time import sleep
@@ -133,7 +139,9 @@ def test_pause_resume(model):
     robot.home()
     homed_coords = pose_tracker.absolute(robot.poses, pipette)
 
+    robot._driver.simulating = False
     robot.pause()
+    robot._driver.simulating = True
 
     def _move_head():
         robot.poses = pipette._move(robot.poses, x=100, y=0, z=0)
@@ -147,7 +155,9 @@ def test_pause_resume(model):
     coords = pose_tracker.absolute(robot.poses, pipette)
     assert isclose(coords, homed_coords).all()
 
+    robot._driver.simulating = False
     robot.resume()
+    robot._driver.simulating = True
     thread.join()
 
     coords = pose_tracker.absolute(robot.poses, pipette)
@@ -181,3 +191,11 @@ def test_speed_change(model, monkeypatch):
         ['G0F9000 M400']
     ]
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_pause_in_protocol(model):
+    model.robot._driver.simulating = True
+
+    model.robot.pause()
+
+    assert model.robot._driver.run_flag.is_set()

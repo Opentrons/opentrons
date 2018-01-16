@@ -2,6 +2,7 @@
 
 import sys
 import logging
+import os
 from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
@@ -12,8 +13,24 @@ log = logging.getLogger(__name__)
 
 
 def log_init():
+    """
+    Function that sets log levels and format strings. Checks for the
+    OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
+    :return:
+    """
     # TODO(artyom): might as well use this:
     # https://pypi.python.org/pypi/logging-color-formatter
+
+    # TODO (Laura 20171222): Elevate default to INFO or WARN for production
+    default_log_level = 'DEBUG'
+    ot_log_level = os.environ.get('OT_LOG_LEVEL', default_log_level)
+    if ot_log_level not in logging._nameToLevel:
+        log.warning("OT Log Level {} not found. Defaulting to {}".format(
+            ot_log_level, default_log_level))
+        ot_log_level = default_log_level
+
+    level_value = logging._nameToLevel[ot_log_level]
+
     logging_config = dict(
         version=1,
         formatters={
@@ -31,15 +48,19 @@ def log_init():
         loggers={
             '__main__': {
                 'handlers': ['debug'],
-                'level': logging.DEBUG
+                'level': level_value
             },
             'opentrons.server': {
                 'handlers': ['debug'],
-                'level': logging.INFO
+                'level': level_value
             },
             'opentrons.api': {
                 'handlers': ['debug'],
-                'level': logging.DEBUG
+                'level': level_value
+            },
+            'opentrons.drivers.smoothie_drivers.driver_3_0': {
+                'handlers': ['debug'],
+                'level': level_value
             }
         }
     )

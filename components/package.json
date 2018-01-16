@@ -1,10 +1,11 @@
 {
   "name": "@opentrons/components",
-  "version": "0.0.0",
+  "version": "3.0.0",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
+  "style": "src/index.css",
   "scripts": {
-    "test": "jest"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -31,11 +32,19 @@
       "$Keys"
     ],
     "env": [
+      "node",
       "browser",
       "jest"
+    ],
+    "ignore": [
+      "**/dist/**",
+      "**/flow-typed/**"
     ]
   },
   "stylelint": {
+    "rules": {
+      "selector-class-pattern": "^[a-z0-9_]+$"
+    },
     "extends": [
       "stylelint-config-standard",
       "stylelint-config-css-modules"
@@ -45,28 +54,40 @@
     ]
   },
   "devDependencies": {
+    "@opentrons/webpack-config": "^3.0.0",
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.3",
+    "babel-eslint": "8.0.3",
     "babel-jest": "^21.2.0",
+    "babel-loader": "^7.1.2",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.1.1",
-    "eslint-plugin-flowtype": "^2.39.1",
-    "flow-bin": "^0.60.1",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
+    "postcss": "^6.0.16",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-import": "^11.0.0",
+    "postcss-loader": "^2.0.10",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-styleguidist": "^6.1.0",
     "react-test-renderer": "^16.2.0",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3",
     "stylelint": "^8.3.1",
     "stylelint-config-css-modules": "^1.1.0",
-    "stylelint-config-standard": "^18.0.0"
+    "stylelint-config-standard": "^18.0.0",
+    "webpack": "^3.10.0"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "react": "^16.2.0",
+    "react-router-dom": "^4.2.2",
     "classnames": "^2.2.5",
-    "react": "^16.2.0"
+    "lodash": "^4.17.4"
   }
 }

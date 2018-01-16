@@ -16,54 +16,47 @@ export default function CowButton (props) {
 
 ## setup
 
-Requirements:
+Usage requirements for dependent projects:
 
-* Node lts/carbon (v8) and npm v5.6.0
-* React v16
-* `babel-loader` configured to run `babel-preset-react` on `.js` files
-* `jest` configured to:
-    * proxy `.css` imports to `identity-obj-proxy`
-    * transform `.js` files in `node_modules/@opentrons`
+*   Node lts/carbon (v8) and yarn
+*   The following `dependencies` (peer dependencies of `@opentrons/components`)
+    *   `react`: `^16.2.0`,
+    *   `react-router-dom`: `^4.2.2`,
+    *   `classnames`: `^2.2.5`,
+    *   `lodash`: `^4.17.4`
+*   `babel-loader` configured to run `babel-preset-react` on `.js` files
+*   `jest` configured to:
+    *   proxy `.css` imports to `identity-obj-proxy`
+    *   transform `.js` files in `node_modules/@opentrons`
 
-### node/npm setup
+### node setup
 
-The root of the monorepo has an `.nvmrc` file with the correct Node version, so to make sure your Node and npm versions are correct:
+The root of the monorepo has an `.nvmrc` file with the correct Node version, so to make sure your Node version is correct:
 
 ``` shell
 cd opentrons
 nvm use
-npm install -g npm@5.6.0
-```
-
-### components library setup
-
-Since we're using a monorepo with symlink dependencies (thanks npm v5!), when you use the components library in a project, the library will pull dependencies from its own directory. Therefore, we need to install them first.
-
-```shell
-# install components library requirements
-cd components
-make install
-# if you'll be writing components
-make install-types
 ```
 
 ### new project setup (optional)
 
 If you ever need to set up a new project in the monorepo that depends on the components library:
 
-```shell
-cd new-project
-npm install --save ../components
-# or use save-dev depending on the project setup
-# npm install --save-dev ../components
-```
+1.  Add the new project to `workspaces` in the repository's `package.json`
+2.  Ensure the required peer dependencies (listed above) are also in `dependencies`
+    ```shell
+    yarn add react@^16.2.0 react-router-dom@^4.2.2 classnames@^2.2.5 lodash@^4.17.4
+    ```
+3.  Add `@opentrons/components` at the current version to `dependencies` in the new project's `package.json`
+4.  Run `yarn`
+
 
 You'll also need to make sure webpack, babel, and jest are set up properly. [`app`](../app) and [`protocol-designer`](../protocol-designer) are good to look at for examples of monorepo projects using the components library.
 
 **example webpack.config.js**
 
 ```shell
-npm install --save-dev webpack babel-core babel-loader
+yarn add --dev webpack babel-core babel-loader
 ```
 
 ``` js
@@ -86,7 +79,7 @@ module.exports = {
 **example .babelrc**
 
 ```shell
-npm install --save-dev babel-preset-react babel-preset-env babel-plugin-transform-es2015-modules-commonjs
+yarn add --dev babel-preset-react babel-preset-env babel-plugin-transform-es2015-modules-commonjs
 ```
 
 ``` json
@@ -105,10 +98,10 @@ npm install --save-dev babel-preset-react babel-preset-env babel-plugin-transfor
 }
 ```
 
-**example packkage.json**
+**example package.json**
 
 ```shell
-npm install --save-dev jest babel-jest identity-obj-proxy
+yarn add --dev jest babel-jest identity-obj-proxy
 ```
 
 ```json
@@ -138,13 +131,14 @@ Primary application button with dark background and white text
 import {PrimaryButton} from '@opentrons/components'
 ```
 
-prop      | flow type                  | required | description
---------- | -------------------------- | -------- | ----------------------
-onClick   | (SyntheticEvent<>) => void | yes      | click event handler
-title     | string                     | no       | element title
-disabled  | bool                       | no       | disabled flag
-className | string                     | no       | additional class names
-children  | React.Node                 | no       | contents of the button
+ prop      | flow type                  | required | description
+---------- | -------------------------- | -------- | ----------------------
+ onClick   | (SyntheticEvent<>) => void | yes      | click event handler
+ title     | string                     | no       | element title
+ disabled  | bool                       | no       | disabled flag
+ className | string                     | no       | additional class names
+ children  | React.Node                 | no       | contents of the button
+ iconName  | string                     | no       | adds icon in left side of button
 
 ### icons
 
@@ -153,26 +147,161 @@ children  | React.Node                 | no       | contents of the button
 SVG icons that take `color` from their parent.
 
 ```js
-import {Icon, BACK, REFRESH, USB, WIFI} from '@opentrons/components'
+import {Icon, BACK, CLOSE, REFRESH, USB, WIFI, FLASK, CHECKED, UNCHECKED,
+CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, PROTOCOL, COG, CONNECT } from '@opentrons/components'
 ```
 
-prop      | flow type                      | required | description
---------- | ------------------------------ | -------- | ----------------------
-name      | BACK &#124; REFRESH &#124; ... | yes      | icon name
-className | string                         | no       | additional class names
+ prop      | flow type | required | description
+---------- | --------- | -------- | ------------------------
+ name      | IconName  | yes      | icon name
+ className | string    | no       | additional class names
+ spin      | bool      | no       | if set, icon will spin!
 
+#### icon names
+
+```js
+import type {IconName} from '@opentrons/components'
+```
+
+*   `ALERT`
+*   `BACK`
+*   `REFRESH`
+*   `SPINNER`
+*   `USB`
+*   `WIFI`
+*   `FLASK`
+*   `CHECKED`
+*   `UNCHECKED`
+
+### structure
+
+#### PageTabs
+
+Sub-page tabs to sit underneath the title bar
+
+```js
+import {PageTabs} from '@opentrons/components'
+```
+
+ prop      | flow type              | required | description
+---------- | ---------------------- | -------- | ------------------------------
+ pages     | Array&lt;TabProps&gt; | yes      | Array of pages that need tabs
+
+**TabProps**
+
+ prop       | flow type | required | description
+----------- | --------- | -------- | ------------------------------
+ title      | string    | yes      | Link title (displayed on tab)
+ href       | string    | yes      | Link target
+ isDisabled | bool      | yes      | Is the link disabled?
+ isActive   | bool      | yes      | Is the link active?
+
+
+#### TitleBar
+
+Top title bar with optional subtitle
+
+```js
+import {TitleBar} from '@opentrons/components'
+```
+
+ prop      | flow type  | required | description
+---------- | ---------- | -------- | ------------
+ title     | React.Node | yes      | h1 child
+ subtitle  | React.Node | no       | h2 child
+
+#### VerticalNavBar
+
+Side nav bar wrapper which receives NavButtons as children and optional className
+
+```js
+import {VerticalNavBar} from '@opentrons/components'
+```
+
+ prop      | flow type  | required | description
+---------- | ---------- | -------- | ------------
+ className | string     | no       | additional class names
+ children  | React.Node | no       | NavButton chidren
+
+#### NavButton
+
+Side nav bar wrapper which receives NavButtons as children and optional className
+
+```js
+import {NavButton} from '@opentrons/components'
+```
+
+ prop       | flow type                 | required | description
+----------- | ------------------------- | -------- | -------------------------------------------------
+ onClick    | (SyntheticEvent<>) => void| yes      | click action
+ iconName   | iconName                  | yes      | icon as button content
+ isCurrent  | bool                      | no       | is button current content?
+ disabled   | bool                      | no       | is button disabled?
+ isBottom   | bool                      | no       | is button fixed to bottom of navbar? (1 per navbar)
+ className  | string                    | no       | additional class names
+
+### lists
+
+#### TitledList
+
+Titled ordered list wrapper with optional title icon
+
+```js
+import {TitledList} from '@opentrons/components'
+```
+
+ prop        | flow type                 | required | description
+----------   | ------------------------- | -------- | -----------------------
+ title       | React.Node                | yes      | text of title
+ children    | React.Node                | yes      | children: must all be li
+ className   | string                    | yes      | additional class names
+ collapsed   | boolean                   | no       | sets collapsed appearance. List is expanded by default.
+ description | React.Node                | no       | component with descriptive text about the list
+ iconName    | iconName                  | no       | optional icon before h3
+ onClick     | (SyntheticEvent<>) => void| no       | optional click action (on title div, not children)
+onCollapseToggle | (SyntheticEvent<>) => void| no   | optional click action (on carat click only, not rest of title div). If defined, the TitledList is expandable and the carat is visible
+ selected    | boolean                   | no       | highlights the whole TitledList if true
+
+#### ListItem
+
+List item with optional icon, link, and action
+
+```js
+import {Listitem} from '@opentrons/components'
+```
+
+ prop      | flow type                  | required | description
+---------- | -------------------------- | -------- | -----------------------------
+ children  | React.Node                 | yes      | span(s) children
+ className | string                     | no       | additional class names
+ url       | string                     | no       | optional NavLink url
+ iconName  | iconName                   | no       | optional icon before children
+ onClick   | (SyntheticEvent<>) => void | no       | optional click action
+
+#### ListItem
+
+List item alert
+
+```js
+import {ListAlert} from '@opentrons/components'
+```
+
+ prop      | flow type   | required | description
+---------- | ----------- | -------- | ----------------------
+ children  | React.Node  | yes      | span(s) children
+ className | string      | no       | additional class names
 
 ## contributing
 
 ### flow
 
-We use [flow] for static type checking of our components. See flow's documentation for usage instructions and type definitions.
+We use [flow][] for static type checking of our components. See flow's documentation for usage instructions and type definitions.
 
-If you need to add an external dependency to the components library for a component, it probably won't come with type definitions (for example, `classnames`). In that case, [flow-typed] probably has the type definitions you're looking for.
+If you need to add an external dependency to the components library for a component, it probably won't come with type definitions (for example, `classnames`). In that case, [flow-typed][] probably has the type definitions you're looking for.
 
-```
+```shell
 # install some dependency
-npm install --save classnames
+yarn add classnames
 # install type definitions for all dependencies
 make install-types
 ```
@@ -183,14 +312,14 @@ You also may want to check out good [editor setups for flow][flow-editors].
 
 Unit tests live in a `__tests__` directory in the same directory as the module under test. When writing unit tests for components, we've found the following tests to be the most useful:
 
-* DOM tests
-    * Make sure the component renders the correct node type
-    * Make sure DOM attributes are mapped correctly
-    * Make sure handlers fire correctly
-* Render tests
-    * Snapshot tests using [jest's snapshot functionality][jest-snapshots]
-    * To regenerate snapshots after an intentional rendering change, run:
-    
+*   DOM tests
+    *   Make sure the component renders the correct node type
+    *   Make sure DOM attributes are mapped correctly
+    *   Make sure handlers fire correctly
+*   Render tests
+    *   Snapshot tests using [jest's snapshot functionality][jest-snapshots]
+    *   To regenerate snapshots after an intentional rendering change, run:
+
     ``` shell
     make test updateSnapshot=true
     ```

@@ -1,0 +1,52 @@
+{
+  "name": "ot-app-desktop",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Opentrons decktop application shell",
+  "main": "lib/main.js",
+  "scripts": {
+    "start": "make dev",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
+  "standard": {
+    "ignore": [
+      "dist/"
+    ],
+    "env": [
+      "node",
+      "browser"
+    ]
+  },
+  "devDependencies": {
+    "cross-env": "^5.0.1",
+    "electron": "1.6.11",
+    "electron-builder": "19.52.1",
+    "electron-builder-squirrel-windows": "19.52.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "electron-debug": "^1.1.0",
+    "electron-devtools-installer": "^2.2.0",
+    "electron-json-storage": "^2.0.0",
+    "electron-log": "^2.2.9",
+    "electron-settings": "^2.2.4",
+    "electron-squirrel-startup": "^1.0.0",
+    "moment": "^2.19.1",
+    "shelljs": "^0.7.8",
+    "zip-folder": "^1.0.0"
+  }
+}
