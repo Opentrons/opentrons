@@ -1,4 +1,4 @@
-import { containers } from './reducers'
+import { containers } from '../reducers'
 
 const containersInitialState = {}
 
