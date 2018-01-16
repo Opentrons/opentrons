@@ -43,8 +43,9 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
   render () {
     const {expanded, onExpandClick, onStepClick} = this.props
     return (
-      <div ref={ref => { this.ref = ref }}>{expanded
-        ? <React.Fragment>
+      <div ref={ref => { this.ref = ref }}>
+        <PrimaryButton onClick={onExpandClick}>+ Add Action</PrimaryButton>
+        {expanded && <React.Fragment>
           <PrimaryButton
             onClick={onStepClick('transfer')}
             iconName='arrow right'
@@ -57,8 +58,8 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
             >Distribute
           </PrimaryButton>
         </React.Fragment>
-          : <PrimaryButton onClick={onExpandClick}>+ Add Action</PrimaryButton>
-        }</div>
+        }
+      </div>
     )
   }
 }
