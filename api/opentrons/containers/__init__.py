@@ -38,6 +38,19 @@ def load(robot, container_name, slot, label=None, share=False):
     >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
+
+    # OT-One users specify columns in the A1, B3 fashion
+    # below checks for this naming scheme, and converts to the 1, 2, etc names
+    columns_lookup = {'A':0, 'B': 1, 'C': 2}
+    if isinstance(slot, str) and slot[0] in columns_lookup:
+        col = columns_lookup[slot[0]]
+        row = int(slot[1])
+        index = col + (row * robot.get_max_robot_cols())
+        slot = str(index + 1)
+
+    # if user pass in slot name as number (eg: 3 instead of '3')
+    slot = str(slot)
+
     return robot.add_container(container_name, slot, label, share)
 
 
