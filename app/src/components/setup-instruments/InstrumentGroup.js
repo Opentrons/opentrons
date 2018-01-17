@@ -14,7 +14,6 @@ export default function InstrumentGroup (props: Props) {
   return (
     <section className={styles.pipette_group}>
       {instruments.map((instrument) => {
-        console.log(instrument)
         return (
           <InstrumentInfo {...instrument} key={instrument.axis} />
         )
