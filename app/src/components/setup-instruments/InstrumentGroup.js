@@ -1,28 +1,22 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+// @flow
+import * as React from 'react'
 
-import InstrumentInfo from './InstrumentInfo'
+import InstrumentInfo, {type InstrumentInfoProps} from './InstrumentInfo'
 
 import styles from './instrument.css'
 
-InstrumentGroup.propTypes = {
-  currentInstrument: PropTypes.shape({
-    axis: PropTypes.string.isRequired
-  }),
-  instruments: PropTypes.arrayOf(PropTypes.shape({
-    axis: PropTypes.string.isRequired,
-    channels: PropTypes.number,
-    volume: PropTypes.number
-  })).isRequired
+type Props = {
+  instruments: InstrumentInfoProps[]
 }
 
-export default function InstrumentGroup (props) {
-  const {instruments, currentInstrument} = props
+export default function InstrumentGroup (props: Props) {
+  const {instruments} = props
   return (
     <section className={styles.pipette_group}>
-      {instruments.map((inst) => {
+      {instruments.map((instrument) => {
+        console.log(instrument)
         return (
-          <InstrumentInfo {...inst} currentInstrument={currentInstrument} key={inst.axis} />
+          <InstrumentInfo {...instrument} key={instrument.axis} />
         )
       })}
     </section>

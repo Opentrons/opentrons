@@ -1,16 +1,16 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import styles from './instrument.css'
 
 import singleSrc from '../../img/pipetteSingle.png'
 import multiSrc from '../../img/pipetteMulti.png'
 
-InstrumentDiagram.propTypes = {
-  channels: PropTypes.number
+type Props = {
+  channels?: number
 }
 
-export default function InstrumentDiagram (props) {
+export default function InstrumentDiagram (props: Props) {
   const {channels} = props
   const imgSrc = channels === 1
     ? singleSrc

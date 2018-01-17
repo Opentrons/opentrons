@@ -1,5 +1,5 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import InfoItem from './InfoItem.js' // move to comp lib?
@@ -7,27 +7,27 @@ import InstrumentDiagram from './InstrumentDiagram.js'
 
 import styles from './instrument.css'
 
-InstrumentInfo.propTypes = {
-  axis: PropTypes.string.isRequired,
-  channels: PropTypes.number,
-  isDisabled: PropTypes.bool,
-  description: PropTypes.string.isRequired,
-  tipType: PropTypes.string.isRequired
+export type InstrumentInfoProps = {
+  axis: string,
+  description: string,
+  tipType: string,
+  isDisabled: boolean,
+  channels?: number,
+  className?: string
 }
 
-export default function InstrumentInfo (props) {
-  const {axis, channels, isDisabled, description, tipType} = props
-  const className = classnames(styles.pipette, styles[axis], {
-    [styles.disabled]: isDisabled
+export default function InstrumentInfo (props: InstrumentInfoProps) {
+  const className = classnames(styles.pipette, styles[props.axis], {
+    [styles.disabled]: props.isDisabled
   })
 
   return (
     <div className={className}>
       <div className={styles.pipette_info}>
-        <InfoItem title={'pipette'} value={description} />
-        <InfoItem title={'suggested tip type'} value={tipType} />
+        <InfoItem title={'pipette'} value={props.description} />
+        <InfoItem title={'suggested tip type'} value={props.tipType} />
       </div>
-      <InstrumentDiagram channels={channels} />
+      <InstrumentDiagram channels={props.channels} />
     </div>
   )
 }

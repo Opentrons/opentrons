@@ -1,4 +1,3 @@
-import React from 'react'
 import {connect} from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
@@ -6,13 +5,7 @@ import InstrumentGroup from './InstrumentGroup'
 
 import {selectors as robotSelectors} from '../../robot'
 
-export default connect(mapStateToProps, null, mergeProps)(Instruments)
-
-function Instruments (props) {
-  return (
-    <InstrumentGroup {...props} />
-  )
-}
+export default connect(mapStateToProps, null, mergeProps)(InstrumentGroup)
 
 function mapStateToProps (state, ownProps) {
   const instruments = robotSelectors.getInstruments(state)

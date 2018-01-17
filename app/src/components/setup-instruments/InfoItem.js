@@ -1,15 +1,15 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import styles from './instrument.css'
 
-InfoItem.propTypes = {
-  title: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  className: PropTypes.string
+type Props = {
+  title: string,
+  value: string,
+  className?: string,
 }
 
-export default function InfoItem (props) {
+export default function InfoItem (props: Props) {
   const {title, value, className} = props
   return (
     <div className={className}>
