@@ -1,7 +1,7 @@
 :root {
-  --fc-dark: #4a4a4a;
-  --fc-light: white;
-  --fc-disabled: #9c9c9c;
+  --c-font-dark: #4a4a4a;
+  --c-font-light: white;
+  --c-font-disabled: #9c9c9c;
   --fs-huge: 3rem;
   --fs-header: 1.125rem;
   --fs-body-2: 0.875rem;
@@ -14,49 +14,49 @@
   --font-huge-dark: {
     font-size: var(--fs-huge);
     font-weight: var(--fw-bold);
-    color: var(--fc-dark);
+    color: var(--c-font-dark);
   };
 
   --font-huge-light: {
     font-size: var(--fs-huge);
     font-weight: var(--fw-bold);
-    color: var(--fc-light);
+    color: var(--c-font-light);
   };
 
   --font-header-dark: {
     font-size: var(--fs-header);
     font-weight: var(--fw-semibold);
-    color: var(--fc-dark);
+    color: var(--c-font-dark);
   };
 
   --font-header-light: {
     font-size: var(--fs-header);
     font-weight: var(--fw-semibold);
-    color: var(--fc-light);
+    color: var(--c-font-light);
   };
 
   --font-body-2-dark: {
     font-size: var(--fs-body-2);
     font-weight: var(--fw-regular);
-    color: var(--fc-dark);
+    color: var(--c-font-dark);
   };
 
   --font-body-2-light: {
     font-size: var(--fs-body-2);
     font-weight: var(--fw-regular);
-    color: var(--fc-light);
+    color: var(--c-font-light);
   };
 
   --font-body-1-dark: {
     font-size: var(--fs-body-1);
     font-weight: var(--fw-regular);
-    color: var(--fc-dark);
+    color: var(--c-font-dark);
   };
 
   --font-body-1-light: {
     font-size: var(--fs-body-1);
     font-weight: var(--fw-regular);
-    color: var(--fc-light);
+    color: var(--c-font-light);
   };
 }
 

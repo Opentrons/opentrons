@@ -21,7 +21,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  color: var(--fc-dark);
+  color: var(--c-font-dark);
 }
 
 a {
