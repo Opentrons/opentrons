@@ -4,11 +4,7 @@
   margin: 0 auto;
   min-width: 40rem;
   max-width: 45rem;
-<<<<<<< HEAD
-  padding: 0rem 1rem 2rem;
-=======
   padding: 0 1rem 2rem;
->>>>>>> Split tip probe from instrument info
   display: grid;
   grid-column-gap: 0.25rem;
   grid-template-columns: 50% 50%;
@@ -57,15 +53,3 @@
   font-size: var(--fs-body-2);
   margin-left: 1rem;
 }
-<<<<<<< HEAD
-
-.info {
-  border: 2px solid silver;
-  border-radius: 0.25rem;
-  margin-top: 1rem;
-  padding: 0.5rem;
-  font-size: 0.75rem;
-  min-height: 7.1rem;
-}
-=======
->>>>>>> Split tip probe from instrument info
