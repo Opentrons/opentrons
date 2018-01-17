@@ -1,17 +1,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
+import map from 'lodash/map'
 
 import {PrimaryButton} from '@opentrons/components'
 import {addStep, expandAddStepButton} from '../steplist/actions'
 import {selectors} from '../steplist/reducers'
-
-// TODO factor out Step types
-type StepType = 'transfer'
-  | 'distribute'
-  | 'consolidate'
-  | 'mix'
-  | 'pause'
-  | 'deck setup'
+import {stepIconsByType} from '../steplist/types'
+import type {StepType} from '../steplist/types'
 
 type StepCreationButtonProps = {
   onStepClick?: StepType => (event?: SyntheticEvent<>) => void,
@@ -28,7 +23,7 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
 
   handleAllClicks (e) {
     if (this.ref && !this.ref.contains(e.target)) {
-      this.props.onClickAway(e)
+      this.props.expanded && this.props.onClickAway(e)
     }
   }
 
@@ -41,24 +36,19 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
   }
 
   render () {
-    const {expanded, onExpandClick, onStepClick} = this.props
+    const {expanded, onExpandClick, onStepClick, onClickAway} = this.props
     return (
       <div ref={ref => { this.ref = ref }}>
-        <PrimaryButton onClick={onExpandClick}>+ Add Action</PrimaryButton>
-        {expanded && <React.Fragment>
+        <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Action</PrimaryButton>
+        {expanded && map(stepIconsByType, (iconName, stepType) =>
           <PrimaryButton
-            onClick={onStepClick('transfer')}
-            iconName='arrow right'
-            >
-              Transfer
+            key={stepType}
+            onClick={onStepClick(stepType)}
+            iconName={iconName}
+          >
+            {stepType}
           </PrimaryButton>
-          <PrimaryButton
-            onClick={onStepClick('distribute')}
-            iconName='distribute'
-            >Distribute
-          </PrimaryButton>
-        </React.Fragment>
-        }
+        )}
       </div>
     )
   }
@@ -72,7 +62,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    onStepClick: stepType => e => dispatch(addStep({type: stepType, collapsed: false})),
+    onStepClick: stepType => e => dispatch(addStep({stepType})),
     onExpandClick: e => dispatch(expandAddStepButton(true)),
     onClickAway: e => dispatch(expandAddStepButton(false))
   }

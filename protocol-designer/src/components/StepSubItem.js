@@ -2,13 +2,10 @@
 import * as React from 'react'
 
 import {Icon} from '@opentrons/components'
+import type {StepSubItemData} from '../steplist/types'
 import styles from './StepItem.css'
 
-type StepSubItemProps = {
-  sourceIngredientName?: string,
-  destIngredientName?: string,
-  sourceWell?: string,
-  destWell?: string,
+export type StepSubItemProps = StepSubItemData & {
   onMouseOver?: (event: SyntheticEvent<>) => void,
 }
 
