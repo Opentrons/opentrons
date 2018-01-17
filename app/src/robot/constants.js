@@ -17,6 +17,10 @@ export type ConnectionStatus =
   | 'disconnecting'
 
 // session status (api/opentrons/api/session.py::VALID_STATES)
+// TODO(mc, 2018-01-11): remove constant exports in favor of flowtype
+export const RUNNING = 'running'
+export const PAUSED = 'paused'
+export const FINISHED = 'finished'
 export type SessionStatus =
   | ''
   | 'loaded'

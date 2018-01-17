@@ -2,45 +2,96 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {PrimaryButton} from '..'
+import {FLASK} from '../icons'
+import {Button, FlatButton, PrimaryButton} from '..'
 
-describe('PrimaryButton', () => {
+describe('buttons', () => {
+  const onClick = () => {}
+
   test('creates a button with props', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
-      <PrimaryButton onClick={onClick}
+      <Button onClick={onClick}
         className='class'
         title='title'
         disabled={false}
       >
         children
-      </PrimaryButton>
+      </Button>
     ).root.findByType('button')
 
     button.props.onClick()
     expect(button.props.className).toMatch(/\bclass\b/)
     expect(button.props.title).toBe('title')
     expect(button.props.disabled).toBe(false)
-    expect(button.children).toEqual(['children'])
     expect(onClick).toHaveBeenCalled()
   })
 
   test('disabled sets onClick to undefined', () => {
     const onClick = () => {}
     const button = Renderer.create(
-      <PrimaryButton onClick={onClick} disabled />
+      <Button onClick={onClick} disabled />
     ).root.findByType('button')
 
     expect(button.props.disabled).toBe(true)
     expect(button.props.onClick).toBe(undefined)
   })
 
-  test('renders correctly', () => {
-    const onClick = () => {}
+  test('Button renders correctly', () => {
+    const tree = Renderer.create(
+      <Button onClick={onClick} title='t' className='c'>
+        children
+      </Button>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Button with iconName renders correctly', () => {
+    const tree = Renderer.create(
+      <Button onClick={onClick} title='t' className='c' iconName={FLASK}>
+        children
+      </Button>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('PrimaryButton renders correctly', () => {
     const tree = Renderer.create(
       <PrimaryButton onClick={onClick} title='t' className='c'>
         children
       </PrimaryButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('PrimaryButton with iconName renders correctly', () => {
+    const tree = Renderer.create(
+      <PrimaryButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+        children
+      </PrimaryButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('FlatButton renders correctly', () => {
+    const tree = Renderer.create(
+      <FlatButton onClick={onClick} title='t' className='c'>
+        children
+      </FlatButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('FlatButton with iconName renders correctly', () => {
+    const tree = Renderer.create(
+      <FlatButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+        children
+      </FlatButton>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

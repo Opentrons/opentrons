@@ -2,7 +2,6 @@
 import * as React from 'react'
 import classnames from 'classnames'
 
-import {Icon} from '../icons'
 import Button, {type ButtonProps} from './Button'
 import styles from './buttons.css'
 
@@ -15,7 +14,6 @@ export default function PrimaryButton (props: ButtonProps) {
 
   return (
     <Button {...props} className={className}>
-      {props.iconName && <Icon name={props.iconName} className={styles.button_icon} />}
       {props.children}
     </Button>
   )

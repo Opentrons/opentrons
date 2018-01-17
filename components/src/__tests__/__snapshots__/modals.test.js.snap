@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`modals ContinueModal renders correctly 1`] = `
+<div
+  className="modal"
+>
+  <div
+    className="overlay"
+    onClick={[Function]}
+  />
+  <div
+    className="modal_contents"
+  >
+    <div
+      className="continue_modal_contents"
+    >
+      children
+    </div>
+    <div
+      className="continue_modal_buttons"
+    >
+      <button
+        className="button_flat"
+        disabled={undefined}
+        onClick={[Function]}
+        title="Cancel"
+      >
+        Cancel
+      </button>
+      <button
+        className="button_flat"
+        disabled={undefined}
+        onClick={[Function]}
+        title="Continue"
+      >
+        Continue
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`modals Modal renders correctly 1`] = `
+<div
+  className="modal"
+>
+  <div
+    className="overlay"
+    onClick={[Function]}
+  />
+  <div
+    className="modal_contents"
+  >
+    children
+  </div>
+</div>
+`;
