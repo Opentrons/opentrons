@@ -1,3 +1,5 @@
+@import '@opentrons/components';
+
 /* TODO(mc, 2018-01-12): remove @values in favor of @opentrons/components */
 @value blue: #006FFF;
 @value teal: #05C1B3;
@@ -19,6 +21,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  color: var(--c-font-dark);
 }
 
 a {
