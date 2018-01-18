@@ -148,10 +148,8 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
 
-        self.speeds = {
-            'aspirate': aspirate_speed,
-            'dispense': dispense_speed
-        }
+        self.speeds = {}
+        self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
 
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
@@ -1486,14 +1484,18 @@ class Pipette:
 
     def set_speed(self, aspirate=None, dispense=None):
         """
-        Set the speed (mm/minute) the :any:`Pipette` plunger will move
+        Set the speed (mm/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
 
         Parameters
         ----------
-        kwargs: Dict
-            A dictionary who's keys are either "aspirate" or "dispense",
-            and who's values are int or float (Example: `{"aspirate": 300}`)
+        aspirate: int
+            The speed in millimeters-per-second, at which the plunger will
+            move while performing an aspirate
+
+        dispense: int
+            The speed in millimeters-per-second, at which the plunger will
+            move while performing an dispense
         """
         if aspirate:
             self.speeds['aspirate'] = aspirate
@@ -1502,6 +1504,20 @@ class Pipette:
         return self
 
     def set_flow_rate(self, aspirate=None, dispense=None):
+        """
+        Set the speed (uL/second) the :any:`Pipette` plunger will move
+        during :meth:`aspirate` and :meth:`dispense`
+
+        Parameters
+        ----------
+        aspirate: int
+            The speed in microliters-per-second, at which the plunger will
+            move while performing an aspirate
+
+        dispense: int
+            The speed in microliters-per-second, at which the plunger will
+            move while performing an dispense
+        """
         if aspirate:
             self.set_speed(
                 aspirate=self._ul_to_mm(aspirate))
