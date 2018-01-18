@@ -30,6 +30,6 @@ function mapStateToProps (state, ownProps) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    clearLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed(false))
+    clearDeckPopulated: () => dispatch(robotActions.setDeckPopulated(false))
   }
 }

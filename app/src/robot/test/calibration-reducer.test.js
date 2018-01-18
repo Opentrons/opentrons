@@ -6,7 +6,7 @@ describe('robot reducer - calibration', () => {
     const state = reducer(undefined, {}).calibration
 
     expect(state).toEqual({
-      labwareReviewed: false,
+      deckPopulated: true,
       jogDistance: constants.JOG_DISTANCE_SLOW_MM,
 
       probedByAxis: {},
@@ -55,25 +55,25 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
-  test('handles SET_LABWARE_REVIEWED action', () => {
-    const setToTrue = {type: actionTypes.SET_LABWARE_REVIEWED, payload: true}
-    const setToFalse = {type: actionTypes.SET_LABWARE_REVIEWED, payload: false}
+  test('handles SET_DECK_POPULATED action', () => {
+    const setToTrue = {type: actionTypes.SET_DECK_POPULATED, payload: true}
+    const setToFalse = {type: actionTypes.SET_DECK_POPULATED, payload: false}
 
-    let state = {calibration: {labwareReviewed: false}}
+    let state = {calibration: {deckPopulated: false}}
     expect(reducer(state, setToTrue).calibration).toEqual({
-      labwareReviewed: true
+      deckPopulated: true
     })
 
-    state = {calibration: {labwareReviewed: true}}
+    state = {calibration: {deckPopulated: true}}
     expect(reducer(state, setToFalse).calibration).toEqual({
-      labwareReviewed: false
+      deckPopulated: false
     })
   })
 
   test('handles PICKUP_AND_HOME action', () => {
     const state = {
       calibration: {
-        labwareReviewed: false,
+        deckPopulated: false,
         pickupRequest: {inProgress: false, error: new Error(), slot: 0},
         labwareBySlot: {5: constants.UNCONFIRMED}
       }
@@ -84,7 +84,7 @@ describe('robot reducer - calibration', () => {
       payload: {instrument: 'left', labware: 5}
     }
     expect(reducer(state, action).calibration).toEqual({
-      labwareReviewed: true,
+      deckPopulated: true,
       pickupRequest: {inProgress: true, error: null, slot: 5},
       labwareBySlot: {5: constants.PICKING_UP}
     })
@@ -369,7 +369,7 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO action', () => {
     const state = {
       calibration: {
-        labwareReviewed: false,
+        deckPopulated: false,
         moveToRequest: {inProgress: false, error: new Error()},
         labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED}
       }
@@ -380,7 +380,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      labwareReviewed: true,
+      deckPopulated: true,
       moveToRequest: {inProgress: true, error: null, slot: 3},
       labwareBySlot: {3: constants.MOVING_TO_SLOT, 5: constants.UNCONFIRMED}
     })

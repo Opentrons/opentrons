@@ -37,7 +37,7 @@ function mapStateToProps (state, ownProps) {
   const containerName = labware.name
 
   const nextLabware = robotSelectors.getNextLabware(state)
-  const labwareReviewed = robotSelectors.getLabwareReviewed(state)
+  const deckPopulated = robotSelectors.getDeckPopulated(state)
   const allTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
 
   const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
@@ -69,8 +69,8 @@ function mapStateToProps (state, ownProps) {
     containerName,
     wellContents,
     highlighted,
-    labwareReviewed,
-    canRevisit: labwareReviewed && !isMoving &&
+    deckPopulated,
+    canRevisit: deckPopulated && !isMoving &&
       allTipracksConfirmed &&
       !(isTiprack && confirmed), // user cannot revisit a confirmed tiprack
     isMoving,
