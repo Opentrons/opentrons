@@ -693,8 +693,6 @@ class Robot(object):
         """
         SLOT_OFFSETS = {
             'slots': {
-                'x_offset': 0,
-                'y_offset': 0,
                 'col_offset': 132.50,
                 'row_offset': 90.5
             }
@@ -702,8 +700,6 @@ class Robot(object):
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
         row_offset = slot_settings.get('row_offset')
         col_offset = slot_settings.get('col_offset')
-        x_offset = slot_settings.get('x_offset')
-        y_offset = slot_settings.get('y_offset')
         return (row_offset, col_offset)
 
     def get_max_robot_rows(self):
@@ -711,7 +707,7 @@ class Robot(object):
         return 4
 
     def get_max_robot_cols(self):
-        # TODO: dynamically figure out robot rows
+        # TODO: dynamically figure out robot cols
         return 3
 
     def add_slots_to_deck(self):

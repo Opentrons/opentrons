@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import json
 import os
+import warnings
 
 from opentrons.data_storage import database
 from opentrons.containers.placeable import (
@@ -41,12 +42,18 @@ def load(robot, container_name, slot, label=None, share=False):
 
     # OT-One users specify columns in the A1, B3 fashion
     # below checks for this naming scheme, and converts to the 1, 2, etc names
-    columns_lookup = {'A':0, 'B': 1, 'C': 2}
+    columns_lookup = {'A': 0, 'B': 1, 'C': 2}
     if isinstance(slot, str) and slot[0] in columns_lookup:
         col = columns_lookup[slot[0]]
         row = int(slot[1])
         index = col + (row * robot.get_max_robot_cols())
+        old_slot = slot
         slot = str(index + 1)
+        warnings.warn(
+            'Please reference slots on OT2 as numbers 1-11. '
+            'Converting {0} to {1}'.format(old_slot, slot),
+            DeprecationWarning
+        )
 
     # if user pass in slot name as number (eg: 3 instead of '3')
     slot = str(slot)
