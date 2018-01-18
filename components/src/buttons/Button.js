@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
-import {type IconName} from '../icons'
+
+import {Icon, type IconName} from '../icons'
+import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */
@@ -37,6 +39,9 @@ export default function Button (props: ButtonProps) {
       title={props.title}
       className={props.className}
     >
+      {props.iconName && (
+        <Icon name={props.iconName} className={styles.button_icon} />
+      )}
       {props.children}
     </button>
   )
