@@ -1,15 +1,12 @@
 @import '..';
 
-@value color_light_grey, color_med_grey from '../styles/colors.css';
-@value border: 2px solid color_light_grey;
-
 .navbar {
   flex: none;
   position: relative;
   width: 5rem;
   height: 100%;
-  background-color: light_grey;
-  border-right: border;
+  background-color: var(--c-bg-light);
+  border-right: var(--bd-light);
 }
 
 .button {
@@ -17,10 +14,10 @@
   width: 100%;
   height: 5rem;
   background-color: transparent;
-  border-bottom: border;
+  border-bottom: var(--bd-light);
   cursor: pointer;
   padding: 1rem;
-  color: color_med_grey;
+  color: var(--c-med-gray);
 }
 
 /*
@@ -32,7 +29,7 @@ revisit once we have a need for more than one icon aligned to bottom.
   bottom: 0;
   justify-self: flex-end;
   border-bottom-width: 0;
-  border-top: border;
+  border-top: var(--bd-light);
 }
 
 .button[disabled] {
@@ -41,7 +38,7 @@ revisit once we have a need for more than one icon aligned to bottom.
 }
 
 .active {
-  background-color: color_med_grey;
+  background-color: var(--c-med-gray);
   color: var(--c-dark-gray);
 }
 
@@ -49,5 +46,5 @@ revisit once we have a need for more than one icon aligned to bottom.
   max-width: 100%;
   height: 100%;
   padding: 1.25rem;
-  color: color_med_grey;
+  color: var(---c-med-gray);
 }

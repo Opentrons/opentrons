@@ -1,35 +1,37 @@
-@value blue, lightGrey, medGrey, plateBg from '../colors.css';
-
-/* @value overlay_transparency from '../globals.css'; */
+@import '..';
 
 /*
 NOTE: available defs are:
   #roundSlotClipPath
 */
 
-.round_slot {
-  clip-path: url(#roundSlotClipPath);
+:root {
+  --round-slot: {
+    clip-path: url(#roundSlotClipPath);
+  };
+
+  --slot-overlay: {
+    fill: black;
+
+    @apply --round-slot;
+  }
 }
 
 .highlighted {
   fill: none;
-  stroke: blue;
+  stroke: var(--c-blue);
   stroke-width: 2.5;
 }
 
 .empty_slot {
-  composes: round_slot;
-  fill: plateBg;
+  fill: var(--c-plate-bg);
+
+  @apply --round-slot;
 }
 
 .empty_slot text {
   fill: white;
   font-size: 2rem;
-}
-
-.slot_overlay {
-  composes: round_slot;
-  fill: black;
 }
 
 .slot_overlay > rect {
@@ -42,7 +44,7 @@ NOTE: available defs are:
 }
 
 .slot_overlay_name_it {
-  composes: slot_overlay;
+  @apply --slot-overlay;
 }
 
 .slot_overlay_name_it > rect {
@@ -64,7 +66,7 @@ NOTE: available defs are:
 }
 
 .clickable:hover {
-  fill: lightgray;
+  fill: var(--c-light-gray);
 }
 
 .pass_thru_mouse {
@@ -76,9 +78,10 @@ NOTE: available defs are:
 
 /* shows container name on deck */
 .name_overlay {
-  composes: round_slot;
   font-size: 0.5rem;
   fill: white;
+
+  @apply --round-slot;
 }
 
 .name_overlay rect {
@@ -87,7 +90,7 @@ NOTE: available defs are:
 }
 
 .name_overlay .container_type {
-  font-weight: bold;
+  font-weight: var(--fw-bold);
 }
 
 .deck_slot:hover .name_overlay {

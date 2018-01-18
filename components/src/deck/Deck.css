@@ -1,27 +1,29 @@
-@value blue, lightGrey, medGrey, plateBg from '../colors.css';
+@import '..';
+
+:root {
+  --deck-element: {
+    fill: #fff;
+    stroke: var(--c-plate-bg);
+  }
+}
 
 .deck {
   max-height: 90vh;
 }
 
-.deck_element {
-  fill: white;
-}
-
 .deck_outline {
-  composes: deck_element;
+  @apply --deck-element;
+
   width: 100%;
   height: 100%;
-  stroke: plateBg;
 }
 
 .trash_outer {
-  composes: deck_element;
-  stroke: plateBg;
+  @apply --deck-element;
 }
 
 .trash_inner {
-  fill: plateBg;
+  fill: var(--c-plate-bg);
 }
 
 .trash text {

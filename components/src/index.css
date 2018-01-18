@@ -3,3 +3,12 @@
 @import './styles/colors.css';
 @import './styles/typography.css';
 @import './styles/borders.css';
+
+/*
+TODO(ka 2018-1-17) need loaded for font files defaulting to sans serif for now
+@import './styles/fonts.css';
+*/
+
+* {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
