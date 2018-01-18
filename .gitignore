@@ -70,6 +70,7 @@ docs/build/
 target/
 .idea/
 .setup_litter
+/Pipfile
 
 # Testing
 sample_protocol.py

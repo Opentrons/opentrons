@@ -11,7 +11,7 @@ function mapStateToProps (state, ownProps) {
   const pages = robotSelectors.getInstruments(state).map((inst) => ({
     title: inst.axis,
     href: `/setup-instruments/${inst.axis}`,
-    isActive: inst.axis === ownProps.side,
+    isActive: inst.axis === ownProps.mount,
     isDisabled: inst.name == null
   }))
 

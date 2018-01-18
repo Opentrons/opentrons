@@ -1,3 +1,6 @@
+@import '@opentrons/components';
+
+/* TODO(mc, 2018-01-12): remove @values in favor of @opentrons/components */
 @value blue: #006FFF;
 @value teal: #05C1B3;
 @value mustard: #FFD252;
@@ -7,7 +10,6 @@
 /* backgrounds */
 @value light_grey: #fafafa;
 @value grey: #d9d9d9;
-@value dark_grey: #9b9b9b;
 
 * {
   box-sizing: border-box;
@@ -19,6 +21,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  color: var(--c-font-dark);
 }
 
 a {

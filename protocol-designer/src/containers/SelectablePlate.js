@@ -2,8 +2,8 @@ import { connect } from 'react-redux'
 import get from 'lodash/get'
 
 import SelectablePlate from '../components/SelectablePlate.js'
-import { selectors } from '../reducers'
-import { preselectWells, selectWells } from '../actions'
+import { selectors } from '../labware-ingred/reducers'
+import { preselectWells, selectWells } from '../labware-ingred/actions'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
 import { getCollidingWells } from '../utils.js'
 

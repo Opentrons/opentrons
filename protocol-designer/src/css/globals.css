@@ -1,4 +1,4 @@
-@value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
+@value blue, lightGrey, medGrey, plateBg from '../css/colors.css';
 @value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../css/fontSizes.css';
 
 /* NOTE Ian 2017-12-06 these globals aren't really carefully designed at the moment */

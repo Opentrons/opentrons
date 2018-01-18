@@ -16,6 +16,7 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 #   https://github.com/electron-userland/electron-builder/issues/2222
 .PHONY: install
 install:
+	pip install pipenv
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) install

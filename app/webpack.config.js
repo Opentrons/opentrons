@@ -8,7 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
-const namedRules = require('./webpack/rules')
+const {rules: namedRules} = require('@opentrons/webpack-config')
 const devServerConfig = require('./webpack/dev-server')
 const {description, author} = require('./package.json')
 const gtmConfig = require('./src/analytics/gtm-config')
@@ -32,7 +32,7 @@ const output = {
 }
 
 const rules = [
-  namedRules.babel,
+  namedRules.js,
   namedRules.worker,
   namedRules.globalCss,
   namedRules.localCss,
@@ -49,7 +49,11 @@ const plugins = [
     DEBUG: false
   }),
 
-  new ExtractTextPlugin(CSS_OUTPUT_NAME),
+  new ExtractTextPlugin({
+    filename: CSS_OUTPUT_NAME,
+    disable: DEV,
+    ignoreOrder: true
+  }),
 
   new HtmlWebpackPlugin({
     title: 'OT App',

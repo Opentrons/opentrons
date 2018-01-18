@@ -3,7 +3,7 @@
 
 import { connect } from 'react-redux'
 
-import { hoverWellBegin, hoverWellEnd } from '../actions'
+import { hoverWellBegin, hoverWellEnd } from '../labware-ingred/actions'
 import Well from '../components/Well.js'
 
 export default connect(

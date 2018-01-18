@@ -11,8 +11,8 @@ import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
 import uniq from 'lodash/uniq'
 
-import { getMaxVolumes, defaultContainers, sortedSlotnames } from '../constants.js'
-import { uuid } from '../utils.js'
+import { getMaxVolumes, defaultContainers, sortedSlotnames } from '../../constants.js' // TODO factor out constants
+import { uuid } from '../../utils.js'
 
 // UTILS
 const nextEmptySlot = loadedContainersSubstate => {
@@ -189,6 +189,7 @@ export const ingredients = handleActions({
   }
 }, {})
 
+// TODO Ian 2018-01-15 factor into separate files
 const rootReducer = combineReducers({
   modeLabwareSelection,
   copyLabwareMode,
@@ -202,7 +203,7 @@ const rootReducer = combineReducers({
 
 // SELECTORS
 
-const rootSelector = state => state.default
+const rootSelector = state => state.labwareIngred // TODO
 
 const _loadedContainersBySlot = containers =>
   reduce(containers, (acc, container, containerId) => (container.slotName)

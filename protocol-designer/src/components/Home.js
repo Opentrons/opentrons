@@ -1,11 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import {
-  closeIngredientSelector
-} from '../actions'
+import {closeIngredientSelector} from '../labware-ingred/actions'
 
-import { selectors } from '../reducers'
+import { selectors } from '../labware-ingred/reducers'
 import {Deck} from '@opentrons/components'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
