@@ -1,5 +1,5 @@
 /* Upload component styles */
-@value red, blue from './App.global.css';
+@import '@opentrons/components';
 
 .status_bar {
   display: flex;
@@ -26,7 +26,7 @@
   padding-left: 2rem;
   font-size: 1.25rem;
   font-weight: bold;
-  color: grey;
+  color: var(--c-med-gray);
 }
 
 .error {
@@ -37,13 +37,13 @@
   margin-bottom: 1.5rem;
   padding-left: 8rem;
   font-size: 1rem;
-  color: grey;
+  color: var(--c-med-gray);
 }
 
 .error {
   margin-bottom: 1rem;
   font-weight: bold;
-  color: red;
+  color: var(--c-red);
 }
 
 .file_details_title {
@@ -55,5 +55,5 @@
 
 .open_setup_link {
   cursor: pointer;
-  color: blue;
+  color: var(--c-blue);
 }

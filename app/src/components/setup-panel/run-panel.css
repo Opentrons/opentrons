@@ -33,7 +33,7 @@ literally just copying button styles from component lib for now
   text-align: center;
   line-height: 1.4;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
 
   /* TODO(mc, 2017-12-07): pull colors out to central file */
   color: white;
@@ -50,7 +50,7 @@ literally just copying button styles from component lib for now
 }
 
 .button_primary:active {
-  font-weight: normal;
+  font-weight: 400;
   background-color: #6c6c6c;
 
   /* TODO(mc, 2017-12-07): pull shadows out to central file */
@@ -61,7 +61,7 @@ literally just copying button styles from component lib for now
 
 .button_primary[disabled],
 .button_primary.disabled {
-  font-weight: normal;
+  font-weight: 400;
   color: #9c9c9c;
   background-color: #d2d2d2;
   box-shadow: none;
