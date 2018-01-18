@@ -16,12 +16,12 @@ class GridTestCase(unittest.TestCase):
     def test_rows_cols(self):
         plate = self.plate
         wells = [
-            plate.rows[1]['B'],
-            plate.rows['2']['B'],
-            plate.rows['2'][1],
+            plate.rows[1]['2'],
+            plate.rows['B']['2'],
+            plate.rows['B'][1],
             plate.rows[1][1],
-            plate.cols['B']['2'],
-            plate.cols[1]['2'],
+            plate.cols['2']['B'],
+            plate.cols[1]['B'],
             plate.cols[1][1],
             plate['B2'],
             plate[9]
