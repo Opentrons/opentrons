@@ -4,7 +4,8 @@
   "workspaces": [
     "app",
     "components",
-    "protocol-designer"
+    "protocol-designer",
+    "webpack-config"
   ],
   "devDependencies": {
     "flow-bin": "^0.63.0",

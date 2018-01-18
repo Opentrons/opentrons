@@ -1,19 +1,17 @@
+// @flow
 // robot selectors
-  // TODO(mc, 2017-08-30): memoize with reselect
 import padStart from 'lodash/padStart'
+import {createSelector} from 'reselect'
+
+import type {State as CalibrationState} from './reducer/calibration'
+import type {State as ConnectionState} from './reducer/connection'
+import type {State as SessionState} from './reducer/session'
 
 import {
+  type ConnectionStatus,
+  type SessionStatus,
+  type InstrumentMount,
   _NAME,
-  DISCONNECTED,
-  CONNECTING,
-  CONNECTED,
-  DISCONNECTING,
-  LOADED,
-  RUNNING,
-  PAUSED,
-  ERROR,
-  FINISHED,
-  STOPPED,
   UNPROBED,
   PREPARING_TO_PROBE,
   READY_TO_PROBE,
@@ -21,276 +19,289 @@ import {
   PROBED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
-  DECK_SLOTS,
-  SINGLE_CHANNEL,
-  MULTI_CHANNEL
+  DECK_SLOTS
 } from './constants'
 
-const getState = (state) => state[_NAME]
-const getConnectionState = (state) => getState(state).connection
-const getSessionState = (state) => getState(state).session
-const getCalibrationState = (state) => getState(state).calibration
+type State = {
+  robot: {
+    calibration: CalibrationState,
+    connection: ConnectionState,
+    session: SessionState
+  }
+}
+const calibration = (state: State): CalibrationState => state[_NAME].calibration
 
-export function getIsScanning (state) {
-  return getConnectionState(state).isScanning
+const connection = (state: State): ConnectionState => state[_NAME].connection
+
+const session = (state: State): SessionState => state[_NAME].session
+const sessionRequest = (state: State) => session(state).sessionRequest
+const sessionStatus = (state: State) => session(state).state
+
+export function getIsScanning (state: State): boolean {
+  return connection(state).isScanning
 }
 
-export function getDiscovered (state) {
-  const {
-    discovered,
-    discoveredByName,
-    connectedTo
-  } = getConnectionState(state)
-
-  return discovered.map((name) => ({
+export const getDiscovered = createSelector(
+  (state: State) => connection(state).discovered,
+  (state: State) => connection(state).discoveredByName,
+  (state: State) => connection(state).connectedTo,
+  (discovered, discoveredByName, connectedTo) => discovered.map((name) => ({
     ...discoveredByName[name],
     isConnected: connectedTo === name
   }))
+)
+
+export const getConnectionStatus = createSelector(
+  (state: State) => connection(state).connectedTo,
+  (state: State) => connection(state).connectRequest.inProgress,
+  (state: State) => connection(state).disconnectRequest.inProgress,
+  (connectedTo, isConnecting, isDisconnecting): ConnectionStatus => {
+    if (!connectedTo && isConnecting) return 'connecting'
+    if (connectedTo && !isDisconnecting) return 'connected'
+    if (connectedTo && isDisconnecting) return 'disconnecting'
+
+    return 'disconnected'
+  }
+)
+
+export function getUploadInProgress (state: State) {
+  return sessionRequest(state).inProgress
 }
 
-export function getConnectionStatus (state) {
-  const {
-    connectedTo,
-    connectRequest: {inProgress: isConnecting},
-    disconnectRequest: {inProgress: isDisconnecting}
-  } = getConnectionState(state)
-
-  if (!connectedTo && isConnecting) return CONNECTING
-  if (connectedTo && !isDisconnecting) return CONNECTED
-  if (connectedTo && isDisconnecting) return DISCONNECTING
-
-  return DISCONNECTED
+export function getUploadError (state: State): ?{message: string} {
+  return sessionRequest(state).error
 }
 
-export function getUploadInProgress (state) {
-  return getSessionState(state).sessionRequest.inProgress
+export function getSessionName (state: State): string {
+  return session(state).name
 }
 
-export function getUploadError (state) {
-  return getSessionState(state).sessionRequest.error
+export function getSessionIsLoaded (state: State): boolean {
+  return sessionStatus(state) !== ('': SessionStatus)
 }
 
-export function getSessionName (state) {
-  return getSessionState(state).name
+export function getIsReadyToRun (state: State): boolean {
+  return sessionStatus(state) === ('loaded': SessionStatus)
 }
 
-export function getSessionIsLoaded (state) {
-  return !!getSessionState(state).state
-}
-
-export function getIsReadyToRun (state) {
-  return getSessionState(state).state === LOADED
-}
-
-export function getIsRunning (state) {
-  const sessionState = getSessionState(state).state
+export function getIsRunning (state: State): boolean {
+  const status = sessionStatus(state)
 
   return (
-    sessionState === RUNNING ||
-    sessionState === PAUSED
+    status === ('running': SessionStatus) ||
+    status === ('paused': SessionStatus)
   )
 }
 
-export function getIsPaused (state) {
-  return getSessionState(state).state === PAUSED
+export function getIsPaused (state: State): boolean {
+  return sessionStatus(state) === ('paused': SessionStatus)
 }
 
-export function getIsDone (state) {
-  const sessionState = getSessionState(state).state
+export function getIsDone (state: State): boolean {
+  const status = sessionStatus(state)
 
   return (
-    sessionState === ERROR ||
-    sessionState === FINISHED ||
-    sessionState === STOPPED
+    status === ('error': SessionStatus) ||
+    status === ('finished': SessionStatus) ||
+    status === ('stopped': SessionStatus)
   )
 }
 
-export function getCommands (state) {
-  const {
-    protocolCommands,
-    protocolCommandsById
-  } = getSessionState(state)
+// helper function for getCommands selector
+function traverseCommands (commandsById, parentIsCurrent) {
+  return function mapIdToCommand (id, index, commands) {
+    const {description, handledAt, children} = commandsById[id]
+    const next = commandsById[commands[index + 1]]
+    const isCurrent = (
+      parentIsCurrent &&
+      handledAt != null &&
+      (next == null || next.handledAt == null)
+    )
+    const isLast = isCurrent && !children.length
 
-  return protocolCommands.map(idToCommandList(true))
-
-  function idToCommandList (parentIsCurrent) {
-    return function mapIdToCommand (id, index, commands) {
-      const command = protocolCommandsById[id]
-      const next = protocolCommandsById[commands[index + 1]]
-      const isCurrent = (
-        parentIsCurrent &&
-        command.handledAt &&
-        (!next || !next.handledAt)
-      ) || false
-      const isLast = isCurrent && !command.children.length
-      const children = command.children.map(idToCommandList(isCurrent))
-
-      return {...command, children, isCurrent, isLast}
+    return {
+      id,
+      description,
+      handledAt,
+      isCurrent,
+      isLast,
+      children: children.map(traverseCommands(commandsById, isCurrent))
     }
   }
 }
 
-export function getRunProgress (state) {
-  const leaves = getCommands(state).reduce(countLeaves, {handled: 0, total: 0})
+export const getCommands = createSelector(
+  (state: State) => session(state).protocolCommands,
+  (state: State) => session(state).protocolCommandsById,
+  (commands, commandsById) => commands.map(traverseCommands(commandsById, true))
+)
 
-  if (!leaves.total) return 0
+export const getRunProgress = createSelector(
+  getCommands,
+  (commands): number => {
+    const leaves = commands.reduce(countLeaves, {handled: 0, total: 0})
 
-  return 100 * (leaves.handled / leaves.total)
+    return leaves.total && ((leaves.handled / leaves.total) * 100)
 
-  function countLeaves (result, cmd) {
-    if (cmd.children.length) return cmd.children.reduce(countLeaves, result)
-    if (cmd.handledAt) result.handled++
-    result.total++
+    function countLeaves (result, command) {
+      let {handled, total} = result
 
-    return result
+      if (command.children.length) {
+        return command.children.reduce(countLeaves, result)
+      }
+
+      if (command.handledAt) handled++
+      total++
+
+      return {handled, total}
+    }
   }
-}
+)
 
 // TODO(mc, 2018-01-04): inferring start time from handledAt of first command
 // is inadequate; robot starts moving before this timestamp is set
-export function getStartTime (state) {
-  const commands = getCommands(state)
+export const getStartTime = createSelector(
+  getCommands,
+  (commands): ?number => commands.length
+    ? commands[0].handledAt
+    : null
+)
 
-  if (!commands.length) return null
-  return commands[0].handledAt
+export const getRunTime = createSelector(
+  getStartTime,
+  (state: State) => session(state).runTime,
+  (startTime: ?number, runTime: ?number): string => {
+    // TODO(mc, 2018-01-04): gt check is required because of the TODO above
+    const runTimeSeconds = (runTime && startTime && runTime > startTime)
+      ? Math.floor((runTime - startTime) / 1000)
+      : 0
+
+    const hours = padStart(`${Math.floor(runTimeSeconds / 3600)}`, 2, '0')
+    const minutes = padStart(`${Math.floor(runTimeSeconds / 60) % 60}`, 2, '0')
+    const seconds = padStart(`${runTimeSeconds % 60}`, 2, '0')
+
+    return `${hours}:${minutes}:${seconds}`
+  }
+)
+
+export function getInstrumentsByAxis (state: State) {
+  return session(state).protocolInstrumentsByAxis
 }
 
-export function getRunTime (state) {
-  const {runTime} = getSessionState(state)
-  const startTime = getStartTime(state)
-  // TODO(mc, 2018-01-04): gt check is required because of the TODO above
-  const runTimeSeconds = (runTime && startTime && runTime > startTime)
-    ? Math.floor((runTime - startTime) / 1000)
-    : 0
+export const getInstruments = createSelector(
+  getInstrumentsByAxis,
+  (state: State) => calibration(state).probedByAxis,
+  (state: State) => calibration(state).calibrationRequest,
+  (instrumentsByMount, probedByMount, calibrationRequest) => {
+    return INSTRUMENT_AXES.map((mount) => {
+      const instrument = instrumentsByMount[mount]
+      if (!instrument || !instrument.name) return {axis: mount}
 
-  const hours = padStart(Math.floor(runTimeSeconds / 3600), 2, '0')
-  const minutes = padStart(Math.floor(runTimeSeconds / 60) % 60, 2, '0')
-  const seconds = padStart(runTimeSeconds % 60, 2, '0')
+      let calibration = UNPROBED
 
-  return `${hours}:${minutes}:${seconds}`
-}
-
-export function getInstrumentsByAxis (state) {
-  return getSessionState(state).protocolInstrumentsByAxis
-}
-
-export function getInstruments (state) {
-  const protocolInstrumentsByAxis = getInstrumentsByAxis(state)
-  const {
-    calibrationRequest,
-    probedByAxis
-  } = getCalibrationState(state)
-
-  return INSTRUMENT_AXES.map((mount) => {
-    let instrument = protocolInstrumentsByAxis[mount] || {axis: mount}
-    let calibration = UNPROBED
-
-    if (instrument.channels === 1) {
-      instrument = {...instrument, channels: SINGLE_CHANNEL}
-    } else if (instrument.channels > 1) {
-      instrument = {...instrument, channels: MULTI_CHANNEL}
-    }
-
-    // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
-    if (calibrationRequest.mount === mount && !calibrationRequest.error) {
-      if (calibrationRequest.type === 'MOVE_TO_FRONT') {
-        calibration = calibrationRequest.inProgress
-          ? PREPARING_TO_PROBE
-          : READY_TO_PROBE
-      } else if (calibrationRequest.type === 'PROBE_TIP') {
-        calibration = calibrationRequest.inProgress
-          ? PROBING
-          : PROBED
+      // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
+      if (calibrationRequest.mount === mount && !calibrationRequest.error) {
+        if (calibrationRequest.type === 'MOVE_TO_FRONT') {
+          calibration = calibrationRequest.inProgress
+            ? PREPARING_TO_PROBE
+            : READY_TO_PROBE
+        } else if (calibrationRequest.type === 'PROBE_TIP') {
+          calibration = calibrationRequest.inProgress
+            ? PROBING
+            : PROBED
+        }
       }
-    }
 
-    if (instrument.name) {
-      instrument = {
+      return {
         ...instrument,
         calibration,
-        probed: probedByAxis[mount] || false
+        probed: probedByMount[mount] || false
       }
-    }
-
-    return instrument
-  })
-}
+    })
+  }
+)
 
 // returns the mount of the pipette to use for deckware calibration
 // TODO(mc, 2018-01-03): select pipette based on deckware props
-export function getCalibratorMount (state) {
-  const instruments = getInstruments(state)
-  const singleChannel = instruments.find((i) => i.channels === SINGLE_CHANNEL)
-  const calibrator = singleChannel || instruments[0] || {axis: ''}
+export const getCalibratorMount = createSelector(
+  getInstruments,
+  (instruments): InstrumentMount | '' => {
+    const single = instruments.find((i) => i.channels && i.channels === 1)
+    const multi = instruments.find((i) => i.channels && i.channels > 1)
 
-  return calibrator.axis
+    const calibrator = single || multi || {axis: ''}
+
+    return calibrator.axis
+  }
+)
+
+export const getInstrumentsCalibrated = createSelector(
+  getInstruments,
+  (instruments): boolean => instruments.every((i) => !i.name || i.probed)
+)
+
+export function getLabwareBySlot (state: State) {
+  return session(state).protocolLabwareBySlot
 }
 
-export function getInstrumentsCalibrated (state) {
-  const instruments = getInstruments(state)
+export const getLabware = createSelector(
+  getLabwareBySlot,
+  (state: State) => calibration(state).labwareBySlot,
+  (state: State) => calibration(state).confirmedBySlot,
+  (labwareBySlot, statusBySlot, confirmedBySlot) => {
+    return DECK_SLOTS
+      .map((slot) => {
+        const labware = labwareBySlot[slot]
 
-  return instruments
-    .every((i) => i.name == null || i.probed)
+        if (!labware) return {slot}
+
+        return {
+          ...labware,
+          calibration: statusBySlot[slot] || UNCONFIRMED,
+          confirmed: confirmedBySlot[slot] || false
+        }
+      })
+  }
+)
+
+export function getLabwareReviewed (state: State) {
+  return calibration(state).labwareReviewed
 }
 
-export function getLabwareBySlot (state) {
-  return getSessionState(state).protocolLabwareBySlot
+export const getUnconfirmedLabware = createSelector(
+  getLabware,
+  (labware) => labware.filter((lw) => lw.type && !lw.confirmed)
+)
+
+export const getUnconfirmedTipracks = createSelector(
+  getUnconfirmedLabware,
+  (labware) => labware.filter((lw) => lw.type && lw.isTiprack)
+)
+
+export const getNextLabware = createSelector(
+  getUnconfirmedTipracks,
+  getUnconfirmedLabware,
+  (tipracks, labware) => tipracks[0] || labware[0]
+)
+
+export const getTipracksConfirmed = createSelector(
+  getUnconfirmedTipracks,
+  (remaining): boolean => remaining.length === 0
+)
+
+export const getLabwareConfirmed = createSelector(
+  getUnconfirmedLabware,
+  (remaining): boolean => remaining.length === 0
+)
+
+export function getJogInProgress (state: State): boolean {
+  return calibration(state).jogRequest.inProgress
 }
 
-export function getLabware (state) {
-  const protocolLabwareBySlot = getLabwareBySlot(state)
-  const {
-    confirmedBySlot,
-    labwareBySlot: calibrationBySlot
-  } = getCalibrationState(state)
-
-  return DECK_SLOTS.map((slot) => {
-    let labware = protocolLabwareBySlot[slot] || {slot}
-
-    if (labware.type) {
-      labware = {
-        ...labware,
-        calibration: calibrationBySlot[slot] || UNCONFIRMED,
-        confirmed: confirmedBySlot[slot] || false
-      }
-    }
-
-    return labware
-  })
+export function getOffsetUpdateInProgress (state: State): boolean {
+  return calibration(state).updateOffsetRequest.inProgress
 }
 
-export function getLabwareReviewed (state) {
-  return getCalibrationState(state).labwareReviewed
-}
-
-export function getUnconfirmedLabware (state) {
-  return getLabware(state).filter((lw) => (lw.type != null && !lw.confirmed))
-}
-
-export function getUnconfirmedTipracks (state) {
-  return getUnconfirmedLabware(state).filter((lw) => lw.isTiprack)
-}
-
-export function getNextLabware (state) {
-  return getUnconfirmedTipracks(state)[0] || getUnconfirmedLabware(state)[0]
-}
-
-export function getTipracksConfirmed (state) {
-  return getUnconfirmedTipracks(state).length === 0
-}
-
-export function getLabwareConfirmed (state) {
-  return getUnconfirmedLabware(state).length === 0
-}
-
-export function getJogInProgress (state) {
-  return getCalibrationState(state).jogRequest.inProgress
-}
-
-export function getOffsetUpdateInProgress (state) {
-  return getCalibrationState(state).updateOffsetRequest.inProgress
-}
-
-export function getJogDistance (state) {
-  return getCalibrationState(state).jogDistance
+export function getJogDistance (state: State): number {
+  return calibration(state).jogDistance
 }

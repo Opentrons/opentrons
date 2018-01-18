@@ -3,9 +3,9 @@
 import * as React from 'react'
 import classnames from 'classnames'
 
-import {IconButton} from '../buttons'
-import {CLOSE} from '../icons'
-import styles from './sidepanel.css'
+import {FlatButton} from '../buttons'
+import {Icon, CLOSE} from '../icons'
+import styles from './SidePanel.css'
 
 type SidePanelProps= {
   title: string,
@@ -17,11 +17,12 @@ type SidePanelProps= {
 export default function SidePanel (props: SidePanelProps) {
   const open = !props.isClosed || props.onCloseClick == null
   const closeButton = props.onCloseClick && (
-    <IconButton
-      className={styles.button_close}
-      iconName={CLOSE}
+    <FlatButton
       onClick={props.onCloseClick}
-    />
+      className={styles.button_close}
+    >
+      <Icon name={CLOSE} className={styles.button_close_icon} />
+    </FlatButton>
   )
   const className = classnames(styles.panel, {[styles.closed]: !open})
 

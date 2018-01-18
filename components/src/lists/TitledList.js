@@ -12,13 +12,13 @@ type ListProps = {
   /** text of title */
   title: string,
   /** children must all be `<li>` */
-  children: React.Node,
+  children?: React.Node,
   /** additional classnames */
   className?: string,
   /** sets collapsed appearance. List is expanded by default. */
   collapsed?: boolean,
   /** component with descriptive text about the list */
-  description?: string,
+  description?: React.Node,
   /** optional icon before h3 */
   iconName?: IconName,
   /** optional click action (on title div, not children) */
@@ -29,14 +29,6 @@ type ListProps = {
   onCollapseToggle?: (event: SyntheticEvent<>) => void,
   /** highlights the whole TitledList if true */
   selected?: boolean
-}
-
-function List (props: ListProps) {
-  return (
-    <ol className={props.className}>
-      {props.children}
-    </ol>
-  )
 }
 
 /**
@@ -56,6 +48,8 @@ export default function TitledList (props: ListProps) {
     }
   }
 
+  const hasValidChildren = React.Children.toArray(props.children).some(child => child)
+
   return (
     <div className={cx({[styles.list_selected]: props.selected}, props.className)}>
       <div onClick={props.onClick}
@@ -72,10 +66,10 @@ export default function TitledList (props: ListProps) {
         }
       </div>
       {!props.collapsed && props.description}
-      {!props.collapsed &&
-        <List {...props} className={styles.titled_list}>
+      {!props.collapsed && hasValidChildren &&
+        <ol className={styles.titled_list}>
           {props.children}
-        </List>
+        </ol>
       }
     </div>
   )

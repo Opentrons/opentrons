@@ -1,6 +1,69 @@
+// @flow
 // robot session (protocol) state and reducer
+import type {InstrumentMount, SessionStatus} from '../constants'
 import {actionTypes} from '../actions'
 
+type Channels = 1 | 8
+
+type Request = {
+  inProgress: boolean,
+  error: ?{message: string}
+}
+
+type Command = {
+  id: number,
+  description: string,
+  handledAt: ?number,
+  children: number[]
+}
+
+export type State = {
+  sessionRequest: Request,
+  name: string,
+  state: SessionStatus,
+  errors: {}[],
+  protocolText: string,
+  // TODO(mc, 2018-01-11): command IDs should be strings
+  protocolCommands: number[],
+  protocolCommandsById: {
+    [number]: Command
+  },
+  protocolInstrumentsByAxis: {
+    [InstrumentMount]: {
+      _id: number,
+      axis: InstrumentMount,
+      channels: Channels,
+      name: string,
+      volume: number
+    }
+  },
+  protocolLabwareBySlot: {
+    // TODO(mc, 2018-01-11): slot IDs should be strings
+    [number]: {
+      _id: number,
+      slot: number,
+      type: string,
+      name: string,
+      id: string,
+      isTiprack: boolean
+    }
+  },
+  runRequest: Request,
+  pauseRequest: Request,
+  resumeRequest: Request,
+  cancelRequest: Request,
+  runTime: number,
+}
+
+// TODO(mc, 2018-01-11): import union of discrete action types from actions
+type Action = {
+  type: string,
+  payload?: any,
+  error?: boolean,
+  meta?: {}
+}
+
+// TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
   DISCONNECT_RESPONSE,
   SESSION,
@@ -16,7 +79,7 @@ const {
   TICK_RUN_TIME
 } = actionTypes
 
-const INITIAL_STATE = {
+const INITIAL_STATE: State = {
   // loading a protocol
   sessionRequest: {inProgress: false, error: null},
   name: '',
@@ -24,6 +87,7 @@ const INITIAL_STATE = {
   errors: [],
   protocolText: '',
   protocolCommands: [],
+  protocolCommandsById: {},
   protocolInstrumentsByAxis: {},
   protocolLabwareBySlot: {},
 
@@ -35,7 +99,10 @@ const INITIAL_STATE = {
   runTime: 0
 }
 
-export default function sessionReducer (state = INITIAL_STATE, action) {
+export default function sessionReducer (
+  state: State = INITIAL_STATE,
+  action: Action
+): State {
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
@@ -60,6 +127,8 @@ function handleDisconnectResponse (state, action) {
 }
 
 function handleSession (state, action) {
+  if (!action.payload || !action.payload.file) return state
+
   const {payload: {file: {name}}} = action
   const sessionRequest = {inProgress: true, error: null}
 

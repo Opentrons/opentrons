@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
-import { closeLabwareSelector, createContainer } from '../actions'
-import { selectors } from '../reducers'
+import { closeLabwareSelector, createContainer } from '../labware-ingred/actions'
+import { selectors } from '../labware-ingred/reducers'
 import LabwareDropdown from '../components/LabwareDropdown.js'
 
 export default connect(

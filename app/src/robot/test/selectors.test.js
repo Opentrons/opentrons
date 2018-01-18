@@ -351,7 +351,7 @@ describe('robot selectors', () => {
       {
         axis: 'left',
         name: 'p200m',
-        channels: 'multi',
+        channels: 8,
         volume: 200,
         calibration: constants.PROBING,
         probed: true
@@ -359,7 +359,7 @@ describe('robot selectors', () => {
       {
         axis: 'right',
         name: 'p50s',
-        channels: 'single',
+        channels: 1,
         volume: 50,
         calibration: constants.UNPROBED,
         probed: false
@@ -565,9 +565,20 @@ describe('robot selectors', () => {
         confirmed: false
       })
 
-      state[NAME].calibration.confirmedBySlot[1] = true
+      const nextState = {
+        [NAME]: {
+          ...state[NAME],
+          calibration: {
+            ...state[NAME].calibration,
+            confirmedBySlot: {
+              ...state[NAME].calibration.confirmedBySlot,
+              1: true
+            }
+          }
+        }
+      }
 
-      expect(getNextLabware(state)).toEqual({
+      expect(getNextLabware(nextState)).toEqual({
         slot: 9,
         id: 'C3',
         name: 'c3',

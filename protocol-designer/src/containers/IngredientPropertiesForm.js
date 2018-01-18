@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
-import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../actions'
-import { selectors } from '../reducers'
+import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../labware-ingred/actions'
+import { selectors } from '../labware-ingred/reducers'
 import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 
 export default connect(

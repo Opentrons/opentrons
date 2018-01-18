@@ -1,4 +1,6 @@
-@value blue, grey, dark_grey from '../App.global.css';
+@import '@opentrons/components';
+
+@value blue, grey '../App.global.css';
 @value border: 2px solid #e5e2e2;
 
 .robot_list {
@@ -37,7 +39,7 @@
 }
 
 .disconnected {
-  color: dark_grey;
+  color: var(--c-dark-gray);
 }
 
 .connected {
@@ -59,7 +61,7 @@
 }
 
 .refresh {
-  color: dark_grey;
+  color: var(--c-dark-gray);
 }
 
 .refresh:hover {

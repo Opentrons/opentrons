@@ -1,6 +1,10 @@
-@value blue, lightGrey, medGrey, darkGrey, plateBg from '../css/colors.css';
+@value blue, lightGrey, medGrey, plateBg from '../css/colors.css';
 @value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../css/fontSizes.css';
 @value close from '../css/mixins.css';
+
+:root {
+  --ingredient_panel_sidebar_width: 40%;
+}
 
 .ingredient_modal {
   position: absolute;
@@ -47,14 +51,12 @@
   cursor: pointer;
 }
 
-@value ingredient_panel_sidebar_width: 40%;
-
 .ingredient_panel_sidebar {
   float: left;
   display: inline-block;
   position: relative;
   height: 100%;
-  width: ingredient_panel_sidebar_width;
+  width: var(--ingredient_panel_sidebar_width);
   border-right: 3px solid gray;
 }
 
@@ -63,7 +65,7 @@
   position: relative;
   display: inline-block;
   height: 100%;
-  width: calc(100% - ingredient_panel_sidebar_width - 3px);
+  width: calc(100% - var(--ingredient_panel_sidebar_width) - 3px);
 }
 
 .container_detail {

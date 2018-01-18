@@ -1,4 +1,6 @@
-@value color_light_grey, color_med_grey , color_dark_grey from '../styles/colors.css';
+@import '..';
+
+@value color_light_grey, color_med_grey from '../styles/colors.css';
 @value border: 2px solid color_light_grey;
 @value width: 18rem;
 
@@ -26,7 +28,7 @@
   margin: 0 auto 0 1rem;
   font-size: 1rem;
   font-weight: normal;
-  color: color_dark_grey;
+  color: var(--c-dark-gray);
   line-height: 2.5;
 }
 
@@ -37,11 +39,15 @@
   overflow-y: scroll;
 }
 
-.button_close {
-  border-width: 0;
-  background-color: transparent;
-  color: color_med_grey;
-  cursor: pointer;
-  height: 2rem;
-  width: 2rem;
+/*
+ * TODO(mc, 2018-01-16): need a little extra specificity here to survive
+ * hot reloads. Try to figure out why that's the case.
+ */
+button.button_close {
+  width: auto;
+}
+
+.button_close_icon {
+  display: block;
+  width: 1.5rem;
 }
