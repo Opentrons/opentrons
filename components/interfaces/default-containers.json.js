@@ -1,4 +1,4 @@
-declare module '../api/opentrons/config/containers/default-containers.json' {
+declare module './src/default-containers.json' {
   declare var containers: {
     [containerType: string]: {
       'origin-offset'?: {
