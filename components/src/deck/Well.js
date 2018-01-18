@@ -26,7 +26,7 @@ type Props = {
   }
 }
 
-export function Well (props: Props) {
+export default function Well (props: Props) {
   const {
     wellName,
     groupId,

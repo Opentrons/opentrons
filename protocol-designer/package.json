@@ -24,7 +24,8 @@
       "/node_modules/(?!@opentrons/)"
     ],
     "moduleNameMapper": {
-      "\\.(css)$": "identity-obj-proxy"
+      "\\.(css)$": "identity-obj-proxy",
+      "default-containers.json": "<rootDir>/../api/opentrons/config/containers/default-containers.json"
     }
   },
   "bugs": {
