@@ -185,11 +185,11 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     assert [i.axis for i in instruments] == ['a', 'b']
     assert [i.id for i in instruments] == [id(p100), id(p1000)]
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
-        [['A1', 'A2'], ['A1', 'A2']]
+        [['1', '4'], ['1', '4']]
     assert [[c.slot for c in i.containers] for i in instruments] == \
-        [['B1'], ['B1', 'B2']]
+        [['2'], ['2', '5']]
 
-    assert [c.slot for c in containers] == ['B1', 'B2']
+    assert [c.slot for c in containers] == ['2', '5']
     assert [[i.id for i in c.instruments] for c in containers] == \
         [[id(p100), id(p1000)], [id(p1000)]]
     assert [c.id for c in containers] == [id(plates[0]), id(plates[1])]

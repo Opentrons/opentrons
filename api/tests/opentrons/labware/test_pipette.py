@@ -1508,8 +1508,8 @@ class PipetteTest(unittest.TestCase):
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
         self.tiprack2 = generate_plate(
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
-        self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
-        self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
+        self.robot._deck['1'].add(self.tiprack1, 'tiprack1')
+        self.robot._deck['2'].add(self.tiprack2, 'tiprack2')
 
         self.p200 = Pipette(
             self.robot,

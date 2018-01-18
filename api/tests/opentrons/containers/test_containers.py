@@ -31,7 +31,7 @@ def test_containers_create(robot):
     assert len(p) == 96
     assert len(p.rows) == 12
     assert len(p.cols) == 8
-    assert p.get_parent() == robot.deck['A1']
+    assert p.get_parent() == robot.deck['1']
     assert p['C3'] == p[18]
     assert p['C3'].max_volume() == 1000
     for i, w in enumerate(p):

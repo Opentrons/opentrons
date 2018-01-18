@@ -50,7 +50,7 @@ def load(robot, container_name, slot, label=None, share=False):
         old_slot = slot
         slot = str(index + 1)
         warnings.warn(
-            'Please reference slots on OT2 as numbers 1-11. '
+            'Please reference slots as numbers 1-11. '
             'Converting {0} to {1}'.format(old_slot, slot),
             DeprecationWarning
         )
