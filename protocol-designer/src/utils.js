@@ -59,14 +59,8 @@ export const getCollidingWells = (rectPositions, selectableClassname) => {
   )
 
   const collidedWellData = collidedElems.reduce((acc, elem) => {
-    // if ('wellX' in elem.dataset && 'wellY' in elem.dataset) {
-    //   const wellX = elem.dataset['wellX']
-    //   const wellY = elem.dataset['wellY']
-    //   const wellKey = wellX + ',' + wellY
-    //   return {...acc, [wellKey]: [parseInt(wellX), parseInt(wellY)]}
-    // }
-    if ('wellName' in elem.dataset) {
-      const wellName = elem.dataset['wellName']
+    if ('wellname' in elem.dataset) {
+      const wellName = elem.dataset['wellname']
       return {...acc, [wellName]: wellName}
     }
     return acc
