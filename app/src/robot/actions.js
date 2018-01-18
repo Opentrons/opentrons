@@ -24,7 +24,7 @@ export const actionTypes = {
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
 
   // calibration
-  SET_LABWARE_REVIEWED: makeRobotActionName('SET_LABWARE_REVIEWED'),
+  SET_DECK_POPULATED: makeRobotActionName('SET_DECK_POPULATED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
   PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
@@ -120,8 +120,8 @@ export const actions = {
     }
   },
 
-  setLabwareReviewed (payload) {
-    return {type: actionTypes.SET_LABWARE_REVIEWED, payload}
+  setDeckPopulated (payload) {
+    return {type: actionTypes.SET_DECK_POPULATED, payload}
   },
 
   pickupAndHome (instrument, labware) {

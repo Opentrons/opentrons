@@ -4,7 +4,7 @@ import Button from '../Button'
 import styles from './deck.css'
 
 ReviewPrompt.propTypes = {
-  setLabwareReviewed: PropTypes.func.isRequired,
+  setDeckPopulated: PropTypes.func.isRequired,
   moveToLabware: PropTypes.func.isRequired,
   currentLabware: PropTypes.shape({
     slot: PropTypes.number.isRequired

@@ -264,8 +264,8 @@ export const getLabware = createSelector(
   }
 )
 
-export function getLabwareReviewed (state: State) {
-  return calibration(state).labwareReviewed
+export function getDeckPopulated (state: State) {
+  return calibration(state).deckPopulated
 }
 
 export const getUnconfirmedLabware = createSelector(
