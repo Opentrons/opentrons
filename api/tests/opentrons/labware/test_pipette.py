@@ -39,8 +39,7 @@ def test_aspirate_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -89,8 +88,7 @@ def test_dispense_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -127,7 +125,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1,
@@ -1511,7 +1508,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200 = Pipette(
             self.robot,
-            max_volume=200,
             mount='right',
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
@@ -1566,7 +1562,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='right',
             channels=8

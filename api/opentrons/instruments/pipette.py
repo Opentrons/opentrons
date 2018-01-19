@@ -59,8 +59,6 @@ class Pipette:
         The number of channels on this pipette (Default: `1`)
     min_volume : int
         The smallest recommended uL volume for this pipette (Default: `0`)
-    max_volume : int
-        The largest uL volume for this pipette (Default: `min_volume` + 1)
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
         (Default: `None`)
@@ -84,12 +82,11 @@ class Pipette:
     >>> from opentrons import instruments, containers, robot
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> p1000 = instruments.Pipette(mount='left', max_volume=1000)
+    >>> p1000 = instruments.Pipette(mount='left')
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
     >>> p200 = instruments.Pipette(
     ...     name='p200',
     ...     mount='right',
-    ...     max_volume=200,
     ...     tip_racks=[tip_rack_200ul])
     """
 
@@ -312,7 +309,7 @@ class Pipette:
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'A1')
         >>> p200 = instruments.Pipette(
-        ...     name='p200', axis='a', max_volume=200)
+        ...     name='p200', axis='a')
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -407,7 +404,7 @@ class Pipette:
         --------
         ..
         >>> plate = containers.load('96-flat', 'C1')
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -545,7 +542,7 @@ class Pipette:
         ..
         >>> plate = containers.load('96-flat', 'D1')
 
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
 
         >>> # mix 50uL in a Well, three times
         >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
@@ -597,7 +594,7 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -647,7 +644,7 @@ class Pipette:
         ..
         >>> plate = containers.load('96-flat', 'B2')
 
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
@@ -713,7 +710,7 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
@@ -757,7 +754,7 @@ class Pipette:
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'E1', share=True)
         >>> p200 = instruments.Pipette(axis='a',
-        ...     tip_racks=[tiprack], max_volume=200)
+        ...     tip_racks=[tiprack])
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -997,7 +994,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'B3')
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1030,7 +1027,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'A3')
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1130,7 +1127,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'D1')
-        >>> p200 = instruments.Pipette(name='p200', axis='a', max_volume=200)
+        >>> p200 = instruments.Pipette(name='p200', axis='a')
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """

@@ -8,7 +8,6 @@ pipette = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],
-    max_volume=200,
     mount="right",
     channels=1
 )
