@@ -9,15 +9,10 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
-const RUN_TIME_TICK_INTERVAL_MS = 200
+const RUN_TIME_TICK_INTERVAL_MS = 500
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
-// TODO(mc, 2017-10-31): API supports mount, so this can be removed
-const INSTRUMENT_AXES = {
-  b: 'left',
-  a: 'right'
-}
 
 const UNEXPECTED_CLOSE_MESSAGE = "Uh oh, it looks like the connection to your robot has been lost. If this was unexpected, please try reconnecting. Contact support if this happens frequently or if you're unable to reconnect"
 
@@ -138,7 +133,7 @@ export default function client (dispatch) {
 
   function moveToFront (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
@@ -150,7 +145,7 @@ export default function client (dispatch) {
 
   function pickupAndHome (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.pick_up_tip(instrument, labware)
@@ -160,7 +155,7 @@ export default function client (dispatch) {
 
   function dropTipAndHome (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.drop_tip(instrument, labware)
@@ -172,7 +167,7 @@ export default function client (dispatch) {
   // drop the tip unless the tiprack is the last one to be confirmed
   function confirmTiprack (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     if (selectors.getUnconfirmedTipracks(state).length === 1) {
@@ -186,7 +181,7 @@ export default function client (dispatch) {
 
   function probeTip (state, action) {
     const {payload: {instrument: axis}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
@@ -198,7 +193,7 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
@@ -212,8 +207,8 @@ export default function client (dispatch) {
   // TODO(mc, 2017-10-06): signature is instrument, distance, axis
   // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
-    const {payload: {instrument: instrumentAxis, axis, direction}} = action
-    const instrument = selectors.getInstrumentsByAxis(state)[instrumentAxis]
+    const {payload: {instrument: mount, axis, direction}} = action
+    const instrument = selectors.getInstrumentsByMount(state)[mount]
     const distance = selectors.getJogDistance(state) * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
@@ -228,7 +223,7 @@ export default function client (dispatch) {
     const {payload: {instrument: axis, labware: slot}} = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
-    const instrument = {_id: selectors.getInstrumentsByAxis(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
     const labware = {_id: labwareObject._id}
     const isTiprack = labwareObject.isTiprack || false
 
@@ -305,8 +300,8 @@ export default function client (dispatch) {
     } = apiSession
     const protocolCommands = []
     const protocolCommandsById = {}
-    const protocolInstrumentsByAxis = {}
-    const protocolLabwareBySlot = {}
+    const instrumentsByMount = {}
+    const labwareBySlot = {}
 
     // ensure run timer is running or stopped
     if (state === constants.RUNNING) {
@@ -327,8 +322,8 @@ export default function client (dispatch) {
       protocolText: protocol_text,
       protocolCommands,
       protocolCommandsById,
-      protocolInstrumentsByAxis,
-      protocolLabwareBySlot
+      instrumentsByMount,
+      labwareBySlot
     }
 
     dispatch(actions.sessionResponse(null, payload))
@@ -355,11 +350,12 @@ export default function client (dispatch) {
     }
 
     function apiInstrumentToInstrument (apiInstrument) {
-      const {_id, axis: originalAxis, name, channels} = apiInstrument
-      const axis = INSTRUMENT_AXES[originalAxis]
+      const {_id, mount, name, channels} = apiInstrument
+      // TODO(mc, 2018-01-17): pull this somehow from tiprack the instrument
+      //  interacts with
       const volume = Number(name.match(RE_VOLUME)[1])
 
-      protocolInstrumentsByAxis[axis] = {_id, axis, name, channels, volume}
+      instrumentsByMount[mount] = {_id, mount, name, channels, volume}
     }
 
     function apiContainerToContainer (apiContainer) {
@@ -367,7 +363,7 @@ export default function client (dispatch) {
       const isTiprack = RE_TIPRACK.test(type)
       const slot = letterSlotToNumberSlot(id)
 
-      protocolLabwareBySlot[slot] = {_id, name, id, slot, type, isTiprack}
+      labwareBySlot[slot] = {_id, name, slot, type, isTiprack}
     }
   }
 
@@ -402,5 +398,5 @@ function letterSlotToNumberSlot (slot) {
   // slot = (col where A === 1, B === 2, C === 3) + 3 * (row - 1)
   // 'A'.charCodeAt(0) === 65, '1'.charCodeAt(0) === 49
   // before simplification: 3 * (row - 49) + (col - 64)
-  return (3 * row + col - 211)
+  return `${(3 * row + col - 211)}`
 }

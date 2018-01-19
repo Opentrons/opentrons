@@ -1,16 +1,16 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
 
-LabwareListItem.propTypes = {
-  name: PropTypes.string,
-  slot: PropTypes.number.isRequired,
-  confirmed: PropTypes.bool,
-  isDisabled: PropTypes.bool.isRequired,
-  onClick: PropTypes.func
+type Props = {
+  slot: string,
+  isDisabled: boolean,
+  onClick: () => void,
+  name: ?string,
+  confirmed: ?boolean
 }
 
-export default function LabwareListItem (props) {
+export default function LabwareListItem (props: Props) {
   const {
     name,
     slot,

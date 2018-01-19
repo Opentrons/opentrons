@@ -1,20 +1,12 @@
 // @flow
 // robot session (protocol) state and reducer
-import type {InstrumentMount, SessionStatus} from '../constants'
+import type {Command, Instrument, Labware, Mount, Slot} from '../types'
+import type {SessionStatus} from '../constants'
 import {actionTypes} from '../actions'
-
-type Channels = 1 | 8
 
 type Request = {
   inProgress: boolean,
   error: ?{message: string}
-}
-
-type Command = {
-  id: number,
-  description: string,
-  handledAt: ?number,
-  children: number[]
 }
 
 export type State = {
@@ -28,25 +20,11 @@ export type State = {
   protocolCommandsById: {
     [number]: Command
   },
-  protocolInstrumentsByAxis: {
-    [InstrumentMount]: {
-      _id: number,
-      axis: InstrumentMount,
-      channels: Channels,
-      name: string,
-      volume: number
-    }
+  instrumentsByMount: {
+    [Mount]: Instrument
   },
-  protocolLabwareBySlot: {
-    // TODO(mc, 2018-01-11): slot IDs should be strings
-    [number]: {
-      _id: number,
-      slot: number,
-      type: string,
-      name: string,
-      id: string,
-      isTiprack: boolean
-    }
+  labwareBySlot: {
+    [Slot]: Labware
   },
   runRequest: Request,
   pauseRequest: Request,
@@ -88,8 +66,10 @@ const INITIAL_STATE: State = {
   protocolText: '',
   protocolCommands: [],
   protocolCommandsById: {},
-  protocolInstrumentsByAxis: {},
-  protocolLabwareBySlot: {},
+
+  // deck setup from protocol
+  instrumentsByMount: {},
+  labwareBySlot: {},
 
   // running a protocol
   runRequest: {inProgress: false, error: null},
