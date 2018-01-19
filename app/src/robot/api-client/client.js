@@ -359,9 +359,8 @@ export default function client (dispatch) {
     }
 
     function apiContainerToContainer (apiContainer) {
-      const {_id, name, type, slot: id} = apiContainer
+      const {_id, name, type, slot} = apiContainer
       const isTiprack = RE_TIPRACK.test(type)
-      const slot = letterSlotToNumberSlot(id)
 
       labwareBySlot[slot] = {_id, name, slot, type, isTiprack}
     }
@@ -382,21 +381,4 @@ export default function client (dispatch) {
   function handleClientError (error) {
     console.error(error)
   }
-}
-
-// swap OT1 protocol slot to OT2 protocol slot
-// TODO(mc, 2017-10-03): be less "clever" about this
-// 4 10|11|_t
-// 3 _7|_8|_9
-// 2 _4|_5|_6
-// 1 _1|_2|_3
-//    A  B  C
-function letterSlotToNumberSlot (slot) {
-  // split two-char string into charcodes
-  const [col, row] = Array.from(slot.toUpperCase()).map((c) => c.charCodeAt(0))
-
-  // slot = (col where A === 1, B === 2, C === 3) + 3 * (row - 1)
-  // 'A'.charCodeAt(0) === 65, '1'.charCodeAt(0) === 49
-  // before simplification: 3 * (row - 49) + (col - 64)
-  return `${(3 * row + col - 211)}`
 }
