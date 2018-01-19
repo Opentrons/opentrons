@@ -11,13 +11,13 @@ import styles from './deck.css'
 
 CalibrateDeck.propTypes = {
   slot: PropTypes.number.isRequired,
-  labwareReviewed: PropTypes.bool.isRequired
+  deckPopulated: PropTypes.bool.isRequired
 }
 
 export default function CalibrateDeck (props) {
-  const {labwareReviewed, slot} = props
-  const style = classnames({[styles.review_deck]: !labwareReviewed})
-  const Prompt = labwareReviewed
+  const {deckPopulated, slot} = props
+  const style = classnames({[styles.review_deck]: !deckPopulated})
+  const Prompt = deckPopulated
     ? CalibrationPrompt
     : ReviewLabware
 

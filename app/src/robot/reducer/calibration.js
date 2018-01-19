@@ -44,7 +44,7 @@ type LabwareConfirmationRequest = {
 }
 
 export type State = {
-  labwareReviewed: boolean,
+  deckPopulated: boolean,
   jogDistance: number,
 
   probedByAxis: {[InstrumentMount]: boolean},
@@ -74,7 +74,7 @@ type Action = {
 const {
   SESSION,
   DISCONNECT_RESPONSE,
-  SET_LABWARE_REVIEWED,
+  SET_DECK_POPULATED,
   PICKUP_AND_HOME,
   PICKUP_AND_HOME_RESPONSE,
   DROP_TIP_AND_HOME,
@@ -97,7 +97,7 @@ const {
 } = actionTypes
 
 const INITIAL_STATE: State = {
-  labwareReviewed: false,
+  deckPopulated: true,
   jogDistance: JOG_DISTANCE_SLOW_MM,
 
   probedByAxis: {},
@@ -128,7 +128,7 @@ export default function calibrationReducer (
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
-    case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
+    case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
@@ -164,8 +164,8 @@ function handleSession (state, action) {
   return INITIAL_STATE
 }
 
-function handleSetLabwareReviewed (state, action) {
-  return {...state, labwareReviewed: action.payload}
+function handleSetDeckPopulated (state, action) {
+  return {...state, deckPopulated: action.payload}
 }
 
 function handleMoveToFront (state, action) {
@@ -251,7 +251,7 @@ function handleMoveTo (state, action) {
 
   return {
     ...state,
-    labwareReviewed: true,
+    deckPopulated: true,
     moveToRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: MOVING_TO_SLOT}
   }
@@ -290,7 +290,7 @@ function handlePickupAndHome (state, action) {
 
   return {
     ...state,
-    labwareReviewed: true,
+    deckPopulated: true,
     pickupRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: PICKING_UP}
   }

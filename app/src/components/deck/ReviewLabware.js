@@ -28,7 +28,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
   return {
     ...stateProps,
     ...ownProps,
-    setLabwareReviewed: () => dispatch(robotActions.setLabwareReviewed()),
+    setDeckPopulated: () => dispatch(robotActions.setDeckPopulated()),
     // TODO(mc, 2017-11-29): DRY (logic shared by NextLabware, ReviewLabware,
     // Deck, and ConnectedSetupPanel); could also move logic to the API client
     moveToLabware: () => {

@@ -39,7 +39,7 @@ class Server(object):
         self.clients = {}
         self.tasks = []
 
-        self.app = web.Application()
+        self.app = web.Application(loop=loop)
         self.app.router.add_get('/', self.handler)
         self.app.on_shutdown.append(self.on_shutdown)
 
@@ -58,6 +58,7 @@ class Server(object):
     def start(self, host, port):
         # This call will block while server is running
         # run_app is capable of catching SIGINT and shutting down
+        log.info("Starting server on {}:{}".format(host, port))
         web.run_app(self.app, host=host, port=port)
 
     def shutdown(self):
@@ -65,6 +66,11 @@ class Server(object):
         self.monitor_events_task.cancel()
 
     async def on_shutdown(self, app):
+        """
+        Graceful shutdown handler
+
+        See https://docs.aiohttp.org/en/stable/web.html#graceful-shutdown
+        """
         for ws in self.clients.copy():
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
