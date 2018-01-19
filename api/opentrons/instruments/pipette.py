@@ -1524,6 +1524,7 @@ class Pipette:
         if dispense:
             self.set_speed(
                 dispense=self._ul_to_mm(dispense))
+        return self
 
     def _move(self, pose_tree, x=None, y=None, z=None, low_current_z=False):
         current_x, current_y, current_z = pose_tracker.absolute(
