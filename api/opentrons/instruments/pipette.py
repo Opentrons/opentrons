@@ -356,7 +356,8 @@ class Pipette:
 
         self._position_for_aspirate(location)
 
-        mm_position = self._ul_to_mm(self.current_volume + volume)
+        mm_position = self._ul_to_plunger_position(
+            self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
         self.instrument_actuator.set_speed(speed)
@@ -450,7 +451,8 @@ class Pipette:
 
         self._position_for_dispense(location)
 
-        mm_position = self._ul_to_mm(self.current_volume - volume)
+        mm_position = self._ul_to_plunger_position(
+            self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
@@ -1300,6 +1302,15 @@ class Pipette:
                     position))
 
     def _ul_to_mm(self, ul):
+        """Calculate distance in millimeters to move for a given liquid volume.
+
+        Calibration of the pipette motor's ul-to-mm conversion is required
+        """
+
+        millimeters = ul / self.ul_per_mm
+        return round(millimeters, 3)
+
+    def _ul_to_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
@@ -1308,7 +1319,7 @@ class Pipette:
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
 
-        millimeters = ul / self.ul_per_mm
+        millimeters = self._ul_to_mm(ul)
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 3)
 
