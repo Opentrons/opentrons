@@ -13,3 +13,9 @@
 .tiny_labels:nth-child(odd) {
   fill: gray;
 }
+
+.fallback_plate {
+  font-size: 0.75rem;
+  font-style: italic;
+  fill: gray;
+}
