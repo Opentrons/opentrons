@@ -7,7 +7,6 @@ plate = containers.load('96-flat', 'B2')
 
 multi = instruments.Pipette(
     mount='left',
-    max_volume=300,
     min_volume=10,
     name="p200S",
     tip_racks=[tiprack],
