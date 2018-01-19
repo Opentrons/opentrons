@@ -3,17 +3,20 @@ import json
 import logging
 import subprocess
 from aiohttp import web
-
+from opentrons import robot, __version__
 
 log = logging.getLogger(__name__)
 ENABLE_NMCLI = os.environ.get('ENABLE_NETWORKING_ENDPOINTS', '')
 
 
 async def health(request):
+    res = {
+        'api_version': __version__,
+        'fw_version': robot.fw_version
+    }
     return web.json_response(
-        headers={
-            'Access-Control-Allow-Origin': '*'
-        })
+        headers={'Access-Control-Allow-Origin': '*'},
+        body=repr(json.dumps(res)))
 
 
 async def wifi_list(request):

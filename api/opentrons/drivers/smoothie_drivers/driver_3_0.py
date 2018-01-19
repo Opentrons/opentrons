@@ -136,6 +136,13 @@ class SmoothieDriver_3_0_0:
     def disconnect(self):
         self.simulating = True
 
+    def get_fw_version(self):
+        version = 'Virtual Smoothie'
+        if not self.simulating:
+            version = serial_communication.write_and_return(
+                "version\n", self._connection).split('\r')[0]
+        return version
+
     @property
     def position(self):
         """
