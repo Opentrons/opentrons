@@ -1,4 +1,4 @@
-@value blue from '../App.global.css';
+@import '@opentrons/components';
 
 .review_deck {
   background-color: rgba(0, 0, 0, 0.8);
@@ -43,6 +43,6 @@ button.btn_calibrate {
   margin: 1rem;
   font-size: 1rem;
   padding: 0 3rem;
-  background-color: blue;
+  background-color: var(--c-blue);
   color: white;
 }

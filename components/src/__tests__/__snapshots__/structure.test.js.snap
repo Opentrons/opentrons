@@ -30,7 +30,7 @@ exports[`PageTabs renders PageTabs correctly 1`] = `
   className="page_tabs"
 >
   <a
-    className="active_tab_link"
+    className="tab_link active_tab_link"
     href="/page1"
     onClick={[Function]}
   >

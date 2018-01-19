@@ -1,4 +1,4 @@
-@value light_grey from './App.global.css';
+@import '@opentrons/components';
 
 .modal_wrapper {
   background-color: rgba(0, 0, 0, 0.8);
@@ -179,7 +179,7 @@ p.jog_toggle_title {
 
 .active_toggle {
   opacity: 1;
-  background-color: light_grey;
+  background-color: var(--c-light-gray);
 }
 
 .jog_toggle input {

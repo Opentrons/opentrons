@@ -1,25 +1,23 @@
-/* TODO(mc, 2018-01-12): convert this file to :root { --var: ... } */
-
-/* ot brand */
-@value color_blue: #006fff;
-@value color_teal: #05c1b3;
-
-/* greys */
-@value color_med_grey: #9B9B9B;
-@value color_light_grey: #e5e2e2;
-
-/* background colors */
-@value color_bg_light: #fcfcfc;
-@value color_bg_dark: #4a4a4a;
-@value color_bg_selected: #d1d1d1;
-
 :root {
+  /* ot brand */
+  --c-mustard: #ffd252;
+  --c-blue: #006fff;
+  --c-teal: #05c1b3;
   --c-mustard: #ffd252;
 
   /* grays */
   --c-dark-gray: #4a4a4a;
+  --c-med-gray: #9b9b9b;
+  --c-light-gray: #e5e2e2;
 
   /* background colors */
   --c-bg-dark: #4a4a4a;
   --c-bg-light: #fcfcfc;
+  --c-bg-selected: #d1d1d1;
+
+  /* Misc */
+  --c-overlay: rgba(0, 0, 0, 0.7);
+  --c-plate-bg: #ccc;
+  --c-green: #7ed321;
+  --c-red: #f00000;
 }

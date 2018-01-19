@@ -59,22 +59,3 @@
     color: var(--c-font-light);
   };
 }
-
-/* TODO ka 2018-1-16: remove @values completely */
-
-/* font colors */
-@value color_font_dark: #4a4a4a;
-@value color_font_light: white;
-@value color_font_disabled: #9c9c9c;
-
-/* font sizes */
-@value font_size_huge: 3rem;
-@value font_size_header: 1.125rem;
-@value font_size_body_2: 0.875rem;
-@value font_size_body_1: 0.75rem;
-@value font_size_caption: 0.625rem;
-
-/* font weights */
-@value font_weight_bold: 800;
-@value font_weight_semibold: 500;
-@value font_weight_regular: 400;
