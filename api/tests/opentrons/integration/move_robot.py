@@ -23,7 +23,6 @@ p200 = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack],
-    max_volume=200,
     min_volume=0.1,  # These are variable
     axis="b",
     channels=1

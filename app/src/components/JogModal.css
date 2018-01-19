@@ -1,0 +1,189 @@
+@import '@opentrons/components';
+
+.modal_wrapper {
+  background-color: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  padding-top: 4rem;
+}
+
+.modal_wrapper:target {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.jog_modal {
+  width: 25rem;
+  border-radius: 0.5rem;
+  position: relative;
+  margin: 5rem auto;
+  padding: 1rem 2rem;
+  background: #ddd;
+  text-align: center;
+}
+
+a.close {
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  color: black;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0.5rem;
+  text-decoration: none;
+}
+
+.jog_controls {
+  margin: 2rem auto 1rem;
+  width: 16rem;
+  display: grid;
+  grid-gap: 0.25rem;
+  grid-template-rows: repeat(2, [row] 3rem) 2rem;
+  grid-template-columns: repeat(5, [col] 3rem);
+}
+
+.btn {
+  border-radius: 0.25rem;
+  background-color: #333;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #111;
+}
+
+.btn[disabled],
+.btn.disabled {
+  cursor: default;
+}
+
+.btn_back {
+  composes: btn;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.btn_up {
+  composes: btn;
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.btn_left {
+  composes: btn;
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.btn_forward {
+  composes: btn;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.btn_right {
+  composes: btn;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.btn_down {
+  composes: btn;
+  grid-column: 5;
+  grid-row: 2;
+}
+
+.jog_modal p {
+  font-size: 0.75rem;
+  margin: 1rem 0;
+}
+
+.jog_xy {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 2rem;
+}
+
+.jog_z {
+  grid-column: 5;
+  grid-row: 3;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 2rem;
+}
+
+.btn_confirm {
+  display: inline-block;
+  margin: 1rem;
+  font-size: 1rem;
+  width: 16rem;
+  padding: 0 3rem;
+  border-radius: 0.5rem;
+  background-color: #777;
+  font-family: 'trons';
+  color: white;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn_confirm:hover {
+  background-color: #555;
+}
+
+.btn_confirm.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.spinner {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 3rem;
+}
+
+.jog_toggle {
+  display: block;
+  width: 8rem;
+  margin: auto;
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+p.jog_toggle_title {
+  line-height: 1.25;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.jog_toggle_setting {
+  display: inline-block;
+  width: 50%;
+  text-align: center;
+  padding: 0.5rem;
+  opacity: 0.3;
+}
+
+.active_toggle {
+  opacity: 1;
+  background-color: var(--c-light-gray);
+}
+
+.jog_toggle input {
+  /* TODO(mc, 2017-11-27): move this SR hidden style into global or util */
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}

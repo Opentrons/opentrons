@@ -96,14 +96,14 @@ class Mover:
     def default_speed(self):
         self._driver.default_speed()
 
-    def set_power(self, power):
-        self._driver.set_power({
+    def set_current(self, power):
+        self._driver.set_current({
                 axis.upper(): power
                 for axis in self._axis_mapping.values()
             })
 
-    def default_power(self):
-        self._driver.default_power()
+    def default_current(self):
+        self._driver.default_current()
 
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis

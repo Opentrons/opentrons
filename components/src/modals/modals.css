@@ -1,0 +1,35 @@
+/* common styling for modals */
+
+.modal,
+.overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.modal_contents {
+  z-index: 1;
+  padding: 1rem;
+  background-color: white;
+}
+
+.continue_modal_contents {
+  padding: 1.5rem;
+}
+
+.continue_modal_buttons {
+  float: right;
+}

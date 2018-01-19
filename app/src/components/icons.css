@@ -1,0 +1,27 @@
+/* styles for icon components */
+@import '@opentrons/components';
+
+.circle {
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.success::before {
+  content: '✓';
+}
+
+.success {
+  background-color: var(--c-green);
+  color: white;
+}
+
+.warning::before {
+  content: '!';
+}
+
+.warning {
+  background-color: var(--c-red);
+  color: white;
+}

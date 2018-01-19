@@ -20,7 +20,14 @@ MOUNT_CURRENT_HIGH = 1.0
 X_CURRENT_HIGH = 1.5
 Y_CURRENT_HIGH = 1.7
 
-DEFAULT_POWER = {
+X_MAX_SPEED = 300
+Y_MAX_SPEED = 200
+Z_MAX_SPEED = 90
+A_MAX_SPEED = 90
+B_MAX_SPEED = 40
+C_MAX_SPEED = 40
+
+DEFAULT_CURRENT = {
     'X': X_CURRENT_HIGH,
     'Y': Y_CURRENT_HIGH,
     'Z': MOUNT_CURRENT_HIGH,
@@ -29,15 +36,23 @@ DEFAULT_POWER = {
     'C': PLUNGER_CURRENT_LOW
 }
 
-DEFAULT_POWER_STRING = ' '.join(
-    ['{}{}'.format(key, value) for key, value in DEFAULT_POWER.items()])
+DEFAULT_MAX_SPEEDS = {
+    'X': X_MAX_SPEED,
+    'Y': Y_MAX_SPEED,
+    'Z': Z_MAX_SPEED,
+    'A': A_MAX_SPEED,
+    'B': B_MAX_SPEED,
+    'C': C_MAX_SPEED
+}
+
+DEFAULT_CURRENT_STRING = ' '.join(
+    ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
 robot_config = namedtuple(
     'robot_config',
     [
         'name',
         'steps_per_mm',
-        'max_speeds',
         'acceleration',
         'current',
         'gantry_calibration',
@@ -48,7 +63,8 @@ robot_config = namedtuple(
         'plunger_current_low',
         'plunger_current_high',
         'tip_length',
-        'default_power'
+        'default_current',
+        'default_max_speed'
     ]
 )
 
@@ -56,9 +72,8 @@ robot_config = namedtuple(
 default = robot_config(
     name='Ada Lovelace',
     steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
-    max_speeds='M203.1 X550 Y400 Z120 A120 B40 C40',
     acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-    current='M907 ' + DEFAULT_POWER_STRING,
+    current='M907 ' + DEFAULT_CURRENT_STRING,
     probe_center=(295.0, 300.0, 55.0),
     probe_dimensions=(35.0, 40.0, 60.0),
     gantry_calibration=[  # "safe" offset, overwrote in factory calibration
@@ -89,7 +104,8 @@ default = robot_config(
         }
     },
     serial_speed=115200,
-    default_power=DEFAULT_POWER,
+    default_current=DEFAULT_CURRENT,
+    default_max_speed=DEFAULT_MAX_SPEEDS,
     plunger_current_low=PLUNGER_CURRENT_LOW,
     plunger_current_high=PLUNGER_CURRENT_HIGH
 )

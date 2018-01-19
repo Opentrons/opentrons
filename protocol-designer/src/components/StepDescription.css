@@ -1,0 +1,9 @@
+.step_description {
+  padding: 0.5rem;
+  border-bottom: 2px solid #e5e2e2 /* TODO Ian 2018-01-12 import this color */
+}
+
+.step_description header {
+  font-style: italic;
+  font-weight: bold;
+}

@@ -8,17 +8,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
-const {description, author} = require('./package.json')
-const namedRules = require('./webpack/rules')
+const {rules: namedRules} = require('@opentrons/webpack-config')
 const devServerConfig = require('./webpack/dev-server')
-const gtmConfig = require('./ui/analytics/gtm-config')
+const {description, author} = require('./package.json')
+const gtmConfig = require('./src/analytics/gtm-config')
 
 const DEV = process.env.NODE_ENV !== 'production'
 const ANALYZER = process.env.ANALYZER === 'true'
 const PORT = process.env.PORT
 
-const JS_BUNDLE_ENTRY = path.join(__dirname, './ui/index.js')
-const OUTPUT_PATH = path.join(__dirname, 'ui/dist')
+const JS_BUNDLE_ENTRY = path.join(__dirname, 'src/index.js')
+const OUTPUT_PATH = path.join(__dirname, 'dist')
 const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'
 
@@ -32,7 +32,7 @@ const output = {
 }
 
 const rules = [
-  namedRules.babel,
+  namedRules.js,
   namedRules.worker,
   namedRules.globalCss,
   namedRules.localCss,
@@ -49,11 +49,15 @@ const plugins = [
     DEBUG: false
   }),
 
-  new ExtractTextPlugin(CSS_OUTPUT_NAME),
+  new ExtractTextPlugin({
+    filename: CSS_OUTPUT_NAME,
+    disable: DEV,
+    ignoreOrder: true
+  }),
 
   new HtmlWebpackPlugin({
     title: 'OT App',
-    template: './ui/index.hbs',
+    template: './src/index.hbs',
     description,
     author,
     gtmConfig
@@ -70,7 +74,7 @@ let devServer = {}
 
 if (DEV) {
   const publicPath = `http://localhost:${PORT}/`
-  const contentBase = [path.join(__dirname, './ui')]
+  const contentBase = [path.join(__dirname, './src')]
 
   entry.unshift('react-hot-loader/patch')
 

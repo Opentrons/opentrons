@@ -1,0 +1,130 @@
+@import '@opentrons/components';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--c-font-dark);
+}
+
+a {
+  text-decoration: none;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.absolute__fill {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.inline {
+  display: inline;
+}
+
+.block {
+  display: block;
+}
+
+.inline_block {
+  display: inline-block;
+}
+
+/*** TYPOGRAPHY ***/
+@font-face {
+  font-family: 'trons';
+  src: url('../fonts/Geogtq-Rg-webfont.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sans';
+  src: url('../fonts/OpenSans-Regular-webfont.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.sans {
+  font-family: sans;
+}
+
+.trons {
+  font-family: trons;
+}
+
+/*** BUTTONS ***/
+button {
+  border: none;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.btn {
+  height: 2.5rem;
+  line-height: 2.5rem;
+  border-radius: 2px;
+  font-family: 'sans';
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.btn:active {
+  outline: none;
+  border: none;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.btn_light {
+  border: 1px solid silver;
+  background-color: #fff;
+  color: #666;
+}
+
+.btn_light:hover {
+  background-color: #eee;
+}
+
+.btn_dark {
+  background-color: #9b9b9b;
+  color: white;
+}
+
+.btn_dark:hover {
+  background-color: #777;
+}
+
+.btn_blue {
+  background-color: #006fff;
+  color: white;
+}
+
+.btn_blue:hover {
+  background-color: #00f;
+}

@@ -1,0 +1,156 @@
+/* tooltip styles */
+
+.parent {
+  position: relative;
+}
+
+.parent:hover .tooltip {
+  display: block;
+}
+
+.tooltip {
+  display: none;
+  position: absolute;
+  z-index: 999;
+  line-height: 1.25;
+  border-radius: 0.5rem;
+  white-space: pre;
+  text-align: center;
+  text-transform: uppercase;
+  background-color: black;
+  color: white;
+}
+
+[disabled] .tooltip,
+.disabled .tooltip {
+  background-color: grey;
+}
+
+.small {
+  /* min-height == font-size * line-height + 2 * padding */
+  min-height: 2rem;
+  font-size: 0.75rem;
+  padding: 0.625rem;
+}
+
+.medium {
+  /* min-height == font-size * line-height + 2 * padding */
+  min-height: 3rem;
+  font-size: 1rem;
+  padding: 0.875rem;
+}
+
+.top,
+.bottom,
+.bottom_right {
+  left: 50%;
+}
+
+.top,
+.bottom {
+  transform: translateX(-50%);
+}
+
+.bottom_right {
+  transform: translateX(-20%);
+}
+
+.left,
+.right {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.top {
+  bottom: calc(50% + 0.5rem);
+}
+
+.bottom {
+  top: calc(50% + 0.5rem);
+}
+
+.right {
+  left: calc(50% + 1rem);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.medium.right {
+  left: calc(50% + 1.5rem);
+}
+
+.left {
+  right: calc(50% + 1rem);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.medium.left {
+  right: calc(50% + 1.5rem);
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  border-style: solid;
+  border-color: black;
+}
+
+[disabled] .tooltip::after,
+.disabled .tooltip::after {
+  border-color: grey;
+}
+
+.tooltip.top::after,
+.tooltip.bottom::after,
+.tooltip.bottom_right::after {
+  margin-left: -0.5rem;
+  border-width: 0.5rem;
+  border-right-color: transparent;
+  border-left-color: transparent;
+}
+
+.tooltip.top::after,
+.tooltip.bottom::after {
+  left: 50%;
+}
+
+.tooltip.bottom_right::after {
+  left: 20%;
+}
+
+.tooltip.top::after {
+  top: 100%;
+  border-bottom-color: transparent;
+}
+
+.tooltip.bottom::after,
+.tooltip.bottom_right::after {
+  bottom: 100%;
+  border-top-color: transparent;
+}
+
+.tooltip.right::after,
+.tooltip.left::after {
+  top: 50%;
+  margin-top: -1rem;
+  border-width: 1rem;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.medium.right::after,
+.medium.left::after {
+  margin-top: -1.5rem;
+  border-width: 1.5rem;
+}
+
+.tooltip.right::after {
+  right: 100%;
+  border-left-color: transparent;
+}
+
+.tooltip.left::after {
+  left: 100%;
+  border-right-color: transparent;
+}

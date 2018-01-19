@@ -1,0 +1,8 @@
+.clickable {
+  cursor: pointer;
+}
+
+.rotated {
+  transform-origin: center;
+  transform: rotate(180deg);
+}

@@ -74,31 +74,29 @@ def test_functional(smoothie):
     assert smoothie.position == HOMED_POSITION
 
 
-power = []
+# def test_set_current(model):
+#     from opentrons.robot.robot_configs import DEFAULT_CURRENT
+#     import types
+#     driver = model.robot._driver
 
+#     set_current = driver.set_current
 
-def test_low_power_z(model):
-    from opentrons.robot.robot_configs import DEFAULT_POWER
-    import types
-    driver = model.robot._driver
+#     gcode_log = []
 
-    set_power = driver.set_power
+#     def send_and_log(self, target):
+#         nonlocal gcode_log
+#         gcode_log.append(target)
+#         return(target)
 
-    def set_power_mock(self, target):
-        global power
-        power.append(target)
+#     driver.set_current = types.MethodType(set_current_mock, driver)
 
-        set_power(target)
+#     driver.move({'A': 100}, low_current_z=False)
+#     # Instrument in `model` is configured to right mount, which is the A axis
+#     # on the Smoothie (see `Robot._actuators`)
+#     assert current == []
 
-    driver.set_power = types.MethodType(set_power_mock, driver)
-
-    driver.move({'A': 100}, low_power_z=False)
-    # Instrument in `model` is configured to right mount, which is the A axis
-    # on the Smoothie (see `Robot._actuators`)
-    assert power == []
-
-    driver.move({'A': 10}, low_power_z=True)
-    assert power == [{'A': 0.1}, DEFAULT_POWER]
+#     driver.move({'A': 10}, low_current_z=True)
+#     assert current == [{'A': 0.1}, DEFAULT_CURRENT]
 
 
 def test_fast_home(model):
@@ -123,6 +121,12 @@ def test_fast_home(model):
 
 
 def test_pause_resume(model):
+    """
+    This test has to use an ugly work-around with the `simulating` member of
+    the driver. When issuing movement commands in test, `simulating` should be
+    True, but when testing whether `pause` actually pauses and `resume`
+    resumes, `simulating` must be False.
+    """
     from numpy import isclose
     from opentrons.trackers import pose_tracker
     from time import sleep
@@ -133,7 +137,9 @@ def test_pause_resume(model):
     robot.home()
     homed_coords = pose_tracker.absolute(robot.poses, pipette)
 
+    robot._driver.simulating = False
     robot.pause()
+    robot._driver.simulating = True
 
     def _move_head():
         robot.poses = pipette._move(robot.poses, x=100, y=0, z=0)
@@ -147,7 +153,9 @@ def test_pause_resume(model):
     coords = pose_tracker.absolute(robot.poses, pipette)
     assert isclose(coords, homed_coords).all()
 
+    robot._driver.simulating = False
     robot.resume()
+    robot._driver.simulating = True
     thread.join()
 
     coords = pose_tracker.absolute(robot.poses, pipette)
@@ -173,11 +181,56 @@ def test_speed_change(model, monkeypatch):
                         write_with_log)
 
     pipette.tip_attached = True
+    pipette.set_speed(aspirate=20, dispense=40)
     pipette.aspirate().dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
-        ['G0F9000 M400'],
+        ['G0F30000 M400'],
         ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
-        ['G0F9000 M400']
+        ['G0F30000 M400']
     ]
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_max_speed_change(model, monkeypatch):
+
+    robot = model.robot
+    robot._driver.simulating = False
+
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    command_log = []
+
+    def write_with_log(command, connection, timeout):
+        if 'M203.1' in command or 'G0F' in command:
+            command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+
+    robot.head_speed(555)
+    robot.head_speed(x=1, y=2, z=3, a=4, b=5, c=6)
+    robot.head_speed(123, x=7)
+    robot._driver.set_speed(321)
+    robot._driver.default_speed()
+    expected = [
+        ['G0F{} M400'.format(555 * 60)],
+        ['M203.1 A4 B5 C6 X1 Y2 Z3 M400'],
+        ['M203.1 X7 M400'],
+        ['G0F{} M400'.format(123 * 60)],
+        ['G0F{} M400'.format(321 * 60)],
+        ['G0F{} M400'.format(123 * 60)]
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_pause_in_protocol(model):
+    model.robot._driver.simulating = True
+
+    model.robot.pause()
+
+    assert model.robot._driver.run_flag.is_set()

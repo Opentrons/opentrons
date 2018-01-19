@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+python /usr/local/bin/setup_gpio.py
+
 radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
 # mdns announcement
@@ -23,5 +25,7 @@ if [ ! -e "$config_path" ]; then
     echo "Config file not found. Please perform factory calibration and then restart robot"
     while true; do sleep 1; done
 fi
+
+export ENABLE_NETWORKING_ENDPOINTS=true
 echo "Starting Opentrons API server"
-python -m opentrons.server.main -H :: -P $OT_API_PORT_NUMBER
+python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH opentrons.server.main:init

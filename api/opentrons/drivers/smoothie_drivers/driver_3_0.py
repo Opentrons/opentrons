@@ -1,4 +1,3 @@
-from copy import copy
 from os import environ
 import logging
 from time import sleep
@@ -29,8 +28,8 @@ HOMED_POSITION = {
 }
 
 PLUNGER_BACKLASH_MM = 0.3
-LOW_POWER_Z_SPEED = 30
-POWER_CHANGE_DELAY = 0.05
+LOW_CURRENT_Z_SPEED = 30
+CURRENT_CHANGE_DELAY = 0.05
 
 DEFAULT_AXES_SPEED = 500
 
@@ -53,6 +52,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
+          'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907'}
 
 # Number of digits after the decimal point for coordinates being sent
@@ -82,9 +82,11 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
-        self._default_power_settings = config.default_power
-        self._current_power_settings =  self._default_power_settings.copy()
-        gpio.initialize()
+        self._default_current_settings = config.default_current
+        self._current_settings = self._default_current_settings.copy()
+        self._max_speed_settings = config.default_max_speed
+
+        self._default_axes_speed = DEFAULT_AXES_SPEED
 
     def _update_position(self, target):
         self._position.update({
@@ -134,6 +136,13 @@ class SmoothieDriver_3_0_0:
     def disconnect(self):
         self.simulating = True
 
+    def get_fw_version(self):
+        version = 'Virtual Smoothie'
+        if not self.simulating:
+            version = serial_communication.write_and_return(
+                "version\n", self._connection).split('\r')[0]
+        return version
+
     @property
     def position(self):
         """
@@ -153,8 +162,8 @@ class SmoothieDriver_3_0_0:
         return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
 
     @property
-    def power(self):
-        return self._current_power_settings
+    def current(self):
+        return self._current_settings
 
     @property
     def speed(self):
@@ -166,17 +175,38 @@ class SmoothieDriver_3_0_0:
         command = GCODES['SET_SPEED'] + str(speed)
         self._send_command(command)
 
-    def default_speed(self):
+    def default_speed(self, new_default=None):
         ''' set total axes movement speed in mm/second back to default'''
-        self.set_speed(DEFAULT_AXES_SPEED)
+        if new_default:
+            self._default_axes_speed = int(new_default)
+        self.set_speed(self._default_axes_speed)
 
-    def set_power(self, settings):
-        ''' set total movement speed in mm/second
+    def set_axis_max_speed(self, settings):
+        '''
+        Sets the maximum speed (mm/sec) that a given axis will move
+
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
-            and floating point number for setting (generally between 0.1 and 2)
+            and floating point number for millimeters per second (mm/sec)
         '''
-        self._current_power_settings.update(settings)
+        self._max_speed_settings.update(settings)
+        values = ['{}{}'.format(axis.upper(), value)
+                  for axis, value in sorted(settings.items())]
+        command = '{} {}'.format(
+            GCODES['SET_MAX_SPEED'],
+            ' '.join(values)
+        )
+        self._send_command(command)
+
+    def set_current(self, settings):
+        '''
+        Sets the current in mA by axis.
+
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for current (generally between 0.1 and 2)
+        '''
+        self._current_settings.update(settings)
         values = ['{}{}'.format(axis, value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
@@ -184,10 +214,10 @@ class SmoothieDriver_3_0_0:
             ' '.join(values)
         )
         self._send_command(command)
-        self.delay(POWER_CHANGE_DELAY)
+        self.delay(CURRENT_CHANGE_DELAY)
 
-    def default_power(self):
-        self.set_power(self._default_power_settings)
+    def default_current(self):
+        self.set_current(self._default_current_settings)
 
     # ----------- Private functions --------------- #
 
@@ -224,10 +254,8 @@ class SmoothieDriver_3_0_0:
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
 
             if moving_plunger:
-                self.set_power({
-                    axis: self._config.plunger_current_high
-                    for axis in 'BC'
-                })
+                self.set_current({axis: self._config.plunger_current_high
+                                  for axis in 'BC'})
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
@@ -238,10 +266,8 @@ class SmoothieDriver_3_0_0:
                 raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
 
             if moving_plunger:
-                self.set_power({
-                    axis: self._config.plunger_current_low
-                    for axis in 'BC'
-                })
+                self.set_current({axis: self._config.plunger_current_low
+                                  for axis in 'BC'})
 
             return ret_code
 
@@ -249,7 +275,6 @@ class SmoothieDriver_3_0_0:
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.current)
-        self._send_command(self._config.max_speeds)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)
@@ -356,10 +381,12 @@ class SmoothieDriver_3_0_0:
         return self.home(axis=axis, disabled=disabled)
 
     def pause(self):
-        self.run_flag.clear()
+        if not self.simulating:
+            self.run_flag.clear()
 
     def resume(self):
-        self.run_flag.set()
+        if not self.simulating:
+            self.run_flag.set()
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:
@@ -386,14 +413,6 @@ class SmoothieDriver_3_0_0:
     def turn_off_button_light(self):
         log.debug("Turning off the button")
         gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
-
-    def turn_on_frame_light(self):
-        log.debug("Turning on the LED strip")
-        gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
-
-    def turn_off_frame_light(self):
-        log.debug("Turning off the LED strip")
-        gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
 
     def kill(self):
         """

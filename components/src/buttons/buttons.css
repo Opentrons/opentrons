@@ -1,0 +1,88 @@
+/* button styling */
+@import '..';
+
+:root {
+  --c-font-disabled: color(var(--c-font-light) shade(50%));
+  --button-pad: 0.5rem;
+}
+
+.button_flat,
+.button_primary {
+  position: relative;
+  line-height: 1.4;
+  border: none;
+  padding: var(--button-pad);
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.button_primary {
+  width: 100%;
+  border-radius: 2px;
+  color: var(--c-font-light);
+  background-color: var(--c-bg-dark);
+
+  /* TODO(mc, 2017-12-07): pull shadows out to central file */
+  box-shadow:
+    0 0 2px rgba(0, 0, 0, 0.12),
+    0 2px 2px rgba(0, 0, 0, 0.24);
+}
+
+.button_flat {
+  width: 9rem;
+  color: var(--c-font-dark);
+  background-color: transparent;
+}
+
+.button_primary:hover {
+  background-color: color(var(--c-bg-dark) shade(30%));
+}
+
+.button_flat:hover {
+  background-color: color(var(--c-bg-light) shade(5%));
+}
+
+.button_primary:active {
+  font-weight: var(--fw-regular);
+  background-color: color(var(--c-bg-dark) tint(30%));
+
+  /* TODO(mc, 2017-12-07): pull shadows out to central file */
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.12),
+    0 8px 8px rgba(0, 0, 0, 0.24);
+}
+
+.button_flat:active {
+  font-weight: var(--fw-regular);
+  background-color: color(var(--c-bg-light) shade(10%));
+}
+
+.button_primary[disabled],
+.button_primary.disabled,
+.button_flat[disabled],
+.button_flat.disabled {
+  font-weight: normal;
+  color: var(--c-font-disabled);
+  cursor: default;
+}
+
+.button_primary[disabled],
+.button_primary.disabled {
+  background-color: color(var(--c-bg-dark) tint(70%));
+  box-shadow: none;
+}
+
+.button_flat[disabled],
+.button_flat.disabled {
+  background-color: initial;
+}
+
+.button_icon {
+  position: absolute;
+  top: var(--button-pad);
+  left: var(--button-pad);
+  height: calc(100% - 2 * var(--button-pad));
+}

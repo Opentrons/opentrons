@@ -1,16 +1,12 @@
-export const humanize = s =>
-  s.toLowerCase().split(/-|_|\./)
-    .filter(s => s) // only truthy
-    .map(substring =>
-      substring[0].toUpperCase() + substring.slice(1)
-    ).join(' ')
+import * as componentLibrary from '@opentrons/components'
+
+export const { humanize, wellNameSplit } = componentLibrary
 
 // Not really a UUID, but close enough...?
 export const uuid = () => new Date().getTime() + '.' + Math.random()
 
 export const intToAlphabetLetter = (i, lowerCase = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
-
 
 export const transpose = matrix => matrix[0].map((_col, i) =>
   matrix.map(row => row[i])
@@ -24,6 +20,15 @@ export const toWellName = ({rowNum, colNum}) => (
 export const wellKeyToXYList = wellKey => {
   const [x, y] = wellKey.split(',').map(s => parseInt(s, 10))
   return toWellName({rowNum: parseInt(y), colNum: x})
+}
+
+export const wellNameToXY = wellName => {
+  // Eg B9 => [1, 8]
+  const [letters, numbers] = wellNameSplit(wellName)
+
+  const letterNum = letters.toUpperCase().charCodeAt(0) - 65
+  const numberNum = parseInt(numbers, 10) - 1
+  return [letterNum, numberNum]
 }
 
 // Collision detection for SelectionRect / SelectablePlate
@@ -54,11 +59,9 @@ export const getCollidingWells = (rectPositions, selectableClassname) => {
   )
 
   const collidedWellData = collidedElems.reduce((acc, elem) => {
-    if ('wellX' in elem.dataset && 'wellY' in elem.dataset) {
-      const wellX = elem.dataset['wellX']
-      const wellY = elem.dataset['wellY']
-      const wellKey = wellX + ',' + wellY
-      return {...acc, [wellKey]: [parseInt(wellX), parseInt(wellY)]}
+    if ('wellname' in elem.dataset) {
+      const wellName = elem.dataset['wellname']
+      return {...acc, [wellName]: wellName}
     }
     return acc
   }, {})

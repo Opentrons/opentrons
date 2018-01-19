@@ -4,11 +4,8 @@
 SHELL := bash
 
 # source files
-ui_source := $(shell find ui -type f -name '*' -not -path 'ui/dist/*')
-shell_source := $(shell find shell -type f -name '*.js')
-
-# intermediate target files
-ui_target := ui/dist/bundle.js
+source := $(shell find src -type f -name '*')
+shell_dir := ../app-shell
 
 # use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(env)=environment
@@ -27,20 +24,15 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
-set_package_env := $(bin)/cross-env \
-	OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) \
-	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
-	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
-
-# stardard targets
+# standard targets
 #####################################################################
 
 .PHONY: all
-all: clean package
+all: clean dist
 
 .PHONY: install
 install:
-	npm install
+	yarn
 
 .PHONY: uninstall
 uninstall:
@@ -48,52 +40,28 @@ uninstall:
 
 .PHONY: clean
 clean:
-	rm -rf coverage dist ui/dist
+	rm -rf dist
 
 # artifacts
 #####################################################################
 
-$(ui_target): $(ui_source)
+.PHONY: dist
+dist: $(source)
 	$(env)=production $(bin)/webpack --profile
-
-.PHONY: package
-package: $(ui_target) $(shell_source)
-	$(set_package_env) $(bin)/electron-builder --dir
-
-.PHONY: dist-posix
-dist-posix: $(ui_target) $(shell_source)
-	$(set_package_env) $(bin)/electron-builder --linux --mac --publish never
-
-.PHONY: dist-osx
-dist-osx: $(ui_target) $(shell_source)
-	$(set_package_env) $(bin)/electron-builder --mac --publish never
-
-.PHONY: dist-linux
-dist-linux: $(ui_target) $(shell_source)
-	$(set_package_env) $(bin)/electron-builder --linux --publish never
-
-.PHONY: dist-win
-dist-win: $(ui_target) $(shell_source)
-	$(set_package_env) $(bin)/electron-builder --win --x64 --publish never
 
 # development
 #####################################################################
 
 .PHONY: dev
-dev: clean
+dev:
 	$(bin)/concurrently \
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-mdns" \
-		"sleep 3 && $(MAKE) dev-app" \
-
+		"sleep 3 && $(MAKE) -C $(shell_dir) dev port=$(port)"
 
 .PHONY: dev-server
 dev-server:
 	$(env)=development PORT=$(port) $(bin)/webpack-dev-server --hot
-
-.PHONY: dev-app
-dev-app:
-	$(env)=development PORT=$(port) $(bin)/electron shell/main.js
 
 # TODO(mc, 2017-10-31): remove when API is capable of advertising itself
 .PHONY: dev-mdns
@@ -105,19 +73,25 @@ dev-mdns:
 
 .PHONY: test
 test: test-unit
-	$(MAKE) lint
+	$(MAKE) check lint
 
 .PHONY: test-unit
 test-unit:
 	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
+.PHONY: check
+check:
+	$(bin)/flow
+
 .PHONY: lint
-lint: lint-js lint-css
-
-.PHONY: lint-js
-lint-js:
+lint:
 	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-
-.PHONY: lint-css
-lint-css:
 	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+
+.PHONY: install-types
+install-types:
+	$(bin)/flow-typed install --ignoreDeps dev
+
+.PHONY: uninstall-types
+uninstall-types:
+	rm -rf flow-typed

@@ -1,0 +1,10 @@
+.well {
+  stroke-width: 0.4;
+  stroke: black;
+  fill: var(--fill-color);
+}
+
+.selected {
+  stroke-width: 1;
+  stroke: blue;
+}

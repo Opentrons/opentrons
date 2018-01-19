@@ -39,10 +39,9 @@ def test_aspirate_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
-    x, y, z = (161.0, 116.7, 0)
+    x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
@@ -89,37 +88,27 @@ def test_dispense_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
+    x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
-    x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
 
     robot.poses = p200._move(robot.poses, x=x, y=y, z=z)
-
     robot.calibrate_container_with_instrument(plate, p200, False)
-
-    robot.home()
 
     p200.pick_up_tip()
     p200.aspirate(100, location)
     p200.dispense(100, location)
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200.instrument_actuator)
+    assert (current_pos == (2.0, 0.0, 0.0)).all()
 
-    # driver = robot._driver
-
-    # TODO (artyom, 20171102):  uncomment once calibration is fixed
-    # current_plunger_pos = driver.get_plunger_positions()['current']
-    # current_head_pos = pose_tracker.relative(
-    #     robot.poses,
-    #     src=robot.deck,
-    #     dst=p200
-    # )
-
-    # assert (current_head_pos == (172.24, 131.04, 3.0)).all()
-    # assert current_plunger_pos == {'a': 0, 'b': 10.0}
+    current_pos = pose_tracker.absolute(robot.poses, p200)
+    assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
 
 
 class PipetteTest(unittest.TestCase):
@@ -136,7 +125,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1,
@@ -176,19 +164,12 @@ class PipetteTest(unittest.TestCase):
             RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
     def test_set_max_volume(self):
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 200)
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.set_max_volume(202)
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 202)
-
-        self.assertRaises(RuntimeError, self.p200.set_max_volume, 9)
+        import warnings
+        warnings.filterwarnings('error')
+        self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, mount='left', max_volume=200)
+        warnings.filterwarnings('default')
 
     # TODO: (artyom, 20171101): bring back once plunger position is being tracked
     # def test_calibrate_by_position_name(self):
@@ -416,6 +397,18 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.set_speed(dispense=100)
         self.assertEqual(self.p200.speeds['dispense'], 100)
+
+    def test_set_flow_rate(self):
+        ul_per_mm = 20
+        self.p200 = Pipette(self.robot, mount='left', ul_per_mm=ul_per_mm)
+
+        self.p200.set_flow_rate(aspirate=100)
+        expected_mm_per_sec = 100 / ul_per_mm
+        self.assertEqual(self.p200.speeds['aspirate'], expected_mm_per_sec)
+
+        self.p200.set_flow_rate(dispense=200)
+        expected_mm_per_sec = 200 / ul_per_mm
+        self.assertEqual(self.p200.speeds['dispense'], expected_mm_per_sec)
 
     def test_distribute(self):
         self.p200.reset()
@@ -1319,71 +1312,57 @@ class PipetteTest(unittest.TestCase):
         expected = [
             mock.call(self.plate[0],
                       instrument=self.p200,
-                      low_power_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(self.plate[1],
                       instrument=self.p200,
-                      low_power_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[1], (4.80, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (1.60, 3.20, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 4.80, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 1.60, 10.50)),
                 instrument=self.p200,
-                low_power_z=False,
                 strategy='direct')
         ]
 
@@ -1520,7 +1499,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200 = Pipette(
             self.robot,
-            max_volume=200,
             mount='right',
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
@@ -1540,11 +1518,11 @@ class PipetteTest(unittest.TestCase):
         for i in range(0, total_tips_per_plate):
             expected.extend(self.build_pick_up_tip(self.tiprack2[i]))
 
-        # from pprint import pprint
-        # print('Mock calls')
-        # pprint(self.p200.move_to.mock_calls)
-        # print('Expected')
-        # pprint(expected)
+        from pprint import pprint
+        print('Mock calls')
+        pprint(self.p200.move_to.mock_calls)
+        print('Expected')
+        pprint(expected)
         self.assertEqual(
             self.p200.move_to.mock_calls,
             expected
@@ -1575,7 +1553,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='right',
             channels=8
@@ -1634,11 +1611,11 @@ class PipetteTest(unittest.TestCase):
         plunge = -10
         return [
             mock.call(well.top(), strategy='arc'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_power_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
 

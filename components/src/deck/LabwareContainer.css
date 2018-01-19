@@ -1,0 +1,98 @@
+@import '..';
+
+/*
+NOTE: available defs are:
+  #roundSlotClipPath
+*/
+
+:root {
+  --round-slot: {
+    clip-path: url(#roundSlotClipPath);
+  };
+
+  --slot-overlay: {
+    @apply --round-slot;
+
+    fill: black;
+  };
+}
+
+.highlighted {
+  fill: none;
+  stroke: var(--c-blue);
+  stroke-width: 2.5;
+}
+
+.empty_slot {
+  @apply --round-slot;
+
+  fill: var(--c-plate-bg);
+}
+
+.empty_slot text {
+  fill: white;
+  font-size: 2rem;
+}
+
+.slot_overlay > rect {
+  width: 100%;
+  height: 100%;
+}
+
+.slot_overlay text {
+  fill: white;
+}
+
+.slot_overlay_name_it {
+  @apply --slot-overlay;
+}
+
+.slot_overlay_name_it > rect {
+  height: 80%;
+  transform: translate(0, 10%);
+}
+
+.appear_on_mouseover > * {
+  opacity: 0;
+}
+
+.appear_on_mouseover:hover > * {
+  opacity: 0.75;
+}
+
+/* Clickable text / icons */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  fill: var(--c-light-gray);
+}
+
+.pass_thru_mouse {
+  /* TODO Ian 2017-12-07 move to mixins.css ? */
+  pointer-events: none;
+}
+
+/* ----------- */
+
+/* shows container name on deck */
+.name_overlay {
+  @apply --round-slot;
+
+  font-size: 0.5rem;
+  fill: white;
+}
+
+.name_overlay rect {
+  fill: black;
+  opacity: 0.75;
+}
+
+.name_overlay .container_type {
+  font-weight: var(--fw-bold);
+}
+
+.deck_slot:hover .name_overlay {
+  display: none;
+}
