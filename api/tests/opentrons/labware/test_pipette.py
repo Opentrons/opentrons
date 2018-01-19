@@ -164,19 +164,12 @@ class PipetteTest(unittest.TestCase):
             RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
     def test_set_max_volume(self):
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 200)
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.set_max_volume(202)
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 202)
-
-        self.assertRaises(RuntimeError, self.p200.set_max_volume, 9)
+        import warnings
+        warnings.filterwarnings('error')
+        self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, mount='left', max_volume=200)
+        warnings.filterwarnings('default')
 
     # TODO: (artyom, 20171101): bring back once plunger position is being tracked
     # def test_calibrate_by_position_name(self):

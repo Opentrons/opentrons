@@ -145,7 +145,7 @@ class Pipette:
 
         if max_volume:
             warnings.warn(
-                "Pipette 'max_volume' is deprecated, use `ul_per_mm`"
+                "'max_volume' is deprecated, use `ul_per_mm` in constructor"
             )
 
         self.ul_per_mm = ul_per_mm
@@ -1270,13 +1270,17 @@ class Pipette:
             Must be calculated and set after plunger calibrations to ensure
             accuracy
         """
-        self.max_volume = max_volume
+        # self.max_volume = max_volume
 
-        if self.max_volume <= self.min_volume:
-            raise RuntimeError(
-                'Pipette max volume is less than '
-                'min volume ({0} < {1})'.format(
-                    self.max_volume, self.min_volume))
+        # if self.max_volume <= self.min_volume:
+        #     raise RuntimeError(
+        #         'Pipette max volume is less than '
+        #         'min volume ({0} < {1})'.format(
+        #             self.max_volume, self.min_volume))
+
+        warnings.warn(
+            "'max_volume' is deprecated, use `ul_per_mm` in constructor"
+        )
 
         return self
 
