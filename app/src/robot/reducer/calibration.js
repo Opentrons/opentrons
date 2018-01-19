@@ -1,10 +1,10 @@
 // @flow
 // robot calibration state and reducer
 // TODO(mc, 2018-01-10): refactor to use combineReducers
+import type {Mount, Slot, LabwareCalibrationStatus} from '../types'
 import {actionTypes} from '../actions'
 
 import {
-  type InstrumentMount,
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
@@ -30,7 +30,7 @@ type CalibrationRequestType =
 
 type CalibrationRequest = {
   type: CalibrationRequestType,
-  mount: InstrumentMount | '',
+  mount: Mount | '',
   inProgress: boolean,
   error: ?{message: string},
 }
@@ -38,8 +38,8 @@ type CalibrationRequest = {
 // TODO(mc, 2018-01-10): replace with CalibrationRequest
 type LabwareConfirmationRequest = {
   inProgress: boolean,
-  axis?: string,
-  slot?: number,
+  mount?: Mount | '',
+  slot?: Slot | '',
   error: ?{message: string},
 }
 
@@ -47,10 +47,10 @@ export type State = {
   deckPopulated: boolean,
   jogDistance: number,
 
-  probedByAxis: {[InstrumentMount]: boolean},
+  probedByMount: {[Mount]: boolean},
 
-  labwareBySlot: {[number]: {}},
-  confirmedBySlot: {[number]: boolean},
+  labwareBySlot: {[Slot]: LabwareCalibrationStatus},
+  confirmedBySlot: {[Slot]: boolean},
 
   calibrationRequest: CalibrationRequest,
 
@@ -100,7 +100,7 @@ const INITIAL_STATE: State = {
   deckPopulated: true,
   jogDistance: JOG_DISTANCE_SLOW_MM,
 
-  probedByAxis: {},
+  probedByMount: {},
 
   // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
   // slot. confirmedBySlot holds a flag for whether the labware has been
@@ -113,9 +113,9 @@ const INITIAL_STATE: State = {
   // TODO(mc, 2017-11-22): collapse all these into a single
   // instrumentRequest object. We can't have simultaneous instrument
   // movements so split state hurts us without benefit
-  pickupRequest: {inProgress: false, error: null, slot: 0},
-  homeRequest: {inProgress: false, error: null, slot: 0},
-  confirmTiprackRequest: {inProgress: false, error: null, slot: 0},
+  pickupRequest: {inProgress: false, error: null, slot: ''},
+  homeRequest: {inProgress: false, error: null, slot: ''},
+  confirmTiprackRequest: {inProgress: false, error: null, slot: ''},
   moveToRequest: {inProgress: false, error: null},
   jogRequest: {inProgress: false, error: null},
   updateOffsetRequest: {inProgress: false, error: null}
@@ -230,9 +230,9 @@ function handleProbeTipResponse (state, action) {
         ? payload
         : null
     },
-    probedByAxis: {
-      ...state.probedByAxis,
-      [mount]: state.probedByAxis[mount] || !error
+    probedByMount: {
+      ...state.probedByMount,
+      [mount]: state.probedByMount[mount] || !error
     }
   }
 }

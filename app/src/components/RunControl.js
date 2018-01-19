@@ -96,7 +96,7 @@ export default function RunControl (props) {
 
 RunControl.propTypes = {
   sessionName: PropTypes.string.isRequired,
-  startTime: PropTypes.string.isRequired,
+  startTime: PropTypes.number,
   runTime: PropTypes.string.isRequired,
   isRunning: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,

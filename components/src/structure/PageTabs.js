@@ -14,11 +14,11 @@ type TabProps = {
   isDisabled: bool
 }
 
-type Props = {
+export type PageTabProps = {
   pages: Array<TabProps>
 }
 
-export default function PageTabs (props: Props) {
+export default function PageTabs (props: PageTabProps) {
   return (
     <nav className={styles.page_tabs}>
       {props.pages.map((page) => (

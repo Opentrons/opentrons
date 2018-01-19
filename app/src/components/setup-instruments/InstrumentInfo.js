@@ -2,13 +2,14 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import type {Mount} from '../../robot'
 import InfoItem from './InfoItem.js' // move to comp lib?
 import InstrumentDiagram from './InstrumentDiagram.js'
 
 import styles from './instrument.css'
 
 export type InstrumentInfoProps = {
-  axis: string,
+  mount: Mount,
   description: string,
   tipType: string,
   isDisabled: boolean,
@@ -17,7 +18,7 @@ export type InstrumentInfoProps = {
 }
 
 export default function InstrumentInfo (props: InstrumentInfoProps) {
-  const className = classnames(styles.pipette, styles[props.axis], {
+  const className = classnames(styles.pipette, styles[props.mount], {
     [styles.disabled]: props.isDisabled
   })
 

@@ -10,7 +10,6 @@ import type {State as SessionState} from './reducer/session'
 import {
   type ConnectionStatus,
   type SessionStatus,
-  type InstrumentMount,
   _NAME,
   UNPROBED,
   PREPARING_TO_PROBE,
@@ -21,6 +20,8 @@ import {
   INSTRUMENT_AXES,
   DECK_SLOTS
 } from './constants'
+
+import type {Mount} from './types'
 
 type State = {
   robot: {
@@ -184,18 +185,18 @@ export const getRunTime = createSelector(
   }
 )
 
-export function getInstrumentsByAxis (state: State) {
-  return session(state).protocolInstrumentsByAxis
+export function getInstrumentsByMount (state: State) {
+  return session(state).instrumentsByMount
 }
 
 export const getInstruments = createSelector(
-  getInstrumentsByAxis,
-  (state: State) => calibration(state).probedByAxis,
+  getInstrumentsByMount,
+  (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).calibrationRequest,
   (instrumentsByMount, probedByMount, calibrationRequest) => {
     return INSTRUMENT_AXES.map((mount) => {
       const instrument = instrumentsByMount[mount]
-      if (!instrument || !instrument.name) return {axis: mount}
+      if (!instrument || !instrument.name) return {mount}
 
       let calibration = UNPROBED
 
@@ -225,13 +226,13 @@ export const getInstruments = createSelector(
 // TODO(mc, 2018-01-03): select pipette based on deckware props
 export const getCalibratorMount = createSelector(
   getInstruments,
-  (instruments): InstrumentMount | '' => {
+  (instruments): Mount | '' => {
     const single = instruments.find((i) => i.channels && i.channels === 1)
     const multi = instruments.find((i) => i.channels && i.channels > 1)
 
-    const calibrator = single || multi || {axis: ''}
+    const calibrator = single || multi || {mount: ''}
 
-    return calibrator.axis
+    return calibrator.mount
   }
 )
 
@@ -241,7 +242,7 @@ export const getInstrumentsCalibrated = createSelector(
 )
 
 export function getLabwareBySlot (state: State) {
-  return session(state).protocolLabwareBySlot
+  return session(state).labwareBySlot
 }
 
 export const getLabware = createSelector(
