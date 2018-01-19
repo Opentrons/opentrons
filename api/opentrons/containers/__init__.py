@@ -47,13 +47,10 @@ def load(robot, container_name, slot, label=None, share=False):
         col = columns_lookup[slot[0]]
         row = int(slot[1]) - 1
         index = col + (row * robot.get_max_robot_cols())
-        old_slot = slot
+        _s = slot
         slot = str(index + 1)
-        warnings.warn(
-            'Please reference slots as numbers 1-11. '
-            'Converting {0} to {1}'.format(old_slot, slot),
-            DeprecationWarning
-        )
+        msg = 'Slot name is "{0}", format "{1}" is deprecated'.format(slot, _s)
+        warnings.warn(msg)
     elif isinstance(slot, (int, float, complex)):
         # if user pass in slot name as number (eg: 3 instead of '3')
         slot = str(slot)
