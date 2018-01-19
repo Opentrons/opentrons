@@ -23,7 +23,7 @@ def test_pos_tracker_persistance(robot):
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, 'trough-12row', 'B2')
+    plate = containers_load(robot, 'trough-12row', '5')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
     assert robot.max_deck_height() == 40.0
 
@@ -91,8 +91,8 @@ def test_create_arc(robot):
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, '96-flat', 'A1')
-    plate2 = containers_load(robot, '96-flat', 'B1')
+    plate = containers_load(robot, '96-flat', '1')
+    plate2 = containers_load(robot, '96-flat', '2')
     robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 

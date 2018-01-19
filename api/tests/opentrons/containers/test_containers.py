@@ -27,7 +27,7 @@ def test_containers_create(robot):
         volume=1000,
         save=True)
 
-    p = containers_load(robot, container_name, 'A1')
+    p = containers_load(robot, container_name, '1')
     assert len(p) == 96
     assert len(p.rows) == 12
     assert len(p.cols) == 8
@@ -65,7 +65,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'
-        slot = 'A1'
+        slot = '1'
         containers_load(self.robot, container_name, slot)
         self.assertEquals(len(self.robot.get_containers()), 1)
 

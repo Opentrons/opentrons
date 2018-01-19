@@ -11,9 +11,9 @@ robot = Robot.get_instance()
 
 robot._driver = SmoothieDriver1()
 
-plate = containers.load('96-flat', 'A2', 'magbead')
-trash = containers.load('point', 'A1', 'trash')
-tiprack = containers.load('tiprack-200ul', 'B2', 'p200-rack')
+plate = containers.load('96-flat', '4', 'magbead')
+trash = containers.load('point', '1', 'trash')
+tiprack = containers.load('tiprack-200ul', '5', 'p200-rack')
 
 # tipracks need a Well height equal to the tip length
 for tip in tiprack:

@@ -15,9 +15,9 @@ def labware_setup():
     from opentrons import containers, instruments
 
     tip_racks = \
-        [containers.load('tiprack-200ul', slot, slot) for slot in ['A1', 'A2']]
+        [containers.load('tiprack-200ul', slot, slot) for slot in ['1', '4']]
     plates = \
-        [containers.load('96-PCR-flat', slot, slot) for slot in ['B1', 'B2']]
+        [containers.load('96-PCR-flat', slot, slot) for slot in ['2', '5']]
 
     p100 = instruments.Pipette(
         name='p100', mount='right', channels=8, tip_racks=tip_racks)

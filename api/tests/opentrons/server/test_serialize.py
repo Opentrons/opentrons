@@ -39,11 +39,11 @@ def type_id(instance):
 
 def test_robot():
     robot.reset()
-    containers.load('trough-12row', 'C1', 'trough')
-    containers.load('96-PCR-flat', 'A1', 'plate')
+    containers.load('trough-12row', '3', 'trough')
+    containers.load('96-PCR-flat', '1', 'plate')
 
     # a tip rack for our pipette
-    p200rack = containers.load('tiprack-200ul', 'B1', 'tiprack')
+    p200rack = containers.load('tiprack-200ul', '2', 'tiprack')
 
     # create a p200 pipette on robot axis B
     instruments.Pipette(
