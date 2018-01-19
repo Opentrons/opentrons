@@ -30,9 +30,9 @@ export default function PageTabs (props: Props) {
 
 function Tab (props: TabProps) {
   const {isDisabled} = props
-  const tabLinkClass = props.isActive
-    ? classnames(styles.tab_link, styles.active_tab_link)
-    : styles.tab_link
+  const tabLinkClass = classnames(styles.tab_link, {
+    [styles.active_tab_link]: props.isActive
+  })
 
   // TODO(mc, 2017-12-14): make a component for proper disabling of links
   const MaybeLink = !isDisabled

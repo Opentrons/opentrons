@@ -11,10 +11,10 @@ NOTE: available defs are:
   };
 
   --slot-overlay: {
-    fill: black;
-
     @apply --round-slot;
-  }
+
+    fill: black;
+  };
 }
 
 .highlighted {
@@ -24,9 +24,9 @@ NOTE: available defs are:
 }
 
 .empty_slot {
-  fill: var(--c-plate-bg);
-
   @apply --round-slot;
+
+  fill: var(--c-plate-bg);
 }
 
 .empty_slot text {
@@ -78,10 +78,10 @@ NOTE: available defs are:
 
 /* shows container name on deck */
 .name_overlay {
+  @apply --round-slot;
+
   font-size: 0.5rem;
   fill: white;
-
-  @apply --round-slot;
 }
 
 .name_overlay rect {
