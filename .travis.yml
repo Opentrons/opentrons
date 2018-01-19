@@ -56,8 +56,10 @@ script:
   - make -C app test && make -C app-shell dist-posix
   # Clean up. This will leave only single-file build artifacts
   - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
-  # protocol designer
-  - make -C protocol-designer test build
+  # protocol designer build
+  - make -C protocol-designer build
+  # component library build
+  - make -C components build
 
 after_success:
   - make coverage
@@ -90,6 +92,20 @@ deploy:
     bucket: opentrons-protocol-designer
     skip_cleanup: true
     local-dir: $(pwd)/protocol-designer/dist/
+    upload-dir: $TRAVIS_BRANCH
+    acl: public_read
+    region: us-west-2
+    on:
+      condition: $TRAVIS_TEST_RESULT = 0
+      repo: Opentrons/opentrons
+      all_branches: true
+
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: opentrons-components
+    skip_cleanup: true
+    local-dir: $(pwd)/components/dist/
     upload-dir: $TRAVIS_BRANCH
     acl: public_read
     region: us-west-2
