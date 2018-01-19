@@ -8,9 +8,7 @@ import SessionHeader from '../containers/SessionHeader'
 import ConnectedJogModal from '../containers/ConnectedJogModal'
 
 export default function SetupDeckPage (props) {
-  const {match: {url}, match: {params}} = props
-  // TODO(mc, 2017-10-18): use strings for slot for consitency
-  const slot = parseInt(params.slot) || 1
+  const {match: {url}, match: {params: {slot}}} = props
 
   return (
     <Page>

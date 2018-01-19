@@ -204,8 +204,8 @@ describe('api client', () => {
         protocolText: session.protocol_text,
         protocolCommands: [],
         protocolCommandsById: {},
-        protocolInstrumentsByAxis: {},
-        protocolLabwareBySlot: {}
+        instrumentsByMount: {},
+        labwareBySlot: {}
       })
 
       return sendConnect()
@@ -260,17 +260,17 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('maps api instruments and intruments by axis', () => {
+    test('maps api instruments and intruments by mount', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
-        protocolInstrumentsByAxis: {
-          left: {_id: 2, axis: 'left', name: 'p200', channels: 1, volume: 200},
-          right: {_id: 1, axis: 'right', name: 'p50', channels: 8, volume: 50}
+        instrumentsByMount: {
+          left: {_id: 2, mount: 'left', name: 'p200', channels: 1, volume: 200},
+          right: {_id: 1, mount: 'right', name: 'p50', channels: 8, volume: 50}
         }
       }))
 
       session.instruments = [
-        {_id: 1, axis: 'a', name: 'p50', channels: 8},
-        {_id: 2, axis: 'b', name: 'p200', channels: 1}
+        {_id: 1, mount: 'right', name: 'p50', channels: 8},
+        {_id: 2, mount: 'left', name: 'p200', channels: 1}
       ]
 
       return sendConnect()
@@ -279,10 +279,10 @@ describe('api client', () => {
 
     test('maps api containers to labware by slot', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
-        protocolLabwareBySlot: {
-          1: {_id: 1, id: 'A1', slot: 1, name: 'a', type: 'tiprack', isTiprack: true},
-          5: {_id: 2, id: 'B2', slot: 5, name: 'b', type: 'B', isTiprack: false},
-          9: {_id: 3, id: 'C3', slot: 9, name: 'c', type: 'C', isTiprack: false}
+        labwareBySlot: {
+          1: {_id: 1, slot: '1', name: 'a', type: 'tiprack', isTiprack: true},
+          5: {_id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false},
+          9: {_id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false}
         }
       }))
 
@@ -308,11 +308,11 @@ describe('api client', () => {
             jogDistance: constants.JOG_DISTANCE_FAST_MM
           },
           session: {
-            protocolInstrumentsByAxis: {
+            instrumentsByMount: {
               left: {_id: 'inst-2'},
               right: {_id: 'inst-1'}
             },
-            protocolLabwareBySlot: {
+            labwareBySlot: {
               1: {_id: 'lab-1', type: '96-flat'},
               5: {_id: 'lab-2', type: 'tiprack-200ul', isTiprack: true},
               9: {_id: 'lab-3', type: 'tiprack-200ul', isTiprack: true}

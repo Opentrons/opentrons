@@ -329,9 +329,9 @@ describe('robot selectors', () => {
   test('get instruments', () => {
     const state = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {axis: 'right', name: 'p50s', channels: 1, volume: 50}
+        instrumentsByMount: {
+          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
         }
       },
       calibration: {
@@ -341,7 +341,7 @@ describe('robot selectors', () => {
           inProgress: true,
           error: null
         },
-        probedByAxis: {
+        probedByMount: {
           left: true
         }
       }
@@ -349,7 +349,7 @@ describe('robot selectors', () => {
 
     expect(getInstruments(state)).toEqual([
       {
-        axis: 'left',
+        mount: 'left',
         name: 'p200m',
         channels: 8,
         volume: 200,
@@ -357,7 +357,7 @@ describe('robot selectors', () => {
         probed: true
       },
       {
-        axis: 'right',
+        mount: 'right',
         name: 'p50s',
         channels: 1,
         volume: 50,
@@ -378,14 +378,14 @@ describe('robot selectors', () => {
   test('get calibrator mount with single channel installed', () => {
     const state = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {axis: 'right', name: 'p50s', channels: 1, volume: 50}
+        instrumentsByMount: {
+          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByAxis: {}
+        probedByMount: {}
       }
     })
 
@@ -395,13 +395,13 @@ describe('robot selectors', () => {
   test('get calibrator mount with only multi channel installed', () => {
     const state = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          left: {axis: 'left', name: 'p200m', channels: 8, volume: 200}
+        instrumentsByMount: {
+          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByAxis: {}
+        probedByMount: {}
       }
     })
 
@@ -411,39 +411,39 @@ describe('robot selectors', () => {
   test('get instruments are calibrated', () => {
     const twoPipettesCalibrated = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        instrumentsByMount: {
+          left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByAxis: {left: true, right: true}
+        probedByMount: {left: true, right: true}
       }
     })
 
     const twoPipettesNotCalibrated = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          left: {name: 'p200', axis: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        instrumentsByMount: {
+          left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByAxis: {left: false, right: false}
+        probedByMount: {left: false, right: false}
       }
     })
 
     const onePipetteCalibrated = makeState({
       session: {
-        protocolInstrumentsByAxis: {
-          right: {name: 'p50', axis: 'right', channels: 1, volume: 50}
+        instrumentsByMount: {
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByAxis: {right: true}
+        probedByMount: {right: true}
       }
     })
 
@@ -458,10 +458,10 @@ describe('robot selectors', () => {
     beforeEach(() => {
       state = makeState({
         session: {
-          protocolLabwareBySlot: {
-            1: {id: 'A1', slot: 1, name: 'a1', type: 'a', isTiprack: true},
-            5: {id: 'B2', slot: 5, name: 'b2', type: 'b', isTiprack: false},
-            9: {id: 'C3', slot: 9, name: 'c3', type: 'c', isTiprack: false}
+          labwareBySlot: {
+            1: {id: 'A1', slot: '1', name: 'a1', type: 'a', isTiprack: true},
+            5: {id: 'B2', slot: '5', name: 'b2', type: 'b', isTiprack: false},
+            9: {id: 'C3', slot: '9', name: 'c3', type: 'c', isTiprack: false}
           }
         },
         calibration: {
@@ -480,7 +480,7 @@ describe('robot selectors', () => {
     test('get labware', () => {
       expect(getLabware(state)).toEqual([
         {
-          slot: 1,
+          slot: '1',
           id: 'A1',
           name: 'a1',
           type: 'a',
@@ -488,11 +488,11 @@ describe('robot selectors', () => {
           calibration: constants.UNCONFIRMED,
           confirmed: false
         },
-        {slot: 2},
-        {slot: 3},
-        {slot: 4},
+        {slot: '2'},
+        {slot: '3'},
+        {slot: '4'},
         {
-          slot: 5,
+          slot: '5',
           id: 'B2',
           name: 'b2',
           type: 'b',
@@ -500,11 +500,11 @@ describe('robot selectors', () => {
           calibration: constants.OVER_SLOT,
           confirmed: true
         },
-        {slot: 6},
-        {slot: 7},
-        {slot: 8},
+        {slot: '6'},
+        {slot: '7'},
+        {slot: '8'},
         {
-          slot: 9,
+          slot: '9',
           id: 'C3',
           name: 'c3',
           type: 'c',
@@ -512,15 +512,15 @@ describe('robot selectors', () => {
           calibration: constants.UNCONFIRMED,
           confirmed: false
         },
-        {slot: 10},
-        {slot: 11}
+        {slot: '10'},
+        {slot: '11'}
       ])
     })
 
     test('get unconfirmed tipracks', () => {
       expect(getUnconfirmedTipracks(state)).toEqual([
         {
-          slot: 1,
+          slot: '1',
           id: 'A1',
           name: 'a1',
           type: 'a',
@@ -534,7 +534,7 @@ describe('robot selectors', () => {
     test('get unconfirmed labware', () => {
       expect(getUnconfirmedLabware(state)).toEqual([
         {
-          slot: 1,
+          slot: '1',
           id: 'A1',
           name: 'a1',
           type: 'a',
@@ -543,7 +543,7 @@ describe('robot selectors', () => {
           confirmed: false
         },
         {
-          slot: 9,
+          slot: '9',
           id: 'C3',
           name: 'c3',
           type: 'c',
@@ -556,7 +556,7 @@ describe('robot selectors', () => {
 
     test('get next labware', () => {
       expect(getNextLabware(state)).toEqual({
-        slot: 1,
+        slot: '1',
         id: 'A1',
         name: 'a1',
         type: 'a',
@@ -579,7 +579,7 @@ describe('robot selectors', () => {
       }
 
       expect(getNextLabware(nextState)).toEqual({
-        slot: 9,
+        slot: '9',
         id: 'C3',
         name: 'c3',
         type: 'c',

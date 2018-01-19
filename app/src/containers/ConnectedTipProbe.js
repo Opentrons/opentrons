@@ -1,5 +1,8 @@
+// @flow
+import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
+import type {Mount} from '../robot'
 import TipProbe from '../components/TipProbe'
 
 import {
@@ -7,16 +10,23 @@ import {
   selectors as robotSelectors
 } from '../robot'
 
-const mapStateToProps = (state, ownProps) => {
+type OwnProps = {
+  mount: Mount
+}
+
+const mapStateToProps = (state, ownProps: OwnProps) => {
+  const mount = ownProps.mount
   const instruments = robotSelectors.getInstruments(state)
-  const currentInstrument = instruments.find((inst) => inst.axis === ownProps.mount)
+  const currentInstrument = instruments.find((inst) => inst.mount === mount)
+
   return {
     currentInstrument
   }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: OwnProps) => {
   const mount = ownProps.mount
+
   return {
     onPrepareClick: () => dispatch(robotActions.moveToFront(mount)),
     onProbeTipClick: () => dispatch(robotActions.probeTip(mount)),

@@ -1,28 +1,53 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
-import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
+import {
+  ListItem,
+  CHECKED,
+  UNCHECKED,
+  type
+  IconName
+} from '@opentrons/components'
 
-InstrumentListItem.propTypes = {
-  isRunning: PropTypes.bool.isRequired,
-  name: PropTypes.string,
-  axis: PropTypes.string,
-  volume: PropTypes.number,
-  channels: PropTypes.number,
-  probed: PropTypes.bool,
-  clearDeckPopulated: PropTypes.func
+import type {Mount, Channels} from '../../robot'
+
+type Props = {
+  isRunning: boolean,
+  mount: Mount,
+  clearDeckPopulated: () => void,
+  name: ?string,
+  volume: ?number,
+  channels: ?Channels,
+  probed: ?boolean,
 }
 
-export default function InstrumentListItem (props) {
-  const {isRunning, name, axis, volume, channels, probed, clearDeckPopulated} = props
-  const isDisabled = name == null
-  const url = isRunning
-  ? '#'
-  : `/setup-instruments/${axis}`
+export default function InstrumentListItem (props: Props) {
+  const {
+    isRunning,
+    name,
+    mount,
+    volume,
+    channels,
+    probed,
+    clearDeckPopulated
+  } = props
+
+  const isUsed = name != null
+  const isDisabled = !isUsed || isRunning
+
+  const url = !isDisabled
+    ? `/setup-instruments/${mount}`
+    : '#'
+
+  const onClick = !isDisabled
+    ? clearDeckPopulated
+    : undefined
+
   // TODO (ka 2018-1-17): Move this up to container mergeProps in upcoming update setup panel ticket
   const confirmed = probed
-  const iconName = confirmed
+
+  const iconName: IconName = confirmed
     ? CHECKED
     : UNCHECKED
 
@@ -30,20 +55,23 @@ export default function InstrumentListItem (props) {
     ? 'multi'
     : 'single'
 
-  const description = !isDisabled
+  const description = isUsed
     ? `${capitalize(pipetteType)}-channel`
     : 'N/A'
 
-  const units = !isDisabled ? 'ul' : null
+  const units = !isDisabled
+    ? 'ul'
+    : null
+
   return (
     <ListItem
-      isDisabled={isDisabled || isRunning}
+      isDisabled={isDisabled}
       url={url}
-      onClick={!isRunning && clearDeckPopulated}
+      onClick={onClick}
       confirmed={confirmed}
       iconName={iconName}
     >
-      <span>{capitalize(axis)}</span>
+      <span>{capitalize(mount)}</span>
       <span>{description}</span>
       <span>{volume} {units}</span>
     </ListItem>
