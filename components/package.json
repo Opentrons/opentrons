@@ -50,6 +50,7 @@
       "stylelint-config-css-modules"
     ],
     "ignoreFiles": [
+      "**/dist/**",
       "**/coverage/**"
     ]
   },
