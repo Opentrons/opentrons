@@ -28,7 +28,7 @@ publish:
 
 .PHONY: dev
 dev:
-	python opentrons/server/main.py -P 31950
+	python opentrons/server/main.py -P 31950 opentrons.server.main:init
 
 dist/update.base64: clean
 	rm -rf dist/* && \

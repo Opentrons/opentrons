@@ -120,13 +120,16 @@ describe('robot actions', () => {
     expect(actions.sessionResponse(error)).toEqual(failure)
   })
 
-  test('set labware reviewed action', () => {
-    const expected = {
-      type: actionTypes.SET_LABWARE_REVIEWED,
+  test('set deck populated action', () => {
+    expect(actions.setDeckPopulated(false)).toEqual({
+      type: actionTypes.SET_DECK_POPULATED,
       payload: false
-    }
+    })
 
-    expect(actions.setLabwareReviewed(false)).toEqual(expected)
+    expect(actions.setDeckPopulated(true)).toEqual({
+      type: actionTypes.SET_DECK_POPULATED,
+      payload: true
+    })
   })
 
   test('move tip to front action', () => {
