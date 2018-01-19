@@ -104,7 +104,9 @@ class Pipette:
             trash_container=None,
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
-            dispense_speed=DEFAULT_DISPENSE_SPEED):
+            dispense_speed=DEFAULT_DISPENSE_SPEED,
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
 
         self.robot = robot
         self.mount = mount
@@ -136,11 +138,6 @@ class Pipette:
         self.previous_placeable = None
         self.current_volume = 0
 
-        self.speeds = {
-            'aspirate': aspirate_speed,
-            'dispense': dispense_speed
-        }
-
         self.plunger_positions = PLUNGER_POSITIONS.copy()
 
         if max_volume:
@@ -153,6 +150,12 @@ class Pipette:
         t = self._get_plunger_position('top')
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
+
+        self.speeds = {}
+        self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
+
+        self.set_flow_rate(
+            aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
     def reset(self):
         """
@@ -356,7 +359,8 @@ class Pipette:
 
         self._position_for_aspirate(location)
 
-        mm_position = self._ul_to_mm(self.current_volume + volume)
+        mm_position = self._ul_to_plunger_position(
+            self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
         self.instrument_actuator.set_speed(speed)
@@ -450,7 +454,8 @@ class Pipette:
 
         self._position_for_dispense(location)
 
-        mm_position = self._ul_to_mm(self.current_volume - volume)
+        mm_position = self._ul_to_plunger_position(
+            self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.set_speed(speed)
@@ -1304,6 +1309,15 @@ class Pipette:
                     position))
 
     def _ul_to_mm(self, ul):
+        """Calculate distance in millimeters to move for a given liquid volume.
+
+        Calibration of the pipette motor's ul-to-mm conversion is required
+        """
+
+        millimeters = ul / self.ul_per_mm
+        return round(millimeters, 3)
+
+    def _ul_to_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
@@ -1312,7 +1326,7 @@ class Pipette:
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
 
-        millimeters = ul / self.ul_per_mm
+        millimeters = self._ul_to_mm(ul)
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 3)
 
@@ -1486,20 +1500,48 @@ class Pipette:
             tips -= 1
         return tips
 
-    def set_speed(self, **kwargs):
+    def set_speed(self, aspirate=None, dispense=None):
         """
-        Set the speed (mm/minute) the :any:`Pipette` plunger will move
+        Set the speed (mm/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
 
         Parameters
         ----------
-        kwargs: Dict
-            A dictionary who's keys are either "aspirate" or "dispense",
-            and who's values are int or float (Example: `{"aspirate": 300}`)
+        aspirate: int
+            The speed in millimeters-per-second, at which the plunger will
+            move while performing an aspirate
+
+        dispense: int
+            The speed in millimeters-per-second, at which the plunger will
+            move while performing an dispense
         """
-        keys = {'aspirate', 'dispense'} & kwargs.keys()
-        for key in keys:
-            self.speeds[key] = kwargs.get(key)
+        if aspirate:
+            self.speeds['aspirate'] = aspirate
+        if dispense:
+            self.speeds['dispense'] = dispense
+        return self
+
+    def set_flow_rate(self, aspirate=None, dispense=None):
+        """
+        Set the speed (uL/second) the :any:`Pipette` plunger will move
+        during :meth:`aspirate` and :meth:`dispense`
+
+        Parameters
+        ----------
+        aspirate: int
+            The speed in microliters-per-second, at which the plunger will
+            move while performing an aspirate
+
+        dispense: int
+            The speed in microliters-per-second, at which the plunger will
+            move while performing an dispense
+        """
+        if aspirate:
+            self.set_speed(
+                aspirate=self._ul_to_mm(aspirate))
+        if dispense:
+            self.set_speed(
+                dispense=self._ul_to_mm(dispense))
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None, low_current_z=False):

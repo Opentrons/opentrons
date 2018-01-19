@@ -398,6 +398,18 @@ class PipetteTest(unittest.TestCase):
         self.p200.set_speed(dispense=100)
         self.assertEqual(self.p200.speeds['dispense'], 100)
 
+    def test_set_flow_rate(self):
+        ul_per_mm = 20
+        self.p200 = Pipette(self.robot, mount='left', ul_per_mm=ul_per_mm)
+
+        self.p200.set_flow_rate(aspirate=100)
+        expected_mm_per_sec = 100 / ul_per_mm
+        self.assertEqual(self.p200.speeds['aspirate'], expected_mm_per_sec)
+
+        self.p200.set_flow_rate(dispense=200)
+        expected_mm_per_sec = 200 / ul_per_mm
+        self.assertEqual(self.p200.speeds['dispense'], expected_mm_per_sec)
+
     def test_distribute(self):
         self.p200.reset()
         # Setting true instead of calling pick_up_tip because the test is
