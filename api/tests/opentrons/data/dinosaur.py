@@ -13,7 +13,6 @@ p200 = instruments.Pipette(
     name="p200",
     mount="left",
     min_volume=20,
-    max_volume=200,
     tip_racks=[p200rack]
 )
 
