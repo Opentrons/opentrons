@@ -1,15 +1,12 @@
 // @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
 
 import type {StepItemData, StepIdType} from './types'
-import type {
-  AddStepAction,
-  ExpandAddStepButtonAction,
-  ToggleStepCollapsedAction,
-  SelectStepAction
-} from './actions'
+import type {AddStepAction} from './actions' // Thunk action creators
+import {expandAddStepButton, selectStep, toggleStepCollapsed} from './actions'
 
 // TODO move to test
 /*
@@ -138,9 +135,9 @@ const collapsedSteps = handleActions({
     ...state,
     [action.payload.id]: false
   }),
-  TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, action: ToggleStepCollapsedAction) => ({
+  TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, {payload}: ActionType<typeof toggleStepCollapsed>) => ({
     ...state,
-    [action.payload]: !state[action.payload]
+    [payload]: !state[payload]
   })
 }, {})
 
@@ -155,15 +152,18 @@ type SelectedStepState = null | StepIdType
 
 const selectedStep = handleActions({
   ADD_STEP: (state: SelectedStepState, action: AddStepAction) => action.payload.id,
-  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
+  SELECT_STEP: (state: SelectedStepState, {payload}: ActionType<typeof selectStep>) => payload
 }, null)
 
 type StepCreationButtonExpandedState = boolean
 
 const stepCreationButtonExpanded = handleActions({
   ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: (state: StepCreationButtonExpandedState, action: ExpandAddStepButtonAction) =>
-    action.payload
+  EXPAND_ADD_STEP_BUTTON: (
+    state: StepCreationButtonExpandedState,
+    {payload}: ActionType<typeof expandAddStepButton>
+  ) =>
+    payload
 }, false)
 
 export type RootState = {
@@ -183,17 +183,18 @@ const rootReducer = combineReducers({
 })
 
 // TODO: Rethink the hard-coded 'steplist' key in Redux root
-const rootSelector = (state: {steplist: RootState}) => state.steplist
+type BaseState = {steplist: RootState}
+const rootSelector = (state: BaseState): RootState => state.steplist
 
 export const selectors = {
   stepCreationButtonExpanded: createSelector(
     rootSelector,
-    state => state.stepCreationButtonExpanded
+    (state: RootState) => state.stepCreationButtonExpanded
   ),
   allSteps: createSelector(
-    state => rootSelector(state).steps,
-    state => rootSelector(state).orderedSteps,
-    state => rootSelector(state).collapsedSteps,
+    (state: BaseState) => rootSelector(state).steps,
+    (state: BaseState) => rootSelector(state).orderedSteps,
+    (state: BaseState) => rootSelector(state).collapsedSteps,
     (steps, orderedSteps, collapsedSteps) => orderedSteps.map(id => ({
       ...steps[id],
       collapsed: collapsedSteps[id]
@@ -201,7 +202,7 @@ export const selectors = {
   ),
   selectedStepId: createSelector(
     rootSelector,
-    state => state.selectedStep
+    (state: RootState) => state.selectedStep
   )
 }
 

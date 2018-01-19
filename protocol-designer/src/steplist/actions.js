@@ -1,4 +1,5 @@
 // @flow
+import {createAction} from 'redux-actions'
 import type {
   // Store as ReduxStore,
   Dispatch as ReduxDispatch
@@ -40,7 +41,7 @@ export const addStep = (payload: NewStepPayload) =>
     stepIdCounter += 1
   }
 
-export type ExpandAddStepButtonAction = {
+type ExpandAddStepButtonAction = {
   type: 'EXPAND_ADD_STEP_BUTTON',
   payload: boolean
 }
@@ -50,8 +51,8 @@ export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction
   payload
 })
 
-// TODO use action creator!!
-export type ToggleStepCollapsedAction = {
+// TODO use action creator instead of manual dispatch elsewhere!!
+type ToggleStepCollapsedAction = {
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: StepIdType
 }
@@ -61,16 +62,5 @@ export const toggleStepCollapsed = (payload: StepIdType): ToggleStepCollapsedAct
   payload
 })
 
-// TODO use action creator!!
-export type SelectStepAction = {
-  type: 'SELECT_STEP',
-  payload: StepIdType
-}
-
-export const selectStep = (payload: StepIdType): SelectStepAction => ({
-  type: 'SELECT_STEP',
-  payload
-})
-
-// TODO VERY SOON export Actions as union of all action types,
-// use Action here and in reducers.js instead of individual types.
+// TODO use action creator instead of manual dispatch elsewhere!!
+export const selectStep = createAction('SELECT_STEP', (stepId: StepIdType) => stepId)
