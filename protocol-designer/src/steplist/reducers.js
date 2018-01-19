@@ -1,8 +1,15 @@
+// @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { createSelector } from 'reselect'
 
-import type {StepType} from './types'
+import type {StepItemData, StepIdType} from './types'
+import type {
+  AddStepAction,
+  ExpandAddStepButtonAction,
+  ToggleStepCollapsedAction,
+  SelectStepAction
+} from './actions'
 
 // TODO move to test
 /*
@@ -107,45 +114,65 @@ const initialSteps = {
 const initialStepOrder = [0, 2, 3, 4, 5]
 */
 
-type AddStepType = {
-  stepType: StepType,
-  id: number
+// Add default title (and later, other default values) to newly-created Step
+export function createDefaultStep (action: AddStepAction) {
+  const {stepType} = action.payload
+  return {...action.payload, title: stepType}
 }
 
-export function createDefaultStep (payload: AddStepType) {
-  const {stepType} = payload
-  return {...payload, title: stepType}
-}
+type StepsState = {[StepIdType]: StepItemData}
 
 const steps = handleActions({
-  ADD_STEP: (state, action) => ({
+  ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
-    [action.payload.id]: createDefaultStep(action.payload)
+    [action.payload.id]: createDefaultStep(action)
   })
 }, {})
 
-// Payload is ID. TODO: type that
+type CollapsedStepsState = {
+  [StepIdType]: boolean
+}
+
 const collapsedSteps = handleActions({
-  ADD_STEP: (state, action) => ({...state, [action.payload]: false}),
-  TOGGLE_STEP_COLLAPSED: (state, action) => ({
+  ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
+    ...state,
+    [action.payload.id]: false
+  }),
+  TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, action: ToggleStepCollapsedAction) => ({
     ...state,
     [action.payload]: !state[action.payload]
   })
 }, {})
 
+type OrderedStepsState = Array<StepIdType>
+
 const orderedSteps = handleActions({
-  ADD_STEP: (state, action) => [...state, action.payload.id]
+  ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
+    [...state, action.payload.id]
 }, [])
 
+type SelectedStepState = null | StepIdType
+
 const selectedStep = handleActions({
-  ADD_STEP: (state, action) => action.payload.id,
-  SELECT_STEP: (state, action) => action.payload
+  ADD_STEP: (state: SelectedStepState, action: AddStepAction) => action.payload.id,
+  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
 }, null)
+
+type StepCreationButtonExpandedState = boolean
 
 const stepCreationButtonExpanded = handleActions({
   ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: (state, action) => action.payload
+  EXPAND_ADD_STEP_BUTTON: (state: StepCreationButtonExpandedState, action: ExpandAddStepButtonAction) =>
+    action.payload
 }, false)
+
+export type RootState = {
+  steps: StepsState,
+  collapsedSteps: CollapsedStepsState,
+  orderedSteps: OrderedStepsState,
+  selectedStep: SelectedStepState,
+  stepCreationButtonExpanded: StepCreationButtonExpandedState
+}
 
 const rootReducer = combineReducers({
   steps,
@@ -155,7 +182,8 @@ const rootReducer = combineReducers({
   stepCreationButtonExpanded
 })
 
-const rootSelector = state => state.steplist // TODO LATER
+// TODO: Rethink the hard-coded 'steplist' key in Redux root
+const rootSelector = (state: {steplist: RootState}) => state.steplist
 
 export const selectors = {
   stepCreationButtonExpanded: createSelector(

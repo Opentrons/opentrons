@@ -11,6 +11,8 @@ export const stepIconsByType = {
 
 export type StepType = $Keys<typeof stepIconsByType>
 
+export type StepIdType = number
+
 export type StepSubItemData = {
   sourceIngredientName?: string,
   destIngredientName?: string,
@@ -19,7 +21,7 @@ export type StepSubItemData = {
 }
 
 export type StepItemData = {
-  id: number,
+  id: StepIdType,
   title: string,
   stepType: StepType,
   substeps: Array<StepSubItemData>,
