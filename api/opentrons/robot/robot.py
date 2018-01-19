@@ -189,6 +189,7 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
         self.modules = []
+        self.fw_version = self._driver.get_fw_version()
 
         # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
@@ -449,6 +450,7 @@ class Robot(object):
         self._driver.connect()
         for module in self.modules:
             module.connect()
+        self.fw_version = self._driver.get_fw_version()
 
         # device = None
         # if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
