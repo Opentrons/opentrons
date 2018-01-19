@@ -5,14 +5,26 @@ const path = require('path')
 // TODO(mc, 2017-12-22): Create common webpack config
 const {rules} = require('@opentrons/webpack-config')
 
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const DEV = process.env.NODE_ENV !== 'production'
+const CSS_OUTPUT_NAME = 'style.css'
+
 module.exports = {
+  styleguideDir: 'dist',
   webpackConfig: {
     module: {
       rules: [
         rules.js,
         rules.localCss
       ]
-    }
+    },
+    plugins: [
+      new ExtractTextPlugin({
+        filename: CSS_OUTPUT_NAME,
+        disable: DEV,
+        ignoreOrder: true
+      })
+    ]
   },
   showUsage: true,
   showCode: true,
@@ -33,6 +45,10 @@ module.exports = {
     {
       name: 'Modals',
       components: 'src/modals/[A-Z]*.js'
+    },
+    {
+      name: 'Deck',
+      components: 'src/deck/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {

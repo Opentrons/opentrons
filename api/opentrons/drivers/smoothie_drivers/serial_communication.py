@@ -1,6 +1,9 @@
 import serial
 from serial.tools import list_ports
 import contextlib
+import logging
+
+log = logging.getLogger(__name__)
 
 DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
@@ -70,11 +73,13 @@ def _write_to_device_and_return(cmd, device_connection):
 
 
 def _connect(port_name, baudrate):
-    return serial.Serial(
+    ser = serial.Serial(
         port=port_name,
         baudrate=baudrate,
         timeout=DEFAULT_SERIAL_TIMEOUT
     )
+    log.debug(ser)
+    return ser
 
 
 def _attempt_command_recovery(command, serial_conn):
@@ -106,4 +111,5 @@ def connect(device_name, baudrate=115200):
     :return: serial.Serial connection
     '''
     smoothie_port = get_ports_by_name(device_name=device_name)[0]
+    log.debug("Device name: {}, Port: {}".format(device_name, smoothie_port))
     return _connect(port_name=smoothie_port, baudrate=baudrate)

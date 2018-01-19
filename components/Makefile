@@ -20,7 +20,7 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
-# stardard targets
+# standard targets
 #####################################################################
 
 .PHONY: install
@@ -30,6 +30,13 @@ install:
 .PHONY: uninstall
 uninstall:
 	rm -rf node_modules
+
+	# artifacts
+	#####################################################################
+
+.PHONY: build
+build:
+	$(env)=production $(bin)/styleguidist build
 
 # development
 #####################################################################
