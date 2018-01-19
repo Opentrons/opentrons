@@ -7,7 +7,7 @@ import type {
 import type {StepType, StepIdType} from './types'
 
 // TODO Ian 2018-01-19 import GenericAction from some "general Redux types" file
-type GenericAction = {
+export type GenericAction = {
   type: string,
   payload?: any,
   meta?: any

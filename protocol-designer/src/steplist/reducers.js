@@ -182,7 +182,7 @@ const rootReducer = combineReducers({
   stepCreationButtonExpanded
 })
 
-// TODO: Rethink the hard-coded 'steplist' key in Redux root
+// TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 type BaseState = {steplist: RootState}
 const rootSelector = (state: BaseState): RootState => state.steplist
 
