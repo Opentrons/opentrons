@@ -148,9 +148,7 @@ class Pipette:
 
         if max_volume:
             warnings.warn(
-                "Pipette 'max_volume' is deprecated; the max volume is "
-                "calculated using the plunger's length and it's uL/mm value",
-                DeprecationWarning
+                "Pipette 'max_volume' is deprecated, use `ul_per_mm`"
             )
 
         self.ul_per_mm = ul_per_mm
