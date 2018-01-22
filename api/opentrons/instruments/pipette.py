@@ -154,10 +154,9 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
 
-        if self.type == 'single':
-            self._pick_up_current = SINGLE_PLUNGE_CURRENT
-        else:
-            self._pick_up_current = MULTI_PLUNGE_CURRENT
+        self._pick_up_current = SINGLE_PLUNGE_CURRENT
+        if self.type == 'multi':
+            self.set_pick_up_current(MULTI_PLUNGE_CURRENT)
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
@@ -1549,6 +1548,23 @@ class Pipette:
         if dispense:
             self.set_speed(
                 dispense=self._ul_to_mm(dispense))
+        return self
+
+    def set_pick_up_current(self, amperes):
+        """
+        Set the current (amperes) the pipette mount's motor will use while
+        picking up a tip.
+
+        Parameters
+        ----------
+        amperes: float (0.0 - 2.0)
+            The amperage of the motor while creating a seal with tips.
+        """
+        if amperes >= 0 and amperes <= 2.0:
+            self._pick_up_current = amperes
+        else:
+            raise ValueError(
+                'Amperes must be a floating point between 0.0 and 2.0')
         return self
 
     def _move(self, pose_tree, x=None, y=None, z=None):
