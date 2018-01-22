@@ -308,6 +308,24 @@ def delay(seconds, minutes):
     )
 
 
+def pause():
+    return make_command(
+        name=types.PAUSE,
+        payload={
+            'text': 'Pausing robot operation'
+        }
+    )
+
+
+def resume():
+    return make_command(
+        name=types.RESUME,
+        payload={
+            'text': 'Resuming robot operation'
+        }
+    )
+
+
 def magbead():
     pass
 

@@ -819,6 +819,7 @@ class Robot(object):
                 )
             )
 
+    @commands.publish.both(command=commands.pause)
     def pause(self):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -831,6 +832,7 @@ class Robot(object):
         """
         self.halt()
 
+    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
