@@ -93,6 +93,35 @@ class ContainerTestCase(unittest.TestCase):
             self.robot, 'trough-12row', slot, share=True)
         self.assertEquals(len(self.robot.get_containers()), 3)
 
+    def test_load_legacy_slot_names(self):
+        slots_old = [
+            'A1', 'B1', 'C1',
+            'A2', 'B2', 'C2',
+            'A3', 'B3', 'C3',
+            'A4', 'B4', 'C4'
+        ]
+        slots_new = [
+            '1', '2', '3',
+            '4', '5', '6',
+            '7', '8', '9',
+            '10', '11', '12'
+        ]
+        import warnings
+        warnings.filterwarnings('ignore')
+
+        def test_slot_name(slot_name, expected_name):
+            self.robot.reset()
+            p = containers_load(self.robot, '96-flat', slot_name)
+            slot_name = p.get_parent().get_name()
+            assert slot_name == expected_name
+
+        for i in range(len(slots_old)):
+            test_slot_name(slots_new[i], slots_new[i])
+            test_slot_name(int(slots_new[i]), slots_new[i])
+            test_slot_name(slots_old[i], slots_new[i])
+
+        warnings.filterwarnings('default')
+
     def test_containers_list(self):
         res = containers_list()
         self.assertTrue(len(res))

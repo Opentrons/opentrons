@@ -14,6 +14,7 @@ from opentrons.containers.placeable import (
     get_container
 )
 from opentrons.containers.calibrator import apply_calibration
+from opentrons.helpers import helpers
 from opentrons.util import environment
 
 __all__ = [
@@ -61,6 +62,7 @@ def load(robot, container_name, slot, label=None, share=False):
             if is_ot_one_slot_name(slot):
                 slot = convert_ot_one_slot_names(slot)
 
+    if helpers.is_number(slot):
         # test that it is within correct range
         if not (1 <= slot <= len(robot.deck)):
             raise ValueError('Unknown slot: {}'.format(slot))
