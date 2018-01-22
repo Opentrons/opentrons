@@ -23,7 +23,7 @@ def test_pos_tracker_persistance(robot):
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, 'trough-12row', 'B2')
+    plate = containers_load(robot, 'trough-12row', '5')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
     assert robot.max_deck_height() == 40.0
 
@@ -38,7 +38,7 @@ def test_calibrated_max_z(robot):
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
     assert robot.max_deck_height() == 10.5
 
@@ -62,12 +62,12 @@ def test_get_serial_ports_list(robot, monkeypatch):
 
 
 def test_add_container(robot):
-    c1 = robot.add_container('96-flat', 'A1')
+    c1 = robot.add_container('96-flat', '1')
     res = robot.get_containers()
     expected = [c1]
     assert res == expected
 
-    c2 = robot.add_container('96-flat', 'A2', 'my-special-plate')
+    c2 = robot.add_container('96-flat', '4', 'my-special-plate')
     res = robot.get_containers()
     expected = [c1, c2]
     assert res == expected
@@ -91,8 +91,8 @@ def test_create_arc(robot):
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, '96-flat', 'A1')
-    plate2 = containers_load(robot, '96-flat', 'B1')
+    plate = containers_load(robot, '96-flat', '1')
+    plate2 = containers_load(robot, '96-flat', '2')
     robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 

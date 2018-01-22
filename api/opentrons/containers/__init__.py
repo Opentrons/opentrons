@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import json
 import os
+import warnings
 
 from opentrons.data_storage import database
 from opentrons.containers.placeable import (
@@ -13,6 +14,7 @@ from opentrons.containers.placeable import (
     get_container
 )
 from opentrons.containers.calibrator import apply_calibration
+from opentrons.helpers import helpers
 from opentrons.util import environment
 
 __all__ = [
@@ -31,13 +33,41 @@ def load(robot, container_name, slot, label=None, share=False):
     Examples
     --------
     >>> from opentrons import containers
-    >>> containers.load('96-flat', 'A1')
-    <Deck>/<Slot A1>/<Container 96-flat>
-    >>> containers.load('96-flat', 'A2', 'plate')
-    <Deck>/<Slot A2>/<Container plate>
-    >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
+    >>> containers.load('96-flat', '1')
+    <Deck>/<Slot 1>/<Container 96-flat>
+    >>> containers.load('96-flat', '4', 'plate')
+    <Deck>/<Slot 4>/<Container plate>
+    >>> containers.load('non-existent-type', '4') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
+
+    # OT-One users specify columns in the A1, B3 fashion
+    # below methods help convert to the 1, 2, etc integer names
+    def is_ot_one_slot_name(s):
+        return isinstance(s, str) and len(s) is 2 and s[0] in 'ABCD'
+
+    def convert_ot_one_slot_names(s):
+        col = 'ABCD'.index(slot[0])
+        row = int(slot[1]) - 1
+        slot_number = col + (row * robot.get_max_robot_cols()) + 1
+        warnings.warn('Changing deprecated slot name "{}" to "{}"'.format(
+            slot, slot_number))
+        return slot_number
+
+    if isinstance(slot, str):
+        # convert to integer
+        try:
+            slot = int(slot)
+        except (ValueError, TypeError):
+            if is_ot_one_slot_name(slot):
+                slot = convert_ot_one_slot_names(slot)
+
+    if helpers.is_number(slot):
+        # test that it is within correct range
+        if not (1 <= slot <= len(robot.deck)):
+            raise ValueError('Unknown slot: {}'.format(slot))
+        slot = str(slot)
+
     return robot.add_container(container_name, slot, label, share)
 
 

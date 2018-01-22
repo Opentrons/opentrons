@@ -287,9 +287,9 @@ describe('api client', () => {
       }))
 
       session.containers = [
-        {_id: 1, slot: 'A1', name: 'a', type: 'tiprack'},
-        {_id: 2, slot: 'B2', name: 'b', type: 'B'},
-        {_id: 3, slot: 'C3', name: 'c', type: 'C'}
+        {_id: 1, slot: '1', name: 'a', type: 'tiprack'},
+        {_id: 2, slot: '5', name: 'b', type: 'B'},
+        {_id: 3, slot: '9', name: 'c', type: 'C'}
       ]
 
       return sendConnect()

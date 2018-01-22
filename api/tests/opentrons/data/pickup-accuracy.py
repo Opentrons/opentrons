@@ -7,7 +7,7 @@ from opentrons import containers, instruments
 
 tipracks = [
     containers.load('tiprack-200ul', slot)
-    for slot in ('A4', 'C1')]
+    for slot in ('10', '3')]
 
 single = instruments.Pipette(
     mount='right',
