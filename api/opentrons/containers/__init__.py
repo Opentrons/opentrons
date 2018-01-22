@@ -32,27 +32,38 @@ def load(robot, container_name, slot, label=None, share=False):
     Examples
     --------
     >>> from opentrons import containers
-    >>> containers.load('96-flat', 'A1')
-    <Deck>/<Slot A1>/<Container 96-flat>
-    >>> containers.load('96-flat', 'A2', 'plate')
-    <Deck>/<Slot A2>/<Container plate>
-    >>> containers.load('non-existent-type', 'A2') # doctest: +ELLIPSIS
+    >>> containers.load('96-flat', '1')
+    <Deck>/<Slot 1>/<Container 96-flat>
+    >>> containers.load('96-flat', '4', 'plate')
+    <Deck>/<Slot 4>/<Container plate>
+    >>> containers.load('non-existent-type', '4') # doctest: +ELLIPSIS
     Exception: Container type "non-existent-type" not found in file ...
     """
 
     # OT-One users specify columns in the A1, B3 fashion
-    # below checks for this naming scheme, and converts to the 1, 2, etc names
-    columns_lookup = {'A': 0, 'B': 1, 'C': 2}
-    if isinstance(slot, str) and slot[0] in columns_lookup:
-        col = columns_lookup[slot[0]]
+    # below methods help convert to the 1, 2, etc integer names
+    def is_ot_one_slot_name(s):
+        return isinstance(s, str) and len(s) is 2 and s[0] in 'ABCD'
+
+    def convert_ot_one_slot_names(s):
+        col = 'ABCD'.index(slot[0])
         row = int(slot[1]) - 1
-        index = col + (row * robot.get_max_robot_cols())
-        _s = slot
-        slot = str(index + 1)
-        msg = 'Slot name is "{0}", format "{1}" is deprecated'.format(slot, _s)
-        warnings.warn(msg)
-    elif isinstance(slot, (int, float, complex)):
-        # if user pass in slot name as number (eg: 3 instead of '3')
+        slot_number = col + (row * robot.get_max_robot_cols()) + 1
+        warnings.warn('Changing deprecated slot name "{}" to "{}"'.format(
+            slot, slot_number))
+        return slot_number
+
+    if isinstance(slot, str):
+        # convert to integer
+        try:
+            slot = int(slot)
+        except (ValueError, TypeError):
+            if is_ot_one_slot_name(slot):
+                slot = convert_ot_one_slot_names(slot)
+
+        # test that it is within correct range
+        if not (1 <= slot <= len(robot.deck)):
+            raise ValueError('Unknown slot: {}'.format(slot))
         slot = str(slot)
 
     return robot.add_container(container_name, slot, label, share)
