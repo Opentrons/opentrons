@@ -1,5 +1,4 @@
 /* tooltip styles */
-@value grey from './App.global.css';
 
 .parent {
   position: relative;

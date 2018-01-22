@@ -1,8 +1,5 @@
 @import '..';
 
-@value color_bg_light, color_bg_selected, color_blue, color_light_grey, color_med_grey from '../styles/colors.css';
-@value color_font_dark, color_font_disabled, font_size_body_2, font_size_body_1 from '../styles/typography.css';
-
 .titled_list {
   list-style-type: none;
   margin: 1rem;
@@ -13,10 +10,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  color: color_font_dark;
+  color: var(--c-font-dark);
   text-decoration: none;
-  font-size: font_size_body_2;
-  background-color: color_bg_light;
+  font-size: var(--fs-body-2);
+  background-color: var(--c-bg-light);
   height: 3rem;
   padding-left: 0.5rem;
 }
@@ -31,7 +28,7 @@
 }
 
 div.list_selected {
-  border: 2px solid color_blue;
+  border: 2px solid var(--c-blue);
 }
 
 .accordion_carat {
@@ -47,23 +44,23 @@ div.list_selected {
 /* List Items */
 .titled_list li {
   margin: 0;
-  border-bottom: 2px solid color_light_grey;
+  border-bottom: 2px solid var(--c-light-gray);
 }
 
 .titled_list a {
   width: 100%;
   display: block;
   height: 3rem;
-  background-color: color_bg_light;
-  font-size: font_size_body_1;
-  color: color_font_dark;
+  background-color: var(--c-bg-light);
+  font-size: var(--fs-body-1);
+  color: var(--c-font-dark);
   line-height: 3rem;
   padding: 0 0.5rem;
 }
 
 a:hover,
 a.active {
-  background-color: color_bg_selected;
+  background-color: var(--c-bg-selected);
 }
 
 a[disabled] {
@@ -91,8 +88,8 @@ a[disabled] {
 .titled_list li.alert {
   width: 100%;
   padding: 0.5rem 1rem;
-  background-color: color_bg_light;
-  font-size: font_size_body_1;
+  background-color: var(--c-bg-light);
+  font-size: var(--fs-body-1);
   line-height: 1rem;
   font-style: italic;
 }

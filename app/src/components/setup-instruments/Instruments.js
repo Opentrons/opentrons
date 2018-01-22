@@ -9,7 +9,9 @@ export default connect(mapStateToProps, null, mergeProps)(InstrumentGroup)
 
 function mapStateToProps (state, ownProps) {
   const instruments = robotSelectors.getInstruments(state)
-  const currentInstrument = instruments.find((inst) => inst.axis === ownProps.mount)
+  const currentInstrument = instruments.find((inst) => (
+    inst.mount && inst.mount === ownProps.mount
+  ))
 
   return {
     currentInstrument,
@@ -20,7 +22,7 @@ function mapStateToProps (state, ownProps) {
 function mergeProps (stateProps) {
   const instruments = stateProps.instruments.map(inst => {
     const isUsed = inst.name != null
-    const isDisabled = inst.axis !== stateProps.currentInstrument.axis
+    const isDisabled = inst.mount !== stateProps.currentInstrument.mount
     const description = isUsed
       ? `${capitalize(inst.channels)}-channel (${inst.volume} ul)`
       : 'N/A'

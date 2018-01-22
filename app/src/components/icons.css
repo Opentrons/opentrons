@@ -1,5 +1,5 @@
 /* styles for icon components */
-@value red, green from './App.global.css';
+@import '@opentrons/components';
 
 .circle {
   display: inline-block;
@@ -13,7 +13,7 @@
 }
 
 .success {
-  background-color: green;
+  background-color: var(--c-green);
   color: white;
 }
 
@@ -22,6 +22,6 @@
 }
 
 .warning {
-  background-color: red;
+  background-color: var(--c-red);
   color: white;
 }

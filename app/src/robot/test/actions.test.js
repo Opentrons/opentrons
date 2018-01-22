@@ -160,11 +160,11 @@ describe('robot actions', () => {
   test('pick up tip and home action', () => {
     const action = {
       type: actionTypes.PICKUP_AND_HOME,
-      payload: {instrument: 'left', labware: 5},
+      payload: {instrument: 'left', labware: '5'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.pickupAndHome('left', 5)).toEqual(action)
+    expect(actions.pickupAndHome('left', '5')).toEqual(action)
   })
 
   test('pick up tip and home response action', () => {
@@ -185,11 +185,11 @@ describe('robot actions', () => {
   test('drop tip and home action', () => {
     const action = {
       type: actionTypes.DROP_TIP_AND_HOME,
-      payload: {instrument: 'right', labware: 5},
+      payload: {instrument: 'right', labware: '5'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.dropTipAndHome('right', 5)).toEqual(action)
+    expect(actions.dropTipAndHome('right', '5')).toEqual(action)
   })
 
   test('drop tip and home response action', () => {
@@ -211,11 +211,11 @@ describe('robot actions', () => {
   test('confirm tiprack action', () => {
     const action = {
       type: actionTypes.CONFIRM_TIPRACK,
-      payload: {instrument: 'left', labware: 9},
+      payload: {instrument: 'left', labware: '9'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.confirmTiprack('left', 9)).toEqual(action)
+    expect(actions.confirmTiprack('left', '9')).toEqual(action)
   })
 
   test('confirm tiprack response action', () => {
@@ -271,11 +271,11 @@ describe('robot actions', () => {
   test('move to action', () => {
     const expected = {
       type: actionTypes.MOVE_TO,
-      payload: {instrument: 'left', labware: 3},
+      payload: {instrument: 'left', labware: '3'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.moveTo('left', 3)).toEqual(expected)
+    expect(actions.moveTo('left', '3')).toEqual(expected)
   })
 
   test('move to response action', () => {
@@ -327,11 +327,11 @@ describe('robot actions', () => {
   test('update offset action', () => {
     const expected = {
       type: actionTypes.UPDATE_OFFSET,
-      payload: {instrument: 'left', labware: 2},
+      payload: {instrument: 'left', labware: '2'},
       meta: {robotCommand: true}
     }
 
-    expect(actions.updateOffset('left', 2)).toEqual(expected)
+    expect(actions.updateOffset('left', '2')).toEqual(expected)
   })
 
   test('update offset response action', () => {
@@ -353,10 +353,10 @@ describe('robot actions', () => {
   test('confirm labware action', () => {
     const expected = {
       type: actionTypes.CONFIRM_LABWARE,
-      payload: {labware: 2}
+      payload: {labware: '2'}
     }
 
-    expect(actions.confirmLabware(2)).toEqual(expected)
+    expect(actions.confirmLabware('2')).toEqual(expected)
   })
 
   test('run action', () => {

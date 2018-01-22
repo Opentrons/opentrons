@@ -1,6 +1,3 @@
-@value colors: '../colors.css';
-@value blue, lightGrey, medGrey, plateBg from colors;
-
 .well {
   stroke-width: 0.4;
   stroke: black;

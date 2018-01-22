@@ -169,7 +169,7 @@ class Robot(object):
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
-    >>> p200 = instruments.Pipette(axis='b', max_volume=200)
+    >>> p200 = instruments.Pipette(axis='b')
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
@@ -819,6 +819,7 @@ class Robot(object):
                 )
             )
 
+    @commands.publish.both(command=commands.pause)
     def pause(self):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -831,6 +832,7 @@ class Robot(object):
         """
         self.halt()
 
+    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`

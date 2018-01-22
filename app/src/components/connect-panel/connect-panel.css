@@ -1,8 +1,5 @@
 @import '@opentrons/components';
 
-@value blue, grey '../App.global.css';
-@value border: 2px solid #e5e2e2;
-
 .robot_list {
   list-style: none;
   margin-left: 0;

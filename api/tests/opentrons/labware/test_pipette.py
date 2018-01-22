@@ -39,8 +39,7 @@ def test_aspirate_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -89,8 +88,7 @@ def test_dispense_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack],
-                   max_volume=200)
+                   tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', 'A1')
@@ -127,7 +125,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1,
@@ -167,19 +164,12 @@ class PipetteTest(unittest.TestCase):
             RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
     def test_set_max_volume(self):
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 200)
-
-        self.p200.reset()
-        self.p200.pick_up_tip()
-        self.p200.set_max_volume(202)
-        self.p200.aspirate()
-        self.assertEquals(self.p200.current_volume, 202)
-
-        self.assertRaises(RuntimeError, self.p200.set_max_volume, 9)
+        import warnings
+        warnings.filterwarnings('error')
+        self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, mount='left', max_volume=200)
+        warnings.filterwarnings('default')
 
     # TODO: (artyom, 20171101): bring back once plunger position is being tracked
     # def test_calibrate_by_position_name(self):
@@ -407,6 +397,18 @@ class PipetteTest(unittest.TestCase):
 
         self.p200.set_speed(dispense=100)
         self.assertEqual(self.p200.speeds['dispense'], 100)
+
+    def test_set_flow_rate(self):
+        ul_per_mm = 20
+        self.p200 = Pipette(self.robot, mount='left', ul_per_mm=ul_per_mm)
+
+        self.p200.set_flow_rate(aspirate=100)
+        expected_mm_per_sec = 100 / ul_per_mm
+        self.assertEqual(self.p200.speeds['aspirate'], expected_mm_per_sec)
+
+        self.p200.set_flow_rate(dispense=200)
+        expected_mm_per_sec = 200 / ul_per_mm
+        self.assertEqual(self.p200.speeds['dispense'], expected_mm_per_sec)
 
     def test_distribute(self):
         self.p200.reset()
@@ -1511,7 +1513,6 @@ class PipetteTest(unittest.TestCase):
 
         self.p200 = Pipette(
             self.robot,
-            max_volume=200,
             mount='right',
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
@@ -1566,7 +1567,6 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='right',
             channels=8

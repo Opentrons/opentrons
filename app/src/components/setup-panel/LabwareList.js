@@ -26,6 +26,7 @@ function LabwareList (props) {
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack, setLabware} = lab
+    // TODO(mc, 2018-01-19): remove all these extra props (see LabwareListItem)
     const links = (
       <LabwareListItem
         {...lab}

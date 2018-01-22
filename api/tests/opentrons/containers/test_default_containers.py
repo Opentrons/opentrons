@@ -15,7 +15,6 @@ def test_new_containers(robot):
         robot,
         mount='right',
         tip_racks=[tip_rack],
-        max_volume=1000,
         name='test-pipette'
     )
 
@@ -28,7 +27,7 @@ def test_new_containers(robot):
 
 def test_fixed_trash(robot, dummy_db):
     p200 = pipette.Pipette(
-        robot, mount='right', max_volume=1000, name='test-pipette'
+        robot, mount='right', name='test-pipette'
     )
     trash = containers_load(robot, 'fixed-trash', 'C4')
     p200.move_to(trash[0])

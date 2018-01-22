@@ -15,7 +15,6 @@ m50 = instruments.Pipette(
     name="p200",
     trash_container=trash,
     tip_racks=[tiprack, tiprack2],
-    max_volume=50,
     mount="left",
     channels=8
 )
@@ -24,7 +23,6 @@ p200 = instruments.Pipette(
     name="p200S",
     trash_container=trash,
     tip_racks=[tiprack],
-    max_volume=300,
     mount="right"
 )
 

@@ -71,7 +71,6 @@ class GridTestCase(unittest.TestCase):
             self.robot,
             trash_container=trash,
             tip_racks=[tiprack],
-            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1

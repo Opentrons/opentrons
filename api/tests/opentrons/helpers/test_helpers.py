@@ -12,7 +12,7 @@ class HelpersTest(unittest.TestCase):
         # TODO(Ahmed): Why does this test setup a plate, robot, container
         # when it doesnt use them in any test cases?
         self.robot = Robot()
-        self.p200 = pipette.Pipette(self.robot, mount='left', max_volume=200)
+        self.p200 = pipette.Pipette(self.robot, mount='left')
         self.plate = containers_load(self.robot, '96-flat', 'C1')
 
     def test_break_down_travel(self):

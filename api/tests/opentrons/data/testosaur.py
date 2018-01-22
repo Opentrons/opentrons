@@ -7,8 +7,7 @@ p200 = instruments.Pipette(
     name="p200",
     mount="right",
     tip_racks=[p200rack],
-    min_volume=20,
-    max_volume=200
+    min_volume=20
 )
 
 p200.pick_up_tip()
