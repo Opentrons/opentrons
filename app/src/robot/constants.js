@@ -33,18 +33,13 @@ export type SessionStatus =
   | 'stopped'
 
 // tip probe calibration states
+// TODO(mc, 2018-01-22): remove constant exports in favor of flowtype
+//   see types.js
 export const UNPROBED = 'unprobed'
 export const PREPARING_TO_PROBE = 'preparing-to-probe'
 export const READY_TO_PROBE = 'ready-to-probe'
 export const PROBING = 'probing'
 export const PROBED = 'probed'
-export const INSTRUMENT_CALIBRATION_TYPE = PropTypes.oneOf([
-  UNPROBED,
-  PREPARING_TO_PROBE,
-  READY_TO_PROBE,
-  PROBING,
-  PROBED
-])
 
 // labware confirmation states
 // TODO(mc, 2018-01-11): remove constant exports in favor of types.js

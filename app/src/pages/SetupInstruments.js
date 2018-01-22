@@ -2,7 +2,7 @@
 import React from 'react'
 
 import Page from '../components/Page'
-import ConnectedTipProbe from '../containers/ConnectedTipProbe'
+import TipProbe from '../components/TipProbe'
 import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
 import SessionHeader from '../containers/SessionHeader'
@@ -18,7 +18,7 @@ export default function SetupInstrumentsPage (props) {
       <SessionHeader subtitle={PAGE_TITLE} />
       <InstrumentTabs mount={mount} />
       <Instruments mount={mount} />
-      <ConnectedTipProbe mount={mount} />
+      <TipProbe mount={mount} />
     </Page>
   )
 }
