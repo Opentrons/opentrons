@@ -76,3 +76,30 @@
     padding-right: 1.5rem;
   }
 }
+
+.dropdown_field {
+  position: relative;
+
+  & select {
+    border: 0;
+    padding: 0.25rem 1rem;
+    outline: none;
+    border-radius: 3px;
+    color: var(--c-dark-gray);
+    background-color: var(--c-light-gray);
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    appearance: none;
+    overflow: hidden;
+  }
+
+  & .dropdown_icon {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.25rem;
+    width: 1.25rem;
+    color: var(--c-dark-gray);
+    pointer-events: none;
+  }
+}

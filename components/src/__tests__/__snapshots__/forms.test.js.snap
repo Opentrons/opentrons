@@ -76,6 +76,54 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
 </label>
 `;
 
+exports[`DropdownField renders correctly 1`] = `
+<div
+  className="dropdown_field"
+>
+  <select
+    className="dropdown"
+    onChange={undefined}
+    value="rna"
+  >
+    <option
+      value="dna"
+    >
+      DNA
+    </option>
+    <option
+      value="rna"
+    >
+      RNA
+    </option>
+    <option
+      value="protein"
+    >
+      Protein
+    </option>
+  </select>
+  <div
+    className="dropdown_icon"
+  >
+    <svg
+      aria-hidden="true"
+      className=""
+      fill="currentColor"
+      height={undefined}
+      version="1.1"
+      viewBox="0 0 24 24"
+      width="100%"
+      x={undefined}
+      y={undefined}
+    >
+      <path
+        d="M7,10L12,15L17,10H7Z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+</div>
+`;
+
 exports[`InputField renders correctly 1`] = `
 <label
   className="form_field"

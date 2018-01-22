@@ -4,6 +4,7 @@ import Renderer from 'react-test-renderer'
 
 import {
   CheckboxField,
+  DropdownField,
   InputField,
   RadioGroup
 } from '..'
@@ -26,6 +27,24 @@ describe('CheckboxField', () => {
         label='Check Box 1'
         className='foo'
         checked
+      />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('DropdownField', () => {
+  test('renders correctly', () => {
+    const tree = Renderer.create(
+      <DropdownField
+        className='foo'
+        value={'rna'}
+        options={[
+          {name: 'DNA', value: 'dna'},
+          {name: 'RNA', value: 'rna'},
+          {name: 'Protein', value: 'protein'}
+        ]}
       />
     ).toJSON()
 
