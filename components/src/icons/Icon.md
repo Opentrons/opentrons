@@ -6,7 +6,7 @@ const {
   ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
   CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX,
   CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT,
-  CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT
+  CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT, MENU_DOWN
 } = require('./icon-data')
 
 ;<div>
@@ -36,6 +36,7 @@ const {
   <Icon width='64px' name={MIX} />
   <Icon width='64px' name={PAUSE} />
   <Icon width='64px' name={ARROW_RIGHT} />
+  <Icon width='64px' name={MENU_DOWN} />
 </div>
 ```
 

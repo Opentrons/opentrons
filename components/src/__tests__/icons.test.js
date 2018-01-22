@@ -14,6 +14,10 @@ import {
   FLASK,
   CHECKED,
   UNCHECKED,
+  CHECKED_RADIO,
+  UNCHECKED_RADIO,
+  CHECKED_BOX,
+  UNCHECKED_BOX,
   CHEVRON_UP,
   CHEVRON_DOWN,
   CHEVRON_LEFT,
@@ -25,7 +29,8 @@ import {
   DISTRIBUTE,
   MIX,
   PAUSE,
-  ARROW_RIGHT
+  ARROW_RIGHT,
+  MENU_DOWN
 } from '..'
 
 describe('icons', () => {
@@ -112,6 +117,38 @@ describe('icons', () => {
   test('UNCHECKED icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={UNCHECKED} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('CHECKED_RADIO icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CHECKED_RADIO} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('UNCHECKED_RADIO icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={UNCHECKED_RADIO} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('CHECKED_BOX icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CHECKED_BOX} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('UNCHECKED_BOX icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={UNCHECKED_BOX} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -208,6 +245,14 @@ describe('icons', () => {
   test('CONSOLIDATE icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={CONSOLIDATE} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('MENU_DOWN icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={MENU_DOWN} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

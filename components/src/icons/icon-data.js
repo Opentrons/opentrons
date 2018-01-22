@@ -28,6 +28,7 @@ export const DISTRIBUTE = 'distribute'
 export const MIX = 'mix'
 export const PAUSE = 'pause'
 export const ARROW_RIGHT = 'arrow right'
+export const MENU_DOWN = 'menu down'
 
 // icon data
 const ICON_DATA_BY_NAME = {
@@ -134,6 +135,10 @@ const ICON_DATA_BY_NAME = {
   [ARROW_RIGHT]: {
     viewBox: '0 0 24 24',
     path: 'M0 10.8h15.5V8l8.5 5-8.5 4.9v-2.8H0z'
+  },
+  [MENU_DOWN]: {
+    viewBox: '0 0 24 24',
+    path: 'M7,10L12,15L17,10H7Z'
   }
 }
 
