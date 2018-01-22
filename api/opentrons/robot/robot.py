@@ -684,17 +684,15 @@ class Robot(object):
     def get_slot_offsets(self):
         """
         col_offset
-        - from bottom left corner of A to bottom corner of B
+        - from bottom left corner of 1 to bottom corner of 2
 
         row_offset
-        - from bottom left corner of 1 to bottom corner of 2
+        - from bottom left corner of 1 to bottom corner of 4
 
         TODO: figure out actual X and Y offsets (from origin)
         """
         SLOT_OFFSETS = {
             'slots': {
-                'x_offset': 0,
-                'y_offset': 0,
                 'col_offset': 132.50,
                 'row_offset': 90.5
             }
@@ -702,20 +700,23 @@ class Robot(object):
         slot_settings = SLOT_OFFSETS.get(self.get_deck_slot_types())
         row_offset = slot_settings.get('row_offset')
         col_offset = slot_settings.get('col_offset')
-        x_offset = slot_settings.get('x_offset')
-        y_offset = slot_settings.get('y_offset')
-        return (row_offset, col_offset, x_offset, y_offset)
+        return (row_offset, col_offset)
 
     def get_max_robot_rows(self):
         # TODO: dynamically figure out robot rows
         return 4
 
-    def add_slots_to_deck(self):
-        robot_rows = self.get_max_robot_rows()
-        row_offset, col_offset, x_offset, y_offset = self.get_slot_offsets()
+    def get_max_robot_cols(self):
+        # TODO: dynamically figure out robot cols
+        return 3
 
-        for col_index, col in enumerate('ABC'):
-            for row_index, row in enumerate(range(1, robot_rows + 1)):
+    def add_slots_to_deck(self):
+        row_offset, col_offset = self.get_slot_offsets()
+        row_count = self.get_max_robot_rows()
+        col_count = self.get_max_robot_cols()
+
+        for row_index in range(row_count):
+            for col_index in range(col_count):
                 properties = {
                     'width': col_offset,
                     'length': row_offset,
@@ -723,11 +724,12 @@ class Robot(object):
                 }
                 slot = containers.Slot(properties=properties)
                 slot_coordinates = (
-                    (col_offset * col_index) + x_offset,
-                    (row_offset * row_index) + y_offset,
-                    0  # TODO: should z always be zero?
+                    (col_offset * col_index),
+                    (row_offset * row_index),
+                    0
                 )
-                slot_name = "{}{}".format(col, row)
+                slot_index = col_index + (row_index * col_count)
+                slot_name = str(slot_index + 1)
                 self._deck.add(slot, slot_name, slot_coordinates)
 
     def setup_deck(self):

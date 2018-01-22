@@ -3,13 +3,13 @@ from opentrons import containers, instruments
 # containers.robot.connect()
 # containers.robot.home()
 
-tiprack = containers.load('tiprack-200ul', 'C3')
-tiprack2 = containers.load('tiprack-200ul', 'B4')
+tiprack = containers.load('tiprack-200ul', '9')
+tiprack2 = containers.load('tiprack-200ul', '11')
 trash = containers.load('trash-box', 'C4')
 
-trough = containers.load('trough-12row', 'B2')
-plate = containers.load('96-PCR-flat', 'A1')
-tuberack = containers.load('tube-rack-2ml', 'A2')
+trough = containers.load('trough-12row', '5')
+plate = containers.load('96-PCR-flat', '1')
+tuberack = containers.load('tube-rack-2ml', '4')
 
 m50 = instruments.Pipette(
     name="p200",

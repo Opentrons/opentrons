@@ -1,8 +1,8 @@
 from opentrons import containers, instruments
 
-tiprack = containers.load('tiprack-200ul', 'B3')
-trash = containers.load('trash-box', 'C4')
-plate = containers.load('96-PCR-flat', 'B2')
+tiprack = containers.load('tiprack-200ul', '8')
+trash = containers.load('trash-box', '12')
+plate = containers.load('96-PCR-flat', '5')
 
 pipette = instruments.Pipette(
     name="p200",

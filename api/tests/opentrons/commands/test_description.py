@@ -8,8 +8,8 @@ def containers():
     from opentrons import containers
     robot.reset()
     return {
-        '1': containers.load('96-flat', 'A1'),
-        '11': containers.load('96-flat', 'B4')
+        '1': containers.load('96-flat', '1'),
+        '11': containers.load('96-flat', '11')
     }
 
 

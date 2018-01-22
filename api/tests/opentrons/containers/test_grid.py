@@ -8,7 +8,7 @@ from opentrons import Robot
 class GridTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
-        self.plate = load(self.robot, '96-flat', 'A2')
+        self.plate = load(self.robot, '96-flat', '4')
 
     def tearDown(self):
         del self.robot
@@ -42,28 +42,28 @@ class GridTestCase(unittest.TestCase):
         plate = load(
             self.robot,
             '96-flat',
-            'B1',
+            '2',
             'plate'
         )
 
         tiprack = load(
             self.robot,
             'tiprack-200ul',  # container type from library
-            'A1',             # slot on deck
+            '1',             # slot on deck
             'tiprack'         # calibration reference for 1.2 compatibility
         )
 
         trough = load(
             self.robot,
             'trough-12row',
-            'B2',
+            '5',
             'trough'
         )
 
         trash = load(
             self.robot,
             'point',
-            'C1',
+            '3',
             'trash'
         )
 

@@ -1,9 +1,9 @@
 from opentrons import containers, instruments
 
-tiprack = containers.load('tiprack-200ul', 'B3')
-trough = containers.load('trough-12row', 'C3')
-trash = containers.load('trash-box', 'C4')
-plate = containers.load('96-flat', 'B2')
+tiprack = containers.load('tiprack-200ul', '8')
+trough = containers.load('trough-12row', '9')
+trash = containers.load('trash-box', '12')
+plate = containers.load('96-flat', '5')
 
 multi = instruments.Pipette(
     mount='left',
