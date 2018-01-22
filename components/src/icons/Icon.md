@@ -3,7 +3,8 @@ All available icons:
 ```js
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
-  ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED, CHECKED_BOX, UNCHECKED_BOX,
+  ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
+  CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX,
   CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT,
   CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT
 } = require('./icon-data')
@@ -19,6 +20,8 @@ const {
   <Icon width='64px' name={FLASK} />
   <Icon width='64px' name={CHECKED} />
   <Icon width='64px' name={UNCHECKED} />
+  <Icon width='64px' name={CHECKED_RADIO} />
+  <Icon width='64px' name={UNCHECKED_RADIO} />
   <Icon width='64px' name={CHECKED_BOX} />
   <Icon width='64px' name={UNCHECKED_BOX} />
   <Icon width='64px' name={CHEVRON_UP} />

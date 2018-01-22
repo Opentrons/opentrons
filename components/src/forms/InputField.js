@@ -4,7 +4,7 @@ import cx from 'classnames'
 // import globalStyles from '../styles/index.css'
 import styles from './forms.css'
 
-type InputFieldProps = {
+type Props = {
   /* change handler */
   onChange: (event: SyntheticEvent<>) => void,
   /* classes to apply */
@@ -19,7 +19,7 @@ type InputFieldProps = {
   value?: string
 }
 
-export default function (props: InputFieldProps) {
+export default function InputField (props: Props) {
   return (
     <label className={cx(styles.form_field, props.className)}>
       <div className={styles.label_text}>{props.label}</div>

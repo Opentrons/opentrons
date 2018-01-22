@@ -20,7 +20,7 @@
 
 .label_text {
   flex: 0 0 auto;
-  padding: 0 1rem;
+  padding: 0 0.5rem;
 
   &:empty {
     padding: 0;
@@ -64,5 +64,13 @@
     flex: 1 0;
     font-weight: var(--fw-semibold);
     text-align: right;
+  }
+}
+
+.inline {
+  display: flex;
+
+  & .label_text {
+    padding-right: 1.5rem;
   }
 }

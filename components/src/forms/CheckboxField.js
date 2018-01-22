@@ -5,21 +5,25 @@ import {Icon} from '../icons'
 
 import styles from './forms.css'
 
-type CheckboxFieldProps = {
+type Props = {
+  /* change handler */
+  onChange: (event: SyntheticEvent<>) => void,
   /* checkbox is checked */
   checked?: boolean,
   /* classes to apply */
   className?: string,
   /* label text for checkbox */
-  label?: string,
-  /* change handler */
-  onChange: (event: SyntheticEvent<>) => void
+  label?: string
 }
 
-export default function (props: CheckboxFieldProps) {
+export default function CheckboxField (props: Props) {
   return (
     <label className={cx(styles.form_field, props.className)}>
-      <Icon className={styles.checkbox_icon} name={props.checked ? 'checked box' : 'unchecked box'} width='1.25rem' />
+      <Icon
+        className={styles.checkbox_icon}
+        name={props.checked ? 'checked box' : 'unchecked box'}
+        width='1.25rem'
+      />
       <input
         className={cx(styles.input_field, styles.accessibly_hidden)}
         type='checkbox'

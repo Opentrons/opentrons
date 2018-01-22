@@ -1,3 +1,10 @@
 // @flow
-export CheckboxField from './CheckboxField'
-export InputField from './InputField'
+import CheckboxField from './CheckboxField'
+import InputField from './InputField'
+import RadioGroup from './RadioGroup'
+
+export {
+  CheckboxField,
+  InputField,
+  RadioGroup
+}
