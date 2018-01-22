@@ -1,0 +1,68 @@
+@import '../index.css';
+
+.accessibly_hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+.form_field {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+}
+
+.label_text {
+  flex: 0 0 auto;
+  padding: 0 1rem;
+
+  &:empty {
+    padding: 0;
+  }
+}
+
+.checkbox_icon {
+  fill: var(--c-med-gray);
+}
+
+.input_field {
+  display: flex;
+  flex: 1 1;
+  background-color: var(--c-light-gray);
+  border-radius: 3px;
+  padding: 0.25rem 1rem;
+
+  & input {
+    background-color: inherit;
+    border-radius: inherit;
+    border: none;
+    flex: 1 1 auto;
+    color: inherit;
+  }
+
+  & input:focus {
+    outline: none;
+    color: inherit;
+  }
+
+  & input::placeholder {
+    color: var(--c-med-gray);
+  }
+
+  &:focus-within {
+    border: 2px solid var(--c-med-gray);
+  }
+
+  & .suffix {
+    display: inline-block;
+    flex: 1 0;
+    font-weight: var(--fw-semibold);
+    text-align: right;
+  }
+}
