@@ -19,11 +19,9 @@ type Props = {
 export default function CheckboxField (props: Props) {
   return (
     <label className={cx(styles.form_field, props.className)}>
-      <Icon
-        className={styles.checkbox_icon}
-        name={props.checked ? 'checked box' : 'unchecked box'}
-        width='1.25rem'
-      />
+      <div className={styles.checkbox_icon}>
+        <Icon name={props.checked ? 'checked box' : 'unchecked box'} width='100%' />
+      </div>
       <input
         className={cx(styles.input_field, styles.accessibly_hidden)}
         type='checkbox'

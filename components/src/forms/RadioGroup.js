@@ -26,11 +26,12 @@ export default function RadioGroup (props: Props) {
     <div className={cx({[styles.inline]: props.inline})}>
       {props.options && props.options.map(radio =>
         <label key={radio.value} className={cx(styles.form_field, props.className)}>
-          <Icon
-            className={styles.checkbox_icon}
-            name={radio.value === props.checkedValue ? 'checked radio' : 'unchecked radio'}
-            width='1.25rem'
-          />
+          <div className={styles.checkbox_icon}>
+            <Icon
+              name={radio.value === props.checkedValue ? 'checked radio' : 'unchecked radio'}
+              width='100%'
+            />
+          </div>
 
           <input
             className={cx(styles.input_field, styles.accessibly_hidden)}
