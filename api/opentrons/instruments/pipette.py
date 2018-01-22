@@ -187,7 +187,7 @@ class Pipette:
             iterables = self.tip_racks
 
             if self.channels > 1:
-                iterables = [r for rack in self.tip_racks for r in rack.rows]
+                iterables = [c for rack in self.tip_racks for c in rack.cols]
             else:
                 iterables = [w for rack in self.tip_racks for w in rack]
 

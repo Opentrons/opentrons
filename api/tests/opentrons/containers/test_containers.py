@@ -29,8 +29,8 @@ def test_containers_create(robot):
 
     p = containers_load(robot, container_name, '1')
     assert len(p) == 96
-    assert len(p.rows) == 12
-    assert len(p.cols) == 8
+    assert len(p.cols) == 12
+    assert len(p.rows) == 8
     assert p.get_parent() == robot.deck['1']
     assert p['C3'] == p[18]
     assert p['C3'].max_volume() == 1000

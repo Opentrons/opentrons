@@ -1226,8 +1226,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 8
         self.p200.transfer(
             200,
-            self.plate.rows[0],
-            self.plate.rows[1],
+            self.plate.cols[0],
+            self.plate.cols[1],
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1250,8 +1250,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 1
         self.p200.transfer(
             200,
-            self.plate.rows('1', '2'),
-            self.plate.rows('3'),
+            self.plate.cols('1', '2'),
+            self.plate.cols('3'),
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1582,9 +1582,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack1.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack1.cols[i]))
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack2.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack2.cols[i]))
 
         # print('Mock calls')
         # pprint(p200_multi.move_to.mock_calls)

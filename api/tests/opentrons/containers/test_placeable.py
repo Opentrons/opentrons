@@ -102,7 +102,7 @@ class PlaceableTestCase(unittest.TestCase):
         for i in range(len(b)):
             self.assertEqual(b[i], result[i + len(a)])
 
-        result = a.rows(0) + b.cols(0)
+        result = a.cols(0) + b.rows(0)
         self.assertEqual(len(result), 4)
         self.assertEqual(a[0], result[0])
         self.assertEqual(a[1], result[1])
@@ -231,10 +231,10 @@ class PlaceableTestCase(unittest.TestCase):
     def test_slice_with_strings(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
         self.assertWellSeriesEqual(c['A1':'A2'], c[0:8])
-        self.assertWellSeriesEqual(c['A12':], c.rows[-1][0:])
-        self.assertWellSeriesEqual(c.rows['4':'8'], c.rows[3:7])
-        self.assertWellSeriesEqual(c.cols['B':'E'], c.cols[1:4])
-        self.assertWellSeriesEqual(c.cols['B']['1':'7'], c.cols[1][0:6])
+        self.assertWellSeriesEqual(c['A12':], c.cols[-1][0:])
+        self.assertWellSeriesEqual(c.cols['4':'8'], c.cols[3:7])
+        self.assertWellSeriesEqual(c.rows['B':'E'], c.rows[1:4])
+        self.assertWellSeriesEqual(c.rows['B']['1':'7'], c.rows[1][0:6])
 
     def test_wells(self):
         c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
@@ -249,14 +249,14 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(c.get('A1', 'B2', 'C3'), expected)
         self.assertWellSeriesEqual(c('A1', 'B2', 'C3'), expected)
 
-        expected = [c.cols[0][0], c.cols[0][5]]
-        self.assertWellSeriesEqual(c.cols['A'].wells('1', '6'), expected)
-        self.assertWellSeriesEqual(c.cols['A'].get('1', '6'), expected)
+        expected = [c.rows[0][0], c.rows[0][5]]
+        self.assertWellSeriesEqual(c.rows['A'].wells('1', '6'), expected)
+        self.assertWellSeriesEqual(c.rows['A'].get('1', '6'), expected)
 
-        expected = [c.cols[0][0], c.cols[0][5]]
-        self.assertWellSeriesEqual(c.cols['A'].wells(['1', '6']), expected)
-        self.assertWellSeriesEqual(c.cols['A'].get('1', '6'), expected)
-        self.assertWellSeriesEqual(c.cols('A').get('1', '6'), expected)
+        expected = [c.rows[0][0], c.rows[0][5]]
+        self.assertWellSeriesEqual(c.rows['A'].wells(['1', '6']), expected)
+        self.assertWellSeriesEqual(c.rows['A'].get('1', '6'), expected)
+        self.assertWellSeriesEqual(c.rows('A').get('1', '6'), expected)
 
         expected = c.wells('A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1')
         self.assertWellSeriesEqual(c.wells('A1', to='H1'), expected)
@@ -266,8 +266,8 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(c.wells('A1', to='H1', step=2), expected)
         self.assertWellSeriesEqual(c.get('A1', to='H1', step=2), expected)
 
-        expected = c.rows['1':'12':2]
-        self.assertWellSeriesEqual(c.rows('1', to='12', step=2), expected)
+        expected = c.cols['1':'12':2]
+        self.assertWellSeriesEqual(c.cols('1', to='12', step=2), expected)
 
         expected = c.wells(
             'A3', 'G2', 'E2', 'C2', 'A2', 'G1', 'E1', 'C1', 'A1')
