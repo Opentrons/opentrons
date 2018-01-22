@@ -32,6 +32,8 @@ PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.05
 
+Y_SWITCH_BACK_OFF_MM = 20
+
 DEFAULT_AXES_SPEED = 150
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
@@ -361,14 +363,20 @@ class SmoothieDriver_3_0_0:
 
         command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
         self._send_command(command, timeout=30)
+        did_home_y_axis = 'Y' in command
 
         # Only update axes that have been selected for homing
         homed = {
             ax: HOMED_POSITION.get(ax)
             for ax in ''.join(home_sequence)
         }
-
+        if 'Y' in homed:
+            homed['Y'] += Y_SWITCH_BACK_OFF_MM
         self.update_position(default=homed)
+
+        # back-off Y switch 20mm to avoid collisions if we home X afterwards
+        if did_home_y_axis:
+            self.move({'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM})
 
         return homed
 

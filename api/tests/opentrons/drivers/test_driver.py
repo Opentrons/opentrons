@@ -40,6 +40,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 B0.1 C0.1 M400'],              # Set plunger current low
         ['G4P0.05 M400'],                      # Dwell
         ['M114.2 M400'],                      # Get position
+        ['G0Y-20 M400'],
         ['G0.+ M400'],                        # Move (non-plunger)
         ['M907 B0.5 C0.5 M400'],              # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
@@ -47,8 +48,8 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 B0.1 C0.1 M400'],              # Set plunger current low
         ['G4P0.05 M400']                       # Dwell
     ]
-    # from pprint import pprint
-    # pprint(command_log)
+    from pprint import pprint
+    pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
