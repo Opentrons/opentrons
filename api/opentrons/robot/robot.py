@@ -169,7 +169,7 @@ class Robot(object):
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
     >>> plate = containers.load('96-flat', 'A1', 'plate')
-    >>> p200 = instruments.Pipette(axis='b', max_volume=200)
+    >>> p200 = instruments.Pipette(axis='b')
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
@@ -189,6 +189,7 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
         self.modules = []
+        self.fw_version = self._driver.get_fw_version()
 
         # TODO (andy) should come from a config file
         self.dimensions = (395, 345, 228)
@@ -449,6 +450,7 @@ class Robot(object):
         self._driver.connect()
         for module in self.modules:
             module.connect()
+        self.fw_version = self._driver.get_fw_version()
 
         # device = None
         # if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
@@ -516,26 +518,35 @@ class Robot(object):
     def move_plunger(self, *args, **kwargs):
         self._driver.move_plunger(*args, **kwargs)
 
-    def head_speed(self, *args, **kwargs):
+    def head_speed(
+            self, default_speed=None,
+            x=None, y=None, z=None, a=None, b=None, c=None):
         """
-        Set the XY axis speeds of the robot, set in millimeters per minute
+        Set the speeds (mm/sec) of the robot
 
         Parameters
         ----------
-        rate : int
-            An integer setting the mm/minute rate of the X and Y axis.
-            Speeds too fast (around 6000 and higher) will cause the robot
-            to skip step, be careful when using this method
+        speed : number setting the current combined-axes speed
+        default_speed : number specifying a default combined-axes speed
+        <axis> : key/value pair, specifying the maximum speed of that axis
 
         Examples
-        --------
+        ---------
         >>> from opentrons import robot
-        >>> robot.connect('Virtual Smoothie')
-        >>> robot.home()
-        >>> robot.head_speed(4500)
-        >>> robot.move_head(x=200, y=200)
+        >>> robot.head_speed(300)  # default axes speed is 300 mm/sec
+        >>> robot.head_speed(default_speed=400) # default speed is 400 mm/sec
+        >>> robot.head_speed(x=400, y=200) # sets max speeds of X and Y
         """
-        self._driver.set_speed(*args, **kwargs)
+        user_set_speeds = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
+        axis_max_speeds = {
+            axis: value
+            for axis, value in user_set_speeds.items()
+            if value
+        }
+        if axis_max_speeds:
+            self._driver.set_axis_max_speed(axis_max_speeds)
+        if default_speed:
+            self._driver.default_speed(new_default=default_speed)
 
     def move_to(
             self,
@@ -808,6 +819,7 @@ class Robot(object):
                 )
             )
 
+    @commands.publish.both(command=commands.pause)
     def pause(self):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -820,6 +832,7 @@ class Robot(object):
         """
         self.halt()
 
+    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`

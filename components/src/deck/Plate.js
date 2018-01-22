@@ -4,12 +4,12 @@ import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 
-import defaultContainers from '../default-containers.json'
+import { defaultContainers } from '../'
 import { wellNameSplit } from '../utils.js'
 import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
 
 import styles from './Plate.css'
-import { Well } from './Well'
+import Well from './Well'
 
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
@@ -39,7 +39,20 @@ export type PlateProps = {
   selectable?: boolean
 }
 
-export class Plate extends React.Component<PlateProps> {
+const plateOutline = <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
+
+function FallbackPlate () {
+  return (
+    <g>
+      {plateOutline}
+      <text x='50%' y='50%' textAnchor='middle' className={styles.fallback_plate}>
+        Custom Container
+      </text>
+    </g>
+  )
+}
+
+export default class Plate extends React.Component<PlateProps> {
   constructor (props: PlateProps) {
     super(props)
     // TODO Ian 2017-12-12 A prettier way to bind `this` w/ flow still happy? https://github.com/facebook/flow/issues/1517
@@ -58,7 +71,7 @@ export class Plate extends React.Component<PlateProps> {
     const { containerType } = this.props
 
     if (!(containerType in defaultContainers.containers)) {
-      throw new Error(`No container type "${containerType}" in defaultContainers`)
+      throw new Error(`<Plate>: No container type "${containerType}" in defaultContainers`)
     }
 
     const infoForContainerType = defaultContainers.containers[containerType]
@@ -145,15 +158,21 @@ export class Plate extends React.Component<PlateProps> {
   }
 
   render () {
-    const { showLabels } = this.props
+    const { showLabels, containerType } = this.props
+
+    if (!(containerType in defaultContainers.containers)) {
+      return <FallbackPlate />
+    }
+
     const { allWellNames } = this.getContainerData()
 
     return (
       <g>
-        {/* Debug: plate boundary */}
-        <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
+        {plateOutline}
+
         {/* The wells: */}
         {map(allWellNames, this.createWell)}
+
         {showLabels && this.createLabels()}
       </g>
     )

@@ -30,7 +30,7 @@ exports[`PageTabs renders PageTabs correctly 1`] = `
   className="page_tabs"
 >
   <a
-    className="active_tab_link"
+    className="tab_link active_tab_link"
     href="/page1"
     onClick={[Function]}
   >
@@ -66,14 +66,14 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
       title
     </h2>
     <button
-      className="button_icon button_close"
+      className="button_flat button_close"
       disabled={undefined}
       onClick={[Function]}
       title={undefined}
     >
       <svg
         aria-hidden="true"
-        className=""
+        className="button_close_icon"
         fill="currentColor"
         height={undefined}
         version="1.1"

@@ -1,13 +1,13 @@
 @import '..';
 
-@value color_light_grey, color_med_grey from '../styles/colors.css';
-@value border: 2px solid color_light_grey;
-@value width: 18rem;
+:root {
+  --w-sidebar: 18rem;
+}
 
 .panel {
   overflow: hidden;
   width: 18rem;
-  border-right: border;
+  border-right: var(--bd-light);
   transition: all 0.5s ease-in-out;
   position: relative;
 }
@@ -20,8 +20,8 @@
 .title_bar {
   display: flex;
   align-items: center;
-  width: width;
-  border-bottom: border;
+  width: var(--w-sidebar);
+  border-bottom: var(--bd-light);
 }
 
 .title {
@@ -33,17 +33,21 @@
 }
 
 .panel_contents {
-  width: width;
+  width: var(--w-sidebar);
   height: calc(100vh - 2.625rem);
   overflow-x: hidden;
   overflow-y: scroll;
 }
 
-.button_close {
-  border-width: 0;
-  background-color: transparent;
-  color: color_med_grey;
-  cursor: pointer;
-  height: 2rem;
-  width: 2rem;
+/*
+ * TODO(mc, 2018-01-16): need a little extra specificity here to survive
+ * hot reloads. Try to figure out why that's the case.
+ */
+button.button_close {
+  width: auto;
+}
+
+.button_close_icon {
+  display: block;
+  width: 1.5rem;
 }

@@ -1,5 +1,5 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import {Deck} from '@opentrons/components'
@@ -9,15 +9,15 @@ import ReviewLabware from './ReviewLabware'
 import CalibrationPrompt from './CalibrationPrompt'
 import styles from './deck.css'
 
-CalibrateDeck.propTypes = {
-  slot: PropTypes.number.isRequired,
-  labwareReviewed: PropTypes.bool.isRequired
+type Props = {
+  slot: string,
+  deckPopulated: boolean
 }
 
-export default function CalibrateDeck (props) {
-  const {labwareReviewed, slot} = props
-  const style = classnames({[styles.review_deck]: !labwareReviewed})
-  const Prompt = labwareReviewed
+export default function CalibrateDeck (props: Props) {
+  const {deckPopulated, slot} = props
+  const style = classnames({[styles.review_deck]: !deckPopulated})
+  const Prompt = deckPopulated
     ? CalibrationPrompt
     : ReviewLabware
 

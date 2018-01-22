@@ -1,5 +1,14 @@
 {
      "containers": {
+          "temperature-plate": {
+               "origin-offset": {
+                    "x": 11.24,
+                    "y": 14.34,
+                    "z": 97
+               },
+               "locations":{}
+          },
+
           "tube-rack-5ml-96": {
                "locations": {
                     "A1": {
@@ -5507,6 +5516,18 @@
                          "depth": 40,
                          "length": 120,
                          "width": 90
+                    }
+               }
+          },
+          "fixed-trash": {
+               "locations": {
+                    "A1": {
+                         "x": 80,
+                         "y": 80,
+                         "z": 40,
+                         "depth": 70,
+                         "length": 160,
+                         "width": 160
                     }
                }
           },
@@ -21401,7 +21422,7 @@
                          "z": 0,
                          "depth": 2,
                          "diameter": 1,
-                         "total-liquid-volume": 20
+                         "total-liquid-volume": 2
                     },
                     "B1": {
                          "x": 9,

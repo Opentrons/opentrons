@@ -1,4 +1,5 @@
 // instrument setup components
 import InstrumentTabs from './InstrumentTabs'
+import Instruments from './Instruments'
 
-export {InstrumentTabs}
+export {InstrumentTabs, Instruments}

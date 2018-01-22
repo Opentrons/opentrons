@@ -26,6 +26,7 @@ function LabwareList (props) {
 
   const {tiprackList, labwareList} = labware.reduce((result, lab) => {
     const {slot, name, isTiprack, setLabware} = lab
+    // TODO(mc, 2018-01-19): remove all these extra props (see LabwareListItem)
     const links = (
       <LabwareListItem
         {...lab}
@@ -66,7 +67,7 @@ function mapStateToProps (state, ownProps) {
   return {
     labware: robotSelectors.getLabware(state),
     labwareBySlot: robotSelectors.getLabwareBySlot(state),
-    labwareReviewed: robotSelectors.getLabwareReviewed(state),
+    deckPopulated: robotSelectors.getDeckPopulated(state),
     instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
     tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
     labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
@@ -78,7 +79,7 @@ function mapStateToProps (state, ownProps) {
 function mergeProps (stateProps, dispatchProps) {
   const {
     _calibrator,
-    labwareReviewed,
+    deckPopulated,
     instrumentsCalibrated,
     tipracksConfirmed,
     isRunning
@@ -96,7 +97,7 @@ function mergeProps (stateProps, dispatchProps) {
       ...lw,
       isDisabled,
       setLabware: () => {
-        if (labwareReviewed) {
+        if (deckPopulated) {
           if (lw.isTiprack) {
             return dispatch(robotActions.pickupAndHome(_calibrator, lw.slot))
           }

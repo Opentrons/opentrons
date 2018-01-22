@@ -11,7 +11,6 @@ tipracks = [
 
 single = instruments.Pipette(
     mount='right',
-    max_volume=300,
     min_volume=10,
     name="p200",
     tip_racks=tipracks)

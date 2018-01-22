@@ -1,8 +1,8 @@
-@value fontSizeHuge, fontSizeHeader, fontSizeBody2, fontSizeBody1, fontSizeCaption from '../fontSizes.css';
+@import '..';
 
 .plate_label {
   pointer-events: none;
-  font-size: fontSizeCaption;
+  font-size: var(--fs-caption);
   text-anchor: middle;
 }
 
@@ -11,5 +11,11 @@
 }
 
 .tiny_labels:nth-child(odd) {
+  fill: gray;
+}
+
+.fallback_plate {
+  font-size: 0.75rem;
+  font-style: italic;
   fill: gray;
 }

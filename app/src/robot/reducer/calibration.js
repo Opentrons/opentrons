@@ -1,10 +1,10 @@
 // @flow
 // robot calibration state and reducer
 // TODO(mc, 2018-01-10): refactor to use combineReducers
+import type {Mount, Slot, LabwareCalibrationStatus} from '../types'
 import {actionTypes} from '../actions'
 
 import {
-  type InstrumentMount,
   UNCONFIRMED,
   MOVING_TO_SLOT,
   OVER_SLOT,
@@ -30,7 +30,7 @@ type CalibrationRequestType =
 
 type CalibrationRequest = {
   type: CalibrationRequestType,
-  mount: InstrumentMount | '',
+  mount: Mount | '',
   inProgress: boolean,
   error: ?{message: string},
 }
@@ -38,19 +38,19 @@ type CalibrationRequest = {
 // TODO(mc, 2018-01-10): replace with CalibrationRequest
 type LabwareConfirmationRequest = {
   inProgress: boolean,
-  axis?: string,
-  slot?: number,
+  mount?: Mount | '',
+  slot?: Slot | '',
   error: ?{message: string},
 }
 
 export type State = {
-  labwareReviewed: boolean,
+  deckPopulated: boolean,
   jogDistance: number,
 
-  probedByAxis: {[InstrumentMount]: boolean},
+  probedByMount: {[Mount]: boolean},
 
-  labwareBySlot: {[number]: {}},
-  confirmedBySlot: {[number]: boolean},
+  labwareBySlot: {[Slot]: LabwareCalibrationStatus},
+  confirmedBySlot: {[Slot]: boolean},
 
   calibrationRequest: CalibrationRequest,
 
@@ -74,7 +74,7 @@ type Action = {
 const {
   SESSION,
   DISCONNECT_RESPONSE,
-  SET_LABWARE_REVIEWED,
+  SET_DECK_POPULATED,
   PICKUP_AND_HOME,
   PICKUP_AND_HOME_RESPONSE,
   DROP_TIP_AND_HOME,
@@ -97,10 +97,10 @@ const {
 } = actionTypes
 
 const INITIAL_STATE: State = {
-  labwareReviewed: false,
+  deckPopulated: true,
   jogDistance: JOG_DISTANCE_SLOW_MM,
 
-  probedByAxis: {},
+  probedByMount: {},
 
   // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
   // slot. confirmedBySlot holds a flag for whether the labware has been
@@ -113,9 +113,9 @@ const INITIAL_STATE: State = {
   // TODO(mc, 2017-11-22): collapse all these into a single
   // instrumentRequest object. We can't have simultaneous instrument
   // movements so split state hurts us without benefit
-  pickupRequest: {inProgress: false, error: null, slot: 0},
-  homeRequest: {inProgress: false, error: null, slot: 0},
-  confirmTiprackRequest: {inProgress: false, error: null, slot: 0},
+  pickupRequest: {inProgress: false, error: null, slot: ''},
+  homeRequest: {inProgress: false, error: null, slot: ''},
+  confirmTiprackRequest: {inProgress: false, error: null, slot: ''},
   moveToRequest: {inProgress: false, error: null},
   jogRequest: {inProgress: false, error: null},
   updateOffsetRequest: {inProgress: false, error: null}
@@ -128,7 +128,7 @@ export default function calibrationReducer (
   switch (action.type) {
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
-    case SET_LABWARE_REVIEWED: return handleSetLabwareReviewed(state, action)
+    case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PICKUP_AND_HOME: return handlePickupAndHome(state, action)
@@ -164,8 +164,8 @@ function handleSession (state, action) {
   return INITIAL_STATE
 }
 
-function handleSetLabwareReviewed (state, action) {
-  return {...state, labwareReviewed: action.payload}
+function handleSetDeckPopulated (state, action) {
+  return {...state, deckPopulated: action.payload}
 }
 
 function handleMoveToFront (state, action) {
@@ -230,9 +230,9 @@ function handleProbeTipResponse (state, action) {
         ? payload
         : null
     },
-    probedByAxis: {
-      ...state.probedByAxis,
-      [mount]: state.probedByAxis[mount] || !error
+    probedByMount: {
+      ...state.probedByMount,
+      [mount]: state.probedByMount[mount] || !error
     }
   }
 }
@@ -251,7 +251,7 @@ function handleMoveTo (state, action) {
 
   return {
     ...state,
-    labwareReviewed: true,
+    deckPopulated: true,
     moveToRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: MOVING_TO_SLOT}
   }
@@ -290,7 +290,7 @@ function handlePickupAndHome (state, action) {
 
   return {
     ...state,
-    labwareReviewed: true,
+    deckPopulated: true,
     pickupRequest: {inProgress: true, error: null, slot},
     labwareBySlot: {...state.labwareBySlot, [slot]: PICKING_UP}
   }

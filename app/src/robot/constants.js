@@ -2,6 +2,8 @@
 // robot redux module constants
 import PropTypes from 'prop-types'
 
+import type {Mount, Slot} from './types'
+
 export const _NAME = 'robot'
 
 // connection states
@@ -17,6 +19,10 @@ export type ConnectionStatus =
   | 'disconnecting'
 
 // session status (api/opentrons/api/session.py::VALID_STATES)
+// TODO(mc, 2018-01-11): remove constant exports in favor of flowtype
+export const RUNNING = 'running'
+export const PAUSED = 'paused'
+export const FINISHED = 'finished'
 export type SessionStatus =
   | ''
   | 'loaded'
@@ -41,7 +47,7 @@ export const INSTRUMENT_CALIBRATION_TYPE = PropTypes.oneOf([
 ])
 
 // labware confirmation states
-// several are redundant and could be collapsed into something like MOVING
+// TODO(mc, 2018-01-11): remove constant exports in favor of types.js
 export const UNCONFIRMED = 'unconfirmed'
 export const MOVING_TO_SLOT = 'moving-to-slot'
 export const OVER_SLOT = 'over-slot'
@@ -66,9 +72,20 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
 ])
 
 // deck layout
-export type InstrumentMount = 'left' | 'right'
-export const INSTRUMENT_AXES: InstrumentMount[] = ['left', 'right']
-export const DECK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+export const INSTRUMENT_AXES: Mount[] = ['left', 'right']
+export const DECK_SLOTS: Slot[] = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11'
+]
 
 // pipette channels
 export const SINGLE_CHANNEL = 'single'
