@@ -8,9 +8,9 @@ import type {StepItemData, StepIdType} from './types'
 import type {AddStepAction} from './actions' // Thunk action creators
 import {expandAddStepButton, selectStep, toggleStepCollapsed} from './actions'
 
-// TODO move to test
+// TODO move to test once substeps selector is implemented
 /*
-const initialSteps = {
+{
   0: {
     title: 'Transfer X',
     stepType: 'transfer',
@@ -112,7 +112,7 @@ const initialStepOrder = [0, 2, 3, 4, 5]
 */
 
 // Add default title (and later, other default values) to newly-created Step
-export function createDefaultStep (action: AddStepAction) {
+function createDefaultStep (action: AddStepAction) {
   const {stepType} = action.payload
   return {...action.payload, title: stepType}
 }
@@ -174,13 +174,15 @@ export type RootState = {
   stepCreationButtonExpanded: StepCreationButtonExpandedState
 }
 
-const rootReducer = combineReducers({
+export const _allReducers = {
   steps,
   collapsedSteps,
   orderedSteps,
   selectedStep,
   stepCreationButtonExpanded
-})
+}
+
+const rootReducer = combineReducers(_allReducers)
 
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 type BaseState = {steplist: RootState}
