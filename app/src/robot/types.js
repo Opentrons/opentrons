@@ -18,6 +18,15 @@ export type Slot =
   | '10'
   | '11'
 
+// TODO(mc, 2018-01-22): pay attention to this when deprecating status contants
+//   in constants.js. Also re-evaluate the need for this logic / type
+export type InstrumentCalibrationStatus =
+  | 'unprobed'
+  | 'preparing-to-probe'
+  | 'ready-to-probe'
+  | 'probing'
+  | 'probed'
+
 // TODO(mc, 2018-01-11): collapse a bunch of these into something like MOVING
 export type LabwareCalibrationStatus =
   | 'unconfirmed'
