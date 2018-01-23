@@ -175,6 +175,7 @@ function handleMoveToFront (state, action) {
 
   return {
     ...state,
+    deckPopulated: false,
     calibrationRequest: {
       type: 'MOVE_TO_FRONT',
       mount: instrument,

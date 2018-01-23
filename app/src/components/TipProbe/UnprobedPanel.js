@@ -2,26 +2,39 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
+
 import CalibrationInfoContent from '../CalibrationInfoContent'
 import {PrimaryButton} from '@opentrons/components'
 
 import {
   actions as robotActions,
+  selectors as robotSelectors,
   type Mount
 } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
-  probed: boolean
+  probed: boolean,
+  confirmTipProbeUrl: string
+}
+
+type StateProps = {
+  _showContinueModal: boolean
 }
 
 type DispatchProps = {
+  dispatch: Dispatch<*>
+}
+
+type Props = {
+  probed: bool,
   onPrepareClick: () => void
 }
 
-export default connect(null, mapDispatchToProps)(UnprobedPanel)
+export default connect(mapStateToProps, null, mergeProps)(UnprobedPanel)
 
-function UnprobedPanel (props: OwnProps & DispatchProps) {
+function UnprobedPanel (props: Props) {
   const {probed, onPrepareClick} = props
 
   const message = !probed
@@ -48,14 +61,27 @@ function UnprobedPanel (props: OwnProps & DispatchProps) {
   )
 }
 
-function mapDispatchToProps (
-  dispatch: Dispatch<*>,
-  ownProps: OwnProps
-): DispatchProps {
-  const mount = ownProps.mount
-
-  // TODO(ka 1-22-18): add in isDeckPopulated modal logic
+function mapStateToProps (state, ownProps: OwnProps): StateProps {
   return {
-    onPrepareClick: () => dispatch(robotActions.moveToFront(mount))
+    _showContinueModal: robotSelectors.getDeckPopulated(state)
+  }
+}
+
+function mergeProps (
+  stateProps: StateProps,
+  dispatchProps: DispatchProps,
+  ownProps: OwnProps
+): Props {
+  const {_showContinueModal} = stateProps
+  const {dispatch} = dispatchProps
+  const {mount, confirmTipProbeUrl} = ownProps
+
+  const onPrepareClick = _showContinueModal
+    ? () => dispatch(push(confirmTipProbeUrl))
+    : () => dispatch(robotActions.moveToFront(mount))
+
+  return {
+    ...ownProps,
+    onPrepareClick
   }
 }

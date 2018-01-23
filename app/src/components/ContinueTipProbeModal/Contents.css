@@ -1,0 +1,12 @@
+/* style for ContinueTipProbeModal contents */
+@import '@opentrons/components';
+
+.list {
+  list-style: none;
+  padding-left: 1rem;
+  font-size: var(--fs-body-2);
+}
+
+.list li {
+  margin-top: 0.75rem;
+}

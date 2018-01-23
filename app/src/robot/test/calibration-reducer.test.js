@@ -221,6 +221,7 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_FRONT action', () => {
     const state = {
       calibration: {
+        deckPopulated: true,
         calibrationRequest: {
           type: '',
           mount: '',
@@ -235,6 +236,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      deckPopulated: false,
       calibrationRequest: {
         type: 'MOVE_TO_FRONT',
         mount: 'left',
