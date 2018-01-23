@@ -35,6 +35,10 @@ module.exports = {
       components: 'src/buttons/[A-Z]*.js'
     },
     {
+      name: 'Form Components',
+      components: 'src/forms/[A-Z]*.js'
+    },
+    {
       name: 'Icons',
       components: 'src/icons/[A-Z]*.js'
     },
