@@ -5,17 +5,17 @@ import cx from 'classnames'
 import styles from './forms.css'
 
 type Props = {
-  /* change handler */
+  /** change handler */
   onChange: (event: SyntheticEvent<>) => void,
-  /* classes to apply */
+  /** classes to apply */
   className?: string,
-  /* label text */
+  /** label text */
   label?: string,
-  /* placeholder text */
+  /** placeholder text */
   placeholder?: string,
-  /* optional units string, appears to the right of input text */
+  /** optional units string, appears to the right of input text */
   units?: string,
-  /* current value of text in box, defaults to '' */
+  /** current value of text in box, defaults to '' */
   value?: string
 }
 

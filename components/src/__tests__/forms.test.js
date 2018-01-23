@@ -5,6 +5,7 @@ import Renderer from 'react-test-renderer'
 import {
   CheckboxField,
   DropdownField,
+  FormGroup,
   InputField,
   RadioGroup
 } from '..'
@@ -46,6 +47,22 @@ describe('DropdownField', () => {
           {name: 'Protein', value: 'protein'}
         ]}
       />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('FormGroup', () => {
+  test('renders correctly', () => {
+    const tree = Renderer.create(
+      <FormGroup
+        className='foo'
+        label='This is the label'
+      >
+        <div>Hey test here</div>
+        <div>More test here</div>
+      </FormGroup>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

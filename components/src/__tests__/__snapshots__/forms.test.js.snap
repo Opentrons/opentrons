@@ -124,6 +124,24 @@ exports[`DropdownField renders correctly 1`] = `
 </div>
 `;
 
+exports[`FormGroup renders correctly 1`] = `
+<div
+  className="foo"
+>
+  <div
+    className="formgroup_label"
+  >
+    This is the label
+  </div>
+  <div>
+    Hey test here
+  </div>
+  <div>
+    More test here
+  </div>
+</div>
+`;
+
 exports[`InputField renders correctly 1`] = `
 <label
   className="form_field"

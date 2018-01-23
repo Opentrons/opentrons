@@ -27,6 +27,13 @@
   }
 }
 
+.formgroup_label {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-bold);
+  margin-bottom: 0.5rem;
+}
+
 .checkbox_icon {
   /* Icon for radiobutton and for checkbox */
   width: 1.25rem;

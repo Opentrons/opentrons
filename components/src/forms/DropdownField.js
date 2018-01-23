@@ -4,16 +4,16 @@ import {Icon} from '..'
 import styles from './forms.css'
 
 type Props = {
-  /* change handler */
+  /** change handler */
   onChange: (event: SyntheticEvent<>) => void,
-  /* value that is selected */
+  /** value that is selected */
   value?: string,
-  /* Array of {name, value} data */
+  /** Array of {name, value} data */
   options?: Array<{
     name: string,
     value: string
   }>,
-  /* classes to apply */
+  /** classes to apply */
   className?: string
 }
 

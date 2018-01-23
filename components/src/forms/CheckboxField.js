@@ -6,13 +6,13 @@ import {Icon} from '../icons'
 import styles from './forms.css'
 
 type Props = {
-  /* change handler */
+  /** change handler */
   onChange: (event: SyntheticEvent<>) => void,
-  /* checkbox is checked */
+  /** checkbox is checked */
   checked?: boolean,
-  /* classes to apply */
+  /** classes to apply */
   className?: string,
-  /* label text for checkbox */
+  /** label text for checkbox */
   label?: string
 }
 
