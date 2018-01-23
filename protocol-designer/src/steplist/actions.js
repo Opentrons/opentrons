@@ -6,13 +6,6 @@ import type {
 } from 'redux'
 import type {StepType, StepIdType} from './types'
 
-// TODO Ian 2018-01-19 import GenericAction from some "general Redux types" file
-export type GenericAction = {
-  type: string,
-  payload?: any,
-  meta?: any
-}
-
 export type AddStepAction = {
   type: 'ADD_STEP',
   payload: {
@@ -30,7 +23,7 @@ type StepListState = {}
 // addStep thunk adds an incremental integer ID for Step reducers.
 let stepIdCounter = 0
 export const addStep = (payload: NewStepPayload) =>
-  (dispatch: ReduxDispatch<GenericAction>, getState: StepListState) => {
+  (dispatch: ReduxDispatch<AddStepAction>, getState: StepListState) => {
     dispatch({
       type: 'ADD_STEP',
       payload: {
@@ -51,7 +44,6 @@ export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction
   payload
 })
 
-// TODO use action creator instead of manual dispatch elsewhere!!
 type ToggleStepCollapsedAction = {
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: StepIdType
@@ -62,5 +54,4 @@ export const toggleStepCollapsed = (payload: StepIdType): ToggleStepCollapsedAct
   payload
 })
 
-// TODO use action creator instead of manual dispatch elsewhere!!
 export const selectStep = createAction('SELECT_STEP', (stepId: StepIdType) => stepId)
