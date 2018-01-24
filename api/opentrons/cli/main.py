@@ -40,14 +40,14 @@ point_number = -1
 
 # (0, 0) is in bottom-left corner
 
-slot_4_dimple = (108.75, 92.8)
-slot_6_dimple = (373.75, 92.8)
-slot_11_dimple = (241.25, 273.80)
+slot_1_lower_left = (12.13, 6.0)
+slot_3_lower_right = (380.87, 6.0)
+slot_10_upper_left = (12.13, 351.5)
 # Expected reference points
 expected = [
-    slot_4_dimple,
-    slot_6_dimple,
-    slot_11_dimple
+    slot_1_lower_left,
+    slot_3_lower_right,
+    slot_10_upper_left
 ]
 
 # Actuals get overridden when ENTER is pressed
