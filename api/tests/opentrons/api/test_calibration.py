@@ -71,6 +71,16 @@ async def test_drop_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+async def test_return_tip(main_router, model):
+    with mock.patch.object(model.instrument._instrument, 'return_tip') as return_tip:  # NOQA
+        main_router.calibration_manager.return_tip(model.instrument)
+
+        return_tip.assert_called_with(home_after=True)
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 async def test_home(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'home') as home:
         main_router.calibration_manager.home(
