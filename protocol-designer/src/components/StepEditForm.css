@@ -1,10 +1,30 @@
+@import '@opentrons/components';
+
+/* TODO Ian 2018-01-24 generic column fraction classes available in component css? */
+
+.column_1_2 {
+  lost-column: 1/2;
+}
+
+.column_1_3 {
+  lost-column: 1/3;
+}
+
+.column_2_3 {
+  lost-column: 2/3;
+}
+
+.column_1_4 {
+  lost-column: 1/4;
+}
+
 .form {
   position: absolute;
   background-color: white;
   top: 0;
   left: 0;
   right: 0;
-  padding: 2rem 0.75rem;
+  padding: 0.75rem;
   box-shadow: 0 0.25rem 1rem 0 rgba(0, 0, 0, 0.25);
 }
 
@@ -13,27 +33,44 @@
   margin-bottom: 1rem;
 
   & > * {
-    lost-column: 1/3;
+    lost-column: 1/4;
   }
+
+  /*
+  & > *:first-child {
+    lost-column: 1/2;
+  }
+  */
 }
 
 .row_wrapper {
   lost-utility: clearfix;
 }
 
-.half_col {
-  lost-column: 1/2;
-}
-
 .field_row {
-  /* TODO use grid not flex see design */
-  display: flex;
+  lost-utility: clearfix;
 
   & > * {
-    flex: 1 1 auto;
+    lost-column: 1/3;
+  }
+}
+
+.button_row {
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
   }
 
-  & :not(:first-child, :last-child) {
-    padding: 0 1rem;
+  & > *:first-child {
+    /* MORE OPTIONS button */
+    @apply --font-header-dark;
+
+    lost-column: 2/6;
+  }
+
+  & > *:nth-child(2) {
+    lost-offset: 2/6;
   }
 }
