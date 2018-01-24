@@ -221,6 +221,7 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_FRONT action', () => {
     const state = {
       calibration: {
+        deckPopulated: true,
         calibrationRequest: {
           type: '',
           mount: '',
@@ -235,6 +236,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      deckPopulated: false,
       calibrationRequest: {
         type: 'MOVE_TO_FRONT',
         mount: 'left',
@@ -290,7 +292,8 @@ describe('robot reducer - calibration', () => {
           mount: 'left',
           inProgress: false,
           error: new Error('AH')
-        }
+        },
+        probedByMount: {left: true, right: true}
       }
     }
     const action = {
@@ -304,7 +307,8 @@ describe('robot reducer - calibration', () => {
         mount: 'left',
         inProgress: true,
         error: null
-      }
+      },
+      probedByMount: {left: false, right: true}
     })
   })
 
@@ -316,8 +320,7 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
           inProgress: true,
           error: null
-        },
-        probedByMount: {}
+        }
       }
     }
     const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
@@ -333,9 +336,6 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: null
-      },
-      probedByMount: {
-        right: true
       }
     })
     expect(reducer(state, failure).calibration).toEqual({
@@ -344,25 +344,23 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: new Error('AH')
-      },
-      probedByMount: {
-        right: false
       }
     })
   })
 
-  test('handles RESET_TIP_PROBE', () => {
+  test('handles CONFIRM_PROBED', () => {
     const state = {
       calibration: {
-        calibrationRequest: {mount: 'left'}
+        probedByMount: {left: false, right: true}
       }
     }
     const action = {
-      type: actionTypes.RESET_TIP_PROBE
+      type: 'robot:CONFIRM_PROBED',
+      payload: 'left'
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      calibrationRequest: {mount: ''}
+      probedByMount: {left: true, right: true}
     })
   })
 

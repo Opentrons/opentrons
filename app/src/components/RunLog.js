@@ -17,7 +17,7 @@ export default class RunLog extends Component {
 
       if (children.length) {
         nestedList = (
-          <ol>
+          <ol className={styles.list}>
             {children.map(makeCommandToTemplateMapper(depth + 1))}
           </ol>
         )
@@ -46,7 +46,7 @@ export default class RunLog extends Component {
 
     return (
       <section className={styles.run_log_wrapper}>
-        <ol>
+        <ol className={styles.list}>
           {commandItems}
         </ol>
       </section>

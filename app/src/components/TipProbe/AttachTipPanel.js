@@ -63,6 +63,6 @@ function mapDispatchToProps (
   const mount = ownProps.mount
 
   return {
-    onProbeTipClick: () => dispatch(robotActions.probeTip(mount))
+    onProbeTipClick: () => { dispatch(robotActions.probeTip(mount)) }
   }
 }

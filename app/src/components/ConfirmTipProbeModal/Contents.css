@@ -1,0 +1,17 @@
+/* style for ContinueTipProbeModal contents */
+@import '@opentrons/components';
+
+.attention {
+  @apply --font-header-dark;
+}
+
+.list {
+  @apply --font-body-2-dark;
+
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.list li {
+  margin-top: 0.75rem;
+}

@@ -16,22 +16,21 @@ import UnprobedPanel from './UnprobedPanel'
 import InstrumentMovingPanel from './InstrumentMovingPanel'
 import AttachTipPanel from './AttachTipPanel'
 import RemoveTipPanel from './RemoveTipPanel'
+import ContinuePanel from './ContinuePanel'
 
 type OwnProps = {
   mount: Mount,
+  confirmTipProbeUrl: string,
 }
 
 type StateProps = {
-  calibration: InstrumentCalibrationStatus
-}
-
-type TipProbeProps = {
-  mount: Mount,
+  calibration: InstrumentCalibrationStatus,
   channels: Channels,
   volume: number,
   probed: boolean,
-  calibration: InstrumentCalibrationStatus
 }
+
+type TipProbeProps = OwnProps & StateProps
 
 const PANEL_BY_CALIBRATION: {
   [InstrumentCalibrationStatus]: React.ComponentType<TipProbeProps>
@@ -40,7 +39,8 @@ const PANEL_BY_CALIBRATION: {
   'preparing-to-probe': InstrumentMovingPanel,
   'ready-to-probe': AttachTipPanel,
   'probing': InstrumentMovingPanel,
-  'probed': RemoveTipPanel
+  'probed-tip-on': RemoveTipPanel,
+  'probed': ContinuePanel
 }
 
 export default connect(mapStateToProps)(TipProbe)
@@ -53,7 +53,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
   // TODO(mc, 2018-01-22): this should never happen; refactor so this
   //   check isn't necessary
   if (!currentInstrument || !currentInstrument.calibration) {
-    return {calibration: 'unprobed'}
+    throw new Error('no currentIntrument or has no calibration status')
   }
 
   return currentInstrument
