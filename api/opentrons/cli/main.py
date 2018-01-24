@@ -9,11 +9,11 @@ import atexit
 import os
 import sys
 from numpy.linalg import inv
-from numpy import dot, array, insert
+from numpy import dot, array
 from opentrons.robot import robot_configs
 from opentrons import robot, instruments
 from opentrons.util.calibration_functions import probe_instrument
-from opentrons.cli.solve import solve
+from opentrons.cli.linal import solve, add_z
 
 
 # Distance increments for jog
@@ -27,7 +27,7 @@ left = 'Z'
 right = 'A'
 current_pipette = right
 
-status_text = urwid.Text('')
+status_text = urwid.Text('')  # type 'urwid.Text'
 current_position = (0, 0, 0)
 
 # 200uL tip. Used during calibration process
@@ -39,11 +39,15 @@ TIP_LENGTH = 51.7
 point_number = -1
 
 # (0, 0) is in bottom-left corner
+
+slot_4_dimple = (108.75, 92.8)
+slot_6_dimple = (373.75, 92.8)
+slot_11_dimple = (241.25, 273.80)
 # Expected reference points
 expected = [
-    (108.75, 92.8),       # dimple 4
-    (373.75, 92.8),      # dimple 6
-    (241.25, 273.80)    # dimple 11
+    slot_4_dimple,
+    slot_6_dimple,
+    slot_11_dimple
 ]
 
 # Actuals get overridden when ENTER is pressed
@@ -64,17 +68,7 @@ T = robot.config.gantry_calibration
 XY = None
 
 
-# Add fixed Z offset which is known so we don't have to calibrate for height
-# during calibration process
-def add_z(XY):
-    return insert(
-        insert(XY, 2, [0, 0, 0], axis=1),
-        2,
-        [0, 0, 1, T[2][3]],
-        axis=0)
-
-
-def current_step():
+def current_step() -> float:
     """
     Given current step index return step value in mm
     """
@@ -97,7 +91,7 @@ def position():
         return res
 
 
-def status(text):
+def status(text_box: urwid.Text, text: str):
     """
     Refresh status in a text box
     """
@@ -119,14 +113,14 @@ def status(text):
         'Message: ' + text
     ])
 
-    status_text.set_text(text)
+    text_box.set_text(text)
 
 
 def jog(axis, direction, step):
     global current_position
     robot._driver.move({axis: robot._driver.position[axis] + direction * step})
     current_position = position()
-    status('Jog: ' + repr([axis, str(direction), str(step)]))
+    status(status_text, 'Jog: ' + repr([axis, str(direction), str(step)]))
 
 
 key_mappings = {
@@ -140,29 +134,28 @@ key_mappings = {
 
 
 def key_pressed(key):
-    global current_position, current_pipette, step_index, \
-        point_number, XY, T
+    global current_position, current_pipette, step_index, point_number, XY, T
 
     if key == 'z':
         current_pipette = left if current_pipette == right else right
-        status('current pipette axis: ' + repr(current_pipette))
+        status(status_text, 'current pipette axis: ' + repr(current_pipette))
     elif key.isnumeric():
         validate(int(key) - 1)
     # less travel
     elif key == '-':
         if step_index > 0:
             step_index -= 1
-        status('step: ' + repr(current_step()))
+        status(status_text, 'step: ' + repr(current_step()))
     # more travel
     elif key == '=':
         if step_index < len(steps) - 1:
             step_index += 1
-        status('step: ' + repr(current_step()))
+        status(status_text, 'step: ' + repr(current_step()))
     # skip calibration point
     elif key == 's':
         if (point_number < len(actual) - 1):
             point_number += 1
-        status('skipped #{0}'.format(point_number))
+        status(status_text, 'skipped #{0}'.format(point_number))
     # run tip probe
     elif key == 'p':
 
@@ -174,7 +167,7 @@ def key_pressed(key):
         robot.config = robot.config._replace(
             probe_center=probe_center
         )
-        status('Tip probe')
+        status(status_text, 'Tip probe')
     # save calibration point and move to next
     elif key == 'enter':
         if point_number >= len(actual):
@@ -185,48 +178,49 @@ def key_pressed(key):
             expected_z = T[2][3] + TIP_LENGTH
             T[2][3] += actual_z - expected_z
             point_number += 1
-            status('saved Z-Offset: {0}'.format(T[2][3]))
+            status(status_text, 'saved Z-Offset: {0}'.format(T[2][3]))
             return
 
         actual[point_number] = position()[:-1]
         point_number += 1
-        status('saved #{0}: {1}'.format(point_number, actual[point_number-1]))
+        status(status_text, 'saved #{0}: {1}'.format(
+            point_number, actual[point_number-1]))
 
         # On last point update gantry calibration
         if point_number == len(actual):
             XY = solve(expected, actual)
-            T = add_z(XY)
+            T = add_z(XY, T[2][3])
             robot.config = robot.config._replace(
                     gantry_calibration=list(map(lambda i: list(i), T)),
                 )
-            status(str(robot.config))
+            status(status_text, str(robot.config))
 
     # move to previous calibration point
     elif key == 'backspace':
         if point_number > 0:
             point_number -= 1
-        status('')
+        status(status_text, '')
     # home
     elif key == '\\':
         robot.home()
         current_position = position()
-        status('Homed')
+        status(status_text, 'Homed')
     # calculate transformation matrix
     elif key == 'esc':
         raise urwid.ExitMainLoop
     elif key == ' ':
         try:
             diff = robot_configs.save(robot.config)
-            status('Saved')
+            status(status_text, 'Saved')
         except Exception as e:
-            status(repr(e))
+            status(status_text, repr(e))
         else:
-            status(str(diff))
+            status(status_text, str(diff))
     else:
         try:
             key_mappings[key]()
         except KeyError:
-            status('invalid key: ' + repr(key))
+            status(status_text, 'invalid key: ' + repr(key))
 
 
 # move to test points based on current matrix value
@@ -249,13 +243,21 @@ def clear_configuration_and_reload():
     robot.reset()
 
 
+def backup_configuration_and_reload(tag=None):
+    from datetime import datetime
+    if not tag:
+        tag = datetime.now().isoformat(timespec="seconds")
+    robot_configs.save(robot.config, tag=tag)
+    clear_configuration_and_reload()
+
+
 def main():
     prompt = input(
-        ">>> Warning! Running this tool will delete any previous calibration data. Proceed (y/n)? ")  # NOQA
+        ">>> Warning! Running this tool backup and clear any previous calibration data. Proceed (y/[n])? ")  # NOQA
     if prompt not in ['y', 'Y', 'yes']:
-        print('Exiting--prior configuration data not deleted')
+        print('Exiting--prior configuration data not changed')
         sys.exit()
-    clear_configuration_and_reload()
+    backup_configuration_and_reload()
 
     robot.connect()
     tip = urwid.Text(u"X/Y/Z: left,right/up,down/q,a; Pipette (swap): z; Steps: -/=; Test points: 1, 2, 3")   # NOQA
@@ -269,7 +271,7 @@ def main():
         handle_mouse=False,
         unhandled_input=key_pressed,
         event_loop=event_loop)
-    status('Hello!')
+    status(status_text, 'Hello!')
     ui_loop.run()
 
     print('Robot config: \n', robot.config)
