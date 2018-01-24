@@ -77,8 +77,8 @@ function mergeProps (
   const {mount, confirmTipProbeUrl} = ownProps
 
   const onPrepareClick = _showContinueModal
-    ? () => dispatch(push(confirmTipProbeUrl))
-    : () => dispatch(robotActions.moveToFront(mount))
+    ? () => { dispatch(push(confirmTipProbeUrl)) }
+    : () => { dispatch(robotActions.moveToFront(mount)) }
 
   return {
     ...ownProps,

@@ -7,7 +7,7 @@ import type {Mount} from '../robot'
 
 import Page from '../components/Page'
 import TipProbe from '../components/TipProbe'
-import ContinueTipProbeModal from '../components/ContinueTipProbeModal'
+import ConfirmTipProbeModal from '../components/ConfirmTipProbeModal'
 import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
 import SessionHeader from '../containers/SessionHeader'
@@ -27,8 +27,6 @@ export default function SetupInstrumentsPage (props: Props) {
   const {match: {url, params: {mount}}} = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
-  console.log('MOUNT', mount)
-
   return (
     <Page>
       <SessionHeader subtitle={PAGE_TITLE} />
@@ -36,7 +34,7 @@ export default function SetupInstrumentsPage (props: Props) {
       <Instruments mount={mount} />
       <TipProbe mount={mount} confirmTipProbeUrl={confirmTipProbeUrl} />
       <Route path={confirmTipProbeUrl} render={() => (
-        <ContinueTipProbeModal mount={mount} backUrl={url} />
+        <ConfirmTipProbeModal mount={mount} backUrl={url} />
       )} />
     </Page>
   )

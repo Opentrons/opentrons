@@ -16,6 +16,7 @@ import UnprobedPanel from './UnprobedPanel'
 import InstrumentMovingPanel from './InstrumentMovingPanel'
 import AttachTipPanel from './AttachTipPanel'
 import RemoveTipPanel from './RemoveTipPanel'
+import ContinuePanel from './ContinuePanel'
 
 type OwnProps = {
   mount: Mount,
@@ -38,7 +39,8 @@ const PANEL_BY_CALIBRATION: {
   'preparing-to-probe': InstrumentMovingPanel,
   'ready-to-probe': AttachTipPanel,
   'probing': InstrumentMovingPanel,
-  'probed': RemoveTipPanel
+  'probed-tip-on': RemoveTipPanel,
+  'probed': ContinuePanel
 }
 
 export default connect(mapStateToProps)(TipProbe)

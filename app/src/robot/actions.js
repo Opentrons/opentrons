@@ -1,13 +1,35 @@
+// @flow
 // robot actions and action types
 // action helpers
 import {makeActionName} from '../util'
 import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
+import type {
+  Mount,
+  Slot,
+  Axis,
+  Direction,
+  RobotService,
+  ProtocolFile
+} from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = (action) => makeActionName(NAME, action)
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
+type Error = {message: string}
+
+export type ConfirmProbedAction = {
+  type: 'robot:CONFIRM_PROBED',
+  payload: Mount
+}
+
+// TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
+export type Action =
+  | ConfirmProbedAction
+
+// TODO(mc, 2018-01-23): refactor to use type above
+//    DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
   // discovery, connect, and disconnect
   DISCOVER: makeRobotActionName('DISCOVER'),
@@ -38,7 +60,6 @@ export const actionTypes = {
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
   PROBE_TIP_RESPONSE: makeRobotActionName('PROBE_TIP_RESPONSE'),
-  RESET_TIP_PROBE: makeRobotActionName('RESET_TIP_PROBE'),
   MOVE_TO: makeRobotActionName('MOVE_TO'),
   MOVE_TO_RESPONSE: makeRobotActionName('MOVE_TO_RESPONSE'),
   TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
@@ -70,11 +91,11 @@ export const actions = {
     return {type: actionTypes.DISCOVER_FINISH}
   },
 
-  connect (name) {
+  connect (name: string) {
     return tagForRobotApi({type: actionTypes.CONNECT, payload: {name}})
   },
 
-  connectResponse (error) {
+  connectResponse (error: ?Error) {
     const didError = error != null
     const action = {type: actionTypes.CONNECT_RESPONSE, error: didError}
 
@@ -87,28 +108,33 @@ export const actions = {
     return tagForRobotApi({type: actionTypes.DISCONNECT})
   },
 
-  disconnectResponse (error) {
-    const didError = error != null
-    const action = {type: actionTypes.DISCONNECT_RESPONSE, error: didError}
-    if (didError) action.payload = error
+  disconnectResponse (error: ?Error) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.DISCONNECT_RESPONSE,
+      error: error != null
+    }
+
+    if (error) action.payload = error
 
     return action
   },
 
-  addDiscovered (service) {
+  // TODO(mc, 2018-01-23): type RobotService
+  addDiscovered (service: RobotService) {
     return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (name) {
+  removeDiscovered (name: string) {
     return {type: actionTypes.REMOVE_DISCOVERED, payload: {name}}
   },
 
-  // get session or make new session with protocol file
-  session (file) {
+  // make new session with protocol file
+  session (file: ProtocolFile) {
     return tagForRobotApi({type: actionTypes.SESSION, payload: {file}})
   },
 
-  sessionResponse (error, session) {
+  // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
+  sessionResponse (error: ?Error, session: any) {
     const didError = error != null
 
     return {
@@ -120,19 +146,19 @@ export const actions = {
     }
   },
 
-  setDeckPopulated (payload) {
+  setDeckPopulated (payload: boolean) {
     return {type: actionTypes.SET_DECK_POPULATED, payload}
   },
 
-  pickupAndHome (instrument, labware) {
+  pickupAndHome (instrument: Mount, labware: Slot) {
     return tagForRobotApi({
       type: actionTypes.PICKUP_AND_HOME,
       payload: {instrument, labware}
     })
   },
 
-  pickupAndHomeResponse (error = null) {
-    const action = {
+  pickupAndHomeResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.PICKUP_AND_HOME_RESPONSE,
       error: error != null
     }
@@ -145,15 +171,15 @@ export const actions = {
   // this action is performed in the context of confirming a tiprack labware.
   // This is confusing though, so refactor these actions + state-management
   // as necessary
-  dropTipAndHome (instrument, labware) {
+  dropTipAndHome (instrument: Mount, labware: Slot) {
     return tagForRobotApi({
       type: actionTypes.DROP_TIP_AND_HOME,
       payload: {instrument, labware}
     })
   },
 
-  dropTipAndHomeResponse (error = null) {
-    const action = {
+  dropTipAndHomeResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
       error: error != null
     }
@@ -163,15 +189,15 @@ export const actions = {
   },
 
   // confirm tiprack action drops the tip unless the tiprack is last
-  confirmTiprack (instrument, labware) {
+  confirmTiprack (instrument: Mount, labware: Slot) {
     return tagForRobotApi({
       type: actionTypes.CONFIRM_TIPRACK,
       payload: {instrument, labware}
     })
   },
 
-  confirmTiprackResponse (error = null) {
-    const action = {
+  confirmTiprackResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
       error: error != null
     }
@@ -180,15 +206,15 @@ export const actions = {
     return action
   },
 
-  moveToFront (instrument) {
+  moveToFront (instrument: Mount) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
       payload: {instrument}
     })
   },
 
-  moveToFrontResponse (error = null, instrument) {
-    const action = {
+  moveToFrontResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: error != null
     }
@@ -197,30 +223,36 @@ export const actions = {
     return action
   },
 
-  probeTip (instrument) {
+  probeTip (instrument: Mount) {
     return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {instrument}})
   },
 
-  probeTipResponse (error = null) {
-    const action = {type: actionTypes.PROBE_TIP_RESPONSE, error: error != null}
+  probeTipResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: error != null
+    }
     if (error) action.payload = error
 
     return action
   },
 
-  resetTipProbe (instrument) {
-    return {type: actionTypes.RESET_TIP_PROBE, payload: {instrument}}
+  confirmProbed (instrument: Mount): ConfirmProbedAction {
+    return {type: 'robot:CONFIRM_PROBED', payload: instrument}
   },
 
-  moveTo (instrument, labware) {
+  moveTo (instrument: Mount, labware: Slot) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO,
       payload: {instrument, labware}
     })
   },
 
-  moveToResponse (error = null) {
-    const action = {type: actionTypes.MOVE_TO_RESPONSE, error: error != null}
+  moveToResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.MOVE_TO_RESPONSE,
+      error: error != null
+    }
     if (error) action.payload = error
 
     return action
@@ -230,28 +262,31 @@ export const actions = {
     return {type: actionTypes.TOGGLE_JOG_DISTANCE}
   },
 
-  jog (instrument, axis, direction) {
+  jog (instrument: Mount, axis: Axis, direction: Direction) {
     return tagForRobotApi({
       type: actionTypes.JOG,
       payload: {instrument, axis, direction}
     })
   },
 
-  jogResponse (error = null) {
-    const action = {type: actionTypes.JOG_RESPONSE, error: error != null}
+  jogResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.JOG_RESPONSE,
+      error: error != null
+    }
     if (error) action.payload = error
 
     return action
   },
 
-  updateOffset (instrument, labware) {
+  updateOffset (instrument: Mount, labware: Slot) {
     return tagForRobotApi({
       type: actionTypes.UPDATE_OFFSET,
       payload: {instrument, labware}
     })
   },
 
-  updateOffsetResponse (error = null, isTiprack) {
+  updateOffsetResponse (error: ?Error = null, isTiprack: boolean) {
     return {
       type: actionTypes.UPDATE_OFFSET_RESPONSE,
       error: error != null,
@@ -259,7 +294,7 @@ export const actions = {
     }
   },
 
-  confirmLabware (labware) {
+  confirmLabware (labware: Slot) {
     return {type: actionTypes.CONFIRM_LABWARE, payload: {labware}}
   },
 
@@ -267,10 +302,12 @@ export const actions = {
     return tagForRobotApi({type: actionTypes.RUN})
   },
 
-  runResponse (error) {
-    const didError = error != null
-    const action = {type: actionTypes.RUN_RESPONSE, error: didError}
-    if (didError) action.payload = error
+  runResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.RUN_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
 
     return action
   },
@@ -279,10 +316,12 @@ export const actions = {
     return tagForRobotApi({type: actionTypes.PAUSE})
   },
 
-  pauseResponse (error) {
-    const didError = error != null
-    const action = {type: actionTypes.PAUSE_RESPONSE, error: didError}
-    if (didError) action.payload = error
+  pauseResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.PAUSE_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
 
     return action
   },
@@ -291,10 +330,12 @@ export const actions = {
     return tagForRobotApi({type: actionTypes.RESUME})
   },
 
-  resumeResponse (error) {
-    const didError = error != null
-    const action = {type: actionTypes.RESUME_RESPONSE, error: didError}
-    if (didError) action.payload = error
+  resumeResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.RESUME_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
 
     return action
   },
@@ -303,10 +344,12 @@ export const actions = {
     return tagForRobotApi({type: actionTypes.CANCEL})
   },
 
-  cancelResponse (error) {
-    const didError = error != null
-    const action = {type: actionTypes.CANCEL_RESPONSE, error: didError}
-    if (didError) action.payload = error
+  cancelResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.CANCEL_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
 
     return action
   },

@@ -7,10 +7,8 @@ import styles from './Contents.css'
 export default function () {
   return (
     <div>
-      <p>
-        <strong>
-          Before continuing:
-        </strong>
+      <p className={styles.attention}>
+        Before continuing:
       </p>
       <ol className={styles.list}>
         <li>
