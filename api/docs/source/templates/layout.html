@@ -1,144 +1,115 @@
-{%- extends "basic/layout.html" %} {% set css_files = css_files + ['https://opentrons.com/css/master.css'] + ['_static/override_master.css'] + ['_static/override_sphinx.css'] %} {%- block extrahead %} {{ super() }}
+{%- extends "basic/layout.html" %}
+{% set css_files = css_files +  ['_static/nav.css'] + ['_static/override_sphinx.css'] + ['_static/override_master.css']  %}
+{%- block extrahead %}
+{{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
 <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" /> {% endif %} {% if theme_canonical_url %}
 <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {% endif %}
 <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<script src="{{ pathto('_static/Akko-Pro-All.js', 1) }}"></script>
 <!-- INTERCOM -->
 <script>
 window.intercomSettings = {
-    app_id: "ukpodv2l"
+  app_id: 'ukpodv2l'
 };
 </script>
 <script>
-(function() {
-    var w = window;
-    var ic = w.Intercom;
-    if (typeof ic === "function") {
-        ic('reattach_activator');
-        ic('update', intercomSettings);
-    } else {
-        var d = document;
-        var i = function() {
-            i.c(arguments)
-        };
-        i.q = [];
-        i.c = function(args) {
-            i.q.push(args)
-        };
-        w.Intercom = i;
+(function () {
+  var w = window;
+  var ic = w.Intercom;
+  if (typeof ic === "function") {
+    ic('reattach_activator');
+    ic('update', intercomSettings);
+  } else {
+    var d = document;
+    var i = function() {
+      i.c(arguments)
+    };
+    i.q = [];
+    i.c = function(args) {
+      i.q.push(args)
+    };
+    w.Intercom = i;
 
-        function l() {
-            var s = d.createElement('script');
-            s.type = 'text/javascript';
-            s.async = true;
-            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
-            var x = d.getElementsByTagName('script')[0];
-            x.parentNode.insertBefore(s, x);
-        }
-        if (w.attachEvent) {
-            w.attachEvent('onload', l);
-        } else {
-            w.addEventListener('load', l, false);
-        }
+    function l () {
+      var s = d.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+      var x = d.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
     }
+    if (w.attachEvent) {
+        w.attachEvent('onload', l);
+    } else {
+        w.addEventListener('load', l, false);
+    }
+  }
 })()
 </script>
+<script>
+  function toggleNav () {
+    document.getElementById('main-menu').classList.toggle('open');
+  }
+</script>
 {% endblock %} {# Disable base theme's top+bottom related navs; we have our own in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock %} {# Nav should appear before content, not after #} {%- block content %}
-<header>
-    <a href="https://opentrons.com" class="brand">
-        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+
+<header id="nav">
+  <nav class="main-menu" id="main-menu" class="">
+    <a href="#" class="brand"><img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
     </a>
-    <div id="nav-collapse">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
+
+    <div id="nav-collapse" onclick="toggleNav()">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
     </div>
-    <nav>
-        <ul id="main">
-            <li>
-                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
-            </li>
-            <li>
-                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
-            </li>
-            <li>
-                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
-            </li>
-            <li>
-                <a href="https://shop.opentrons.com/">Buy</a>
-            </li>
+
+    <ul >
+      <li>
+        <a href="#" class="top-level">
+         Products
+        </a>
+        <ul>
+          <li><a href="https://opentrons.com/robots" >Robots</a></li>
+          <li><a href="https://opentrons.com/modules" >Modules</a></li>
+          <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+          <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
         </ul>
-        <section id="dropdown">
-            <ul class="products">
-                <li class="mobile">Products</li>
-                <li><a href="https://opentrons.com/robots">Robots</a></li>
-                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
-                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
-                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
-                <li>&nbsp;</li>
-            </ul>
-            <ul class="company">
-                <li class="mobile">Company</li>
-                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
-                <li><a href="https://opentrons.com/about">About</a></li>
-                <li><a href="https://opentrons.com/team">Team</a></li>
-                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
-                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
-            </ul>
-            <ul class="resources">
-                <li class="mobile">Resources</li>
-                <li><a href="https://support.opentrons.com/">Support</a></li>
-                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
-                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
-                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
-                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
-            </ul>
-        </section>
-    </nav>
-    <br style="clear:both">
-    <script type="text/javascript">
-    $(function() {
 
-        $('#dropdown').slideUp(0);
-
-        $('#nav-collapse').click(function(event) {
-            $(this).toggleClass('change');
-            $('#dropdown').slideToggle(500);
-        });
-
-        $('#dropdown ul').mouseenter(function(event) {
-            $('*').removeClass('active');
-            $(this).addClass('active');
-        });
-
-        $('#dropdown ul').mouseleave(function(event) {
-            $('*').removeClass('active');
-        });
-
-        $('.menu-toggle').mouseenter(function(event) {
-            event.preventDefault();
-            var target = $(this).attr('data-dropdown');
-
-            $('*').removeClass('active');
-            $(this).addClass('active');
-            $(target).addClass('active');
-
-            $('#dropdown').slideDown(300);
-
-            $('.brand').addClass('open');
-            $('#nav-spacer').addClass('nav-open');
-
-
-        });
-        $('header').mouseleave(function(event) {
-            $('#dropdown').slideUp(300);
-            $('.brand').removeClass('open');
-            $('#nav-spacer').removeClass('nav-open');
-        });
-    });
-    </script>
+      </li>
+      <li>
+        <a href="#">
+          Company
+        </a>
+        <ul>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">We're Hiring</a></li>
+          <li><a href="https://opentrons.com/about" >About</a></li>
+          <li><a href="https://opentrons.com/team" >Team</a></li>
+          <li><a href="https://blog.opentrons.com/">Blog</a></li>
+          <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          Resources
+        </a>
+        <ul>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="https://support.opentrons.com/getting-started"target="_blank" >Getting Started</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="https://shop.opentrons.com/" class="buy">
+          Buy
+        </a>
+      </li>
+    </ul>
+  </nav>
 </header>
-<div id="nav-spacer">&nbsp;</div>
+
 {%- if theme_fixed_sidebar|lower == 'true' %}
 <div class="document">
     {{ sidebar() }} {%- block document %}
@@ -158,93 +129,80 @@ window.intercomSettings = {
 </div>
 {%- else %} {{ super() }} {%- endif %} {%- endblock %} {%- block footer %}
 <footer>
-    <div class="get-in-touch">
-        <h1 class="title">Get In Touch</h1>
-        <p class="caption">
-            We'd love to hear from you!
-            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
-        </p>
-        <form class="footerForm">
-            <div class="input-wrapper">
-                <input type="text" name="name" value="" id="name" placeholder="Name">
-                <input type="email" name="email" value="" id="email" placeholder="Email">
-            </div>
-            <textarea name="message" id="message" placeholder="Message"></textarea>
-            <input type="hidden" name="type" value="message"></input>
-            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+  <div class="wrapper">
+
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
         </form>
-    </div>
-    <div class="nav-link-group">
-        <div class="nav-link products">
-            <span class="link-title">PRODUCTS</span>
-            <ul class="products-list">
-                <li><a href="https://opentrons.com/robots">Robots</a></li>
-                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
-                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
-                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link company">
-            <span class="link-title">COMPANY</span>
-            <ul class="company-list">
-                <li><a href="https://opentrons.com/about">About</a></li>
-                <li><a href="https://opentrons.com/team">Team</a></li>
-                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
-                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
-                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
-                <!-- <li>Privacy Policy</li> -->
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link resources">
-            <span class="link-title">RESOURCES</span>
-            <ul class="resources-list">
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >Robots</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+        <li><a href="https://support.opentrons.com/getting-started" target="_blank">Getting Started</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
 
+    </section>
 
-            <li><a href="https://support.opentrons.com/">Support</a></li>
-
-
-                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
-                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
-                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
-            </ul>
-        </div>
-        <div class="nav-link-divider"></div>
-        <div class="nav-link buy-button">
-            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
-        </div>
-        <div class="social-group">
-            <p class="social-links">
-                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
-                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
-                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
-                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
-                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
-            </p>
-            <p class="ot-newsletter">
-                Subscribe to our newsletter
-                <br>
-                <!-- <input type="email" name="email" placeholder="Email"></input>
-      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
-                <div id="mc_embed_signup">
-                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                        <div id="mc_embed_signup_scroll">
-                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
-                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
-                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
-                            </div>
-                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
-                        </div>
-                    </form>
-                </div>
-            </p>
-        </div>
-        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
-    </div>
+  </div>
 </footer>
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function(){
 
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -253,42 +211,7 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
 ga('create', 'UA-83820700-1', 'auto');
 ga('send', 'pageview');
-
-  $(".footerForm").submit(function(event) {
-    event.preventDefault();
-    var data = {};
-    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
-    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
-    console.log(data)
-
-    $.ajax({
-      type: "POST",
-      url: "https://email.opentrons.com:3000",
-      dataType: "json",
-      contentType : "application/json",
-      data: JSON.stringify(data),
-      success: function(res) {
-        console.log(`success: ${res}`);
-        $(".footerForm").fadeOut("slow");
-        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
-      },
-      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
-    });
-
-    
-    return false;
-  });
-
-  $("form.validate").submit(function(event) {
-    var data = {};
-    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
-    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
-  });
-
-  $('#chat').on('click', () => {
-    Intercom('showNewMessage');
-  })
-});
+ });
 </script>
 
 
