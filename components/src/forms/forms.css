@@ -37,6 +37,7 @@
 .checkbox_icon {
   /* Icon for radiobutton and for checkbox */
   width: 1.25rem;
+  min-width: 1.25rem;
   fill: var(--c-med-gray);
 }
 

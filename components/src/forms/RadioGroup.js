@@ -9,7 +9,7 @@ type Props = {
   /* change handler */
   onChange: (event: SyntheticEvent<>) => void,
   /* value that is checked */
-  checkedValue?: string,
+  value?: string,
   /* Array of {name, value} data */
   options?: Array<{
     name: string,
@@ -28,7 +28,7 @@ export default function RadioGroup (props: Props) {
         <label key={radio.value} className={cx(styles.form_field, props.className)}>
           <div className={styles.checkbox_icon}>
             <Icon
-              name={radio.value === props.checkedValue ? 'checked radio' : 'unchecked radio'}
+              name={radio.value === props.value ? 'checked radio' : 'unchecked radio'}
               width='100%'
             />
           </div>
@@ -37,7 +37,7 @@ export default function RadioGroup (props: Props) {
             className={cx(styles.input_field, styles.accessibly_hidden)}
             type='radio'
             value={radio.value}
-            checked={radio.value === props.checkedValue}
+            checked={radio.value === props.value}
             onChange={props.onChange}
           />
           <div className={styles.label_text}>{radio.name}</div>
