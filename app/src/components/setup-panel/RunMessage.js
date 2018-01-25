@@ -28,7 +28,7 @@ export default function RunMessage (props: Props) {
           Click [RUN PROTOCOL] to start your run.
         </p>
         <p className={styles.run_message_item}>
-          Tip: Calibrating labware is recomended, but not required.
+          Tip: Calibrating labware is recommended, but not required.
         </p>
       </InfoBox>
     )
