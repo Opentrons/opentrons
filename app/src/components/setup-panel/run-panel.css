@@ -67,8 +67,7 @@ literally just copying button styles from component lib for now
   box-shadow: none;
 }
 
-.run_link {
-  composes: button_primary;
+.button_run {
   margin: 1rem;
   width: calc(100% - 2rem);
   position: absolute;
