@@ -13,10 +13,11 @@ export default function RunMessage (props: Props) {
     return (
       <InfoBox className={styles.run_message}>
         <p className={styles.run_message_item}>
-          Confirming labware calibration is recomended but not required.
-        <p className={styles.run_message_item}>
-          Click [RUN PROTOCOL] to start your run.
+          Hurray, your robot is now ready! Click [RUN PROTOCOL] to start your run.
         </p>
+        <p className={styles.run_message_item}>
+          Tip: Try a dry run prior to adding your samples and re-agents to avoid
+          wasting materials.
         </p>
       </InfoBox>
     )
@@ -24,8 +25,7 @@ export default function RunMessage (props: Props) {
     return (
       <InfoBox className={styles.run_message}>
         <p className={styles.run_message_item}>
-          You can now proceed to labware calibration or
-          click [RUN PROTOCOL] to start your run.
+          Click [RUN PROTOCOL] to start your run.
         </p>
         <p className={styles.run_message_item}>
           Tip: Calibrating labware is recomended, but not required.
