@@ -62,6 +62,9 @@ module.exports = {
   },
   styles: {
     StyleGuide: {
+      '@global body': {
+        fontFamily: "'Open Sans', sans-serif"
+      },
       '@global .display-block': {
         display: 'block'
       },

@@ -46,5 +46,5 @@ revisit once we have a need for more than one icon aligned to bottom.
   max-width: 100%;
   height: 100%;
   padding: 1.25rem;
-  color: var(---c-med-gray);
+  color: var(--c-med-gray);
 }
