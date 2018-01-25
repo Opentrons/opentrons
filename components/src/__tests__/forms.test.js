@@ -27,7 +27,7 @@ describe('CheckboxField', () => {
       <CheckboxField
         label='Check Box 1'
         className='foo'
-        checked
+        value
       />
     ).toJSON()
 
@@ -102,7 +102,7 @@ describe('RadioGroup', () => {
   test('renders correctly with checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
-        checkedValue={'chocolate'}
+        value='chocolate'
         options={[
           {name: 'Hazelnut', value: 'hazelnut'},
           {name: 'Chocolate', value: 'chocolate'},
@@ -117,7 +117,7 @@ describe('RadioGroup', () => {
   test('renders correctly inline', () => {
     const tree = Renderer.create(
       <RadioGroup
-        checkedValue={'chocolate'}
+        value={'chocolate'}
         options={[
           {name: 'Hazelnut', value: 'hazelnut'},
           {name: 'Chocolate', value: 'chocolate'},

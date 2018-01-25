@@ -2,7 +2,7 @@
 initialState = {selectedValue: 'chocolate'}
 
 ;<RadioGroup
-  checkedValue={state.selectedValue}
+  value={state.selectedValue}
   options={[
     {name: 'Hazelnut', value: 'hazelnut'},
     {name: 'Chocolate', value: 'chocolate'},
@@ -18,7 +18,7 @@ Inline
 initialState = {selectedValue: 'chocolate'}
 
 ;<RadioGroup
-  checkedValue={state.selectedValue}
+  value={state.selectedValue}
   options={[
     {name: 'Hazelnut', value: 'hazelnut'},
     {name: 'Chocolate', value: 'chocolate'},
