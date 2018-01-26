@@ -1,10 +1,40 @@
 // @flow
-import {createAction} from 'redux-actions'
+// import {createAction} from 'redux-actions'
 import type {
   // Store as ReduxStore,
-  Dispatch as ReduxDispatch
+  Dispatch
 } from 'redux'
+
+import {type RootState, selectors} from './reducers'
 import type {StepType, StepIdType} from './types'
+
+type GetState = () => RootState
+
+// Update Form input (onChange on inputs)
+
+type ChangeFormPayload = {
+  accessor: string, // TODO use FormData keys type
+  value: string | boolean
+}
+
+type ChangeFormInputAction = {
+  type: 'CHANGE_FORM_INPUT',
+  payload: ChangeFormPayload
+}
+
+export const changeFormInput = (payload: ChangeFormPayload): ChangeFormInputAction => ({
+  type: 'CHANGE_FORM_INPUT',
+  payload
+})
+
+// Populate form with selected action (only used in thunks)
+
+export type PopulateFormAction = {
+  type: 'POPULATE_FORM',
+  payload: {} // TODO use FormData keys type
+}
+
+// Create new step
 
 export type AddStepAction = {
   type: 'ADD_STEP',
@@ -18,20 +48,19 @@ type NewStepPayload = {
   stepType: StepType
 }
 
-type StepListState = {}
-
 // addStep thunk adds an incremental integer ID for Step reducers.
-let stepIdCounter = 0
 export const addStep = (payload: NewStepPayload) =>
-  (dispatch: ReduxDispatch<AddStepAction>, getState: StepListState) => {
+  (dispatch: Dispatch<*> /*!*/, getState: GetState) => {
+    const stepId = selectors.nextStepId(getState())
     dispatch({
       type: 'ADD_STEP',
       payload: {
         ...payload,
-        id: stepIdCounter
+        id: stepId
       }
     })
-    stepIdCounter += 1
+
+    dispatch(selectStep(stepId))
   }
 
 type ExpandAddStepButtonAction = {
@@ -54,4 +83,28 @@ export const toggleStepCollapsed = (payload: StepIdType): ToggleStepCollapsedAct
   payload
 })
 
-export const selectStep = createAction('SELECT_STEP', (stepId: StepIdType) => stepId)
+export const selectStep = (payload: StepIdType) =>
+  (dispatch: Dispatch<*>, getState: GetState) => {
+    dispatch({
+      type: 'SELECT_STEP',
+      payload: payload
+    })
+
+    dispatch({
+      type: 'POPULATE_FORM',
+      payload: selectors.selectedStepFormData(getState())
+    })
+  }
+
+export const saveStepForm = () =>
+  (dispatch: Dispatch<*>, getState: GetState) => {
+    dispatch({
+      type: 'SAVE_STEP_FORM',
+      payload: selectors.formDataToStep(getState())
+    })
+  }
+
+export const cancelStepForm = () => ({
+  type: 'CANCEL_STEP_FORM',
+  payload: null
+})

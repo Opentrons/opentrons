@@ -12,39 +12,12 @@ import {
 
 import FormSection from './FormSection'
 import styles from './StepEditForm.css'
+import type {FormData} from '../steplist/types' // TODO import from index.js
 
 type Options = Array<{
   name: string,
   value: string
 }>
-
-type FormData = {
-  'aspirate--labware': string,
-  'aspirate--wells': string,
-  'aspirate--pipette': string,
-  'aspirate--pre-wet-tip': boolean,
-  'aspirate--touch-tip': boolean,
-  'aspirate--air-gap--checkbox': boolean,
-  'aspirate--air-gap--volume': string,
-  'aspirate--mix--checkbox': boolean,
-  'aspirate--mix--volume': string,
-  'aspirate--mix--time': string,
-  'aspirate--disposal-vol--checkbox': boolean,
-  'aspirate--disposal-vol--volume': string,
-  'aspirate--change-tip': string,
-  'dispense--labware': string,
-  'dispense--wells': string,
-  'dispense--volume': string,
-  'dispense--mix--checkbox': boolean,
-  'dispense--mix--volume': string,
-  'dispense--mix--times': string,
-  'dispense--delay--checkbox': boolean,
-  'dispense--delay-minutes': string,
-  'dispense--delay-seconds': string,
-  'dispense--blowout--checkbox': boolean,
-  'dispense--blowout--labware': string,
-  'dispense--change-tip': string
-}
 
 type Props = {
   stepType: 'transfer' | 'distribute', /* TODO Ian 2018-01-24 support other steps */

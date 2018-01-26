@@ -1,38 +1,21 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import type {Dispatch} from 'redux'
 
+import {changeFormInput, cancelStepForm, saveStepForm} from '../steplist/actions' // TODO use steplist/index.js
+import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
+
 import StepEditForm from '../components/StepEditForm'
+
+function StepEditFormWrapper (props) {
+  // control rendering
+  return props.formData && <StepEditForm {...props} />
+}
 
 function mapStateToProps (state) {
   return {
-    formData: {
-      'aspirate--labware': 'sourcePlateId',
-      'aspirate--wells': 'A1,A2,A3',
-      'aspirate--pipette': '300-single',
-      'aspirate--pre-wet-tip': false,
-      'aspirate--touch-tip': false,
-      'aspirate--air-gap--checkbox': true,
-      'aspirate--air-gap--volume': '',
-      'aspirate--mix--checkbox': false,
-      'aspirate--mix--volume': '',
-      'aspirate--mix--time': '',
-      'aspirate--disposal-vol--checkbox': false,
-      'aspirate--disposal-vol--volume': '',
-      'aspirate--change-tip': 'always',
-      'dispense--labware': 'destPlateId',
-      'dispense--wells': 'B2, C3',
-      'dispense--volume': '20',
-      'dispense--mix--checkbox': false,
-      'dispense--mix--volume': '',
-      'dispense--mix--times': '',
-      'dispense--delay--checkbox': false,
-      'dispense--delay-minutes': '',
-      'dispense--delay-seconds': '',
-      'dispense--blowout--checkbox': false,
-      'dispense--blowout--labware': '',
-      'dispense--change-tip': 'never'
-    },
+    formData: selectors.formData(state),
     stepType: 'transfer',
     pipetteOptions: [
       {name: '10 μL Single', value: '10-single'}, /* TODO: should be 'p10 single'? What 'value'? */
@@ -50,11 +33,11 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch: Dispatch<*>) {
   return {
-    onCancel: e => dispatch({type: 'FAKE_CANCEL'}), // TODO
-    onSave: e => dispatch({type: 'FAKE_SAVE'}), // TODO
+    onCancel: e => dispatch(cancelStepForm()),
+    onSave: e => dispatch(saveStepForm()),
     handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
       // TODO Ian 2018-01-26 factor this nasty type handling out
-      const dispatchEvent = value => dispatch({type: 'FORM_CHANGE__STEP_EDIT_FORM', payload: {accessor, value}})
+      const dispatchEvent = value => dispatch(changeFormInput({accessor, value}))
 
       if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
         dispatchEvent(e.target.checked)
@@ -65,4 +48,4 @@ function mapDispatchToProps (dispatch: Dispatch<*>) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StepEditForm)
+export default connect(mapStateToProps, mapDispatchToProps)(StepEditFormWrapper)
