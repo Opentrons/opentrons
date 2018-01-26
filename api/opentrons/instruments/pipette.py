@@ -4,6 +4,7 @@ import warnings
 from opentrons import commands
 
 from opentrons.containers import unpack_location
+
 from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
@@ -62,7 +63,7 @@ class Pipette:
         The smallest recommended uL volume for this pipette (Default: `0`)
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
-        (Default: `None`)
+        (Default: `fixed-trash`)
     tip_racks : list
         A list of Containers for this Pipette to track tips when calling
         :meth:`pick_up_tip` (Default: [])
@@ -101,7 +102,7 @@ class Pipette:
             min_volume=0,
             max_volume=None,
             ul_per_mm=18.51,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
             dispense_speed=DEFAULT_DISPENSE_SPEED,
@@ -120,8 +121,12 @@ class Pipette:
             name = self.__class__.__name__
         self.name = name
 
+        if trash_container == '':
+            trash_container = self.robot.fixed_trash
+
         if isinstance(trash_container, Container) and len(trash_container) > 0:
             trash_container = trash_container[0]
+
         self.trash_container = trash_container
         self.tip_racks = tip_racks
         self.starting_tip = None
@@ -924,7 +929,13 @@ class Pipette:
 
         if isinstance(location, Placeable):
             # give space for the drop-tip mechanism
-            location = location.bottom(self._drop_tip_offset)
+            # @TODO (Laura & Andy 2018261)
+            # When container typing is implemented, make sure that
+            # when returning to a tiprack, tips are dropped from the bottom
+            if 'rack' in location.get_parent().get_type():
+                location = location.bottom(self._drop_tip_offset)
+            else:
+                location = location.top()
 
         @commands.publish.both(command=commands.drop_tip)
         def _drop_tip(location, instrument=self):
