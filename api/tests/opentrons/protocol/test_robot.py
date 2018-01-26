@@ -25,28 +25,30 @@ def test_pos_tracker_persistance(robot):
     )
     plate = containers_load(robot, 'trough-12row', '5')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 40.0
+    assert robot.max_placeable_height_on_deck(plate) == 40.0
 
     robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 40.0
+    assert robot.max_placeable_height_on_deck(plate) == 10.0
 
 
 def test_calibrated_max_z(robot):
+
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, '96-flat', '1')
+    assert robot.max_deck_height() == 63
+    # plate = containers_load(robot, '96-flat', '1')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 10.5
+    # assert robot.max_deck_height() == 10.5
 
-    robot.move_head(x=10, y=10)
-    robot.calibrate_container_with_instrument(plate, p200, save=False)
+    # robot.move_head(x=10, y=10)
+    # robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 10.5
+    # assert robot.max_deck_height() == 10.5
 
 
 def test_get_serial_ports_list(robot, monkeypatch):
@@ -63,14 +65,15 @@ def test_get_serial_ports_list(robot, monkeypatch):
 
 def test_add_container(robot):
     c1 = robot.add_container('96-flat', '1')
+    trash = robot.fixed_trash
     res = robot.get_containers()
-    expected = [c1]
-    assert res == expected
+    expected = [c1, trash]
+    assert set(res) == set(expected)
 
     c2 = robot.add_container('96-flat', '4', 'my-special-plate')
     res = robot.get_containers()
-    expected = [c1, c2]
-    assert res == expected
+    expected = [c1, c2, trash]
+    assert set(res) == set(expected)
 
 
 def test_comment(robot):
@@ -88,6 +91,8 @@ def test_comment(robot):
 
 
 def test_create_arc(robot):
+    from opentrons.robot.robot import TIP_CLEARANCE
+
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
@@ -100,7 +105,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 30.5},
+        {'z': robot.max_deck_height() + TIP_CLEARANCE},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -115,7 +120,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 30.5},
+        {'z': robot.max_deck_height() + TIP_CLEARANCE},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
