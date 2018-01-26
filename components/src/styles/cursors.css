@@ -1,0 +1,11 @@
+/* cursor styling */
+
+:root {
+  --clickable: {
+    cursor: pointer;
+  };
+
+  --click-disabled: {
+    cursor: default;
+  };
+}
