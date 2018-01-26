@@ -19,15 +19,44 @@ export default function ProtocolEditor () {
 
         <div className={styles.main_page_content}>
           <StepEditForm
-            onCancel={e => window.alert('TODO: Cancel')}
-            onSave={e => window.alert('TODO: Save')}
-            handleChange={(accessor: string) => (e: React.SyntheticEvent<>) => console.log(accessor, e.target.type === 'checkbox' ? e.target.checked : e.target.value)}
+            onCancel={e => console.log('TODO: Cancel')}
+            onSave={e => console.log('TODO: Save')}
+            handleChange={(accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
+              // TODO Ian 2018-01-26 factor this nasty type handling out
+              const dispatchEvent = value => console.log(accessor, value)
+
+              if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
+                dispatchEvent(e.target.checked)
+              } else if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
+                dispatchEvent(e.target.value)
+              }
+            }}
             formData={{
-              'aspirate--labware': 'destPlateId',
+              'aspirate--labware': 'sourcePlateId',
               'aspirate--wells': 'A1,A2,A3',
+              'aspirate--pipette': '300-single',
               'aspirate--pre-wet-tip': false,
-              'aspirate--touch-tip': true,
-              'aspirate--change-tip': 'once'
+              'aspirate--touch-tip': false,
+              'aspirate--air-gap--checkbox': true,
+              'aspirate--air-gap--volume': '',
+              'aspirate--mix--checkbox': false,
+              'aspirate--mix--volume': '',
+              'aspirate--mix--time': '',
+              'aspirate--disposal-vol--checkbox': false,
+              'aspirate--disposal-vol--volume': '',
+              'aspirate--change-tip': 'always',
+              'dispense--labware': 'destPlateId',
+              'dispense--wells': 'B2, C3',
+              'dispense--volume': '20',
+              'dispense--mix--checkbox': false,
+              'dispense--mix--volume': '',
+              'dispense--mix--times': '',
+              'dispense--delay--checkbox': false,
+              'dispense--delay-minutes': '',
+              'dispense--delay-seconds': '',
+              'dispense--blowout--checkbox': false,
+              'dispense--blowout--labware': '',
+              'dispense--change-tip': 'never'
             }}
             stepType='transfer'
             /* ingredientOptions={[
