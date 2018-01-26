@@ -19,7 +19,9 @@ type Props = {
   /** width as a number or string (for nesting inside another SVG) */
   height?: number | string,
   /** height as a number or string (for nesting inside another SVG) */
-  width?: number | string
+  width?: number | string,
+  /** onClick handler */
+  onClick?: (event: SyntheticEvent<>) => void
 }
 
 /**
@@ -31,7 +33,7 @@ type Props = {
  * ```
  */
 export default function Icon (props: Props) {
-  const {x, y, height, width} = props
+  const {x, y, height, width, onClick} = props
   const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin
@@ -43,6 +45,7 @@ export default function Icon (props: Props) {
       aria-hidden='true'
       viewBox={viewBox}
       className={className}
+      onClick={onClick}
       fill='currentColor'
       {...{x, y, height, width}}
     >
