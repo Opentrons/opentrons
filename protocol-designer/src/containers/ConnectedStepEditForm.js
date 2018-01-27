@@ -1,16 +1,25 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 
 import {changeFormInput, cancelStepForm, saveStepForm} from '../steplist/actions' // TODO use steplist/index.js
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
+import type {FormData} from '../steplist/types'
 
-import StepEditForm from '../components/StepEditForm'
+import StepEditForm, {type Props as StepEditFormProps} from '../components/StepEditForm'
 
-function StepEditFormWrapper (props) {
-  // control rendering
-  return props.formData && <StepEditForm {...props} />
+type Props = {
+  ...StepEditFormProps,
+  formData?: FormData
+}
+
+function StepEditFormWrapper (props: Props) {
+  // don't render StepEditForm unless there is formData available
+  if (props.formData) {
+    return <StepEditForm {...props} />
+  }
+  return null
 }
 
 function mapStateToProps (state) {

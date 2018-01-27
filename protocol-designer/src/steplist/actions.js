@@ -1,14 +1,11 @@
 // @flow
-// import {createAction} from 'redux-actions'
 import type {
-  // Store as ReduxStore,
   Dispatch
 } from 'redux'
 
-import {type RootState, selectors} from './reducers'
+import {selectors} from './reducers'
 import type {StepType, StepIdType} from './types'
-
-type GetState = () => RootState
+import type {GetState, ThunkAction} from '../types'
 
 // Update Form input (onChange on inputs)
 
@@ -50,7 +47,7 @@ type NewStepPayload = {
 
 // addStep thunk adds an incremental integer ID for Step reducers.
 export const addStep = (payload: NewStepPayload) =>
-  (dispatch: Dispatch<*> /*!*/, getState: GetState) => {
+  (dispatch: any, getState: GetState) => {
     const stepId = selectors.nextStepId(getState())
     dispatch({
       type: 'ADD_STEP',
@@ -83,7 +80,12 @@ export const toggleStepCollapsed = (payload: StepIdType): ToggleStepCollapsedAct
   payload
 })
 
-export const selectStep = (payload: StepIdType) =>
+export type SelectStepAction = {
+  type: 'SELECT_STEP',
+  payload: StepIdType
+}
+
+export const selectStep = (payload: StepIdType): ThunkAction<*> =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     dispatch({
       type: 'SELECT_STEP',
@@ -95,6 +97,13 @@ export const selectStep = (payload: StepIdType) =>
       payload: selectors.selectedStepFormData(getState())
     })
   }
+
+export type SaveStepFormAction = {
+  type: 'SAVE_STEP_FORM',
+  payload: {
+    id: StepIdType
+  }
+}
 
 export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {

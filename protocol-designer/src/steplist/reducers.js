@@ -3,15 +3,21 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
+import max from 'lodash/max'
 
+import type {BaseState} from '../types'
 import type {FormData, StepItemData, StepIdType} from './types'
-import type {AddStepAction, PopulateFormAction} from './actions' // Thunk action creators
+import type {
+  AddStepAction,
+  PopulateFormAction,
+  SaveStepFormAction,
+  SelectStepAction
+} from './actions' // Thunk action creators
 import {
   cancelStepForm,
   saveStepForm,
   changeFormInput,
   expandAddStepButton,
-  selectStep,
   toggleStepCollapsed
 } from './actions'
 
@@ -145,7 +151,7 @@ const steps = handleActions({
     ...state,
     [action.payload.id]: createDefaultStep(action)
   }),
-  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => ({
+  SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
     [action.payload.id]: action.payload // TODO translate fields don't literally take them
   })
@@ -176,8 +182,7 @@ const orderedSteps = handleActions({
 type SelectedStepState = null | StepIdType
 
 const selectedStep = handleActions({
-  // ADD_STEP: (state: SelectedStepState, action: AddStepAction) => action.payload.id,
-  SELECT_STEP: (state: SelectedStepState, action: ActionType<typeof selectStep>) => action.payload
+  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
 }, null)
 
 type StepCreationButtonExpandedState = boolean
@@ -212,7 +217,6 @@ export const _allReducers = {
 const rootReducer = combineReducers(_allReducers)
 
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
-type BaseState = {steplist: RootState}
 const rootSelector = (state: BaseState): RootState => state.steplist
 
 export const selectors = {
@@ -248,9 +252,12 @@ export const selectors = {
   ),
   nextStepId: createSelector( // generates the next step ID to use
     (state: BaseState) => rootSelector(state).steps,
-    steps => Object.keys(steps).length === 0
-      ? 0
-      : Math.max(...Object.keys(steps)) + 1
+    (steps): number => {
+      const allStepIds = Object.keys(steps).map(stepId => parseInt(stepId))
+      return allStepIds.length === 0
+        ? 0
+        : max(allStepIds) + 1
+    }
   )
 }
 

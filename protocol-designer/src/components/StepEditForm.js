@@ -19,7 +19,7 @@ type Options = Array<{
   value: string
 }>
 
-type Props = {
+export type Props = {
   stepType: 'transfer' | 'distribute', /* TODO Ian 2018-01-24 support other steps */
   // ingredientOptions: Options,
   pipetteOptions: Options,
@@ -27,7 +27,8 @@ type Props = {
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
-  formData: FormData /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
+  formData: FormData
+  /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
     this obj reflects the form selector's return values */
 }
 
