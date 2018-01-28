@@ -7,7 +7,6 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import (
 POSITION_ON_BOOT = {axis: 0 for axis in AXES}
 
 
-
 def test_driver_init(smoothie):
     assert smoothie.position == POSITION_ON_BOOT
 

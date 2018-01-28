@@ -192,7 +192,8 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         # TODO (andy) should come from a config file
-        self.dimensions = (395, 345, 228)
+        # TODO (andy) height 200 is arbitrary, should calc per pipette/tip?
+        self.dimensions = (393, 357.5, 200)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
