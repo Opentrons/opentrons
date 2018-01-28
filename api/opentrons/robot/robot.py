@@ -19,7 +19,7 @@ log = get_logger(__name__)
 # container. This should not be a single value, but should be optimized given
 # the movements context (ie sterility vs speed). This is being set to 20mm
 # to allow containers >150mm to be usable on the deck for the tiem being.
-TIP_CLEARANCE = 20
+TIP_CLEARANCE = 5
 
 
 class InstrumentMosfet(object):
@@ -617,7 +617,7 @@ class Robot(object):
             _, _, z = pose_tracker.absolute(self.poses, other)
             safe_height = self.max_deck_height() + TIP_CLEARANCE
             if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+                self.poses = other.instrument_mover.fast_home(self.poses, 10)
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
@@ -649,7 +649,10 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        travel_height = self.max_deck_height() + self.arc_height
+        travel_height = self.max_deck_height()
+        if this_container and self._previous_container == this_container:
+            travel_height = self.max_placeable_height_on_deck(this_container)
+        travel_height += self.arc_height
 
         _, _, robot_max_z = self.dimensions  # TODO: Check what this does
         arc_top = min(travel_height, robot_max_z)
@@ -961,3 +964,15 @@ class Robot(object):
     @lru_cache()
     def max_deck_height(self):
         return pose_tracker.max_z(self.poses, self._deck)
+
+    def max_placeable_height_on_deck(self, placeable):
+        offset = placeable.top()[1]
+        placeable_coordinate = add(
+            pose_tracker.absolute(
+                self.poses,
+                placeable
+            ),
+            offset.coordinates
+        )
+        placeable_tallest_point = pose_tracker.max_z(self.poses, placeable)
+        return placeable_coordinate[2] + placeable_tallest_point
