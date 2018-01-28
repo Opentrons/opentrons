@@ -20,12 +20,12 @@ log = logging.getLogger(__name__)
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
-    'X': 394,
-    'Y': 344,
-    'Z': 227,
-    'A': 227,
-    'B': 18.9997,
-    'C': 18.9997
+    'X': 418,
+    'Y': 353,
+    'Z': 218,
+    'A': 218,
+    'B': 19,
+    'C': 19
 }
 
 PLUNGER_BACKLASH_MM = 0.3
