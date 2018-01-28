@@ -42,6 +42,16 @@ def test_containers_create(robot):
     database.delete_container(container_name)
     assert container_name not in containers_list()
 
+    container_name = 'other_plate_for_testing_containers_create'
+    p = containers_create(
+        name=container_name,
+        grid=(8, 12),
+        spacing=(9, 9),
+        diameter=4,
+        depth=8,
+        save=False)
+    assert p['C3'].max_volume() == 0
+
 
 class ContainerTestCase(unittest.TestCase):
     def setUp(self):
