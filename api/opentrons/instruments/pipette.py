@@ -15,7 +15,7 @@ PLUNGER_POSITIONS = {
     'top': 18.5,
     'bottom': 2,
     'blow_out': 0,
-    'drop_tip': -3.5
+    'drop_tip': -7
 }
 
 DEFAULT_ASPIRATE_SPEED = 5

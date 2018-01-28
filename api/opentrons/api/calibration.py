@@ -90,7 +90,7 @@ class CalibrationManager:
         inst = instrument._instrument
         log.debug('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        # inst.robot.home()
+        inst.robot.home()
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
         )

@@ -197,9 +197,9 @@ def test_speed_change(model, monkeypatch):
     pipette.aspirate().dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
-        ['G0F30000 M400'],
+        ['G0F9000 M400'],
         ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
-        ['G0F30000 M400']
+        ['G0F9000 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
