@@ -42,6 +42,42 @@ class InstrumentsWrapper(object):
     def Pipette(self, *args, **kwargs):
         return inst.Pipette(self.robot, *args, **kwargs)
 
+    def P300_Single(self, *args, **kwargs):
+        kwargs.update({
+            'channels': 1,
+            'ul_per_mm': 18.51
+        })
+        p = inst.Pipette(self.robot, *args, **kwargs)
+        p.set_pick_up_current(0.1)
+        return p
+
+    def P300_Multi(self, *args, **kwargs):
+        kwargs.update({
+            'channels': 8,
+            'ul_per_mm': 18.51
+        })
+        p = inst.Pipette(self.robot, *args, **kwargs)
+        p.set_pick_up_current(0.3)
+        return p
+
+    def P10_Single(self, *args, **kwargs):
+        kwargs.update({
+            'channels': 1,
+            'ul_per_mm': 0.617
+        })
+        p = inst.Pipette(self.robot, *args, **kwargs)
+        p.set_pick_up_current(0.1)
+        return p
+
+    def P10_Multi(self, *args, **kwargs):
+        kwargs.update({
+            'channels': 8,
+            'ul_per_mm': 0.617
+        })
+        p = inst.Pipette(self.robot, *args, **kwargs)
+        p.set_pick_up_current(0.3)
+        return p
+
     def Magbead(self, *args, **kwargs):
         return inst.Magbead(self.robot, *args, **kwargs)
 
