@@ -392,7 +392,7 @@ class SmoothieDriver_3_0_0:
         }
         self.update_position(default=homed)
 
-        return homed
+        return self.position
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
