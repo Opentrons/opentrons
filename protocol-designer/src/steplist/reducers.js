@@ -1,12 +1,16 @@
+// @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
 
-import type {StepType} from './types'
+import type {StepItemData, StepIdType} from './types'
+import type {AddStepAction} from './actions' // Thunk action creators
+import {expandAddStepButton, selectStep, toggleStepCollapsed} from './actions'
 
-// TODO move to test
+// TODO move to test once substeps selector is implemented
 /*
-const initialSteps = {
+{
   0: {
     title: 'Transfer X',
     stepType: 'transfer',
@@ -107,65 +111,92 @@ const initialSteps = {
 const initialStepOrder = [0, 2, 3, 4, 5]
 */
 
-type AddStepType = {
-  stepType: StepType,
-  id: number
+// Add default title (and later, other default values) to newly-created Step
+function createDefaultStep (action: AddStepAction) {
+  const {stepType} = action.payload
+  return {...action.payload, title: stepType}
 }
 
-export function createDefaultStep (payload: AddStepType) {
-  const {stepType} = payload
-  return {...payload, title: stepType}
-}
+type StepsState = {[StepIdType]: StepItemData}
 
 const steps = handleActions({
-  ADD_STEP: (state, action) => ({
+  ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
-    [action.payload.id]: createDefaultStep(action.payload)
+    [action.payload.id]: createDefaultStep(action)
   })
 }, {})
 
-// Payload is ID. TODO: type that
+type CollapsedStepsState = {
+  [StepIdType]: boolean
+}
+
 const collapsedSteps = handleActions({
-  ADD_STEP: (state, action) => ({...state, [action.payload]: false}),
-  TOGGLE_STEP_COLLAPSED: (state, action) => ({
+  ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
     ...state,
-    [action.payload]: !state[action.payload]
+    [action.payload.id]: false
+  }),
+  TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, {payload}: ActionType<typeof toggleStepCollapsed>) => ({
+    ...state,
+    [payload]: !state[payload]
   })
 }, {})
+
+type OrderedStepsState = Array<StepIdType>
 
 const orderedSteps = handleActions({
-  ADD_STEP: (state, action) => [...state, action.payload.id]
+  ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
+    [...state, action.payload.id]
 }, [])
 
+type SelectedStepState = null | StepIdType
+
 const selectedStep = handleActions({
-  ADD_STEP: (state, action) => action.payload.id,
-  SELECT_STEP: (state, action) => action.payload
+  ADD_STEP: (state: SelectedStepState, action: AddStepAction) => action.payload.id,
+  SELECT_STEP: (state: SelectedStepState, {payload}: ActionType<typeof selectStep>) => payload
 }, null)
+
+type StepCreationButtonExpandedState = boolean
 
 const stepCreationButtonExpanded = handleActions({
   ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: (state, action) => action.payload
+  EXPAND_ADD_STEP_BUTTON: (
+    state: StepCreationButtonExpandedState,
+    {payload}: ActionType<typeof expandAddStepButton>
+  ) =>
+    payload
 }, false)
 
-const rootReducer = combineReducers({
+export type RootState = {
+  steps: StepsState,
+  collapsedSteps: CollapsedStepsState,
+  orderedSteps: OrderedStepsState,
+  selectedStep: SelectedStepState,
+  stepCreationButtonExpanded: StepCreationButtonExpandedState
+}
+
+export const _allReducers = {
   steps,
   collapsedSteps,
   orderedSteps,
   selectedStep,
   stepCreationButtonExpanded
-})
+}
 
-const rootSelector = state => state.steplist // TODO LATER
+const rootReducer = combineReducers(_allReducers)
+
+// TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
+type BaseState = {steplist: RootState}
+const rootSelector = (state: BaseState): RootState => state.steplist
 
 export const selectors = {
   stepCreationButtonExpanded: createSelector(
     rootSelector,
-    state => state.stepCreationButtonExpanded
+    (state: RootState) => state.stepCreationButtonExpanded
   ),
   allSteps: createSelector(
-    state => rootSelector(state).steps,
-    state => rootSelector(state).orderedSteps,
-    state => rootSelector(state).collapsedSteps,
+    (state: BaseState) => rootSelector(state).steps,
+    (state: BaseState) => rootSelector(state).orderedSteps,
+    (state: BaseState) => rootSelector(state).collapsedSteps,
     (steps, orderedSteps, collapsedSteps) => orderedSteps.map(id => ({
       ...steps[id],
       collapsed: collapsedSteps[id]
@@ -173,7 +204,7 @@ export const selectors = {
   ),
   selectedStepId: createSelector(
     rootSelector,
-    state => state.selectedStep
+    (state: RootState) => state.selectedStep
   )
 }
 

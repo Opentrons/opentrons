@@ -34,17 +34,26 @@ def test_plunger_commands(smoothie, monkeypatch):
         'B': 4,
         'C': 5})
     expected = [
-        ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+        ['M907 B0.5 C0.5 M400'],               # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
-        ['G28.2[ABCZ]+ G28.2X G28.2Y M400'],  # Home
-        ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+        ['G28.2[ABCZ]+ M400'],                 # Home
+        ['M907 B0.1 C0.1 M400'],               # Set plunger current low
         ['G4P0.05 M400'],                      # Dwell
-        ['M114.2 M400'],                      # Get position
-        ['G0.+ M400'],                        # Move (non-plunger)
-        ['M907 B0.5 C0.5 M400'],              # Set plunger current high
+        ['M907 Y0.8 M400'],                    # set Y motor to low current
+        ['G4P0.05 M400'],                      # delay for current
+        ['G0F3000 M400'],                      # set Y motor to low speed
+        ['G0Y-20 M400'],                       # move Y motor away from switch
+        ['M907 Y1.5 M400'],                    # set Y back to high current
+        ['G4P0.05 M400'],                      # delay for current
+        ['G0F9000 M400'],                      # set back to default speed
+        ['G28.2X M400'],                       # home X
+        ['G28.2Y M400'],                       # home Y
+        ['M114.2 M400'],                       # Get position
+        ['G0.+ M400'],                         # Move (non-plunger)
+        ['M907 B0.5 C0.5 M400'],               # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
-        ['G0.+[BC].+ M400'],                  # Move (including BC)
-        ['M907 B0.1 C0.1 M400'],              # Set plunger current low
+        ['G0.+[BC].+ M400'],                   # Move (including BC)
+        ['M907 B0.1 C0.1 M400'],               # Set plunger current low
         ['G4P0.05 M400']                       # Dwell
     ]
     # from pprint import pprint
@@ -100,7 +109,8 @@ def test_functional(smoothie):
 
 
 def test_fast_home(model):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION, \
+        Y_SWITCH_BACK_OFF_MM
     import types
     driver = model.robot._driver
 
@@ -112,11 +122,13 @@ def test_fast_home(model):
         coords.append(target)
         move(target)
 
+    target_y = driver.position['Y'] - Y_SWITCH_BACK_OFF_MM
+
     driver.move = types.MethodType(move_mock, driver)
 
     assert coords == []
     driver.fast_home(axis='X', safety_margin=12)
-    assert coords == [{'X': HOMED_POSITION['X'] - 12}]
+    assert coords == [{'X': HOMED_POSITION['X'] - 12}, {'Y': target_y}]
     assert driver.position['X'] == HOMED_POSITION['X']
 
 

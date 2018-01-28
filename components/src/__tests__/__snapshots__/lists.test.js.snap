@@ -2,7 +2,7 @@
 
 exports[`ListAlert list alert renders correctly 1`] = `
 <li
-  className="alert"
+  className="list_alert"
 >
    alert alert
 </li>
@@ -10,11 +10,12 @@ exports[`ListAlert list alert renders correctly 1`] = `
 
 exports[`ListItem renders ListItem with icon correctly 1`] = `
 <li
+  className="list_item disabled"
   onClick={undefined}
 >
   <svg
     aria-hidden="true"
-    className="icon"
+    className="item_icon"
     fill="currentColor"
     height={undefined}
     version="1.1"
@@ -36,6 +37,7 @@ exports[`ListItem renders ListItem with icon correctly 1`] = `
 
 exports[`ListItem renders ListItem without icon correctly 1`] = `
 <li
+  className="list_item disabled"
   onClick={undefined}
 >
   <span
@@ -49,17 +51,17 @@ exports[`TitledList renders TitledList with children correctly 1`] = `
   className=""
 >
   <div
-    className="list_title_bar"
+    className="title_bar"
     onClick={undefined}
   >
     <h3
-      className="list_title"
+      className="title"
     >
       foo
     </h3>
   </div>
   <ol
-    className="titled_list"
+    className="list"
   >
     <li>
       Woop
@@ -73,11 +75,11 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
   className=""
 >
   <div
-    className="list_title_bar"
+    className="title_bar"
     onClick={undefined}
   >
     <h3
-      className="list_title"
+      className="title"
     >
       foo
     </h3>
@@ -90,11 +92,11 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
   className=""
 >
   <div
-    className="list_title_bar"
+    className="title_bar"
     onClick={undefined}
   >
     <h3
-      className="list_title"
+      className="title"
     >
       foo
     </h3>
@@ -107,19 +109,19 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
   className=""
 >
   <div
-    className="list_title_bar"
+    className="title_bar"
     onClick={undefined}
   >
     <h3
-      className="list_title"
+      className="title"
     />
     <div
-      className="accordion_carat"
+      className="title_bar_carat"
       onClick={[Function]}
     >
       <svg
         aria-hidden="true"
-        className=""
+        className="title_bar_icon"
         fill="currentColor"
         height={undefined}
         version="1.1"
@@ -143,19 +145,19 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
   className=""
 >
   <div
-    className="list_title_bar"
+    className="title_bar"
     onClick={undefined}
   >
     <h3
-      className="list_title"
+      className="title"
     />
     <div
-      className="accordion_carat"
+      className="title_bar_carat"
       onClick={[Function]}
     >
       <svg
         aria-hidden="true"
-        className=""
+        className="title_bar_icon"
         fill="currentColor"
         height={undefined}
         version="1.1"
@@ -175,7 +177,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
     Description
   </span>
   <ol
-    className="titled_list"
+    className="list"
   >
     <li>
       1

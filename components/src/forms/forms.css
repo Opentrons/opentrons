@@ -1,0 +1,113 @@
+@import '../index.css';
+
+.accessibly_hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+.form_field {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+}
+
+.label_text {
+  flex: 0 0 auto;
+  padding: 0 0.5rem;
+
+  &:empty {
+    padding: 0;
+  }
+}
+
+.formgroup_label {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-bold);
+  margin-bottom: 0.5rem;
+}
+
+.checkbox_icon {
+  /* Icon for radiobutton and for checkbox */
+  width: 1.25rem;
+  min-width: 1.25rem;
+  fill: var(--c-med-gray);
+}
+
+.input_field {
+  display: flex;
+  flex: 1 1;
+  background-color: var(--c-light-gray);
+  border-radius: 3px;
+  padding: 0.25rem 1rem;
+
+  & input {
+    background-color: inherit;
+    border-radius: inherit;
+    border: none;
+    flex: 1 1 auto;
+    color: inherit;
+  }
+
+  & input:focus {
+    outline: none;
+    color: inherit;
+  }
+
+  & input::placeholder {
+    color: var(--c-med-gray);
+  }
+
+  &:focus-within {
+    border: 2px solid var(--c-med-gray);
+  }
+
+  & .suffix {
+    display: inline-block;
+    flex: 1 0;
+    font-weight: var(--fw-semibold);
+    text-align: right;
+  }
+}
+
+.inline {
+  display: flex;
+
+  & .label_text {
+    padding-right: 1.5rem;
+  }
+}
+
+.dropdown_field {
+  position: relative;
+
+  & select {
+    border: 0;
+    padding: 0.25rem 1rem;
+    outline: none;
+    border-radius: 3px;
+    color: var(--c-dark-gray);
+    background-color: var(--c-light-gray);
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    appearance: none;
+    overflow: hidden;
+  }
+
+  & .dropdown_icon {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.25rem;
+    width: 1.25rem;
+    color: var(--c-dark-gray);
+    pointer-events: none;
+  }
+}

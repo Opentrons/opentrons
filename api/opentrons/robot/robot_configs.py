@@ -119,14 +119,17 @@ def load(filename=None):
         with open(filename, 'r') as file:
             local = json.load(file)
             result = robot_config(**merge([default._asdict(), local]))
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         log.info('Config {0} not found. Loading defaults'.format(filename))
 
     return result
 
 
-def save(config, filename=None):
+def save(config, filename=None, tag=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if tag:
+        root, ext = os.path.splitext(filename)
+        filename = "{}-{}{}".format(root, tag, ext)
     _default = children(default._asdict())
 
     diff = build([

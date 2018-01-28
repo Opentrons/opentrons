@@ -11,17 +11,12 @@ import {
   type ConnectionStatus,
   type SessionStatus,
   _NAME,
-  UNPROBED,
-  PREPARING_TO_PROBE,
-  READY_TO_PROBE,
-  PROBING,
-  PROBED,
   UNCONFIRMED,
   INSTRUMENT_AXES,
   DECK_SLOTS
 } from './constants'
 
-import type {Mount} from './types'
+import type {Mount, InstrumentCalibrationStatus} from './types'
 
 type State = {
   robot: {
@@ -198,25 +193,31 @@ export const getInstruments = createSelector(
       const instrument = instrumentsByMount[mount]
       if (!instrument || !instrument.name) return {mount}
 
-      let calibration = UNPROBED
+      const probed = probedByMount[mount] || false
+      let calibration: InstrumentCalibrationStatus = 'unprobed'
 
       // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
+      // TODO(mc: 2018-01-23): handle probe error state better
       if (calibrationRequest.mount === mount && !calibrationRequest.error) {
         if (calibrationRequest.type === 'MOVE_TO_FRONT') {
           calibration = calibrationRequest.inProgress
-            ? PREPARING_TO_PROBE
-            : READY_TO_PROBE
+            ? 'preparing-to-probe'
+            : 'ready-to-probe'
         } else if (calibrationRequest.type === 'PROBE_TIP') {
-          calibration = calibrationRequest.inProgress
-            ? PROBING
-            : PROBED
+          if (calibrationRequest.inProgress) {
+            calibration = 'probing'
+          } else if (!probed) {
+            calibration = 'probed-tip-on'
+          } else {
+            calibration = 'probed'
+          }
         }
       }
 
       return {
         ...instrument,
         calibration,
-        probed: probedByMount[mount] || false
+        probed
       }
     })
   }

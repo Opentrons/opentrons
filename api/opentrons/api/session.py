@@ -166,6 +166,10 @@ class Session(object):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
+            if message['name'] == types.PAUSE:
+                self.set_state('paused')
+            if message['name'] == types.RESUME:
+                self.set_state('running')
 
         self._reset()
 

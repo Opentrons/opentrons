@@ -7,7 +7,7 @@ ReviewPrompt.propTypes = {
   setDeckPopulated: PropTypes.func.isRequired,
   moveToLabware: PropTypes.func.isRequired,
   currentLabware: PropTypes.shape({
-    slot: PropTypes.number.isRequired
+    slot: PropTypes.string.isRequired
   }).isRequired
 }
 

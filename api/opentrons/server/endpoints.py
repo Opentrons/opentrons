@@ -16,7 +16,7 @@ async def health(request):
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
-        body=repr(json.dumps(res)))
+        body=json.dumps(res))
 
 
 async def wifi_list(request):
@@ -43,7 +43,7 @@ async def wifi_list(request):
             splitres = proc.stdout.decode().split("\n")
             ssids = repr(json.dumps([x.split(":")[0] for x in splitres]))
     else:
-        ssids = repr(json.dumps(['a', 'b', 'c']))
+        ssids = json.dumps(['a', 'b', 'c'])
     return web.json_response(
         body=ssids
     )
@@ -114,5 +114,5 @@ async def wifi_status(request):
     else:
         connectivity['status'] = "testing"
     return web.json_response(
-        body=repr(json.dumps(connectivity))
+        body=json.dumps(connectivity)
     )

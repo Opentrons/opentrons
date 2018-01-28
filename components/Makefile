@@ -36,7 +36,7 @@ uninstall:
 
 .PHONY: build
 build:
-	$(env)=production $(bin)/styleguidist build
+	$(env)=development $(bin)/styleguidist build
 
 # development
 #####################################################################

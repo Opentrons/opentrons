@@ -494,17 +494,17 @@ class Container(Placeable):
         Calculates the grid inferring row/column structure
         from indexes. Currently only Letter+Number names are supported
         """
-        rows = OrderedDict()
+        columns = OrderedDict()
         index_pattern = r'^([A-Za-z]+)([0-9]+)$'
         for name in self.children_by_name:
             match = re.match(index_pattern, name)
             if match:
-                col, row = match.groups(0)
-                if row not in rows:
-                    rows[row] = OrderedDict()
-                rows[row][col] = (row, col)
+                row, col = match.groups(0)
+                if col not in columns:
+                    columns[col] = OrderedDict()
+                columns[col][row] = (row, col)
 
-        return rows
+        return columns
 
     def transpose(self, rows):
         """
@@ -523,14 +523,14 @@ class Container(Placeable):
         Returns the grid as a WellSeries of WellSeries
         """
         res = OrderedDict()
-        for row, cells in matrix.items():
-            if row not in res:
-                res[row] = OrderedDict()
-            for col, cell in cells.items():
-                res[row][col] = self.children_by_name[
-                    ''.join(reversed(cell))
+        for col, cells in matrix.items():
+            if col not in res:
+                res[col] = OrderedDict()
+            for row, cell in cells.items():
+                res[col][row] = self.children_by_name[
+                    ''.join(cell)
                 ]
-            res[row] = WellSeries(res[row], name=row)
+            res[col] = WellSeries(res[col], name=col)
         return WellSeries(res)
 
     @property
@@ -538,14 +538,14 @@ class Container(Placeable):
         """
         Rows can be accessed as:
         >>> plate.rows[0]
-        >>> plate.rows['1']
+        >>> plate.rows['A']
 
         Wells can be accessed as:
         >>> plate.rows[0][0]
-        >>> plate.rows['1']['A']
+        >>> plate.rows['A']['1']
         """
         self.calculate_grid()
-        return self.grid
+        return self.grid_transposed
 
     @property
     def columns(self):
@@ -559,7 +559,7 @@ class Container(Placeable):
         >>> plate.columns['1']['A']
         """
         self.calculate_grid()
-        return self.grid_transposed
+        return self.grid
 
     @property
     def cols(self):
@@ -651,12 +651,11 @@ class Container(Placeable):
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
         if x is None and isinstance(y, int):
-            return self.rows(y)
+            return self.rows[y]
         elif y is None and isinstance(x, int):
-            return self.cols(x)
+            return self.cols[x]
         elif isinstance(x, int) and isinstance(y, int):
-            i = (y * len(self.cols)) + x
-            return self.wells(i)
+            return self.cols[x][y]
         else:
             raise ValueError('Placeable.wells(x=, y=) expects ints')
 

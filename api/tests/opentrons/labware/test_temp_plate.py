@@ -13,7 +13,7 @@ def plate(robot):
     def buffer_gcodes(command, timeout=None):
         gcode_buffer.append(command)
 
-    temp_plate = TemperaturePlate(robot, 'A1', min_temp=4, max_temp=70)
+    temp_plate = TemperaturePlate(robot, '1', min_temp=4, max_temp=70)
     setattr(temp_plate.driver, '_send_command', buffer_gcodes)
     setattr(temp_plate, 'test_buffer', gcode_buffer)
     temp_plate.driver.simulating = False
@@ -22,7 +22,7 @@ def plate(robot):
 
 @pytest.fixture
 def sim_plate(robot):
-    temp_plate = TemperaturePlate(robot, 'A1', min_temp=4, max_temp=70)
+    temp_plate = TemperaturePlate(robot, '1', min_temp=4, max_temp=70)
     return temp_plate
 
 

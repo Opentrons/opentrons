@@ -14,6 +14,7 @@
   --c-bg-dark: #4a4a4a;
   --c-bg-light: #fcfcfc;
   --c-bg-selected: #d1d1d1;
+  --c-bg-selected-light: #f1f1f1;
 
   /* Misc */
   --c-overlay: rgba(0, 0, 0, 0.7);

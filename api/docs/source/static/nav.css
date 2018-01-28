@@ -1,0 +1,432 @@
+/************************
+        Main Nav
+************************/
+header#nav {
+    border-bottom: 1px solid #e5e5e5;
+    z-index: 10000;
+    width: 100%;
+    *zoom: 1;
+    position: fixed;
+    top: 0;
+    background-color: white;
+}
+
+header#nav:before,
+header#nav:after {
+    content: " ";
+    display: table;
+}
+
+header#nav:after {
+    clear: both;
+}
+
+nav.main-menu {
+    width: 90%;
+    margin: 0 auto;
+    font-size: 1em;
+    position: relative;
+    width: 100vw;
+    height: 48px;
+    line-height: 48px;
+    overflow: hidden;
+    transition: height 0.5s linear;
+    z-index: 1000;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    nav.main-menu {
+        width: 90%;
+    }
+}
+
+nav.main-menu div#nav-collapse {
+    display: none;
+}
+
+nav.main-menu a.brand {
+    display: inline-block;
+    width: 140px;
+}
+
+nav.main-menu a.brand img {
+    margin-top: 4px;
+    margin-bottom: 6px;
+    transition: all 0.5s linear;
+    width: 100%;
+}
+
+nav.main-menu:hover {
+    height: 160px;
+    overflow: hidden;
+}
+
+nav.main-menu:hover a.brand img {
+    margin-top: 52.8px;
+}
+
+nav.main-menu ul {
+    display: inline-block;
+    float: right;
+    margin-top: 0;
+}
+
+nav.main-menu li {
+    display: inline-block;
+    width: 130px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+nav.main-menu li:nth-child(4) {
+    width: 50px;
+}
+
+nav.main-menu li .buy {
+    border: 1px solid #999;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 24px;
+}
+
+nav.main-menu li a {
+    display: block;
+    color: #999;
+    text-decoration: none;
+    transition: color 0.5s linear;
+    transition: padding 0.2s linear;
+    padding: 0;
+}
+
+nav.main-menu li a:hover {
+    color: black;
+}
+
+nav.main-menu li ul {
+    overflow: visible;
+    line-height: 20px;
+}
+
+nav.main-menu li ul li {
+    display: block;
+    font-size: 11px;
+    white-space: nowrap;
+    color: grey;
+    text-transform: capitalize;
+    padding: 0;
+}
+
+nav.main-menu li ul li a:hover {
+    padding-left: 3px;
+}
+
+nav.main-menu li:hover ul li {
+    color: black;
+}
+
+@media only screen and (max-width: 768px),
+only screen and (max-device-width: 768px) {
+    /********* Toggle Mobile Nav Icon**********/
+    nav.main-menu div#nav-collapse {
+        float: right;
+        display: block;
+        width: 50px;
+        cursor: pointer;
+        padding-right: 20px;
+        margin-top: 4px;
+    }
+    nav.main-menu div#nav-collapse .bar1,
+    nav.main-menu div#nav-collapse .bar2,
+    nav.main-menu div#nav-collapse .bar3 {
+        width: 35px;
+        height: 5px;
+        background-color: #0070ff;
+        margin: 6px 0;
+        transition: 0.4s;
+        border-radius: 2px;
+    }
+    nav.main-menu.open .bar1 {
+        -webkit-transform: rotate(-45deg) translate(-9px, 6px);
+        transform: rotate(-45deg) translate(-9px, 6px);
+    }
+    nav.main-menu.open .bar2 {
+        opacity: 0;
+    }
+    nav.main-menu.open .bar3 {
+        -webkit-transform: rotate(45deg) translate(-8px, -8px);
+        transform: rotate(45deg) translate(-8px, -8px);
+    }
+    /********* Expand and Contract Menu on Toggle **********/
+    nav.main-menu {
+        transition: all 0.5s linear;
+    }
+    nav.main-menu:hover {
+        height: 50px;
+    }
+    nav.main-menu:hover a.brand img {
+        margin-top: 4px;
+    }
+    nav.main-menu.open {
+        height: 780px;
+        overflow: hidden;
+    }
+    nav.main-menu ul {
+        height: 100%;
+    }
+    nav.main-menu ul,
+    nav.main-menu ul li,
+    nav.main-menu ul li:last-child,
+    nav.main-menu ul li:nth-child(4) {
+        width: 100%;
+        display: block;
+        text-align: center;
+        padding: 0;
+    }
+    nav.main-menu ul li a {
+        font-weight: 800;
+        color: black;
+        font-size: 14px;
+        line-height: 40px;
+        background-color: #EEE;
+    }
+    nav.main-menu ul li a:hover {
+        background-color: #d5d5d5;
+    }
+    nav.main-menu ul ul a {
+        font-weight: 600;
+        color: grey;
+        font-size: 12px;
+        background-color: white;
+    }
+    nav.main-menu ul ul {
+        border-bottom: 1px solid #EEE;
+    }
+}
+
+/************************
+        Footer
+************************/
+
+
+
+footer {
+    background-color: #333;
+    width: 100%;
+    *zoom: 1;
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+
+footer:before,
+footer:after {
+    content: " ";
+    display: table;
+}
+
+footer:after {
+    clear: both;
+}
+
+footer .wrapper {
+    width: 90%;
+    margin: 0 auto;
+    font-size: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper {
+        width: 90%;
+    }
+}
+
+footer .wrapper section.social-signup {
+    width: 98%;
+    display: block;
+    padding: 0%;
+    margin: 0;
+    font-size: 16px;
+    vertical-align: top;
+    font-family: "AkkoPro-Light", sans-serif;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.social-signup {
+        display: inline-block;
+        width: 41.66667%;
+        vertical-align: top;
+        padding-left: 1%;
+        padding-right: 1%;
+        margin-right: -4px;
+    }
+}
+
+footer .wrapper section.social-signup h3 {
+    margin-bottom: 12px;
+    color: white;
+}
+
+footer .wrapper section.footer-menu {
+    width: 98%;
+    display: block;
+    padding: 0%;
+    margin: 0;
+    font-size: 16px;
+    vertical-align: top;
+    color: white;
+    display: none;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu {
+        display: inline-block;
+        width: 50%;
+        vertical-align: top;
+        padding-left: 1%;
+        padding-right: 1%;
+        margin-right: -4px;
+    }
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+}
+
+footer .wrapper section.footer-menu ul {
+    list-style-type: none;
+    display: inline-block;
+    flex: 1 1 100px;
+    padding: 0 20px;
+    vertical-align: top;
+    text-align: left;
+    white-space: nowrap;
+}
+
+footer .wrapper section.footer-menu ul:not(:last-child) {
+    border-right: 3px solid #666;
+}
+
+footer .wrapper section.footer-menu ul:last-child {
+    padding-right: 0;
+    flex: 1 0 50px;
+}
+
+footer .wrapper section.footer-menu ul li:first-child,
+footer .wrapper section.footer-menu ul li:first-child a {
+    font-weight: 400;
+    text-transform: uppercase;
+    padding-bottom: 24px;
+    color: white;
+}
+
+footer .wrapper section.footer-menu ul li a {
+    color: #777;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu ul li a {
+        font-size: 1.5vw;
+    }
+}
+
+@media only screen and (min-device-width: 960px) and (min-width: 960px) {
+    footer .wrapper section.footer-menu ul li a {
+        font-size: 16px;
+    }
+}
+
+footer .wrapper section.footer-menu ul li a.buy {
+    text-decoration: underline;
+}
+
+div.social-links {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+div.social-links img {
+    display: inline-block;
+    width: 34px;
+    margin-right: 10px;
+}
+
+p.copyrite {
+    font-family: "Open Sans", sans-serif;
+    font-size: 10px;
+    color: white;
+}
+
+div#mc_embed_signup_scroll {
+    padding: 0;
+    color: black;
+}
+
+div#mc_embed_signup_scroll input {
+    max-width: 100%;
+    width: 98%;
+    height: 34px;
+    margin-top: 5px;
+    padding-left: 10px;
+    border: none;
+    font-size: 12px;
+    vertical-align: bottom;
+    border-radius: 6px;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    div#mc_embed_signup_scroll input {
+        max-width: 70%;
+    }
+}
+
+div#mc_embed_signup_scroll input.subscribe {
+    color: black;
+    padding: 6px 10px;
+    font-size: 16px;
+    width: 100%;
+    min-width: 100px;
+    height: 34px;
+    background-color: #EEE;
+}
+
+@media only screen and (min-device-width: 960px) and (min-width: 960px) {
+    div#mc_embed_signup_scroll input.subscribe {
+        margin-left: 5px;
+        width: 20%;
+    }
+}
+
+div#mc_embed_signup_scroll input.subscribe:hover {
+    padding-top: 5px;
+    cursor: pointer;
+    color: black;
+}
+
+div.hero {
+    width: 100vw;
+    height: 100vh;
+    padding: 0 1%;
+    position: relative;
+    overflow: hidden;
+    background: url("https://s3.amazonaws.com/opentrons-landing-img/hero_landing.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    text-align: center;
+    color: white;
+    font-family: "Open Sans", sans-serif;
+}
+
+footer .hiring{
+    color: #006FFF;
+
+  }

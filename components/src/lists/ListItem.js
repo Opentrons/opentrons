@@ -1,7 +1,8 @@
 // @flow
-// list components
+// ListItem component to be used as a child of TitledList
 import * as React from 'react'
 import {NavLink} from 'react-router-dom'
+import classnames from 'classnames'
 
 import styles from './lists.css'
 import {type IconName, Icon} from '../icons'
@@ -12,7 +13,7 @@ type ListItemProps = {
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string,
   className?: string,
-  /** if disabled, the NavLink will be disabled */
+  /** if disabled, the onClick handler / NavLink will be disabled */
   isDisabled: boolean,
   /** name constant of the icon to display */
   iconName?: IconName,
@@ -24,8 +25,26 @@ type ListItemProps = {
  *
  */
 export default function ListItem (props: ListItemProps) {
-  const {url, isDisabled, onClick, iconName} = props
-  const itemIcon = iconName && (<Icon className={styles.icon} name={iconName} />)
+  const {url, isDisabled, iconName} = props
+  const onClick = props.onClick && !isDisabled
+    ? props.onClick
+    : undefined
+
+  const className = classnames(props.className, styles.list_item, {
+    [styles.list_item_link]: url,
+    [styles.disabled]: isDisabled,
+    [styles.clickable]: onClick
+  })
+
+  const itemIcon = iconName && (
+    <Icon className={styles.item_icon} name={iconName} />
+  )
+
+  const children = (
+    <span className={styles.info}>
+      {props.children}
+    </span>
+  )
 
   if (url) {
     return (
@@ -34,21 +53,20 @@ export default function ListItem (props: ListItemProps) {
           to={url}
           onClick={onClick}
           disabled={isDisabled}
+          className={className}
           activeClassName={styles.active}
-          >
+        >
           {itemIcon}
-          <span className={styles.info}>{props.children}</span>
+          {children}
         </NavLink>
       </li>
     )
   }
 
   return (
-    <li onClick={onClick}>
+    <li onClick={onClick} className={className}>
       {itemIcon}
-      <span className={styles.info}>
-        {props.children}
-      </span>
+      {children}
     </li>
   )
 }

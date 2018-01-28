@@ -31,6 +31,10 @@ PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.05
 
+Y_SWITCH_BACK_OFF_MM = 20
+Y_BACKOFF_LOW_CURRENT = 0.8
+Y_BACKOFF_SLOW_SPEED = 50
+
 DEFAULT_AXES_SPEED = 500
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
@@ -271,6 +275,21 @@ class SmoothieDriver_3_0_0:
 
             return ret_code
 
+    def _home_x(self):
+        # move the gantry forward on Y axis with low power
+        prior_y_current = float(self._current_settings['Y'])
+        self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
+        self.set_speed(Y_BACKOFF_SLOW_SPEED)
+
+        # move away from the Y endstop switch
+        target_coord = {'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM}
+        self.move(target_coord)
+        self.set_current({'Y': prior_y_current})
+        self.default_speed()
+
+        # now it is safe to home the X axis
+        self._send_command(GCODES['HOME'] + 'X')
+
     def _setup(self):
         self._reset_from_error()
         self._send_command(self._config.acceleration)
@@ -349,15 +368,18 @@ class SmoothieDriver_3_0_0:
                 for group in HOME_SEQUENCE
             ]))
 
-        command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
-        self._send_command(command, timeout=30)
+        for axes in home_sequence:
+            if 'X' in axes:
+                self._home_x()
+            else:
+                command = GCODES['HOME'] + axes
+                self._send_command(command, timeout=30)
 
         # Only update axes that have been selected for homing
         homed = {
             ax: HOMED_POSITION.get(ax)
             for ax in ''.join(home_sequence)
         }
-
         self.update_position(default=homed)
 
         return homed

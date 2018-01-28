@@ -12,21 +12,6 @@ def stringify_location(location):
             if isinstance(item, Slot):
                 return item
 
-    slot_number_mapping = {
-        'A1': '1',
-        'B1': '2',
-        'C1': '3',
-        'A2': '4',
-        'B2': '5',
-        'C2': '6',
-        'A3': '7',
-        'B3': '8',
-        'C3': '9',
-        'A4': '10',
-        'B4': '11',
-        'C4': '12',
-    }
-
     type_to_text = {
         Slot: 'slot',
         Container: 'container',
@@ -63,7 +48,7 @@ def stringify_location(location):
             suffix='s' if multiple else '',
             first=location[0].get_name(),
             last='...'+location[-1].get_name() if multiple else '',
-            slot_text=slot_number_mapping[get_slot(location[0]).get_name()]
+            slot_text=get_slot(location[0]).get_name()
         )
 
 
@@ -304,6 +289,24 @@ def delay(seconds, minutes):
             'minutes': minutes,
             'seconds': seconds,
             'text': text
+        }
+    )
+
+
+def pause():
+    return make_command(
+        name=types.PAUSE,
+        payload={
+            'text': 'Pausing robot operation'
+        }
+    )
+
+
+def resume():
+    return make_command(
+        name=types.RESUME,
+        payload={
+            'text': 'Resuming robot operation'
         }
     )
 

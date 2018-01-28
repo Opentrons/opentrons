@@ -1,5 +1,5 @@
 from math import pi, sin, cos
-from opentrons.cli.solve import solve
+from opentrons.cli.linal import solve
 import numpy as np
 
 

@@ -2,7 +2,7 @@
 // robot calibration state and reducer
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import type {Mount, Slot, LabwareCalibrationStatus} from '../types'
-import {actionTypes} from '../actions'
+import {actionTypes, type ConfirmProbedAction} from '../actions'
 
 import {
   UNCONFIRMED,
@@ -62,13 +62,15 @@ export type State = {
   updateOffsetRequest: LabwareConfirmationRequest,
 }
 
-// TODO(mc, 2018-01-11): import union of discrete action types from actions
-type Action = {
-  type: string,
-  payload?: any,
-  error?: boolean,
-  meta?: {}
-}
+// TODO(mc, 2018-01-11): depecrate this once all robot actions typed
+type Action =
+  | {
+      type: string,
+      payload?: any,
+      error?: boolean,
+      meta?: {}
+    }
+  | ConfirmProbedAction
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
@@ -85,7 +87,6 @@ const {
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
   PROBE_TIP_RESPONSE,
-  RESET_TIP_PROBE,
   MOVE_TO,
   MOVE_TO_RESPONSE,
   TOGGLE_JOG_DISTANCE,
@@ -126,6 +127,7 @@ export default function calibrationReducer (
   action: Action
 ): State {
   switch (action.type) {
+    case 'robot:CONFIRM_PROBED': return handleConfirmProbed(state, action)
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
@@ -141,7 +143,6 @@ export default function calibrationReducer (
     case CONFIRM_TIPRACK_RESPONSE: return handleConfirmTiprackResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
-    case RESET_TIP_PROBE: return handleResetTipProbe(state, action)
     case MOVE_TO: return handleMoveTo(state, action)
     case MOVE_TO_RESPONSE: return handleMoveToResponse(state, action)
     case TOGGLE_JOG_DISTANCE: return handleToggleJog(state, action)
@@ -175,6 +176,7 @@ function handleMoveToFront (state, action) {
 
   return {
     ...state,
+    deckPopulated: false,
     calibrationRequest: {
       type: 'MOVE_TO_FRONT',
       mount: instrument,
@@ -211,15 +213,16 @@ function handleProbeTip (state, action) {
       mount: instrument,
       inProgress: true,
       error: null
+    },
+    probedByMount: {
+      ...state.probedByMount,
+      [instrument]: false
     }
   }
 }
 
 function handleProbeTipResponse (state, action) {
-  const {calibrationRequest: {mount}} = state
   const {payload, error} = action
-
-  if (mount !== 'left' && mount !== 'right') return state
 
   return {
     ...state,
@@ -229,18 +232,18 @@ function handleProbeTipResponse (state, action) {
       error: error
         ? payload
         : null
-    },
-    probedByMount: {
-      ...state.probedByMount,
-      [mount]: state.probedByMount[mount] || !error
     }
   }
 }
 
-function handleResetTipProbe (state, action) {
+// TODO(mc, 2018-01-23): change Action to ConfirmProbedAction when able
+function handleConfirmProbed (state: State, action: Action): State {
+  // TODO(mc, 2018-01-23): remove when actions are fully typed
+  if (action.payload !== 'left' && action.payload !== 'right') return state
+
   return {
     ...state,
-    calibrationRequest: {...state.calibrationRequest, mount: ''}
+    probedByMount: {...state.probedByMount, [action.payload]: true}
   }
 }
 

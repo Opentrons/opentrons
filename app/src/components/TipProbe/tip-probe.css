@@ -1,0 +1,9 @@
+.spinner {
+  width: 25%;
+
+  /*
+   * TODO(mc, 2018-01-22): revisit positioning of spinner
+   * For now, this centers it b/t two columns of CalibrationInfoContent
+   */
+  margin-left: calc(-12.5% - 1rem);
+}

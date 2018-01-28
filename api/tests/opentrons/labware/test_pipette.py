@@ -13,8 +13,8 @@ from numpy import isclose
 
 
 def test_drop_tip_move_to(robot):
-    plate = containers_load(robot, '96-flat', 'A1')
-    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    plate = containers_load(robot, '96-flat', '1')
+    tiprack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
     p200.tip_attached = True
     x, y, z = (161.0, 116.7, 3.0)
@@ -36,13 +36,13 @@ def test_drop_tip_move_to(robot):
 
 
 def test_aspirate_move_to(robot):
-    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,
                    mount='left',
                    tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
@@ -62,11 +62,11 @@ def test_aspirate_move_to(robot):
 
 
 def test_blow_out_move_to(robot):
-    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tiprack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
     p200.pick_up_tip()
 
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
@@ -85,13 +85,13 @@ def test_blow_out_move_to(robot):
 
 
 def test_dispense_move_to(robot):
-    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,
                    mount='left',
                    tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
@@ -115,11 +115,11 @@ class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
         self.robot.home()
-        self.trash = containers_load(self.robot, 'point', 'A1')
-        self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', 'B2')
-        self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', 'B3')
+        self.trash = containers_load(self.robot, 'point', '1')
+        self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', '5')
+        self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', '8')
 
-        self.plate = containers_load(self.robot, '96-flat', 'A2')
+        self.plate = containers_load(self.robot, '96-flat', '4')
 
         self.p200 = Pipette(
             self.robot,
@@ -1226,8 +1226,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 8
         self.p200.transfer(
             200,
-            self.plate.rows[0],
-            self.plate.rows[1],
+            self.plate.cols[0],
+            self.plate.cols[1],
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1250,8 +1250,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 1
         self.p200.transfer(
             200,
-            self.plate.rows('1', '2'),
-            self.plate.rows('3'),
+            self.plate.cols('1', '2'),
+            self.plate.cols('3'),
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1494,8 +1494,8 @@ class PipetteTest(unittest.TestCase):
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
         self.tiprack2 = generate_plate(
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
-        self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
-        self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
+        self.robot._deck['1'].add(self.tiprack1, 'tiprack1')
+        self.robot._deck['2'].add(self.tiprack2, 'tiprack2')
 
         self.p200 = Pipette(
             self.robot,
@@ -1568,9 +1568,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack1.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack1.cols[i]))
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack2.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack2.cols[i]))
 
         # print('Mock calls')
         # pprint(p200_multi.move_to.mock_calls)
