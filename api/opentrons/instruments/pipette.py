@@ -23,8 +23,7 @@ DEFAULT_DISPENSE_SPEED = 10
 
 DEFAULT_TIP_PRESS_MM = -10
 
-SINGLE_PLUNGE_CURRENT = 0.1
-MULTI_PLUNGE_CURRENT = 0.3
+DEFAULT_PLUNGE_CURRENT = 0.1
 
 
 class PipetteTip:
@@ -103,7 +102,7 @@ class Pipette:
             channels=1,
             min_volume=0,
             max_volume=None,
-            ul_per_mm=18.51,
+            ul_per_mm=1000.0,  # if none is specified, make it incredibily big
             trash_container=None,
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
@@ -154,9 +153,8 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
 
-        self._pick_up_current = SINGLE_PLUNGE_CURRENT
-        if self.type == 'multi':
-            self.set_pick_up_current(MULTI_PLUNGE_CURRENT)
+        self._pick_up_current = None
+        self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
