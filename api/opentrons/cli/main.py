@@ -43,29 +43,50 @@ point_number = -1
 slot_1_lower_left = (12.13, 6.0)
 slot_3_lower_right = (380.87, 6.0)
 slot_10_upper_left = (12.13, 351.5)
-# Expected reference points
-expected = [
+expected_dots = [
     slot_1_lower_left,
     slot_3_lower_right,
     slot_10_upper_left
 ]
 
+# for machines that cannot reach the calibration dots, use the screw holes
+slot_4_screw_hole = (108.75, 92.8)
+slot_6_screw_hole = (373.75, 92.8)
+slot_11_screw_hole = (241.25, 273.80)
+expected_holes = [
+    slot_4_screw_hole,
+    slot_6_screw_hole,
+    slot_11_screw_hole
+]
+
+# Expected reference points
+expected = []
+test_points = []
+
 # Actuals get overridden when ENTER is pressed
 actual = [(0, 0)] * 3
 
-# Accessible through 1,2,3 ... keyboard keys to test
-# calibration by moving to known locations
-test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
-    [
-        (132.50, 90.50, TIP_LENGTH),        # Slot 5
-        (332.13, 47.41, TIP_LENGTH),        # Corner of 3
-        (190.65, 227.57, TIP_LENGTH),       # Corner of 8
-        (330.14, 222.78, TIP_LENGTH),       # Corner of 9
-    ]
-
-
 T = robot.config.gantry_calibration
 XY = None
+
+
+def generate_test_points():
+    global test_points, expected_dots, expected_holes, expected
+    # older machines cannot reach deck points, use the screw holes instead
+    res = input('Are you calibrating to the screw holes? (y/n)')
+    if 'y' in res.lower():
+        expected = expected_holes
+    else:
+        expected = expected_dots
+    # Accessible through 1,2,3 ... keyboard keys to test
+    # calibration by moving to known locations
+    test_points = [(x, y, TIP_LENGTH) for x, y in expected] + \
+        [
+            (132.50, 90.50, TIP_LENGTH),        # Slot 5
+            (332.13, 47.41, TIP_LENGTH),        # Corner of 3
+            (190.65, 227.57, TIP_LENGTH),       # Corner of 8
+            (330.14, 222.78, TIP_LENGTH),       # Corner of 9
+        ]
 
 
 def current_step() -> float:
@@ -258,6 +279,8 @@ def main():
         print('Exiting--prior configuration data not changed')
         sys.exit()
     backup_configuration_and_reload()
+
+    generate_test_points()
 
     robot.connect()
     tip = urwid.Text(u"X/Y/Z: left,right/up,down/q,a; Pipette (swap): z; Steps: -/=; Test points: 1, 2, 3")   # NOQA

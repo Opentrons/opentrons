@@ -77,10 +77,10 @@ default = robot_config(
     probe_center=(295.0, 300.0, 55.0),
     probe_dimensions=(35.0, 40.0, 60.0),
     gantry_calibration=[  # "safe" offset, overwrote in factory calibration
-        [ 1.00, 0.00, 0.00,  -27.0],
-        [ 0.00, 1.00, 0.00,   -10],
-        [ 0.00, 0.00, 1.00,  -10],
-        [ 0.00, 0.00, 0.00,   1.00]
+        [ 1.00, 0.00, 0.00,  0.00],
+        [ 0.00, 1.00, 0.00,  0.00],
+        [ 0.00, 0.00, 1.00,  0.00],
+        [ 0.00, 0.00, 0.00,  1.00]
     ],
     # left relative to right
     instrument_offset={
