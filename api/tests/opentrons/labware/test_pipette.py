@@ -143,6 +143,11 @@ class PipetteTest(unittest.TestCase):
     def test_bad_volume_percentage(self):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
 
+    def test_add_instrument(self):
+        self.robot.reset()
+        Pipette(self.robot, mount='left')
+        self.assertRaises(RuntimeError, Pipette, self.robot, mount='left')
+
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
         self.p200.tip_attached = True
@@ -168,7 +173,7 @@ class PipetteTest(unittest.TestCase):
         warnings.filterwarnings('error')
         self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
         self.assertRaises(
-            UserWarning, Pipette, self.robot, mount='left', max_volume=200)
+            UserWarning, Pipette, self.robot, mount='right', max_volume=200)
         warnings.filterwarnings('default')
 
     # TODO: (artyom, 20171101): bring back once plunger position is being tracked
@@ -400,7 +405,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_set_flow_rate(self):
         ul_per_mm = 20
-        self.p200 = Pipette(self.robot, mount='left', ul_per_mm=ul_per_mm)
+        self.p200 = Pipette(self.robot, mount='right', ul_per_mm=ul_per_mm)
 
         self.p200.set_flow_rate(aspirate=100)
         expected_mm_per_sec = 100 / ul_per_mm
