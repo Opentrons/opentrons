@@ -24,12 +24,14 @@ export default function FormSection (props: Props) {
       </div>
 
       {props.onCollapseToggle &&
-        <Icon
-          onClick={props.onCollapseToggle}
-          width='30px'
-          name={props.collapsed === true ? 'chevron up' : 'chevron down'}
-          className={styles.carat}
-        />
+        <div onClick={props.onCollapseToggle}>
+          {/* TODO Ian 2018-01-29 use an IconButton once it exists */}
+          <Icon
+            width='30px'
+            name={props.collapsed === true ? 'chevron up' : 'chevron down'}
+            className={styles.carat}
+          />
+        </div>
       }
     </div>
   )

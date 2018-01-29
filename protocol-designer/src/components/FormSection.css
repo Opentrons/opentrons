@@ -1,7 +1,7 @@
 @import '@opentrons/components';
 
 :root {
-  --title-width: 7rem;
+  --formsection-title-width: 7rem;
 }
 
 .form_section {
@@ -19,7 +19,7 @@
 }
 
 .content {
-  padding-left: var(--title-width);
+  padding-left: var(--formsection-title-width);
 }
 
 .carat {

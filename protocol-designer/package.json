@@ -53,7 +53,9 @@
   },
   "stylelint": {
     "rules": {
-      "selector-class-pattern": "^[a-z0-9_]+$"
+      "selector-class-pattern": "^[a-z0-9_]+$",
+      "at-rule-no-unknown": null,
+      "property-no-unknown": null
     },
     "extends": [
       "stylelint-config-standard",

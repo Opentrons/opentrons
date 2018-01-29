@@ -51,8 +51,7 @@ dev:
 
 .PHONY: test
 test:
-	$(MAKE) check jest
-	$(MAKE) check lint
+	$(MAKE) check jest lint
 
 .PHONY: jest
 jest:
