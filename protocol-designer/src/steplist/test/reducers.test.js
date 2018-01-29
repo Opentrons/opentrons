@@ -126,15 +126,6 @@ describe('orderedSteps reducer', () => {
 })
 
 describe('selectedStep reducer', () => {
-  test('select newly added step', () => {
-    const action = {
-      type: 'ADD_STEP',
-      payload: {id: 123, stepType: 'transfer'}
-    }
-    expect(selectedStep(5, action)).toEqual(123)
-    expect(selectedStep(null, action)).toEqual(123)
-  })
-
   test('select step action: deselect with null', () => {
     const action = {
       type: 'SELECT_STEP',

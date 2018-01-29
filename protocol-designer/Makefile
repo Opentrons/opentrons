@@ -42,18 +42,24 @@ build:
 # development
 #####################################################################
 
-
+.PHONY: dev
+dev:
+	$(env)=development $(bin)/webpack-dev-server --hot
 
 # checks
 #####################################################################
 
 .PHONY: test
 test:
+	$(MAKE) check jest
+	$(MAKE) check lint
+
+.PHONY: jest
+jest:
 	$(env)=test $(bin)/jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
-	$(MAKE) check lint
 
 .PHONY: check
 check:
