@@ -11,62 +11,60 @@ import {
 } from '../../robot'
 
 const {
-  // UNCONFIRMED,
   MOVING_TO_SLOT,
   PICKING_UP,
   HOMING,
   UPDATING,
   CONFIRMING
-  // CONFIRMED
 } = robotConstants
-
-// TODO: Ian 2017-12-14 single-labware-oriented selector instead? slot in number, slotName is string like '1'
-const labwareToSlotName = (lw) => lw && lw.slot && `${lw.slot}`
 
 export default withRouter(connect(mapStateToProps, null, mergeProps)(LabwareItem))
 
 function mapStateToProps (state, ownProps) {
   const {slotName} = ownProps
-  const routeSlot = ownProps.match.params.slot
-  const labware = robotSelectors.getLabwareBySlot(state)[slotName]
+  const {match: {params: {slot: selectedSlot}}} = ownProps
+  const allLabware = robotSelectors.getLabware(state)
+
+  const selectedLabware = allLabware.find((lw) => lw.slot === selectedSlot)
+  const labware = allLabware.find((lw) => lw.slot === slotName)
 
   // bail out if it's an empty slot
-  if (labware === undefined) return {}
-
-  const containerType = labware.type
-  const containerName = labware.name
+  if (labware == null) return {}
 
   const nextLabware = robotSelectors.getNextLabware(state)
   const deckPopulated = robotSelectors.getDeckPopulated(state)
   const allTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
+  const {
+    type,
+    name,
+    confirmed,
+    calibration,
+    isTiprack,
+    calibratorMount
+  } = labware
 
-  const highlighted = slotName === (routeSlot || labwareToSlotName(nextLabware))
+  const current = slotName === selectedSlot
+  const highlighted = (
+    (current && !confirmed) ||
+    (selectedLabware.confirmed && nextLabware && slotName === nextLabware.slot)
+  )
 
   // NOTE: this is a hacky carryover from Protocol Designer.
   // TODO Ian 2017-12-14 allow alternative to wellContents for setting well styles.
   const wellContents = highlighted ? {'A1': {selected: true, groupId: 6}} : {}
 
-  // TODO Ian 2017-12-14 this is ugly, sorry, probably should happen in selector soon
-  const allLabwareCalibrationStuff = robotSelectors.getLabware(state)
-  const thisLabwareCalibrationStuff = (
-    allLabwareCalibrationStuff &&
-    allLabwareCalibrationStuff[labware.slot - 1]
-  ) || {}
-
-  const {confirmed, isTiprack} = thisLabwareCalibrationStuff
-
   // TODO Ian 2017-12-14 another selector candidate
-  const isMoving = allLabwareCalibrationStuff.some(l =>
-    l.calibration === MOVING_TO_SLOT ||
-    l.calibration === PICKING_UP ||
-    l.calibration === HOMING ||
-    l.calibration === UPDATING ||
-    l.calibration === CONFIRMING
+  const isMoving = highlighted && (
+    calibration === MOVING_TO_SLOT ||
+    calibration === PICKING_UP ||
+    calibration === HOMING ||
+    calibration === UPDATING ||
+    calibration === CONFIRMING
   )
 
   return {
-    containerType,
-    containerName,
+    containerType: type,
+    containerName: name,
     wellContents,
     highlighted,
     deckPopulated,
@@ -76,32 +74,28 @@ function mapStateToProps (state, ownProps) {
     isMoving,
     confirmed,
 
-    // Data to pass to mergeProps but not to component
-    _stateData: {
-      calibrator: robotSelectors.getCalibratorMount(state),
-      isTiprack
-    }
+    // pass to mergeProps but not to component
+    _calibrator: calibratorMount || robotSelectors.getCalibratorMount(state),
+    _isTiprack: isTiprack
   }
 }
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
+  const {confirmed, _calibrator, _isTiprack} = stateProps
   const {dispatch} = dispatchProps
+  const slot = ownProps && ownProps.slotName
 
-  const slot = ownProps && ownProps.slotName && parseInt(ownProps.slotName)
-  const _stateData = stateProps._stateData || {}
-  const {calibrator, isTiprack} = _stateData
-
-  const onLabwareClick = (e) => {
-    if (isTiprack) {
-      if (!stateProps.confirmed) {
-        dispatch(robotActions.pickupAndHome(calibrator, slot))
+  const onLabwareClick = () => {
+    if (_isTiprack) {
+      if (!confirmed) {
+        dispatch(robotActions.pickupAndHome(_calibrator, slot))
       }
     } else {
-      dispatch(robotActions.moveTo(calibrator, slot))
+      dispatch(robotActions.moveTo(_calibrator, slot))
     }
   }
 
-  const setLabwareConfirmed = (e) => dispatch(robotActions.confirmLabware(slot))
+  const setLabwareConfirmed = () => dispatch(robotActions.confirmLabware(slot))
 
   return {
     onLabwareClick,

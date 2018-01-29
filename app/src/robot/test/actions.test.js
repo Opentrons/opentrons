@@ -157,23 +157,24 @@ describe('robot actions', () => {
     expect(actions.moveToFrontResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('pick up tip and home action', () => {
+  test('PICKUP_AND_HOME action', () => {
     const action = {
-      type: actionTypes.PICKUP_AND_HOME,
-      payload: {instrument: 'left', labware: '5'},
+      type: 'robot:PICKUP_AND_HOME',
+      payload: {mount: 'left', slot: '5'},
       meta: {robotCommand: true}
     }
 
     expect(actions.pickupAndHome('left', '5')).toEqual(action)
   })
 
-  test('pick up tip and home response action', () => {
+  test('PICKUP_AND_HOME_RESPONSE action', () => {
     const success = {
-      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
-      error: false
+      type: 'robot:PICKUP_AND_HOME_RESPONSE',
+      error: false,
+      payload: {}
     }
     const failure = {
-      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      type: 'robot:PICKUP_AND_HOME_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
@@ -182,24 +183,25 @@ describe('robot actions', () => {
     expect(actions.pickupAndHomeResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('drop tip and home action', () => {
+  test('DROP_TIP_AND_HOME action', () => {
     const action = {
-      type: actionTypes.DROP_TIP_AND_HOME,
-      payload: {instrument: 'right', labware: '5'},
+      type: 'robot:DROP_TIP_AND_HOME',
+      payload: {mount: 'right', slot: '5'},
       meta: {robotCommand: true}
     }
 
     expect(actions.dropTipAndHome('right', '5')).toEqual(action)
   })
 
-  test('drop tip and home response action', () => {
+  test('DROP_TIP_AND_HOME_RESPONSE action', () => {
     const success = {
-      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
-      error: false
+      type: 'robot:DROP_TIP_AND_HOME_RESPONSE',
+      error: false,
+      payload: {}
     }
 
     const failure = {
-      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      type: 'robot:DROP_TIP_AND_HOME_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
@@ -208,29 +210,30 @@ describe('robot actions', () => {
     expect(actions.dropTipAndHomeResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('confirm tiprack action', () => {
+  test('CONFIRM_TIPRACK action', () => {
     const action = {
-      type: actionTypes.CONFIRM_TIPRACK,
-      payload: {instrument: 'left', labware: '9'},
+      type: 'robot:CONFIRM_TIPRACK',
+      payload: {mount: 'left', slot: '9'},
       meta: {robotCommand: true}
     }
 
     expect(actions.confirmTiprack('left', '9')).toEqual(action)
   })
 
-  test('confirm tiprack response action', () => {
+  test('CONFIRM_TIPRACK_RESPONSE action', () => {
     const success = {
-      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
-      error: false
+      type: 'robot:CONFIRM_TIPRACK_RESPONSE',
+      error: false,
+      payload: {tipOn: true}
     }
 
     const failure = {
-      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      type: 'robot:CONFIRM_TIPRACK_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
 
-    expect(actions.confirmTiprackResponse()).toEqual(success)
+    expect(actions.confirmTiprackResponse(null, true)).toEqual(success)
     expect(actions.confirmTiprackResponse(new Error('AH'))).toEqual(failure)
   })
 
@@ -324,24 +327,24 @@ describe('robot actions', () => {
     expect(actions.jogResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('update offset action', () => {
+  test('UPDATE_OFFSET action', () => {
     const expected = {
-      type: actionTypes.UPDATE_OFFSET,
-      payload: {instrument: 'left', labware: '2'},
+      type: 'robot:UPDATE_OFFSET',
+      payload: {mount: 'left', slot: '2'},
       meta: {robotCommand: true}
     }
 
     expect(actions.updateOffset('left', '2')).toEqual(expected)
   })
 
-  test('update offset response action', () => {
+  test('UPDATE_OFFSET_RESPONSE action', () => {
     const success = {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: false,
       payload: {isTiprack: true}
     }
     const failure = {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: true,
       payload: new Error('AH')
     }

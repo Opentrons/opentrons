@@ -9,6 +9,7 @@ import {
 import ReviewPrompt from './ReviewPrompt'
 
 const mapStateToProps = (state, ownProps) => {
+  // TODO(mc, 2018-01-26): getCurrentLabware selector
   const {slot} = ownProps
   const labware = robotSelectors.getLabware(state)
   const currentLabware = labware.find((lab) => lab.slot === slot)
@@ -16,7 +17,10 @@ const mapStateToProps = (state, ownProps) => {
   return {
     currentLabware,
     labware,
-    _calibrator: robotSelectors.getCalibratorMount(state)
+    _calibrator: (
+      currentLabware.calibratorMount ||
+      robotSelectors.getCalibratorMount(state)
+    )
   }
 }
 

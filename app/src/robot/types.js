@@ -95,9 +95,6 @@ export type Labware = {
   type: string,
   // user defined name of the labware
   name: string,
-  // A1 style slot ID
-  // TODO(mc, 2018-01-17): deprecate or rename to something less confusing
-  id: string,
   // whether or not the labware is a tiprack (implied from type)
   isTiprack: boolean,
   // intrument mount to use as the calibrator if isTiprack is true

@@ -343,6 +343,9 @@ describe('robot selectors', () => {
         },
         probedByMount: {
           left: true
+        },
+        tipOnByMount: {
+          right: true
         }
       }
     })
@@ -354,7 +357,8 @@ describe('robot selectors', () => {
         channels: 8,
         volume: 200,
         calibration: constants.PROBING,
-        probed: true
+        probed: true,
+        tipOn: false
       },
       {
         mount: 'right',
@@ -362,7 +366,8 @@ describe('robot selectors', () => {
         channels: 1,
         volume: 50,
         calibration: constants.UNPROBED,
-        probed: false
+        probed: false,
+        tipOn: true
       }
     ])
   })
@@ -375,8 +380,8 @@ describe('robot selectors', () => {
     expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
   })
 
-  test('get calibrator mount with single channel installed', () => {
-    const state = makeState({
+  test('get calibrator mount', () => {
+    const leftState = makeState({
       session: {
         instrumentsByMount: {
           left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
@@ -385,27 +390,27 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {}
+        probedByMount: {left: true, right: true},
+        tipOnByMount: {left: true}
       }
     })
 
-    expect(getCalibratorMount(state)).toBe('right')
-  })
-
-  test('get calibrator mount with only multi channel installed', () => {
-    const state = makeState({
+    const rightState = makeState({
       session: {
         instrumentsByMount: {
-          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200}
+          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
+          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
         }
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {}
+        probedByMount: {left: true, right: true},
+        tipOnByMount: {right: true}
       }
     })
 
-    expect(getCalibratorMount(state)).toBe('left')
+    expect(getCalibratorMount(leftState)).toBe('left')
+    expect(getCalibratorMount(rightState)).toBe('right')
   })
 
   test('get instruments are calibrated', () => {
@@ -418,7 +423,8 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: true, right: true}
+        probedByMount: {left: true, right: true},
+        tipOnByMount: {}
       }
     })
 
@@ -431,7 +437,8 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: false, right: false}
+        probedByMount: {left: false, right: false},
+        tipOnByMount: {}
       }
     })
 
@@ -443,7 +450,8 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {right: true}
+        probedByMount: {right: true},
+        tipOnByMount: {}
       }
     })
 
@@ -459,9 +467,15 @@ describe('robot selectors', () => {
       state = makeState({
         session: {
           labwareBySlot: {
-            1: {id: 'A1', slot: '1', name: 'a1', type: 'a', isTiprack: true},
-            5: {id: 'B2', slot: '5', name: 'b2', type: 'b', isTiprack: false},
-            9: {id: 'C3', slot: '9', name: 'c3', type: 'c', isTiprack: false}
+            1: {
+              slot: '1',
+              name: 'a1',
+              type: 'a',
+              isTiprack: true,
+              calibratorMount: 'left'
+            },
+            5: {slot: '5', name: 'b2', type: 'b', isTiprack: false},
+            9: {slot: '9', name: 'c3', type: 'c', isTiprack: false}
           }
         },
         calibration: {
@@ -472,7 +486,14 @@ describe('robot selectors', () => {
           confirmedBySlot: {
             1: false,
             5: true
-          }
+          },
+          instrumentsByMount: {
+            left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
+            right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
+          },
+          calibrationRequest: {},
+          probedByMount: {},
+          tipOnByMount: {right: true}
         }
       })
     })
@@ -481,39 +502,29 @@ describe('robot selectors', () => {
       expect(getLabware(state)).toEqual([
         {
           slot: '1',
-          id: 'A1',
           name: 'a1',
           type: 'a',
           isTiprack: true,
           calibration: constants.UNCONFIRMED,
-          confirmed: false
+          confirmed: false,
+          calibratorMount: 'left'
         },
-        {slot: '2'},
-        {slot: '3'},
-        {slot: '4'},
         {
           slot: '5',
-          id: 'B2',
           name: 'b2',
           type: 'b',
           isTiprack: false,
           calibration: constants.OVER_SLOT,
           confirmed: true
         },
-        {slot: '6'},
-        {slot: '7'},
-        {slot: '8'},
         {
           slot: '9',
-          id: 'C3',
           name: 'c3',
           type: 'c',
           isTiprack: false,
           calibration: constants.UNCONFIRMED,
           confirmed: false
-        },
-        {slot: '10'},
-        {slot: '11'}
+        }
       ])
     })
 
@@ -521,12 +532,12 @@ describe('robot selectors', () => {
       expect(getUnconfirmedTipracks(state)).toEqual([
         {
           slot: '1',
-          id: 'A1',
           name: 'a1',
           type: 'a',
           isTiprack: true,
           calibration: constants.UNCONFIRMED,
-          confirmed: false
+          confirmed: false,
+          calibratorMount: 'left'
         }
       ])
     })
@@ -535,16 +546,15 @@ describe('robot selectors', () => {
       expect(getUnconfirmedLabware(state)).toEqual([
         {
           slot: '1',
-          id: 'A1',
           name: 'a1',
           type: 'a',
           isTiprack: true,
           calibration: constants.UNCONFIRMED,
-          confirmed: false
+          confirmed: false,
+          calibratorMount: 'left'
         },
         {
           slot: '9',
-          id: 'C3',
           name: 'c3',
           type: 'c',
           isTiprack: false,
@@ -557,12 +567,12 @@ describe('robot selectors', () => {
     test('get next labware', () => {
       expect(getNextLabware(state)).toEqual({
         slot: '1',
-        id: 'A1',
         name: 'a1',
         type: 'a',
         isTiprack: true,
         calibration: constants.UNCONFIRMED,
-        confirmed: false
+        confirmed: false,
+        calibratorMount: 'left'
       })
 
       const nextState = {
@@ -580,7 +590,6 @@ describe('robot selectors', () => {
 
       expect(getNextLabware(nextState)).toEqual({
         slot: '9',
-        id: 'C3',
         name: 'c3',
         type: 'c',
         isTiprack: false,
