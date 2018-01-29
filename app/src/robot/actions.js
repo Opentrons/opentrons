@@ -24,12 +24,34 @@ export type ConfirmProbedAction = {
   payload: Mount
 }
 
-// TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
-export type Action =
-  | ConfirmProbedAction
+export type LabwareCalibrationAction = {
+  type:
+    | 'robot:PICKUP_AND_HOME'
+    | 'robot:DROP_TIP_AND_HOME'
+    | 'robot:CONFIRM_TIPRACK'
+    | 'robot:UPDATE_OFFSET'
+  ,
+  payload: {mount: Mount, slot: Slot},
+  meta: {robotCommand: true}
+}
+
+// TODO(mc, 2018-01-29): split success and failure action types
+//   union types for payload make things difficult
+export type CalibrationResponseAction = {
+  type:
+    | 'robot:PICKUP_AND_HOME_RESPONSE'
+    | 'robot:DROP_TIP_AND_HOME_RESPONSE'
+    | 'robot:CONFIRM_TIPRACK_RESPONSE'
+    | 'robot:UPDATE_OFFSET_RESPONSE',
+  error: boolean,
+  payload: Error | {
+    isTiprack?: boolean,
+    tipOn?: boolean
+  }
+}
 
 // TODO(mc, 2018-01-23): refactor to use type above
-//    DO NOT ADD NEW ACTIONS HERE
+//   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
   // discovery, connect, and disconnect
   DISCOVER: makeRobotActionName('DISCOVER'),
@@ -49,12 +71,6 @@ export const actionTypes = {
   SET_DECK_POPULATED: makeRobotActionName('SET_DECK_POPULATED'),
   SET_CURRENT_LABWARE: makeRobotActionName('SET_CURRENT_LABWARE'),
   SET_CURRENT_INSTRUMENT: makeRobotActionName('SET_CURRENT_INSTRUMENT'),
-  PICKUP_AND_HOME: makeRobotActionName('PICKUP_AND_HOME'),
-  PICKUP_AND_HOME_RESPONSE: makeRobotActionName('PICKUP_AND_HOME_RESPONSE'),
-  DROP_TIP_AND_HOME: makeRobotActionName('DROP_TIP_AND_HOME'),
-  DROP_TIP_AND_HOME_RESPONSE: makeRobotActionName('DROP_TIP_AND_HOME_RESPONSE'),
-  CONFIRM_TIPRACK: makeRobotActionName('CONFIRM_TIPRACK'),
-  CONFIRM_TIPRACK_RESPONSE: makeRobotActionName('CONFIRM_TIPRACK_RESPONSE'),
   // TODO(mc, 2018-01-10): rename MOVE_TO_FRONT to PREPARE_TO_PROBE?
   MOVE_TO_FRONT: makeRobotActionName('MOVE_TO_FRONT'),
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
@@ -65,8 +81,6 @@ export const actionTypes = {
   TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
   JOG: makeRobotActionName('JOG'),
   JOG_RESPONSE: makeRobotActionName('JOG_RESPONSE'),
-  UPDATE_OFFSET: makeRobotActionName('UPDATE_OFFSET'),
-  UPDATE_OFFSET_RESPONSE: makeRobotActionName('UPDATE_OFFSET_RESPONSE'),
   CONFIRM_LABWARE: makeRobotActionName('CONFIRM_LABWARE'),
 
   // protocol run controls
@@ -81,6 +95,12 @@ export const actionTypes = {
 
   TICK_RUN_TIME: makeRobotActionName('TICK_RUN_TIME')
 }
+
+// TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
+export type Action =
+  | ConfirmProbedAction
+  | LabwareCalibrationAction
+  | CalibrationResponseAction
 
 export const actions = {
   discover () {
@@ -150,60 +170,62 @@ export const actions = {
     return {type: actionTypes.SET_DECK_POPULATED, payload}
   },
 
-  pickupAndHome (instrument: Mount, labware: Slot) {
-    return tagForRobotApi({
-      type: actionTypes.PICKUP_AND_HOME,
-      payload: {instrument, labware}
-    })
-  },
-
-  pickupAndHomeResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
-      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
-      error: error != null
+  // pick up a tip with intrument on `mount` from tiprack in `slot`
+  pickupAndHome (mount: Mount, slot: Slot): LabwareCalibrationAction {
+    return {
+      type: 'robot:PICKUP_AND_HOME',
+      payload: {mount, slot},
+      meta: {robotCommand: true}
     }
-    if (error) action.payload = error
-
-    return action
   },
 
-  // TODO(mc, 2017-11-22): dropTipAndHome takes a slot at the moment because
-  // this action is performed in the context of confirming a tiprack labware.
-  // This is confusing though, so refactor these actions + state-management
-  // as necessary
-  dropTipAndHome (instrument: Mount, labware: Slot) {
-    return tagForRobotApi({
-      type: actionTypes.DROP_TIP_AND_HOME,
-      payload: {instrument, labware}
-    })
-  },
-
-  dropTipAndHomeResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
-      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
-      error: error != null
+  // response for pickup and home
+  pickupAndHomeResponse (error: ?Error = null): CalibrationResponseAction {
+    return {
+      type: 'robot:PICKUP_AND_HOME_RESPONSE',
+      error: error != null,
+      payload: error || {}
     }
-    if (error) action.payload = error
-
-    return action
   },
 
-  // confirm tiprack action drops the tip unless the tiprack is last
-  confirmTiprack (instrument: Mount, labware: Slot) {
-    return tagForRobotApi({
-      type: actionTypes.CONFIRM_TIPRACK,
-      payload: {instrument, labware}
-    })
-  },
-
-  confirmTiprackResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
-      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
-      error: error != null
+  // drop the tip on instrument on `mount` into the tiprack in `slot`
+  dropTipAndHome (mount: Mount, slot: Slot): LabwareCalibrationAction {
+    return {
+      type: 'robot:DROP_TIP_AND_HOME',
+      payload: {mount, slot},
+      meta: {robotCommand: true}
     }
-    if (error) action.payload = error
+  },
 
-    return action
+  // response for drop tip and home
+  dropTipAndHomeResponse (error: ?Error = null): CalibrationResponseAction {
+    return {
+      type: 'robot:DROP_TIP_AND_HOME_RESPONSE',
+      error: error != null,
+      payload: error || {}
+    }
+  },
+
+  // set tiprack to calibrated and conditionally drop the tip
+  confirmTiprack (mount: Mount, slot: Slot): LabwareCalibrationAction {
+    return {
+      type: 'robot:CONFIRM_TIPRACK',
+      payload: {mount, slot},
+      meta: {robotCommand: true}
+    }
+  },
+
+  // response for pickup and home
+  // payload.tipOn is a flag for whether a tip remains on the instrument
+  confirmTiprackResponse (
+    error: ?Error = null,
+    tipOn: boolean = false
+  ): CalibrationResponseAction {
+    return {
+      type: 'robot:CONFIRM_TIPRACK_RESPONSE',
+      error: error != null,
+      payload: error || {tipOn}
+    }
   },
 
   moveToFront (instrument: Mount) {
@@ -279,16 +301,23 @@ export const actions = {
     return action
   },
 
-  updateOffset (instrument: Mount, labware: Slot) {
-    return tagForRobotApi({
-      type: actionTypes.UPDATE_OFFSET,
-      payload: {instrument, labware}
-    })
+  // update the offset of labware in slot using position of pipette on mount
+  updateOffset (mount: Mount, slot: Slot): LabwareCalibrationAction {
+    return {
+      type: 'robot:UPDATE_OFFSET',
+      payload: {mount, slot},
+      meta: {robotCommand: true}
+    }
   },
 
-  updateOffsetResponse (error: ?Error = null, isTiprack: boolean) {
+  // response for updateOffset
+  // payload.isTiprack is a flag for whether or not the labware is a tiprack
+  updateOffsetResponse (
+    error: ?Error = null,
+    isTiprack: boolean
+  ): CalibrationResponseAction {
     return {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: error != null,
       payload: error || {isTiprack}
     }

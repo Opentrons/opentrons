@@ -280,14 +280,27 @@ describe('api client', () => {
     test('maps api containers to labware by slot', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
         labwareBySlot: {
-          1: {_id: 1, slot: '1', name: 'a', type: 'tiprack', isTiprack: true},
+          1: {
+            _id: 1,
+            slot: '1',
+            name: 'a',
+            type: 'tiprack',
+            isTiprack: true,
+            calibratorMount: 'right'
+          },
           5: {_id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false},
           9: {_id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false}
         }
       }))
 
       session.containers = [
-        {_id: 1, slot: '1', name: 'a', type: 'tiprack'},
+        {
+          _id: 1,
+          slot: '1',
+          name: 'a',
+          type: 'tiprack',
+          instruments: [{mount: 'right'}]
+        },
         {_id: 2, slot: '5', name: 'b', type: 'B'},
         {_id: 3, slot: '9', name: 'c', type: 'C'}
       ]
@@ -377,7 +390,7 @@ describe('api client', () => {
     })
 
     test('handles MOVE_TO success', () => {
-      const action = actions.moveTo('left', 5)
+      const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse()
 
       calibrationManager.move_to.mockReturnValue(Promise.resolve())
@@ -392,7 +405,7 @@ describe('api client', () => {
     })
 
     test('handles MOVE_TO failure', () => {
-      const action = actions.moveTo('left', 5)
+      const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse(new Error('AH'))
 
       calibrationManager.move_to
@@ -404,7 +417,7 @@ describe('api client', () => {
     })
 
     test('handles PICKUP_AND_HOME success', () => {
-      const action = actions.pickupAndHome('left', 5)
+      const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse()
 
       calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
@@ -420,7 +433,7 @@ describe('api client', () => {
     })
 
     test('handles PICKUP_AND_HOME failure during pickup', () => {
-      const action = actions.pickupAndHome('left', 5)
+      const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
       calibrationManager.pick_up_tip
@@ -432,7 +445,7 @@ describe('api client', () => {
     })
 
     test('handles DROP_TIP_AND_HOME success', () => {
-      const action = actions.dropTipAndHome('right', 9)
+      const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse()
 
       calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
@@ -449,7 +462,7 @@ describe('api client', () => {
     })
 
     test('handles DROP_TIP_AND_HOME failure in drop_tip', () => {
-      const action = actions.dropTipAndHome('right', 9)
+      const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
       calibrationManager.drop_tip
@@ -461,7 +474,7 @@ describe('api client', () => {
     })
 
     test('handles DROP_TIP_AND_HOME failure in home', () => {
-      const action = actions.dropTipAndHome('right', 9)
+      const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
       calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
@@ -473,7 +486,7 @@ describe('api client', () => {
     })
 
     test('CONFIRM_TIPRACK drops tip if not last tiprack', () => {
-      const action = actions.confirmTiprack('left', 9)
+      const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse()
 
       calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
@@ -487,11 +500,11 @@ describe('api client', () => {
         })
     })
 
-    test('CONFIRM_TIPRACK noops if last tiprack', () => {
+    test('CONFIRM_TIPRACK noops and keeps tip if last tiprack', () => {
       state[NAME].calibration.confirmedBySlot[5] = true
 
-      const action = actions.confirmTiprack('left', 9)
-      const expectedResponse = actions.confirmTiprackResponse()
+      const action = actions.confirmTiprack('left', '9')
+      const expectedResponse = actions.confirmTiprackResponse(null, true)
 
       calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
 
@@ -504,7 +517,7 @@ describe('api client', () => {
     })
 
     test('handles CONFIRM_TIPRACK drop tip failure', () => {
-      const action = actions.confirmTiprack('left', 9)
+      const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
 
       calibrationManager.drop_tip

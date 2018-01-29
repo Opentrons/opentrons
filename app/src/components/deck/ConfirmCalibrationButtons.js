@@ -34,13 +34,17 @@ function ConfirmCalibrationButtons (props) {
 
 function mapStateToProps (state, ownProps) {
   const {slot} = ownProps
-  const isTiprack = robotSelectors.getLabwareBySlot(state)[slot].isTiprack
+  const labware = robotSelectors.getLabwareBySlot(state)[slot]
+  const isTiprack = labware.isTiprack
   const props = {isTiprack}
 
   // confirm tiprack action needs the instrument being used for confirmation
   // for now, hardcode this to the single-channel
   if (isTiprack) {
-    props._calibrator = robotSelectors.getCalibratorMount(state)
+    props._calibrator = (
+      labware.calibratorMount ||
+      robotSelectors.getCalibratorMount(state)
+    )
   }
 
   return props
