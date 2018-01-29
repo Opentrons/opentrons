@@ -14,6 +14,8 @@ export type StepType = $Keys<typeof stepIconsByType>
 export type StepIdType = number
 
 export type StepSubItemData = {
+  parentStepId: StepIdType,
+  substepId: number,
   sourceIngredientName?: string,
   destIngredientName?: string,
   sourceWell?: string,
@@ -24,10 +26,7 @@ export type StepItemData = {
   id: StepIdType,
   title: string,
   stepType: StepType,
-  substeps: Array<StepSubItemData>,
-  description?: string,
-  sourceLabwareName?: string,
-  destLabwareName?: string
+  description?: string
 }
 
 export type FormData = {
