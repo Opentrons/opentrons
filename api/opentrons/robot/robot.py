@@ -510,7 +510,6 @@ class Robot(object):
         # close to XY switches so we are don't accidentally hit them
         self.poses = self.gantry.home(self.poses)
 
-    # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
