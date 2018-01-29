@@ -12,6 +12,26 @@ from tests.opentrons.conftest import fuzzy_assert
 from numpy import isclose
 
 
+def test_pipette_models(robot):
+    from opentrons import instruments, robot
+
+    robot.reset()
+    p = instruments.P300_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 300
+    p = instruments.P300_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 300
+
+    robot.reset()
+    p = instruments.P10_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 10
+    p = instruments.P10_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 10
+
+
 def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', '1')
     tiprack = containers_load(robot, 'tiprack-200ul', '3')

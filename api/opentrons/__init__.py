@@ -45,37 +45,37 @@ class InstrumentsWrapper(object):
     def P300_Single(self, *args, **kwargs):
         kwargs.update({
             'channels': 1,
-            'ul_per_mm': 18.51
+            'ul_per_mm': 18.51  # TODO (andy): should come from config
         })
         p = inst.Pipette(self.robot, *args, **kwargs)
-        p.set_pick_up_current(0.1)
+        p.set_pick_up_current(0.1)  # TODO (andy): should come from config
         return p
 
     def P300_Multi(self, *args, **kwargs):
         kwargs.update({
             'channels': 8,
-            'ul_per_mm': 18.51
+            'ul_per_mm': 18.51  # TODO (andy): should come from config
         })
         p = inst.Pipette(self.robot, *args, **kwargs)
-        p.set_pick_up_current(0.3)
+        p.set_pick_up_current(0.3)  # TODO (andy): should come from config
         return p
 
     def P10_Single(self, *args, **kwargs):
         kwargs.update({
             'channels': 1,
-            'ul_per_mm': 0.617
+            'ul_per_mm': 0.617  # TODO (andy): should come from config
         })
         p = inst.Pipette(self.robot, *args, **kwargs)
-        p.set_pick_up_current(0.1)
+        p.set_pick_up_current(0.1)  # TODO (andy): should come from config
         return p
 
     def P10_Multi(self, *args, **kwargs):
         kwargs.update({
             'channels': 8,
-            'ul_per_mm': 0.617
+            'ul_per_mm': 0.617  # TODO (andy): should come from config
         })
         p = inst.Pipette(self.robot, *args, **kwargs)
-        p.set_pick_up_current(0.3)
+        p.set_pick_up_current(0.3)  # TODO (andy): should come from config
         return p
 
     def Magbead(self, *args, **kwargs):
