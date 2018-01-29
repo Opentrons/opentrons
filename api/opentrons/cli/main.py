@@ -72,9 +72,8 @@ XY = None
 
 def generate_test_points():
     global test_points, expected_dots, expected_holes, expected
-    # Beta machines cannot reach deck points, use the screw holes instead
-    beta_message = 'Are you running a Beta machine? (y/n)'
-    res = input(beta_message)
+    # older machines cannot reach deck points, use the screw holes instead
+    res = input('Are you calibrating to the screw holes? (y/n)')
     if 'y' in res.lower():
         expected = expected_holes
     else:
