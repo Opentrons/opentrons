@@ -134,6 +134,51 @@ def test_fast_home(model):
     assert driver.position['X'] == HOMED_POSITION['X']
 
 
+def test_switch_state(model):
+    import types
+    driver = model.robot._driver
+
+    def send_mock(self, target):
+        smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'
+        smoothie_switch_res += ' _pins '
+        smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+        smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 0\r\n'
+        return smoothie_switch_res
+
+    driver._send_command = types.MethodType(send_mock, driver)
+
+    expected = {
+        'X': False,
+        'Y': False,
+        'Z': False,
+        'A': False,
+        'B': False,
+        'C': False,
+        'Probe': False
+    }
+    assert driver.switch_state == expected
+
+    def send_mock(self, target):
+        smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:1 B_max:0 C_max:0'
+        smoothie_switch_res += ' _pins '
+        smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+        smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 1\r\n'
+        return smoothie_switch_res
+
+    driver._send_command = types.MethodType(send_mock, driver)
+
+    expected = {
+        'X': False,
+        'Y': False,
+        'Z': False,
+        'A': True,
+        'B': False,
+        'C': False,
+        'Probe': True
+    }
+    assert driver.switch_state == expected
+
+
 def test_pause_resume(model):
     """
     This test has to use an ugly work-around with the `simulating` member of

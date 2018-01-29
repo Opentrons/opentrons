@@ -78,7 +78,8 @@ def _parse_axis_values(raw_axis_values):
 
 def _parse_switch_values(raw_switch_values):
     # probe has a space after it's ":" for some reasone
-    raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
+    if 'Probe: ' in raw_switch_values:
+        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
     parsed_values = raw_switch_values.strip().split(' ')
     return {
         s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
