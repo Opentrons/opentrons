@@ -54,6 +54,5 @@ export type FormData = {
   'dispense--delay-minutes': string,
   'dispense--delay-seconds': string,
   'dispense--blowout--checkbox': boolean,
-  'dispense--blowout--labware': string,
-  'dispense--change-tip': string
+  'dispense--blowout--labware': string
 }
