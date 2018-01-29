@@ -75,7 +75,7 @@ def list():
     return database.list_all_containers()
 
 
-def create(name, grid, spacing, diameter, depth, volume, save=False):
+def create(name, grid, spacing, diameter, depth, volume=0, save=False):
     columns, rows = grid
     col_spacing, row_spacing = spacing
     custom_container = Container()
