@@ -16,7 +16,7 @@ export default connect(mapStateToProps, null, mergeProps)(ConnectPanel)
 function ConnectPanel (props) {
   return (
     <div>
-      <ScanButton {...props} titleBtn />
+      <ScanButton {...props} inTitleBar />
       <RobotList>
         {props.robots.map((robot) => (
           <RobotItem key={robot.name} {...robot} />

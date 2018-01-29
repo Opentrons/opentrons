@@ -3,7 +3,7 @@ import React from 'react'
 import Renderer from 'react-test-renderer'
 
 import {FLASK} from '../icons'
-import {Button, FlatButton, PrimaryButton} from '..'
+import {Button, FlatButton, PrimaryButton, OutlineButton, IconButton} from '..'
 
 describe('buttons', () => {
   const onClick = () => {}
@@ -92,6 +92,41 @@ describe('buttons', () => {
       <FlatButton onClick={onClick} title='t' className='c' iconName={FLASK}>
         children
       </FlatButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('OutlineButton renders correctly', () => {
+    const tree = Renderer.create(
+      <OutlineButton onClick={onClick} title='t' className='c'>
+        children
+      </OutlineButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('OutlineButton with iconName renders correctly', () => {
+    const tree = Renderer.create(
+      <OutlineButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+        children
+      </OutlineButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('IconButton renders correctly', () => {
+    const tree = Renderer.create(
+      <IconButton
+        onClick={onClick}
+        title='t'
+        className='c'
+        name='close'
+        spin
+        disabled
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
