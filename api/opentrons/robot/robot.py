@@ -349,6 +349,10 @@ class Robot(object):
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
         """
+        if mount in self._instruments:
+            prev_instr = self._instruments[mount]
+            raise RuntimeError('Instrument {0} already on {1} mount'.format(
+                prev_instr.name, mount))
         self._instruments[mount] = instrument
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
