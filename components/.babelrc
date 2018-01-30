@@ -6,6 +6,9 @@
       ]
     }
   },
+  "plugins": [
+    "transform-object-rest-spread"
+  ],
   "presets": [
     "react",
     ["env", {"modules": false}]

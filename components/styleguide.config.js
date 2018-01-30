@@ -72,10 +72,10 @@ module.exports = {
         width: 'auto !important'
       },
       '@global .width-3-rem': {
-        width: '3rem'
+        width: '3rem !important'
       },
       '@global .height-3-rem': {
-        height: '3rem'
+        height: '3rem !important'
       }
     }
   }
