@@ -166,10 +166,15 @@ def absolute(state, obj):
 
 
 def max_z(state, root):
-    return max([
-        Point(*change_base(state, src=obj, dst=root)).z
+    test = [
+        (obj, Point(*change_base(state, src=obj, dst=root)).z)
         for obj, _ in descendants(state, root)
-    ])
+    ]
+
+    #from pprint import pprint
+    #pprint(test, indent=2)
+    m = max([i[1] for i in test])
+    return m
 
 
 def stringify(state, root=None):

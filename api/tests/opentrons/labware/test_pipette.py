@@ -1638,17 +1638,3 @@ class PipetteTest(unittest.TestCase):
             mock.call(well.top(), strategy='direct')
         ]
 
-    def test_drop_tip_to_trash(self):
-        self.p200.move_to = mock.Mock()
-
-        self.p200.pick_up_tip()
-        self.p200.drop_tip()
-
-        assert self.p200.move_to.mock_calls[0] == \
-            mock.call(self.tiprack1[0].top(),
-                      strategy='arc')
-
-        assert self.p200.move_to.mock_calls[-1] == \
-            mock.call(
-                self.trash[0].top(self.p200._drop_tip_offset),
-                strategy='arc')

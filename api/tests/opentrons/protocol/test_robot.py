@@ -4,7 +4,9 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.trackers import pose_tracker
+from opentrons.util import vector
 from numpy import isclose
+from unittest import mock
 
 SMOOTHIE_VERSION = 'edge-1c222d9NOMSD'
 
@@ -290,3 +292,21 @@ def test_get_mosfet_caching(robot):
     assert m0 == robot.get_mosfet(0)
     m1 = robot.get_mosfet(1)
     assert m1 == robot.get_mosfet(1)
+
+
+def test_drop_tip_default_trash(robot):
+    tiprack = containers_load(robot, 'tiprack-200ul', '1')
+    pip = pipette.Pipette(robot, name='P300', mount='right', tip_racks=[tiprack])
+
+    trash_loc = vector.Vector([80.00, 80.00, 70.00])
+
+    pip.pick_up_tip()
+
+    with mock.patch.object(robot, 'move_to') as move_to:  # NOQA
+        pip.drop_tip()
+
+        move_to.assert_called_with(
+            (robot.fixed_trash[0], trash_loc), instrument=pip, low_current_z=False, strategy='arc')
+
+
+
