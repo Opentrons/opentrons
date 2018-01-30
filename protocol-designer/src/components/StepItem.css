@@ -2,7 +2,6 @@
 
 .step_item {
   margin: 0.25rem 0;
-  border: 1px solid rgb(200, 200, 200); /* TODO gray */
 }
 
 .step_item ol {

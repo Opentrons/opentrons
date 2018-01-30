@@ -3,10 +3,23 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
+import max from 'lodash/max'
 
-import type {StepItemData, StepIdType} from './types'
-import type {AddStepAction} from './actions' // Thunk action creators
-import {expandAddStepButton, selectStep, toggleStepCollapsed} from './actions'
+import type {BaseState} from '../types'
+import type {FormData, StepItemData, StepIdType} from './types'
+import type {
+  AddStepAction,
+  PopulateFormAction,
+  SaveStepFormAction,
+  SelectStepAction
+} from './actions' // Thunk action creators
+import {
+  cancelStepForm,
+  saveStepForm,
+  changeFormInput,
+  expandAddStepButton,
+  toggleStepCollapsed
+} from './actions'
 
 // TODO move to test once substeps selector is implemented
 /*
@@ -111,7 +124,21 @@ import {expandAddStepButton, selectStep, toggleStepCollapsed} from './actions'
 const initialStepOrder = [0, 2, 3, 4, 5]
 */
 
+type FormState = FormData | null
+
+const form = handleActions({
+  CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
+    ...state,
+    [action.payload.accessor]: action.payload.value
+  }),
+  POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
+  CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
+  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null
+}, null)
+
 // Add default title (and later, other default values) to newly-created Step
+// TODO: Ian 2018-01-26 don't add any default values, selector should generate title if missing,
+// title is all pristine Steps need added into the selector.
 function createDefaultStep (action: AddStepAction) {
   const {stepType} = action.payload
   return {...action.payload, title: stepType}
@@ -123,6 +150,10 @@ const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
+  }),
+  SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
+    ...state,
+    [action.payload.id]: action.payload // TODO translate fields don't literally take them
   })
 }, {})
 
@@ -151,8 +182,7 @@ const orderedSteps = handleActions({
 type SelectedStepState = null | StepIdType
 
 const selectedStep = handleActions({
-  ADD_STEP: (state: SelectedStepState, action: AddStepAction) => action.payload.id,
-  SELECT_STEP: (state: SelectedStepState, {payload}: ActionType<typeof selectStep>) => payload
+  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
 }, null)
 
 type StepCreationButtonExpandedState = boolean
@@ -166,15 +196,17 @@ const stepCreationButtonExpanded = handleActions({
     payload
 }, false)
 
-export type RootState = {
+export type RootState = {|
+  form: FormState,
   steps: StepsState,
   collapsedSteps: CollapsedStepsState,
   orderedSteps: OrderedStepsState,
   selectedStep: SelectedStepState,
   stepCreationButtonExpanded: StepCreationButtonExpandedState
-}
+|}
 
 export const _allReducers = {
+  form,
   steps,
   collapsedSteps,
   orderedSteps,
@@ -185,7 +217,6 @@ export const _allReducers = {
 const rootReducer = combineReducers(_allReducers)
 
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
-type BaseState = {steplist: RootState}
 const rootSelector = (state: BaseState): RootState => state.steplist
 
 export const selectors = {
@@ -205,6 +236,28 @@ export const selectors = {
   selectedStepId: createSelector(
     rootSelector,
     (state: RootState) => state.selectedStep
+  ),
+  selectedStepFormData: createSelector( // TODO translate step data to form data
+    (state: BaseState) => rootSelector(state).steps,
+    (state: BaseState) => rootSelector(state).selectedStep,
+    (steps, selectedStep) => selectedStep !== null && steps[selectedStep]
+  ),
+  formDataToStep: createSelector( // TODO translate form to step here
+    rootSelector,
+    (state: RootState) => ({...state.form}) // TODO
+  ),
+  formData: createSelector(
+    rootSelector,
+    (state: RootState) => state.form
+  ),
+  nextStepId: createSelector( // generates the next step ID to use
+    (state: BaseState) => rootSelector(state).steps,
+    (steps): number => {
+      const allStepIds = Object.keys(steps).map(stepId => parseInt(stepId))
+      return allStepIds.length === 0
+        ? 0
+        : max(allStepIds) + 1
+    }
   )
 }
 

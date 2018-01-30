@@ -1,9 +1,9 @@
 // @flow
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
-import type {ActionType} from 'redux-actions'
+import type {Dispatch} from '../types'
 
 import {selectors} from '../steplist/reducers'
+import type {StepIdType} from '../steplist/types'
 import {selectStep, toggleStepCollapsed} from '../steplist/actions'
 import StepList from '../components/StepList'
 
@@ -14,13 +14,10 @@ function mapStateToProps (state) {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<
-  | ActionType<typeof selectStep>
-  | ActionType<typeof toggleStepCollapsed>
->) {
+function mapDispatchToProps (dispatch: Dispatch<*>) {
   return {
-    handleStepItemClickById: id => e => dispatch(selectStep(id)),
-    handleStepItemCollapseToggleById: id => e => dispatch(toggleStepCollapsed(id))
+    handleStepItemClickById: (id: StepIdType) => () => dispatch(selectStep(id)),
+    handleStepItemCollapseToggleById: (id: StepIdType) => () => dispatch(toggleStepCollapsed(id))
   }
 }
 
