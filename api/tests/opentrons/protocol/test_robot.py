@@ -4,7 +4,9 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import pipette
 from opentrons.robot.robot import Robot
 from opentrons.trackers import pose_tracker
+from opentrons.util import vector
 from numpy import isclose
+from unittest import mock
 
 SMOOTHIE_VERSION = 'edge-1c222d9NOMSD'
 
@@ -25,28 +27,30 @@ def test_pos_tracker_persistance(robot):
     )
     plate = containers_load(robot, 'trough-12row', '5')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 40.0
+    assert robot.max_placeable_height_on_deck(plate) == 40.0
 
     robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 40.0
+    assert robot.max_placeable_height_on_deck(plate) == 10.0
 
 
 def test_calibrated_max_z(robot):
-    p200 = pipette.Pipette(
+
+    pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    plate = containers_load(robot, '96-flat', '1')
+    assert robot.max_deck_height() == 63
+    # plate = containers_load(robot, '96-flat', '1')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 10.5
+    # assert robot.max_deck_height() == 10.5
 
-    robot.move_head(x=10, y=10)
-    robot.calibrate_container_with_instrument(plate, p200, save=False)
+    # robot.move_head(x=10, y=10)
+    # robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
-    assert robot.max_deck_height() == 10.5
+    # assert robot.max_deck_height() == 10.5
 
 
 def test_get_serial_ports_list(robot, monkeypatch):
@@ -63,14 +67,15 @@ def test_get_serial_ports_list(robot, monkeypatch):
 
 def test_add_container(robot):
     c1 = robot.add_container('96-flat', '1')
+    trash = robot.fixed_trash
     res = robot.get_containers()
-    expected = [c1]
-    assert res == expected
+    expected = [c1, trash]
+    assert set(res) == set(expected)
 
     c2 = robot.add_container('96-flat', '4', 'my-special-plate')
     res = robot.get_containers()
-    expected = [c1, c2]
-    assert res == expected
+    expected = [c1, c2, trash]
+    assert set(res) == set(expected)
 
 
 def test_comment(robot):
@@ -88,6 +93,8 @@ def test_comment(robot):
 
 
 def test_create_arc(robot):
+    from opentrons.robot.robot import TIP_CLEARANCE
+
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
@@ -100,7 +107,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 30.5},
+        {'z': robot.max_deck_height() + TIP_CLEARANCE},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -115,7 +122,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-        {'z': 30.5},
+        {'z': robot.max_deck_height() + TIP_CLEARANCE},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -285,3 +292,22 @@ def test_get_mosfet_caching(robot):
     assert m0 == robot.get_mosfet(0)
     m1 = robot.get_mosfet(1)
     assert m1 == robot.get_mosfet(1)
+
+
+def test_drop_tip_default_trash(robot):
+    tiprack = containers_load(robot, 'tiprack-200ul', '1')
+    pip = pipette.Pipette(
+        robot, name='P300', mount='right', tip_racks=[tiprack])
+
+    trash_loc = vector.Vector([80.00, 80.00, 58.00])
+
+    pip.pick_up_tip()
+
+    with mock.patch.object(robot, 'move_to') as move_to:  # NOQA
+        pip.drop_tip()
+
+        move_to.assert_called_with(
+            (robot.fixed_trash[0], trash_loc),
+            instrument=pip,
+            low_current_z=False,
+            strategy='arc')

@@ -7,22 +7,19 @@ from opentrons import containers, instruments
 
 tiprack = containers.load('tiprack-200ul', '8')
 trough = containers.load('trough-12row', '9')
-trash = containers.load('trash-box', '12')
 plate = containers.load('96-flat', '5')
 
 single = instruments.Pipette(
     mount='right',
     min_volume=10,
     name="p200",
-    tip_racks=[tiprack],
-    trash_container=trash)
+    tip_racks=[tiprack])
 
 multi = instruments.Pipette(
     mount='left',
     min_volume=10,
     name="p200S",
     tip_racks=[tiprack],
-    trash_container=trash,
     channels=8)
 
 

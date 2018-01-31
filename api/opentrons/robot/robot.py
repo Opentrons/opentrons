@@ -267,6 +267,7 @@ class Robot(object):
         self._previous_container = None
 
         self._deck = containers.Deck()
+        self._fixed_trash = None
         self.setup_deck()
         self.setup_gantry()
         self._instruments = {}
@@ -738,6 +739,7 @@ class Robot(object):
 
     def setup_deck(self):
         self.add_slots_to_deck()
+
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
@@ -752,9 +754,18 @@ class Robot(object):
                 pose_tracker.Point(*slot._coordinates)
             )
 
+        # @TODO (Laura & Andy) Slot and type of trash
+        # needs to be pulled from config file
+        # Add fixed trash to the initial deck
+        self._fixed_trash = self.add_container('fixed-trash', '12')
+
     @property
     def deck(self):
         return self._deck
+
+    @property
+    def fixed_trash(self):
+        return self._fixed_trash
 
     def get_instruments_by_name(self, name):
         res = []
@@ -965,3 +976,20 @@ class Robot(object):
     @lru_cache()
     def max_deck_height(self):
         return pose_tracker.max_z(self.poses, self._deck)
+
+    def max_placeable_height_on_deck(self, placeable):
+        """
+        :param placeable:
+        :return: Calibrated height of container in mm from
+        deck as the reference point
+        """
+        offset = placeable.top()[1]
+        placeable_coordinate = add(
+            pose_tracker.absolute(
+                self.poses,
+                placeable
+            ),
+            offset.coordinates
+        )
+        placeable_tallest_point = pose_tracker.max_z(self.poses, placeable)
+        return placeable_coordinate[2] + placeable_tallest_point
