@@ -298,7 +298,7 @@ def test_drop_tip_default_trash(robot):
     tiprack = containers_load(robot, 'tiprack-200ul', '1')
     pip = pipette.Pipette(robot, name='P300', mount='right', tip_racks=[tiprack])
 
-    trash_loc = vector.Vector([80.00, 80.00, 70.00])
+    trash_loc = vector.Vector([80.00, 80.00, 58.00])
 
     pip.pick_up_tip()
 
