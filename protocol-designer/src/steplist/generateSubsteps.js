@@ -1,28 +1,8 @@
 // @flow
-import type {StepType, FormData} from './types' /* StepSubItemData, StepIdType */
+import type {Command, StepType, FormData, ValidatedForm} from './types' /* StepSubItemData, StepIdType */
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import zip from 'lodash/zip'
-
-// TODO move to types.js?
-type Command = {
-  commandType: 'aspirate' | 'dispense', // TODO add the rest
-  volume: number,
-  pipette: string,
-  labware: string,
-  well: string,
-  wellOffset?: any, // TODO
-  speed?: number // TODO. In ul/sec
-}
-
-type ValidatedForm = {
-  pipette: 'left' | 'right',
-  sourceWells: Array<string>,
-  destWells: Array<string>,
-  sourceLabware: string,
-  destLabware: string,
-  volume: number
-}
 
 type FormError = {
   name: string,
@@ -56,7 +36,7 @@ export function validateAndProcessForm (stepType: StepType, formData: FormData):
 
   function splitWells (value: string, name: string): Array<string> {
     mustExist(value, name)
-    return value && value.split(',')
+    return value ? value.split(',') : [value]
   }
 
   const sourceWells = splitWells(formData['aspirate--wells'], 'sourceWells')

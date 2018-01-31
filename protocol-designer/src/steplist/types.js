@@ -1,5 +1,15 @@
 // @flow
 
+export type Command = {
+  commandType: 'aspirate' | 'dispense', // TODO add the rest
+  volume: number,
+  pipette: string,
+  labware: string,
+  well: string,
+  wellOffset?: any, // TODO
+  speed?: number // TODO. In ul/sec
+}
+
 // TODO Ian 2018-01-16 factor out to steplist/constants.js ?
 export const stepIconsByType = {
   'transfer': 'arrow right',
@@ -54,4 +64,13 @@ export type FormData = {
   'dispense--delay-seconds': string,
   'dispense--blowout--checkbox': boolean,
   'dispense--blowout--labware': string
+}
+
+export type ValidatedForm = {
+  pipette: 'left' | 'right',
+  sourceWells: Array<string>,
+  destWells: Array<string>,
+  sourceLabware: string,
+  destLabware: string,
+  volume: number
 }

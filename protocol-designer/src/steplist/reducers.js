@@ -5,10 +5,12 @@ import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
 import isNil from 'lodash/isNil'
 import max from 'lodash/max'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
 
-import type {BaseState} from '../types'
-import type {FormData, StepItemData, StepIdType, StepType} from './types'
-import {validateAndProcessForm} from './generateSubsteps'
+import type {BaseState, ValidatedForm} from '../types'
+import type {Command, FormData, StepItemData, StepIdType, StepType, StepSubItemData} from './types'
+import {validateAndProcessForm, generateCommands} from './generateSubsteps'
 
 import type {
   AddStepAction,
@@ -143,6 +145,70 @@ const rootReducer = combineReducers(_allReducers)
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 const rootSelector = (state: BaseState): RootState => state.steplist
 
+// ======= Selectors ===============================================
+
+const validatedForms = (state: BaseState): {[StepIdType]: {errors: Array<*>, validatedData: ValidatedForm}} | null => {
+  // TODO
+  const s = rootSelector(state)
+  if (s.orderedSteps.length === 0) {
+    return null
+  }
+  return s.orderedSteps.reduce((acc, stepId) => ({
+    ...acc,
+    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
+      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
+      : {errors: 'TODO non-transfer', validatedData: null}
+  }), {})
+}
+
+const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
+  mapValues(validatedForms(state), (valForm, stepId) => {
+    // TODO generate all the forms here
+    const errors = valForm.errors
+    if (!valForm.validatedData) {
+      return []
+    }
+
+    const {
+      sourceWells,
+      destWells
+      // sourceLabware, // TODO: show labware & volume, see new designs
+      // destLabware,
+      // volume
+    } = valForm.validatedData
+
+    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
+    if (errors.length > 0) {
+      return []
+    }
+
+    return range(sourceWells.length).map(i => ({
+      parentStepId: stepId,
+      substepId: i,
+      sourceIngredientName: 'ING1',
+      destIngredientName: 'ING2',
+      sourceWell: sourceWells[i],
+      destWell: destWells[i]
+    }))
+  })
+
+const commands = (state: BaseState): Array<Command> => {
+  // TODO use existing selectors, don't rewrite!!!
+  const steps = rootSelector(state).steps
+  const forms = validatedForms(state)
+  const orderedSteps = rootSelector(state).orderedSteps
+
+  console.log({steps, forms})
+
+  return orderedSteps && orderedSteps.map(stepId => {
+    const formData = forms[stepId]
+    const stepType = steps[stepId].stepType
+    return formData.errors.length > 0
+      ? 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
+      : generateCommands(stepType, formData.validatedData)
+  })
+}
+
 export const selectors = {
   stepCreationButtonExpanded: createSelector(
     rootSelector,
@@ -152,9 +218,11 @@ export const selectors = {
     (state: BaseState) => rootSelector(state).steps,
     (state: BaseState) => rootSelector(state).orderedSteps,
     (state: BaseState) => rootSelector(state).collapsedSteps,
-    (steps, orderedSteps, collapsedSteps) => orderedSteps.map(id => ({
+    allSubsteps,
+    (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
       ...steps[id],
-      collapsed: collapsedSteps[id]
+      collapsed: collapsedSteps[id],
+      substeps: _allSubsteps[id]
     }))
   ),
   selectedStepId: createSelector(
@@ -173,7 +241,7 @@ export const selectors = {
   ),
   formDataToStep: createSelector(
     rootSelector,
-    (state: RootState) => ({...state.form}) // TODO
+    (state: RootState) => ({...state.form}) // TODO?
   ),
   formData: createSelector(
     rootSelector,
@@ -188,16 +256,9 @@ export const selectors = {
         : max(allStepIds) + 1
     }
   ),
-  validatedFormsDebug: state => {
-    // TODO
-    const s = rootSelector(state)
-    console.log(s.orderedSteps, s.steps)
-    return s.orderedSteps.map(stepId => {
-      return (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
-        ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-        : 'TODO non-transfer'
-    })
-  }
+  allSubsteps,
+  validatedForms,
+  commands
 }
 
 export default rootReducer
