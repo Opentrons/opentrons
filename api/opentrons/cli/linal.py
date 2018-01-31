@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import insert
+from numpy import insert, dot
 from numpy.linalg import inv
 from typing import List, Tuple
 
@@ -112,3 +112,16 @@ def add_z(xy, z):
     # [ 0  0  0  1 ]
 
     return xyz
+
+
+def apply_transform(
+        t: List[List[float]], pos: (int, int, int)) -> (int, int, int, int):
+    """
+    Change of base using a transform matrix. Primarily used to render a point
+    in space in a way that is more readable for the user.
+
+    :param t: A transformation matrix from one 3D space [A] to another [B]
+    :param pos: XYZ point in space A
+    :return: corresponding XYZ1 point in space B
+    """
+    return tuple(dot(inv(t), list(pos) + [1])[:-1])
