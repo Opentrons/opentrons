@@ -25,7 +25,7 @@ def test_new_containers(robot):
     p200.aspirate(100, T25_flask[0]).dispense(trash_box)
 
 
-def test_fixed_trash(robot, dummy_db):
+def test_fixed_trash(robot):
     p200 = pipette.Pipette(
         robot, mount='right', name='test-pipette'
     )

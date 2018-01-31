@@ -754,7 +754,8 @@ class Robot(object):
                 pose_tracker.Point(*slot._coordinates)
             )
 
-        # @TODO (Laura & Andy) Slot and type of trash needs to be pulled from config file
+        # @TODO (Laura & Andy) Slot and type of trash
+        # needs to be pulled from config file
         # Add fixed trash to the initial deck
         self._fixed_trash = self.add_container('fixed-trash', '12')
 

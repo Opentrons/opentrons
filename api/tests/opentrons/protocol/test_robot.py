@@ -38,7 +38,7 @@ def test_pos_tracker_persistance(robot):
 
 def test_calibrated_max_z(robot):
 
-    p200 = pipette.Pipette(
+    pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
     assert robot.max_deck_height() == 63
@@ -296,7 +296,8 @@ def test_get_mosfet_caching(robot):
 
 def test_drop_tip_default_trash(robot):
     tiprack = containers_load(robot, 'tiprack-200ul', '1')
-    pip = pipette.Pipette(robot, name='P300', mount='right', tip_racks=[tiprack])
+    pip = pipette.Pipette(
+        robot, name='P300', mount='right', tip_racks=[tiprack])
 
     trash_loc = vector.Vector([80.00, 80.00, 58.00])
 
@@ -306,7 +307,7 @@ def test_drop_tip_default_trash(robot):
         pip.drop_tip()
 
         move_to.assert_called_with(
-            (robot.fixed_trash[0], trash_loc), instrument=pip, low_current_z=False, strategy='arc')
-
-
-
+            (robot.fixed_trash[0], trash_loc),
+            instrument=pip,
+            low_current_z=False,
+            strategy='arc')

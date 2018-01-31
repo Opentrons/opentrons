@@ -171,8 +171,8 @@ def max_z(state, root):
         for obj, _ in descendants(state, root)
     ]
 
-    #from pprint import pprint
-    #pprint(test, indent=2)
+    # from pprint import pprint
+    # pprint(test, indent=2)
     m = max([i[1] for i in test])
     return m
 

@@ -1637,4 +1637,3 @@ class PipetteTest(unittest.TestCase):
             mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
-

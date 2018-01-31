@@ -127,7 +127,7 @@ class ContainerTestCase(unittest.TestCase):
             slot_name = p.get_parent().get_name()
             assert slot_name == expected_name
 
-        for i in range(len(slots_old) -1):
+        for i in range(len(slots_old) - 1):
             test_slot_name(slots_new[i], slots_new[i])
             test_slot_name(int(slots_new[i]), slots_new[i])
             test_slot_name(slots_old[i], slots_new[i])
