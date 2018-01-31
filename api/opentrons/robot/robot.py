@@ -766,7 +766,7 @@ class Robot(object):
 
     def get_instruments(self, name=None):
         """
-        :returns: sorted list of (axis, instrument)
+        :returns: sorted list of (mount, instrument)
         """
         if name:
             return self.get_instruments_by_name(name)

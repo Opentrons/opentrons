@@ -94,7 +94,8 @@ class Pipette:
     def __init__(
             self,
             robot,
-            mount,
+            mount=None,
+            axis=None,
             mount_obj=None,
             name=None,
             channels=1,
@@ -109,6 +110,19 @@ class Pipette:
             dispense_flow_rate=None):
 
         self.robot = robot
+
+        # Uses information from axis to decide if a pipette is on the left
+        # or right mount
+        if axis:
+            warnings.warn(
+                "'axis' is deprecated, please use 'mount' in constructor"
+            )
+
+        if axis == 'a':
+            mount = 'right'
+        elif axis == 'b':
+            mount = 'left'
+
         self.mount = mount
         self.channels = channels
 
