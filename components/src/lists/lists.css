@@ -3,15 +3,16 @@
 :root {
   --list-padding-large: 1rem;
   --list-padding-small: 0.75rem;
+
+  --list-disabled: {
+    color: var(--c-font-disabled);
+    border-color: #eee;
+    fill: var(--c-font-disabled);
+  }
 }
 
 .clickable {
   @apply --clickable;
-}
-
-.disabled {
-  opacity: 0.3;
-  pointer-events: none;
 }
 
 .titled_list_selected {
@@ -88,4 +89,12 @@
   justify-content: space-between;
   align-items: center;
   vertical-align: top;
+}
+
+.disabled {
+  pointer-events: none;
+
+  & * {
+    @apply --list-disabled;
+  }
 }
