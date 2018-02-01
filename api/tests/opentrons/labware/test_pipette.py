@@ -183,6 +183,20 @@ class PipetteTest(unittest.TestCase):
     #     self.p200.calibrate('bottom')
     #     self.assertEquals(self.p200.plunger_positions['bottom'], 9)
 
+    def test_deprecated_axis_call(self):
+        import warnings
+
+        warnings.filterwarnings('error')
+        # Check that user warning occurs when axis is called
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, axis='a')
+
+        # Check that the warning is still valid when max_volume is also used
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, axis='a', max_volume=300)
+
+        warnings.filterwarnings('default')
+
     def test_get_instruments_by_name(self):
         self.p1000 = Pipette(
             self.robot,
