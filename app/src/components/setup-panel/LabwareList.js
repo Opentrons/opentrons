@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
@@ -28,7 +29,11 @@ type MergeProps = {
   setLabwareBySlot: () => void
 }
 
-type ListProps = StateProps & DispatchProps & MergeProps
+type OwnProps = {
+  chidren?: React.Node[]
+}
+
+type ListProps = StateProps & DispatchProps & MergeProps & OwnProps
 
 export default connect(mapStateToProps, null, mergeProps)(LabwareList)
 

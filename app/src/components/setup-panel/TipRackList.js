@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
@@ -28,7 +29,7 @@ type MergeProps = {
 
 type ListProps = StateProps & DispatchProps & MergeProps
 
-export default connect(mapStateToProps, null, mergeProps)(TipRackList)
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TipRackList)
 
 function TipRackList (props: ListProps) {
   const {tipracks, setLabwareBySlot, disabled, _deckPopulated} = props
@@ -45,7 +46,7 @@ function TipRackList (props: ListProps) {
   )
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: StateProps) {
   return {
     tipracks: robotSelectors.getTipracks(state),
     disabled: robotSelectors.getTipracksConfirmed(state),

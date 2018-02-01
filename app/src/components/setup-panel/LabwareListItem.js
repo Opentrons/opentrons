@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
 import capitalize from 'lodash/capitalize'
@@ -6,13 +7,14 @@ import {
   type Labware
 } from '../../robot'
 
-type TiprackItemProps = {
+type LabwareItemProps = {
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
   isDisabled: boolean,
   onClick: () => void
 }
-type Props = Labware & TiprackItemProps
+
+type Props = Labware & LabwareItemProps
 
 export default function LabwareListItem (props: Props) {
   const {
