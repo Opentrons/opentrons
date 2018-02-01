@@ -36,11 +36,27 @@ describe('CheckboxField', () => {
 })
 
 describe('DropdownField', () => {
-  test('renders correctly', () => {
+  test('renders correctly with a value', () => {
     const tree = Renderer.create(
       <DropdownField
         className='foo'
         value={'rna'}
+        options={[
+          {name: 'DNA', value: 'dna'},
+          {name: 'RNA', value: 'rna'},
+          {name: 'Protein', value: 'protein'}
+        ]}
+      />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders correctly with a falsey value', () => {
+    const tree = Renderer.create(
+      <DropdownField
+        className='foo'
+        value={false}
         options={[
           {name: 'DNA', value: 'dna'},
           {name: 'RNA', value: 'rna'},
