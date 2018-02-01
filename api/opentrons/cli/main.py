@@ -56,7 +56,17 @@ class CLITool:
         if not loop:
             loop = urwid.main_loop.AsyncioEventLoop(
                 loop=asyncio.get_event_loop())
-        self._tip_text_box = urwid.Text('X/Y/Z: left,right/up,down/q,a; Steps: -/=; Test points: 1, 2, 3')  # NOQA
+        controls = '\n'.join([
+            'arrow keys: move the gantry',
+            'q/a:        move the pipette up/down',
+            '=/-:        increase/decrease the distance moved on each step',
+            '1/2/3:      go to calibration point 1/2/3',
+            'enter:      confirm current calibration point position',
+            'space:      save data (after confirming all 3 points)',
+            'p:          perform tip probe (after saving calibration data)',
+            'esc:        exit calibration tool'
+        ])
+        self._tip_text_box = urwid.Text(controls)
         self._status_text_box = urwid.Text('')
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
@@ -262,7 +272,7 @@ class CLITool:
 
         text = '\n'.join([
             points,
-            'Smoothie: {}'.format(self.current_position),
+            # 'Smoothie: {}'.format(self.current_position),
             'World: {}'.format(apply_transform(
                 self._calibration_matrix, self.current_position)),
             'Step: {}'.format(self.current_step()),
@@ -337,9 +347,9 @@ def main():
     A CLI application for performing factory calibration of an Opentrons robot
 
     Instructions:
-        - Robot must be set up with a single-channel pipette installed on the
-          right-hand mount.
-        - Put a 200ul tip onto the pipette.
+        - Robot must be set up with a 300ul single-channel pipette installed on
+          the right-hand mount.
+        - Put a 300ul tip onto the pipette.
         - Use the arrow keys to jog the robot over an open area of the deck
           (the base deck surface, not over a ridge or numeral engraving). You
           can use the '-' and '=' keys to decrease or increase the amount of
@@ -352,6 +362,7 @@ def main():
         - Repeat with '2' and '3'.
         - Press space to save the configuration.
         - Optionally, press 4,5,6 or 7 to validate the new configuration.
+        - Press 'p' to perform tip probe.
         - Press 'esc' to exit the program.
     """
     prompt = input(
