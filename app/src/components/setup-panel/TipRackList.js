@@ -27,7 +27,7 @@ type DispatchProps = {
 type ListProps = {
   tipracks: Labware[],
   deckPopulated: boolean,
-  setLabwareBySlot: () => void,
+  setLabwareBySlot?: () => void,
   disabled: boolean,
   children: React.Node[]
 }
@@ -36,13 +36,16 @@ export default connect(mapStateToProps, null, mergeProps)(TipRackList)
 
 function TipRackList (props: ListProps) {
   const {tipracks, setLabwareBySlot, disabled, deckPopulated} = props
+  const onClick = deckPopulated ? setLabwareBySlot : null
   return (
     <TitledList title='tipracks' disabled={disabled}>
       {tipracks.map(tr => (
         <LabwareListItem
           {...tr}
           key={tr.slot}
-          onClick={deckPopulated && setLabwareBySlot}
+          isDisabled={tr.confirmed}
+          confirmed={tr.confirmed}
+          onClick={onClick}
         />
       ))}
     </TitledList>
