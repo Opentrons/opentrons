@@ -56,7 +56,7 @@ class CLITool:
         if not loop:
             loop = urwid.main_loop.AsyncioEventLoop(
                 loop=asyncio.get_event_loop())
-        self._tip_text_box = urwid.Text('')
+        self._tip_text_box = urwid.Text('X/Y/Z: left,right/up,down/q,a; Steps: -/=; Test points: 1, 2, 3')  # NOQA
         self._status_text_box = urwid.Text('')
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
@@ -77,8 +77,13 @@ class CLITool:
         self._current_point = 1
         self._calibration_matrix = robot.config.gantry_calibration
 
-        self._expected_points = point_set
-        self._actual_points = {}
+        self._expected_points = {
+            key: (vX, vY, tip_length)
+            for key, (vX, vY) in point_set.items()}
+        self._actual_points = {
+            1: (0, 0),
+            2: (0, 0),
+            3: (0, 0)}
         self._test_points = {
             'slot5': (132.50, 90.50, self._tip_length),
             'corner3': (332.13, 47.41, self._tip_length),
@@ -92,7 +97,7 @@ class CLITool:
             'p': lambda: probe(self._tip_length),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
-            ' ': lambda: save_config(),
+            ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
             'q': lambda: self.jog(
                 self._current_pipette, +1, self.current_step()),
@@ -102,13 +107,13 @@ class CLITool:
             'down': lambda: self.jog('Y', -1, self.current_step()),
             'left': lambda: self.jog('X', -1, self.current_step()),
             'right': lambda: self.jog('X', +1, self.current_step()),
-            '1': lambda: self.validate(self._expected_points[1]),
-            '2': lambda: self.validate(self._expected_points[2]),
-            '3': lambda: self.validate(self._expected_points[3]),
-            '4': lambda: self.validate(self._test_points['slot5']),
-            '5': lambda: self.validate(self._test_points['corner3']),
-            '6': lambda: self.validate(self._test_points['corner8']),
-            '7': lambda: self.validate(self._test_points['corner9'])
+            '1': lambda: self.validate(self._expected_points[1], 1),
+            '2': lambda: self.validate(self._expected_points[2], 2),
+            '3': lambda: self.validate(self._expected_points[3], 3),
+            '4': lambda: self.validate(self._test_points['slot5'], 4),
+            '5': lambda: self.validate(self._test_points['corner3'], 5),
+            '6': lambda: self.validate(self._test_points['corner8'], 6),
+            '7': lambda: self.validate(self._test_points['corner9'], 7)
         }
 
     def current_step(self):
@@ -165,33 +170,40 @@ class CLITool:
         return 'Homed'
 
     def save_point(self) -> str:
+        """
+        Indexes the measured data with the current point as a key and saves the
+        current position once the 'Enter' key is pressed to the 'actual points'
+        vector.
+        """
         self._actual_points[self._current_point] = self.position()[:-1]
 
-        if self._current_point == 3:
-            expected = [self._expected_points[p] for p in [1, 2, 3]]
-            actual = [self._actual_points[p] for p in [1, 2, 3]]
-            # Generate a 2 dimensional transform matrix from the two matricies
-            flat_matrix = solve(expected, actual)
-            current_z = self._calibration_matrix[2][3]
-            # Add the z component to form the 3 dimensional transform
-            self._calibration_matrix = add_z(flat_matrix, current_z)
+        msg = 'saved #{}: {}'.format(
+            self._current_point, self._actual_points[self._current_point])
 
-            robot.config = robot.config._replace(
-                gantry_calibration=list(
-                    map(lambda i: list(i), self._calibration_matrix)))
-            msg = str(robot.config)
-        else:
-            msg = 'saved #{}: {}'.format(
-                self._current_point, self._actual_points[self._current_point])
-            # There's probably a much better way to handle "current point".
-            # Should probably be linked to which of the "expected points" was
-            # last fed to `validate`, but then we'll need a separate key for
-            # Checking if all actual points have been confirmed and saving the
-            # final calibration matrix. More keys to keep track of, but
-            # ultimately better anyway, so that each key has only one behavior
-            # rather than being as dependent on state.
-            self._current_point += 1
         return msg
+
+    def save_transform(self) -> str:
+        """
+        Actual is measured data
+        Expected is based on mechanical drawings of the robot
+
+        This method computes the transformation matrix from actual -> expected.
+        Saves this transform to disc.
+        """
+        expected = [self._expected_points[p][:2] for p in [1, 2, 3]]
+        actual = [self._actual_points[p][:2] for p in [1, 2, 3]]
+        # Generate a 2 dimensional transform matrix from the two matricies
+        flat_matrix = solve(expected, actual)
+        current_z = self._calibration_matrix[2][3]
+        # Add the z component to form the 3 dimensional transform
+        self._calibration_matrix = add_z(flat_matrix, current_z)
+
+        robot.config = robot.config._replace(
+            gantry_calibration=list(
+                map(lambda i: list(i), self._calibration_matrix)))
+        res = str(robot.config)
+
+        return '{}\n{}'.format(res, save_config())
 
     def save_z_value(self) -> str:
         actual_z = self.position()[-1]
@@ -200,7 +212,14 @@ class CLITool:
         self._calibration_matrix[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
-    def validate(self, point: (float, float, float)):
+    def validate(self, point: (float, float, float), point_num: int) -> str:
+        """
+        :param point: Expected values from mechanical drawings
+        :param point_num: The current position attempting to be validated
+
+
+        :return:
+        """
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         v = array(list(point) + [1])
@@ -214,6 +233,9 @@ class CLITool:
         x, y, z, _ = dot(self._calibration_matrix, v)
         robot._driver.move({'X': x, 'Y': y})
         robot._driver.move({self._current_pipette: z})
+
+        self._current_point = point_num
+
         return 'moving to point {}'.format(point)
 
     def exit(self):
@@ -244,7 +266,6 @@ class CLITool:
             'World: {}'.format(apply_transform(
                 self._calibration_matrix, self.current_position)),
             'Step: {}'.format(self.current_step()),
-            'Current stage: ' + self._current_pipette,
             'Message: {}'.format(msg)
         ])
 
@@ -320,7 +341,7 @@ def main():
           right-hand mount.
         - Put a 200ul tip onto the pipette.
         - Use the arrow keys to jog the robot over an open area of the deck
-          (the base deck surface, not over a ridge or numeral ingraving). You
+          (the base deck surface, not over a ridge or numeral engraving). You
           can use the '-' and '=' keys to decrease or increase the amount of
           distance moved with each jog action.
         - Use the 'q' and 'a' keys to jog the pipette up and down respectively
@@ -328,6 +349,10 @@ def main():
         - Press '1' to automatically go to the expected location of the first
           calibration point. Jog the robot until the tip is actually at
           the point, then press 'enter'.
+        - Repeat with '2' and '3'.
+        - Press space to save the configuration.
+        - Optionally, press 4,5,6 or 7 to validate the new configuration.
+        - Press 'esc' to exit the program.
     """
     prompt = input(
         ">>> Warning! Running this tool backup and clear any previous calibration data. Proceed (y/[n])? ")  # NOQA
