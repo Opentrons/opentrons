@@ -271,11 +271,22 @@ class Server(object):
                 self.executor, self.call_and_serialize, func)
             response['$']['status'] = 'success'
         except Exception as e:
+            trace = traceback.format_exc()
             log.warning(
                 'Exception while dispatching a method call: {0}'
-                .format(traceback.format_exc()))
+                .format(trace))
+            try:
+                line_no = [
+                    l.split(',')[0].strip()
+                    for l in trace.split('line')
+                    if '<module>' in l][0]
+            except Exception as exc:
+                log.debug(
+                    "Exception while getting line no: {}".format(type(exc)))
+                line_no = 'unknown'
             response['$']['status'] = 'error'
-            call_result = '{0}: {1}'.format(e.__class__.__name__, str(e))
+            call_result = '{0} [line {1}]: {2}'.format(
+                e.__class__.__name__, line_no, str(e))
         finally:
             log.debug('Call result: {0}'.format(call_result))
             response['data'] = call_result
