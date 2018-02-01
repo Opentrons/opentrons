@@ -139,25 +139,15 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
- // TODO HACK
-const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
-  (validForm && validForm.errors)
-    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
-    : true // No forms counts as error
+const formData = createSelector(
+  rootSelector,
+  (state: RootState) => state.form
+)
 
-const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
-  // TODO
-  const s = rootSelector(state)
-  if (s.orderedSteps.length === 0) {
-    return null
-  }
-  return s.orderedSteps.reduce((acc, stepId) => ({
-    ...acc,
-    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
-      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
-  }), {})
-}
+const selectedStepId = createSelector(
+  rootSelector,
+  (state: RootState) => state.selectedStep
+)
 
 const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
   mapValues(validatedForms(state), (valForm, stepId) => {
@@ -188,6 +178,38 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
     }))
   })
 
+const allSteps = createSelector(
+  (state: BaseState) => rootSelector(state).steps,
+  (state: BaseState) => rootSelector(state).orderedSteps,
+  (state: BaseState) => rootSelector(state).collapsedSteps,
+  allSubsteps,
+  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
+    ...steps[id],
+    collapsed: collapsedSteps[id],
+    substeps: _allSubsteps[id]
+  }))
+)
+
+ // TODO HACK
+const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
+  (validForm && validForm.errors)
+    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
+    : true // No forms counts as error
+
+const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
+  // TODO
+  const s = rootSelector(state)
+  if (s.orderedSteps.length === 0) {
+    return null
+  }
+  return s.orderedSteps.reduce((acc, stepId) => ({
+    ...acc,
+    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
+      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
+      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
+  }), {})
+}
+
 const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
   // TODO use existing selectors, don't rewrite!!!
   const steps = rootSelector(state).steps
@@ -212,21 +234,8 @@ export const selectors = {
     rootSelector,
     (state: RootState) => state.stepCreationButtonExpanded
   ),
-  allSteps: createSelector(
-    (state: BaseState) => rootSelector(state).steps,
-    (state: BaseState) => rootSelector(state).orderedSteps,
-    (state: BaseState) => rootSelector(state).collapsedSteps,
-    allSubsteps,
-    (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
-      ...steps[id],
-      collapsed: collapsedSteps[id],
-      substeps: _allSubsteps[id]
-    }))
-  ),
-  selectedStepId: createSelector(
-    rootSelector,
-    (state: RootState) => state.selectedStep
-  ),
+  allSteps,
+  selectedStepId,
   selectedStepFormData: createSelector(
     (state: BaseState) => rootSelector(state).savedStepForms,
     (state: BaseState) => rootSelector(state).selectedStep,
@@ -237,10 +246,7 @@ export const selectors = {
       // new blank form
       (!isNil(selectedStepId) && generateNewForm(selectedStepId, steps[selectedStepId].stepType))
   ),
-  formData: createSelector(
-    rootSelector,
-    (state: RootState) => state.form
-  ),
+  formData,
   nextStepId: createSelector( // generates the next step ID to use
     (state: BaseState) => rootSelector(state).steps,
     (steps): number => {
@@ -252,7 +258,17 @@ export const selectors = {
   ),
   allSubsteps,
   validatedForms,
-  commands
+  commands,
+  currentFormCanBeSaved: createSelector(
+    formData,
+    selectedStepId,
+    allSteps,
+    (formData, selectedStepId, allSteps): boolean | null => ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
+      ? checkForErrorsHack(
+        validateAndProcessForm(allSteps[selectedStepId].stepType, formData)
+      )
+      : null
+  )
 }
 
 export default rootReducer
