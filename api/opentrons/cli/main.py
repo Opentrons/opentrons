@@ -349,7 +349,7 @@ def main():
     Instructions:
         - Robot must be set up with a 300ul single-channel pipette installed on
           the right-hand mount.
-        - Put a 300ul tip onto the pipette.
+        - Put a GEB 300ul tip onto the pipette.
         - Use the arrow keys to jog the robot over an open area of the deck
           (the base deck surface, not over a ridge or numeral engraving). You
           can use the '-' and '=' keys to decrease or increase the amount of
@@ -360,20 +360,22 @@ def main():
           calibration point. Jog the robot until the tip is actually at
           the point, then press 'enter'.
         - Repeat with '2' and '3'.
-        - Press space to save the configuration.
+        - After calibrating all three points, press the space bar to save the
+          configuration.
         - Optionally, press 4,5,6 or 7 to validate the new configuration.
         - Press 'p' to perform tip probe.
         - Press 'esc' to exit the program.
     """
     prompt = input(
-        ">>> Warning! Running this tool backup and clear any previous calibration data. Proceed (y/[n])? ")  # NOQA
+        ">>> Warning! Running this tool backup and clear any previous "
+        "calibration data. Proceed (y/[n])? ")
     if prompt not in ['y', 'Y', 'yes']:
         print('Exiting--prior configuration data not changed')
         sys.exit()
     backup_configuration_and_reload()
 
     # older machines cannot reach deck points, use the screw holes instead
-    res = input('Are you calibrating to the screw holes? (y/[n])')
+    res = input('Are you calibrating to the screw holes (y/[n])? ')
     if res in ['y', 'Y', 'yes']:
         calibration_points = expected_holes
     else:
