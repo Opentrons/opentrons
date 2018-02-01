@@ -40,7 +40,7 @@ function mapStateToProps (state) {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>) {
+function mapDispatchToProps (dispatch: Dispatch<any>) {
   return {
     onCancel: e => dispatch(cancelStepForm()),
     onSave: e => dispatch(saveStepForm()),

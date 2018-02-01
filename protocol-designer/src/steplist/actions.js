@@ -109,7 +109,7 @@ export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     dispatch({
       type: 'SAVE_STEP_FORM',
-      payload: selectors.formDataToStep(getState())
+      payload: selectors.formData(getState())
     })
   }
 

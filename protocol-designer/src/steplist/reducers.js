@@ -4,13 +4,14 @@ import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
 import isNil from 'lodash/isNil'
+import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
-import type {BaseState, ValidatedForm} from '../types'
-import type {Command, FormData, StepItemData, StepIdType, StepType, StepSubItemData} from './types'
-import {validateAndProcessForm, generateCommands} from './generateSubsteps'
+import type {BaseState} from '../types'
+import type {Command, FormData, StepItemData, StepIdType, StepSubItemData} from './types'
+import {type ValidFormAndErrors, generateNewForm, validateAndProcessForm, generateCommands} from './generateSubsteps'
 
 import type {
   AddStepAction,
@@ -18,6 +19,7 @@ import type {
   SaveStepFormAction,
   SelectStepAction
 } from './actions' // Thunk action creators
+
 import {
   cancelStepForm,
   saveStepForm,
@@ -26,20 +28,10 @@ import {
   toggleStepCollapsed
 } from './actions'
 
-const generateNewForm = (stepId: StepIdType, stepType: StepType): FormData => {
-  if (stepType === 'transfer') {
-  // TODO: other actions
-    return {
-      id: stepId
-      // TODO: rest of blank fields? Default values?
-    }
-  }
-  console.error('Only transfer forms are supported now. TODO.')
-}
-
 type FormState = FormData | null
 
-// the `form` state holds temporary form info that is saved or thrown away with "cancel"
+// the `form` state holds temporary form info that is saved or thrown away with "cancel".
+// TODO: rename to make that more clear. 'unsavedForm'?
 const form = handleActions({
   CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
     ...state,
@@ -77,7 +69,7 @@ type SavedStepFormState = {
 const savedStepForms = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
-    [action.payload.id]: action.payload // TODO translate fields don't literally take them
+    [action.payload.id]: action.payload
   })
 }, {})
 
@@ -147,7 +139,13 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
-const validatedForms = (state: BaseState): {[StepIdType]: {errors: Array<*>, validatedData: ValidatedForm}} | null => {
+ // TODO HACK
+const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
+  (validForm && validForm.errors)
+    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
+    : true // No forms counts as error
+
+const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
   // TODO
   const s = rootSelector(state)
   if (s.orderedSteps.length === 0) {
@@ -157,15 +155,13 @@ const validatedForms = (state: BaseState): {[StepIdType]: {errors: Array<*>, val
     ...acc,
     [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
       ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-      : {errors: 'TODO non-transfer', validatedData: null}
+      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
   }), {})
 }
 
 const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
   mapValues(validatedForms(state), (valForm, stepId) => {
-    // TODO generate all the forms here
-    const errors = valForm.errors
-    if (!valForm.validatedData) {
+    if (!valForm.validatedForm) {
       return []
     }
 
@@ -175,10 +171,10 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
       // sourceLabware, // TODO: show labware & volume, see new designs
       // destLabware,
       // volume
-    } = valForm.validatedData
+    } = valForm.validatedForm
 
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (errors.length > 0) {
+    if (checkForErrorsHack(valForm)) {
       return []
     }
 
@@ -192,20 +188,22 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
     }))
   })
 
-const commands = (state: BaseState): Array<Command> => {
+const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
   // TODO use existing selectors, don't rewrite!!!
   const steps = rootSelector(state).steps
   const forms = validatedForms(state)
   const orderedSteps = rootSelector(state).orderedSteps
 
-  console.log({steps, forms})
+  // don't try to make commands if the step forms are null or if there are any errors.
+  if (forms === null || orderedSteps.map(stepId => checkForErrorsHack(forms[stepId])).some(err => err)) {
+    return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
+  }
 
-  return orderedSteps && orderedSteps.map(stepId => {
-    const formData = forms[stepId]
+  return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
+    const formDataAndErrors = forms[stepId]
     const stepType = steps[stepId].stepType
-    return formData.errors.length > 0
-      ? 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
-      : generateCommands(stepType, formData.validatedData)
+    // TODO checking if there are some errors is repeated from substeps selector, DRY it up
+    return generateCommands(stepType, formDataAndErrors.validatedForm)
   })
 }
 
@@ -238,10 +236,6 @@ export const selectors = {
       (selectedStepId !== null && savedStepForms[selectedStepId]) ||
       // new blank form
       (!isNil(selectedStepId) && generateNewForm(selectedStepId, steps[selectedStepId].stepType))
-  ),
-  formDataToStep: createSelector(
-    rootSelector,
-    (state: RootState) => ({...state.form}) // TODO?
   ),
   formData: createSelector(
     rootSelector,
