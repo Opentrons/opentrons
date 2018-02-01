@@ -10,7 +10,7 @@ import {
 type LabwareItemProps = {
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
-  isDisabled: boolean,
+  isDisabled?: boolean,
   onClick: () => void
 }
 

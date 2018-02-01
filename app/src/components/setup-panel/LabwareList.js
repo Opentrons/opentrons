@@ -16,8 +16,7 @@ import {
 type StateProps = {
   labware: Labware[],
   _calibrator: Mount | '',
-  _deckPopulated: boolean,
-  setLabwareBySlot?: () => void,
+  deckPopulated: boolean,
   disabled: boolean
 }
 
@@ -25,27 +24,29 @@ type DispatchProps = {
   dispatch: Dispatch<*>
 }
 
-type MergeProps = {
-  setLabwareBySlot: () => void
+type ListProps = {
+  labware: Labware[],
+  deckPopulated: boolean,
+  setLabwareBySlot: () => void,
+  disabled: boolean,
+  children: React.Node[]
 }
 
-type OwnProps = {
-  chidren?: React.Node[]
-}
-
-type ListProps = StateProps & DispatchProps & MergeProps & OwnProps
-
-export default connect(mapStateToProps, null, mergeProps)(LabwareList)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(LabwareList)
 
 function LabwareList (props: ListProps) {
-  const {labware, setLabwareBySlot, disabled, _deckPopulated} = props
+  const {labware, setLabwareBySlot, disabled, deckPopulated} = props
   return (
     <TitledList title='labware' disabled={disabled}>
       {labware.map(lw => (
         <LabwareListItem
           {...lw}
           key={lw.slot}
-          onClick={_deckPopulated && setLabwareBySlot}
+          onClick={deckPopulated && setLabwareBySlot}
         />
       ))}
     </TitledList>
@@ -63,13 +64,13 @@ function mapStateToProps (state) {
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {labware, _calibrator, _deckPopulated, disabled} = stateProps
+  const {labware, _calibrator, deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
   const setLabwareBySlot = labware.reduce((result, lw: Labware) => {
     const calibrator = lw.calibratorMount || _calibrator
 
-    if (_deckPopulated && calibrator) {
+    if (deckPopulated && calibrator) {
       result[lw.slot] = () => dispatch(robotActions.moveTo(calibrator, lw.slot))
     }
 

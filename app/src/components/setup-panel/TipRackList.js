@@ -9,13 +9,14 @@ import LabwareListItem from './LabwareListItem'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Labware
+  type Labware,
+  type Mount
 } from '../../robot'
 
 type StateProps = {
   tipracks: Labware[],
-  _calibrator: string,
-  _deckPopulated: boolean,
+  _calibrator: Mount,
+  deckPopulated: boolean,
   disabled: boolean
 }
 
@@ -23,23 +24,25 @@ type DispatchProps = {
   dispatch: Dispatch<*>
 }
 
-type MergeProps = {
-  setLabwareBySlot: () => void
+type ListProps = {
+  tipracks: Labware[],
+  deckPopulated: boolean,
+  setLabwareBySlot: () => void,
+  disabled: boolean,
+  children: React.Node[]
 }
 
-type ListProps = StateProps & DispatchProps & MergeProps
-
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TipRackList)
+export default connect(mapStateToProps, null, mergeProps)(TipRackList)
 
 function TipRackList (props: ListProps) {
-  const {tipracks, setLabwareBySlot, disabled, _deckPopulated} = props
+  const {tipracks, setLabwareBySlot, disabled, deckPopulated} = props
   return (
     <TitledList title='tipracks' disabled={disabled}>
       {tipracks.map(tr => (
         <LabwareListItem
           {...tr}
           key={tr.slot}
-          onClick={_deckPopulated && setLabwareBySlot}
+          onClick={deckPopulated && setLabwareBySlot}
         />
       ))}
     </TitledList>
@@ -56,16 +59,15 @@ function mapStateToProps (state: StateProps) {
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {tipracks, _calibrator, _deckPopulated, disabled} = stateProps
+  const {tipracks, _calibrator, deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
   const setLabwareBySlot = tipracks.reduce((result, tr: Labware) => {
     const calibrator = tr.calibratorMount || _calibrator
 
-    if (_deckPopulated && calibrator) {
+    if (deckPopulated && calibrator) {
       result[tr.slot] = () => dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
     }
-
     return result
   }, {})
 
