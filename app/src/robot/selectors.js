@@ -272,6 +272,16 @@ export const getUnconfirmedLabware = createSelector(
   (labware) => labware.filter((lw) => lw.type && !lw.confirmed)
 )
 
+export const getTipracks = createSelector(
+  getLabware,
+  (labware) => labware.filter((lw) => lw.type && lw.isTiprack)
+)
+
+export const getNotTipracks = createSelector(
+  getLabware,
+  (labware) => labware.filter((lw) => lw.type && !lw.isTiprack)
+)
+
 export const getUnconfirmedTipracks = createSelector(
   getUnconfirmedLabware,
   (labware) => labware.filter((lw) => lw.type && lw.isTiprack)

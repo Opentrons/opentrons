@@ -8,15 +8,13 @@ import LabwareListItem from './LabwareListItem'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount,
   type Labware
 } from '../../robot'
 
 type StateProps = {
-  labware: Labware[],
-  _calibrator: Mount | '',
+  tipracks: Labware[],
+  _calibrator: string,
   _deckPopulated: boolean,
-  setLabwareBySlot?: () => void,
   disabled: boolean
 }
 
@@ -30,16 +28,16 @@ type MergeProps = {
 
 type ListProps = StateProps & DispatchProps & MergeProps
 
-export default connect(mapStateToProps, null, mergeProps)(LabwareList)
+export default connect(mapStateToProps, null, mergeProps)(TipRackList)
 
-function LabwareList (props: ListProps) {
-  const {labware, setLabwareBySlot, disabled, _deckPopulated} = props
+function TipRackList (props: ListProps) {
+  const {tipracks, setLabwareBySlot, disabled, _deckPopulated} = props
   return (
-    <TitledList title='labware' disabled={disabled}>
-      {labware.map(lw => (
+    <TitledList title='tipracks' disabled={disabled}>
+      {tipracks.map(tr => (
         <LabwareListItem
-          {...lw}
-          key={lw.slot}
+          {...tr}
+          key={tr.slot}
           onClick={_deckPopulated && setLabwareBySlot}
         />
       ))}
@@ -48,31 +46,30 @@ function LabwareList (props: ListProps) {
 }
 
 function mapStateToProps (state) {
-  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   return {
-    labware: robotSelectors.getNotTipracks(state),
-    disabled: !tipracksConfirmed,
+    tipracks: robotSelectors.getTipracks(state),
+    disabled: robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state)
   }
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {labware, _calibrator, _deckPopulated, disabled} = stateProps
+  const {tipracks, _calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
-  const setLabwareBySlot = labware.reduce((result, lw: Labware) => {
-    const calibrator = lw.calibratorMount || _calibrator
+  const setLabwareBySlot = tipracks.reduce((result, tr: Labware) => {
+    const calibrator = tr.calibratorMount || _calibrator
 
     if (_deckPopulated && calibrator) {
-      result[lw.slot] = () => dispatch(robotActions.moveTo(calibrator, lw.slot))
+      result[tr.slot] = () => dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
     }
 
     return result
   }, {})
 
   return {
-    labware,
+    tipracks,
     setLabwareBySlot,
     disabled
   }

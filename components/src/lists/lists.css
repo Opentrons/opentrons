@@ -83,7 +83,7 @@
 }
 
 .info {
-  width: calc(100% - 3rem);
+  width: calc(100% - 1.5rem);
   display: inline-flex;
   flex-direction: row;
   justify-content: space-between;

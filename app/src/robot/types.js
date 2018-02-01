@@ -88,7 +88,7 @@ export type Instrument = {
 // labware as returned by the robot API
 export type Labware = {
   // resource ID
-  _id: number,
+  _id?: number,
   // slot labware is installed in
   slot: Slot,
   // unique type of the labware
