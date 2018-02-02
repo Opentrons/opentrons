@@ -25,6 +25,7 @@
     "babel-loader": "^7.1.1",
     "css-loader": "^0.28.4",
     "handlebars-loader": "^1.6.0",
+    "lost": "^8.2.0",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
     "postcss-import": "^11.0.0",

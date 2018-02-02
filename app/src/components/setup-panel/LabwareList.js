@@ -93,13 +93,15 @@ function mergeProps (stateProps, dispatchProps) {
       isRunning
     )
 
+    const calibrator = lw.calibratorMount || _calibrator
+
     return {
       ...lw,
       isDisabled,
       setLabware: () => {
         if (deckPopulated) {
           if (lw.isTiprack) {
-            return dispatch(robotActions.pickupAndHome(_calibrator, lw.slot))
+            return dispatch(robotActions.pickupAndHome(calibrator, lw.slot))
           }
           dispatch(robotActions.moveTo(_calibrator, lw.slot))
         }

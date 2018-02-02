@@ -1,19 +1,35 @@
 // @flow
 import * as React from 'react'
-
-import {Icon, VerticalNavBar} from '@opentrons/components'
+import {Icon, TitleBar, VerticalNavBar} from '@opentrons/components'
+import styles from './ProtocolEditor.css'
+import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
 import ConnectedStepList from '../containers/ConnectedStepList'
+
+const SelectorDebugger = process.env.NODE_ENV === 'development'
+  ? require('../containers/SelectorDebugger').default
+  : () => null
 
 export default function ProtocolEditor () {
   return (
     <div>
-      <div style={{height: '100%', float: 'left'}}> {/* TODO: Ian 2018-01-11 do real styles or use structure in complib... this is quick HACK */}
-        <VerticalNavBar>
+      <SelectorDebugger />
+
+      <div className={styles.wrapper}>
+        <VerticalNavBar className={styles.nav_bar}>
           <Icon name='file' />
           <Icon name='cog' />
         </VerticalNavBar>
+        <ConnectedStepList />
+        <div className={styles.main_page_wrapper}>
+          {/* TODO Ian 2018-01-24 Connect TitleBar, figure out when it changes */}
+          <TitleBar title='Title' subtitle='Subtitle' />
+
+          <div className={styles.main_page_content}>
+            <ConnectedStepEditForm />
+            {'Deck map goes here! '.repeat(200)}
+          </div>
+        </div>
       </div>
-      <ConnectedStepList />
     </div>
   )
 }

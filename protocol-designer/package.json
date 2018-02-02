@@ -53,11 +53,14 @@
   },
   "stylelint": {
     "rules": {
-      "selector-class-pattern": "^[a-z0-9_]+$"
+      "selector-class-pattern": "^[a-z0-9_]+$",
+      "at-rule-no-unknown": null,
+      "property-no-unknown": null
     },
     "extends": [
       "stylelint-config-standard",
-      "stylelint-config-css-modules"
+      "stylelint-config-css-modules",
+      "stylelint-config-lost"
     ],
     "ignoreFiles": [
       "**/dist/**",
@@ -99,6 +102,7 @@
     "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "jest": "^21.2.1",
+    "lost": "^8.2.0",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
     "postcss-import": "^11.0.0",
@@ -109,6 +113,7 @@
     "style-loader": "^0.18.2",
     "stylelint": "^8.2.0",
     "stylelint-config-css-modules": "^1.1.0",
+    "stylelint-config-lost": "^0.0.3",
     "stylelint-config-standard": "^17.0.0",
     "url-loader": "^0.6.2",
     "webpack": "^3.1.0",

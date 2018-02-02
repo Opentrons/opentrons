@@ -4,6 +4,7 @@ import warnings
 from opentrons import commands
 
 from opentrons.containers import unpack_location
+
 from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
@@ -42,7 +43,7 @@ class Pipette:
 
     Here are the typical steps of using the Pipette:
         * Instantiate a pipette with a maximum volume (uL)
-        and an axis (`left` or `right`)
+        and a mount (`left` or `right`)
         * Design your protocol through the pipette's liquid-handling commands
 
     Methods in this class include assertions where needed to ensure that any
@@ -62,7 +63,7 @@ class Pipette:
         The smallest recommended uL volume for this pipette (Default: `0`)
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
-        (Default: `None`)
+        (Default: `fixed-trash`)
     tip_racks : list
         A list of Containers for this Pipette to track tips when calling
         :meth:`pick_up_tip` (Default: [])
@@ -83,7 +84,7 @@ class Pipette:
     >>> from opentrons import instruments, containers, robot
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> p1000 = instruments.Pipette(mount='left')
+    >>> p1000 = instruments.Pipette(name='p1000', mount='left')
     >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
     >>> p200 = instruments.Pipette(
     ...     name='p200',
@@ -94,14 +95,15 @@ class Pipette:
     def __init__(
             self,
             robot,
-            mount,
+            mount=None,
+            axis=None,
             mount_obj=None,
             name=None,
             channels=1,
             min_volume=0,
             max_volume=None,
             ul_per_mm=18.51,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
             dispense_speed=DEFAULT_DISPENSE_SPEED,
@@ -109,6 +111,19 @@ class Pipette:
             dispense_flow_rate=None):
 
         self.robot = robot
+
+        # Uses information from axis to decide if a pipette is on the left
+        # or right mount
+        if axis:
+            warnings.warn(
+                "'axis' is deprecated, please use 'mount' in constructor"
+            )
+
+        if axis == 'a':
+            mount = 'right'
+        elif axis == 'b':
+            mount = 'left'
+
         self.mount = mount
         self.channels = channels
 
@@ -120,8 +135,12 @@ class Pipette:
             name = self.__class__.__name__
         self.name = name
 
+        if trash_container == '':
+            trash_container = self.robot.fixed_trash
+
         if isinstance(trash_container, Container) and len(trash_container) > 0:
             trash_container = trash_container[0]
+
         self.trash_container = trash_container
         self.tip_racks = tip_racks
         self.starting_tip = None
@@ -318,7 +337,7 @@ class Pipette:
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'A1')
         >>> p200 = instruments.Pipette(
-        ...     name='p200', axis='a')
+        ...     name='p200', mount='left')
 
         >>> # aspirate 50uL from a Well
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
@@ -414,7 +433,7 @@ class Pipette:
         --------
         ..
         >>> plate = containers.load('96-flat', 'C1')
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> # fill the pipette with liquid (200uL)
         >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -553,7 +572,7 @@ class Pipette:
         ..
         >>> plate = containers.load('96-flat', 'D1')
 
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
 
         >>> # mix 50uL in a Well, three times
         >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
@@ -605,7 +624,7 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -655,7 +674,7 @@ class Pipette:
         ..
         >>> plate = containers.load('96-flat', 'B2')
 
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
@@ -721,7 +740,7 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
@@ -764,7 +783,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'E1', share=True)
-        >>> p200 = instruments.Pipette(axis='a',
+        >>> p200 = instruments.Pipette(name='p200', mount='left',
         ...     tip_racks=[tiprack])
         >>> p200.pick_up_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
@@ -822,7 +841,8 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'A2')
-        >>> p200 = instruments.Pipette(axis='a', tip_racks=[tiprack])
+        >>> p200 = instruments.Pipette(
+        ... name='p200', mount='left', tip_racks=[tiprack])
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> p200.return_tip() # doctest: +ELLIPSIS
@@ -905,7 +925,8 @@ class Pipette:
         <opentrons.robot.robot.Robot object at ...>
         >>> tiprack = containers.load('tiprack-200ul', 'C2')
         >>> trash = containers.load('point', 'A3')
-        >>> p200 = instruments.Pipette(axis='a', trash_container=trash)
+        >>> p200 = instruments.Pipette(
+        ... name='p200', mount='left', trash_container=trash)
         >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         >>> # drops the tip in the trash
@@ -924,7 +945,13 @@ class Pipette:
 
         if isinstance(location, Placeable):
             # give space for the drop-tip mechanism
-            location = location.bottom(self._drop_tip_offset)
+            # @TODO (Laura & Andy 2018261)
+            # When container typing is implemented, make sure that
+            # when returning to a tiprack, tips are dropped from the bottom
+            if 'rack' in location.get_parent().get_type():
+                location = location.bottom(self._drop_tip_offset)
+            else:
+                location = location.top()
 
         @commands.publish.both(command=commands.drop_tip)
         def _drop_tip(location, instrument=self):
@@ -973,7 +1000,7 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='right')
         >>> p200.home() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1005,7 +1032,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'B3')
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1038,7 +1065,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'A3')
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1138,7 +1165,7 @@ class Pipette:
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> plate = containers.load('96-flat', 'D1')
-        >>> p200 = instruments.Pipette(name='p200', axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
@@ -1209,7 +1236,7 @@ class Pipette:
         --------
         ..
         >>> robot = Robot()
-        >>> p200 = instruments.Pipette(axis='a')
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
         >>> robot.move_plunger(**{'a': 10})
         >>> # save plunger 'top' to coordinate 10
         >>> p200.calibrate('top') # doctest: +ELLIPSIS

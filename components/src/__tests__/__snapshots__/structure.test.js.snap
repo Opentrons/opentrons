@@ -66,14 +66,14 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
       title
     </h2>
     <button
-      className="button_flat button_close"
+      className="button_flat button_icon button_close"
       disabled={undefined}
       onClick={[Function]}
-      title={undefined}
+      title="close panel"
     >
       <svg
         aria-hidden="true"
-        className="button_close_icon"
+        className="button_only_icon"
         fill="currentColor"
         height={undefined}
         version="1.1"

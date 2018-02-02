@@ -3,7 +3,7 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {TitledList, ListItem, ListAlert, FLASK, CHECKED} from '..'
+import {SidePanelGroup, TitledList, ListItem, ListAlert, FLASK, CHECKED} from '..'
 
 describe('TitledList', () => {
   test('adds an h3 with the title', () => {
@@ -119,6 +119,24 @@ describe('ListAlert', () => {
   test('list alert renders correctly', () => {
     const tree = Renderer.create(
       <ListAlert> alert alert</ListAlert>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('ListItem', () => {
+  test('Side Panel Group renders correctly', () => {
+    const tree = Renderer.create(
+      <SidePanelGroup title='title' iconName='flask'> children </SidePanelGroup>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Disabled Side Panel Group renders correctly', () => {
+    const tree = Renderer.create(
+      <SidePanelGroup title='title' iconName='flask' disabled> children </SidePanelGroup>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

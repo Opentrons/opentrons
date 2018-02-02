@@ -191,7 +191,8 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         # TODO (andy) should come from a config file
-        self.dimensions = (395, 345, 228)
+        # TODO (andy) height 200 is arbitrary, should calc per pipette/tip?
+        self.dimensions = (393, 357.5, 200)
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
@@ -265,6 +266,7 @@ class Robot(object):
         self._previous_container = None
 
         self._deck = containers.Deck()
+        self._fixed_trash = None
         self.setup_deck()
         self.setup_gantry()
         self._instruments = {}
@@ -347,6 +349,10 @@ class Robot(object):
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
         """
+        if mount in self._instruments:
+            prev_instr = self._instruments[mount]
+            raise RuntimeError('Instrument {0} already on {1} mount'.format(
+                prev_instr.name, mount))
         self._instruments[mount] = instrument
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
@@ -509,7 +515,6 @@ class Robot(object):
         # close to XY switches so we are don't accidentally hit them
         self.poses = self.gantry.home(self.poses)
 
-    # TODO (ben 20171030): refactor use this to use public methods
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
@@ -736,6 +741,7 @@ class Robot(object):
 
     def setup_deck(self):
         self.add_slots_to_deck()
+
         # Setup Deck as root object for pose tracker
         self.poses = pose_tracker.add(
             self.poses,
@@ -750,9 +756,18 @@ class Robot(object):
                 pose_tracker.Point(*slot._coordinates)
             )
 
+        # @TODO (Laura & Andy) Slot and type of trash
+        # needs to be pulled from config file
+        # Add fixed trash to the initial deck
+        self._fixed_trash = self.add_container('fixed-trash', '12')
+
     @property
     def deck(self):
         return self._deck
+
+    @property
+    def fixed_trash(self):
+        return self._fixed_trash
 
     def get_instruments_by_name(self, name):
         res = []
@@ -764,7 +779,7 @@ class Robot(object):
 
     def get_instruments(self, name=None):
         """
-        :returns: sorted list of (axis, instrument)
+        :returns: sorted list of (mount, instrument)
         """
         if name:
             return self.get_instruments_by_name(name)
@@ -965,6 +980,11 @@ class Robot(object):
         return pose_tracker.max_z(self.poses, self._deck)
 
     def max_placeable_height_on_deck(self, placeable):
+        """
+        :param placeable:
+        :return: Calibrated height of container in mm from
+        deck as the reference point
+        """
         offset = placeable.top()[1]
         placeable_coordinate = add(
             pose_tracker.absolute(

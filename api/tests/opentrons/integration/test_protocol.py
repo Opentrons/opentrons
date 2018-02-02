@@ -16,7 +16,7 @@ class ProtocolTestCase(unittest.TestCase):
         tiprack = containers_load(self.robot, 'tiprack-10ul', '5')
 
         containers_list = self.robot.get_containers()
-        self.assertEqual(len(containers_list), 2)
+        self.assertEqual(len(containers_list), 3)
 
         self.assertEqual(self.robot._deck['1']['myPlate'], plate)
         self.assertEqual(self.robot._deck['5']['tiprack-10ul'], tiprack)
@@ -47,10 +47,14 @@ class ProtocolTestCase(unittest.TestCase):
     def test_deck_setup(self):
         deck = self.robot.deck
 
-        trash = containers_load(self.robot, 'point', '1', 'myTrash')
+        pip = pipette.Pipette(self.robot, mount='left')
+
+        # Check that the fixed trash has loaded on to the pipette
+        trash = pip.trash_container
         tiprack = containers_load(self.robot, 'tiprack-10ul', '5')
 
         self.assertTrue(isinstance(tiprack, Container))
         self.assertTrue(isinstance(deck, Deck))
-        self.assertTrue(deck.has_container(trash))
+        # Check that well location is the same on the robot as the pipette
+        self.assertEqual(self.robot._deck['12']['fixed-trash'][0], trash)
         self.assertTrue(deck.has_container(tiprack))

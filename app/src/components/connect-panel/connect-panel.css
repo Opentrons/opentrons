@@ -49,12 +49,7 @@
 }
 
 .scan_button {
-  display: block;
   width: 5rem;
-  height: auto;
-  font-size: 5rem;
-  line-height: 1;
-  margin: 0.5rem auto;
 }
 
 .refresh {
@@ -65,13 +60,10 @@
   color: #888;
 }
 
-.title_button {
+.title_scan_button {
   position: absolute;
-  right: 2rem;
-  top: -0.25rem;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0.5rem;
-  line-height: 0.5;
-  cursor: pointer;
+  top: 0;
+  right: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }

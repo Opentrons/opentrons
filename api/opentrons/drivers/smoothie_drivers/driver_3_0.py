@@ -20,12 +20,12 @@ log = logging.getLogger(__name__)
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
-    'X': 394,
-    'Y': 344,
-    'Z': 227,
-    'A': 227,
-    'B': 18.9997,
-    'C': 18.9997
+    'X': 418,
+    'Y': 353,
+    'Z': 218,
+    'A': 218,
+    'B': 19,
+    'C': 19
 }
 
 PLUNGER_BACKLASH_MM = 0.3
@@ -66,13 +66,25 @@ GCODE_ROUNDING_PRECISION = 3
 
 
 def _parse_axis_values(raw_axis_values):
-    parsed_values = raw_axis_values.split(' ')
+    parsed_values = raw_axis_values.strip().split(' ')
     parsed_values = parsed_values[2:]
     return {
         s.split(':')[0].upper(): round(
             float(s.split(':')[1]),
             GCODE_ROUNDING_PRECISION)
         for s in parsed_values
+    }
+
+
+def _parse_switch_values(raw_switch_values):
+    # probe has a space after it's ":" for some reasone
+    if 'Probe: ' in raw_switch_values:
+        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
+    parsed_values = raw_switch_values.strip().split(' ')
+    return {
+        s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
+        for s in parsed_values
+        if any([n in s for n in ['max', 'Probe']])
     }
 
 
@@ -163,7 +175,8 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
-        return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
+        res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
+        return _parse_switch_values(res)
 
     @property
     def current(self):
@@ -392,7 +405,7 @@ class SmoothieDriver_3_0_0:
         }
         self.update_position(default=homed)
 
-        return homed
+        return self.position
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall

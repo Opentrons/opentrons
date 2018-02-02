@@ -12,9 +12,9 @@ import styles from './deck.css'
 import tooltipStyles from '../ToolTip.css'
 
 ConfirmCalibrationPrompt.propTypes = {
-  slot: PropTypes.number.isRequired,
+  slot: PropTypes.string.isRequired,
   currentLabware: PropTypes.shape({
-    slot: PropTypes.number.isRequired,
+    slot: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     isTiprack: PropTypes.bool,
     calibration: robotConstants.LABWARE_CONFIRMATION_TYPE

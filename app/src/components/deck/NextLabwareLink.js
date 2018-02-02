@@ -9,9 +9,13 @@ import {
 
 import CalibrationLink from './CalibrationLink'
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
+  const nextLabware = robotSelectors.getNextLabware(state)
+
   return {
-    _calibrator: robotSelectors.getCalibratorMount(state),
+    _calibrator: nextLabware && nextLabware.calibratorMount
+      ? nextLabware.calibratorMount
+      : robotSelectors.getCalibratorMount(state),
     nextLabware: robotSelectors.getNextLabware(state)
   }
 }
