@@ -203,7 +203,7 @@ async def test_exception_on_call(session, root):
                     'token': session.token,
                     'status': 'error',
                     'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 'Exception: Kaboom!'}
+                'data': 'Exception [line unknown]: Kaboom!'}
 
     assert res == expected
 

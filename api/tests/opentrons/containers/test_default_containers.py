@@ -25,12 +25,12 @@ def test_new_containers(robot):
     p200.aspirate(100, T25_flask[0]).dispense(trash_box)
 
 
-def test_fixed_trash(robot, dummy_db):
+def test_fixed_trash(robot):
     p200 = pipette.Pipette(
         robot, mount='right', name='test-pipette'
     )
-    trash = containers_load(robot, 'fixed-trash', '12')
-    p200.move_to(trash[0])
+
+    p200.move_to(p200.trash_container)
     assert isclose(
             pose_tracker.absolute(robot.poses, p200),
-            (345.0, 351.5, 110.0)).all()
+            (345.0, 351.5, 63.0)).all()

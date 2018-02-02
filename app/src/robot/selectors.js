@@ -3,6 +3,7 @@
 import padStart from 'lodash/padStart'
 import {createSelector} from 'reselect'
 
+import type {Mount, InstrumentCalibrationStatus} from './types'
 import type {State as CalibrationState} from './reducer/calibration'
 import type {State as ConnectionState} from './reducer/connection'
 import type {State as SessionState} from './reducer/session'
@@ -12,11 +13,8 @@ import {
   type SessionStatus,
   _NAME,
   UNCONFIRMED,
-  INSTRUMENT_AXES,
-  DECK_SLOTS
+  INSTRUMENT_AXES
 } from './constants'
-
-import type {Mount, InstrumentCalibrationStatus} from './types'
 
 type State = {
   robot: {
@@ -187,13 +185,15 @@ export function getInstrumentsByMount (state: State) {
 export const getInstruments = createSelector(
   getInstrumentsByMount,
   (state: State) => calibration(state).probedByMount,
+  (state: State) => calibration(state).tipOnByMount,
   (state: State) => calibration(state).calibrationRequest,
-  (instrumentsByMount, probedByMount, calibrationRequest) => {
+  (instrumentsByMount, probedByMount, tipOnByMount, calibrationRequest) => {
     return INSTRUMENT_AXES.map((mount) => {
       const instrument = instrumentsByMount[mount]
       if (!instrument || !instrument.name) return {mount}
 
       const probed = probedByMount[mount] || false
+      const tipOn = tipOnByMount[mount] || false
       let calibration: InstrumentCalibrationStatus = 'unprobed'
 
       // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
@@ -217,7 +217,8 @@ export const getInstruments = createSelector(
       return {
         ...instrument,
         calibration,
-        probed
+        probed,
+        tipOn
       }
     })
   }
@@ -228,10 +229,8 @@ export const getInstruments = createSelector(
 export const getCalibratorMount = createSelector(
   getInstruments,
   (instruments): Mount | '' => {
-    const single = instruments.find((i) => i.channels && i.channels === 1)
-    const multi = instruments.find((i) => i.channels && i.channels > 1)
-
-    const calibrator = single || multi || {mount: ''}
+    const tipOn = instruments.find((i) => i.probed && i.tipOn)
+    const calibrator = tipOn || {mount: ''}
 
     return calibrator.mount
   }
@@ -251,11 +250,9 @@ export const getLabware = createSelector(
   (state: State) => calibration(state).labwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
   (labwareBySlot, statusBySlot, confirmedBySlot) => {
-    return DECK_SLOTS
+    return Object.keys(labwareBySlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
-
-        if (!labware) return {slot}
 
         return {
           ...labware,

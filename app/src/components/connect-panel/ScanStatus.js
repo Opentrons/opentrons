@@ -1,18 +1,17 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+// @flow
+import * as React from 'react'
 
-import {Spinner} from '../icons'
 import ScanButton from './ScanButton'
 
 import styles from './connect-panel.css'
 
-ScanStatus.propTypes = {
-  onScanClick: PropTypes.func.isRequired,
-  isScanning: PropTypes.bool.isRequired,
-  found: PropTypes.bool.isRequired
+type Props = {
+  onScanClick: () => void,
+  isScanning: boolean,
+  found: boolean
 }
 
-export default function ScanStatus (props) {
+export default function ScanStatus (props: Props) {
   const {found, isScanning} = props
 
   const notFoundMessage = !isScanning && !found && (
@@ -21,14 +20,11 @@ export default function ScanStatus (props) {
       <p>Connect a robot via USB and click the scan button</p>
     </div>
   )
-  const scanBtn = !isScanning
-    ? <ScanButton {...props} />
-    : <Spinner className={styles.scan_button} />
 
   return (
     <div className={styles.scan_status}>
       {notFoundMessage}
-      {scanBtn}
+      <ScanButton {...props} />
     </div>
   )
 }

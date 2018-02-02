@@ -1,28 +1,33 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import Button from '../Button'
-import Icon, {REFRESH} from '../Icon'
+// @flow
+import * as React from 'react'
+import {IconButton, REFRESH, SPINNER} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
-ScanButton.propTypes = {
-  onScanClick: PropTypes.func.isRequired,
-  titleBtn: PropTypes.bool
+type Props = {
+  isScanning: boolean,
+  onScanClick: () => void,
+  inTitleBar?: boolean
 }
 
-export default function ScanButton (props) {
-  const {onScanClick, titleBtn} = props
-  const style = titleBtn
-    ? styles.title_button
+export default function ScanButton (props: Props) {
+  const {isScanning} = props
+  const iconName = isScanning
+    ? SPINNER
+    : REFRESH
+
+  const className = props.inTitleBar
+    ? styles.title_scan_button
     : styles.scan_button
 
   return (
-    <Button
-      style={style}
-      onClick={onScanClick}
+    <IconButton
       title='Scan for robots'
-    >
-      <Icon name={REFRESH} className={styles.refresh} />
-    </Button>
+      onClick={props.onScanClick}
+      className={className}
+      name={iconName}
+      spin={isScanning}
+      disabled={isScanning}
+    />
   )
 }

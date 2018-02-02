@@ -5,7 +5,7 @@ from opentrons import containers, instruments
 
 tiprack = containers.load('tiprack-200ul', '9')
 tiprack2 = containers.load('tiprack-200ul', '11')
-trash = containers.load('trash-box', 'C4')
+
 
 trough = containers.load('trough-12row', '5')
 plate = containers.load('96-PCR-flat', '1')
@@ -13,7 +13,6 @@ tuberack = containers.load('tube-rack-2ml', '4')
 
 m50 = instruments.Pipette(
     name="p200",
-    trash_container=trash,
     tip_racks=[tiprack, tiprack2],
     mount="left",
     channels=8
@@ -21,7 +20,6 @@ m50 = instruments.Pipette(
 
 p200 = instruments.Pipette(
     name="p200S",
-    trash_container=trash,
     tip_racks=[tiprack],
     mount="right"
 )
@@ -56,7 +54,7 @@ m50.transfer(
     new_tip='never')
 
 # remove 25uL from last row
-m50.aspirate(25, plate.cols('11')).dispense(trash.wells(0))
+m50.aspirate(25, plate.cols('11')).dispense(m50.trash_container)
 m50.drop_tip()
 
 # fill columns 1 to 11 with 200 uL of Bradford reagent

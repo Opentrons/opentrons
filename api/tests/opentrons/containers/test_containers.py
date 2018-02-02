@@ -42,6 +42,16 @@ def test_containers_create(robot):
     database.delete_container(container_name)
     assert container_name not in containers_list()
 
+    container_name = 'other_plate_for_testing_containers_create'
+    p = containers_create(
+        name=container_name,
+        grid=(8, 12),
+        spacing=(9, 9),
+        diameter=4,
+        depth=8,
+        save=False)
+    assert p['C3'].max_volume() == 0
+
 
 class ContainerTestCase(unittest.TestCase):
     def setUp(self):
@@ -67,7 +77,8 @@ class ContainerTestCase(unittest.TestCase):
         container_name = '96-flat'
         slot = '1'
         containers_load(self.robot, container_name, slot)
-        self.assertEquals(len(self.robot.get_containers()), 1)
+        # 2018-1-30 Incremented number of containers based on fixed trash
+        self.assertEquals(len(self.robot.get_containers()), 2)
 
         self.assertRaises(
             RuntimeWarning, containers_load,
@@ -87,11 +98,11 @@ class ContainerTestCase(unittest.TestCase):
 
         containers_load(
             self.robot, container_name, slot, 'custom-name', share=True)
-        self.assertEquals(len(self.robot.get_containers()), 2)
+        self.assertEquals(len(self.robot.get_containers()), 3)
 
         containers_load(
             self.robot, 'trough-12row', slot, share=True)
-        self.assertEquals(len(self.robot.get_containers()), 3)
+        self.assertEquals(len(self.robot.get_containers()), 4)
 
     def test_load_legacy_slot_names(self):
         slots_old = [
@@ -109,13 +120,14 @@ class ContainerTestCase(unittest.TestCase):
         import warnings
         warnings.filterwarnings('ignore')
 
+        # Only check up to the non fixed-trash slots
         def test_slot_name(slot_name, expected_name):
             self.robot.reset()
             p = containers_load(self.robot, '96-flat', slot_name)
             slot_name = p.get_parent().get_name()
             assert slot_name == expected_name
 
-        for i in range(len(slots_old)):
+        for i in range(len(slots_old) - 1):
             test_slot_name(slots_new[i], slots_new[i])
             test_slot_name(int(slots_new[i]), slots_new[i])
             test_slot_name(slots_old[i], slots_new[i])
