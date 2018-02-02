@@ -1558,11 +1558,11 @@ class PipetteTest(unittest.TestCase):
         for i in range(0, total_tips_per_plate):
             expected.extend(self.build_pick_up_tip(self.tiprack2[i]))
 
-        from pprint import pprint
-        print('Mock calls')
-        pprint(self.p200.move_to.mock_calls)
-        print('Expected')
-        pprint(expected)
+        # from pprint import pprint
+        # print('Mock calls')
+        # pprint(self.p200.move_to.mock_calls)
+        # print('Expected')
+        # pprint(expected)
         self.assertEqual(
             self.p200.move_to.mock_calls,
             expected

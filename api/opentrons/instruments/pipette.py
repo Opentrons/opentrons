@@ -886,8 +886,7 @@ class Pipette:
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.fast_home(
-                self.robot.poses, plunge_depth)
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
 
             return self
 
@@ -971,9 +970,8 @@ class Pipette:
             )
 
             if home_after:
-                safety_margin = abs(pos_bottom - pos_drop_tip)
-                self.robot.poses = self.instrument_actuator.fast_home(
-                    self.robot.poses, safety_margin)
+                self.robot.poses = self.instrument_actuator.home(
+                    self.robot.poses)
                 self.robot.poses = self.instrument_actuator.move(
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')

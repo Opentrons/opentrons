@@ -265,7 +265,6 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-
             # TODO (ben 20171117): modify all axes to dwell at low current
             moving_plunger = ('B' in command or 'C' in command) \
                 and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
