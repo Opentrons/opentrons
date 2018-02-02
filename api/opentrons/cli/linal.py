@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import insert
+from numpy import insert, dot
 from numpy.linalg import inv
 from typing import List, Tuple
 
@@ -74,19 +74,19 @@ def solve(expected: List[Tuple[float, float]],
     return transform
 
 
-def add_z(xy, z):
+def add_z(xy: np.ndarray, z: float) -> np.ndarray:
     """
     Turn a 2-D transform matrix into a 3-D transform matrix (scale/shift only,
     no rotation).
 
-    :param xy: A two-dimensional matrix transform matrix (a 3x3 matrix in the
+    :param xy: A two-dimensional transform matrix (a 3x3 numpy ndarray) in the
         following form:
             [ 1  0  x ]
             [ 0  1  y ]
             [ 0  0  1 ]
-    :param z: an integer for the z component
-    :return: a three-dimensional transformation matrix with x, y, and z from
-        the inputs, in the following form:
+    :param z: a float for the z component
+    :return: a three-dimensional transformation matrix (a 4x4 numpy ndarray)
+        with x, y, and z from the function parameters, in the following form:
             [ 1  0  0  x ]
             [ 0  1  0  y ]
             [ 0  0  1  z ]
@@ -112,3 +112,16 @@ def add_z(xy, z):
     # [ 0  0  0  1 ]
 
     return xyz
+
+
+def apply_transform(
+        t: List[List[float]], pos: (int, int, int)) -> (int, int, int, int):
+    """
+    Change of base using a transform matrix. Primarily used to render a point
+    in space in a way that is more readable for the user.
+
+    :param t: A transformation matrix from one 3D space [A] to another [B]
+    :param pos: XYZ point in space A
+    :return: corresponding XYZ1 point in space B
+    """
+    return tuple(dot(inv(t), list(pos) + [1])[:-1])
