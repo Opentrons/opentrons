@@ -1,5 +1,5 @@
 ```js
-initialState = {isChecked1: true, isChecked2: false}
+initialState = {isChecked1: false, isChecked2: true}
 
 ;<div>
   <CheckboxField
@@ -9,10 +9,11 @@ initialState = {isChecked1: true, isChecked2: false}
     value={state.isChecked1}
   />
   <CheckboxField
-    label="Check Box 2"
+    label="Check Box 2 (with error)"
     className="display-block"
     onChange={() => setState({...state, isChecked2: !state.isChecked2})}
     value={state.isChecked2}
+    error='error string example'
   />
 </div>
 ```

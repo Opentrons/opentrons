@@ -1,8 +1,14 @@
 ```js
-initialState = {inputValue: null}
+initialState = {inputValue: ''}
 
 function handleChange (e) {
   setState({inputValue: e.target.value})
+}
+
+function getError (state) {
+  return state.inputValue.length > 12
+    ? 'Too many characters'
+    : undefined
 }
 
 ;<InputField
@@ -11,6 +17,9 @@ function handleChange (e) {
   onChange={handleChange}
   value={state.inputValue}
   units='μL'
+  caption='caption here'
+  secondaryCaption={state.inputValue.length + '/12'}
+  error={getError(state)}
 />
 ```
 

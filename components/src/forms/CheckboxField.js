@@ -13,13 +13,15 @@ type Props = {
   /** classes to apply */
   className?: string,
   /** label text for checkbox */
-  label?: string
+  label?: string,
+  /** if is included, checkbox will use error style. The content of the string is ignored. */
+  error?: string
 }
 
 export default function CheckboxField (props: Props) {
   return (
     <label className={cx(styles.form_field, props.className)}>
-      <div className={styles.checkbox_icon}>
+      <div className={cx(styles.checkbox_icon, {[styles.error]: props.error !== undefined})}>
         <Icon name={props.value ? 'checked box' : 'unchecked box'} width='100%' />
       </div>
       <input
