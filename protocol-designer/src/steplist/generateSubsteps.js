@@ -22,20 +22,12 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): FormDat
       // TODO: rest of blank fields? Default values?
     }
   }
-  console.error('Only transfer forms are supported now. TODO.')
+  console.warn('generateNewForm: Only transfer forms are supported now. TODO.')
   return baseForm
 }
 
-export function validateAndProcessForm (stepType: StepType, formData: FormData): any { // TODO type should be ValidFormAndErrors
-  // TODO
-  if (stepType !== 'transfer') {
-    return {
-      errors: {
-        'form': ['Unsupported step type: ' + stepType]
-      },
-      validatedForm: {}
-    }
-  }
+export function validateAndProcessForm (formData: FormData): any { // TODO type should be ValidFormAndErrors
+  const {stepType} = formData
 
   // This makes sure required fields are present, and parses strings to numbers where needed.
   // It doesn't do any logic combining the fields.
@@ -99,7 +91,12 @@ export function validateAndProcessForm (stepType: StepType, formData: FormData):
       )
 
       return {
-        errors: {...acc.errors, [dataName]: fieldResult.errors},
+        errors: {
+          ...acc.errors,
+          [dataName]: fieldResult.errors.length
+            ? fieldResult.errors
+            : undefined // skip field if there are no errors
+        },
         validatedForm: {...acc.validatedForm, [dataName]: fieldResult.value}
       }
     },
@@ -108,38 +105,73 @@ export function validateAndProcessForm (stepType: StepType, formData: FormData):
     return fieldsAndErrors
   }
 
-  return validateIt([
-    {
-      dataName: 'pipette',
-      formFieldName: 'aspirate--pipette',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'sourceWells',
-      formFieldName: 'aspirate--wells',
-      validators: [splitWells]
-    },
-    {
-      dataName: 'destWells',
-      formFieldName: 'dispense--wells',
-      validators: [splitWells]
-    },
-    {
-      dataName: 'sourceLabware',
-      formFieldName: 'aspirate--labware',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'destLabware',
-      formFieldName: 'dispense--labware',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'volume',
-      formFieldName: 'dispense--volume',
-      validators: [toNumber, nonZero]
+  if (stepType === 'transfer') {
+    return validateIt([
+      {
+        dataName: 'pipette',
+        formFieldName: 'aspirate--pipette',
+        validators: [mustExist]
+      },
+      {
+        dataName: 'sourceWells',
+        formFieldName: 'aspirate--wells',
+        validators: [splitWells]
+      },
+      {
+        dataName: 'destWells',
+        formFieldName: 'dispense--wells',
+        validators: [splitWells]
+      },
+      {
+        dataName: 'sourceLabware',
+        formFieldName: 'aspirate--labware',
+        validators: [mustExist]
+      },
+      {
+        dataName: 'destLabware',
+        formFieldName: 'dispense--labware',
+        validators: [mustExist]
+      },
+      {
+        dataName: 'volume',
+        formFieldName: 'dispense--volume',
+        validators: [toNumber, nonZero]
+      }
+    ])
+  }
+
+  if (stepType === 'pause') {
+    const secondsDelay = (parseFloat(formData['pause-hour']) || 0) * 360 +
+      (parseFloat(formData['pause-minute']) || 0) * 60 +
+      (parseFloat(formData['pause-second']) || 0)
+
+    return {
+      errors: {
+        'pause-for-amount-of-time': (!formData['pause-for-amount-of-time'])
+          ? ['Pause for amount of time vs pause until user input is required']
+          : undefined,
+        'pause-times': (
+          formData['pause-for-amount-of-time'] === 'true' &&
+          (secondsDelay <= 0)
+        )
+          ? ['Must include hours, minutes, or seconds']
+          : undefined
+      },
+      validatedForm: {
+        'pauseForTime': formData['pause-for-amount-of-time'] === 'true',
+        secondsDelay,
+        'message': formData['pause-message']
+      }
     }
-  ])
+  }
+
+  // TODO
+  return {
+    errors: {
+      'form': ['Unsupported step type: ' + stepType]
+    },
+    validatedForm: {}
+  }
 }
 
 export function generateCommands (stepType: StepType, data: ValidatedForm): Array<Command> {

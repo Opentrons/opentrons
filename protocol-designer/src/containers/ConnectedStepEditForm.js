@@ -25,6 +25,7 @@ function StepEditFormWrapper (props: Props) {
 function mapStateToProps (state) {
   return {
     formData: selectors.formData(state),
+    canSave: selectors.currentFormCanBeSaved(state),
     pipetteOptions: [
       {name: '10 μL Single', value: '10-single'}, /* TODO: should be 'p10 single'? What 'value'? */
       {name: '300 μL Single', value: '300-single'},
