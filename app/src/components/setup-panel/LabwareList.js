@@ -1,5 +1,4 @@
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
 import {TitledList} from '@opentrons/components'
@@ -7,29 +6,8 @@ import LabwareListItem from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions,
-  type Mount,
-  type Labware
+  actions as robotActions
 } from '../../robot'
-
-type StateProps = {
-  _labware: Labware[],
-  _calibrator: Mount | '',
-  _deckPopulated: boolean,
-  disabled: boolean
-}
-
-type DispatchProps = {
-  dispatch: Dispatch<*>
-}
-
-type ListProps = {
-  labware: Labware[],
-  deckPopulated: boolean,
-  setLabware?: () => void,
-  disabled: boolean,
-  children: React.Node[]
-}
 
 export default connect(
   mapStateToProps,
@@ -37,7 +15,7 @@ export default connect(
   mergeProps
 )(LabwareList)
 
-function LabwareList (props: ListProps) {
+function LabwareList (props) {
   const {labware, disabled} = props
   return (
     <TitledList title='labware' disabled={disabled}>
@@ -64,7 +42,7 @@ function mapStateToProps (state) {
   }
 }
 
-function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
+function mergeProps (stateProps, dispatchProps) {
   const {_calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
