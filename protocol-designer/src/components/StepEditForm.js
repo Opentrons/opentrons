@@ -142,18 +142,6 @@ export default function StepEditForm (props: Props) {
               (WellSelectionWidget here)
             </FormGroup>
 
-            <FormGroup label='CHANGE TIP'>
-              <RadioGroup
-                inline
-                options={[
-                  {name: 'Always', value: 'always'},
-                  {name: 'Once', value: 'once'},
-                  {name: 'never', value: 'never'}
-                ]}
-                {...formConnector('dispense--change-tip')}
-              />
-            </FormGroup>
-
             <FormGroup label='FLOW RATE'>
               (Flow rate SliderInput here)
             </FormGroup>

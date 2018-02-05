@@ -3,16 +3,23 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
+import isNil from 'lodash/isNil'
+import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
 
 import type {BaseState} from '../types'
-import type {FormData, StepItemData, StepIdType} from './types'
+import type {Command, FormData, StepItemData, StepIdType, StepSubItemData} from './types'
+import {type ValidFormAndErrors, generateNewForm, validateAndProcessForm, generateCommands} from './generateSubsteps'
+
 import type {
   AddStepAction,
   PopulateFormAction,
   SaveStepFormAction,
   SelectStepAction
 } from './actions' // Thunk action creators
+
 import {
   cancelStepForm,
   saveStepForm,
@@ -21,111 +28,10 @@ import {
   toggleStepCollapsed
 } from './actions'
 
-// TODO move to test once substeps selector is implemented
-/*
-{
-  0: {
-    title: 'Transfer X',
-    stepType: 'transfer',
-    sourceLabwareName: 'X Plate',
-    sourceWell: 'X2',
-    destLabwareName: 'Dest X',
-    destWell: 'Y2',
-    id: 0,
-    collapsed: false,
-    substeps: [
-      {
-        sourceIngredientName: 'DNA',
-        sourceWell: 'B1',
-        destIngredientName: 'ddH2O',
-        destWell: 'B2'
-      },
-      {
-        sourceIngredientName: 'DNA',
-        sourceWell: 'C1',
-        destIngredientName: 'ddH2O',
-        destWell: 'C2'
-      },
-      {
-        sourceIngredientName: 'DNA',
-        sourceWell: 'D1',
-        destIngredientName: 'ddH2O',
-        destWell: 'D2'
-      }
-    ]
-  },
-  2: {
-    title: 'Pause 1',
-    stepType: 'pause',
-    id: 2
-  },
-  3: {
-    title: 'Distribute X',
-    description: 'Description is here',
-    stepType: 'distribute',
-    sourceLabwareName: 'X Plate',
-    destLabwareName: 'Dest X',
-    id: 3,
-    substeps: [
-      {
-        sourceIngredientName: 'LB',
-        sourceWell: 'A1',
-        destIngredientName: 'ddH2O',
-        destWell: 'B1'
-      },
-      {
-        sourceIngredientName: 'LB',
-        destIngredientName: 'ddH2O',
-        destWell: 'B2'
-      },
-      {
-        sourceIngredientName: 'LB',
-        destIngredientName: 'ddH2O',
-        destWell: 'B3'
-      },
-      {
-        sourceIngredientName: 'LB',
-        destIngredientName: 'ddH2O',
-        destWell: 'B4'
-      }
-    ]
-  },
-  4: {
-    title: 'Pause 2',
-    stepType: 'pause',
-    id: 4,
-    description: 'Wait until operator adds new tip rack.'
-  },
-  5: {
-    title: 'Consolidate X',
-    stepType: 'consolidate',
-    sourceLabwareName: 'Labware A',
-    destLabwareName: 'Labware B',
-    id: 5,
-    substeps: [
-      {
-        sourceIngredientName: 'Cells',
-        sourceWell: 'A1'
-      },
-      {
-        sourceIngredientName: 'Cells',
-        sourceWell: 'A2'
-      },
-      {
-        sourceIngredientName: 'Cells',
-        sourceWell: 'A3',
-        destIngredientName: 'LB Broth',
-        destWell: 'H1'
-      }
-    ]
-  }
-}
-
-const initialStepOrder = [0, 2, 3, 4, 5]
-*/
-
 type FormState = FormData | null
 
+// the `form` state holds temporary form info that is saved or thrown away with "cancel".
+// TODO: rename to make that more clear. 'unsavedForm'?
 const form = handleActions({
   CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
     ...state,
@@ -150,10 +56,20 @@ const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
-  }),
+  })
+}, {})
+
+type SavedStepFormState = {
+  [StepIdType]: {
+    ...FormData,
+    id: StepIdType
+  }
+}
+
+const savedStepForms = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
-    [action.payload.id]: action.payload // TODO translate fields don't literally take them
+    [action.payload.id]: action.payload
   })
 }, {})
 
@@ -199,6 +115,7 @@ const stepCreationButtonExpanded = handleActions({
 export type RootState = {|
   form: FormState,
   steps: StepsState,
+  savedStepForms: SavedStepFormState,
   collapsedSteps: CollapsedStepsState,
   orderedSteps: OrderedStepsState,
   selectedStep: SelectedStepState,
@@ -208,6 +125,7 @@ export type RootState = {|
 export const _allReducers = {
   form,
   steps,
+  savedStepForms,
   collapsedSteps,
   orderedSteps,
   selectedStep,
@@ -219,37 +137,116 @@ const rootReducer = combineReducers(_allReducers)
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 const rootSelector = (state: BaseState): RootState => state.steplist
 
+// ======= Selectors ===============================================
+
+const formData = createSelector(
+  rootSelector,
+  (state: RootState) => state.form
+)
+
+const selectedStepId = createSelector(
+  rootSelector,
+  (state: RootState) => state.selectedStep
+)
+
+const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
+  mapValues(validatedForms(state), (valForm, stepId) => {
+    if (!valForm.validatedForm) {
+      return []
+    }
+
+    const {
+      sourceWells,
+      destWells
+      // sourceLabware, // TODO: show labware & volume, see new designs
+      // destLabware,
+      // volume
+    } = valForm.validatedForm
+
+    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
+    if (checkForErrorsHack(valForm)) {
+      return []
+    }
+
+    return range(sourceWells.length).map(i => ({
+      parentStepId: stepId,
+      substepId: i,
+      sourceIngredientName: 'ING1',
+      destIngredientName: 'ING2',
+      sourceWell: sourceWells[i],
+      destWell: destWells[i]
+    }))
+  })
+
+const allSteps = createSelector(
+  (state: BaseState) => rootSelector(state).steps,
+  (state: BaseState) => rootSelector(state).orderedSteps,
+  (state: BaseState) => rootSelector(state).collapsedSteps,
+  allSubsteps,
+  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
+    ...steps[id],
+    collapsed: collapsedSteps[id],
+    substeps: _allSubsteps[id]
+  }))
+)
+
+ // TODO HACK
+const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
+  (validForm && validForm.errors)
+    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
+    : true // No forms counts as error
+
+const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
+  // TODO
+  const s = rootSelector(state)
+  if (s.orderedSteps.length === 0) {
+    return null
+  }
+  return s.orderedSteps.reduce((acc, stepId) => ({
+    ...acc,
+    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
+      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
+      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
+  }), {})
+}
+
+const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
+  // TODO use existing selectors, don't rewrite!!!
+  const steps = rootSelector(state).steps
+  const forms = validatedForms(state)
+  const orderedSteps = rootSelector(state).orderedSteps
+
+  // don't try to make commands if the step forms are null or if there are any errors.
+  if (forms === null || orderedSteps.map(stepId => checkForErrorsHack(forms[stepId])).some(err => err)) {
+    return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
+  }
+
+  return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
+    const formDataAndErrors = forms[stepId]
+    const stepType = steps[stepId].stepType
+    // TODO checking if there are some errors is repeated from substeps selector, DRY it up
+    return generateCommands(stepType, formDataAndErrors.validatedForm)
+  })
+}
+
 export const selectors = {
   stepCreationButtonExpanded: createSelector(
     rootSelector,
     (state: RootState) => state.stepCreationButtonExpanded
   ),
-  allSteps: createSelector(
-    (state: BaseState) => rootSelector(state).steps,
-    (state: BaseState) => rootSelector(state).orderedSteps,
-    (state: BaseState) => rootSelector(state).collapsedSteps,
-    (steps, orderedSteps, collapsedSteps) => orderedSteps.map(id => ({
-      ...steps[id],
-      collapsed: collapsedSteps[id]
-    }))
-  ),
-  selectedStepId: createSelector(
-    rootSelector,
-    (state: RootState) => state.selectedStep
-  ),
-  selectedStepFormData: createSelector( // TODO translate step data to form data
-    (state: BaseState) => rootSelector(state).steps,
+  allSteps,
+  selectedStepId,
+  selectedStepFormData: createSelector(
+    (state: BaseState) => rootSelector(state).savedStepForms,
     (state: BaseState) => rootSelector(state).selectedStep,
-    (steps, selectedStep) => selectedStep !== null && steps[selectedStep]
+    (state: BaseState) => rootSelector(state).steps,
+    (savedStepForms, selectedStepId, steps) =>
+      // existing form
+      (selectedStepId !== null && savedStepForms[selectedStepId]) ||
+      // new blank form
+      (!isNil(selectedStepId) && generateNewForm(selectedStepId, steps[selectedStepId].stepType))
   ),
-  formDataToStep: createSelector( // TODO translate form to step here
-    rootSelector,
-    (state: RootState) => ({...state.form}) // TODO
-  ),
-  formData: createSelector(
-    rootSelector,
-    (state: RootState) => state.form
-  ),
+  formData,
   nextStepId: createSelector( // generates the next step ID to use
     (state: BaseState) => rootSelector(state).steps,
     (steps): number => {
@@ -258,6 +255,19 @@ export const selectors = {
         ? 0
         : max(allStepIds) + 1
     }
+  ),
+  allSubsteps,
+  validatedForms,
+  commands,
+  currentFormCanBeSaved: createSelector(
+    formData,
+    selectedStepId,
+    allSteps,
+    (formData, selectedStepId, allSteps): boolean | null => ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
+      ? checkForErrorsHack(
+        validateAndProcessForm(allSteps[selectedStepId].stepType, formData)
+      )
+      : null
   )
 }
 
