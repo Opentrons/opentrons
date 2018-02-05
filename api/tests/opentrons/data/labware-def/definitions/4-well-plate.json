@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "name": "4-well-plate"
+  },
+  "wells": {
+    "A1": {
+      "x": 40,
+      "y": 40,
+      "z": 30,
+      "depth": 26,
+      "diameter": 10,
+      "total-liquid-volume": 78.6
+    },
+    "A2": {
+      "x": 40,
+      "y": 80,
+      "z": 30,
+      "depth": 26,
+      "diameter": 10,
+      "total-liquid-volume": 78.6
+    },
+    "B1": {
+      "x": 80,
+      "y": 40,
+      "z": 30,
+      "depth": 26,
+      "diameter": 10,
+      "total-liquid-volume": 78.6
+    },
+    "B2": {
+      "x": 80,
+      "y": 80,
+      "z": 30,
+      "depth": 26,
+      "diameter": 10,
+      "total-liquid-volume": 78.6
+    }
+  },
+  "ordering": [
+    [
+      "A1",
+      "B1"
+    ],
+    [
+      "A2",
+      "B2"
+    ]
+  ]
+}
