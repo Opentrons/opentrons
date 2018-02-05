@@ -106,20 +106,27 @@ class InstrumentMotor(object):
 
 
 def _setup_container(container_name):
-    container = database.load_container(container_name)
-    container.properties['type'] = container_name
+    try:
+        container = database.load_container(container_name)
+        container.properties['type'] = container_name
 
-    container_x, container_y, container_z = container._coordinates
+        container_x, container_y, container_z = container._coordinates
 
-    # infer z from height
-    if container_z == 0 and 'height' in container[0].properties:
-        container_z = container[0].properties['height']
+        # infer z from height
+        if container_z == 0 and 'height' in container[0].properties:
+            container_z = container[0].properties['height']
 
-    from opentrons.util.vector import Vector
-    container._coordinates = Vector(
-        container_x,
-        container_y,
-        container_z)
+        from opentrons.util.vector import Vector
+        container._coordinates = Vector(
+            container_x,
+            container_y,
+            container_z)
+
+    # Database.load_container throws ValueError when a container name is not
+    # found.
+    except ValueError:
+        container = None
+        print("Container not found in database")
 
     return container
 
@@ -813,11 +820,12 @@ class Robot(object):
 
     def add_container(self, name, slot, label=None, share=False):
         container = _setup_container(name)
-        location = self._get_placement_location(slot)
-        if self._is_available_slot(location, share, slot, name):
-            location.add(container, label or name)
-        self.add_container_to_pose_tracker(location, container)
-        self.max_deck_height.cache_clear()
+        if container is not None:
+            location = self._get_placement_location(slot)
+            if self._is_available_slot(location, share, slot, name):
+                location.add(container, label or name)
+            self.add_container_to_pose_tracker(location, container)
+            self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
