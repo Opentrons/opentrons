@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Modal, ContinueModal} from '..'
+import {Modal, ContinueModal, Overlay} from '..'
 
 describe('modals', () => {
   test('Modal has a clickable overlay', () => {
@@ -77,6 +77,14 @@ describe('modals', () => {
       >
         children
       </ContinueModal>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Overlay renders correctly', () => {
+    const tree = Renderer.create(
+      <Overlay onClick={() => {}} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -4,6 +4,7 @@
 @import './styles/typography.css';
 @import './styles/borders.css';
 @import './styles/cursors.css';
+@import './styles/positioning.css';
 
 :global(*) {
   box-sizing: border-box;

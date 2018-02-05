@@ -16,7 +16,6 @@ type LabwareItemProps = {
   highlighted?: boolean,
   confirmed?: boolean,
   isMoving?: boolean,
-  deckPopulated?: boolean, // `deckPopulated` is false the first time a user is looking at the deck, true once they click "Continue" to proceed with calibration
   canRevisit?: boolean, // if true, wrap labware in a Link
   height: number,
   width: number,
@@ -32,7 +31,6 @@ export default function LabwareItem (props: LabwareItemProps) {
     highlighted,
     confirmed,
     isMoving,
-    deckPopulated,
     canRevisit,
     height,
     width,
@@ -43,8 +41,8 @@ export default function LabwareItem (props: LabwareItemProps) {
     onLabwareClick
   } = props
 
-  const showNameOverlay = !isMoving && (!deckPopulated || confirmed || highlighted)
-  const showUnconfirmed = deckPopulated && !confirmed && !isMoving
+  const showNameOverlay = !isMoving && (confirmed || highlighted)
+  const showUnconfirmed = !confirmed && !isMoving
 
   const PlateWithOverlay = (
     <g>

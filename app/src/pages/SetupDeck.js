@@ -7,9 +7,10 @@ import {Redirect, Route, withRouter, type ContextRouter} from 'react-router'
 import {selectors as robotSelectors} from '../robot'
 import Page from '../components/Page'
 import LabwareCalibrationInfo from '../components/LabwareCalibrationInfo'
-import DeckConfig from '../components/deck/DeckConfig'
+import CalibrateDeck from '../components/deck/CalibrateDeck'
 import SessionHeader from '../containers/SessionHeader'
 import ConnectedJogModal from '../containers/ConnectedJogModal'
+import ReviewDeckModal from '../components/ReviewDeckModal'
 
 type StateProps = {
   deckPopulated: boolean
@@ -34,9 +35,12 @@ function SetupDeckPage (props: Props) {
     <Page>
       <SessionHeader subtitle='Setup Deck' />
       <LabwareCalibrationInfo slot={slot} />
-      <DeckConfig slot={slot} />
+      <CalibrateDeck slot={slot} />
       <Route path={`${path}/jog`} render={() => (
         <ConnectedJogModal slot={slot} />
+      )} />
+      <Route path={`${path}/review`} render={() => (
+        <ReviewDeckModal slot={slot} closeUrl={url} />
       )} />
     </Page>
   )

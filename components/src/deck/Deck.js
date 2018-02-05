@@ -3,7 +3,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
-import type {DeckSlot} from '../../interfaces/DeckSlot'
 
 import {
   SLOTNAME_MATRIX,
@@ -18,17 +17,31 @@ import {
 
 import styles from './Deck.css'
 
-type Props = {
-  className: string,
-  LabwareComponent: DeckSlot
+export type LabwareComponentProps = {
+  slotName: string,
+  width: number,
+  height: number
 }
 
-export const Deck = (props: Props) => {
+type Props = {
+  className: string,
+  LabwareComponent: React.ComponentType<LabwareComponentProps>
+}
+
+// TODO(mc, 2018-02-05): this viewbox is wrong; fix it
+const VIEWBOX = [
+  -SLOT_OFFSET,
+  -SLOT_OFFSET,
+  DECK_WIDTH + SLOT_OFFSET * 2,
+  DECK_HEIGHT + SLOT_OFFSET * 4
+].join(' ')
+
+export default function Deck (props: Props) {
   const {className, LabwareComponent} = props
 
   return (
     // TODO css not inline style on svg
-    <svg viewBox={`${-SLOT_OFFSET} ${-SLOT_OFFSET} ${DECK_WIDTH + SLOT_OFFSET * 2} ${DECK_HEIGHT + SLOT_OFFSET * 4}`} className={cx(styles.deck, className)}>
+    <svg viewBox={VIEWBOX} className={cx(styles.deck, className)}>
 
       {/* Deck outline */}
       <g transform='scale(0.666)' className={styles.deck_outline}>
@@ -47,21 +60,34 @@ export const Deck = (props: Props) => {
 
       {/* All containers */}
       <g transform={`translate(${SLOT_OFFSET} ${SLOT_OFFSET})`}>
-        {flatMap(SLOTNAME_MATRIX, (slotRow: Array<string>, row: number): Array<React.Node> =>
-          slotRow.map((slotName: string, col: number): React.Node =>
-            (slotName === TRASH_SLOTNAME)
-            ? null // no LabwareComponent for Trash in slot 12
-            : <g key={slotName}
-              transform={`translate(${
-              SLOT_WIDTH * col + SLOT_SPACING * (col + 1)}, ${
-              SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)})`}
-            >
-              <LabwareComponent slotName={slotName} width={SLOT_WIDTH} height={SLOT_HEIGHT} />
-            </g>
-          )
-        )}
+        {renderLabware(LabwareComponent)}
       </g>
 
     </svg>
   )
+}
+
+function renderLabware (LabwareComponent): React.Node[] {
+  return flatMap(
+    SLOTNAME_MATRIX,
+    (columns: string[], row: number): React.Node[] => {
+      return columns.map((slotName: string, col: number) => {
+        if (slotName === TRASH_SLOTNAME) return null
+
+        const transform = `translate(${[
+          SLOT_WIDTH * col + SLOT_SPACING * (col + 1),
+          SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)
+        ].join(',')})`
+
+        return (
+          <g key={slotName} transform={transform}>
+            <LabwareComponent
+              slotName={slotName}
+              width={SLOT_WIDTH}
+              height={SLOT_HEIGHT}
+            />
+          </g>
+        )
+      })
+    })
 }

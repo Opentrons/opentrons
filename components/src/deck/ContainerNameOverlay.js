@@ -20,7 +20,11 @@ export function ContainerNameOverlay (props: Props) {
     <g className={styles.name_overlay}>
       <g transform={`translate(0 ${SLOT_HEIGHT - boxHeight})`}>
         <rect x='0' y='0' height={boxHeight} width='100%' />
-        <text x={paddingLeft} y={0.4 * boxHeight + paddingTop} className={styles.container_type}>
+        <text
+          x={paddingLeft}
+          y={0.4 * boxHeight + paddingTop}
+          className={styles.container_type}
+        >
           {humanize(containerType).toUpperCase()}
         </text>
         <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>

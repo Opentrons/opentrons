@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import {CenteredTextSvg} from '../CenteredTextSvg'
-import {LabwareContainer} from './LabwareContainer'
+import LabwareContainer from './LabwareContainer'
 import styles from './LabwareContainer.css'
 
 import type {DeckSlotProps} from '../../interfaces/DeckSlot'

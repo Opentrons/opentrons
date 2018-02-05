@@ -1,23 +1,16 @@
 /* common styling for modals */
-
-.modal,
-.overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.overlay {
-  background-color: rgba(0, 0, 0, 0.6);
-}
+@import '..';
 
 .modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @apply --modal;
+
   padding: 4rem;
+}
+
+.overlay {
+  @apply --absolute-fill;
+
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .modal_contents {
