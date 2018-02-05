@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'

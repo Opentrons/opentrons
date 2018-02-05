@@ -7,9 +7,9 @@ import {
 } from '../../robot'
 
 type LabwareItemProps = {
-  confirmed: ?boolean,
-  isDisabled: ?boolean,
-  onClick: ?() => void
+  confirmed?: boolean,
+  isDisabled: boolean,
+  onClick?: () => void
 }
 
 type Props = Labware & LabwareItemProps
