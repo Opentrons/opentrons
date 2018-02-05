@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
@@ -15,7 +16,7 @@ import {
 type StateProps = {
   _labware: Labware[],
   _calibrator: Mount | '',
-  deckPopulated: boolean,
+  _deckPopulated: boolean,
   disabled: boolean
 }
 
@@ -26,7 +27,7 @@ type DispatchProps = {
 type ListProps = {
   labware: Labware[],
   deckPopulated: boolean,
-  setLabwareBySlot?: () => void,
+  setLabware?: () => void,
   disabled: boolean,
   children: React.Node[]
 }
@@ -65,7 +66,7 @@ function mapStateToProps (state) {
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {_calibrator, deckPopulated, disabled} = stateProps
+  const {_calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
   const labware = stateProps._labware.map(lw => {
@@ -73,7 +74,7 @@ function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
       ...lw,
       setLabware: () => {
         const calibrator = lw.calibratorMount || _calibrator
-        if (deckPopulated && calibrator) {
+        if (_deckPopulated && calibrator) {
           dispatch(robotActions.moveTo(calibrator, lw.slot))
         }
       }

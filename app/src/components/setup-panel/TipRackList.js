@@ -26,7 +26,7 @@ type DispatchProps = {
 type ListProps = {
   tipracks: Labware[],
   deckPopulated: boolean,
-  setLabwareBySlot?: () => void,
+  setLabware?: () => void,
   disabled: boolean,
   children: React.Node[]
 }
