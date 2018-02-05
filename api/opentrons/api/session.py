@@ -189,6 +189,15 @@ class Session(object):
 
         return self
 
+    def identify(self):
+        robot.identify()
+
+    def turn_on_rail_lights(self):
+        robot.turn_on_rail_lights()
+
+    def turn_off_rail_lights(self):
+        robot.turn_off_rail_lights()
+
     def set_state(self, state):
         log.info("State set to {}".format(state))
         if state not in VALID_STATES:

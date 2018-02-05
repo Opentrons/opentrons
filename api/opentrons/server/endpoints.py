@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import subprocess
+from threading import Thread
 from aiohttp import web
 from opentrons import robot, __version__
 
@@ -116,3 +117,19 @@ async def wifi_status(request):
     return web.json_response(
         body=json.dumps(connectivity)
     )
+
+
+async def identify(request):
+    Thread(target=lambda: robot.identify(
+        int(request.query.get('seconds', '10')))).run()
+    return web.Response(text='Ok')
+
+
+async def turn_on_rail_lights(request):
+    robot.turn_on_rail_lights()
+    return web.Response(text='Ok')
+
+
+async def turn_off_rail_lights(request):
+    robot.turn_off_rail_lights()
+    return web.Response(text='Ok')
