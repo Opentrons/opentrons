@@ -107,11 +107,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-<<<<<<< HEAD
-        {'z': 15.5},
-=======
         {'z': robot.max_deck_height() + TIP_CLEARANCE},
->>>>>>> v3a
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -126,11 +122,7 @@ def test_create_arc(robot):
     # TODO(artyom 20171030): confirm expected values are correct after merging
     # calibration work
     expected = [
-<<<<<<< HEAD
-        {'z': 15.5},
-=======
         {'z': robot.max_deck_height() + TIP_CLEARANCE},
->>>>>>> v3a
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
