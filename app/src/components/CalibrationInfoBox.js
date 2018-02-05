@@ -6,13 +6,13 @@ import styles from './calibration-info.css'
 
 type Props = {
   title: string,
-  panel: React.Node,
   iconName: IconName,
-  className?: string
+  className?: string,
+  children: React.Node
 }
 
 export default function CalibrationInfoBox (props: Props) {
-  const {className, iconName, title, panel} = props
+  const {className, iconName, title, children} = props
 
   return (
     <section className={classnames(styles.info_box, className)}>
@@ -20,7 +20,7 @@ export default function CalibrationInfoBox (props: Props) {
         <Icon name={iconName} className={styles.info_header_icon} />
         <h2 className={styles.info_header_title}>{title}</h2>
       </div>
-      {panel}
+      {children}
     </section>
   )
 }

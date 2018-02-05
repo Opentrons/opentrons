@@ -73,7 +73,7 @@ function mapStateToProps (state): StateProps {
   } else if (nextLabware) {
     _button = {
       href: `/setup-deck/${nextLabware.slot}`,
-      text: 'Continue to Labeware setup'
+      text: 'Continue to Labware setup'
     }
   }
 

@@ -1,8 +1,6 @@
 # validate labware calibration instrument selection
 from opentrons import containers, instruments
 
-trash = containers.load('fixed-trash', '12')
-
 tiprack_s1 = containers.load('tiprack-200ul', '6', label='s1')
 tiprack_s2 = containers.load('tiprack-200ul', '3', label='s2')
 
@@ -14,7 +12,6 @@ plate = containers.load('96-PCR-flat', '5')
 
 multi = instruments.Pipette(
     name="p200",
-    trash_container=trash,
     tip_racks=[tiprack_m2, tiprack_m1],
     mount="left",
     channels=8
@@ -22,7 +19,6 @@ multi = instruments.Pipette(
 
 single = instruments.Pipette(
     name="p200s",
-    trash_container=trash,
     tip_racks=[tiprack_s2, tiprack_s1],
     mount="right"
 )

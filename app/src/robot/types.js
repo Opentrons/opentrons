@@ -69,8 +69,8 @@ export type Command = {
   children: number[],
 }
 
-// instrument as returned by the robot API
-export type Instrument = {
+// instrument as stored in redux state
+export type StateInstrument = {
   // resource ID
   _id: number,
   // robot mount instrument is installed on
@@ -85,8 +85,8 @@ export type Instrument = {
   volume: number,
 }
 
-// labware as returned by the robot API
-export type Labware = {
+// labware as stored in redux state
+export type StateLabware = {
   // resource ID
   _id: number,
   // slot labware is installed in
@@ -99,4 +99,9 @@ export type Labware = {
   isTiprack: boolean,
   // intrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount
+}
+
+export type Labware = StateLabware & {
+  calibration: LabwareCalibrationStatus,
+  confirmed: boolean
 }

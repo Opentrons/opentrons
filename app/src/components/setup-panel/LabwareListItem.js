@@ -7,7 +7,6 @@ import {
 } from '../../robot'
 
 type LabwareItemProps = {
-  confirmed?: boolean,
   isDisabled: boolean,
   onClick?: () => void
 }
