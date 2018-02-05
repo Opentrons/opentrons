@@ -1,17 +1,24 @@
 ```js
-initialState = {checkbox1: true, inputfield1: null}
+initialState = {checkbox1: true, inputfield1: ''}
 
-;<FormGroup label='This is a FormGroup'>
+function getError (state) {
+  return ((state.inputfield1 === '') || (parseFloat(state.inputfield1) > 0))
+    ? null
+    : 'volume must be a positive number'
+}
+
+;<FormGroup label='This is a FormGroup' error={getError(state)}>
   <CheckboxField
     label="Check Box 1"
-    onChange={e => setState({checkbox1: !state.checkbox1})}
-    checked={state.checkbox1}
+    onChange={() => setState({...state, checkbox1: !state.checkbox1})}
+    value={state.checkbox1}
   />
   <InputField
     placeholder='Placeholder Text'
-    onChange={e => setState({inputfield1: e.target.value})}
+    onChange={e => setState({...state, inputfield1: e.target.value})}
     value={state.inputfield1}
     units='μL'
+    error={getError(state)}
   />
 </FormGroup>
 ```

@@ -6,24 +6,27 @@ import {Icon} from '../icons'
 import styles from './forms.css'
 
 type Props = {
-  /* change handler */
+  /** change handler */
   onChange: (event: SyntheticEvent<>) => void,
-  /* value that is checked */
+  /** value that is checked */
   value?: string,
-  /* Array of {name, value} data */
+  /** Array of {name, value} data */
   options?: Array<{
     name: string,
     value: string
   }>,
-  /* Show radio buttons inline instead of stacked */
+  /** Show radio buttons inline instead of stacked */
   inline?: boolean,
-  /* classes to apply */
-  className?: string
+  /** classes to apply */
+  className?: string,
+  /** if is included, RadioGroup will use error style. The content of the string is ignored. */
+  error?: ?string
 }
 
 export default function RadioGroup (props: Props) {
+  const error = props.error != null
   return (
-    <div className={cx({[styles.inline]: props.inline})}>
+    <div className={cx({[styles.inline]: props.inline, [styles.error]: error})}>
       {props.options && props.options.map(radio =>
         <label key={radio.value} className={cx(styles.form_field, props.className)}>
           <div className={styles.checkbox_icon}>

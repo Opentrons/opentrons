@@ -78,101 +78,119 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
 
 exports[`DropdownField renders correctly with a falsey value 1`] = `
 <div
-  className="dropdown_field"
+  className={undefined}
 >
-  <select
-    className="dropdown"
-    onChange={undefined}
-    value=""
+  <div
+    className="dropdown_field"
   >
-    <option
+    <select
+      className="dropdown"
+      onChange={undefined}
       value=""
     >
-      
-    </option>
-    <option
-      value="dna"
+      <option
+        value=""
+      >
+        
+      </option>
+      <option
+        value="dna"
+      >
+        DNA
+      </option>
+      <option
+        value="rna"
+      >
+        RNA
+      </option>
+      <option
+        value="protein"
+      >
+        Protein
+      </option>
+    </select>
+    <div
+      className="dropdown_icon"
     >
-      DNA
-    </option>
-    <option
-      value="rna"
-    >
-      RNA
-    </option>
-    <option
-      value="protein"
-    >
-      Protein
-    </option>
-  </select>
+      <svg
+        aria-hidden="true"
+        className=""
+        fill="currentColor"
+        height={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width="100%"
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M7,10L12,15L17,10H7Z"
+          fillRule="evenodd"
+        />
+      </svg>
+    </div>
+  </div>
   <div
-    className="dropdown_icon"
+    className="input_caption"
   >
-    <svg
-      aria-hidden="true"
-      className=""
-      fill="currentColor"
-      height={undefined}
-      version="1.1"
-      viewBox="0 0 24 24"
-      width="100%"
-      x={undefined}
-      y={undefined}
-    >
-      <path
-        d="M7,10L12,15L17,10H7Z"
-        fillRule="evenodd"
-      />
-    </svg>
+    <span />
   </div>
 </div>
 `;
 
 exports[`DropdownField renders correctly with a value 1`] = `
 <div
-  className="dropdown_field"
+  className={undefined}
 >
-  <select
-    className="dropdown"
-    onChange={undefined}
-    value="rna"
+  <div
+    className="dropdown_field"
   >
-    <option
-      value="dna"
-    >
-      DNA
-    </option>
-    <option
+    <select
+      className="dropdown"
+      onChange={undefined}
       value="rna"
     >
-      RNA
-    </option>
-    <option
-      value="protein"
+      <option
+        value="dna"
+      >
+        DNA
+      </option>
+      <option
+        value="rna"
+      >
+        RNA
+      </option>
+      <option
+        value="protein"
+      >
+        Protein
+      </option>
+    </select>
+    <div
+      className="dropdown_icon"
     >
-      Protein
-    </option>
-  </select>
+      <svg
+        aria-hidden="true"
+        className=""
+        fill="currentColor"
+        height={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width="100%"
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M7,10L12,15L17,10H7Z"
+          fillRule="evenodd"
+        />
+      </svg>
+    </div>
+  </div>
   <div
-    className="dropdown_icon"
+    className="input_caption"
   >
-    <svg
-      aria-hidden="true"
-      className=""
-      fill="currentColor"
-      height={undefined}
-      version="1.1"
-      viewBox="0 0 24 24"
-      width="100%"
-      x={undefined}
-      y={undefined}
-    >
-      <path
-        d="M7,10L12,15L17,10H7Z"
-        fillRule="evenodd"
-      />
-    </svg>
+    <span />
   </div>
 </div>
 `;
@@ -204,19 +222,29 @@ exports[`InputField renders correctly 1`] = `
   >
     Input field
   </div>
-  <div
-    className="input_field"
-  >
-    <input
-      onChange={undefined}
-      placeholder="Placeholder Text"
-      type="text"
-      value=""
-    />
+  <div>
     <div
-      className="suffix"
+      className="input_field"
     >
-      μL
+      <input
+        onChange={undefined}
+        placeholder="Placeholder Text"
+        type="text"
+        value=""
+      />
+      <div
+        className="suffix"
+      >
+        μL
+      </div>
+    </div>
+    <div
+      className="input_caption"
+    >
+      <span />
+      <span
+        className="right"
+      />
     </div>
   </div>
 </label>

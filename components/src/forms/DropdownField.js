@@ -14,7 +14,11 @@ type Props = {
     value: string
   }>,
   /** classes to apply */
-  className?: string
+  className?: string,
+  /** optional caption. hidden when `error` is given */
+  caption?: string,
+  /** if included, DropdownField will use error style and display error instead of caption */
+  error?: ?string
 }
 
 export default function DropdownField (props: Props) {
@@ -23,18 +27,25 @@ export default function DropdownField (props: Props) {
     ? props.options
     : [{name: '', value: ''}, ...props.options]
 
-  return (
-    <div className={styles.dropdown_field}>
-      <select value={props.value || ''} onChange={props.onChange} className={styles.dropdown}>
-        {options.map(opt =>
-          <option key={opt.value} value={opt.value}>
-            {opt.name}
-          </option>
-        )}
-      </select>
+  const error = props.error != null
 
-      <div className={styles.dropdown_icon}>
-        <Icon name='menu down' width='100%' />
+  return (
+    <div className={error ? styles.error : undefined}>
+      <div className={styles.dropdown_field}>
+        <select value={props.value || ''} onChange={props.onChange} className={styles.dropdown}>
+          {options.map(opt =>
+            <option key={opt.value} value={opt.value}>
+              {opt.name}
+            </option>
+          )}
+        </select>
+
+        <div className={styles.dropdown_icon}>
+          <Icon name='menu down' width='100%' />
+        </div>
+      </div>
+      <div className={styles.input_caption}>
+        <span>{error ? props.error : props.caption}</span>
       </div>
     </div>
   )
