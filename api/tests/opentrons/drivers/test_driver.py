@@ -83,29 +83,32 @@ def test_functional(smoothie):
     assert smoothie.position == HOMED_POSITION
 
 
-# def test_set_current(model):
-#     from opentrons.robot.robot_configs import DEFAULT_CURRENT
-#     import types
-#     driver = model.robot._driver
+def test_set_current(model):
+    from opentrons.robot.robot_configs import DEFAULT_CURRENT
+    import types
+    driver = model.robot._driver
 
-#     set_current = driver.set_current
+    set_current = driver.set_current
 
-#     gcode_log = []
+    current_log = []
 
-#     def send_and_log(self, target):
-#         nonlocal gcode_log
-#         gcode_log.append(target)
-#         return(target)
+    def set_current_mock(self, target):
+        nonlocal current_log
+        current_log.append(target)
+        set_current(target)
 
-#     driver.set_current = types.MethodType(set_current_mock, driver)
+    driver.set_current = types.MethodType(set_current_mock, driver)
 
-#     driver.move({'A': 100}, low_current_z=False)
-#     # Instrument in `model` is configured to right mount, which is the A axis
-#     # on the Smoothie (see `Robot._actuators`)
-#     assert current == []
+    rack = model.robot.add_container('tiprack-200ul', '10')
+    pipette = model.instrument._instrument
+    pipette.pick_up_tip(rack[0], presses=1)
 
-#     driver.move({'A': 10}, low_current_z=True)
-#     assert current == [{'A': 0.1}, DEFAULT_CURRENT]
+    # Instrument in `model` is configured to right mount, which is the A axis
+    # on the Smoothie (see `Robot._actuators`)
+    expected = [{'A': 0.1}, DEFAULT_CURRENT]
+    from pprint import pprint
+    pprint(current_log)
+    assert current_log == expected
 
 
 def test_fast_home(model):
