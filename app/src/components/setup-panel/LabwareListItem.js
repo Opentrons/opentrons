@@ -9,7 +9,7 @@ import {
 type LabwareItemProps = {
   confirmed?: boolean,
   isDisabled: boolean,
-  setLabware?: () => void
+  onClick?: () => void
 }
 
 type Props = Labware & LabwareItemProps
@@ -22,7 +22,7 @@ export default function LabwareListItem (props: Props) {
     isTiprack,
     confirmed,
     isDisabled,
-    setLabware
+    onClick
   } = props
 
   const url = `/setup-deck/${slot}`
@@ -38,7 +38,7 @@ export default function LabwareListItem (props: Props) {
     <ListItem
       isDisabled={isDisabled}
       url={url}
-      onClick={setLabware}
+      onClick={onClick}
       iconName={iconName}
     >
       <span>Slot {slot}</span>
