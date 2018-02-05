@@ -32,7 +32,7 @@ export default connect(
 
 function RunPanel (props: RunPanelProps) {
   const {isRunning, labwareConfirmed, readyToRun, run} = props
-  const runMessage = readyToRun && (<RunMessage labwareConfirmed={labwareConfirmed} />)
+  const runMessage = labwareConfirmed && (<RunMessage />)
   const isDisabled = !readyToRun || isRunning
 
   return (

@@ -96,11 +96,6 @@ button:focus {
   border: none;
 }
 
-.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
 .btn_light {
   border: 1px solid silver;
   background-color: #fff;

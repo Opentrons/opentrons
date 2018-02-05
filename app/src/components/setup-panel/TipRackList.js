@@ -9,23 +9,19 @@ import {
   actions as robotActions
 } from '../../robot'
 
-export default connect(
-  mapStateToProps,
-  null,
-  mergeProps
-)(LabwareList)
+export default connect(mapStateToProps, null, mergeProps)(TipRackList)
 
-function LabwareList (props) {
-  const {labware, disabled} = props
+function TipRackList (props) {
+  const {tipracks, disabled} = props
   return (
-    <TitledList title='labware' disabled={disabled}>
-      {labware.map(lw => (
+    <TitledList title='tipracks' disabled={disabled}>
+      {tipracks.map(tr => (
         <LabwareListItem
-          {...lw}
-          isDisabled={disabled}
-          confirmed={lw.confirmed}
-          key={lw.slot}
-          onClick={lw.setLabware}
+          {...tr}
+          key={tr.slot}
+          isDisabled={tr.confirmed}
+          confirmed={tr.confirmed}
+          onClick={tr.setLabware}
         />
       ))}
     </TitledList>
@@ -33,10 +29,9 @@ function LabwareList (props) {
 }
 
 function mapStateToProps (state) {
-  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   return {
-    _labware: robotSelectors.getNotTipracks(state),
-    disabled: !tipracksConfirmed,
+    _tipracks: robotSelectors.getTipracks(state),
+    disabled: robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state)
   }
@@ -46,20 +41,20 @@ function mergeProps (stateProps, dispatchProps) {
   const {_calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
-  const labware = stateProps._labware.map(lw => {
+  const tipracks = stateProps._tipracks.map(tr => {
     return {
-      ...lw,
+      ...tr,
       setLabware: () => {
-        const calibrator = lw.calibratorMount || _calibrator
+        const calibrator = tr.calibratorMount || _calibrator
         if (_deckPopulated && calibrator) {
-          dispatch(robotActions.moveTo(calibrator, lw.slot))
+          dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
         }
       }
     }
   })
 
   return {
-    labware,
+    tipracks,
     disabled
   }
 }

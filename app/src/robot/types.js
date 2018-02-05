@@ -98,5 +98,5 @@ export type Labware = {
   // whether or not the labware is a tiprack (implied from type)
   isTiprack: boolean,
   // intrument mount to use as the calibrator if isTiprack is true
-  calibratorMount: ?Mount,
+  calibratorMount: ?Mount
 }
