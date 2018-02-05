@@ -1,13 +1,13 @@
 ```js
 initialState = {checkbox1: true, inputfield1: ''}
 
-function isError(state) {
+function getError (state) {
   return ((state.inputfield1 === '') || (parseFloat(state.inputfield1) > 0))
-    ? undefined
+    ? null
     : 'volume must be a positive number'
 }
 
-;<FormGroup label='This is a FormGroup' error={isError(state)}>
+;<FormGroup label='This is a FormGroup' error={getError(state)}>
   <CheckboxField
     label="Check Box 1"
     onChange={() => setState({...state, checkbox1: !state.checkbox1})}
@@ -18,7 +18,7 @@ function isError(state) {
     onChange={e => setState({...state, inputfield1: e.target.value})}
     value={state.inputfield1}
     units='μL'
-    error={isError(state)}
+    error={getError(state)}
   />
 </FormGroup>
 ```

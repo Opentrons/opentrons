@@ -20,11 +20,11 @@ type Props = {
   /** classes to apply */
   className?: string,
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
-  error?: string
+  error?: ?string
 }
 
 export default function RadioGroup (props: Props) {
-  const error = props.error !== undefined
+  const error = props.error != null
   return (
     <div className={cx({[styles.inline]: props.inline, [styles.error]: error})}>
       {props.options && props.options.map(radio =>

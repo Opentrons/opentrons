@@ -18,7 +18,7 @@ type Props = {
   /** optional caption. hidden when `error` is given */
   caption?: string,
   /** if included, DropdownField will use error style and display error instead of caption */
-  error?: string
+  error?: ?string
 }
 
 export default function DropdownField (props: Props) {
@@ -27,10 +27,10 @@ export default function DropdownField (props: Props) {
     ? props.options
     : [{name: '', value: ''}, ...props.options]
 
-  const error = props.error !== undefined
+  const error = props.error != null
 
   return (
-    <div className={error && styles.error}>
+    <div className={error ? styles.error : undefined}>
       <div className={styles.dropdown_field}>
         <select value={props.value || ''} onChange={props.onChange} className={styles.dropdown}>
           {options.map(opt =>

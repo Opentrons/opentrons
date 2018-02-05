@@ -78,7 +78,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
 
 exports[`DropdownField renders correctly with a falsey value 1`] = `
 <div
-  className={false}
+  className={undefined}
 >
   <div
     className="dropdown_field"
@@ -140,7 +140,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
 
 exports[`DropdownField renders correctly with a value 1`] = `
 <div
-  className={false}
+  className={undefined}
 >
   <div
     className="dropdown_field"

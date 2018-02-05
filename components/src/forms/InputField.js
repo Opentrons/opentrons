@@ -19,7 +19,7 @@ type Props = {
   /** current value of text in box, defaults to '' */
   value?: string,
   /** if included, InputField will use error style and display error instead of caption */
-  error?: string,
+  error?: ?string,
   /** optional caption. hidden when `error` is given */
   caption?: string,
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
@@ -27,7 +27,7 @@ type Props = {
 }
 
 export default function InputField (props: Props) {
-  const error = props.error !== undefined
+  const error = props.error != null
   return (
     <label className={cx(styles.form_field, props.className, {[styles.error]: error})}>
       <div className={styles.label_text}>

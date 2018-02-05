@@ -12,11 +12,11 @@ type Props = {
   /** classes to apply */
   className?: string,
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
-  error?: string
+  error?: ?string
 }
 
 export default function FormGroup (props: Props) {
-  const error = props.error !== undefined
+  const error = props.error != null
   return (
     <div className={props.className}>
       <div className={cx(styles.formgroup_label, {[styles.error]: error})}>
