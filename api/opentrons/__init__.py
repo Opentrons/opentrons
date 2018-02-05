@@ -42,29 +42,54 @@ class InstrumentsWrapper(object):
     def Pipette(self, *args, **kwargs):
         return inst.Pipette(self.robot, *args, **kwargs)
 
-    def P10_Single(self, *args, **kwargs):
-        kwargs.update({
-            'channels': 1,
-            'ul_per_mm': 0.617  # TODO (andy): should come from config
-        })
-        p = inst.Pipette(self.robot, *args, **kwargs)
+    def P10_Single(
+            self,
+            mount,
+            name=None,
+            trash_container=None,
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
 
-        # TODO (andy): should come from config
+        p = inst.Pipette(
+            self.robot,
+            name=name,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            channels=1,
+            ul_per_mm=0.617,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
         p.plunger_positions['top'] = 18
         p.plunger_positions['bottom'] = 2
         p.plunger_positions['blow_out'] = 0
         p.plunger_positions['drop_tip'] = -6
         p.set_pick_up_current(0.1)
+
         return p
 
-    def P10_Multi(self, *args, **kwargs):
-        kwargs.update({
-            'channels': 8,
-            'ul_per_mm': 0.617  # TODO (andy): should come from config
-        })
-        p = inst.Pipette(self.robot, *args, **kwargs)
+    def P10_Multi(
+            self,
+            mount,
+            name=None,
+            trash_container=None,
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
 
-        # TODO (andy): should come from config
+        p = inst.Pipette(
+            self.robot,
+            name=name,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            channels=8,
+            ul_per_mm=0.617,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
         p.plunger_positions['top'] = 18
         p.plunger_positions['bottom'] = 2
         p.plunger_positions['blow_out'] = 0
@@ -72,14 +97,26 @@ class InstrumentsWrapper(object):
         p.set_pick_up_current(0.3)
         return p
 
-    def P300_Single(self, *args, **kwargs):
-        kwargs.update({
-            'channels': 1,
-            'ul_per_mm': 18.51  # TODO (andy): should come from config
-        })
-        p = inst.Pipette(self.robot, *args, **kwargs)
+    def P300_Single(
+            self,
+            mount,
+            name=None,
+            trash_container=None,
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
 
-        # TODO (andy): should come from config
+        p = inst.Pipette(
+            self.robot,
+            name=name,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            channels=1,
+            ul_per_mm=18.51,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
         p.plunger_positions['top'] = 18
         p.plunger_positions['bottom'] = 0
         p.plunger_positions['blow_out'] = -2
@@ -87,17 +124,31 @@ class InstrumentsWrapper(object):
         p.set_pick_up_current(0.1)
         return p
 
-    def P300_Multi(self, *args, **kwargs):
-        kwargs.update({
-            'channels': 8,
-            'ul_per_mm': 18.51  # TODO (andy): should come from config
-        })
-        p = inst.Pipette(self.robot, *args, **kwargs)
+    def P300_Multi(
+            self,
+            mount,
+            name=None,
+            trash_container=None,
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
+
+        p = inst.Pipette(
+            self.robot,
+            name=name,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            channels=8,
+            ul_per_mm=18.51,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
         p.plunger_positions['top'] = 18
         p.plunger_positions['bottom'] = 0
         p.plunger_positions['blow_out'] = -2
         p.plunger_positions['drop_tip'] = -5
-        p.set_pick_up_current(0.3)  # TODO (andy): should come from config
+        p.set_pick_up_current(0.3)
         return p
 
     def Magbead(self, *args, **kwargs):
