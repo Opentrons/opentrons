@@ -13,9 +13,9 @@ import {
 } from '../../robot'
 
 type StateProps = {
-  tipracks: Labware[],
+  _tipracks: Labware[],
   _calibrator: Mount,
-  deckPopulated: boolean,
+  _deckPopulated: boolean,
   disabled: boolean
 }
 
@@ -34,8 +34,7 @@ type ListProps = {
 export default connect(mapStateToProps, null, mergeProps)(TipRackList)
 
 function TipRackList (props: ListProps) {
-  const {tipracks, setLabwareBySlot, disabled, deckPopulated} = props
-  const onClick = deckPopulated ? setLabwareBySlot : null
+  const {tipracks, disabled} = props
   return (
     <TitledList title='tipracks' disabled={disabled}>
       {tipracks.map(tr => (
@@ -44,7 +43,7 @@ function TipRackList (props: ListProps) {
           key={tr.slot}
           isDisabled={tr.confirmed}
           confirmed={tr.confirmed}
-          onClick={onClick}
+          onClick={tr.setLabware}
         />
       ))}
     </TitledList>
@@ -53,7 +52,7 @@ function TipRackList (props: ListProps) {
 
 function mapStateToProps (state: StateProps) {
   return {
-    tipracks: robotSelectors.getTipracks(state),
+    _tipracks: robotSelectors.getTipracks(state),
     disabled: robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state)
@@ -61,21 +60,23 @@ function mapStateToProps (state: StateProps) {
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {tipracks, _calibrator, deckPopulated, disabled} = stateProps
+  const {_calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
-  const setLabwareBySlot = tipracks.reduce((result, tr: Labware) => {
-    const calibrator = tr.calibratorMount || _calibrator
-
-    if (deckPopulated && calibrator) {
-      result[tr.slot] = () => dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
+  const tipracks = stateProps._tipracks.map(tr => {
+    return {
+      ...tr,
+      setLabware: () => {
+        const calibrator = tr.calibratorMount || _calibrator
+        if (_deckPopulated && calibrator) {
+          dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
+        }
+      }
     }
-    return result
-  }, {})
+  })
 
   return {
     tipracks,
-    setLabwareBySlot,
     disabled
   }
 }

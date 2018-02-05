@@ -13,7 +13,7 @@ import {
 } from '../../robot'
 
 type StateProps = {
-  labware: Labware[],
+  _labware: Labware[],
   _calibrator: Mount | '',
   deckPopulated: boolean,
   disabled: boolean
@@ -38,7 +38,7 @@ export default connect(
 )(LabwareList)
 
 function LabwareList (props: ListProps) {
-  const {labware, setLabwareBySlot, disabled} = props
+  const {labware, disabled} = props
   return (
     <TitledList title='labware' disabled={disabled}>
       {labware.map(lw => (
@@ -47,7 +47,7 @@ function LabwareList (props: ListProps) {
           isDisabled={disabled}
           confirmed={lw.confirmed}
           key={lw.slot}
-          onClick={setLabwareBySlot}
+          onClick={lw.setLabware}
         />
       ))}
     </TitledList>
@@ -57,7 +57,7 @@ function LabwareList (props: ListProps) {
 function mapStateToProps (state) {
   const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   return {
-    labware: robotSelectors.getNotTipracks(state),
+    _labware: robotSelectors.getNotTipracks(state),
     disabled: !tipracksConfirmed,
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state)
@@ -65,22 +65,23 @@ function mapStateToProps (state) {
 }
 
 function mergeProps (stateProps: StateProps, dispatchProps: DispatchProps) {
-  const {labware, _calibrator, deckPopulated, disabled} = stateProps
+  const {_calibrator, deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
 
-  const setLabwareBySlot = labware.reduce((result, lw: Labware) => {
-    const calibrator = lw.calibratorMount || _calibrator
-
-    if (deckPopulated && calibrator) {
-      result[lw.slot] = () => dispatch(robotActions.moveTo(calibrator, lw.slot))
+  const labware = stateProps._labware.map(lw => {
+    return {
+      ...lw,
+      setLabware: () => {
+        const calibrator = lw.calibratorMount || _calibrator
+        if (deckPopulated && calibrator) {
+          dispatch(robotActions.moveTo(calibrator, lw.slot))
+        }
+      }
     }
-
-    return result
-  }, {})
+  })
 
   return {
     labware,
-    setLabwareBySlot,
     disabled
   }
 }
