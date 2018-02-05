@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 
 import {NavButton, VerticalNavBar} from '@opentrons/components'
 import {type Page, actions, selectors} from '../navigation'
+import styles from './NavBar.css'
 
 type Props = {
   currentPage: Page,
@@ -13,7 +14,7 @@ type Props = {
 
 function Nav (props: Props) {
   return (
-    <VerticalNavBar>
+    <VerticalNavBar className={styles.nav_bar}>
       <NavButton
         iconName='file'
         isCurrent={props.currentPage === 'file page'}
