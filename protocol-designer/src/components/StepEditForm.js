@@ -26,7 +26,8 @@ export type Props = {
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
-  formData: FormData
+  formData: FormData,
+  canSave: boolean
   /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
     this obj reflects the form selector's return values */
 }
@@ -39,6 +40,36 @@ export default function StepEditForm (props: Props) {
     onChange: props.handleChange(accessor),
     value: props.formData[accessor] || ''
   })
+
+  const buttonRow = <div className={styles.button_row}>
+    <FlatButton onClick={e => console.log('TODO: "MORE OPTIONS".')}>MORE OPTIONS</FlatButton>
+    <PrimaryButton onClick={props.onCancel}>CANCEL</PrimaryButton>
+    <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
+  </div>
+
+  if (stepType === 'pause') {
+    return (
+      <div className={styles.form}>
+        <div className={styles.row_wrapper}>
+          <div className={styles.column_1_2}>
+            <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
+              {...formConnector('pause-for-amount-of-time')} />
+            <InputField units='hr' {...formConnector('pause-hour')} />
+            <InputField units='m' {...formConnector('pause-minute')} />
+            <InputField units='s' {...formConnector('pause-second')} />
+          </div>
+          <div className={styles.column_1_2}>
+            <RadioGroup options={[{name: 'Pause until told to resume', value: 'false'}]}
+              {...formConnector('pause-for-amount-of-time')} />
+            <FormGroup label='Message to display'>
+              <InputField {...formConnector('pause-message')} />
+            </FormGroup>
+          </div>
+        </div>
+        {buttonRow}
+      </div>
+    )
+  }
 
   if (stepType === 'transfer') {
     return (
@@ -152,11 +183,7 @@ export default function StepEditForm (props: Props) {
 
         </FormSection>
 
-        <div className={styles.button_row}>
-          <FlatButton onClick={e => console.log('TODO: "MORE OPTIONS".')}>MORE OPTIONS</FlatButton>
-          <PrimaryButton onClick={props.onCancel}>CANCEL</PrimaryButton>
-          <PrimaryButton onClick={props.onSave}>SAVE</PrimaryButton>
-        </div>
+        {buttonRow}
       </div>
     )
   }

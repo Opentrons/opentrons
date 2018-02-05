@@ -32,7 +32,7 @@ type FormState = FormData | null
 
 // the `form` state holds temporary form info that is saved or thrown away with "cancel".
 // TODO: rename to make that more clear. 'unsavedForm'?
-const form = handleActions({
+const unsavedForm = handleActions({
   CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
     ...state,
     [action.payload.accessor]: action.payload.value
@@ -113,7 +113,7 @@ const stepCreationButtonExpanded = handleActions({
 }, false)
 
 export type RootState = {|
-  form: FormState,
+  unsavedForm: FormState,
   steps: StepsState,
   savedStepForms: SavedStepFormState,
   collapsedSteps: CollapsedStepsState,
@@ -123,7 +123,7 @@ export type RootState = {|
 |}
 
 export const _allReducers = {
-  form,
+  unsavedForm,
   steps,
   savedStepForms,
   collapsedSteps,
@@ -141,7 +141,7 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 const formData = createSelector(
   rootSelector,
-  (state: RootState) => state.form
+  (state: RootState) => state.unsavedForm
 )
 
 const selectedStepId = createSelector(
@@ -155,27 +155,31 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
       return []
     }
 
-    const {
-      sourceWells,
-      destWells
-      // sourceLabware, // TODO: show labware & volume, see new designs
-      // destLabware,
-      // volume
-    } = valForm.validatedForm
+    if (valForm.stepType === 'transfer') {
+      const {
+        sourceWells,
+        destWells
+        // sourceLabware, // TODO: show labware & volume, see new designs
+        // destLabware,
+        // volume
+      } = valForm.validatedForm
 
-    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (checkForErrorsHack(valForm)) {
-      return []
+      // Don't try to render with errors. TODO LATER: presentational error state of substeps?
+      if (checkForErrorsHack(valForm)) {
+        return []
+      }
+
+      return range(sourceWells.length).map(i => ({
+        parentStepId: stepId,
+        substepId: i,
+        sourceIngredientName: 'ING1',
+        destIngredientName: 'ING2',
+        sourceWell: sourceWells[i],
+        destWell: destWells[i]
+      }))
     }
-
-    return range(sourceWells.length).map(i => ({
-      parentStepId: stepId,
-      substepId: i,
-      sourceIngredientName: 'ING1',
-      destIngredientName: 'ING2',
-      sourceWell: sourceWells[i],
-      destWell: destWells[i]
-    }))
+    console.warn('allSubsteps doesnt support step type: ' + valForm.stepType)
+    return []
   })
 
 const allSteps = createSelector(
@@ -205,8 +209,8 @@ const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | 
   return s.orderedSteps.reduce((acc, stepId) => ({
     ...acc,
     [stepId]: (s.savedStepForms[stepId] && s.steps[stepId])
-      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-      : {errors: {'form': ['missing step ' + stepId]}, validatedForm: {}} // TODO revisit
+      ? validateAndProcessForm(s.savedStepForms[stepId])
+      : {errors: {'form': ['no saved form for step ' + stepId]}, validatedForm: {}} // TODO revisit
   }), {})
 }
 
@@ -259,15 +263,18 @@ export const selectors = {
   allSubsteps,
   validatedForms,
   commands,
+  currentFormErrors: state => formData(state) && validateAndProcessForm(formData(state)).errors, // TODO use this
+  _currentFormDebug: state => formData(state) && validateAndProcessForm(formData(state)), // TODO delete
   currentFormCanBeSaved: createSelector(
     formData,
     selectedStepId,
     allSteps,
-    (formData, selectedStepId, allSteps): boolean | null => ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
-      ? checkForErrorsHack(
-        validateAndProcessForm(allSteps[selectedStepId].stepType, formData)
-      )
-      : null
+    (formData, selectedStepId, allSteps): boolean | null =>
+      ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
+        ? !checkForErrorsHack(
+          validateAndProcessForm(formData)
+        )
+        : null
   )
 }
 
