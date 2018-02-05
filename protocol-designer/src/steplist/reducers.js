@@ -197,16 +197,16 @@ const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
     : true // No forms counts as error
 
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
-  // TODO
   const s = rootSelector(state)
   if (s.orderedSteps.length === 0) {
     return null
   }
+
   return s.orderedSteps.reduce((acc, stepId) => ({
     ...acc,
-    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
+    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId])
       ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
+      : {errors: {'form': ['missing step ' + stepId]}, validatedForm: {}} // TODO revisit
   }), {})
 }
 

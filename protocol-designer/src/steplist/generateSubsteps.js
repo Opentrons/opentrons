@@ -29,7 +29,12 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): FormDat
 export function validateAndProcessForm (stepType: StepType, formData: FormData): any { // TODO type should be ValidFormAndErrors
   // TODO
   if (stepType !== 'transfer') {
-    throw new Error('validateAndProcessForm only supports transfer now')
+    return {
+      errors: {
+        'form': ['Unsupported step type: ' + stepType]
+      },
+      validatedForm: {}
+    }
   }
 
   // This makes sure required fields are present, and parses strings to numbers where needed.
