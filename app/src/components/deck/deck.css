@@ -20,6 +20,7 @@
 
 .deck {
   box-sizing: border-box;
+  display: block;
   padding: 1rem 2rem;
   margin: 0 auto;
   width: 38rem;

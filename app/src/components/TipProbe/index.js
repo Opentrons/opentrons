@@ -53,7 +53,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
   // TODO(mc, 2018-01-22): this should never happen; refactor so this
   //   check isn't necessary
   if (!currentInstrument || !currentInstrument.calibration) {
-    throw new Error('no currentIntrument or has no calibration status')
+    throw new Error('no currentInstrument or has no calibration status')
   }
 
   return currentInstrument
@@ -69,12 +69,8 @@ function TipProbe (props: TipProbeProps) {
   const Panel = PANEL_BY_CALIBRATION[calibration]
 
   return (
-    <CalibrationInfoBox
-      iconName={iconName}
-      title={title}
-      panel={(
-        <Panel {...props} />
-      )}
-    />
+    <CalibrationInfoBox iconName={iconName} title={title}>
+      <Panel {...props} />
+    </CalibrationInfoBox>
   )
 }

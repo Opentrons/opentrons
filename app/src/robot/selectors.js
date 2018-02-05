@@ -3,7 +3,7 @@
 import padStart from 'lodash/padStart'
 import {createSelector} from 'reselect'
 
-import type {Mount, InstrumentCalibrationStatus} from './types'
+import type {Mount, InstrumentCalibrationStatus, Labware} from './types'
 import type {State as CalibrationState} from './reducer/calibration'
 import type {State as ConnectionState} from './reducer/connection'
 import type {State as SessionState} from './reducer/session'
@@ -249,7 +249,7 @@ export const getLabware = createSelector(
   getLabwareBySlot,
   (state: State) => calibration(state).labwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
-  (labwareBySlot, statusBySlot, confirmedBySlot) => {
+  (labwareBySlot, statusBySlot, confirmedBySlot): Labware[] => {
     return Object.keys(labwareBySlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
