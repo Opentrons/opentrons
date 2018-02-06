@@ -264,13 +264,14 @@ class Robot(object):
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
-        self._previous_container = None
 
         self._deck = containers.Deck()
         self._fixed_trash = None
         self.setup_deck()
         self.setup_gantry()
         self._instruments = {}
+
+        self._previous_instrument = None
 
         # TODO: Move homing info to driver
         self.axis_homed = {
@@ -633,13 +634,10 @@ class Robot(object):
             ),
             offset.coordinates
         )
-        other_instrument = {instrument} ^ set(self._instruments.values())
-        if other_instrument:
-            other = other_instrument.pop()
-            _, _, z = pose_tracker.absolute(self.poses, other)
-            safe_height = self.max_deck_height() + TIP_CLEARANCE
-            if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+
+        if self._previous_instrument:
+            if self._previous_instrument != instrument:
+                self._previous_instrument.retract()
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
