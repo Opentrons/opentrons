@@ -1,6 +1,7 @@
 import sys
 
 from opentrons.robot.robot import Robot
+from opentrons.instruments import pipette_config
 from opentrons import instruments as inst, containers as cnt
 from opentrons.data_storage import database_migration
 from opentrons._version import __version__
@@ -45,28 +46,25 @@ class InstrumentsWrapper(object):
     def P10_Single(
             self,
             mount,
-            name=None,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        p = inst.Pipette(
-            self.robot,
-            name=name,
+        config = pipette_config.load('p10_single')
+
+        p = self.Pipette(
             mount=mount,
+            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=1,
-            ul_per_mm=0.617,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            channels=config.channels,
+            ul_per_mm=config.ul_per_mm,
+            aspirate_flow_rate=config.aspirate_flow_rate,
+            dispense_flow_rate=config.dispense_flow_rate)
 
-        p.plunger_positions['top'] = 18
-        p.plunger_positions['bottom'] = 2
-        p.plunger_positions['blow_out'] = 0
-        p.plunger_positions['drop_tip'] = -6
-        p.set_pick_up_current(0.1)
+        p.plunger_positions = config.plunger_positions.copy()
+        p.set_pick_up_current(config.pick_up_current)
 
         return p
 
@@ -74,81 +72,78 @@ class InstrumentsWrapper(object):
             self,
             mount,
             name=None,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        p = inst.Pipette(
-            self.robot,
-            name=name,
+        config = pipette_config.load('p10_multi')
+
+        p = self.Pipette(
             mount=mount,
+            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=8,
-            ul_per_mm=0.617,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            channels=config.channels,
+            ul_per_mm=config.ul_per_mm,
+            aspirate_flow_rate=config.aspirate_flow_rate,
+            dispense_flow_rate=config.dispense_flow_rate)
 
-        p.plunger_positions['top'] = 18
-        p.plunger_positions['bottom'] = 2
-        p.plunger_positions['blow_out'] = 0
-        p.plunger_positions['drop_tip'] = -6
-        p.set_pick_up_current(0.3)
+        p.plunger_positions = config.plunger_positions.copy()
+        p.set_pick_up_current(config.pick_up_current)
+
         return p
 
     def P300_Single(
             self,
             mount,
             name=None,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        p = inst.Pipette(
-            self.robot,
-            name=name,
+        config = pipette_config.load('p300_single')
+
+        p = self.Pipette(
             mount=mount,
+            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=1,
-            ul_per_mm=18.51,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            channels=config.channels,
+            ul_per_mm=config.ul_per_mm,
+            aspirate_flow_rate=config.aspirate_flow_rate,
+            dispense_flow_rate=config.dispense_flow_rate)
 
-        p.plunger_positions['top'] = 18
-        p.plunger_positions['bottom'] = 0
-        p.plunger_positions['blow_out'] = -2
-        p.plunger_positions['drop_tip'] = -3.5
-        p.set_pick_up_current(0.1)
+        p.plunger_positions = config.plunger_positions.copy()
+        p.set_pick_up_current(config.pick_up_current)
+
         return p
 
     def P300_Multi(
             self,
             mount,
             name=None,
-            trash_container=None,
+            trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        p = inst.Pipette(
-            self.robot,
-            name=name,
+        config = pipette_config.load('p300_multi')
+
+        p = self.Pipette(
             mount=mount,
+            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=8,
-            ul_per_mm=18.51,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            channels=config.channels,
+            ul_per_mm=config.ul_per_mm,
+            aspirate_flow_rate=config.aspirate_flow_rate,
+            dispense_flow_rate=config.dispense_flow_rate)
 
-        p.plunger_positions['top'] = 18
-        p.plunger_positions['bottom'] = 0
-        p.plunger_positions['blow_out'] = -2
-        p.plunger_positions['drop_tip'] = -5
-        p.set_pick_up_current(0.3)
+        p.plunger_positions = config.plunger_positions.copy()
+        p.set_pick_up_current(config.pick_up_current)
+
         return p
 
     def Magbead(self, *args, **kwargs):
