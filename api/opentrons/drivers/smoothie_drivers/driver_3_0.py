@@ -452,12 +452,16 @@ class SmoothieDriver_3_0_0:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
     def turn_on_button_light(self):
-        log.debug("Turning on the button")
         gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
 
     def turn_off_button_light(self):
-        log.debug("Turning off the button")
         gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_on_rail_lights(self):
+        gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
+    def turn_off_rail_lights(self):
+        gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
 
     def kill(self):
         """

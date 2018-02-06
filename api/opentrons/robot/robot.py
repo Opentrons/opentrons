@@ -286,6 +286,23 @@ class Robot(object):
     def turn_off_button_light(self):
         self._driver.turn_off_button_light()
 
+    def turn_on_rail_lights(self):
+        self._driver.turn_on_rail_lights()
+
+    def turn_off_rail_lights(self):
+        self._driver.turn_off_rail_lights()
+
+    def identify(self, seconds):
+        """
+        Identify a robot by flashing the light around the frame button for 10s
+        """
+        from time import sleep
+        for i in range(seconds):
+            self.turn_off_button_light()
+            sleep(0.25)
+            self.turn_on_button_light()
+            sleep(0.25)
+
     def setup_gantry(self):
         driver = self._driver
 
