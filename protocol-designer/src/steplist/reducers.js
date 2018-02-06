@@ -60,10 +60,7 @@ const steps = handleActions({
 }, {})
 
 type SavedStepFormState = {
-  [StepIdType]: {
-    ...FormData,
-    id: StepIdType
-  }
+  [StepIdType]: FormData
 }
 
 const savedStepForms = handleActions({
@@ -216,7 +213,6 @@ const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | 
 
 const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
   // TODO use existing selectors, don't rewrite!!!
-  const steps = rootSelector(state).steps
   const forms = validatedForms(state)
   const orderedSteps = rootSelector(state).orderedSteps
 
@@ -227,9 +223,8 @@ const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE 
 
   return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
     const formDataAndErrors = forms[stepId]
-    const stepType = steps[stepId].stepType
     // TODO checking if there are some errors is repeated from substeps selector, DRY it up
-    return generateCommands(stepType, formDataAndErrors.validatedForm)
+    return generateCommands(formDataAndErrors.validatedForm)
   })
 }
 
@@ -263,8 +258,10 @@ export const selectors = {
   allSubsteps,
   validatedForms,
   commands,
-  currentFormErrors: state => formData(state) && validateAndProcessForm(formData(state)).errors, // TODO use this
-  _currentFormDebug: state => formData(state) && validateAndProcessForm(formData(state)), // TODO delete
+  currentFormErrors: (state: BaseState) => {
+    const form = formData(state)
+    return form && validateAndProcessForm(form).errors // TODO refactor selectors
+  },
   currentFormCanBeSaved: createSelector(
     formData,
     selectedStepId,

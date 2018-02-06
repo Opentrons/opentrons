@@ -39,7 +39,10 @@ export type StepItemData = {
   description?: string
 }
 
-export type FormData = {
+type TransferForm = {|
+  stepType: 'transfer',
+  id: StepIdType,
+
   'aspirate--labware'?: string,
   'aspirate--wells'?: string,
   'aspirate--pipette'?: string,
@@ -65,13 +68,36 @@ export type FormData = {
   'dispense--delay-seconds'?: string,
   'dispense--blowout--checkbox'?: boolean,
   'dispense--blowout--labware'?: string
-}
+|}
 
-export type ValidatedForm = {
+type PauseForm = {|
+  stepType: 'pause',
+  id: StepIdType,
+
+  'pause-for-amount-of-time'?: 'true' | 'false',
+  'pause-hour'?: string,
+  'pause-minute'?: string,
+  'pause-second'?: string,
+  'pause-message'?: string,
+|}
+
+export type FormData = TransferForm | PauseForm
+
+type TransferFormData = {|
+  stepType: 'transfer',
   pipette: 'left' | 'right',
   sourceWells: Array<string>,
   destWells: Array<string>,
   sourceLabware: string,
   destLabware: string,
   volume: number
-}
+|}
+
+type PauseFormData = {|
+  stepType: 'pause',
+  waitForUserInput: boolean,
+  seconds: number,
+  message: string
+|}
+
+export type ProcessedFormData = TransferFormData | PauseFormData

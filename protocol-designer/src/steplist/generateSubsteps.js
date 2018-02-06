@@ -1,14 +1,14 @@
 // @flow
-import type {Command, StepType, StepIdType, FormData, ValidatedForm} from './types' /* StepSubItemData, StepIdType */
+import type {Command, StepType, StepIdType, FormData, ProcessedFormData} from './types' /* StepSubItemData, StepIdType */
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 
 export type ValidFormAndErrors = {
   errors: {[string]: string}, // was [$Keys<FormData>]: string, but that's too strict TODO
-  validatedForm: ValidatedForm
+  validatedForm: ProcessedFormData
 } // TODO rename and move to types?
 
-export const generateNewForm = (stepId: StepIdType, stepType: StepType): FormData => {
+export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
   const baseForm = {
     id: stepId,
     stepType: stepType
@@ -27,8 +27,6 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): FormDat
 }
 
 export function validateAndProcessForm (formData: FormData): any { // TODO type should be ValidFormAndErrors
-  const {stepType} = formData
-
   // This makes sure required fields are present, and parses strings to numbers where needed.
   // It doesn't do any logic combining the fields.
   type ValidationOut<B> = { // TODO rename
@@ -39,8 +37,8 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
   type ValidatorFn<A, B> = (value: A, name: string) => ValidationOut<B>
 
   type ValidationAPI = {
-    dataName: $Keys<ValidatedForm>,
-    formFieldName: $Keys<FormData>,
+    dataName: string, // $Keys<ProcessedFormData>,
+    formFieldName: string, // $Keys<FormData>,
     validators: Array<ValidatorFn<any, any>> // not really validators, more like value casters with error reporting?
   }
 
@@ -75,10 +73,17 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
     }
   }
 
+  type Field = {
+    formFieldName: string,
+    dataName: string,
+    validators: any
+  }
+
   // TODO Ian 2018-01-31 wow I cannot Flow type this reduce
   function validateIt (fields: Array<ValidationAPI>) {
     // go thru all the fields of the form
-    const fieldsAndErrors = fields.reduce((acc, {formFieldName, dataName, validators}) => {
+    const fieldsAndErrors = fields.reduce((acc, field: Field) => {
+      const {formFieldName, dataName, validators} = field
       // go thru all the validators for a field
       const fieldResult = validators.reduce((prevResult, validatorFn) => {
         const subresult = validatorFn(prevResult.value, dataName)
@@ -100,12 +105,12 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
         validatedForm: {...acc.validatedForm, [dataName]: fieldResult.value}
       }
     },
-    {errors: {}, validatedForm: {}})
+    {errors: {}, validatedForm: {stepType: formData.stepType}})
 
     return fieldsAndErrors
   }
 
-  if (stepType === 'transfer') {
+  if (formData.stepType === 'transfer') {
     return validateIt([
       {
         dataName: 'pipette',
@@ -140,7 +145,7 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
     ])
   }
 
-  if (stepType === 'pause') {
+  if (formData.stepType === 'pause') {
     const secondsDelay = (parseFloat(formData['pause-hour']) || 0) * 360 +
       (parseFloat(formData['pause-minute']) || 0) * 60 +
       (parseFloat(formData['pause-second']) || 0)
@@ -168,14 +173,14 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
   // TODO
   return {
     errors: {
-      'form': ['Unsupported step type: ' + stepType]
+      'form': ['Unsupported step type: ' + formData.stepType]
     },
     validatedForm: {}
   }
 }
 
-export function generateCommands (stepType: StepType, data: ValidatedForm): Array<Command> {
-  if (stepType === 'transfer') {
+export function generateCommands (data: ProcessedFormData): Array<Command> {
+  if (data.stepType === 'transfer') {
     // TODO: this should be done in validation/preprocessing step
     const {sourceWells, destWells, volume, pipette, sourceLabware, destLabware} = data
 
@@ -202,7 +207,7 @@ export function generateCommands (stepType: StepType, data: ValidatedForm): Arra
       }
     ])
   }
-  console.warn('generateCommands only supports transfer, got: ' + stepType)
+  console.warn('generateCommands only supports transfer, got: ' + data.stepType)
   return [] // TODO
 }
 

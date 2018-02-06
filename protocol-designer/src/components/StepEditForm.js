@@ -26,16 +26,14 @@ export type Props = {
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
-  formData: FormData,
+  formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean
   /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
     this obj reflects the form selector's return values */
 }
 
 export default function StepEditForm (props: Props) {
-  const {stepType} = props.formData
-
-  const formConnector = (accessor: $Keys<FormData>): {| onChange: any, value: any |} => ({
+  const formConnector = (accessor: string): {| onChange: any, value: any |} => ({
     // Uses single accessor string to pass onChange & value into form fields
     onChange: props.handleChange(accessor),
     value: props.formData[accessor] || ''
@@ -47,7 +45,7 @@ export default function StepEditForm (props: Props) {
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>
 
-  if (stepType === 'pause') {
+  if (props.formData.stepType === 'pause') {
     return (
       <div className={styles.form}>
         <div className={styles.row_wrapper}>
@@ -71,7 +69,7 @@ export default function StepEditForm (props: Props) {
     )
   }
 
-  if (stepType === 'transfer') {
+  if (props.formData.stepType === 'transfer') {
     return (
       <div className={styles.form}>
         <FormSection title='Aspirate' onCollapseToggle={() => console.log('TODO: collapse toggle')}> {/* TODO: should collapse be stateful to simplify Redux? */}
@@ -188,5 +186,9 @@ export default function StepEditForm (props: Props) {
     )
   }
 
-  return <div>Todo: support {stepType} step</div>
+  return (
+    <div className={styles.form}>
+      <div>Todo: support {props.formData.stepType} step</div>
+    </div>
+  )
 }
