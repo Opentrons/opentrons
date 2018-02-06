@@ -152,7 +152,7 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
       return []
     }
 
-    if (valForm.stepType === 'transfer') {
+    if (valForm.validatedForm.stepType === 'transfer') {
       const {
         sourceWells,
         destWells
@@ -175,7 +175,7 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
         destWell: destWells[i]
       }))
     }
-    console.warn('allSubsteps doesnt support step type: ' + valForm.stepType)
+    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
     return []
   })
 
