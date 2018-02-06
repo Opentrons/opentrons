@@ -17,9 +17,8 @@ log = get_logger(__name__)
 
 # TODO (andy) this is the height the tip will travel above the deck's tallest
 # container. This should not be a single value, but should be optimized given
-# the movements context (ie sterility vs speed). This is being set to 20mm
-# to allow containers >150mm to be usable on the deck for the tiem being.
-TIP_CLEARANCE = 20
+# the movements context (ie sterility vs speed)
+TIP_CLEARANCE = 5
 
 
 class InstrumentMosfet(object):
@@ -191,10 +190,6 @@ class Robot(object):
         self.modules = []
         self.fw_version = self._driver.get_fw_version()
 
-        # TODO (andy) should come from a config file
-        # TODO (andy) height 200 is arbitrary, should calc per pipette/tip?
-        self.dimensions = (393, 357.5, 200)
-
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.arc_height = TIP_CLEARANCE
@@ -271,6 +266,8 @@ class Robot(object):
         self.setup_deck()
         self.setup_gantry()
         self._instruments = {}
+
+        self._prev_container = None
 
         # TODO: Move homing info to driver
         self.axis_homed = {
@@ -671,18 +668,24 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        travel_height = self.max_deck_height() + self.arc_height
+        arc_top = self.max_deck_height()
 
-        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
-        arc_top = min(travel_height, robot_max_z)
-        arrival_z = min(destination[2], robot_max_z)
+        # movements that stay within the same container do not need to avoid
+        # other containers on the deck, so the travel height of arced movements
+        # can be relative to just that one container's height
+        if this_container and self._prev_container == this_container:
+            arc_top = self.max_placeable_height_on_deck(this_container)
 
-        self._previous_container = this_container
+        self._prev_container = this_container
+
+        # TODO (andy): need some way of avoiding collision with top ZA switches
+        # for when using tall labware
+        arc_top += self.arc_height
 
         strategy = [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {'z': arrival_z}
+            {'z': destination[2]}
         ]
 
         return strategy
