@@ -41,13 +41,8 @@ export default function StepList (props: StepListProps) {
             'collapsed'
           ])}
         >
-          {step.substeps && step.substeps.map((substep, subkey) => // TODO
-            <StepSubItem key={subkey} {...pick(substep, [
-              'sourceIngredientName',
-              'sourceWell',
-              'destIngredientName',
-              'destWell'
-            ])} />
+          {step.substeps && step.substeps.map((substep: StepSubItemData, subkey) => // TODO
+            <StepSubItem key={subkey} {...substep} />
           )}
         </StepItem>
       ))}

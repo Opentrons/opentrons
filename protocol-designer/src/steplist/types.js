@@ -23,21 +23,32 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type StepIdType = number
 
-export type StepSubItemData = {
+export type StepSubItemData = {|
+  stepType: 'transfer',
   parentStepId: StepIdType,
   substepId: number,
   sourceIngredientName?: string,
   destIngredientName?: string,
   sourceWell?: string,
   destWell?: string,
-}
+|} | {|
+  stepType: 'pause',
+  waitForUserInput: false,
+  hours: number,
+  minutes: number,
+  seconds: number
+|} | {|
+  stepType: 'pause',
+  waitForUserInput: true,
+  message: string
+|}
 
-export type StepItemData = {
+export type StepItemData = {|
   id: StepIdType,
   title: string,
   stepType: StepType,
   description?: string
-}
+|}
 
 type TransferForm = {|
   stepType: 'transfer',
@@ -93,10 +104,13 @@ type TransferFormData = {|
   volume: number
 |}
 
-type PauseFormData = {|
+export type PauseFormData = {|
   stepType: 'pause',
   waitForUserInput: boolean,
-  seconds: number,
+  seconds: number, // s/m/h only needed by substep...
+  minutes: number,
+  hours: number,
+  totalSeconds: number,
   message: string
 |}
 
