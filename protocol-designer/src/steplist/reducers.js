@@ -10,8 +10,22 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
 import type {BaseState} from '../types'
-import type {Command, FormData, StepItemData, StepIdType, StepSubItemData, PauseFormData} from './types'
-import {type ValidFormAndErrors, generateNewForm, validateAndProcessForm, generateCommands} from './generateSubsteps'
+import type {
+  Command,
+  FormData,
+  StepItemData,
+  StepIdType,
+  StepSubItemData,
+  PauseFormData
+} from './types'
+
+import {
+  type ValidFormAndErrors,
+  generateNewForm,
+  validateAndProcessForm,
+  generateCommands,
+  formHasErrors
+} from './generateSubsteps' // TODO rename generateSubsteps.js
 
 import type {
   AddStepAction,
@@ -149,7 +163,7 @@ const selectedStepId = createSelector(
 const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} =>
   mapValues(validatedForms(state), (valForm: FormData, stepId: StepIdType) => {
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (!valForm.validatedForm || checkForErrorsHack(valForm)) {
+    if (!valForm.validatedForm || formHasErrors(valForm)) {
       return null
     }
 
@@ -197,12 +211,6 @@ const allSteps = createSelector(
   }))
 )
 
- // TODO HACK
-const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
-  (validForm && validForm.errors)
-    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
-    : true // No forms counts as error
-
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
   const s = rootSelector(state)
   if (s.orderedSteps.length === 0) {
@@ -223,12 +231,15 @@ const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE 
   const orderedSteps = rootSelector(state).orderedSteps
 
   // don't try to make commands if the step forms are null or if there are any errors.
-  if (forms === null || orderedSteps.map(stepId => checkForErrorsHack(forms[stepId])).some(err => err)) {
+  if (forms === null || orderedSteps.some(stepId => forms[stepId].validatedForm === null)) {
     return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
   }
 
   return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
     const formDataAndErrors = forms[stepId]
+    if (formDataAndErrors.validatedForm === null) {
+      throw new Error('validatedForm should not be null here') // for flow only, should be fully handled above
+    }
     // TODO checking if there are some errors is repeated from substeps selector, DRY it up
     return generateCommands(formDataAndErrors.validatedForm)
   })
@@ -274,7 +285,7 @@ export const selectors = {
     allSteps,
     (formData, selectedStepId, allSteps): boolean | null =>
       ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
-        ? !checkForErrorsHack(
+        ? !formHasErrors(
           validateAndProcessForm(formData)
         )
         : null
