@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 
+import Overlay from './Overlay'
 import styles from './modals.css'
 
 type ModalProps = {
@@ -17,7 +18,7 @@ type ModalProps = {
 export default function Modal (props: ModalProps) {
   return (
     <div className={styles.modal}>
-      <div className={styles.overlay} onClick={props.onCloseClick} />
+      <Overlay onClick={props.onCloseClick} />
       <div className={styles.modal_contents}>
         {props.children}
       </div>

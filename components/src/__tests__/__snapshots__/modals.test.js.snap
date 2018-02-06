@@ -55,3 +55,10 @@ exports[`modals Modal renders correctly 1`] = `
   </div>
 </div>
 `;
+
+exports[`modals Overlay renders correctly 1`] = `
+<div
+  className="overlay"
+  onClick={[Function]}
+/>
+`;
