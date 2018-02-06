@@ -1,0 +1,15 @@
+{
+  "name": "labware-definitions",
+  "version": "0.1.0",
+  "description": "Default labware definitions for Opentrons robots",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No test specified--see API labware definitions tests\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": "Opentrons Labworks",
+  "license": "Apache-2.0"
+}
