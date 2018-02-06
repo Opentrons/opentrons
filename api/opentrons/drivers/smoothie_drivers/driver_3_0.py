@@ -18,6 +18,9 @@ from opentrons.drivers.rpi_drivers import gpio
 
 log = logging.getLogger(__name__)
 
+ERROR_KEYWORD = 'error'
+ALARM_KEYWORD = 'ALARM'
+
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
     'X': 418,
@@ -36,7 +39,7 @@ Y_SWITCH_BACK_OFF_MM = 20
 Y_BACKOFF_LOW_CURRENT = 0.8
 Y_BACKOFF_SLOW_SPEED = 50
 
-DEFAULT_AXES_SPEED = 150
+DEFAULT_AXES_SPEED = 400
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
@@ -86,6 +89,10 @@ def _parse_switch_values(raw_switch_values):
         for s in parsed_values
         if any([n in s for n in ['max', 'Probe']])
     }
+
+
+class SmoothieError(Exception):
+    pass
 
 
 class SmoothieDriver_3_0_0:
@@ -274,13 +281,19 @@ class SmoothieDriver_3_0_0:
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
-            if ret_code and 'alarm' in ret_code.lower():
+            # Smoothieware returns error state if a switch was hit while moving
+            smoothie_error = False
+            if ERROR_KEYWORD in ret_code or ALARM_KEYWORD in ret_code:
                 self._reset_from_error()
-                raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
+                smoothie_error = True
 
             if moving_plunger:
                 self.set_current({axis: self._config.plunger_current_low
                                   for axis in 'BC'})
+
+            # ensure we lower plunger currents before raising an exception
+            if smoothie_error:
+                raise SmoothieError(ret_code)
 
             return ret_code
 
@@ -419,7 +432,13 @@ class SmoothieDriver_3_0_0:
             ax: HOMED_POSITION.get(ax) - abs(safety_margin)
             for ax in axis.upper()
         }
-        self.move(destination)
+
+        # there is a chance the axis will hit it's home switch too soon
+        # if this happens, catch the error and continue with homing afterwards
+        try:
+            self.move(destination)
+        except SmoothieError:
+            pass
 
         # then home once we're closer to the endstop(s)
         disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])

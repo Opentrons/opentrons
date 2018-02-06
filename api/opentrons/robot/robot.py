@@ -17,9 +17,8 @@ log = get_logger(__name__)
 
 # TODO (andy) this is the height the tip will travel above the deck's tallest
 # container. This should not be a single value, but should be optimized given
-# the movements context (ie sterility vs speed). This is being set to 20mm
-# to allow containers >150mm to be usable on the deck for the tiem being.
-TIP_CLEARANCE = 20
+# the movements context (ie sterility vs speed)
+TIP_CLEARANCE = 5
 
 
 class InstrumentMosfet(object):
@@ -191,10 +190,6 @@ class Robot(object):
         self.modules = []
         self.fw_version = self._driver.get_fw_version()
 
-        # TODO (andy) should come from a config file
-        # TODO (andy) height 200 is arbitrary, should calc per pipette/tip?
-        self.dimensions = (393, 357.5, 200)
-
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
         self.arc_height = TIP_CLEARANCE
@@ -264,7 +259,8 @@ class Robot(object):
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
-        self._previous_container = None
+        self._prev_container = None
+        self._prev_instrument = None
 
         self._deck = containers.Deck()
         self._fixed_trash = None
@@ -504,17 +500,13 @@ class Robot(object):
         >>> robot.home()
         """
 
-        # Home pipettes first to avoid colliding with labware
+        # Home gantry first to avoid colliding with labware
         # and to make sure tips are not in the liquid while
-        # homing plungers
-        self.poses = self._actuators['left']['carriage'].home(self.poses)
-        self.poses = self._actuators['right']['carriage'].home(self.poses)
+        # homing plungers. Z/A axis will automatically home before X/Y
+        self.poses = self.gantry.home(self.poses)
         # Then plungers
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
-        # Gantry goes last to avoid any further movement while
-        # close to XY switches so we are don't accidentally hit them
-        self.poses = self.gantry.home(self.poses)
 
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
@@ -616,13 +608,13 @@ class Robot(object):
             ),
             offset.coordinates
         )
-        other_instrument = {instrument} ^ set(self._instruments.values())
-        if other_instrument:
-            other = other_instrument.pop()
-            _, _, z = pose_tracker.absolute(self.poses, other)
-            safe_height = self.max_deck_height() + TIP_CLEARANCE
-            if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+
+        # move the previously-engaged instrument upwards and away from deck
+        if self._prev_instrument and (instrument != self._prev_instrument):
+            self.poses = self._prev_instrument.instrument_mover.fast_home(
+                self.poses, 10)
+
+        self._prev_instrument = instrument
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
@@ -654,18 +646,24 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        travel_height = self.max_deck_height() + self.arc_height
+        arc_top = self.max_deck_height()
 
-        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
-        arc_top = min(travel_height, robot_max_z)
-        arrival_z = min(destination[2], robot_max_z)
+        # movements that stay within the same container do not need to avoid
+        # other containers on the deck, so the travel height of arced movements
+        # can be relative to just that one container's height
+        if this_container and self._prev_container == this_container:
+            arc_top = self.max_placeable_height_on_deck(this_container)
 
-        self._previous_container = this_container
+        self._prev_container = this_container
+
+        # TODO (andy): need some way of avoiding collision with top ZA switches
+        # for when using tall labware
+        arc_top += self.arc_height
 
         strategy = [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {'z': arrival_z}
+            {'z': destination[2]}
         ]
 
         return strategy

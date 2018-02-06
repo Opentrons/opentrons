@@ -43,9 +43,9 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
         ['G0Y-20 M400'],                       # move Y motor away from switch
-        ['M907 Y1.5 M400'],                    # set Y back to high current
+        ['M907 Y1.7 M400'],                    # set Y back to high current
         ['G4P0.05 M400'],                      # delay for current
-        ['G0F9000 M400'],                      # set back to default speed
+        ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
         ['G28.2Y M400'],                       # home Y
         ['M114.2 M400'],                       # Get position
@@ -243,9 +243,9 @@ def test_speed_change(model, monkeypatch):
     pipette.aspirate().dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
-        ['G0F9000 M400'],
+        ['G0F24000 M400'],
         ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
-        ['G0F9000 M400']
+        ['G0F24000 M400']
     ]
     fuzzy_assert(result=command_log, expected=expected)
 
