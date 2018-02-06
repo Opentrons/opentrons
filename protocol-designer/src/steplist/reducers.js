@@ -10,7 +10,7 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
 import type {BaseState} from '../types'
-import type {Command, FormData, StepItemData, StepIdType, StepSubItemData} from './types'
+import type {Command, FormData, StepItemData, StepIdType, StepSubItemData, PauseFormData} from './types'
 import {type ValidFormAndErrors, generateNewForm, validateAndProcessForm, generateCommands} from './generateSubsteps'
 
 import type {
@@ -147,8 +147,9 @@ const selectedStepId = createSelector(
 )
 
 const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
-  mapValues(validatedForms(state), (valForm, stepId) => {
-    if (!valForm.validatedForm) {
+  mapValues(validatedForms(state), (valForm: FormData, stepId: StepIdType) => {
+    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
+    if (!valForm.validatedForm || checkForErrorsHack(valForm)) {
       return []
     }
 
@@ -161,21 +162,24 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
         // volume
       } = valForm.validatedForm
 
-      // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-      if (checkForErrorsHack(valForm)) {
-        return []
-      }
-
       return range(sourceWells.length).map(i => ({
+        stepType: 'transfer',
         parentStepId: stepId,
         substepId: i,
-        sourceIngredientName: 'ING1',
+        sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
         destIngredientName: 'ING2',
         sourceWell: sourceWells[i],
         destWell: destWells[i]
       }))
     }
-    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
+
+    if (valForm.validatedForm.stepType === 'pause') {
+      // TODO. just wraps formData in a list.
+      const formData: PauseFormData = valForm.validatedForm
+      return [formData]
+    }
+
+    console.log('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
     return []
   })
 

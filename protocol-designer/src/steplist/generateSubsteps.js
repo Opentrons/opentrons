@@ -146,9 +146,10 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
   }
 
   if (formData.stepType === 'pause') {
-    const secondsDelay = (parseFloat(formData['pause-hour']) || 0) * 360 +
-      (parseFloat(formData['pause-minute']) || 0) * 60 +
-      (parseFloat(formData['pause-second']) || 0)
+    const hours = parseFloat(formData['pause-hour']) || 0
+    const minutes = parseFloat(formData['pause-minute']) || 0
+    const seconds = parseFloat(formData['pause-second']) || 0
+    const totalSeconds = hours * 360 + minutes * 60 + seconds
 
     return {
       errors: {
@@ -157,14 +158,18 @@ export function validateAndProcessForm (formData: FormData): any { // TODO type 
           : undefined,
         'pause-times': (
           formData['pause-for-amount-of-time'] === 'true' &&
-          (secondsDelay <= 0)
+          (totalSeconds <= 0)
         )
           ? ['Must include hours, minutes, or seconds']
           : undefined
       },
       validatedForm: {
-        'pauseForTime': formData['pause-for-amount-of-time'] === 'true',
-        secondsDelay,
+        stepType: formData.stepType,
+        waitForUserInput: formData['pause-for-amount-of-time'] === 'false',
+        totalSeconds,
+        hours,
+        minutes,
+        seconds,
         'message': formData['pause-message']
       }
     }
