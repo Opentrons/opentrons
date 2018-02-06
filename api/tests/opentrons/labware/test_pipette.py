@@ -1695,18 +1695,19 @@ class PipetteTest(unittest.TestCase):
 
         expected = [
             mock.call(
-                self.plate[0], self.p200, strategy='arc', low_current_z=False),
+                self.plate[0], instrument=self.p200, low_current_z=False, strategy='arc'),
             mock.call(
-                self.plate[0].top(), self.p200, strategy='direct', low_current_z=False),
+                self.plate[0].top(), instrument=self.p200, low_current_z=False, strategy='direct'),
             mock.call(
-                self.plate[0].bottom(), self.p200, strategy='direct', low_current_z=False),
+                self.plate[0].bottom(), instrument=self.p200, low_current_z=False, strategy='direct'),
             mock.call(
-                self.plate[1], self.p200, strategy='arc', low_current_z=False),
+                self.plate[1], instrument=self.p200, low_current_z=False, strategy='arc'),
             mock.call(
-                self.plate[2], self.p200, strategy='arc', low_current_z=False),
+                self.plate[2], instrument=self.p200, low_current_z=False, strategy='arc'),
             mock.call(
-                self.plate[3], self.p200, strategy='direct', low_current_z=False)
+                self.plate[2].bottom(), instrument=self.p200, low_current_z=False, strategy='direct')
         ]
+        self.assertEqual(self.robot.move_to.mock_calls, expected)
 
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
