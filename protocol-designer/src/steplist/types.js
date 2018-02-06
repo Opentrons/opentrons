@@ -23,15 +23,19 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type StepIdType = number
 
-export type StepSubItemData = {|
-  stepType: 'transfer',
+export type TransferishStepItem = {|
+  stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
-  substepId: number,
-  sourceIngredientName?: string,
-  destIngredientName?: string,
-  sourceWell?: string,
-  destWell?: string,
-|} | {|
+  rows: Array<{
+    substepId: number,
+    sourceIngredientName?: string,
+    destIngredientName?: string,
+    sourceWell?: string,
+    destWell?: string
+  }>
+|}
+
+export type StepSubItemData = TransferishStepItem | {|
   stepType: 'pause',
   waitForUserInput: false,
   hours: number,

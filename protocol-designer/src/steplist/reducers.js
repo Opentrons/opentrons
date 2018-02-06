@@ -146,11 +146,11 @@ const selectedStepId = createSelector(
   (state: RootState) => state.selectedStep
 )
 
-const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
+const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} =>
   mapValues(validatedForms(state), (valForm: FormData, stepId: StepIdType) => {
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
     if (!valForm.validatedForm || checkForErrorsHack(valForm)) {
-      return []
+      return null
     }
 
     if (valForm.validatedForm.stepType === 'transfer') {
@@ -162,24 +162,26 @@ const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =
         // volume
       } = valForm.validatedForm
 
-      return range(sourceWells.length).map(i => ({
+      return {
         stepType: 'transfer',
         parentStepId: stepId,
-        substepId: i,
-        sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
-        destIngredientName: 'ING2',
-        sourceWell: sourceWells[i],
-        destWell: destWells[i]
-      }))
+        rows: range(sourceWells.length).map(i => ({
+          substepId: i,
+          sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
+          destIngredientName: 'ING2',
+          sourceWell: sourceWells[i],
+          destWell: destWells[i]
+        }))
+      }
     }
 
     if (valForm.validatedForm.stepType === 'pause') {
-      // TODO. just wraps formData in a list.
+      // just returns formData
       const formData: PauseFormData = valForm.validatedForm
-      return [formData]
+      return formData
     }
 
-    console.log('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
+    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
     return []
   })
 
