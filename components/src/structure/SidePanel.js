@@ -2,7 +2,6 @@
 // collapsable side panel
 import * as React from 'react'
 import classnames from 'classnames'
-
 import {IconButton} from '../buttons'
 import {CLOSE} from '../icons'
 import styles from './SidePanel.css'

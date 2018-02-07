@@ -3,7 +3,13 @@
 import padStart from 'lodash/padStart'
 import {createSelector} from 'reselect'
 
-import type {Mount, InstrumentCalibrationStatus, Labware} from './types'
+import type {
+  Mount,
+  InstrumentCalibrationStatus,
+  Labware,
+  LabwareCalibrationStatus
+} from './types'
+
 import type {State as CalibrationState} from './reducer/calibration'
 import type {State as ConnectionState} from './reducer/connection'
 import type {State as SessionState} from './reducer/session'
@@ -12,7 +18,6 @@ import {
   type ConnectionStatus,
   type SessionStatus,
   _NAME,
-  UNCONFIRMED,
   INSTRUMENT_AXES
 } from './constants'
 
@@ -178,6 +183,10 @@ export const getRunTime = createSelector(
   }
 )
 
+export function getCalibrationRequest (state: State) {
+  return calibration(state).calibrationRequest
+}
+
 export function getInstrumentsByMount (state: State) {
   return session(state).instrumentsByMount
 }
@@ -186,7 +195,7 @@ export const getInstruments = createSelector(
   getInstrumentsByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
-  (state: State) => calibration(state).calibrationRequest,
+  (state: State) => getCalibrationRequest(state),
   (instrumentsByMount, probedByMount, tipOnByMount, calibrationRequest) => {
     return INSTRUMENT_AXES.map((mount) => {
       const instrument = instrumentsByMount[mount]
@@ -247,18 +256,41 @@ export function getLabwareBySlot (state: State) {
 
 export const getLabware = createSelector(
   getLabwareBySlot,
-  (state: State) => calibration(state).labwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
-  (labwareBySlot, statusBySlot, confirmedBySlot): Labware[] => {
+  (state: State) => getCalibrationRequest(state),
+  (labwareBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(labwareBySlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
+        const confirmed = confirmedBySlot[slot] || false
+        let calibration: LabwareCalibrationStatus = 'unconfirmed'
+        let isMoving = false
 
-        return {
-          ...labware,
-          calibration: statusBySlot[slot] || UNCONFIRMED,
-          confirmed: confirmedBySlot[slot] || false
+        // TODO(mc: 2018-01-10): rethink the labware level "calibration" prop
+        if (calibrationRequest.slot === slot && !calibrationRequest.error) {
+          const {type, inProgress} = calibrationRequest
+          isMoving = inProgress
+
+          if (type === 'MOVE_TO' || type === 'DROP_TIP_AND_HOME') {
+            calibration = inProgress
+              ? 'moving-to-slot'
+              : 'over-slot'
+          } else if (
+            type === 'PICKUP_AND_HOME' ||
+            // update offset picks up and homes with tipracks
+            (type === 'UPDATE_OFFSET' && labware.isTiprack)
+          ) {
+            calibration = inProgress
+              ? 'picking-up'
+              : 'picked-up'
+          } else if (type === 'CONFIRM_TIPRACK' || type === 'UPDATE_OFFSET') {
+            calibration = inProgress
+              ? 'confirming'
+              : 'confirmed'
+          }
         }
+
+        return {...labware, calibration, confirmed, isMoving}
       })
   }
 )
@@ -304,11 +336,15 @@ export const getLabwareConfirmed = createSelector(
 )
 
 export function getJogInProgress (state: State): boolean {
-  return calibration(state).jogRequest.inProgress
+  const request = getCalibrationRequest(state)
+
+  return request.type === 'JOG' && request.inProgress
 }
 
 export function getOffsetUpdateInProgress (state: State): boolean {
-  return calibration(state).updateOffsetRequest.inProgress
+  const request = getCalibrationRequest(state)
+
+  return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
 
 export function getJogDistance (state: State): number {

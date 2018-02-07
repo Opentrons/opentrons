@@ -19,10 +19,12 @@ PLUNGER_POSITIONS = {
     'drop_tip': -3.5
 }
 
-DEFAULT_ASPIRATE_SPEED = 20
-DEFAULT_DISPENSE_SPEED = 40
+DEFAULT_ASPIRATE_SPEED = 5
+DEFAULT_DISPENSE_SPEED = 10
 
 DEFAULT_TIP_PRESS_MM = -10
+
+DEFAULT_PLUNGE_CURRENT = 0.1
 
 
 class PipetteTip:
@@ -102,7 +104,7 @@ class Pipette:
             channels=1,
             min_volume=0,
             max_volume=None,
-            ul_per_mm=18.51,
+            ul_per_mm=1000.0,  # if none is specified, make it incredibily big
             trash_container='',
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
@@ -169,6 +171,9 @@ class Pipette:
         t = self._get_plunger_position('top')
         b = self._get_plunger_position('bottom')
         self.max_volume = (t - b) * self.ul_per_mm
+
+        self._pick_up_current = None
+        self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
@@ -251,7 +256,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc', low_current_z=False):
+    def move_to(self, location, strategy='arc'):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -272,11 +277,6 @@ class Pipette:
             "direct" strategies will simply move in a straight line from
             the current position
 
-        low_current_z : bool
-            Setting this to True will cause the pipette to move at low current
-            setting **in the Z axis only**, primarily to prevent damage to the
-            pipette in case of collision during calibration.
-
         Returns
         -------
 
@@ -289,8 +289,7 @@ class Pipette:
         self.robot.move_to(
             location,
             instrument=self,
-            strategy=strategy,
-            low_current_z=low_current_z)
+            strategy=strategy)
 
         return self
 
@@ -722,7 +721,9 @@ class Pipette:
         # Apply vertical offset to well edges
         well_edges = map(lambda x: x + v_offset, well_edges)
 
+        self.robot.gantry.set_speed(100)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
+        self.robot.gantry.default_speed()
 
         return self
 
@@ -818,7 +819,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, low_current_z=True):
+    def pick_up_tip(self, location=None, presses=3):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -839,11 +840,6 @@ class Pipette:
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
             not desireable, but could be used for dry-run)
-        low_current_z: : :any:bool
-            The current setting for picking up tip. Should be False for normal
-            operation. Should be set to True for calibration where it is
-            possible for the pipette to collide with the tip rack, which could
-            damate the pipette.
 
         Returns
         -------
@@ -891,18 +887,22 @@ class Pipette:
 
             for i in range(int(presses)):
                 # move nozzle down into the tip
+                self.instrument_mover.set_current(self._pick_up_current)
+                self.instrument_mover.set_speed(30)
                 self.move_to(
                     self.current_tip().top(plunge_depth),
-                    strategy='direct',
-                    low_current_z=low_current_z)
+                    strategy='direct')
                 # move nozzle back up
+                self.instrument_mover.default_current()
+                self.instrument_mover.default_speed()
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, abs(plunge_depth))
 
             return self
 
@@ -973,18 +973,26 @@ class Pipette:
             if location:
                 self.move_to(location, strategy='arc')
 
+            pos_bottom = self._get_plunger_position('bottom')
+            pos_drop_tip = self._get_plunger_position('drop_tip')
+
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
-                x=self._get_plunger_position('bottom')
+                x=pos_bottom
             )
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
-                x=self._get_plunger_position('drop_tip')
+                x=pos_drop_tip
             )
 
             if home_after:
-                self.robot.poses = self.instrument_actuator.home(
-                    self.robot.poses)
+                # incase plunger motor stalled while dropping a tip, add a
+                # safety margin of the distance between `bottom` and `drop_tip`
+                b = self._get_plunger_position('bottom')
+                d = self._get_plunger_position('drop_tip')
+                safety_margin = abs(b - d)
+                self.robot.poses = self.instrument_actuator.fast_home(
+                    self.robot.poses, safety_margin)
                 self.robot.poses = self.instrument_actuator.move(
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')
@@ -1586,7 +1594,24 @@ class Pipette:
                 dispense=self._ul_to_mm(dispense))
         return self
 
-    def _move(self, pose_tree, x=None, y=None, z=None, low_current_z=False):
+    def set_pick_up_current(self, amperes):
+        """
+        Set the current (amperes) the pipette mount's motor will use while
+        picking up a tip.
+
+        Parameters
+        ----------
+        amperes: float (0.0 - 2.0)
+            The amperage of the motor while creating a seal with tips.
+        """
+        if amperes >= 0 and amperes <= 2.0:
+            self._pick_up_current = amperes
+        else:
+            raise ValueError(
+                'Amperes must be a floating point between 0.0 and 2.0')
+        return self
+
+    def _move(self, pose_tree, x=None, y=None, z=None):
         current_x, current_y, current_z = pose_tracker.absolute(
             pose_tree,
             self)
@@ -1611,8 +1636,7 @@ class Pipette:
         if z is not None:
             pose_tree = self.instrument_mover.move(
                 pose_tree,
-                z=_z,
-                low_current_z=low_current_z)
+                z=_z)
 
         return pose_tree
 

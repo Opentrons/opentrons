@@ -53,6 +53,11 @@ RUN apk add --update \
 RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
 
+# Copy server files and data into the container. Note: any directories that
+# you wish to copy into the container must be excluded from the .dockerignore
+# file, or you will encounter a copy error
+ENV LABWARE_DEF=/etc/labware
+COPY ./labware-definitions/definitions /etc/labware
 COPY ./api /tmp/api
 COPY ./compute/avahi_tools /tmp/avahi_tools
 

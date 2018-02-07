@@ -10,7 +10,7 @@ exports[`ListAlert list alert renders correctly 1`] = `
 
 exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
 <div
-  className="disabled"
+  className="panel_group disabled"
 >
   <div
     className="title_bar"
@@ -43,7 +43,7 @@ exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
 
 exports[`ListItem Side Panel Group renders correctly 1`] = `
 <div
-  className=""
+  className="panel_group"
 >
   <div
     className="title_bar"
@@ -114,7 +114,7 @@ exports[`ListItem renders ListItem without icon correctly 1`] = `
 
 exports[`TitledList renders TitledList with children correctly 1`] = `
 <div
-  className=""
+  className="titled_list"
 >
   <div
     className="title_bar"
@@ -138,7 +138,7 @@ exports[`TitledList renders TitledList with children correctly 1`] = `
 
 exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 <div
-  className=""
+  className="titled_list"
 >
   <div
     className="title_bar"
@@ -155,7 +155,7 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 
 exports[`TitledList renders TitledList without icon correctly 1`] = `
 <div
-  className=""
+  className="titled_list"
 >
   <div
     className="title_bar"
@@ -172,7 +172,7 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
 
 exports[`TitledList renders collapsed TitledList correctly 1`] = `
 <div
-  className=""
+  className="titled_list"
 >
   <div
     className="title_bar"
@@ -208,7 +208,7 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
 
 exports[`TitledList renders expanded TitledList correctly 1`] = `
 <div
-  className=""
+  className="titled_list"
 >
   <div
     className="title_bar"

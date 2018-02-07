@@ -44,8 +44,8 @@ export default function client (dispatch) {
       case 'robot:CONFIRM_TIPRACK': return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
-      case actionTypes.MOVE_TO: return moveTo(state, action)
-      case actionTypes.JOG: return jog(state, action)
+      case 'robot:MOVE_TO': return moveTo(state, action)
+      case 'robot:JOG': return jog(state, action)
       case 'robot:UPDATE_OFFSET': return updateOffset(state, action)
       case actionTypes.RUN: return run(state, action)
       case actionTypes.PAUSE: return pause(state, action)
@@ -193,8 +193,8 @@ export default function client (dispatch) {
   }
 
   function moveTo (state, action) {
-    const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {mount, slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
@@ -205,10 +205,8 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
 
-  // TODO(mc, 2017-10-06): signature is instrument, distance, axis
-  // axis is x, y, z, not left and right (which we will call mount)
   function jog (state, action) {
-    const {payload: {instrument: mount, axis, direction}} = action
+    const {payload: {mount, axis, direction}} = action
     const instrument = selectors.getInstrumentsByMount(state)[mount]
     const distance = selectors.getJogDistance(state) * direction
 
