@@ -1,4 +1,3 @@
-from copy import copy
 from os import environ
 import logging
 from time import sleep
@@ -99,7 +98,8 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
-        self._current_settings = config.default_current
+        self._default_current_settings = config.default_current
+        self._current_settings = self._default_current_settings.copy()
         self._max_speed_settings = config.default_max_speed
 
         self._default_axes_speed = DEFAULT_AXES_SPEED
@@ -233,6 +233,9 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
 
+    def default_current(self):
+        self.set_current(self._default_current_settings)
+
     # ----------- Private functions --------------- #
 
     def _reset_from_error(self):
@@ -310,7 +313,7 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target, low_current_z=False):
+    def move(self, target):
         from numpy import isclose
 
         self.run_flag.wait()
@@ -339,16 +342,6 @@ class SmoothieDriver_3_0_0:
         target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
-        low_current_axes = [axis
-                            for axis, _ in sorted(target.items())
-                            if axis in 'ZA']
-        prior_current = copy(self._current_settings)
-
-        if low_current_z:
-            new_current = {axis: 0.1 for axis in low_current_axes}
-            self.set_current(new_current)
-            self.set_speed(LOW_CURRENT_Z_SPEED)
-
         if target_coords:
             command = ''
             if backlash_coords != target_coords:
@@ -356,10 +349,6 @@ class SmoothieDriver_3_0_0:
             command += GCODES['MOVE'] + ''.join(target_coords)
             self._send_command(command)
             self._update_position(target)
-
-        if low_current_z:
-            self.set_current(prior_current)
-            self.default_speed()
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 

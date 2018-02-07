@@ -575,7 +575,6 @@ class Robot(object):
             location,
             instrument,
             strategy='arc',
-            low_current_z=False,
             **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -600,11 +599,6 @@ class Robot(object):
             avoiding obstacles.
 
             ``direct`` : move to the point in a straight line.
-
-        low_current_z : bool
-            Setting this to True will cause the instrument to move at a low
-            current setting for vertical motions, primarily to prevent damage
-            to the pipette in case of collision during calibration.
 
         Examples
         --------
@@ -646,14 +640,12 @@ class Robot(object):
             for coord in arc_coords:
                 self.poses = instrument._move(
                     self.poses,
-                    low_current_z=low_current_z,
                     **coord)
 
         elif strategy == 'direct':
             position = {'x': target[0], 'y': target[1], 'z': target[2]}
             self.poses = instrument._move(
                 self.poses,
-                low_current_z=low_current_z,
                 **position)
         else:
             raise RuntimeError(
