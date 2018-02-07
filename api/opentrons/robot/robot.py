@@ -259,7 +259,6 @@ class Robot(object):
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
-        self._previous_container = None
 
         self._deck = containers.Deck()
         self._fixed_trash = None
@@ -267,6 +266,7 @@ class Robot(object):
         self.setup_gantry()
         self._instruments = {}
 
+        self._previous_instrument = None
         self._prev_container = None
 
         # TODO: Move homing info to driver
@@ -620,13 +620,10 @@ class Robot(object):
             ),
             offset.coordinates
         )
-        other_instrument = {instrument} ^ set(self._instruments.values())
-        if other_instrument:
-            other = other_instrument.pop()
-            _, _, z = pose_tracker.absolute(self.poses, other)
-            safe_height = self.max_deck_height() + TIP_CLEARANCE
-            if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+
+        if self._previous_instrument:
+            if self._previous_instrument != instrument:
+                self._previous_instrument.retract()
                 # because we're switching pipettes, this ensures a large (safe)
                 # Z arc height will be used for the new pipette
                 self._prev_container = None

@@ -55,6 +55,29 @@ def test_drop_tip_move_to(robot):
     #     })
 
 
+def test_retract(robot):
+    robot.reset()
+    plate = containers_load(robot, '96-flat', '1')
+    p200 = Pipette(robot, mount='left')
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
+
+    p200.move_to(plate[0].top())
+
+    assert p200.previous_placeable == plate[0]
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200)
+    assert current_pos[2] == plate[0].top()[1][2]
+
+    p200.retract()
+
+    assert p200.previous_placeable is None
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200.instrument_mover)
+    assert current_pos[2] == HOMED_POSITION['A']
+
+
 def test_aspirate_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,

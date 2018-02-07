@@ -82,6 +82,12 @@ export type StateInstrument = {
   volume: number,
 }
 
+export type Instrument = StateInstrument & {
+  calibration: InstrumentCalibrationStatus,
+  probed: boolean,
+  tipOn: boolean
+}
+
 // labware as stored in redux state
 export type StateLabware = {
   // resource ID
