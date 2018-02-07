@@ -5,6 +5,7 @@ import {createSelector} from 'reselect'
 
 import type {
   Mount,
+  Instrument,
   InstrumentCalibrationStatus,
   Labware,
   LabwareCalibrationStatus
@@ -17,8 +18,7 @@ import type {State as SessionState} from './reducer/session'
 import {
   type ConnectionStatus,
   type SessionStatus,
-  _NAME,
-  INSTRUMENT_AXES
+  _NAME
 } from './constants'
 
 type State = {
@@ -196,10 +196,14 @@ export const getInstruments = createSelector(
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
   (state: State) => getCalibrationRequest(state),
-  (instrumentsByMount, probedByMount, tipOnByMount, calibrationRequest) => {
-    return INSTRUMENT_AXES.map((mount) => {
+  (
+    instrumentsByMount,
+    probedByMount,
+    tipOnByMount,
+    calibrationRequest
+  ): Instrument[] => {
+    return Object.keys(instrumentsByMount).map((mount) => {
       const instrument = instrumentsByMount[mount]
-      if (!instrument || !instrument.name) return {mount}
 
       const probed = probedByMount[mount] || false
       const tipOn = tipOnByMount[mount] || false
@@ -234,16 +238,20 @@ export const getInstruments = createSelector(
 )
 
 // returns the mount of the pipette to use for deckware calibration
-// TODO(mc, 2018-01-03): select pipette based on deckware props
-export const getCalibratorMount = createSelector(
+// TODO(mc, 2018-02-07): be smarter about the backup case
+export const getCalibrator = createSelector(
   getInstruments,
-  (instruments): Mount | '' => {
+  (instruments): Instrument => {
     const tipOn = instruments.find((i) => i.probed && i.tipOn)
-    const calibrator = tipOn || {mount: ''}
 
-    return calibrator.mount
+    return tipOn || instruments[0]
   }
 )
+
+// TODO(mc, 2018-02-07): remove this selector in favor of the one above
+export function getCalibratorMount (state: State): Mount {
+  return getCalibrator(state).mount
+}
 
 export const getInstrumentsCalibrated = createSelector(
   getInstruments,

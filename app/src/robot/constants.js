@@ -67,7 +67,7 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
 ])
 
 // deck layout
-export const INSTRUMENT_AXES: Mount[] = ['left', 'right']
+export const INSTRUMENT_MOUNTS: Mount[] = ['left', 'right']
 export const DECK_SLOTS: Slot[] = [
   '1',
   '2',
