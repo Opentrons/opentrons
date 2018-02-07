@@ -50,10 +50,7 @@ export type LabwareCalibrationStatus =
   | 'moving-to-slot'
   | 'over-slot'
   | 'picking-up'
-  | 'homing'
-  | 'homed'
-  | 'updating'
-  | 'updated'
+  | 'picked-up'
   | 'confirming'
   | 'confirmed'
 
@@ -103,5 +100,6 @@ export type StateLabware = {
 
 export type Labware = StateLabware & {
   calibration: LabwareCalibrationStatus,
-  confirmed: boolean
+  confirmed: boolean,
+  isMoving: boolean
 }

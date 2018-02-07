@@ -5,18 +5,9 @@ import {withRouter} from 'react-router'
 import LabwareItem from './LabwareItem'
 
 import {
-  constants as robotConstants,
   selectors as robotSelectors,
   actions as robotActions
 } from '../../robot'
-
-const {
-  MOVING_TO_SLOT,
-  PICKING_UP,
-  HOMING,
-  UPDATING,
-  CONFIRMING
-} = robotConstants
 
 export default withRouter(connect(mapStateToProps, null, mergeProps)(LabwareItem))
 
@@ -37,7 +28,6 @@ function mapStateToProps (state, ownProps) {
     type,
     name,
     confirmed,
-    calibration,
     isTiprack,
     calibratorMount
   } = labware
@@ -53,13 +43,7 @@ function mapStateToProps (state, ownProps) {
   const wellContents = highlighted ? {'A1': {selected: true, groupId: 6}} : {}
 
   // TODO Ian 2017-12-14 another selector candidate
-  const isMoving = highlighted && (
-    calibration === MOVING_TO_SLOT ||
-    calibration === PICKING_UP ||
-    calibration === HOMING ||
-    calibration === UPDATING ||
-    calibration === CONFIRMING
-  )
+  const isMoving = highlighted && labware.isMoving
 
   return {
     containerType: type,
