@@ -93,8 +93,11 @@ class Mover:
     def set_speed(self, value):
         self._driver.set_speed(value)
 
-    def default_speed(self):
-        self._driver.default_speed()
+    def push_speed(self):
+        self._driver.push_speed()
+
+    def pop_speed(self):
+        self._driver.pop_speed()
 
     def set_current(self, power):
         self._driver.set_current({
@@ -102,8 +105,11 @@ class Mover:
                 for axis in self._axis_mapping.values()
             })
 
-    def default_current(self):
-        self._driver.default_current()
+    def push_current(self):
+        self._driver.push_current()
+
+    def pop_current(self):
+        self._driver.pop_current()
 
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis
