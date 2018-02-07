@@ -98,11 +98,12 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
-        self._default_current_settings = config.default_current
-        self._current_settings = self._default_current_settings.copy()
+        self._saved_current_settings = config.default_current.copy()
+        self._current_settings = self._saved_current_settings.copy()
         self._max_speed_settings = config.default_max_speed
 
-        self._default_axes_speed = DEFAULT_AXES_SPEED
+        self._combined_speed = float(DEFAULT_AXES_SPEED)
+        self._saved_axes_speed = float(self._combined_speed)
 
     def _update_position(self, target):
         self._position.update({
@@ -188,15 +189,16 @@ class SmoothieDriver_3_0_0:
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
-        speed = int(value * SEC_PER_MIN)
-        command = GCODES['SET_SPEED'] + str(speed)
+        self._combined_speed = float(value)
+        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
+        command = GCODES['SET_SPEED'] + str(speed_per_min)
         self._send_command(command)
 
-    def default_speed(self, new_default=None):
-        ''' set total axes movement speed in mm/second back to default'''
-        if new_default:
-            self._default_axes_speed = int(new_default)
-        self.set_speed(self._default_axes_speed)
+    def push_speed(self):
+        self._saved_axes_speed = float(self._combined_speed)
+
+    def pop_speed(self):
+        self.set_speed(self._saved_axes_speed)
 
     def set_axis_max_speed(self, settings):
         '''
@@ -233,8 +235,11 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
 
-    def default_current(self):
-        self.set_current(self._default_current_settings)
+    def push_current(self):
+        self._saved_current_settings.update(self._current_settings)
+
+    def pop_current(self):
+        self.set_current(self._saved_current_settings)
 
     # ----------- Private functions --------------- #
 
@@ -289,15 +294,16 @@ class SmoothieDriver_3_0_0:
 
     def _home_x(self):
         # move the gantry forward on Y axis with low power
-        prior_y_current = float(self._current_settings['Y'])
+        self.push_current()
+        self.push_speed()
         self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
         # move away from the Y endstop switch
         target_coord = {'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM}
         self.move(target_coord)
-        self.set_current({'Y': prior_y_current})
-        self.default_speed()
+        self.pop_current()
+        self.pop_speed()
 
         # now it is safe to home the X axis
         self._send_command(GCODES['HOME'] + 'X')
@@ -309,7 +315,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)
-        self.default_speed()
+        self.pop_speed()
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
@@ -403,7 +409,6 @@ class SmoothieDriver_3_0_0:
         that distance away from the homing switch. Then finish with home.
         '''
         # move some mm distance away from the target axes endstop switch(es)
-        self.default_speed()
         destination = {
             ax: HOMED_POSITION.get(ax) - abs(safety_margin)
             for ax in axis.upper()

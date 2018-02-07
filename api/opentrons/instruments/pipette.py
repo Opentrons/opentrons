@@ -381,12 +381,13 @@ class Pipette:
             self.current_volume + volume)
         speed = self.speeds['aspirate'] * rate
 
+        self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=mm_position
         )
-        self.instrument_actuator.default_speed()
+        self.instrument_actuator.pop_speed()
         self.current_volume += volume  # update after actual aspirate
 
         return self
@@ -476,12 +477,13 @@ class Pipette:
             self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
+        self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=mm_position
         )
-        self.instrument_actuator.default_speed()
+        self.instrument_actuator.pop_speed()
         self.current_volume -= volume  # update after actual dispense
 
         return self
@@ -706,9 +708,10 @@ class Pipette:
         # Apply vertical offset to well edges
         well_edges = map(lambda x: x + v_offset, well_edges)
 
+        self.robot.gantry.push_speed()
         self.robot.gantry.set_speed(100)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
-        self.robot.gantry.default_speed()
+        self.robot.gantry.pop_speed()
 
         return self
 
@@ -872,14 +875,16 @@ class Pipette:
 
             for i in range(int(presses)):
                 # move nozzle down into the tip
+                self.instrument_mover.push_speed()
+                self.instrument_mover.push_current()
                 self.instrument_mover.set_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
                 self.move_to(
                     self.current_tip().top(plunge_depth),
                     strategy='direct')
                 # move nozzle back up
-                self.instrument_mover.default_current()
-                self.instrument_mover.default_speed()
+                self.instrument_mover.pop_current()
+                self.instrument_mover.pop_speed()
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
