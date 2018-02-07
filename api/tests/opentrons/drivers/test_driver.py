@@ -43,9 +43,9 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
         ['G0Y-20 M400'],                       # move Y motor away from switch
-        ['M907 A0.8 B0.1 C0.1 X1.2 Y1.5 Z0.8 M400'],  # set current back
+        ['M907 A1.0 B0.1 C0.1 X1.5 Y1.75 Z1.0 M400'],  # set current back
         ['G4P0.05 M400'],                      # delay for current
-        ['G0F9000 M400'],                      # set back to default speed
+        ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
         ['G28.2Y M400'],                       # home Y
         ['M114.2 M400'],                       # Get position
@@ -245,9 +245,9 @@ def test_speed_change(model, monkeypatch):
     pipette.aspirate().dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
-        ['G0F9000 M400'],
+        ['G0F24000 M400'],
         ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
-        ['G0F9000 M400']
+        ['G0F24000 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
