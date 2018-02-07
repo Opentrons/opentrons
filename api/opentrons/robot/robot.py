@@ -637,6 +637,9 @@ class Robot(object):
             safe_height = self.max_deck_height() + TIP_CLEARANCE
             if z < safe_height:
                 self.poses = other._move(self.poses, z=safe_height)
+                # because we're switching pipettes, this ensures a large (safe)
+                # Z arc height will be used for the new pipette
+                self._prev_container = None
 
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
