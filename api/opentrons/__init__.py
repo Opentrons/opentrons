@@ -53,25 +53,17 @@ class InstrumentsWrapper(object):
 
         config = pipette_config.load('p10_single')
 
-        p = self.Pipette(
+        return self._create_pipette_from_config(
+            config=config,
             mount=mount,
-            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=config.channels,
-            ul_per_mm=config.ul_per_mm,
-            aspirate_flow_rate=config.aspirate_flow_rate,
-            dispense_flow_rate=config.dispense_flow_rate)
-
-        p.plunger_positions = config.plunger_positions.copy()
-        p.set_pick_up_current(config.pick_up_current)
-
-        return p
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
 
     def P10_Multi(
             self,
             mount,
-            name=None,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -79,25 +71,17 @@ class InstrumentsWrapper(object):
 
         config = pipette_config.load('p10_multi')
 
-        p = self.Pipette(
+        return self._create_pipette_from_config(
+            config=config,
             mount=mount,
-            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=config.channels,
-            ul_per_mm=config.ul_per_mm,
-            aspirate_flow_rate=config.aspirate_flow_rate,
-            dispense_flow_rate=config.dispense_flow_rate)
-
-        p.plunger_positions = config.plunger_positions.copy()
-        p.set_pick_up_current(config.pick_up_current)
-
-        return p
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
 
     def P300_Single(
             self,
             mount,
-            name=None,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -105,25 +89,17 @@ class InstrumentsWrapper(object):
 
         config = pipette_config.load('p300_single')
 
-        p = self.Pipette(
+        return self._create_pipette_from_config(
+            config=config,
             mount=mount,
-            name=config.name,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            channels=config.channels,
-            ul_per_mm=config.ul_per_mm,
-            aspirate_flow_rate=config.aspirate_flow_rate,
-            dispense_flow_rate=config.dispense_flow_rate)
-
-        p.plunger_positions = config.plunger_positions.copy()
-        p.set_pick_up_current(config.pick_up_current)
-
-        return p
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
 
     def P300_Multi(
             self,
             mount,
-            name=None,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -131,6 +107,29 @@ class InstrumentsWrapper(object):
 
         config = pipette_config.load('p300_multi')
 
+        return self._create_pipette_from_config(
+            config=config,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
+    def Magbead(self, *args, **kwargs):
+        return inst.Magbead(self.robot, *args, **kwargs)
+
+    def TemperaturePlate(self,  *args, **kwargs):
+        return inst.TemperaturePlate(self.robot, *args, **kwargs)
+
+    def _create_pipette_from_config(
+            self,
+            config,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
+
         p = self.Pipette(
             mount=mount,
             name=config.name,
@@ -143,14 +142,7 @@ class InstrumentsWrapper(object):
 
         p.plunger_positions = config.plunger_positions.copy()
         p.set_pick_up_current(config.pick_up_current)
-
         return p
-
-    def Magbead(self, *args, **kwargs):
-        return inst.Magbead(self.robot, *args, **kwargs)
-
-    def TemperaturePlate(self,  *args, **kwargs):
-        return inst.TemperaturePlate(self.robot, *args, **kwargs)
 
 
 instruments = InstrumentsWrapper(robot)
