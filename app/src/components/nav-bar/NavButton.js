@@ -11,7 +11,7 @@ import {
   constants as robotConstants
 } from '../../robot'
 
-import {NavButton, FILE, COG, CONNECT, USB} from '@opentrons/components'
+import {NavButton, FILE, COG, CONNECT} from '@opentrons/components'
 
 export default connect(mapStateToProps, null, mergeProps)(NavButton)
 
@@ -34,10 +34,7 @@ function mapStateToProps (state, ownProps) {
     disabled = !isSessionLoaded
     iconName = COG
   } else if (name === 'connect') {
-    iconName = isConnected
-      ? USB
-      : CONNECT
-    isBottom = true
+    iconName = CONNECT
   }
 
   return {
