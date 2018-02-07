@@ -198,7 +198,7 @@ class SmoothieDriver_3_0_0:
             self._default_axes_speed = int(new_default)
         self.set_speed(self._default_axes_speed)
 
-    def set_axis_max_speed(self, settings):
+    def set_axis_max_speed(self, settings=None):
         '''
         Sets the maximum speed (mm/sec) that a given axis will move
 
@@ -206,7 +206,10 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for millimeters per second (mm/sec)
         '''
-        self._max_speed_settings.update(settings)
+        if not settings:
+            settings = self._max_speed_settings.copy()
+        else:
+            self._max_speed_settings.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
@@ -306,6 +309,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)
+        self.set_axis_max_speed()
         self.default_speed()
     # ----------- END Private functions ----------- #
 
