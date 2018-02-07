@@ -14,6 +14,8 @@ import FormSection from './FormSection'
 import styles from './StepEditForm.css'
 import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
 
+import {formConnectorFactory} from '../utils'
+
 type Options = Array<{
   name: string,
   value: string
@@ -35,12 +37,7 @@ export type Props = {
 }
 
 export default function StepEditForm (props: Props) {
-  const formConnector = (accessor: string): {| onChange: any, value: any |} => ({
-    // Uses single accessor string to pass onChange & value into form fields
-    // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
-    onChange: props.handleChange(accessor),
-    value: props.formData[accessor] || ''
-  })
+  const formConnector = formConnectorFactory(props.handleChange, props.formData)
 
   const buttonRow = <div className={styles.button_row}>
     <FlatButton onClick={e => console.log('TODO: "MORE OPTIONS".')}>MORE OPTIONS</FlatButton>

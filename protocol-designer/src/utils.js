@@ -1,28 +1,39 @@
+// @flow
 import * as componentLibrary from '@opentrons/components'
 
 export const { humanize, wellNameSplit } = componentLibrary
 
+export const formConnectorFactory = (
+  handleChange: (string) => (e: SyntheticEvent<*>) => void,
+  formData: {}
+) => (accessor: string): {| onChange: any, value: any |} => ({
+  // Uses single accessor string to pass onChange & value into form fields
+  // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
+  onChange: handleChange(accessor),
+  value: formData[accessor] || ''
+})
+
 // Not really a UUID, but close enough...?
 export const uuid = () => new Date().getTime() + '.' + Math.random()
 
-export const intToAlphabetLetter = (i, lowerCase = false) =>
+export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
 
-export const transpose = matrix => matrix[0].map((_col, i) =>
+export const transpose = (matrix: Array<Array<any>>) => matrix[0].map((_col, i) =>
   matrix.map(row => row[i])
 )
 
 // These utils are great candidates for unit tests
-export const toWellName = ({rowNum, colNum}) => (
+export const toWellName = ({rowNum, colNum}: {rowNum: number, colNum: number}) => (
   String.fromCharCode(colNum + 65) + (rowNum + 1)
 )
 
-export const wellKeyToXYList = wellKey => {
+export const wellKeyToXYList = (wellKey: string) => {
   const [x, y] = wellKey.split(',').map(s => parseInt(s, 10))
   return toWellName({rowNum: parseInt(y), colNum: x})
 }
 
-export const wellNameToXY = wellName => {
+export const wellNameToXY = (wellName: string) => {
   // Eg B9 => [1, 8]
   const [letters, numbers] = wellNameSplit(wellName)
 
@@ -33,14 +44,17 @@ export const wellNameToXY = wellName => {
 
 // Collision detection for SelectionRect / SelectablePlate
 
-export const rectCollision = (rect1, rect2) => (
+type Rect = {x: number, y: number, width: number, height: number}
+
+export const rectCollision = (rect1: Rect, rect2: any) => ( // TODO rect2 should be Rect. But the getBoundingClientRect doesn't always return x/y https://github.com/facebook/flow/issues/5357
   rect1.x < rect2.x + rect2.width &&
   rect1.x + rect1.width > rect2.x &&
   rect1.y < rect2.y + rect2.height &&
   rect1.height + rect1.y > rect2.y
 )
 
-export const getCollidingWells = (rectPositions, selectableClassname) => {
+type RectPositions = {x0: number, y0: number, x1: number, y1: number}
+export const getCollidingWells = (rectPositions: RectPositions, selectableClassname: string) => {
   // Returns obj of selected wells under a collision rect
   // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
   const { x0, y0, x1, y1 } = rectPositions

@@ -1,0 +1,17 @@
+/* TODO Ian 2018-02-07 This is duplicated in StepEditForm. Should be in component library? */
+
+.column_1_2 {
+  lost-column: 1/2;
+}
+
+.column_1_3 {
+  lost-column: 1/3;
+}
+
+.column_2_3 {
+  lost-column: 2/3;
+}
+
+.column_1_4 {
+  lost-column: 1/4;
+}
