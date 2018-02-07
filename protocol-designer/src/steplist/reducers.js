@@ -7,6 +7,7 @@ import isNil from 'lodash/isNil'
 import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
 import range from 'lodash/range'
 
 import type {BaseState} from '../types'
@@ -30,9 +31,12 @@ import {
 
 import type {
   AddStepAction,
+  DeleteStepAction,
   PopulateFormAction,
   SaveStepFormAction,
   SelectStepAction,
+  ChangeMoreOptionsModalInputAction,
+  SaveMoreOptionsModal,
   CollapseFormSectionAction // <- TODO this isn't a thunk
 } from './actions' // Thunk action creators
 
@@ -55,7 +59,11 @@ const unsavedForm = handleActions({
   }),
   POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
-  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null
+  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
+  DELETE_STEP: () => null,
+  // save the modal state into the unsavedForm --
+  // it was 2 levels away from savedStepForms, now it's one level away
+  SAVE_MORE_OPTIONS_MODAL: (state, action: SaveMoreOptionsModal) => ({...state, ...action.payload})
 }, null)
 
 // Handles aspirate / dispense form sections opening / closing
@@ -78,13 +86,25 @@ function createDefaultStep (action: AddStepAction) {
   return {...action.payload, title: stepType}
 }
 
+// the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
+// It's 2 degrees away from actual savedStepForms.
+const unsavedFormModal = handleActions({
+  OPEN_MORE_OPTIONS_MODAL: () => ({'step-name': 'Example name init', 'step-details': ''}), /* TODO IMMEDIATELY state here should come from unsavedForm. */
+  CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
+    ({...state, [action.payload.accessor]: action.payload.value}),
+  CANCEL_MORE_OPTIONS_MODAL: () => null,
+  SAVE_MORE_OPTIONS_MODAL: () => null,
+  DELETE_STEP: () => null
+}, null)
+
 type StepsState = {[StepIdType]: StepItemData}
 
 const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
-  })
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
 }, {})
 
 type SavedStepFormState = {
@@ -107,6 +127,8 @@ const collapsedSteps = handleActions({
     ...state,
     [action.payload.id]: false
   }),
+  DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
+    omit(state, action.payload.toString()),
   TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, {payload}: ActionType<typeof toggleStepCollapsed>) => ({
     ...state,
     [payload]: !state[payload]
@@ -117,13 +139,16 @@ type OrderedStepsState = Array<StepIdType>
 
 const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
-    [...state, action.payload.id]
+    [...state, action.payload.id],
+  DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
+    state.filter(stepId => stepId !== action.payload)
 }, [])
 
 type SelectedStepState = null | StepIdType
 
 const selectedStep = handleActions({
-  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
+  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
+  DELETE_STEP: () => null
 }, null)
 
 type StepCreationButtonExpandedState = boolean
@@ -139,6 +164,7 @@ const stepCreationButtonExpanded = handleActions({
 
 export type RootState = {|
   unsavedForm: FormState,
+  unsavedFormModal: any, // TODO IMMEDIATELY
   formSectionCollapse: FormSectionState,
   steps: StepsState,
   savedStepForms: SavedStepFormState,
@@ -150,6 +176,7 @@ export type RootState = {|
 
 export const _allReducers = {
   unsavedForm,
+  unsavedFormModal,
   formSectionCollapse,
   steps,
   savedStepForms,
@@ -169,6 +196,11 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 const formData = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedForm
+)
+
+const formModalData = createSelector(
+  rootSelector,
+  (state: RootState) => state.unsavedFormModal
 )
 
 const selectedStepId = createSelector(
@@ -279,6 +311,7 @@ export const selectors = {
       (!isNil(selectedStepId) && generateNewForm(selectedStepId, steps[selectedStepId].stepType))
   ),
   formData,
+  formModalData,
   nextStepId: createSelector( // generates the next step ID to use
     (state: BaseState) => rootSelector(state).steps,
     (steps): number => {

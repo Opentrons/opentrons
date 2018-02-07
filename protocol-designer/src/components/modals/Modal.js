@@ -5,6 +5,7 @@ import omit from 'lodash/omit'
 import styles from './Modal.css'
 
 type ModalProps = {
+  hideModal?: boolean,
   onClickAway?: (event: ?SyntheticEvent<>) => void,
   children?: React.Node
 }
@@ -24,6 +25,10 @@ export default class Modal extends React.Component<ModalProps> {
   }
 
   render () {
+    if (this.props.hideModal) {
+      return null
+    }
+
     return (
       <div ref={this.setOuterRef} className={styles.modal} onClick={this.handleClickAway} >
         <div className={styles.modal_content}>
@@ -37,8 +42,8 @@ export default class Modal extends React.Component<ModalProps> {
 export const modalHOC = <C>(ChildComponent: React.ComponentType<C>) =>
   (props: ModalProps & C): React.Element<typeof Modal> => {
     return (
-      <Modal onClickAway={props.onClickAway} >
-        <ChildComponent {...omit(props, 'onClickAway')} />
+      <Modal onClickAway={props.onClickAway} hideModal={props.hideModal} >
+        <ChildComponent {...omit(props, 'onClickAway', 'hideModal')} />
       </Modal>
     )
   }

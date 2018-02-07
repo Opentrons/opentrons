@@ -60,6 +60,18 @@ export const addStep = (payload: NewStepPayload) =>
     dispatch(selectStep(stepId))
   }
 
+export type DeleteStepAction = {
+  type: 'DELETE_STEP',
+  payload: StepIdType
+}
+
+export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
+  dispatch({
+    type: 'DELETE_STEP',
+    payload: selectors.selectedStepId(getState())
+  })
+}
+
 type ExpandAddStepButtonAction = {
   type: 'EXPAND_ADD_STEP_BUTTON',
   payload: boolean
@@ -128,4 +140,39 @@ export function collapseFormSection (payload: FormSectionNames): CollapseFormSec
     type: 'COLLAPSE_FORM_SECTION',
     payload
   }
+}
+
+// ========= MORE OPTIONS MODAL =======
+// Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
+
+export const openMoreOptionsModal = () => ({ // does this need to be a thunk that populates the form? TODO IMMEDIATELY.
+  type: 'OPEN_MORE_OPTIONS_MODAL',
+  payload: null
+})
+
+export const cancelMoreOptionsModal = () => ({
+  type: 'CANCEL_MORE_OPTIONS_MODAL',
+  payload: null
+})
+
+export type ChangeMoreOptionsModalInputAction = {
+  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
+  payload: ChangeFormPayload
+}
+
+export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeMoreOptionsModalInputAction => ({
+  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
+  payload
+})
+
+export type SaveMoreOptionsModal = {
+  type: 'SAVE_MORE_OPTIONS_MODAL',
+  payload: any // TODO
+}
+
+export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
+  dispatch({
+    type: 'SAVE_MORE_OPTIONS_MODAL',
+    payload: selectors.formModalData(getState())
+  })
 }

@@ -28,6 +28,7 @@ export type Props = {
   formSectionCollapse: FormSectionState,
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
+  onClickMoreOptions: (event: SyntheticEvent<>) => void,
   onToggleFormSection: (section: FormSectionNames) => any => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
@@ -40,7 +41,7 @@ export default function StepEditForm (props: Props) {
   const formConnector = formConnectorFactory(props.handleChange, props.formData)
 
   const buttonRow = <div className={styles.button_row}>
-    <FlatButton onClick={e => console.log('TODO: "MORE OPTIONS".')}>MORE OPTIONS</FlatButton>
+    <FlatButton onClick={props.onClickMoreOptions}>MORE OPTIONS</FlatButton>
     <PrimaryButton onClick={props.onCancel}>CANCEL</PrimaryButton>
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>

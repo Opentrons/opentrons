@@ -2,26 +2,43 @@
 // import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
+
 import {modalHOC} from '../components/modals/Modal'
 import MoreOptionsModal from '../components/modals/MoreOptionsModal'
 
+import {selectors} from '../steplist/reducers'
+import {
+  deleteStep,
+  cancelMoreOptionsModal,
+  changeMoreOptionsModalInput,
+  saveMoreOptionsModal
+} from '../steplist/actions'
+
 function mapStateToProps (state) {
+  const formModalData = selectors.formModalData(state)
   return {
-    formData: {
-      'step-name': 'Example name',
-      'step-details': 'Details here blah blah...'
-    }
+    hideModal: formModalData === null,
+    formData: formModalData || {} // TODO IMMEDIATELY: {} fallback should not be necessary.
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch<any>) {
   return {
-    onDelete: e => console.log('TODO: delete step'),
-    onCancel: e => console.log('TODO: cancel'),
-    onSave: e => console.log('TODO: save'),
-    handleChange: (accessor: string) => () => console.log('TODO: handle change for', accessor),
+    onDelete: e => dispatch(deleteStep()),
+    onCancel: e => dispatch(cancelMoreOptionsModal()),
+    onSave: e => dispatch(saveMoreOptionsModal()),
 
-    onClickAway: () => console.log('clicked away') // TODO do an action
+    handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement>) => {
+      if (typeof e.target.value === 'string' || typeof e.target.value === 'boolean') {
+        // TODO Ian 2018-02-07 remove this flow typechecking cruft
+        // NOTE this is similar to ConnectedStepEdit form, is it possible to make a more general reusable fn?
+        dispatch(changeMoreOptionsModalInput({accessor, value: e.target.value}))
+      } else {
+        console.warn('handleChange got value of wrong type')
+      }
+    },
+
+    onClickAway: e => dispatch(cancelMoreOptionsModal())
   }
 }
 

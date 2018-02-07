@@ -7,7 +7,8 @@ import {
   changeFormInput,
   cancelStepForm,
   saveStepForm,
-  collapseFormSection
+  collapseFormSection,
+  openMoreOptionsModal
 } from '../steplist/actions' // TODO use steplist/index.js
 
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
@@ -49,6 +50,7 @@ function mapDispatchToProps (dispatch: Dispatch<any>) {
   return {
     onCancel: e => dispatch(cancelStepForm()),
     onSave: e => dispatch(saveStepForm()),
+    onClickMoreOptions: e => dispatch(openMoreOptionsModal()),
     onToggleFormSection: (section) => e => dispatch(collapseFormSection(section)),
     handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
       // TODO Ian 2018-01-26 factor this nasty type handling out
