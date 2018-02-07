@@ -6,11 +6,6 @@
   width: 100%;
 }
 
-.nav_bar {
-  /* TODO Ian 2018-01-23 Why does VerticalNavBar color and height not match app? */
-  height: 100vh;
-}
-
 .main_page_wrapper {
   flex: 1;
   height: 100vh;
