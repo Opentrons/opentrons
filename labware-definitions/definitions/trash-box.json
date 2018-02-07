@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "name": "trash-box"
+  },
+  "ordering": [
+    [
+      "A1"
+    ]
+  ],
+  "wells": {
+    "A1": {
+      "depth": 40,
+      "height": 40,
+      "length": 120,
+      "width": 90,
+      "x": 18.875,
+      "y": -17.25,
+      "z": 0
+    }
+  }
+}

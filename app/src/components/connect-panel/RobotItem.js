@@ -1,8 +1,8 @@
 // item in a RobotList
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import {PrimaryButton, Icon, USB} from '@opentrons/components'
+import cx from 'classnames'
+import {ListItem, Icon, USB, UNCHECKED_RADIO, CHECKED_RADIO} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
@@ -14,39 +14,26 @@ RobotItem.propTypes = {
 }
 
 export default function RobotItem (props) {
-  return (
-    <li className={styles.robot_item}>
-      <RobotItemIcon {...props} />
-      <RobotItemControls {...props} />
-    </li>
-  )
-}
-
-function RobotItemIcon (props) {
-  const {isConnected} = props
-  const className = classnames(styles.robot_icon, {
+  const {name, isConnected, onConnectClick, onDisconnectClick} = props
+  const onClick = isConnected
+    ? onDisconnectClick
+    : onConnectClick
+  const className = cx({
     [styles.connected]: isConnected,
     [styles.disconnected]: !isConnected
   })
-
+  // TODO (ka 2018-2-6):this is a temp workaround for pending connection toggle button
+  const toggleIcon = isConnected
+    ? CHECKED_RADIO
+    : UNCHECKED_RADIO
   return (
-    <Icon name={USB} className={className} />
-  )
-}
-
-function RobotItemControls (props) {
-  const {name, isConnected, onConnectClick, onDisconnectClick} = props
-  const buttonOnClick = (isConnected && onDisconnectClick) || onConnectClick
-  const buttonText = (isConnected && 'Disconnect Robot') || 'Connect to Robot'
-
-  return (
-    <div className={styles.robot_controls}>
+    <ListItem
+      onClick={onClick}
+      iconName={USB}
+      className={className}
+    >
       <p className={styles.robot_name}>{name}</p>
-      <div>
-        <PrimaryButton onClick={buttonOnClick}>
-          {buttonText}
-        </PrimaryButton>
-      </div>
-    </div>
+      <Icon name={toggleIcon} className={styles.connection_toggle} />
+    </ListItem>
   )
 }

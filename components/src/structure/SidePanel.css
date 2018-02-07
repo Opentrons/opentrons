@@ -5,11 +5,13 @@
 }
 
 .panel {
+  box-sizing: border-box;
   overflow: hidden;
-  width: 18rem;
   border-right: var(--bd-light);
+  background-color: var(--c-bg-light);
   transition: all 0.5s ease-in-out;
   position: relative;
+  padding: 0 4px;
 }
 
 .closed {
@@ -21,15 +23,14 @@
   display: flex;
   align-items: center;
   width: var(--sidebar-width);
-  border-bottom: var(--bd-light);
 }
 
 .title {
-  margin: 0 auto 0 1rem;
-  font-size: 1rem;
+  margin: 0 auto;
+  font-size: var(fs-header);
   font-weight: normal;
   color: var(--c-dark-gray);
-  line-height: 2.5;
+  line-height: 2;
 }
 
 .panel_contents {
