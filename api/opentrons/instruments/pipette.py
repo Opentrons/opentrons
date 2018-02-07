@@ -528,6 +528,21 @@ class Pipette:
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 
+    def retract(self, safety_margin=10):
+        '''
+        Move the pipette's mount upwards and away from the deck
+
+        Parameters
+        ----------
+        safety_margin: int
+            Distance in millimeters awey from the limit switch,
+            used during the mount's `fast_home()` method
+        '''
+        self.previous_placeable = None  # it is no longer inside a placeable
+        self.robot.poses = self.instrument_mover.fast_home(
+            self.robot.poses, safety_margin)
+        return self
+
     @commands.publish.both(command=commands.mix)
     def mix(self,
             repetitions=1,
