@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "name": "fixed-trash"
+  },
+  "ordering": [
+    [
+      "A1"
+    ]
+  ],
+  "wells": {
+    "A1": {
+      "depth": 58,
+      "height": 58,
+      "length": 160,
+      "width": 160,
+      "x": 0.0,
+      "y": 0.0,
+      "z": 5
+    }
+  }
+}

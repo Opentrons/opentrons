@@ -31,7 +31,7 @@
     "url": "https://github.com/OpenTrons/opentrons/issues"
   },
   "homepage": "https://github.com/OpenTrons/opentrons",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "standard": {
     "parser": "babel-eslint",
     "plugins": [
