@@ -43,7 +43,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
         ['G0Y-20 M400'],                       # move Y motor away from switch
-        ['M907 Y1.5 M400'],                    # set Y back to high current
+        ['M907 A0.8 B0.1 C0.1 X1.2 Y1.5 Z0.8 M400'],  # set current back
         ['G4P0.05 M400'],                      # delay for current
         ['G0F9000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
@@ -273,8 +273,9 @@ def test_max_speed_change(model, monkeypatch):
     robot.head_speed(555)
     robot.head_speed(x=1, y=2, z=3, a=4, b=5, c=6)
     robot.head_speed(123, x=7)
+    robot._driver.push_speed()
     robot._driver.set_speed(321)
-    robot._driver.default_speed()
+    robot._driver.pop_speed()
     expected = [
         ['G0F{} M400'.format(555 * 60)],
         ['M203.1 A4 B5 C6 X1 Y2 Z3 M400'],
