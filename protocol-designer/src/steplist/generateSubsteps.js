@@ -15,8 +15,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
     stepType: stepType
   }
 
-  if (stepType === 'transfer') {
-  // TODO: other actions
+  if (stepType === 'transfer' || stepType === 'consolidate') {
     return {
       ...baseForm,
       'aspirate--change-tip': 'once'
@@ -24,7 +23,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
     }
   }
   if (stepType !== 'pause') {
-    console.warn('generateNewForm: Only transfer & pause forms are supported now. TODO.')
+    console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO.')
   }
   return baseForm
 }
@@ -34,31 +33,40 @@ export function formHasErrors (form: {errors: {[string]: string}}): boolean {
 }
 
 export function validateAndProcessForm (formData: FormData): ValidFormAndErrors {
-  if (formData.stepType === 'transfer') {
+  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate') {
     const pipette = formData['aspirate--pipette']
     const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
     const destWells = formData['dispense--wells'] ? formData['dispense--wells'].split(',') : []
     const sourceLabware = formData['aspirate--labware']
     const destLabware = formData['dispense--labware']
-    const volume = parseFloat(formData['dispense--volume'])
+
+    const rawVolume = formData.stepType === 'transfer'
+      ? formData['dispense--volume']
+      : formData['aspirate--volume']
+    const volume = parseFloat(rawVolume)
 
     const requiredFieldErrors = [
       'aspirate--pipette',
       'aspirate--labware',
       'dispense--labware'
-    ].reduce((acc, fieldName) =>
-      (formData.stepType === 'transfer' && !formData[fieldName])
-      // NOTE: explicit stepType check to help out flow ^
+    ].reduce((acc, fieldName) => {
+      if (formData.stepType !== 'transfer' && formData.stepType !== 'consolidate') {
+        return {}
+      }
+      return (!formData[fieldName])
       ? {...acc, [fieldName]: 'This field is required'}
       : acc
-    , {})
+    }, {})
 
     const errors = {
       ...(isNaN(volume) || volume <= 0)
-        ? {'dispense--volume': 'Volume must be a positive number'}
+        ? {[formData.stepType === 'transfer' ? 'dispense--volume' : 'aspirate--volume']: 'Volume must be a positive number'}
         : {},
-      ...(sourceWells.length !== destWells.length || sourceWells.length === 0)
+      ...(formData.stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0))
         ? {'_mismatchedWells': 'Numbers of wells must match'}
+        : {},
+      ...(formData.stepType === 'consolidate' && (sourceWells.length !== 1 || destWells.length < 1))
+        ? {'_mismatchedWells': 'Exactly one source well and at least one destination well is required.'}
         : {},
       ...requiredFieldErrors
     }
@@ -69,11 +77,8 @@ export function validateAndProcessForm (formData: FormData): ValidFormAndErrors 
         !formHasErrors({errors}) &&
         // extra explicit for flow
         (pipette === 'left' || pipette === 'right') &&
-        sourceWells &&
-        destWells &&
         sourceLabware &&
-        destLabware &&
-        volume
+        destLabware
       )
         ? {
           stepType: formData.stepType,

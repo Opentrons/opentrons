@@ -35,6 +35,7 @@ export type Props = {
 export default function StepEditForm (props: Props) {
   const formConnector = (accessor: string): {| onChange: any, value: any |} => ({
     // Uses single accessor string to pass onChange & value into form fields
+    // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
     onChange: props.handleChange(accessor),
     value: props.formData[accessor] || ''
   })
@@ -69,7 +70,7 @@ export default function StepEditForm (props: Props) {
     )
   }
 
-  if (props.formData.stepType === 'transfer') {
+  if (props.formData.stepType === 'transfer' || props.formData.stepType === 'consolidate') {
     return (
       <div className={styles.form}>
         <FormSection title='Aspirate' onCollapseToggle={() => console.log('TODO: collapse toggle')}> {/* TODO: should collapse be stateful to simplify Redux? */}
@@ -83,6 +84,9 @@ export default function StepEditForm (props: Props) {
             <FormGroup label='Pipette:'>
               <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
             </FormGroup>
+            {props.formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
+              <InputField placeholder='20' units='μL' {...formConnector('aspirate--volume')} />
+            </FormGroup>}
           </div>
 
           <div className={styles.row_wrapper}>
@@ -140,9 +144,9 @@ export default function StepEditForm (props: Props) {
             <FormGroup label='Wells:'>
               <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('dispense--wells')} />
             </FormGroup>
-            <FormGroup label='Volume:'>
+            {props.formData.stepType === 'transfer' && <FormGroup label='Volume:'>
               <InputField placeholder='20' units='μL' {...formConnector('dispense--volume')} />
-            </FormGroup>
+            </FormGroup>}
           </div>
 
           <div className={styles.row_wrapper}>
@@ -169,9 +173,9 @@ export default function StepEditForm (props: Props) {
             </div>
 
             <div className={styles.column_1_2}>
-              <FormGroup label='WELL ORDER'>
+              {props.formData.stepType === 'transfer' && <FormGroup label='WELL ORDER'>
                 (WellSelectionWidget here)
-              </FormGroup>
+              </FormGroup>}
 
               <FormGroup label='FLOW RATE'>
                 (Flow rate SliderInput here)

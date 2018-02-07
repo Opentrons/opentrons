@@ -25,7 +25,7 @@ import {
   validateAndProcessForm,
   generateCommands,
   formHasErrors
-} from './generateSubsteps' // TODO rename generateSubsteps.js
+} from './generateSubsteps' // TODO rename generateSubsteps.js to something else
 
 import type {
   AddStepAction,
@@ -196,7 +196,7 @@ const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} =
     }
 
     console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
-    return []
+    return null
   })
 
 const allSteps = createSelector(
