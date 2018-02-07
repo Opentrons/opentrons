@@ -2,8 +2,8 @@
   /* ot brand */
   --c-mustard: #ffd252;
   --c-blue: #006fff;
+  --c-light-blue: color(var(--c-blue) lightness(85%));
   --c-teal: #05c1b3;
-  --c-mustard: #ffd252;
 
   /* grays */
   --c-dark-gray: #4a4a4a;
@@ -14,6 +14,7 @@
   --c-bg-dark: #4a4a4a;
   --c-bg-light: #fcfcfc;
   --c-bg-selected: #d1d1d1;
+  --c-bg-selected-light: #f1f1f1;
 
   /* Misc */
   --c-overlay: rgba(0, 0, 0, 0.7);

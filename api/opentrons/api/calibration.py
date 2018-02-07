@@ -79,6 +79,13 @@ class CalibrationManager:
         inst.drop_tip(container._container[0], home_after=True)
         self._set_state('ready')
 
+    def return_tip(self, instrument):
+        inst = instrument._instrument
+        log.debug('Returning tip from {}'.format(instrument.name))
+        self._set_state('moving')
+        inst.return_tip(home_after=True)
+        self._set_state('ready')
+
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.debug('Moving {}'.format(instrument.name))

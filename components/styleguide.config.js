@@ -35,6 +35,10 @@ module.exports = {
       components: 'src/buttons/[A-Z]*.js'
     },
     {
+      name: 'Form Components',
+      components: 'src/forms/[A-Z]*.js'
+    },
+    {
       name: 'Icons',
       components: 'src/icons/[A-Z]*.js'
     },
@@ -49,6 +53,10 @@ module.exports = {
     {
       name: 'Deck',
       components: 'src/deck/[A-Z]*.js'
+    },
+    {
+      name: 'Structure',
+      components: 'src/structure/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {
@@ -58,6 +66,9 @@ module.exports = {
   },
   styles: {
     StyleGuide: {
+      '@global body': {
+        fontFamily: "'Open Sans', sans-serif"
+      },
       '@global .display-block': {
         display: 'block'
       },
@@ -65,10 +76,10 @@ module.exports = {
         width: 'auto !important'
       },
       '@global .width-3-rem': {
-        width: '3rem'
+        width: '3rem !important'
       },
       '@global .height-3-rem': {
-        height: '3rem'
+        height: '3rem !important'
       }
     }
   }

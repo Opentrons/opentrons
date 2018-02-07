@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import subprocess
+from threading import Thread
 from aiohttp import web
 from opentrons import robot, __version__
 
@@ -16,7 +17,7 @@ async def health(request):
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
-        body=repr(json.dumps(res)))
+        body=json.dumps(res))
 
 
 async def wifi_list(request):
@@ -43,7 +44,7 @@ async def wifi_list(request):
             splitres = proc.stdout.decode().split("\n")
             ssids = repr(json.dumps([x.split(":")[0] for x in splitres]))
     else:
-        ssids = repr(json.dumps(['a', 'b', 'c']))
+        ssids = json.dumps(['a', 'b', 'c'])
     return web.json_response(
         body=ssids
     )
@@ -114,5 +115,21 @@ async def wifi_status(request):
     else:
         connectivity['status'] = "testing"
     return web.json_response(
-        body=repr(json.dumps(connectivity))
+        body=json.dumps(connectivity)
     )
+
+
+async def identify(request):
+    Thread(target=lambda: robot.identify(
+        int(request.query.get('seconds', '10')))).run()
+    return web.Response(text='Ok')
+
+
+async def turn_on_rail_lights(request):
+    robot.turn_on_rail_lights()
+    return web.Response(text='Ok')
+
+
+async def turn_off_rail_lights(request):
+    robot.turn_off_rail_lights()
+    return web.Response(text='Ok')

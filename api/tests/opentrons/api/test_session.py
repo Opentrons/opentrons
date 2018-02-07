@@ -15,9 +15,9 @@ def labware_setup():
     from opentrons import containers, instruments
 
     tip_racks = \
-        [containers.load('tiprack-200ul', slot, slot) for slot in ['A1', 'A2']]
+        [containers.load('tiprack-200ul', slot, slot) for slot in ['1', '4']]
     plates = \
-        [containers.load('96-PCR-flat', slot, slot) for slot in ['B1', 'B2']]
+        [containers.load('96-PCR-flat', slot, slot) for slot in ['2', '5']]
 
     p100 = instruments.Pipette(
         name='p100', mount='right', channels=8, tip_racks=tip_racks)
@@ -53,7 +53,8 @@ async def test_load_from_text(session_manager, protocol):
             acc.append(command)
             traverse(command['children'])
     traverse(session.commands)
-    assert len(acc) == 90
+    # Less commands now that trash is built in
+    assert len(acc) == 88
 
 
 async def test_async_notifications(main_router):
@@ -185,11 +186,11 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     assert [i.axis for i in instruments] == ['a', 'b']
     assert [i.id for i in instruments] == [id(p100), id(p1000)]
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
-        [['A1', 'A2'], ['A1', 'A2']]
+        [['1', '4'], ['1', '4']]
     assert [[c.slot for c in i.containers] for i in instruments] == \
-        [['B1'], ['B1', 'B2']]
+        [['2'], ['2', '5']]
 
-    assert [c.slot for c in containers] == ['B1', 'B2']
+    assert [c.slot for c in containers] == ['2', '5']
     assert [[i.id for i in c.instruments] for c in containers] == \
         [[id(p100), id(p1000)], [id(p1000)]]
     assert [c.id for c in containers] == [id(plates[0]), id(plates[1])]
@@ -244,7 +245,7 @@ def test_get_labware(labware_setup):
 async def test_session_model_functional(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
-           ['tiprack', 'trough', 'plate']
+           ['tiprack', 'trough', 'plate', 'fixed-trash']
     assert [instrument.name for instrument in session.instruments] == ['p200']
 
 
@@ -260,9 +261,9 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     """
     session = session_manager.create(name='<blank>', text=protocol.text)
 
-    assert 'trash-box' in [c.name for c in session.get_containers()]
+    assert 'fixed-trash' in [c.name for c in session.get_containers()]
     containers = sum([i.containers for i in session.get_instruments()], [])
-    assert 'trash-box' in [c.name for c in containers]
+    assert 'fixed-trash' in [c.name for c in containers]
 
 
 async def test_session_create_error(main_router):

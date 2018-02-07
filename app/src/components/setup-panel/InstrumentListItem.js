@@ -15,7 +15,6 @@ import type {Mount, Channels} from '../../robot'
 type Props = {
   isRunning: boolean,
   mount: Mount,
-  clearDeckPopulated: () => void,
   name: ?string,
   volume: ?number,
   channels: ?Channels,
@@ -29,8 +28,7 @@ export default function InstrumentListItem (props: Props) {
     mount,
     volume,
     channels,
-    probed,
-    clearDeckPopulated
+    probed
   } = props
 
   const isUsed = name != null
@@ -39,10 +37,6 @@ export default function InstrumentListItem (props: Props) {
   const url = !isDisabled
     ? `/setup-instruments/${mount}`
     : '#'
-
-  const onClick = !isDisabled
-    ? clearDeckPopulated
-    : undefined
 
   // TODO (ka 2018-1-17): Move this up to container mergeProps in upcoming update setup panel ticket
   const confirmed = probed
@@ -67,7 +61,6 @@ export default function InstrumentListItem (props: Props) {
     <ListItem
       isDisabled={isDisabled}
       url={url}
-      onClick={onClick}
       confirmed={confirmed}
       iconName={iconName}
     >

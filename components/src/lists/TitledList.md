@@ -1,7 +1,8 @@
+Basic usage:
+
 ```js
 <TitledList
-  title='TitledList With Icon'
-  onClick={e => window.alert('You clicked the title')}
+  title='Titled List With Icon'
   iconName='flask'
 >
   <ListItem>Something 1</ListItem>
@@ -9,41 +10,47 @@
 </TitledList>
 ```
 
-Selected:
+Using the onClick and selected props:
+
+```js
+initialState = {selected: false}
+
+;<TitledList
+  title='Selectable Titled List'
+  onClick={() => setState({selected: !state.selected})}
+  selected={state.selected}
+>
+  <ListItem>Something 1</ListItem>
+  <ListItem>Something 2</ListItem>
+</TitledList>
+```
+
+If `onCollapseToggle` prop is given a function, the TitledList will be collapsible, dictated by the `collapsed` prop. `onCollapseToggle` will only fire on caret clicks, not title clicks:
+
+```js
+initialState = {selected: false, collapsed: false}
+
+;<TitledList
+  title='Collapsible Titled List'
+  onClick={() => setState({selected: !state.selected})}
+  onCollapseToggle={() => setState({collapsed: !state.collapsed})}
+  selected={state.selected}
+  collapsed={state.collapsed}
+>
+  <ListItem>Something 1</ListItem>
+  <ListItem>Something 2</ListItem>
+</TitledList>
+```
+
+The entire TitledList may be disabled with the `disabled` prop. The `selected` prop will be ignored while the `collapsed` prop will be respected. `onClick` and `onCollapseToggle` will not fire:
 
 ```js
 <TitledList
-  title='Selected TitledList'
+  title='Disabled Titled List'
+  onClick={() => alert("this won't happen")}
+  onCollapseToggle={() => alert("this won't happen")}
   selected
->
-  <ListItem>Something 1</ListItem>
-  <ListItem>Something 2</ListItem>
-</TitledList>
-```
-
-#### If `onCollapseToggle` prop is given a function, the TitledList will be collapsible.
-
-##### Expanded:
-
-```js
-<TitledList
-  title='Collapsible TitledList'
-  onClick={e => window.alert('You clicked the title')}
-  onCollapseToggle={e => window.alert('You clicked collapse/expand')}
->
-  <ListItem>Something 1</ListItem>
-  <ListItem>Something 2</ListItem>
-</TitledList>
-```
-
-##### Collapsed:
-
-```js
-<TitledList
-  title='Collapsible TitledList'
-  onClick={e => window.alert('You clicked the title')}
-  onCollapseToggle={e => window.alert('You clicked collapse/expand')}
-  collapsed
+  disabled
 >
   <ListItem>Something 1</ListItem>
   <ListItem>Something 2</ListItem>

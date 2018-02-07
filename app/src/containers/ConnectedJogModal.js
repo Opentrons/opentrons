@@ -9,12 +9,18 @@ import JogModal from '../components/JogModal'
 
 export default connect(mapStateToProps, null, mergeProps)(JogModal)
 
-function mapStateToProps (state) {
+function mapStateToProps (state, ownProps) {
+  const {slot} = ownProps
+  const currentLabware = robotSelectors.getLabwareBySlot(state)[slot]
+
   return {
     jogDistance: robotSelectors.getJogDistance(state),
     isJogging: robotSelectors.getJogInProgress(state),
     isUpdating: robotSelectors.getOffsetUpdateInProgress(state),
-    _calibrator: robotSelectors.getCalibratorMount(state)
+    _calibrator: (
+      currentLabware.calibratorMount ||
+      robotSelectors.getCalibratorMount(state)
+    )
   }
 }
 

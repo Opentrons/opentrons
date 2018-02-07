@@ -3,6 +3,7 @@
 import padStart from 'lodash/padStart'
 import {createSelector} from 'reselect'
 
+import type {Mount, InstrumentCalibrationStatus, Labware} from './types'
 import type {State as CalibrationState} from './reducer/calibration'
 import type {State as ConnectionState} from './reducer/connection'
 import type {State as SessionState} from './reducer/session'
@@ -11,17 +12,9 @@ import {
   type ConnectionStatus,
   type SessionStatus,
   _NAME,
-  UNPROBED,
-  PREPARING_TO_PROBE,
-  READY_TO_PROBE,
-  PROBING,
-  PROBED,
   UNCONFIRMED,
-  INSTRUMENT_AXES,
-  DECK_SLOTS
+  INSTRUMENT_AXES
 } from './constants'
-
-import type {Mount} from './types'
 
 type State = {
   robot: {
@@ -192,31 +185,40 @@ export function getInstrumentsByMount (state: State) {
 export const getInstruments = createSelector(
   getInstrumentsByMount,
   (state: State) => calibration(state).probedByMount,
+  (state: State) => calibration(state).tipOnByMount,
   (state: State) => calibration(state).calibrationRequest,
-  (instrumentsByMount, probedByMount, calibrationRequest) => {
+  (instrumentsByMount, probedByMount, tipOnByMount, calibrationRequest) => {
     return INSTRUMENT_AXES.map((mount) => {
       const instrument = instrumentsByMount[mount]
       if (!instrument || !instrument.name) return {mount}
 
-      let calibration = UNPROBED
+      const probed = probedByMount[mount] || false
+      const tipOn = tipOnByMount[mount] || false
+      let calibration: InstrumentCalibrationStatus = 'unprobed'
 
       // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
+      // TODO(mc: 2018-01-23): handle probe error state better
       if (calibrationRequest.mount === mount && !calibrationRequest.error) {
         if (calibrationRequest.type === 'MOVE_TO_FRONT') {
           calibration = calibrationRequest.inProgress
-            ? PREPARING_TO_PROBE
-            : READY_TO_PROBE
+            ? 'preparing-to-probe'
+            : 'ready-to-probe'
         } else if (calibrationRequest.type === 'PROBE_TIP') {
-          calibration = calibrationRequest.inProgress
-            ? PROBING
-            : PROBED
+          if (calibrationRequest.inProgress) {
+            calibration = 'probing'
+          } else if (!probed) {
+            calibration = 'probed-tip-on'
+          } else {
+            calibration = 'probed'
+          }
         }
       }
 
       return {
         ...instrument,
         calibration,
-        probed: probedByMount[mount] || false
+        probed,
+        tipOn
       }
     })
   }
@@ -227,10 +229,8 @@ export const getInstruments = createSelector(
 export const getCalibratorMount = createSelector(
   getInstruments,
   (instruments): Mount | '' => {
-    const single = instruments.find((i) => i.channels && i.channels === 1)
-    const multi = instruments.find((i) => i.channels && i.channels > 1)
-
-    const calibrator = single || multi || {mount: ''}
+    const tipOn = instruments.find((i) => i.probed && i.tipOn)
+    const calibrator = tipOn || {mount: ''}
 
     return calibrator.mount
   }
@@ -249,12 +249,10 @@ export const getLabware = createSelector(
   getLabwareBySlot,
   (state: State) => calibration(state).labwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
-  (labwareBySlot, statusBySlot, confirmedBySlot) => {
-    return DECK_SLOTS
+  (labwareBySlot, statusBySlot, confirmedBySlot): Labware[] => {
+    return Object.keys(labwareBySlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
-
-        if (!labware) return {slot}
 
         return {
           ...labware,
@@ -272,6 +270,16 @@ export function getDeckPopulated (state: State) {
 export const getUnconfirmedLabware = createSelector(
   getLabware,
   (labware) => labware.filter((lw) => lw.type && !lw.confirmed)
+)
+
+export const getTipracks = createSelector(
+  getLabware,
+  (labware) => labware.filter((lw) => lw.type && lw.isTiprack)
+)
+
+export const getNotTipracks = createSelector(
+  getLabware,
+  (labware) => labware.filter((lw) => lw.type && !lw.isTiprack)
 )
 
 export const getUnconfirmedTipracks = createSelector(

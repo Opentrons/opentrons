@@ -6,7 +6,7 @@ import os
 from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
-from opentrons.server.endpoints import health, wifi_configure, wifi_list, wifi_status  # NOQA
+from opentrons.server import endpoints as endp
 from logging.config import dictConfig
 
 from argparse import ArgumentParser
@@ -77,10 +77,13 @@ def init(loop=None):
     routes for methods defined in opentrons.server.endpoints
     """
     server = Server(MainRouter(), loop=loop)
-    server.app.router.add_get('/health', health)
-    server.app.router.add_get('/wifi/list', wifi_list)
-    server.app.router.add_post('/wifi/configure', wifi_configure)
-    server.app.router.add_get('/wifi/status', wifi_status)
+    server.app.router.add_get('/health', endp.health)
+    server.app.router.add_get('/wifi/list', endp.wifi_list)
+    server.app.router.add_post('/wifi/configure', endp.wifi_configure)
+    server.app.router.add_get('/wifi/status', endp.wifi_status)
+    server.app.router.add_get('/identify', endp.identify)
+    server.app.router.add_get('/lights/on', endp.turn_on_rail_lights)
+    server.app.router.add_get('/lights/off', endp.turn_off_rail_lights)
     return server.app
 
 

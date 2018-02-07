@@ -27,11 +27,11 @@ def test_containers_create(robot):
         volume=1000,
         save=True)
 
-    p = containers_load(robot, container_name, 'A1')
+    p = containers_load(robot, container_name, '1')
     assert len(p) == 96
-    assert len(p.rows) == 12
-    assert len(p.cols) == 8
-    assert p.get_parent() == robot.deck['A1']
+    assert len(p.cols) == 12
+    assert len(p.rows) == 8
+    assert p.get_parent() == robot.deck['1']
     assert p['C3'] == p[18]
     assert p['C3'].max_volume() == 1000
     for i, w in enumerate(p):
@@ -41,6 +41,16 @@ def test_containers_create(robot):
 
     database.delete_container(container_name)
     assert container_name not in containers_list()
+
+    container_name = 'other_plate_for_testing_containers_create'
+    p = containers_create(
+        name=container_name,
+        grid=(8, 12),
+        spacing=(9, 9),
+        diameter=4,
+        depth=8,
+        save=False)
+    assert p['C3'].max_volume() == 0
 
 
 class ContainerTestCase(unittest.TestCase):
@@ -65,9 +75,10 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'
-        slot = 'A1'
+        slot = '1'
         containers_load(self.robot, container_name, slot)
-        self.assertEquals(len(self.robot.get_containers()), 1)
+        # 2018-1-30 Incremented number of containers based on fixed trash
+        self.assertEquals(len(self.robot.get_containers()), 2)
 
         self.assertRaises(
             RuntimeWarning, containers_load,
@@ -87,11 +98,41 @@ class ContainerTestCase(unittest.TestCase):
 
         containers_load(
             self.robot, container_name, slot, 'custom-name', share=True)
-        self.assertEquals(len(self.robot.get_containers()), 2)
+        self.assertEquals(len(self.robot.get_containers()), 3)
 
         containers_load(
             self.robot, 'trough-12row', slot, share=True)
-        self.assertEquals(len(self.robot.get_containers()), 3)
+        self.assertEquals(len(self.robot.get_containers()), 4)
+
+    def test_load_legacy_slot_names(self):
+        slots_old = [
+            'A1', 'B1', 'C1',
+            'A2', 'B2', 'C2',
+            'A3', 'B3', 'C3',
+            'A4', 'B4', 'C4'
+        ]
+        slots_new = [
+            '1', '2', '3',
+            '4', '5', '6',
+            '7', '8', '9',
+            '10', '11', '12'
+        ]
+        import warnings
+        warnings.filterwarnings('ignore')
+
+        # Only check up to the non fixed-trash slots
+        def test_slot_name(slot_name, expected_name):
+            self.robot.reset()
+            p = containers_load(self.robot, '96-flat', slot_name)
+            slot_name = p.get_parent().get_name()
+            assert slot_name == expected_name
+
+        for i in range(len(slots_old) - 1):
+            test_slot_name(slots_new[i], slots_new[i])
+            test_slot_name(int(slots_new[i]), slots_new[i])
+            test_slot_name(slots_old[i], slots_new[i])
+
+        warnings.filterwarnings('default')
 
     def test_containers_list(self):
         res = containers_list()

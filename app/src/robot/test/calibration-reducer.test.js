@@ -9,7 +9,10 @@ describe('robot reducer - calibration', () => {
       deckPopulated: true,
       jogDistance: constants.JOG_DISTANCE_SLOW_MM,
 
+      // intrument probed + basic tip-tracking state
+      // TODO(mc, 2018-01-22): combine these into subreducer
       probedByMount: {},
+      tipOnByMount: {},
 
       // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
       // slot. confirmedBySlot holds a flag for whether the labware has been
@@ -17,12 +20,10 @@ describe('robot reducer - calibration', () => {
       labwareBySlot: {},
       confirmedBySlot: {},
 
-      calibrationRequest: {type: '', inProgress: false, mount: '', error: null},
+      // TODO(mc, 2018-01-22): make this state a sub-reducer
+      calibrationRequest: {type: '', inProgress: false, error: null},
 
       // TODO(mc, 2018-01-10): collapse all these into calibrationRequest
-      pickupRequest: {inProgress: false, error: null, slot: ''},
-      homeRequest: {inProgress: false, error: null, slot: ''},
-      confirmTiprackRequest: {inProgress: false, error: null, slot: ''},
       moveToRequest: {inProgress: false, error: null},
       jogRequest: {inProgress: false, error: null},
       updateOffsetRequest: {inProgress: false, error: null}
@@ -74,18 +75,28 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         deckPopulated: false,
-        pickupRequest: {inProgress: false, error: new Error(), slot: ''},
+        calibrationRequest: {
+          type: '',
+          inProgress: false,
+          error: new Error()
+        },
         labwareBySlot: {5: constants.UNCONFIRMED}
       }
     }
 
     const action = {
-      type: actionTypes.PICKUP_AND_HOME,
-      payload: {instrument: 'left', labware: '5'}
+      type: 'robot:PICKUP_AND_HOME',
+      payload: {mount: 'left', slot: '5'}
     }
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: true,
-      pickupRequest: {inProgress: true, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'PICKUP_AND_HOME',
+        mount: 'left',
+        slot: '5',
+        inProgress: true,
+        error: null
+      },
       labwareBySlot: {5: constants.PICKING_UP}
     })
   })
@@ -93,26 +104,51 @@ describe('robot reducer - calibration', () => {
   test('handles PICKUP_AND_HOME_RESPONSE action', () => {
     const state = {
       calibration: {
-        pickupRequest: {inProgress: true, error: null, slot: '5'},
+        calibrationRequest: {
+          type: 'PICKUP_AND_HOME',
+          mount: 'left',
+          slot: '5',
+          inProgress: true,
+          error: null
+        },
+        tipOnByMount: {right: false},
         labwareBySlot: {5: constants.PICKING_UP}
       }
     }
 
-    const success = {type: actionTypes.PICKUP_AND_HOME_RESPONSE}
+    const success = {
+      type: 'robot:PICKUP_AND_HOME_RESPONSE',
+      error: false,
+      payload: {}
+    }
 
     const failure = {
-      type: actionTypes.PICKUP_AND_HOME_RESPONSE,
+      type: 'robot:PICKUP_AND_HOME_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
 
     expect(reducer(state, success).calibration).toEqual({
-      pickupRequest: {inProgress: false, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'PICKUP_AND_HOME',
+        mount: 'left',
+        slot: '5',
+        inProgress: false,
+        error: null
+      },
+      tipOnByMount: {left: true, right: false},
       labwareBySlot: {5: constants.HOMED}
     })
 
     expect(reducer(state, failure).calibration).toEqual({
-      pickupRequest: {inProgress: false, error: new Error('AH'), slot: '5'},
+      calibrationRequest: {
+        type: 'PICKUP_AND_HOME',
+        mount: 'left',
+        slot: '5',
+        inProgress: false,
+        error: new Error('AH')
+      },
+      tipOnByMount: {left: false, right: false},
       labwareBySlot: {5: constants.UNCONFIRMED}
     })
   })
@@ -120,17 +156,27 @@ describe('robot reducer - calibration', () => {
   test('handles DROP_TIP_AND_HOME action', () => {
     const state = {
       calibration: {
-        homeRequest: {inProgress: false, error: new Error('AH'), slot: ''},
+        calibrationRequest: {
+          type: '',
+          inProgress: false,
+          error: new Error('AH')
+        },
         labwareBySlot: {5: constants.UNCONFIRMED}
       }
     }
     const action = {
-      type: actionTypes.DROP_TIP_AND_HOME,
-      payload: {instrument: 'right', labware: '5'}
+      type: 'robot:DROP_TIP_AND_HOME',
+      payload: {mount: 'right', slot: '5'}
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      homeRequest: {inProgress: true, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'DROP_TIP_AND_HOME',
+        mount: 'right',
+        slot: '5',
+        inProgress: true,
+        error: null
+      },
       labwareBySlot: {5: constants.HOMING}
     })
   })
@@ -138,26 +184,51 @@ describe('robot reducer - calibration', () => {
   test('handles DROP_TIP_AND_HOME_RESPONSE action', () => {
     const state = {
       calibration: {
-        homeRequest: {inProgress: true, error: null, slot: '5'},
+        calibrationRequest: {
+          type: 'DROP_TIP_AND_HOME',
+          mount: 'right',
+          slot: '5',
+          inProgress: true,
+          error: null
+        },
+        tipOnByMount: {left: false, right: true},
         labwareBySlot: {5: constants.HOMING}
       }
     }
 
-    const success = {type: actionTypes.DROP_TIP_AND_HOME_RESPONSE}
+    const success = {
+      type: 'robot:DROP_TIP_AND_HOME_RESPONSE',
+      error: false,
+      payload: {}
+    }
 
     const failure = {
-      type: actionTypes.DROP_TIP_AND_HOME_RESPONSE,
+      type: 'robot:DROP_TIP_AND_HOME_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
 
     expect(reducer(state, success).calibration).toEqual({
-      homeRequest: {inProgress: false, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'DROP_TIP_AND_HOME',
+        mount: 'right',
+        slot: '5',
+        inProgress: false,
+        error: null
+      },
+      tipOnByMount: {left: false, right: false},
       labwareBySlot: {5: constants.HOMED}
     })
 
     expect(reducer(state, failure).calibration).toEqual({
-      homeRequest: {inProgress: false, error: new Error('AH'), slot: '5'},
+      calibrationRequest: {
+        type: 'DROP_TIP_AND_HOME',
+        mount: 'right',
+        slot: '5',
+        inProgress: false,
+        error: new Error('AH')
+      },
+      tipOnByMount: {left: false, right: true},
       labwareBySlot: {5: constants.UNCONFIRMED}
     })
   })
@@ -165,21 +236,29 @@ describe('robot reducer - calibration', () => {
   test('handles CONFIRM_TIPRACK action', () => {
     const state = {
       calibration: {
-        confirmTiprackRequest: {
+        calibrationRequest: {
+          type: '',
+          mount: 'right',
+          slot: '5',
           inProgress: false,
-          error: new Error('AH'),
-          slot: ''
+          error: new Error('AH')
         },
         labwareBySlot: {5: constants.UNCONFIRMED}
       }
     }
     const action = {
-      type: actionTypes.CONFIRM_TIPRACK,
-      payload: {instrument: 'right', labware: '5'}
+      type: 'robot:CONFIRM_TIPRACK',
+      payload: {mount: 'right', slot: '5'}
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      confirmTiprackRequest: {inProgress: true, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'CONFIRM_TIPRACK',
+        inProgress: true,
+        error: null,
+        mount: 'right',
+        slot: '5'
+      },
       labwareBySlot: {5: constants.CONFIRMING}
     })
   })
@@ -187,32 +266,53 @@ describe('robot reducer - calibration', () => {
   test('handles CONFIRM_TIPRACK_RESPONSE action', () => {
     const state = {
       calibration: {
-        confirmTiprackRequest: {inProgress: true, error: null, slot: '5'},
+        calibrationRequest: {
+          type: 'CONFIRM_TIPRACK',
+          inProgress: true,
+          error: null,
+          mount: 'right',
+          slot: '5'
+        },
+        tipOnByMount: {right: true},
         labwareBySlot: {5: constants.CONFIRMING},
         confirmedBySlot: {5: false}
       }
     }
 
-    const success = {type: actionTypes.CONFIRM_TIPRACK_RESPONSE}
+    const success = {
+      type: 'robot:CONFIRM_TIPRACK_RESPONSE',
+      error: false,
+      payload: {tipOn: false}
+    }
 
     const failure = {
-      type: actionTypes.CONFIRM_TIPRACK_RESPONSE,
+      type: 'robot:CONFIRM_TIPRACK_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
 
     expect(reducer(state, success).calibration).toEqual({
-      confirmTiprackRequest: {inProgress: false, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'CONFIRM_TIPRACK',
+        inProgress: false,
+        error: null,
+        mount: 'right',
+        slot: '5'
+      },
+      tipOnByMount: {right: false},
       labwareBySlot: {5: constants.CONFIRMED},
       confirmedBySlot: {5: true}
     })
 
     expect(reducer(state, failure).calibration).toEqual({
-      confirmTiprackRequest: {
+      calibrationRequest: {
+        type: 'CONFIRM_TIPRACK',
         inProgress: false,
         error: new Error('AH'),
+        mount: 'right',
         slot: '5'
       },
+      tipOnByMount: {right: true},
       labwareBySlot: {5: constants.UNCONFIRMED},
       confirmedBySlot: {5: false}
     })
@@ -221,6 +321,7 @@ describe('robot reducer - calibration', () => {
   test('handles MOVE_TO_FRONT action', () => {
     const state = {
       calibration: {
+        deckPopulated: true,
         calibrationRequest: {
           type: '',
           mount: '',
@@ -235,6 +336,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
+      deckPopulated: false,
       calibrationRequest: {
         type: 'MOVE_TO_FRONT',
         mount: 'left',
@@ -290,7 +392,8 @@ describe('robot reducer - calibration', () => {
           mount: 'left',
           inProgress: false,
           error: new Error('AH')
-        }
+        },
+        probedByMount: {left: true, right: true}
       }
     }
     const action = {
@@ -304,7 +407,8 @@ describe('robot reducer - calibration', () => {
         mount: 'left',
         inProgress: true,
         error: null
-      }
+      },
+      probedByMount: {left: false, right: true}
     })
   })
 
@@ -316,8 +420,7 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
           inProgress: true,
           error: null
-        },
-        probedByMount: {}
+        }
       }
     }
     const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
@@ -333,9 +436,6 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: null
-      },
-      probedByMount: {
-        right: true
       }
     })
     expect(reducer(state, failure).calibration).toEqual({
@@ -344,25 +444,23 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: new Error('AH')
-      },
-      probedByMount: {
-        right: false
       }
     })
   })
 
-  test('handles RESET_TIP_PROBE', () => {
+  test('handles CONFIRM_PROBED', () => {
     const state = {
       calibration: {
-        calibrationRequest: {mount: 'left'}
+        probedByMount: {left: false, right: true}
       }
     }
     const action = {
-      type: actionTypes.RESET_TIP_PROBE
+      type: 'robot:CONFIRM_PROBED',
+      payload: 'left'
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      calibrationRequest: {mount: ''}
+      probedByMount: {left: true, right: true}
     })
   })
 
@@ -457,14 +555,27 @@ describe('robot reducer - calibration', () => {
   test('handles UPDATE_OFFSET action', () => {
     const state = {
       calibration: {
-        updateOffsetRequest: {inProgress: false, error: new Error()},
+        calibrationRequest: {
+          type: '',
+          inProgress: false,
+          error: new Error()
+        },
         labwareBySlot: {}
       }
     }
-    const action = {type: actionTypes.UPDATE_OFFSET, payload: {labware: '5'}}
+    const action = {
+      type: 'robot:UPDATE_OFFSET',
+      payload: {mount: 'right', slot: '5'}
+    }
 
     expect(reducer(state, action).calibration).toEqual({
-      updateOffsetRequest: {inProgress: true, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'UPDATE_OFFSET',
+        inProgress: true,
+        error: null,
+        mount: 'right',
+        slot: '5'
+      },
       labwareBySlot: {5: constants.UPDATING}
     })
   })
@@ -472,40 +583,68 @@ describe('robot reducer - calibration', () => {
   test('handles UPDATE_OFFSET_RESPONSE action', () => {
     const state = {
       calibration: {
-        updateOffsetRequest: {inProgress: true, error: null, slot: '5'},
+        calibrationRequest: {
+          type: 'UPDATE_OFFSET',
+          inProgress: true,
+          error: null,
+          mount: 'right',
+          slot: '5'
+        },
+        tipOnByMount: {},
         labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UPDATING},
         confirmedBySlot: {}
       }
     }
 
     const successNonTiprack = {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: false,
       payload: {isTiprack: false}
     }
     const successTiprack = {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: false,
       payload: {isTiprack: true}
     }
     const failure = {
-      type: actionTypes.UPDATE_OFFSET_RESPONSE,
+      type: 'robot:UPDATE_OFFSET_RESPONSE',
       error: true,
       payload: new Error('AH')
     }
 
     expect(reducer(state, successNonTiprack).calibration).toEqual({
-      updateOffsetRequest: {inProgress: false, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'UPDATE_OFFSET',
+        inProgress: false,
+        error: null,
+        mount: 'right',
+        slot: '5'
+      },
+      tipOnByMount: {},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.CONFIRMED},
       confirmedBySlot: {5: true}
     })
     expect(reducer(state, successTiprack).calibration).toEqual({
-      updateOffsetRequest: {inProgress: false, error: null, slot: '5'},
+      calibrationRequest: {
+        type: 'UPDATE_OFFSET',
+        inProgress: false,
+        error: null,
+        mount: 'right',
+        slot: '5'
+      },
+      tipOnByMount: {right: true},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UPDATED},
       confirmedBySlot: {}
     })
     expect(reducer(state, failure).calibration).toEqual({
-      updateOffsetRequest: {inProgress: false, error: new Error('AH'), slot: '5'},
+      calibrationRequest: {
+        type: 'UPDATE_OFFSET',
+        inProgress: false,
+        error: new Error('AH'),
+        mount: 'right',
+        slot: '5'
+      },
+      tipOnByMount: {},
       labwareBySlot: {3: constants.UNCONFIRMED, 5: constants.UNCONFIRMED},
       confirmedBySlot: {5: false}
     })

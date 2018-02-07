@@ -1,0 +1,49 @@
+@import '@opentrons/components';
+
+.info_box {
+  border: 2px solid var(--c-light-gray);
+  margin: 1rem;
+}
+
+.info_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0.5rem;
+  height: 2rem;
+}
+
+.info_header_icon {
+  width: 1.5rem;
+  vertical-align: bottom;
+}
+
+.info_header_title {
+  @apply --font-header-dark;
+
+  text-transform: uppercase;
+  line-height: 2rem;
+  padding-left: 1rem;
+}
+
+.info_wrapper {
+  display: flex;
+}
+
+.info_left,
+.info_right {
+  flex: 0 0 50%;
+  padding: 1rem;
+}
+
+.info_left p,
+.info_right p {
+  margin-bottom: 1rem;
+}
+
+.info_left img,
+.info_right img {
+  width: 100%;
+  margin-top: -3rem;
+}

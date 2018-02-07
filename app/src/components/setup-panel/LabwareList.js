@@ -1,13 +1,13 @@
-import React from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
+
+import {TitledList} from '@opentrons/components'
+import LabwareListItem from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
   actions as robotActions
 } from '../../robot'
-
-import {TitledList, ListAlert} from '@opentrons/components'
-import LabwareListItem from './LabwareListItem'
 
 export default connect(
   mapStateToProps,
@@ -16,99 +16,50 @@ export default connect(
 )(LabwareList)
 
 function LabwareList (props) {
-  const title = 'Labware Setup'
-  const {
-    isRunning,
-    labware,
-    instrumentsCalibrated,
-    tipracksConfirmed
-  } = props
-
-  const {tiprackList, labwareList} = labware.reduce((result, lab) => {
-    const {slot, name, isTiprack, setLabware} = lab
-    // TODO(mc, 2018-01-19): remove all these extra props (see LabwareListItem)
-    const links = (
-      <LabwareListItem
-        {...lab}
-        key={slot}
-        instrumentsCalibrated={instrumentsCalibrated}
-        tipracksConfirmed={tipracksConfirmed}
-        onClick={!isRunning && setLabware}
-        isRunning={isRunning}
-      />
-    )
-
-    if (name && isTiprack) {
-      result.tiprackList.push(links)
-    } else if (name) {
-      result.labwareList.push(links)
-    }
-
-    return result
-  }, {tiprackList: [], labwareList: []})
-
-  const labwareMsg = !instrumentsCalibrated
-    ? <ListAlert>Setup is disabled until pipette setup is complete.</ListAlert>
-    : null
-  const pipetteMsg = !tipracksConfirmed && instrumentsCalibrated
-    ? <ListAlert>Tipracks must be setup first.</ListAlert>
-    : null
-
+  const {labware, disabled} = props
   return (
-    <TitledList title={title}>
-      {tiprackList}
-      {labwareList}
-      {labwareMsg}
-      {pipetteMsg}
+    <TitledList title='labware' disabled={disabled}>
+      {labware.map(lw => (
+        <LabwareListItem
+          {...lw}
+          isDisabled={disabled}
+          confirmed={lw.confirmed}
+          key={lw.slot}
+          onClick={lw.setLabware}
+        />
+      ))}
     </TitledList>
   )
 }
-function mapStateToProps (state, ownProps) {
+
+function mapStateToProps (state) {
+  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   return {
-    labware: robotSelectors.getLabware(state),
-    labwareBySlot: robotSelectors.getLabwareBySlot(state),
-    deckPopulated: robotSelectors.getDeckPopulated(state),
-    instrumentsCalibrated: robotSelectors.getInstrumentsCalibrated(state),
-    tipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
-    labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
-    isRunning: robotSelectors.getIsRunning(state),
-    _calibrator: robotSelectors.getCalibratorMount(state)
+    _labware: robotSelectors.getNotTipracks(state),
+    disabled: !tipracksConfirmed,
+    _calibrator: robotSelectors.getCalibratorMount(state),
+    _deckPopulated: robotSelectors.getDeckPopulated(state)
   }
 }
 
 function mergeProps (stateProps, dispatchProps) {
-  const {
-    _calibrator,
-    deckPopulated,
-    instrumentsCalibrated,
-    tipracksConfirmed,
-    isRunning
-  } = stateProps
+  const {_calibrator, _deckPopulated, disabled} = stateProps
   const {dispatch} = dispatchProps
-  const labware = stateProps.labware.map(lw => {
-    const isDisabled = (
-      !instrumentsCalibrated ||
-      (lw.isTiprack && lw.confirmed) ||
-      !(lw.isTiprack || tipracksConfirmed) ||
-      isRunning
-    )
 
+  const labware = stateProps._labware.map(lw => {
     return {
       ...lw,
-      isDisabled,
       setLabware: () => {
-        if (deckPopulated) {
-          if (lw.isTiprack) {
-            return dispatch(robotActions.pickupAndHome(_calibrator, lw.slot))
-          }
-          dispatch(robotActions.moveTo(_calibrator, lw.slot))
+        const calibrator = lw.calibratorMount || _calibrator
+        if (_deckPopulated && calibrator) {
+          dispatch(robotActions.moveTo(calibrator, lw.slot))
         }
       }
     }
   })
 
   return {
-    ...stateProps,
-    labware
+    labware,
+    disabled
   }
 }

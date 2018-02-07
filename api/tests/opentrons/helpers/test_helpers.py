@@ -13,7 +13,7 @@ class HelpersTest(unittest.TestCase):
         # when it doesnt use them in any test cases?
         self.robot = Robot()
         self.p200 = pipette.Pipette(self.robot, mount='left')
-        self.plate = containers_load(self.robot, '96-flat', 'C1')
+        self.plate = containers_load(self.robot, '96-flat', '3')
 
     def test_break_down_travel(self):
         # with 3-dimensional points

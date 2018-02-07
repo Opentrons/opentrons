@@ -30,7 +30,7 @@ export type ButtonProps = {
  */
 export default function Button (props: ButtonProps) {
   const {disabled} = props
-  const onClick = disabled ? undefined : props.onClick
+  const onClick = !disabled ? props.onClick : undefined
 
   return (
     <button
@@ -40,7 +40,7 @@ export default function Button (props: ButtonProps) {
       className={props.className}
     >
       {props.iconName && (
-        <Icon name={props.iconName} className={styles.button_icon} />
+        <Icon name={props.iconName} className={styles.icon} />
       )}
       {props.children}
     </button>

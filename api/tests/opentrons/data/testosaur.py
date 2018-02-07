@@ -1,6 +1,6 @@
 from opentrons import containers, instruments, robot
 
-p200rack = containers.load('tiprack-200ul', 'B2', 'tiprack')
+p200rack = containers.load('tiprack-200ul', '5', 'tiprack')
 
 # create a p200 pipette on robot axis B
 p200 = instruments.Pipette(
@@ -15,12 +15,12 @@ p200.pick_up_tip()
 containers = [
     containers.load('96-PCR-flat', slot)
     for slot
-    in ('B3', 'C3')
+    in ('8', '11')
 ]
 
 # Uncomment these to test precision
-p200.move_to(robot.deck['B4'])
-p200.move_to(robot.deck['C2'])
+p200.move_to(robot.deck['11'])
+p200.move_to(robot.deck['6'])
 
 for container in containers:
     p200.aspirate(10, container[0]).dispense(10, container[-1].top(5))

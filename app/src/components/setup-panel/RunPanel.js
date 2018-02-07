@@ -1,5 +1,9 @@
-import React from 'react'
+// @flow
+// Run panel container
+import * as React from 'react'
+import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
 
 import {
   selectors as robotSelectors,
@@ -7,42 +11,54 @@ import {
 } from '../../robot'
 
 import RunMessage from './RunMessage'
-import RunLink from './RunLink'
+import RunButton from './RunButton'
+
+type StateProps = {
+  isRunning: boolean,
+  labwareConfirmed: boolean,
+  readyToRun: boolean
+}
+
+type DispatchProps = {
+  run: () => void
+}
+
+type RunPanelProps = StateProps & DispatchProps
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(RunPanel)
 
-function RunPanel (props) {
-  const {isRunning, readyToRun, run} = props
-  const runMessage = readyToRun && (<RunMessage />)
-  const runLinkUrl = isRunning
-    ? '#'
-    : '/run'
-  const onRunClick = readyToRun && !isRunning
-    ? run
-    : null
-
+function RunPanel (props: RunPanelProps) {
+  const {isRunning, labwareConfirmed, readyToRun, run} = props
+  const runMessage = labwareConfirmed && (<RunMessage />)
   const isDisabled = !readyToRun || isRunning
 
   return (
     <div>
       {runMessage}
-      <RunLink to={runLinkUrl} onClick={onRunClick} disabled={isDisabled} />
+      <RunButton onClick={run} disabled={isDisabled} />
     </div>
   )
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state): StateProps {
   return {
     isRunning: robotSelectors.getIsRunning(state),
-    readyToRun: robotSelectors.getLabwareConfirmed(state)
+    labwareConfirmed: robotSelectors.getLabwareConfirmed(state),
+    readyToRun: robotSelectors.getInstrumentsCalibrated(state)
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps (
+  dispatch: Dispatch<*>,
+  stateProps: StateProps
+): DispatchProps {
   return {
-    run: () => dispatch(robotActions.run())
+    run: () => {
+      dispatch(push('/run'))
+      dispatch(robotActions.run())
+    }
   }
 }

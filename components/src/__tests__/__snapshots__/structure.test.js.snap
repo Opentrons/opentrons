@@ -66,14 +66,14 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
       title
     </h2>
     <button
-      className="button_flat button_close"
+      className="button_flat button_icon button_close"
       disabled={undefined}
       onClick={[Function]}
-      title={undefined}
+      title="close panel"
     >
       <svg
         aria-hidden="true"
-        className="button_close_icon"
+        className="button_only_icon"
         fill="currentColor"
         height={undefined}
         version="1.1"
@@ -97,25 +97,79 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
 </div>
 `;
 
+exports[`TitleBar renders TitleBar with back button correctly 1`] = `
+<header
+  className="title_bar"
+>
+  <button
+    className="button_flat back_button"
+    disabled={undefined}
+    onClick={[Function]}
+    title="back"
+  >
+    <svg
+      aria-hidden="true"
+      className="icon"
+      fill="currentColor"
+      height={undefined}
+      version="1.1"
+      viewBox="0 0 24 24"
+      width={undefined}
+      x={undefined}
+      y={undefined}
+    >
+      <path
+        d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
+        fillRule="evenodd"
+      />
+    </svg>
+    Back
+  </button>
+  <div
+    className="title_wrapper"
+  >
+    <h1
+      className="title"
+    >
+      foo
+    </h1>
+    <span
+      className="separator"
+    >
+      |
+    </span>
+    <h2
+      className="subtitle"
+    >
+      bar
+    </h2>
+  </div>
+</header>
+`;
+
 exports[`TitleBar renders TitleBar with subtitle correctly 1`] = `
 <header
   className="title_bar"
 >
-  <h1
-    className="title"
+  <div
+    className="title_wrapper"
   >
-    foo
-  </h1>
-  <span
-    className="separator"
-  >
-    |
-  </span>
-  <h2
-    className="subtitle"
-  >
-    bar
-  </h2>
+    <h1
+      className="title"
+    >
+      foo
+    </h1>
+    <span
+      className="separator"
+    >
+      |
+    </span>
+    <h2
+      className="subtitle"
+    >
+      bar
+    </h2>
+  </div>
 </header>
 `;
 
@@ -123,11 +177,15 @@ exports[`TitleBar renders TitleBar without subtitle correctly 1`] = `
 <header
   className="title_bar"
 >
-  <h1
-    className="title"
+  <div
+    className="title_wrapper"
   >
-    foo
-  </h1>
+    <h1
+      className="title"
+    >
+      foo
+    </h1>
+  </div>
 </header>
 `;
 

@@ -77,10 +77,10 @@ default = robot_config(
     probe_center=(295.0, 300.0, 55.0),
     probe_dimensions=(35.0, 40.0, 60.0),
     gantry_calibration=[  # "safe" offset, overwrote in factory calibration
-        [ 1.00, 0.00, 0.00,  -27.0],
-        [ 0.00, 1.00, 0.00,   -10],
-        [ 0.00, 0.00, 1.00,  -10],
-        [ 0.00, 0.00, 0.00,   1.00]
+        [ 1.00, 0.00, 0.00,  0.00],
+        [ 0.00, 1.00, 0.00,  0.00],
+        [ 0.00, 0.00, 1.00,  0.00],
+        [ 0.00, 0.00, 0.00,  1.00]
     ],
     # left relative to right
     instrument_offset={
@@ -119,14 +119,17 @@ def load(filename=None):
         with open(filename, 'r') as file:
             local = json.load(file)
             result = robot_config(**merge([default._asdict(), local]))
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         log.info('Config {0} not found. Loading defaults'.format(filename))
 
     return result
 
 
-def save(config, filename=None):
+def save(config, filename=None, tag=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if tag:
+        root, ext = os.path.splitext(filename)
+        filename = "{}-{}{}".format(root, tag, ext)
     _default = children(default._asdict())
 
     diff = build([

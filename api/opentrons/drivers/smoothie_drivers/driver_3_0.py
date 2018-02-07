@@ -20,17 +20,21 @@ log = logging.getLogger(__name__)
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
-    'X': 394,
-    'Y': 344,
-    'Z': 227,
-    'A': 227,
-    'B': 18.9997,
-    'C': 18.9997
+    'X': 418,
+    'Y': 353,
+    'Z': 218,
+    'A': 218,
+    'B': 19,
+    'C': 19
 }
 
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.05
+
+Y_SWITCH_BACK_OFF_MM = 20
+Y_BACKOFF_LOW_CURRENT = 0.8
+Y_BACKOFF_SLOW_SPEED = 50
 
 DEFAULT_AXES_SPEED = 150
 
@@ -64,7 +68,7 @@ GCODE_ROUNDING_PRECISION = 3
 
 
 def _parse_axis_values(raw_axis_values):
-    parsed_values = raw_axis_values.split(' ')
+    parsed_values = raw_axis_values.strip().split(' ')
     parsed_values = parsed_values[2:]
     return {
         s.split(':')[0].upper(): round(
@@ -81,8 +85,16 @@ def _parse_instrument_values(hex_str):
     }
 
 
-def _byte_array_to_hex_string(byte_array):
-    return ''.join('%02x' % b for b in byte_array)
+def _parse_switch_values(raw_switch_values):
+    # probe has a space after it's ":" for some reasone
+    if 'Probe: ' in raw_switch_values:
+        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
+    parsed_values = raw_switch_values.strip().split(' ')
+    return {
+        s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
+        for s in parsed_values
+        if any([n in s for n in ['max', 'Probe']])
+    }
 
 
 class SmoothieDriver_3_0_0:
@@ -139,17 +151,6 @@ class SmoothieDriver_3_0_0:
             if line
         }
 
-    def write_instrument(self, mount, byte_array):
-        if not isinstance(byte_array, bytearray):
-            raise ValueError(
-                'Expected {0}, not {1}'.format(bytearray, type(byte_array)))
-        byte_string = _byte_array_to_hex_string(byte_array)
-        command = GCODES['WRITE_INSTRUMENT'] + mount + byte_string
-        res = self._send_command(command)
-        print(res)
-        res = _parse_instrument_values(res)
-        assert res['data'] == byte_array
-
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     def connect(self):
@@ -191,7 +192,8 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
-        return self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
+        res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
+        return _parse_switch_values(res)
 
     @property
     def current(self):
@@ -299,6 +301,21 @@ class SmoothieDriver_3_0_0:
 
             return ret_code
 
+    def _home_x(self):
+        # move the gantry forward on Y axis with low power
+        prior_y_current = float(self._current_settings['Y'])
+        self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
+        self.set_speed(Y_BACKOFF_SLOW_SPEED)
+
+        # move away from the Y endstop switch
+        target_coord = {'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM}
+        self.move(target_coord)
+        self.set_current({'Y': prior_y_current})
+        self.default_speed()
+
+        # now it is safe to home the X axis
+        self._send_command(GCODES['HOME'] + 'X')
+
     def _setup(self):
         self._reset_from_error()
         self._send_command(self._config.acceleration)
@@ -391,18 +408,21 @@ class SmoothieDriver_3_0_0:
                 for group in HOME_SEQUENCE
             ]))
 
-        command = ' '.join([GCODES['HOME'] + axes for axes in home_sequence])
-        self._send_command(command, timeout=30)
+        for axes in home_sequence:
+            if 'X' in axes:
+                self._home_x()
+            else:
+                command = GCODES['HOME'] + axes
+                self._send_command(command, timeout=30)
 
         # Only update axes that have been selected for homing
         homed = {
             ax: HOMED_POSITION.get(ax)
             for ax in ''.join(home_sequence)
         }
-
         self.update_position(default=homed)
 
-        return homed
+        return self.position
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
@@ -449,12 +469,16 @@ class SmoothieDriver_3_0_0:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
     def turn_on_button_light(self):
-        log.debug("Turning on the button")
         gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
 
     def turn_off_button_light(self):
-        log.debug("Turning off the button")
         gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_on_rail_lights(self):
+        gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
+    def turn_off_rail_lights(self):
+        gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
 
     def kill(self):
         """

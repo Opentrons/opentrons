@@ -1,0 +1,37 @@
+@import '@opentrons/components';
+
+.modal {
+  @apply --modal;
+
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.modal * {
+  z-index: 1;
+}
+
+.prompt {
+  max-width: 32rem;
+  margin-bottom: 1.5rem;
+}
+
+.prompt_text {
+  @apply --font-header-light;
+
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.prompt_button {
+  display: block;
+  width: auto;
+  margin: 0 auto;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.deck {
+  width: 100%;
+  overflow: visible;
+}

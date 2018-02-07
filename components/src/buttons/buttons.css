@@ -19,6 +19,15 @@
   cursor: pointer;
 }
 
+.button_primary[disabled],
+.button_primary.disabled,
+.button_flat[disabled],
+.button_flat.disabled {
+  font-weight: normal;
+  color: var(--c-font-disabled);
+  cursor: default;
+}
+
 .button_primary {
   width: 100%;
   border-radius: 2px;
@@ -29,58 +38,82 @@
   box-shadow:
     0 0 2px rgba(0, 0, 0, 0.12),
     0 2px 2px rgba(0, 0, 0, 0.24);
+
+  &:hover {
+    background-color: color(var(--c-bg-dark) shade(30%));
+  }
+
+  &:active {
+    font-weight: var(--fw-regular);
+    background-color: color(var(--c-bg-dark) tint(30%));
+
+    /* TODO(mc, 2017-12-07): pull shadows out to central file */
+    box-shadow:
+      0 0 8px rgba(0, 0, 0, 0.12),
+      0 8px 8px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: color(var(--c-bg-dark) tint(70%));
+    box-shadow: none;
+  }
 }
 
 .button_flat {
   width: 9rem;
   color: var(--c-font-dark);
   background-color: transparent;
+
+  &:hover {
+    background-color: color(var(--c-bg-light) shade(5%));
+  }
+
+  &:active {
+    font-weight: var(--fw-regular);
+    background-color: color(var(--c-bg-light) shade(10%));
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: initial;
+  }
 }
 
-.button_primary:hover {
-  background-color: color(var(--c-bg-dark) shade(30%));
-}
-
-.button_flat:hover {
-  background-color: color(var(--c-bg-light) shade(5%));
-}
-
-.button_primary:active {
-  font-weight: var(--fw-regular);
-  background-color: color(var(--c-bg-dark) tint(30%));
-
-  /* TODO(mc, 2017-12-07): pull shadows out to central file */
-  box-shadow:
-    0 0 8px rgba(0, 0, 0, 0.12),
-    0 8px 8px rgba(0, 0, 0, 0.24);
-}
-
-.button_flat:active {
-  font-weight: var(--fw-regular);
-  background-color: color(var(--c-bg-light) shade(10%));
-}
-
-.button_primary[disabled],
-.button_primary.disabled,
-.button_flat[disabled],
-.button_flat.disabled {
-  font-weight: normal;
-  color: var(--c-font-disabled);
-  cursor: default;
-}
-
-.button_primary[disabled],
-.button_primary.disabled {
-  background-color: color(var(--c-bg-dark) tint(70%));
+.button_outline {
+  background-color: transparent;
   box-shadow: none;
+  border: 1px solid var(--c-font-light);
+
+  &:hover,
+  &:active {
+    color: color(var(--c-font-light) shade(10%));
+    border-color: color(var(--c-font-light) shade(10%));
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    color: color(var(--c-font-light) shade(20%));
+    border-color: color(var(--c-font-light) shade(20%));
+    background-color: initial;
+  }
 }
 
-.button_flat[disabled],
-.button_flat.disabled {
-  background-color: initial;
-}
-
+/* style for IconButton */
 .button_icon {
+  width: auto;
+
+  & > * {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* style for the supplementary icon displayed by Button */
+.icon {
   position: absolute;
   top: var(--button-pad);
   left: var(--button-pad);

@@ -1,7 +1,7 @@
 @import '..';
 
 :root {
-  --w-sidebar: 18rem;
+  --sidebar-width: 18rem;
 }
 
 .panel {
@@ -20,7 +20,7 @@
 .title_bar {
   display: flex;
   align-items: center;
-  width: var(--w-sidebar);
+  width: var(--sidebar-width);
   border-bottom: var(--bd-light);
 }
 
@@ -33,7 +33,7 @@
 }
 
 .panel_contents {
-  width: var(--w-sidebar);
+  width: var(--sidebar-width);
   height: calc(100vh - 2.625rem);
   overflow-x: hidden;
   overflow-y: scroll;
@@ -44,10 +44,5 @@
  * hot reloads. Try to figure out why that's the case.
  */
 button.button_close {
-  width: auto;
-}
-
-.button_close_icon {
-  display: block;
-  width: 1.5rem;
+  width: 2.5rem;
 }

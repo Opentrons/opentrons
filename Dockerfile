@@ -1,8 +1,8 @@
 # Use this for local development on intel machines
-# FROM resin/amd64-alpine-python:3.6-slim
+# FROM resin/amd64-alpine-python:3.6-slim-20180123
 
 # Use this for running on a robot
-FROM resin/raspberrypi3-alpine-python:3.6-slim
+FROM resin/raspberrypi3-alpine-python:3.6-slim-20180120
 
 # TODO (artyom, 20171205): remove this and set all relevant environment
 # variables (such as APP_DATA_DIR) explicitly

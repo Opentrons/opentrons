@@ -2,7 +2,8 @@
 @import '..';
 
 .title_bar {
-  padding: 1rem;
+  display: flex;
+  align-items: center;
   text-transform: uppercase;
   background-color: var(--c-dark-gray);
 }
@@ -17,11 +18,16 @@
 .separator {
   display: inline-block;
   font-size: var(--fs-header);
+  margin: 0;
 }
 
 .title,
 .separator {
   font-weight: var(--fw-semibold);
+}
+
+.title_wrapper {
+  padding: 1rem 1.5rem;
 }
 
 .subtitle {
@@ -30,6 +36,16 @@
 
 .separator {
   padding: 0 1.75rem;
+}
+
+.back_button {
+  margin-right: auto;
+  color: var(--c-font-light);
+
+  &:hover {
+    color: color(var(--c-font-light) shade(10%));
+    background-color: transparent;
+  }
 }
 
 .page_tabs {

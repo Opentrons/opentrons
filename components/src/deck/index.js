@@ -1,16 +1,19 @@
 // @flow
-import {ContainerNameOverlay} from './ContainerNameOverlay'
-import {Deck} from './Deck'
-import {EmptyDeckSlot} from './EmptyDeckSlot'
-import {LabwareContainer} from './LabwareContainer'
+import Deck from './Deck'
+import LabwareContainer from './LabwareContainer'
 import Plate from './Plate'
-import {SlotOverlay} from './SlotOverlay'
 import Well from './Well'
+
+import {ContainerNameOverlay} from './ContainerNameOverlay'
+import {EmptyDeckSlot} from './EmptyDeckSlot'
+import {SlotOverlay} from './SlotOverlay'
+
 export * from './constants'
+export * from './Deck'
 
 export {
-  ContainerNameOverlay,
   Deck,
+  ContainerNameOverlay,
   EmptyDeckSlot,
   LabwareContainer,
   Plate,

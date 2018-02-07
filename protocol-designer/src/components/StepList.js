@@ -4,7 +4,7 @@ import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
-import type {StepItemData} from '../steplist/types'
+import type {StepItemData, StepSubItemData} from '../steplist/types'
 import StepItem from '../components/StepItem'
 import StepSubItem from '../components/StepSubItem'
 import StepCreationButton from '../containers/StepCreationButton'
@@ -13,7 +13,7 @@ import styles from '../components/StepItem.css' // TODO: Ian 2018-01-11 This is 
 
 type StepListProps = {
   selectedStepId?: number,
-  steps: Array<StepItemData>,
+  steps: Array<StepItemData & {substeps?: Array<StepSubItemData>}>,
   handleStepItemClickById?: number => (event?: SyntheticEvent<>) => void,
   handleStepItemCollapseToggleById?: number => (event?: SyntheticEvent<>) => void
 }
@@ -41,8 +41,8 @@ export default function StepList (props: StepListProps) {
             'collapsed'
           ])}
         >
-          {step && step.substeps && step.substeps.map((substep, key) =>
-            <StepSubItem {...pick(substep, [
+          {step.substeps && step.substeps.map((substep, subkey) => // TODO
+            <StepSubItem key={subkey} {...pick(substep, [
               'sourceIngredientName',
               'sourceWell',
               'destIngredientName',

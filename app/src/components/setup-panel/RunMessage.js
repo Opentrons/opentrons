@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import InfoBox from '../InfoBox'
 import styles from './run-panel.css'

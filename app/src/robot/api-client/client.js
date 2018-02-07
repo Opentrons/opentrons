@@ -1,5 +1,6 @@
 // robot api client
 // takes a dispatch (send) function and returns a receive handler
+// TODO(mc, 2018-01-26): typecheck with flow
 import {push} from 'react-router-redux'
 
 import RpcClient from '../../rpc/client'
@@ -38,14 +39,14 @@ export default function client (dispatch) {
       case actionTypes.CONNECT: return connect(state, action)
       case actionTypes.DISCONNECT: return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
-      case actionTypes.PICKUP_AND_HOME: return pickupAndHome(state, action)
-      case actionTypes.DROP_TIP_AND_HOME: return dropTipAndHome(state, action)
-      case actionTypes.CONFIRM_TIPRACK: return confirmTiprack(state, action)
+      case 'robot:PICKUP_AND_HOME': return pickupAndHome(state, action)
+      case 'robot:DROP_TIP_AND_HOME': return dropTipAndHome(state, action)
+      case 'robot:CONFIRM_TIPRACK': return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
       case actionTypes.PROBE_TIP: return probeTip(state, action)
       case actionTypes.MOVE_TO: return moveTo(state, action)
       case actionTypes.JOG: return jog(state, action)
-      case actionTypes.UPDATE_OFFSET: return updateOffset(state, action)
+      case 'robot:UPDATE_OFFSET': return updateOffset(state, action)
       case actionTypes.RUN: return run(state, action)
       case actionTypes.PAUSE: return pause(state, action)
       case actionTypes.RESUME: return resume(state, action)
@@ -144,8 +145,8 @@ export default function client (dispatch) {
   }
 
   function pickupAndHome (state, action) {
-    const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {mount, slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.pick_up_tip(instrument, labware)
@@ -154,8 +155,8 @@ export default function client (dispatch) {
   }
 
   function dropTipAndHome (state, action) {
-    const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {mount, slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     remote.calibration_manager.drop_tip(instrument, labware)
@@ -166,12 +167,12 @@ export default function client (dispatch) {
 
   // drop the tip unless the tiprack is the last one to be confirmed
   function confirmTiprack (state, action) {
-    const {payload: {instrument: axis, labware: slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {mount, slot}} = action
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     if (selectors.getUnconfirmedTipracks(state).length === 1) {
-      return dispatch(actions.confirmTiprackResponse())
+      return dispatch(actions.confirmTiprackResponse(null, true))
     }
 
     remote.calibration_manager.drop_tip(instrument, labware)
@@ -220,10 +221,10 @@ export default function client (dispatch) {
   }
 
   function updateOffset (state, action) {
-    const {payload: {instrument: axis, labware: slot}} = action
+    const {payload: {mount, slot}} = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: labwareObject._id}
     const isTiprack = labwareObject.isTiprack || false
 
@@ -359,11 +360,15 @@ export default function client (dispatch) {
     }
 
     function apiContainerToContainer (apiContainer) {
-      const {_id, name, type, slot: id} = apiContainer
+      const {_id, name, type, slot} = apiContainer
       const isTiprack = RE_TIPRACK.test(type)
-      const slot = letterSlotToNumberSlot(id)
+      const labware = {_id, name, slot, type, isTiprack}
 
-      labwareBySlot[slot] = {_id, name, slot, type, isTiprack}
+      if (isTiprack && apiContainer.instruments.length > 0) {
+        labware.calibratorMount = apiContainer.instruments[0].mount
+      }
+
+      labwareBySlot[slot] = labware
     }
   }
 
@@ -382,21 +387,4 @@ export default function client (dispatch) {
   function handleClientError (error) {
     console.error(error)
   }
-}
-
-// swap OT1 protocol slot to OT2 protocol slot
-// TODO(mc, 2017-10-03): be less "clever" about this
-// 4 10|11|_t
-// 3 _7|_8|_9
-// 2 _4|_5|_6
-// 1 _1|_2|_3
-//    A  B  C
-function letterSlotToNumberSlot (slot) {
-  // split two-char string into charcodes
-  const [col, row] = Array.from(slot.toUpperCase()).map((c) => c.charCodeAt(0))
-
-  // slot = (col where A === 1, B === 2, C === 3) + 3 * (row - 1)
-  // 'A'.charCodeAt(0) === 65, '1'.charCodeAt(0) === 49
-  // before simplification: 3 * (row - 49) + (col - 64)
-  return `${(3 * row + col - 211)}`
 }

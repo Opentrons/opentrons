@@ -13,8 +13,8 @@ from numpy import isclose
 
 
 def test_drop_tip_move_to(robot):
-    plate = containers_load(robot, '96-flat', 'A1')
-    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    plate = containers_load(robot, '96-flat', '1')
+    tiprack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
     p200.tip_attached = True
     x, y, z = (161.0, 116.7, 3.0)
@@ -36,13 +36,13 @@ def test_drop_tip_move_to(robot):
 
 
 def test_aspirate_move_to(robot):
-    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,
                    mount='left',
                    tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
@@ -62,11 +62,11 @@ def test_aspirate_move_to(robot):
 
 
 def test_blow_out_move_to(robot):
-    tiprack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tiprack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot, mount='left', tip_racks=[tiprack])
     p200.pick_up_tip()
 
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     x, y, z = (161.0, 116.7, 3.0)
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
@@ -85,13 +85,13 @@ def test_blow_out_move_to(robot):
 
 
 def test_dispense_move_to(robot):
-    tip_rack = containers_load(robot, 'tiprack-200ul', 'C1')
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,
                    mount='left',
                    tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
-    plate = containers_load(robot, '96-flat', 'A1')
+    plate = containers_load(robot, '96-flat', '1')
     well = plate[0]
     pos = well.from_center(x=0, y=0, z=-1, reference=plate)
     location = (plate, pos)
@@ -115,11 +115,11 @@ class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
         self.robot.home()
-        self.trash = containers_load(self.robot, 'point', 'A1')
-        self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', 'B2')
-        self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', 'B3')
+        self.trash = containers_load(self.robot, 'point', '1')
+        self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', '5')
+        self.tiprack2 = containers_load(self.robot, 'tiprack-10ul', '8')
 
-        self.plate = containers_load(self.robot, '96-flat', 'A2')
+        self.plate = containers_load(self.robot, '96-flat', '4')
 
         self.p200 = Pipette(
             self.robot,
@@ -142,6 +142,11 @@ class PipetteTest(unittest.TestCase):
 
     def test_bad_volume_percentage(self):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
+
+    def test_add_instrument(self):
+        self.robot.reset()
+        Pipette(self.robot, mount='left')
+        self.assertRaises(RuntimeError, Pipette, self.robot, mount='left')
 
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
@@ -168,7 +173,7 @@ class PipetteTest(unittest.TestCase):
         warnings.filterwarnings('error')
         self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
         self.assertRaises(
-            UserWarning, Pipette, self.robot, mount='left', max_volume=200)
+            UserWarning, Pipette, self.robot, mount='right', max_volume=200)
         warnings.filterwarnings('default')
 
     # TODO: (artyom, 20171101): bring back once plunger position is being tracked
@@ -177,6 +182,20 @@ class PipetteTest(unittest.TestCase):
     #     self.p200.motor.move(9)
     #     self.p200.calibrate('bottom')
     #     self.assertEquals(self.p200.plunger_positions['bottom'], 9)
+
+    def test_deprecated_axis_call(self):
+        import warnings
+
+        warnings.filterwarnings('error')
+        # Check that user warning occurs when axis is called
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, axis='a')
+
+        # Check that the warning is still valid when max_volume is also used
+        self.assertRaises(
+            UserWarning, Pipette, self.robot, axis='a', max_volume=300)
+
+        warnings.filterwarnings('default')
 
     def test_get_instruments_by_name(self):
         self.p1000 = Pipette(
@@ -400,7 +419,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_set_flow_rate(self):
         ul_per_mm = 20
-        self.p200 = Pipette(self.robot, mount='left', ul_per_mm=ul_per_mm)
+        self.p200 = Pipette(self.robot, mount='right', ul_per_mm=ul_per_mm)
 
         self.p200.set_flow_rate(aspirate=100)
         expected_mm_per_sec = 100 / ul_per_mm
@@ -1226,8 +1245,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 8
         self.p200.transfer(
             200,
-            self.plate.rows[0],
-            self.plate.rows[1],
+            self.plate.cols[0],
+            self.plate.cols[1],
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1250,8 +1269,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.channels = 1
         self.p200.transfer(
             200,
-            self.plate.rows('1', '2'),
-            self.plate.rows('3'),
+            self.plate.cols('1', '2'),
+            self.plate.cols('3'),
             touch_tip=False,
             blow_out=False,
             trash=False
@@ -1508,8 +1527,8 @@ class PipetteTest(unittest.TestCase):
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
         self.tiprack2 = generate_plate(
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
-        self.robot._deck['A1'].add(self.tiprack1, 'tiprack1')
-        self.robot._deck['B1'].add(self.tiprack2, 'tiprack2')
+        self.robot._deck['1'].add(self.tiprack1, 'tiprack1')
+        self.robot._deck['2'].add(self.tiprack2, 'tiprack2')
 
         self.p200 = Pipette(
             self.robot,
@@ -1582,9 +1601,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack1.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack1.cols[i]))
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack2.rows[i]))
+            expected.extend(self.build_pick_up_tip(self.tiprack2.cols[i]))
 
         # print('Mock calls')
         # pprint(p200_multi.move_to.mock_calls)
@@ -1632,18 +1651,3 @@ class PipetteTest(unittest.TestCase):
             mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
-
-    def test_drop_tip_to_trash(self):
-        self.p200.move_to = mock.Mock()
-
-        self.p200.pick_up_tip()
-        self.p200.drop_tip()
-
-        assert self.p200.move_to.mock_calls[0] == \
-            mock.call(self.tiprack1[0].top(),
-                      strategy='arc')
-
-        assert self.p200.move_to.mock_calls[-1] == \
-            mock.call(
-                self.trash[0].top(self.p200._drop_tip_offset),
-                strategy='arc')

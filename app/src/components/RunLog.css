@@ -6,13 +6,13 @@
   max-height: 34rem;
 }
 
-ol {
+.list {
   list-style-type: none;
   padding: 0;
   color: #999;
 }
 
-li {
+.list li {
   margin: 0.5rem 0;
 }
 

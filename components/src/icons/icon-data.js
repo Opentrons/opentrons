@@ -12,6 +12,10 @@ export const WIFI = 'wifi'
 export const FLASK = 'flask'
 export const CHECKED = 'checked'
 export const UNCHECKED = 'unchecked'
+export const CHECKED_RADIO = 'checked radio'
+export const UNCHECKED_RADIO = 'unchecked radio'
+export const CHECKED_BOX = 'checked box'
+export const UNCHECKED_BOX = 'unchecked box'
 export const CHEVRON_UP = 'chevron up'
 export const CHEVRON_DOWN = 'chevron down'
 export const CHEVRON_LEFT = 'chevron left'
@@ -24,6 +28,7 @@ export const DISTRIBUTE = 'distribute'
 export const MIX = 'mix'
 export const PAUSE = 'pause'
 export const ARROW_RIGHT = 'arrow right'
+export const MENU_DOWN = 'menu down'
 
 // icon data
 const ICON_DATA_BY_NAME = {
@@ -66,6 +71,22 @@ const ICON_DATA_BY_NAME = {
   [UNCHECKED]: {
     viewBox: '0 0 24 24',
     path: 'M12,21.6 C6.6980664,21.6 2.4,17.3019336 2.4,12 C2.4,6.6980664 6.6980664,2.4 12,2.4 C14.5460783,2.4 16.9878759,3.41142567 18.7882251,5.2117749 C20.5885743,7.01212413 21.6,9.4539217 21.6,12 C21.6,17.3019336 17.3019336,21.6 12,21.6 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z'
+  },
+  [CHECKED_RADIO]: {
+    viewBox: '0 0 24 24',
+    path: 'M12 20a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 5a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5z'
+  },
+  [UNCHECKED_RADIO]: {
+    viewBox: '0 0 24 24',
+    path: 'M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'
+  },
+  [CHECKED_BOX]: {
+    viewBox: '0 0 24 24',
+    path: 'M10 17l-5-5 1.4-1.4 3.6 3.6 7.6-7.6L19 8m0-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z'
+  },
+  [UNCHECKED_BOX]: {
+    viewBox: '0 0 24 24',
+    path: 'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z'
   },
   [CHEVRON_UP]: {
     viewBox: '0 0 24 24',
@@ -114,6 +135,10 @@ const ICON_DATA_BY_NAME = {
   [ARROW_RIGHT]: {
     viewBox: '0 0 24 24',
     path: 'M0 10.8h15.5V8l8.5 5-8.5 4.9v-2.8H0z'
+  },
+  [MENU_DOWN]: {
+    viewBox: '0 0 24 24',
+    path: 'M7,10L12,15L17,10H7Z'
   }
 }
 

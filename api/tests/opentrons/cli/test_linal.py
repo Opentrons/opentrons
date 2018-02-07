@@ -1,5 +1,5 @@
 from math import pi, sin, cos
-from opentrons.cli.solve import solve
+from opentrons.cli.linal import solve, add_z, apply_transform
 import numpy as np
 
 
@@ -23,3 +23,47 @@ def test_solve():
     result = np.dot(X, np.array([[0], [1], [1]])).transpose()
 
     return np.isclose(expected, result).all()
+
+
+def test_add_z():
+    x = 5
+    y = 10
+    z = 20
+
+    xy_array = np.array([
+        [1, 0, x],
+        [0, 1, y],
+        [0, 0, 1]])
+
+    expected = np.array([
+        [1, 0, 0, x],
+        [0, 1, 0, y],
+        [0, 0, 1, z],
+        [0, 0, 0, 1]])
+
+    result = add_z(xy_array, z)
+    assert (result == expected).all()
+
+
+def test_apply_transform():
+    x = 1
+    y = 2
+    z = 3
+
+    x_delta = -0.1
+    y_delta = -0.2
+    z_delta = 0.3
+
+    transform = [
+        [1, 0, 0, x_delta],
+        [0, 1, 0, y_delta],
+        [0, 0, 1, z_delta],
+        [0, 0, 0, 1]]
+
+    expected = (
+        round(x - x_delta, 2),
+        round(y - y_delta, 2),
+        round(z - z_delta, 2))
+
+    result = apply_transform(transform, (x, y, z))
+    assert result == expected

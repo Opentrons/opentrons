@@ -1,4 +1,5 @@
 import pytest
+from opentrons.util import environment
 
 
 @pytest.fixture
@@ -23,6 +24,30 @@ def test_clear_config(config):
     main.clear_configuration_and_reload()
 
     from opentrons import robot
-    from opentrons.robot.robot_configs import default
+    from opentrons.robot import robot_configs
 
-    assert robot.config == default
+    assert robot.config == robot_configs.default
+
+
+def test_save_and_clear_config(config):
+    # Clear should happen automatically after the following import, resetting
+    # the robot config to the default value from robot_configs
+    from opentrons.cli import main
+    from opentrons import robot
+    import os
+
+    old_config = robot.config
+    base_filename = environment.get_path('OT_CONFIG_FILE')
+
+    tag = "testing"
+    root, ext = os.path.splitext(base_filename)
+    filename = "{}-{}{}".format(root, tag, ext)
+    main.backup_configuration_and_reload(tag=tag)
+
+    from opentrons import robot
+    from opentrons.robot import robot_configs
+
+    assert robot.config == robot_configs.default
+
+    saved_config = robot_configs.load(filename)
+    assert saved_config == old_config

@@ -1,6 +1,6 @@
 // @flow
 // robot session (protocol) state and reducer
-import type {Command, Instrument, Labware, Mount, Slot} from '../types'
+import type {Command, StateInstrument, StateLabware, Mount, Slot} from '../types'
 import type {SessionStatus} from '../constants'
 import {actionTypes} from '../actions'
 
@@ -21,10 +21,10 @@ export type State = {
     [number]: Command
   },
   instrumentsByMount: {
-    [Mount]: Instrument
+    [Mount]: StateInstrument
   },
   labwareBySlot: {
-    [Slot]: Labware
+    [Slot]: StateLabware
   },
   runRequest: Request,
   pauseRequest: Request,
