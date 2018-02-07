@@ -147,5 +147,6 @@ class InstrumentsWrapper(object):
 
 instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
+labware = ContainersWrapper(robot)
 
 __all__ = [containers, instruments, robot, reset, __version__]
