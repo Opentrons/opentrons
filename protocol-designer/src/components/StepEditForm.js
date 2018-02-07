@@ -12,7 +12,7 @@ import {
 
 import FormSection from './FormSection'
 import styles from './StepEditForm.css'
-import type {FormData} from '../steplist/types' // TODO import from index.js
+import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
 
 type Options = Array<{
   name: string,
@@ -23,8 +23,10 @@ export type Props = {
   // ingredientOptions: Options,
   pipetteOptions: Options,
   labwareOptions: Options,
+  formSectionCollapse: FormSectionState,
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
+  onToggleFormSection: (section: FormSectionNames) => any => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean
@@ -73,7 +75,10 @@ export default function StepEditForm (props: Props) {
   if (props.formData.stepType === 'transfer' || props.formData.stepType === 'consolidate') {
     return (
       <div className={styles.form}>
-        <FormSection title='Aspirate' onCollapseToggle={() => console.log('TODO: collapse toggle')}> {/* TODO: should collapse be stateful to simplify Redux? */}
+        <FormSection title='Aspirate'
+          onCollapseToggle={props.onToggleFormSection('aspirate')}
+          collapsed={props.formSectionCollapse.aspirate}
+        >
           <div className={styles.top_row}>
             <FormGroup label='Labware:'>
               <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
@@ -136,7 +141,10 @@ export default function StepEditForm (props: Props) {
 
         </FormSection>
 
-        <FormSection title='Dispense' onCollapseToggle={() => console.log('TODO: collapse toggle')}>
+        <FormSection title='Dispense'
+          onCollapseToggle={props.onToggleFormSection('dispense')}
+          collapsed={props.formSectionCollapse.dispense}
+        >
           <div className={styles.top_row}>
             <FormGroup label='Labware:'>
               <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />

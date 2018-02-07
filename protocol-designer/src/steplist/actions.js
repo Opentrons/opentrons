@@ -4,7 +4,7 @@ import type {
 } from 'redux'
 
 import {selectors} from './reducers'
-import type {StepType, StepIdType} from './types'
+import type {StepType, StepIdType, FormSectionNames} from './types'
 import type {GetState, ThunkAction} from '../types'
 
 // Update Form input (onChange on inputs)
@@ -121,3 +121,11 @@ export const cancelStepForm = () => ({
   type: 'CANCEL_STEP_FORM',
   payload: null
 })
+
+export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload: FormSectionNames}
+export function collapseFormSection (payload: FormSectionNames): CollapseFormSectionAction {
+  return {
+    type: 'COLLAPSE_FORM_SECTION',
+    payload
+  }
+}

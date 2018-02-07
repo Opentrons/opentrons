@@ -15,12 +15,15 @@ type Props = {
 }
 
 export default function FormSection (props: Props) {
+  const childrenArray = React.Children.toArray(props.children)
   return (
     <div className={cx(styles.form_section, props.className)}>
       <div className={styles.title}>{props.title}</div>
 
       <div className={styles.content}>
-        {props.collapsed !== true && props.children}
+        {/* First child always visible, following children only visible if not collapsed */}
+        {childrenArray[0]}
+        {props.collapsed !== true && childrenArray.slice(1)}
       </div>
 
       {props.onCollapseToggle &&

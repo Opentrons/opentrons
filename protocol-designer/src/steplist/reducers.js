@@ -16,7 +16,8 @@ import type {
   StepItemData,
   StepIdType,
   StepSubItemData,
-  PauseFormData
+  PauseFormData,
+  FormSectionState
 } from './types'
 
 import {
@@ -31,11 +32,12 @@ import type {
   AddStepAction,
   PopulateFormAction,
   SaveStepFormAction,
-  SelectStepAction
+  SelectStepAction,
+  CollapseFormSectionAction // <- TODO this isn't a thunk
 } from './actions' // Thunk action creators
 
 import {
-  cancelStepForm,
+  cancelStepForm, // TODO try collapsing them all into a single Action type
   saveStepForm,
   changeFormInput,
   expandAddStepButton,
@@ -55,6 +57,18 @@ const unsavedForm = handleActions({
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
   SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null
 }, null)
+
+// Handles aspirate / dispense form sections opening / closing
+export const initialFormSectionState: FormSectionState = {aspirate: true, dispense: true}
+
+const formSectionCollapse = handleActions({
+  COLLAPSE_FORM_SECTION: (state, action: CollapseFormSectionAction) =>
+    ({...state, [action.payload]: !state[action.payload]}),
+  // exiting the form resets the collapse state
+  CANCEL_STEP_FORM: () => initialFormSectionState,
+  SAVE_STEP_FORM: () => initialFormSectionState,
+  POPULATE_FORM: () => initialFormSectionState
+}, initialFormSectionState)
 
 // Add default title (and later, other default values) to newly-created Step
 // TODO: Ian 2018-01-26 don't add any default values, selector should generate title if missing,
@@ -125,6 +139,7 @@ const stepCreationButtonExpanded = handleActions({
 
 export type RootState = {|
   unsavedForm: FormState,
+  formSectionCollapse: FormSectionState,
   steps: StepsState,
   savedStepForms: SavedStepFormState,
   collapsedSteps: CollapsedStepsState,
@@ -135,6 +150,7 @@ export type RootState = {|
 
 export const _allReducers = {
   unsavedForm,
+  formSectionCollapse,
   steps,
   savedStepForms,
   collapsedSteps,
@@ -289,6 +305,10 @@ export const selectors = {
           validateAndProcessForm(formData)
         )
         : null
+  ),
+  formSectionCollapse: createSelector(
+    rootSelector,
+    s => s.formSectionCollapse
   )
 }
 

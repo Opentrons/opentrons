@@ -1,5 +1,9 @@
 // @flow
 
+// sections of the form that are expandable/collapsible
+export type FormSectionState = {aspirate: boolean, dispense: boolean}
+export type FormSectionNames = 'aspirate' | 'dispense'
+
 export type Command = {
   commandType: 'aspirate' | 'dispense', // TODO add the rest
   volume: number,

@@ -52,8 +52,8 @@ export default function StepList (props: StepListProps) {
   return (
     <SidePanel title='Protocol Step List'>
 
-      {/* TODO: Ian 2018-01-16 figure out if 'Labware & Ingred Setup' is a Step or something else... */}
-      <TitledList className={styles.step_item} iconName='flask' title='Labware & Ingredient Setup' />
+      {/* TODO: Ian 2018-01-16 figure out if 'Deck Setup' is a Step or something else... */}
+      <TitledList className={styles.step_item} iconName='flask' title='Deck Setup' />
 
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
