@@ -678,8 +678,8 @@ class Robot(object):
 
         self._prev_container = this_container
 
-        # TODO (andy): need some way of avoiding collision with top ZA switches
-        # for when using tall labware
+        # TODO (andy): there is no check here for if this height will hit
+        # the limit switches, so if a tall labware is used, we risk collision
         arc_top += self.arc_height
 
         strategy = [
