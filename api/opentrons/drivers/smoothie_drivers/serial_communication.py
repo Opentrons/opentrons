@@ -10,9 +10,6 @@ RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
 
-ERROR_KEYWORD = b'error'
-ALARM_KEYWORD = b'ALARM'
-
 
 def get_ports_by_name(device_name):
     '''Returns all serial devices with a given name'''
@@ -42,9 +39,6 @@ def serial_with_temp_timeout(serial_connection, timeout):
 
 
 def _parse_smoothie_response(response):
-    if ERROR_KEYWORD in response or ALARM_KEYWORD in response:
-        print("[SMOOTHIE ISSUE]: ", response)
-
     if DRIVER_ACK in response:
         parsed_response = response.split(DRIVER_ACK)[0]
         return parsed_response

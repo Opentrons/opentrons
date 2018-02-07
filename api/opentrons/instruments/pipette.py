@@ -886,7 +886,8 @@ class Pipette:
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, abs(plunge_depth))
 
             return self
 
@@ -970,8 +971,13 @@ class Pipette:
             )
 
             if home_after:
-                self.robot.poses = self.instrument_actuator.home(
-                    self.robot.poses)
+                # incase plunger motor stalled while dropping a tip, add a
+                # safety margin of the distance between `bottom` and `drop_tip`
+                b = self._get_plunger_position('bottom')
+                d = self._get_plunger_position('drop_tip')
+                safety_margin = abs(b - d)
+                self.robot.poses = self.instrument_actuator.fast_home(
+                    self.robot.poses, safety_margin)
                 self.robot.poses = self.instrument_actuator.move(
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')
