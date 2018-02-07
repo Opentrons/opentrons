@@ -8,7 +8,7 @@ describe('interface reducer', () => {
     const state = reducer(undefined, {})
 
     expect(state).toEqual({
-      isPanelClosed: true,
+      isPanelClosed: false,
       currentPanel: 'connect'
     })
   })

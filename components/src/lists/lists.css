@@ -8,11 +8,18 @@
     color: var(--c-font-disabled);
     border-color: #eee;
     fill: var(--c-font-disabled);
+    background-color: transparent;
   }
 }
 
 .clickable {
   @apply --clickable;
+}
+
+.panel_group,
+.titled_list,
+.list_item {
+  background-color: white;
 }
 
 .titled_list_selected {
@@ -57,7 +64,6 @@
   display: block;
   width: 100%;
   line-height: 1.25;
-  border-bottom: 2px solid var(--c-light-gray);
   margin: 0;
   padding: var(--list-padding-small);
 
@@ -78,12 +84,11 @@
 
 .item_icon {
   height: calc(1.25 * var(--fs-body-1));
-  color: var(--c-dark-gray);
   padding-right: 0.5rem;
 }
 
 .info {
-  width: calc(100% - 1.5rem);
+  width: calc(100% - 2rem);
   display: inline-flex;
   flex-direction: row;
   justify-content: space-between;
@@ -93,6 +98,7 @@
 
 .disabled {
   pointer-events: none;
+  background-color: transparent;
 
   & * {
     @apply --list-disabled;

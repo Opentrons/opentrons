@@ -491,7 +491,12 @@ describe('robot selectors', () => {
             left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
             right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
           },
-          calibrationRequest: {},
+          calibrationRequest: {
+            type: 'MOVE_TO',
+            inProgress: true,
+            slot: '1',
+            mount: 'left'
+          },
           probedByMount: {},
           tipOnByMount: {right: true}
         }
@@ -505,7 +510,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         },
@@ -514,7 +520,8 @@ describe('robot selectors', () => {
           name: 'b2',
           type: 'b',
           isTiprack: false,
-          calibration: constants.OVER_SLOT,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: true
         },
         {
@@ -522,7 +529,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false
         }
       ])
@@ -535,7 +543,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         }
@@ -549,7 +558,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         },
@@ -558,7 +568,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false
         }
       ])
@@ -570,7 +581,8 @@ describe('robot selectors', () => {
         name: 'a1',
         type: 'a',
         isTiprack: true,
-        calibration: constants.UNCONFIRMED,
+        isMoving: true,
+        calibration: 'moving-to-slot',
         confirmed: false,
         calibratorMount: 'left'
       })
@@ -593,7 +605,8 @@ describe('robot selectors', () => {
         name: 'c3',
         type: 'c',
         isTiprack: false,
-        calibration: constants.UNCONFIRMED,
+        isMoving: false,
+        calibration: 'unconfirmed',
         confirmed: false
       })
     })

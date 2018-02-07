@@ -53,7 +53,7 @@ export default function TitledList (props: ListProps) {
   const hasValidChildren = React.Children.toArray(props.children)
     .some(child => child)
 
-  const className = cx(props.className, {
+  const className = cx(styles.titled_list, props.className, {
     [styles.disabled]: disabled,
     [styles.titled_list_selected]: !disabled && props.selected
   })

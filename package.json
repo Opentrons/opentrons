@@ -4,6 +4,7 @@
   "workspaces": [
     "app",
     "components",
+    "labware-definitions",
     "protocol-designer",
     "webpack-config"
   ],

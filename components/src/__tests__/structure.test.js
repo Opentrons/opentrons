@@ -24,6 +24,16 @@ describe('TitleBar', () => {
     expect(heading.children).toEqual(['world'])
   })
 
+  test('add optional back button', () => {
+    const onBackClick = jest.fn()
+    const button = Renderer.create(
+      <TitleBar title='hello' onBackClick={onBackClick} />
+    ).root.findByType('button')
+
+    button.props.onClick()
+    expect(onBackClick).toHaveBeenCalled()
+  })
+
   test('renders TitleBar without subtitle correctly', () => {
     const tree = Renderer.create(
       <TitleBar title='foo' />
@@ -35,6 +45,14 @@ describe('TitleBar', () => {
   test('renders TitleBar with subtitle correctly', () => {
     const tree = Renderer.create(
       <TitleBar title='foo' subtitle='bar' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders TitleBar with back button correctly', () => {
+    const tree = Renderer.create(
+      <TitleBar title='foo' subtitle='bar' onBackClick={() => {}} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -53,6 +53,10 @@ module.exports = {
     {
       name: 'Deck',
       components: 'src/deck/[A-Z]*.js'
+    },
+    {
+      name: 'Structure',
+      components: 'src/structure/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {

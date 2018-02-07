@@ -8,11 +8,11 @@ import {actionTypes as robotActionTypes} from '../robot/actions'
 export const NAME = 'interface'
 const META_ALERT = `${NAME}:alert`
 
-export const PANEL_NAMES = ['upload', 'setup', 'connect']
+export const PANEL_NAMES = ['connect', 'upload', 'setup']
 export const PANEL_PROPS_BY_NAME = {
   upload: {title: 'Open Protocol'},
   setup: {title: 'Prep for Run'},
-  connect: {title: 'Connect Robot'}
+  connect: {title: 'Robots'}
 }
 const DEFAULT_PANEL = 'connect'
 
@@ -25,7 +25,7 @@ const makeInterfaceActionName = (action) => makeActionName(NAME, action)
 const getModuleState = (state) => state[NAME]
 
 const INITIAL_STATE = {
-  isPanelClosed: true,
+  isPanelClosed: false,
   currentPanel: DEFAULT_PANEL
 }
 

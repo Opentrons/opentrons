@@ -21,11 +21,18 @@ ConfirmCalibrationPrompt.propTypes = {
   }).isRequired
 }
 
-const {MOVING_TO_SLOT, PICKING_UP, HOMING, UPDATING, CONFIRMED} = robotConstants
+const {
+  MOVING_TO_SLOT,
+  OVER_SLOT,
+  PICKING_UP,
+  HOMING,
+  UPDATING,
+  CONFIRMED
+} = robotConstants
 
 export default function ConfirmCalibrationPrompt (props) {
   const {currentLabware, slot} = props
-  const {calibration, isTiprack, type} = currentLabware
+  const {confirmed, calibration, isTiprack, type} = currentLabware
   const toolTipMessage = <Diagram isTiprack={isTiprack} type={type} />
 
   // TODO(mc, 2017-11-27): spinner?
@@ -37,7 +44,10 @@ export default function ConfirmCalibrationPrompt (props) {
     calibration === UPDATING
   ) return null
 
-  if (calibration === CONFIRMED) {
+  if (
+    calibration === CONFIRMED ||
+    (calibration === OVER_SLOT && confirmed)
+  ) {
     return (
       <div className={styles.prompt}>
         <NextLabwareLink />

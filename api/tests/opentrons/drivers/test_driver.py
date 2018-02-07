@@ -83,31 +83,32 @@ def test_functional(smoothie):
     assert smoothie.position == HOMED_POSITION
 
 
-current = []
-
-
-def test_low_current_z(model):
+def test_set_current(model):
     from opentrons.robot.robot_configs import DEFAULT_CURRENT
     import types
     driver = model.robot._driver
 
     set_current = driver.set_current
 
-    def set_current_mock(self, target):
-        global current
-        current.append(target)
+    current_log = []
 
+    def set_current_mock(self, target):
+        nonlocal current_log
+        current_log.append(target)
         set_current(target)
 
     driver.set_current = types.MethodType(set_current_mock, driver)
 
-    driver.move({'A': 100}, low_current_z=False)
+    rack = model.robot.add_container('tiprack-200ul', '10')
+    pipette = model.instrument._instrument
+    pipette.pick_up_tip(rack[0], presses=1)
+
     # Instrument in `model` is configured to right mount, which is the A axis
     # on the Smoothie (see `Robot._actuators`)
-    assert current == []
-
-    driver.move({'A': 10}, low_current_z=True)
-    assert current == [{'A': 0.1}, DEFAULT_CURRENT]
+    expected = [{'A': 0.1}, DEFAULT_CURRENT]
+    from pprint import pprint
+    pprint(current_log)
+    assert current_log == expected
 
 
 def test_fast_home(model):
@@ -240,6 +241,7 @@ def test_speed_change(model, monkeypatch):
                         write_with_log)
 
     pipette.tip_attached = True
+    pipette.set_speed(aspirate=20, dispense=40)
     pipette.aspirate().dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
@@ -247,6 +249,8 @@ def test_speed_change(model, monkeypatch):
         ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
         ['G0F24000 M400']
     ]
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -279,8 +283,8 @@ def test_max_speed_change(model, monkeypatch):
         ['G0F{} M400'.format(321 * 60)],
         ['G0F{} M400'.format(123 * 60)]
     ]
-    from pprint import pprint
-    pprint(command_log)
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 

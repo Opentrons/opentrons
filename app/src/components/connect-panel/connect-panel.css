@@ -5,17 +5,7 @@
   margin-left: 0;
 }
 
-.robot_item {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border-bottom: border;
-}
-
-.robot_icon {
-  flex: none;
-  width: 1.5rem;
+.item_icon {
   height: 2rem;
 }
 
@@ -28,36 +18,49 @@
 }
 
 .robot_name {
-  margin-bottom: 0.5rem;
   font-weight: bold;
+  max-width: calc(100% - 3rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.connection_toggle {
+  height: calc(2 * var(--fs-body-1));
+}
+
 .disconnected {
   color: var(--c-dark-gray);
+  fill: var(--c-dark-gray);
 }
 
 .connected {
   color: blue;
+  fill: blue;
 }
 
 .scan_status {
-  padding: 1rem;
+  padding: 2rem 1rem;
   text-align: center;
 }
 
-.scan_button {
+.title {
+  font-size: var(--fs-header);
+  font-weight: var(--fw-semibold);
+  margin: 1.25rem;
+}
+
+.message {
+  font-size: var(--fs-body-1);
+  margin: 1.25rem;
+}
+
+.scan_progress {
   width: 5rem;
 }
 
-.refresh {
-  color: var(--c-dark-gray);
-}
-
-.refresh:hover {
-  color: #888;
+.scan_button {
+  max-width: 80%;
 }
 
 .title_scan_button {

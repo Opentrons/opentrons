@@ -316,6 +316,7 @@ describe('api client', () => {
       state = {
         [NAME]: {
           calibration: {
+            calibrationRequest: {},
             confirmedBySlot: {},
             labwareBySlot: {},
             jogDistance: constants.JOG_DISTANCE_FAST_MM

@@ -1,0 +1,137 @@
+{
+  "metadata": {
+    "name": "tube-rack-15_50ml"
+  },
+  "ordering": [
+    [
+      "A1",
+      "B1",
+      "C1"
+    ],
+    [
+      "A2",
+      "B2",
+      "C2"
+    ],
+    [
+      "A3",
+      "B3"
+    ],
+    [
+      "A4",
+      "B4"
+    ]
+  ],
+  "wells": {
+    "A1": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 10.5,
+      "y": 47.26,
+      "z": 0
+    },
+    "A2": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 33.2,
+      "y": 47.26,
+      "z": 0
+    },
+    "A3": {
+      "depth": 76.81281249999999,
+      "diameter": 30,
+      "height": 76.81281249999999,
+      "length": 30,
+      "total-liquid-volume": 50000,
+      "width": 30,
+      "x": 55.26,
+      "y": 65.5,
+      "z": 0
+    },
+    "A4": {
+      "depth": 76.81281249999999,
+      "diameter": 30,
+      "height": 76.81281249999999,
+      "length": 30,
+      "total-liquid-volume": 50000,
+      "width": 30,
+      "x": 91.1,
+      "y": 65.5,
+      "z": 0
+    },
+    "B1": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 10.5,
+      "y": 34.0,
+      "z": 0
+    },
+    "B2": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 33.2,
+      "y": 34.0,
+      "z": 0
+    },
+    "B3": {
+      "depth": 76.81281249999999,
+      "diameter": 30,
+      "height": 76.81281249999999,
+      "length": 30,
+      "total-liquid-volume": 50000,
+      "width": 30,
+      "x": 55.26,
+      "y": 2.5,
+      "z": 0
+    },
+    "B4": {
+      "depth": 76.81281249999999,
+      "diameter": 30,
+      "height": 76.81281249999999,
+      "length": 30,
+      "total-liquid-volume": 50000,
+      "width": 30,
+      "x": 91.1,
+      "y": 2.5,
+      "z": 0
+    },
+    "C1": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 10.5,
+      "y": 1.9,
+      "z": 0
+    },
+    "C2": {
+      "depth": 76.81281249999999,
+      "diameter": 17,
+      "height": 76.81281249999999,
+      "length": 17,
+      "total-liquid-volume": 15000,
+      "width": 17,
+      "x": 33.2,
+      "y": 1.9,
+      "z": 0
+    }
+  }
+}

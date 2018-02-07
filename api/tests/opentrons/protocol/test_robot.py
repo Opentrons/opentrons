@@ -309,5 +309,4 @@ def test_drop_tip_default_trash(robot):
         move_to.assert_called_with(
             (robot.fixed_trash[0], trash_loc),
             instrument=pip,
-            low_current_z=False,
             strategy='arc')

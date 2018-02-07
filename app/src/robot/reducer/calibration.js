@@ -3,29 +3,18 @@
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
 
-import type {Mount, Slot, LabwareCalibrationStatus} from '../types'
+import type {Mount, Slot} from '../types'
 import {actionTypes} from '../actions'
 import type {
   Action,
   ConfirmProbedAction,
+  PipetteCalibrationAction,
   LabwareCalibrationAction,
-  CalibrationResponseAction
+  CalibrationSuccessAction,
+  CalibrationFailureAction
 } from '../actions'
 
 import {
-  DECK_SLOTS,
-
-  UNCONFIRMED,
-  MOVING_TO_SLOT,
-  OVER_SLOT,
-  PICKING_UP,
-  HOMING,
-  HOMED,
-  UPDATING,
-  UPDATED,
-  CONFIRMING,
-  CONFIRMED,
-
   JOG_DISTANCE_SLOW_MM,
   JOG_DISTANCE_FAST_MM
 } from '../constants'
@@ -37,6 +26,8 @@ type CalibrationRequestType =
   | ''
   | 'MOVE_TO_FRONT'
   | 'PROBE_TIP'
+  | 'MOVE_TO'
+  | 'JOG'
   | 'PICKUP_AND_HOME'
   | 'DROP_TIP_AND_HOME'
   | 'CONFIRM_TIPRACK'
@@ -50,29 +41,16 @@ type CalibrationRequest = {
   error: ?{message: string},
 }
 
-// TODO(mc, 2018-01-10): replace with CalibrationRequest
-type LabwareConfirmationRequest = {
-  inProgress: boolean,
-  mount?: Mount | '',
-  slot?: Slot | '',
-  error: ?{message: string},
-}
-
 export type State = {
-  deckPopulated: boolean,
-  jogDistance: number,
+  +deckPopulated: boolean,
+  +jogDistance: number,
 
-  probedByMount: {[Mount]: boolean},
-  tipOnByMount: {[Mount]: boolean},
+  +probedByMount: {[Mount]: boolean},
+  +tipOnByMount: {[Mount]: boolean},
 
-  labwareBySlot: {[Slot]: LabwareCalibrationStatus},
-  confirmedBySlot: {[Slot]: boolean},
+  +confirmedBySlot: {[Slot]: boolean},
 
-  calibrationRequest: CalibrationRequest,
-
-  moveToRequest: LabwareConfirmationRequest,
-  jogRequest: LabwareConfirmationRequest,
-  updateOffsetRequest: LabwareConfirmationRequest,
+  +calibrationRequest: CalibrationRequest
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -84,11 +62,7 @@ const {
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
   PROBE_TIP_RESPONSE,
-  MOVE_TO,
-  MOVE_TO_RESPONSE,
   TOGGLE_JOG_DISTANCE,
-  JOG,
-  JOG_RESPONSE,
   CONFIRM_LABWARE
 } = actionTypes
 
@@ -100,20 +74,9 @@ const INITIAL_STATE: State = {
   probedByMount: {},
   tipOnByMount: {},
 
-  // TODO(mc, 2017-11-07): labwareBySlot holds confirmation status by
-  // slot. confirmedBySlot holds a flag for whether the labware has been
-  // confirmed at least once. Rethink or combine these states
-  labwareBySlot: {},
   confirmedBySlot: {},
 
-  calibrationRequest: {type: '', inProgress: false, error: null},
-
-  // TODO(mc, 2017-11-22): collapse all these into a single
-  // instrumentRequest object. We can't have simultaneous instrument
-  // movements so split state hurts us without benefit
-  moveToRequest: {inProgress: false, error: null},
-  jogRequest: {inProgress: false, error: null},
-  updateOffsetRequest: {inProgress: false, error: null}
+  calibrationRequest: {type: '', inProgress: false, error: null}
 }
 
 export default function calibrationReducer (
@@ -124,29 +87,59 @@ export default function calibrationReducer (
     case 'robot:CONFIRM_PROBED':
       return handleConfirmProbed(state, action)
 
+    case 'robot:MOVE_TO':
+      return handleMoveTo(state, action)
+
+    case 'robot:MOVE_TO_SUCCESS':
+      return handleMoveToSuccess(state, action)
+
+    case 'robot:MOVE_TO_FAILURE':
+      return handleMoveToFailure(state, action)
+
+    case 'robot:JOG':
+      return handleJog(state, action)
+
+    case 'robot:JOG_SUCCESS':
+      return handleJogSuccess(state, action)
+
+    case 'robot:JOG_FAILURE':
+      return handleJogFailure(state, action)
+
     case 'robot:PICKUP_AND_HOME':
       return handlePickupAndHome(state, action)
 
-    case 'robot:PICKUP_AND_HOME_RESPONSE':
-      return handlePickupAndHomeResponse(state, action)
+    case 'robot:PICKUP_AND_HOME_SUCCESS':
+      return handlePickupAndHomeSuccess(state, action)
+
+    case 'robot:PICKUP_AND_HOME_FAILURE':
+      return handlePickupAndHomeFailure(state, action)
 
     case 'robot:DROP_TIP_AND_HOME':
       return handleDropTipAndHome(state, action)
 
-    case 'robot:DROP_TIP_AND_HOME_RESPONSE':
-      return handleDropTipAndHomeResponse(state, action)
+    case 'robot:DROP_TIP_AND_HOME_SUCCESS':
+      return handleDropTipAndHomeSuccess(state, action)
+
+    case 'robot:DROP_TIP_AND_HOME_FAILURE':
+      return handleDropTipAndHomeFailure(state, action)
 
     case 'robot:CONFIRM_TIPRACK':
       return handleConfirmTiprack(state, action)
 
-    case 'robot:CONFIRM_TIPRACK_RESPONSE':
-      return handleConfirmTiprackResponse(state, action)
+    case 'robot:CONFIRM_TIPRACK_SUCCESS':
+      return handleConfirmTiprackSuccess(state, action)
+
+    case 'robot:CONFIRM_TIPRACK_FAILURE':
+      return handleConfirmTiprackFailure(state, action)
 
     case 'robot:UPDATE_OFFSET':
       return handleUpdateOffset(state, action)
 
-    case 'robot:UPDATE_OFFSET_RESPONSE':
-      return handleUpdateResponse(state, action)
+    case 'robot:UPDATE_OFFSET_SUCCESS':
+      return handleUpdateOffsetSuccess(state, action)
+
+    case 'robot:UPDATE_OFFSET_FAILURE':
+      return handleUpdateOffsetFailure(state, action)
 
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
@@ -156,11 +149,7 @@ export default function calibrationReducer (
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
-    case MOVE_TO: return handleMoveTo(state, action)
-    case MOVE_TO_RESPONSE: return handleMoveToResponse(state, action)
     case TOGGLE_JOG_DISTANCE: return handleToggleJog(state, action)
-    case JOG: return handleJog(state, action)
-    case JOG_RESPONSE: return handleJogResponse(state, action)
     case CONFIRM_LABWARE: return handleConfirmLabware(state, action)
   }
 
@@ -257,41 +246,54 @@ function handleConfirmProbed (
   }
 }
 
-function handleMoveTo (state: State, action: any) {
-  if (!action.payload || !action.payload.labware) return state
-
-  // TODO(mc, 2018-01-26): remove when MODE_TO is flow typed
-  const slot = action.payload.labware
-  if (DECK_SLOTS.indexOf(slot) < 0) return state
+function handleMoveTo (state: State, action: LabwareCalibrationAction): State {
+  const {mount, slot} = action.payload
 
   return {
     ...state,
     deckPopulated: true,
-    moveToRequest: {inProgress: true, error: null, slot},
-    labwareBySlot: {...state.labwareBySlot, [slot]: MOVING_TO_SLOT}
+    calibrationRequest: {
+      type: 'MOVE_TO',
+      inProgress: true,
+      error: null,
+      mount,
+      slot
+    }
   }
 }
 
-function handleMoveToResponse (state: State, action: any) {
-  const {moveToRequest: {slot}} = state
+function handleMoveToSuccess (
+  state: State,
+  action: CalibrationSuccessAction
+): State {
+  const {calibrationRequest: {slot}} = state
   if (!slot) return state
-
-  const {payload, error} = action
 
   return {
     ...state,
-    moveToRequest: {
-      ...state.moveToRequest,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error: null
+    }
+  }
+}
+
+function handleMoveToFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const {calibrationRequest: {slot}} = state
+  if (!slot) return state
+
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
       inProgress: false,
       error: error
-        ? payload
-        : null
-    },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: !error
-        ? OVER_SLOT
-        : UNCONFIRMED
     }
   }
 }
@@ -311,43 +313,47 @@ function handlePickupAndHome (
       error: null,
       mount,
       slot
-    },
-    labwareBySlot: {...state.labwareBySlot, [slot]: PICKING_UP}
+    }
   }
 }
 
-function handlePickupAndHomeResponse (
+function handlePickupAndHomeSuccess (
   state: State,
-  action: CalibrationResponseAction
+  action: CalibrationSuccessAction
 ): State {
   const {calibrationRequest: {mount, slot}} = state
   if (!slot || !mount) return state
-
-  const {payload, error} = action
-
-  // HACK(mc, 2018-01-26): fix after we separate success and failure actions
-  let errorObject: ?Error = null
-  if (typeof payload.message === 'string' && error) {
-    errorObject = new Error(payload.message)
-  }
 
   return {
     ...state,
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: errorObject
+      error: null
     },
     // assume that only one tip can be on at a time
     tipOnByMount: {
       ...mapValues(state.tipOnByMount, (value: boolean, key: Mount) => false),
-      [mount]: !error
-    },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: error
-        ? UNCONFIRMED
-        : HOMED
+      [mount]: true
+    }
+  }
+}
+
+function handlePickupAndHomeFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const {calibrationRequest: {mount, slot}} = state
+  if (!slot || !mount) return state
+
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error
     }
   }
 }
@@ -366,42 +372,46 @@ function handleDropTipAndHome (
       error: null,
       mount,
       slot
-    },
-    labwareBySlot: {...state.labwareBySlot, [slot]: HOMING}
+    }
   }
 }
 
-function handleDropTipAndHomeResponse (
+function handleDropTipAndHomeSuccess (
   state: State,
-  action: CalibrationResponseAction
+  action: CalibrationSuccessAction
 ): State {
   const {calibrationRequest: {mount, slot}} = state
   if (!slot || !mount) return state
-
-  const {error, payload} = action
-
-  // HACK(mc, 2018-01-26): fix after we separate success and failure actions
-  let errorObject: ?Error = null
-  if (error && typeof payload.message === 'string') {
-    errorObject = new Error(payload.message)
-  }
 
   return {
     ...state,
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: errorObject
+      error: null
     },
     tipOnByMount: {
       ...state.tipOnByMount,
-      [mount]: !!error
-    },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: error
-        ? UNCONFIRMED
-        : HOMED
+      [mount]: false
+    }
+  }
+}
+
+function handleDropTipAndHomeFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const {calibrationRequest: {mount, slot}} = state
+  if (!slot || !mount) return state
+
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error
     }
   }
 }
@@ -420,49 +430,52 @@ function handleConfirmTiprack (
       error: null,
       mount,
       slot
-    },
-    labwareBySlot: {...state.labwareBySlot, [slot]: CONFIRMING}
+    }
   }
 }
 
-function handleConfirmTiprackResponse (
+function handleConfirmTiprackSuccess (
   state: State,
-  action: CalibrationResponseAction
+  action: CalibrationSuccessAction
 ): State {
   const {calibrationRequest: {mount, slot}} = state
   if (!slot || !mount) return state
 
-  const {payload, error} = action
-
-  // HACK(mc, 2018-01-26): fix after we separate success and failure actions
-  let errorObject: ?Error = null
-  let tipOn: boolean = state.tipOnByMount[mount] || false
-  if (typeof payload.message === 'string' && error) {
-    errorObject = new Error(payload.message)
-  } else if (typeof payload.tipOn === 'boolean') {
-    tipOn = payload.tipOn
-  }
+  const tipOn = action.payload.tipOn || false
 
   return {
     ...state,
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: errorObject
+      error: null
     },
     tipOnByMount: {
       ...state.tipOnByMount,
       [mount]: tipOn
     },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: error
-        ? UNCONFIRMED
-        : CONFIRMED
-    },
     confirmedBySlot: {
       ...state.confirmedBySlot,
-      [slot]: !error
+      [slot]: true
+    }
+  }
+}
+
+function handleConfirmTiprackFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const {calibrationRequest: {mount, slot}} = state
+  if (!slot || !mount) return state
+
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error
     }
   }
 }
@@ -476,20 +489,46 @@ function handleToggleJog (state: State, action: any) {
   }
 }
 
-function handleJog (state: State, action: any) {
-  return {...state, jogRequest: {inProgress: true, error: null}}
-}
-
-function handleJogResponse (state: State, action: any) {
-  const {payload, error} = action
+function handleJog (state: State, action: PipetteCalibrationAction): State {
+  const {payload: {mount}} = action
 
   return {
     ...state,
-    jogRequest: {
+    calibrationRequest: {
+      type: 'JOG',
+      inProgress: true,
+      error: null,
+      mount
+    }
+  }
+}
+
+function handleJogSuccess (
+  state: State,
+  action: CalibrationSuccessAction
+): State {
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
       inProgress: false,
-      error: error
-        ? payload
-        : null
+      error: null
+    }
+  }
+}
+
+function handleJogFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error
     }
   }
 }
@@ -508,47 +547,27 @@ function handleUpdateOffset (
       error: null,
       mount,
       slot
-    },
-    labwareBySlot: {
-      ...state.labwareBySlot,
-      [slot]: UPDATING
     }
   }
 }
 
-function handleUpdateResponse (
+function handleUpdateOffsetSuccess (
   state: State,
-  action: CalibrationResponseAction
+  action: CalibrationSuccessAction
 ): State {
   const {calibrationRequest: {mount, slot}} = state
   if (!mount || !slot) return state
 
-  const {error, payload} = action
-  let labwareBySlot = {...state.labwareBySlot}
+  const isTiprack = action.payload.isTiprack || false
   let confirmedBySlot = {...state.confirmedBySlot}
   let tipOnByMount = {...state.tipOnByMount}
-
-  // HACK(mc, 2018-01-26): fix after we separate success and failure actions
-  let errorObject: ?Error = null
-  let isTiprack: boolean = false
-  if (typeof payload.message === 'string' && error) {
-    errorObject = new Error(payload.message)
-  } else if (typeof payload.isTiprack === 'boolean') {
-    isTiprack = payload.isTiprack
-  }
 
   // set status and confirmed flag for non-tipracks
   // tipracks are handled by confirmTiprack so we don't want to touch them here
   if (isTiprack) {
-    tipOnByMount[mount] = !error
-    labwareBySlot[slot] = !error
-      ? UPDATED
-      : UNCONFIRMED
+    tipOnByMount[mount] = true
   } else {
-    confirmedBySlot[slot] = !error
-    labwareBySlot[slot] = !error
-      ? CONFIRMED
-      : UNCONFIRMED
+    confirmedBySlot[slot] = true
   }
 
   return {
@@ -556,11 +575,29 @@ function handleUpdateResponse (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: errorObject
+      error: null
     },
     tipOnByMount,
-    labwareBySlot,
     confirmedBySlot
+  }
+}
+
+function handleUpdateOffsetFailure (
+  state: State,
+  action: CalibrationFailureAction
+): State {
+  const {calibrationRequest: {mount, slot}} = state
+  if (!mount || !slot) return state
+
+  const error = action.payload
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error
+    }
   }
 }
 
@@ -571,7 +608,6 @@ function handleConfirmLabware (state, action: any) {
 
   return {
     ...state,
-    labwareBySlot: {...state.labwareBySlot, [slot]: CONFIRMED},
     confirmedBySlot: {...state.confirmedBySlot, [slot]: true}
   }
 }
