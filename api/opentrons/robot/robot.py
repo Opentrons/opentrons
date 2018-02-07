@@ -639,6 +639,8 @@ class Robot(object):
             if self._previous_instrument != instrument:
                 self._previous_instrument.retract()
 
+        self._previous_instrument = instrument
+
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
             for coord in arc_coords:
