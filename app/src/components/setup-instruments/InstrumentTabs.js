@@ -4,7 +4,11 @@
 
 import {connect} from 'react-redux'
 import {PageTabs, type PageTabProps} from '@opentrons/components'
-import {selectors as robotSelectors, type Mount} from '../../robot'
+import {
+  constants as robotConstants,
+  selectors as robotSelectors,
+  type Mount
+} from '../../robot'
 
 export default connect(mapStateToProps)(PageTabs)
 
@@ -13,11 +17,13 @@ type OwnProps = {
 }
 
 function mapStateToProps (state, ownProps: OwnProps): PageTabProps {
-  const pages = robotSelectors.getInstruments(state).map((inst) => ({
-    title: inst.mount,
-    href: `/setup-instruments/${inst.mount}`,
-    isActive: inst.mount === ownProps.mount,
-    isDisabled: !('name' in inst)
+  const instruments = robotSelectors.getInstruments(state)
+
+  const pages = robotConstants.INSTRUMENT_MOUNTS.map((mount) => ({
+    title: mount,
+    href: `/setup-instruments/${mount}`,
+    isActive: mount === ownProps.mount,
+    isDisabled: !instruments.some((inst) => inst.mount === mount)
   }))
 
   return {pages}

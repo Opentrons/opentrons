@@ -54,7 +54,7 @@ const {
   STOPPED,
 
   // deck layout
-  INSTRUMENT_AXES,
+  INSTRUMENT_MOUNTS,
   DECK_SLOTS,
 
   // pipette channels names

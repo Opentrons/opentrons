@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import {TitledList} from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
@@ -9,11 +10,9 @@ import {
   actions as robotActions
 } from '../../robot'
 
-export default connect(
-  mapStateToProps,
-  null,
-  mergeProps
-)(LabwareList)
+export default withRouter(
+  connect(mapStateToProps, null, mergeProps)(LabwareList)
+)
 
 function LabwareList (props) {
   const {labware, disabled} = props

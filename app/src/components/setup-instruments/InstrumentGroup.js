@@ -11,6 +11,7 @@ type Props = {
 
 export default function InstrumentGroup (props: Props) {
   const {instruments} = props
+
   return (
     <section className={styles.pipette_group}>
       {instruments.map((instrument) => {
