@@ -23,23 +23,41 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type StepIdType = number
 
-export type StepSubItemData = {
+export type TransferishStepItem = {|
+  stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
-  substepId: number,
-  sourceIngredientName?: string,
-  destIngredientName?: string,
-  sourceWell?: string,
-  destWell?: string,
-}
+  rows: Array<{
+    substepId: number,
+    sourceIngredientName?: string,
+    destIngredientName?: string,
+    sourceWell?: string,
+    destWell?: string
+  }>
+|}
 
-export type StepItemData = {
+export type StepSubItemData = TransferishStepItem | {|
+  stepType: 'pause',
+  waitForUserInput: false,
+  hours: number,
+  minutes: number,
+  seconds: number
+|} | {|
+  stepType: 'pause',
+  waitForUserInput: true,
+  message: string
+|}
+
+export type StepItemData = {|
   id: StepIdType,
   title: string,
   stepType: StepType,
   description?: string
-}
+|}
 
-export type FormData = {
+type TransferForm = {|
+  stepType: 'transfer',
+  id: StepIdType,
+
   'aspirate--labware'?: string,
   'aspirate--wells'?: string,
   'aspirate--pipette'?: string,
@@ -65,13 +83,39 @@ export type FormData = {
   'dispense--delay-seconds'?: string,
   'dispense--blowout--checkbox'?: boolean,
   'dispense--blowout--labware'?: string
-}
+|}
 
-export type ValidatedForm = {
+type PauseForm = {|
+  stepType: 'pause',
+  id: StepIdType,
+
+  'pause-for-amount-of-time'?: 'true' | 'false',
+  'pause-hour'?: string,
+  'pause-minute'?: string,
+  'pause-second'?: string,
+  'pause-message'?: string,
+|}
+
+export type FormData = TransferForm | PauseForm
+
+type TransferFormData = {|
+  stepType: 'transfer',
   pipette: 'left' | 'right',
   sourceWells: Array<string>,
   destWells: Array<string>,
   sourceLabware: string,
   destLabware: string,
   volume: number
-}
+|}
+
+export type PauseFormData = {|
+  stepType: 'pause',
+  waitForUserInput: boolean,
+  seconds: number, // s/m/h only needed by substep...
+  minutes: number,
+  hours: number,
+  totalSeconds: number,
+  message: string
+|}
+
+export type ProcessedFormData = TransferFormData | PauseFormData

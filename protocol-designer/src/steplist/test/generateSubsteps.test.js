@@ -6,6 +6,7 @@ import {
 describe('generateCommands', () => {
   test('commands for minimal transfer step', () => {
     const data = {
+      stepType: 'transfer',
       pipette: 'left',
       'sourceWells': ['A1', 'A2'],
       'sourceLabware': 'sourcePlateId',
@@ -13,7 +14,7 @@ describe('generateCommands', () => {
       'destLabware': 'destPlateId',
       'destWells': ['B1', 'B2']
     }
-    expect(generateCommands('transfer', data)).toEqual([
+    expect(generateCommands(data)).toEqual([
       {
         commandType: 'aspirate',
         volume: 20,

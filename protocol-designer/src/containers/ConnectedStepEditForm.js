@@ -25,15 +25,13 @@ function StepEditFormWrapper (props: Props) {
 function mapStateToProps (state) {
   return {
     formData: selectors.formData(state),
-    stepType: 'transfer',
+    canSave: selectors.currentFormCanBeSaved(state),
     pipetteOptions: [
-      {name: '10 μL Single', value: '10-single'}, /* TODO: should be 'p10 single'? What 'value'? */
-      {name: '300 μL Single', value: '300-single'},
-      {name: '10 μL Multi-Channel', value: '10-multi'},
-      {name: '300 μL Multi-Channel', value: '300-multi'}
+      {name: '10 μL Single', value: 'left'}, /* TODO: should be 'p10 single'? What 'value'? Should value be 'left' | 'right' ? */
+      {name: '300 μL Multi-Channel', value: 'right'}
     ],
     labwareOptions: [
-      {name: 'Source Plate', value: 'sourcePlateId'}, /* TODO later: dropdown needs to deal with being empty */
+      {name: 'Source Plate', value: 'sourcePlateId'}, /* TODO: get labware with selector, not hard-coded! */
       {name: 'Dest Plate', value: 'destPlateId'},
       {name: 'Trough with very long name', value: 'troughId'}
     ]

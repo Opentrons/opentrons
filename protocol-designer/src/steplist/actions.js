@@ -108,8 +108,8 @@ export type SaveStepFormAction = {
 export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     const state = getState()
-    const errors = selectors.currentFormCanBeSaved(state)
-    if (!errors) {
+
+    if (selectors.currentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
         payload: selectors.formData(state)
