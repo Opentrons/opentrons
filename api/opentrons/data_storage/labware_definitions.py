@@ -3,13 +3,15 @@ import json
 
 """
 There will be 3 directories for json blobs to define labware:
-- `labware_data`: Currently in opentrons/api/opentrons/config, should be moved
-        to the repo root and get copied in by the Dockerfile (how to deal with
-        this for local development?).
+- `labware_data`: Definitions live in the `labware-definitions` project in the
+        root of the Opentrons/opentrons GitHub repo. These are copied into the
+        Docker container to "/etc/labware".
 - `custom_definitions`: Same format as definitions in `labware_data`, but lives
-        in the persistent data directory.
+        in the persistent data directory
+        "/data/user_storage/opentrons_data/labware/definitions".
 - `offsets`: A dict with xyz values that get added to each well's xyz fields,
-        lives in the persistent data directory.
+        lives in the persistent data directory
+        "/data/user_storage/opentrons_data/labware/offsets".
 
 Container load function will take "<labware_name>" as a parameter (consistent
 with existing behavior), check `custom_definitions` first, and fall back to the
@@ -99,44 +101,83 @@ Notes:
 
 """
 
+file_dir = os.path.abspath(os.path.dirname(__file__))
 
-def load_definition(path: str, labware_name: str):
+
+def _load_definition(path: str, labware_name: str) -> dict:
     definition_file = os.path.join(
         path, "{}.json".format(labware_name))
-    with open(definition_file) as defn_f:
-        lw = json.load(defn_f)
+    try:
+        with open(definition_file) as defn_f:
+            lw = json.load(defn_f)
+    except FileNotFoundError:
+        lw = {}
     # from pprint import pprint
     # print("Labware definition:")
     # pprint(lw)
     return lw
 
 
-def load_offset(path: str, labware_name: str):
+def _load_offset(path: str, labware_name: str) -> dict:
     offset_file = os.path.join(
         path, "{}.json".format(labware_name))
     offs = {}
-    if os.path.exists(offset_file):
-        with open(offset_file) as offs_f:
-            offs = json.load(offs_f)
+    try:
+        if os.path.exists(offset_file):
+            with open(offset_file) as offs_f:
+                offs = json.load(offs_f)
+    except FileNotFoundError:
+        pass
     # from pprint import pprint
     # print("Offsets:")
     # pprint(offs)
     return offs
 
 
-def load(root_path: str, labware_name: str):
-    defn_dir = os.path.join(root_path, 'definitions')
-    offset_dir = os.path.join(root_path, 'offsets')
-    lw = load_definition(defn_dir, labware_name)
-    offs = load_offset(offset_dir, labware_name)
+def _load(default_defn_dir: str,
+          user_defn_root_path: str,
+          labware_name: str) -> dict:
+    """
+    Try to find definition file in <user_defn_root_path>/definitions first,
+    then fall back to <default_defn_dir>. If a definition is found in either
+    place, look for an offset file in <user_defn_root_path>/offsets and apply
+    it if found.
 
-    for well in lw['wells'].keys():
-        for axis in 'xyz':
-            default_value = lw['wells'][well][axis]
-            offset = offs[axis]
-            lw['wells'][well][axis] = round(default_value + offset, 2)
+    If no definition file is found, raise a FileNotFoundException.
+
+    :param default_defn_dir: Opentrons default labware definition directory
+    :param user_defn_root_path: User labware definition directory
+    :param labware_name: Name of labware definition file (without extension)
+    :return: a dict of the definition with offset applied to each well
+    """
+    defn_dir = os.path.join(user_defn_root_path, 'definitions')
+    offset_dir = os.path.join(user_defn_root_path, 'offsets')
+    lw = _load_definition(defn_dir, labware_name)
+    if not lw:
+        lw = _load_definition(default_defn_dir, labware_name)
+    if not lw:
+        raise FileNotFoundError
+    offs = _load_offset(offset_dir, labware_name)
+
+    if offs:
+        for well in lw['wells'].keys():
+            for axis in 'xyz':
+                default_value = lw['wells'][well][axis]
+                offset = offs[axis]
+                lw['wells'][well][axis] = round(default_value + offset, 2)
 
     # from pprint import pprint
     # print("Labware with offsets:")
     # pprint(lw)
     return lw
+
+
+def load_json(labware_name: str) -> dict:
+    default_defn_dir = os.environ.get(
+        'LABWARE_DEF',
+        os.path.abspath(os.path.join(
+            file_dir, '..', '..', '..', 'labware-definitions', 'definitions')))
+    print("=-> {}".format(default_defn_dir))
+    user_defn_root = os.path.join(
+        '/', 'data', 'user_storage', 'opentrons_data', 'labware')
+    return _load(default_defn_dir, user_defn_root, labware_name)
