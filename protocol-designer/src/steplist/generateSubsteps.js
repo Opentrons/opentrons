@@ -1,5 +1,6 @@
 // @flow
 import type {Command, StepType, StepIdType, FormData, ProcessedFormData} from './types' /* StepSubItemData, StepIdType */
+import {humanize} from '../utils'
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 
@@ -10,16 +11,18 @@ export type ValidFormAndErrors = {
 }
 
 export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
+  // Add default values to a new step form
   const baseForm = {
     id: stepId,
-    stepType: stepType
+    stepType: stepType,
+    'step-name': humanize(stepType) + ' ' + (stepId + 1),
+    'step-details': ''
   }
 
   if (stepType === 'transfer' || stepType === 'consolidate') {
     return {
       ...baseForm,
       'aspirate--change-tip': 'once'
-      // TODO: rest of blank fields? Default values?
     }
   }
   if (stepType !== 'pause') {

@@ -154,3 +154,8 @@ export type PauseFormData = {|
 |}
 
 export type ProcessedFormData = TransferishFormData | PauseFormData
+
+export type FormModalFields = {
+  'step-name': string,
+  'step-details': string
+}

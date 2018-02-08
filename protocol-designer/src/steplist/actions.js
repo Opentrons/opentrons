@@ -4,7 +4,7 @@ import type {
 } from 'redux'
 
 import {selectors} from './reducers'
-import type {StepType, StepIdType, FormSectionNames} from './types'
+import type {StepType, StepIdType, FormSectionNames, FormModalFields} from './types'
 import type {GetState, ThunkAction} from '../types'
 
 // Update Form input (onChange on inputs)
@@ -145,10 +145,17 @@ export function collapseFormSection (payload: FormSectionNames): CollapseFormSec
 // ========= MORE OPTIONS MODAL =======
 // Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
 
-export const openMoreOptionsModal = () => ({ // does this need to be a thunk that populates the form? TODO IMMEDIATELY.
+// Populate newly-opened options modal with fields from unsaved form
+export type OpenMoreOptionsModal = {
   type: 'OPEN_MORE_OPTIONS_MODAL',
-  payload: null
-})
+  payload: FormModalFields
+}
+export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
+  dispatch({
+    type: 'OPEN_MORE_OPTIONS_MODAL',
+    payload: selectors.formData(getState()) // TODO only pull in relevant fields?
+  })
+}
 
 export const cancelMoreOptionsModal = () => ({
   type: 'CANCEL_MORE_OPTIONS_MODAL',

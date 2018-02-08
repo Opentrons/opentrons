@@ -18,7 +18,8 @@ import type {
   StepIdType,
   StepSubItemData,
   PauseFormData,
-  FormSectionState
+  FormSectionState,
+  FormModalFields
 } from './types'
 
 import {
@@ -32,12 +33,15 @@ import {
 import type {
   AddStepAction,
   DeleteStepAction,
-  PopulateFormAction,
   SaveStepFormAction,
   SelectStepAction,
+
+  PopulateFormAction,
+  CollapseFormSectionAction, // <- TODO this isn't a thunk
+
   ChangeMoreOptionsModalInputAction,
-  SaveMoreOptionsModal,
-  CollapseFormSectionAction // <- TODO this isn't a thunk
+  OpenMoreOptionsModal,
+  SaveMoreOptionsModal
 } from './actions' // Thunk action creators
 
 import {
@@ -89,7 +93,7 @@ function createDefaultStep (action: AddStepAction) {
 // the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
 // It's 2 degrees away from actual savedStepForms.
 const unsavedFormModal = handleActions({
-  OPEN_MORE_OPTIONS_MODAL: () => ({'step-name': 'Example name init', 'step-details': ''}), /* TODO IMMEDIATELY state here should come from unsavedForm. */
+  OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModal) => action.payload,
   CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
     ({...state, [action.payload.accessor]: action.payload.value}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,
@@ -164,7 +168,7 @@ const stepCreationButtonExpanded = handleActions({
 
 export type RootState = {|
   unsavedForm: FormState,
-  unsavedFormModal: any, // TODO IMMEDIATELY
+  unsavedFormModal: FormModalFields,
   formSectionCollapse: FormSectionState,
   steps: StepsState,
   savedStepForms: SavedStepFormState,
@@ -193,6 +197,7 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
+// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
 const formData = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedForm

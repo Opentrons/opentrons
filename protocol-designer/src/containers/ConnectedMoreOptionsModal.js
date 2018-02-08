@@ -18,7 +18,7 @@ function mapStateToProps (state) {
   const formModalData = selectors.formModalData(state)
   return {
     hideModal: formModalData === null,
-    formData: formModalData || {} // TODO IMMEDIATELY: {} fallback should not be necessary.
+    formData: formModalData
   }
 }
 
