@@ -5,6 +5,15 @@
   margin-left: 0;
 }
 
+.robot_item {
+  text-transform: uppercase;
+}
+
+/* this is needed for usb icon to override default icon height  render it at proper size */
+.robot_item svg:first-child {
+  height: 1.5rem;
+}
+
 .item_icon {
   height: 2rem;
 }
@@ -26,7 +35,8 @@
 }
 
 .connection_toggle {
-  height: calc(2 * var(--fs-body-1));
+  width: 2rem;
+  padding: 0;
 }
 
 .disconnected {
@@ -34,9 +44,11 @@
   fill: var(--c-dark-gray);
 }
 
-.connected {
-  color: blue;
-  fill: blue;
+.connected,
+.connected button {
+  color: #0ec9eb;
+  fill: #0ec9eb;
+  background-color: #f0f3ff;
 }
 
 .scan_status {

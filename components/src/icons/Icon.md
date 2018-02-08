@@ -4,9 +4,9 @@ All available icons:
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
   ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
-  CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX,
-  CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG, CONNECT,
-  CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT, MENU_DOWN
+  CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
+  TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG,
+  CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT, MENU_DOWN
 } = require('./icon-data')
 
 ;<div>
@@ -24,6 +24,8 @@ const {
   <Icon width='64px' name={UNCHECKED_RADIO} />
   <Icon width='64px' name={CHECKED_BOX} />
   <Icon width='64px' name={UNCHECKED_BOX} />
+  <Icon width='64px' name={TOGGLED_OFF} />
+  <Icon width='64px' name={TOGGLED_ON} />
   <Icon width='64px' name={CHEVRON_UP} />
   <Icon width='64px' name={CHEVRON_DOWN} />
   <Icon width='64px' name={CHEVRON_LEFT} />

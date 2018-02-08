@@ -16,6 +16,8 @@ export const CHECKED_RADIO = 'checked radio'
 export const UNCHECKED_RADIO = 'unchecked radio'
 export const CHECKED_BOX = 'checked box'
 export const UNCHECKED_BOX = 'unchecked box'
+export const TOGGLED_OFF = 'toggled off'
+export const TOGGLED_ON = 'toggled on'
 export const CHEVRON_UP = 'chevron up'
 export const CHEVRON_DOWN = 'chevron down'
 export const CHEVRON_LEFT = 'chevron left'
@@ -87,6 +89,14 @@ const ICON_DATA_BY_NAME = {
   [UNCHECKED_BOX]: {
     viewBox: '0 0 24 24',
     path: 'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z'
+  },
+  [TOGGLED_OFF]: {
+    viewBox: '0 0 24 24',
+    path: 'M19.2 7.8h-7.61a6.3 6.3 0 1 0 0 8.4h7.61a4.2 4.2 0 0 0 0-8.4zM6.9 17.3a5.3 5.3 0 1 1 5.3-5.3 5.31 5.31 0 0 1-5.3 5.3z'
+  },
+  [TOGGLED_ON]: {
+    viewBox: '0 0 24 24',
+    path: 'M17.1,5.7a6.28,6.28,0,0,0-4.69,2.1H4.8a4.2,4.2,0,1,0,0,8.4h7.61A6.3,6.3,0,1,0,17.1,5.7Zm-5.42,9.5H4.8a3.2,3.2,0,1,1,0-6.4h6.88a6.26,6.26,0,0,0,0,6.4Z'
   },
   [CHEVRON_UP]: {
     viewBox: '0 0 24 24',

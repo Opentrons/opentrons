@@ -18,6 +18,8 @@ import {
   UNCHECKED_RADIO,
   CHECKED_BOX,
   UNCHECKED_BOX,
+  TOGGLED_OFF,
+  TOGGLED_ON,
   CHEVRON_UP,
   CHEVRON_DOWN,
   CHEVRON_LEFT,
@@ -149,6 +151,22 @@ describe('icons', () => {
   test('UNCHECKED_BOX icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={UNCHECKED_BOX} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('TOGGLED_OFF icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={TOGGLED_OFF} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('TOGGLED_ON icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={TOGGLED_ON} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
