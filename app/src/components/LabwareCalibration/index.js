@@ -10,7 +10,7 @@ import {
   type Labware
 } from '../../robot'
 
-import CalibrateDeck from '../deck/CalibrateDeck'
+import CalibrateDeck from '../CalibrateDeck'
 import InfoBox from './InfoBox'
 import ConfirmModal from './ConfirmModal'
 

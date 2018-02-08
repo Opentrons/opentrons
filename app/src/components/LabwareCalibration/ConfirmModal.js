@@ -16,6 +16,12 @@ type Props = {
 export default function ConfirmModal (props: Props) {
   const {labware, onBackClick} = props
 
+  // disable back click if we're moving or if we've loaded up with tips
+  const backClickDisabled = (
+    labware.isMoving ||
+    labware.calibration === 'picked-up'
+  )
+
   // TODO(mc, 2018-02-07): TitleBar is locked to <h1> and <h2>
   //   this isn't quite semantic, so fix it up
   return (
@@ -26,6 +32,7 @@ export default function ConfirmModal (props: Props) {
         title='Setup Deck'
         subtitle={labware.name}
         onBackClick={onBackClick}
+        backClickDisabled={backClickDisabled}
       />
       <div className={styles.modal_contents}>
         <ConfirmModalContents {...labware} />

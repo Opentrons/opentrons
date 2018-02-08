@@ -35,6 +35,7 @@ function ConfirmModalContents (props: Props) {
 
     case 'moving-to-slot':
     case 'picking-up':
+    case 'dropping-tip':
     case 'confirming':
       return (<InProgressContents {...props} />)
 

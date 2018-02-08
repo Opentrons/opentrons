@@ -7,7 +7,7 @@ import React from 'react'
 import {Deck} from '@opentrons/components'
 import ConnectedLabwareItem from './ConnectedLabwareItem'
 
-import styles from './deck.css'
+import styles from './styles.css'
 
 export default function CalibrateDeck () {
   return (

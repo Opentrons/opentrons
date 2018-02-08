@@ -6,8 +6,7 @@ import {withRouter, type ContextRouter} from 'react-router'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount,
-  type Labware
+  type Mount
 } from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
@@ -17,11 +16,7 @@ type OwnProps = LabwareComponentProps & ContextRouter
 
 type StateProps = {
   _calibrator?: Mount,
-  _labware?: Labware & {
-    highlighted: boolean,
-    disabled: boolean,
-    showSpinner: boolean,
-  }
+  _labware?: $PropertyType<LabwareItemProps, 'labware'>
 }
 
 type DispatchProps = {
@@ -50,7 +45,10 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
       ...labware,
       highlighted,
       disabled: (isTiprack && confirmed) || (!isTiprack && !tipracksConfirmed),
-      showSpinner: highlighted && labware.calibration === 'moving-to-slot'
+      showName: highlighted || confirmed,
+      showUnconfirmed: true,
+      showSpinner: highlighted && labware.calibration === 'moving-to-slot',
+      url: `/setup-deck/${slotName}`
     }
   }
 }
