@@ -2,7 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import {ListItem, IconButton, TOGGLED_OFF, TOGGLED_ON} from '@opentrons/components'
+import {ListItem, IconButton, USB, TOGGLED_OFF, TOGGLED_ON} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
@@ -32,7 +32,7 @@ export default function RobotItem (props) {
   return (
     <ListItem
       onClick={onClick}
-      iconName={'usb'}
+      iconName={USB}
       className={className}
     >
       <p className={styles.robot_name}>{name}</p>
