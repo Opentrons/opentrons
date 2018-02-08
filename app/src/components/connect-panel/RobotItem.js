@@ -2,7 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import {ListItem, Icon, USB, UNCHECKED_RADIO, CHECKED_RADIO} from '@opentrons/components'
+import {ListItem, IconButton, USB, TOGGLED_OFF, TOGGLED_ON} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
@@ -18,14 +18,17 @@ export default function RobotItem (props) {
   const onClick = isConnected
     ? onDisconnectClick
     : onConnectClick
-  const className = cx({
+  const className = cx(styles.robot_item, {
     [styles.connected]: isConnected,
     [styles.disconnected]: !isConnected
   })
-  // TODO (ka 2018-2-6):this is a temp workaround for pending connection toggle button
+  /* TODO (ka 2018-2-7): No onClick passed to IconButton for now because parent
+    ListItem receives the onClick temporarily. double toggle = no toggle.
+    Once routes in place for connection pages this will be resolved by replacing
+    onClick in ListItem with url */
   const toggleIcon = isConnected
-    ? CHECKED_RADIO
-    : UNCHECKED_RADIO
+    ? TOGGLED_ON
+    : TOGGLED_OFF
   return (
     <ListItem
       onClick={onClick}
@@ -33,7 +36,10 @@ export default function RobotItem (props) {
       className={className}
     >
       <p className={styles.robot_name}>{name}</p>
-      <Icon name={toggleIcon} className={styles.connection_toggle} />
+      <IconButton
+        name={toggleIcon}
+        className={styles.connection_toggle}
+      />
     </ListItem>
   )
 }
