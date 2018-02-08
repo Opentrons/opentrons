@@ -88,7 +88,7 @@ export default function StepEditForm (props: Props) {
               <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
             </FormGroup>
             {props.formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
-              <InputField placeholder='20' units='μL' {...formConnector('aspirate--volume')} />
+              <InputField units='μL' {...formConnector('aspirate--volume')} />
             </FormGroup>}
           </div>
 
@@ -151,7 +151,7 @@ export default function StepEditForm (props: Props) {
               <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('dispense--wells')} />
             </FormGroup>
             {props.formData.stepType === 'transfer' && <FormGroup label='Volume:'>
-              <InputField placeholder='20' units='μL' {...formConnector('dispense--volume')} />
+              <InputField units='μL' {...formConnector('dispense--volume')} />
             </FormGroup>}
           </div>
 
