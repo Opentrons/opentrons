@@ -23,17 +23,10 @@ def _json_to_well(
 
     well = Well(properties=well_properties)
 
-    # subtract half the size, because
-    # Placeable assigns X-Y to bottom-left corner, but
-    # persisted container files assign X-Y to center of each Well
-    x -= (well.x_size() / 2)
-    y -= (well.y_size() / 2)
-
     well_coordinates = (x, y, z)
     return well, well_coordinates
 
 
-# check equivalence of Container from this method with prior
 def json_to_container(json_defn: dict) -> Container:
     container_data = json_defn.copy()
     container = Container()
@@ -48,19 +41,13 @@ def json_to_container(json_defn: dict) -> Container:
 
 
 def _well_to_json(well: Well) -> dict:
-    # Placeable does some weird stuff w/ xyz. Probably need to reverse the
-    # effect of the well.x_size and well.y_size modification made on load.
-    # Check.
-    x, y, z = well.coordinates()
-    x += (well.x_size() * 2)
-    y += (well.y_size() * 2)
+    x, y, z = map(lambda num: round(num, 3), well.coordinates())
     well_json = {'x': x, 'y': y, 'z': z}
     well_json.update(well.properties)
     return well_json
 
 
 # TODO (ben 20180207): rename everything to "labware"
-# check round-trip
 def container_to_json(container: Container) -> dict:
     metadata = {'name': container.get_name()}
     wells = {
