@@ -21,6 +21,13 @@ export type Slot =
 // jog axes and directions
 export type Axis = 'x' | 'y' | 'z'
 export type Direction = -1 | 1
+export type JogButtonName =
+  | 'left'
+  | 'right'
+  | 'back'
+  | 'forward'
+  | 'up'
+  | 'down'
 
 // robot MDNS service for connectivity
 export type RobotService = {
@@ -49,6 +56,7 @@ export type LabwareCalibrationStatus =
   | 'unconfirmed'
   | 'moving-to-slot'
   | 'over-slot'
+  | 'jogging'
   | 'picking-up'
   | 'picked-up'
   | 'confirming'

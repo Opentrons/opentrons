@@ -1,88 +1,79 @@
-// import * as React from 'react'
+// @flow
+import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {withRouter} from 'react-router'
-
-import LabwareItem from './LabwareItem'
+import {withRouter, type ContextRouter} from 'react-router'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions
+  actions as robotActions,
+  type Mount,
+  type Labware
 } from '../../robot'
 
-export default withRouter(connect(mapStateToProps, null, mergeProps)(LabwareItem))
+import type {LabwareComponentProps} from '@opentrons/components'
+import LabwareItem, {type LabwareItemProps} from './LabwareItem'
 
-function mapStateToProps (state, ownProps) {
-  const {slotName} = ownProps
-  const {match: {params: {slot: selectedSlot}}} = ownProps
-  const allLabware = robotSelectors.getLabware(state)
+type OwnProps = LabwareComponentProps & ContextRouter
 
-  const selectedLabware = allLabware.find((lw) => lw.slot === selectedSlot)
-  const labware = allLabware.find((lw) => lw.slot === slotName)
-
-  // bail out if it's an empty slot
-  if (labware == null) return {}
-
-  const nextLabware = robotSelectors.getNextLabware(state)
-  const allTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
-  const {
-    type,
-    name,
-    confirmed,
-    isTiprack,
-    calibratorMount
-  } = labware
-
-  const current = slotName === selectedSlot
-  const highlighted = (
-    (current && !confirmed) ||
-    (selectedLabware.confirmed && nextLabware && slotName === nextLabware.slot)
-  )
-
-  // NOTE: this is a hacky carryover from Protocol Designer.
-  // TODO Ian 2017-12-14 allow alternative to wellContents for setting well styles.
-  const wellContents = highlighted ? {'A1': {selected: true, groupId: 6}} : {}
-
-  // TODO Ian 2017-12-14 another selector candidate
-  const isMoving = highlighted && labware.isMoving
-
-  return {
-    containerType: type,
-    containerName: name,
-    wellContents,
-    highlighted,
-    canRevisit: !isMoving &&
-      allTipracksConfirmed &&
-      !(isTiprack && confirmed), // user cannot revisit a confirmed tiprack
-    isMoving,
-    confirmed,
-
-    // pass to mergeProps but not to component
-    _calibrator: calibratorMount || robotSelectors.getCalibratorMount(state),
-    _isTiprack: isTiprack
+type StateProps = {
+  _calibrator?: Mount,
+  _labware?: Labware & {
+    highlighted: boolean,
+    disabled: boolean,
+    showSpinner: boolean,
   }
 }
 
-function mergeProps (stateProps, dispatchProps, ownProps) {
-  const {confirmed, _calibrator, _isTiprack} = stateProps
-  const {dispatch} = dispatchProps
-  const slot = ownProps && ownProps.slotName
+type DispatchProps = {
+  dispatch: Dispatch<*>
+}
 
-  const onLabwareClick = () => {
-    if (_isTiprack) {
-      if (!confirmed) {
-        dispatch(robotActions.pickupAndHome(_calibrator, slot))
-      }
-    } else {
-      dispatch(robotActions.moveTo(_calibrator, slot))
-    }
-  }
+export default withRouter(
+  connect(mapStateToProps, null, mergeProps)(LabwareItem)
+)
 
-  const setLabwareConfirmed = () => dispatch(robotActions.confirmLabware(slot))
+function mapStateToProps (state, ownProps: OwnProps): StateProps {
+  const {slotName, match: {params: {slot: selectedSlot}}} = ownProps
+  const allLabware = robotSelectors.getLabware(state)
+  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
+  const labware = allLabware.find((lw) => lw.slot === slotName)
+
+  // bail out if it's an empty slot
+  if (!labware) return {}
+
+  const {isTiprack, confirmed, calibratorMount} = labware
+  const highlighted = slotName === selectedSlot
 
   return {
-    onLabwareClick,
-    setLabwareConfirmed,
+    _calibrator: calibratorMount || robotSelectors.getCalibratorMount(state),
+    _labware: {
+      ...labware,
+      highlighted,
+      disabled: (isTiprack && confirmed) || (!isTiprack && !tipracksConfirmed),
+      showSpinner: highlighted && labware.calibration === 'moving-to-slot'
+    }
+  }
+}
+
+function mergeProps (
+  stateProps: StateProps,
+  dispatchProps: DispatchProps,
+  ownProps: OwnProps
+): LabwareItemProps {
+  const {_labware, _calibrator} = stateProps
+  const {dispatch} = dispatchProps
+
+  if (!_labware) return {...ownProps}
+
+  return {
     ...ownProps,
-    ...stateProps
+    labware: {
+      ..._labware,
+      onClick: () => {
+        if (_calibrator && (!_labware.isTiprack || !_labware.confirmed)) {
+          dispatch(robotActions.moveTo(_calibrator, _labware.slot))
+        }
+      }
+    }
   }
 }

@@ -29,3 +29,12 @@ button.btn_calibrate {
   background-color: var(--c-blue);
   color: white;
 }
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.spinner {
+  color: var(--c-font-light);
+}

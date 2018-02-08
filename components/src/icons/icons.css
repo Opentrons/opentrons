@@ -5,6 +5,6 @@
 }
 
 .spin > * {
-  animation: spin 1.5s steps(8) infinite;
+  animation: spin 0.8s steps(8) infinite;
   transform-origin: center;
 }
