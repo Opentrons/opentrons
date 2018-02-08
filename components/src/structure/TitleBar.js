@@ -12,11 +12,12 @@ type Props = {
   title: React.Node,
   subtitle?: React.Node,
   onBackClick?: () => void,
+  backClickDisabled?: boolean,
   className?: string
 }
 
 export default function TitleBar (props: Props) {
-  const {title, subtitle, onBackClick, className} = props
+  const {title, subtitle, onBackClick, backClickDisabled, className} = props
 
   const separator = subtitle && (
     <span className={styles.separator}>
@@ -36,6 +37,7 @@ export default function TitleBar (props: Props) {
       title='back'
       iconName={CHEVRON_LEFT}
       onClick={onBackClick}
+      disabled={backClickDisabled}
     >
       Back
     </FlatButton>

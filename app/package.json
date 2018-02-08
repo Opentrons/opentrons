@@ -50,7 +50,8 @@
     "globals": [
       "SyntheticEvent",
       "$Keys",
-      "$Call"
+      "$Call",
+      "$PropertyType"
     ],
     "env": [
       "node",

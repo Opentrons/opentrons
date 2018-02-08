@@ -8,7 +8,8 @@ import type {
   Instrument,
   InstrumentCalibrationStatus,
   Labware,
-  LabwareCalibrationStatus
+  LabwareCalibrationStatus,
+  LabwareType
 } from './types'
 
 import type {State as CalibrationState} from './reducer/calibration'
@@ -45,6 +46,12 @@ export function isMount (target: ?string): boolean {
 
 export function isSlot (target: ?string): boolean {
   return DECK_SLOTS.indexOf(target) > -1
+}
+
+export function labwareType (labware: Labware): LabwareType {
+  return labware.isTiprack
+    ? 'tiprack'
+    : 'labware'
 }
 
 export function getIsScanning (state: State): boolean {
@@ -289,15 +296,21 @@ export const getLabware = createSelector(
         // TODO(mc: 2018-01-10): rethink the labware level "calibration" prop
         if (calibrationRequest.slot === slot && !calibrationRequest.error) {
           const {type, inProgress} = calibrationRequest
-          isMoving = inProgress
 
-          if (type === 'MOVE_TO' || type === 'DROP_TIP_AND_HOME') {
+          // don't set isMoving for jogs because it's distracting
+          isMoving = inProgress && type !== 'JOG'
+
+          if (type === 'MOVE_TO') {
             calibration = inProgress
               ? 'moving-to-slot'
               : 'over-slot'
           } else if (type === 'JOG') {
             calibration = inProgress
               ? 'jogging'
+              : 'over-slot'
+          } else if (type === 'DROP_TIP_AND_HOME') {
+            calibration = inProgress
+              ? 'dropping-tip'
               : 'over-slot'
           } else if (type === 'PICKUP_AND_HOME') {
             calibration = inProgress

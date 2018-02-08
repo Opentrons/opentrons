@@ -17,19 +17,22 @@ import {
 
 import type {Labware} from '../../robot'
 
-import styles from './deck.css'
+import styles from './styles.css'
 
 export type LabwareItemProps = LabwareComponentProps & {
   labware?: Labware & {
-    highlighted: boolean,
-    disabled: boolean,
-    showSpinner: boolean,
-    onClick: () => void
+    highlighted?: boolean,
+    disabled?: boolean,
+    showName?: boolean,
+    showUnconfirmed?: boolean,
+    showSpinner?: boolean,
+    onClick?: () => void,
+    url?: string
   }
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {slotName, width, height, labware} = props
+  const {width, height, labware} = props
 
   if (!labware) {
     return (
@@ -45,12 +48,13 @@ export default function LabwareItem (props: LabwareItemProps) {
     confirmed,
     highlighted,
     disabled,
+    showName,
+    showUnconfirmed,
     showSpinner,
-    onClick
+    onClick,
+    url
   } = labware
 
-  const showNameOverlay = !showSpinner && (confirmed || highlighted)
-  const showUnconfirmed = !showSpinner && !confirmed
   const plateClass = cx({[styles.disabled]: disabled})
 
   const item = (
@@ -58,11 +62,11 @@ export default function LabwareItem (props: LabwareItemProps) {
       <g className={plateClass}>
         <Plate containerType={type} wellContents={{}} />
 
-        {showNameOverlay && (
+        {!showSpinner && showName && (
           <ContainerNameOverlay containerName={name} containerType={type} />
         )}
 
-        {showUnconfirmed && (
+        {!showSpinner && showUnconfirmed && !confirmed && (
           <SlotOverlay text='Position Unconfirmed' icon={ALERT} />
         )}
 
@@ -84,9 +88,9 @@ export default function LabwareItem (props: LabwareItemProps) {
     </LabwareContainer>
   )
 
-  if (!showSpinner && !disabled) {
+  if (!showSpinner && !disabled && url) {
     return (
-      <Link to={`/setup-deck/${slotName}`} onClick={onClick}>
+      <Link to={url} onClick={onClick}>
         {item}
       </Link>
     )

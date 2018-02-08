@@ -8,7 +8,7 @@ import styles from './tip-probe.css'
 export default function UnprobedPanel () {
   return (
     <CalibrationInfoContent
-      rightChildren={(
+      leftChildren={(
         <Icon name={SPINNER} spin className={styles.spinner} />
       )}
     />

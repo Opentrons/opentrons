@@ -10,7 +10,6 @@ import {
   type Channels
 } from '../../robot'
 
-import {UNCHECKED, CHECKED} from '@opentrons/components'
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import UnprobedPanel from './UnprobedPanel'
 import InstrumentMovingPanel from './InstrumentMovingPanel'
@@ -62,14 +61,11 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
 function TipProbe (props: TipProbeProps) {
   const {mount, probed, calibration} = props
   const title = `${mount} pipette setup`
-  const iconName = probed
-    ? CHECKED
-    : UNCHECKED
 
   const Panel = PANEL_BY_CALIBRATION[calibration]
 
   return (
-    <CalibrationInfoBox iconName={iconName} title={title}>
+    <CalibrationInfoBox confirmed={probed} title={title}>
       <Panel {...props} />
     </CalibrationInfoBox>
   )

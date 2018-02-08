@@ -55,8 +55,9 @@ export type InstrumentCalibrationStatus =
 export type LabwareCalibrationStatus =
   | 'unconfirmed'
   | 'moving-to-slot'
-  | 'over-slot'
   | 'jogging'
+  | 'dropping-tip'
+  | 'over-slot'
   | 'picking-up'
   | 'picked-up'
   | 'confirming'
@@ -117,3 +118,5 @@ export type Labware = StateLabware & {
   confirmed: boolean,
   isMoving: boolean
 }
+
+export type LabwareType = 'tiprack' | 'labware'
