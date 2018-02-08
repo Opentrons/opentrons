@@ -3,7 +3,6 @@
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 
-import {modalHOC} from '../components/modals/Modal'
 import MoreOptionsModal from '../components/modals/MoreOptionsModal'
 
 import {selectors} from '../steplist/reducers'
@@ -42,4 +41,4 @@ function mapDispatchToProps (dispatch: Dispatch<any>) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(modalHOC(MoreOptionsModal))
+export default connect(mapStateToProps, mapDispatchToProps)(MoreOptionsModal)

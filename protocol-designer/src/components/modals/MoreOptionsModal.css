@@ -1,7 +1,7 @@
 @import './grid.css';
 
-.modal_wrapper {
-  padding: 2rem;
+.modal {
+  z-index: 100;
 }
 
 .big_text_box {
