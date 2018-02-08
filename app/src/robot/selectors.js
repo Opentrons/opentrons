@@ -1,6 +1,7 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
+import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
 import type {
@@ -55,10 +56,17 @@ export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
   (state: State) => connection(state).discoveredByName,
   (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo) => discovered.map((name) => ({
-    ...discoveredByName[name],
-    isConnected: connectedTo === name
-  }))
+  (discovered, discoveredByName, connectedTo) => sortBy(
+    discovered.map((name) => ({
+      ...discoveredByName[name],
+      isConnected: connectedTo === name
+    })),
+    [
+      (robot) => !robot.isConnected,
+      (robot) => !robot.wired,
+      'name'
+    ]
+  )
 )
 
 export const getConnectionStatus = createSelector(

@@ -34,6 +34,7 @@ export type RobotService = {
   name: string,
   host: string,
   ip: string,
+  wired?: boolean,
 }
 
 // protocol file (browser File object)
