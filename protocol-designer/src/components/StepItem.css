@@ -22,13 +22,6 @@
   font-weight: bold;
 }
 
-/* TODO Ian 2018-01-11 replace with real SidePanel */
-.fake_sidepanel_standin {
-  height: 100%;
-  float: left;
-  width: 25%;
-}
-
 /* Step Subitem */
 
 .step_subitem {

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-
+import cx from 'classnames'
 import Overlay from './Overlay'
 import styles from './modals.css'
 
@@ -8,7 +8,9 @@ type ModalProps = {
   /** handler to close the modal (attached to `Overlay` onClick) */
   onCloseClick: (event: SyntheticEvent<>) => void,
   /** modal contents */
-  children: React.Node
+  children: React.Node,
+  /** classes to apply */
+  className?: string
 }
 
 /**
@@ -17,7 +19,7 @@ type ModalProps = {
  */
 export default function Modal (props: ModalProps) {
   return (
-    <div className={styles.modal}>
+    <div className={cx(styles.modal, props.className)}>
       <Overlay onClick={props.onCloseClick} />
       <div className={styles.modal_contents}>
         {props.children}

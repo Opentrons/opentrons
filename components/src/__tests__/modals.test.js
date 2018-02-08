@@ -61,7 +61,7 @@ describe('modals', () => {
 
   test('Modal renders correctly', () => {
     const tree = Renderer.create(
-      <Modal onCloseClick={() => {}}>
+      <Modal onCloseClick={() => {}} className='foo'>
         children
       </Modal>
     ).toJSON()
