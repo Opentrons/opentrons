@@ -31,7 +31,7 @@ export default function FormSection (props: Props) {
           {/* TODO Ian 2018-01-29 use an IconButton once it exists */}
           <Icon
             width='30px'
-            name={props.collapsed === true ? 'chevron up' : 'chevron down'}
+            name={props.collapsed === true ? 'chevron down' : 'chevron up'}
             className={styles.carat}
           />
         </div>
