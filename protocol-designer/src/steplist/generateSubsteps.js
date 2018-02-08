@@ -61,17 +61,24 @@ export function validateAndProcessForm (formData: FormData): ValidFormAndErrors 
       : acc
     }, {})
 
-    const errors = {
-      ...(isNaN(volume) || volume <= 0)
-        ? {[formData.stepType === 'transfer' ? 'dispense--volume' : 'aspirate--volume']: 'Volume must be a positive number'}
-        : {},
-      ...(formData.stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0))
-        ? {'_mismatchedWells': 'Numbers of wells must match'}
-        : {},
-      ...(formData.stepType === 'consolidate' && (sourceWells.length !== 1 || destWells.length < 1))
-        ? {'_mismatchedWells': 'Exactly one source well and at least one destination well is required.'}
-        : {},
-      ...requiredFieldErrors
+    // Conditionally add error fields
+    let errors = {...requiredFieldErrors}
+
+    if (!(volume > 0)) {
+      const field = formData.stepType === 'transfer' ? 'dispense--volume' : 'aspirate--volume'
+      errors[field] = 'Volume must be a positive number'
+    }
+
+    if (formData.stepType === 'transfer') {
+      if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
+        errors._mismatchedWells = 'Numbers of wells must match'
+      }
+    }
+
+    if (formData.stepType === 'consolidate') {
+      if (sourceWells.length !== 1 || destWells.length < 1) {
+        errors._mismatchedWells = 'Exactly one source well and at least one destination well is required.'
+      }
     }
 
     return {
