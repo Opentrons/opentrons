@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react'
+import omit from 'lodash/omit'
 
 import {Icon, type IconName} from '../icons'
 import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */
-  onClick: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticEvent<>) => void,
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
@@ -16,7 +17,9 @@ export type ButtonProps = {
   /** classes to apply */
   className?: string,
   /** contents of the button */
-  children?: React.Node
+  children?: React.Node,
+  /** custom element or component to use instead of `<button>` */
+  Component?: React.ElementType
 }
 
 /**
@@ -29,20 +32,21 @@ export type ButtonProps = {
  * ```
  */
 export default function Button (props: ButtonProps) {
-  const {disabled} = props
+  const {title, disabled, className} = props
   const onClick = !disabled ? props.onClick : undefined
+  const Component = props.Component || 'button'
+
+  // pass all props if using a custom component
+  const buttonProps = !props.Component
+    ? {title, disabled, onClick, className}
+    : {...omit(props, ['iconName', 'children', 'Component']), onClick}
 
   return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      title={props.title}
-      className={props.className}
-    >
+    <Component {...buttonProps}>
       {props.iconName && (
         <Icon name={props.iconName} className={styles.icon} />
       )}
       {props.children}
-    </button>
+    </Component>
   )
 }

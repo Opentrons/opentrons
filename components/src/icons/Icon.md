@@ -5,8 +5,9 @@ All available icons:
 const {
   ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
   CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
-  TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE, COG,
-  CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT, MENU_DOWN
+  TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE,
+  UPLOAD, COG, CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT,
+  MENU_DOWN
 } = require('./icon-data')
 
 ;<div>
@@ -31,6 +32,7 @@ const {
   <Icon width='64px' name={CHEVRON_LEFT} />
   <Icon width='64px' name={CHEVRON_RIGHT} />
   <Icon width='64px' name={FILE} />
+  <Icon width='64px' name={UPLOAD} />
   <Icon width='64px' name={COG} />
   <Icon width='64px' name={CONNECT} />
   <Icon width='64px' name={CONSOLIDATE} />

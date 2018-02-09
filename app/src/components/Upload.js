@@ -1,11 +1,12 @@
 // upload summary component
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Icon, SPINNER} from '@opentrons/components'
+import cx from 'classnames'
 
-import CenteredContent from './CenteredContent'
+import {PANEL_PROPS_BY_NAME} from '../interface'
+
+import {Icon, ALERT, CHECKED, SPINNER} from '@opentrons/components'
 import Splash from './Splash'
-import {Success, Warning} from './icons'
 
 import styles from './Upload.css'
 
@@ -30,13 +31,13 @@ export default function Upload (props) {
   }
 
   const content = inProgress
-    ? (<Icon name={SPINNER} spin className={styles.spinner} />)
+    ? (<Icon name={SPINNER} spin className={styles.status_icon} />)
     : (<UploadResults {...props} />)
 
   return (
-    <CenteredContent>
+    <div className={styles.container}>
       {content}
-    </CenteredContent>
+    </div>
   )
 }
 
@@ -52,7 +53,7 @@ function UploadResults (props) {
     // instructions for an unsuccessful upload
     instructions = (
       <div className={styles.details}>
-        <p className={styles.error}>
+        <p className={styles.error_message}>
           {error.message}
         </p>
         <p>
@@ -72,7 +73,7 @@ function UploadResults (props) {
           onClick={openSetupPanel}
           className={styles.open_setup_link}
         >
-          {' Prep For Run '}
+          {` ${PANEL_PROPS_BY_NAME.setup.title} `}
         </span>
         <span>
           panel to set up your pipettes and labware for the run
@@ -83,34 +84,37 @@ function UploadResults (props) {
 
   return (
     <div className={styles.results}>
-      <StatusBar success={!error}>
-        <span className={styles.status_message}>
+      <StatusIcon success={!error} />
+      <div className={styles.status}>
+        <p className={styles.status_message}>
           {message}
-        </span>
-      </StatusBar>
-      <div className={styles.details}>
-        <h3 className={styles.file_details_title}>
-          File details:
-        </h3>
-        <p>
-          Filename: {name}
         </p>
+        <div className={styles.details}>
+          <h3 className={styles.file_details_title}>
+            File details:
+          </h3>
+          <p>
+            Filename: {name}
+          </p>
+        </div>
+        {instructions}
       </div>
-      {instructions}
     </div>
   )
 }
 
-function StatusBar (props) {
+function StatusIcon (props) {
   const {success} = props
-  const StatusIcon = success
-    ? Success
-    : Warning
+  const iconClassName = cx(styles.status_icon, {
+    [styles.success]: success,
+    [styles.error]: !success
+  })
+
+  const iconName = success
+    ? CHECKED
+    : ALERT
 
   return (
-    <div className={styles.status_bar}>
-      <StatusIcon className={styles.status_icon} />
-      {props.children}
-    </div>
+    <Icon name={iconName} className={iconClassName} />
   )
 }

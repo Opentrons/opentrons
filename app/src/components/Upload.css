@@ -4,56 +4,61 @@
 /* Upload component styles */
 @import '@opentrons/components';
 
-.status_bar {
+.container {
+  @apply --center-children;
+
+  width: 100%;
+  height: 100%;
+}
+
+.results {
   display: flex;
   align-items: center;
 }
 
-.spinner {
-  width: 8rem;
-}
-
-.results {
-  max-width: 32rem;
-}
-
 .status_icon {
-  line-height: 1;
-  font-size: 4rem;
-  padding: 1rem;
   width: 6rem;
-  height: 6rem;
+}
+
+.status {
+  margin-left: 2rem;
+  max-width: 24rem;
+
+  & > *:not(:last-child) {
+    margin-bottom: 1rem;
+  }
 }
 
 .status_message {
-  padding-left: 2rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: var(--c-med-gray);
-}
+  @apply --font-header-dark;
 
-.error {
-  color: red;
-}
-
-.details {
-  margin-bottom: 1.5rem;
-  padding-left: 8rem;
-  font-size: 1rem;
-  color: var(--c-med-gray);
-}
-
-.error {
   margin-bottom: 1rem;
-  font-weight: bold;
+}
+
+.success {
+  color: var(--c-green);
+}
+
+.error,
+.error_message {
   color: var(--c-red);
 }
 
+.details {
+  @apply --font-body-2-dark;
+}
+
+.error_message {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
 .file_details_title {
-  text-transform: uppercase;
+  @apply --font-header-dark;
+
   margin-top: 0;
   margin-bottom: 0.5rem;
-  font-weight: normal;
+  font-weight: var(--fw-regular);
 }
 
 .open_setup_link {
