@@ -8,22 +8,18 @@ class Mover:
         self._dst = dst
         self._src = src
 
-    def position(self, pose_tree):
+    def jog(self, pose_tree, axis, distance):
+        assert axis in 'xyz', "axis value should be x, y or z"
+        assert axis in self._axis_mapping, "mapping is not set for " + axis
+
         x, y, z = change_base(pose_tree, src=self)
 
-        pos = {
+        target = {
             'x': x if 'x' in self._axis_mapping else None,
             'y': y if 'y' in self._axis_mapping else None,
             'z': z if 'z' in self._axis_mapping else None,
         }
 
-        return pos
-
-    def jog(self, pose_tree, axis, distance):
-        assert axis in 'xyz', "axis value should be x, y or z"
-        assert axis in self._axis_mapping, "mapping is not set for " + axis
-
-        target = self.position(pose_tree)
         target[axis] += distance
 
         return self.move(pose_tree, **target)

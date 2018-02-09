@@ -675,11 +675,8 @@ class Robot(object):
         arc_top = max(arc_top, destination[2])
 
         # if instrument is currently taller than arc_top, no need to move down
-        current_pos = inst.instrument_mover.position(self.poses)
-        current_height = current_pos.get('z', 0)
-        arc_top = max(arc_top, current_height)
-
-        print(arc_top)
+        _, _, pip_z = pose_tracker.absolute(self.poses, inst)
+        arc_top = max(arc_top, pip_z)
 
         strategy = [
             {'z': arc_top},
