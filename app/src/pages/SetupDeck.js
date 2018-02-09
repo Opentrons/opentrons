@@ -23,7 +23,7 @@ function SetupDeckPage (props: Props) {
 
   return (
     <Page>
-      <SessionHeader subtitle='Setup Deck' />
+      <SessionHeader />
       <LabwareCalibration slot={slot} url={url} />
       {!deckPopulated && (
         <ReviewDeckModal slot={slot} />

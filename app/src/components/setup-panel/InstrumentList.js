@@ -17,26 +17,23 @@ type Props = {
   isRunning: bool,
 }
 
-export default withRouter(connect(mapStateToProps)(InstrumentList))
+const TITLE = 'Pipette Calibration'
 
-const TITLE = 'Pipette Setup'
+export default withRouter(connect(mapStateToProps)(InstrumentList))
 
 function InstrumentList (props: Props) {
   const {instruments, isRunning} = props
 
   return (
     <TitledList title={TITLE}>
-      {robotConstants.INSTRUMENT_MOUNTS.map((mount) => {
-        const inst = instruments.find((i) => i.mount === mount) || {mount}
-
-        return (
-          <InstrumentListItem
-            key={inst.mount}
-            isRunning={isRunning}
-            {...inst}
-          />
-        )
-      })}
+      {robotConstants.INSTRUMENT_MOUNTS.map((mount) => (
+        <InstrumentListItem
+          key={mount}
+          mount={mount}
+          isRunning={isRunning}
+          instrument={instruments.find((i) => i.mount === mount)}
+        />
+      ))}
     </TitledList>
   )
 }

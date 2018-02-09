@@ -10,6 +10,7 @@ import CalibrationInfoContent from '../CalibrationInfoContent'
 import {selectors as robotSelectors} from '../../robot'
 
 type StateProps = {
+  done: boolean,
   _button: ?{
     href: string,
     text: string
@@ -21,6 +22,7 @@ type DispatchProps = {
 }
 
 type RemoveTipProps = {
+  done: boolean,
   button: ?{
     text: string,
     onClick: () => void
@@ -30,38 +32,34 @@ type RemoveTipProps = {
 export default connect(mapStateToProps, null, mergeProps)(RemoveTipPanel)
 
 function RemoveTipPanel (props: RemoveTipProps) {
-  const {button} = props
-
-  // TODO(mc, 2018-01-22): needed to quickly work around the case of
-  //   no-next-labware; rethink this display after talking to UX
-  const leftChildren = (
-    <div>
-      <p>Pipette tip has been calibrated.</p>
-      {button && (
-        <PrimaryButton onClick={button.onClick}>
-          {button.text}
-        </PrimaryButton>
-      )}
-      {!button && (
-        <p>
-          Your protocol is ready to run!
-        </p>
-      )}
-    </div>
-  )
+  const {done, button} = props
 
   return (
-    <CalibrationInfoContent
-      leftChildren={leftChildren}
-    />
+    <CalibrationInfoContent leftChildren={(
+      <div>
+        <p>Pipette tip has been calibrated.</p>
+        {done && (
+          <p>Replace trash bin on top of tip probe before continuing</p>
+        )}
+        {button && (
+          <PrimaryButton onClick={button.onClick}>
+            {button.text}
+          </PrimaryButton>
+        )}
+        {!button && (
+          <p>
+            Your protocol is ready to run!
+          </p>
+        )}
+      </div>
+    )} />
   )
 }
 
 function mapStateToProps (state): StateProps {
   const instruments = robotSelectors.getInstruments(state)
   const nextLabware = robotSelectors.getNextLabware(state)
-  const nextInstrument = instruments
-    .find((inst) => inst.name && !inst.probed)
+  const nextInstrument = instruments.find((inst) => !inst.probed)
 
   let _button = null
 
@@ -77,17 +75,18 @@ function mapStateToProps (state): StateProps {
     }
   }
 
-  return {_button}
+  return {_button, done: nextInstrument == null}
 }
 
 function mergeProps (
   stateProps: StateProps,
   dispatchProps: DispatchProps
 ): RemoveTipProps {
-  const {_button} = stateProps
+  const {done, _button} = stateProps
   const {dispatch} = dispatchProps
 
   return {
+    done,
     button: _button && {
       text: _button.text,
       onClick: () => dispatch(push(_button.href))

@@ -1,3 +1,16 @@
+@import '@opentrons/components';
+
+.setup_panel {
+  & > * {
+    margin: 0.5rem 0 1.5rem;
+  }
+}
+
+.tiprack_item_mount {
+  font-weight: var(--fw-bold);
+  padding-right: 0.75rem;
+}
+
 .run_message {
   margin: 1rem;
   font-size: 0.75rem;

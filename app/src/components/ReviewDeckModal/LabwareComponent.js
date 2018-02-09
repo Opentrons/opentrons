@@ -30,10 +30,5 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
 
   if (!labware) return {}
 
-  return {
-    labware: {
-      ...labware,
-      showName: true
-    }
-  }
+  return {labware: {...labware}}
 }

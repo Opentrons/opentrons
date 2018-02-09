@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
+
+import type {Labware} from '../../robot'
+
 import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
-import capitalize from 'lodash/capitalize'
-import {
-  type Labware
-} from '../../robot'
+import styles from './styles.css'
 
 type LabwareItemProps = {
   isDisabled: boolean,
@@ -15,7 +15,7 @@ type Props = Labware & LabwareItemProps
 
 export default function LabwareListItem (props: Props) {
   const {
-    name,
+    type,
     slot,
     calibratorMount,
     isTiprack,
@@ -25,10 +25,6 @@ export default function LabwareListItem (props: Props) {
   } = props
 
   const url = `/setup-deck/${slot}`
-  const label = capitalize(name.replace('-', ' '))
-  const mount = isTiprack && calibratorMount
-    ? capitalize(calibratorMount.charAt(0))
-    : ''
   const iconName = confirmed
     ? CHECKED
     : UNCHECKED
@@ -41,8 +37,17 @@ export default function LabwareListItem (props: Props) {
       iconName={iconName}
     >
       <span>Slot {slot}</span>
-      <span>{label}</span>
-      <span>{mount}</span>
+      {isTiprack && (
+        <span>
+          <span className={styles.tiprack_item_mount}>
+            {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
+          </span>
+          Tiprack
+        </span>
+      )}
+      <span>
+        {type}
+      </span>
     </ListItem>
   )
 }
