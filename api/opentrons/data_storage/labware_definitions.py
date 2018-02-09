@@ -102,6 +102,10 @@ Notes:
 
 """
 
+
+# Contants that use paths defined by environment variables that should be set
+# on the robot, and fall back to paths relative to this file within the source
+# repository for development purposes
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_DEFN_DIR = os.environ.get(
     'LABWARE_DEF',
@@ -197,3 +201,44 @@ def list_all_labware() -> List[str]:
     user_list = [] + _list_labware(os.path.join(USER_DEFN_ROOT, 'definitions'))
     default_list = [] + _list_labware(DEFAULT_DEFN_DIR)
     return sorted(list(set(user_list + default_list)))
+
+
+def _save_user_definition(path: str, defn: dict) -> bool:
+    filename = os.path.join(
+        path, '{}.json'.format(defn['metadata']['name']))
+    with open(filename, 'w') as def_file:
+        json.dump(defn, def_file, indent=2)
+    # Once possible failures are understood, catch and return a success code
+    return True
+
+
+def _save_offset(path: str, name: str, offset: dict):
+    filename = os.path.join(
+        path, '{}.json'.format(name))
+    with open(filename, 'w') as offset_file:
+        json.dump(offset, offset_file, indent=2)
+    # Once possible failures are understood, catch and return a success code
+    return True
+
+
+def save_user_definition(defn: dict) -> bool:
+    """
+    :param defn: a definition json dict, as returned by
+        `opentrons.data_storage.serializers.labware_to_json`
+    :return: success code
+    """
+    return _save_user_definition(
+        os.path.join(USER_DEFN_ROOT, 'definitions'), defn)
+
+
+def save_labware_offset(name: str, offset: dict) -> bool:
+    """
+    :param name: the name of the labware (most easily found in the labware
+        dict in ['metadata']['name'])
+    :param offset: a dict with keys 'x', 'y', and 'z', and float values
+        representing the relative position of a container compared to the
+        definition file, as determined by calibration
+    :return: success code
+    """
+    return _save_offset(
+        os.path.join(USER_DEFN_ROOT, 'offsets'), name, offset)
