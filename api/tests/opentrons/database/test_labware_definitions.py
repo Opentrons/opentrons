@@ -55,3 +55,12 @@ def test_load_labware():
     real_lw_name = '6-well-plate'
     real_lw = ldef._load(test_defn_root, test_user_defn_root, real_lw_name)
     assert real_lw['metadata']['name'] == real_lw_name
+
+
+def test_list_labware():
+    # Minor spot-checks, function is simple. Values will need to be updated if
+    # labware is added to library
+    lw = ldef.list_all_labware()
+    assert len(lw) == 41
+    assert lw[0] == '12-well-plate'
+    assert lw[-1] == 'wheaton_vial_rack'

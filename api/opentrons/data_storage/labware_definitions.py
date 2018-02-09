@@ -1,5 +1,6 @@
 import os
 import json
+from typing import List
 
 """
 There will be 3 directories for json blobs to define labware:
@@ -101,7 +102,15 @@ Notes:
 
 """
 
-file_dir = os.path.abspath(os.path.dirname(__file__))
+FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+DEFAULT_DEFN_DIR = os.environ.get(
+    'LABWARE_DEF',
+    os.path.abspath(os.path.join(
+        FILE_DIR, '..', '..', '..', 'labware-definitions', 'definitions')))
+USER_DEFN_ROOT = os.environ.get(
+    'USER_DEFN_ROOT',
+    os.path.abspath(os.path.join(
+        FILE_DIR, '..', '..', '..', 'labware-definitions', 'user')))
 
 
 def _load_definition(path: str, labware_name: str) -> dict:
@@ -173,11 +182,18 @@ def _load(default_defn_dir: str,
 
 
 def load_json(labware_name: str) -> dict:
-    default_defn_dir = os.environ.get(
-        'LABWARE_DEF',
-        os.path.abspath(os.path.join(
-            file_dir, '..', '..', '..', 'labware-definitions', 'definitions')))
-    print("=-> {}".format(default_defn_dir))
-    user_defn_root = os.path.join(
-        '/', 'data', 'user_storage', 'opentrons_data', 'labware')
-    return _load(default_defn_dir, user_defn_root, labware_name)
+    return _load(DEFAULT_DEFN_DIR, USER_DEFN_ROOT, labware_name)
+
+
+def _list_labware(path: str) -> List[str]:
+    try:
+        lw = list(map(lambda x: os.path.splitext(x)[0], os.listdir(path)))
+    except FileNotFoundError:
+        lw = []
+    return lw
+
+
+def list_all_labware() -> List[str]:
+    user_list = [] + _list_labware(os.path.join(USER_DEFN_ROOT, 'definitions'))
+    default_list = [] + _list_labware(DEFAULT_DEFN_DIR)
+    return sorted(list(set(user_list + default_list)))
