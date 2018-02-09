@@ -15,10 +15,8 @@ from opentrons.util.log import get_logger
 
 log = get_logger(__name__)
 
-# TODO (andy) this is the height the tip will travel above the deck's tallest
-# container. This should not be a single value, but should be optimized given
-# the movements context (ie sterility vs speed)
-TIP_CLEARANCE = 5
+TIP_CLEARANCE_DECK = 20   # clearance when moving between different labware
+TIP_CLEARANCE_LABWARE = 5 # clearance when staying within a single labware
 
 
 class InstrumentMosfet(object):
@@ -192,7 +190,7 @@ class Robot(object):
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
 
-        self.arc_height = TIP_CLEARANCE
+        self.arc_height = TIP_CLEARANCE_DECK
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -658,19 +656,19 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        arc_top = self.max_deck_height()
+        arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
 
         # movements that stay within the same container do not need to avoid
         # other containers on the deck, so the travel height of arced movements
         # can be relative to just that one container's height
         if this_container and self._prev_container == this_container:
             arc_top = self.max_placeable_height_on_deck(this_container)
+            arc_top += TIP_CLEARANCE_DECK
 
         self._prev_container = this_container
 
         # TODO (andy): there is no check here for if this height will hit
         # the limit switches, so if a tall labware is used, we risk collision
-        arc_top += self.arc_height
         arc_top = max(arc_top, destination[2])
 
         strategy = [
