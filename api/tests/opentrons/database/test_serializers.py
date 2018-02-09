@@ -8,7 +8,12 @@ test_defn_root = os.path.abspath(os.path.join(
     file_dir, '..', '..', '..', '..', 'labware-definitions', 'definitions'))
 
 
-def test_deserializer():
+# ===================
+# Tests below are compatibility tests with sqlite database. These tests will no
+# longer be relevant once the sqlite database is removed, and should be revised
+# or deleted
+# ===================
+def test_one_deserializer():
     plate = '6-well-plate'
     new_container = ser.json_to_container(
         ldef._load_definition(test_defn_root, plate))
@@ -33,7 +38,7 @@ def test_deserializer():
     assert old_wells == new_wells
 
 
-def test_serializer():
+def test_one_serializer():
     plate = '6-well-plate'
     old_container = sqldb.load_container(plate)
 
@@ -47,3 +52,15 @@ def test_serializer():
 
     assert json_from_container['ordering'] == json_from_file['ordering']
     assert json_from_container['wells'] == json_from_file['wells']
+
+
+def test_seralizer_all_containers():
+    plates = ldef.list_all_labware()
+    for plate in plates:
+        old_container = sqldb.load_container(plate)
+
+        json_from_file = ldef._load_definition(test_defn_root, plate)
+        json_from_container = ser.container_to_json(old_container)
+
+        assert json_from_container['ordering'] == json_from_file['ordering']
+        assert json_from_container['wells'] == json_from_file['wells']
