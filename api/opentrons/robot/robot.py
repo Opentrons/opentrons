@@ -628,6 +628,8 @@ class Robot(object):
                 # Z arc height will be used for the new pipette
                 self._prev_container = None
 
+        self._previous_instrument = instrument
+
         if strategy == 'arc':
             arc_coords = self._create_arc(target, placeable)
             for coord in arc_coords:
@@ -669,6 +671,7 @@ class Robot(object):
         # TODO (andy): there is no check here for if this height will hit
         # the limit switches, so if a tall labware is used, we risk collision
         arc_top += self.arc_height
+        arc_top = max(arc_top, destination[2])
 
         strategy = [
             {'z': arc_top},
