@@ -32,13 +32,13 @@ describe('robot actions', () => {
   })
 
   test('REMOVE_DISCOVERED action', () => {
-    const name = 'ot'
+    const service = {name: 'ot'}
     const expected = {
       type: actionTypes.REMOVE_DISCOVERED,
-      payload: {name}
+      payload: service
     }
 
-    expect(actions.removeDiscovered(name)).toEqual(expected)
+    expect(actions.removeDiscovered(service)).toEqual(expected)
   })
 
   test('CONNECT action', () => {

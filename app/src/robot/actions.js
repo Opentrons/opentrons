@@ -177,8 +177,8 @@ export const actions = {
     return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (name: string) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: {name}}
+  removeDiscovered (service: RobotService) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: service}
   },
 
   // make new session with protocol file

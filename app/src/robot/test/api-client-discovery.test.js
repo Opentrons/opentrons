@@ -111,7 +111,7 @@ describe('api client - discovery', () => {
       .then(() => services.forEach((s) => browser.emit('down', s)))
       .then(() => services.forEach((s) => {
         expect(dispatch)
-          .toHaveBeenCalledWith(actions.removeDiscovered(s.name))
+          .toHaveBeenCalledWith(actions.removeDiscovered(s))
       }))
   })
 
@@ -153,11 +153,11 @@ describe('api client - discovery', () => {
     return sendToClient(notScanningState, actions.discover())
       .then(() => services.forEach((s) => browser.emit('up', s)))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
-        actions.addDiscovered({host: 'nope.local'})
+        actions.addDiscovered(services[1])
       ))
       .then(() => services.forEach((s) => browser.emit('down', s)))
       .then(() => expect(dispatch).not.toHaveBeenCalledWith(
-        actions.removeDiscovered('nope.local')
+        actions.removeDiscovered(services[1])
       ))
   })
 
@@ -166,7 +166,8 @@ describe('api client - discovery', () => {
     const expectedDispatch = actions.addDiscovered({
       name: 'Opentrons USB',
       ip: '[fd00:0:cafe:fefe::1]',
-      port: 31950
+      port: 31950,
+      wired: true
     })
 
     global.fetch.mockReturnValue(Promise.resolve({ok: true}))

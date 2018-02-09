@@ -41,18 +41,22 @@ describe('robot selectors', () => {
   test('getDiscovered', () => {
     const state = {
       connection: {
-        connectedTo: 'foo',
-        discovered: ['foo', 'bar'],
+        connectedTo: 'bar',
+        discovered: ['foo', 'bar', 'baz', 'qux'],
         discoveredByName: {
           foo: {host: 'abcdef.local', name: 'foo'},
-          bar: {host: '123456.local', name: 'bar'}
+          bar: {host: '123456.local', name: 'bar'},
+          baz: {host: 'qwerty.local', name: 'baz'},
+          qux: {host: 'dvorak.local', name: 'qux', wired: true}
         }
       }
     }
 
     expect(getDiscovered(makeState(state))).toEqual([
-      {name: 'foo', host: 'abcdef.local', isConnected: true},
-      {name: 'bar', host: '123456.local', isConnected: false}
+      {name: 'bar', host: '123456.local', isConnected: true},
+      {name: 'qux', host: 'dvorak.local', isConnected: false, wired: true},
+      {name: 'baz', host: 'qwerty.local', isConnected: false},
+      {name: 'foo', host: 'abcdef.local', isConnected: false}
     ])
   })
 
