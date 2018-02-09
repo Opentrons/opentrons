@@ -679,6 +679,8 @@ class Robot(object):
         current_height = current_pos.get('z', 0)
         arc_top = max(arc_top, current_height)
 
+        print(arc_top)
+
         strategy = [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
@@ -989,6 +991,8 @@ class Robot(object):
             container,
             *delta, save
         )
+
+        self.max_deck_height.cache_clear()
 
     @lru_cache()
     def max_deck_height(self):

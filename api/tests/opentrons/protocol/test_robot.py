@@ -130,10 +130,6 @@ def test_create_arc(robot):
     robot.poses = p200._move(robot.poses, x=10, y=10, z=new_labware_height)
     robot.calibrate_container_with_instrument(plate2, p200, save=False)
 
-    print(robot.max_placeable_height_on_deck(plate2))
-    print(robot.max_deck_height())
-    print(robot)
-    print(robot.max_placeable_height_on_deck(robot.deck['2'].get_children_list()[0]))
     assert robot.max_deck_height() == new_labware_height
 
     res = robot._create_arc(p200, (0, 0, 0), plate2[0])
