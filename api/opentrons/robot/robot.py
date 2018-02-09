@@ -527,6 +527,11 @@ class Robot(object):
         self._previous_instrument = None
         self._prev_container = None
 
+        # explicitly update carriage Mover positions in pose tree
+        # because their Mover.home() commands aren't used here
+        for a in self._actuators.values():
+            self.poses = a['carriage'].update_pose_from_driver(self.poses)
+
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
@@ -670,13 +675,12 @@ class Robot(object):
 
         self._prev_container = this_container
 
-        # TODO (andy): there is no check here for if this height will hit
-        # the limit switches, so if a tall labware is used, we risk collision
-        arc_top = max(arc_top, destination[2])
-
         # if instrument is currently taller than arc_top, no need to move down
         _, _, pip_z = pose_tracker.absolute(self.poses, inst)
-        arc_top = max(arc_top, pip_z)
+
+        # TODO (andy): there is no check here for if this height will hit
+        # the limit switches, so if a tall labware is used, we risk collision
+        arc_top = max(arc_top, destination[2], pip_z)
 
         strategy = [
             {'z': arc_top},
@@ -813,6 +817,7 @@ class Robot(object):
         if self._is_available_slot(location, share, slot, name):
             location.add(container, label or name)
         self.add_container_to_pose_tracker(location, container)
+        self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
