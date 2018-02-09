@@ -93,7 +93,7 @@ def test_comment(robot):
 
 
 def test_create_arc(robot):
-    from opentrons.robot.robot import TIP_CLEARANCE
+    from opentrons.robot.robot import TIP_CLEARANCE_DECK, TIP_CLEARANCE_LABWARE
 
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
@@ -104,10 +104,18 @@ def test_create_arc(robot):
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
     res = robot._create_arc((0, 0, 0), plate[0])
-    # TODO(artyom 20171030): confirm expected values are correct after merging
-    # calibration work
+    arc_top = robot.max_deck_height() + TIP_CLEARANCE_DECK
     expected = [
-        {'z': robot.max_deck_height() + TIP_CLEARANCE},
+        {'z': arc_top},
+        {'x': 0, 'y': 0},
+        {'z': 0}
+    ]
+    assert res == expected
+
+    res = robot._create_arc((0, 0, 0), plate[1])
+    arc_top = robot.max_placeable_height_on_deck(plate) + TIP_CLEARANCE_LABWARE
+    expected = [
+        {'z': arc_top},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
@@ -118,11 +126,9 @@ def test_create_arc(robot):
         plate2, p200, save=False
     )
     res = robot._create_arc((0, 0, 0), plate2[0])
-
-    # TODO(artyom 20171030): confirm expected values are correct after merging
-    # calibration work
+    arc_top = robot.max_deck_height() + TIP_CLEARANCE_DECK
     expected = [
-        {'z': robot.max_deck_height() + TIP_CLEARANCE},
+        {'z': arc_top},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
