@@ -163,12 +163,13 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
 def move_instrument_for_probing_prep(instrument, robot):
     # TODO(artyom, ben 20171026): calculate from robot dimensions
-    robot.poses = instrument._move(
-        robot.poses,
-        x=191.5,
-        y=75.0,
-        z=128
-    )
+    # robot.poses = instrument._move(
+    #     robot.poses,
+    #     x=191.5,
+    #     y=75.0,
+    #     z=128
+    # )
+    instrument.move_to(robot.deck['5'].top(150))
 
 
 def jog_instrument(instrument, axis, robot, distance):
