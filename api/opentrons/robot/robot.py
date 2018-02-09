@@ -632,7 +632,7 @@ class Robot(object):
         self._previous_instrument = instrument
 
         if strategy == 'arc':
-            arc_coords = self._create_arc(target, placeable)
+            arc_coords = self._create_arc(instrument, target, placeable)
             for coord in arc_coords:
                 self.poses = instrument._move(
                     self.poses,
@@ -647,7 +647,7 @@ class Robot(object):
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-    def _create_arc(self, destination, placeable=None):
+    def _create_arc(self, inst, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -673,6 +673,11 @@ class Robot(object):
         # TODO (andy): there is no check here for if this height will hit
         # the limit switches, so if a tall labware is used, we risk collision
         arc_top = max(arc_top, destination[2])
+
+        # if instrument is currently taller than arc_top, no need to move down
+        current_pos = inst.instrument_mover.position(self.poses)
+        current_height = current_pos.get('z', 0)
+        arc_top = max(arc_top, current_height)
 
         strategy = [
             {'z': arc_top},
