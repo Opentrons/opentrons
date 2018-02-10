@@ -1,7 +1,7 @@
 // @flow
 import type {ConsolidateFormData, RobotState} from './'
 
-// TODO add return type: AnnotatedCommands.
+// TODO add return type: AnnotatedCommandReducer.
 export default function consolidate (data: ConsolidateFormData, robotState: RobotState) {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
@@ -20,11 +20,16 @@ export default function consolidate (data: ConsolidateFormData, robotState: Robo
     // TODO
   }
 
+  const nextRobotState = robotState // TODO IMMEDIATELY
+
   return {
-    annotation: {
-      name: data.name,
-      description: data.description
-    },
-    commands
+    robotState: nextRobotState,
+    atomicCommands: {
+      annotation: {
+        name: data.name,
+        description: data.description
+      },
+      commands
+    }
   }
 }

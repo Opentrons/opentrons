@@ -1,25 +1,30 @@
 // @flow
-import {filledTiprackWells, p300Single} from './fixtures'
+import {filledTiprackWells, emptyTiprackWells, p300Single} from './fixtures'
 import {pickUpTip} from '../'
 
-describe.skip('pickUpTip', () => { // TODO don't skip
+describe('pickUpTip: single channel', () => {
   const robotInitialState = {
     instruments: {
       p300SingleId: p300Single
     },
     labware: {
       tiprack1Id: {
-        slot: '7',
+        slot: '1',
+        type: 'tiprack-200uL',
+        name: 'Tip rack'
+      },
+      tiprack10Id: {
+        slot: '10',
         type: 'tiprack-200uL',
         name: 'Tip rack'
       },
       sourcePlateId: {
-        slot: '10',
+        slot: '11',
         type: 'trough-12row',
         name: 'Source (Buffer)'
       },
       destPlateId: {
-        slot: '11',
+        slot: '8',
         type: '96-flat',
         name: 'Destination Plate'
       },
@@ -31,7 +36,8 @@ describe.skip('pickUpTip', () => { // TODO don't skip
     },
     tipState: {
       tipracks: {
-        tiprack1Id: {...filledTiprackWells}
+        tiprack1Id: {...filledTiprackWells},
+        tiprack10Id: {...filledTiprackWells}
       },
       pipettes: {
         p300SingleId: false
@@ -53,6 +59,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false
@@ -70,6 +77,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false
@@ -92,6 +100,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false,
@@ -110,6 +119,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false,
@@ -139,6 +149,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false,
@@ -148,7 +159,8 @@ describe.skip('pickUpTip', () => { // TODO don't skip
             E1: false,
             F1: false,
             G1: false,
-            H1: false
+            H1: false,
+            A2: false
           }
         },
         pipettes: {
@@ -163,6 +175,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false
@@ -193,6 +206,7 @@ describe.skip('pickUpTip', () => { // TODO don't skip
       ...robotInitialState,
       tipState: {
         tipracks: {
+          ...robotInitialState.tipState.tipracks,
           tiprack1Id: {
             ...filledTiprackWells,
             A1: false,
@@ -206,7 +220,48 @@ describe.skip('pickUpTip', () => { // TODO don't skip
     })
   })
 
-  test.skip('Single-channel: used all tips in first rack, move to second rack', () => {
-    // TODO!
+  test('Single-channel: used all tips in first rack, move to second rack', () => {
+    const result = pickUpTip('p300SingleId', {
+      ...robotInitialState,
+      tipState: {
+        tipracks: {
+          ...robotInitialState.tipState.tipracks,
+          tiprack1Id: {...emptyTiprackWells}
+        },
+        pipettes: {
+          p300SingleId: false
+        }
+      }
+    })
+
+    expect(result.nextCommands).toEqual([{
+      command: 'pick-up-tip',
+      pipette: 'p300SingleId',
+      labware: 'tiprack10Id',
+      well: 'A1'
+    }])
+
+    expect(result.nextRobotState).toEqual({
+      ...robotInitialState,
+      tipState: {
+        tipracks: {
+          ...robotInitialState.tipState.tipracks,
+          tiprack1Id: {
+            ...emptyTiprackWells
+          },
+          tiprack10Id: {
+            ...filledTiprackWells,
+            A1: false
+          }
+        },
+        pipettes: {
+          p300SingleId: true
+        }
+      }
+    })
   })
+})
+
+describe.skip('pickUpTip: multi-channel', () => {
+  // TODO add tests immediately!
 })

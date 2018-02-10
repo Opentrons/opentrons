@@ -12,6 +12,11 @@ export const filledTiprackWells = tiprackWellNamesFlat.reduce(
   {}
 )
 
+export const emptyTiprackWells = tiprackWellNamesFlat.reduce(
+  (acc, wellName) => ({...acc, [wellName]: false}),
+  {}
+)
+
 export const p300Single = {
   id: 'p300SingleId',
   mount: 'right',

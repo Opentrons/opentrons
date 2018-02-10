@@ -1,5 +1,5 @@
 // @flow
-import {filledTiprackWells, p300Single} from './fixtures'
+import {filledTiprackWells, emptyTiprackWells, p300Single} from './fixtures'
 import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
 
 describe('sortLabwareBySlot', () => {
@@ -187,7 +187,7 @@ describe('getNextTiprack - single-channel', () => {
         }
       },
       tipState: {
-        tipracks: {},
+        tipracks: {...emptyTiprackWells},
         pipettes: {
           p300SingleId: false
         }
@@ -426,7 +426,7 @@ describe('getNextTiprack - 8-channel', () => {
         }
       },
       tipState: {
-        tipracks: {},
+        tipracks: {...emptyTiprackWells},
         pipettes: {
           p300SingleId: false
         }
