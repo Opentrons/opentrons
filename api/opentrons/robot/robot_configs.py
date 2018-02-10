@@ -101,12 +101,13 @@ def _get_default():
         instrument_offset={
             'right': {
                 'single': (0.0, 0.0, 0.0),        # numbers are from CAD
-                'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
+                'multi': (0.0, 0.0, 0.0)  # numbers are from CAD
             },
             'left': {
-                'single': (-34, 0.0, 0.0),        # numbers are from CAD
-                'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
-            }
+                'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+                'multi': (0.0, 0.0, 0.0) # numbers are from CAD
+            },
+            'Pipette': 51.7  # TODO (andy): move to tip-rack
         },
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
@@ -114,6 +115,41 @@ def _get_default():
         plunger_current_low=PLUNGER_CURRENT_LOW,
         plunger_current_high=PLUNGER_CURRENT_HIGH
     )
+
+default = robot_config(
+    name='Ada Lovelace',
+    steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
+    acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
+    current='M907 ' + DEFAULT_CURRENT_STRING,
+    probe_center=(295.0, 300.0, 55.0),
+    probe_dimensions=(35.0, 40.0, 60.0),
+    gantry_calibration=[  # "safe" offset, overwrote in factory calibration
+        [ 1.00, 0.00, 0.00,  0.00],
+        [ 0.00, 1.00, 0.00,  0.00],
+        [ 0.00, 0.00, 1.00,  0.00],
+        [ 0.00, 0.00, 0.00,  1.00]
+    ],
+    # left relative to right
+    instrument_offset={
+        'right': (0.0, 0.0, 0.0),
+        'left': (0.0, 0.0, 0.0)
+    },
+    tip_length={
+        'left': {
+            'single': 51.7,
+            'multi': 51.7
+        },
+        'right': {
+            'single': 51.7,
+            'multi': 51.7
+        }
+    },
+    serial_speed=115200,
+    default_current=DEFAULT_CURRENT,
+    default_max_speed=DEFAULT_MAX_SPEEDS,
+    plunger_current_low=PLUNGER_CURRENT_LOW,
+    plunger_current_high=PLUNGER_CURRENT_HIGH
+)
 
 
 def load(filename=None):

@@ -20,6 +20,7 @@ log = get_logger(__name__)
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
+# distance in millimeters between the left and right mounts (aka carriages)
 X_DISTANCE_BETWEEN_MOUNTS = 34
 
 
@@ -272,8 +273,6 @@ class Robot(object):
 
         self.poses = pose_tracker.init()
 
-
-
         self._runtime_warnings = []
 
         self._deck = containers.Deck()
@@ -404,11 +403,13 @@ class Robot(object):
         # one id(instrument) to store it's offset vector and another
         # with zero offset, which can be increased/decreased by
         # tip length for pickup and drop tip
+        cx, cy, _ = self.config.instrument_offset[mount]
+        mx, my, mz = instrument.model_offset
         self.poses = pose_tracker.add(
             self.poses,
             instrument,
             parent=mount,
-            point=self.config.instrument_offset[mount][instrument.type]
+            point=(mx + cx, my + cy, mz)
         )
 
     def add_warning(self, warning_msg):
