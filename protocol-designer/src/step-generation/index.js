@@ -1,8 +1,9 @@
 // @flow
 import consolidate from './consolidate'
 import pickUpTip from './pickUpTip'
-
+export * from './robotStateSelectors'
 export * from './types'
+export * from './data'
 
 // ===== UTILITIES ===== (TODO LATER: factor out)
 

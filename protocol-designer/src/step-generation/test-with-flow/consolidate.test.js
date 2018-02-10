@@ -1,15 +1,8 @@
 // @flow
+import {p300Single, filledTiprackWells} from './fixtures'
 import {consolidate} from '../'
 
-describe('consolidate', () => {
-  // TODO IMMEDIATELY proper fixture data passing around in jest
-  const p300Single = {
-    id: 'p300SingleId',
-    mount: 'right',
-    maxVolume: 300,
-    channels: 1
-  }
-
+describe.skip('consolidate', () => { // TODO don't skip
   const robotInitialState = {
     instruments: {
       p300SingleId: p300Single
@@ -38,12 +31,7 @@ describe('consolidate', () => {
     },
     tipState: {
       tipracks: {
-        tiprack1Id: {
-          A1: true,
-          A2: true,
-          A3: true
-          // TODO IMMEDIATELY add rest of tiprack "wells"
-        }
+        tiprack1Id: {...filledTiprackWells}
       },
       pipettes: {
         p300SingleId: false

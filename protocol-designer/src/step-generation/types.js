@@ -56,11 +56,13 @@ export type Mount = 'left' | 'right'
 
 export type DeckSlot = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12'
 
+export type PipetteChannels = 1 | 8
+
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
   maxVolume: number,
-  channels: 1 | 8
+  channels: PipetteChannels
 |}
 
 export type LabwareData = {
@@ -69,6 +71,7 @@ export type LabwareData = {
   slot: DeckSlot
 }
 
+// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
   instruments: {
     [instrumentId: string]: PipetteData
