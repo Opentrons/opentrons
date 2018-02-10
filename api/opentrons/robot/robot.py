@@ -20,6 +20,8 @@ log = get_logger(__name__)
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
+X_DISTANCE_BETWEEN_MOUNTS = 34
+
 
 class InstrumentMosfet(object):
     """
@@ -270,6 +272,8 @@ class Robot(object):
 
         self.poses = pose_tracker.init()
 
+
+
         self._runtime_warnings = []
 
         self._deck = containers.Deck()
@@ -344,8 +348,14 @@ class Robot(object):
                 obj=id(self.config.gantry_calibration),
                 transform=self.config.gantry_calibration) \
             .add(obj=self.gantry, parent=id(self.config.gantry_calibration)) \
-            .add(obj=left_carriage, parent=self.gantry) \
-            .add(obj=right_carriage, parent=self.gantry) \
+            .add(
+                obj=left_carriage,
+                parent=self.gantry,
+                point=(-X_DISTANCE_BETWEEN_MOUNTS, 0, 0)) \
+            .add(
+                obj=right_carriage,
+                parent=self.gantry,
+                point=(0, 0, 0)) \
             .add(
                 obj='left',
                 parent=left_carriage,

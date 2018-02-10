@@ -108,16 +108,6 @@ def _get_default():
                 'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
             }
         },
-        tip_length={
-            'left': {
-                'single': 51.7,
-                'multi': 51.7
-            },
-            'right': {
-                'single': 51.7,
-                'multi': 51.7
-            }
-        },
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
         default_max_speed=DEFAULT_MAX_SPEEDS,
