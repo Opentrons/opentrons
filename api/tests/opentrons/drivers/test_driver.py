@@ -25,14 +25,6 @@ def test_plunger_commands(smoothie, monkeypatch):
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.home()
-    smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
-    smoothie.move({
-        'X': 10.987654321,
-        'Y': 1.12345678,
-        'Z': 2,
-        'A': 3,
-        'B': 4,
-        'C': 5})
     expected = [
         ['M907 B0.5 C0.5 M400'],               # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
@@ -47,9 +39,38 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
-        ['G28.2Y M400'],                       # home Y
+        ['G28.2Y M400'],                        # home Y
         ['M114.2 M400'],                       # Get position
-        ['G0.+ M400'],                         # Move (non-plunger)
+        ['M203.1 Y8 M400'],                     # lower speed on Y for retract
+        ['G0.+ M400'],                          # retract Y
+        ['G28.2Y M400'],                        # home Y
+        ['M114.2 M400'],                       # Get position
+        ['G0.+ M400'],                          # retract Y
+        ['M203.1 A100 B70 C70 X600 Y400 Z100 M400'],  # return to norm current
+        ['M114.2 M400']                       # Get position
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
+    smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
+    expected = [
+        ['G0.+ M400']                         # Move (non-plunger)
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
+    smoothie.move({
+        'X': 10.987654321,
+        'Y': 1.12345678,
+        'Z': 2,
+        'A': 3,
+        'B': 4,
+        'C': 5})
+    expected = [
         ['M907 B0.5 C0.5 M400'],               # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
         ['G0.+[BC].+ M400'],                   # Move (including BC)
