@@ -43,21 +43,20 @@ script:
   - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
-  # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C api test
-  - make -C api lint
+  - make test
+  - make lint
   # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
-  # components library
-  # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
-  - make -C components test build
-  # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C app test && make -C app-shell dist-posix
+  # build components library
+  - make -C components build
+  # build protocol designer
+  - make -C protocol-designer build
+  # build run app
+  - make -C app-shell dist-posix
+  # TODO(mc, 2018-02-10): this should be part of app-shell's Makefile
   # Clean up. This will leave only single-file build artifacts
   - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
-  # protocol designer build
-  - make -C protocol-designer test build
 
 after_success:
   - make coverage

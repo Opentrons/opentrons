@@ -15,10 +15,9 @@ env := $(bin)/cross-env NODE_ENV
 # dev server port
 port ?= 8090
 
-# watch, coverage, and fix variables for tests and linting
+# watch and coverage variables for tests
 watch ?= false
 cover ?= true
-fix ?= false
 
 ifeq ($(watch), true)
 	cover := false
@@ -72,26 +71,9 @@ dev-mdns:
 #####################################################################
 
 .PHONY: test
-test: test-unit
-	$(MAKE) check lint
-
-.PHONY: test-unit
-test-unit:
+test:
 	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
-
-.PHONY: check
-check:
-	$(bin)/flow
-
-.PHONY: lint
-lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps dev
-
-.PHONY: uninstall-types
-uninstall-types:
-	rm -rf flow-typed
+	$(bin)/flow-typed install --ignoreDeps=dev --packageDir=..
