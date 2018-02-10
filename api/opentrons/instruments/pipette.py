@@ -19,6 +19,8 @@ PLUNGER_POSITIONS = {
     'drop_tip': -3.5
 }
 
+DROP_TIP_RELEASE_DISTANCE = 20
+
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
 
@@ -147,9 +149,9 @@ class Pipette:
         self.tip_racks = tip_racks
         self.starting_tip = None
 
-        # default mm above tip to execute drop-tip
-        # this gives room for the drop-tip mechanism to work
-        self._drop_tip_offset = 15
+        # default mm below top of tip-rack to execute drop-tip
+        # gives room for the drop-tip mechanism to work when returning tips
+        self._drop_tip_offset = -5
 
         self.reset_tip_tracking()
 
@@ -967,9 +969,9 @@ class Pipette:
             # give space for the drop-tip mechanism
             # @TODO (Laura & Andy 2018261)
             # When container typing is implemented, make sure that
-            # when returning to a tiprack, tips are dropped from the bottom
+            # when returning to a tiprack, tips are dropped within the rack
             if 'rack' in location.get_parent().get_type():
-                location = location.bottom(self._drop_tip_offset)
+                location = location.top(self._drop_tip_offset)
             else:
                 location = location.top()
 
@@ -1002,6 +1004,12 @@ class Pipette:
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')
                 )
+
+            # tips don't always fully fall off, especially if resting against
+            # tiprack or other tips below it. To ensure the tip has fallen,
+            # raise the pipette upwards so we are sure tip has fallen off
+            self.robot.poses = self._jog(
+                self.robot.poses, 'z', DROP_TIP_RELEASE_DISTANCE)
 
             self.current_volume = 0
             self.current_tip(None)
