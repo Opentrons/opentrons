@@ -495,6 +495,8 @@ function handleJog (state: State, action: PipetteCalibrationAction): State {
   return {
     ...state,
     calibrationRequest: {
+      // make sure we hang on to any state from a previous labware calibration
+      ...state.calibrationRequest,
       type: 'JOG',
       inProgress: true,
       error: null,
@@ -558,18 +560,6 @@ function handleUpdateOffsetSuccess (
   const {calibrationRequest: {mount, slot}} = state
   if (!mount || !slot) return state
 
-  const isTiprack = action.payload.isTiprack || false
-  let confirmedBySlot = {...state.confirmedBySlot}
-  let tipOnByMount = {...state.tipOnByMount}
-
-  // set status and confirmed flag for non-tipracks
-  // tipracks are handled by confirmTiprack so we don't want to touch them here
-  if (isTiprack) {
-    tipOnByMount[mount] = true
-  } else {
-    confirmedBySlot[slot] = true
-  }
-
   return {
     ...state,
     calibrationRequest: {
@@ -577,8 +567,10 @@ function handleUpdateOffsetSuccess (
       inProgress: false,
       error: null
     },
-    tipOnByMount,
-    confirmedBySlot
+    confirmedBySlot: {
+      ...state.confirmedBySlot,
+      [slot]: true
+    }
   }
 }
 

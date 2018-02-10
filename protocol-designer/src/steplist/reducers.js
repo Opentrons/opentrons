@@ -7,21 +7,45 @@ import isNil from 'lodash/isNil'
 import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
 import range from 'lodash/range'
 
 import type {BaseState} from '../types'
-import type {Command, FormData, StepItemData, StepIdType, StepSubItemData} from './types'
-import {type ValidFormAndErrors, generateNewForm, validateAndProcessForm, generateCommands} from './generateSubsteps'
+import type {
+  Command,
+  FormData,
+  StepItemData,
+  StepIdType,
+  StepSubItemData,
+  PauseFormData,
+  FormSectionState,
+  FormModalFields
+} from './types'
+
+import {
+  type ValidFormAndErrors,
+  generateNewForm,
+  validateAndProcessForm,
+  generateCommands,
+  formHasErrors
+} from './generateSubsteps' // TODO rename generateSubsteps.js to something else
 
 import type {
   AddStepAction,
-  PopulateFormAction,
+  DeleteStepAction,
   SaveStepFormAction,
-  SelectStepAction
+  SelectStepAction,
+
+  PopulateFormAction,
+  CollapseFormSectionAction, // <- TODO this isn't a thunk
+
+  ChangeMoreOptionsModalInputAction,
+  OpenMoreOptionsModal,
+  SaveMoreOptionsModal
 } from './actions' // Thunk action creators
 
 import {
-  cancelStepForm,
+  cancelStepForm, // TODO try collapsing them all into a single Action type
   saveStepForm,
   changeFormInput,
   expandAddStepButton,
@@ -32,15 +56,31 @@ type FormState = FormData | null
 
 // the `form` state holds temporary form info that is saved or thrown away with "cancel".
 // TODO: rename to make that more clear. 'unsavedForm'?
-const form = handleActions({
+const unsavedForm = handleActions({
   CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
     ...state,
     [action.payload.accessor]: action.payload.value
   }),
   POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
-  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null
+  SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
+  DELETE_STEP: () => null,
+  // save the modal state into the unsavedForm --
+  // it was 2 levels away from savedStepForms, now it's one level away
+  SAVE_MORE_OPTIONS_MODAL: (state, action: SaveMoreOptionsModal) => ({...state, ...action.payload})
 }, null)
+
+// Handles aspirate / dispense form sections opening / closing
+export const initialFormSectionState: FormSectionState = {aspirate: true, dispense: true}
+
+const formSectionCollapse = handleActions({
+  COLLAPSE_FORM_SECTION: (state, action: CollapseFormSectionAction) =>
+    ({...state, [action.payload]: !state[action.payload]}),
+  // exiting the form resets the collapse state
+  CANCEL_STEP_FORM: () => initialFormSectionState,
+  SAVE_STEP_FORM: () => initialFormSectionState,
+  POPULATE_FORM: () => initialFormSectionState
+}, initialFormSectionState)
 
 // Add default title (and later, other default values) to newly-created Step
 // TODO: Ian 2018-01-26 don't add any default values, selector should generate title if missing,
@@ -50,20 +90,29 @@ function createDefaultStep (action: AddStepAction) {
   return {...action.payload, title: stepType}
 }
 
+// the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
+// It's 2 degrees away from actual savedStepForms.
+const unsavedFormModal = handleActions({
+  OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModal) => action.payload,
+  CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
+    ({...state, [action.payload.accessor]: action.payload.value}),
+  CANCEL_MORE_OPTIONS_MODAL: () => null,
+  SAVE_MORE_OPTIONS_MODAL: () => null,
+  DELETE_STEP: () => null
+}, null)
+
 type StepsState = {[StepIdType]: StepItemData}
 
 const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
-  })
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
 }, {})
 
 type SavedStepFormState = {
-  [StepIdType]: {
-    ...FormData,
-    id: StepIdType
-  }
+  [StepIdType]: FormData
 }
 
 const savedStepForms = handleActions({
@@ -82,6 +131,8 @@ const collapsedSteps = handleActions({
     ...state,
     [action.payload.id]: false
   }),
+  DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
+    omit(state, action.payload.toString()),
   TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, {payload}: ActionType<typeof toggleStepCollapsed>) => ({
     ...state,
     [payload]: !state[payload]
@@ -92,13 +143,16 @@ type OrderedStepsState = Array<StepIdType>
 
 const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
-    [...state, action.payload.id]
+    [...state, action.payload.id],
+  DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
+    state.filter(stepId => stepId !== action.payload)
 }, [])
 
 type SelectedStepState = null | StepIdType
 
 const selectedStep = handleActions({
-  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload
+  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
+  DELETE_STEP: () => null
 }, null)
 
 type StepCreationButtonExpandedState = boolean
@@ -113,7 +167,9 @@ const stepCreationButtonExpanded = handleActions({
 }, false)
 
 export type RootState = {|
-  form: FormState,
+  unsavedForm: FormState,
+  unsavedFormModal: FormModalFields,
+  formSectionCollapse: FormSectionState,
   steps: StepsState,
   savedStepForms: SavedStepFormState,
   collapsedSteps: CollapsedStepsState,
@@ -123,7 +179,9 @@ export type RootState = {|
 |}
 
 export const _allReducers = {
-  form,
+  unsavedForm,
+  unsavedFormModal,
+  formSectionCollapse,
   steps,
   savedStepForms,
   collapsedSteps,
@@ -139,9 +197,15 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
+// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
 const formData = createSelector(
   rootSelector,
-  (state: RootState) => state.form
+  (state: RootState) => state.unsavedForm
+)
+
+const formModalData = createSelector(
+  rootSelector,
+  (state: RootState) => state.unsavedFormModal
 )
 
 const selectedStepId = createSelector(
@@ -149,33 +213,43 @@ const selectedStepId = createSelector(
   (state: RootState) => state.selectedStep
 )
 
-const allSubsteps = (state: BaseState): {[StepIdType]: Array<StepSubItemData>} =>
-  mapValues(validatedForms(state), (valForm, stepId) => {
-    if (!valForm.validatedForm) {
-      return []
-    }
-
-    const {
-      sourceWells,
-      destWells
-      // sourceLabware, // TODO: show labware & volume, see new designs
-      // destLabware,
-      // volume
-    } = valForm.validatedForm
-
+const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} =>
+  mapValues(validatedForms(state), (valForm: FormData, stepId: StepIdType) => {
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (checkForErrorsHack(valForm)) {
-      return []
+    if (!valForm.validatedForm || formHasErrors(valForm)) {
+      return null
     }
 
-    return range(sourceWells.length).map(i => ({
-      parentStepId: stepId,
-      substepId: i,
-      sourceIngredientName: 'ING1',
-      destIngredientName: 'ING2',
-      sourceWell: sourceWells[i],
-      destWell: destWells[i]
-    }))
+    if (valForm.validatedForm.stepType === 'transfer') {
+      const {
+        sourceWells,
+        destWells
+        // sourceLabware, // TODO: show labware & volume, see new designs
+        // destLabware,
+        // volume
+      } = valForm.validatedForm
+
+      return {
+        stepType: 'transfer',
+        parentStepId: stepId,
+        rows: range(sourceWells.length).map(i => ({
+          substepId: i,
+          sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
+          destIngredientName: 'ING2',
+          sourceWell: sourceWells[i],
+          destWell: destWells[i]
+        }))
+      }
+    }
+
+    if (valForm.validatedForm.stepType === 'pause') {
+      // just returns formData
+      const formData: PauseFormData = valForm.validatedForm
+      return formData
+    }
+
+    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
+    return null
   })
 
 const allSteps = createSelector(
@@ -190,42 +264,37 @@ const allSteps = createSelector(
   }))
 )
 
- // TODO HACK
-const checkForErrorsHack = (validForm: ValidFormAndErrors | null): boolean =>
-  (validForm && validForm.errors)
-    ? Object.values(validForm.errors).some(err => Array.isArray(err) && err.length > 0)
-    : true // No forms counts as error
-
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} | null => {
-  // TODO
   const s = rootSelector(state)
   if (s.orderedSteps.length === 0) {
     return null
   }
+
   return s.orderedSteps.reduce((acc, stepId) => ({
     ...acc,
-    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId].stepType === 'transfer')
-      ? validateAndProcessForm(s.steps[stepId].stepType, s.savedStepForms[stepId])
-      : {errors: {overallForm: ['TODO non-transfer']}, validatedForm: {}} // TODO
+    [stepId]: (s.savedStepForms[stepId] && s.steps[stepId])
+      ? validateAndProcessForm(s.savedStepForms[stepId])
+      : {errors: {'form': ['no saved form for step ' + stepId]}, validatedForm: {}} // TODO revisit
   }), {})
 }
 
 const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
   // TODO use existing selectors, don't rewrite!!!
-  const steps = rootSelector(state).steps
   const forms = validatedForms(state)
   const orderedSteps = rootSelector(state).orderedSteps
 
   // don't try to make commands if the step forms are null or if there are any errors.
-  if (forms === null || orderedSteps.map(stepId => checkForErrorsHack(forms[stepId])).some(err => err)) {
+  if (forms === null || orderedSteps.some(stepId => forms[stepId].validatedForm === null)) {
     return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
   }
 
   return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
     const formDataAndErrors = forms[stepId]
-    const stepType = steps[stepId].stepType
+    if (formDataAndErrors.validatedForm === null) {
+      throw new Error('validatedForm should not be null here') // for flow only, should be fully handled above
+    }
     // TODO checking if there are some errors is repeated from substeps selector, DRY it up
-    return generateCommands(stepType, formDataAndErrors.validatedForm)
+    return generateCommands(formDataAndErrors.validatedForm)
   })
 }
 
@@ -247,6 +316,7 @@ export const selectors = {
       (!isNil(selectedStepId) && generateNewForm(selectedStepId, steps[selectedStepId].stepType))
   ),
   formData,
+  formModalData,
   nextStepId: createSelector( // generates the next step ID to use
     (state: BaseState) => rootSelector(state).steps,
     (steps): number => {
@@ -259,15 +329,24 @@ export const selectors = {
   allSubsteps,
   validatedForms,
   commands,
+  currentFormErrors: (state: BaseState) => {
+    const form = formData(state)
+    return form && validateAndProcessForm(form).errors // TODO refactor selectors
+  },
   currentFormCanBeSaved: createSelector(
     formData,
     selectedStepId,
     allSteps,
-    (formData, selectedStepId, allSteps): boolean | null => ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
-      ? checkForErrorsHack(
-        validateAndProcessForm(allSteps[selectedStepId].stepType, formData)
-      )
-      : null
+    (formData, selectedStepId, allSteps): boolean | null =>
+      ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
+        ? !formHasErrors(
+          validateAndProcessForm(formData)
+        )
+        : null
+  ),
+  formSectionCollapse: createSelector(
+    rootSelector,
+    s => s.formSectionCollapse
   )
 }
 

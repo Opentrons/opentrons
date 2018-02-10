@@ -50,7 +50,7 @@ function mergeProps (stateProps, dispatchProps) {
       setLabware: () => {
         const calibrator = tr.calibratorMount || _calibrator
         if (_deckPopulated && calibrator) {
-          dispatch(robotActions.pickupAndHome(calibrator, tr.slot))
+          dispatch(robotActions.moveTo(calibrator, tr.slot))
         }
       }
     }

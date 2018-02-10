@@ -1,6 +1,7 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
+import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
 import type {
@@ -8,7 +9,8 @@ import type {
   Instrument,
   InstrumentCalibrationStatus,
   Labware,
-  LabwareCalibrationStatus
+  LabwareCalibrationStatus,
+  LabwareType
 } from './types'
 
 import type {State as CalibrationState} from './reducer/calibration'
@@ -18,7 +20,9 @@ import type {State as SessionState} from './reducer/session'
 import {
   type ConnectionStatus,
   type SessionStatus,
-  _NAME
+  _NAME,
+  INSTRUMENT_MOUNTS,
+  DECK_SLOTS
 } from './constants'
 
 type State = {
@@ -28,6 +32,7 @@ type State = {
     session: SessionState
   }
 }
+
 const calibration = (state: State): CalibrationState => state[_NAME].calibration
 
 const connection = (state: State): ConnectionState => state[_NAME].connection
@@ -35,6 +40,20 @@ const connection = (state: State): ConnectionState => state[_NAME].connection
 const session = (state: State): SessionState => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const sessionStatus = (state: State) => session(state).state
+
+export function isMount (target: ?string): boolean {
+  return INSTRUMENT_MOUNTS.indexOf(target) > -1
+}
+
+export function isSlot (target: ?string): boolean {
+  return DECK_SLOTS.indexOf(target) > -1
+}
+
+export function labwareType (labware: Labware): LabwareType {
+  return labware.isTiprack
+    ? 'tiprack'
+    : 'labware'
+}
 
 export function getIsScanning (state: State): boolean {
   return connection(state).isScanning
@@ -44,10 +63,17 @@ export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
   (state: State) => connection(state).discoveredByName,
   (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo) => discovered.map((name) => ({
-    ...discoveredByName[name],
-    isConnected: connectedTo === name
-  }))
+  (discovered, discoveredByName, connectedTo) => sortBy(
+    discovered.map((name) => ({
+      ...discoveredByName[name],
+      isConnected: connectedTo === name
+    })),
+    [
+      (robot) => !robot.isConnected,
+      (robot) => !robot.wired,
+      'name'
+    ]
+  )
 )
 
 export const getConnectionStatus = createSelector(
@@ -202,7 +228,7 @@ export const getInstruments = createSelector(
     tipOnByMount,
     calibrationRequest
   ): Instrument[] => {
-    return Object.keys(instrumentsByMount).map((mount) => {
+    return Object.keys(instrumentsByMount).filter(isMount).map((mount) => {
       const instrument = instrumentsByMount[mount]
 
       const probed = probedByMount[mount] || false
@@ -268,6 +294,7 @@ export const getLabware = createSelector(
   (state: State) => getCalibrationRequest(state),
   (labwareBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(labwareBySlot)
+      .filter(isSlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
         const confirmed = confirmedBySlot[slot] || false
@@ -277,17 +304,23 @@ export const getLabware = createSelector(
         // TODO(mc: 2018-01-10): rethink the labware level "calibration" prop
         if (calibrationRequest.slot === slot && !calibrationRequest.error) {
           const {type, inProgress} = calibrationRequest
-          isMoving = inProgress
 
-          if (type === 'MOVE_TO' || type === 'DROP_TIP_AND_HOME') {
+          // don't set isMoving for jogs because it's distracting
+          isMoving = inProgress && type !== 'JOG'
+
+          if (type === 'MOVE_TO') {
             calibration = inProgress
               ? 'moving-to-slot'
               : 'over-slot'
-          } else if (
-            type === 'PICKUP_AND_HOME' ||
-            // update offset picks up and homes with tipracks
-            (type === 'UPDATE_OFFSET' && labware.isTiprack)
-          ) {
+          } else if (type === 'JOG') {
+            calibration = inProgress
+              ? 'jogging'
+              : 'over-slot'
+          } else if (type === 'DROP_TIP_AND_HOME') {
+            calibration = inProgress
+              ? 'dropping-tip'
+              : 'over-slot'
+          } else if (type === 'PICKUP_AND_HOME') {
             calibration = inProgress
               ? 'picking-up'
               : 'picked-up'

@@ -177,8 +177,8 @@ export const actions = {
     return {type: actionTypes.ADD_DISCOVERED, payload: service}
   },
 
-  removeDiscovered (name: string) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: {name}}
+  removeDiscovered (service: RobotService) {
+    return {type: actionTypes.REMOVE_DISCOVERED, payload: service}
   },
 
   // make new session with protocol file
@@ -375,11 +375,7 @@ export const actions = {
   },
 
   // response for updateOffset
-  // payload.isTiprack is a flag for whether or not the labware is a tiprack
-  updateOffsetResponse (
-    error: ?Error = null,
-    isTiprack: boolean
-  ): CalibrationResponseAction {
+  updateOffsetResponse (error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:UPDATE_OFFSET_FAILURE',
@@ -390,7 +386,7 @@ export const actions = {
 
     return {
       type: 'robot:UPDATE_OFFSET_SUCCESS',
-      payload: {isTiprack}
+      payload: {}
     }
   },
 

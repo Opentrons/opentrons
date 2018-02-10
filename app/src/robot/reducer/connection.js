@@ -111,7 +111,9 @@ function handleAddDiscovered (state, action) {
 }
 
 function handleRemoveDiscovered (state, action) {
-  if (!action.payload) return state
+  if (!action.payload || state.connectedTo === action.payload.name) {
+    return state
+  }
 
   const {payload: {name}} = action
 

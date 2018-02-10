@@ -418,6 +418,44 @@ exports[`icons SPINNER icon renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons TOGGLED_OFF icon renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19.2 7.8h-7.61a6.3 6.3 0 1 0 0 8.4h7.61a4.2 4.2 0 0 0 0-8.4zM6.9 17.3a5.3 5.3 0 1 1 5.3-5.3 5.31 5.31 0 0 1-5.3 5.3z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons TOGGLED_ON icon renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M17.1,5.7a6.28,6.28,0,0,0-4.69,2.1H4.8a4.2,4.2,0,1,0,0,8.4h7.61A6.3,6.3,0,1,0,17.1,5.7Zm-5.42,9.5H4.8a3.2,3.2,0,1,1,0-6.4h6.88a6.26,6.26,0,0,0,0,6.4Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons UNCHECKED icon renders correctly 1`] = `
 <svg
   aria-hidden="true"

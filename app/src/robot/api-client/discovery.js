@@ -20,9 +20,11 @@ const DIRECT_HEALTH_URL = `http://${DIRECT_IP}:${DIRECT_PORT}/health`
 const DIRECT_SERVICE = {
   name: 'Opentrons USB',
   ip: DIRECT_IP,
-  port: DIRECT_PORT
+  port: DIRECT_PORT,
+  wired: true
 }
 const DIRECT_POLL_INTERVAL_MS = 1000
+let directDiscovered = false
 
 export function handleDiscover (dispatch, state, action) {
   // don't duplicate discovery requests
@@ -47,7 +49,7 @@ export function handleDiscover (dispatch, state, action) {
 
   function handleServiceDown (service) {
     if (NAME_RE.test(service.name)) {
-      dispatch(actions.removeDiscovered(service.name))
+      dispatch(actions.removeDiscovered(service))
     }
   }
 
@@ -62,9 +64,17 @@ export function handleDiscover (dispatch, state, action) {
   function pollDirectConnection () {
     fetch(DIRECT_HEALTH_URL)
       .then((response) => {
-        if (response.ok) dispatch(actions.addDiscovered(DIRECT_SERVICE))
+        if (response.ok && !directDiscovered) {
+          directDiscovered = true
+          dispatch(actions.addDiscovered(DIRECT_SERVICE))
+        }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (directDiscovered) {
+          directDiscovered = false
+          dispatch(actions.removeDiscovered(DIRECT_SERVICE))
+        }
+      })
   }
 }
 

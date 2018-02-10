@@ -1,0 +1,19 @@
+@import '@opentrons/components';
+
+.deck {
+  box-sizing: border-box;
+  display: block;
+  padding: 1rem 2rem;
+  margin: 0 auto;
+  width: 38rem;
+  height: 33rem;
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.spinner {
+  color: var(--c-font-light);
+}

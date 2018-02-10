@@ -1,144 +1,161 @@
 // @flow
-import type {Command, StepType, StepIdType, FormData, ValidatedForm} from './types' /* StepSubItemData, StepIdType */
+import type {Command, StepType, StepIdType, FormData, ProcessedFormData} from './types' /* StepSubItemData, StepIdType */
+import {humanize} from '../utils'
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 
+// TODO rename and move to types?
 export type ValidFormAndErrors = {
-  errors: {[string]: string}, // was [$Keys<FormData>]: string, but that's too strict TODO
-  validatedForm: ValidatedForm
-} // TODO rename and move to types?
+  errors: {[string]: string},
+  validatedForm: ProcessedFormData | null // TODO: incompleteData field when this is null?
+}
 
-export const generateNewForm = (stepId: StepIdType, stepType: StepType): FormData => {
+export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
+  // Add default values to a new step form
   const baseForm = {
     id: stepId,
-    stepType: stepType
+    stepType: stepType,
+    'step-name': humanize(stepType) + ' ' + (stepId + 1),
+    'step-details': ''
   }
 
-  if (stepType === 'transfer') {
-  // TODO: other actions
+  if (stepType === 'transfer' || stepType === 'consolidate') {
     return {
       ...baseForm,
       'aspirate--change-tip': 'once'
-      // TODO: rest of blank fields? Default values?
     }
   }
-  console.error('Only transfer forms are supported now. TODO.')
+  if (stepType !== 'pause') {
+    console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO.')
+  }
   return baseForm
 }
 
-export function validateAndProcessForm (stepType: StepType, formData: FormData): any { // TODO type should be ValidFormAndErrors
-  // TODO
-  if (stepType !== 'transfer') {
-    throw new Error('validateAndProcessForm only supports transfer now')
-  }
-
-  // This makes sure required fields are present, and parses strings to numbers where needed.
-  // It doesn't do any logic combining the fields.
-  type ValidationOut<B> = { // TODO rename
-    errors: Array<string>,
-    value: B
-  }
-
-  type ValidatorFn<A, B> = (value: A, name: string) => ValidationOut<B>
-
-  type ValidationAPI = {
-    dataName: $Keys<ValidatedForm>,
-    formFieldName: $Keys<FormData>,
-    validators: Array<ValidatorFn<any, any>> // not really validators, more like value casters with error reporting?
-  }
-
-  function mustExist<A> (value: A, name: string): ValidationOut<A> {
-    return {
-      errors: (value !== 0 && !value) ? ['is required'] : [],
-      value
-    }
-  }
-
-  function toNumber (value: string, name: string): ValidationOut<number> {
-    const num = parseFloat(value)
-
-    return {
-      errors: isNaN(num) ? ['must be a number'] : [],
-      value: num
-    }
-  }
-
-  function nonZero (value: number, name: string): ValidationOut<number> {
-    return {
-      errors: value === 0 ? ['must be greater than zero'] : [],
-      value
-    }
-  }
-
-  function splitWells (value: string, name: string): ValidationOut<Array<string>> {
-    mustExist(value, name)
-    return {
-      errors: mustExist(value, name).errors,
-      value: value ? value.split(',') : [value]
-    }
-  }
-
-  // TODO Ian 2018-01-31 wow I cannot Flow type this reduce
-  function validateIt (fields: Array<ValidationAPI>) {
-    // go thru all the fields of the form
-    const fieldsAndErrors = fields.reduce((acc, {formFieldName, dataName, validators}) => {
-      // go thru all the validators for a field
-      const fieldResult = validators.reduce((prevResult, validatorFn) => {
-        const subresult = validatorFn(prevResult.value, dataName)
-        return {
-          errors: [...prevResult.errors, ...subresult.errors],
-          value: subresult.value
-        }
-      },
-      {errors: [], value: formData[formFieldName]}
-      )
-
-      return {
-        errors: {...acc.errors, [dataName]: fieldResult.errors},
-        validatedForm: {...acc.validatedForm, [dataName]: fieldResult.value}
-      }
-    },
-    {errors: {}, validatedForm: {}})
-
-    return fieldsAndErrors
-  }
-
-  return validateIt([
-    {
-      dataName: 'pipette',
-      formFieldName: 'aspirate--pipette',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'sourceWells',
-      formFieldName: 'aspirate--wells',
-      validators: [splitWells]
-    },
-    {
-      dataName: 'destWells',
-      formFieldName: 'dispense--wells',
-      validators: [splitWells]
-    },
-    {
-      dataName: 'sourceLabware',
-      formFieldName: 'aspirate--labware',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'destLabware',
-      formFieldName: 'dispense--labware',
-      validators: [mustExist]
-    },
-    {
-      dataName: 'volume',
-      formFieldName: 'dispense--volume',
-      validators: [toNumber, nonZero]
-    }
-  ])
+export function formHasErrors (form: {errors: {[string]: string}}): boolean {
+  return Object.values(form.errors).length > 0
 }
 
-export function generateCommands (stepType: StepType, data: ValidatedForm): Array<Command> {
-  if (stepType === 'transfer') {
+export function validateAndProcessForm (formData: FormData): ValidFormAndErrors {
+  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate') {
+    const pipette = formData['aspirate--pipette']
+    const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
+    const destWells = formData['dispense--wells'] ? formData['dispense--wells'].split(',') : []
+    const sourceLabware = formData['aspirate--labware']
+    const destLabware = formData['dispense--labware']
+
+    const rawVolume = formData.stepType === 'transfer'
+      ? formData['dispense--volume']
+      : formData['aspirate--volume']
+    const volume = parseFloat(rawVolume)
+
+    const requiredFieldErrors = [
+      'aspirate--pipette',
+      'aspirate--labware',
+      'dispense--labware'
+    ].reduce((acc, fieldName) => {
+      if (formData.stepType !== 'transfer' && formData.stepType !== 'consolidate') {
+        return {}
+      }
+      return (!formData[fieldName])
+      ? {...acc, [fieldName]: 'This field is required'}
+      : acc
+    }, {})
+
+    // Conditionally add error fields
+    let errors = {...requiredFieldErrors}
+
+    if (!(volume > 0)) {
+      const field = formData.stepType === 'transfer' ? 'dispense--volume' : 'aspirate--volume'
+      errors[field] = 'Volume must be a positive number'
+    }
+
+    if (formData.stepType === 'transfer') {
+      if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
+        errors._mismatchedWells = 'Numbers of wells must match'
+      }
+    }
+
+    if (formData.stepType === 'consolidate') {
+      if (sourceWells.length !== 1 || destWells.length < 1) {
+        errors._mismatchedWells = 'Exactly one source well and at least one destination well is required.'
+      }
+    }
+
+    return {
+      errors,
+      validatedForm: (
+        !formHasErrors({errors}) &&
+        // extra explicit for flow
+        (pipette === 'left' || pipette === 'right') &&
+        sourceLabware &&
+        destLabware
+      )
+        ? {
+          stepType: formData.stepType,
+          pipette,
+          sourceWells,
+          destWells,
+          sourceLabware,
+          destLabware,
+          volume
+        }
+        : null
+    }
+  }
+
+  if (formData.stepType === 'pause') {
+    const hours = parseFloat(formData['pause-hour']) || 0
+    const minutes = parseFloat(formData['pause-minute']) || 0
+    const seconds = parseFloat(formData['pause-second']) || 0
+    const totalSeconds = hours * 360 + minutes * 60 + seconds
+
+    const message = formData['pause-message'] || ''
+
+    const errors = {
+      ...(!formData['pause-for-amount-of-time']
+        ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
+        : {}
+      ),
+      ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
+        ? {'_pause-times': 'Must include hours, minutes, or seconds'}
+        : {}
+      )
+    }
+
+    return {
+      errors,
+      validatedForm: (
+        !formHasErrors({errors}) &&
+        // extra explicit for flow
+        totalSeconds &&
+        hours &&
+        minutes &&
+        seconds
+      )
+        ? null
+        : {
+          stepType: formData.stepType,
+          waitForUserInput: formData['pause-for-amount-of-time'] === 'false',
+          totalSeconds,
+          hours,
+          minutes,
+          seconds,
+          message
+        }
+    }
+  }
+
+  // Fallback for unsupported step type. Should be unreachable (...right?)
+  return {
+    errors: {
+      '_form': 'Unsupported step type: ' + formData.stepType
+    },
+    validatedForm: null
+  }
+}
+
+export function generateCommands (data: ProcessedFormData): Array<Command> {
+  if (data.stepType === 'transfer') {
     // TODO: this should be done in validation/preprocessing step
     const {sourceWells, destWells, volume, pipette, sourceLabware, destLabware} = data
 
@@ -165,7 +182,7 @@ export function generateCommands (stepType: StepType, data: ValidatedForm): Arra
       }
     ])
   }
-  console.warn('generateCommands only supports transfer, got: ' + stepType)
+  console.warn('generateCommands only supports transfer, got: ' + data.stepType)
   return [] // TODO
 }
 

@@ -47,15 +47,16 @@ function mapStateToProps (state, ownProps) {
 
 function mergeProps (stateProps, dispatchProps, ownProps) {
   const {dispatch} = dispatchProps
-  const {isCurrent} = stateProps
   const {name} = ownProps
+  /* TODO (ka 2018-2-8): leaving this commented out in the event we need to
+  bring back the collapsible panel.
   const clickAction = isCurrent
     ? interfaceActions.closePanel()
-    : interfaceActions.setCurrentPanel(name)
+    : interfaceActions.setCurrentPanel(name) */
 
   return {
     ...ownProps,
     ...stateProps,
-    onClick: () => dispatch(clickAction)
+    onClick: () => dispatch(interfaceActions.setCurrentPanel(name))
   }
 }

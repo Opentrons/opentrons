@@ -32,13 +32,13 @@ describe('robot actions', () => {
   })
 
   test('REMOVE_DISCOVERED action', () => {
-    const name = 'ot'
+    const service = {name: 'ot'}
     const expected = {
       type: actionTypes.REMOVE_DISCOVERED,
-      payload: {name}
+      payload: service
     }
 
-    expect(actions.removeDiscovered(name)).toEqual(expected)
+    expect(actions.removeDiscovered(service)).toEqual(expected)
   })
 
   test('CONNECT action', () => {
@@ -337,7 +337,7 @@ describe('robot actions', () => {
   test('UPDATE_OFFSET response actions', () => {
     const success = {
       type: 'robot:UPDATE_OFFSET_SUCCESS',
-      payload: {isTiprack: true}
+      payload: {}
     }
     const failure = {
       type: 'robot:UPDATE_OFFSET_FAILURE',
@@ -345,7 +345,7 @@ describe('robot actions', () => {
       payload: new Error('AH')
     }
 
-    expect(actions.updateOffsetResponse(null, true)).toEqual(success)
+    expect(actions.updateOffsetResponse()).toEqual(success)
     expect(actions.updateOffsetResponse(new Error('AH'))).toEqual(failure)
   })
 

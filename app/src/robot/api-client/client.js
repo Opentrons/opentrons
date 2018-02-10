@@ -144,12 +144,18 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.moveToFrontResponse(error)))
   }
 
+  // saves container offset and then attempts a tip pickup
   function pickupAndHome (state, action) {
     const {payload: {mount, slot}} = action
     const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
-    remote.calibration_manager.pick_up_tip(instrument, labware)
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.pickupAndHomeResponse()), 1000)
+
+    remote.calibration_manager
+      .update_container_offset(labware, instrument)
+      .then(() => remote.calibration_manager.pick_up_tip(instrument, labware))
       .then(() => dispatch(actions.pickupAndHomeResponse()))
       .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
   }
@@ -159,8 +165,12 @@ export default function client (dispatch) {
     const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.dropTipAndHomeResponse()), 1000)
+
     remote.calibration_manager.drop_tip(instrument, labware)
       .then(() => remote.calibration_manager.home(instrument))
+      .then(() => remote.calibration_manager.move_to(instrument, labware))
       .then(() => dispatch(actions.dropTipAndHomeResponse()))
       .catch((error) => dispatch(actions.dropTipAndHomeResponse(error)))
   }
@@ -174,6 +184,9 @@ export default function client (dispatch) {
     if (selectors.getUnconfirmedTipracks(state).length === 1) {
       return dispatch(actions.confirmTiprackResponse(null, true))
     }
+
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.confirmTiprackResponse()), 1000)
 
     remote.calibration_manager.drop_tip(instrument, labware)
       .then(() => dispatch(actions.confirmTiprackResponse()))
@@ -198,10 +211,16 @@ export default function client (dispatch) {
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
-    // return setTimeout(() => dispatch(actions.moveToResponse()), 1000)
+    // return setTimeout(() => {
+    //   dispatch(actions.moveToResponse())
+    //   dispatch(push(`/setup-deck/${slot}/confirm`))
+    // }, 1000)
 
     remote.calibration_manager.move_to(instrument, labware)
-      .then(() => dispatch(actions.moveToResponse()))
+      .then(() => {
+        dispatch(actions.moveToResponse())
+        dispatch(push(`/setup-deck/${slot}/confirm`))
+      })
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }
 
@@ -218,32 +237,21 @@ export default function client (dispatch) {
       .catch((error) => dispatch(actions.jogResponse(error)))
   }
 
+  // saves container offset
+  // TODO(mc, 2018-02-07): rename to confirmNonTiprack
   function updateOffset (state, action) {
     const {payload: {mount, slot}} = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
     const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
     const labware = {_id: labwareObject._id}
-    const isTiprack = labwareObject.isTiprack || false
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
-    // return setTimeout(() => {
-    //   dispatch(actions.updateOffsetResponse())
-    //   dispatch(push(`/setup-deck/${slot}`))
-    // }, 2000)
+    // return setTimeout(() => dispatch(actions.updateOffsetResponse()), 2000)
 
-    let request = remote.calibration_manager
+    remote.calibration_manager
       .update_container_offset(labware, instrument)
-
-    // TODO(mc, 2017-11-29): DRY this up (reuses logic from pickup and home)
-    if (isTiprack) {
-      request = request
-        .then(() => remote.calibration_manager.pick_up_tip(instrument, labware))
-        .then(() => remote.calibration_manager.home(instrument))
-    }
-
-    request
-      .then(() => dispatch(actions.updateOffsetResponse(null, isTiprack)))
+      .then(() => dispatch(actions.updateOffsetResponse()))
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
 

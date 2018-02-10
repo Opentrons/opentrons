@@ -3,7 +3,6 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
 
 import {
   actions as robotActions,
@@ -30,8 +29,7 @@ type DispatchProps = {
 }
 
 type OwnProps = {
-  slot: ?string,
-  closeUrl: string
+  slot: ?string
 }
 
 export default connect(mapStateToProps, null, mergeProps)(ReviewDeckModal)
@@ -65,27 +63,20 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
 
 function mergeProps (
   stateProps: StateProps,
-  dispatchProps: DispatchProps,
-  ownProps: OwnProps
+  dispatchProps: DispatchProps
 ): Props {
   const {currentLabware, _calibrator} = stateProps
   const {dispatch} = dispatchProps
-  const {closeUrl} = ownProps
 
   // TODO(mc, 2018-02-05): refactor so this check isn't necessary
   if (!_calibrator) {
     throw new Error('no calibrator available; this is a bug')
   }
 
-  const clickAction = currentLabware.isTiprack
-    ? robotActions.pickupAndHome(_calibrator, currentLabware.slot)
-    : robotActions.moveTo(_calibrator, currentLabware.slot)
-
   return {
     ...currentLabware,
     onClick: () => {
-      dispatch(clickAction)
-      dispatch(push(closeUrl))
+      dispatch(robotActions.moveTo(_calibrator, currentLabware.slot))
     }
   }
 }

@@ -616,18 +616,13 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
           slot: '5'
         },
-        tipOnByMount: {},
         confirmedBySlot: {}
       }
     }
 
-    const successNonTiprack = {
+    const success = {
       type: 'robot:UPDATE_OFFSET_SUCCESS',
-      payload: {isTiprack: false}
-    }
-    const successTiprack = {
-      type: 'robot:UPDATE_OFFSET_SUCCESS',
-      payload: {isTiprack: true}
+      payload: {}
     }
     const failure = {
       type: 'robot:UPDATE_OFFSET_FAILURE',
@@ -635,7 +630,7 @@ describe('robot reducer - calibration', () => {
       payload: new Error('AH')
     }
 
-    expect(reducer(state, successNonTiprack).calibration).toEqual({
+    expect(reducer(state, success).calibration).toEqual({
       calibrationRequest: {
         type: 'UPDATE_OFFSET',
         inProgress: false,
@@ -643,19 +638,7 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5'
       },
-      tipOnByMount: {},
       confirmedBySlot: {5: true}
-    })
-    expect(reducer(state, successTiprack).calibration).toEqual({
-      calibrationRequest: {
-        type: 'UPDATE_OFFSET',
-        inProgress: false,
-        error: null,
-        mount: 'right',
-        slot: '5'
-      },
-      tipOnByMount: {right: true},
-      confirmedBySlot: {}
     })
     expect(reducer(state, failure).calibration).toEqual({
       calibrationRequest: {
@@ -665,7 +648,6 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5'
       },
-      tipOnByMount: {},
       confirmedBySlot: {}
     })
   })

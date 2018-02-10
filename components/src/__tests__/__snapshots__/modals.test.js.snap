@@ -42,7 +42,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
 
 exports[`modals Modal renders correctly 1`] = `
 <div
-  className="modal"
+  className="modal foo"
 >
   <div
     className="overlay"
