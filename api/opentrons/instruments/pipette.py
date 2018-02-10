@@ -97,6 +97,7 @@ class Pipette:
     def __init__(
             self,
             robot,
+            model_offset=(0, 0, 0),
             mount=None,
             axis=None,
             mount_obj=None,
@@ -128,6 +129,8 @@ class Pipette:
 
         self.mount = mount
         self.channels = channels
+
+        self.model_offset = model_offset
 
         self.tip_attached = False
         self.instrument_actuator = None

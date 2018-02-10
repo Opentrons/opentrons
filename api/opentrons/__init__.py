@@ -131,6 +131,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None):
 
         p = self.Pipette(
+            model_offset=config.model_offset,
             mount=mount,
             name=config.name,
             trash_container=trash_container,

@@ -46,8 +46,6 @@ def calibrate_container_with_delta(
 
 
 def probe_instrument(instrument, robot, tip_length=None) -> Point:
-    from statistics import mean
-
     robot.home()
 
     if tip_length is None:
@@ -78,10 +76,6 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
 
     acc = []
 
-    res = {
-        'x': [], 'y': [], 'z': []
-    }
-
     safe_height = center.z + Z_CROSSOVER_CLEARANCE
 
     robot.poses = instrument._move(robot.poses, z=safe_height)
@@ -100,13 +94,6 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         value = absolute(robot.poses, instrument)[axis_index]
         acc.append(value)
 
-        # Since we are measuring to update instrument offset and tip length
-        # store mover position for XY and tip's Z
-        node = instrument if axis == 'z' else instrument.instrument_mover
-        res[axis].append(
-            absolute(robot.poses, node)[axis_index]
-        )
-
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
         if len(acc) == 2:
@@ -121,10 +108,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
 
     instrument._remove_tip(tip_length)
 
-    return center._replace(**{
-        axis: mean(values)
-        for axis, values in res.items()
-    })
+    return center
 
 
 def update_instrument_config(instrument, measured_center) -> (Point, float):
@@ -140,12 +124,16 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
     config = robot.config
     instrument_offset = deepcopy(config.instrument_offset)
 
-    _, _, z = instrument_offset[instrument.mount][instrument.type]
     dx, dy, dz = array(measured_center) - config.probe_center
 
     tip_length = deepcopy(config.tip_length)
 
-    instrument_offset[instrument.mount][instrument.type] = (-dx, -dy, z)
+    old_x, old_y, _ = instrument_offset[instrument.mount]
+    # any Z offsets adjusts the tip length, so instruments have Z=0.0 offset
+    new_offset = (old_x - dx, old_y - dy, 0.0)
+
+    # remove the instrument model's designed offsets from the saved offset
+    instrument_offset[instrument.mount] = new_offset
     tip_length[instrument.mount][instrument.type] = \
         tip_length[instrument.mount][instrument.type] + dz
 
@@ -156,7 +144,9 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
     robot_configs.save(config)
 
-    robot.poses = update(robot.poses, instrument, (-dx, -dy, z))
+    mx, my, mz = instrument.model_offset
+    new_absolute_pos = (mx + new_offset[0], my + new_offset[1], mz)
+    robot.poses = update(robot.poses, instrument, new_absolute_pos)
 
     return instrument.robot.config
 
