@@ -149,10 +149,6 @@ class Pipette:
         self.tip_racks = tip_racks
         self.starting_tip = None
 
-        # default mm below top of tip-rack to execute drop-tip
-        # gives room for the drop-tip mechanism to work when returning tips
-        self._drop_tip_offset = -5
-
         self.reset_tip_tracking()
 
         self.robot.add_instrument(self.mount, self)
@@ -906,7 +902,7 @@ class Pipette:
                     self.current_tip().top(0),
                     strategy='direct')
             self._add_tip(
-                length=self.robot.config.tip_length[self.mount][self.type]
+                length=self._tip_length
             )
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, abs(plunge_depth))
@@ -971,7 +967,8 @@ class Pipette:
             # When container typing is implemented, make sure that
             # when returning to a tiprack, tips are dropped within the rack
             if 'rack' in location.get_parent().get_type():
-                location = location.top(self._drop_tip_offset)
+                half_tip_length = self._tip_length / 2
+                location = location.top(-half_tip_length)
             else:
                 location = location.top()
 
@@ -1014,7 +1011,7 @@ class Pipette:
             self.current_volume = 0
             self.current_tip(None)
             self._remove_tip(
-                length=self.robot.config.tip_length[self.mount][self.type]
+                length=self._tip_length
             )
 
             return self
@@ -1562,6 +1559,12 @@ class Pipette:
                 self.return_tip()
             tips -= 1
         return tips
+
+    @property
+    def _tip_length(self):
+        # TODO (andy): tip length should be retrieved from tip-rack's labware
+        # definition, unblocking ability to use multiple types of tips
+        return self.robot.config.tip_length[self.mount][self.type]
 
     def set_speed(self, aspirate=None, dispense=None):
         """
