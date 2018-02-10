@@ -28,6 +28,9 @@ DEFAULT_TIP_PRESS_MM = -10
 
 DEFAULT_PLUNGE_CURRENT = 0.1
 
+SHAKE_OFF_TIPS_SPEED = 50
+SHAKE_OFF_TIPS_DISTANCE = 2
+
 
 class PipetteTip:
     def __init__(self, length):
@@ -989,24 +992,10 @@ class Pipette:
                 x=pos_drop_tip
             )
 
-            if home_after:
-                # incase plunger motor stalled while dropping a tip, add a
-                # safety margin of the distance between `bottom` and `drop_tip`
-                b = self._get_plunger_position('bottom')
-                d = self._get_plunger_position('drop_tip')
-                safety_margin = abs(b - d)
-                self.robot.poses = self.instrument_actuator.fast_home(
-                    self.robot.poses, safety_margin)
-                self.robot.poses = self.instrument_actuator.move(
-                    self.robot.poses,
-                    x=self._get_plunger_position('bottom')
-                )
+            self._shake_off_tips(location)
 
-            # tips don't always fully fall off, especially if resting against
-            # tiprack or other tips below it. To ensure the tip has fallen,
-            # raise the pipette upwards so we are sure tip has fallen off
-            self.robot.poses = self._jog(
-                self.robot.poses, 'z', DROP_TIP_RELEASE_DISTANCE)
+            if home_after:
+                self._home_after_drop_tip()
 
             self.current_volume = 0
             self.current_tip(None)
@@ -1016,6 +1005,46 @@ class Pipette:
 
             return self
         return _drop_tip(location)
+
+    def _shake_off_tips(self, location):
+        # tips don't always fall off, especially if resting against
+        # tiprack or other tips below it. To ensure the tip has fallen
+        # first, shake the pipette to dislodge partially-sealed tips,
+        # then second, raise the pipette so loosened tips have room to fall
+
+        # shake the pipette left/right a few millimeters
+        shake_off_distance = SHAKE_OFF_TIPS_DISTANCE
+        if location:
+            placeable, _ = unpack_location(location)
+            # ensure the distance is not >25% the diameter of placeable
+            shake_off_distance = min(
+                shake_off_distance, placeable.x_size() / 4)
+        self.robot.gantry.push_speed()
+        self.robot.gantry.set_speed(SHAKE_OFF_TIPS_SPEED)
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', -shake_off_distance)  # move left
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', shake_off_distance * 2)  # move right
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', -shake_off_distance)  # move left
+        self.robot.gantry.pop_speed()
+
+        # raise the pipette upwards so we are sure tip has fallen off
+        self.robot.poses = self._jog(
+            self.robot.poses, 'z', DROP_TIP_RELEASE_DISTANCE)
+
+    def _home_after_drop_tip(self):
+        # incase plunger motor stalled while dropping a tip, add a
+        # safety margin of the distance between `bottom` and `drop_tip`
+        b = self._get_plunger_position('bottom')
+        d = self._get_plunger_position('drop_tip')
+        safety_margin = abs(b - d)
+        self.robot.poses = self.instrument_actuator.fast_home(
+            self.robot.poses, safety_margin)
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
+            x=self._get_plunger_position('bottom')
+        )
 
     def home(self):
         """
