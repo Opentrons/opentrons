@@ -1,6 +1,9 @@
 # opentrons platform makefile
 # https://github.com/OpenTrons/opentrons
 
+# add node_modules/.bin to PATH
+PATH := $(shell yarn bin):$(PATH)
+
 SHELL := /bin/bash
 
 API_DIR := api
@@ -51,12 +54,12 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	yarn run eslint '**/*.js'
-	yarn run flow
+	eslint '**/*.js'
+	flow
 
 .PHONY: lint-css
 lint-css:
-	yarn run stylelint '**/*.css'
+	stylelint '**/*.css'
 
 # upload coverage reports
 # uses codecov's bash upload script
