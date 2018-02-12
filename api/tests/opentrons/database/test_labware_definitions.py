@@ -1,4 +1,6 @@
 import os
+import json
+import tempfile
 from opentrons.data_storage import labware_definitions as ldef
 
 file_dir = os.path.abspath(os.path.dirname(__file__))
@@ -64,3 +66,34 @@ def test_list_labware():
     assert len(lw) == 41
     assert lw[0] == '12-well-plate'
     assert lw[-1] == 'wheaton_vial_rack'
+
+
+def test_save_offset():
+    test_data = {'x': 1, 'y': 2, 'z': -3}
+    test_dir = tempfile.mkdtemp()
+
+    ldef._save_offset(test_dir, 'testy', test_data)
+
+    files = os.listdir(test_dir)
+    assert files == ['testy.json']
+
+    with open(os.path.join(test_dir, 'testy.json')) as test_file:
+        actual = json.load(test_file)
+        assert actual == test_data
+
+
+def test_save_user_definition():
+    test_file_name = '4-well-plate.json'
+    with open(os.path.join(
+            test_user_defn_root, 'definitions', test_file_name)) as test_def:
+        test_data = json.load(test_def)
+    test_dir = tempfile.mkdtemp()
+
+    ldef._save_user_definition(test_dir, test_data)
+
+    files = os.listdir(test_dir)
+    assert files == [test_file_name]
+
+    with open(os.path.join(test_dir, test_file_name)) as test_file:
+        actual = json.load(test_file)
+        assert actual == test_data
