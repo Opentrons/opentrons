@@ -68,10 +68,3 @@ dist-win: $(source) ui
 .PHONY: dev
 dev:
 	$(env)=development PORT=$(port) $(bin)/electron lib/main.js
-
-# checks
-#####################################################################
-
-.PHONY: lint
-lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy

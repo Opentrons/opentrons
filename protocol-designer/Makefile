@@ -51,28 +51,11 @@ dev:
 
 .PHONY: test
 test:
-	$(MAKE) check jest lint
-
-.PHONY: jest
-jest:
 	$(env)=test $(bin)/jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
 
-.PHONY: check
-check:
-	$(bin)/flow
-
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps dev
-
-.PHONY: uninstall-types
-uninstall-types:
-	rm -rf flow-typed
-
-.PHONY: lint
-lint:
-	$(bin)/standard --verbose --fix=$(fix) | $(bin)/snazzy
-	$(bin)/stylelint '**/*.css' --fix=$(fix) --verbose
+	$(bin)/flow-typed install --ignoreDeps=dev --packageDir=..
