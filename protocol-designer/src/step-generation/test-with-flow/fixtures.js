@@ -30,3 +30,41 @@ export const p300Multi = {
   maxVolume: 300,
   channels: 8
 }
+
+export const getBasicRobotState = () => ({
+  instruments: {
+    p300SingleId: p300Single,
+    p300MultiId: p300Multi
+  },
+  labware: {
+    tiprack1Id: {
+      slot: '7',
+      type: 'tiprack-200uL',
+      name: 'Tip rack'
+    },
+    sourcePlateId: {
+      slot: '10',
+      type: 'trough-12row',
+      name: 'Source (Buffer)'
+    },
+    destPlateId: {
+      slot: '11',
+      type: '96-flat',
+      name: 'Destination Plate'
+    },
+    trashId: {
+      slot: '12',
+      type: 'fixed-trash',
+      name: 'Trash'
+    }
+  },
+  tipState: {
+    tipracks: {
+      tiprack1Id: {...filledTiprackWells}
+    },
+    pipettes: {
+      p300SingleId: false,
+      p300MultiId: false
+    }
+  }
+})

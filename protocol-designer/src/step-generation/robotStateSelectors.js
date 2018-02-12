@@ -14,7 +14,7 @@ export function sortLabwareBySlot (robotState: RobotState) {
 export function _getNextTip (
   pipetteChannels: PipetteChannels,
   tiprackWellsState: {[wellName: string]: boolean
-}) {
+}): string | null {
   /** Given a tiprack's wells state, return the well of the next available tip
     NOTE: expects 96-well tiprack
   */
@@ -25,11 +25,10 @@ export function _getNextTip (
     return well || null
   }
 
-  if (pipetteChannels === 8) {
-    // return first well in the column (for 96-well format, the 'A' row)
-    const fullColumn = tiprackWellNamesByCol.find(wellNamesInCol => wellNamesInCol.every(hasTiprack))
-    return fullColumn ? fullColumn[0] : null
-  }
+  // Otherwise, pipetteChannels === 8.
+  // return first well in the column (for 96-well format, the 'A' row)
+  const fullColumn = tiprackWellNamesByCol.find(wellNamesInCol => wellNamesInCol.every(hasTiprack))
+  return fullColumn ? fullColumn[0] : null
 }
 
 export function getNextTiprack (pipetteChannels: PipetteChannels, robotState: RobotState) {
@@ -47,10 +46,14 @@ export function getNextTiprack (pipetteChannels: PipetteChannels, robotState: Ro
     _getNextTip(pipetteChannels, robotState.tipState.tipracks[tiprackId])
   )
 
-  if (firstAvailableTiprack) {
+  // TODO Ian 2018-02-12: avoid calling _getNextTip twice
+  const nextTip = firstAvailableTiprack &&
+    _getNextTip(pipetteChannels, robotState.tipState.tipracks[firstAvailableTiprack])
+
+  if (firstAvailableTiprack && nextTip) {
     return {
       tiprackId: firstAvailableTiprack,
-      well: _getNextTip(pipetteChannels, robotState.tipState.tipracks[firstAvailableTiprack]) // TODO later: avoid calling this twice
+      well: nextTip
     }
   }
   // No available tipracks (for given pipette channels)

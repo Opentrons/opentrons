@@ -1,43 +1,9 @@
 // @flow
-import {p300Single, filledTiprackWells} from './fixtures'
+import {getBasicRobotState, p300Single, filledTiprackWells} from './fixtures'
 import {consolidate} from '../'
 
 describe('consolidate single-channel', () => { // TODO don't skip
-  const robotInitialState = {
-    instruments: {
-      p300SingleId: p300Single
-    },
-    labware: {
-      tiprack1Id: {
-        slot: '7',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      sourcePlateId: {
-        slot: '10',
-        type: 'trough-12row',
-        name: 'Source (Buffer)'
-      },
-      destPlateId: {
-        slot: '11',
-        type: '96-flat',
-        name: 'Destination Plate'
-      },
-      trashId: {
-        slot: '12',
-        type: 'fixed-trash',
-        name: 'Trash'
-      }
-    },
-    tipState: {
-      tipracks: {
-        tiprack1Id: {...filledTiprackWells}
-      },
-      pipettes: {
-        p300SingleId: false
-      }
-    }
-  }
+  const robotInitialState = getBasicRobotState()
 
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
     const data = {
@@ -63,41 +29,51 @@ describe('consolidate single-channel', () => { // TODO don't skip
       blowOut: false
     }
 
-    expect(consolidate(data, robotInitialState)).toEqual({
-      annotation: {
-        name: 'Consolidate Test',
-        description: 'test blah blah'
-      },
-      commands: [
-        {
-          command: 'pick-up-tip', // TODO IMMEDIATELY need labware, tip, & instrument info
-          pipette: 'pipette1Id',
-          labware: 'tiprack1Id',
-          well: 'A1'
+    const result = consolidate(data)(robotInitialState)
+    expect(result.robotState).toEqual({
+      ...robotInitialState,
+      tipState: {
+        ...robotInitialState.tipState,
+        tipracks: {
+          ...robotInitialState.tipState.tipracks,
+          tiprack1Id: {...filledTiprackWells, A1: false}
         },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 50,
-          labware: 'sourcePlateId',
-          well: 'A1'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 50,
-          labware: 'sourcePlateId',
-          well: 'A2'
-        },
-        {
-          command: 'dispense',
-          pipette: 'pipette1Id',
-          volume: 100,
-          labware: 'destPlateId',
-          well: 'B1'
+        pipettes: {
+          ...robotInitialState.tipState.pipettes,
+          p300SingleId: true
         }
-      ]
+      }
     })
+
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 100,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
   })
 
   test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
@@ -123,61 +99,70 @@ describe('consolidate single-channel', () => { // TODO don't skip
       blowOut: false
     }
 
-    expect(consolidate(data, robotInitialState)).toEqual({
-      annotation: {
-        name: 'Consolidate Test',
-        description: 'test blah blah'
+    const result = consolidate(data)(robotInitialState)
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
       },
-      commands: [
-        {
-          command: 'pick-up-tip',
-          pipette: 'pipette1Id',
-          labware: 'tiprack1Id',
-          well: 'A1'
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+
+    expect(result.robotState).toEqual({
+      ...robotInitialState,
+      tipState: {
+        tipracks: {
+          ...robotInitialState.tipState.tipracks,
+          tiprack1Id: {...filledTiprackWells, A1: false}
         },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A1'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A2'
-        },
-        {
-          command: 'dispense',
-          pipette: 'pipette1Id',
-          volume: 300,
-          labware: 'destPlateId',
-          well: 'B1'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A3'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A4'
-        },
-        {
-          command: 'dispense',
-          pipette: 'pipette1Id',
-          volume: 300,
-          labware: 'destPlateId',
-          well: 'B1'
+        pipettes: {
+          ...robotInitialState.tipState.pipettes,
+          p300SingleId: true
         }
-      ]
+      }
     })
   })
 
@@ -205,73 +190,83 @@ describe('consolidate single-channel', () => { // TODO don't skip
       blowOut: false
     }
 
-    expect(consolidate(data, robotInitialState)).toEqual({
-      annotation: {
-        name: 'Consolidate Test',
-        description: 'test blah blah'
+    const result = consolidate(data)(robotInitialState)
+
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
       },
-      commands: [
-        {
-          command: 'pick-up-tip',
-          pipette: 'pipette1Id',
-          labware: 'tiprack1Id',
-          well: 'A1'
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'drop-tip',
+        pipette: 'p300SingleId',
+        labware: 'trashId',
+        well: 'A1'
+      },
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+
+    expect(result.robotState).toEqual({
+      ...robotInitialState,
+      tipState: {
+        tipracks: {
+          ...robotInitialState.tipState.tipracks,
+          tiprack1Id: {...filledTiprackWells, A1: false, B1: false}
         },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A1'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A2'
-        },
-        {
-          command: 'dispense',
-          pipette: 'pipette1Id',
-          volume: 300,
-          labware: 'destPlateId',
-          well: 'B1'
-        },
-        {
-          command: 'drop-tip',
-          pipette: 'pipette1Id',
-          labware: 'trashId',
-          well: 'A1'
-        },
-        {
-          command: 'pick-up-tip',
-          pipette: 'pipette1Id',
-          labware: 'tiprack1Id',
-          well: 'A2'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A3'
-        },
-        {
-          command: 'aspirate',
-          pipette: 'pipette1Id',
-          volume: 150,
-          labware: 'sourcePlateId',
-          well: 'A4'
-        },
-        {
-          command: 'dispense',
-          pipette: 'pipette1Id',
-          volume: 300,
-          labware: 'destPlateId',
-          well: 'B1'
+        pipettes: {
+          ...robotInitialState.tipState.pipettes,
+          p300SingleId: true
         }
-      ]
+      }
     })
   })
 })

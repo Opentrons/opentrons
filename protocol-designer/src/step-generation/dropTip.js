@@ -2,12 +2,12 @@
 import type {CommandReducer, RobotState} from './'
 import cloneDeep from 'lodash/cloneDeep'
 
-export default function dropTip (pipetteId: string, robotState: RobotState): CommandReducer {
+const dropTip = (pipetteId: string): CommandReducer => (robotState: RobotState) => {
   // No-op if there is no tip
   if (robotState.tipState.pipettes[pipetteId] === false) {
     return {
-      nextRobotState: robotState,
-      nextCommands: []
+      robotState,
+      commands: []
     }
   }
 
@@ -16,8 +16,8 @@ export default function dropTip (pipetteId: string, robotState: RobotState): Com
   nextRobotState.tipState.pipettes[pipetteId] = false
 
   return ({
-    nextRobotState,
-    nextCommands: [
+    robotState: nextRobotState,
+    commands: [
       {
         command: 'drop-tip',
         pipette: pipetteId,
@@ -27,3 +27,5 @@ export default function dropTip (pipetteId: string, robotState: RobotState): Com
     ]
   })
 }
+
+export default dropTip

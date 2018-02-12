@@ -91,7 +91,37 @@ export type RobotState = {|
   }
 |}
 
-export type CommandReducer = {|
-  nextCommands: Array<{}>, // TODO Command export type
-  nextRobotState: RobotState
+export type PipetteLabwareFields = {|
+  pipette: string,
+  labware: string,
+  well: string
+  /* TODO optional uL/sec (or uL/minute???) speed here */
+|}
+
+export type AspirateDispenseArgs = {|
+  ...PipetteLabwareFields,
+  volume: number
+|}
+
+export type Command = {|
+  command: 'aspirate' | 'dispense',
+  ...AspirateDispenseArgs
+|} | {|
+  command: 'pick-up-tip' | 'drop-tip' | 'blowout',
+  ...PipetteLabwareFields
+|} | {|
+  command: 'delay',
+  /** number of seconds to delay (fractional values OK),
+    or `true` for delay until user input */
+  wait: number | true,
+  message: ?string
+|} | {|
+  command: 'air-gap',
+  pipette: string,
+  volume: number
+|}
+
+export type CommandReducer = (prevRobotState: RobotState) => {|
+  commands: Array<Command>,
+  robotState: RobotState
 |}
