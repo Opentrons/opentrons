@@ -12,8 +12,6 @@ import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
 import SessionHeader from '../containers/SessionHeader'
 
-const PAGE_TITLE = 'Setup Instruments'
-
 type Props = {
   match: {
     url: string,
@@ -29,7 +27,7 @@ export default function SetupInstrumentsPage (props: Props) {
 
   return (
     <Page>
-      <SessionHeader subtitle={PAGE_TITLE} />
+      <SessionHeader />
       <InstrumentTabs mount={mount} />
       <Instruments mount={mount} />
       <TipProbe mount={mount} confirmTipProbeUrl={confirmTipProbeUrl} />

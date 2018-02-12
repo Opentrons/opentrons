@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react'
+
 import {PrimaryButton} from '@opentrons/components'
-import styles from './run-panel.css'
+
+import styles from './styles.css'
 
 type RunButtonProps = {
   onClick: () => void,

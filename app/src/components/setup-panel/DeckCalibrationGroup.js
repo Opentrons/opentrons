@@ -1,26 +1,29 @@
 // @flow
 import {connect} from 'react-redux'
-import {SidePanelGroup, type IconName} from '@opentrons/components'
+import {SidePanelGroup, type IconName, FLASK} from '@opentrons/components'
 
 import {
   selectors as robotSelectors
 } from '../../robot'
 
-type Props = {
+const TITLE = 'Deck Calibration'
+
+type StateProps = {
+  title: string,
+  iconName: IconName,
   disabled: boolean,
-  title?: string,
-  iconName?: IconName
 }
 
 export default connect(mapStateToProps)(SidePanelGroup)
 
-function mapStateToProps (state): Props {
+function mapStateToProps (state): StateProps {
   const instrumentsCalibrated = robotSelectors.getInstrumentsCalibrated(state)
   const isRunning = robotSelectors.getIsRunning(state)
   const disabled = isRunning || !instrumentsCalibrated
+
   return {
-    disabled,
-    title: 'Deck Calibration',
-    iconName: 'flask'
+    title: TITLE,
+    iconName: FLASK,
+    disabled
   }
 }

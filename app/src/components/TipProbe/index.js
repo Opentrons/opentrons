@@ -60,7 +60,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
 
 function TipProbe (props: TipProbeProps) {
   const {mount, probed, calibration} = props
-  const title = `${mount} pipette setup`
+  const title = `${mount} pipette calibration`
 
   const Panel = PANEL_BY_CALIBRATION[calibration]
 

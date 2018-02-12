@@ -19,17 +19,11 @@ type Props = Labware & {
 }
 
 export default function ConfirmPositionDiagram (props: Props) {
-  const {
-    slot,
-    name,
-    type,
-    isTiprack,
-    buttonText,
-    calibrator: {mount, channels}
-  } = props
+  const {type, isTiprack, calibrator: {mount, channels}} = props
   const multi = channels === 8
   const calibrator = `${mount} ${multi ? 'multi' : 'single'}-channel pipette`
-  const target = isTiprack ? 'tiprack' : 'labware'
+  const targetLocation = multi ? 'column 1' : 'A1'
+  const target = (isTiprack ? 'tip' : 'well') + (multi ? 's' : '')
   const tipOrNozzle = isTiprack ? 'nozzle' : 'tip'
   const calibrationDescription = `${tipOrNozzle}${multi ? 's are ' : ' is '}`
 
@@ -55,13 +49,14 @@ export default function ConfirmPositionDiagram (props: Props) {
   return (
     <div className={styles.position_diagram}>
       <h3 className={styles.diagram_title}>
-        Calibrate {target} {name} in slot {slot}
+        Calibrate pipette to {type}
       </h3>
       <img className={styles.diagram_image} src={diagramSrc} />
       <p className={styles.diagram_instructions}>
-        If necesary, jog the {calibrator} until the {calibrationDescription}
-        aligned over the {target} in slot {slot} as illustrated. Once aligned,
-        click [{buttonText.toUpperCase()}].
+        Jog the {calibrator} until the {calibrationDescription} centered
+        above and flush with the top of the {targetLocation} {target} as
+        illustrated above.
+        {isTiprack && ` Then try picking up the ${target}.`}
       </p>
     </div>
   )

@@ -92,7 +92,3 @@ NOTE: available defs are:
 .name_overlay .container_type {
   font-weight: var(--fw-bold);
 }
-
-.deck_slot:hover .name_overlay {
-  display: none;
-}
