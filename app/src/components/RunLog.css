@@ -1,3 +1,5 @@
+/* TODO(mc, 2018-02-09): fix lint errors and remove this ignore */
+/* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
 .run_log_wrapper {
   box-sizing: border-box;
   font-family: 'sans';

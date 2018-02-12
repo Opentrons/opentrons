@@ -64,31 +64,15 @@ class Mover:
         return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
     def home(self, pose_tree):
-        position = self._driver.home(axis=''.join(self._axis_mapping.values()))
-        # map from driver axis names to xyz and expand position
-        # into point object
-        point = Point(
-            x=position.get(self._axis_mapping.get('x', ''), 0.0),
-            y=position.get(self._axis_mapping.get('y', ''), 0.0),
-            z=position.get(self._axis_mapping.get('z', ''), 0.0)
-        )
-
-        return update(pose_tree, self, point)
+        self._driver.home(axis=''.join(self._axis_mapping.values()))
+        return self.update_pose_from_driver(pose_tree)
 
     def fast_home(self, pose_tree, safety_margin):
-        position = self._driver.fast_home(
+        self._driver.fast_home(
             axis=''.join(self._axis_mapping.values()),
             safety_margin=safety_margin
         )
-        # map from driver axis names to xyz and expand position
-        # into point object
-        point = Point(
-            x=position.get(self._axis_mapping.get('x', ''), 0.0),
-            y=position.get(self._axis_mapping.get('y', ''), 0.0),
-            z=position.get(self._axis_mapping.get('z', ''), 0.0)
-        )
-
-        return update(pose_tree, self, point)
+        return self.update_pose_from_driver(pose_tree)
 
     def set_speed(self, value):
         self._driver.set_speed(value)
@@ -115,16 +99,19 @@ class Mover:
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
         if axis in self._axis_mapping:
-            position = self._driver.probe_axis(
-                self._axis_mapping[axis],
-                movement)
-            point = Point(
-                x=position.get(self._axis_mapping.get('x', ''), 0.0),
-                y=position.get(self._axis_mapping.get('y', ''), 0.0),
-                z=position.get(self._axis_mapping.get('z', ''), 0.0)
-            )
-
-            return update(pose_tree, self, point)
+            self._driver.probe_axis(self._axis_mapping[axis], movement)
+            return self.update_pose_from_driver(pose_tree)
 
     def delay(self, seconds):
         self._driver.delay(seconds)
+
+    def update_pose_from_driver(self, pose_tree):
+        # map from driver axis names to xyz and expand position
+        # into point object
+        point = Point(
+            x=self._driver.position.get(self._axis_mapping.get('x', ''), 0.0),
+            y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
+            z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
+        )
+
+        return update(pose_tree, self, point)

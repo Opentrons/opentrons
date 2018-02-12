@@ -49,82 +49,7 @@ We love contributors! Here is the best way to work with us:
 
 2.  Submit a pull request with any new features you've added to a branch of the API or App. We will reach out to talk with you about integration testing and launching it into our product!
 
-For more information, please read [the contributing guide][contributing].
-
-### Using BETA versions
-
-If you want to build the platform and play with the latest development version we are working on before it is launched, here are the steps:
-
-### Set up your development environment
-
-Your computer will need the following tools installed to be able to develop with the Opentrons platform:
-
-*   macOS 10.11+, Linux, or Windows 10 with Cygwin
-*   Python 3.5.3  - [pyenv](https://github.com/pyenv/pyenv) is optional, but recommended
-
-    ``` shell
-    # pyenv on macOS: install with shared framework option
-    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
-
-    # pyenv on Linux: install with shared library option
-    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.3
-    ```
-
-*   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
-
-    ```shell
-    # nvm on macOS and Linux
-    # installs version from .nvmrc ("8")
-    nvm install && nvm use
-    ```
-
-*   [yarn][yarn-install] - JavaScript package manager
-
-*   GNU Make - we use [Makefiles][] to manage our builds
-
-Once you're set up, clone the repository, install all project dependencies, and run the tests to get started:
-
-```shell
-git clone https://github.com/Opentrons/opentrons.git
-cd opentrons
-make install
-make test
-```
-
-### Start the Opentrons API
-
-To run the Opentrons API in development mode:
-
-Install the dependencies and API itself.
-
-```shell
-# change into the API directory
-$ cd api
-
-# verify API is working by printing the version
-python -c 'import opentrons; print(opentrons.__version__)'
-
-# run API with virtual robot
-ENABLE_VIRTUAL_SMOOTHIE=true make dev
-# run API with robot's motor driver connected via USB to UART cable
-make dev
-```
-
-You may also test and lint the API code:
-
-```shell
-make test
-```
-
-If you'd like to test your code on a real robot, you can push and run your current API code to that robot with:
-
-```shell
-make push
-```
-
-### Start the Opentrons App
-
-See the [App README][app-readme] for instructions.
+For more information and development setup instructions, please read [the contributing guide][contributing].
 
 Enjoy!
 
@@ -135,7 +60,3 @@ Enjoy!
 [codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
 [codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
 [contributing]: ./CONTRIBUTING.md
-[app-readme]: ./app/README.md
-[makefiles]: https://en.wikipedia.org/wiki/Makefile
-[nvm]: https://github.com/creationix/nvm
-[yarn-install]: https://yarnpkg.com/en/docs/install

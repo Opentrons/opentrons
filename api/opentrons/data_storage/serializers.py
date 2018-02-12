@@ -63,3 +63,8 @@ def container_to_json(container: Container) -> dict:
 
     ordering = [sorted(groups[idx]) for idx in sorted(groups.keys())]
     return {'metadata': metadata, 'wells': wells, 'ordering': ordering}
+
+
+# Aliases until we get rid of "container" nomenclature
+labware_to_json = container_to_json
+json_to_labware = json_to_container

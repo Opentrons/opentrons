@@ -310,6 +310,10 @@ You also may want to check out good [editor setups for flow][flow-editors].
 
 ### unit tests
 
+```shell
+make test
+```
+
 Unit tests live in a `__tests__` directory in the same directory as the module under test. When writing unit tests for components, we've found the following tests to be the most useful:
 
 *   DOM tests

@@ -9,7 +9,18 @@
     "webpack-config"
   ],
   "devDependencies": {
+    "babel-eslint": "7.2.3",
+    "eslint": "3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^6.0.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-react": "^7.6.1",
+    "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.63.0",
-    "flow-typed": "^2.2.3"
+    "flow-typed": "^2.2.3",
+    "stylelint": "^8.4.0",
+    "stylelint-config-standard": "^18.0.0"
   }
 }

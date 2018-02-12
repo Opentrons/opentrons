@@ -32,13 +32,9 @@ The desktop application shell uses:
 *   [Electron][]
 *   [Electron Builder][electron-builder]
 
-## testing and linting
+## testing
 
 The desktop shell has no tests at this time.
-
-To lint the JS:
-
-*   `make lint` - Lint JS
 
 ## building
 
