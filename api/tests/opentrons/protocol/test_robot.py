@@ -93,36 +93,49 @@ def test_comment(robot):
 
 
 def test_create_arc(robot):
-    from opentrons.robot.robot import TIP_CLEARANCE
+    from opentrons.robot.robot import TIP_CLEARANCE_DECK, TIP_CLEARANCE_LABWARE
 
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
     plate = containers_load(robot, '96-flat', '1')
     plate2 = containers_load(robot, '96-flat', '2')
-    robot.poses = p200._move(robot.poses, x=10, y=10, z=10)
+
+    new_labware_height = 10
+    robot.poses = p200._move(robot.poses, x=10, y=10, z=new_labware_height)
     robot.calibrate_container_with_instrument(plate, p200, save=False)
 
-    res = robot._create_arc((0, 0, 0), plate[0])
-    # TODO(artyom 20171030): confirm expected values are correct after merging
-    # calibration work
+    trash_height = robot.max_placeable_height_on_deck(robot.fixed_trash)
+    assert robot.max_deck_height() == trash_height
+
+    res = robot._create_arc(p200, (0, 0, 0), plate[0])
+    arc_top = robot.max_deck_height() + TIP_CLEARANCE_DECK
     expected = [
-        {'z': robot.max_deck_height() + TIP_CLEARANCE},
+        {'z': arc_top},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]
     assert res == expected
 
-    robot.poses = p200._move(robot.poses, x=10, y=10, z=100)
-    robot.calibrate_container_with_instrument(
-        plate2, p200, save=False
-    )
-    res = robot._create_arc((0, 0, 0), plate2[0])
-
-    # TODO(artyom 20171030): confirm expected values are correct after merging
-    # calibration work
+    res = robot._create_arc(p200, (0, 0, 0), plate[1])
+    arc_top = robot.max_placeable_height_on_deck(plate) + TIP_CLEARANCE_LABWARE
     expected = [
-        {'z': robot.max_deck_height() + TIP_CLEARANCE},
+        {'z': arc_top},
+        {'x': 0, 'y': 0},
+        {'z': 0}
+    ]
+    assert res == expected
+
+    new_labware_height = 200
+    robot.poses = p200._move(robot.poses, x=10, y=10, z=new_labware_height)
+    robot.calibrate_container_with_instrument(plate2, p200, save=False)
+
+    assert robot.max_deck_height() == new_labware_height
+
+    res = robot._create_arc(p200, (0, 0, 0), plate2[0])
+    arc_top = robot.max_deck_height() + TIP_CLEARANCE_DECK
+    expected = [
+        {'z': arc_top},
         {'x': 0, 'y': 0},
         {'z': 0}
     ]

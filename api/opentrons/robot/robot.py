@@ -15,10 +15,8 @@ from opentrons.util.log import get_logger
 
 log = get_logger(__name__)
 
-# TODO (andy) this is the height the tip will travel above the deck's tallest
-# container. This should not be a single value, but should be optimized given
-# the movements context (ie sterility vs speed)
-TIP_CLEARANCE = 5
+TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
+TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
 
 class InstrumentMosfet(object):
@@ -191,8 +189,6 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
-
-        self.arc_height = TIP_CLEARANCE
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -526,6 +522,16 @@ class Robot(object):
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
 
+        # next move should not use any previously used instrument or labware
+        # to prevent robot.move_to() from using risky path optimization
+        self._previous_instrument = None
+        self._prev_container = None
+
+        # explicitly update carriage Mover positions in pose tree
+        # because their Mover.home() commands aren't used here
+        for a in self._actuators.values():
+            self.poses = a['carriage'].update_pose_from_driver(self.poses)
+
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
@@ -628,8 +634,10 @@ class Robot(object):
                 # Z arc height will be used for the new pipette
                 self._prev_container = None
 
+        self._previous_instrument = instrument
+
         if strategy == 'arc':
-            arc_coords = self._create_arc(target, placeable)
+            arc_coords = self._create_arc(instrument, target, placeable)
             for coord in arc_coords:
                 self.poses = instrument._move(
                     self.poses,
@@ -644,7 +652,7 @@ class Robot(object):
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-    def _create_arc(self, destination, placeable=None):
+    def _create_arc(self, inst, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -656,19 +664,23 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        arc_top = self.max_deck_height()
+        arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
 
         # movements that stay within the same container do not need to avoid
         # other containers on the deck, so the travel height of arced movements
         # can be relative to just that one container's height
         if this_container and self._prev_container == this_container:
             arc_top = self.max_placeable_height_on_deck(this_container)
+            arc_top += TIP_CLEARANCE_LABWARE
 
         self._prev_container = this_container
 
+        # if instrument is currently taller than arc_top, no need to move down
+        _, _, pip_z = pose_tracker.absolute(self.poses, inst)
+
         # TODO (andy): there is no check here for if this height will hit
         # the limit switches, so if a tall labware is used, we risk collision
-        arc_top += self.arc_height
+        arc_top = max(arc_top, destination[2], pip_z)
 
         strategy = [
             {'z': arc_top},
@@ -805,6 +817,7 @@ class Robot(object):
         if self._is_available_slot(location, share, slot, name):
             location.add(container, label or name)
         self.add_container_to_pose_tracker(location, container)
+        self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
@@ -980,6 +993,8 @@ class Robot(object):
             container,
             *delta, save
         )
+
+        self.max_deck_height.cache_clear()
 
     @lru_cache()
     def max_deck_height(self):

@@ -138,7 +138,6 @@ class CalibrationManager:
             instrument=inst,
             save=True
         )
-        inst.robot.max_deck_height.cache_clear()
 
     # TODO (artyom, 20171003): along with session, consider extracting this
     # into abstract base class or find any other way to keep notifications
