@@ -14,6 +14,7 @@ describe('aspirate', () => {
       }
     }
   }
+
   test('aspirate with tip', () => {
     const result = aspirate({
       pipette: 'p300SingleId',
@@ -33,7 +34,7 @@ describe('aspirate', () => {
     expect(result.robotState).toEqual(robotStateWithTip)
   })
 
-  test('aspirate with volume > pipette max vol', () => {
+  test('aspirate with volume > pipette max vol should throw error', () => {
     expect(() => aspirate({
       pipette: 'p300SingleId',
       volume: 10000,
@@ -42,7 +43,7 @@ describe('aspirate', () => {
     })(robotStateWithTip)).toThrow(/Attempted to aspirate volume greater than pipette max volume/)
   })
 
-  test('aspirate with invalid pipette ID', () => {
+  test('aspirate with invalid pipette ID should throw error', () => {
     expect(() => aspirate({
       pipette: 'badPipette',
       volume: 50,
@@ -51,7 +52,7 @@ describe('aspirate', () => {
     })(robotStateWithTip)).toThrow(/Attempted to aspirate with pipette id .* this pipette was not found/)
   })
 
-  test('aspirate with no tip', () => {
+  test('aspirate with no tip should throw error', () => {
     expect(() => aspirate({
       pipette: 'p300SingleId',
       volume: 50,

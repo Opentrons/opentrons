@@ -3,7 +3,7 @@ import chunk from 'lodash/chunk'
 import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
 import {aspirate, dispense, replaceTip} from './'
-import type {ConsolidateFormData, RobotState, Command, CommandReducer} from './'
+import type {ConsolidateFormData, RobotState, CommandReducer} from './'
 
 const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotState: RobotState) => {
   /**

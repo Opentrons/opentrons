@@ -1,8 +1,8 @@
 // @flow
-import {getBasicRobotState, p300Single, filledTiprackWells} from './fixtures'
+import {getBasicRobotState, filledTiprackWells} from './fixtures'
 import {consolidate} from '../'
 
-describe('consolidate single-channel', () => { // TODO don't skip
+describe('consolidate single-channel', () => {
   const robotInitialState = getBasicRobotState()
 
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
