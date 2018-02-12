@@ -23,3 +23,10 @@ export const p300Single = {
   maxVolume: 300,
   channels: 1
 }
+
+export const p300Multi = {
+  id: 'p300MultiId',
+  mount: 'left',
+  maxVolume: 300,
+  channels: 8
+}

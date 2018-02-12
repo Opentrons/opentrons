@@ -1,5 +1,5 @@
 // @flow
-import {filledTiprackWells, emptyTiprackWells, p300Single} from './fixtures'
+import {filledTiprackWells, emptyTiprackWells, p300Single, p300Multi} from './fixtures'
 import {pickUpTip} from '../'
 
 describe('pickUpTip: single channel', () => {
@@ -262,6 +262,157 @@ describe('pickUpTip: single channel', () => {
   })
 })
 
-describe.skip('pickUpTip: multi-channel', () => {
-  // TODO add tests immediately!
+describe('pickUpTip: multi-channel', () => {
+  const robotInitialState = {
+    instruments: {
+      p300MultiId: p300Multi
+    },
+    labware: {
+      tiprack1Id: {
+        slot: '1',
+        type: 'tiprack-200uL',
+        name: 'Tip rack'
+      },
+      tiprack10Id: {
+        slot: '10',
+        type: 'tiprack-200uL',
+        name: 'Tip rack'
+      },
+      sourcePlateId: {
+        slot: '11',
+        type: 'trough-12row',
+        name: 'Source (Buffer)'
+      },
+      destPlateId: {
+        slot: '8',
+        type: '96-flat',
+        name: 'Destination Plate'
+      },
+      trashId: {
+        slot: '12',
+        type: 'fixed-trash',
+        name: 'Trash'
+      }
+    },
+    tipState: {
+      tipracks: {
+        tiprack1Id: {...filledTiprackWells},
+        tiprack10Id: {...filledTiprackWells}
+      },
+      pipettes: {
+        p300MultiId: false
+      }
+    }
+  }
+
+  test('multi-channel, all tipracks have tips', () => {
+    const result = pickUpTip('p300MultiId', robotInitialState)
+
+    expect(result.nextCommands).toEqual([{
+      command: 'pick-up-tip',
+      pipette: 'p300MultiId',
+      labware: 'tiprack1Id',
+      well: 'A1'
+    }])
+
+    expect(result.nextRobotState).toEqual({
+      ...robotInitialState,
+      tipState: {
+        tipracks: {
+          tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
+          tiprack10Id: {...filledTiprackWells}
+        },
+        pipettes: {
+          p300MultiId: true
+        }
+      }
+    })
+  })
+
+  test('multi-channel, missing tip in first row', () => {
+    const robotStateWithTipA1Missing = {
+      ...robotInitialState,
+      tipState: {
+        ...robotInitialState.tipState,
+        tipracks: {
+          tiprack1Id: {...filledTiprackWells, A1: false},
+          tiprack10Id: {...filledTiprackWells}
+        }
+      }
+    }
+
+    const result = pickUpTip('p300MultiId', robotStateWithTipA1Missing)
+    expect(result.nextCommands).toEqual([{
+      command: 'pick-up-tip',
+      pipette: 'p300MultiId',
+      labware: 'tiprack1Id',
+      well: 'A2' // get from next row
+    }])
+
+    expect(result.nextRobotState).toEqual({
+      ...robotStateWithTipA1Missing,
+      tipState: {
+        ...robotStateWithTipA1Missing.tipState,
+        tipracks: {
+          tiprack1Id: {
+            ...filledTiprackWells,
+            A1: false,
+            // Column 2 now empty
+            A2: false,
+            B2: false,
+            C2: false,
+            D2: false,
+            E2: false,
+            F2: false,
+            G2: false,
+            H2: false
+          },
+          tiprack10Id: {...filledTiprackWells}
+        },
+        pipettes: {
+          p300MultiId: true
+        }
+      }
+    })
+  })
+
+  test('Multi-channel: pipette already has tip, so tip will be replaced.', () => {
+    const robotStateWithTipsOnMulti = {
+      ...robotInitialState,
+      tipState: {
+        ...robotInitialState.tipState,
+        pipettes: {
+          p300MultiId: true
+        }
+      }
+    }
+    const result = pickUpTip('p300MultiId', robotStateWithTipsOnMulti)
+    expect(result.nextCommands).toEqual([
+      {
+        command: 'drop-tip',
+        pipette: 'p300MultiId',
+        labware: 'trashId',
+        well: 'A1'
+      },
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300MultiId',
+        labware: 'tiprack1Id',
+        well: 'A1' // get from next row
+      }
+    ])
+
+    expect(result.nextRobotState).toEqual({
+      ...robotStateWithTipsOnMulti,
+      tipState: {
+        tipracks: {
+          tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
+          tiprack10Id: {...filledTiprackWells}
+        },
+        pipettes: {
+          p300MultiId: true
+        }
+      }
+    })
+  })
 })

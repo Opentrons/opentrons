@@ -1,5 +1,6 @@
 // @flow
-import {assign, getNextTiprack, tiprackWellNamesByCol} from './'
+import cloneDeep from 'lodash/cloneDeep'
+import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
 import type {RobotState, CommandReducer} from './types'
 
 export default function pickUpTip (pipetteId: string, robotState: RobotState): CommandReducer {
@@ -13,7 +14,7 @@ export default function pickUpTip (pipetteId: string, robotState: RobotState): C
   let nextCommands = []
 
   // TODO IMMEDIATELY: more elegant way to avoid this mutation-driven state update?
-  let nextRobotState: RobotState = assign(robotState)
+  let nextRobotState = cloneDeep(robotState)
 
   // get next full tiprack in slot order
   const nextTiprack = getNextTiprack(pipetteData.channels, robotState)
@@ -22,19 +23,12 @@ export default function pickUpTip (pipetteId: string, robotState: RobotState): C
     throw new Error('TODO IMMEDIATELY/SOON! Need to figure out how to handle running out of tips')
   }
 
-  if (robotState.tipState.pipettes[pipetteId]) {
-    // already have tip, should drop it
-    // TODO IMMEDIATELY: factor this drop tip out,
-    // dropTip(pipetteId, robotState): CommandReducer fn, with tests & update to robot state.
-    // This should be a model of how to keep passing around the robot state.
-    nextCommands.push({
-      command: 'drop-tip',
-      pipette: pipetteData.id,
-      labware: 'trashId', // TODO Ian 2018-02-09 will we always have this trash in robotState? If so, put the ID in constants (or cooked into RobotState type itself).
-      well: 'A1' // TODO: Is 'A1' of the trash always the right place to drop tips?
-    })
-  }
+  // drop tip if you have one
+  const dropTipResult = dropTip(pipetteData.id, nextRobotState)
+  nextCommands = nextCommands.concat(dropTipResult.nextCommands)
+  nextRobotState = dropTipResult.nextRobotState
 
+  // pick up tip command
   nextCommands.push({
     command: 'pick-up-tip',
     pipette: pipetteData.id,
