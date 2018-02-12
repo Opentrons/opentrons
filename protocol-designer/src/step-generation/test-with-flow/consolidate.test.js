@@ -2,7 +2,7 @@
 import {p300Single, filledTiprackWells} from './fixtures'
 import {consolidate} from '../'
 
-describe.skip('consolidate single-channel', () => { // TODO don't skip
+describe('consolidate single-channel', () => { // TODO don't skip
   const robotInitialState = {
     instruments: {
       p300SingleId: p300Single

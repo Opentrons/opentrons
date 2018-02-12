@@ -1,8 +1,8 @@
 // @flow
 import {filledTiprackWells, emptyTiprackWells, p300Single, p300Multi} from './fixtures'
-import {pickUpTip} from '../'
+import {replaceTip} from '../'
 
-describe('pickUpTip: single channel', () => {
+describe('replaceTip: single channel', () => {
   const robotInitialState = {
     instruments: {
       p300SingleId: p300Single
@@ -46,7 +46,7 @@ describe('pickUpTip: single channel', () => {
   }
 
   test('Single-channel: first tip', () => {
-    const result = pickUpTip('p300SingleId', robotInitialState)
+    const result = replaceTip('p300SingleId', robotInitialState)
 
     expect(result.nextCommands).toEqual([{
       command: 'pick-up-tip',
@@ -73,7 +73,7 @@ describe('pickUpTip: single channel', () => {
   })
 
   test('Single-channel: second tip B1', () => {
-    const result = pickUpTip('p300SingleId', {
+    const result = replaceTip('p300SingleId', {
       ...robotInitialState,
       tipState: {
         tipracks: {
@@ -115,7 +115,7 @@ describe('pickUpTip: single channel', () => {
   })
 
   test('Single-channel: ninth tip (next column)', () => {
-    const result = pickUpTip('p300SingleId', {
+    const result = replaceTip('p300SingleId', {
       ...robotInitialState,
       tipState: {
         tipracks: {
@@ -171,7 +171,7 @@ describe('pickUpTip: single channel', () => {
   })
 
   test('Single-channel: pipette already has tip, so tip will be replaced.', () => {
-    const result = pickUpTip('p300SingleId', {
+    const result = replaceTip('p300SingleId', {
       ...robotInitialState,
       tipState: {
         tipracks: {
@@ -221,7 +221,7 @@ describe('pickUpTip: single channel', () => {
   })
 
   test('Single-channel: used all tips in first rack, move to second rack', () => {
-    const result = pickUpTip('p300SingleId', {
+    const result = replaceTip('p300SingleId', {
       ...robotInitialState,
       tipState: {
         tipracks: {
@@ -262,7 +262,7 @@ describe('pickUpTip: single channel', () => {
   })
 })
 
-describe('pickUpTip: multi-channel', () => {
+describe('replaceTip: multi-channel', () => {
   const robotInitialState = {
     instruments: {
       p300MultiId: p300Multi
@@ -306,7 +306,7 @@ describe('pickUpTip: multi-channel', () => {
   }
 
   test('multi-channel, all tipracks have tips', () => {
-    const result = pickUpTip('p300MultiId', robotInitialState)
+    const result = replaceTip('p300MultiId', robotInitialState)
 
     expect(result.nextCommands).toEqual([{
       command: 'pick-up-tip',
@@ -341,7 +341,7 @@ describe('pickUpTip: multi-channel', () => {
       }
     }
 
-    const result = pickUpTip('p300MultiId', robotStateWithTipA1Missing)
+    const result = replaceTip('p300MultiId', robotStateWithTipA1Missing)
     expect(result.nextCommands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300MultiId',
@@ -386,7 +386,7 @@ describe('pickUpTip: multi-channel', () => {
         }
       }
     }
-    const result = pickUpTip('p300MultiId', robotStateWithTipsOnMulti)
+    const result = replaceTip('p300MultiId', robotStateWithTipsOnMulti)
     expect(result.nextCommands).toEqual([
       {
         command: 'drop-tip',

@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
 import type {RobotState, CommandReducer} from './types'
 
-export default function pickUpTip (pipetteId: string, robotState: RobotState): CommandReducer {
+export default function replaceTip (pipetteId: string, robotState: RobotState): CommandReducer {
   /**
     Pick up next available tip. Works differently for an 8-channel which needs a full row of tips.
     Expects 96-well format tip naming system on the tiprack.

@@ -46,7 +46,7 @@ const makeRobotState = ({singleHasTips, multiHasTips}: {singleHasTips: boolean, 
   }
 })
 
-describe('pickUpTip: single channel', () => {
+describe('replaceTip: single channel', () => {
   test('drop tip if there is a tip', () => {
     const result = dropTip('p300SingleId', makeRobotState({singleHasTips: true, multiHasTips: true}))
     expect(result && result.nextCommands).toEqual([{

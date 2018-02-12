@@ -1,7 +1,7 @@
 // @flow
 import consolidate from './consolidate'
 import dropTip from './dropTip'
-import pickUpTip from './pickUpTip'
+import replaceTip from './replaceTip'
 export * from './robotStateSelectors'
 export * from './types'
 export * from './data'
@@ -9,5 +9,5 @@ export * from './data'
 export {
   consolidate,
   dropTip,
-  pickUpTip
+  replaceTip
 }

@@ -1,8 +1,8 @@
 // @flow
-import type {ConsolidateFormData, RobotState} from './'
+import cloneDeep from 'lodash/cloneDeep'
+import type {ConsolidateFormData, RobotState, CommandReducer} from './'
 
-// TODO add return type: AnnotatedCommandReducer.
-export default function consolidate (data: ConsolidateFormData, robotState: RobotState) {
+export default function consolidate (data: ConsolidateFormData, robotState: RobotState): CommandReducer {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
     then dispense into a single destination.
@@ -12,24 +12,24 @@ export default function consolidate (data: ConsolidateFormData, robotState: Robo
 
     A single uniform volume will be aspirated from every source well.
   */
-  const pipetteHasTip = (robotState.tipState.pipettes[data.pipette])
+  const nextRobotState = cloneDeep(robotState)
+  let nextCommands = []
 
-  let commands = []
-
-  if (!pipetteHasTip) {
-    // TODO
-  }
-
-  const nextRobotState = robotState // TODO IMMEDIATELY
+  // TODO IMMEDIATELY
 
   return {
-    robotState: nextRobotState,
-    atomicCommands: {
-      annotation: {
-        name: data.name,
-        description: data.description
-      },
-      commands
-    }
+    nextRobotState,
+    nextCommands
   }
 }
+
+// return { // TODO: figure out where outside consolidate this annotation happens
+//   robotState: nextRobotState,
+//   atomicCommands: {
+//     annotation: {
+//       name: data.name,
+//       description: data.description
+//     },
+//     commands
+//   }
+// }
