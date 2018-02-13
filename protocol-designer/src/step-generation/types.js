@@ -1,5 +1,10 @@
 // @flow
 
+export type MixArgs = {|
+  ul: number,
+  times: number
+|}
+
 // import export type {TransferishFormData} from '../steplist/export types'
 // TODO IMMEDIATELY import this export type and use it in validateAndProcessForm
 export type ConsolidateFormData = {|
@@ -34,22 +39,20 @@ export type ConsolidateFormData = {|
     'never': reuse the tip from the last step
   */
   changeTip: 'always' | 'once' | 'never', // TODO extract this enum as its own export type
-  /** uL of air aspirated before the first aspirate in each asp-asp-disp cycle */
-  airGap: number | false,
-  // TODO: "Aspirate" section's Mix settings... what do they mean for aspirate?
+  /** Mix in first well in chunk */
+  mixFirstAspirate: ?MixArgs,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: number | false,
+  disposalVolume: ?number,
 
   // ===== DISPENSE SETTINGS =====
   /** Mix in destination well after dispense */
-  mixInDestination: {| // TODO factor out mix export type with ul/times as its own export type
-    ul: number,
-    times: number
-  |} | false,
+  mixInDestination: ?MixArgs,
+  /** Touch tip in destination well after dispense */
+  touchTipAfterDispense: boolean,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
-  delayAfterDispense: number | false,
+  delayAfterDispense: ?number,
   /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowOut: string | false // TODO LATER LabwareId export type here instead of string?
+  blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
 export type Mount = 'left' | 'right'
