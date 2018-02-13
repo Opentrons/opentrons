@@ -262,6 +262,8 @@ class Robot(object):
         self.setup_gantry()
         self._instruments = {}
 
+        self._use_safest_height = False
+
         self._previous_instrument = None
         self._prev_container = None
 
@@ -664,23 +666,27 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
+        # bring the pipettes up as high as possible while calibrating
+        if self._use_safest_height:
+            arc_top = inst._max_deck_height()
 
-        # movements that stay within the same container do not need to avoid
-        # other containers on the deck, so the travel height of arced movements
-        # can be relative to just that one container's height
-        if this_container and self._prev_container == this_container:
-            arc_top = self.max_placeable_height_on_deck(this_container)
-            arc_top += TIP_CLEARANCE_LABWARE
+        else:
+            arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
 
-        self._prev_container = this_container
+            # movements that stay within the same container do not need to
+            # avoid other containers on the deck, so the travel height of
+            # arced movements can be relative to just that one container
+            if this_container and self._prev_container == this_container:
+                arc_top = self.max_placeable_height_on_deck(this_container)
+                arc_top += TIP_CLEARANCE_LABWARE
 
-        # if instrument is currently taller than arc_top, no need to move down
-        _, _, pip_z = pose_tracker.absolute(self.poses, inst)
+            self._prev_container = this_container
 
-        # TODO (andy): there is no check here for if this height will hit
-        # the limit switches, so if a tall labware is used, we risk collision
-        arc_top = max(arc_top, destination[2], pip_z)
+            # if instrument is currently taller than arc_top, don't move down
+            _, _, pip_z = pose_tracker.absolute(self.poses, inst)
+
+            arc_top = max(arc_top, destination[2], pip_z)
+            arc_top = min(arc_top, inst._max_deck_height())
 
         strategy = [
             {'z': arc_top},
