@@ -2,7 +2,8 @@ from . import types
 from ..broker import broker
 import functools
 import inspect
-from opentrons.containers import Well, Container, Slot, WellSeries
+from opentrons.containers import Well, Container, Slot, WellSeries,\
+    unpack_location
 
 
 def stringify_location(location):
@@ -17,6 +18,12 @@ def stringify_location(location):
         Container: 'container',
         Well: 'well'
     }
+
+    if isinstance(location, list):
+        location = WellSeries([
+            unpack_location(l)[0]  # incase it's a location tuple
+            for l in location
+        ])
 
     if isinstance(location, tuple):
         location = location[0]
