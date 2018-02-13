@@ -1,9 +1,9 @@
 // @flow
 // import cloneDeep from 'lodash/cloneDeep'
-import type {RobotState, CommandReducer, AspirateDispenseArgs} from './'
+import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
 
 // TODO Ian 2018-02-12 dispense is almost identical to aspirate, what will change? Should they share code?
-const dispense = (args: AspirateDispenseArgs): CommandReducer => (prevRobotState: RobotState) => {
+const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
   /** Dispense with given args. Requires tip. */
   const {pipette, volume, labware, well} = args
 

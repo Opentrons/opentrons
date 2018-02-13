@@ -2,9 +2,9 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {aspirate, dispense, blowout, replaceTip, repeatArray, reduceCommandCreators} from './'
-import type {ConsolidateFormData, RobotState, CommandReducer} from './'
+import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
-const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotState: RobotState) => {
+const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
     then dispense into a single destination.
@@ -14,7 +14,7 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
 
     A single uniform volume will be aspirated from every source well.
   */
-  let commandReducers: Array<CommandReducer> = []
+  let CommandCreators: Array<CommandCreator> = []
 
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
@@ -30,11 +30,11 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
     (pipetteData.maxVolume - disposalVolume) / data.volume
   )
 
-  commandReducers = flatMap(
+  CommandCreators = flatMap(
     chunk(data.sourceWells, maxWellsPerChunk),
-    (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandReducer> => {
+    (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       // Aspirate commands for all source wells in the chunk
-      const aspirateCommands = sourceWellChunk.map((sourceWell: string, wellIndex: number): CommandReducer => {
+      const aspirateCommands = sourceWellChunk.map((sourceWell: string, wellIndex: number): CommandCreator => {
         const isFirstWellInChunk = wellIndex === 0
         return aspirate({
           pipette: data.pipette,
@@ -44,7 +44,7 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
         })
       })
 
-      let tipCommands: Array<CommandReducer> = []
+      let tipCommands: Array<CommandCreator> = []
 
       if (
         data.changeTip === 'always' ||
@@ -140,7 +140,7 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
     }
   )
 
-  return reduceCommandCreators(commandReducers)(prevRobotState)
+  return reduceCommandCreators(CommandCreators)(prevRobotState)
 }
 
 export default consolidate

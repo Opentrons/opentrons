@@ -124,7 +124,7 @@ export type Command = {|
   volume: number
 |}
 
-export type CommandReducer = (prevRobotState: RobotState) => {|
+export type CommandCreator = (prevRobotState: RobotState) => {|
   commands: Array<Command>,
   robotState: RobotState
 |}

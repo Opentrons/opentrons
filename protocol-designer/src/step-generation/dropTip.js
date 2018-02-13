@@ -1,8 +1,8 @@
 // @flow
-import type {CommandReducer, RobotState} from './'
+import type {CommandCreator, RobotState} from './'
 import cloneDeep from 'lodash/cloneDeep'
 
-const dropTip = (pipetteId: string): CommandReducer => (robotState: RobotState) => {
+const dropTip = (pipetteId: string): CommandCreator => (robotState: RobotState) => {
   // No-op if there is no tip
   if (robotState.tipState.pipettes[pipetteId] === false) {
     return {

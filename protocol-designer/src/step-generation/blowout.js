@@ -1,8 +1,8 @@
 // @flow
 // import cloneDeep from 'lodash/cloneDeep'
-import type {RobotState, CommandReducer, PipetteLabwareFields} from './'
+import type {RobotState, CommandCreator, PipetteLabwareFields} from './'
 
-const blowout = (args: PipetteLabwareFields): CommandReducer => (prevRobotState: RobotState) => {
+const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState: RobotState) => {
   /** Blowout with given args. Requires tip. */
   const {pipette, labware, well} = args
 
