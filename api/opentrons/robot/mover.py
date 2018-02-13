@@ -58,7 +58,6 @@ class Mover:
             driver_target[self._axis_mapping['z']] = dst_z
 
         self._driver.move(driver_target)
-
         return self.update_pose_from_driver(pose_tree)
 
     def home(self, pose_tree):
@@ -129,11 +128,5 @@ class Mover:
             y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
             z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
         )
-
-        point = change_base(
-            pose_tree,
-            src=self._dst,
-            dst=self._src,
-            point=point)
 
         return update(pose_tree, self, point)

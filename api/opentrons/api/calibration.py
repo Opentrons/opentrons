@@ -34,6 +34,8 @@ class CalibrationManager:
         log.debug('Probing tip with {}'.format(instrument.name))
         self._set_state('probing')
 
+        inst.robot._use_safest_height = True
+
         measured_center = calibration_functions.probe_instrument(
             instrument=inst,
             robot=inst.robot)
@@ -51,6 +53,8 @@ class CalibrationManager:
             inst, inst.robot
         )
 
+        inst.robot._use_safest_height = False
+
         self._set_state('ready')
 
     def pick_up_tip(self, instrument, container):
@@ -63,7 +67,9 @@ class CalibrationManager:
         log.debug('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
+        inst.robot._use_safest_height = True
         inst.pick_up_tip(container._container[0])
+        inst.robot._use_safest_height = False
         self._set_state('ready')
 
     def drop_tip(self, instrument, container):
@@ -76,24 +82,30 @@ class CalibrationManager:
         log.debug('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
+        inst.robot._use_safest_height = True
         inst.drop_tip(container._container[0], home_after=True)
+        inst.robot._use_safest_height = False
         self._set_state('ready')
 
     def return_tip(self, instrument):
         inst = instrument._instrument
         log.debug('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
+        inst.robot._use_safest_height = True
         inst.return_tip(home_after=True)
+        inst.robot._use_safest_height = False
         self._set_state('ready')
 
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.debug('Moving {}'.format(instrument.name))
         self._set_state('moving')
+        inst.robot._use_safest_height = True
         inst.robot.home()
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
         )
+        inst.robot._use_safest_height = False
         self._set_state('ready')
 
     def move_to(self, instrument, container):
@@ -107,7 +119,9 @@ class CalibrationManager:
         log.debug('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
+        inst.robot._use_safest_height = True
         inst.move_to(container._container[0])
+        inst.robot._use_safest_height = False
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):
@@ -150,8 +164,4 @@ class CalibrationManager:
         }
 
     def _on_state_changed(self):
-        if self.state == 'moving':
-            robot._use_safest_height = True
-        else:
-            robot._use_safest_height = False
         publish(CalibrationManager.TOPIC, self._snapshot())
