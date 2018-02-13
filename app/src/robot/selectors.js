@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
 import type {State} from '../types'
+import {selectHealth} from '../http-api-client'
 
 import type {
   Mount,
@@ -12,7 +13,8 @@ import type {
   InstrumentCalibrationStatus,
   Labware,
   LabwareCalibrationStatus,
-  LabwareType
+  LabwareType,
+  Robot
 } from './types'
 
 import {
@@ -51,17 +53,20 @@ export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
   (state: State) => connection(state).discoveredByName,
   (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo) => sortBy(
-    discovered.map((name) => ({
+  selectHealth,
+  (discovered, discoveredByName, connectedTo, healthByName): Robot[] => {
+    const robots = discovered.map((name) => ({
       ...discoveredByName[name],
-      isConnected: connectedTo === name
-    })),
-    [
+      isConnected: connectedTo === name,
+      health: healthByName[name]
+    }))
+
+    return sortBy(robots, [
       (robot) => !robot.isConnected,
       (robot) => !robot.wired,
       'name'
-    ]
-  )
+    ])
+  }
 )
 
 export const getConnectionStatus = createSelector(

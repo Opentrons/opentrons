@@ -1,9 +1,10 @@
 // mock http api client
+'use strict'
 
 let _mockResponse = null
 let _mockError = null
 
-const client = jest.fn(() => {
+const client = module.exports = jest.fn(() => {
   if (_mockResponse) {
     return new Promise((resolve) => process.nextTick(() => {
       resolve(_mockResponse)
@@ -28,5 +29,3 @@ client.__setMockError = function setMockError (error) {
 client.__clearMock = function clearMockResponses () {
   client.mockClear()
 }
-
-export default client

@@ -38,16 +38,18 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
+export type RobotHealth = {
+  /** request in progress flag */
+  inProgress: boolean,
+  /** possible error response */
+  error: ?ClientResponseError,
+  /** possible success response */
+  response: ?HealthResponse
+}
+
 export type HealthState = {
   /** robot name */
-  [string]: {
-    /** request in progress flag */
-    inProgress: boolean,
-    /** possible error response */
-    error: ?ClientResponseError,
-    /** possible success response */
-    response: ?HealthResponse
-  }
+  [string]: RobotHealth
 }
 
 export function fetchHealth (robot: RobotService): ThunkAction {
