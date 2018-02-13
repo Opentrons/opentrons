@@ -1,5 +1,7 @@
 # opentrons component library makefile
 
+SHELL := /bin/bash
+
 # add node_modules/.bin to PATH
 PATH := $(shell yarn bin):$(PATH)
 

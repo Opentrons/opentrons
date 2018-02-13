@@ -1,10 +1,10 @@
 # opentrons platform makefile
 # https://github.com/OpenTrons/opentrons
 
+SHELL := /bin/bash
+
 # add node_modules/.bin to PATH
 PATH := $(shell yarn bin):$(PATH)
-
-SHELL := /bin/bash
 
 API_DIR := api
 COMPONENTS_DIR := components
@@ -23,6 +23,13 @@ install:
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) install
+	$(MAKE) install-types
+
+.PHONY: install-types
+install-types:
+	$(MAKE) -C $(COMPONENTS_DIR) install-types
+	$(MAKE) -C $(APP_DIR) install-types
+	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install-types
 
 # all tests
 .PHONY: test
