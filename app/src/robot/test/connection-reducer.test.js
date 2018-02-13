@@ -227,4 +227,56 @@ describe('robot reducer - connection', () => {
       }
     })
   })
+
+  test('adds wired robot to discovered on HEALTH_SUCCESS', () => {
+    const state = {
+      connection: {
+        discovered: ['foo'],
+        discoveredByName: {
+          foo: {name: 'foo', host: 'abcdef.local'}
+        }
+      }
+    }
+
+    const action = {
+      type: 'api:HEALTH_SUCCESS',
+      payload: {
+        robot: {name: 'bar', host: 'ghijkl.local', wired: true}
+      }
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      discovered: ['foo', 'bar'],
+      discoveredByName: {
+        foo: {name: 'foo', host: 'abcdef.local'},
+        bar: {name: 'bar', host: 'ghijkl.local', wired: true}
+      }
+    })
+  })
+
+  test('removes wired robot from discovered on HEALTH_FAILURE', () => {
+    const state = {
+      connection: {
+        discovered: ['foo', 'bar'],
+        discoveredByName: {
+          foo: {name: 'foo', host: 'abcdef.local'},
+          bar: {name: 'bar', host: 'ghijkl.local', wired: true}
+        }
+      }
+    }
+
+    const action = {
+      type: 'api:HEALTH_FAILURE',
+      payload: {
+        robot: {name: 'bar', host: 'ghijkl.local', wired: true}
+      }
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      discovered: ['foo'],
+      discoveredByName: {
+        foo: {name: 'foo', host: 'abcdef.local'}
+      }
+    })
+  })
 })

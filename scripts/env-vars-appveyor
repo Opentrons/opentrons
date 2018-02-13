@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')
-export OT_BRANCH_SUFFIX=-${APPVEYOR_REPO_BRANCH}
-export OT_COMMIT_SUFFIX=-${APPVEYOR_REPO_COMMIT:0:7}

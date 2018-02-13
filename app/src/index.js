@@ -3,35 +3,16 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import {Provider} from 'react-redux'
 import {AppContainer} from 'react-hot-loader'
-import {createStore, combineReducers, applyMiddleware} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import {createLogger} from 'redux-logger'
+import thunk from 'redux-thunk'
 import createHistory from 'history/createBrowserHistory'
-import {
-  ConnectedRouter,
-  routerReducer,
-  routerMiddleware
-} from 'react-router-redux'
+import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
-// interface state
-import {
-  NAME as INTERFACE_NAME,
-  reducer as interfaceReducer,
-  alertMiddleware
-} from './interface'
-
-// robot state
-import {
-  NAME as ROBOT_NAME,
-  reducer as robotReducer,
-  apiClientMiddleware as robotApiMiddleware
-} from './robot'
-
-// analytics state
-import {
-  NAME as ANALYTICS_NAME,
-  reducer as analyticsReducer,
-  middleware as analyticsMiddleware
-} from './analytics'
+import {alertMiddleware} from './interface'
+import {apiClientMiddleware as robotApiMiddleware} from './robot'
+import {middleware as analyticsMiddleware} from './analytics'
+import reducer from './reducer'
 
 // analytics events map
 // in a separate file for separation of concerns / DI / cicular dep prevention
@@ -40,16 +21,10 @@ import analyticsEventsMap from './analytics/events-map'
 // components
 import App from './components/App'
 
-const reducer = combineReducers({
-  [INTERFACE_NAME]: interfaceReducer,
-  [ROBOT_NAME]: robotReducer,
-  [ANALYTICS_NAME]: analyticsReducer,
-  router: routerReducer
-})
-
 const history = createHistory()
 
 const middleware = applyMiddleware(
+  thunk,
   robotApiMiddleware(),
   analyticsMiddleware(analyticsEventsMap),
   alertMiddleware(window),

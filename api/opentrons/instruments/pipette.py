@@ -1690,8 +1690,8 @@ class Pipette:
             self.robot.poses, 'z')
         _, _, pipette_max_height = pose_tracker.change_base(
             self.robot.poses,
-            src=self.mount,
-            dst=self,
+            src=self,
+            dst=self.mount,
             point=(0, 0, mount_max_height))
         return pipette_max_height
 

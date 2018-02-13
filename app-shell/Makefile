@@ -1,21 +1,13 @@
 # opentrons app desktop shell makefile
 
-# use bash
-SHELL := bash
+# add node_modules/.bin to PATH
+PATH := $(shell yarn bin):$(PATH)
 
-# source files
-source := $(shell find lib -type f -name '*.js')
+# ui directory for production build
 ui_dir := ../app
 
-# use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
-
-set_package_env := $(bin)/cross-env \
-	OT_TIME_SUFFIX=$(OT_TIME_SUFFIX) \
-	OT_BRANCH_SUFFIX=$(OT_BRANCH_SUFFIX) \
-	OT_COMMIT_SUFFIX=$(OT_COMMIT_SUFFIX)
+env := cross-env NODE_ENV
 
 # standard targets
 #####################################################################
@@ -29,11 +21,11 @@ install:
 
 .PHONY: uninstall
 uninstall:
-	rm -rf node_modules
+	shx rm -rf node_modules
 
 .PHONY: clean
 clean:
-	rm -rf dist
+	shx rm -rf dist
 
 # artifacts
 #####################################################################
@@ -43,28 +35,37 @@ ui:
 	$(MAKE) -C $(ui_dir)
 
 .PHONY: package
-package: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --dir
+package: ui
+	electron-builder --dir
 
 .PHONY: dist-posix
-dist-posix: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --linux --mac --publish never
+dist-posix: clean ui
+	electron-builder --linux --mac --publish never
+	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-osx
-dist-osx: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --mac --publish never
+dist-osx: clean ui
+	electron-builder --mac --publish never
+	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
-dist-linux: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --linux --publish never
+dist-linux: clean ui
+	electron-builder --linux --publish never
+	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-win
-dist-win: $(source) ui
-	$(set_package_env) $(bin)/electron-builder --win --x64 --publish never
+dist-win: clean ui
+	electron-builder --win --x64 --publish never
+	$(MAKE) _dist-collect-artifacts
+
+# copy distributable artifacts to the publish directory
+.PHONY: _dist-collect-artifacts
+_dist-collect-artifacts:
+	shx mkdir -p dist/publish && shx cp dist/**/opentrons-v* dist/publish
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	$(env)=development PORT=$(port) $(bin)/electron lib/main.js
+	$(env)=development PORT=$(port) electron lib/main.js

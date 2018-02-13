@@ -1,6 +1,11 @@
 // @flow
 // common robot types
 
+import type {RobotHealth} from '../http-api-client'
+import typeof reducer from './reducer'
+
+export type State = $Call<reducer>
+
 export type Channels = 1 | 8
 
 export type Mount = 'left' | 'right'
@@ -34,7 +39,14 @@ export type RobotService = {
   name: string,
   host: string,
   ip: string,
+  port: number,
   wired?: boolean,
+}
+
+// robot from getDiscovered selector
+export type Robot = RobotService & {
+  isConnected: boolean,
+  health: RobotHealth
 }
 
 // protocol file (browser File object)
