@@ -110,7 +110,7 @@ export type Command = {|
   command: 'aspirate' | 'dispense',
   ...AspirateDispenseArgs
 |} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'blowout',
+  command: 'pick-up-tip' | 'drop-tip' | 'blowout' | 'touch-tip',
   ...PipetteLabwareFields
 |} | {|
   command: 'delay',

@@ -1,7 +1,7 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import {aspirate, dispense, blowout, replaceTip, repeatArray, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, repeatArray, touchTip, reduceCommandCreators} from './'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
 const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -34,14 +34,26 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     chunk(data.sourceWells, maxWellsPerChunk),
     (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       // Aspirate commands for all source wells in the chunk
-      const aspirateCommands = sourceWellChunk.map((sourceWell: string, wellIndex: number): CommandCreator => {
+      const aspirateCommands = flatMap(sourceWellChunk, (sourceWell: string, wellIndex: number): Array<CommandCreator> => {
         const isFirstWellInChunk = wellIndex === 0
-        return aspirate({
-          pipette: data.pipette,
-          volume: data.volume + (isFirstWellInChunk ? disposalVolume : 0),
-          labware: data.sourceLabware,
-          well: sourceWell
-        })
+
+        const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
+          ? [touchTip({
+            pipette: data.pipette,
+            labware: data.sourceLabware,
+            well: sourceWell
+          })]
+          : []
+
+        return [
+          aspirate({
+            pipette: data.pipette,
+            volume: data.volume + (isFirstWellInChunk ? disposalVolume : 0),
+            labware: data.sourceLabware,
+            well: sourceWell
+          }),
+          ...touchTipAfterAspirateCommand
+        ]
       })
 
       let tipCommands: Array<CommandCreator> = []
@@ -52,6 +64,14 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
       ) {
         tipCommands = [replaceTip(data.pipette)]
       }
+
+      const touchTipAfterDispenseCommands = data.touchTipAfterDispense
+        ? [touchTip({
+          pipette: data.pipette,
+          labware: data.destLabware,
+          well: data.destWell
+        })]
+        : []
 
       const trashTheDisposalVol = disposalVolume
         ? [
@@ -133,6 +153,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           labware: data.destLabware,
           well: data.destWell
         }),
+        ...touchTipAfterDispenseCommands,
         ...trashTheDisposalVol,
         ...mixAfterCommands,
         ...blowoutCommand

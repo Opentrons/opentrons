@@ -1320,6 +1320,168 @@ describe('consolidate single-channel', () => {
     ])
     expect(result.robotState).toEqual(robotStatePickedUpOneTip)
   })
+
+  test('touch-tip after aspirate should touch tip after every aspirate command', () => {
+    const data = {
+      ...baseData,
+      volume: 150,
+      changeTip: 'once',
+      touchTipAfterAspirate: true
+    }
+
+    const result = consolidate(data)(robotInitialState)
+
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+  })
+
+  test('touch-tip after dispense should touch tip after dispense on destination well', () => {
+    const data = {
+      ...baseData,
+      volume: 150,
+      changeTip: 'once',
+      touchTipAfterDispense: true
+    }
+
+    const result = consolidate(data)(robotInitialState)
+
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 150,
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 300,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'touch-tip',
+        pipette: 'p300SingleId',
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+  })
 })
 
 describe('consolidate multi-channel', () => {
