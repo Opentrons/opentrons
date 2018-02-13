@@ -387,9 +387,17 @@ describe('consolidate single-channel', () => {
       {
         command: 'dispense',
         pipette: 'p300SingleId',
-        volume: 250,
+        volume: 200,
         labware: 'destPlateId',
         well: 'B1'
+      },
+      {
+        // Trash the disposal volume
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'trashId',
+        well: 'A1'
       },
       {
         command: 'aspirate',
@@ -408,9 +416,17 @@ describe('consolidate single-channel', () => {
       {
         command: 'dispense',
         pipette: 'p300SingleId',
-        volume: 250,
+        volume: 200,
         labware: 'destPlateId',
         well: 'B1'
+      },
+      {
+        // Trash the disposal volume
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'trashId',
+        well: 'A1'
       }
     ])
     expect(result.robotState).toEqual(robotStatePickedUpOneTip)
@@ -600,9 +616,17 @@ describe('consolidate single-channel', () => {
       {
         command: 'dispense',
         pipette: 'p300SingleId',
-        volume: 230,
+        volume: 200,
         labware: 'destPlateId',
         well: 'B1'
+      },
+      {
+        // Trash the disposal volume
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 30,
+        labware: 'trashId',
+        well: 'A1'
       },
       {
         command: 'aspirate',
@@ -621,9 +645,17 @@ describe('consolidate single-channel', () => {
       {
         command: 'dispense',
         pipette: 'p300SingleId',
-        volume: 230,
+        volume: 200,
         labware: 'destPlateId',
         well: 'B1'
+      },
+      {
+        // Trash the disposal volume
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 30,
+        labware: 'trashId',
+        well: 'A1'
       }
     ])
     expect(result.robotState).toEqual(robotStatePickedUpOneTip)
@@ -796,7 +828,8 @@ describe('consolidate single-channel', () => {
     // expect(result.robotState).toEqual(robotStatePickedUpOneTip)
   })
 
-  test.skip('mix after dispense with disposal volume -- ?should this throw error?', () => { // TODO IMMEDIATELY
+  test.skip('mix after dispense with disposal volume: dispose, then mix (?)', () => {
+    // TODO Ian 2018-02-13 should the mixing happen after disposing?
     const data = {
       ...baseData,
       volume: 100,
@@ -806,29 +839,257 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
-    throw new Error('TODO')
-    // expect(result.commands).toEqual([
-    //   // TODO IMMEDIATELY
-    // ])
-    // expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 130, // includes disposal volume
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 100,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 200,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        // Trash the disposal volume
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 30,
+        labware: 'trashId',
+        well: 'A1'
+      },
+      // Now, mix in the dest well
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
   })
 
-  test.skip('pre-wet tip should aspirate and dispense ??? volume TODO', () => {}) // TODO IMMEDIATELY
+  test('"pre-wet tip" should aspirate and dispense 2/3 pipette max volume from first well (?)', () => {
+    // TODO Ian 2018-02-13 Should it be transfer volume instead?
+    // TODO IMMEDIATELY what happens when you are reusing tips or replacing tips across chunks?
+    const data = {
+      ...baseData,
+      volume: 100,
+      changeTip: 'once',
+      preWetTip: true,
+      sourceWells: ['A1', 'A2']
+    }
+
+    const preWetVol = 200
+
+    const result = consolidate(data)(robotInitialState)
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300SingleId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: preWetVol,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: preWetVol,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      // pre-wet tip
+      // done pre-wet
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 100,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300SingleId',
+        volume: 100,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300SingleId',
+        volume: 200,
+        labware: 'destPlateId',
+        well: 'B1'
+      }
+    ])
+    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+  })
 
 })
 
-describe.skip('consolidate multi-channel', () => { // TODO don't skip
-  test('simple multi-channel 96 plate: cols A1 A2 A3 A4 to col A12', () => {
-    throw new Error('TODO')
+describe('consolidate multi-channel', () => {
+  const robotInitialState = getBasicRobotState()
+
+  const robotStatePickedUpOneTip = {
+    ...robotInitialState,
+    tipState: {
+      tipracks: {
+        ...robotInitialState.tipState.tipracks,
+        tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false}
+      },
+      pipettes: {
+        ...robotInitialState.tipState.pipettes,
+        p300MultiId: true
+      }
+    }
+  }
+
+  const baseData = {
+    stepType: 'consolidate',
+    name: 'Consolidate Test',
+    description: 'test blah blah',
+    pipette: 'p300MultiId',
+
+    sourceWells: ['A1', 'A2', 'A3', 'A4'],
+    destWell: 'A12',
+    sourceLabware: 'sourcePlateId',
+    destLabware: 'destPlateId',
+
+    // volume and changeTip should be explicit in tests
+
+    preWetTip: false,
+    touchTipAfterAspirate: false,
+    disposalVolume: null,
+    mixFirstAspirate: null,
+
+    touchTipAfterDispense: false,
+    mixInDestination: null,
+    delayAfterDispense: null,
+    blowout: null
+  }
+
+  test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
+    const data = {
+      ...baseData,
+      volume: 140,
+      changeTip: 'once'
+    }
+    const result = consolidate(data)(robotInitialState)
+
+    expect(result.commands).toEqual([
+      {
+        command: 'pick-up-tip',
+        pipette: 'p300MultiId',
+        labware: 'tiprack1Id',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300MultiId',
+        volume: 140,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300MultiId',
+        volume: 140,
+        labware: 'sourcePlateId',
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300MultiId',
+        volume: 280,
+        labware: 'destPlateId',
+        well: 'A12'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300MultiId',
+        volume: 140,
+        labware: 'sourcePlateId',
+        well: 'A3'
+      },
+      {
+        command: 'aspirate',
+        pipette: 'p300MultiId',
+        volume: 140,
+        labware: 'sourcePlateId',
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        pipette: 'p300MultiId',
+        volume: 280,
+        labware: 'destPlateId',
+        well: 'A12'
+      }
+    ])
+    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
   })
 
-  test('multi-channel 384 plate: cols A1 A2 A3 A4 to col A12', () => {
-    throw new Error('TODO')
-  })
+  // TODO later: address different multi-channel layouts of plates?
+  test.skip('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12')
 
-  test('multi-channel trough A1 A2 A3 A4 to A12', () => {
-    throw new Error('TODO')
-  })
-
-  test('invalid wells')
+  test.skip('multi-channel trough A1 A2 A3 A4 to 96-plate A12')
 })
