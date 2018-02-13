@@ -3,10 +3,13 @@ import Bonjour from 'bonjour'
 import EventEmitter from 'events'
 
 import {delay as _delay} from '../../util'
+import {fetchHealth, __mockThunk} from '../../http-api-client/health'
 import client from '../api-client/client'
 import {actions} from '../'
 
 jest.mock('bonjour')
+jest.mock('../../http-api-client/health')
+
 jest.useFakeTimers()
 
 const EXPECTED_DISCOVERY_MS = 30000
@@ -32,17 +35,6 @@ describe('api client - discovery', () => {
   let browser
   let dispatch
   let sendToClient
-  let _oldFetch
-
-  beforeAll(() => {
-    // mock fetch
-    _oldFetch = global.fetch
-    global.fetch = jest.fn(() => Promise.resolve({ok: false}))
-  })
-
-  afterAll(() => {
-    global.fetch = _oldFetch
-  })
 
   beforeEach(() => {
     // mock mdns browser
@@ -52,7 +44,8 @@ describe('api client - discovery', () => {
     bonjour = {find: jest.fn(() => browser)}
     Bonjour.mockReturnValue(bonjour)
 
-    global.fetch.mockClear()
+    fetchHealth.mockClear()
+    __mockThunk.mockClear()
 
     dispatch = jest.fn()
     const _receive = client(dispatch)
@@ -97,6 +90,22 @@ describe('api client - discovery', () => {
       .then(() => services.forEach((s) => {
         const robot = Object.assign({}, s, {ip: s.addresses[0]})
         expect(dispatch).toHaveBeenCalledWith(actions.addDiscovered(robot))
+      }))
+  })
+
+  test('dispatches fetchHealth on new services', () => {
+    const services = [
+      {name: 'opentrons-1', port: '31950', addresses: ['192.168.1.1']},
+      {name: 'opentrons-2', port: '31950', addresses: ['192.168.1.2']},
+      {name: 'opentrons-3', port: '31950', addresses: ['192.168.1.3']}
+    ]
+
+    return sendToClient(notScanningState, actions.discover())
+      .then(() => services.forEach((s) => browser.emit('up', s)))
+      .then(() => services.forEach((s) => {
+        const robot = Object.assign({}, s, {ip: s.addresses[0]})
+        expect(fetchHealth).toHaveBeenCalledWith(robot)
+        expect(__mockThunk).toHaveBeenCalledWith(dispatch)
       }))
   })
 
@@ -161,46 +170,22 @@ describe('api client - discovery', () => {
       ))
   })
 
-  test('polls directly connected host every second and adds it', () => {
-    const expectedEndpoint = 'http://[fd00:0:cafe:fefe::1]:31950/health'
-    const expectedDispatch = actions.addDiscovered({
+  test('dispatches fetchHealth for wired host every second', () => {
+    const expectedRobot = {
       name: 'Opentrons USB',
       ip: '[fd00:0:cafe:fefe::1]',
       port: 31950,
       wired: true
-    })
-
-    global.fetch.mockReturnValue(Promise.resolve({ok: true}))
+    }
 
     return sendToClient(notScanningState, actions.discover())
       .then(() => delay(EXPECTED_DISCOVERY_MS))
       .then(() => {
-        expect(global.fetch).toHaveBeenCalledTimes(30)
-        expect(global.fetch).toHaveBeenCalledWith(expectedEndpoint)
+        expect(fetchHealth).toHaveBeenCalledTimes(30)
+        expect(fetchHealth).toHaveBeenCalledWith(expectedRobot)
+        expect(__mockThunk).toHaveBeenCalledTimes(30)
+        expect(__mockThunk).toHaveBeenCalledWith(dispatch)
       })
-      .then(() => expect(dispatch).toHaveBeenCalledWith(expectedDispatch))
-  })
-
-  test('does not add a direct service if fetch fails', () => {
-    const unexpected = actions.addDiscovered(expect.anything())
-
-    global.fetch.mockReturnValue(Promise.resolve({ok: false}))
-
-    return sendToClient(notScanningState, actions.discover())
-      .then(() => delay(1000))
-      .then(() => expect(global.fetch).toHaveBeenCalled())
-      .then(() => expect(dispatch).not.toHaveBeenCalledWith(unexpected))
-  })
-
-  test('does not add a direct service if fetch errors', () => {
-    const unexpected = actions.addDiscovered(expect.anything())
-
-    global.fetch.mockReturnValue(Promise.reject(new Error('network error')))
-
-    return sendToClient(notScanningState, actions.discover())
-      .then(() => delay(1000))
-      .then(() => expect(global.fetch).toHaveBeenCalled())
-      .then(() => expect(dispatch).not.toHaveBeenCalledWith(unexpected))
   })
 
   test('does not start new discovery if already in progress', () => {
@@ -209,6 +194,6 @@ describe('api client - discovery', () => {
     return sendToClient(state, actions.discover())
       .then(() => delay(EXPECTED_DISCOVERY_MS))
       .then(() => expect(bonjour.find).not.toHaveBeenCalled())
-      .then(() => expect(global.fetch).not.toHaveBeenCalled())
+      .then(() => expect(fetchHealth).not.toHaveBeenCalled())
   })
 })
