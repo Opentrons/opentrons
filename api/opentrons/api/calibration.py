@@ -150,4 +150,8 @@ class CalibrationManager:
         }
 
     def _on_state_changed(self):
+        if self.state == 'moving':
+            robot._use_safest_height = True
+        else:
+            robot._use_safest_height = False
         publish(CalibrationManager.TOPIC, self._snapshot())
