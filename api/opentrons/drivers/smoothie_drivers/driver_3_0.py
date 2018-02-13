@@ -37,6 +37,8 @@ CURRENT_CHANGE_DELAY = 0.05
 Y_SWITCH_BACK_OFF_MM = 20
 Y_BACKOFF_LOW_CURRENT = 0.8
 Y_BACKOFF_SLOW_SPEED = 50
+Y_RETRACT_SPEED = 8
+Y_RETRACT_DISTANCE = 3
 
 DEFAULT_AXES_SPEED = 400
 
@@ -107,7 +109,8 @@ class SmoothieDriver_3_0_0:
         self._config = config
         self._saved_current_settings = config.default_current.copy()
         self._current_settings = self._saved_current_settings.copy()
-        self._max_speed_settings = config.default_max_speed
+        self._max_speed_settings = config.default_max_speed.copy()
+        self._saved_max_speed_settings = self._max_speed_settings.copy()
 
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
@@ -207,7 +210,7 @@ class SmoothieDriver_3_0_0:
     def pop_speed(self):
         self.set_speed(self._saved_axes_speed)
 
-    def set_axis_max_speed(self, settings=None):
+    def set_axis_max_speed(self, settings):
         '''
         Sets the maximum speed (mm/sec) that a given axis will move
 
@@ -215,10 +218,7 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for millimeters per second (mm/sec)
         '''
-        if not settings:
-            settings = self._max_speed_settings.copy()
-        else:
-            self._max_speed_settings.update(settings)
+        self._max_speed_settings.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
@@ -226,6 +226,12 @@ class SmoothieDriver_3_0_0:
             ' '.join(values)
         )
         self._send_command(command)
+
+    def push_axis_max_speed(self):
+        self._saved_max_speed_settings = self._max_speed_settings.copy()
+
+    def pop_axis_max_speed(self):
+        self.set_axis_max_speed(self._saved_max_speed_settings)
 
     def set_current(self, settings):
         '''
@@ -324,6 +330,23 @@ class SmoothieDriver_3_0_0:
         # now it is safe to home the X axis
         self._send_command(GCODES['HOME'] + 'X')
 
+    def _home_y(self):
+        # home the Y at normal speed (fast)
+        self._send_command(GCODES['HOME'] + 'Y')
+        self.update_position(default={'Y': HOMED_POSITION.get('Y')})
+        # slow the maximum allowed speed on Y axis
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
+        # move away from the switch
+        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
+        # home again, but slower now
+        self._send_command(GCODES['HOME'] + 'Y')
+        self.update_position()
+        # move away from the switch again
+        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
+        # bring max speeds back to normal
+        self.pop_axis_max_speed()
+
     def _setup(self):
         self._reset_from_error()
         self._send_command(self._config.acceleration)
@@ -331,7 +354,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self.update_position(default=HOMED_POSITION)
-        self.set_axis_max_speed()
+        self.pop_axis_max_speed()
         self.pop_speed()
     # ----------- END Private functions ----------- #
 
@@ -406,7 +429,10 @@ class SmoothieDriver_3_0_0:
         for axes in home_sequence:
             if 'X' in axes:
                 self._home_x()
+            elif 'Y' in axes:
+                self._home_y()
             else:
+                # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
                 self._send_command(command, timeout=30)
 
