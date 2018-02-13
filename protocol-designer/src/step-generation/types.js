@@ -1,7 +1,7 @@
 // @flow
 
 export type MixArgs = {|
-  ul: number,
+  volume: number,
   times: number
 |}
 

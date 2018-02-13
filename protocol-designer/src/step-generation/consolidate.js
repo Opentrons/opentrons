@@ -1,8 +1,7 @@
 // @flow
 import chunk from 'lodash/chunk'
-import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
-import {aspirate, dispense, replaceTip} from './'
+import {aspirate, dispense, blowout, replaceTip, repeatArray, reduceCommandCreators} from './'
 import type {ConsolidateFormData, RobotState, CommandReducer} from './'
 
 const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotState: RobotState) => {
@@ -19,9 +18,14 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
 
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
-    throw new Error('Consolidate called with pipette that does not exist in robotState, pipette id: ' + data.pipette)
+    throw new Error('Consolidate called with pipette that does not exist in robotState, pipette id: ' + data.pipette) // TODO test
   }
-  const disposalVolume = data.disposalVolume || 0
+
+  // TODO error on negative data.disposalVolume?
+  const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
+    ? data.disposalVolume
+    : 0
+
   const maxWellsPerChunk = Math.floor(
     (pipetteData.maxVolume - disposalVolume) / data.volume
   )
@@ -29,6 +33,7 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
   commandReducers = flatMap(
     chunk(data.sourceWells, maxWellsPerChunk),
     (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandReducer> => {
+      // Aspirate commands for all source wells in the chunk
       const aspirateCommands = sourceWellChunk.map((sourceWell: string, wellIndex: number): CommandReducer => {
         const isFirstWellInChunk = wellIndex === 0
         return aspirate({
@@ -48,31 +53,94 @@ const consolidate = (data: ConsolidateFormData): CommandReducer => (prevRobotSta
         tipCommands = [replaceTip(data.pipette)]
       }
 
+      const trashTheDisposalVol = disposalVolume
+        ? [
+          blowout({
+            pipette: data.pipette,
+            labware: 'trashId', // TODO trash ID should be a constant
+            well: 'A1'
+          })
+        ]
+        : []
+
+      // TODO factor out createMix helper fn
+      function createMix (pipette: string, labware: string, well: string, volume: number, times: number) {
+        return repeatArray([
+          aspirate({
+            pipette,
+            volume,
+            labware,
+            well
+          }),
+          dispense({
+            pipette,
+            volume,
+            labware,
+            well
+          })
+        ], times)
+      }
+
+      const mixBeforeCommands = (data.mixFirstAspirate)
+        ? createMix(
+          data.pipette,
+          data.sourceLabware,
+          sourceWellChunk[0],
+          data.mixFirstAspirate.volume,
+          data.mixFirstAspirate.times
+        )
+        : []
+
+      const preWetTipCommands = (data.preWetTip)
+        // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
+        ? createMix(
+          data.pipette,
+          data.sourceLabware,
+          sourceWellChunk[0],
+          data.volume,
+          1
+        )
+        : []
+
+      const mixAfterCommands = (data.mixInDestination)
+        ? createMix(
+          data.pipette,
+          data.destLabware,
+          data.destWell,
+          data.mixInDestination.volume,
+          data.mixInDestination.times
+        )
+        : []
+
+      const blowoutCommand = (data.blowout)
+        ? [
+          blowout({
+            pipette: data.pipette,
+            labware: data.blowout,
+            well: 'A1' // TODO LATER: should user be able to specify the blowout well?
+          })
+        ]
+        : []
+
       return [
         ...tipCommands,
+        ...mixBeforeCommands,
+        ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
         ...aspirateCommands,
         dispense({
           pipette: data.pipette,
-          volume: data.volume * sourceWellChunk.length + disposalVolume,
+          volume: data.volume * sourceWellChunk.length,
           labware: data.destLabware,
           well: data.destWell
-        })
+        }),
+        ...trashTheDisposalVol,
+        ...mixAfterCommands,
+        ...blowoutCommand
       ]
     }
   )
 
-  const commandsAndState = commandReducers.reduce(
-    (prev, reducerFn) => {
-      const next = reducerFn(prev.robotState)
-      return {
-        robotState: next.robotState,
-        commands: [...prev.commands, ...next.commands]
-      }
-    },
-    {robotState: cloneDeep(prevRobotState), commands: []} // TODO: should I clone here (for safety) or is it safe enough?
-  )
-
-  return commandsAndState
+  return reduceCommandCreators(commandReducers)(prevRobotState)
 }
 
 export default consolidate

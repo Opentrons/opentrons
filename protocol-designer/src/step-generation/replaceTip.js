@@ -19,7 +19,7 @@ const replaceTip = (pipetteId: string): CommandReducer => (prevRobotState: Robot
   const nextTiprack = getNextTiprack(pipetteData.channels, robotState)
 
   if (!nextTiprack) {
-    throw new Error('TODO IMMEDIATELY/SOON! Need to figure out how to handle running out of tips')
+    throw new Error('TODO IMMEDIATELY/SOON! Need to figure out how to handle running out of tips') // TODO: test
   }
 
   // drop tip if you have one
@@ -45,7 +45,7 @@ const replaceTip = (pipetteId: string): CommandReducer => (prevRobotState: Robot
   if (pipetteData.channels === 8) {
     const allWells = tiprackWellNamesByCol.find(col => col[0] === nextTiprack.well)
     if (!allWells) {
-      throw new Error('Invalid well: ' + nextTiprack.well)
+      throw new Error('Invalid well: ' + nextTiprack.well) // TODO: test
     }
     allWells.forEach(function (well) {
       robotState.tipState.tipracks[nextTiprack.tiprackId][well] = false
