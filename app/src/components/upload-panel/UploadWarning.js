@@ -5,8 +5,10 @@ import styles from './upload-panel.css'
 export default function UploadWarning (props) {
   return (
     <div className={styles.upload_warning}>
-      <h3>Warning:</h3>
-      <p>
+      <h3 className={styles.upload_warning_title}>
+        Warning
+      </h3>
+      <p className={styles.upload_warning_body}>
         Opening a new protocol will close the one you currently have open.
         This will clear out current calibration data.
       </p>
