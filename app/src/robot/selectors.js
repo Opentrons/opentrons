@@ -4,6 +4,8 @@ import padStart from 'lodash/padStart'
 import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
+import type {State} from '../types'
+
 import type {
   Mount,
   Instrument,
@@ -13,10 +15,6 @@ import type {
   LabwareType
 } from './types'
 
-import type {State as CalibrationState} from './reducer/calibration'
-import type {State as ConnectionState} from './reducer/connection'
-import type {State as SessionState} from './reducer/session'
-
 import {
   type ConnectionStatus,
   type SessionStatus,
@@ -25,19 +23,9 @@ import {
   DECK_SLOTS
 } from './constants'
 
-type State = {
-  robot: {
-    calibration: CalibrationState,
-    connection: ConnectionState,
-    session: SessionState
-  }
-}
-
-const calibration = (state: State): CalibrationState => state[_NAME].calibration
-
-const connection = (state: State): ConnectionState => state[_NAME].connection
-
-const session = (state: State): SessionState => state[_NAME].session
+const calibration = (state: State) => state[_NAME].calibration
+const connection = (state: State) => state[_NAME].connection
+const session = (state: State) => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const sessionStatus = (state: State) => session(state).state
 
