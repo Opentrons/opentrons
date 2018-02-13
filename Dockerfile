@@ -64,7 +64,7 @@ COPY ./compute/avahi_tools /tmp/avahi_tools
 # When adding more python packages make sure to use setuptools to keep
 # packaging consistent across environments
 ENV PIPENV_VENV_IN_PROJECT=true
-RUN pip install pipenv jupyter && \
+RUN pip install pipenv && \
     pipenv install /tmp/api --system && \
     pip install /tmp/avahi_tools && \
     rm -rf /tmp/api && \
