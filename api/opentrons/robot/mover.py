@@ -59,9 +59,7 @@ class Mover:
 
         self._driver.move(driver_target)
 
-        # Update pose with the new value. Since stepper motors are open loop
-        # there is no need to to query diver for position
-        return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
+        return self.update_pose_from_driver(pose_tree)
 
     def home(self, pose_tree):
         self._driver.home(axis=''.join(self._axis_mapping.values()))
@@ -105,6 +103,24 @@ class Mover:
     def delay(self, seconds):
         self._driver.delay(seconds)
 
+    def axis_maximum(self, pose_tree, axis):
+        assert axis in 'xyz', "axis value should be x, y or z"
+        assert axis in self._axis_mapping, "mapping is not set for " + axis
+        d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
+        d_point = {'x': 0, 'y': 0, 'z': 0}
+        d_point[axis] = d_axis_max
+        x, y, z = change_base(
+            pose_tree,
+            src=self._dst,
+            dst=self._src,
+            point=Point(**d_point))
+        if axis == 'x':
+            return x
+        if axis == 'y':
+            return y
+        if axis == 'z':
+            return z
+
     def update_pose_from_driver(self, pose_tree):
         # map from driver axis names to xyz and expand position
         # into point object
@@ -113,5 +129,11 @@ class Mover:
             y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
             z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
         )
+
+        point = change_base(
+            pose_tree,
+            src=self._dst,
+            dst=self._src,
+            point=point)
 
         return update(pose_tree, self, point)
