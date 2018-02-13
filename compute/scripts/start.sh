@@ -7,9 +7,6 @@ radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 # mdns announcement
 announce_mdns.py &
 
-# Start jupyter notebook server
-jupyter notebook --port 18888 &
-
 # serve static pages and proxy HTTP services
 nginx
 
