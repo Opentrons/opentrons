@@ -1499,6 +1499,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
 
+        print(self.p200.tip_racks)
+
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
@@ -1510,7 +1512,7 @@ class PipetteTest(unittest.TestCase):
             self.p200.aspirate.mock_calls,
             [
                 mock.call.aspirate(volume=50,
-                                   location=self.p200.tip_racks[0][0],
+                                   location=None,
                                    rate=1.0),
                 mock.call.aspirate(50, rate=1.0)
             ]

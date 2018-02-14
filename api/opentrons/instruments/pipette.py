@@ -915,6 +915,7 @@ class Pipette:
             self._add_tip(
                 length=self.robot.config.tip_length[self.mount][self.type]
             )
+            self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, abs(plunge_depth))
 
@@ -1047,6 +1048,7 @@ class Pipette:
             self.robot.poses = self.instrument_actuator.home(
                 self.robot.poses)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.previous_placeable = None  # no longer inside a placeable
 
         _home(self.mount)
         return self
