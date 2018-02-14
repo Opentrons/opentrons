@@ -34,11 +34,14 @@ def location_to_list(loc):
     # like what's returned from well.top()
     if isinstance(loc, tuple):
         loc = unpack_location(loc)[0]
-    elif isinstance(loc, list):
-        loc = [
-            unpack_location(l)[0]
-            for l in loc
-        ]
+    if isinstance(loc, list):
+        if isinstance(loc[0], (WellSeries, list)):
+            loc = [well for series in loc for well in series]
+        else:
+            loc = [
+                unpack_location(l)[0]
+                for l in loc
+            ]
 
     if isinstance(loc, WellSeries):
         # TODO(artyom, 20171107): this is to handle a case when
