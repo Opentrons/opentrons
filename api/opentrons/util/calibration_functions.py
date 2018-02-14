@@ -127,14 +127,10 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
     dx, dy, dz = array(measured_center) - config.probe_center
 
-    tip_length = deepcopy(config.tip_length)
-
+    # any Z offset will adjust the tip length, so instruments have Z=0 offset
     old_x, old_y, _ = instrument_offset[instrument.mount]
-    # any Z offsets adjusts the tip length, so instruments have Z=0.0 offset
-    new_offset = (old_x - dx, old_y - dy, 0.0)
-
-    # remove the instrument model's designed offsets from the saved offset
-    instrument_offset[instrument.mount] = new_offset
+    instrument_offset[instrument.mount] = (old_x - dx, old_y - dy, 0.0)
+    tip_length = deepcopy(config.tip_length)
     tip_length[instrument.mount][instrument.type] = \
         tip_length[instrument.mount][instrument.type] + dz
 
@@ -142,14 +138,15 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
         ._replace(instrument_offset=instrument_offset) \
         ._replace(tip_length=tip_length)
     robot.config = config
-
     robot_configs.save(config)
 
-    mx, my, mz = instrument.model_offset
-    new_absolute_pos = (mx + new_offset[0], my + new_offset[1], mz)
-    robot.poses = update(robot.poses, instrument, new_absolute_pos)
+    new_coordinates = change_base(
+        robot.poses,
+        src=instrument,
+        dst=instrument.instrument_mover) - Point(dx, dy, 0.0)
+    robot.poses = update(robot.poses, instrument, new_coordinates)
 
-    return instrument.robot.config
+    return robot.config
 
 
 def move_instrument_for_probing_prep(instrument, robot):

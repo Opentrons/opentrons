@@ -347,14 +347,8 @@ class Robot(object):
                 obj=id(self.config.gantry_calibration),
                 transform=self.config.gantry_calibration) \
             .add(obj=self.gantry, parent=id(self.config.gantry_calibration)) \
-            .add(
-                obj=left_carriage,
-                parent=self.gantry,
-                point=(-X_DISTANCE_BETWEEN_MOUNTS, 0, 0)) \
-            .add(
-                obj=right_carriage,
-                parent=self.gantry,
-                point=(0, 0, 0)) \
+            .add(obj=left_carriage, parent=self.gantry) \
+            .add(obj=right_carriage, parent=self.gantry) \
             .add(
                 obj='left',
                 parent=left_carriage,
@@ -405,6 +399,8 @@ class Robot(object):
         # tip length for pickup and drop tip
         cx, cy, _ = self.config.instrument_offset[mount]
         mx, my, mz = instrument.model_offset
+        if mount == 'left':
+            mx -= X_DISTANCE_BETWEEN_MOUNTS
         self.poses = pose_tracker.add(
             self.poses,
             instrument,
