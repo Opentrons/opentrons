@@ -32,8 +32,14 @@ def config(monkeypatch, tmpdir):
             probe_dimensions=(50.0, 50.0, 100.0),
             # left relative to right
             instrument_offset={
-                'right': (0.0, 0.0, 0.0),
-                'left': (0.0, 0.0, 0.0)
+                'right': {
+                    'single': (0.0, 0.0, 0.0),
+                    'multi': (0.0, 0.0, 0.0)
+                },
+                'left': {
+                    'single': (0.0, 0.0, 0.0),
+                    'multi': (0.0, 0.0, 0.0)
+                }
             },
             tip_length={
                 'left': {
@@ -111,7 +117,7 @@ def test_update_instrument_config(fixture, monkeypatch):
     # tip_length = robot.config. \
     #     tip_length[instrument.mount][instrument.type]
     instrument_offset = robot.config. \
-        instrument_offset[instrument.mount]
+        instrument_offset[instrument.mount][instrument.type]
 
     config = update_instrument_config(
         instrument=instrument,
@@ -121,7 +127,7 @@ def test_update_instrument_config(fixture, monkeypatch):
     new_tip_length = config \
         .tip_length[instrument.mount][instrument.type]
     new_instrument_offset = config \
-        .instrument_offset[instrument.mount]
+        .instrument_offset[instrument.mount][instrument.type]
 
     assert new_tip_length == 55.0
     assert new_instrument_offset == \
@@ -136,7 +142,9 @@ def test_update_instrument_config(fixture, monkeypatch):
     with open(filename, 'r') as file:
         assert json.load(file) == {
             'instrument_offset': {
-                'right': [5.0, 5.0, 0.0]
+                'right': {
+                    'single': [5.0, 5.0, 0.0]
+                }
             },
             'tip_length': {
                 'right': {
