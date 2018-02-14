@@ -2,8 +2,7 @@ from . import types
 from ..broker import broker
 import functools
 import inspect
-from opentrons.containers import Well, Container, Slot, WellSeries,\
-    unpack_location, location_to_list
+from opentrons.containers import Well, Container, Slot, location_to_list
 
 
 def stringify_location(location):
