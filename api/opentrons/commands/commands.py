@@ -2,7 +2,8 @@ from . import types
 from ..broker import broker
 import functools
 import inspect
-from opentrons.containers import Well, Container, Slot, WellSeries
+from opentrons.containers import Well, Container, Slot, WellSeries,\
+    unpack_location
 
 
 def stringify_location(location):
@@ -18,29 +19,11 @@ def stringify_location(location):
         Well: 'well'
     }
 
-    if isinstance(location, tuple):
-        location = location[0]
-
     # Coordinates only
     if location is None:
         return '?'
 
-    # TODO(artyom, 20171107): this is to handle a case when
-    # container.rows('1', '2') returns a WellSeries of WellSeries
-    # the data structure should be fixed when WellSeries is phased out
-    if (isinstance(location, WellSeries) and
-            isinstance(location[0], WellSeries)):
-        location = WellSeries(
-            wells=[well for series in location for well in series])
-
-    if (isinstance(location, WellSeries)):
-        location = list(location)
-
-    if not (isinstance(location, WellSeries) or
-            isinstance(location, list) or
-            isinstance(location, tuple)):
-        location = [location]
-
+    location = _location_to_list(location)
     multiple = len(location) > 1
 
     return '{object_text}{suffix} {first}{last} in "{slot_text}"'.format(
@@ -50,6 +33,32 @@ def stringify_location(location):
             last='...'+location[-1].get_name() if multiple else '',
             slot_text=get_slot(location[0]).get_name()
         )
+
+
+def _location_to_list(loc):
+    # might be a location tuple, or list of location tuples
+    # like what's returned from well.top()
+    if isinstance(loc, tuple):
+        loc = unpack_location(loc)[0]
+    elif isinstance(loc, list):
+        loc = [
+            unpack_location(l)[0]
+            for l in loc
+        ]
+
+    if isinstance(loc, WellSeries):
+        # TODO(artyom, 20171107): this is to handle a case when
+        # container.rows('1', '2') returns a WellSeries of WellSeries
+        # the data structure should be fixed when WellSeries is phased out
+        if isinstance(loc[0], WellSeries):
+            loc = [well for series in loc for well in series]
+        else:
+            loc = list(loc)
+
+    # ensure it returns either list or tuple
+    if not (isinstance(loc, list) or isinstance(loc, tuple)):
+        loc = [loc]
+    return loc
 
 
 def make_command(name, payload):
