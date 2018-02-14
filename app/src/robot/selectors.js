@@ -260,7 +260,7 @@ export const getInstruments = createSelector(
 // TODO(mc, 2018-02-07): be smarter about the backup case
 export const getCalibrator = createSelector(
   getInstruments,
-  (instruments): Instrument => {
+  (instruments): ?Instrument => {
     const tipOn = instruments.find((i) => i.probed && i.tipOn)
 
     return tipOn || instruments[0]
@@ -268,13 +268,20 @@ export const getCalibrator = createSelector(
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
-export function getCalibratorMount (state: State): Mount {
-  return getCalibrator(state).mount
+export function getCalibratorMount (state: State): ?Mount {
+  const calibrator = getCalibrator(state)
+
+  if (!calibrator) return null
+
+  return calibrator.mount
 }
 
 export const getInstrumentsCalibrated = createSelector(
   getInstruments,
-  (instruments): boolean => instruments.every((i) => !i.name || i.probed)
+  (instruments): boolean => (
+    instruments.length !== 0 &&
+    instruments.every((i) => i.probed)
+  )
 )
 
 export function getLabwareBySlot (state: State) {
