@@ -374,7 +374,7 @@ class Robot(object):
         # one id(instrument) to store it's offset vector and another
         # with zero offset, which can be increased/decreased by
         # tip length for pickup and drop tip
-        cx, cy, _ = self.config.instrument_offset[mount]
+        cx, cy, _ = self.config.instrument_offset[mount][instrument.type]
         mx, my, mz = instrument.model_offset
         if mount == 'left':
             mx -= X_DISTANCE_BETWEEN_MOUNTS

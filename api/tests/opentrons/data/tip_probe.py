@@ -17,8 +17,8 @@ def introduce_error(config, poses, instrument, error):
     mount = instrument.mount
     _type = instrument.type
 
-    config.instrument_offset[mount] = tuple(
-        array((dx, dy, 0)) + config.instrument_offset[mount]
+    config.instrument_offset[mount][_type] = tuple(
+        array((dx, dy, 0)) + config.instrument_offset[mount][_type]
     )
 
     config.tip_length[mount][_type] = \
@@ -27,7 +27,7 @@ def introduce_error(config, poses, instrument, error):
     return update(
         poses,
         obj=instrument,
-        point=config.instrument_offset[mount])
+        point=config.instrument_offset[mount][_type])
 
 
 def init_instruments():
@@ -59,7 +59,7 @@ def test_instrument(calibration_manager, robot, instrument, error):
     calibration_manager.tip_probe(instrument)
 
     return (
-        robot.config.instrument_offset[mount],
+        robot.config.instrument_offset[mount][_type],
         robot.config.tip_length[mount][_type]
     )
 

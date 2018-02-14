@@ -127,8 +127,9 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
     dx, dy, dz = array(measured_center) - config.probe_center
 
     # any Z offset will adjust the tip length, so instruments have Z=0 offset
-    old_x, old_y, _ = instrument_offset[instrument.mount]
-    instrument_offset[instrument.mount] = (old_x - dx, old_y - dy, 0.0)
+    old_x, old_y, _ = instrument_offset[instrument.mount][instrument.type]
+    instrument_offset[instrument.mount][instrument.type] = \
+        (old_x - dx, old_y - dy, 0.0)
     tip_length = deepcopy(config.tip_length)
     tip_length[instrument.mount][instrument.type] = \
         tip_length[instrument.mount][instrument.type] + dz
