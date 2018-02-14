@@ -72,6 +72,9 @@ GCODE_ROUNDING_PRECISION = 3
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
     parsed_values = parsed_values[2:]
+    if len(parsed_values) != 6:
+        raise ParseError('Unexpected response from Smoothieware: {}'.format(
+            raw_axis_values))
     return {
         s.split(':')[0].upper(): round(
             float(s.split(':')[1]),
@@ -93,6 +96,10 @@ def _parse_switch_values(raw_switch_values):
 
 
 class SmoothieError(Exception):
+    pass
+
+
+class ParseError(Exception):
     pass
 
 
@@ -137,7 +144,7 @@ class SmoothieDriver_3_0_0:
                 updated_position = \
                     _parse_axis_values(position_response)
                 # TODO jmg 10/27: log warning rather than an exception
-            except TypeError as e:
+            except (TypeError, ParseError) as e:
                 if is_retry:
                     raise e
                 else:
