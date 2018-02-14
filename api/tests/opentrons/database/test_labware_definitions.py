@@ -63,7 +63,7 @@ def test_list_labware():
     # Minor spot-checks, function is simple. Values will need to be updated if
     # labware is added to library
     lw = ldef.list_all_labware()
-    assert len(lw) == 41
+    assert len(lw) == 42
     assert lw[0] == '12-well-plate'
     assert lw[-1] == 'wheaton_vial_rack'
 

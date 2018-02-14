@@ -4,18 +4,18 @@ import padStart from 'lodash/padStart'
 import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
+import type {State} from '../types'
+import {selectHealth} from '../http-api-client'
+
 import type {
   Mount,
   Instrument,
   InstrumentCalibrationStatus,
   Labware,
   LabwareCalibrationStatus,
-  LabwareType
+  LabwareType,
+  Robot
 } from './types'
-
-import type {State as CalibrationState} from './reducer/calibration'
-import type {State as ConnectionState} from './reducer/connection'
-import type {State as SessionState} from './reducer/session'
 
 import {
   type ConnectionStatus,
@@ -25,19 +25,9 @@ import {
   DECK_SLOTS
 } from './constants'
 
-type State = {
-  robot: {
-    calibration: CalibrationState,
-    connection: ConnectionState,
-    session: SessionState
-  }
-}
-
-const calibration = (state: State): CalibrationState => state[_NAME].calibration
-
-const connection = (state: State): ConnectionState => state[_NAME].connection
-
-const session = (state: State): SessionState => state[_NAME].session
+const calibration = (state: State) => state[_NAME].calibration
+const connection = (state: State) => state[_NAME].connection
+const session = (state: State) => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const sessionStatus = (state: State) => session(state).state
 
@@ -63,17 +53,20 @@ export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
   (state: State) => connection(state).discoveredByName,
   (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo) => sortBy(
-    discovered.map((name) => ({
+  selectHealth,
+  (discovered, discoveredByName, connectedTo, healthByName): Robot[] => {
+    const robots = discovered.map((name) => ({
       ...discoveredByName[name],
-      isConnected: connectedTo === name
-    })),
-    [
+      isConnected: connectedTo === name,
+      health: healthByName[name]
+    }))
+
+    return sortBy(robots, [
       (robot) => !robot.isConnected,
       (robot) => !robot.wired,
       'name'
-    ]
-  )
+    ])
+  }
 )
 
 export const getConnectionStatus = createSelector(
@@ -267,7 +260,7 @@ export const getInstruments = createSelector(
 // TODO(mc, 2018-02-07): be smarter about the backup case
 export const getCalibrator = createSelector(
   getInstruments,
-  (instruments): Instrument => {
+  (instruments): ?Instrument => {
     const tipOn = instruments.find((i) => i.probed && i.tipOn)
 
     return tipOn || instruments[0]
@@ -275,13 +268,20 @@ export const getCalibrator = createSelector(
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
-export function getCalibratorMount (state: State): Mount {
-  return getCalibrator(state).mount
+export function getCalibratorMount (state: State): ?Mount {
+  const calibrator = getCalibrator(state)
+
+  if (!calibrator) return null
+
+  return calibrator.mount
 }
 
 export const getInstrumentsCalibrated = createSelector(
   getInstruments,
-  (instruments): boolean => instruments.every((i) => !i.name || i.probed)
+  (instruments): boolean => (
+    instruments.length !== 0 &&
+    instruments.every((i) => i.probed)
+  )
 )
 
 export function getLabwareBySlot (state: State) {

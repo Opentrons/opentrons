@@ -76,7 +76,10 @@ function createWindow () {
       devTools: DEV_MODE || DEBUG_MODE,
       experimentalFeatures: true,
       // node integration needed for mdns robot discovery
-      nodeIntegrationInWorker: true
+      nodeIntegrationInWorker: true,
+      // TODO(mc, 2018-02-12): this works around CORS restrictions
+      //   while in dev mode; evaluate whether this is acceptable
+      webSecurity: !DEV_MODE
     }
   })
 

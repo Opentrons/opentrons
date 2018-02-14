@@ -40,21 +40,40 @@ describe('robot selectors', () => {
 
   test('getDiscovered', () => {
     const state = {
-      connection: {
-        connectedTo: 'bar',
-        discovered: ['foo', 'bar', 'baz', 'qux'],
-        discoveredByName: {
-          foo: {host: 'abcdef.local', name: 'foo'},
-          bar: {host: '123456.local', name: 'bar'},
-          baz: {host: 'qwerty.local', name: 'baz'},
-          qux: {host: 'dvorak.local', name: 'qux', wired: true}
+      api: {
+        health: {
+          bar: {response: {api_version: '1.2.3', fw_version: '4.5.6'}},
+          qux: {response: {api_version: '1.2.3', fw_version: '4.5.6'}}
+        }
+      },
+      robot: {
+        connection: {
+          connectedTo: 'bar',
+          discovered: ['foo', 'bar', 'baz', 'qux'],
+          discoveredByName: {
+            foo: {host: 'abcdef.local', name: 'foo'},
+            bar: {host: '123456.local', name: 'bar'},
+            baz: {host: 'qwerty.local', name: 'baz'},
+            qux: {host: 'dvorak.local', name: 'qux', wired: true}
+          }
         }
       }
     }
 
-    expect(getDiscovered(makeState(state))).toEqual([
-      {name: 'bar', host: '123456.local', isConnected: true},
-      {name: 'qux', host: 'dvorak.local', isConnected: false, wired: true},
+    expect(getDiscovered(state)).toEqual([
+      {
+        name: 'bar',
+        host: '123456.local',
+        isConnected: true,
+        health: state.api.health.bar
+      },
+      {
+        name: 'qux',
+        host: 'dvorak.local',
+        isConnected: false,
+        wired: true,
+        health: state.api.health.qux
+      },
       {name: 'baz', host: 'qwerty.local', isConnected: false},
       {name: 'foo', host: 'abcdef.local', isConnected: false}
     ])

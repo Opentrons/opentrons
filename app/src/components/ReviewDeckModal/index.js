@@ -21,7 +21,7 @@ type Props = Labware & {
 
 type StateProps = {
   currentLabware: Labware,
-  _calibrator: Mount | ''
+  _calibrator: ?Mount
 }
 
 type DispatchProps = {
@@ -68,15 +68,12 @@ function mergeProps (
   const {currentLabware, _calibrator} = stateProps
   const {dispatch} = dispatchProps
 
-  // TODO(mc, 2018-02-05): refactor so this check isn't necessary
-  if (!_calibrator) {
-    throw new Error('no calibrator available; this is a bug')
-  }
-
   return {
     ...currentLabware,
     onClick: () => {
-      dispatch(robotActions.moveTo(_calibrator, currentLabware.slot))
+      if (_calibrator) {
+        dispatch(robotActions.moveTo(_calibrator, currentLabware.slot))
+      }
     }
   }
 }

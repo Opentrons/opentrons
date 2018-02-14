@@ -13,22 +13,29 @@
 
 .prompt {
   max-width: 32rem;
-  margin-bottom: 1.5rem;
+  margin: 0 0 0.5rem;
 }
 
 .prompt_text {
   @apply --font-header-light;
 
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .prompt_button {
   display: block;
   width: auto;
-  margin: 0 auto;
+  margin: 1rem auto;
   padding-left: 3rem;
   padding-right: 3rem;
+}
+
+.prompt_details {
+  @apply --font-body-2-light;
+
+  margin: 1rem 0 0;
+  text-align: center;
 }
 
 .deck {

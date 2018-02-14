@@ -29,8 +29,8 @@ export default function ConfirmModal (props: Props) {
       <Overlay />
       <TitleBar
         className={styles.title_bar}
-        title='Setup Deck'
-        subtitle={labware.name}
+        title='Calibrate Deck'
+        subtitle={labware.type}
         onBackClick={onBackClick}
         backClickDisabled={backClickDisabled}
       />

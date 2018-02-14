@@ -56,7 +56,7 @@ function InfoBox (props: Props) {
   if (labware) {
     const labwareType = robotSelectors.labwareType(labware)
 
-    title = labware.name
+    title = labware.type
     confirmed = labware.confirmed
     description = confirmed
       ? `${capitalize(labwareType)} is calibrated`

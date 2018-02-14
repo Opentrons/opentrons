@@ -40,7 +40,7 @@ install:
   - make install
 
 script:
-  - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
+  - "export OT_TIME_SUFFIX=-$(date -u '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   - make test
@@ -54,9 +54,6 @@ script:
   - make -C protocol-designer build
   # build run app
   - make -C app-shell dist-posix
-  # TODO(mc, 2018-02-10): this should be part of app-shell's Makefile
-  # Clean up. This will leave only single-file build artifacts
-  - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
 
 after_success:
   - make coverage
@@ -68,7 +65,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(pwd)/app-shell/dist
+    local-dir: $(pwd)/app-shell/dist/publish
     upload-dir: ci-builds
     acl: public_read
     on:

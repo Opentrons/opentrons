@@ -23,6 +23,7 @@ export const CHEVRON_DOWN = 'chevron down'
 export const CHEVRON_LEFT = 'chevron left'
 export const CHEVRON_RIGHT = 'chevron right'
 export const FILE = 'file'
+export const UPLOAD = 'upload'
 export const COG = 'cog'
 export const CONNECT = 'connect'
 export const CONSOLIDATE = 'consolidate'
@@ -121,6 +122,10 @@ const ICON_DATA_BY_NAME = {
   [FILE]: {
     viewBox: '0 0 24 24',
     path: 'M20.907 0H3.803C3.334.044 3 .356 3 .822c0 1.822.022 3.645.022 5.467v11.355c0 1.823-.022 3.645-.022 5.467 0 .467.334.8.803.822H7.37c2.051 0 3.88.023 6.199 0 .736 0 1.383-.289 1.918-.777.535-.49 1.048-.956 1.538-1.49a201.554 201.554 0 0 0 2.989-3.177c.379-.4.713-.822 1.025-1.267a3.17 3.17 0 0 0 .58-1.844c.045-4.867.045-9.711.067-14.578.022-.444-.312-.778-.78-.8zm-2.074 16.444c-1.115.312-2.275.312-3.434.334-.424 0-.647.155-.736.555-.045.2-.023.867-.023 1.09-.066 1-.044 1.6-.178 2.6-.134.866-.624 1.51-1.762 1.488-2.586-.022-8.005 0-8.161 0V1.556h15.61v13.222c.022 1-.536 1.466-1.316 1.666z'
+  },
+  [UPLOAD]: {
+    viewBox: '0 0 24 24',
+    path: 'M7.714 18.353v-8.47H2L12 0l10 9.882h-5.714v8.47H7.714zM2 24v-2.824h20V24H2z'
   },
   [COG]: {
     viewBox: '0 0 24 24',

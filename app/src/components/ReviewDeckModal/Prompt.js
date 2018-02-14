@@ -2,7 +2,7 @@
 // prompt for ReviewDeckModal of labware calibration page
 import * as React from 'react'
 
-import type {Labware} from '../../robot'
+import {selectors as robotSelectors, type Labware} from '../../robot'
 import {OutlineButton} from '@opentrons/components'
 
 import styles from './styles.css'
@@ -12,16 +12,21 @@ type Props = Labware & {
 }
 
 export default function Prompt (props: Props) {
-  const {name, type, slot, onClick} = props
+  const {type, slot, onClick} = props
+  const labwareType = robotSelectors.labwareType(props)
 
   return (
     <div className={styles.prompt}>
       <p className={styles.prompt_text}>
-        To calibrate labware on the deck, position full tipracks and empty labware in their designated slots as illustrated below
+        To calibrate deck, position full tipracks and empty labware in their
+        designated slots as illustrated below
       </p>
       <OutlineButton className={styles.prompt_button} onClick={onClick}>
-        {`Calibrate ${name} (${type}) in slot ${slot}`}
+        {`Continue moving to ${labwareType}`}
       </OutlineButton>
+      <p className={styles.prompt_details}>
+        {`Pipette will move to ${type} in slot ${slot}`}
+      </p>
     </div>
   )
 }

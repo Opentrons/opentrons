@@ -4,15 +4,13 @@ import cx from 'classnames'
 import {Link} from 'react-router-dom'
 
 import {
-  type LabwareComponentProps,
   ContainerNameOverlay,
   EmptyDeckSlot,
   Icon,
-  SlotOverlay,
   LabwareContainer,
   Plate,
   SPINNER,
-  ALERT
+  type LabwareComponentProps
 } from '@opentrons/components'
 
 import type {Labware} from '../../robot'
@@ -23,8 +21,6 @@ export type LabwareItemProps = LabwareComponentProps & {
   labware?: Labware & {
     highlighted?: boolean,
     disabled?: boolean,
-    showName?: boolean,
-    showUnconfirmed?: boolean,
     showSpinner?: boolean,
     onClick?: () => void,
     url?: string
@@ -45,11 +41,8 @@ export default function LabwareItem (props: LabwareItemProps) {
   const {
     name,
     type,
-    confirmed,
     highlighted,
     disabled,
-    showName,
-    showUnconfirmed,
     showSpinner,
     onClick,
     url
@@ -62,12 +55,8 @@ export default function LabwareItem (props: LabwareItemProps) {
       <g className={plateClass}>
         <Plate containerType={type} wellContents={{}} />
 
-        {!showSpinner && showName && (
+        {!showSpinner && (
           <ContainerNameOverlay containerName={name} containerType={type} />
-        )}
-
-        {!showSpinner && showUnconfirmed && !confirmed && (
-          <SlotOverlay text='Position Unconfirmed' icon={ALERT} />
         )}
 
         {showSpinner && (

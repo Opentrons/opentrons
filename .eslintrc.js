@@ -19,6 +19,8 @@ module.exports = {
 
   globals: {
     SyntheticEvent: true,
+    SynthenticMouseEvent: true,
+    SyntheticInputEvent: true,
     $Keys: true,
     $Call: true,
     $PropertyType: true

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import classnames from 'classnames'
+import cx from 'classnames'
 
 import Button, {type ButtonProps} from './Button'
 import styles from './buttons.css'
@@ -10,7 +10,7 @@ import styles from './buttons.css'
  * background with white text
  */
 export default function PrimaryButton (props: ButtonProps) {
-  const className = classnames(styles.button_primary, props.className)
+  const className = cx(styles.button_primary, props.className)
 
   return (
     <Button {...props} className={className}>

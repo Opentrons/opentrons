@@ -3,6 +3,7 @@ import os from 'os'
 import net from 'net'
 import Bonjour from 'bonjour'
 
+import {fetchHealth} from '../../http-api-client'
 import {actions} from '../actions'
 import {getIsScanning} from '../selectors'
 
@@ -14,17 +15,13 @@ const DOWN_EVENT = 'down'
 
 // direct discovery constants
 // see compute/scripts/setup.sh
-const DIRECT_IP = '[fd00:0:cafe:fefe::1]'
-const DIRECT_PORT = 31950
-const DIRECT_HEALTH_URL = `http://${DIRECT_IP}:${DIRECT_PORT}/health`
 const DIRECT_SERVICE = {
   name: 'Opentrons USB',
-  ip: DIRECT_IP,
-  port: DIRECT_PORT,
+  ip: '[fd00:0:cafe:fefe::1]',
+  port: 31950,
   wired: true
 }
 const DIRECT_POLL_INTERVAL_MS = 1000
-let directDiscovered = false
 
 export function handleDiscover (dispatch, state, action) {
   // don't duplicate discovery requests
@@ -43,7 +40,11 @@ export function handleDiscover (dispatch, state, action) {
 
   function handleServiceUp (service) {
     if (NAME_RE.test(service.name)) {
-      dispatch(actions.addDiscovered(serviceWithIp(service)))
+      const serviceWithIp = withIp(service)
+      dispatch(actions.addDiscovered(serviceWithIp))
+
+      // fetchHealth is a thunk action, so give it dispatch
+      return fetchHealth(serviceWithIp)(dispatch)
     }
   }
 
@@ -62,25 +63,16 @@ export function handleDiscover (dispatch, state, action) {
   }
 
   function pollDirectConnection () {
-    fetch(DIRECT_HEALTH_URL)
-      .then((response) => {
-        if (response.ok && !directDiscovered) {
-          directDiscovered = true
-          dispatch(actions.addDiscovered(DIRECT_SERVICE))
-        }
-      })
-      .catch(() => {
-        if (directDiscovered) {
-          directDiscovered = false
-          dispatch(actions.removeDiscovered(DIRECT_SERVICE))
-        }
-      })
+    // fetchHealth is a thunk action, so give it dispatch
+    fetchHealth(DIRECT_SERVICE)(dispatch)
   }
 }
 
 // grab IP address from service
 // prefer IPv4, then IPv6, then hostname (with override for localhost)
-function serviceWithIp (service) {
+function withIp (service) {
+  if (service.ip) return service
+
   const addresses = service.addresses || []
   let ip = addresses.find((address) => net.isIPv4(address))
   if (!ip) ip = addresses.find((address) => net.isIP(address))

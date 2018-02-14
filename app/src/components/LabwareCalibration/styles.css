@@ -35,15 +35,7 @@
 .diagram_title {
   @apply --font-header-dark;
 
-  margin: 0 auto 0.5rem;
-  text-align: center;
-}
-
-.diagram_subtitle {
-  @apply --font-body-2-dark;
-
-  margin: 0 auto 1rem;
-  text-align: center;
+  margin: 0 1rem 0.5rem;
 }
 
 .diagram_instructions {

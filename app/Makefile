@@ -1,16 +1,15 @@
 # opentrons app makefile
 
-# use bash
-SHELL := bash
+SHELL := /bin/bash
 
-# source files
-source := $(shell find src -type f -name '*')
+# add node_modules/.bin to PATH
+PATH := $(shell yarn bin):$(PATH)
+
+# desktop shell directory for dev
 shell_dir := ../app-shell
 
-# use devDependency CLIs with $(bin)/command
 # set NODE_ENV for a command with $(env)=environment
-bin := node_modules/.bin
-env := $(bin)/cross-env NODE_ENV
+env := cross-env NODE_ENV
 
 # dev server port
 port ?= 8090
@@ -33,47 +32,48 @@ all: clean dist
 install:
 	yarn
 
-.PHONY: uninstall
-uninstall:
-	rm -rf node_modules
-
 .PHONY: clean
 clean:
-	rm -rf dist
+	shx rm -rf dist
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
-dist: $(source)
-	$(env)=production $(bin)/webpack --profile
+dist:
+	$(env)=production webpack --profile
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	$(bin)/concurrently \
+	concurrently --no-color --kill-others --names "server,mdns,shell"\
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-mdns" \
-		"sleep 3 && $(MAKE) -C $(shell_dir) dev port=$(port)"
+		"$(MAKE) dev-shell"
 
 .PHONY: dev-server
 dev-server:
-	$(env)=development PORT=$(port) $(bin)/webpack-dev-server --hot
+	$(env)=development PORT=$(port) webpack-dev-server --hot
 
 # TODO(mc, 2017-10-31): remove when API is capable of advertising itself
 .PHONY: dev-mdns
 dev-mdns:
 	$(env)=development node scripts/advertise-local-api.js
 
+.PHONY: dev-shell
+dev-shell:
+	wait-on http-get://localhost:$(port) && \
+	$(MAKE) -C $(shell_dir) dev port=$(port)
+
 # checks
 #####################################################################
 
 .PHONY: test
 test:
-	$(env)=test $(bin)/jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
+	$(env)=test jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
 .PHONY: install-types
 install-types:
-	$(bin)/flow-typed install --ignoreDeps=dev --packageDir=..
+	flow-typed install --ignoreDeps=dev --packageDir=..
