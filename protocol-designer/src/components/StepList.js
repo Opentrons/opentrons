@@ -19,8 +19,8 @@ type StepListProps = {
 }
 
 function generateSubsteps (substeps) {
-  if (substeps === null) {
-    // no substeps, form is probably not finished
+  if (!substeps) {
+    // no substeps, form is probably not finished (or it's "deck-setup" stepType)
     return null
   }
 
@@ -58,7 +58,11 @@ export default function StepList (props: StepListProps) {
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
-          onCollapseToggle={props.handleStepItemCollapseToggleById && props.handleStepItemCollapseToggleById(step.id)}
+          onCollapseToggle={
+            (step.stepType === 'deck-setup' || !props.handleStepItemCollapseToggleById)
+              ? null // Deck Setup steps are not collapsible
+              : props.handleStepItemCollapseToggleById(step.id)
+          }
           selected={!isNil(props.selectedStepId) && step.id === props.selectedStepId}
           {...pick(step, [
             'title',

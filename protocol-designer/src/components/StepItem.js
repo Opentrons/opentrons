@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import noop from 'lodash/noop'
 
 import {Icon, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
@@ -48,7 +47,7 @@ export default function StepItem (props: StepItemProps) {
     <TitledList
       className={styles.step_item}
       description={Description}
-      {...{iconName, title, selected, onClick, onCollapseToggle: onCollapseToggle || noop, collapsed}}
+      {...{iconName, title, selected, onClick, onCollapseToggle: onCollapseToggle, collapsed}}
     >
       {showLabwareHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <span>{sourceLabwareName}</span>

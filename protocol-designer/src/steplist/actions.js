@@ -111,10 +111,6 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
     if (stepType === 'deck-setup') {
       // Cancel open step form, if any
       dispatch(cancelStepForm())
-      dispatch({
-        type: 'ENTER_DECK_SETUP',
-        payload: 'TODO IMMEDIATELY' // TODO IMMEDIATELY Ian 2018-02-14: make this action real, make it do something
-      })
     } else {
       dispatch({
         type: 'POPULATE_FORM',
