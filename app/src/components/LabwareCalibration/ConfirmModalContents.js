@@ -16,7 +16,7 @@ import InProgressContents from './InProgressContents'
 type OwnProps = Labware
 
 type StateProps = {
-  calibrator: Instrument
+  calibrator: ?Instrument
 }
 
 type Props = OwnProps & StateProps
@@ -24,6 +24,8 @@ type Props = OwnProps & StateProps
 export default connect(mapStateToProps)(ConfirmModalContents)
 
 function ConfirmModalContents (props: Props) {
+  if (!props.calibrator) return null
+
   switch (props.calibration) {
     case 'unconfirmed':
     case 'over-slot':
