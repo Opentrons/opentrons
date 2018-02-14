@@ -3,7 +3,7 @@ from ..broker import broker
 import functools
 import inspect
 from opentrons.containers import Well, Container, Slot, WellSeries,\
-    unpack_location
+    unpack_location, location_to_list
 
 
 def stringify_location(location):
@@ -23,7 +23,7 @@ def stringify_location(location):
     if location is None:
         return '?'
 
-    location = _location_to_list(location)
+    location = location_to_list(location)
     multiple = len(location) > 1
 
     return '{object_text}{suffix} {first}{last} in "{slot_text}"'.format(
@@ -33,32 +33,6 @@ def stringify_location(location):
             last='...'+location[-1].get_name() if multiple else '',
             slot_text=get_slot(location[0]).get_name()
         )
-
-
-def _location_to_list(loc):
-    # might be a location tuple, or list of location tuples
-    # like what's returned from well.top()
-    if isinstance(loc, tuple):
-        loc = unpack_location(loc)[0]
-    elif isinstance(loc, list):
-        loc = [
-            unpack_location(l)[0]
-            for l in loc
-        ]
-
-    if isinstance(loc, WellSeries):
-        # TODO(artyom, 20171107): this is to handle a case when
-        # container.rows('1', '2') returns a WellSeries of WellSeries
-        # the data structure should be fixed when WellSeries is phased out
-        if isinstance(loc[0], WellSeries):
-            loc = [well for series in loc for well in series]
-        else:
-            loc = list(loc)
-
-    # ensure it returns either list or tuple
-    if not (isinstance(loc, list) or isinstance(loc, tuple)):
-        loc = [loc]
-    return loc
 
 
 def make_command(name, payload):
