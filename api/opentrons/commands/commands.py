@@ -90,11 +90,14 @@ def consolidate(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.CONSOLIDATE,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -109,11 +112,14 @@ def distribute(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.DISTRIBUTE,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -128,11 +134,14 @@ def transfer(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.TRANSFER,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,
