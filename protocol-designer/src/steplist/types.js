@@ -20,7 +20,8 @@ export const stepIconsByType = {
   'distribute': 'distribute',
   'consolidate': 'consolidate',
   'mix': 'mix',
-  'pause': 'pause'
+  'pause': 'pause',
+  'deck-setup': 'flask'
 }
 
 export type StepType = $Keys<typeof stepIconsByType>

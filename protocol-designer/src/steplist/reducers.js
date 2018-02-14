@@ -10,6 +10,7 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import range from 'lodash/range'
 
+import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
 import type {
   Command,
@@ -103,13 +104,21 @@ const unsavedFormModal = handleActions({
 
 type StepsState = {[StepIdType]: StepItemData}
 
+const initialStepState = {
+  [INITIAL_DECK_SETUP_ID]: {
+    id: INITIAL_DECK_SETUP_ID,
+    title: 'Deck Setup',
+    stepType: 'deck-setup'
+  }
+}
+
 const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
-}, {})
+}, initialStepState)
 
 type SavedStepFormState = {
   [StepIdType]: FormData
@@ -146,7 +155,7 @@ const orderedSteps = handleActions({
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
     state.filter(stepId => stepId !== action.payload)
-}, [])
+}, [INITIAL_DECK_SETUP_ID])
 
 type SelectedStepState = null | StepIdType
 

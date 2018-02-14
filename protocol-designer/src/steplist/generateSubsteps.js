@@ -182,6 +182,7 @@ export function generateCommands (data: ProcessedFormData): Array<Command> {
       }
     ])
   }
+  // TODO IMMEDIATELY Ian 2018-02-14 why does this keep getting undefined stepType?
   console.warn('generateCommands only supports transfer, got: ' + data.stepType)
   return [] // TODO
 }
