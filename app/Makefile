@@ -48,10 +48,10 @@ dist:
 
 .PHONY: dev
 dev:
-	concurrently \
+	concurrently --no-color --kill-others --names "server,mdns,shell"\
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-mdns" \
-		"wait-on http-get://localhost:$(port) && $(MAKE) -C $(shell_dir) dev port=$(port)"
+		"$(MAKE) dev-shell"
 
 .PHONY: dev-server
 dev-server:
@@ -61,6 +61,11 @@ dev-server:
 .PHONY: dev-mdns
 dev-mdns:
 	$(env)=development node scripts/advertise-local-api.js
+
+.PHONY: dev-shell
+dev-shell:
+	wait-on http-get://localhost:$(port) && \
+	$(MAKE) -C $(shell_dir) dev port=$(port)
 
 # checks
 #####################################################################
