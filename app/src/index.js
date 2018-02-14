@@ -3,8 +3,7 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import {Provider} from 'react-redux'
 import {AppContainer} from 'react-hot-loader'
-import {createStore, applyMiddleware} from 'redux'
-import {createLogger} from 'redux-logger'
+import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
@@ -28,12 +27,12 @@ const middleware = applyMiddleware(
   robotApiMiddleware(),
   analyticsMiddleware(analyticsEventsMap),
   alertMiddleware(window),
-  routerMiddleware(history),
-  // TODO(mc): log to file instead of console in prod
-  createLogger()
+  routerMiddleware(history)
 )
 
-const store = createStore(reducer, middleware)
+const composeEnhancers = global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
+const store = createStore(reducer, composeEnhancers(middleware))
 
 const renderApp = () => ReactDom.render(
   (
