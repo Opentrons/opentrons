@@ -126,9 +126,9 @@
   ],
   "wells": {
     "A1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -137,9 +137,9 @@
       "z": 0
     },
     "A10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -148,9 +148,9 @@
       "z": 0
     },
     "A11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -159,9 +159,9 @@
       "z": 0
     },
     "A12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -170,9 +170,9 @@
       "z": 0
     },
     "A2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -181,9 +181,9 @@
       "z": 0
     },
     "A3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -192,9 +192,9 @@
       "z": 0
     },
     "A4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -203,9 +203,9 @@
       "z": 0
     },
     "A5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -214,9 +214,9 @@
       "z": 0
     },
     "A6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -225,9 +225,9 @@
       "z": 0
     },
     "A7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -236,9 +236,9 @@
       "z": 0
     },
     "A8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -247,9 +247,9 @@
       "z": 0
     },
     "A9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -258,9 +258,9 @@
       "z": 0
     },
     "B1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -269,9 +269,9 @@
       "z": 0
     },
     "B10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -280,9 +280,9 @@
       "z": 0
     },
     "B11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -291,9 +291,9 @@
       "z": 0
     },
     "B12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -302,9 +302,9 @@
       "z": 0
     },
     "B2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -313,9 +313,9 @@
       "z": 0
     },
     "B3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -324,9 +324,9 @@
       "z": 0
     },
     "B4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -335,9 +335,9 @@
       "z": 0
     },
     "B5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -346,9 +346,9 @@
       "z": 0
     },
     "B6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -357,9 +357,9 @@
       "z": 0
     },
     "B7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -368,9 +368,9 @@
       "z": 0
     },
     "B8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -379,9 +379,9 @@
       "z": 0
     },
     "B9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -390,9 +390,9 @@
       "z": 0
     },
     "C1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -401,9 +401,9 @@
       "z": 0
     },
     "C10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -412,9 +412,9 @@
       "z": 0
     },
     "C11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -423,9 +423,9 @@
       "z": 0
     },
     "C12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -434,9 +434,9 @@
       "z": 0
     },
     "C2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -445,9 +445,9 @@
       "z": 0
     },
     "C3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -456,9 +456,9 @@
       "z": 0
     },
     "C4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -467,9 +467,9 @@
       "z": 0
     },
     "C5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -478,9 +478,9 @@
       "z": 0
     },
     "C6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -489,9 +489,9 @@
       "z": 0
     },
     "C7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -500,9 +500,9 @@
       "z": 0
     },
     "C8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -511,9 +511,9 @@
       "z": 0
     },
     "C9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -522,9 +522,9 @@
       "z": 0
     },
     "D1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -533,9 +533,9 @@
       "z": 0
     },
     "D10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -544,9 +544,9 @@
       "z": 0
     },
     "D11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -555,9 +555,9 @@
       "z": 0
     },
     "D12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -566,9 +566,9 @@
       "z": 0
     },
     "D2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -577,9 +577,9 @@
       "z": 0
     },
     "D3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -588,9 +588,9 @@
       "z": 0
     },
     "D4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -599,9 +599,9 @@
       "z": 0
     },
     "D5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -610,9 +610,9 @@
       "z": 0
     },
     "D6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -621,9 +621,9 @@
       "z": 0
     },
     "D7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -632,9 +632,9 @@
       "z": 0
     },
     "D8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -643,9 +643,9 @@
       "z": 0
     },
     "D9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -654,9 +654,9 @@
       "z": 0
     },
     "E1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -665,9 +665,9 @@
       "z": 0
     },
     "E10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -676,9 +676,9 @@
       "z": 0
     },
     "E11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -687,9 +687,9 @@
       "z": 0
     },
     "E12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -698,9 +698,9 @@
       "z": 0
     },
     "E2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -709,9 +709,9 @@
       "z": 0
     },
     "E3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -720,9 +720,9 @@
       "z": 0
     },
     "E4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -731,9 +731,9 @@
       "z": 0
     },
     "E5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -742,9 +742,9 @@
       "z": 0
     },
     "E6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -753,9 +753,9 @@
       "z": 0
     },
     "E7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -764,9 +764,9 @@
       "z": 0
     },
     "E8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -775,9 +775,9 @@
       "z": 0
     },
     "E9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -786,9 +786,9 @@
       "z": 0
     },
     "F1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -797,9 +797,9 @@
       "z": 0
     },
     "F10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -808,9 +808,9 @@
       "z": 0
     },
     "F11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -819,9 +819,9 @@
       "z": 0
     },
     "F12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -830,9 +830,9 @@
       "z": 0
     },
     "F2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -841,9 +841,9 @@
       "z": 0
     },
     "F3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -852,9 +852,9 @@
       "z": 0
     },
     "F4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -863,9 +863,9 @@
       "z": 0
     },
     "F5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -874,9 +874,9 @@
       "z": 0
     },
     "F6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -885,9 +885,9 @@
       "z": 0
     },
     "F7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -896,9 +896,9 @@
       "z": 0
     },
     "F8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -907,9 +907,9 @@
       "z": 0
     },
     "F9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -918,9 +918,9 @@
       "z": 0
     },
     "G1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -929,9 +929,9 @@
       "z": 0
     },
     "G10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -940,9 +940,9 @@
       "z": 0
     },
     "G11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -951,9 +951,9 @@
       "z": 0
     },
     "G12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -962,9 +962,9 @@
       "z": 0
     },
     "G2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -973,9 +973,9 @@
       "z": 0
     },
     "G3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -984,9 +984,9 @@
       "z": 0
     },
     "G4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -995,9 +995,9 @@
       "z": 0
     },
     "G5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1006,9 +1006,9 @@
       "z": 0
     },
     "G6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1017,9 +1017,9 @@
       "z": 0
     },
     "G7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1028,9 +1028,9 @@
       "z": 0
     },
     "G8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1039,9 +1039,9 @@
       "z": 0
     },
     "G9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1050,9 +1050,9 @@
       "z": 0
     },
     "H1": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1061,9 +1061,9 @@
       "z": 0
     },
     "H10": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1072,9 +1072,9 @@
       "z": 0
     },
     "H11": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1083,9 +1083,9 @@
       "z": 0
     },
     "H12": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1094,9 +1094,9 @@
       "z": 0
     },
     "H2": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1105,9 +1105,9 @@
       "z": 0
     },
     "H3": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1116,9 +1116,9 @@
       "z": 0
     },
     "H4": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1127,9 +1127,9 @@
       "z": 0
     },
     "H5": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1138,9 +1138,9 @@
       "z": 0
     },
     "H6": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1149,9 +1149,9 @@
       "z": 0
     },
     "H7": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1160,9 +1160,9 @@
       "z": 0
     },
     "H8": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
@@ -1171,9 +1171,9 @@
       "z": 0
     },
     "H9": {
-      "depth": 72,
+      "depth": 51,
       "diameter": 15,
-      "height": 72,
+      "height": 51,
       "length": 15,
       "total-liquid-volume": 5000,
       "width": 15,
