@@ -21,7 +21,7 @@ class MainRouter:
             self._notifications.on_notify)]
 
         self.session_manager = SessionManager(loop=loop)
-        self.calibration_manager = CalibrationManager(loop=loop)
+        self.calibration_manager = CalibrationManager(loop=loop, robot=robot)
 
     @property
     def notifications(self):

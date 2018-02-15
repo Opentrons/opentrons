@@ -18,17 +18,18 @@ class CalibrationManager:
     """
     TOPIC = 'calibration'
 
-    def __init__(self, loop=None):
+    def __init__(self, loop=None, robot=None):
         self._loop = loop
         self.state = None
+        self.robot = robot
 
-    def _set_state(self, state, instrument=None):
+    def _set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
         self.state = state
-        if instrument:
-            instrument.robot._use_safest_height = (state == 'moving')
+        if self.robot:
+            self.robot._use_safest_height = (state == 'moving')
         self._on_state_changed()
 
     def tip_probe(self, instrument):
