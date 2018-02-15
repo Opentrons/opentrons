@@ -10,7 +10,7 @@ You can use an `<OutlineButton>` in exactly the same manner as a `<PrimaryButton
 </div>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <div style={{padding: '2rem', width: '20rem'}}>
     <OutlineButton onClick={() => alert('you clicked me')} inverted>
       {'Click for alert'}
@@ -31,7 +31,7 @@ Disabled:
 </div>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <div style={{padding: '2rem', width: '20rem'}}>
     <OutlineButton onClick={() => alert("can't click")} disabled inverted>
       {'Disabled'}

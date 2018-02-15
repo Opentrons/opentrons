@@ -23,7 +23,7 @@
 ```
 
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <IconButton
     onClick={() => alert('you clicked me')}
     title='left'

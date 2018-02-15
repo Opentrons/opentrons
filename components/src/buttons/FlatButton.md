@@ -1,12 +1,12 @@
 Basic usage:
 
 ```js
-  <FlatButton onClick={() => alert('you clicked me')}>
-    {'Click me!'}
-  </FlatButton>
+<FlatButton onClick={() => alert('you clicked me')}>
+  {'Click me!'}
+</FlatButton>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <FlatButton onClick={() => alert('you clicked me')} inverted>
     {'Click me!'}
   </FlatButton>
@@ -23,7 +23,7 @@ Disabled:
 </div>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <FlatButton onClick={() => alert("can't click me")} disabled inverted>
     {"Can't click"}
   </FlatButton>
@@ -33,14 +33,14 @@ Disabled:
 With icon:
 
 ```js
-  <div>
+<div>
   <FlatButton onClick={() => alert('you clicked me')} iconName='flask'>
     {'Click me!'}
   </FlatButton>
 </div>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <FlatButton onClick={() => alert('you clicked me')} iconName='flask' inverted>
     {'Click me!'}
   </FlatButton>
@@ -62,7 +62,7 @@ Use the inspector on this example to see that the "button" is a `<div>` with the
 </FlatButton>
 ```
 ```js
-<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+<div className='dark_background'>
   <FlatButton
     Component='div'
     role='button'

@@ -12,8 +12,10 @@ type ListItemProps = {
   onClick?: (event: SyntheticEvent<>) => void,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string,
-  className?: string,
+  /** if URL is specified NavLink can receive an active class name */
   activeClassName?: string,
+  /** Additional class name */
+  className?: string,
   /** if disabled, the onClick handler / NavLink will be disabled */
   isDisabled: boolean,
   /** name constant of the icon to display */

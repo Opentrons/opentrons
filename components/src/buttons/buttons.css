@@ -11,6 +11,7 @@
     color: var(--c-font-disabled);
     fill: var(--c-font-disabled);
     cursor: default;
+    pointer-events: none;
   }
 
   --button-default: {
@@ -25,6 +26,7 @@
     cursor: pointer;
     color: var(--c-font-dark);
     background: transparent;
+    border-radius: 2px;
 
     &:hover {
       background-color: color(var(--c-bg-light) shade(5%));
@@ -67,7 +69,6 @@
   @apply --button-default;
 
   width: 100%;
-  border-radius: 2px;
   color: var(--c-font-light);
   background-color: var(--c-bg-dark);
 
@@ -104,9 +105,9 @@
   }
 
   &:disabled,
-  &.disabled,
-  &:disabled:hover,
-  &.disabled:hover {
+  &.disabled {
+    @apply --button-disabled;
+
     background-color: color(var(--c-bg-dark) tint(70%));
     box-shadow: none;
     color: var(--c-font-disabled);
@@ -152,7 +153,7 @@
 
     &:disabled,
     &.disabled {
-      background-color: initial;
+      @apply --button-disabled;
     }
   }
 }
