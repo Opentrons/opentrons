@@ -37,7 +37,7 @@ function RunPanel (props: RunPanelProps) {
 
   return (
     <div>
-      {runMessage}
+      {readyToRun && runMessage}
       <RunButton onClick={run} disabled={isDisabled} />
     </div>
   )

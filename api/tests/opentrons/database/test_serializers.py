@@ -55,7 +55,8 @@ def test_one_serializer():
 
 
 def test_seralizer_all_containers():
-    plates = ldef.list_all_labware()
+    new_defs = ['GEB-tiprack-300ul', 'tube-rack-5ml-96']
+    plates = [item for item in ldef.list_all_labware() if item not in new_defs]
     for plate in plates:
         old_container = sqldb.load_container(plate)
 

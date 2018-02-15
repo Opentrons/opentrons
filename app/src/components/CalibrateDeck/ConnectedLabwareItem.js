@@ -15,7 +15,7 @@ import LabwareItem, {type LabwareItemProps} from './LabwareItem'
 type OwnProps = LabwareComponentProps & ContextRouter
 
 type StateProps = {
-  _calibrator?: Mount,
+  _calibrator?: ?Mount,
   _labware?: $PropertyType<LabwareItemProps, 'labware'>
 }
 
