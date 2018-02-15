@@ -10,7 +10,7 @@ import styles from './buttons.css'
  * background with white text
  */
 export default function PrimaryButton (props: ButtonProps) {
-  const className = cx(styles.button_primary, props.className)
+  const className = cx(styles.button_primary, props.className, {[styles.inverted]: props.inverted})
 
   return (
     <Button {...props} className={className}>

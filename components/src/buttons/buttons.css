@@ -2,35 +2,73 @@
 @import '..';
 
 :root {
-  --c-font-disabled: color(var(--c-font-light) shade(50%));
   --button-pad: 0.5rem;
+
+  --button-disabled : {
+    background-color: transparent;
+    font-weight: normal;
+    border-color: var(--c-font-disabled);
+    color: var(--c-font-disabled);
+    fill: var(--c-font-disabled);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  --button-default: {
+    position: relative;
+    line-height: 1.4;
+    border: none;
+    padding: var(--button-pad);
+    font-size: var(--fs-body-2);
+    font-weight: var(--fw-semibold);
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--c-font-dark);
+    background: transparent;
+    border-radius: 2px;
+
+    &:hover {
+      background-color: color(var(--c-bg-light) shade(5%));
+    }
+
+    &:active {
+      font-weight: var(--fw-regular);
+      background-color: color(var(--c-bg-light) shade(10%));
+    }
+
+    &:disabled,
+    &.disabled {
+      @apply --button-disabled;
+    }
+  }
+
+  --button-inverted: {
+    color: var(--c-font-light);
+    border-color: var(--c-font-light);
+
+    &:hover {
+      background-color: color(var(--c-bg-dark) tint(5%));
+    }
+
+    &:active {
+      font-weight: var(--fw-regular);
+      background-color: color(var(--c-bg-dark) tint(10%));
+    }
+
+    &:disabled,
+    &.disabled {
+      @apply --button-disabled;
+    }
+  }
 }
 
-.button_flat,
+/* TODO(ka, 2017-2-14): standardize primary button vars */
+
 .button_primary {
-  position: relative;
-  line-height: 1.4;
-  border: none;
-  padding: var(--button-pad);
-  font-size: var(--fs-body-2);
-  font-weight: var(--fw-semibold);
-  text-align: center;
-  text-transform: uppercase;
-  cursor: pointer;
-}
+  @apply --button-default;
 
-.button_primary[disabled],
-.button_primary.disabled,
-.button_flat[disabled],
-.button_flat.disabled {
-  font-weight: normal;
-  color: var(--c-font-disabled);
-  cursor: default;
-}
-
-.button_primary {
   width: 100%;
-  border-radius: 2px;
   color: var(--c-font-light);
   background-color: var(--c-bg-dark);
 
@@ -53,55 +91,52 @@
       0 8px 8px rgba(0, 0, 0, 0.24);
   }
 
+  &.inverted {
+    background-color: var(--c-bg-light);
+    color: var(--c-font-dark);
+
+    &:hover {
+      background-color: color(var(--c-bg-light) shade(5%));
+    }
+
+    &:active {
+      background-color: color(var(--c-bg-light) shade(10%));
+    }
+  }
+
   &:disabled,
   &.disabled {
+    @apply --button-disabled;
+
     background-color: color(var(--c-bg-dark) tint(70%));
     box-shadow: none;
+    color: var(--c-font-disabled);
   }
 }
 
 .button_flat {
+  @apply --button-default;
+
   width: 9rem;
-  color: var(--c-font-dark);
-  background-color: transparent;
 
-  &:hover {
-    background-color: color(var(--c-bg-light) shade(5%));
-  }
-
-  &:active {
-    font-weight: var(--fw-regular);
-    background-color: color(var(--c-bg-light) shade(10%));
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: initial;
+  &.inverted {
+    @apply --button-inverted;
   }
 }
 
 .button_outline {
-  background-color: transparent;
-  box-shadow: none;
-  border: 1px solid var(--c-font-light);
+  @apply --button-default;
 
-  &:hover,
-  &:active {
-    color: color(var(--c-font-light) shade(10%));
-    border-color: color(var(--c-font-light) shade(10%));
-    background-color: transparent;
-    box-shadow: none;
-  }
+  width: 9rem;
+  border: 1px solid var(--c-font-dark);
 
-  &:disabled,
-  &.disabled {
-    color: color(var(--c-font-light) shade(20%));
-    border-color: color(var(--c-font-light) shade(20%));
-    background-color: initial;
+  &.inverted {
+    @apply --button-inverted;
   }
 }
 
 /* style for IconButton */
+
 .button_icon {
   width: auto;
 
@@ -109,6 +144,17 @@
     display: block;
     height: 100%;
     width: 100%;
+  }
+
+  &.inverted {
+    color: white;
+    fill: white;
+    stroke: white;
+
+    &:disabled,
+    &.disabled {
+      @apply --button-disabled;
+    }
   }
 }
 
