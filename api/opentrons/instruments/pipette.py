@@ -504,10 +504,17 @@ class Pipette:
         """
         assert self.tip_attached
 
-        # first go to the destination
+        placeable = None
         if location:
             placeable, _ = unpack_location(location)
+
+        # go to top of source, if not already there
+        if (placeable and placeable != self.previous_placeable):
             self.move_to(placeable.top())
+        # else, go to top of previous well, if currently empty
+        elif self.current_volume == 0 and self.previous_placeable:
+            # placeable is either None, or we're in the same well as before
+            self.move_to(self.previous_placeable.top())
 
         # setup the plunger above the liquid
         if self.current_volume == 0:
@@ -528,16 +535,10 @@ class Pipette:
         """
         assert self.tip_attached
 
-        # first go to the destination
-        if location:
-            placeable, _ = unpack_location(location)
-            self.move_to(placeable.top())
-
-        # then go inside the location
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(min(location.z_size(), 1))
-            self.move_to(location, strategy='direct')
+            self.move_to(location)
 
     def retract(self, safety_margin=10):
         '''
