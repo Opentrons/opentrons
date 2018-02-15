@@ -29,6 +29,35 @@ def unpack_location(location):
     return (placeable, Vector(coordinates))
 
 
+def location_to_list(loc):
+    # might be a location tuple, or list of location tuples
+    # like what's returned from well.top()
+    if isinstance(loc, tuple):
+        loc = unpack_location(loc)[0]
+    if isinstance(loc, list):
+        if isinstance(loc[0], (WellSeries, list)):
+            loc = [well for series in loc for well in series]
+        else:
+            loc = [
+                unpack_location(l)[0]
+                for l in loc
+            ]
+
+    if isinstance(loc, WellSeries):
+        # TODO(artyom, 20171107): this is to handle a case when
+        # container.rows('1', '2') returns a WellSeries of WellSeries
+        # the data structure should be fixed when WellSeries is phased out
+        if isinstance(loc[0], WellSeries):
+            loc = [well for series in loc for well in series]
+        else:
+            loc = list(loc)
+
+    # ensure it returns either list or tuple
+    if not (isinstance(loc, list) or isinstance(loc, tuple)):
+        loc = [loc]
+    return loc
+
+
 def get_container(location):
     obj, _ = unpack_location(location)
 
