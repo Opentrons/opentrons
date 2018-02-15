@@ -21,7 +21,7 @@ export default function Prompt (props: Props) {
         To calibrate deck, position full tipracks and empty labware in their
         designated slots as illustrated below
       </p>
-      <OutlineButton className={styles.prompt_button} onClick={onClick} light>
+      <OutlineButton className={styles.prompt_button} onClick={onClick} inverted>
         {`Continue moving to ${labwareType}`}
       </OutlineButton>
       <p className={styles.prompt_details}>
