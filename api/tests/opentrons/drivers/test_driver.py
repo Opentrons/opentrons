@@ -1,10 +1,29 @@
 from threading import Thread
+import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
 
 
 def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
+
+
+def test_parse_axis_values(smoothie):
+    from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
+    good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+    bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
+    res = drv._parse_axis_values(good_data)
+    expected = {
+        'X': 10,
+        'Y': 20,
+        'Z': 30,
+        'A': 40,
+        'B': 50,
+        'C': 60,
+    }
+    assert res == expected
+    with pytest.raises(drv.ParseError):
+        drv._parse_axis_values(bad_data)
 
 
 def test_plunger_commands(smoothie, monkeypatch):
