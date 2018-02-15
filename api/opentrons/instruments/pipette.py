@@ -507,21 +507,24 @@ class Pipette:
         placeable = None
         if location:
             placeable, _ = unpack_location(location)
+            # go to top of source, if not already there
+            if placeable != self.previous_placeable:
+                self.move_to(placeable.top())
+        else:
+            placeable = self.previous_placeable
 
-        # go to top of source, if not already there
-        if (placeable and placeable != self.previous_placeable):
-            self.move_to(placeable.top())
-        # else, go to top of previous well, if currently empty
-        elif self.current_volume == 0 and self.previous_placeable:
-            # placeable is either None, or we're in the same well as before
-            self.move_to(self.previous_placeable.top())
-
-        # setup the plunger above the liquid
+        # if pipette is currently empty, ensure the plunger is at "bottom"
         if self.current_volume == 0:
-            self.robot.poses = self.instrument_actuator.move(
-                self.robot.poses,
-                x=self._get_plunger_position('bottom')
-            )
+            pos, _, _ = pose_tracker.absolute(
+                self.robot.poses, self.instrument_actuator)
+            if pos != self._get_plunger_position('bottom'):
+                # move to top of well to avoid touching liquid
+                if placeable:
+                    self.move_to(placeable.top())
+                self.robot.poses = self.instrument_actuator.move(
+                    self.robot.poses,
+                    x=self._get_plunger_position('bottom')
+                )
 
         # then go inside the location
         if location:
