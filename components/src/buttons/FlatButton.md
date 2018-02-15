@@ -1,25 +1,50 @@
 Basic usage:
 
 ```js
-<FlatButton onClick={() => alert('you clicked me')}>
-  {'Click me!'}
-</FlatButton>
+  <FlatButton onClick={() => alert('you clicked me')}>
+    {'Click me!'}
+  </FlatButton>
+```
+```js
+<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+  <FlatButton onClick={() => alert('you clicked me')} inverted>
+    {'Click me!'}
+  </FlatButton>
+</div>
 ```
 
 Disabled:
 
 ```js
-<FlatButton onClick={() => alert("can't click me")} disabled>
-  {"Can't click"}
-</FlatButton>
+  <div>
+  <FlatButton onClick={() => alert("can't click me")} disabled>
+    {"Can't click"}
+  </FlatButton>
+</div>
+```
+```js
+<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+  <FlatButton onClick={() => alert("can't click me")} disabled inverted>
+    {"Can't click"}
+  </FlatButton>
+</div>
 ```
 
 With icon:
 
 ```js
-<FlatButton onClick={() => alert('you clicked me')} iconName='flask'>
-  {'Click me!'}
-</FlatButton>
+  <div>
+  <FlatButton onClick={() => alert('you clicked me')} iconName='flask'>
+    {'Click me!'}
+  </FlatButton>
+</div>
+```
+```js
+<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+  <FlatButton onClick={() => alert('you clicked me')} iconName='flask' inverted>
+    {'Click me!'}
+  </FlatButton>
+</div>
 ```
 
 Sometimes you need `<FlatButton>` that isn't a native `<button>`. To do this, pass a string or React component to the `Component` prop. If you pass `Component`, any extra props will get passed to your custom component.
@@ -35,4 +60,17 @@ Use the inspector on this example to see that the "button" is a `<div>` with the
 >
   {"I'm a div!"}
 </FlatButton>
+```
+```js
+<div style={{backgroundColor: 'rgba(0,0,0,0.9)'}}>
+  <FlatButton
+    Component='div'
+    role='button'
+    iconName={'flask'}
+    onClick={() => alert('click!')}
+    inverted
+  >
+    {"I'm a div!"}
+  </FlatButton>
+</div>
 ```

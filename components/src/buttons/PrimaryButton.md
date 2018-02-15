@@ -7,6 +7,13 @@ Basic usage:
   </PrimaryButton>
 </div>
 ```
+```js
+<div style={{width: '16rem'}}>
+  <PrimaryButton onClick={() => alert('you clicked me')} inverted>
+    {'Click for alert'}
+  </PrimaryButton>
+</div>
+```
 
 Disabled:
 

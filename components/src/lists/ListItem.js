@@ -13,6 +13,7 @@ type ListItemProps = {
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string,
   className?: string,
+  activeClassName?: string,
   /** if disabled, the onClick handler / NavLink will be disabled */
   isDisabled: boolean,
   /** name constant of the icon to display */
@@ -25,7 +26,7 @@ type ListItemProps = {
  *
  */
 export default function ListItem (props: ListItemProps) {
-  const {url, isDisabled, iconName} = props
+  const {url, isDisabled, iconName, activeClassName} = props
   const onClick = props.onClick && !isDisabled
     ? props.onClick
     : undefined
@@ -54,7 +55,7 @@ export default function ListItem (props: ListItemProps) {
           onClick={onClick}
           disabled={isDisabled}
           className={className}
-          activeClassName={styles.active}
+          activeClassName={activeClassName}
         >
           {itemIcon}
           {children}

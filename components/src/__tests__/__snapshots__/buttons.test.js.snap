@@ -102,9 +102,20 @@ exports[`buttons IconButton renders correctly 1`] = `
 </button>
 `;
 
+exports[`buttons Inverted OutlineButton renders correctly 1`] = `
+<button
+  className="button_outline c inverted"
+  disabled={undefined}
+  onClick={[Function]}
+  title="t"
+>
+  children
+</button>
+`;
+
 exports[`buttons OutlineButton renders correctly 1`] = `
 <button
-  className="button_primary button_outline c"
+  className="button_outline c"
   disabled={undefined}
   onClick={[Function]}
   title="t"
@@ -115,7 +126,7 @@ exports[`buttons OutlineButton renders correctly 1`] = `
 
 exports[`buttons OutlineButton with iconName renders correctly 1`] = `
 <button
-  className="button_primary button_outline c"
+  className="button_outline c"
   disabled={undefined}
   onClick={[Function]}
   title="t"

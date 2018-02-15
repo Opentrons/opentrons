@@ -17,7 +17,7 @@ type Props =
  * both Button _and_ Icon. Use `name` to specify icon name.
  */
 export default function IconButton (props: Props) {
-  const className = cx(styles.button_icon, props.className)
+  const className = cx(styles.button_icon, props.className, {[styles.inverted]: props.inverted})
 
   return (
     <FlatButton {...props} className={className} iconName={undefined}>
