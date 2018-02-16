@@ -6,7 +6,7 @@ import type {RobotService} from '../robot'
 import type {ApiResponse} from './types'
 import client, {type ClientResponseError} from './client'
 
-type HealthResponse = {
+type HealthInfo = {
   api_version: string,
   fw_version: string,
 }
@@ -22,7 +22,7 @@ export type HealthSuccessAction = {|
   type: 'api:HEALTH_SUCCESS',
   payload: {|
     robot: RobotService,
-    health: HealthResponse
+    health: HealthInfo,
   |}
 |}
 
@@ -30,7 +30,7 @@ export type HealthFailureAction = {|
   type: 'api:HEALTH_FAILURE',
   payload: {|
     robot: RobotService,
-    error: ClientResponseError
+    error: ClientResponseError,
   |}
 |}
 
@@ -39,7 +39,7 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
-export type RobotHealth = ApiResponse<HealthResponse>
+export type RobotHealth = ApiResponse<HealthInfo>
 
 export type HealthState = {
   [robotName: string]: RobotHealth
@@ -50,8 +50,8 @@ export function fetchHealth (robot: RobotService): ThunkAction {
     dispatch(healthRequest(robot))
 
     return client(robot, 'GET', 'health')
-      .then((maybeHealth) => dispatch(healthResponse(null, robot, maybeHealth)))
-      .catch((error) => dispatch(healthResponse(error, robot)))
+      .then((health) => dispatch(healthSuccess(robot, health)))
+      .catch((error) => dispatch(healthFailure(robot, error)))
   }
 }
 
@@ -59,31 +59,18 @@ function healthRequest (robot: RobotService): HealthRequestAction {
   return {type: 'api:HEALTH_REQUEST', payload: {robot}}
 }
 
-function healthResponse (
-  error: ?ClientResponseError,
+function healthSuccess (
   robot: RobotService,
-  maybeHealth?: any
-): HealthSuccessAction | HealthFailureAction {
-  if (error || typeof maybeHealth !== 'object') {
-    return {
-      type: 'api:HEALTH_FAILURE',
-      payload: {
-        robot,
-        error: error || {name: 'Error', message: 'malformed /health response'}
-      }
-    }
-  }
+  health: HealthInfo
+): HealthSuccessAction {
+  return {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
+}
 
-  return {
-    type: 'api:HEALTH_SUCCESS',
-    payload: {
-      robot,
-      health: {
-        api_version: maybeHealth.api_version,
-        fw_version: maybeHealth.fw_version
-      }
-    }
-  }
+function healthFailure (
+  robot: RobotService,
+  error: ClientResponseError
+): HealthFailureAction {
+  return {type: 'api:HEALTH_FAILURE', payload: {robot, error}}
 }
 
 export function healthReducer (

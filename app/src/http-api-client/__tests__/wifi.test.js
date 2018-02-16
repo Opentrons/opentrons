@@ -28,10 +28,14 @@ describe('wifi', () => {
   })
 
   describe('fetchWifiList action creator', () => {
-    const list = ['ssid-1', 'ssid-2', 'ssid-3']
+    const list = [
+      {ssid: 'ssid-1', signal: 42, active: true},
+      {ssid: 'ssid-2', signa: 43, active: false},
+      {ssid: 'ssid-3', signal: null, active: false}
+    ]
 
     test('calls GET /wifi/list', () => {
-      client.__setMockResponse(list)
+      client.__setMockResponse({list})
 
       return fetchWifiList(robot)(() => {})
         .then(() => {
@@ -46,7 +50,7 @@ describe('wifi', () => {
         {type: 'api:WIFI_SUCCESS', payload: {robot, list, path: 'list'}}
       ]
 
-      client.__setMockResponse(list)
+      client.__setMockResponse({list})
 
       return store.dispatch(fetchWifiList(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))

@@ -40,7 +40,7 @@ export default function client (
   method: Method,
   path: string,
   body?: {}
-): Promise<{}> {
+): Promise<any> {
   const url = `http://${robot.ip}:${robot.port}/${path}`
   const options = {
     method,
@@ -53,7 +53,7 @@ export default function client (
   return fetch(url, options).then(jsonFromResponse, fetchErrorFromError)
 }
 
-function jsonFromResponse (response: Response): Promise<{}> {
+function jsonFromResponse (response: Response): Promise<*> {
   if (!response.ok) {
     return Promise.reject(ResponseError(response))
   }
@@ -61,6 +61,6 @@ function jsonFromResponse (response: Response): Promise<{}> {
   return response.json().catch(fetchErrorFromError)
 }
 
-function fetchErrorFromError (error: Error): Promise<{}> {
+function fetchErrorFromError (error: Error): Promise<*> {
   return Promise.reject(FetchError(error))
 }
