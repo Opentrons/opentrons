@@ -112,7 +112,8 @@ def _setup_container(container_name):
 
     # Database.load_container throws ValueError when a container name is not
     # found.
-    except ValueError:
+    except Exception as e:
+        log.debug("This is the exception {}".format(e))
         container = old_container_loading.get_persisted_container(
             container_name)
         rotated_container = database_migration.rotate_container_for_alpha(
