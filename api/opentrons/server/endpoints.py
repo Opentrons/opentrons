@@ -30,23 +30,37 @@ async def wifi_list(request):
     server, but will not be set during development on a laptop, or while
     running the server during test on CI.
     """
-    ssids = ''
+    res = {"list": []}
     if ENABLE_NMCLI:
         try:
-            proc = subprocess.run(["nmcli", "-terse", "--fields",
-                                   "ssid,signal", "device", "wifi", "list"],
+            proc = subprocess.run(["nmcli", "--terse",
+                                   "--fields", "ssid,signal,active",
+                                   "device", "wifi", "list"],
                                   stdout=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            ssids = "CalledProcessError: {}".format(e.stdout)
+            res = "CalledProcessError: {}".format(e.stdout)
         except FileNotFoundError as e:
-            ssids = "FileNotFoundError: {}".format(e)
+            res = "FileNotFoundError: {}".format(e)
         else:
-            splitres = proc.stdout.decode().split("\n")
-            ssids = repr(json.dumps([x.split(":")[0] for x in splitres]))
+            lines = proc.stdout.decode().split("\n")
+            networks = [x.split(":") for x in lines]
+            res["list"] = [
+                {
+                    "ssid": n[0],
+                    "signal": int(n[1]) if n[1].isdigit() else None,
+                    "active": n[2].lower() == "yes"
+                }
+                for n in networks if len(n) >= 3
+            ]
     else:
-        ssids = json.dumps(['a', 'b', 'c'])
+        res["list"] = [
+            {"ssid": "a", "signal": 42, "active": True},
+            {"ssid": "b", "signal": 43, "active": False},
+            {"ssid": "c", "signal": None, "active": False}
+        ]
+
     return web.json_response(
-        body=ssids
+        body=json.dumps(res)
     )
 
 
@@ -89,7 +103,7 @@ async def wifi_status(request):
 
     Options are:
       "none" - no connection to router or network
-      "portal" - this device is acting as a network portal
+      "portal" - device behind a captive portal and cannot reach full internet
       "limited" - connection to router but not internet
       "full" - connection to router and internet
       "unknown" - an exception occured while trying to determine status

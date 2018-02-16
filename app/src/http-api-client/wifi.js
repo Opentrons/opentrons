@@ -6,11 +6,17 @@ import type {RobotService} from '../robot'
 import type {ApiResponse} from './types'
 import client, {type ClientResponseError} from './client'
 
-type SsidList = string[]
+type NetworkList = Array<{
+  ssid: string,
+  signal: ?number,
+  active: boolean
+}>
 
 type Status = 'none' | 'portal' | 'limited' | 'full' | 'unknown' | 'testing'
 
-type ListResponse = SsidList
+type ListResponse = {
+  list: NetworkList,
+}
 
 type StatusResponse = {
   status: Status,
@@ -33,7 +39,7 @@ export type WifiSuccessAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-    list?: SsidList,
+    list?: NetworkList,
     status?: Status,
   |}
 |}
@@ -111,7 +117,7 @@ function wifiRequest (
 function wifiSuccess (
   robot: RobotService,
   path: RequestPath,
-  response: {}
+  response: any
 ): WifiSuccessAction {
   const action: WifiSuccessAction = {
     type: 'api:WIFI_SUCCESS',
@@ -119,9 +125,9 @@ function wifiSuccess (
   }
 
   if (path === LIST_PATH) {
-    action.payload.list = listFromResponse(response)
+    action.payload.list = (response: ListResponse).list
   } else if (path === STATUS_PATH) {
-    action.payload.status = statusFromResponse(response)
+    action.payload.status = (response: StatusResponse).status
   }
 
   return action
@@ -133,31 +139,6 @@ function wifiFailure (
   error: ClientResponseError
 ): WifiFailureAction {
   return {type: 'api:WIFI_FAILURE', payload: {robot, path, error}}
-}
-
-function listFromResponse (response: {}): SsidList {
-  return Array.isArray(response)
-    ? response.map((ssid) => `${ssid}`)
-    : []
-}
-
-function isStatus (maybeStatus: mixed): boolean %checks {
-  return (
-    maybeStatus === 'none' ||
-    maybeStatus === 'portal' ||
-    maybeStatus === 'limited' ||
-    maybeStatus === 'full' ||
-    maybeStatus === 'unknown' ||
-    maybeStatus === 'testing'
-  )
-}
-
-function statusFromResponse (response: {}): Status {
-  if (response && response.status && isStatus(response.status)) {
-    return response.status
-  }
-
-  return 'unknown'
 }
 
 function reduceWifiRequest (
@@ -172,11 +153,7 @@ function reduceWifiRequest (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {
-        ...stateByNameByPath,
-        inProgress: true,
-        error: null
-      }
+      [path]: {...stateByNameByPath, error: null, inProgress: true}
     }
   }
 }
@@ -185,18 +162,14 @@ function reduceWifiSuccess (
   state: WifiState,
   action: WifiSuccessAction
 ): WifiState {
-  const {payload: {path, robot: {name}}} = action
+  const {payload: {path, [path]: response, robot: {name}}} = action
   const stateByName = state[name] || {}
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {
-        inProgress: false,
-        error: null,
-        response: action.payload[path]
-      }
+      [path]: {response, error: null, inProgress: false}
     }
   }
 }
@@ -213,11 +186,7 @@ function reduceWifiFailure (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {
-        ...stateByNameByPath,
-        inProgress: false,
-        error
-      }
+      [path]: {...stateByNameByPath, error, inProgress: false}
     }
   }
 }
