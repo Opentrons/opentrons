@@ -1,0 +1,56 @@
+@import '@opentrons/components';
+
+/* TODO Ian 2018-02-16: this is copied from LabwareContainer.css in complib -- should it be imported in index.css? */
+:root {
+  --round-slot: {
+    clip-path: url(#roundSlotClipPath);
+  };
+
+  --slot-overlay: {
+    @apply --round-slot;
+
+    fill: black;
+  };
+}
+
+.slot_overlay {
+  @apply --slot-overlay;
+
+  & text {
+    font-size: var(--fs-caption);
+  }
+
+  & .overlay_panel {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.pass_thru_mouse {
+  pointer-events: none;
+}
+
+.appear_on_mouseover {
+  opacity: 0;
+}
+
+.appear_on_mouseover:hover {
+  opacity: 0.75;
+}
+
+.clickable_text {
+  color: var(--c-med-gray);
+  fill: currentColor;
+  cursor: pointer;
+  transform: translate(20%, 0);
+  text-transform: uppercase;
+
+  & .icon {
+    transform: translate(-60%, -12%);
+  }
+
+  &:hover {
+    color: white;
+    fill: currentColor;
+  }
+}
