@@ -1,6 +1,7 @@
-import { connect } from 'react-redux'
+// @flow
+import {connect} from 'react-redux'
 
-import { selectors } from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/reducers'
 import {
   openIngredientSelector,
 
@@ -14,8 +15,9 @@ import {
   setCopyLabwareMode,
   copyLabware
 } from '../labware-ingred/actions'
+import {selectors as steplistSelectors} from '../steplist/reducers'
 
-import { LabwareOnDeck } from '../components/labware'
+import {LabwareOnDeck} from '../components/labware'
 
 export default connect(
   (state, ownProps) => {
@@ -28,7 +30,8 @@ export default connect(
       canAdd: selectors.canAdd(state),
       activeModals: selectors.activeModals(state),
       labwareToCopy: selectors.labwareToCopy(state),
-      highlighted: selectors.selectedContainerSlot(state) === ownProps.slotName || selectors.canAdd(state) === ownProps.slotName
+      highlighted: selectors.selectedContainerSlot(state) === ownProps.slotName || selectors.canAdd(state) === ownProps.slotName,
+      deckSetupMode: steplistSelectors.deckSetupMode(state)
     }
   },
   {

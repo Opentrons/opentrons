@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {TitleBar} from '@opentrons/components'
 
+import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
@@ -28,7 +29,7 @@ export default function ProtocolEditor () {
           <div className={styles.main_page_content}>
             <ConnectedMoreOptionsModal />
             <ConnectedStepEditForm />
-            {'Deck map goes here! '.repeat(200)}
+            <ConnectedDeckSetup />
           </div>
         </div>
       </div>
