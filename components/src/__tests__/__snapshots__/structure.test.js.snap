@@ -1,5 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Card renders Card correctly 1`] = `
+<section
+  className="card"
+>
+  <h3
+    className="card_title"
+  >
+    title
+  </h3>
+  <div
+    className="card_content"
+  >
+    children children children
+  </div>
+</section>
+`;
+
+exports[`LabeledValue renders LabeledValue correctly 1`] = `
+<div
+  className="labeled_value"
+>
+  <p>
+    Label
+    :
+  </p>
+  <p>
+    Value
+  </p>
+</div>
+`;
+
 exports[`NavButton renders nav button with icon correctly 1`] = `
 <button
   className="button"

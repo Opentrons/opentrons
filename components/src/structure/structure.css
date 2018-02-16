@@ -1,6 +1,14 @@
 /* TitleBar styles */
 @import '..';
 
+:root {
+  --card-disabled: {
+    color: var(--c-font-disabled);
+    fill: var(--c-font-disabled);
+    background-color: transparent;
+  }
+}
+
 .title_bar {
   display: flex;
   align-items: center;
@@ -74,4 +82,39 @@
 
 .active_tab_link .tab_title {
   font-weight: var(--fw-bold);
+}
+
+/* Card and card content styles */
+.card {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.33);
+  padding: 1rem;
+}
+
+.card_title {
+  @apply --font-header-dark;
+
+  font-weight: 400;
+}
+
+.card_content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.card_column {
+  flex-direction: column;
+}
+
+.disabled {
+  pointer-events: none;
+  background-color: transparent;
+
+  & * {
+    @apply --card-disabled;
+  }
+}
+
+.labeled_value {
+  @apply --font-body-1-dark;
 }
