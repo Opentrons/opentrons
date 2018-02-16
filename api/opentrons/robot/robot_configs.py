@@ -61,6 +61,7 @@ robot_config = namedtuple(
     'robot_config',
     [
         'name',
+        'version',
         'steps_per_mm',
         'acceleration',
         'current',
@@ -118,6 +119,7 @@ def _get_default():
 
 default = robot_config(
     name='Ada Lovelace',
+    version=1,
     steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
     acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
     current='M907 ' + DEFAULT_CURRENT_STRING,
@@ -165,7 +167,9 @@ def load(filename=None):
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
-            result = robot_config(**merge([result._asdict(), local]))
+            local = _check_version_and_update(local)
+            result = robot_config(**merge([default._asdict(), local]))
+
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
 
@@ -194,3 +198,14 @@ def clear(filename=None):
     log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)
+
+
+def _check_version_and_update(config_json):
+    version = config_json.get('version', 0)
+    if version == 0:
+        # add a version number to the config
+        config_json['version'] = 1
+        # overwrite instrument_offset to the default
+        config_json['instrument_offset'] = default.instrument_offset.copy()
+        return _check_version_and_update(config_json)
+
