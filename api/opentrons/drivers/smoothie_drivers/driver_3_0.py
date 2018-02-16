@@ -57,6 +57,7 @@ GCODES = {'HOME': 'G28.2',
           'LIMIT_SWITCH_STATUS': 'M119',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
+          'RELATIVE_COORDS': 'G91',
           'RESET_FROM_ERROR': 'M999',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
@@ -340,17 +341,22 @@ class SmoothieDriver_3_0_0:
     def _home_y(self):
         # home the Y at normal speed (fast)
         self._send_command(GCODES['HOME'] + 'Y')
-        self.update_position(default={'Y': HOMED_POSITION.get('Y')})
+
         # slow the maximum allowed speed on Y axis
         self.push_axis_max_speed()
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
-        # move away from the switch
-        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
-        # home again, but slower now
+
+        # retract, then home, then retract again
+        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+            GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
+            GCODES['MOVE'],  # move 3 millimeters away from switch
+            str(-Y_RETRACT_DISTANCE),
+            GCODES['ABSOLUTE_COORDS']  # set back to absolute coordinate system
+        )
+        self._send_command(relative_retract_command)
         self._send_command(GCODES['HOME'] + 'Y')
-        self.update_position()
-        # move away from the switch again
-        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
+        self._send_command(relative_retract_command)
+
         # bring max speeds back to normal
         self.pop_axis_max_speed()
 
