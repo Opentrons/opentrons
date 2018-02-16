@@ -6,7 +6,8 @@ from numpy import add, subtract
 from opentrons import commands, containers, drivers, helpers
 from opentrons.broker import subscribe
 from opentrons.containers import Container
-from opentrons.data_storage import database
+from opentrons.data_storage import database, old_container_loading,\
+    database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
@@ -108,25 +109,29 @@ class InstrumentMotor(object):
 def _setup_container(container_name):
     try:
         container = database.load_container(container_name)
-        container.properties['type'] = container_name
-
-        container_x, container_y, container_z = container._coordinates
-
-        # infer z from height
-        if container_z == 0 and 'height' in container[0].properties:
-            container_z = container[0].properties['height']
-
-        from opentrons.util.vector import Vector
-        container._coordinates = Vector(
-            container_x,
-            container_y,
-            container_z)
 
     # Database.load_container throws ValueError when a container name is not
     # found.
     except ValueError:
-        container = None
-        print("Container not found in database")
+        container = old_container_loading.get_persisted_container(
+            container_name)
+        rotated_container = database_migration.rotate_container_for_alpha(
+            container)
+        database.save_new_container(rotated_container, container_name)
+
+    container.properties['type'] = container_name
+
+    container_x, container_y, container_z = container._coordinates
+
+    # infer z from height
+    if container_z == 0 and 'height' in container[0].properties:
+        container_z = container[0].properties['height']
+
+    from opentrons.util.vector import Vector
+    container._coordinates = Vector(
+        container_x,
+        container_y,
+        container_z)
 
     return container
 

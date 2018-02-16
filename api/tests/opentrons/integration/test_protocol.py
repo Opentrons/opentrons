@@ -58,10 +58,3 @@ class ProtocolTestCase(unittest.TestCase):
         # Check that well location is the same on the robot as the pipette
         self.assertEqual(self.robot._deck['12']['fixed-trash'][0], trash)
         self.assertTrue(deck.has_container(tiprack))
-
-    def test_unknown_container(self):
-
-        incorrect_container = containers_load(
-            self.robot, 'this-is-not-a-container', '5')
-
-        self.assertRaises(ValueError, incorrect_container)
