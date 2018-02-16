@@ -1,11 +1,12 @@
 // @flow
-// http api actions and action types
+// health http api module
 import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
+import type {ApiResponse} from './types'
 import client, {type ClientResponseError} from './client'
 
-export type HealthResponse = {
+type HealthResponse = {
   api_version: string,
   fw_version: string,
 }
@@ -38,18 +39,10 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
-export type RobotHealth = {
-  /** request in progress flag */
-  inProgress: boolean,
-  /** possible error response */
-  error: ?ClientResponseError,
-  /** possible success response */
-  response: ?HealthResponse
-}
+export type RobotHealth = ApiResponse<HealthResponse>
 
 export type HealthState = {
-  /** robot name */
-  [string]: RobotHealth
+  [robotName: string]: RobotHealth
 }
 
 export function fetchHealth (robot: RobotService): ThunkAction {
@@ -67,7 +60,7 @@ function healthRequest (robot: RobotService): HealthRequestAction {
 }
 
 function healthResponse (
-  error: ?Error,
+  error: ?ClientResponseError,
   robot: RobotService,
   maybeHealth?: any
 ): HealthSuccessAction | HealthFailureAction {
@@ -134,6 +127,6 @@ export function healthReducer (
   return state
 }
 
-export function selectHealth (state: State) {
+export function selectHealth (state: State): HealthState {
   return state.api.health
 }

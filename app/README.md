@@ -27,11 +27,12 @@ make dev
 
 At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
- variable   | default      | description
------------ | ------------ | -------------------------------------------------
- `NODE_ENV` | `production` | Run environment: production, development, or test
- `DEBUG`    | unset        | Runs the app in debug mode
- `PORT`     | `8090`       | Development server port
+ variable          | default      | description
+------------------ | ------------ | ----------------------------------------------
+ `NODE_ENV`        | `production` | Environment: production, development, or test
+ `DEBUG`           | unset        | Runs the app in debug mode
+ `PORT`            | `8090`       | Development server port
+ `SKIP_WIRED_POLL` | unset        | Turn off polling for directly connected wired robots
 
 **Note:** you may want to be running the Opentrons API in a different terminal while developing the app. Please see [the contributing guide][contributing-guide-running-the-api] for API specific instructions.
 
@@ -48,7 +49,9 @@ The UI stack is built using:
 Some important directories:
 
 *   `app/src` — Client-side React app run in Electron's [renderer process][electron-renderer]
-*   `app/src/rpc` - Opentrons API RPC client (see `api/opentrons/server`)
+*   API clients (see [`api/opentrons/server`][api-server-source])
+    *   `app/src/rpc` - RPC API client
+    *   `app/src/http-api-client` - HTTP API client
 *   `app/webpack` - Webpack configuration helpers
 
 ## testing
@@ -99,6 +102,7 @@ ANALYZER=true make
 [contributing-guide-setup]: ../CONTRIBUTING.md#development-setup
 [contributing-guide-running-the-api]: ../CONTRIBUTING.md#opentrons-api
 [app-shell-readme-build]: ../app-shell/README.md#building
+[api-server-source]: ../api/opentrons/server
 [electron]: https://electron.atom.io/
 [electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
