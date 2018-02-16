@@ -114,6 +114,8 @@ def _setup_container(container_name):
     # found.
     except Exception as e:
         log.debug("This is the exception {}".format(e))
+        old_container_loading.load_all_containers_from_disk()
+
         container = old_container_loading.get_persisted_container(
             container_name)
         rotated_container = database_migration.rotate_container_for_alpha(
@@ -121,7 +123,6 @@ def _setup_container(container_name):
         database.save_new_container(rotated_container, container_name)
 
     container.properties['type'] = container_name
-
     container_x, container_y, container_z = container._coordinates
 
     # infer z from height
