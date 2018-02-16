@@ -347,7 +347,7 @@ class SmoothieDriver_3_0_0:
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
 
         # retract, then home, then retract again
-        relative_retract_command = '{0} {1}{2} {3}'.format(
+        relative_retract_command = '{0} {1}Y{2} {3}'.format(
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
             GCODES['MOVE'],  # move 3 millimeters away from switch
             str(-Y_RETRACT_DISTANCE),
