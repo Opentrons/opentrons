@@ -59,12 +59,10 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
         ['G28.2Y M400'],                        # home Y
-        ['M114.2 M400'],                       # Get position
         ['M203.1 Y8 M400'],                     # lower speed on Y for retract
-        ['G0.+ M400'],                          # retract Y
+        ['G91 G0-3 G90'],                          # retract Y
         ['G28.2Y M400'],                        # home Y
-        ['M114.2 M400'],                       # Get position
-        ['G0.+ M400'],                          # retract Y
+        ['G91 G0-3 G90'],                          # retract Y
         ['M203.1 A100 B70 C70 X600 Y400 Z100 M400'],  # return to norm current
         ['M114.2 M400']                       # Get position
     ]
