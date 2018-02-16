@@ -6,7 +6,7 @@ import styles from './modals.css'
 
 type ModalProps = {
   /** handler to close the modal (attached to `Overlay` onClick) */
-  onCloseClick: (event: SyntheticEvent<>) => void,
+  onCloseClick?: (event: SyntheticEvent<>) => void,
   /** modal contents */
   children: React.Node,
   /** classes to apply */
