@@ -68,7 +68,7 @@ async def wifi_configure(request):
         jbody = json.loads(body)
     except Exception as e:
         result = "Error: {}, type: {}".format(e, type(e))
-        log.debug(result)
+        log.warning(result)
     else:
         if ENABLE_NMCLI:
             cmd = 'nmcli device wifi connect {} password "{}"'.format(
@@ -78,7 +78,7 @@ async def wifi_configure(request):
         else:
             result = "Configuration successful. SSID: {}, PSK: {}".format(
                 jbody['ssid'], jbody['psk'])
-    log.debug("Wifi configure result: {}".format(result))
+    log.info("Wifi configure result: {}".format(result))
     return web.Response(text=result)
 
 

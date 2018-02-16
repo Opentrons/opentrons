@@ -21,7 +21,7 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
-        # TODO(artyom, 20171006): with axis removed from the instrument
+        # Although axis has been deprecated from the instrument
         # we still need to pass it to the UI for now
         # Warning: this does not correspond to the Smoothie axis!
         self.axis = 'a' if self.mount == 'right' else 'b'

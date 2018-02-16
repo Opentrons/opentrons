@@ -82,15 +82,14 @@ class Server(object):
         def task_done(future):
             exception = future.result()
             if exception:
-                log.warning('Send task for socket {0}'.format(_id))
-            log.info('Send task for {0} finished'.format(_id))
+                log.debug('Send task for socket {0}'.format(_id))
+            log.debug('Send task for {0} finished'.format(_id))
 
         async def send_task(socket, queue):
             while True:
                 payload = await queue.get()
                 if socket.closed:
-                    log.warning('Websocket {0} closed'  # noqa
-                        .format(id(_id)))
+                    log.debug('Websocket {0} closed'.format(id(_id)))
                     break
 
                 # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
@@ -100,7 +99,7 @@ class Server(object):
         queue = Queue(loop=self.loop)
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
-        log.info('Send task for {0} started'.format(_id))
+        log.debug('Send task for {0} started'.format(_id))
 
         return (task, queue)
 
@@ -142,8 +141,9 @@ class Server(object):
         # upgrade to Websockets
         await client.prepare(request)
 
-        log.info('Tasks: {0}'.format(self.tasks))
-        log.info('Clients: {0}'.format(self.clients))
+        log.info('Opening Websocket {0}'.format(id(client)))
+        log.debug('Tasks: {0}'.format(self.tasks))
+        log.debug('Clients: {0}'.format(self.clients))
 
         try:
             log.debug('Sending root info to {0}'.format(client_id))
@@ -160,14 +160,14 @@ class Server(object):
             self.clients[client] = self.send_worker(client)
             # Async receive client data until websocket is closed
             async for msg in client:
-                log.debug('Received: {0}'.format(msg))
+                # log.debug('Received: {0}'.format(msg))
                 task = self.loop.create_task(self.process(msg))
                 task.add_done_callback(task_done)
                 self.tasks += [task]
         except Exception as e:
             log.error(
                 'While reading from socket: {0}'
-                .format(traceback.format_exc()))
+                .format(traceback.format_exc()), e)
         finally:
             log.info('Closing WebSocket {0}'.format(id(client)))
             client.close()
@@ -178,7 +178,7 @@ class Server(object):
     def build_call(self, _id, name, args):
         if _id not in self.objects:
             raise ValueError(
-                'build_call(): object with id {0} not found'.format(_id))
+                'object with id {0} not found'.format(_id))
 
         obj = self.objects[_id]
         function = getattr(type(obj), name)
@@ -192,7 +192,7 @@ class Server(object):
             kwargs = args.pop()
 
         log.debug(
-            'build_call(): will call {0}.{1}({2})'
+            '{0}.{1}({2})'
             .format(obj, name, ', '.join([str(a) for a in args])))
 
         if not function:
