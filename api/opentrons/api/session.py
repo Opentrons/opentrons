@@ -199,7 +199,7 @@ class Session(object):
         robot.turn_off_rail_lights()
 
     def set_state(self, state):
-        log.info("State set to {}".format(state))
+        log.debug("State set to {}".format(state))
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
