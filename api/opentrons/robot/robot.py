@@ -826,7 +826,6 @@ class Robot(object):
 
     def add_container(self, name, slot, label=None, share=False):
         container = _setup_container(name)
-
         if container is not None:
             location = self._get_placement_location(slot)
             if self._is_available_slot(location, share, slot, name):
