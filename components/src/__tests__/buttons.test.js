@@ -107,6 +107,16 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  test('Inverted OutlineButton renders correctly', () => {
+    const tree = Renderer.create(
+      <OutlineButton onClick={onClick} title='t' className='c' inverted>
+        children
+      </OutlineButton>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
   test('OutlineButton with iconName renders correctly', () => {
     const tree = Renderer.create(
       <OutlineButton onClick={onClick} title='t' className='c' iconName={FLASK}>

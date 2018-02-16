@@ -16,6 +16,8 @@ export type ButtonProps = {
   iconName?: IconName,
   /** classes to apply */
   className?: string,
+  /** inverts the default color/background/border of default button style */
+  inverted?: boolean,
   /** contents of the button */
   children?: React.Node,
   /** custom element or component to use instead of `<button>` */

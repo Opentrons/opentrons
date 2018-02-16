@@ -26,7 +26,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
     }
   }
   if (stepType !== 'pause') {
-    console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO.')
+    console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO. Got ' + stepType)
   }
   return baseForm
 }
@@ -124,14 +124,7 @@ export function validateAndProcessForm (formData: FormData): ValidFormAndErrors 
 
     return {
       errors,
-      validatedForm: (
-        !formHasErrors({errors}) &&
-        // extra explicit for flow
-        totalSeconds &&
-        hours &&
-        minutes &&
-        seconds
-      )
+      validatedForm: formHasErrors({errors})
         ? null
         : {
           stepType: formData.stepType,
@@ -182,7 +175,8 @@ export function generateCommands (data: ProcessedFormData): Array<Command> {
       }
     ])
   }
-  console.warn('generateCommands only supports transfer, got: ' + data.stepType)
+  // TODO IMMEDIATELY Ian 2018-02-14 why does this keep getting undefined stepType?
+  console.warn('generateCommands only supports transfer, got: ' + data.stepType, data)
   return [] // TODO
 }
 

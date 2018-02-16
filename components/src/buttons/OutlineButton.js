@@ -3,18 +3,19 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import type {ButtonProps} from './Button'
-import PrimaryButton from './PrimaryButton'
+import Button from './Button'
 import styles from './buttons.css'
 
 /**
- * `<PrimaryButton>` variant with no background fill and a light border
+ * Button with no background fill and a dark border.
+ Use inverted prop for buttons on dark backgrounds.
  */
 export default function OutlineButton (props: ButtonProps) {
-  const className = cx(styles.button_outline, props.className)
+  const className = cx(styles.button_outline, props.className, {[styles.inverted]: props.inverted})
 
   return (
-    <PrimaryButton {...props} className={className}>
+    <Button {...props} className={className}>
       {props.children}
-    </PrimaryButton>
+    </Button>
   )
 }
