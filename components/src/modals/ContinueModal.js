@@ -1,38 +1,33 @@
 // @flow
 import * as React from 'react'
 
-import {FlatButton} from '../buttons'
-import Modal from './Modal'
-import styles from './modals.css'
+import AlertModal from './AlertModal'
 
 type ContinueModalProps = {
   /** cancellation handler (also passed to `Modal`'s `onCloseClick`) */
-  onCancelClick: (event: SyntheticEvent<>) => void,
+  onCancelClick: () => void,
   /** continuation handler */
-  onContinueClick: (event: SyntheticEvent<>) => void,
+  onContinueClick: () => void,
   /** modal contents */
-  children: React.Node
+  children: React.Node,
 }
 
+const CANCEL = 'Cancel'
+const CONTINUE = 'Continue'
+
 /**
- * Modal to prompt the user to "Cancel" or "Continue" a given action
+ * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
 export default function ContinueModal (props: ContinueModalProps) {
   const {onCancelClick, onContinueClick} = props
+  const buttons = [
+    {title: CANCEL, children: CANCEL, onClick: onCancelClick},
+    {title: CONTINUE, children: CONTINUE, onClick: onContinueClick}
+  ]
 
   return (
-    <Modal onCloseClick={onCancelClick}>
-      <div className={styles.continue_modal_contents}>
-        {props.children}
-      </div>
-      <div className={styles.continue_modal_buttons}>
-        <FlatButton title='Cancel' onClick={onCancelClick}>
-          Cancel
-        </FlatButton>
-        <FlatButton title='Continue' onClick={onContinueClick}>
-          Continue
-        </FlatButton>
-      </div>
-    </Modal>
+    <AlertModal buttons={buttons} onCloseClick={onCancelClick}>
+      {props.children}
+    </AlertModal>
   )
 }

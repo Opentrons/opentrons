@@ -15,7 +15,7 @@ import {
   copyLabware
 } from '../labware-ingred/actions'
 
-import { LabwareOnDeck } from '../components/LabwareOnDeck'
+import { LabwareOnDeck } from '../components/labware'
 
 export default connect(
   (state, ownProps) => {

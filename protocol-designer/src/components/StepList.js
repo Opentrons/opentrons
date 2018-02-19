@@ -2,14 +2,14 @@
 import * as React from 'react'
 import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
-import {SidePanel, TitledList} from '@opentrons/components'
+import {SidePanel} from '@opentrons/components'
 
 import type {StepItemData, StepSubItemData} from '../steplist/types'
 import StepItem from '../components/StepItem'
 import TransferishSubstep from '../components/TransferishSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
 
-import styles from '../components/StepItem.css' // TODO: Ian 2018-01-11 This is just for "Labware & Ingredient Setup" right now, can remove later
+// import styles from '../components/StepItem.css' // TODO: Ian 2018-01-11 This is just for "Labware & Ingredient Setup" right now, can remove later
 
 type StepListProps = {
   selectedStepId?: number,
@@ -19,8 +19,8 @@ type StepListProps = {
 }
 
 function generateSubsteps (substeps) {
-  if (substeps === null) {
-    // no substeps, form is probably not finished
+  if (!substeps) {
+    // no substeps, form is probably not finished (or it's "deck-setup" stepType)
     return null
   }
 
@@ -53,12 +53,16 @@ export default function StepList (props: StepListProps) {
     <SidePanel title='Protocol Step List'>
 
       {/* TODO: Ian 2018-01-16 figure out if 'Deck Setup' is a Step or something else... */}
-      <TitledList className={styles.step_item} iconName='flask' title='Deck Setup' />
+      {/* <TitledList className={styles.step_item} iconName='flask' title='Deck Setup' /> */}
 
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
-          onCollapseToggle={props.handleStepItemCollapseToggleById && props.handleStepItemCollapseToggleById(step.id)}
+          onCollapseToggle={
+            (step.stepType === 'deck-setup' || !props.handleStepItemCollapseToggleById)
+              ? null // Deck Setup steps are not collapsible
+              : props.handleStepItemCollapseToggleById(step.id)
+          }
           selected={!isNil(props.selectedStepId) && step.id === props.selectedStepId}
           {...pick(step, [
             'title',

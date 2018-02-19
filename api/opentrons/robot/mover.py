@@ -59,7 +59,10 @@ class Mover:
             driver_target[self._axis_mapping['z']] = dst_z
 
         self._driver.move(driver_target)
-        return self.update_pose_from_driver(pose_tree)
+
+        # Update pose with the new value. Since stepper motors are open loop
+        # there is no need to to query diver for position
+        return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
     def home(self, pose_tree):
         self._driver.home(axis=''.join(self._axis_mapping.values()))

@@ -3,7 +3,7 @@ Basic usage:
 ```js
 initialState = {continue: null}
 
-;<div style={{position: 'relative', width: '48em', height: '16rem'}}>
+;<div style={{position: 'relative', width: '48em', height: '24rem'}}>
   {state.continue == null && (
     <ContinueModal
       onCancelClick={() => setState({continue: 'cancel'})}

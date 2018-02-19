@@ -4,6 +4,7 @@ import net from 'net'
 import Bonjour from 'bonjour'
 
 import {fetchHealth} from '../../http-api-client'
+
 import {actions} from '../actions'
 import {getIsScanning} from '../selectors'
 
@@ -23,6 +24,8 @@ const DIRECT_SERVICE = {
 }
 const DIRECT_POLL_INTERVAL_MS = 1000
 
+const SKIP_WIRED_POLL = process.env.SKIP_WIRED_POLL
+
 export function handleDiscover (dispatch, state, action) {
   // don't duplicate discovery requests
   if (getIsScanning(state)) return
@@ -31,12 +34,15 @@ export function handleDiscover (dispatch, state, action) {
   // advertises an SSH service. Instead, we should be registering an HTTP
   // service on port 31950 and listening for that instead
   const browser = Bonjour().find({type: 'http'})
-  let pollInterval
+    .on(UP_EVENT, handleServiceUp)
+    .on(DOWN_EVENT, handleServiceDown)
 
-  pollInterval = setInterval(pollDirectConnection, DIRECT_POLL_INTERVAL_MS)
+  let pollInterval
+  if (!SKIP_WIRED_POLL) {
+    pollInterval = setInterval(pollDirectConnection, DIRECT_POLL_INTERVAL_MS)
+  }
+
   setTimeout(finishDiscovery, DISCOVERY_TIMEOUT_MS)
-  browser.on(UP_EVENT, handleServiceUp)
-  browser.on(DOWN_EVENT, handleServiceDown)
 
   function handleServiceUp (service) {
     if (NAME_RE.test(service.name)) {

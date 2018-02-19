@@ -23,11 +23,10 @@ def log_init():
     # TODO(artyom): might as well use this:
     # https://pypi.python.org/pypi/logging-color-formatter
 
-    # TODO (Laura 20171222): Elevate default to INFO or WARN for production
-    default_log_level = 'DEBUG'
+    default_log_level = 'INFO'
     ot_log_level = os.environ.get('OT_LOG_LEVEL', default_log_level)
     if ot_log_level not in logging._nameToLevel:
-        log.warning("OT Log Level {} not found. Defaulting to {}".format(
+        log.info("OT Log Level {} not found. Defaulting to {}".format(
             ot_log_level, default_log_level))
         ot_log_level = default_log_level
 

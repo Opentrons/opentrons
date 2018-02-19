@@ -666,18 +666,19 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
-
-        # bring the pipettes up as high as possible while calibrating
-        if self._use_safest_height:
-            arc_top = inst._max_deck_height()
-
-        # movements that stay within the same container do not need to
-        # avoid other containers on the deck, so the travel height of
-        # arced movements can be relative to just that one container
         if this_container and self._prev_container == this_container:
+            # movements that stay within the same container do not need to
+            # avoid other containers on the deck, so the travel height of
+            # arced movements can be relative to just that one container
             arc_top = self.max_placeable_height_on_deck(this_container)
             arc_top += TIP_CLEARANCE_LABWARE
+        elif self._use_safest_height:
+            # bring the pipettes up as high as possible while calibrating
+            # arc_top = inst._max_deck_height()
+            arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
+        else:
+            # bring pipette up above the tallest container currently on deck
+            arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
 
         self._prev_container = this_container
 
@@ -685,7 +686,7 @@ class Robot(object):
         _, _, pip_z = pose_tracker.absolute(self.poses, inst)
 
         arc_top = max(arc_top, destination[2], pip_z)
-        arc_top = min(arc_top, inst._max_deck_height())
+        # arc_top = min(arc_top, inst._max_deck_height())
 
         strategy = [
             {'z': arc_top},

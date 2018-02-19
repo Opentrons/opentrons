@@ -10,15 +10,19 @@
 
 import React from 'react'
 import cx from 'classnames'
-import { CenteredTextSvg, LabwareContainer, ContainerNameOverlay, allStyles } from '@opentrons/components'
+import {
+  CenteredTextSvg,
+  LabwareContainer,
+  ContainerNameOverlay,
+  EmptyDeckSlot
+} from '@opentrons/components'
 
-import { nonFillableContainers } from '../constants'
+import {nonFillableContainers} from '../../constants'
+import styles from './labware.css'
 
-// import CopyIcon from '../svg/CopyIcon.js' // TODO bring back icon
-import SelectablePlate from '../containers/SelectablePlate.js'
-import NameThisLabwareOverlay from '../components/NameThisLabwareOverlay.js'
-
-const styles = allStyles.LabwareContainer
+import ClickableText from './ClickableText'
+import SelectablePlate from '../../containers/SelectablePlate.js'
+import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
 
 function OccupiedDeckSlotOverlay ({
   canAddIngreds,
@@ -32,27 +36,20 @@ function OccupiedDeckSlotOverlay ({
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-      {/* Overlay Background */}
-      <rect x='0' y='0' className={styles.slot_overlay} />
-      {canAddIngreds && // TODO add back canAddIngreds conditional
-        <text x='0' y='25%' className={styles.clickable}
-          onClick={() => openIngredientSelector({containerId, slotName, containerType})}
-          >
-            Add Ingredients
-          </text>
+      <rect className={styles.overlay_panel} />
+      {canAddIngreds &&
+        <ClickableText onClick={() => openIngredientSelector({containerId, slotName, containerType})}
+          iconName='plus' y='25%' text='Edit Ingredients' />
       }
+      <ClickableText onClick={() => setCopyLabwareMode(containerId)}
+        iconName='move' y='50%' text='Copy Labware' />
+      {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
-      <text x='0' y='50%' className={styles.clickable}
-        onClick={() => setCopyLabwareMode(containerId)}>Copy Labware</text>
-
-      <text x='0' y='75%' className={styles.clickable}
-        onClick={() =>
-            window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
-            deleteContainer({containerId, slotName, containerType})
-        }
-      >
-        Remove {containerName}
-      </text>
+      <ClickableText onClick={() =>
+          window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slotName}?`) &&
+          deleteContainer({containerId, slotName, containerType})
+      }
+        iconName='close' y='75%' text='Delete Labware' />
     </g>
   )
 }
@@ -91,25 +88,25 @@ type LabwareOnDeckProps = {
     },
     labwareSelection: boolean
   },
-  openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => mixed,
+  openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => void,
 
   // createContainer: ({slotName: string, containerType: string}) => mixed,
-  deleteContainer: ({containerId: string, slotName: string, containerType: string}) => mixed,
-  modifyContainer: ({containerId: string, modify: mixed}) => mixed, // eg modify = {name: 'newName'}
+  deleteContainer: ({containerId: string, slotName: string, containerType: string}) => void,
+  modifyContainer: ({containerId: string, modify: {[field: string]: mixed}}) => void, // eg modify = {name: 'newName'}
 
-  openLabwareSelector: ({slotName: string}) => mixed,
+  openLabwareSelector: ({slotName: string}) => void,
   // closeLabwareSelector: ({slotName: string}) => mixed,
 
-  setCopyLabwareMode: (containerId: string) => mixed,
+  setCopyLabwareMode: (containerId: string) => void,
   labwareToCopy: string, // ?
-  copyLabware : (slotName: string) => mixed,
+  copyLabware : (slotName: string) => void,
 
   height: number,
   width: number,
   highlighted: boolean
 }
 
-export function LabwareOnDeck (props: LabwareOnDeckProps) {
+export default function LabwareOnDeck (props: LabwareOnDeckProps) {
   const {
     slotName,
 
@@ -148,27 +145,27 @@ export function LabwareOnDeck (props: LabwareOnDeckProps) {
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
-        // Empty slot TODO Ian 2017-12-13 use EmptyDeckSlot from component lib
-        : <g className={styles.empty_slot}>
-          <rect width='100%' height='100%' />
-          <CenteredTextSvg text={slotName} />
-        </g>}
+        : <EmptyDeckSlot {...{height, width, slotName}} />
+      }
 
-      {!slotIsOccupied && (activeModals.labwareSelection
+      {(!slotIsOccupied && activeModals.labwareSelection)
         // "Add Labware" labware selection dropdown menu
         ? null
         : (labwareToCopy
             // Mouseover empty slot -- Add (or Copy if in copy mode)
             ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.add_labware} onClick={() => copyLabware(slotName)} />
-              <CenteredTextSvg className={styles.pass_thru_mouse} text='Place Copy' />
+              <rect className={styles.overlay_panel} onClick={() => copyLabware(slotName)} />
+              <CenteredTextSvg className={cx(styles.pass_thru_mouse, styles.clickable_text)} text='Place Copy' />
             </g>
-            : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.add_labware} onClick={e => openLabwareSelector({slotName})} />
-              <CenteredTextSvg className={styles.pass_thru_mouse} text='Add Labware' />
+            : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
+              <rect className={styles.overlay_panel} />
+              <ClickableText onClick={e => openLabwareSelector({slotName})}
+                iconName='plus' y='40%' text='Add Labware' />
+              <ClickableText onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
+                iconName='copy' y='65%' text='Add Copy' />
             </g>
         )
-      )}
+      }
 
       {slotIsOccupied && hasName &&
         <OccupiedDeckSlotOverlay {...{

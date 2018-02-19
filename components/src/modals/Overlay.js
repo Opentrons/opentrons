@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import styles from './modals.css'
 
@@ -14,7 +15,11 @@ type OverlayProps = {
  * just want to use `<Modal>`
  */
 export default function Overlay (props: OverlayProps) {
+  const className = cx(styles.overlay, {
+    [styles.clickable]: props.onClick
+  })
+
   return (
-    <div className={styles.overlay} onClick={props.onClick} />
+    <div className={className} onClick={props.onClick} />
   )
 }
