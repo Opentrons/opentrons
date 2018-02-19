@@ -178,6 +178,7 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
+
     filename = filename or environment.get_path('OT_CONFIG_FILE')
     if tag:
         root, ext = os.path.splitext(filename)
@@ -188,10 +189,7 @@ def save(config, filename=None, tag=None):
         item for item in children(config._asdict())
         if item not in _default
     ])
-
-    with open(filename, 'w') as file:
-        json.dump(diff, file, sort_keys=True, indent=4)
-        return diff
+    return _save_config_json(diff, filename=filename, tag=tag)
 
 
 def clear(filename=None):
@@ -201,21 +199,43 @@ def clear(filename=None):
         os.remove(filename)
 
 
-def _backup_configuration(config, tag=None):
-    if not tag:
-        # isoformat(timespec=) kwarg not in Python 3.5
-        tag = datetime.now().isoformat().split('.')[0]
-    save(config, tag=tag)
+def _save_config_json(config_json, filename=None, tag=None):
+    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if tag:
+        root, ext = os.path.splitext(filename)
+        filename = "{}-{}{}".format(root, tag, ext)
+
+    with open(filename, 'w') as file:
+        json.dump(config_json, file, sort_keys=True, indent=4)
+        return config_json
 
 
 def _check_version_and_update(config_json):
+    migration_functions = {
+        0: _migrate_zero_to_one
+    }
+
     version = config_json.get('version', 0)
-    if version == 0:
-        _backup_configuration(
-            robot_config(**merge([default._asdict(), config_json])))
-        # add a version number to the config
-        config_json['version'] = 1
-        # overwrite instrument_offset to the default
-        config_json['instrument_offset'] = default.instrument_offset.copy()
-        return _check_version_and_update(config_json)
+
+    if version in migration_functions:
+        # backup the loaded configuration json file
+        tag = datetime.now().isoformat().split('.')[0]
+        tag += '-v{}'.format(version)
+        _save_config_json(config_json, tag=tag)
+        # migrate the configuration file
+        migrate_func = migration_functions[version]
+        config_json = migrate_func(config_json)
+        # recursively update the config
+        # until there are no more migration methods for it's version
+        config_json = _check_version_and_update(config_json)
+
+    return config_json
+
+
+def _migrate_zero_to_one(config_json):
+    # add a version number to the config, and set to 1
+    config_json['version'] = 1
+    # overwrite instrument_offset to the default
+    config_json['instrument_offset'] = default.instrument_offset.copy()
+    return config_json
 
