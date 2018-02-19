@@ -28,7 +28,7 @@ p10_single = pipette_config(
         'blow_out': 0,
         'drop_tip': -6
     },
-    pick_up_current=0.05,
+    pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=0.617,
