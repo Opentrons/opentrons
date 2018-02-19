@@ -107,7 +107,7 @@ def load_all_containers():
     return containers
 
 
-def  create_container_obj_from_dict(container_data: dict) -> Container:
+def create_container_obj_from_dict(container_data: dict) -> Container:
     """
 
     Example input:
