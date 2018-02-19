@@ -112,14 +112,16 @@ def _setup_container(container_name):
 
     # Database.load_container throws ValueError when a container name is not
     # found.
-    except Exception as e:
-        log.info("This is the exception {}".format(e))
+    except ValueError:
+        # First must populate "get persisted container" list
         old_container_loading.load_all_containers_from_disk()
-
+        # Load container from old json file
         container = old_container_loading.get_persisted_container(
             container_name)
+        # Rotate coordinates to fit the new deck map
         rotated_container = database_migration.rotate_container_for_alpha(
             container)
+        # Save to the new database
         database.save_new_container(rotated_container, container_name)
 
     container.properties['type'] = container_name
