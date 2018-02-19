@@ -21,7 +21,9 @@ exports[`LabeledValue renders LabeledValue correctly 1`] = `
 <div
   className="labeled_value"
 >
-  <p>
+  <p
+    className="labeled_value_label"
+  >
     Label
     :
   </p>

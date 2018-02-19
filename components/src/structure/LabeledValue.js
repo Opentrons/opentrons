@@ -18,9 +18,10 @@ type Props = {
 export default function LabeledValue (props: Props) {
   const {label, value} = props
   const className = cx(styles.labeled_value, props.className)
+
   return (
     <div className={className}>
-      <p>{label}:</p>
+      <p className={styles.labeled_value_label}>{label}:</p>
       <p>{value}</p>
     </div>
   )

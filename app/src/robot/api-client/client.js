@@ -108,7 +108,6 @@ export default function client (dispatch) {
     remote = null
     isDisconnecting = false
 
-    dispatch(push('/'))
     dispatch(response)
   }
 

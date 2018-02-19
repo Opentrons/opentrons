@@ -38,7 +38,7 @@
 }
 
 .upload_warning_title {
-  @apply --font-heading-dark;
+  @apply --font-header-dark;
 
   margin-bottom: 0.5rem;
 }

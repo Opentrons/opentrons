@@ -1,4 +1,5 @@
 import React from 'react'
+import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
 
 import {
@@ -10,7 +11,9 @@ import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
 
-export default connect(mapStateToProps, null, mergeProps)(ConnectPanel)
+export default withRouter(
+  connect(mapStateToProps, null, mergeProps)(ConnectPanel)
+)
 
 function ConnectPanel (props) {
   return (

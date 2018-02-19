@@ -86,14 +86,15 @@
 
 /* Card and card content styles */
 .card {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.33);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
   padding: 1rem;
 }
 
 .card_title {
   @apply --font-header-dark;
 
-  font-weight: 400;
+  margin-bottom: 0.5rem;
+  font-weight: --fw-regular;
 }
 
 .card_content {
@@ -116,5 +117,10 @@
 }
 
 .labeled_value {
-  @apply --font-body-1-dark;
+  @apply --font-body-2-dark;
+}
+
+.labeled_value_label {
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.25rem;
 }

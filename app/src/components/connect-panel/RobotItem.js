@@ -27,15 +27,15 @@ export default function RobotItem (props) {
     ? onDisconnectClick
     : onConnectClick
 
-  const className = cx(styles.robot_item, {
+  const className = cx(styles.connection_toggle, {
     [styles.connected]: isConnected,
     [styles.disconnected]: !isConnected
   })
 
-  /* TODO (ka 2018-2-7): No onClick passed to IconButton for now because parent
-    ListItem receives the onClick temporarily. double toggle = no toggle.
-    Once routes in place for connection pages this will be resolved by replacing
-    onClick in ListItem with url */
+  /* TODO (ka 2018-2-13):
+  Toggle Button Class based on connectivity,
+  NavLink gets ActiveClassName in ListItem
+  */
   const toggleIcon = isConnected
     ? TOGGLED_ON
     : TOGGLED_OFF
@@ -46,14 +46,16 @@ export default function RobotItem (props) {
 
   return (
     <ListItem
-      onClick={onClick}
+      url={`/robots/${name}`}
       iconName={iconName}
-      className={className}
+      className={styles.robot_item}
+      activeClassName={styles.active}
     >
       <p className={styles.robot_name}>{name}</p>
       <IconButton
         name={toggleIcon}
-        className={styles.connection_toggle}
+        className={className}
+        onClick={onClick}
       />
     </ListItem>
   )

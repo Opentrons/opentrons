@@ -21,11 +21,18 @@ type Props = {
 
 export default function Card (props: Props) {
   const {title, column, children} = props
-  const style = cx(styles.card, props.className, {[styles.disabled]: props.disabled})
+
+  const style = cx(styles.card, props.className, {
+    [styles.disabled]: props.disabled
+  })
+  const childrenStyle = cx(styles.card_content, {
+    [styles.card_column]: column
+  })
+
   return (
     <section className={style}>
       <h3 className={styles.card_title}>{title}</h3>
-      <div className={cx(styles.card_content, {[styles.card_column]: column})}>
+      <div className={childrenStyle}>
         {children}
       </div>
     </section>
