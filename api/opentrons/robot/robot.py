@@ -674,8 +674,7 @@ class Robot(object):
             arc_top += TIP_CLEARANCE_LABWARE
         elif self._use_safest_height:
             # bring the pipettes up as high as possible while calibrating
-            # arc_top = inst._max_deck_height()
-            arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
+            arc_top = inst._max_deck_height()
         else:
             # bring pipette up above the tallest container currently on deck
             arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
@@ -686,7 +685,7 @@ class Robot(object):
         _, _, pip_z = pose_tracker.absolute(self.poses, inst)
 
         arc_top = max(arc_top, destination[2], pip_z)
-        # arc_top = min(arc_top, inst._max_deck_height())
+        arc_top = min(arc_top, inst._max_deck_height())
 
         strategy = [
             {'z': arc_top},

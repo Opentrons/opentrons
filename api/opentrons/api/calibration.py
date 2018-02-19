@@ -3,6 +3,7 @@ from copy import copy
 
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
+from opentrons import robot
 
 from .models import Container
 
@@ -21,15 +22,13 @@ class CalibrationManager:
     def __init__(self, loop=None):
         self._loop = loop
         self.state = None
-        # self.robot = robot
 
     def _set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
         self.state = state
-        # if self.robot:
-        #     self.robot._use_safest_height = (state in ['probing', 'moving'])
+        robot._use_safest_height = (state in ['probing', 'moving'])
         self._on_state_changed()
 
     def tip_probe(self, instrument):
