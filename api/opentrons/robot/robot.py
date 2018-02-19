@@ -113,7 +113,7 @@ def _setup_container(container_name):
     # Database.load_container throws ValueError when a container name is not
     # found.
     except Exception as e:
-        log.debug("This is the exception {}".format(e))
+        log.info("This is the exception {}".format(e))
         old_container_loading.load_all_containers_from_disk()
 
         container = old_container_loading.get_persisted_container(
