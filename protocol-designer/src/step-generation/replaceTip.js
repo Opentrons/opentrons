@@ -10,7 +10,6 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     If there's already a tip on the pipette, this will drop it before getting a new one
   */
   const pipetteData = prevRobotState.instruments[pipetteId]
-  let commands = []
 
   // TODO IMMEDIATELY: more elegant way to avoid this mutation-driven state update?
   let robotState = cloneDeep(prevRobotState)
@@ -24,16 +23,18 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
 
   // drop tip if you have one
   const dropTipResult = dropTip(pipetteData.id)(robotState)
-  commands = commands.concat(dropTipResult.commands)
   robotState = dropTipResult.robotState
 
-  // pick up tip command
-  commands.push({
-    command: 'pick-up-tip',
-    pipette: pipetteData.id,
-    labware: nextTiprack.tiprackId,
-    well: nextTiprack.well
-  })
+  const commands = [
+    ...dropTipResult.commands,
+    // pick up tip command
+    {
+      command: 'pick-up-tip',
+      pipette: pipetteData.id,
+      labware: nextTiprack.tiprackId,
+      well: nextTiprack.well
+    }
+  ]
 
   // pipette now has tip
   robotState.tipState.pipettes[pipetteId] = true

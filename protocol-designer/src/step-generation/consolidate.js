@@ -14,8 +14,6 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
 
     A single uniform volume will be aspirated from every source well.
   */
-  let CommandCreators: Array<CommandCreator> = []
-
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     throw new Error('Consolidate called with pipette that does not exist in robotState, pipette id: ' + data.pipette) // TODO test
@@ -30,7 +28,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     (pipetteData.maxVolume - disposalVolume) / data.volume
   )
 
-  CommandCreators = flatMap(
+  const CommandCreators = flatMap(
     chunk(data.sourceWells, maxWellsPerChunk),
     (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       // Aspirate commands for all source wells in the chunk
