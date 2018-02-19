@@ -13,6 +13,7 @@ import {
 
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
 import type {FormData} from '../steplist/types'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import StepEditForm, {type Props as StepEditFormProps} from '../components/StepEditForm'
 
@@ -34,15 +35,12 @@ function mapStateToProps (state) {
     formData: selectors.formData(state),
     formSectionCollapse: selectors.formSectionCollapse(state),
     canSave: selectors.currentFormCanBeSaved(state),
+    /* NOTE: when pipette selection page exists, pipettes will come from that saved pipette state */
     pipetteOptions: [
-      {name: '10 μL Single', value: 'left'}, /* TODO: should be 'p10 single'? What 'value'? Should value be 'left' | 'right' ? */
-      {name: '300 μL Multi-Channel', value: 'right'}
+      {name: '10 μL Single', value: 'p10SingleId'},
+      {name: '300 μL Multi-Channel', value: 'p300multiId'}
     ],
-    labwareOptions: [
-      {name: 'Source Plate', value: 'sourcePlateId'}, /* TODO: get labware with selector, not hard-coded! */
-      {name: 'Dest Plate', value: 'destPlateId'},
-      {name: 'Trough with very long name', value: 'troughId'}
-    ]
+    labwareOptions: labwareIngredSelectors.labwareOptions(state)
   }
 }
 

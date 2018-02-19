@@ -161,7 +161,7 @@ type SelectedStepState = null | StepIdType
 const selectedStep = handleActions({
   SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
   DELETE_STEP: () => null
-}, null)
+}, INITIAL_DECK_SETUP_ID)
 
 type StepCreationButtonExpandedState = boolean
 

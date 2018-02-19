@@ -24,7 +24,7 @@ export type LabwareComponentProps = {
 }
 
 type Props = {
-  className: string,
+  className?: string,
   LabwareComponent: React.ComponentType<LabwareComponentProps>
 }
 
