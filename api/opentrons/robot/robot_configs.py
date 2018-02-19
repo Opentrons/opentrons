@@ -170,7 +170,7 @@ def _check_version_and_update(config_json):
 
     if version in migration_functions:
         # backup the loaded configuration json file
-        tag = datetime.now().isoformat().split('.')[0]
+        tag = datetime.now().isoformat().split('.')[0].replace(':', '-')
         tag += '-v{}'.format(version)
         _save_config_json(config_json, tag=tag)
         # migrate the configuration file
