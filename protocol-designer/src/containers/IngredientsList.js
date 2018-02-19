@@ -10,6 +10,8 @@ export default connect(
     const activeModals = selectors.activeModals(state)
     const container = selectors.selectedContainer(state)
 
+    console.log('selectedContainer', container)
+
     return {
       slotName: activeModals.ingredientSelection.slotName,
       containerName: container.name,

@@ -238,17 +238,6 @@ const labwareOptions: (state: any) => Array<{value: string, name: string}> = cre
 
 const canAdd = state => rootSelector(state).modeLabwareSelection // false or selected slotName to add labware to, eg 'A2'
 
-// Currently selected container's slot
-const selectedContainerSlot = createSelector(
-  rootSelector,
-  state => get(state, ['selectedContainer', 'slotName'])
-)
-
-const selectedContainerSelector = createSelector(
-  rootSelector,
-  state => state.selectedContainer
-)
-
 const containerById = containerId => state => {
   const container = rootSelector(state).containers
   return container && container[containerId]
@@ -258,6 +247,24 @@ const containerById = containerId => state => {
     }
     : null
 }
+
+// TODO: containerId should be intrinsic to container reducer?
+const selectedContainerSelector = createSelector(
+  rootSelector,
+  state => (state.selectedContainer === null)
+    ? null
+    : {
+      ...state.containers[state.selectedContainer],
+      containerId: state.selectedContainer
+    }
+)
+
+// Currently selected container's slot
+// TODO flow type container so this doesn't need its own selector
+const selectedContainerSlot = createSelector(
+  selectedContainerSelector,
+  container => container && container.slotName
+)
 
 const containersBySlot = createSelector(
   state => rootSelector(state).containers,
@@ -375,7 +382,7 @@ const ingredientsForContainer = createSelector(
   allIngredients,
   selectedContainerSelector,
   (allIngredients, selectedContainer) => {
-    return selectedContainer.containerId
+    return (selectedContainer)
     ? _ingredientsForContainerId(allIngredients, selectedContainer.containerId)
     : null
   }
@@ -454,13 +461,16 @@ const activeModals = createSelector(
   rootSelector,
   selectedContainerSlot,
   selectedContainerType,
-  (state, slotName, containerType) => ({
-    labwareSelection: state.modeLabwareSelection !== false,
-    ingredientSelection: {
-      slotName,
-      containerName: containerType
-    }
-  })
+  (state, slotName, containerType) => {
+    console.log('activeModals', {state, slotName, containerType})
+    return ({
+      labwareSelection: state.modeLabwareSelection !== false,
+      ingredientSelection: {
+        slotName,
+        containerName: containerType
+      }
+    })
+  }
 )
 
 const labwareToCopy = state => rootSelector(state).copyLabwareMode

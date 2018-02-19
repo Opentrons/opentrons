@@ -38,7 +38,7 @@ function OccupiedDeckSlotOverlay ({
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
-        <ClickableText onClick={() => openIngredientSelector({containerId, slotName, containerType})}
+        <ClickableText onClick={() => openIngredientSelector(containerId)}
           iconName='plus' y='25%' text='Edit Ingredients' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
@@ -88,7 +88,7 @@ type LabwareOnDeckProps = {
     },
     labwareSelection: boolean
   },
-  openIngredientSelector: ({containerId: string, slotName: string, containerType: string}) => void,
+  openIngredientSelector: (containerId: string) => void,
 
   // createContainer: ({slotName: string, containerType: string}) => mixed,
   deleteContainer: ({containerId: string, slotName: string, containerType: string}) => void,

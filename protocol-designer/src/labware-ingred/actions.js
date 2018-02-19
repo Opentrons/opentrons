@@ -10,7 +10,7 @@ export const {
   openLabwareSelector,
   closeLabwareSelector,
 
-  // openIngredientSelector,
+  openIngredientSelector,
   closeIngredientSelector,
 
   setCopyLabwareMode,
@@ -32,7 +32,7 @@ export const {
   OPEN_LABWARE_SELECTOR: undefined,
   CLOSE_LABWARE_SELECTOR: undefined,
 
-  // OPEN_INGREDIENT_SELECTOR: undefined,
+  OPEN_INGREDIENT_SELECTOR: undefined,
   CLOSE_INGREDIENT_SELECTOR: undefined,
 
   SET_COPY_LABWARE_MODE: undefined, // payload is containerId
@@ -76,14 +76,6 @@ export const deleteIngredient = payload => (dispatch, getState) => {
       ...payload,
       containerId: selectors.selectedContainer(getState()).containerId
     }
-  })
-}
-
-// Using thunks to get access to the larger state
-export const openIngredientSelector = payload => (dispatch, getState) => {
-  return dispatch({
-    type: 'OPEN_INGREDIENT_SELECTOR',
-    payload: selectors.containerById(payload.containerId)(getState())
   })
 }
 
