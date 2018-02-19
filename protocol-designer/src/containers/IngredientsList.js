@@ -13,7 +13,7 @@ export default connect(
     console.log('selectedContainer', container)
 
     return {
-      slotName: activeModals.ingredientSelection.slotName,
+      slot: activeModals.ingredientSelection.slot,
       containerName: container.name,
       containerType: container.type,
       ingredients: selectors.ingredientsForContainer(state),

@@ -1,6 +1,11 @@
-import { createActions } from 'redux-actions'
-import { selectors } from './reducers'
-import { uuid } from '../utils.js'
+// @flow
+import {createActions} from 'redux-actions'
+import {uuid} from '../utils'
+import {selectors} from './reducers'
+
+import type {Dispatch} from 'redux'
+import type {DeckSlot, IngredInputFields} from './types'
+import type {GetState} from '../types'
 
 // Payload mappers
 const xyToSingleWellObj = (x, y) => ({ [(x + ',' + y)]: [x, y] })
@@ -54,9 +59,13 @@ export const {
   HOVER_WELL_END: xyToSingleWellObj
 })
 
-export const copyLabware = slotName => (dispatch, getState) => {
+export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<*>, getState: GetState) => {
   const state = getState()
   const fromContainer = selectors.labwareToCopy(state)
+  if (fromContainer === false) {
+    console.warn('Attempted to copy labware with no fromContainer')
+    return
+  }
   return dispatch({
     type: 'COPY_LABWARE',
     payload: {
@@ -64,22 +73,28 @@ export const copyLabware = slotName => (dispatch, getState) => {
       toContainer: uuid() + ':' + fromContainer.split(':')[1],
       // 'toContainer' is the containerId of the new clone.
       // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'default-trash'.
-      toSlot: slotName
+      toSlot: slot
     }
   })
 }
 
-export const deleteIngredient = payload => (dispatch, getState) => {
+export const deleteIngredient = (payload: {|wellName?: string, groupId: string|}) => (dispatch: Dispatch<*>, getState: GetState) => {
+  const container = selectors.selectedContainer(getState())
+  if (!container || !container.containerId) {
+    console.warn('Tried to delete ingredient with no selected container')
+    return
+  }
+
   return dispatch({
     type: 'DELETE_INGREDIENT',
     payload: {
       ...payload,
-      containerId: selectors.selectedContainer(getState()).containerId
+      containerId: container.containerId
     }
   })
 }
 
-export const editIngredient = payload => (dispatch, getState) => {
+export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<*>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
 
@@ -87,10 +102,10 @@ export const editIngredient = payload => (dispatch, getState) => {
     type: 'EDIT_INGREDIENT',
     payload: {
       ...payload,
-      // slotName: selectors.selectedContainerSlot(state),
+      // slot: selectors.selectedContainerSlot(state),
       containerId: container && container.containerId,
       groupId: selectors.selectedIngredientGroupId(state),
-      wells: selectors.selectedWellNames(state) // TODO use locations: [slotName]: [selected wells]
+      wells: selectors.selectedWellNames(state) // TODO use locations: [slot]: [selected wells]
     }
   })
 }

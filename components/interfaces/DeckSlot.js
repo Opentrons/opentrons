@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 export type DeckSlotProps = {
-  slotName: string,
+  slot: string,
   width: number,
   height: number,
   highlighted?: boolean,

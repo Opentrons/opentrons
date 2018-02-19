@@ -12,7 +12,7 @@ import {closeIngredientSelector} from '../labware-ingred/actions'
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 
-const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slotName
+const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 
 // TODO Ian 2017-12-04 make proper component
 const ConnectedIngredSelModal = connect(

@@ -14,9 +14,9 @@ function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displa
   )
 }
 
-export default function LabwareDropdown ({onClose, onContainerChoose, slotName}) {
-  // do not render without a slotName
-  if (!slotName) return null
+export default function LabwareDropdown ({onClose, onContainerChoose, slot}) {
+  // do not render without a slot
+  if (!slot) return null
 
   const labwareItemMapper = (item, key) => (
     // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
@@ -30,7 +30,7 @@ export default function LabwareDropdown ({onClose, onContainerChoose, slotName})
 
   return (
     <div className={styles.labware_dropdown}>
-      <label>Add Labware to Slot {slotName}</label>
+      <label>Add Labware to Slot {slot}</label>
       <div className={styles.close} onClick={onClose}>X</div>
       <ul>
         <Accordion title='Tip Rack'>

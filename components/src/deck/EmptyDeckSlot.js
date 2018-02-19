@@ -8,11 +8,11 @@ import styles from './LabwareContainer.css'
 import type {DeckSlotProps} from '../../interfaces/DeckSlot'
 
 export function EmptyDeckSlot (props: DeckSlotProps) {
-  const {slotName} = props
+  const {slot} = props
   return <LabwareContainer {...props}>
     <g className={styles.empty_slot}>
       <rect width='100%' height='100%' />
-      <CenteredTextSvg text={slotName} />
+      <CenteredTextSvg text={slot} />
     </g>
   </LabwareContainer>
 }
