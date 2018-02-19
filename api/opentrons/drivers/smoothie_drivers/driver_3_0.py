@@ -295,12 +295,15 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             # TODO (ben 20171117): modify all axes to dwell at low current
-            moving_plunger = ('B' in command or 'C' in command) \
-                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+            moving_plungers = []
+            if GCODES['MOVE'] in command or GCODES['HOME'] in command:
+                moving_plungers = [ax for ax in 'BC' if ax in command]
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_high
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_high
+                    for axis in moving_plungers
+                })
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
@@ -312,9 +315,11 @@ class SmoothieDriver_3_0_0:
                 self._reset_from_error()
                 smoothie_error = True
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_low
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_low
+                    for axis in moving_plungers
+                })
 
             # ensure we lower plunger currents before raising an exception
             if smoothie_error:
