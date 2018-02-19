@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Modal, ContinueModal, Overlay} from '..'
+import {Modal, AlertModal, ContinueModal, Overlay} from '..'
 
 describe('modals', () => {
   test('Modal has a clickable overlay', () => {
@@ -13,7 +13,7 @@ describe('modals', () => {
       </Modal>
     ).root
 
-    const overlay = root.findByProps({className: 'overlay'})
+    const overlay = root.findByProps({className: 'overlay clickable'})
     overlay.props.onClick()
 
     expect(onCloseClick).toHaveBeenCalled()
@@ -53,7 +53,7 @@ describe('modals', () => {
       </ContinueModal>
     ).root
 
-    const overlay = root.findByProps({className: 'overlay'})
+    const overlay = root.findByProps({className: 'overlay clickable'})
 
     overlay.props.onClick()
     expect(onCancelClick).toHaveBeenCalled()
@@ -64,6 +64,24 @@ describe('modals', () => {
       <Modal onCloseClick={() => {}} className='foo'>
         children
       </Modal>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('AlertModal renders correctly', () => {
+    const tree = Renderer.create(
+      <AlertModal
+        heading={'heading'}
+        className={'style'}
+        onCloseClick={() => {}}
+        buttons={[
+          {onClick: () => {}, children: 'a'},
+          {onClick: () => {}, children: 'b'}
+        ]}
+      >
+        children
+      </AlertModal>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -50,12 +50,17 @@ export default function client (
       : undefined
   }
 
-  return fetch(url, options)
-    .then(
-      (response) => (response.ok
-        ? response.json()
-        : Promise.reject(ResponseError(response))
-      ),
-      (error) => Promise.reject(FetchError(error))
-    )
+  return fetch(url, options).then(jsonFromResponse, fetchErrorFromError)
+}
+
+function jsonFromResponse (response: Response): Promise<*> {
+  if (!response.ok) {
+    return Promise.reject(ResponseError(response))
+  }
+
+  return response.json().catch(fetchErrorFromError)
+}
+
+function fetchErrorFromError (error: Error): Promise<*> {
+  return Promise.reject(FetchError(error))
 }

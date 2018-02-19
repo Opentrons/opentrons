@@ -30,7 +30,12 @@ const middleware = applyMiddleware(
   routerMiddleware(history)
 )
 
-const composeEnhancers = global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const composeEnhancers = (
+  (
+    global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({maxAge: 200})
+  ) ||
+  compose
+)
 
 const store = createStore(reducer, composeEnhancers(middleware))
 

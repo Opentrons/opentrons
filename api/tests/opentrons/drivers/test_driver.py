@@ -59,12 +59,10 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
         ['G28.2Y M400'],                        # home Y
-        ['M114.2 M400'],                       # Get position
         ['M203.1 Y8 M400'],                     # lower speed on Y for retract
-        ['G0.+ M400'],                          # retract Y
+        ['G91 G0Y-3 G90'],                          # retract Y
         ['G28.2Y M400'],                        # home Y
-        ['M114.2 M400'],                       # Get position
-        ['G0.+ M400'],                          # retract Y
+        ['G91 G0Y-3 G90'],                          # retract Y
         ['M203.1 A100 B70 C70 X600 Y400 Z100 M400'],  # return to norm current
         ['M114.2 M400']                       # Get position
     ]
@@ -76,6 +74,19 @@ def test_plunger_commands(smoothie, monkeypatch):
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
         ['G0.+ M400']                         # Move (non-plunger)
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
+    smoothie.move({'B': 2})
+    expected = [
+        ['M907 B0.5 M400'],
+        ['G4P0.05 M400'],
+        ['G0B2.3 G0B2 M400'],
+        ['M907 B0.1 M400'],
+        ['G4P0.05 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)

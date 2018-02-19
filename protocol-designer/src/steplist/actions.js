@@ -97,17 +97,26 @@ export type SelectStepAction = {
   payload: StepIdType
 }
 
-export const selectStep = (payload: StepIdType): ThunkAction<*> =>
+export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
   (dispatch: Dispatch<*>, getState: GetState) => {
-    dispatch({
-      type: 'SELECT_STEP',
-      payload: payload
-    })
+    const stepData = selectors.allSteps(getState())[stepId]
+    const stepType = stepData && stepData.stepType
 
     dispatch({
-      type: 'POPULATE_FORM',
-      payload: selectors.selectedStepFormData(getState())
+      type: 'SELECT_STEP',
+      payload: stepId
     })
+
+    // 'deck-setup' steps don't use a Step Form, all others do
+    if (stepType === 'deck-setup') {
+      // Cancel open step form, if any
+      dispatch(cancelStepForm())
+    } else {
+      dispatch({
+        type: 'POPULATE_FORM',
+        payload: selectors.selectedStepFormData(getState())
+      })
+    }
   }
 
 export type SaveStepFormAction = {
@@ -129,10 +138,12 @@ export const saveStepForm = () =>
     }
   }
 
-export const cancelStepForm = () => ({
-  type: 'CANCEL_STEP_FORM',
-  payload: null
-})
+export function cancelStepForm () {
+  return {
+    type: 'CANCEL_STEP_FORM',
+    payload: null
+  }
+}
 
 export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload: FormSectionNames}
 export function collapseFormSection (payload: FormSectionNames): CollapseFormSectionAction {

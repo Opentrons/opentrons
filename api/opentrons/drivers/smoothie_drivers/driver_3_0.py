@@ -57,6 +57,7 @@ GCODES = {'HOME': 'G28.2',
           'LIMIT_SWITCH_STATUS': 'M119',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
+          'RELATIVE_COORDS': 'G91',
           'RESET_FROM_ERROR': 'M999',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
@@ -300,12 +301,15 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             # TODO (ben 20171117): modify all axes to dwell at low current
-            moving_plunger = ('B' in command or 'C' in command) \
-                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+            moving_plungers = []
+            if GCODES['MOVE'] in command or GCODES['HOME'] in command:
+                moving_plungers = [ax for ax in 'BC' if ax in command]
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_high
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_high
+                    for axis in moving_plungers
+                })
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
@@ -317,9 +321,11 @@ class SmoothieDriver_3_0_0:
                 self._reset_from_error()
                 smoothie_error = True
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_low
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_low
+                    for axis in moving_plungers
+                })
 
             # ensure we lower plunger currents before raising an exception
             if smoothie_error:
@@ -346,17 +352,22 @@ class SmoothieDriver_3_0_0:
     def _home_y(self):
         # home the Y at normal speed (fast)
         self._send_command(GCODES['HOME'] + 'Y')
-        self.update_position(default={'Y': HOMED_POSITION.get('Y')})
+
         # slow the maximum allowed speed on Y axis
         self.push_axis_max_speed()
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
-        # move away from the switch
-        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
-        # home again, but slower now
+
+        # retract, then home, then retract again
+        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+            GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
+            GCODES['MOVE'],  # move 3 millimeters away from switch
+            str(-Y_RETRACT_DISTANCE),
+            GCODES['ABSOLUTE_COORDS']  # set back to absolute coordinate system
+        )
+        self._send_command(relative_retract_command)
         self._send_command(GCODES['HOME'] + 'Y')
-        self.update_position()
-        # move away from the switch again
-        self.move({'Y': self.position['Y'] - Y_RETRACT_DISTANCE})
+        self._send_command(relative_retract_command)
+
         # bring max speeds back to normal
         self.pop_axis_max_speed()
 

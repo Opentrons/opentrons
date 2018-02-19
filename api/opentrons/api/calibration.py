@@ -28,13 +28,13 @@ class CalibrationManager:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
         self.state = state
-        if self.robot:
-            self.robot._use_safest_height = (state in ['probing', 'moving'])
+        # if self.robot:
+        #     self.robot._use_safest_height = (state in ['probing', 'moving'])
         self._on_state_changed()
 
     def tip_probe(self, instrument):
         inst = instrument._instrument
-        log.debug('Probing tip with {}'.format(instrument.name))
+        log.info('Probing tip with {}'.format(instrument.name))
         self._set_state('probing')
 
         measured_center = calibration_functions.probe_instrument(
@@ -48,7 +48,7 @@ class CalibrationManager:
             measured_center=measured_center
         )
 
-        log.debug('New config: {0}'.format(config))
+        log.info('New config: {0}'.format(config))
 
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
@@ -63,7 +63,7 @@ class CalibrationManager:
                 .format(type(container)))
 
         inst = instrument._instrument
-        log.debug('Picking up tip from {} in {} with {}'.format(
+        log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
         inst.pick_up_tip(container._container[0])
@@ -76,7 +76,7 @@ class CalibrationManager:
                 .format(type(container)))
 
         inst = instrument._instrument
-        log.debug('Dropping tip from {} in {} with {}'.format(
+        log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
         inst.drop_tip(container._container[0], home_after=True)
@@ -84,14 +84,14 @@ class CalibrationManager:
 
     def return_tip(self, instrument):
         inst = instrument._instrument
-        log.debug('Returning tip from {}'.format(instrument.name))
+        log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
         inst.return_tip(home_after=True)
         self._set_state('ready')
 
     def move_to_front(self, instrument):
         inst = instrument._instrument
-        log.debug('Moving {}'.format(instrument.name))
+        log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
         inst.robot.home()
         calibration_functions.move_instrument_for_probing_prep(
@@ -100,14 +100,13 @@ class CalibrationManager:
         self._set_state('ready')
 
     def move_to(self, instrument, container):
-        # TODO (ben 20171115) Replace `isinstance` checks with typed params
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
                 .format(type(container)))
 
         inst = instrument._instrument
-        log.debug('Moving {} to {} in {}'.format(
+        log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
         inst.move_to(container._container[0])
@@ -115,7 +114,7 @@ class CalibrationManager:
 
     def jog(self, instrument, distance, axis):
         inst = instrument._instrument
-        log.debug('Jogging {} by {} in {}'.format(
+        log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
         self._set_state('moving')
         calibration_functions.jog_instrument(
@@ -128,23 +127,20 @@ class CalibrationManager:
 
     def home(self, instrument):
         inst = instrument._instrument
-        log.debug('Homing {}'.format(instrument.name))
+        log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
         inst.home()
         self._set_state('ready')
 
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
-        log.debug('Updating {} in {}'.format(container.name, container.slot))
+        log.info('Updating {} in {}'.format(container.name, container.slot))
         inst.robot.calibrate_container_with_instrument(
             container=container._container,
             instrument=inst,
             save=True
         )
 
-    # TODO (artyom, 20171003): along with session, consider extracting this
-    # into abstract base class or find any other way to keep notifications
-    # consistent across all managers
     def _snapshot(self):
         return {
             'topic': CalibrationManager.TOPIC,
