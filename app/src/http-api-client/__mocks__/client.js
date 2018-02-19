@@ -27,5 +27,7 @@ client.__setMockError = function setMockError (error) {
 }
 
 client.__clearMock = function clearMockResponses () {
+  _mockResponse = null
+  _mockError = null
   client.mockClear()
 }

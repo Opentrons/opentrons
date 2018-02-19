@@ -150,4 +150,4 @@ instruments = InstrumentsWrapper(robot)
 containers = ContainersWrapper(robot)
 labware = ContainersWrapper(robot)
 
-__all__ = [containers, instruments, robot, reset, __version__]
+__all__ = [containers, instruments, labware, robot, reset, __version__]

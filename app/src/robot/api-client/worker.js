@@ -20,7 +20,11 @@ function dispatchFromWorker (action) {
     action.payload = errorToPlainObject(action.payload)
   }
 
-  self.postMessage(action)
+  try {
+    self.postMessage(action)
+  } catch (error) {
+    console.error('Unable to dispatch action from worker', action, error)
+  }
 }
 
 function errorToPlainObject (error) {

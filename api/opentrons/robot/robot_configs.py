@@ -128,7 +128,7 @@ def load(filename=None):
             local = _check_version_and_update(local)
             result = robot_config(**merge([default._asdict(), local]))
     except FileNotFoundError:
-        log.info('Config {0} not found. Loading defaults'.format(filename))
+        log.warning('Config {0} not found. Loading defaults'.format(filename))
 
     return result
 
@@ -152,7 +152,7 @@ def save(config, filename=None, tag=None):
 
 def clear(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    log.debug('Deleting config file: {}'.format(filename))
+    log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)
 
