@@ -80,6 +80,19 @@ def test_plunger_commands(smoothie, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
+    smoothie.move({'B': 2})
+    expected = [
+        ['M907 B0.5 M400'],
+        ['G4P0.05 M400'],
+        ['G0B2.3 G0B2 M400'],
+        ['M907 B0.1 M400'],
+        ['G4P0.05 M400']
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
     smoothie.move({
         'X': 10.987654321,
         'Y': 1.12345678,
