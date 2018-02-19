@@ -134,7 +134,8 @@ type PauseForm = {|
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
 
-type TransferishFormData = {|
+/* TODO immediately: add ALL fields to this data, split transfer and consolidate apart */
+export type TransferishFormData = {|
   stepType: 'transfer' | 'consolidate',
   pipette: 'left' | 'right', // TODO: pipette ID vs mount enum is TBD
   sourceWells: Array<string>,
