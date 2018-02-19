@@ -56,18 +56,14 @@ This section details production build instructions for the desktop application.
 
 *   `make` - Default target is "clean package"
 *   `make clean` - Delete the dist folder
-*   `make package` - Package the app for running and inspection (does not create a distributable)
-*   `make dist-mac` - Create a macOS distributable of the app
-*   `make dist-linux` - Create a Linux distributable of the app
-*   `make dist-posix` - Create macOS and Linux apps simultaneously
-*   `make dist-win` - Create a Windows distributable of the app
+*   `make package` - Creates a production package of the app for running and inspection (does not create a distributable)
 
 #### production builds
 
 All packages and/or distributables will be placed in `app-shell/dist`. After running `make package`, you can launch the production app with:
 
 *   macOS: `./dist/mac/Opentrons.app/Contents/MacOS/Opentrons`
-*   Linux: `./dist/linux-unpacked/ot-app-desktop`
+*   Linux: `./dist/linux-unpacked/opentrons`
 *   Windows: `./dist/win-unpacked/Opentrons.exe`
 
 To run the production app in debug mode, set the `DEBUG` environment variable. For example, on macOS:
@@ -75,6 +71,33 @@ To run the production app in debug mode, set the `DEBUG` environment variable. F
 ```shell
 DEBUG=1 ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons
 ```
+
+#### ci
+
+There are a series of tasks designed to be run in CI to create distributable versions of the app.
+
+*   `make dist-osx` - Create a macOS distributable of the app
+*   `make dist-linux` - Create a Linux distributable of the app
+*   `make dist-posix` - Create macOS and Linux apps simultaneously
+*   `make dist-win` - Create a Windows distributable of the app
+
+These tasks need the following environment variables defined:
+
+ name          | description   | why
+-------------- | ------------- | -------------------------------------
+ OT_BRANCH     | Branch name   | Sometimes added to the artifact name
+ OT_BUILD      | Build number  | Appended to the artifact name
+ OT_TAG        | Tag name      | Flags autoupdate files to be published
+ OT_BUCKET_APP | AWS S3 bucket | Artifact deploy bucket
+ OT_FOLDER_APP | AWS S3 folder | Artifact deploy folder in bucket
+
+The release channel is set according to the version string:
+
+-   `vM.m.p-alpha.x` - "alpha" channel
+-   `vM.m.p-beta.x` - "beta" channel
+-   `vM.m.p` - "latest" channel
+
+The `electron-updater` autoupdate files (e.g. `beta-mac.yml`) will only be copied to the publish directory if `OT_TAG` is set.
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600

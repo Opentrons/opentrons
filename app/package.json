@@ -1,6 +1,5 @@
 {
-  "name": "ot-app",
-  "private": true,
+  "name": "@opentrons/app",
   "version": "3.0.0-beta.1",
   "description": "Opentrons desktop application UI",
   "main": "src/index.js",

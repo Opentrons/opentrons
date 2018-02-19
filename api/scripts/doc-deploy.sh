@@ -1,4 +1,7 @@
 #!/bin/bash
+# TODO(mc, 2018-03-26): if docs are still to be deployed to GH Pages,
+#   remove this script in favor of Travis' built-in GH pages deploy
+
 set -e # Exit with nonzero exit code if anything fails
 
 SOURCE_BRANCH="master"

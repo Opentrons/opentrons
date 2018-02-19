@@ -1,4 +1,6 @@
 #!/bin/bash
+# TODO(mc, 2018-03-26): delete this script
+
 set -e
 
 echo "--------- GIT STATUS ---------"

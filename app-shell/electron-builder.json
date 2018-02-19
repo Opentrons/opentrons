@@ -1,5 +1,6 @@
 {
-  "appId": "com.opentrons.ot-app",
+  "productName": "Opentrons",
+  "appId": "com.opentrons.app",
   "electronVersion": "1.8.3",
   "files": [
     "**/*",
@@ -17,7 +18,7 @@
       "filter": ["**/*"]
     }
   ],
-  "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
+  "artifactName": "${productName}-v${version}-${os}-${env.BUILD}.${ext}",
   "asar": true,
   "dmg": {
     "backgroundColor": "white",
@@ -50,6 +51,11 @@
     "target": [
       "deb"
     ],
+    "executableName": "opentrons",
     "category": "Science"
-  }
+  },
+  "publish": {
+    "provider": "s3"
+  },
+  "generateUpdatesFilesForAllChannels": true
 }
