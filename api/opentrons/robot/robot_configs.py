@@ -3,6 +3,7 @@
 # pylama:skip=1
 
 from collections import namedtuple
+from datetime import datetime
 from opentrons.util import environment
 from opentrons.config import merge, children, build
 
@@ -157,9 +158,18 @@ def clear(filename=None):
         os.remove(filename)
 
 
+def _backup_configuration(config, tag=None):
+    if not tag:
+        # isoformat(timespec=) kwarg not in Python 3.5
+        tag = datetime.now().isoformat().split('.')[0]
+    save(config, tag=tag)
+
+
 def _check_version_and_update(config_json):
     version = config_json.get('version', 0)
     if version == 0:
+        _backup_configuration(
+            robot_config(**merge([default._asdict(), config_json])))
         # add a version number to the config
         config_json['version'] = 1
         # overwrite instrument_offset to the default
