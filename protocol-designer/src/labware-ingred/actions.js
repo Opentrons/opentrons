@@ -64,7 +64,16 @@ export const {
   HOVER_WELL_END: xyToSingleWellObj
 })
 
-export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<*>, getState: GetState) => {
+export type CopyLabware = {
+  type: 'COPY_LABWARE',
+  payload: {
+    fromContainer: string,
+    toContainer: string,
+    toSlot: DeckSlot
+  }
+}
+
+export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>, getState: GetState) => {
   const state = getState()
   const fromContainer = selectors.labwareToCopy(state)
   if (fromContainer === false) {
@@ -83,7 +92,20 @@ export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<*>, getState:
   })
 }
 
-export const deleteIngredient = (payload: {|wellName?: string, groupId: string|}) => (dispatch: Dispatch<*>, getState: GetState) => {
+type DeleteIngredientPrepayload = {|
+  wellName: ?string,
+  groupId: string
+|}
+
+type DeleteIngredient = {|
+  type: 'DELETE_INGREDIENT',
+  payload: {
+    ...DeleteIngredientPrepayload,
+    containerId: string
+  }
+|}
+
+export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
   const container = selectors.selectedContainer(getState())
   if (!container || !container.containerId) {
     console.warn('Tried to delete ingredient with no selected container')
@@ -100,7 +122,19 @@ export const deleteIngredient = (payload: {|wellName?: string, groupId: string|}
 }
 
 // TODO test this thunk
-export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<*>, getState: GetState) => {
+export type EditIngredient = {
+  type: 'EDIT_INGREDIENT',
+  payload: {
+    name: string,
+    containerId: string,
+    groupId: string,
+    wells: Array<string>,
+    isUnchangedClone: boolean,
+    ...IngredInputFields
+  }
+}
+
+export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
   const allIngredients = selectors.allIngredients(state)
@@ -138,3 +172,19 @@ export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFie
     }
   })
 }
+
+export type Action =
+  | CopyLabware
+  | EditIngredient
+  | DeleteIngredient
+  // TODO IMMEDIATELY properly handle these guys
+  | {
+    type: 'OPEN_LABWARE_SELECTOR' | 'CLOSE_LABWARE_SELECTOR',
+    payload: {
+      slot: string
+    }
+  }
+  | {
+    type: 'CREATE_CONTAINER',
+    payload: any
+  }
