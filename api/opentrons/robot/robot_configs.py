@@ -144,14 +144,7 @@ default = robot_config(
         }
     },
     tip_length={
-        'left': {
-            'single': 51.7,
-            'multi': 51.7
-        },
-        'right': {
-            'single': 51.7,
-            'multi': 51.7
-        }
+        'Pipette': 51.7 # TODO (andy): move to tip-rack
     },
     serial_speed=115200,
     default_current=DEFAULT_CURRENT,
@@ -237,5 +230,6 @@ def _migrate_zero_to_one(config_json):
     config_json['version'] = 1
     # overwrite instrument_offset to the default
     config_json['instrument_offset'] = default.instrument_offset.copy()
+    config_json['tip_length'] = default.tip_length.copy()
     return config_json
 
