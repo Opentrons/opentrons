@@ -118,6 +118,10 @@
 
 .labeled_value {
   @apply --font-body-2-dark;
+
+  & svg {
+    height: var(--fs-body-2);
+  }
 }
 
 .labeled_value_label {

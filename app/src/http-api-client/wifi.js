@@ -83,14 +83,14 @@ export type WifiAction =
   | WifiFailureAction
   | SetConfigureWifiBodyAction
 
-export type RobotWifi = {
+export type RobotWifi = ?{
   list?: ApiCall<void, ListResponse>,
   status?: ApiCall<void, StatusResponse>,
   configure?: ApiCall<ConfigureRequest, ConfigureResponse>,
 }
 
 export type WifiState = {
-  [robotName: string]: ?RobotWifi
+  [robotName: string]: RobotWifi
 }
 
 const LIST_PATH: RequestPath = 'list'

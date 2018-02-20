@@ -39,7 +39,7 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
-export type RobotHealth = ApiCall<void, HealthInfo>
+export type RobotHealth = ?ApiCall<void, HealthInfo>
 
 export type HealthState = {
   [robotName: string]: RobotHealth
