@@ -42,14 +42,7 @@ def config(monkeypatch, tmpdir):
                 }
             },
             tip_length={
-                'left': {
-                    'single': 50.0,
-                    'multi': 50.0
-                },
-                'right': {
-                    'single': 50.0,
-                    'multi': 50.0
-                }
+                'Pipette': 50
             }
         )
     monkeypatch.setattr(robot_configs, 'default', default)
@@ -240,8 +233,7 @@ def test_update_instrument_config(fixture, monkeypatch):
         measured_center=(0.0, 0.0, 105.0)
     )
 
-    new_tip_length = config \
-        .tip_length[instrument.mount][instrument.type]
+    new_tip_length = config.tip_length[instrument.name]
     new_instrument_offset = config \
         .instrument_offset[instrument.mount][instrument.type]
 
@@ -263,8 +255,6 @@ def test_update_instrument_config(fixture, monkeypatch):
                 }
             },
             'tip_length': {
-                'right': {
-                    'single': 55.0
-                }
+                'Pipette': 55.0
             }
         }

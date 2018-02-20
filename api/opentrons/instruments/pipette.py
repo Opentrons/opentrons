@@ -3,6 +3,7 @@ import warnings
 
 from opentrons import commands
 
+from opentrons.robot import robot_configs
 from opentrons.containers import unpack_location
 
 from opentrons.containers.placeable import (
@@ -111,7 +112,8 @@ class Pipette:
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
             dispense_speed=DEFAULT_DISPENSE_SPEED,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            tip_length=51.7):  # TODO (andy): remove this, move to tip-rack
 
         self.robot = robot
 
@@ -183,6 +185,11 @@ class Pipette:
 
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
+
+        # TODO (andy): remove from pipette, move to tip-rack
+        self.robot.config.tip_length[self.name] = \
+            self.robot.config.tip_length.get(self.name, tip_length)
+        robot_configs.save(self.robot.config)
 
     def reset(self):
         """
@@ -907,7 +914,7 @@ class Pipette:
                     self.current_tip().top(0),
                     strategy='direct')
             self._add_tip(
-                length=self.robot.config.tip_length[self.mount][self.type]
+                length=self.robot.config.tip_length[self.name]
             )
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, abs(plunge_depth))
@@ -1009,7 +1016,7 @@ class Pipette:
             self.current_volume = 0
             self.current_tip(None)
             self._remove_tip(
-                length=self.robot.config.tip_length[self.mount][self.type]
+                length=self.robot.config.tip_length[self.name]
             )
 
             return self

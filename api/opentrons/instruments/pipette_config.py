@@ -31,7 +31,8 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'channels',
         'name',
-        'model_offset'
+        'model_offset',
+        'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
 
@@ -48,7 +49,8 @@ p10_single = pipette_config(
     ul_per_mm=0.617,
     channels=1,
     name='p10_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P10)
+    model_offset=(0.0, 0.0, Z_OFFSET_P10),
+    tip_length=40  # TODO (andy): remove from pipette, move to tip-rack
 )
 
 p10_multi = pipette_config(
@@ -64,7 +66,8 @@ p10_multi = pipette_config(
     ul_per_mm=0.617,
     channels=8,
     name='p10_multi',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI)
+    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    tip_length=40  # TODO (andy): remove from pipette, move to tip-rack
 )
 
 p300_single = pipette_config(
@@ -80,7 +83,8 @@ p300_single = pipette_config(
     ul_per_mm=18.51,
     channels=1,
     name='p300_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P300)
+    model_offset=(0.0, 0.0, Z_OFFSET_P300),
+    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
 )
 
 p300_multi = pipette_config(
@@ -96,7 +100,8 @@ p300_multi = pipette_config(
     ul_per_mm=18.51,
     channels=8,
     name='p300_multi',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI)
+    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
 )
 
 
