@@ -239,7 +239,7 @@ export const ingredLocations = handleActions({
 }, {})
 
 export type RootState = {|
-  modeLabwareSelection: boolean,
+  modeLabwareSelection: string | false, // TODO use null, not false
   copyLabwareMode: string | false,
   selectedContainer: string | null,
   selectedIngredientGroup: SelectedIngredientGroupState,
