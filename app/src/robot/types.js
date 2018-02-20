@@ -133,3 +133,12 @@ export type Labware = StateLabware & {
 }
 
 export type LabwareType = 'tiprack' | 'labware'
+
+export type SessionStatus =
+  | ''
+  | 'loaded'
+  | 'running'
+  | 'paused'
+  | 'error'
+  | 'finished'
+  | 'stopped'

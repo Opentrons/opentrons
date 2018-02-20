@@ -3,7 +3,7 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {PageTabs, TitleBar, VerticalNavBar, NavButton, SidePanel, FILE} from '..'
+import {PageTabs, TitleBar, VerticalNavBar, NavButton, SidePanel, FILE, Card, LabeledValue} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -209,6 +209,30 @@ describe('SidePanel', () => {
       <SidePanel title={'title'} onCloseClick={onClick} isClosed='true'>
         children
       </SidePanel>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('Card', () => {
+  test('renders Card correctly', () => {
+    const tree = Renderer.create(
+      <Card title={'title'} >
+        children
+        children
+        children
+      </Card>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('LabeledValue', () => {
+  test('renders LabeledValue correctly', () => {
+    const tree = Renderer.create(
+      <LabeledValue label={'Label'} value={'Value'} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

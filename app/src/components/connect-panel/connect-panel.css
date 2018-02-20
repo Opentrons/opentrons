@@ -40,15 +40,17 @@
 }
 
 .disconnected {
-  color: var(--c-dark-gray);
   fill: var(--c-dark-gray);
 }
 
-.connected,
-.connected button {
+.active {
   color: #0ec9eb;
-  fill: #0ec9eb;
   background-color: #f0f3ff;
+}
+
+.connected {
+  fill: #0ec9eb;
+  color: #0ec9eb;
 }
 
 .scan_status {
