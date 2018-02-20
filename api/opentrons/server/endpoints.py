@@ -59,9 +59,8 @@ async def wifi_list(request):
             {"ssid": "c", "signal": None, "active": False}
         ]
 
-    return web.json_response(
-        body=json.dumps(res)
-    )
+    # TODO(mc, 2019-02-20): return error status code if error
+    return web.json_response(res)
 
 
 async def wifi_configure(request):
@@ -76,24 +75,33 @@ async def wifi_configure(request):
     will not be set during development on a laptop, or while running the server
     during test on CI.
     """
-    result = '...'
+    result = {}
     try:
         body = await request.text()
         jbody = json.loads(body)
+        ssid = jbody['ssid']
+        psk = jbody['psk']
     except Exception as e:
         result = "Error: {}, type: {}".format(e, type(e))
         log.warning(result)
     else:
+        message = ''
         if ENABLE_NMCLI:
             cmd = 'nmcli device wifi connect {} password "{}"'.format(
-                jbody['ssid'], jbody['psk'])
+                ssid, psk)
             proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-            result = proc.stdout.decode().strip().split("\r")[-1]
+            # TODO(mc, 2019-02-20): check this string for success or failure
+            #   nmcli success: "Device 'wlan0' successfully activated..."
+            message = proc.stdout.decode().strip().split("\r")[-1]
         else:
-            result = "Configuration successful. SSID: {}, PSK: {}".format(
-                jbody['ssid'], jbody['psk'])
+            message = "Configuration successful. PSK: '{}'".format(psk)
+
+        result = {'ssid': ssid, 'message': message}
+
     log.info("Wifi configure result: {}".format(result))
-    return web.Response(text=result)
+
+    # TODO(mc, 2019-02-20): return error status code if error
+    return web.json_response(result)
 
 
 async def wifi_status(request):
@@ -128,9 +136,9 @@ async def wifi_status(request):
             log.error("FileNotFoundError: {}".format(e))
     else:
         connectivity['status'] = "testing"
-    return web.json_response(
-        body=json.dumps(connectivity)
-    )
+
+    # TODO(mc, 2019-02-20): return error status code if error
+    return web.json_response(connectivity)
 
 
 async def identify(request):

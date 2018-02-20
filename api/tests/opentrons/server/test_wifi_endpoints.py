@@ -18,10 +18,10 @@ async def test_wifi_list(virtual_smoothie_env, loop, test_client):
     cli = await loop.create_task(test_client(app))
 
     expected = json.dumps({
-        "list": [
-            {"ssid": "a", "signal": 42, "active": True},
-            {"ssid": "b", "signal": 43, "active": False},
-            {"ssid": "c", "signal": None, "active": False}
+        'list': [
+            {'ssid': 'a', 'signal': 42, 'active': True},
+            {'ssid': 'b', 'signal': 43, 'active': False},
+            {'ssid': 'c', 'signal': None, 'active': False}
         ]
     })
     resp = await cli.get('/wifi/list')
@@ -34,7 +34,10 @@ async def test_wifi_configure(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    expected = "Configuration successful. SSID: this, PSK: that"
+    expected = json.dumps({
+        'ssid': 'this',
+        'message': "Configuration successful. PSK: 'that'"
+    })
     resp = await cli.post('/wifi/configure',
                           json={'ssid': 'this', 'psk': 'that'})
     text = await resp.text()
