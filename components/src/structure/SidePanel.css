@@ -26,18 +26,16 @@
 }
 
 .title {
-  margin: 0 auto;
-  font-size: var(fs-header);
-  font-weight: normal;
-  color: var(--c-dark-gray);
-  line-height: 2;
+  @apply --font-header-dark;
+
+  margin: 1rem auto;
 }
 
 .panel_contents {
   width: var(--sidebar-width);
   height: calc(100vh - 2.625rem);
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /*

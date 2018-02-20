@@ -32,6 +32,19 @@ def test_pipette_models(robot):
     assert p.max_volume > 10
 
 
+def test_pipette_max_deck_height(robot):
+    from opentrons import instruments, robot
+    robot.reset()
+    tallest_point = robot._driver.homed_position['Z']
+    p = instruments.P300_Single(mount='left')
+    assert p._max_deck_height() == tallest_point
+
+    for tip_length in [10, 25, 55, 100]:
+        p._add_tip(length=tip_length)
+        assert p._max_deck_height() == tallest_point - tip_length
+        p._remove_tip(length=tip_length)
+
+
 def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', '1')
     tiprack = containers_load(robot, 'tiprack-200ul', '3')

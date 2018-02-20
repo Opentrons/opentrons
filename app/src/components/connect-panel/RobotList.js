@@ -1,6 +1,5 @@
 // list of robots
 import React from 'react'
-
 import styles from './connect-panel.css'
 
 export default function RobotList (props) {

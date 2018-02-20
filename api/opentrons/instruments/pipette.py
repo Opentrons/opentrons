@@ -1688,6 +1688,16 @@ class Pipette:
                 x, y, z + length))
         self.tip_attached = False
 
+    def _max_deck_height(self):
+        mount_max_height = self.instrument_mover.axis_maximum(
+            self.robot.poses, 'z')
+        _, _, pipette_max_height = pose_tracker.change_base(
+            self.robot.poses,
+            src=self,
+            dst=self.mount,
+            point=(0, 0, mount_max_height))
+        return pipette_max_height
+
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'

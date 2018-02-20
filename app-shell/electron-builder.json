@@ -1,4 +1,6 @@
 {
+  "appId": "com.opentrons.ot-app",
+  "electronVersion": "1.6.11",
   "files": [
     "node_modules/**/*",
     "lib/**/*",
@@ -10,9 +12,6 @@
   ],
   "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
   "asar": true,
-  "appId": "com.opentrons.ot-app",
-  "electronVersion": "1.6.11",
-  "productName": "Opentrons",
   "dmg": {
     "backgroundColor": "white",
     "contents": [
@@ -33,19 +32,17 @@
     "target": [
       "zip"
     ],
-    "category": "productivity"
+    "category": "public.app-category.productivity"
   },
   "win": {
     "target": [
-      "squirrel"
+      "nsis"
     ]
   },
-  "squirrelWindows": {
-    "iconUrl": "https://s3.amazonaws.com/ot-app-builds/win/icon.ico"
-  },
   "linux": {
-    "category": "Science",
-    "target": "deb",
-    "executableName": "opentrons-app"
+    "target": [
+      "deb"
+    ],
+    "category": "Science"
   }
 }

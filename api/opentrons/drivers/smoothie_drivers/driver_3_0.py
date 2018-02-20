@@ -109,7 +109,7 @@ class SmoothieDriver_3_0_0:
         self.run_flag = Event()
         self.run_flag.set()
 
-        self._position = {}
+        self._position = HOMED_POSITION.copy()
         self.log = []
         self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
@@ -122,6 +122,12 @@ class SmoothieDriver_3_0_0:
 
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
+
+        self._homed_position = HOMED_POSITION.copy()
+
+    @property
+    def homed_position(self):
+        return self._homed_position.copy()
 
     def _update_position(self, target):
         self._position.update({
@@ -295,12 +301,15 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             # TODO (ben 20171117): modify all axes to dwell at low current
-            moving_plunger = ('B' in command or 'C' in command) \
-                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+            moving_plungers = []
+            if GCODES['MOVE'] in command or GCODES['HOME'] in command:
+                moving_plungers = [ax for ax in 'BC' if ax in command]
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_high
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_high
+                    for axis in moving_plungers
+                })
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
@@ -312,9 +321,11 @@ class SmoothieDriver_3_0_0:
                 self._reset_from_error()
                 smoothie_error = True
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_low
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_low
+                    for axis in moving_plungers
+                })
 
             # ensure we lower plunger currents before raising an exception
             if smoothie_error:
@@ -366,7 +377,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.current)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.update_position(default=HOMED_POSITION)
+        self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
     # ----------- END Private functions ----------- #
@@ -451,10 +462,19 @@ class SmoothieDriver_3_0_0:
 
         # Only update axes that have been selected for homing
         homed = {
-            ax: HOMED_POSITION.get(ax)
+            ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
         self.update_position(default=homed)
+
+        # coordinate after homing might not synce with default in API
+        # so update this driver's homed position using current coordinates
+        new = {
+            ax: self.position[ax]
+            for ax in self.homed_position.keys()
+            if ax in axis
+        }
+        self._homed_position.update(new)
 
         return self.position
 
@@ -466,7 +486,7 @@ class SmoothieDriver_3_0_0:
         '''
         # move some mm distance away from the target axes endstop switch(es)
         destination = {
-            ax: HOMED_POSITION.get(ax) - abs(safety_margin)
+            ax: self.homed_position.get(ax) - abs(safety_margin)
             for ax in axis.upper()
         }
 

@@ -1,0 +1,6 @@
+/* stylesheet for RobotSettings components */
+@import '@opentrons/components';
+
+.robot_settings {
+  padding: 1.5rem;
+}

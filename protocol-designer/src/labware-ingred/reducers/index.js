@@ -216,6 +216,21 @@ const loadedContainersBySlot = createSelector(
   containers => _loadedContainersBySlot(containers)
 )
 
+/** Returns options for dropdowns, excluding tiprack labware */
+const labwareOptions: (state: any) => Array<{value: string, name: string}> = createSelector(
+  state => rootSelector(state).containers,
+  containers => reduce(containers, (acc, containerFields, containerId) => {
+    // TODO Ian 2018-02-16 more robust way to filter out tipracks?
+    if (!containerFields.type || containerFields.type.startsWith('tiprack')) {
+      return acc
+    }
+    return [
+      ...acc,
+      {name: containerFields.name, value: containerId}
+    ]
+  }, [])
+)
+
 // const canAdd = createSelector(
 //   loadedContainersBySlot,
 //   loadedContainers => nextEmptySlot(loadedContainers)
@@ -469,7 +484,8 @@ export const selectors = {
   containerById,
   ingredientsForContainer,
   // selectedIngredientProperties,
-  selectedIngredientGroupId
+  selectedIngredientGroupId,
+  labwareOptions
 }
 
 export default rootReducer

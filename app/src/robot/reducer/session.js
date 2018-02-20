@@ -1,7 +1,14 @@
 // @flow
 // robot session (protocol) state and reducer
-import type {Command, StateInstrument, StateLabware, Mount, Slot} from '../types'
-import type {SessionStatus} from '../constants'
+import type {
+  Command,
+  StateInstrument,
+  StateLabware,
+  Mount,
+  Slot,
+  SessionStatus
+} from '../types'
+
 import {actionTypes} from '../actions'
 
 type Request = {

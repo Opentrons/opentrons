@@ -14,12 +14,12 @@ import type {
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
-  Robot
+  Robot,
+  SessionStatus
 } from './types'
 
 import {
   type ConnectionStatus,
-  type SessionStatus,
   _NAME,
   INSTRUMENT_MOUNTS,
   DECK_SLOTS
@@ -29,7 +29,6 @@ const calibration = (state: State) => state[_NAME].calibration
 const connection = (state: State) => state[_NAME].connection
 const session = (state: State) => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
-const sessionStatus = (state: State) => session(state).state
 
 export function isMount (target: ?string): boolean {
   return INSTRUMENT_MOUNTS.indexOf(target) > -1
@@ -94,16 +93,20 @@ export function getSessionName (state: State): string {
   return session(state).name
 }
 
+export function getSessionStatus (state: State): SessionStatus {
+  return session(state).state
+}
+
 export function getSessionIsLoaded (state: State): boolean {
-  return sessionStatus(state) !== ('': SessionStatus)
+  return getSessionStatus(state) !== ('': SessionStatus)
 }
 
 export function getIsReadyToRun (state: State): boolean {
-  return sessionStatus(state) === ('loaded': SessionStatus)
+  return getSessionStatus(state) === ('loaded': SessionStatus)
 }
 
 export function getIsRunning (state: State): boolean {
-  const status = sessionStatus(state)
+  const status = getSessionStatus(state)
 
   return (
     status === ('running': SessionStatus) ||
@@ -112,11 +115,11 @@ export function getIsRunning (state: State): boolean {
 }
 
 export function getIsPaused (state: State): boolean {
-  return sessionStatus(state) === ('paused': SessionStatus)
+  return getSessionStatus(state) === ('paused': SessionStatus)
 }
 
 export function getIsDone (state: State): boolean {
-  const status = sessionStatus(state)
+  const status = getSessionStatus(state)
 
   return (
     status === ('error': SessionStatus) ||
