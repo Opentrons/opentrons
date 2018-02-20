@@ -3,9 +3,10 @@ import { connect } from 'react-redux'
 import { closeLabwareSelector, createContainer } from '../labware-ingred/actions'
 import { selectors } from '../labware-ingred/reducers'
 import LabwareDropdown from '../components/LabwareDropdown.js'
+import type {BaseState} from '../types'
 
 export default connect(
-  state => ({
+  (state: BaseState) => ({
     slot: selectors.canAdd(state)
   }),
   (dispatch) => ({dispatch}), // TODO Ian 2018-02-19 what does flow want for no-op mapDispatchToProps?

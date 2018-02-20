@@ -11,9 +11,10 @@ import {
   openMoreOptionsModal
 } from '../steplist/actions' // TODO use steplist/index.js
 
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
 import type {FormData} from '../steplist/types'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import type {BaseState} from '../types'
 
 import StepEditForm, {type Props as StepEditFormProps} from '../components/StepEditForm'
 
@@ -30,7 +31,7 @@ function StepEditFormWrapper (props: Props) {
   return null
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: BaseState) {
   return {
     formData: selectors.formData(state),
     formSectionCollapse: selectors.formSectionCollapse(state),

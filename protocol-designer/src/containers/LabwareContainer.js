@@ -18,9 +18,10 @@ import {
 import {selectors as steplistSelectors} from '../steplist/reducers'
 
 import {LabwareOnDeck} from '../components/labware'
+import type {BaseState} from '../types'
 
 export default connect(
-  (state, ownProps) => {
+  (state: BaseState, ownProps) => {
     const container = selectors.containersBySlot(state)[ownProps.slot]
     const containerInfo = (container)
       ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
