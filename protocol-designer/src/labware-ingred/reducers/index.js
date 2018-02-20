@@ -5,18 +5,18 @@ import {createSelector} from 'reselect'
 
 import findKey from 'lodash/findKey'
 import get from 'lodash/get'
-import isNil from 'lodash/isNil'
 import min from 'lodash/min'
+import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
-import set from 'lodash/set' // <- careful, this mutates the object
 import uniq from 'lodash/uniq'
 
 import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants.js' // TODO factor out constants
 import {uuid} from '../../utils.js'
 
-import type {Labware, Wells} from '../types'
+import {editableIngredFields} from '../types'
+import type {IngredInputFields, Labware, Wells} from '../types'
 import type {BaseState} from '../../types'
 
 // UTILS
@@ -124,91 +124,103 @@ const highlightedIngredients = handleActions({
   HOVER_WELL_END: (state, action) => ({}) // clear highlighting
 }, {})
 
-type IngredientsState = any // TODO IMMEDIATELY refactor this state anyway
+type IngredientsState = {
+  [ingredGroupId: string]: IngredInputFields
+}
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
-    const editableIngredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize']
-    const { groupId, containerId, copyGroupId } = action.payload
-    if (!isNil(groupId)) {
-      // GroupId was given, edit existing ingredient
-      return set(
-        {...state},
-        groupId,
-        {
-          ...state[groupId],
-          ...pick(action.payload, editableIngredFields)
-          // TODO: changing wells and wellDetails
-        }
-      )
-    }
-    // No groupId, create new ingredient groupId by adding 1 to the highest ID
-    // TODO: use uuid, use an array of uuids to give order to ingreds.
-    const newGroupId = Object.keys(state).length === 0
-      ? 0
-      : Math.max(...Object.keys(state).map(key => parseInt(key))) + 1
-
-    const isUnchangedClone = state[copyGroupId] && editableIngredFields.every(field =>
-        state[copyGroupId][field] === action.payload[field])
-
-    if (isUnchangedClone) {
-      // for an unchanged clone, just add the new wells.
-      // TODO: make this more concise
+    const { groupId, isUnchangedClone } = action.payload
+    if (!(groupId in state)) {
+      // is a new ingredient
       return {
         ...state,
-        [copyGroupId]: {
-          ...state[copyGroupId],
-          locations: {
-            ...state[copyGroupId].locations,
-            [containerId]: state[copyGroupId].locations[containerId]
-              ? uniq(state[copyGroupId].locations[containerId].concat(action.payload.wells))
-              : action.payload.wells
-          }
-        }
+        [groupId]: pick(action.payload, editableIngredFields)
       }
+    }
+
+    if (isUnchangedClone) {
+      // for an unchanged clone, do nothing
+      return state
     }
 
     // otherwise, create a new ingredient group
     return {
       ...state,
-      [newGroupId]: {
-        ...pick(action.payload, editableIngredFields),
-        locations: { [containerId]: action.payload.wells },
-        name: state[copyGroupId] && state[copyGroupId].name === action.payload.name
-          ? state[copyGroupId].name + ' copy' // todo: copy 2, copy 3 etc.
-          : action.payload.name
+      [groupId]: {
+        ...pick(action.payload, editableIngredFields)
       }
     }
   },
   // Remove the deleted group (referenced by array index)
   DELETE_INGREDIENT: (state, action) => {
-    const { wellName, groupId, containerId } = action.payload
+    const {groupId, wellName} = action.payload
     return (wellName)
-      ? {
+      // if wellName included, only a single well is being delete. not the whole group. Only ingredLocations change.
+      ? state
+      // otherwise, the whole ingred group is deleted
+      : omit(state, [groupId])
+  }
+}, {})
+
+type LocationsState = {
+  [ingredGroupId: string]: {
+    [containerId: string]: Wells
+  }
+}
+
+export const ingredLocations = handleActions({
+  EDIT_INGREDIENT: (state, action) => {
+    const { groupId, containerId, isUnchangedClone } = action.payload
+
+    if (isUnchangedClone) {
+      // for an unchanged clone, just add the new wells.
+      return {
         ...state,
         [groupId]: {
           ...state[groupId],
-          locations: {
-            ...state[groupId].locations,
-            [containerId]: state[groupId].locations[containerId].filter(well => well !== wellName)
-          }
+          [containerId]: uniq([
+            ...state[groupId][containerId],
+            ...action.payload.wells
+          ])
         }
       }
-      : pickBy(state, (value: any, key: string) => key !== groupId) // TODO Ian 2018-02-19 no `any`, do proper type
+    }
+
+    return {
+      ...state,
+      [groupId]: {
+        [containerId]: action.payload.wells
+      }
+    }
+  },
+  DELETE_INGREDIENT: (state, action) => {
+    const { wellName, groupId, containerId } = action.payload
+    if (wellName) {
+      // deleting single well location
+      return {
+        ...state,
+        [groupId]: {
+          ...state[groupId],
+          [containerId]: omit(state[groupId][containerId], [wellName])
+        }
+      }
+    }
+    // deleting entire ingred group
+    return omit(state, [groupId])
   },
   COPY_LABWARE: (state, action) => {
-    const { fromContainer, toContainer } = action.payload
-    return reduce(state, (acc, ingredData, ingredId) => ({
-      ...acc,
-      [ingredId]: fromContainer in ingredData.locations
-        // this ingred has instances located in the container we're cloning,
-        // copy it into the 'toContainer' clone
-        ? {
-          ...ingredData,
-          locations: {...ingredData.locations, [toContainer]: ingredData.locations[fromContainer]}
-        }
-        // no instances in the clone parent, do nothing to this ingred
-        : ingredData
-    }), {})
+    const {fromContainer, toContainer} = action.payload
+    return reduce(state, (acc, ingredLocations, ingredId) => {
+      return {
+        ...acc,
+        [ingredId]: (state[ingredId] && state[ingredId][fromContainer])
+          ? {
+            ...ingredLocations,
+            [toContainer]: state[ingredId][fromContainer]
+          }
+          : ingredLocations
+      }
+    }, {})
   }
 }, {})
 
@@ -220,6 +232,7 @@ export type RootState = {|
   containers: ContainersState,
   selectedWells: SelectedWellsState,
   ingredients: IngredientsState,
+  ingredLocations: LocationsState,
   highlightedIngredients: HighlightedIngredientsState
 |}
 
@@ -232,6 +245,7 @@ const rootReducer = combineReducers({
   containers,
   selectedWells,
   ingredients,
+  ingredLocations,
   highlightedIngredients
 })
 
@@ -329,9 +343,26 @@ const _ingredAtWell = (ingredientsForContainer: any) => (wellName: string) => {
   return {...matchedIngred, ingredientNum, wellName}
 }
 
-const allIngredients = createSelector(
+type IngredView = {
+  [labwareId: string]: {|
+      ...IngredInputFields,
+      locations: {
+        [containerId: string]: Wells
+      }
+  |}
+}
+
+const allIngredients: (BaseState) => IngredView = createSelector(
   rootSelector,
-  state => state.ingredients
+  state => reduce(state.ingredients, (acc, ingredData: IngredInputFields, ingredId) => {
+    return {
+      ...acc,
+      [ingredId]: {
+        ...ingredData,
+        locations: state.ingredLocations[ingredId]
+      }
+    }
+  }, {})
 )
 
 // returns selected group id (index in array of all ingredients), or undefined.
@@ -359,14 +390,16 @@ const selectedIngredientGroupId = createSelector(
 const ingredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId']
 
 type IngredGroupFields = {
-  [ingredGroupId: string]: any // TODO don't use any for ingreds
+  [ingredGroupId: string]: IngredInputFields
 }
 const allIngredientGroupFields = createSelector(
   allIngredients,
-  allIngredients => reduce(allIngredients, (acc: IngredGroupFields, ingredGroup: any, ingredGroupId: string) => ({
-    ...acc,
-    [ingredGroupId]: pick(ingredGroup, ingredFields)
-  }), {})
+  allIngredients => reduce(
+    allIngredients,
+    (acc: IngredGroupFields, ingredGroup: IngredInputFields, ingredGroupId: string) => ({
+      ...acc,
+      [ingredGroupId]: pick(ingredGroup, ingredFields)
+    }), {})
 )
 
 const selectedWellNames = createSelector(
@@ -508,7 +541,6 @@ const activeModals = createSelector(
   selectedContainerSlot,
   selectedContainerType,
   (state, slot, containerType) => {
-    console.log('activeModals', {state, slot, containerType})
     return ({
       labwareSelection: state.modeLabwareSelection !== false,
       ingredientSelection: {
@@ -524,6 +556,7 @@ const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 // TODO: prune selectors
 export const selectors = {
   activeModals,
+  allIngredients,
   allIngredientGroupFields,
   allIngredientNamesIds,
   allWellMatricesById,
