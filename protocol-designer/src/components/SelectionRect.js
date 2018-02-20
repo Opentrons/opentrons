@@ -1,27 +1,43 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+// @flow
+import * as React from 'react'
 
 import styles from './SelectionRect.css'
 
-class SelectionRect extends React.Component {
-  static propTypes = {
-    // callbacks with (event, rect)
-    onSelectionMove: PropTypes.func,
-    onSelectionDone: PropTypes.func,
+type DragRect = {
+  xStart: number,
+  yStart: number,
+  xDynamic: number,
+  yDynamic: number
+}
 
-    children: PropTypes.element
-  }
+type GenericRect = {
+  x0: number,
+  x1: number,
+  y0: number,
+  y1: number
+}
 
-  constructor (props) {
+type Props = {
+  onSelectionMove?: (e: MouseEvent, GenericRect) => void,
+  onSelectionDone?: (e: MouseEvent, GenericRect) => void,
+  svg?: boolean, // set true if this is an embedded SVG
+  children?: React.Node
+}
+
+type State = {
+  positions: DragRect | null
+}
+
+class SelectionRect extends React.Component<Props, State> {
+  parentRef: ?any // No support in Flow for SVGElement yet... this should be HTMLElement | SVGElement
+
+  constructor (props: Props) {
     super(props)
     this.state = { positions: null }
-
-    this.handleMouseDown = this.handleMouseDown.bind(this)
-    this.handleDrag = this.handleDrag.bind(this)
-    this.handleMouseUp = this.handleMouseUp.bind(this)
   }
 
-  renderRect ({xStart, yStart, xDynamic, yDynamic}) {
+  renderRect (args: DragRect) {
+    const {xStart, yStart, xDynamic, yDynamic} = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
     const width = Math.abs(xDynamic - xStart)
@@ -30,8 +46,13 @@ class SelectionRect extends React.Component {
     if (this.props.svg) {
       // calculate ratio btw clientRect bounding box vs svg parent viewBox
       // WARNING: May not work right if you're nesting SVGs!
-      const clientRect = this.refs.parentRect.getBoundingClientRect()
-      const viewBox = this.refs.parentRect.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
+      const parentRef = this.parentRef
+      if (!parentRef) {
+        return null
+      }
+
+      const clientRect: {width: number, height: number, left: number, top: number} = parentRef.getBoundingClientRect()
+      const viewBox: {width: number, height: number} = parentRef.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
 
       const xScale = viewBox.width / clientRect.width
       const yScale = viewBox.height / clientRect.height
@@ -56,7 +77,8 @@ class SelectionRect extends React.Component {
     />
   }
 
-  getRect ({xStart, yStart, xDynamic, yDynamic}) {
+  getRect (args: DragRect) {
+    const {xStart, yStart, xDynamic, yDynamic} = args
     // convert internal rect position to more generic form
     // TODO should this be used in renderRect?
     return {
@@ -67,42 +89,45 @@ class SelectionRect extends React.Component {
     }
   }
 
-  handleMouseDown (e) {
-    window.addEventListener('mousemove', this.handleDrag)
-    window.addEventListener('mouseup', this.handleMouseUp)
+  handleMouseDown = (e: MouseEvent) => {
+    document.addEventListener('mousemove', this.handleDrag)
+    document.addEventListener('mouseup', this.handleMouseUp)
     this.setState({ positions: {xStart: e.clientX, xDynamic: e.clientX, yStart: e.clientY, yDynamic: e.clientY} })
   }
 
-  handleDrag (e) {
-    this.setState({ positions: {...this.state.positions, xDynamic: e.clientX, yDynamic: e.clientY} })
+  handleDrag = (e: MouseEvent) => {
+    const nextRect = {...this.state.positions, xDynamic: e.clientX, yDynamic: e.clientY}
+    this.setState({ positions: nextRect })
 
-    this.props.onSelectionMove &&
-      this.props.onSelectionMove(e, this.getRect(this.state.positions))
+    const rect = this.getRect(nextRect)
+    this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
   }
 
-  handleMouseUp (e) {
-    window.removeEventListener('mousemove', this.handleDrag)
-    window.removeEventListener('mouseup', this.handleMouseUp)
+  handleMouseUp = (e: MouseEvent) => {
+    if (!(e instanceof MouseEvent)) {
+      return
+    }
+    document.removeEventListener('mousemove', this.handleDrag)
+    document.removeEventListener('mouseup', this.handleMouseUp)
 
-    const finalRect = this.getRect(this.state.positions)
+    const finalRect = this.state.positions && this.getRect(this.state.positions)
 
     // clear the rectangle
     this.setState({ positions: null })
 
     // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    this.props.onSelectionDone &&
-      this.props.onSelectionDone(e, finalRect)
+    this.props.onSelectionDone && finalRect && this.props.onSelectionDone(e, finalRect)
   }
 
   render () {
     const { svg, children } = this.props
 
     return svg
-      ? <g onMouseDown={this.handleMouseDown} ref='parentRect'>
+      ? <g onMouseDown={this.handleMouseDown} ref={ref => { this.parentRef = ref }}>
         {children}
         {this.state.positions && this.renderRect(this.state.positions)}
       </g>
-      : <div onMouseDown={this.handleMouseDown} ref='parentRect'>
+      : <div onMouseDown={this.handleMouseDown} ref={ref => { this.parentRef = ref }}>
         {this.state.positions && this.renderRect(this.state.positions)}
         {children}
       </div>

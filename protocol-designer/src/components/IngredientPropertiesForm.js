@@ -3,36 +3,7 @@ import * as React from 'react'
 import isNil from 'lodash/isNil'
 import styles from './IngredientPropertiesForm.css'
 
-import Button from './Button.js'
-
-type SetSubstate = (accessor: string, value: string | boolean | number) => any
-type GetSubstate = (accessor: string) => string | boolean
-
-type FieldProps = {
-  accessor: string,
-  numeric?: boolean,
-  type?: string
-}
-
-const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
-  (props: FieldProps) => { /* otherProps */
-    const {setSubstate, getSubstate} = args
-    const {accessor, numeric, ...otherProps} = props
-
-    const ElementType = (otherProps.type === 'textarea')
-      ? 'textarea'
-      : 'input'
-
-    return <ElementType
-      id={accessor}
-      checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
-      value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
-      onChange={(e: SyntheticInputEvent<HTMLInputElement>) => otherProps.type === 'checkbox'
-        ? setSubstate(accessor, !getSubstate(accessor))
-        : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
-      {...otherProps}
-    />
-  }
+import Button from './Button.js' // TODO Ian 2018-02-01 Use comp lib button
 
 type SetStateCallback = (...args: Array<any>) => any
 
@@ -47,14 +18,53 @@ type IngredInputs = {
   serializeName: string | null
 }
 
+// type Accessor = $Keys<IngredInputs>
+type Accessor =
+  | 'name'
+  | 'volume'
+  | 'description'
+  | 'concentration'
+  | 'individualize'
+  | 'serializeName'
+
 type AllIngredGroupFields = {
   [ingredGroupId: string]: IngredInputs
 }
 
+type SetSubstate = (accessor: string, value: string | boolean | number) => any
+type GetSubstate = (accessor: Accessor) => string | boolean | number | null
+
+type FieldProps = {
+  accessor: Accessor,
+  numeric?: boolean,
+  type?: string
+}
+
+const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
+  (props: FieldProps) => { /* otherProps */
+    const {setSubstate, getSubstate} = args
+    const {accessor, numeric, type, ...otherProps} = props
+
+    const ElementType = (type === 'textarea')
+      ? 'textarea'
+      : 'input'
+
+    return <ElementType
+      id={accessor}
+      checked={type === 'checkbox' && getSubstate(accessor) === true}
+      value={getSubstate(accessor) || ''}
+      onChange={(e: SyntheticInputEvent<HTMLInputElement>) => (type === 'checkbox')
+        ? setSubstate(accessor, !getSubstate(accessor))
+        : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
+      type={type}
+      {...otherProps}
+    />
+  }
+
 type Props = {
-  onSave: any,
-  onCancel: any,
-  onDelete: any,
+  onSave: ({copyGroupId: ?number} & IngredInputs) => void,
+  onCancel: () => void,
+  onDelete: (groupId: number) => void,
   numWellsSelected: number,
   selectedWellsMaxVolume: number,
 
@@ -147,12 +157,23 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
   }
 
+  handleDelete = (selectedIngredientFields: *) => (e: SyntheticEvent<*>) => {
+    const {onDelete} = this.props
+
+    const groupToDelete = selectedIngredientFields && selectedIngredientFields.groupId
+    if (groupToDelete) {
+      window.confirm('Are you sure you want to delete all ingredients in this group?') &&
+        onDelete(groupToDelete)
+    } else {
+      console.warn('Tried to delete in IngredientPropertiesForm, with no groupId to delete!')
+    }
+  }
+
   render () {
     const {
       numWellsSelected,
       onSave,
       onCancel,
-      onDelete,
       allIngredientNamesIds,
       allIngredientGroupFields,
       editingIngredGroupId,
@@ -228,25 +249,17 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           </div>
         </form>
 
-        {/* editMode &&
-          <div><label>Editing: "{selectedIngredientFields.name}"</label></div> */}
-
-        {/* <span>
-          <label>Color Swatch</label>
-          <div className={styles.circle} style={{backgroundColor: 'red'}} />
-        </span> */}
         <div className={styles.button_row}>
           <Button /* disabled={TODO: validate input here} */
-            onClick={e => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+            onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
           >
             Save
           </Button>
           <Button onClick={onCancel}>Cancel</Button>
           {editMode &&
-            <Button className={styles.delete_ingred} onClick={() =>
-              window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-              onDelete(selectedIngredientFields && selectedIngredientFields.groupId)
-            }>Delete Ingredient</Button>
+            <Button className={styles.delete_ingred} onClick={this.handleDelete(selectedIngredientFields)}>
+              Delete Ingredient
+            </Button>
           }
         </div>
       </div>

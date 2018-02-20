@@ -17,7 +17,7 @@ function LabwareItem (props: LabwareItemProps) {
   return (
     <li
       className={styles.labware_list_item}
-      onClick={e => onContainerChoose(containerType)}
+      onClick={() => onContainerChoose(containerType)}
       style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
     >
       {displayName}

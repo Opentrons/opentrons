@@ -7,10 +7,11 @@ import { swatchColors } from '../constants.js'
 import { humanize } from '../utils.js'
 
 type DeleteIngredient = (args: {wellName: string, groupId: number}) => void // TODO get from action type?
+type EditModeIngredientGroup = (args: {groupId: number}) => void
 
 // Props used by both IngredientsList and IngredGroupCard // TODO
 type CommonProps = {|
-  editModeIngredientGroup: any,
+  editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient,
   selected: boolean
 |}
@@ -65,7 +66,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <div className={styles.circle} style={{backgroundColor: swatchColors(groupId)}} />
           <div className={styles.ingred_label}>{ingredCategoryData.name}</div>
           {/* <div>{ingredCategoryData.wells.length} Wells</div> */}
-          <div className={styles.edit_button} onClick={e => editModeIngredientGroup({groupId})}>EDIT</div>
+          <div className={styles.edit_button} onClick={() => editModeIngredientGroup({groupId})}>EDIT</div>
         </label>
 
         {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
@@ -95,7 +96,7 @@ type IndividProps = {|
   concentration?: string,
   canDelete: boolean,
   groupId: number,
-  editModeIngredientGroup: any,
+  editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient
 |}
 
@@ -123,7 +124,7 @@ function IngredIndividual (props: IndividProps) {
       {/* <button className={styles.edit_button} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
       <div>{concentration === null ? '-' : concentration}</div>
       {canDelete && <div className={styles.delete_ingredient} onClick={
-          e => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
+          () => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
           deleteIngredient({wellName, groupId})
         }>✕</div>}
     </div>
