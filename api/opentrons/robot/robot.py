@@ -273,6 +273,12 @@ class Robot(object):
 
         self.clear_commands()
 
+        # update the position of each Mover
+        self._driver.update_position()
+        for mount in self._actuators.values():
+            for mover in mount.values():
+                self.poses = mover.update_pose_from_driver(self.poses)
+
         return self
 
     def turn_on_button_light(self):
