@@ -76,9 +76,13 @@ export const getDiscovered = createSelector(
   }
 )
 
+export function getConnectRequest (state: State) {
+  return connection(state).connectRequest
+}
+
 export const getConnectionStatus = createSelector(
   (state: State) => connection(state).connectedTo,
-  (state: State) => connection(state).connectRequest.inProgress,
+  (state: State) => getConnectRequest(state).inProgress,
   (state: State) => connection(state).disconnectRequest.inProgress,
   (connectedTo, isConnecting, isDisconnecting): ConnectionStatus => {
     if (!connectedTo && isConnecting) return 'connecting'
