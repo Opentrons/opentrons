@@ -25,7 +25,7 @@ type GroupProps = {
 export default function SidePanelGroup (props: GroupProps) {
   const {iconName, disabled} = props
 
-  const className = cx(props.className, {
+  const className = cx(styles.panel_group, props.className, {
     [styles.disabled]: disabled
   })
 

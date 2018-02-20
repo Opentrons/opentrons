@@ -22,43 +22,10 @@
       "\\.(css)$": "identity-obj-proxy"
     }
   },
-  "standard": {
-    "parser": "babel-eslint",
-    "plugins": [
-      "flowtype"
-    ],
-    "globals": [
-      "SyntheticEvent",
-      "$Keys"
-    ],
-    "env": [
-      "node",
-      "browser",
-      "jest"
-    ],
-    "ignore": [
-      "**/dist/**",
-      "**/flow-typed/**"
-    ]
-  },
-  "stylelint": {
-    "rules": {
-      "selector-class-pattern": "^[a-z0-9_]+$"
-    },
-    "extends": [
-      "stylelint-config-standard",
-      "stylelint-config-css-modules"
-    ],
-    "ignoreFiles": [
-      "**/dist/**",
-      "**/coverage/**"
-    ]
-  },
   "devDependencies": {
     "@opentrons/webpack-config": "^3.0.0",
     "babel-core": "^6.26.0",
-    "babel-eslint": "8.0.3",
-    "babel-jest": "^21.2.0",
+    "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
@@ -66,11 +33,9 @@
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.1.1",
-    "eslint-plugin-flowtype": "^2.41.0",
-    "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^21.2.1",
+    "jest": "^20.0.4",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
     "postcss-import": "^11.0.0",
@@ -79,11 +44,7 @@
     "react-dom": "^16.2.0",
     "react-styleguidist": "^6.1.0",
     "react-test-renderer": "^16.2.0",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3",
-    "stylelint": "^8.3.1",
-    "stylelint-config-css-modules": "^1.1.0",
-    "stylelint-config-standard": "^18.0.0",
+    "shx": "^0.2.2",
     "webpack": "^3.10.0"
   },
   "peerDependencies": {

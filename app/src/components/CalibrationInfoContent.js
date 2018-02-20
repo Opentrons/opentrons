@@ -7,7 +7,7 @@ type Props = {
   rightChildren?: React.Node
 }
 
-export default function CalibrationInfoBox (props: Props) {
+export default function CalibrationInfoContent (props: Props) {
   const {leftChildren, rightChildren} = props
 
   return (

@@ -15,17 +15,22 @@ log = logging.getLogger(__name__)
 
 PLUNGER_CURRENT_LOW = 0.1
 PLUNGER_CURRENT_HIGH = 0.5
-MOUNT_CURRENT_LOW = 0.1
-MOUNT_CURRENT_HIGH = 0.8
-X_CURRENT_HIGH = 1.2
-Y_CURRENT_HIGH = 1.5
 
-X_MAX_SPEED = 300
-Y_MAX_SPEED = 200
-Z_MAX_SPEED = 90
-A_MAX_SPEED = 90
-B_MAX_SPEED = 40
-C_MAX_SPEED = 40
+MOUNT_CURRENT_LOW = 0.1
+MOUNT_CURRENT_HIGH = 1.0
+
+X_CURRENT_LOW = 0.3
+X_CURRENT_HIGH = 1.5
+
+Y_CURRENT_LOW = 0.3
+Y_CURRENT_HIGH = 1.75
+
+X_MAX_SPEED = 600
+Y_MAX_SPEED = 400
+Z_MAX_SPEED = 100
+A_MAX_SPEED = 100
+B_MAX_SPEED = 70
+C_MAX_SPEED = 70
 
 DEFAULT_CURRENT = {
     'X': X_CURRENT_HIGH,
@@ -120,7 +125,7 @@ def load(filename=None):
             local = json.load(file)
             result = robot_config(**merge([default._asdict(), local]))
     except FileNotFoundError:
-        log.info('Config {0} not found. Loading defaults'.format(filename))
+        log.warning('Config {0} not found. Loading defaults'.format(filename))
 
     return result
 
@@ -144,6 +149,6 @@ def save(config, filename=None, tag=None):
 
 def clear(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    log.debug('Deleting config file: {}'.format(filename))
+    log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)

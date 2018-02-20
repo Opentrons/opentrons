@@ -1,9 +1,12 @@
+# opentrons platform appveyor config
+#   Note: if build get stucks, you can use RDP to diagnose
+#   https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+
 image: Visual Studio 2015
 
 environment:
-  BASH: C:\cygwin64\bin\bash
-  PYTHON: c:\Python35 # No trailing backslash
-  CYG_PYTHON_PATH: /cygdrive/c/Python35:/cygdrive/c/Python35/Scripts # Need to override /usr/bin
+  PYTHON: C:\Python36
+  MAKE: C:\MinGW\bin\mingw32-make.exe
 
 platform: x64
 
@@ -11,39 +14,33 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 init:
-  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH% # Activate Python 3.5
-  - git config --global core.autocrlf false # don't convert LFs to CRLFs since we are running Cygwin
-  # Start RDP server to watch the build
-  # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-  # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
-# Keep RDP server to see at what happened if the build got stuck
-# Uncomment this to debug a stuck build through RDP:
-# https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-# on_finish:
-#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  # ensure Python 3.6 is first in path
+  - cmd: set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  # set artifact naming environment vairables
+  - cmd: set OT_BRANCH_SUFFIX=-%APPVEYOR_REPO_BRANCH%
+  - cmd: set OT_COMMIT_SUFFIX=-%APPVEYOR_REPO_COMMIT:~0,7%
+  - ps: $env:OT_TIME_SUFFIX = (Get-Date).ToUniversalTime().ToString("-yyyy-MM-dd_HH-mm")
 
 install:
   # read node version from the first line of .nvmrc
-  - ps: $env:nodejs_version = (Get-Content -Path $env:APPVEYOR_BUILD_FOLDER\.nvmrc)[0]
+  - ps: $env:nodejs_version = (Get-Content -Path .nvmrc)[0]
   - ps: Install-Product node $env:nodejs_version x64
   # install dev dependencies
-  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER && make install"'
+  - cmd: '%MAKE% install'
 
-build: false # No need to run MSBuild
+# do not run MSBuild
+build: false
 
 # do not run automatic test discovery
 test: off
 
 build_script:
-  - '%BASH% -lc "export PATH=$CYG_PYTHON_PATH:$PATH && cd $APPVEYOR_BUILD_FOLDER/api && make test"'
-  # Note: we are not running test-e2e on Windows due to problems with ChromeDriver
-  - '%BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && source scripts/env-vars-appveyor && make -C app test && make -C app-shell dist-win"'
-  - >
-    %BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/app-shell/dist/squirrel-windows && ls -la . && find ./** ! -name 'opentrons-v*' -exec rm -rf {} + && ls -la ."
+  - cmd: '%MAKE% test'
+  # build run app
+  - cmd: '%MAKE% -C app-shell dist-win'
 
-before_deploy:
-  - ps: Get-ChildItem .\app-shell\dist\squirrel-windows | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
+after_build:
+  - ps: Get-ChildItem .\app-shell\dist\publish\* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name -DeploymentName OTAppWin}
 
 deploy:
   - provider: S3

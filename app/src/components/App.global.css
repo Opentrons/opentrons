@@ -1,7 +1,10 @@
+/* TODO(mc, 2018-02-09): fix lint errors and remove this ignore */
+/* stylelint-disable font-family-no-missing-generic-family-keyword  */
 @import '@opentrons/components';
 
 * {
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -15,37 +18,6 @@ body {
 
 a {
   text-decoration: none;
-}
-
-.fixed {
-  position: fixed;
-}
-
-.relative {
-  position: relative;
-}
-
-.absolute {
-  position: absolute;
-}
-
-.absolute__fill {
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-}
-
-.inline {
-  display: inline;
-}
-
-.block {
-  display: block;
-}
-
-.inline_block {
-  display: inline-block;
 }
 
 /*** TYPOGRAPHY ***/

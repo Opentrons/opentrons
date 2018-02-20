@@ -15,11 +15,8 @@ from opentrons.util.log import get_logger
 
 log = get_logger(__name__)
 
-# TODO (andy) this is the height the tip will travel above the deck's tallest
-# container. This should not be a single value, but should be optimized given
-# the movements context (ie sterility vs speed). This is being set to 20mm
-# to allow containers >150mm to be usable on the deck for the tiem being.
-TIP_CLEARANCE = 20
+TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
+TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
 
 class InstrumentMosfet(object):
@@ -191,13 +188,7 @@ class Robot(object):
         self.modules = []
         self.fw_version = self._driver.get_fw_version()
 
-        # TODO (andy) should come from a config file
-        # TODO (andy) height 200 is arbitrary, should calc per pipette/tip?
-        self.dimensions = (393, 357.5, 200)
-
         self.INSTRUMENT_DRIVERS_CACHE = {}
-
-        self.arc_height = TIP_CLEARANCE
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -264,13 +255,17 @@ class Robot(object):
         self.poses = pose_tracker.init()
 
         self._runtime_warnings = []
-        self._previous_container = None
 
         self._deck = containers.Deck()
         self._fixed_trash = None
         self.setup_deck()
         self.setup_gantry()
         self._instruments = {}
+
+        self._use_safest_height = False
+
+        self._previous_instrument = None
+        self._prev_container = None
 
         # TODO: Move homing info to driver
         self.axis_homed = {
@@ -521,17 +516,23 @@ class Robot(object):
         >>> robot.home()
         """
 
-        # Home pipettes first to avoid colliding with labware
+        # Home gantry first to avoid colliding with labware
         # and to make sure tips are not in the liquid while
-        # homing plungers
-        self.poses = self._actuators['left']['carriage'].home(self.poses)
-        self.poses = self._actuators['right']['carriage'].home(self.poses)
+        # homing plungers. Z/A axis will automatically home before X/Y
+        self.poses = self.gantry.home(self.poses)
         # Then plungers
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
-        # Gantry goes last to avoid any further movement while
-        # close to XY switches so we are don't accidentally hit them
-        self.poses = self.gantry.home(self.poses)
+
+        # next move should not use any previously used instrument or labware
+        # to prevent robot.move_to() from using risky path optimization
+        self._previous_instrument = None
+        self._prev_container = None
+
+        # explicitly update carriage Mover positions in pose tree
+        # because their Mover.home() commands aren't used here
+        for a in self._actuators.values():
+            self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
@@ -541,7 +542,7 @@ class Robot(object):
         self._driver.move_plunger(*args, **kwargs)
 
     def head_speed(
-            self, default_speed=None,
+            self, combined_speed=None,
             x=None, y=None, z=None, a=None, b=None, c=None):
         """
         Set the speeds (mm/sec) of the robot
@@ -549,14 +550,14 @@ class Robot(object):
         Parameters
         ----------
         speed : number setting the current combined-axes speed
-        default_speed : number specifying a default combined-axes speed
+        combined_speed : number specifying a combined-axes speed
         <axis> : key/value pair, specifying the maximum speed of that axis
 
         Examples
         ---------
         >>> from opentrons import robot
         >>> robot.head_speed(300)  # default axes speed is 300 mm/sec
-        >>> robot.head_speed(default_speed=400) # default speed is 400 mm/sec
+        >>> robot.head_speed(combined_speed=400) # default speed is 400 mm/sec
         >>> robot.head_speed(x=400, y=200) # sets max speeds of X and Y
         """
         user_set_speeds = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
@@ -567,15 +568,14 @@ class Robot(object):
         }
         if axis_max_speeds:
             self._driver.set_axis_max_speed(axis_max_speeds)
-        if default_speed:
-            self._driver.default_speed(new_default=default_speed)
+        if combined_speed:
+            self._driver.set_speed(combined_speed)
 
     def move_to(
             self,
             location,
             instrument,
             strategy='arc',
-            low_current_z=False,
             **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -600,11 +600,6 @@ class Robot(object):
             avoiding obstacles.
 
             ``direct`` : move to the point in a straight line.
-
-        low_current_z : bool
-            Setting this to True will cause the instrument to move at a low
-            current setting for vertical motions, primarily to prevent damage
-            to the pipette in case of collision during calibration.
 
         Examples
         --------
@@ -633,33 +628,33 @@ class Robot(object):
             ),
             offset.coordinates
         )
-        other_instrument = {instrument} ^ set(self._instruments.values())
-        if other_instrument:
-            other = other_instrument.pop()
-            _, _, z = pose_tracker.absolute(self.poses, other)
-            safe_height = self.max_deck_height() + TIP_CLEARANCE
-            if z < safe_height:
-                self.poses = other._move(self.poses, z=safe_height)
+
+        if self._previous_instrument:
+            if self._previous_instrument != instrument:
+                self._previous_instrument.retract()
+                # because we're switching pipettes, this ensures a large (safe)
+                # Z arc height will be used for the new pipette
+                self._prev_container = None
+
+        self._previous_instrument = instrument
 
         if strategy == 'arc':
-            arc_coords = self._create_arc(target, placeable)
+            arc_coords = self._create_arc(instrument, target, placeable)
             for coord in arc_coords:
                 self.poses = instrument._move(
                     self.poses,
-                    low_current_z=low_current_z,
                     **coord)
 
         elif strategy == 'direct':
             position = {'x': target[0], 'y': target[1], 'z': target[2]}
             self.poses = instrument._move(
                 self.poses,
-                low_current_z=low_current_z,
                 **position)
         else:
             raise RuntimeError(
                 'Unknown move strategy: {}'.format(strategy))
 
-    def _create_arc(self, destination, placeable=None):
+    def _create_arc(self, inst, destination, placeable=None):
         """
         Returns a list of coordinates to arrive to the destination coordinate
         """
@@ -671,18 +666,31 @@ class Robot(object):
         elif isinstance(placeable, containers.Container):
             this_container = placeable
 
-        travel_height = self.max_deck_height() + self.arc_height
+        if this_container and self._prev_container == this_container:
+            # movements that stay within the same container do not need to
+            # avoid other containers on the deck, so the travel height of
+            # arced movements can be relative to just that one container
+            arc_top = self.max_placeable_height_on_deck(this_container)
+            arc_top += TIP_CLEARANCE_LABWARE
+        elif self._use_safest_height:
+            # bring the pipettes up as high as possible while calibrating
+            arc_top = inst._max_deck_height()
+        else:
+            # bring pipette up above the tallest container currently on deck
+            arc_top = self.max_deck_height() + TIP_CLEARANCE_DECK
 
-        _, _, robot_max_z = self.dimensions  # TODO: Check what this does
-        arc_top = min(travel_height, robot_max_z)
-        arrival_z = min(destination[2], robot_max_z)
+        self._prev_container = this_container
 
-        self._previous_container = this_container
+        # if instrument is currently taller than arc_top, don't move down
+        _, _, pip_z = pose_tracker.absolute(self.poses, inst)
+
+        arc_top = max(arc_top, destination[2], pip_z)
+        arc_top = min(arc_top, inst._max_deck_height())
 
         strategy = [
             {'z': arc_top},
             {'x': destination[0], 'y': destination[1]},
-            {'z': arrival_z}
+            {'z': destination[2]}
         ]
 
         return strategy
@@ -814,6 +822,7 @@ class Robot(object):
         if self._is_available_slot(location, share, slot, name):
             location.add(container, label or name)
         self.add_container_to_pose_tracker(location, container)
+        self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
@@ -989,6 +998,8 @@ class Robot(object):
             container,
             *delta, save
         )
+
+        self.max_deck_height.cache_clear()
 
     @lru_cache()
     def max_deck_height(self):

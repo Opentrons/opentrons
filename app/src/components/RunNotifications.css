@@ -1,3 +1,5 @@
+/* TODO(mc, 2018-02-09): fix lint errors and remove this ignore */
+/* stylelint-disable font-family-no-missing-generic-family-keyword  */
 .no_notification {
   height: 4rem;
 }
@@ -56,4 +58,3 @@
   font-family: 'trons';
   text-transform: uppercase;
 }
-

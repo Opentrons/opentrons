@@ -1,23 +1,68 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`modals ContinueModal renders correctly 1`] = `
+exports[`modals AlertModal renders correctly 1`] = `
 <div
-  className="modal"
+  className="modal style"
 >
   <div
-    className="overlay"
+    className="overlay clickable"
     onClick={[Function]}
   />
   <div
     className="modal_contents"
   >
     <div
-      className="continue_modal_contents"
+      className="alert_modal_contents"
+    >
+      <div
+        className="alert_modal_heading"
+      >
+        heading
+      </div>
+      children
+    </div>
+    <div
+      className="alert_modal_buttons"
+    >
+      <button
+        className="button_flat"
+        disabled={undefined}
+        onClick={[Function]}
+        title={undefined}
+      >
+        a
+      </button>
+      <button
+        className="button_flat"
+        disabled={undefined}
+        onClick={[Function]}
+        title={undefined}
+      >
+        b
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`modals ContinueModal renders correctly 1`] = `
+<div
+  className="modal"
+>
+  <div
+    className="overlay clickable"
+    onClick={[Function]}
+  />
+  <div
+    className="modal_contents"
+  >
+    <div
+      className="alert_modal_contents"
     >
       children
     </div>
     <div
-      className="continue_modal_buttons"
+      className="alert_modal_buttons"
     >
       <button
         className="button_flat"
@@ -42,10 +87,10 @@ exports[`modals ContinueModal renders correctly 1`] = `
 
 exports[`modals Modal renders correctly 1`] = `
 <div
-  className="modal"
+  className="modal foo"
 >
   <div
-    className="overlay"
+    className="overlay clickable"
     onClick={[Function]}
   />
   <div
@@ -58,7 +103,7 @@ exports[`modals Modal renders correctly 1`] = `
 
 exports[`modals Overlay renders correctly 1`] = `
 <div
-  className="overlay"
+  className="overlay clickable"
   onClick={[Function]}
 />
 `;

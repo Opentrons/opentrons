@@ -6,16 +6,15 @@
 }
 
 .robot_item {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border-bottom: border;
+  text-transform: uppercase;
 }
 
-.robot_icon {
-  flex: none;
-  width: 1.5rem;
+/* this is needed for usb icon to override default icon height  render it at proper size */
+.robot_item svg:first-child {
+  height: 1.5rem;
+}
+
+.item_icon {
   height: 2rem;
 }
 
@@ -28,36 +27,54 @@
 }
 
 .robot_name {
-  margin-bottom: 0.5rem;
   font-weight: bold;
+  max-width: calc(100% - 3rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.connection_toggle {
+  width: 2rem;
+  padding: 0;
+}
+
 .disconnected {
-  color: var(--c-dark-gray);
+  fill: var(--c-dark-gray);
+}
+
+.active {
+  color: #0ec9eb;
+  background-color: #f0f3ff;
 }
 
 .connected {
-  color: blue;
+  fill: #0ec9eb;
+  color: #0ec9eb;
 }
 
 .scan_status {
-  padding: 1rem;
+  padding: 2rem 1rem;
   text-align: center;
 }
 
-.scan_button {
+.title {
+  font-size: var(--fs-header);
+  font-weight: var(--fw-semibold);
+  margin: 1.25rem;
+}
+
+.message {
+  font-size: var(--fs-body-1);
+  margin: 1.25rem;
+}
+
+.scan_progress {
   width: 5rem;
 }
 
-.refresh {
-  color: var(--c-dark-gray);
-}
-
-.refresh:hover {
-  color: #888;
+.scan_button {
+  max-width: 80%;
 }
 
 .title_scan_button {

@@ -10,52 +10,33 @@ import {
   IconName
 } from '@opentrons/components'
 
-import type {Mount, Channels} from '../../robot'
+import type {Mount, Instrument} from '../../robot'
 
 type Props = {
   isRunning: boolean,
   mount: Mount,
-  name: ?string,
-  volume: ?number,
-  channels: ?Channels,
-  probed: ?boolean,
+  instrument: ?Instrument
 }
 
 export default function InstrumentListItem (props: Props) {
-  const {
-    isRunning,
-    name,
-    mount,
-    volume,
-    channels,
-    probed
-  } = props
-
-  const isUsed = name != null
-  const isDisabled = !isUsed || isRunning
-
+  const {isRunning, mount, instrument} = props
+  const confirmed = instrument && instrument.probed
+  const isDisabled = !instrument || isRunning
   const url = !isDisabled
     ? `/setup-instruments/${mount}`
     : '#'
-
-  // TODO (ka 2018-1-17): Move this up to container mergeProps in upcoming update setup panel ticket
-  const confirmed = probed
 
   const iconName: IconName = confirmed
     ? CHECKED
     : UNCHECKED
 
-  const pipetteType = channels === 8
-    ? 'multi'
-    : 'single'
-
-  const description = isUsed
-    ? `${capitalize(pipetteType)}-channel`
+  const description = instrument
+    ? `${capitalize(instrument.channels === 8 ? 'multi' : 'single')}-channel`
     : 'N/A'
 
-  const units = !isDisabled
-    ? 'ul'
-    : null
+  const name = instrument
+    ? instrument.name
+    : 'N/A'
 
   return (
     <ListItem
@@ -66,7 +47,7 @@ export default function InstrumentListItem (props: Props) {
     >
       <span>{capitalize(mount)}</span>
       <span>{description}</span>
-      <span>{volume} {units}</span>
+      <span>{name}</span>
     </ListItem>
   )
 }

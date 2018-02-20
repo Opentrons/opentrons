@@ -1,41 +1,37 @@
 // @flow
 import React from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import {
+  constants as robotConstants,
   selectors as robotSelectors,
-  type Mount,
-  type Channels
+  type Instrument
 } from '../../robot'
 
 import {TitledList} from '@opentrons/components'
 import InstrumentListItem from './InstrumentListItem'
 
 type Props = {
-  instruments: {
-    mount: Mount,
-    name?: string,
-    volume?: number,
-    channels?: Channels,
-    probed?: boolean,
-  }[],
+  instruments: Instrument[],
   isRunning: bool,
 }
 
-export default connect(mapStateToProps)(InstrumentList)
+const TITLE = 'Pipette Calibration'
 
-const TITLE = 'Pipette Setup'
+export default withRouter(connect(mapStateToProps)(InstrumentList))
 
 function InstrumentList (props: Props) {
   const {instruments, isRunning} = props
 
   return (
     <TitledList title={TITLE}>
-      {instruments.map((inst) => (
+      {robotConstants.INSTRUMENT_MOUNTS.map((mount) => (
         <InstrumentListItem
-          key={inst.mount}
+          key={mount}
+          mount={mount}
           isRunning={isRunning}
-          {...inst}
+          instrument={instruments.find((i) => i.mount === mount)}
         />
       ))}
     </TitledList>

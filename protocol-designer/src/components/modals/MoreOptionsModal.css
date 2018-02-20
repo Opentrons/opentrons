@@ -1,0 +1,27 @@
+@import './grid.css';
+
+.modal {
+  z-index: 100;
+}
+
+.big_text_box {
+  height: 12rem;
+}
+
+.button_row {
+  /* TODO replicated in StepEditForm.css -- does this pattern exist anywhere else? */
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
+  }
+
+  & > *:first-child {
+    lost-column: 2/6;
+  }
+
+  & > *:nth-child(2) {
+    lost-offset: 2/6;
+  }
+}

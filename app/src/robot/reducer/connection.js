@@ -3,18 +3,22 @@
 import omit from 'lodash/omit'
 import without from 'lodash/without'
 
+import type {Action} from '../../types'
+
+import type {
+  HealthSuccessAction,
+  HealthFailureAction
+} from '../../http-api-client'
+
+import type {RobotService} from '../types'
+
 import {actionTypes} from '../actions'
 
-export type State = {
+type State = {
   isScanning: boolean,
   discovered: string[],
   discoveredByName: {
-    [string]: {
-      name: String,
-      ip: String,
-      host: String,
-      port: number
-    }
+    [string]: RobotService
   },
   connectedTo: string,
   connectRequest: {
@@ -29,13 +33,6 @@ export type State = {
 }
 
 // TODO(mc, 2018-01-11): import union of discrete action types from actions
-type Action = {
-  type: string,
-  payload?: any,
-  error?: boolean,
-  meta?: {}
-}
-
 const {
   DISCOVER,
   DISCOVER_FINISH,
@@ -57,38 +54,43 @@ const INITIAL_STATE: State = {
 }
 
 export default function connectionReducer (
-  state: State = INITIAL_STATE,
+  state?: State,
   action: Action
 ): State {
+  if (state == null) return INITIAL_STATE
+
   switch (action.type) {
-    case DISCOVER: return handleDiscover(state, action)
-    case DISCOVER_FINISH: return handleDiscoverFinish(state, action)
+    case DISCOVER: return handleDiscover(state)
+    case DISCOVER_FINISH: return handleDiscoverFinish(state)
     case ADD_DISCOVERED: return handleAddDiscovered(state, action)
     case REMOVE_DISCOVERED: return handleRemoveDiscovered(state, action)
     case CONNECT: return handleConnect(state, action)
     case CONNECT_RESPONSE: return handleConnectResponse(state, action)
     case DISCONNECT: return handleDisconnect(state, action)
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
+
+    case 'api:HEALTH_SUCCESS': return maybeDiscoverWired(state, action)
+    case 'api:HEALTH_FAILURE': return maybeRemoveWired(state, action)
   }
 
   return state
 }
 
-function handleDiscover (state, action) {
+function handleDiscover (state: State): State {
   return {
     ...state,
     isScanning: true
   }
 }
 
-function handleDiscoverFinish (state, action) {
+function handleDiscoverFinish (state: State): State {
   return {
     ...state,
     isScanning: false
   }
 }
 
-function handleAddDiscovered (state, action) {
+function handleAddDiscovered (state: State, action: any): State {
   if (!action.payload) return state
 
   const {payload} = action
@@ -110,8 +112,10 @@ function handleAddDiscovered (state, action) {
   return {...state, discovered, discoveredByName}
 }
 
-function handleRemoveDiscovered (state, action) {
-  if (!action.payload) return state
+function handleRemoveDiscovered (state: State, action: any): State {
+  if (!action.payload || state.connectedTo === action.payload.name) {
+    return state
+  }
 
   const {payload: {name}} = action
 
@@ -122,7 +126,7 @@ function handleRemoveDiscovered (state, action) {
   }
 }
 
-function handleConnect (state, action) {
+function handleConnect (state: State, action: any): State {
   if (!action.payload) return state
 
   const {payload: {name}} = action
@@ -130,7 +134,7 @@ function handleConnect (state, action) {
   return {...state, connectRequest: {inProgress: true, error: null, name}}
 }
 
-function handleConnectResponse (state, action) {
+function handleConnectResponse (state: State, action: any): State {
   const {error: didError} = action
   let connectedTo = state.connectRequest.name
   let error = null
@@ -149,11 +153,11 @@ function handleConnectResponse (state, action) {
   }
 }
 
-function handleDisconnect (state, action) {
+function handleDisconnect (state: State, action: any): State {
   return {...state, disconnectRequest: {inProgress: true, error: null}}
 }
 
-function handleDisconnectResponse (state, action) {
+function handleDisconnectResponse (state, action: any) {
   const {error: didError} = action
   let connectedTo = ''
   let error = null
@@ -164,4 +168,20 @@ function handleDisconnectResponse (state, action) {
   }
 
   return {...state, connectedTo, disconnectRequest: {error, inProgress: false}}
+}
+
+function maybeDiscoverWired (state: State, action: HealthSuccessAction): State {
+  const robot = action.payload.robot
+
+  if (!robot.wired) return state
+
+  return handleAddDiscovered(state, {payload: robot})
+}
+
+function maybeRemoveWired (state: State, action: HealthFailureAction): State {
+  const robot = action.payload.robot
+
+  if (!robot.wired) return state
+
+  return handleRemoveDiscovered(state, {payload: robot})
 }

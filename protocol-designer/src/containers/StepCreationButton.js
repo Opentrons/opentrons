@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import map from 'lodash/map'
+import omit from 'lodash/omit'
 
 import {PrimaryButton} from '@opentrons/components'
 import {addStep, expandAddStepButton} from '../steplist/actions'
@@ -37,10 +38,11 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
 
   render () {
     const {expanded, onExpandClick, onStepClick, onClickAway} = this.props
+    const stepIconsByTypeNoDeckSetup = omit(stepIconsByType, ['deck-setup'])
     return (
       <div ref={ref => { this.ref = ref }}>
-        <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Action</PrimaryButton>
-        {expanded && map(stepIconsByType, (iconName, stepType) =>
+        <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Step</PrimaryButton>
+        {expanded && map(stepIconsByTypeNoDeckSetup, (iconName, stepType) =>
           <PrimaryButton
             key={stepType}
             onClick={onStepClick(stepType)}

@@ -1,0 +1,9 @@
+api/**
+**/node_modules/**
+**/coverage/**
+**/dist/**
+**/venv/**
+
+# flow
+**/flow-typed/**
+**/interfaces/**

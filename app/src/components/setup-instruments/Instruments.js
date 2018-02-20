@@ -1,45 +1,48 @@
+// @flow
 import {connect} from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
+import type InstrumentInfoProps from './InstrumentInfo'
 import InstrumentGroup from './InstrumentGroup'
 
-import {selectors as robotSelectors} from '../../robot'
+import {
+  constants as robotConstants,
+  selectors as robotSelectors
+} from '../../robot'
 
-export default connect(mapStateToProps, null, mergeProps)(InstrumentGroup)
-
-function mapStateToProps (state, ownProps) {
-  const instruments = robotSelectors.getInstruments(state)
-  const currentInstrument = instruments.find((inst) => (
-    inst.mount && inst.mount === ownProps.mount
-  ))
-
-  return {
-    currentInstrument,
-    instruments
-  }
+type OwnProps = {
+  mount: ?string
 }
 
-function mergeProps (stateProps) {
-  const instruments = stateProps.instruments.map(inst => {
-    const isUsed = inst.name != null
-    const isDisabled = inst.mount !== stateProps.currentInstrument.mount
-    const description = isUsed
-      ? `${capitalize(inst.channels)}-channel (${inst.volume} ul)`
+type StateProps = {
+  instruments: InstrumentInfoProps[]
+}
+
+export default connect(mapStateToProps)(InstrumentGroup)
+
+function mapStateToProps (state, ownProps: OwnProps): StateProps {
+  const currentMount = ownProps.mount
+  const allInstruments = robotSelectors.getInstruments(state)
+
+  const instruments = robotConstants.INSTRUMENT_MOUNTS.map((mount) => {
+    const inst = allInstruments.find((i) => i.mount === mount)
+    const isDisabled = !inst || mount !== currentMount
+
+    const description = inst
+      ? `${capitalize(`${inst.channels}`)}-channel (${inst.volume} ul)`
       : 'N/A'
-    const tipType = isUsed
+
+    const tipType = inst
       ? `${inst.volume} ul`
       : 'N/A'
 
     return {
-      ...inst,
+      ...(inst || {mount}),
       isDisabled,
       description,
       tipType
     }
   })
 
-  return {
-    ...stateProps,
-    instruments
-  }
+  return {instruments}
 }

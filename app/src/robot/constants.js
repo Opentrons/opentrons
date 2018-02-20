@@ -23,14 +23,6 @@ export type ConnectionStatus =
 export const RUNNING = 'running'
 export const PAUSED = 'paused'
 export const FINISHED = 'finished'
-export type SessionStatus =
-  | ''
-  | 'loaded'
-  | 'running'
-  | 'paused'
-  | 'error'
-  | 'finished'
-  | 'stopped'
 
 // tip probe calibration states
 // TODO(mc, 2018-01-22): remove constant exports in favor of flowtype
@@ -67,7 +59,7 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
 ])
 
 // deck layout
-export const INSTRUMENT_AXES: Mount[] = ['left', 'right']
+export const INSTRUMENT_MOUNTS: Mount[] = ['left', 'right']
 export const DECK_SLOTS: Slot[] = [
   '1',
   '2',

@@ -40,19 +40,42 @@ describe('robot selectors', () => {
 
   test('getDiscovered', () => {
     const state = {
-      connection: {
-        connectedTo: 'foo',
-        discovered: ['foo', 'bar'],
-        discoveredByName: {
-          foo: {host: 'abcdef.local', name: 'foo'},
-          bar: {host: '123456.local', name: 'bar'}
+      api: {
+        health: {
+          bar: {response: {api_version: '1.2.3', fw_version: '4.5.6'}},
+          qux: {response: {api_version: '1.2.3', fw_version: '4.5.6'}}
+        }
+      },
+      robot: {
+        connection: {
+          connectedTo: 'bar',
+          discovered: ['foo', 'bar', 'baz', 'qux'],
+          discoveredByName: {
+            foo: {host: 'abcdef.local', name: 'foo'},
+            bar: {host: '123456.local', name: 'bar'},
+            baz: {host: 'qwerty.local', name: 'baz'},
+            qux: {host: 'dvorak.local', name: 'qux', wired: true}
+          }
         }
       }
     }
 
-    expect(getDiscovered(makeState(state))).toEqual([
-      {name: 'foo', host: 'abcdef.local', isConnected: true},
-      {name: 'bar', host: '123456.local', isConnected: false}
+    expect(getDiscovered(state)).toEqual([
+      {
+        name: 'bar',
+        host: '123456.local',
+        isConnected: true,
+        health: state.api.health.bar
+      },
+      {
+        name: 'qux',
+        host: 'dvorak.local',
+        isConnected: false,
+        wired: true,
+        health: state.api.health.qux
+      },
+      {name: 'baz', host: 'qwerty.local', isConnected: false},
+      {name: 'foo', host: 'abcdef.local', isConnected: false}
     ])
   })
 
@@ -491,7 +514,12 @@ describe('robot selectors', () => {
             left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
             right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
           },
-          calibrationRequest: {},
+          calibrationRequest: {
+            type: 'MOVE_TO',
+            inProgress: true,
+            slot: '1',
+            mount: 'left'
+          },
           probedByMount: {},
           tipOnByMount: {right: true}
         }
@@ -505,7 +533,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         },
@@ -514,7 +543,8 @@ describe('robot selectors', () => {
           name: 'b2',
           type: 'b',
           isTiprack: false,
-          calibration: constants.OVER_SLOT,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: true
         },
         {
@@ -522,7 +552,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false
         }
       ])
@@ -535,7 +566,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         }
@@ -549,7 +581,8 @@ describe('robot selectors', () => {
           name: 'a1',
           type: 'a',
           isTiprack: true,
-          calibration: constants.UNCONFIRMED,
+          isMoving: true,
+          calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'left'
         },
@@ -558,7 +591,8 @@ describe('robot selectors', () => {
           name: 'c3',
           type: 'c',
           isTiprack: false,
-          calibration: constants.UNCONFIRMED,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false
         }
       ])
@@ -570,7 +604,8 @@ describe('robot selectors', () => {
         name: 'a1',
         type: 'a',
         isTiprack: true,
-        calibration: constants.UNCONFIRMED,
+        isMoving: true,
+        calibration: 'moving-to-slot',
         confirmed: false,
         calibratorMount: 'left'
       })
@@ -593,7 +628,8 @@ describe('robot selectors', () => {
         name: 'c3',
         type: 'c',
         isTiprack: false,
-        calibration: constants.UNCONFIRMED,
+        isMoving: false,
+        calibration: 'unconfirmed',
         confirmed: false
       })
     })

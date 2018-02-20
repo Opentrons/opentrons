@@ -40,24 +40,20 @@ install:
   - make install
 
 script:
-  - "export OT_TIME_SUFFIX=-$(date '+%Y-%m-%d_%H-%M')"
+  - "export OT_TIME_SUFFIX=-$(date -u '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
-  # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C api test
-  - make -C api lint
+  - make test
+  - make lint
   # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
   # - > # Make docs on linux only
   #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
-  # components library
-  # TODO(mc, 2017-12-07): seriously figure out that top-level Makefile
-  - make -C components test build
-  # TODO(mc, 2017-08-28): use top level `make test`
-  - make -C app test && make -C app-shell dist-posix
-  # Clean up. This will leave only single-file build artifacts
-  - find ./app-shell/dist/** ! -name 'opentrons-v*' -exec rm -rf {} +
-  # protocol designer build
-  - make -C protocol-designer test build
+  # build components library
+  - make -C components build
+  # build protocol designer
+  - make -C protocol-designer build
+  # build run app
+  - make -C app-shell dist-posix
 
 after_success:
   - make coverage
@@ -69,7 +65,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: ot-app-builds
     skip_cleanup: true
-    local-dir: $(pwd)/app-shell/dist
+    local-dir: $(pwd)/app-shell/dist/publish
     upload-dir: ci-builds
     acl: public_read
     on:

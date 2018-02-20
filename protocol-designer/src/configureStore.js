@@ -3,6 +3,7 @@ import thunk from 'redux-thunk'
 
 import labwareIngredRootReducer from './labware-ingred/reducers'
 import steplistRootReducer from './steplist/reducers'
+import {rootReducer as navigationRootReducer} from './navigation'
 
 // TODO: Ian 2018-01-15 how to make this more DRY with hot reloading?
 function getRootReducer () {
@@ -15,7 +16,8 @@ function getRootReducer () {
 export default function configureStore () {
   const reducer = combineReducers({
     labwareIngred: labwareIngredRootReducer,
-    steplist: steplistRootReducer
+    steplist: steplistRootReducer,
+    navigation: navigationRootReducer
   })
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

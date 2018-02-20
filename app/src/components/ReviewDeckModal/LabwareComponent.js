@@ -3,23 +3,15 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {
-  selectors as robotSelectors,
-  type Labware
-} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
 
-import {
-  LabwareContainer,
-  EmptyDeckSlot,
-  Plate,
-  ContainerNameOverlay,
-  type LabwareComponentProps
-} from '@opentrons/components'
+import type {LabwareComponentProps} from '@opentrons/components'
+import LabwareItem, {type LabwareItemProps} from '../CalibrateDeck/LabwareItem'
 
 type OwnProps = LabwareComponentProps
 
 type StateProps = {
-  labware: ?Labware
+  labware?: $PropertyType<LabwareItemProps, 'labware'>
 }
 
 type Props = OwnProps & StateProps
@@ -28,29 +20,15 @@ export default connect(mapStateToProps)(LabwareComponent)
 
 function LabwareComponent (props: Props) {
   return (
-    <LabwareContainer {...props}>
-      <SlotContents {...props} />
-    </LabwareContainer>
-  )
-}
-
-function SlotContents (props: Props) {
-  if (!props.labware) return <EmptyDeckSlot {...props} />
-
-  const {name, type} = props.labware
-
-  return (
-    <g>
-      <Plate containerType={type} wellContents={{}} />
-      <ContainerNameOverlay containerName={name} containerType={type} />
-    </g>
+    <LabwareItem {...props} />
   )
 }
 
 function mapStateToProps (state, ownProps: OwnProps): StateProps {
   const allLabware = robotSelectors.getLabware(state)
+  const labware = allLabware.find((lw) => lw.slot === ownProps.slotName)
 
-  return {
-    labware: allLabware.find((lw) => lw.slot === ownProps.slotName)
-  }
+  if (!labware) return {}
+
+  return {labware: {...labware}}
 }

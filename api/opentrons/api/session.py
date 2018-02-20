@@ -5,7 +5,7 @@ from time import time
 from functools import reduce
 
 from opentrons.broker import publish, subscribe
-from opentrons.containers import get_container
+from opentrons.containers import get_container, location_to_list
 from opentrons.commands import tree, types
 from opentrons import robot
 
@@ -199,7 +199,7 @@ class Session(object):
         robot.turn_off_rail_lights()
 
     def set_state(self, state):
-        log.info("State set to {}".format(state))
+        log.debug("State set to {}".format(state))
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
@@ -275,8 +275,9 @@ def _get_labware(command):
         containers.append(get_container(location))
 
     if locations:
+        list_of_locations = location_to_list(locations)
         containers.extend(
-            [get_container(location) for location in locations])
+            [get_container(location) for location in list_of_locations])
 
     containers = [c for c in containers if c is not None]
 

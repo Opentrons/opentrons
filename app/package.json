@@ -42,40 +42,9 @@
       "text"
     ]
   },
-  "standard": {
-    "parser": "babel-eslint",
-    "plugins": [
-      "flowtype"
-    ],
-    "globals": [
-      "SyntheticEvent",
-      "$Keys",
-      "$Call"
-    ],
-    "env": [
-      "node",
-      "browser",
-      "jest"
-    ],
-    "ignore": [
-      "**/dist/**",
-      "**/flow-typed/**"
-    ]
-  },
-  "stylelint": {
-    "extends": [
-      "stylelint-config-standard",
-      "stylelint-config-css-modules"
-    ],
-    "ignoreFiles": [
-      "**/dist/**",
-      "**/coverage/**"
-    ]
-  },
   "devDependencies": {
     "@opentrons/webpack-config": "^3.0.0",
     "babel-core": "^6.25.0",
-    "babel-eslint": "8.0.3",
     "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -88,10 +57,8 @@
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
-    "eslint-plugin-flowtype": "^2.41.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
-    "flow-bin": "^0.63.0",
     "flow-typed": "^2.2.3",
     "handlebars-loader": "^1.6.0",
     "html-webpack-plugin": "^2.28.0",
@@ -102,15 +69,13 @@
     "postcss-cssnext": "^3.0.2",
     "postcss-import": "^11.0.0",
     "postcss-loader": "^2.0.10",
+    "redux-mock-store": "^1.5.1",
     "script-ext-html-webpack-plugin": "^1.8.5",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3",
+    "shx": "^0.2.2",
     "style-loader": "^0.18.2",
-    "stylelint": "~8.0.0",
-    "stylelint-config-css-modules": "^1.1.0",
-    "stylelint-config-standard": "^17.0.0",
     "superagent": "^3.8.1",
     "url-loader": "^0.6.2",
+    "wait-on": "^2.1.0",
     "webpack": "^3.1.0",
     "webpack-bundle-analyzer": "^2.8.2",
     "webpack-dev-server": "^2.5.1",
@@ -133,7 +98,6 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^3.6.0",
-    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
     "winston": "^2.2.0"

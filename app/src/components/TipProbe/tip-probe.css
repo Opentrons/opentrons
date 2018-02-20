@@ -5,5 +5,6 @@
    * TODO(mc, 2018-01-22): revisit positioning of spinner
    * For now, this centers it b/t two columns of CalibrationInfoContent
    */
-  margin-left: calc(-12.5% - 1rem);
+  float: right;
+  margin-right: calc(-12.5% - 1.5rem);
 }

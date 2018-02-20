@@ -1,4 +1,3 @@
-from copy import copy
 from os import environ
 import logging
 from time import sleep
@@ -18,6 +17,9 @@ from opentrons.drivers.rpi_drivers import gpio
 
 log = logging.getLogger(__name__)
 
+ERROR_KEYWORD = 'error'
+ALARM_KEYWORD = 'ALARM'
+
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
     'X': 418,
@@ -35,8 +37,10 @@ CURRENT_CHANGE_DELAY = 0.05
 Y_SWITCH_BACK_OFF_MM = 20
 Y_BACKOFF_LOW_CURRENT = 0.8
 Y_BACKOFF_SLOW_SPEED = 50
+Y_RETRACT_SPEED = 8
+Y_RETRACT_DISTANCE = 3
 
-DEFAULT_AXES_SPEED = 150
+DEFAULT_AXES_SPEED = 400
 
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
@@ -53,6 +57,7 @@ GCODES = {'HOME': 'G28.2',
           'LIMIT_SWITCH_STATUS': 'M119',
           'PROBE': 'G38.2',
           'ABSOLUTE_COORDS': 'G90',
+          'RELATIVE_COORDS': 'G91',
           'RESET_FROM_ERROR': 'M999',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
@@ -70,6 +75,9 @@ GCODE_ROUNDING_PRECISION = 3
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
     parsed_values = parsed_values[2:]
+    if len(parsed_values) != 6:
+        raise ParseError('Unexpected response from Smoothieware: {}'.format(
+            raw_axis_values))
     return {
         s.split(':')[0].upper(): round(
             float(s.split(':')[1]),
@@ -97,21 +105,38 @@ def _parse_switch_values(raw_switch_values):
     }
 
 
+class SmoothieError(Exception):
+    pass
+
+
+class ParseError(Exception):
+    pass
+
+
 class SmoothieDriver_3_0_0:
     def __init__(self, config):
         self.run_flag = Event()
         self.run_flag.set()
 
-        self._position = {}
+        self._position = HOMED_POSITION.copy()
         self.log = []
         self._update_position({axis: 0 for axis in AXES})
         self.simulating = True
         self._connection = None
         self._config = config
-        self._current_settings = config.default_current
-        self._max_speed_settings = config.default_max_speed
+        self._saved_current_settings = config.default_current.copy()
+        self._current_settings = self._saved_current_settings.copy()
+        self._max_speed_settings = config.default_max_speed.copy()
+        self._saved_max_speed_settings = self._max_speed_settings.copy()
 
-        self._default_axes_speed = DEFAULT_AXES_SPEED
+        self._combined_speed = float(DEFAULT_AXES_SPEED)
+        self._saved_axes_speed = float(self._combined_speed)
+
+        self._homed_position = HOMED_POSITION.copy()
+
+    @property
+    def homed_position(self):
+        return self._homed_position.copy()
 
     def _update_position(self, target):
         self._position.update({
@@ -135,7 +160,7 @@ class SmoothieDriver_3_0_0:
                 updated_position = \
                     _parse_axis_values(position_response)
                 # TODO jmg 10/27: log warning rather than an exception
-            except TypeError as e:
+            except (TypeError, ParseError) as e:
                 if is_retry:
                     raise e
                 else:
@@ -205,15 +230,16 @@ class SmoothieDriver_3_0_0:
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
-        speed = int(value * SEC_PER_MIN)
-        command = GCODES['SET_SPEED'] + str(speed)
+        self._combined_speed = float(value)
+        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
+        command = GCODES['SET_SPEED'] + str(speed_per_min)
         self._send_command(command)
 
-    def default_speed(self, new_default=None):
-        ''' set total axes movement speed in mm/second back to default'''
-        if new_default:
-            self._default_axes_speed = int(new_default)
-        self.set_speed(self._default_axes_speed)
+    def push_speed(self):
+        self._saved_axes_speed = float(self._combined_speed)
+
+    def pop_speed(self):
+        self.set_speed(self._saved_axes_speed)
 
     def set_axis_max_speed(self, settings):
         '''
@@ -232,6 +258,12 @@ class SmoothieDriver_3_0_0:
         )
         self._send_command(command)
 
+    def push_axis_max_speed(self):
+        self._saved_max_speed_settings = self._max_speed_settings.copy()
+
+    def pop_axis_max_speed(self):
+        self.set_axis_max_speed(self._saved_max_speed_settings)
+
     def set_current(self, settings):
         '''
         Sets the current in mA by axis.
@@ -249,6 +281,12 @@ class SmoothieDriver_3_0_0:
         )
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
+
+    def push_current(self):
+        self._saved_current_settings.update(self._current_settings)
+
+    def pop_current(self):
+        self.set_current(self._saved_current_settings)
 
     # ----------- Private functions --------------- #
 
@@ -280,41 +318,75 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             # TODO (ben 20171117): modify all axes to dwell at low current
-            moving_plunger = ('B' in command or 'C' in command) \
-                and (GCODES['MOVE'] in command or GCODES['HOME'] in command)
+            moving_plungers = []
+            if GCODES['MOVE'] in command or GCODES['HOME'] in command:
+                moving_plungers = [ax for ax in 'BC' if ax in command]
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_high
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_high
+                    for axis in moving_plungers
+                })
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
-            if ret_code and 'alarm' in ret_code.lower():
+            # Smoothieware returns error state if a switch was hit while moving
+            smoothie_error = False
+            if ERROR_KEYWORD in ret_code or ALARM_KEYWORD in ret_code:
                 self._reset_from_error()
-                raise RuntimeError('Smoothieware Error: {}'.format(ret_code))
+                smoothie_error = True
 
-            if moving_plunger:
-                self.set_current({axis: self._config.plunger_current_low
-                                  for axis in 'BC'})
+            if moving_plungers:
+                self.set_current({
+                    axis: self._config.plunger_current_low
+                    for axis in moving_plungers
+                })
+
+            # ensure we lower plunger currents before raising an exception
+            if smoothie_error:
+                raise SmoothieError(ret_code)
 
             return ret_code
 
     def _home_x(self):
         # move the gantry forward on Y axis with low power
-        prior_y_current = float(self._current_settings['Y'])
+        self.push_current()
+        self.push_speed()
         self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
         # move away from the Y endstop switch
         target_coord = {'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM}
         self.move(target_coord)
-        self.set_current({'Y': prior_y_current})
-        self.default_speed()
+        self.pop_current()
+        self.pop_speed()
 
         # now it is safe to home the X axis
         self._send_command(GCODES['HOME'] + 'X')
+
+    def _home_y(self):
+        # home the Y at normal speed (fast)
+        self._send_command(GCODES['HOME'] + 'Y')
+
+        # slow the maximum allowed speed on Y axis
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
+
+        # retract, then home, then retract again
+        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+            GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
+            GCODES['MOVE'],  # move 3 millimeters away from switch
+            str(-Y_RETRACT_DISTANCE),
+            GCODES['ABSOLUTE_COORDS']  # set back to absolute coordinate system
+        )
+        self._send_command(relative_retract_command)
+        self._send_command(GCODES['HOME'] + 'Y')
+        self._send_command(relative_retract_command)
+
+        # bring max speeds back to normal
+        self.pop_axis_max_speed()
 
     def _setup(self):
         self._reset_from_error()
@@ -322,12 +394,13 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.current)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.update_position(default=HOMED_POSITION)
-        self.default_speed()
+        self.update_position(default=self.homed_position)
+        self.pop_axis_max_speed()
+        self.pop_speed()
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target, low_current_z=False):
+    def move(self, target):
         from numpy import isclose
 
         self.run_flag.wait()
@@ -356,16 +429,6 @@ class SmoothieDriver_3_0_0:
         target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
-        low_current_axes = [axis
-                            for axis, _ in sorted(target.items())
-                            if axis in 'ZA']
-        prior_current = copy(self._current_settings)
-
-        if low_current_z:
-            new_current = {axis: 0.1 for axis in low_current_axes}
-            self.set_current(new_current)
-            self.set_speed(LOW_CURRENT_Z_SPEED)
-
         if target_coords:
             command = ''
             if backlash_coords != target_coords:
@@ -373,10 +436,6 @@ class SmoothieDriver_3_0_0:
             command += GCODES['MOVE'] + ''.join(target_coords)
             self._send_command(command)
             self._update_position(target)
-
-        if low_current_z:
-            self.set_current(prior_current)
-            self.default_speed()
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
@@ -411,16 +470,28 @@ class SmoothieDriver_3_0_0:
         for axes in home_sequence:
             if 'X' in axes:
                 self._home_x()
+            elif 'Y' in axes:
+                self._home_y()
             else:
+                # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
                 self._send_command(command, timeout=30)
 
         # Only update axes that have been selected for homing
         homed = {
-            ax: HOMED_POSITION.get(ax)
+            ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
         self.update_position(default=homed)
+
+        # coordinate after homing might not synce with default in API
+        # so update this driver's homed position using current coordinates
+        new = {
+            ax: self.position[ax]
+            for ax in self.homed_position.keys()
+            if ax in axis
+        }
+        self._homed_position.update(new)
 
         return self.position
 
@@ -431,12 +502,17 @@ class SmoothieDriver_3_0_0:
         that distance away from the homing switch. Then finish with home.
         '''
         # move some mm distance away from the target axes endstop switch(es)
-        self.default_speed()
         destination = {
-            ax: HOMED_POSITION.get(ax) - abs(safety_margin)
+            ax: self.homed_position.get(ax) - abs(safety_margin)
             for ax in axis.upper()
         }
-        self.move(destination)
+
+        # there is a chance the axis will hit it's home switch too soon
+        # if this happens, catch the error and continue with homing afterwards
+        try:
+            self.move(destination)
+        except SmoothieError:
+            pass
 
         # then home once we're closer to the endstop(s)
         disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])

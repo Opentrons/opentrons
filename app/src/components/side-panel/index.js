@@ -33,12 +33,13 @@ NavPanel.propTypes = {
 }
 
 function NavPanel (props) {
-  const {panel, isClosed, close} = props
+  const {panel, isClosed} = props
   const PanelContents = PANELS_BY_NAME[panel]
   const panelProps = PANEL_PROPS_BY_NAME[panel]
-
+  // TODO (ka 2018-2-6): revisit removal of closed panel state,
+  // hiding for now, by removing onCloseClick prop
   return (
-    <SidePanel isClosed={isClosed} onCloseClick={close} title={panelProps.title}>
+    <SidePanel isClosed={isClosed} title={panelProps.title}>
       <PanelContents />
     </SidePanel>
   )

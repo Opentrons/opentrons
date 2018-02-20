@@ -1,35 +1,48 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
+import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
 
-import type {Mount, InstrumentCalibrationStatus, Labware} from './types'
-import type {State as CalibrationState} from './reducer/calibration'
-import type {State as ConnectionState} from './reducer/connection'
-import type {State as SessionState} from './reducer/session'
+import type {State} from '../types'
+import {selectHealth} from '../http-api-client'
+
+import type {
+  Mount,
+  Instrument,
+  InstrumentCalibrationStatus,
+  Labware,
+  LabwareCalibrationStatus,
+  LabwareType,
+  Robot,
+  SessionStatus
+} from './types'
 
 import {
   type ConnectionStatus,
-  type SessionStatus,
   _NAME,
-  UNCONFIRMED,
-  INSTRUMENT_AXES
+  INSTRUMENT_MOUNTS,
+  DECK_SLOTS
 } from './constants'
 
-type State = {
-  robot: {
-    calibration: CalibrationState,
-    connection: ConnectionState,
-    session: SessionState
-  }
-}
-const calibration = (state: State): CalibrationState => state[_NAME].calibration
-
-const connection = (state: State): ConnectionState => state[_NAME].connection
-
-const session = (state: State): SessionState => state[_NAME].session
+const calibration = (state: State) => state[_NAME].calibration
+const connection = (state: State) => state[_NAME].connection
+const session = (state: State) => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
-const sessionStatus = (state: State) => session(state).state
+
+export function isMount (target: ?string): boolean {
+  return INSTRUMENT_MOUNTS.indexOf(target) > -1
+}
+
+export function isSlot (target: ?string): boolean {
+  return DECK_SLOTS.indexOf(target) > -1
+}
+
+export function labwareType (labware: Labware): LabwareType {
+  return labware.isTiprack
+    ? 'tiprack'
+    : 'labware'
+}
 
 export function getIsScanning (state: State): boolean {
   return connection(state).isScanning
@@ -39,10 +52,20 @@ export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
   (state: State) => connection(state).discoveredByName,
   (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo) => discovered.map((name) => ({
-    ...discoveredByName[name],
-    isConnected: connectedTo === name
-  }))
+  selectHealth,
+  (discovered, discoveredByName, connectedTo, healthByName): Robot[] => {
+    const robots = discovered.map((name) => ({
+      ...discoveredByName[name],
+      isConnected: connectedTo === name,
+      health: healthByName[name]
+    }))
+
+    return sortBy(robots, [
+      (robot) => !robot.isConnected,
+      (robot) => !robot.wired,
+      'name'
+    ])
+  }
 )
 
 export const getConnectionStatus = createSelector(
@@ -70,16 +93,20 @@ export function getSessionName (state: State): string {
   return session(state).name
 }
 
+export function getSessionStatus (state: State): SessionStatus {
+  return session(state).state
+}
+
 export function getSessionIsLoaded (state: State): boolean {
-  return sessionStatus(state) !== ('': SessionStatus)
+  return getSessionStatus(state) !== ('': SessionStatus)
 }
 
 export function getIsReadyToRun (state: State): boolean {
-  return sessionStatus(state) === ('loaded': SessionStatus)
+  return getSessionStatus(state) === ('loaded': SessionStatus)
 }
 
 export function getIsRunning (state: State): boolean {
-  const status = sessionStatus(state)
+  const status = getSessionStatus(state)
 
   return (
     status === ('running': SessionStatus) ||
@@ -88,11 +115,11 @@ export function getIsRunning (state: State): boolean {
 }
 
 export function getIsPaused (state: State): boolean {
-  return sessionStatus(state) === ('paused': SessionStatus)
+  return getSessionStatus(state) === ('paused': SessionStatus)
 }
 
 export function getIsDone (state: State): boolean {
-  const status = sessionStatus(state)
+  const status = getSessionStatus(state)
 
   return (
     status === ('error': SessionStatus) ||
@@ -178,6 +205,10 @@ export const getRunTime = createSelector(
   }
 )
 
+export function getCalibrationRequest (state: State) {
+  return calibration(state).calibrationRequest
+}
+
 export function getInstrumentsByMount (state: State) {
   return session(state).instrumentsByMount
 }
@@ -186,11 +217,15 @@ export const getInstruments = createSelector(
   getInstrumentsByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
-  (state: State) => calibration(state).calibrationRequest,
-  (instrumentsByMount, probedByMount, tipOnByMount, calibrationRequest) => {
-    return INSTRUMENT_AXES.map((mount) => {
+  (state: State) => getCalibrationRequest(state),
+  (
+    instrumentsByMount,
+    probedByMount,
+    tipOnByMount,
+    calibrationRequest
+  ): Instrument[] => {
+    return Object.keys(instrumentsByMount).filter(isMount).map((mount) => {
       const instrument = instrumentsByMount[mount]
-      if (!instrument || !instrument.name) return {mount}
 
       const probed = probedByMount[mount] || false
       const tipOn = tipOnByMount[mount] || false
@@ -225,20 +260,31 @@ export const getInstruments = createSelector(
 )
 
 // returns the mount of the pipette to use for deckware calibration
-// TODO(mc, 2018-01-03): select pipette based on deckware props
-export const getCalibratorMount = createSelector(
+// TODO(mc, 2018-02-07): be smarter about the backup case
+export const getCalibrator = createSelector(
   getInstruments,
-  (instruments): Mount | '' => {
+  (instruments): ?Instrument => {
     const tipOn = instruments.find((i) => i.probed && i.tipOn)
-    const calibrator = tipOn || {mount: ''}
 
-    return calibrator.mount
+    return tipOn || instruments[0]
   }
 )
 
+// TODO(mc, 2018-02-07): remove this selector in favor of the one above
+export function getCalibratorMount (state: State): ?Mount {
+  const calibrator = getCalibrator(state)
+
+  if (!calibrator) return null
+
+  return calibrator.mount
+}
+
 export const getInstrumentsCalibrated = createSelector(
   getInstruments,
-  (instruments): boolean => instruments.every((i) => !i.name || i.probed)
+  (instruments): boolean => (
+    instruments.length !== 0 &&
+    instruments.every((i) => i.probed)
+  )
 )
 
 export function getLabwareBySlot (state: State) {
@@ -247,18 +293,48 @@ export function getLabwareBySlot (state: State) {
 
 export const getLabware = createSelector(
   getLabwareBySlot,
-  (state: State) => calibration(state).labwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
-  (labwareBySlot, statusBySlot, confirmedBySlot): Labware[] => {
+  (state: State) => getCalibrationRequest(state),
+  (labwareBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(labwareBySlot)
+      .filter(isSlot)
       .map((slot) => {
         const labware = labwareBySlot[slot]
+        const confirmed = confirmedBySlot[slot] || false
+        let calibration: LabwareCalibrationStatus = 'unconfirmed'
+        let isMoving = false
 
-        return {
-          ...labware,
-          calibration: statusBySlot[slot] || UNCONFIRMED,
-          confirmed: confirmedBySlot[slot] || false
+        // TODO(mc: 2018-01-10): rethink the labware level "calibration" prop
+        if (calibrationRequest.slot === slot && !calibrationRequest.error) {
+          const {type, inProgress} = calibrationRequest
+
+          // don't set isMoving for jogs because it's distracting
+          isMoving = inProgress && type !== 'JOG'
+
+          if (type === 'MOVE_TO') {
+            calibration = inProgress
+              ? 'moving-to-slot'
+              : 'over-slot'
+          } else if (type === 'JOG') {
+            calibration = inProgress
+              ? 'jogging'
+              : 'over-slot'
+          } else if (type === 'DROP_TIP_AND_HOME') {
+            calibration = inProgress
+              ? 'dropping-tip'
+              : 'over-slot'
+          } else if (type === 'PICKUP_AND_HOME') {
+            calibration = inProgress
+              ? 'picking-up'
+              : 'picked-up'
+          } else if (type === 'CONFIRM_TIPRACK' || type === 'UPDATE_OFFSET') {
+            calibration = inProgress
+              ? 'confirming'
+              : 'confirmed'
+          }
         }
+
+        return {...labware, calibration, confirmed, isMoving}
       })
   }
 )
@@ -304,11 +380,15 @@ export const getLabwareConfirmed = createSelector(
 )
 
 export function getJogInProgress (state: State): boolean {
-  return calibration(state).jogRequest.inProgress
+  const request = getCalibrationRequest(state)
+
+  return request.type === 'JOG' && request.inProgress
 }
 
 export function getOffsetUpdateInProgress (state: State): boolean {
-  return calibration(state).updateOffsetRequest.inProgress
+  const request = getCalibrationRequest(state)
+
+  return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
 
 export function getJogDistance (state: State): number {

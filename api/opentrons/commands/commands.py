@@ -2,7 +2,7 @@ from . import types
 from ..broker import broker
 import functools
 import inspect
-from opentrons.containers import Well, Container, Slot, WellSeries
+from opentrons.containers import Well, Container, Slot, location_to_list
 
 
 def stringify_location(location):
@@ -18,29 +18,11 @@ def stringify_location(location):
         Well: 'well'
     }
 
-    if isinstance(location, tuple):
-        location = location[0]
-
     # Coordinates only
     if location is None:
         return '?'
 
-    # TODO(artyom, 20171107): this is to handle a case when
-    # container.rows('1', '2') returns a WellSeries of WellSeries
-    # the data structure should be fixed when WellSeries is phased out
-    if (isinstance(location, WellSeries) and
-            isinstance(location[0], WellSeries)):
-        location = WellSeries(
-            wells=[well for series in location for well in series])
-
-    if (isinstance(location, WellSeries)):
-        location = list(location)
-
-    if not (isinstance(location, WellSeries) or
-            isinstance(location, list) or
-            isinstance(location, tuple)):
-        location = [location]
-
+    location = location_to_list(location)
     multiple = len(location) > 1
 
     return '{object_text}{suffix} {first}{last} in "{slot_text}"'.format(
@@ -108,11 +90,14 @@ def consolidate(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.CONSOLIDATE,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -127,11 +112,14 @@ def distribute(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.DISTRIBUTE,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,
@@ -146,11 +134,14 @@ def transfer(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
+    # incase either source or dest is list of tuple location
+    # strip both down to simply lists of Placeables
+    locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
         name=types.TRANSFER,
         payload={
             'instrument': instrument,
-            'locations': [source, dest],
+            'locations': locations,
             'volume': volume,
             'source': source,
             'dest': dest,

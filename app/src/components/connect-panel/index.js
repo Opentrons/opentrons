@@ -1,4 +1,5 @@
 import React from 'react'
+import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
 
 import {
@@ -6,17 +7,17 @@ import {
   actions as robotActions
 } from '../../robot'
 
-import ScanButton from './ScanButton'
 import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
 
-export default connect(mapStateToProps, null, mergeProps)(ConnectPanel)
+export default withRouter(
+  connect(mapStateToProps, null, mergeProps)(ConnectPanel)
+)
 
 function ConnectPanel (props) {
   return (
     <div>
-      <ScanButton {...props} inTitleBar />
       <RobotList>
         {props.robots.map((robot) => (
           <RobotItem key={robot.name} {...robot} />

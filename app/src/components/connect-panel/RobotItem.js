@@ -1,8 +1,16 @@
 // item in a RobotList
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import {PrimaryButton, Icon, USB} from '@opentrons/components'
+import cx from 'classnames'
+
+import {
+  ListItem,
+  IconButton,
+  USB,
+  WIFI,
+  TOGGLED_OFF,
+  TOGGLED_ON
+} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
@@ -14,39 +22,41 @@ RobotItem.propTypes = {
 }
 
 export default function RobotItem (props) {
-  return (
-    <li className={styles.robot_item}>
-      <RobotItemIcon {...props} />
-      <RobotItemControls {...props} />
-    </li>
-  )
-}
+  const {name, wired, isConnected, onConnectClick, onDisconnectClick} = props
+  const onClick = isConnected
+    ? onDisconnectClick
+    : onConnectClick
 
-function RobotItemIcon (props) {
-  const {isConnected} = props
-  const className = classnames(styles.robot_icon, {
+  const className = cx(styles.connection_toggle, {
     [styles.connected]: isConnected,
     [styles.disconnected]: !isConnected
   })
 
-  return (
-    <Icon name={USB} className={className} />
-  )
-}
+  /* TODO (ka 2018-2-13):
+  Toggle Button Class based on connectivity,
+  NavLink gets ActiveClassName in ListItem
+  */
+  const toggleIcon = isConnected
+    ? TOGGLED_ON
+    : TOGGLED_OFF
 
-function RobotItemControls (props) {
-  const {name, isConnected, onConnectClick, onDisconnectClick} = props
-  const buttonOnClick = (isConnected && onDisconnectClick) || onConnectClick
-  const buttonText = (isConnected && 'Disconnect Robot') || 'Connect to Robot'
+  const iconName = wired
+    ? USB
+    : WIFI
 
   return (
-    <div className={styles.robot_controls}>
+    <ListItem
+      url={`/robots/${name}`}
+      iconName={iconName}
+      className={styles.robot_item}
+      activeClassName={styles.active}
+    >
       <p className={styles.robot_name}>{name}</p>
-      <div>
-        <PrimaryButton onClick={buttonOnClick}>
-          {buttonText}
-        </PrimaryButton>
-      </div>
-    </div>
+      <IconButton
+        name={toggleIcon}
+        className={className}
+        onClick={onClick}
+      />
+    </ListItem>
   )
 }

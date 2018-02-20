@@ -12,6 +12,39 @@ from tests.opentrons.conftest import fuzzy_assert
 from numpy import isclose
 
 
+def test_pipette_models(robot):
+    from opentrons import instruments, robot
+
+    robot.reset()
+    p = instruments.P300_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 300
+    p = instruments.P300_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 300
+
+    robot.reset()
+    p = instruments.P10_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 10
+    p = instruments.P10_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 10
+
+
+def test_pipette_max_deck_height(robot):
+    from opentrons import instruments, robot
+    robot.reset()
+    tallest_point = robot._driver.homed_position['Z']
+    p = instruments.P300_Single(mount='left')
+    assert p._max_deck_height() == tallest_point
+
+    for tip_length in [10, 25, 55, 100]:
+        p._add_tip(length=tip_length)
+        assert p._max_deck_height() == tallest_point - tip_length
+        p._remove_tip(length=tip_length)
+
+
 def test_drop_tip_move_to(robot):
     plate = containers_load(robot, '96-flat', '1')
     tiprack = containers_load(robot, 'tiprack-200ul', '3')
@@ -35,11 +68,35 @@ def test_drop_tip_move_to(robot):
     #     })
 
 
+def test_retract(robot):
+    robot.reset()
+    plate = containers_load(robot, '96-flat', '1')
+    p200 = Pipette(robot, mount='left')
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
+
+    p200.move_to(plate[0].top())
+
+    assert p200.previous_placeable == plate[0]
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200)
+    assert current_pos[2] == plate[0].top()[1][2]
+
+    p200.retract()
+
+    assert p200.previous_placeable is None
+    current_pos = pose_tracker.absolute(
+        robot.poses,
+        p200.instrument_mover)
+    assert current_pos[2] == HOMED_POSITION['A']
+
+
 def test_aspirate_move_to(robot):
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p200 = Pipette(robot,
                    mount='left',
-                   tip_racks=[tip_rack])
+                   tip_racks=[tip_rack],
+                   ul_per_mm=10)
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', '1')
@@ -55,7 +112,7 @@ def test_aspirate_move_to(robot):
     current_pos = pose_tracker.absolute(
         robot.poses,
         p200.instrument_actuator)
-    assert (current_pos == (7.402, 0.0, 0.0)).all()
+    assert (current_pos == (12, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
@@ -1331,71 +1388,57 @@ class PipetteTest(unittest.TestCase):
         expected = [
             mock.call(self.plate[0],
                       instrument=self.p200,
-                      low_current_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (6.40, 3.20, 7.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (0.00, 3.20, 7.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 6.40, 7.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[0], (3.20, 0.00, 7.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(self.plate[1],
                       instrument=self.p200,
-                      low_current_z=False,
                       strategy='arc'),
             mock.call(
                 (self.plate[1], (4.80, 3.20, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (1.60, 3.20, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 4.80, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct'),
             mock.call(
                 (self.plate[1], (3.20, 1.60, 10.50)),
                 instrument=self.p200,
-                low_current_z=False,
                 strategy='direct')
         ]
 
@@ -1644,10 +1687,10 @@ class PipetteTest(unittest.TestCase):
         plunge = -10
         return [
             mock.call(well.top(), strategy='arc'),
-            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), low_current_z=True, strategy='direct'),
+            mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]

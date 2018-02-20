@@ -1,6 +1,11 @@
 // @flow
 // common robot types
 
+import type {RobotHealth} from '../http-api-client'
+import typeof reducer from './reducer'
+
+export type State = $Call<reducer>
+
 export type Channels = 1 | 8
 
 export type Mount = 'left' | 'right'
@@ -21,12 +26,27 @@ export type Slot =
 // jog axes and directions
 export type Axis = 'x' | 'y' | 'z'
 export type Direction = -1 | 1
+export type JogButtonName =
+  | 'left'
+  | 'right'
+  | 'back'
+  | 'forward'
+  | 'up'
+  | 'down'
 
 // robot MDNS service for connectivity
 export type RobotService = {
   name: string,
   host: string,
   ip: string,
+  port: number,
+  wired?: boolean,
+}
+
+// robot from getDiscovered selector
+export type Robot = RobotService & {
+  isConnected: boolean,
+  health: RobotHealth
 }
 
 // protocol file (browser File object)
@@ -48,12 +68,11 @@ export type InstrumentCalibrationStatus =
 export type LabwareCalibrationStatus =
   | 'unconfirmed'
   | 'moving-to-slot'
+  | 'jogging'
+  | 'dropping-tip'
   | 'over-slot'
   | 'picking-up'
-  | 'homing'
-  | 'homed'
-  | 'updating'
-  | 'updated'
+  | 'picked-up'
   | 'confirming'
   | 'confirmed'
 
@@ -85,6 +104,12 @@ export type StateInstrument = {
   volume: number,
 }
 
+export type Instrument = StateInstrument & {
+  calibration: InstrumentCalibrationStatus,
+  probed: boolean,
+  tipOn: boolean
+}
+
 // labware as stored in redux state
 export type StateLabware = {
   // resource ID
@@ -103,5 +128,17 @@ export type StateLabware = {
 
 export type Labware = StateLabware & {
   calibration: LabwareCalibrationStatus,
-  confirmed: boolean
+  confirmed: boolean,
+  isMoving: boolean
 }
+
+export type LabwareType = 'tiprack' | 'labware'
+
+export type SessionStatus =
+  | ''
+  | 'loaded'
+  | 'running'
+  | 'paused'
+  | 'error'
+  | 'finished'
+  | 'stopped'

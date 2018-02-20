@@ -6,6 +6,7 @@ Thanks for your interest in contributing to the Opentrons platform! This Contrib
 *   [Opening Pull Requests](#opening-pull-requests)
 *   [Commit Guidelines](#commit-guidelines)
 *   [Project and Repository Structure](#project-and-repository-structure)
+*   [Development Setup](#development-setup)
 *   [Prior Art](#prior-art)
 
 ## Opening Issues
@@ -84,6 +85,93 @@ Generally, the directory / file structure of our monorepo looks something like t
 
 Our projects use a mix of languages, but mostly Python (backend + robotics) and JavaScript (frontend). Each project has its own `README` + `Makefile` + dependency management.
 
+## Development Setup
+
+If you'd like to contribute (or maybe just run the very latest and greatest version), this section details what you need to do to get your computer and local repository set up.
+
+Individual projects may have additional instructions, so be sure to check out the various project `README`s, too.
+
+### Environment and Repository
+
+Your computer will need the following tools installed to be able to develop with the Opentrons platform:
+
+*   macOS 10.11+, Linux, or Windows 10 with Cygwin
+*   Python 3.5.3  - [pyenv](https://github.com/pyenv/pyenv) is optional, but recommended
+
+    ``` shell
+    # pyenv on macOS: install with shared framework option
+    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
+
+    # pyenv on Linux: install with shared library option
+    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.3
+    ```
+
+*   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
+
+    ```shell
+    # nvm on macOS and Linux
+    # installs version from .nvmrc ("8")
+    nvm install && nvm use
+    ```
+
+*   [yarn][yarn-install] - JavaScript package manager
+
+*   GNU Make - we use [Makefiles][] to manage our builds
+
+Once you're set up, clone the repository and install all project dependencies:
+
+```shell
+git clone https://github.com/Opentrons/opentrons.git
+cd opentrons
+make install
+```
+
+### Testing and Linting
+
+You can tests with:
+
+```shell
+# run all tests
+make test
+
+# run a specific project's tests
+make -C api test
+make -C components test
+make -C protocol-designer test
+make -C app test
+```
+
+And you can run code linting / typechecking with:
+
+```shell
+# lint all code
+make lint
+
+# lint specific languages
+make lint-py
+make lint-js
+make lint-css
+```
+
+### Opentrons API
+
+Be sure to check out the [API `README`][api-readme] for additional instructions. To run the Opentrons API in development mode:
+
+```shell
+# change into the API directory
+$ cd api
+
+# verify API is working by printing the version
+python -c 'import opentrons; print(opentrons.__version__)'
+
+# run API with virtual robot
+ENABLE_VIRTUAL_SMOOTHIE=true make dev
+# run API with robot's motor driver connected via USB to UART cable
+make dev
+
+# push the current contents of the api directory to robot for testing
+make push
+```
 
 ## Prior Art
 
@@ -94,6 +182,8 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 *   [Kibana Contributing Guide][kibana-contributing]
 
 [repo]: https://github.com/Opentrons/opentrons
+[api-readme]: ./api/README.rst
+
 [easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
 [support]: https://support.opentrons.com/
 [fork-and-pull]: https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/
@@ -104,3 +194,6 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [react-contributing]: https://reactjs.org/docs/how-to-contribute.html
 [node-contributing]: https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
 [kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
+[makefiles]: https://en.wikipedia.org/wiki/Makefile
+[nvm]: https://github.com/creationix/nvm
+[yarn-install]: https://yarnpkg.com/en/docs/install

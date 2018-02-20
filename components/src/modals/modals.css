@@ -13,16 +13,29 @@
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+.clickable {
+  @apply --clickable;
+}
+
 .modal_contents {
   z-index: 1;
   padding: 1rem;
   background-color: white;
 }
 
-.continue_modal_contents {
-  padding: 1.5rem;
+.alert_modal_contents {
+  @apply --font-body-2-dark;
+
+  padding: 0.5rem 1rem;
 }
 
-.continue_modal_buttons {
+.alert_modal_heading {
+  @apply --font-header-dark;
+
+  margin-bottom: 0.5rem;
+}
+
+.alert_modal_buttons {
   float: right;
+  margin-top: 1rem;
 }
