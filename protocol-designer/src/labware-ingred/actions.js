@@ -93,7 +93,7 @@ export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>,
 }
 
 type DeleteIngredientPrepayload = {|
-  wellName: ?string,
+  wellName?: string,
   groupId: string
 |}
 

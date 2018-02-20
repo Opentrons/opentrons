@@ -1,3 +1,4 @@
+// @flow
 import { connect } from 'react-redux'
 import get from 'lodash/get'
 
@@ -6,19 +7,22 @@ import { selectors } from '../labware-ingred/reducers'
 import { preselectWells, selectWells } from '../labware-ingred/actions'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
 import { getCollidingWells } from '../utils.js'
+import type {BaseState} from '../types'
 
 export default connect(
-  (state, ownProps) => {
+  (state: BaseState, ownProps) => {
     const selectedContainerId = get(selectors.selectedContainer(state), 'containerId')
     const containerId = ownProps.containerId || selectedContainerId
 
     const isSelectedContainer = containerId === selectedContainerId
 
+    const containerById = selectors.containerById(containerId)(state)
+
     return {
       wellContents: isSelectedContainer
         ? selectors.wellContentsSelectedContainer(state)
         : selectors.allWellMatricesById(state)[containerId],
-      containerType: selectors.containerById(containerId)(state).type
+      containerType: containerById && containerById.type
     }
   },
   {

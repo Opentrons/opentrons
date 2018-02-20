@@ -1,43 +1,83 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-// import cx from 'classnames'
+// @flow
+import * as React from 'react'
 import styles from './IngredientPropertiesForm.css'
 
 import Button from './Button.js'
 
-const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...otherProps}) => {
-  const ElementType = (otherProps.type === 'textarea')
-    ? 'textarea'
-    : 'input'
+type SetSubstate = (accessor: string, value: string | boolean | number) => any
+type GetSubstate = (accessor: string) => string | boolean
 
-  return <ElementType
-    id={accessor}
-    checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
-    value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
-    onChange={e => otherProps.type === 'checkbox'
-      ? setSubstate(accessor, !getSubstate(accessor))
-      : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
-    {...otherProps}
-  />
+type FieldProps = {
+  accessor: string,
+  numeric?: boolean,
+  type?: string
 }
 
-class IngredientPropertiesForm extends React.Component {
-  static propTypes = {
-    onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    numWellsSelected: PropTypes.number.isRequired,
-    selectedWellsMaxVolume: PropTypes.number.isRequired,
+const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
+  (props: FieldProps) => { /* otherProps */
+    const {setSubstate, getSubstate} = args
+    const {accessor, numeric, ...otherProps} = props
 
-    selectedIngredientProperties: PropTypes.shape({
-      name: PropTypes.string,
-      volume: PropTypes.number,
-      description: PropTypes.string,
-      groupId: PropTypes.string
-    })
+    const ElementType = (otherProps.type === 'textarea')
+      ? 'textarea'
+      : 'input'
+
+    return <ElementType
+      id={accessor}
+      checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
+      value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
+      onChange={(e: SyntheticInputEvent<HTMLInputElement>) => otherProps.type === 'checkbox'
+        ? setSubstate(accessor, !getSubstate(accessor))
+        : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
+      {...otherProps}
+    />
   }
 
-  constructor (props) {
+type SetStateCallback = (...args: Array<any>) => any
+
+type IngredInputs = {
+  groupId?: number,
+
+  name: string | null,
+  volume: number | null,
+  description: string | null,
+  concentration: string | null,
+  individualize: boolean,
+  serializeName: string | null
+}
+
+type AllIngredGroupFields = {
+  [ingredGroupId: string]: IngredInputs
+}
+
+type Props = {
+  onSave: any,
+  onCancel: any,
+  onDelete: any,
+  numWellsSelected: number,
+  selectedWellsMaxVolume: number,
+
+  selectedIngredientProperties: {
+    name: string,
+    volume: number,
+    description: string,
+    groupId: number
+  },
+
+  allIngredientGroupFields: ?AllIngredGroupFields,
+  allIngredientNamesIds: Array<{ingredientId: number, name: string}>,
+  editingIngredGroupId: number // TODO change ids to strings
+} & IngredInputs
+
+type State = {
+  input: IngredInputs,
+  copyGroupId: ?number
+}
+
+class IngredientPropertiesForm extends React.Component<Props, State> {
+  Field: $Call<typeof makeInputField, *>
+
+  constructor (props: Props) {
     super(props)
     this.state = {
       input: {
@@ -57,20 +97,20 @@ class IngredientPropertiesForm extends React.Component {
       setSubstate: (inputKey, inputValue) => {
         this.setState({...this.state, input: {...this.state.input, [inputKey]: inputValue}})
       },
-      getSubstate: inputKey => this.state.input[inputKey]
+      getSubstate: (inputKey) => this.state.input[inputKey]
     })
   }
 
-  resetInputState = (ingredGroupId, nextIngredGroupFields, cb) => {
+  resetInputState = (ingredGroupId: number, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
     // nextIngredGroupFields allows you to update with nextProps
-    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields)
+    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId in allIngredientGroupFields) {
       const { name, volume, description, concentration, individualize, serializeName } = this.state.input
-      const newIngredFields = allIngredientGroupFields[ingredGroupId]
+      const newIngredFields = allIngredientGroupFields[ingredGroupId.toString()] // TODO access with string, not number
       this.setState({
         ...this.state,
         input: {
@@ -98,11 +138,11 @@ class IngredientPropertiesForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps (nextProps: Props) {
     this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
   }
 
-  selectExistingIngred = ingredGroupId => {
+  selectExistingIngred = (ingredGroupId: number) => {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
   }
 
@@ -118,7 +158,7 @@ class IngredientPropertiesForm extends React.Component {
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId]
+    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId.toString()]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields
@@ -147,7 +187,7 @@ class IngredientPropertiesForm extends React.Component {
             </span>
             {!editMode && <span>
               {/* TODO make this a Field??? */}
-              <select onChange={e => this.selectExistingIngred(parseInt(e.target.value, 10))}>
+              <select onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(parseInt(e.target.value, 10))}>
                 <option value=''>Select existing ingredient</option>
                 {allIngredientNamesIds.map(({ingredientId, name}, i) =>
                   <option key={i} value={ingredientId}>{name}</option>
@@ -204,7 +244,7 @@ class IngredientPropertiesForm extends React.Component {
           {editMode &&
             <Button className={styles.delete_ingred} onClick={() =>
               window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-              onDelete(selectedIngredientFields.groupId)
+              onDelete(selectedIngredientFields && selectedIngredientFields.groupId)
             }>Delete Ingredient</Button>
           }
         </div>
