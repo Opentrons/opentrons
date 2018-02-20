@@ -94,6 +94,7 @@ def test_comment(robot):
 
 def test_create_arc(robot):
     from opentrons.robot.robot import TIP_CLEARANCE_DECK, TIP_CLEARANCE_LABWARE
+    robot.reset()
 
     p200 = pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
@@ -133,7 +134,7 @@ def test_create_arc(robot):
     assert robot.max_deck_height() == new_labware_height
 
     res = robot._create_arc(p200, (0, 0, 0), plate2[0])
-    arc_top = robot.max_deck_height() + TIP_CLEARANCE_DECK
+    arc_top = p200._max_deck_height()
     expected = [
         {'z': arc_top},
         {'x': 0, 'y': 0},
