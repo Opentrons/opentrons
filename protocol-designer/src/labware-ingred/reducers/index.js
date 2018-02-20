@@ -193,7 +193,7 @@ export const ingredLocations = handleActions({
         [groupId]: {
           ...state[groupId],
           [containerId]: uniq([
-            ...state[groupId][containerId],
+            ...(state[groupId][containerId] || []),
             ...action.payload.wells
           ])
         }

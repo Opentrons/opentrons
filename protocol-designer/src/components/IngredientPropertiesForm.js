@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import isNil from 'lodash/isNil'
 import styles from './IngredientPropertiesForm.css'
 
 import Button from './Button.js'
@@ -158,7 +159,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId.toString()]
+    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId.toString()]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields
