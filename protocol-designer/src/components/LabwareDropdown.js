@@ -3,7 +3,7 @@ import * as React from 'react'
 import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
 
-type OnContainerChoose = (containerType: string) => (e?: SyntheticEvent<*>) => void
+type OnContainerChoose = (containerType: string) => void
 
 type LabwareItemProps = {
   onContainerChoose: OnContainerChoose,

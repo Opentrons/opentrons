@@ -1,5 +1,5 @@
 // @flow
-import {createActions} from 'redux-actions'
+import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
 import omit from 'lodash/omit'
@@ -15,54 +15,104 @@ import type {GetState} from '../types'
 // Payload mappers
 const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
 
-// Actions
-export const {
-  openLabwareSelector,
-  closeLabwareSelector,
+// ===== Labware selector actions =====
 
-  openIngredientSelector,
-  closeIngredientSelector,
+export const openLabwareSelector = createAction(
+  'OPEN_LABWARE_SELECTOR',
+  (args: {slot: string}) => args
+)
 
-  setCopyLabwareMode,
+export const closeLabwareSelector = createAction(
+  'CLOSE_LABWARE_SELECTOR',
+  () => {}
+)
 
-  createContainer,
-  deleteContainer,
-  modifyContainer,
+export const setCopyLabwareMode = createAction(
+  'SET_COPY_LABWARE_MODE',
+  (containerId: string) => containerId
+)
 
-  preselectWells,
-  selectWells,
-  deselectWells,
+// ===== Open and close Ingredient Selector modal ====
 
-  editModeIngredientGroup,
+export const openIngredientSelector = createAction(
+  'OPEN_INGREDIENT_SELECTOR',
+  (containerId: string) => containerId
+)
 
-  hoverWellBegin,
-  hoverWellEnd
-  // deleteIngredient
-} = createActions({
-  OPEN_LABWARE_SELECTOR: undefined,
-  CLOSE_LABWARE_SELECTOR: undefined,
+export const closeIngredientSelector = createAction(
+  'CLOSE_INGREDIENT_SELECTOR',
+  () => {}
+)
 
-  OPEN_INGREDIENT_SELECTOR: undefined,
-  CLOSE_INGREDIENT_SELECTOR: undefined,
+// =====
 
-  SET_COPY_LABWARE_MODE: undefined, // payload is containerId
+export const editModeIngredientGroup = createAction(
+  'EDIT_MODE_INGREDIENT_GROUP',
+  (args:
+    | null // null here means "deselect ingredient group"
+    | {| wellName: string, groupId: string |}
+  ) => args
+)
 
-  CREATE_CONTAINER: undefined,
-  DELETE_CONTAINER: undefined,
-  MODIFY_CONTAINER: undefined, // {containerId, modify: {fieldToModify1: newValue1, fieldToModify2: newValue2}}
+// ==== Create/delete/modify labware =====
 
-  PRESELECT_WELLS: undefined,
-  SELECT_WELLS: undefined,
-  DESELECT_WELLS: undefined,
+export const createContainer = createAction(
+  'CREATE_CONTAINER',
+  (args: {|
+    slot: string,
+    containerType: string
+  |}) => args
+)
 
-  EDIT_MODE_INGREDIENT_GROUP: undefined, // payload => ({...payload, selectedWells: {'0,1': [0, 1]}}),
-  // Payload example: {group: 2, wellName: 'H1' (wellName is optional)}
-  // TODO: ^^^ get [col, row] from wellName, and wellName from either action.payload.wellName, or ingredients[action.payload.group]
-  // DELETE_INGREDIENT: undefined
+export const deleteContainer = createAction(
+  'DELETE_CONTAINER',
+  (args: {|
+    containerId: string,
+    slot: string,
+    containerType: string
+  |}) => args
+)
 
-  HOVER_WELL_BEGIN: xyToSingleWellObj,
-  HOVER_WELL_END: xyToSingleWellObj
-})
+export const modifyContainer = createAction(
+  'MODIFY_CONTAINER',
+  (args: {|
+    containerId: string,
+    modify: {
+      // TODO Ian 2018-02-20: `field` is some 'LabwareField' type
+      [field: string]: mixed // eg modify = {name: 'newName'}
+    }
+  |}) => args
+)
+
+// ===== Preselect / select wells in plate
+
+type WellSelectionArgs = {|
+  wells: Wells,
+  append: boolean // true if user is holding shift key
+|}
+
+export const preselectWells = createAction(
+  'PRESELECT_WELLS',
+  (args: WellSelectionArgs) => args
+)
+
+export const selectWells = createAction(
+  'SELECT_WELLS',
+  (args: WellSelectionArgs) => args
+)
+
+// ===== well hovering =====
+export const hoverWellBegin = createAction(
+  'HOVER_WELL_BEGIN',
+  xyToSingleWellObj
+)
+
+export const hoverWellEnd = createAction(
+  'HOVER_WELL_END',
+  xyToSingleWellObj
+)
+
+// ===========
 
 export type CopyLabware = {
   type: 'COPY_LABWARE',
@@ -97,7 +147,7 @@ type DeleteIngredientPrepayload = {|
   groupId: string
 |}
 
-type DeleteIngredient = {|
+export type DeleteIngredient = {|
   type: 'DELETE_INGREDIENT',
   payload: {
     ...DeleteIngredientPrepayload,
@@ -172,19 +222,3 @@ export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFie
     }
   })
 }
-
-export type Action =
-  | CopyLabware
-  | EditIngredient
-  | DeleteIngredient
-  // TODO IMMEDIATELY properly handle these guys
-  | {
-    type: 'OPEN_LABWARE_SELECTOR' | 'CLOSE_LABWARE_SELECTOR',
-    payload: {
-      slot: string
-    }
-  }
-  | {
-    type: 'CREATE_CONTAINER',
-    payload: any
-  }

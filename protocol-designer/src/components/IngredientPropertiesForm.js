@@ -5,7 +5,7 @@ import styles from './IngredientPropertiesForm.css'
 
 import Button from './Button.js' // TODO Ian 2018-02-01 Use comp lib button
 
-type SetStateCallback = (...args: Array<any>) => any
+type SetStateCallback = (...args: Array<*>) => *
 
 type IngredInputs = {
   groupId?: number,
