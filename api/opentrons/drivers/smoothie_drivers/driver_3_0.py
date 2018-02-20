@@ -93,6 +93,10 @@ def _parse_instrument_values(hex_str):
     }
 
 
+def _byte_array_to_hex_string(byte_array):
+    return ''.join('%02x' % b for b in byte_array)
+
+
 def _parse_switch_values(raw_switch_values):
     # probe has a space after it's ":" for some reasone
     if 'Probe: ' in raw_switch_values:
@@ -168,13 +172,21 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
-    def scan_instruments(self):
+    def _scan_instruments(self):
         res = self._send_command(GCODES['SCAN_INSTRUMENTS'])
         return {
             line.strip()[0]: _parse_instrument_values(line)
             for line in res.split('\n')
             if line
         }
+
+    def _write_instrument(self, mount, byte_array):
+        if not isinstance(byte_array, bytearray):
+            raise ValueError(
+                'Expected {0}, not {1}'.format(bytearray, type(byte_array)))
+        byte_string = _byte_array_to_hex_string(byte_array)
+        command = GCODES['WRITE_INSTRUMENT'] + mount + byte_string
+        self._send_command(command)
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
