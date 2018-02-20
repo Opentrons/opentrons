@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import get from 'lodash/get'
 
@@ -5,8 +6,47 @@ import styles from './IngredientsList.css'
 import { swatchColors } from '../constants.js'
 import { humanize } from '../utils.js'
 
-class IngredGroupCard extends React.Component {
-  constructor (props) {
+type DeleteIngredient = (args: {wellName: string, groupId: number}) => void // TODO get from action type?
+
+// Props used by both IngredientsList and IngredGroupCard // TODO
+type CommonProps = {|
+  editModeIngredientGroup: any,
+  deleteIngredient: DeleteIngredient,
+  selected: boolean
+|}
+
+type IngredCategoryData = {|
+  groupId: number, // TODO: should be a string
+
+  name: string,
+  wells: Array<string>,
+  individualize: boolean,
+  serializeName: string,
+
+  volume?: number,
+  concentration?: string,
+
+  wellDetails: {
+    [wellName: string]: {
+      name: string,
+      volume: number,
+      concentration: string
+    }
+  }
+|}
+
+type CardProps = {|
+  ingredCategoryData: IngredCategoryData,
+  ...CommonProps
+  // otherprops?
+|}
+
+type CardState = {|
+  isExpanded: boolean
+|}
+
+class IngredGroupCard extends React.Component<CardProps, CardState> {
+  constructor (props: CardProps) {
     super(props)
     this.state = {isExpanded: true}
   }
@@ -38,7 +78,9 @@ class IngredGroupCard extends React.Component {
             canDelete
             volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
             concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
-            {...{groupId, editModeIngredientGroup, deleteIngredient}}
+            groupId={groupId}
+            editModeIngredientGroup={editModeIngredientGroup}
+            deleteIngredient={deleteIngredient}
           />
         )}
       </section>
@@ -46,7 +88,30 @@ class IngredGroupCard extends React.Component {
   }
 }
 
-function IngredIndividual ({name, wellName, volume, concentration, canDelete, groupId, editModeIngredientGroup, deleteIngredient, ...otherProps}) {
+type IndividProps = {|
+  name: string,
+  wellName: string,
+  volume: number,
+  concentration?: string,
+  canDelete: boolean,
+  groupId: number,
+  editModeIngredientGroup: any,
+  deleteIngredient: DeleteIngredient
+|}
+
+function IngredIndividual (props: IndividProps) {
+  const {
+    name,
+    wellName,
+    volume,
+    concentration,
+    canDelete,
+    groupId,
+    editModeIngredientGroup,
+    deleteIngredient,
+    ...otherProps
+  } = props
+
   return (
     <div {...otherProps}
       className={styles.ingredient_instance_item}
@@ -65,7 +130,26 @@ function IngredIndividual ({name, wellName, volume, concentration, canDelete, gr
   )
 }
 
-export default function IngredientsList ({slot, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) {
+type ListProps = {|
+  slot: string,
+  containerName: string,
+  containerType: string,
+  ingredients: Array<IngredCategoryData>,
+  selectedIngredientGroupId: number, // TODO string
+  ...CommonProps
+|}
+
+export default function IngredientsList (props: ListProps) {
+  const {
+    slot,
+    containerName,
+    containerType,
+    ingredients,
+    editModeIngredientGroup,
+    deleteIngredient,
+    selectedIngredientGroupId
+  } = props
+
   return (
     <div className={styles.ingredients_list}>
       <div className={styles.ingred_list_header_label}>
@@ -77,12 +161,12 @@ export default function IngredientsList ({slot, containerName, containerType, in
       </div>
 
       {ingredients.map((ingredCategoryData, i) =>
-        <IngredGroupCard key={i} {...{
-          editModeIngredientGroup,
-          deleteIngredient,
-          ingredCategoryData,
-          selected: selectedIngredientGroupId === ingredCategoryData.groupId
-        }} />)
+        <IngredGroupCard key={i}
+          editModeIngredientGroup={editModeIngredientGroup}
+          deleteIngredient={deleteIngredient}
+          ingredCategoryData={ingredCategoryData}
+        selected={selectedIngredientGroupId === ingredCategoryData.groupId}
+        />)
       }
 
     </div>

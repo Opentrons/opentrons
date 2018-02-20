@@ -8,11 +8,12 @@ import {uuid} from '../utils'
 import {selectors} from './reducers'
 
 import {editableIngredFields} from './types'
-import type {DeckSlot, IngredInputFields} from './types'
+import type {DeckSlot, IngredInputFields, Wells} from './types'
+
 import type {GetState} from '../types'
 
 // Payload mappers
-const xyToSingleWellObj = (x, y) => ({ [(x + ',' + y)]: [x, y] })
+const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
 
 // Actions
 export const {

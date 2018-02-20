@@ -8,7 +8,7 @@ export type Labware = { // TODO merge with LabwareData type in `step-generation`
   id: string,
   slot: DeckSlot,
   type: string, // eg '96-flat',
-  name: string | null // nickname
+  name: string // nickname
 }
 
 export type Wells = {
