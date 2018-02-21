@@ -5,6 +5,7 @@ import * as React from 'react'
 import type {Robot} from '../../robot'
 
 import StatusCard from './StatusCard'
+import InformationCard from './InformationCard'
 import ConnectivityCard from './ConnectivityCard'
 import styles from './styles.css'
 
@@ -15,6 +16,9 @@ export default function RobotSettings (props: Props) {
     <div className={styles.robot_settings}>
       <div className={styles.row}>
         <StatusCard {...props} />
+      </div>
+      <div className={styles.row}>
+        <InformationCard {...props} />
       </div>
       <div className={styles.row}>
         <div className={styles.column_50}>
