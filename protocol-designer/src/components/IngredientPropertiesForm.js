@@ -8,7 +8,9 @@ import {
   DropdownField,
   InputField
 } from '@opentrons/components'
+
 import styles from './IngredientPropertiesForm.css'
+import formStyles from './Form.css'
 
 type SetStateCallback = (...args: Array<*>) => *
 
@@ -222,15 +224,15 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     }
 
     return (
-      <div className={styles.ingredient_properties_entry}>
-        <h1>
+      <div className={formStyles.form}> {/* Was: styles.ingredient_properties_entry */}
+        <h1 className={styles.ingred_form_header}>
           <div>Ingredient Properties</div>
           <div>{numWellsSelected} Well(s) Selected</div>
         </h1>
 
         <form>
-          <div className={styles.middle_row}>
-            <span className={styles.two_thirds}>
+          <div className={formStyles.field_row}>
+            <span className={formStyles.column_2_3}>
               <Field accessor='name' label='Name' />
             </span>
             {!editMode && <span>
@@ -247,7 +249,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
               />
             </span>}
           </div>
-          <div className={styles.middle_row}>
+          <div className={formStyles.field_row}>
             <span>
               <span>
                 <Field accessor='individualize' type='checkbox' label='Serialize Name' />
@@ -256,7 +258,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
             </span>
             <span className={styles.serialize_name_example}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>
-          <div className={styles.middle_row}>
+          <div className={formStyles.field_row}>
             <span>
               <Field numeric accessor='volume' label='Volume' units='µL'
                 error={maxVolExceeded
@@ -268,8 +270,9 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
               <Field accessor='concentration' label='Concentration' />
             </span>
           </div>
-          <div className={styles.flex_row}>
+          <div className={formStyles.field_row}>
             <span>
+              {/* TODO Ian 2018-02-21 make TextareaField component and use here */}
               <label>Description</label>
               <Field accessor='description' type='textarea' />
             </span>

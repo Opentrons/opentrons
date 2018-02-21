@@ -34,58 +34,25 @@
   text-align: left;
 }
 
-.ingredient_properties_entry {
-  background-color: white;
-  margin: 1em;
-  padding: 0 1.5em;
-  border: 3px solid darkgray;
-  border-radius: 15px;
-}
-
-.ingredient_properties_entry h1 {
+.ingred_form_header {
   font-size: 10pt;
   font-weight: inherit;
   text-transform: uppercase;
   float: left;
   width: 100%;
-}
 
-.ingredient_properties_entry h1 > * {
-  display: inline-block;
-  border-radius: 0;
-  margin: 0;
-  color: gray;
-  float: right;
-}
+  & > * {
+    display: inline-block;
+    border-radius: 0;
+    margin: 0;
+    color: gray;
+    float: right;
+  }
 
-.ingredient_properties_entry h1 div:first-of-type {
-  border-bottom: 1px solid gray;
-  margin-right: 1em;
-  color: black;
-  float: left;
-}
-
-.ingredient_properties_entry form {
-  display: inline-block;
-  width: 100%;
-}
-
-.ingredient_properties_entry label {
-  color: #5b5b5b;
-}
-
-.ingredient_properties_entry span input,
-textarea {
-  border: none;
-}
-
-.ingredient_properties_entry textarea {
-  width: 98%;
-  height: 2em;
-}
-
-.ingredient_properties_entry .checkbox {
-  border: none;
-  display: flex;
-  align-items: flex-end;
+  & div:first-of-type {
+    border-bottom: 1px solid gray;
+    margin-right: 1em;
+    color: black;
+    float: left;
+  }
 }

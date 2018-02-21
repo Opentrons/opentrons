@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import FormSection from './FormSection'
-import styles from './StepEditForm.css'
+import styles from './Form.css'
 import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
 
 import {formConnectorFactory} from '../utils'
