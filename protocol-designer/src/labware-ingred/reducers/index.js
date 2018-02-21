@@ -350,7 +350,6 @@ const selectedContainerType = createSelector(
 // returns the ingred data for that well, or `null`
 const _ingredAtWell = (ingredientsForContainer: Array<Ingredient>) =>
   (wellName: string): Ingredient | null => {
-    console.log('bodd', {ingredientsForContainer, wellName})
     const matchedIngred = ingredientsForContainer.find(ingred => {
       const wells = Array.isArray(ingred.wells)
       ? ingred.wells

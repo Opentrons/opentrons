@@ -1,9 +1,14 @@
 // @flow
 import * as React from 'react'
 import isNil from 'lodash/isNil'
+import {
+  FlatButton,
+  PrimaryButton,
+  CheckboxField,
+  DropdownField,
+  InputField
+} from '@opentrons/components'
 import styles from './IngredientPropertiesForm.css'
-
-import Button from './Button.js' // TODO Ian 2018-02-01 Use comp lib button
 
 type SetStateCallback = (...args: Array<*>) => *
 
@@ -37,7 +42,10 @@ type GetSubstate = (accessor: Accessor) => string | boolean | number | null
 type FieldProps = {
   accessor: Accessor,
   numeric?: boolean,
-  type?: string
+  type?: string,
+  label?: string,
+  units?: string,
+  error?: string
 }
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
@@ -45,17 +53,36 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
     const {setSubstate, getSubstate} = args
     const {accessor, numeric, type, ...otherProps} = props
 
+    if (!type || type === 'input') {
+      return <InputField
+        label={props.label}
+        units={props.units}
+        error={props.error}
+        value={(getSubstate(accessor) || '').toString()}
+        onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
+          setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)
+        }
+      />
+    }
+
+    if (type === 'checkbox') {
+      return <CheckboxField
+        label={props.label}
+        value={getSubstate(accessor) === true}
+        onChange={(e: SyntheticInputEvent<*>) => setSubstate(accessor, !getSubstate(accessor))}
+      />
+    }
+
+    // TODO Ian 2018-02-21 make Textbox component and get rid of this
     const ElementType = (type === 'textarea')
       ? 'textarea'
       : 'input'
 
     return <ElementType
       id={accessor}
-      checked={type === 'checkbox' && getSubstate(accessor) === true}
       value={getSubstate(accessor) || ''}
-      onChange={(e: SyntheticInputEvent<HTMLInputElement>) => (type === 'checkbox')
-        ? setSubstate(accessor, !getSubstate(accessor))
-        : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
+      onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
+        setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
       type={type}
       {...otherProps}
     />
@@ -204,41 +231,41 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         <form>
           <div className={styles.middle_row}>
             <span className={styles.two_thirds}>
-              <label>Name</label>
-              <Field accessor='name' />
+              <Field accessor='name' label='Name' />
             </span>
             {!editMode && <span>
               {/* TODO make this a Field??? */}
-              <select onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}>
-                <option value=''>Select existing ingredient</option>
-                {allIngredientNamesIds.map(({ingredientId, name}, i) =>
-                  <option key={i} value={ingredientId}>{name}</option>
-                )}
-              </select>
+              <DropdownField
+                onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
+                options={[
+                  {name: 'Select Existing Ingredient', value: ''},
+                  ...allIngredientNamesIds.map(({ingredientId, name}) => ({
+                    name,
+                    value: ingredientId
+                  }))
+                ]}
+              />
             </span>}
           </div>
           <div className={styles.middle_row}>
             <span>
-              <span className={styles.checkbox}>
-                <Field accessor='individualize' type='checkbox' />
-                <label> Serialize Name </label>
+              <span>
+                <Field accessor='individualize' type='checkbox' label='Serialize Name' />
               </span>
               {individualize && <Field accessor='serializeName' placeholder='Sample' />}
             </span>
             <span className={styles.serialize_name_example}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>
           <div className={styles.middle_row}>
-            <span style={{borderColor: maxVolExceeded && 'red'}}>
-              <label>Volume (µL)</label>
-              {maxVolExceeded && // TODO: clean up the styling for this
-                <label style={{color: 'red'}}>
-                  Warning: exceeded max volume per well: {selectedWellsMaxVolume}uL
-                </label>}
-              <Field numeric accessor='volume' />
+            <span>
+              <Field numeric accessor='volume' label='Volume' units='µL'
+                error={maxVolExceeded
+                  ? `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
+                  : undefined}
+              />
             </span>
             <span>
-              <label>Concentration</label>
-              <Field accessor='concentration' />
+              <Field accessor='concentration' label='Concentration' />
             </span>
           </div>
           <div className={styles.flex_row}>
@@ -250,16 +277,16 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         </form>
 
         <div className={styles.button_row}>
-          <Button /* disabled={TODO: validate input here} */
+          <FlatButton /* disabled={TODO: validate input here} */
             onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
           >
             Save
-          </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          </FlatButton>
+          <FlatButton onClick={onCancel}>Cancel</FlatButton>
           {editMode &&
-            <Button className={styles.delete_ingred} onClick={this.handleDelete(selectedIngredientFields)}>
+            <PrimaryButton onClick={this.handleDelete(selectedIngredientFields)}>
               Delete Ingredient
-            </Button>
+            </PrimaryButton>
           }
         </div>
       </div>

@@ -7,7 +7,7 @@ import styles from './forms.css'
 
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticEvent<>) => void,
+  onChange: (event: SyntheticInputEvent<*>) => void,
   /** checkbox is checked if value is true */
   value?: boolean,
   /** classes to apply */
