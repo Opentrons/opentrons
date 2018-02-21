@@ -5,7 +5,7 @@
 }
 
 .panel {
-  box-sizing: border-box;
+  flex-shrink: 0;
   overflow: hidden;
   border-right: var(--bd-light);
   background-color: var(--c-bg-light);
