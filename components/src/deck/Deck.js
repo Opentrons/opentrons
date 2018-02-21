@@ -18,7 +18,7 @@ import {
 import styles from './Deck.css'
 
 export type LabwareComponentProps = {
-  slotName: string,
+  slot: string,
   width: number,
   height: number
 }
@@ -71,8 +71,8 @@ function renderLabware (LabwareComponent): React.Node[] {
   return flatMap(
     SLOTNAME_MATRIX,
     (columns: string[], row: number): React.Node[] => {
-      return columns.map((slotName: string, col: number) => {
-        if (slotName === TRASH_SLOTNAME) return null
+      return columns.map((slot: string, col: number) => {
+        if (slot === TRASH_SLOTNAME) return null
 
         const transform = `translate(${[
           SLOT_WIDTH * col + SLOT_SPACING * (col + 1),
@@ -80,9 +80,9 @@ function renderLabware (LabwareComponent): React.Node[] {
         ].join(',')})`
 
         return (
-          <g key={slotName} transform={transform}>
+          <g key={slot} transform={transform}>
             <LabwareComponent
-              slotName={slotName}
+              slot={slot}
               width={SLOT_WIDTH}
               height={SLOT_HEIGHT}
             />

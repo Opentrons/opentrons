@@ -96,6 +96,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
 
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
+        # except Z, we're only probing that once
         if axis == 'z':
             center = center._replace(**{axis: acc[0]})
             acc.clear()

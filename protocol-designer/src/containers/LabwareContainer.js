@@ -21,7 +21,7 @@ import {LabwareOnDeck} from '../components/labware'
 
 export default connect(
   (state, ownProps) => {
-    const container = selectors.containersBySlot(state)[ownProps.slotName]
+    const container = selectors.containersBySlot(state)[ownProps.slot]
     const containerInfo = (container)
       ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
       : {}
@@ -30,7 +30,7 @@ export default connect(
       canAdd: selectors.canAdd(state),
       activeModals: selectors.activeModals(state),
       labwareToCopy: selectors.labwareToCopy(state),
-      highlighted: selectors.selectedContainerSlot(state) === ownProps.slotName || selectors.canAdd(state) === ownProps.slotName,
+      highlighted: selectors.selectedContainerSlot(state) === ownProps.slot || selectors.canAdd(state) === ownProps.slot,
       deckSetupMode: steplistSelectors.deckSetupMode(state)
     }
   },
