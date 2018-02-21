@@ -4,7 +4,8 @@ from collections import namedtuple
 # multi-channel pipettes share the same dimensional offsets
 DISTANCE_BETWEEN_NOZZLES = 9
 NUM_MULTI_CHANNEL_NOZZLES = 8
-Y_OFFSET_MULTI = DISTANCE_BETWEEN_NOZZLES * (NUM_MULTI_CHANNEL_NOZZLES / 2)
+MULTI_LENGTH = (NUM_MULTI_CHANNEL_NOZZLES - 1) * DISTANCE_BETWEEN_NOZZLES
+Y_OFFSET_MULTI = MULTI_LENGTH / 2
 Z_OFFSET_MULTI = -25.8
 
 # single-channel pipettes have different lengths
