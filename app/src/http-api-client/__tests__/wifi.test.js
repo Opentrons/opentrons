@@ -3,7 +3,14 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import client from '../client'
-import {fetchWifiList, fetchWifiStatus, reducer, selectWifi} from '..'
+import {
+  fetchWifiList,
+  fetchWifiStatus,
+  setConfigureWifiBody,
+  configureWifi,
+  reducer,
+  selectWifi
+} from '..'
 
 jest.mock('../client')
 
@@ -44,13 +51,14 @@ describe('wifi', () => {
     })
 
     test('dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
+      const response = {list}
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'list'}},
-        {type: 'api:WIFI_SUCCESS', payload: {robot, list, path: 'list'}}
+        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'list'}}
       ]
 
-      client.__setMockResponse({list})
+      client.__setMockResponse(response)
 
       return store.dispatch(fetchWifiList(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
@@ -84,13 +92,14 @@ describe('wifi', () => {
     })
 
     test('dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
+      const response = {status}
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'status'}},
-        {type: 'api:WIFI_SUCCESS', payload: {robot, status, path: 'status'}}
+        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'status'}}
       ]
 
-      client.__setMockResponse({status})
+      client.__setMockResponse(response)
 
       return store.dispatch(fetchWifiStatus(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
@@ -111,6 +120,76 @@ describe('wifi', () => {
     })
   })
 
+  describe('setConfigureWifiBody and configureWifi action creators', () => {
+    const ssid = 'some-ssid'
+    const psk = 'some-psk'
+    const response = {ssid, message: 'Success!'}
+    const initialState = {
+      api: {
+        wifi: {
+          opentrons: {
+            configure: {
+              request: {ssid, psk}
+            }
+          }
+        }
+      }
+    }
+
+    test('setConfigureWifiBody creator works', () => {
+      const expected = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, ssid, psk}
+      }
+
+      expect(setConfigureWifiBody(robot, ssid, psk)).toEqual(expected)
+    })
+
+    test('configureWifi calls POST /wifi/configure', () => {
+      const store = mockStore(initialState)
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(configureWifi(robot))
+        .then(() => expect(client).toHaveBeenCalledWith(
+          robot,
+          'POST',
+          '/wifi/configure',
+          {ssid, psk}
+        ))
+    })
+
+    test('configureWifi dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
+      const store = mockStore(initialState)
+      const expectedActions = [
+        {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
+        {
+          type: 'api:WIFI_SUCCESS',
+          payload: {robot, response, path: 'configure'}
+        }
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(configureWifi(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('configureWifi dispatches WIFI_REQUEST and WIFI_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const store = mockStore(initialState)
+      const expectedActions = [
+        {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
+        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'configure'}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(configureWifi(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
   describe('reducer with /wifi/list', () => {
     const path = 'list'
 
@@ -119,9 +198,10 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             list: {
+              request: null,
               inProgress: false,
               error: new Error('AH'),
-              response: ['ssid-1']
+              response: {list: ['ssid-1']}
             }
           }
         }
@@ -131,9 +211,10 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           list: {
+            request: null,
             inProgress: true,
             error: null,
-            response: ['ssid-1']
+            response: {list: ['ssid-1']}
           }
         }
       })
@@ -144,24 +225,26 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             list: {
+              request: null,
               inProgress: true,
               error: null,
-              response: ['ssid-1']
+              response: {list: ['ssid-1']}
             }
           }
         }
       }
       const action = {
         type: 'api:WIFI_SUCCESS',
-        payload: {robot, path, list: ['ssid-1', 'ssid-2', 'ssid-3']}
+        payload: {robot, path, response: {list: ['ssid-1', 'ssid-2']}}
       }
 
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           list: {
+            request: null,
             inProgress: false,
             error: null,
-            response: ['ssid-1', 'ssid-2', 'ssid-3']
+            response: {list: ['ssid-1', 'ssid-2']}
           }
         }
       })
@@ -172,9 +255,10 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             list: {
+              request: null,
               inProgress: true,
               error: null,
-              response: ['ssid-1']
+              response: {list: ['ssid-1']}
             }
           }
         }
@@ -187,9 +271,10 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           list: {
+            request: null,
             inProgress: false,
             error: {name: 'ResponseError'},
-            response: ['ssid-1']
+            response: {list: ['ssid-1']}
           }
         }
       })
@@ -204,9 +289,10 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             status: {
+              request: null,
               inProgress: false,
               error: new Error('AH'),
-              response: 'limited'
+              response: {status: 'limited'}
             }
           }
         }
@@ -216,9 +302,10 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           status: {
+            request: null,
             inProgress: true,
             error: null,
-            response: 'limited'
+            response: {status: 'limited'}
           }
         }
       })
@@ -229,24 +316,26 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             status: {
+              request: null,
               inProgress: true,
               error: null,
-              response: 'limited'
+              response: {status: 'limited'}
             }
           }
         }
       }
       const action = {
         type: 'api:WIFI_SUCCESS',
-        payload: {robot, path, status: 'full'}
+        payload: {robot, path, response: {status: 'full'}}
       }
 
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           status: {
+            request: null,
             inProgress: false,
             error: null,
-            response: 'full'
+            response: {status: 'full'}
           }
         }
       })
@@ -257,9 +346,10 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             status: {
+              request: null,
               inProgress: true,
               error: null,
-              response: 'limited'
+              response: {status: 'limited'}
             }
           }
         }
@@ -272,9 +362,131 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           status: {
+            request: null,
             inProgress: false,
             error: {name: 'ResponseError'},
-            response: 'limited'
+            response: {status: 'limited'}
+          }
+        }
+      })
+    })
+  })
+
+  describe('reducer with /wifi/configure', () => {
+    const path = 'configure'
+
+    test('handles SET_CONFIGURE_WIFI_BODY', () => {
+      const state = {
+        wifi: {
+          opentrons: {
+            configure: {
+              request: null,
+              inProgress: false,
+              error: new Error('AH'),
+              response: {ssid: 'foo', message: 'bar'}
+            }
+          }
+        }
+      }
+
+      const action = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, ssid: 'baz', psk: 'qux'}
+      }
+
+      expect(reducer(state, action).wifi).toEqual({
+        opentrons: {
+          configure: {
+            request: {ssid: 'baz', psk: 'qux'},
+            inProgress: false,
+            error: new Error('AH'),
+            response: {ssid: 'foo', message: 'bar'}
+          }
+        }
+      })
+    })
+
+    test('handles WIFI_REQUEST', () => {
+      const state = {
+        wifi: {
+          opentrons: {
+            configure: {
+              request: {ssid: 'baz', psk: 'qux'},
+              inProgress: false,
+              error: new Error('AH'),
+              response: {ssid: 'foo', message: 'bar'}
+            }
+          }
+        }
+      }
+      const action = {type: 'api:WIFI_REQUEST', payload: {robot, path}}
+
+      expect(reducer(state, action).wifi).toEqual({
+        opentrons: {
+          configure: {
+            request: {ssid: 'baz', psk: 'qux'},
+            inProgress: true,
+            error: null,
+            response: {ssid: 'foo', message: 'bar'}
+          }
+        }
+      })
+    })
+
+    test('handles WIFI_SUCCESS', () => {
+      const state = {
+        wifi: {
+          opentrons: {
+            configure: {
+              request: {ssid: 'baz', psk: 'qux'},
+              inProgress: true,
+              error: null,
+              response: {ssid: 'foo', message: 'bar'}
+            }
+          }
+        }
+      }
+      const action = {
+        type: 'api:WIFI_SUCCESS',
+        payload: {robot, path, response: {ssid: 'baz', message: 'qux'}}
+      }
+
+      expect(reducer(state, action).wifi).toEqual({
+        opentrons: {
+          configure: {
+            request: null,
+            inProgress: false,
+            error: null,
+            response: {ssid: 'baz', message: 'qux'}
+          }
+        }
+      })
+    })
+
+    test('handles WIFI_FAILURE', () => {
+      const state = {
+        wifi: {
+          opentrons: {
+            configure: {
+              inProgress: true,
+              error: null,
+              response: {ssid: 'foo', message: 'bar'}
+            }
+          }
+        }
+      }
+      const action = {
+        type: 'api:WIFI_FAILURE',
+        payload: {robot, path, error: {name: 'ResponseError'}}
+      }
+
+      expect(reducer(state, action).wifi).toEqual({
+        opentrons: {
+          configure: {
+            request: null,
+            inProgress: false,
+            error: {name: 'ResponseError'},
+            response: {ssid: 'foo', message: 'bar'}
           }
         }
       })

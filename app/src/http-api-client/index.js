@@ -10,7 +10,14 @@ export const reducer = combineReducers({
 })
 
 export {fetchHealth, selectHealth} from './health'
-export {fetchWifiList, fetchWifiStatus, selectWifi} from './wifi'
+
+export {
+  fetchWifiList,
+  fetchWifiStatus,
+  setConfigureWifiBody,
+  configureWifi,
+  selectWifi
+} from './wifi'
 
 export type {
   RobotHealth,

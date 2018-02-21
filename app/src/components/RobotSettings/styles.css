@@ -1,6 +1,25 @@
 /* stylesheet for RobotSettings components */
 @import '@opentrons/components';
 
+:root {
+  --robot_settings_card_spacing: 1.5rem;
+}
+
 .robot_settings {
-  padding: 1.5rem;
+  overflow-y: auto;
+  padding: var(--robot_settings_card_spacing);
+}
+
+.row {
+  width: 100%;
+  margin-bottom: var(--robot_settings_card_spacing);
+}
+
+.column_50 {
+  display: inline-block;
+  width: calc(50% - (0.5 * var(--robot_settings_card_spacing)));
+
+  &:not(:last-child) {
+    margin-right: var(--robot_settings_card_spacing);
+  }
 }

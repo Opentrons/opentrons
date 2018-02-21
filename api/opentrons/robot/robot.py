@@ -6,7 +6,8 @@ from numpy import add, subtract
 from opentrons import commands, containers, drivers, helpers
 from opentrons.broker import subscribe
 from opentrons.containers import Container
-from opentrons.data_storage import database
+from opentrons.data_storage import database, old_container_loading,\
+    database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
@@ -106,9 +107,24 @@ class InstrumentMotor(object):
 
 
 def _setup_container(container_name):
-    container = database.load_container(container_name)
-    container.properties['type'] = container_name
+    try:
+        container = database.load_container(container_name)
 
+    # Database.load_container throws ValueError when a container name is not
+    # found.
+    except ValueError:
+        # First must populate "get persisted container" list
+        old_container_loading.load_all_containers_from_disk()
+        # Load container from old json file
+        container = old_container_loading.get_persisted_container(
+            container_name)
+        # Rotate coordinates to fit the new deck map
+        rotated_container = database_migration.rotate_container_for_alpha(
+            container)
+        # Save to the new database
+        database.save_new_container(rotated_container, container_name)
+
+    container.properties['type'] = container_name
     container_x, container_y, container_z = container._coordinates
 
     # infer z from height
@@ -272,6 +288,12 @@ class Robot(object):
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
         self.clear_commands()
+
+        # update the position of each Mover
+        self._driver.update_position()
+        for mount in self._actuators.values():
+            for mover in mount.values():
+                self.poses = mover.update_pose_from_driver(self.poses)
 
         return self
 
@@ -818,11 +840,12 @@ class Robot(object):
 
     def add_container(self, name, slot, label=None, share=False):
         container = _setup_container(name)
-        location = self._get_placement_location(slot)
-        if self._is_available_slot(location, share, slot, name):
-            location.add(container, label or name)
-        self.add_container_to_pose_tracker(location, container)
-        self.max_deck_height.cache_clear()
+        if container is not None:
+            location = self._get_placement_location(slot)
+            if self._is_available_slot(location, share, slot, name):
+                location.add(container, label or name)
+            self.add_container_to_pose_tracker(location, container)
+            self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
