@@ -1,20 +1,30 @@
 // @flow
-import { connect } from 'react-redux'
-import get from 'lodash/get'
+import {connect, type Connector} from 'react-redux'
 
-import SelectablePlate from '../components/SelectablePlate.js'
+import SelectablePlate, {type Props} from '../components/SelectablePlate.js'
 import { selectors } from '../labware-ingred/reducers'
 import { preselectWells, selectWells } from '../labware-ingred/actions'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
 import { getCollidingWells } from '../utils.js'
 import type {BaseState} from '../types'
 
-export default connect(
+type OwnProps = {
+  containerId?: string,
+  cssFillParent?: boolean
+}
+
+const connector: Connector<OwnProps, Props> = connect(
   (state: BaseState, ownProps) => {
-    const selectedContainerId = get(selectors.selectedContainer(state), 'containerId')
+    const selectedContainer = selectors.selectedContainer(state)
+    const selectedContainerId = selectedContainer && selectedContainer.containerId
     const containerId = ownProps.containerId || selectedContainerId
 
     const isSelectedContainer = containerId === selectedContainerId
+
+    if (containerId === null) {
+      console.warn('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+      return {}
+    }
 
     const containerById = selectors.containerById(containerId)(state)
 
@@ -36,4 +46,6 @@ export default connect(
       append: e.shiftKey
     })
   }
-)(SelectablePlate)
+)
+
+export default connector(SelectablePlate)

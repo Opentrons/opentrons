@@ -6,8 +6,8 @@ import styles from './IngredientsList.css'
 import { swatchColors } from '../constants.js'
 import { humanize } from '../utils.js'
 
-type DeleteIngredient = (args: {wellName: string, groupId: number}) => void // TODO get from action type?
-type EditModeIngredientGroup = (args: {groupId: number}) => void
+type DeleteIngredient = (args: {wellName: string, groupId: string}) => void // TODO get from action type?
+type EditModeIngredientGroup = (args: {groupId: string}) => void
 
 // Props used by both IngredientsList and IngredGroupCard // TODO
 type CommonProps = {|
@@ -17,7 +17,7 @@ type CommonProps = {|
 |}
 
 type IngredCategoryData = {|
-  groupId: number, // TODO: should be a string
+  groupId: string,
 
   name: string,
   wells: Array<string>,
@@ -63,7 +63,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       <section {...otherProps} className={selected && styles.selected}>
         <label>
           <div onClick={() => this.toggleAccordion()} className={styles.arrow_dropdown}>{isExpanded ? '▼' : '►'}</div>
-          <div className={styles.circle} style={{backgroundColor: swatchColors(groupId)}} />
+          <div className={styles.circle} style={{backgroundColor: swatchColors(parseInt(groupId))}} />
           <div className={styles.ingred_label}>{ingredCategoryData.name}</div>
           {/* <div>{ingredCategoryData.wells.length} Wells</div> */}
           <div className={styles.edit_button} onClick={() => editModeIngredientGroup({groupId})}>EDIT</div>
@@ -95,7 +95,7 @@ type IndividProps = {|
   volume: number,
   concentration?: string,
   canDelete: boolean,
-  groupId: number,
+  groupId: string,
   editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient
 |}
@@ -116,7 +116,7 @@ function IngredIndividual (props: IndividProps) {
   return (
     <div {...otherProps}
       className={styles.ingredient_instance_item}
-      style={{'--swatch-color': swatchColors(groupId)}}
+      style={{'--swatch-color': swatchColors(parseInt(groupId))}}
     >
       <div>{wellName}</div>
       <div>{name}</div>
@@ -136,7 +136,7 @@ type ListProps = {|
   containerName: string,
   containerType: string,
   ingredients: Array<IngredCategoryData>,
-  selectedIngredientGroupId: number, // TODO string
+  selectedIngredientGroupId: string,
   ...CommonProps
 |}
 

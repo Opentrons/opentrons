@@ -8,7 +8,7 @@ import Button from './Button.js' // TODO Ian 2018-02-01 Use comp lib button
 type SetStateCallback = (...args: Array<*>) => *
 
 type IngredInputs = {
-  groupId?: number,
+  groupId?: string,
 
   name: string | null,
   volume: number | null,
@@ -62,9 +62,9 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
   }
 
 type Props = {
-  onSave: ({copyGroupId: ?number} & IngredInputs) => void,
+  onSave: ({copyGroupId: ?string} & IngredInputs) => void,
   onCancel: () => void,
-  onDelete: (groupId: number) => void,
+  onDelete: (groupId: string) => void,
   numWellsSelected: number,
   selectedWellsMaxVolume: number,
 
@@ -72,17 +72,17 @@ type Props = {
     name: string,
     volume: number,
     description: string,
-    groupId: number
+    groupId: string
   },
 
   allIngredientGroupFields: ?AllIngredGroupFields,
-  allIngredientNamesIds: Array<{ingredientId: number, name: string}>,
-  editingIngredGroupId: number // TODO change ids to strings
+  allIngredientNamesIds: Array<{ingredientId: string, name: string}>,
+  editingIngredGroupId: string
 } & IngredInputs
 
 type State = {
   input: IngredInputs,
-  copyGroupId: ?number
+  copyGroupId: ?string
 }
 
 class IngredientPropertiesForm extends React.Component<Props, State> {
@@ -112,7 +112,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     })
   }
 
-  resetInputState = (ingredGroupId: number, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
+  resetInputState = (ingredGroupId: string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
@@ -121,7 +121,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
     if (ingredGroupId in allIngredientGroupFields) {
       const { name, volume, description, concentration, individualize, serializeName } = this.state.input
-      const newIngredFields = allIngredientGroupFields[ingredGroupId.toString()] // TODO access with string, not number
+      const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,
         input: {
@@ -153,7 +153,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
   }
 
-  selectExistingIngred = (ingredGroupId: number) => {
+  selectExistingIngred = (ingredGroupId: string) => {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
   }
 
@@ -209,7 +209,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
             </span>
             {!editMode && <span>
               {/* TODO make this a Field??? */}
-              <select onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(parseInt(e.target.value, 10))}>
+              <select onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}>
                 <option value=''>Select existing ingredient</option>
                 {allIngredientNamesIds.map(({ingredientId, name}, i) =>
                   <option key={i} value={ingredientId}>{name}</option>

@@ -16,7 +16,16 @@ import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants
 import {uuid} from '../../utils.js'
 
 import {editableIngredFields} from '../types'
-import type {IngredInputFields, Labware, Wells} from '../types'
+import type {
+  IngredInputFields,
+  Labware,
+  Wells,
+  WellMatrices,
+//  WellContents,
+// WellDetails,
+  AllWellContents,
+  Ingredient
+} from '../types'
 import type {BaseState, JsonWellData, VolumeJson} from '../../types'
 import * as actions from '../actions'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
@@ -261,7 +270,7 @@ const rootReducer = combineReducers({
 })
 
 // SELECTORS
-const rootSelector = (state: BaseState): RootState => state.labwareIngred // TODO
+const rootSelector = (state: BaseState): RootState => state.labwareIngred
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
   reduce(containers, (acc, container: Labware, containerId) => (container.slot)
@@ -338,63 +347,6 @@ const selectedContainerType = createSelector(
   (slot, allContainers) => slot && allContainers[slot]
 )
 
-type WellDatum = {|
-  name: string,
-  volume: number,
-  concentration: string
-|}
-
-type WellDetails = {|
-  [wellName: string]: WellDatum
-|}
-
-type WellDetailsByLocation = {|
-  [containerId: string]: WellDetails
-|}
-
-type WellJawn = {|
-  groupId: string,
-  wells: Wells | Array<string>, // TODO standardize what type of wells: obj or array?
-  wellDetails: WellDetails,
-  wellDetailsByLocation: WellDetailsByLocation | null
-|}
-
-type Ingredient = {|
-    // ...IngredInputFields, // TODO IMMEDIATELY is this a part of it?
-    ...WellJawn
-|}
-
-type WellContents = {
-  preselected: boolean,
-  selected: boolean,
-  highlighted: boolean,
-  maxVolume: number,
-  hovered: boolean,
-  ...WellJawn
-}
-
-type AllWellContents = {
-  [wellName: string]: WellContents
-}
-
-type IngredView = {
-  [labwareId: string]: {|
-      ...IngredInputFields,
-      locations: {
-        [containerId: string]: Wells
-      }
-  |}
-}
-
-// type ArrayOfIngredsForContainerId = Array<{
-//   wells: Wells,
-//   wellDetails: WellDetails,
-//   locations: ?{[containerId: string]: Wells},
-//   wellDetailsByLocation: WellDetailsByLocation
-// }>
-
-type WellMatrices = {[containerId: string]: Array<Array<string>>}
-
 // _ingredAtWell: Given ingredientsForContainer obj and wellName (eg 'A1'),
 // returns the ingred data for that well, or `undefined`
 //
@@ -429,20 +381,28 @@ const _ingredAtWell = (ingredientsForContainer: Array<Ingredient> | {[containerI
       const wells = Array.isArray(matchedIngred.wells)
         ? matchedIngred.wells
         : Object.keys(matchedIngred.wells)
-      const ingredientNum = wells.findIndex(w => w === wellName) + 1
+      const ingredientNum = (wells.findIndex(w => w === wellName) + 1).toString()
 
       return {
-        // ...matchedIngred, // TODO exact type hates this
+        ...matchedIngred,
         wells: matchedIngred.wells,
         wellDetails: matchedIngred.wellDetails,
         wellDetailsByLocation: matchedIngred.wellDetailsByLocation,
-        groupId: ingredientNum.toString()
-        // wellName
+        groupId: ingredientNum
       }
     }
 
     return null
   }
+
+type IngredView = {
+  [labwareId: string]: {|
+      ...IngredInputFields,
+      locations: {
+        [containerId: string]: Wells
+      }
+  |}
+}
 
 const allIngredients: (BaseState) => IngredView = createSelector(
   rootSelector,
@@ -519,7 +479,7 @@ const _ingredientsForContainerId = (allIngredients, containerId): Array<Ingredie
   const ingredGroupFromIdx = (allIngredients, idx) => allIngredients && allIngredients[idx]
 
   const ingredGroupConvert = (ingredGroup, groupId): Ingredient => ({
-    // ...ingredGroup, // TODO IMMEDIATELY is this required?
+    ...ingredGroup, // TODO IMMEDIATELY. Which fields are required?
     groupId,
     // Convert deck-wide data to container-specific
     wells: ingredGroup.locations[containerId],
@@ -578,7 +538,6 @@ const _getWellContents = (
 
   return reduce(allLocations, (acc, location: JsonWellData, wellName: string): AllWellContents => {
     // get ingred data, or set to null if the well is empty
-    console.log('about to call _ingredAtWell with', ingredientsForContainer)
     const ingredData = (!ingredientsForContainer)
       ? null
       : _ingredAtWell(ingredientsForContainer)(wellName)

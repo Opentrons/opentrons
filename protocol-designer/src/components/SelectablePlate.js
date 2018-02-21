@@ -4,9 +4,10 @@ import React from 'react'
 import { Plate } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
+import type {AllWellContents} from '../labware-ingred/types'
 
-type Props = {
-  wellContents: *, // WellContents,
+export type Props = {
+  wellContents: AllWellContents,
   containerType: string,
   onSelectionMove: *,
   onSelectionDone: *,

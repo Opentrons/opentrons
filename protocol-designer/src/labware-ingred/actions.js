@@ -200,7 +200,7 @@ export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFie
 
   const groupId = (isUnchangedClone)
     ? payload.copyGroupId
-    : nextGroupId.toString()
+    : nextGroupId
 
   const name = (
     allIngredients[payload.copyGroupId] &&
