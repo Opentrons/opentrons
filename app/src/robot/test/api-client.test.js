@@ -106,21 +106,6 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('dispatch CONNECT_RESPONSE success if already connected', () => {
-      const expectedResponse = actions.connectResponse()
-
-      return sendConnect()
-        .then(() => {
-          RpcClient.mockClear()
-          dispatch.mockClear()
-          return sendConnect()
-        })
-        .then(() => {
-          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
-          expect(RpcClient).toHaveBeenCalledTimes(0)
-        })
-    })
-
     test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
       const expected = actions.disconnectResponse()
 

@@ -55,7 +55,12 @@ export default function client (dispatch) {
   }
 
   function connect (state, action) {
-    if (rpcClient) return dispatch(actions.connectResponse())
+    if (rpcClient) {
+      isDisconnecting = true
+      rpcClient.removeAllListeners()
+      rpcClient.close()
+      handleClientDisconnect()
+    }
 
     const name = action.payload.name
     const target = state[constants._NAME].connection.discoveredByName[name]
