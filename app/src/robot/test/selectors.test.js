@@ -44,6 +44,10 @@ describe('robot selectors', () => {
         health: {
           bar: {response: {api_version: '1.2.3', fw_version: '4.5.6'}},
           qux: {response: {api_version: '1.2.3', fw_version: '4.5.6'}}
+        },
+        wifi: {
+          bar: {list: null, status: null, configure: null},
+          qux: {list: null, status: null, configure: null}
         }
       },
       robot: {
@@ -65,14 +69,16 @@ describe('robot selectors', () => {
         name: 'bar',
         host: '123456.local',
         isConnected: true,
-        health: state.api.health.bar
+        health: state.api.health.bar,
+        wifi: state.api.wifi.bar
       },
       {
         name: 'qux',
         host: 'dvorak.local',
         isConnected: false,
         wired: true,
-        health: state.api.health.qux
+        health: state.api.health.qux,
+        wifi: state.api.wifi.qux
       },
       {name: 'baz', host: 'qwerty.local', isConnected: false},
       {name: 'foo', host: 'abcdef.local', isConnected: false}
