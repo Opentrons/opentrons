@@ -474,8 +474,6 @@ class SmoothieDriver_3_0_0:
                 # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
                 self._send_command(command, timeout=30)
-            # after homing, turn the axes motors off to avoid heat buildup
-            self._disengage_axis(axes)
 
         # Only update axes that have been selected for homing
         homed = {
