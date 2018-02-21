@@ -1,101 +1,29 @@
-/* TODO(mc, 2018-02-09): fix lint warnings and remove this ignore */
-/* stylelint-disable no-descending-specificity, no-duplicate-selectors */
+@import '@opentrons/components';
 
-/* TODO(ian, 2017-11-17): don't use global input, label, etc */
-input {
-  width: 100%;
-}
+:root {
+  --ingredient_row: {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid var(--c-light-gray);
 
-label {
-  color: gray;
-  text-transform: none;
-}
+    & div {
+      flex: 1;
+    }
 
-.ingredients_list {
-  height: 100%;
-  background-color: white;
-  overflow-y: scroll;
-}
+    & *:first-child {
+      /* Well name */
+      flex: 0.25;
+      padding-left: 1rem;
+    }
 
-.ingredients_list section > label {
-  border-bottom: 1px solid gray;
-  display: block;
-}
-
-.arrow_dropdown {
-  color: black;
-  margin-right: 0.5rem;
-}
-
-.ingred_list_header_label {
-  color: white;
-  background-color: black;
-  padding: 1em;
-  border-radius: 0;
-}
-
-.flex_row {
-  display: flex;
-  align-items: baseline;
-}
-
-.ingred_list_header_label div {
-  text-align: left;
-  font-size: 1em;
-  font-weight: bold;
-}
-
-.ingred_list_header_label .container_name {
-  font-size: 1.5em;
-}
-
-.ingred_list_header_label .container_type {
-  padding: 0 1em;
-  font-weight: normal;
-}
-
-.ingredients_list section {
-  margin: 12pt;
-
-  /* box-shadow: 0px 0px 10px 3px darkgrey; */
-  border-radius: 0;
-  padding: 0.2em 1em;
-}
-
-.ingredients_list section.selected {
-  border: 1rem solid skyblue;
-}
-
-.ingredients_list section > label {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.ingredients_list section > label .ingred_label {
-  flex: 1;
-}
-
-.ingredients_list section footer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.ingredients_list section footer .edit_button {
-  /* NOTE: this footer was removed 2017-10-23 */
-  border: 2px lightgray solid;
-  padding: 2px;
-}
-
-.edit_button {
-  color: white;
-  background-color: black;
-  font-weight: bold;
-  border-color: gray;
-  font-size: inherit;
-  margin: 1px;
-  border-width: 1px;
-  cursor: pointer;
-  padding: 0.1em 0.2em;
+    & div:last-child {
+      /* X to delete */
+      flex: 0.25;
+    }
+  }
 }
 
 .delete_ingredient {
@@ -105,174 +33,37 @@ label {
   color: gray;
 }
 
-.delete_ingredient:hover,
-.edit_button:hover,
-section.selected .edit_button {
+.delete_ingredient:hover {
   color: white;
   background-color: lightgray;
 }
 
 /* --------- */
 
-.ingred_label {
-  font-weight: bold;
-  margin-left: 0.2rem;
+.ingredient_titled_list {
+  & :first-child > svg {
+    /* TODO Ian 2018-02-21 Is there a better way to color the icon and not the collapse carat? */
+
+    /* Ingredient color passed in from inline style */
+    color: var(--swatch-color);
+  }
+
+  & > ol > :last-child {
+    padding-bottom: 0;
+    border: none;
+  }
+
+  margin-bottom: 0.5rem;
 }
 
-.add_ingredient_button {
-  margin-left: 30%; /* HACK doesn't work with diff widths */
+/* --------- */
+
+.ingredient_row {
+  @apply --ingredient_row;
 }
 
-/* -------- */
+.ingredient_row_header {
+  @apply --ingredient_row;
 
-.ingredient_inline_detail {
-  margin: 0.4em 0;
-  color: darkgray;
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.ingredient_inline_detail div {
-  display: flex;
-  width: 5rem;
-  margin: 0.25rem;
-}
-
-.ingredient_inline_detail label {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  background-color: lightgray;
-  border: none;
-  flex: 2;
-  text-align: center;
-}
-
-.ingredient_inline_detail input {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  flex: 3;
-  text-align: center;
-}
-
-/* .ingredient_inline_detail input::after {
-  content: 'µL';
-  position: absolute;
-  padding-right: 0.2em;
-} */
-
-/* TODO: reuse this */
-
-.circle {
-  border-radius: 1000px;
-  background-color: gray; /* <-- set inline */
-
-  /* background-color: --color-swatch; */
-  height: 0.8rem;
-  width: 0.8rem;
-  margin-right: 0.1rem;
-}
-
-/* ------- */
-
-/* .leftPill {
-  padding: 2px 0 2px 0.5rem;
-  background-color: lightgray;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 3;
-}
-
-.rightPill {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  display: flex;
-  flex: 5;
-}
-
-.innerList {
-  overflow-y: scroll;
-  height: 15vh;
-} */
-
-/* ------- */
-
-.ingredient_instance_item {
-  display: flex;
-
-  /* width: 100%;
-  padding-top: 2px;
-  padding-bottom: 2px; */
-  flex-direction: row;
-  justify-content: space-between;
-  border-radius: 0;
-  padding: 0.25rem;
-}
-
-.ingredient_instance_item div {
-  flex: 1;
-}
-
-.ingredient_instance_item:nth-child(odd) {
-  background-color: #eee;
-}
-
-.ingredient_instance_item div:first-child {
-  /*    Well name */
-  margin-left: 0.25rem;
-  color: gray;
-  flex: 0.5;
-}
-
-.ingredient_instance_item div:last-child {
-  /* X to delete */
-  flex: 0.25;
-}
-
-.ingredient_instance_item input {
-  text-align: center;
-  font-size: inherit;
-}
-
-/* ------- */
-
-.single_ingred {
-  margin: 0 1rem;
-  border: 2px solid gray;
-}
-
-.single_ingred label::before {
-  content: ' ';
-  display: inline-block;
-  border-radius: 1000px;
-  background-color: gray; /* <-- set inline */
-  background-color: var(--swatch-color);
-  height: 0.8rem;
-  width: 0.8rem;
-  margin-left: 1rem;
-  margin-right: 0.25rem;
-}
-
-.single_ingred * {
-  padding: 0;
-}
-
-.single_ingred label {
-  font-weight: bold;
-}
-
-.single_ingred input {
-  border-top: none;
-  border-bottom: none;
-}
-
-.single_ingred .delete_ingredient {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 1px solid gray;
-  width: 5rem;
-  text-align: center;
+  font-weight: var(--fw-bold);
 }

@@ -27,14 +27,16 @@ type ListProps = {
   /** highlights the whole TitledList if true */
   selected?: boolean,
   /** disables the whole TitledList if true */
-  disabled?: boolean
+  disabled?: boolean,
+  /** inline style */
+  style?: {}
 }
 
 /**
  * An ordered list with optional title, icon, and description.
  */
 export default function TitledList (props: ListProps) {
-  const {iconName, disabled, onCollapseToggle} = props
+  const {iconName, disabled, onCollapseToggle, style} = props
   const collapsible = onCollapseToggle != null
 
   const onClick = !disabled
@@ -63,7 +65,7 @@ export default function TitledList (props: ListProps) {
   })
 
   return (
-    <div className={className}>
+    <div className={className} style={style}>
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
           <Icon className={styles.title_bar_icon} name={iconName} />

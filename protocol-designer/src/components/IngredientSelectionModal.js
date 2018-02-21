@@ -5,7 +5,7 @@ import { SLOT_WIDTH, SLOT_HEIGHT } from '../constants.js'
 import styles from './IngredientSelectionModal.css'
 
 import SelectablePlate from '../containers/SelectablePlate.js'
-import IngredientsList from '../containers/IngredientsList.js'
+// import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 
 type Props = {
@@ -20,25 +20,24 @@ export default function IngredientSelectionModal (props: Props) {
   return (
     <div className={styles.ingredient_modal}>
 
-      <div className={styles.ingredient_panel_sidebar}>
+      {/* TODO put this in the Side Panel */}
+      {/* <div className={styles.ingredient_panel_sidebar}>
         <IngredientsList />
+      </div> */}
+
+      {/* TODO Ian 2018-02-21 Remove this, add this functionality to Header */}
+      <div style={{float: 'right', color: 'red'}}>
+        <div onClick={() => onClose()}>
+          <p>Back to Deck Map</p>
+        </div>
       </div>
 
-      <div className={styles.ingredient_panel_content}>
-        <div className={styles.top_bar}>
-          <div className={styles.info}>Drag to select multiple wells</div>
-          <div className={styles.close} onClick={() => onClose()}>
-            <p>Back to Deck Map</p>
-            <img src='https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/img/back.png' />
-          </div>
-        </div>
-        <div className={styles.container_detail}>
-          <svg width='100%' height='100%' viewBox={`0 0 ${SLOT_WIDTH} ${SLOT_HEIGHT}`}>
-            <SelectablePlate showLabels selectable />
-          </svg>
-        </div>
+      <IngredientPropertiesForm />
 
-        <IngredientPropertiesForm />
+      <div className={styles.container_detail}>
+        <svg width='100%' height='100%' viewBox={`0 0 ${SLOT_WIDTH} ${SLOT_HEIGHT}`}>
+          <SelectablePlate showLabels selectable />
+        </svg>
       </div>
     </div>
   )
