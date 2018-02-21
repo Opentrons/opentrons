@@ -1,3 +1,4 @@
+// @flow
 import reduce from 'lodash/reduce'
 import * as componentLib from '@opentrons/components'
 
@@ -20,12 +21,24 @@ export const {
   SELECTABLE_WELL_CLASS
 } = componentLib
 
-export const getMaxVolumes = containerType => {
-  const cont = defaultContainers.containers[containerType]
+type WellVolumes = {[wellName: string]: number}
+// TODO LATER Ian 2018-02-19 type for containers.json
+type WellData = {
+  'total-liquid-volume': number
+  // missing rest of fields, todo later
+}
+type VolumeJson = {
+  locations: {
+    [wellName: string]: WellData
+  }
+}
+
+export const getMaxVolumes = (containerType: string): WellVolumes => {
+  const cont: VolumeJson = defaultContainers.containers[containerType]
   if (cont) {
     return reduce(
       cont.locations,
-      (acc, wellData, wellName) => ({
+      (acc, wellData: WellData, wellName): WellVolumes => ({
         ...acc,
         [wellName]: wellData['total-liquid-volume']
       }),

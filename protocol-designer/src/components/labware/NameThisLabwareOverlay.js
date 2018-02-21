@@ -9,10 +9,10 @@ import styles from './labware.css'
 type Props = {
   containerType: string,
   containerId: string,
-  slotName: string,
+  slot: string,
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   modifyContainer: (args: {containerId: string, modify: {[field: string]: mixed}}) => void,
-  deleteContainer: (args: {containerId: string, slotName: string, containerType: string}) => void
+  deleteContainer: (args: {containerId: string, slot: string, containerType: string}) => void
 }
 
 type State = {
@@ -58,7 +58,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
     const {
       containerType,
       containerId,
-      slotName,
+      slot,
       // modifyContainer, // TODO do propTypes, include this
       deleteContainer
     } = this.props
@@ -81,10 +81,10 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
           </text> */}
           <ClickableText onClick={this.onSubmit}
             iconName='plus' y='60%' text='Save Labware' />
-          <ClickableText onClick={() => deleteContainer({containerId, slotName, containerType})}
+          <ClickableText onClick={() => deleteContainer({containerId, slot, containerType})}
             iconName='close' y='80%' text='Cancel' />
           {/* <text className={styles.clickable} x='0' y='80%'
-            onClick={() => deleteContainer({containerId, slotName, containerType})}
+            onClick={() => deleteContainer({containerId, slot, containerType})}
           >
               Delete
           </text> */}

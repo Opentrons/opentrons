@@ -65,12 +65,12 @@ function IngredIndividual ({name, wellName, volume, concentration, canDelete, gr
   )
 }
 
-export default function IngredientsList ({slotName, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) {
+export default function IngredientsList ({slot, containerName, containerType, ingredients, editModeIngredientGroup, deleteIngredient, selectedIngredientGroupId}) {
   return (
     <div className={styles.ingredients_list}>
       <div className={styles.ingred_list_header_label}>
         <div className={styles.flex_row}>
-          <div>Slot {slotName}</div>
+          <div>Slot {slot}</div>
           <div className={styles.container_type}>{humanize(containerType)}</div>
         </div>
         <div className={styles.container_name}>{containerName}</div>

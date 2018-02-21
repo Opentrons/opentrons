@@ -28,16 +28,16 @@ export default withRouter(
 )
 
 function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const {slotName, match: {params: {slot: selectedSlot}}} = ownProps
+  const {slot, match: {params: {slot: selectedSlot}}} = ownProps
   const allLabware = robotSelectors.getLabware(state)
   const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
-  const labware = allLabware.find((lw) => lw.slot === slotName)
+  const labware = allLabware.find((lw) => lw.slot === slot)
 
   // bail out if it's an empty slot
   if (!labware) return {}
 
   const {isTiprack, confirmed, calibratorMount} = labware
-  const highlighted = slotName === selectedSlot
+  const highlighted = slot === selectedSlot
 
   return {
     _calibrator: calibratorMount || robotSelectors.getCalibratorMount(state),
@@ -48,7 +48,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
       showName: highlighted || confirmed,
       showUnconfirmed: true,
       showSpinner: highlighted && labware.calibration === 'moving-to-slot',
-      url: `/setup-deck/${slotName}`
+      url: `/setup-deck/${slot}`
     }
   }
 }
