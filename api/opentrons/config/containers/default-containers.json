@@ -2994,6 +2994,18 @@
                     }
                }
           },
+          "trough-1row-test": {
+               "locations": {
+                    "A1": {
+                         "x": 42.75,
+                         "y": 63.875,
+                         "z": 0,
+                         "depth": 26,
+                         "diameter": 10,
+                         "total-liquid-volume": 25000
+                    }
+               }
+          },
           "hampton-1ml-deep-block": {
                "origin-offset": {
                     "x": 11.24,
