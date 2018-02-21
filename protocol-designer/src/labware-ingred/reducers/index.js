@@ -3,7 +3,6 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
-import findKey from 'lodash/findKey'
 import get from 'lodash/get'
 import min from 'lodash/min'
 import omit from 'lodash/omit'
@@ -348,48 +347,22 @@ const selectedContainerType = createSelector(
 )
 
 // _ingredAtWell: Given ingredientsForContainer obj and wellName (eg 'A1'),
-// returns the ingred data for that well, or `undefined`
-//
-// TODO IMMEDIATELY Ian 2018-02-20: there should not be such a crazy polymorphic fn
-// that takes either Array of Ingred vs objected keyed by ingred
-// I need to standardize on one
-const _ingredAtWell = (ingredientsForContainer: Array<Ingredient> | {[containerId: string]: Ingredient}) =>
+// returns the ingred data for that well, or `null`
+const _ingredAtWell = (ingredientsForContainer: Array<Ingredient>) =>
   (wellName: string): Ingredient | null => {
-    let matchedKey
-
-    if (Array.isArray(ingredientsForContainer)) {
-      matchedKey = ingredientsForContainer.find(ingred => {
-        const wells = Array.isArray(ingred.wells)
-        ? ingred.wells
-        : Object.keys(ingred.wells)
-        return wells.includes(wellName)
-      })
-      matchedKey = matchedKey && matchedKey.groupId
-    } else {
-      matchedKey = findKey(ingredientsForContainer, ingred => {
-        const wells = Array.isArray(ingred.wells)
-        ? ingred.wells
-        : Object.keys(ingred.wells)
-        return wells.includes(wellName)
-      })
-    }
+    console.log('bodd', {ingredientsForContainer, wellName})
+    const matchedIngred = ingredientsForContainer.find(ingred => {
+      const wells = Array.isArray(ingred.wells)
+      ? ingred.wells
+      : Object.keys(ingred.wells)
+      return wells.includes(wellName)
+    })
+    const matchedKey = matchedIngred && matchedIngred.groupId
 
     if (matchedKey) {
-      const matchedIngred = Array.isArray(ingredientsForContainer)
-        ? ingredientsForContainer[parseInt(matchedKey)]
-        : ingredientsForContainer[matchedKey]
-      const wells = Array.isArray(matchedIngred.wells)
-        ? matchedIngred.wells
-        : Object.keys(matchedIngred.wells)
-      const ingredientNum = (wells.findIndex(w => w === wellName) + 1).toString()
+      const matchedIngred = ingredientsForContainer[parseInt(matchedKey)]
 
-      return {
-        ...matchedIngred,
-        wells: matchedIngred.wells,
-        wellDetails: matchedIngred.wellDetails,
-        wellDetailsByLocation: matchedIngred.wellDetailsByLocation,
-        groupId: ingredientNum
-      }
+      return matchedIngred
     }
 
     return null
