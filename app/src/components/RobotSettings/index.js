@@ -7,6 +7,7 @@ import type {Robot} from '../../robot'
 import StatusCard from './StatusCard'
 import InformationCard from './InformationCard'
 import ConnectivityCard from './ConnectivityCard'
+import ConnectAlertModal from './ConnectAlertModal'
 import styles from './styles.css'
 
 type Props = Robot
@@ -28,3 +29,5 @@ export default function RobotSettings (props: Props) {
     </div>
   )
 }
+
+export {ConnectAlertModal}

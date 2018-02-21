@@ -19,6 +19,10 @@ const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}
 
+export type ClearConnectResponseAction = {|
+  type: 'robot:CLEAR_CONNECT_RESPONSE'
+|}
+
 export type ConfirmProbedAction = {|
   type: 'robot:CONFIRM_PROBED',
   payload: Mount
@@ -129,6 +133,7 @@ export const actionTypes = {
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
+  | ClearConnectResponseAction
   | ConfirmProbedAction
   | PipetteCalibrationAction
   | LabwareCalibrationAction
@@ -155,6 +160,10 @@ export const actions = {
     if (didError) return {...action, payload: error}
 
     return tagForAnalytics(action)
+  },
+
+  clearConnectResponse (): ClearConnectResponseAction {
+    return {type: 'robot:CLEAR_CONNECT_RESPONSE'}
   },
 
   disconnect () {
