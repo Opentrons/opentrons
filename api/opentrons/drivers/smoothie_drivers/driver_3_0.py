@@ -63,7 +63,8 @@ GCODES = {'HOME': 'G28.2',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
           'SET_MAX_SPEED': 'M203.1',
-          'SET_CURRENT': 'M907'}
+          'SET_CURRENT': 'M907',
+          'DISENGAGE_MOTOR': 'M18'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -265,6 +266,20 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
 
+    def _disengage_axis(self, axes):
+        '''
+        Disable the stepper-motor-driver's 36v output to motor
+        This is a safe GCODE to send to Smoothieware, as it will automatically
+        re-engage the motor if it receives a home or move command
+
+        axes
+            String containing the axes to be disengaged
+            (e.g.: 'XY' or 'ZA' or 'XYZABC')
+        '''
+        axes = ''.join(set(axes.upper()) & set(AXES))
+        if axes:
+            self._send_command(GCODES['DISENGAGE_MOTOR'] + axes)
+
     def push_current(self):
         self._saved_current_settings.update(self._current_settings)
 
@@ -459,6 +474,8 @@ class SmoothieDriver_3_0_0:
                 # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
                 self._send_command(command, timeout=30)
+            # after homing, turn the axes motors off to avoid heat buildup
+            self._disengage_axis(axes)
 
         # Only update axes that have been selected for homing
         homed = {
