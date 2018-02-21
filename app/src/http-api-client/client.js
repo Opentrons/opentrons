@@ -3,7 +3,7 @@
 
 import type {RobotService} from '../robot'
 
-type Method = 'GET'
+type Method = 'GET' | 'POST'
 
 export type ClientResponseError = {
   name: string,

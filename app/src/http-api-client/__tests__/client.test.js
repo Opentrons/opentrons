@@ -79,4 +79,59 @@ describe('http api client', () => {
         message: 'AH'
       }))
   })
+
+  test('POST request', () => {
+    const robot = {
+      ip: '1.2.3.4',
+      port: 8080
+    }
+
+    global.fetch = mockResolve({
+      ok: true,
+      json: () => Promise.resolve({foo: 'bar'})
+    })
+
+    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).resolves
+      .toEqual({foo: 'bar'})
+      .then(() => expect(global.fetch).toHaveBeenCalledWith(
+        'http://1.2.3.4:8080/foo',
+        {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({bar: 'baz'})
+        }
+      ))
+  })
+
+  test('POST request failure', () => {
+    const robot = {
+      ip: '1.2.3.4',
+      port: 8080
+    }
+
+    global.fetch = mockResolve({
+      ok: false,
+      status: '400',
+      statusText: 'Bad Request'
+    })
+
+    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
+      .toEqual(expect.objectContaining({
+        message: '400 Bad Request'
+      }))
+  })
+
+  test('POST request error', () => {
+    const robot = {
+      ip: '1.2.3.4',
+      port: 8080
+    }
+
+    global.fetch = mockReject(new Error('AH'))
+
+    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
+      .toEqual(expect.objectContaining({
+        message: 'AH'
+      }))
+  })
 })

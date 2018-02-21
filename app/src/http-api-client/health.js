@@ -3,7 +3,7 @@
 import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
-import type {ApiResponse} from './types'
+import type {ApiCall} from './types'
 import client, {type ClientResponseError} from './client'
 
 type HealthInfo = {
@@ -39,7 +39,7 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
-export type RobotHealth = ApiResponse<HealthInfo>
+export type RobotHealth = ApiCall<void, HealthInfo>
 
 export type HealthState = {
   [robotName: string]: RobotHealth
