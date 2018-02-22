@@ -1,9 +1,13 @@
 // @flow
 import {createActions} from 'redux-actions'
+import type {Dispatch} from 'redux'
+import max from 'lodash/max'
+import omit from 'lodash/omit'
+
 import {uuid} from '../utils'
 import {selectors} from './reducers'
 
-import type {Dispatch} from 'redux'
+import {editableIngredFields} from './types'
 import type {DeckSlot, IngredInputFields} from './types'
 import type {GetState} from '../types'
 
@@ -94,18 +98,42 @@ export const deleteIngredient = (payload: {|wellName?: string, groupId: string|}
   })
 }
 
+// TODO test this thunk
 export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<*>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
+  const allIngredients = selectors.allIngredients(state)
+
+  const isUnchangedClone = allIngredients[payload.copyGroupId] &&
+    editableIngredFields.every(field =>
+      allIngredients[payload.copyGroupId][field] === payload[field]
+    )
+
+  // TODO Ian 2018-02-19 make selector, or factor out as util.
+  const nextGroupId = (max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0
+  console.log(Object.keys(allIngredients), {nextGroupId})
+
+  const groupId = (isUnchangedClone)
+    ? payload.copyGroupId
+    : nextGroupId.toString()
+
+  const name = (
+    allIngredients[payload.copyGroupId] &&
+    allIngredients[payload.copyGroupId].name === payload.name
+    )
+    ? (payload.name || '') + ' copy' // todo: copy 2, copy 3 etc.
+    : payload.name
 
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
-      ...payload,
-      // slot: selectors.selectedContainerSlot(state),
+      ...omit(payload, ['copyGroupId']),
+      // if it matches the name of the clone parent, append "copy" to that name
+      name,
       containerId: container && container.containerId,
-      groupId: selectors.selectedIngredientGroupId(state),
-      wells: selectors.selectedWellNames(state) // TODO use locations: [slot]: [selected wells]
+      groupId,
+      wells: selectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
+      isUnchangedClone
     }
   })
 }

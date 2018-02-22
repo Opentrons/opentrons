@@ -23,3 +23,12 @@ export type IngredInputFields = {|
   individualize: boolean,
   serializeName: ?string
 |}
+
+export const editableIngredFields = [
+  'name',
+  'serializeName',
+  'volume',
+  'concentration',
+  'description',
+  'individualize'
+]
