@@ -41,19 +41,20 @@ type AllIngredGroupFields = {
 type SetSubstate = (accessor: string, value: string | boolean | number) => any
 type GetSubstate = (accessor: Accessor) => string | boolean | number | null
 
-type FieldProps = {
+type FieldProps = {|
   accessor: Accessor,
   numeric?: boolean,
   type?: string,
   label?: string,
   units?: string,
-  error?: string
-}
+  error?: string,
+  placeholder?: string
+|}
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
   (props: FieldProps) => { /* otherProps */
     const {setSubstate, getSubstate} = args
-    const {accessor, numeric, type, ...otherProps} = props
+    const {accessor, numeric, type, placeholder} = props
 
     if (!type || type === 'input') {
       return <InputField
@@ -86,7 +87,7 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
       onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
         setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
       type={type}
-      {...otherProps}
+      placeholder={placeholder}
     />
   }
 

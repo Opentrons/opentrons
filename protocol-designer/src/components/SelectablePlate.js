@@ -13,7 +13,6 @@ export type Props = {
   onSelectionDone: *,
   containerId: string,
   selectable: boolean
-  // ...otherProps
 }
 
 export default function SelectablePlate (props: Props) {
@@ -23,15 +22,14 @@ export default function SelectablePlate (props: Props) {
     onSelectionMove,
     onSelectionDone,
     containerId,
-    selectable,
-    ...otherProps
+    selectable
   } = props
 
   const plate = <Plate
     selectable={selectable}
     wellContents={wellContents}
     containerType={containerType}
-    {...otherProps}
+    containerId={containerId}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect

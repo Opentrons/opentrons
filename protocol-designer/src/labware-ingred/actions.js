@@ -8,7 +8,8 @@ import {uuid} from '../utils'
 import {selectors} from './reducers'
 
 import {editableIngredFields} from './types'
-import type {DeckSlot, IngredInputFields, Wells} from './types'
+import type {IngredInputFields, Wells} from './types'
+import type {DeckSlot} from '@opentrons/components'
 
 import type {GetState} from '../types'
 

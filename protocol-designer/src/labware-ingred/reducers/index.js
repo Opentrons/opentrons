@@ -14,6 +14,7 @@ import uniq from 'lodash/uniq'
 import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants.js'
 import {uuid} from '../../utils.js'
 
+import type {DeckSlot} from '@opentrons/components'
 import {editableIngredFields} from '../types'
 import type {
   IngredInputFields,
@@ -25,7 +26,7 @@ import type {
   AllWellContents,
   Ingredient
 } from '../types'
-import type {BaseState, JsonWellData, VolumeJson} from '../../types'
+import type {BaseState, Selector, JsonWellData, VolumeJson} from '../../types'
 import * as actions from '../actions'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
@@ -328,15 +329,18 @@ const selectedContainerSlot = createSelector(
   container => container && container.slot
 )
 
-const containersBySlot = createSelector(
+type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
+
+const containersBySlot: Selector<ContainersBySlot> = createSelector(
   (state: BaseState) => rootSelector(state).containers,
-  containers => reduce(containers, (acc, containerObj: Labware, containerId) =>
-    ({
+  containers => reduce(
+    containers,
+    (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
       ...acc,
       // NOTE: containerId added in so you still have a reference
       [containerObj.slot]: {...containerObj, containerId}
-    })
-  , {})
+    }),
+    {})
 )
 
 // Uses selectedSlot to determine container type

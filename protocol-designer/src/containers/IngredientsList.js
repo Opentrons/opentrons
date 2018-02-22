@@ -2,7 +2,7 @@
 import {connect} from 'react-redux'
 import {selectors} from '../labware-ingred/reducers'
 import {editModeIngredientGroup, deleteIngredient} from '../labware-ingred/actions'
-import type {BaseState} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
 import IngredientsList, {type Props} from '../components/IngredientsList.js'
 
@@ -28,8 +28,9 @@ function mapStateToProps (state: BaseState): PropsWithoutActions {
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
+    // TODO Ian 2018-02-23 How to type action creators so that arg types follow along?
     editModeIngredientGroup: (args) => dispatch(editModeIngredientGroup(args)),
     deleteIngredient: (args) => dispatch(deleteIngredient(args))
   }

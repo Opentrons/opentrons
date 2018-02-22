@@ -21,18 +21,6 @@
   }
 }
 
-.delete_ingredient {
-  cursor: pointer;
-  float: right;
-  font-size: 12pt;
-  color: gray;
-}
-
-.delete_ingredient:hover {
-  color: white;
-  background-color: lightgray;
-}
-
 /* --------- */
 
 .ingredient_titled_list {

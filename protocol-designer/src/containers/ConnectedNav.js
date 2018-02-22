@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch, BaseState} from '../types'
+import type {ThunkDispatch, BaseState} from '../types'
 import {connect} from 'react-redux'
 
 import {NavButton, VerticalNavBar} from '@opentrons/components'
@@ -34,7 +34,7 @@ function mapStateToProps (state: BaseState) {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
     handleClick: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName))
   }

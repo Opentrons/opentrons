@@ -2,7 +2,7 @@
 import React from 'react'
 import get from 'lodash/get'
 
-import {SidePanel, TitledList} from '@opentrons/components'
+import {IconButton, SidePanel, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
@@ -56,8 +56,8 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       >
         <div className={styles.ingredient_row_header}>
           <span>Well</span>
-          <span>Name</span>
           <span>Volume</span>
+          <span>Name</span>
           <span />
         </div>
         {/* TODO Ian 2018-02-21 don't need to typecheck for isArray when Ingredient.wells is standardized */}
@@ -70,7 +70,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
             wellName={wellName}
             canDelete
             volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
-            concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
+            // concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
             groupId={groupId}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
@@ -85,7 +85,7 @@ type IndividProps = {|
   name: string,
   wellName: string,
   volume: number,
-  concentration?: string,
+  // concentration?: string,
   canDelete: boolean,
   groupId: string,
   editModeIngredientGroup: EditModeIngredientGroup,
@@ -97,27 +97,24 @@ function IngredIndividual (props: IndividProps) {
     name,
     wellName,
     volume,
-    concentration,
+    // concentration, // TODO LATER Ian 2018-02-22: concentration is removed from MVP. Remove all traces of it, or add it back in
     canDelete,
     groupId,
-    editModeIngredientGroup,
-    deleteIngredient,
-    ...otherProps
+    deleteIngredient
   } = props
 
   return (
-    <div {...otherProps}
+    <div
       className={styles.ingredient_row}
     >
       <div>{wellName}</div>
+      <div>{volume ? volume + ' μL' : '-'}</div>
       <div>{name}</div>
-      <div>{volume ? volume + 'uL' : '-'}</div>
-      {/* <button className={styles.edit_button} onClick={e => editModeIngredientGroup({wellName, groupId})}>EDIT</button> */}
-      {/* <div>{concentration === null ? '-' : concentration}</div> */}
-      {canDelete && <div className={styles.delete_ingredient} onClick={
+      {canDelete && <IconButton name='close'
+        onClick={
           () => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
           deleteIngredient({wellName, groupId})
-        }>✕</div>}
+        } />}
     </div>
   )
 }
@@ -154,7 +151,7 @@ export default function IngredientsList (props: Props) {
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
             ingredCategoryData={ingredCategoryData}
-          selected={selectedIngredientGroupId === ingredCategoryData.groupId}
+            selected={selectedIngredientGroupId === ingredCategoryData.groupId}
           />)
         }
     </SidePanel>

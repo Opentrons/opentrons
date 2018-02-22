@@ -1,5 +1,7 @@
 // @flow
 
+import type {DeckSlot} from '@opentrons/components'
+
 export type MixArgs = {|
   volume: number,
   times: number
@@ -56,8 +58,6 @@ export type ConsolidateFormData = {|
 |}
 
 export type Mount = 'left' | 'right'
-
-export type DeckSlot = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12'
 
 export type PipetteChannels = 1 | 8
 

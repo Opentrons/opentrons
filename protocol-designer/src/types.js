@@ -9,9 +9,11 @@ export type BaseState = {
   labwareIngred: LabwareIngred
 }
 
-export type Dispatch<A> = (action: A | ThunkAction<A>) => any
 export type GetState = () => BaseState
-export type ThunkAction<A> = (dispatch: Dispatch<A>, getState: GetState) => any
+export type Selector<T> = (BaseState) => T
+
+export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
+export type ThunkAction<A> = (dispatch: ThunkDispatch<A>, getState: GetState) => A
 
 export type WellVolumes = {[wellName: string]: number}
 // TODO LATER Ian 2018-02-19 type for containers.json
