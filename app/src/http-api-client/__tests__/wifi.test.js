@@ -120,7 +120,30 @@ describe('wifi', () => {
     })
   })
 
-  describe('setConfigureWifiBody and configureWifi action creators', () => {
+  describe('setConfigureWifiBody action creator', () => {
+    const ssid = 'some-ssid'
+    const psk = 'some-psk'
+
+    test('works with ssid', () => {
+      const expected = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, update: {ssid}}
+      }
+
+      expect(setConfigureWifiBody(robot, {ssid})).toEqual(expected)
+    })
+
+    test('works with psk', () => {
+      const expected = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, update: {psk}}
+      }
+
+      expect(setConfigureWifiBody(robot, {psk})).toEqual(expected)
+    })
+  })
+
+  describe('configureWifi action creator', () => {
     const ssid = 'some-ssid'
     const psk = 'some-psk'
     const response = {ssid, message: 'Success!'}
@@ -136,16 +159,7 @@ describe('wifi', () => {
       }
     }
 
-    test('setConfigureWifiBody creator works', () => {
-      const expected = {
-        type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, ssid, psk}
-      }
-
-      expect(setConfigureWifiBody(robot, ssid, psk)).toEqual(expected)
-    })
-
-    test('configureWifi calls POST /wifi/configure', () => {
+    test('configureWifi calls POST /wifi/configure, GET /wifi/list', () => {
       const store = mockStore(initialState)
 
       client.__setMockResponse(response)
@@ -154,7 +168,7 @@ describe('wifi', () => {
         .then(() => expect(client).toHaveBeenCalledWith(
           robot,
           'POST',
-          '/wifi/configure',
+          'wifi/configure',
           {ssid, psk}
         ))
     })
@@ -391,7 +405,7 @@ describe('wifi', () => {
 
       const action = {
         type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, ssid: 'baz', psk: 'qux'}
+        payload: {robot, update: {ssid: 'baz', psk: 'qux'}}
       }
 
       expect(reducer(state, action).wifi).toEqual({

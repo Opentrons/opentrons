@@ -23,3 +23,29 @@
     margin-right: var(--robot_settings_card_spacing);
   }
 }
+
+.configure_form {
+  margin-top: 1rem;
+}
+
+.configure_label {
+  @apply --font-body-2-dark;
+
+  margin-bottom: 0.5rem;
+  font-weight: var(--fw-semibold);
+}
+
+.configure_input {
+  margin-top: 0.25rem;
+
+  /* TODO(mc, 2018-02-22): refactor so these nested styles aren't needed */
+  & input,
+  & select {
+    @apply --font-body-2-dark;
+  }
+}
+
+.configure_button {
+  float: right;
+  margin-top: 0.5rem;
+}
