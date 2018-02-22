@@ -26,7 +26,7 @@ def test_clear_config(config):
     from opentrons import robot
     from opentrons.robot import robot_configs
 
-    assert robot.config == robot_configs.default
+    assert robot.config == robot_configs._get_default()
 
 
 def test_save_and_clear_config(config):
@@ -47,7 +47,7 @@ def test_save_and_clear_config(config):
     from opentrons import robot
     from opentrons.robot import robot_configs
 
-    assert robot.config == robot_configs.default
+    assert robot.config == robot_configs._get_default()
 
     saved_config = robot_configs.load(filename)
     assert saved_config == old_config

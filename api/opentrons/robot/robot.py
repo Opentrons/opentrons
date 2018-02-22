@@ -804,7 +804,10 @@ class Robot(object):
         # @TODO (Laura & Andy) Slot and type of trash
         # needs to be pulled from config file
         # Add fixed trash to the initial deck
-        self._fixed_trash = self.add_container('fixed-trash', '12')
+        if os.environ.get('OT2_PROBE_HEIGHT', '') == '55.0':
+            self._fixed_trash = self.add_container('fixed-trash', '12')
+        else:
+            self._fixed_trash = self.add_container('tall-fixed-trash', '12')
 
     @property
     def deck(self):

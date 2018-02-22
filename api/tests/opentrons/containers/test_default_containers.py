@@ -23,6 +23,8 @@ def test_new_containers(robot):
     p200.aspirate(100, tube_rack_80well[0]).dispense(trash_box)
     p200.aspirate(100, T75_flask[0]).dispense(trash_box)
     p200.aspirate(100, T25_flask[0]).dispense(trash_box)
+    # Note: test does not contain explicit assertions--checks whether or not an
+    # example protocol raises exceptions. Consider revising/replacing
 
 
 def test_fixed_trash(robot):
@@ -33,4 +35,4 @@ def test_fixed_trash(robot):
     p200.move_to(p200.trash_container)
     assert isclose(
             pose_tracker.absolute(robot.poses, p200),
-            (345.0, 351.5, 63.0)).all()
+            (345.0, 351.5, 85.0)).all()

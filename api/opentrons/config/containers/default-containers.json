@@ -5543,6 +5543,18 @@
                     }
                }
           },
+          "tall-fixed-trash": {
+               "locations": {
+                    "A1": {
+                         "x": 80,
+                         "y": 80,
+                         "z": 5,
+                         "depth": 80,
+                         "length": 160,
+                         "width": 160
+                    }
+               }
+          },
           "wheaton_vial_rack": {
                "origin-offset": {
                     "x": 9,
