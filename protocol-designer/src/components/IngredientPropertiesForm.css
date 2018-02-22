@@ -26,14 +26,6 @@
   flex: calc(2 / 3);
 }
 
-.serialize_name_example {
-  flex: calc(2 / 3);
-  background-color: transparent;
-  border: none;
-  color: lightgray;
-  text-align: left;
-}
-
 .ingred_form_header {
   font-size: 10pt;
   font-weight: inherit;

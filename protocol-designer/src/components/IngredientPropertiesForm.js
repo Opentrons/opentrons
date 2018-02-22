@@ -250,13 +250,12 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
             </span>}
           </div>
           <div className={formStyles.field_row}>
-            <span>
               <span>
                 <Field accessor='individualize' type='checkbox' label='Serialize Name' />
               </span>
-              {individualize && <Field accessor='serializeName' placeholder='Sample' />}
-            </span>
-            <span className={styles.serialize_name_example}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
+              <span>
+                {individualize && <Field accessor='serializeName' placeholder='Sample' />}
+              </span>
           </div>
           <div className={formStyles.field_row}>
             <span>
@@ -266,11 +265,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                   : undefined}
               />
             </span>
-            <span>
-              <Field accessor='concentration' label='Concentration' />
-            </span>
-          </div>
-          <div className={formStyles.field_row}>
             <span>
               {/* TODO Ian 2018-02-21 make TextareaField component and use here */}
               <label>Description</label>
