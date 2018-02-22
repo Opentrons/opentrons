@@ -47,7 +47,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         title={ingredCategoryData.name || 'Unnamed Ingredient'}
         className={styles.ingredient_titled_list}
         style={{'--swatch-color': swatchColors(parseInt(groupId))}}
-        iconName='alert'
+        iconName='circle'
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}
         selected={selected}
