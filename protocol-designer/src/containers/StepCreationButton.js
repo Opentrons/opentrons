@@ -1,30 +1,26 @@
+// @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import map from 'lodash/map'
-import omit from 'lodash/omit'
 
 import {PrimaryButton} from '@opentrons/components'
 import {addStep, expandAddStepButton} from '../steplist/actions'
 import {selectors} from '../steplist/reducers'
 import {stepIconsByType} from '../steplist/types'
 import type {StepType} from '../steplist/types'
+import type {BaseState} from '../types'
 
 type StepCreationButtonProps = {
-  onStepClick?: StepType => (event?: SyntheticEvent<>) => void,
-  onExpandClick?: (event?: SyntheticEvent<>) => void,
-  onClickAway?: (event?: SyntheticEvent<>) => void,
+  onStepClick?: StepType => (event?: SyntheticEvent<*>) => void,
+  onExpandClick?: (event?: SyntheticEvent<*>) => void,
+  onClickAway?: (event?: Event | SyntheticEvent<*>) => void, // TODO is there away around this 2-event union?
   expanded?: boolean
 }
 
 class StepCreationButton extends React.Component<StepCreationButtonProps> {
-  constructor (props) {
-    super(props)
-    this.handleAllClicks = this.handleAllClicks.bind(this)
-  }
-
-  handleAllClicks (e) {
-    if (this.ref && !this.ref.contains(e.target)) {
-      this.props.expanded && this.props.onClickAway(e)
+  ref: ?HTMLDivElement
+  handleAllClicks = (e: Event) => {
+    if (this.ref && (e.currentTarget instanceof HTMLElement) && !this.ref.contains(e.currentTarget)) {
+      this.props.expanded && this.props.onClickAway && this.props.onClickAway(e)
     }
   }
 
@@ -38,15 +34,16 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
 
   render () {
     const {expanded, onExpandClick, onStepClick, onClickAway} = this.props
-    const stepIconsByTypeNoDeckSetup = omit(stepIconsByType, ['deck-setup'])
+    const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause']
+
     return (
       <div ref={ref => { this.ref = ref }}>
         <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Step</PrimaryButton>
-        {expanded && map(stepIconsByTypeNoDeckSetup, (iconName, stepType) =>
+        {expanded && supportedSteps.map(stepType =>
           <PrimaryButton
             key={stepType}
-            onClick={onStepClick(stepType)}
-            iconName={iconName}
+            onClick={onStepClick && onStepClick(stepType)}
+            iconName={stepIconsByType[stepType]}
           >
             {stepType}
           </PrimaryButton>
@@ -56,7 +53,7 @@ class StepCreationButton extends React.Component<StepCreationButtonProps> {
   }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: BaseState) {
   return ({
     expanded: selectors.stepCreationButtonExpanded(state)
   })
@@ -64,9 +61,9 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    onStepClick: stepType => e => dispatch(addStep({stepType})),
-    onExpandClick: e => dispatch(expandAddStepButton(true)),
-    onClickAway: e => dispatch(expandAddStepButton(false))
+    onStepClick: stepType => () => dispatch(addStep({stepType})),
+    onExpandClick: () => dispatch(expandAddStepButton(true)),
+    onClickAway: () => dispatch(expandAddStepButton(false))
   }
 }
 

@@ -1,43 +1,94 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-// import cx from 'classnames'
+// @flow
+import * as React from 'react'
+import isNil from 'lodash/isNil'
 import styles from './IngredientPropertiesForm.css'
 
-import Button from './Button.js'
+import Button from './Button.js' // TODO Ian 2018-02-01 Use comp lib button
 
-const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...otherProps}) => {
-  const ElementType = (otherProps.type === 'textarea')
-    ? 'textarea'
-    : 'input'
+type SetStateCallback = (...args: Array<*>) => *
 
-  return <ElementType
-    id={accessor}
-    checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
-    value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
-    onChange={e => otherProps.type === 'checkbox'
-      ? setSubstate(accessor, !getSubstate(accessor))
-      : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
-    {...otherProps}
-  />
+type IngredInputs = {
+  groupId?: string,
+
+  name: string | null,
+  volume: number | null,
+  description: string | null,
+  concentration: string | null,
+  individualize: boolean,
+  serializeName: string | null
 }
 
-class IngredientPropertiesForm extends React.Component {
-  static propTypes = {
-    onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    numWellsSelected: PropTypes.number.isRequired,
-    selectedWellsMaxVolume: PropTypes.number.isRequired,
+// type Accessor = $Keys<IngredInputs>
+type Accessor =
+  | 'name'
+  | 'volume'
+  | 'description'
+  | 'concentration'
+  | 'individualize'
+  | 'serializeName'
 
-    selectedIngredientProperties: PropTypes.shape({
-      name: PropTypes.string,
-      volume: PropTypes.number,
-      description: PropTypes.string,
-      groupId: PropTypes.string
-    })
+type AllIngredGroupFields = {
+  [ingredGroupId: string]: IngredInputs
+}
+
+type SetSubstate = (accessor: string, value: string | boolean | number) => any
+type GetSubstate = (accessor: Accessor) => string | boolean | number | null
+
+type FieldProps = {
+  accessor: Accessor,
+  numeric?: boolean,
+  type?: string
+}
+
+const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
+  (props: FieldProps) => { /* otherProps */
+    const {setSubstate, getSubstate} = args
+    const {accessor, numeric, type, ...otherProps} = props
+
+    const ElementType = (type === 'textarea')
+      ? 'textarea'
+      : 'input'
+
+    return <ElementType
+      id={accessor}
+      checked={type === 'checkbox' && getSubstate(accessor) === true}
+      value={getSubstate(accessor) || ''}
+      onChange={(e: SyntheticInputEvent<HTMLInputElement>) => (type === 'checkbox')
+        ? setSubstate(accessor, !getSubstate(accessor))
+        : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
+      type={type}
+      {...otherProps}
+    />
   }
 
-  constructor (props) {
+type Props = {
+  onSave: ({copyGroupId: ?string} & IngredInputs) => void,
+  onCancel: () => void,
+  onDelete: (groupId: string) => void,
+  numWellsSelected: number,
+  selectedWellsMaxVolume: number,
+
+  selectedIngredientProperties: {
+    name: string,
+    volume: number,
+    description: string,
+    groupId: string
+  },
+
+  allIngredientGroupFields: ?AllIngredGroupFields,
+  allIngredientNamesIds: Array<{ingredientId: string, name: string}>,
+  editingIngredGroupId: string
+} & IngredInputs
+
+type State = {
+  input: IngredInputs,
+  copyGroupId: ?string
+}
+
+class IngredientPropertiesForm extends React.Component<Props, State> {
+  Field: $Call<typeof makeInputField, *>
+
+  constructor (props: Props) {
     super(props)
     this.state = {
       input: {
@@ -57,16 +108,16 @@ class IngredientPropertiesForm extends React.Component {
       setSubstate: (inputKey, inputValue) => {
         this.setState({...this.state, input: {...this.state.input, [inputKey]: inputValue}})
       },
-      getSubstate: inputKey => this.state.input[inputKey]
+      getSubstate: (inputKey) => this.state.input[inputKey]
     })
   }
 
-  resetInputState = (ingredGroupId, nextIngredGroupFields, cb) => {
+  resetInputState = (ingredGroupId: string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
     // nextIngredGroupFields allows you to update with nextProps
-    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields)
+    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId in allIngredientGroupFields) {
       const { name, volume, description, concentration, individualize, serializeName } = this.state.input
@@ -98,12 +149,24 @@ class IngredientPropertiesForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps (nextProps: Props) {
     this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
   }
 
-  selectExistingIngred = ingredGroupId => {
+  selectExistingIngred = (ingredGroupId: string) => {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
+  }
+
+  handleDelete = (selectedIngredientFields: *) => (e: SyntheticEvent<*>) => {
+    const {onDelete} = this.props
+
+    const groupToDelete = selectedIngredientFields && selectedIngredientFields.groupId
+    if (groupToDelete) {
+      window.confirm('Are you sure you want to delete all ingredients in this group?') &&
+        onDelete(groupToDelete)
+    } else {
+      console.warn('Tried to delete in IngredientPropertiesForm, with no groupId to delete!')
+    }
   }
 
   render () {
@@ -111,14 +174,13 @@ class IngredientPropertiesForm extends React.Component {
       numWellsSelected,
       onSave,
       onCancel,
-      onDelete,
       allIngredientNamesIds,
       allIngredientGroupFields,
       editingIngredGroupId,
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId]
+    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId.toString()]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields
@@ -147,7 +209,7 @@ class IngredientPropertiesForm extends React.Component {
             </span>
             {!editMode && <span>
               {/* TODO make this a Field??? */}
-              <select onChange={e => this.selectExistingIngred(parseInt(e.target.value, 10))}>
+              <select onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}>
                 <option value=''>Select existing ingredient</option>
                 {allIngredientNamesIds.map(({ingredientId, name}, i) =>
                   <option key={i} value={ingredientId}>{name}</option>
@@ -187,25 +249,17 @@ class IngredientPropertiesForm extends React.Component {
           </div>
         </form>
 
-        {/* editMode &&
-          <div><label>Editing: "{selectedIngredientFields.name}"</label></div> */}
-
-        {/* <span>
-          <label>Color Swatch</label>
-          <div className={styles.circle} style={{backgroundColor: 'red'}} />
-        </span> */}
         <div className={styles.button_row}>
           <Button /* disabled={TODO: validate input here} */
-            onClick={e => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+            onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
           >
             Save
           </Button>
           <Button onClick={onCancel}>Cancel</Button>
           {editMode &&
-            <Button className={styles.delete_ingred} onClick={() =>
-              window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-              onDelete(selectedIngredientFields.groupId)
-            }>Delete Ingredient</Button>
+            <Button className={styles.delete_ingred} onClick={this.handleDelete(selectedIngredientFields)}>
+              Delete Ingredient
+            </Button>
           }
         </div>
       </div>

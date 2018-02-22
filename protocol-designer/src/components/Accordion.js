@@ -1,7 +1,18 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 
-class Accordion extends React.Component {
-  constructor (props) {
+type Props = {
+  title: string,
+  collapsed?: boolean,
+  children?: React.Node
+}
+
+type State = {
+  collapsed: boolean
+}
+
+class Accordion extends React.Component<Props, State> {
+  constructor (props: Props) {
     super(props)
     this.state = {collapsed: true}
   }
@@ -9,7 +20,7 @@ class Accordion extends React.Component {
     const { children, title } = this.props
     const { collapsed } = this.state
     return (
-      <li onClick={e => this.setState({collapsed: !collapsed})}>
+      <li onClick={() => this.setState({collapsed: !collapsed})}>
         <label>{title} {collapsed ? '►' : '▼'}</label>
         {!collapsed && <ul>
           {children}

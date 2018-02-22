@@ -32,7 +32,7 @@ export type TransferishStepItem = {|
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
   rows: Array<{
-    substepId: number,
+    substepId: number, // TODO should this be a string or is this ID properly a number?
     sourceIngredientName?: string,
     destIngredientName?: string,
     sourceWell?: string,
