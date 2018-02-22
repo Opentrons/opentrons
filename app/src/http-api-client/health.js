@@ -7,6 +7,7 @@ import type {ApiCall} from './types'
 import client, {type ClientResponseError} from './client'
 
 type HealthInfo = {
+  name: string,
   api_version: string,
   fw_version: string,
 }

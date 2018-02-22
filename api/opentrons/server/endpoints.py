@@ -9,9 +9,15 @@ from opentrons import robot, __version__
 log = logging.getLogger(__name__)
 ENABLE_NMCLI = os.environ.get('ENABLE_NETWORKING_ENDPOINTS', '')
 
+# TODO(mc, 2018-02-22): this naming logic is copied instead of shared
+#   from compute/scripts/anounce_mdns.py
+NAME = 'opentrons-{}'.format(
+    os.environ.get('RESIN_DEVICE_NAME_AT_INIT', 'dev'))
+
 
 async def health(request):
     res = {
+        'name': NAME,
         'api_version': __version__,
         'fw_version': robot.fw_version
     }
