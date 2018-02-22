@@ -1,12 +1,13 @@
-@import '..';
+@import '@opentrons/components';
 
 .plate_label {
   pointer-events: none;
-  font-size: var(--fs-caption);
+  font-size: 0.325rem;
   text-anchor: middle;
 }
 
 .tiny_labels {
+  /* For 384 plate */
   font-size: 0.2rem;
 }
 
