@@ -14,6 +14,7 @@ type PropsWithoutActions = {
 }
 
 function mapStateToProps (state: BaseState): PropsWithoutActions {
+  // TODO Ian 2018-02-21 put these selectors in Header
   // const activeModals = selectors.activeModals(state)
   // const container = selectors.selectedContainer(state)
 

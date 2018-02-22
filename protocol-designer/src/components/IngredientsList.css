@@ -2,26 +2,21 @@
 
 :root {
   --ingredient_row: {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    lost-utility: clearfix;
     padding: 0.25rem;
     padding-bottom: 0.25rem;
     border-bottom: 2px solid var(--c-light-gray);
 
-    & div {
-      flex: 1;
+    & > * {
+      lost-column: 1/4;
+
+      /* Space out empty divs too */
+      min-height: 1px;
     }
 
     & *:first-child {
       /* Well name */
-      flex: 0.25;
       padding-left: 1rem;
-    }
-
-    & div:last-child {
-      /* X to delete */
-      flex: 0.25;
     }
   }
 }

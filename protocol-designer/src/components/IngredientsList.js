@@ -56,6 +56,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       >
         <div className={styles.ingredient_row_header}>
           <span>Well</span>
+          <span>Name</span>
           <span>Volume</span>
           <span />
         </div>
@@ -64,7 +65,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <IngredIndividual key={i}
             name={ingredCategoryData.individualize
               ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${serializeName || 'Sample'} ${i + 1}`)
-              : ' '
+              : ''
             }
             wellName={wellName}
             canDelete
