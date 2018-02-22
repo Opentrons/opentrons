@@ -41,7 +41,7 @@ def test_calibrated_max_z(robot):
     pipette.Pipette(
         robot, mount='left', name='my-fancy-pancy-pipette'
     )
-    assert robot.max_deck_height() == 63
+    assert robot.max_deck_height() == 85
     # plate = containers_load(robot, '96-flat', '1')
     # TODO(artyom, 20171030): re-visit once z-value is back into container data
     # assert robot.max_deck_height() == 10.5
@@ -313,7 +313,7 @@ def test_drop_tip_default_trash(robot):
     pip = pipette.Pipette(
         robot, name='P300', mount='right', tip_racks=[tiprack])
 
-    trash_loc = vector.Vector([80.00, 80.00, 58.00])
+    trash_loc = vector.Vector([80.00, 80.00, 80.00])
 
     pip.pick_up_tip()
 
