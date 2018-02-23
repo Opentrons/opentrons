@@ -13,7 +13,9 @@ import {
   saveMoreOptionsModal
 } from '../steplist/actions'
 
-function mapStateToProps (state) {
+import type {BaseState} from '../types'
+
+function mapStateToProps (state: BaseState) {
   const formModalData = selectors.formModalData(state)
   return {
     hideModal: formModalData === null,

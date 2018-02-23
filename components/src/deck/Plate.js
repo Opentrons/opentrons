@@ -75,7 +75,7 @@ export default class Plate extends React.Component<PlateProps> {
     }
 
     const infoForContainerType = defaultContainers.containers[containerType]
-    const originOffset = infoForContainerType['origin-offset']
+    const originOffset = infoForContainerType['origin-offset'] || {x: 0, y: 0}
     const containerLocations = infoForContainerType.locations
     const firstWell: wellDims = containerLocations['A1']
 

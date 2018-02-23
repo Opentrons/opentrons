@@ -17,6 +17,11 @@ inetd -e /etc/inetd.conf
 echo "Homing Robot... this may take a few seconds."
 python -c "from opentrons import robot; robot.connect(); robot.home()"
 
+# Start Jupyter Notebook server
+echo "Starting Jupyter Notebook server"
+mkdir -p /data/user_storage/opentrons_data/jupyter
+jupyter notebook --log-level=DEBUG --allow-root &
+
 # Check if config exists, and alert if not found
 echo "Checking for deck calibration data..."
 config_path=`python -c "from opentrons.util import environment; print(environment.get_path('OT_CONFIG_FILE'))"`

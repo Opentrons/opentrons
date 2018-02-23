@@ -12,7 +12,7 @@ import type {
 
 import type {RobotService} from '../types'
 
-import {actionTypes} from '../actions'
+import {actionTypes, type ClearConnectResponseAction} from '../actions'
 
 type State = {
   isScanning: boolean,
@@ -69,8 +69,14 @@ export default function connectionReducer (
     case DISCONNECT: return handleDisconnect(state, action)
     case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
 
-    case 'api:HEALTH_SUCCESS': return maybeDiscoverWired(state, action)
-    case 'api:HEALTH_FAILURE': return maybeRemoveWired(state, action)
+    case 'robot:CLEAR_CONNECT_RESPONSE':
+      return handleClearConnectResponse(state, action)
+
+    case 'api:HEALTH_SUCCESS':
+      return maybeDiscoverWired(state, action)
+
+    case 'api:HEALTH_FAILURE':
+      return maybeRemoveWired(state, action)
   }
 
   return state
@@ -168,6 +174,13 @@ function handleDisconnectResponse (state, action: any) {
   }
 
   return {...state, connectedTo, disconnectRequest: {error, inProgress: false}}
+}
+
+function handleClearConnectResponse (
+  state: State,
+  action: ClearConnectResponseAction
+): State {
+  return {...state, connectRequest: INITIAL_STATE.connectRequest}
 }
 
 function maybeDiscoverWired (state: State, action: HealthSuccessAction): State {

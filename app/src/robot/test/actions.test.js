@@ -66,6 +66,12 @@ describe('robot actions', () => {
     expect(actions.connectResponse(new Error('AH'))).toEqual(failure)
   })
 
+  test('CLEAR_CONNECT_RESPONSE action', () => {
+    const expected = {type: 'robot:CLEAR_CONNECT_RESPONSE'}
+
+    expect(actions.clearConnectResponse()).toEqual(expected)
+  })
+
   test('DISCONNECT action', () => {
     const expected = {
       type: actionTypes.DISCONNECT,

@@ -54,12 +54,12 @@ describe('COPY_LABWARE action', () => {
         clonePlate: {
           type: '96-flat',
           name: 'Samples Plate',
-          slotName: 'A2'
+          slot: 'A2'
         },
         otherPlate: {
           type: '384-flat',
           name: 'Destination Plate',
-          slotName: 'B2'
+          slot: 'B2'
         }
       },
       {
@@ -70,18 +70,18 @@ describe('COPY_LABWARE action', () => {
       clonePlate: {
         type: '96-flat',
         name: 'Samples Plate',
-        slotName: 'A2'
+        slot: 'A2'
       },
       newContainer: {
         type: '96-flat',
         name: 'Samples Plate',
-        slotName: 'A3'
+        slot: 'A3'
       },
 
       otherPlate: {
         type: '384-flat',
         name: 'Destination Plate',
-        slotName: 'B2'
+        slot: 'B2'
       }
     })
   })

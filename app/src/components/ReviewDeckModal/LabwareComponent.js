@@ -26,7 +26,7 @@ function LabwareComponent (props: Props) {
 
 function mapStateToProps (state, ownProps: OwnProps): StateProps {
   const allLabware = robotSelectors.getLabware(state)
-  const labware = allLabware.find((lw) => lw.slot === ownProps.slotName)
+  const labware = allLabware.find((lw) => lw.slot === ownProps.slot)
 
   if (!labware) return {}
 

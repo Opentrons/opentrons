@@ -94,12 +94,12 @@ Used by IngredientsList. An array of objects that each represent an ingredient g
     [uniqueContainerId]: {
       type: '96-flat',
       name: 'Samples Plate',
-      slotName: 'A2'
+      slot: 'A2'
     },
     [uniqueContainerId2]: {
       type: '384-flat',
       name: 'Destination Plate',
-      slotName: 'B2'
+      slot: 'B2'
     }
   }
 ```

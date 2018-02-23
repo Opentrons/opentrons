@@ -1,18 +1,26 @@
 // @flow
 // wifi http api module
+import {createSelector} from 'reselect'
+
 import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
-import type {ApiResponse} from './types'
+import type {ApiCall} from './types'
 import client, {type ClientResponseError} from './client'
 
+type Ssid = string
+
+type Psk = string
+
+type Message = string
+
+type Status = 'none' | 'portal' | 'limited' | 'full' | 'unknown' | 'testing'
+
 type NetworkList = Array<{
-  ssid: string,
+  ssid: Ssid,
   signal: ?number,
   active: boolean
 }>
-
-type Status = 'none' | 'portal' | 'limited' | 'full' | 'unknown' | 'testing'
 
 type ListResponse = {
   list: NetworkList,
@@ -22,9 +30,19 @@ type StatusResponse = {
   status: Status,
 }
 
-type ConfigureResponse = {}
+type ConfigureRequest = {
+  ssid: Ssid,
+  psk: Psk,
+}
 
-type RequestPath = 'list' | 'status'
+type ConfigureResponse = {
+  ssid: Ssid,
+  message: Message,
+}
+
+type WifiResponse = ListResponse | StatusResponse | ConfigureResponse
+
+type RequestPath = 'list' | 'status' | 'configure'
 
 export type WifiRequestAction = {|
   type: 'api:WIFI_REQUEST',
@@ -39,8 +57,7 @@ export type WifiSuccessAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-    list?: NetworkList,
-    status?: Status,
+    response: WifiResponse,
   |}
 |}
 
@@ -53,23 +70,40 @@ export type WifiFailureAction = {|
   |}
 |}
 
+export type SetConfigureWifiBodyAction = {|
+  type: 'api:SET_CONFIGURE_WIFI_BODY',
+  payload: {|
+    robot: RobotService,
+    update: {
+      ssid?: Ssid,
+      psk?: Psk
+    }
+  |}
+|}
+
 export type WifiAction =
   | WifiRequestAction
   | WifiSuccessAction
   | WifiFailureAction
+  | SetConfigureWifiBodyAction
 
-export type RobotWifi = {
-  list: ApiResponse<ListResponse>,
-  configure: ApiResponse<ConfigureResponse>,
-  status: ApiResponse<StatusResponse>,
+export type RobotWifiList = ApiCall<void, ListResponse>
+export type RobotWifiStatus = ApiCall<void, StatusResponse>
+export type RobotWifiConfigure = ApiCall<ConfigureRequest, ConfigureResponse>
+
+type RobotWifiState = {
+  list?: RobotWifiList,
+  status?: RobotWifiStatus,
+  configure?: RobotWifiConfigure,
 }
 
-export type WifiState = {
-  [robotName: string]: RobotWifi
+type WifiState = {
+  [robotName: string]: ?RobotWifiState
 }
 
 const LIST_PATH: RequestPath = 'list'
 const STATUS_PATH: RequestPath = 'status'
+const CONFIGURE_PATH: RequestPath = 'configure'
 
 export function fetchWifiList (robot: RobotService): ThunkAction {
   return (dispatch) => {
@@ -91,20 +125,106 @@ export function fetchWifiStatus (robot: RobotService): ThunkAction {
   }
 }
 
+export function setConfigureWifiBody (
+  robot: RobotService,
+  update: {ssid?: Ssid, psk?: Psk}
+): SetConfigureWifiBodyAction {
+  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, update}}
+}
+
+export function configureWifi (robot: RobotService): ThunkAction {
+  return (dispatch, getState) => {
+    const robotWifiState = selectRobotWifiState(getState(), robot) || {}
+    const configureState = robotWifiState.configure || {}
+    const body = configureState.request
+
+    if (!body) {
+      return console.warn('configureWifi called without setConfigureWifiBody')
+    }
+
+    dispatch(wifiRequest(robot, CONFIGURE_PATH))
+
+    return client(robot, 'POST', `wifi/${CONFIGURE_PATH}`, body)
+      .then((resp) => dispatch(wifiSuccess(robot, CONFIGURE_PATH, resp)))
+      .catch((error) => dispatch(wifiFailure(robot, CONFIGURE_PATH, error)))
+  }
+}
+
 export function wifiReducer (state: ?WifiState, action: Action): WifiState {
   if (state == null) return {}
 
   switch (action.type) {
-    case 'api:WIFI_REQUEST': return reduceWifiRequest(state, action)
-    case 'api:WIFI_SUCCESS': return reduceWifiSuccess(state, action)
-    case 'api:WIFI_FAILURE': return reduceWifiFailure(state, action)
+    case 'api:WIFI_REQUEST':
+      return reduceWifiRequest(state, action)
+
+    case 'api:WIFI_SUCCESS':
+      return reduceWifiSuccess(state, action)
+
+    case 'api:WIFI_FAILURE':
+      return reduceWifiFailure(state, action)
+
+    case 'api:SET_CONFIGURE_WIFI_BODY':
+      return reduceSetConfigureWifiBody(state, action)
   }
 
   return state
 }
 
-export function selectWifi (state: State): WifiState {
-  return state.api.wifi
+export const makeGetRobotWifiStatus = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiStatus => (
+    (state && state.status) ||
+    {inProgress: false, error: null, response: null}
+  )
+)
+
+export const makeGetRobotWifiList = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiList => {
+    const listState = (
+      (state && state.list) ||
+      {inProgress: false, error: null, response: null}
+    )
+
+    if (!listState.response) return listState
+
+    return {
+      ...listState,
+      response: {
+        ...listState.response,
+        list: dedupeNetworkList(listState.response.list)
+      }
+    }
+  }
+)
+
+export const makeGetRobotWifiConfigure = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiConfigure => (
+    (state && state.configure) ||
+    {inProgress: false, error: null, request: null, response: null}
+  )
+)
+
+function selectRobotWifiState (state: State, props: RobotService) {
+  return state.api.wifi[props.name]
+}
+
+function dedupeNetworkList (list: NetworkList): NetworkList {
+  const {ids, networksById} = list.reduce((result, network) => {
+    const {ssid, active} = network
+
+    if (!result.networksById[ssid]) {
+      result.ids.push(ssid)
+      result.networksById[ssid] = network
+    } else if (active) {
+      result.networksById[ssid].active = true
+    }
+
+    return result
+  }, {ids: [], networksById: {}})
+
+  return ids.map((ssid) => networksById[ssid])
 }
 
 function wifiRequest (
@@ -117,20 +237,12 @@ function wifiRequest (
 function wifiSuccess (
   robot: RobotService,
   path: RequestPath,
-  response: any
+  response: WifiResponse
 ): WifiSuccessAction {
-  const action: WifiSuccessAction = {
+  return {
     type: 'api:WIFI_SUCCESS',
-    payload: {robot, path}
+    payload: {robot, path, response}
   }
-
-  if (path === LIST_PATH) {
-    action.payload.list = (response: ListResponse).list
-  } else if (path === STATUS_PATH) {
-    action.payload.status = (response: StatusResponse).status
-  }
-
-  return action
 }
 
 function wifiFailure (
@@ -162,14 +274,14 @@ function reduceWifiSuccess (
   state: WifiState,
   action: WifiSuccessAction
 ): WifiState {
-  const {payload: {path, [path]: response, robot: {name}}} = action
+  const {payload: {path, response, robot: {name}}} = action
   const stateByName = state[name] || {}
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {response, error: null, inProgress: false}
+      [path]: {response, request: null, error: null, inProgress: false}
     }
   }
 }
@@ -186,7 +298,28 @@ function reduceWifiFailure (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {...stateByNameByPath, error, inProgress: false}
+      [path]: {...stateByNameByPath, error, request: null, inProgress: false}
+    }
+  }
+}
+
+function reduceSetConfigureWifiBody (
+  state: WifiState,
+  action: SetConfigureWifiBodyAction
+): WifiState {
+  const {payload: {update, robot: {name}}} = action
+  const stateByName = state[name] || {}
+  const configureState = stateByName.configure || {}
+  const requestState = configureState.request || {}
+
+  return {
+    ...state,
+    [name]: {
+      ...stateByName,
+      configure: {
+        ...configureState,
+        request: {...requestState, ...update}
+      }
     }
   }
 }

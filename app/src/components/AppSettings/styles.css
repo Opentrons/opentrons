@@ -1,0 +1,6 @@
+/* stylesheet for AppSettings components */
+@import '@opentrons/components';
+
+.app_settings {
+  padding: 1.5rem;
+}

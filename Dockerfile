@@ -4,14 +4,13 @@
 # Use this for running on a robot
 FROM resin/raspberrypi3-alpine-python:3.6-slim-20180120
 
-# TODO (artyom, 20171205): remove this and set all relevant environment
-# variables (such as APP_DATA_DIR) explicitly
 ENV RUNNING_ON_PI=1
 # This is used by D-Bus clients such as Network Manager cli, announce_mdns
 # connecting to Host OS services
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # Add persisted data directory where new python packages are being installed
 ENV PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
+ENV PATH=$PATH:/data/packages/usr/local/bin
 # Port name for connecting to smoothie over serial, i.e. /dev/ttyAMA0
 ENV OT_SMOOTHIE_ID=AMA
 ENV OT_SERVER_PORT=31950
@@ -27,6 +26,7 @@ ENV ETHERNET_NETWORK_PREFIX_LENGTH=64
 # so we are setting them explicitly
 RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
     echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
+    echo "export PATH=$PATH" >> /etc/profile && \
     echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile && \
     echo "export OT_SMOOTHIE_ID=$OT_SMOOTHIE_ID" >> /etc/profile
 
@@ -40,7 +40,10 @@ RUN apk add --update \
       dropbear-scp \
       gnupg \
       nginx \
+      libstdc++ \
+      g++ \
       networkmanager \
+      py3-zmq \
       py3-urwid \
       py3-numpy \
       && rm -rf /var/cache/apk/*
@@ -52,11 +55,13 @@ RUN apk add --update \
 # site-packages and cleaning up the one created by python3 package.
 RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
+RUN pip install pipenv==9.0.3 jupyter
 
 # Copy server files and data into the container. Note: any directories that
 # you wish to copy into the container must be excluded from the .dockerignore
 # file, or you will encounter a copy error
 ENV LABWARE_DEF=/etc/labware
+COPY ./compute/conf/jupyter_notebook_config.py /root/.jupyter/
 COPY ./labware-definitions/definitions /etc/labware
 COPY ./api /tmp/api
 COPY ./compute/avahi_tools /tmp/avahi_tools
@@ -64,8 +69,7 @@ COPY ./compute/avahi_tools /tmp/avahi_tools
 # When adding more python packages make sure to use setuptools to keep
 # packaging consistent across environments
 ENV PIPENV_VENV_IN_PROJECT=true
-RUN pip install pipenv==9.0.3 && \
-    pipenv install /tmp/api --system && \
+RUN pipenv install /tmp/api --system && \
     pip install /tmp/avahi_tools && \
     rm -rf /tmp/api && \
     rm -rf /tmp/avahi_tools

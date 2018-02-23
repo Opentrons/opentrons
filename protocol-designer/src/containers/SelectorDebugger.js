@@ -1,18 +1,28 @@
+// @flow
 // A development tool for debugging selectors & Redux state
 import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 
-import {selectors} from '../steplist/reducers' // TODO Ian 2018-01-26 add in other modules
+import {selectors as steplist} from '../steplist/reducers'
+import {selectors as labwareIngred} from '../labware-ingred/reducers'
+import type {BaseState} from '../types'
 
-class SelectorDebugger extends React.Component {
-  constructor (props) {
+type Props = {
+  selectors: Object | Array<*>
+}
+
+type State = {
+  collapsed: boolean
+}
+
+class SelectorDebugger extends React.Component<Props, State> {
+  constructor (props: Props) {
     super(props)
     this.state = {collapsed: true}
-    this.toggleCollapsed = this.toggleCollapsed.bind(this)
   }
 
-  toggleCollapsed () {
+  toggleCollapsed = () => {
     this.setState({...this.state, collapsed: !this.state.collapsed})
   }
 
@@ -49,8 +59,17 @@ class SelectorDebugger extends React.Component {
   }
 }
 
-function mapStateToProps (state) {
-  return {selectors: mapValues(selectors, selector => selector(state))}
+function callSelectors (selectors, state) {
+  return mapValues(selectors, selector => selector(state))
 }
 
-export default connect(mapStateToProps)(SelectorDebugger)
+function mapStateToProps (state: BaseState) {
+  return {
+    selectors: {
+      steplist: callSelectors(steplist, state),
+      labwareIngred: callSelectors(labwareIngred, state)
+    }
+  }
+}
+
+export default connect(mapStateToProps, () => {})(SelectorDebugger)

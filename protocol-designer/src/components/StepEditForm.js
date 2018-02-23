@@ -7,7 +7,8 @@ import {
   DropdownField,
   CheckboxField,
   InputField,
-  RadioGroup
+  RadioGroup,
+  type DropdownOption
 } from '@opentrons/components'
 
 import FormSection from './FormSection'
@@ -16,10 +17,7 @@ import type {FormData, FormSectionNames, FormSectionState} from '../steplist/typ
 
 import {formConnectorFactory} from '../utils'
 
-type Options = Array<{
-  name: string,
-  value: string
-}>
+type Options = Array<DropdownOption>
 
 export type Props = {
   // ingredientOptions: Options,

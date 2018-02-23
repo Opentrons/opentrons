@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from '../types'
+import type {Dispatch, BaseState} from '../types'
 import {connect} from 'react-redux'
 
 import {NavButton, VerticalNavBar} from '@opentrons/components'
@@ -28,7 +28,7 @@ function Nav (props: Props) {
   )
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: BaseState) {
   return {
     currentPage: selectors.currentPage(state)
   }

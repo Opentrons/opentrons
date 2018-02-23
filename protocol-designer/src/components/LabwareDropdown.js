@@ -1,12 +1,23 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
 
-function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displayName}) {
+type OnContainerChoose = (containerType: string) => void
+
+type LabwareItemProps = {
+  onContainerChoose: OnContainerChoose,
+  containerType: string,
+  displayName: string,
+  containerImgUrl?: string
+}
+
+function LabwareItem (props: LabwareItemProps) {
+  const {onContainerChoose, containerType, containerImgUrl, displayName} = props
   return (
     <li
       className={styles.labware_list_item}
-      onClick={e => onContainerChoose(containerType)}
+      onClick={() => onContainerChoose(containerType)}
       style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
     >
       {displayName}
@@ -14,9 +25,16 @@ function LabwareItem ({onContainerChoose, containerType, containerImgUrl, displa
   )
 }
 
-export default function LabwareDropdown ({onClose, onContainerChoose, slotName}) {
-  // do not render without a slotName
-  if (!slotName) return null
+type LabwareDropdownProps = {
+  onClose: (e?: SyntheticEvent<*>) => void,
+  onContainerChoose: OnContainerChoose,
+  slot: string | false
+}
+
+export default function LabwareDropdown (props: LabwareDropdownProps) {
+  const {onClose, onContainerChoose, slot} = props
+  // do not render without a slot
+  if (!slot) return null
 
   const labwareItemMapper = (item, key) => (
     // LabwareItem expects item = [containerType, displayName, containerImgUrl(optional)]
@@ -24,13 +42,13 @@ export default function LabwareDropdown ({onClose, onContainerChoose, slotName})
       containerType={item[0]}
       displayName={item[1]}
       onContainerChoose={onContainerChoose}
-      containerImgUrl={item.length >= 3 && `http://docs.opentrons.com/_images/${item[2]}.png`}
+      containerImgUrl={item.length >= 3 ? `http://docs.opentrons.com/_images/${item[2]}.png` : undefined}
     />
   )
 
   return (
     <div className={styles.labware_dropdown}>
-      <label>Add Labware to Slot {slotName}</label>
+      <label>Add Labware to Slot {slot}</label>
       <div className={styles.close} onClick={onClose}>X</div>
       <ul>
         <Accordion title='Tip Rack'>
