@@ -25,21 +25,39 @@ X_CURRENT_HIGH = 1.5
 Y_CURRENT_LOW = 0.3
 Y_CURRENT_HIGH = 1.75
 
+HIGH_CURRENT = {
+    'X': X_CURRENT_HIGH,
+    'Y': Y_CURRENT_HIGH,
+    'Z': MOUNT_CURRENT_HIGH,
+    'A': MOUNT_CURRENT_HIGH,
+    'B': PLUNGER_CURRENT_HIGH,
+    'C': PLUNGER_CURRENT_HIGH
+}
+
+LOW_CURRENT = {
+    'X': X_CURRENT_LOW,
+    'Y': Y_CURRENT_LOW,
+    'Z': MOUNT_CURRENT_LOW,
+    'A': MOUNT_CURRENT_LOW,
+    'B': PLUNGER_CURRENT_LOW,
+    'C': PLUNGER_CURRENT_LOW
+}
+
+DEFAULT_CURRENT = {
+    'X': HIGH_CURRENT['X'],
+    'Y': HIGH_CURRENT['Y'],
+    'Z': HIGH_CURRENT['Z'],
+    'A': HIGH_CURRENT['A'],
+    'B': LOW_CURRENT['B'],
+    'C': LOW_CURRENT['C']
+}
+
 X_MAX_SPEED = 600
 Y_MAX_SPEED = 400
 Z_MAX_SPEED = 100
 A_MAX_SPEED = 100
 B_MAX_SPEED = 70
 C_MAX_SPEED = 70
-
-DEFAULT_CURRENT = {
-    'X': X_CURRENT_HIGH,
-    'Y': Y_CURRENT_HIGH,
-    'Z': MOUNT_CURRENT_HIGH,
-    'A': MOUNT_CURRENT_HIGH,
-    'B': PLUNGER_CURRENT_LOW,
-    'C': PLUNGER_CURRENT_LOW
-}
 
 DEFAULT_MAX_SPEEDS = {
     'X': X_MAX_SPEED,
@@ -62,7 +80,6 @@ robot_config = namedtuple(
         'name',
         'steps_per_mm',
         'acceleration',
-        'current',
         'gantry_calibration',
         'instrument_offset',
         'probe_center',
@@ -72,6 +89,8 @@ robot_config = namedtuple(
         'plunger_current_high',
         'tip_length',
         'default_current',
+        'low_current',
+        'high_current',
         'default_max_speed'
     ]
 )
@@ -88,7 +107,6 @@ def _get_default():
         name='Ada Lovelace',
         steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-        current='M907 ' + DEFAULT_CURRENT_STRING,
         probe_center=(295.0, 300.0, probe_height),
         probe_dimensions=(35.0, 40.0, probe_height + 5.0),
         gantry_calibration=[  # "safe" offset, overwrote in factory calibration
@@ -120,6 +138,8 @@ def _get_default():
         },
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
+        low_current=LOW_CURRENT,
+        high_current=HIGH_CURRENT,
         default_max_speed=DEFAULT_MAX_SPEEDS,
         plunger_current_low=PLUNGER_CURRENT_LOW,
         plunger_current_high=PLUNGER_CURRENT_HIGH
