@@ -175,7 +175,7 @@ class SmoothieDriver_3_0_0:
     def _scan_instruments(self):
         res = self._send_command(GCODES['SCAN_INSTRUMENTS'])
         return {
-            line.strip()[0]: _parse_instrument_values(line)
+            line.strip()[0]: _parse_instrument_values(line)['id']
             for line in res.split('\n')
             if line
         }
