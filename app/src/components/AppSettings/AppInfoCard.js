@@ -11,7 +11,7 @@ const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
 const VERSION_VALUE = version
 
-export default function StatusCard () {
+export default function AppInfoCard () {
   return (
     <Card title={TITLE}>
       <LabeledValue
