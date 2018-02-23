@@ -11,7 +11,7 @@ import {AlertModal} from '@opentrons/components'
 
 const HEADING = 'App Update Available'
 
-const UPDATE_MESSAGE = 'We reccomend updating to the latest software version'
+const UPDATE_MESSAGE = 'We recommend updating to the latest software version'
 
 export default function AppUpdateModal () {
   const onUpdateClick = () => console.log('update')
