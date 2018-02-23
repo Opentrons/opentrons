@@ -15,7 +15,8 @@ module.exports = {
     module: {
       rules: [
         rules.js,
-        rules.localCss
+        rules.localCss,
+        rules.images
       ]
     },
     plugins: [
@@ -53,6 +54,10 @@ module.exports = {
     {
       name: 'Deck',
       components: 'src/deck/[A-Z]*.js'
+    },
+    {
+      name: 'Instrument Diagram',
+      components: 'src/instrument-diagram/[A-Z]*.js'
     },
     {
       name: 'Structure',

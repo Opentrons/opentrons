@@ -1,13 +1,12 @@
 // @flow
 import React from 'react'
 
-import styles from './instrument.css'
-
-import singleSrc from '../../img/pipetteSingle.png'
-import multiSrc from '../../img/pipetteMulti.png'
+import singleSrc from './pipetteSingle.png'
+import multiSrc from './pipetteMulti.png'
 
 type Props = {
-  channels?: number
+  channels?: number,
+  className?: string
 }
 
 export default function InstrumentDiagram (props: Props) {
@@ -17,7 +16,7 @@ export default function InstrumentDiagram (props: Props) {
     : multiSrc
 
   return (
-    <div className={styles.pipette_icon}>
+    <div className={props.className}>
       <img src={imgSrc} />
     </div>
   )
