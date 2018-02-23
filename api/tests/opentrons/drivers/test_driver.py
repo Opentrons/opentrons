@@ -26,6 +26,36 @@ def test_parse_axis_values(smoothie):
         drv._parse_axis_values(bad_data)
 
 
+def test_disable_motor(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    command_log = []
+    smoothie.simulating = False
+
+    def write_with_log(command, connection, timeout):
+        command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    def _parse_axis_values(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+
+    smoothie._disengage_axis('X')
+    smoothie._disengage_axis('XYZ')
+    smoothie._disengage_axis('ABCD')
+    expected = [
+        ['M18X M400'],
+        ['M18[XYZ]+ M400'],
+        ['M18[ABC]+ M400']
+    ]
+    # from pprint import pprint
+    # pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_plunger_commands(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
@@ -50,7 +80,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G28.2[ABCZ]+ M400'],                 # Home
         ['M907 B0.1 C0.1 M400'],               # Set plunger current low
         ['G4P0.05 M400'],                      # Dwell
-        ['M18[ABCZ]+ M400'],
         ['M907 Y0.8 M400'],                    # set Y motor to low current
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
@@ -59,18 +88,16 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F24000 M400'],                      # set back to default speed
         ['G28.2X M400'],                       # home X
-        ['M18X M400'],
         ['G28.2Y M400'],                        # home Y
         ['M203.1 Y8 M400'],                     # lower speed on Y for retract
         ['G91 G0Y-3 G90'],                          # retract Y
         ['G28.2Y M400'],                        # home Y
         ['G91 G0Y-3 G90'],                          # retract Y
         ['M203.1 A100 B70 C70 X600 Y400 Z100 M400'],  # return to norm speed
-        ['M18Y M400'],
         ['M114.2 M400']                       # Get position
     ]
-    from pprint import pprint
-    pprint(command_log)
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
