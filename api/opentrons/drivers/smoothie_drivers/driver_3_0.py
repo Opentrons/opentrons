@@ -284,7 +284,7 @@ class SmoothieDriver_3_0_0:
     def pop_current(self):
         self.set_current(self._saved_current_settings)
 
-    def dwell_motor(self, axes):
+    def dwell_axes(self, axes):
         '''
         Sets motors to low current, for when they are not moving
 
@@ -301,7 +301,7 @@ class SmoothieDriver_3_0_0:
         if dwelling_currents:
             self.set_current(dwelling_currents, axes_dwelling=True)
 
-    def activate_motor(self, axes):
+    def activate_axes(self, axes):
         '''
         Sets motors to a high current, for when they are moving
         and/or must hold position
@@ -377,18 +377,17 @@ class SmoothieDriver_3_0_0:
         self._send_command(relative_retract_command)
         self.pop_current()
         self.pop_speed()
-        self.dwell_motor('Y')
+        self.dwell_axes('Y')
 
         # now it is safe to home the X axis
         try:
-            print('\n\nHERE\\n\n')
-            self.activate_motor('X')
+            self.activate_axes('X')
             self._send_command(GCODES['HOME'] + 'X')
         finally:
-            self.dwell_motor('X')
+            self.dwell_axes('X')
 
     def _home_y(self):
-        self.activate_motor('Y')
+        self.activate_axes('Y')
         # home the Y at normal speed (fast)
         self._send_command(GCODES['HOME'] + 'Y')
 
@@ -409,7 +408,7 @@ class SmoothieDriver_3_0_0:
             self._send_command(relative_retract_command)
             self.pop_axis_max_speed()  # bring max speeds back to normal
         finally:
-            self.dwell_motor('Y')
+            self.dwell_axes('Y')
 
     def _setup(self):
         self._reset_from_error()
@@ -458,13 +457,13 @@ class SmoothieDriver_3_0_0:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
-                self.activate_motor(target.keys())
+                self.activate_axes(target.keys())
                 self._send_command(command)
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
                 if plunger_axis_moved:
-                    self.dwell_motor(plunger_axis_moved)
+                    self.dwell_axes(plunger_axis_moved)
             self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
@@ -506,11 +505,11 @@ class SmoothieDriver_3_0_0:
                 # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
                 try:
-                    self.activate_motor(axes)
+                    self.activate_axes(axes)
                     self._send_command(command, timeout=30)
                 finally:
                     # always dwell an axis after it has been homed
-                    self.dwell_motor(axes)
+                    self.dwell_axes(axes)
 
         # Only update axes that have been selected for homing
         homed = {

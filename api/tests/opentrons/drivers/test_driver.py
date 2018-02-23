@@ -26,6 +26,42 @@ def test_parse_axis_values(smoothie):
         drv._parse_axis_values(bad_data)
 
 
+def test_dwell_and_activate_axes(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    command_log = []
+    smoothie._setup()
+    smoothie.simulating = False
+
+    def write_with_log(command, connection, timeout):
+        command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    def _parse_axis_values(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+
+    smoothie.activate_axes('X')
+    smoothie.dwell_axes('X')
+    smoothie.activate_axes('XYBC')
+    smoothie.dwell_axes('XC')
+    smoothie.dwell_axes('BCY')
+    expected = [
+        ['M907 X1.5 M400'], ['G4P0.05 M400'],
+        ['M907 X0.3 M400'], ['G4P0.05 M400'],
+        ['M907 B0.5 C0.5 X1.5 Y1.75'], ['G4P0.05 M400'],
+        ['M907 C0.1 X0.3 M400'], ['G4P0.05 M400'],
+        ['M907 B0.1 Y0.3 M400'], ['G4P0.05 M400'],
+    ]
+    # from pprint import pprint
+    # for i in range(len(expected)):
+    #     pprint(expected[i][0] == command_log[i], expected[i], command_log[i])
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_plunger_commands(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
