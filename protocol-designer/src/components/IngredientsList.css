@@ -1,28 +1,5 @@
 @import '@opentrons/components';
 
-:root {
-  --ingredient_row: {
-    lost-utility: clearfix;
-    padding: 0.25rem;
-    padding-bottom: 0.25rem;
-    border-bottom: 2px solid var(--c-light-gray);
-
-    & > * {
-      lost-column: 1/4;
-
-      /* Space out empty divs too */
-      min-height: 1px;
-    }
-
-    & *:first-child {
-      /* Well name */
-      padding-left: 1rem;
-    }
-  }
-}
-
-/* --------- */
-
 .ingredient_titled_list {
   & :first-child > svg {
     /* TODO Ian 2018-02-21 Is there a better way to color the icon and not the collapse carat? */
@@ -41,12 +18,26 @@
 
 /* --------- */
 
-.ingredient_row {
-  @apply --ingredient_row;
+.ingredient_row,
+.ingredient_row_header {
+  lost-utility: clearfix;
+  padding: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid var(--c-light-gray);
+
+  & > * {
+    lost-column: 1/4;
+
+    /* Space out empty divs too */
+    min-height: 1px;
+  }
+
+  & *:first-child {
+    /* Well name */
+    padding-left: 1rem;
+  }
 }
 
 .ingredient_row_header {
-  @apply --ingredient_row;
-
   font-weight: var(--fw-bold);
 }
