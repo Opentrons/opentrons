@@ -29,7 +29,7 @@ type ListProps = {
   /** disables the whole TitledList if true */
   disabled?: boolean,
   /** inline style */
-  style?: {}
+  style?: {[string]: string}
 }
 
 /**
