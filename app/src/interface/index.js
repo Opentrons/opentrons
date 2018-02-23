@@ -8,11 +8,12 @@ import {actionTypes as robotActionTypes} from '../robot/actions'
 export const NAME = 'interface'
 const META_ALERT = `${NAME}:alert`
 
-export const PANEL_NAMES = ['connect', 'upload', 'setup']
+export const PANEL_NAMES = ['connect', 'upload', 'setup', 'more']
 export const PANEL_PROPS_BY_NAME = {
   upload: {title: 'Open Protocol'},
   setup: {title: 'Prepare for Run'},
-  connect: {title: 'Robots'}
+  connect: {title: 'Robots'},
+  more: {title: 'Menu'}
 }
 const DEFAULT_PANEL = 'connect'
 

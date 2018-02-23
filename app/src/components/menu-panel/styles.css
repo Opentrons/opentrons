@@ -1,0 +1,32 @@
+@import '@opentrons/components';
+
+.menu_panel {
+  & > * {
+    margin: 0.5rem 0 1.5rem;
+  }
+}
+
+.menu_list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.menu_item {
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: var(--fs-body-2);
+
+  & > span {
+    width: 100%;
+  }
+}
+
+.menu_icon {
+  width: 1.5rem;
+}
+
+.active {
+  color: #0ec9eb;
+  fill: #0ec9eb;
+  background-color: #f0f3ff;
+}

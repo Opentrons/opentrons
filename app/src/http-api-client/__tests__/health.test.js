@@ -3,7 +3,7 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import client from '../client'
-import {fetchHealth, reducer, selectHealth} from '..'
+import {fetchHealth, reducer, makeGetRobotHealth} from '..'
 
 jest.mock('../client')
 
@@ -17,7 +17,7 @@ const health = {name, api_version: '1.2.3', fw_version: '4.5.6'}
 describe('health', () => {
   beforeEach(() => client.__clearMock())
 
-  test('selectHealth returns health substate', () => {
+  test('makeGetRobotHealth returns health of existing robot', () => {
     const state = {
       api: {
         health: {
@@ -30,7 +30,29 @@ describe('health', () => {
       }
     }
 
-    expect(selectHealth(state)).toBe(state.api.health)
+    const getRobotHealth = makeGetRobotHealth()
+
+    expect(getRobotHealth(state, {name})).toEqual({
+      inProgress: true,
+      error: null,
+      response: {name, api_version: '1.2.3', fw_version: '4.5.6'}
+    })
+  })
+
+  test('makeGetRobotHealth returns health of non-robot', () => {
+    const state = {
+      api: {
+        health: {}
+      }
+    }
+
+    const getRobotHealth = makeGetRobotHealth()
+
+    expect(getRobotHealth(state, {name})).toEqual({
+      inProgress: false,
+      error: null,
+      response: null
+    })
   })
 
   test('fetchHealth calls GET /health', () => {
