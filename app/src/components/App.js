@@ -22,7 +22,6 @@ export default function App () {
       <NavPanel />
       <Switch>
         <Route exact path='/' component={Home} />
-        <Route exact path='/menu' component={Home} />
         <Route exact path='/menu/app' component={AppSettingsPage} />
         <Route path='/robots/:name?' component={Robots} />
         <Route path='/upload' component={Upload} />
