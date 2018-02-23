@@ -18,75 +18,82 @@ type DispatchProps = {
     onBackClick: $PropertyType<Props, 'onBackClick'>
 }
 
-type StateProps = $Diff<Props, DispatchProps>
+type StateProps = $Diff<Props, DispatchProps> & {_page: Page}
 
-function mapStateToProps (state: BaseState): BaseState {
-  return state
-}
-
-function mapDispatchToProps (dispatch: Dispatch<*>) {
-  return {dispatch}
-}
-
-function getStateProps (state: BaseState): StateProps {
-  const page: Page = selectors.currentPage(state) // TODO why is this type cast necessary to exclude 'string'?
-  // TODO Ian 2018-02-22 fileName & stepName
+function mapStateToProps (state: BaseState): StateProps {
+  const _page = selectors.currentPage(state)
+  // TODO Ian 2018-02-22 fileName from file
   const fileName = 'Protocol Name'
 
   const selectedStep = steplistSelectors.selectedStep(state)
   const stepName = selectedStep && selectedStep.title
 
-  if (page === 'file') {
+  if (_page === 'file') {
     return {
+      _page,
       title: fileName,
       subtitle: 'FILE DETAILS'
     }
   }
 
-  if (page === 'steplist') {
+  if (_page === 'steplist') {
     return {
+      _page,
       title: fileName,
       subtitle: (
         <span>
           {/* TODO Ian 2018-02-22 add in icon, you need to make it inline and of the correct height */}
-          {/* <Icon name='pause' /> */}
+          {/* <Icon name={stepIconsByType[selectedStep]} /> */}
           {stepName}
         </span>
       )
     }
   }
 
-  if (page === 'ingredient-detail') {
+  if (_page === 'ingredient-detail') {
     const labware = labwareIngredSelectors.selectedContainer(state)
     return {
+      _page,
       title: labware && labware.name,
       subtitle: labware && labware.type,
       backButtonLabel: 'Deck'
     }
   }
 
-  return {title: '???'}
+  if (_page === 'well-selection-modal') {
+    // TODO Ian 2018-02-23 well selection modal's title bar
+    return {
+      _page,
+      title: 'TODO: Well selection modal'
+    }
+  }
+
+  // NOTE: this return should never be reached, it's just to keep flow happy
+  console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
+  return {
+    _page: 'steplist',
+    title: '???'
+  }
 }
 
-function mergeProps (state, dispatchObj: {dispatch: Dispatch<*>}): Props {
-  const stateProps = getStateProps(state)
-  const page = selectors.currentPage(state)
-  const {dispatch} = dispatchObj
+function mergeProps (stateProps: StateProps, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {_page, ...props} = stateProps
+  const {dispatch} = dispatchProps
 
   let onBackClick
 
-  if (page === 'ingredient-detail') {
+  if (_page === 'ingredient-detail') {
     onBackClick = () => dispatch(closeIngredientSelector())
   }
 
-  if (page === 'well-selection-modal') {
+  if (_page === 'well-selection-modal') {
     onBackClick = () => console.warn('TODO: leave well selection modal') // TODO LATER Ian 2018-02-22
   }
 
   return {
-    ...stateProps,
+    ...props,
     onBackClick
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TitleBar)
+export default connect(mapStateToProps, null, mergeProps)(TitleBar)

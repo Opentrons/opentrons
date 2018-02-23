@@ -237,7 +237,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
               <Field accessor='name' label='Name' />
             </span>
             {!editMode && <span>
-              {/* TODO make this a Field??? */}
               <DropdownField
                 onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
                 options={[
