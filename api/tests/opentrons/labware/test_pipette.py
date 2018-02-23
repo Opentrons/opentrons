@@ -1697,20 +1697,20 @@ class PipetteTest(unittest.TestCase):
 
         expected = [
             mock.call(
-                self.plate[0], instrument=self.p200, low_current_z=False, strategy='arc'),
+                self.plate[0], instrument=self.p200, strategy='arc'),
             mock.call(
-                self.plate[0].top(), instrument=self.p200, low_current_z=False, strategy='direct'),
+                self.plate[0].top(), instrument=self.p200, strategy='direct'),
             mock.call(
-                self.plate[0].bottom(), instrument=self.p200, low_current_z=False, strategy='direct'),
+                self.plate[0].bottom(), instrument=self.p200, strategy='direct'),
             mock.call(
-                self.plate[1], instrument=self.p200, low_current_z=False, strategy='arc'),
+                self.plate[1], instrument=self.p200, strategy='arc'),
             mock.call(
-                self.plate[2], instrument=self.p200, low_current_z=False, strategy='arc'),
+                self.plate[2], instrument=self.p200, strategy='arc'),
             mock.call(
-                self.plate[2].bottom(), instrument=self.p200, low_current_z=False, strategy='direct')
+                self.plate[2].bottom(), instrument=self.p200, strategy='direct')
         ]
-        self.assertEqual(self.robot.move_to.mock_calls, expected)
-
+        from pprint import pprint
+        pprint(self.robot.move_to.mock_calls)
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
     def build_pick_up_tip(self, well):
