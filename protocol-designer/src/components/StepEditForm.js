@@ -27,7 +27,7 @@ export type Props = {
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => void,
-  onToggleFormSection: (section: FormSectionNames) => any => void,
+  onToggleFormSection: (section: FormSectionNames) => mixed => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean

@@ -38,7 +38,7 @@ type AllIngredGroupFields = {
   [ingredGroupId: string]: IngredInputs
 }
 
-type SetSubstate = (accessor: string, value: string | boolean | number) => any
+type SetSubstate = (accessor: string, value: string | boolean | number) => mixed
 type GetSubstate = (accessor: Accessor) => string | boolean | number | null
 
 type FieldProps = {|
