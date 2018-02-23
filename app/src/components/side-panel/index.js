@@ -15,6 +15,7 @@ import {SidePanel} from '@opentrons/components'
 import ConnectPanel from '../connect-panel'
 import UploadPanel from '../upload-panel'
 import SetupPanel from '../setup-panel'
+import MenuPanel from '../menu-panel'
 
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(NavPanel)
@@ -23,7 +24,8 @@ export default withRouter(
 const PANELS_BY_NAME = {
   connect: ConnectPanel,
   upload: UploadPanel,
-  setup: SetupPanel
+  setup: SetupPanel,
+  more: MenuPanel
 }
 
 NavPanel.propTypes = {
