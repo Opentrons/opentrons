@@ -20,6 +20,7 @@ exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
       className="title_bar_icon"
       fill="currentColor"
       height={undefined}
+      style={undefined}
       version="1.1"
       viewBox="0 0 24 24"
       width={undefined}
@@ -53,6 +54,7 @@ exports[`ListItem Side Panel Group renders correctly 1`] = `
       className="title_bar_icon"
       fill="currentColor"
       height={undefined}
+      style={undefined}
       version="1.1"
       viewBox="0 0 24 24"
       width={undefined}
@@ -84,6 +86,7 @@ exports[`ListItem renders ListItem with icon correctly 1`] = `
     className="item_icon"
     fill="currentColor"
     height={undefined}
+    style={undefined}
     version="1.1"
     viewBox="0 0 24 24"
     width={undefined}
@@ -115,7 +118,6 @@ exports[`ListItem renders ListItem without icon correctly 1`] = `
 exports[`TitledList renders TitledList with children correctly 1`] = `
 <div
   className="titled_list"
-  style={undefined}
 >
   <div
     className="title_bar"
@@ -140,7 +142,6 @@ exports[`TitledList renders TitledList with children correctly 1`] = `
 exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 <div
   className="titled_list"
-  style={undefined}
 >
   <div
     className="title_bar"
@@ -158,7 +159,6 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 exports[`TitledList renders TitledList without icon correctly 1`] = `
 <div
   className="titled_list"
-  style={undefined}
 >
   <div
     className="title_bar"
@@ -176,7 +176,6 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
 exports[`TitledList renders collapsed TitledList correctly 1`] = `
 <div
   className="titled_list"
-  style={undefined}
 >
   <div
     className="title_bar"
@@ -194,6 +193,7 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
         className="title_bar_icon"
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width={undefined}
@@ -213,7 +213,6 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
 exports[`TitledList renders expanded TitledList correctly 1`] = `
 <div
   className="titled_list"
-  style={undefined}
 >
   <div
     className="title_bar"
@@ -231,6 +230,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
         className="title_bar_icon"
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width={undefined}
