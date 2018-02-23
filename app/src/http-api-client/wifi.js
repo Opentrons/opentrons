@@ -22,11 +22,11 @@ type NetworkList = Array<{
   active: boolean
 }>
 
-type ListResponse = {
+export type WifiListResponse = {
   list: NetworkList,
 }
 
-type StatusResponse = {
+export type WifiStatusResponse = {
   status: Status,
 }
 
@@ -35,12 +35,15 @@ type ConfigureRequest = {
   psk: Psk,
 }
 
-type ConfigureResponse = {
+export type WifiConfigureResponse = {
   ssid: Ssid,
   message: Message,
 }
 
-type WifiResponse = ListResponse | StatusResponse | ConfigureResponse
+type WifiResponse =
+  | WifiListResponse
+  | WifiStatusResponse
+  | WifiConfigureResponse
 
 type RequestPath = 'list' | 'status' | 'configure'
 
@@ -81,15 +84,26 @@ export type SetConfigureWifiBodyAction = {|
   |}
 |}
 
+export type ClearConfigureWifiResponseAction = {|
+  type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
+  payload: {|
+    robot: RobotService
+  |}
+|}
+
 export type WifiAction =
   | WifiRequestAction
   | WifiSuccessAction
   | WifiFailureAction
   | SetConfigureWifiBodyAction
+  | ClearConfigureWifiResponseAction
 
-export type RobotWifiList = ApiCall<void, ListResponse>
-export type RobotWifiStatus = ApiCall<void, StatusResponse>
-export type RobotWifiConfigure = ApiCall<ConfigureRequest, ConfigureResponse>
+export type RobotWifiList = ApiCall<void, WifiListResponse>
+export type RobotWifiStatus = ApiCall<void, WifiStatusResponse>
+export type RobotWifiConfigure = ApiCall<
+  ConfigureRequest,
+  WifiConfigureResponse
+>
 
 type RobotWifiState = {
   list?: RobotWifiList,
@@ -132,6 +146,12 @@ export function setConfigureWifiBody (
   return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, update}}
 }
 
+export function clearConfigureWifiResponse (
+  robot: RobotService
+): ClearConfigureWifiResponseAction {
+  return {type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE', payload: {robot}}
+}
+
 export function configureWifi (robot: RobotService): ThunkAction {
   return (dispatch, getState) => {
     const robotWifiState = selectRobotWifiState(getState(), robot) || {}
@@ -164,7 +184,8 @@ export function wifiReducer (state: ?WifiState, action: Action): WifiState {
       return reduceWifiFailure(state, action)
 
     case 'api:SET_CONFIGURE_WIFI_BODY':
-      return reduceSetConfigureWifiBody(state, action)
+    case 'api:CLEAR_CONFIGURE_WIFI_RESPONSE':
+      return reduceConfigureWifiAction(state, action)
   }
 
   return state
@@ -276,12 +297,19 @@ function reduceWifiSuccess (
 ): WifiState {
   const {payload: {path, response, robot: {name}}} = action
   const stateByName = state[name] || {}
+  const stateByNameByPath = stateByName[path] || {}
+  let request = stateByNameByPath.request || null
+
+  // clear out the PSK on a successful wifi request
+  if (path === 'configure' && request) {
+    request = {ssid: request.ssid, psk: ''}
+  }
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {response, request: null, error: null, inProgress: false}
+      [path]: {response, request, error: null, inProgress: false}
     }
   }
 }
@@ -298,28 +326,32 @@ function reduceWifiFailure (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {...stateByNameByPath, error, request: null, inProgress: false}
+      [path]: {...stateByNameByPath, error, inProgress: false}
     }
   }
 }
 
-function reduceSetConfigureWifiBody (
+function reduceConfigureWifiAction (
   state: WifiState,
-  action: SetConfigureWifiBodyAction
+  action: SetConfigureWifiBodyAction | ClearConfigureWifiResponseAction
 ): WifiState {
-  const {payload: {update, robot: {name}}} = action
+  const {payload: {robot: {name}}} = action
   const stateByName = state[name] || {}
   const configureState = stateByName.configure || {}
-  const requestState = configureState.request || {}
+  let {request, response, error} = configureState
+
+  if (action.type === 'api:SET_CONFIGURE_WIFI_BODY') {
+    request = {...request, ...action.payload.update}
+  } else {
+    response = null
+    error = null
+  }
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      configure: {
-        ...configureState,
-        request: {...requestState, ...update}
-      }
+      configure: {...configureState, request, response, error}
     }
   }
 }

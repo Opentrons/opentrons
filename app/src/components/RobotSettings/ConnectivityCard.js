@@ -4,12 +4,13 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
+import {actions as robotActions, type Robot} from '../../robot'
 
 import {
   fetchWifiList,
   configureWifi,
   setConfigureWifiBody,
+  clearConfigureWifiResponse,
   makeGetRobotWifiList,
   makeGetRobotWifiConfigure,
   type RobotWifiList,
@@ -18,7 +19,8 @@ import {
 
 import {Card, LabeledValue} from '@opentrons/components'
 
-import ConfigureWifiForm from './ConfigureWifiForm'
+import WifiConnectForm from './WifiConnectForm'
+import WifiConnectModal from './WifiConnectModal'
 
 type OwnProps = Robot
 
@@ -30,7 +32,8 @@ type StateProps = {
 type DispatchProps = {
   fetchList: () => *,
   configure: () => *,
-  setConfigureBody: ({['ssid' | 'psk']: string}) => *
+  setConfigureBody: ({['ssid' | 'psk']: string}) => *,
+  clearConfigureResponse: () => *
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -41,15 +44,25 @@ const CONNECTED_BY_LABEL = 'Connected by'
 class ConnectivityCard extends React.Component<Props> {
   render () {
     const {
+      ip,
       wired,
-      listRequest,
-      configureRequest,
       setConfigureBody,
-      configure
+      clearConfigureResponse,
+      configure,
+      listRequest: {
+        response: listResponse
+      },
+      configureRequest: {
+        inProgress: configInProgress,
+        request: configRequest,
+        response: configResponse,
+        error: configError
+      }
     } = this.props
 
-    const credentials = configureRequest.request || {}
-    const list = (listRequest.response && listRequest.response.list) || []
+    const credentials = configRequest || {ssid: '', psk: ''}
+    const list = (listResponse && listResponse.list) || []
+
     const active = list.find((network) => network.active)
     const listOptions = list.map(({active, ssid}) => ({
       name: (active ? `${ssid} *` : ssid),
@@ -60,10 +73,10 @@ class ConnectivityCard extends React.Component<Props> {
       <Card title={TITLE} column>
         <LabeledValue
           label={CONNECTED_BY_LABEL}
-          value={wired ? 'USB' : 'WiFi'}
+          value={`${wired ? 'USB' : 'WiFi'} - ${ip}`}
         />
-        <ConfigureWifiForm
-          wired={wired}
+        <WifiConnectForm
+          disabled={!wired || configInProgress}
           ssid={credentials.ssid}
           psk={credentials.psk}
           activeSsid={active && active.ssid}
@@ -71,6 +84,13 @@ class ConnectivityCard extends React.Component<Props> {
           onChange={setConfigureBody}
           onSubmit={configure}
         />
+        {(configError || configResponse) && (
+          <WifiConnectModal
+            onClose={clearConfigureResponse}
+            error={configError}
+            response={configResponse}
+          />
+        )}
       </Card>
     )
   }
@@ -106,10 +126,18 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   const fetchList = () => dispatch(fetchWifiList(ownProps))
-  const configure = () => dispatch(configureWifi(ownProps)).then(fetchList)
-  const setConfigureBody = (update) => {
-    return dispatch(setConfigureWifiBody(ownProps, update))
+  const configure = () => {
+    dispatch(configureWifi(ownProps))
+      .then(fetchList)
+      .then(() => dispatch(robotActions.discover()))
   }
 
-  return {fetchList, configure, setConfigureBody}
+  const setConfigureBody = (update) => {
+    dispatch(setConfigureWifiBody(ownProps, update))
+  }
+  const clearConfigureResponse = () => {
+    dispatch(clearConfigureWifiResponse(ownProps))
+  }
+
+  return {fetchList, configure, setConfigureBody, clearConfigureResponse}
 }
