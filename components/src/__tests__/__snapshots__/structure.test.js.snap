@@ -103,6 +103,7 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
       disabled={undefined}
       onClick={[Function]}
       title="close panel"
+      type="button"
     >
       <svg
         aria-hidden="true"
@@ -139,6 +140,7 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
     disabled={undefined}
     onClick={[Function]}
     title="back"
+    type="button"
   >
     <svg
       aria-hidden="true"

@@ -72,8 +72,10 @@ export type SetConfigureWifiBodyAction = {|
   type: 'api:SET_CONFIGURE_WIFI_BODY',
   payload: {|
     robot: RobotService,
-    ssid: Ssid,
-    psk: Psk,
+    update: {
+      ssid?: Ssid,
+      psk?: Psk
+    }
   |}
 |}
 
@@ -119,10 +121,9 @@ export function fetchWifiStatus (robot: RobotService): ThunkAction {
 
 export function setConfigureWifiBody (
   robot: RobotService,
-  ssid: Ssid,
-  psk: Psk
+  update: {ssid?: Ssid, psk?: Psk}
 ): SetConfigureWifiBodyAction {
-  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, ssid, psk}}
+  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, update}}
 }
 
 export function configureWifi (robot: RobotService): ThunkAction {
@@ -137,7 +138,7 @@ export function configureWifi (robot: RobotService): ThunkAction {
 
     dispatch(wifiRequest(robot, CONFIGURE_PATH))
 
-    return client(robot, 'POST', `/wifi/${CONFIGURE_PATH}`, body)
+    return client(robot, 'POST', `wifi/${CONFIGURE_PATH}`, body)
       .then((resp) => dispatch(wifiSuccess(robot, CONFIGURE_PATH, resp)))
       .catch((error) => dispatch(wifiFailure(robot, CONFIGURE_PATH, error)))
   }
@@ -247,15 +248,19 @@ function reduceSetConfigureWifiBody (
   state: WifiState,
   action: SetConfigureWifiBodyAction
 ): WifiState {
-  const {payload: {ssid, psk, robot: {name}}} = action
+  const {payload: {update, robot: {name}}} = action
   const stateByName = state[name] || {}
   const configureState = stateByName.configure || {}
+  const requestState = configureState.request || {}
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      configure: {...configureState, request: {ssid, psk}}
+      configure: {
+        ...configureState,
+        request: {...requestState, ...update}
+      }
     }
   }
 }
