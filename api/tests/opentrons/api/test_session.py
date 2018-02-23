@@ -245,7 +245,7 @@ def test_get_labware(labware_setup):
 async def test_session_model_functional(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
-           ['tiprack', 'trough', 'plate', 'fixed-trash']
+           ['tiprack', 'trough', 'plate', 'tall-fixed-trash']
     assert [instrument.name for instrument in session.instruments] == ['p200']
 
 
@@ -261,9 +261,9 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     """
     session = session_manager.create(name='<blank>', text=protocol.text)
 
-    assert 'fixed-trash' in [c.name for c in session.get_containers()]
+    assert 'tall-fixed-trash' in [c.name for c in session.get_containers()]
     containers = sum([i.containers for i in session.get_instruments()], [])
-    assert 'fixed-trash' in [c.name for c in containers]
+    assert 'tall-fixed-trash' in [c.name for c in containers]
 
 
 async def test_session_create_error(main_router):

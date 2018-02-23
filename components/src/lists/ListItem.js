@@ -17,7 +17,7 @@ type ListItemProps = {
   /** Additional class name */
   className?: string,
   /** if disabled, the onClick handler / NavLink will be disabled */
-  isDisabled: boolean,
+  isDisabled?: boolean,
   /** name constant of the icon to display */
   iconName?: IconName,
   children: React.Node

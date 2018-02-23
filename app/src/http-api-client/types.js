@@ -9,7 +9,7 @@ export type ApiCall<T, U> = {
   /** possible error response */
   error: ?ClientResponseError,
   /** possible request body */
-  request?: T,
+  request?: ?T,
   /** possible success response body */
-  response?: U,
+  response?: ?U,
 }

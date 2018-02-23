@@ -53,6 +53,9 @@ DEFAULT_MAX_SPEEDS = {
 DEFAULT_CURRENT_STRING = ' '.join(
     ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
+DEFAULT_PROBE_HEIGHT = 77.0
+
+
 robot_config = namedtuple(
     'robot_config',
     [
@@ -74,56 +77,63 @@ robot_config = namedtuple(
 )
 
 
-default = robot_config(
-    name='Ada Lovelace',
-    steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
-    acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-    current='M907 ' + DEFAULT_CURRENT_STRING,
-    probe_center=(295.0, 300.0, 55.0),
-    probe_dimensions=(35.0, 40.0, 60.0),
-    gantry_calibration=[  # "safe" offset, overwrote in factory calibration
-        [ 1.00, 0.00, 0.00,  0.00],
-        [ 0.00, 1.00, 0.00,  0.00],
-        [ 0.00, 0.00, 1.00,  0.00],
-        [ 0.00, 0.00, 0.00,  1.00]
-    ],
-    # left relative to right
-    instrument_offset={
-        'right': {
-            'single': (0.0, 0.0, 0.0),        # numbers are from CAD
-            'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
+def _get_default():
+    try:
+        probe_height = float(
+            os.environ.get('OT2_PROBE_HEIGHT', DEFAULT_PROBE_HEIGHT))
+    except ValueError:
+        probe_height = DEFAULT_PROBE_HEIGHT
+
+    return robot_config(
+        name='Ada Lovelace',
+        steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
+        acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
+        current='M907 ' + DEFAULT_CURRENT_STRING,
+        probe_center=(295.0, 300.0, probe_height),
+        probe_dimensions=(35.0, 40.0, probe_height + 5.0),
+        gantry_calibration=[  # "safe" offset, overwrote in factory calibration
+            [ 1.00, 0.00, 0.00,  0.00],
+            [ 0.00, 1.00, 0.00,  0.00],
+            [ 0.00, 0.00, 1.00,  0.00],
+            [ 0.00, 0.00, 0.00,  1.00]
+        ],
+        # left relative to right
+        instrument_offset={
+            'right': {
+                'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+                'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
+            },
+            'left': {
+                'single': (-34, 0.0, 0.0),        # numbers are from CAD
+                'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
+            }
         },
-        'left': {
-            'single': (-34, 0.0, 0.0),        # numbers are from CAD
-            'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
-        }
-    },
-    tip_length={
-        'left': {
-            'single': 51.7,
-            'multi': 51.7
+        tip_length={
+            'left': {
+                'single': 51.7,
+                'multi': 51.7
+            },
+            'right': {
+                'single': 51.7,
+                'multi': 51.7
+            }
         },
-        'right': {
-            'single': 51.7,
-            'multi': 51.7
-        }
-    },
-    serial_speed=115200,
-    default_current=DEFAULT_CURRENT,
-    default_max_speed=DEFAULT_MAX_SPEEDS,
-    plunger_current_low=PLUNGER_CURRENT_LOW,
-    plunger_current_high=PLUNGER_CURRENT_HIGH
-)
+        serial_speed=115200,
+        default_current=DEFAULT_CURRENT,
+        default_max_speed=DEFAULT_MAX_SPEEDS,
+        plunger_current_low=PLUNGER_CURRENT_LOW,
+        plunger_current_high=PLUNGER_CURRENT_HIGH
+    )
 
 
 def load(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    result = default
+    result = _get_default()
 
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
-            result = robot_config(**merge([default._asdict(), local]))
+            result = robot_config(**merge([result._asdict(), local]))
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
 
@@ -135,7 +145,7 @@ def save(config, filename=None, tag=None):
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
-    _default = children(default._asdict())
+    _default = children(_get_default()._asdict())
 
     diff = build([
         item for item in children(config._asdict())

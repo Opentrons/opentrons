@@ -11,6 +11,7 @@ import LabwareDropdown from '../containers/LabwareDropdown.js'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
+import type {BaseState} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 
@@ -24,7 +25,7 @@ const ConnectedIngredSelModal = connect(
   }
 )(IngredientSelectionModal)
 
-function mapStateToProps (state) {
+function mapStateToProps (state: BaseState) {
   return {
     deckSetupMode: steplistSelectors.deckSetupMode(state)
   }

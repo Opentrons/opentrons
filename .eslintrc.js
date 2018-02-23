@@ -19,11 +19,13 @@ module.exports = {
 
   globals: {
     SyntheticEvent: true,
-    SynthenticMouseEvent: true,
+    SyntheticMouseEvent: true,
     SyntheticInputEvent: true,
     $Keys: true,
+    $Values: true,
     $Call: true,
-    $PropertyType: true
+    $PropertyType: true,
+    Class: true
   },
 
   env: {

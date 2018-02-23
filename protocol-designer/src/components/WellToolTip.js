@@ -1,21 +1,23 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+// @flow
+import * as React from 'react'
 
 import styles from './WellToolTip.css'
 
-WellToolTip.propTypes = {
-  wellContent: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    volume: PropTypes.number.isRequired,
-    individualize: PropTypes.bool.isRequired,
-    wellName: PropTypes.string.isRequired,
+type Props = {
+  wellContent: {
+    name: string,
+    volume: number,
+    individualize: boolean,
+    wellName: string,
 
-    ingredientNum: PropTypes.number,
-    serializeName: PropTypes.string
-  }).isRequired
+    concentration?: string,
+    ingredientNum?: number,
+    serializeName?: string
+  }
 }
 
-export default function WellToolTip ({wellContent}) {
+export default function WellToolTip (props: Props) {
+  const wellContent = props.wellContent
   return (
     <div className={styles.well_tool_tip}>
       <h1>{wellContent.name}</h1>

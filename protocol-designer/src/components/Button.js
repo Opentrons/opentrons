@@ -1,3 +1,4 @@
+// DEPRECATED. Will  remove soon. Used only in IngredientPropertiesForm.
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'

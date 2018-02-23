@@ -29,6 +29,7 @@ exports[`modals AlertModal renders correctly 1`] = `
         disabled={undefined}
         onClick={[Function]}
         title={undefined}
+        type="button"
       >
         a
       </button>
@@ -37,6 +38,7 @@ exports[`modals AlertModal renders correctly 1`] = `
         disabled={undefined}
         onClick={[Function]}
         title={undefined}
+        type="button"
       >
         b
       </button>
@@ -69,6 +71,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
         disabled={undefined}
         onClick={[Function]}
         title="Cancel"
+        type="button"
       >
         Cancel
       </button>
@@ -77,6 +80,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
         disabled={undefined}
         onClick={[Function]}
         title="Continue"
+        type="button"
       >
         Continue
       </button>

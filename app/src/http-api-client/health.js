@@ -1,12 +1,15 @@
 // @flow
 // health http api module
+import {createSelector} from 'reselect'
+
 import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
 import client, {type ClientResponseError} from './client'
 
-type HealthInfo = {
+type HealthResponse = {
+  name: string,
   api_version: string,
   fw_version: string,
 }
@@ -22,7 +25,7 @@ export type HealthSuccessAction = {|
   type: 'api:HEALTH_SUCCESS',
   payload: {|
     robot: RobotService,
-    health: HealthInfo,
+    health: HealthResponse,
   |}
 |}
 
@@ -39,10 +42,10 @@ export type HealthAction =
  | HealthSuccessAction
  | HealthFailureAction
 
-export type RobotHealth = ?ApiCall<void, HealthInfo>
+export type RobotHealth = ApiCall<void, HealthResponse>
 
-export type HealthState = {
-  [robotName: string]: RobotHealth
+type HealthState = {
+  [robotName: string]: ?RobotHealth
 }
 
 export function fetchHealth (robot: RobotService): ThunkAction {
@@ -53,24 +56,6 @@ export function fetchHealth (robot: RobotService): ThunkAction {
       .then((health) => dispatch(healthSuccess(robot, health)))
       .catch((error) => dispatch(healthFailure(robot, error)))
   }
-}
-
-function healthRequest (robot: RobotService): HealthRequestAction {
-  return {type: 'api:HEALTH_REQUEST', payload: {robot}}
-}
-
-function healthSuccess (
-  robot: RobotService,
-  health: HealthInfo
-): HealthSuccessAction {
-  return {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
-}
-
-function healthFailure (
-  robot: RobotService,
-  error: ClientResponseError
-): HealthFailureAction {
-  return {type: 'api:HEALTH_FAILURE', payload: {robot, error}}
 }
 
 export function healthReducer (
@@ -114,6 +99,31 @@ export function healthReducer (
   return state
 }
 
-export function selectHealth (state: State): HealthState {
-  return state.api.health
+export const makeGetRobotHealth = () => createSelector(
+  selectRobotHealthState,
+  (state: ?RobotHealth): RobotHealth => {
+    return state || {inProgress: false, error: null, response: null}
+  }
+)
+
+function selectRobotHealthState (state: State, props: RobotService) {
+  return state.api.health[props.name]
+}
+
+function healthRequest (robot: RobotService): HealthRequestAction {
+  return {type: 'api:HEALTH_REQUEST', payload: {robot}}
+}
+
+function healthSuccess (
+  robot: RobotService,
+  health: HealthResponse
+): HealthSuccessAction {
+  return {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
+}
+
+function healthFailure (
+  robot: RobotService,
+  error: ClientResponseError
+): HealthFailureAction {
+  return {type: 'api:HEALTH_FAILURE', payload: {robot, error}}
 }

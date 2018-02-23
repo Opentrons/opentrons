@@ -56,5 +56,5 @@ class ProtocolTestCase(unittest.TestCase):
         self.assertTrue(isinstance(tiprack, Container))
         self.assertTrue(isinstance(deck, Deck))
         # Check that well location is the same on the robot as the pipette
-        self.assertEqual(self.robot._deck['12']['fixed-trash'][0], trash)
+        self.assertEqual(self.robot._deck['12']['tall-fixed-trash'][0], trash)
         self.assertTrue(deck.has_container(tiprack))

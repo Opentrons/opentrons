@@ -6,6 +6,7 @@ import NavBar from './nav-bar'
 
 import Home from '../pages/Home'
 import Robots from '../pages/Robots'
+import AppSettingsPage from '../pages/AppSettings'
 import Upload from '../pages/Upload'
 import SetupInstruments from '../pages/SetupInstruments'
 import SetupDeck from '../pages/SetupDeck'
@@ -21,6 +22,7 @@ export default function App () {
       <NavPanel />
       <Switch>
         <Route exact path='/' component={Home} />
+        <Route exact path='/menu/app' component={AppSettingsPage} />
         <Route path='/robots/:name?' component={Robots} />
         <Route path='/upload' component={Upload} />
         <Route path='/setup-instruments/:mount' component={SetupInstruments} />

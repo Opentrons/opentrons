@@ -1,5 +1,7 @@
 // @flow
 // wifi http api module
+import {createSelector} from 'reselect'
+
 import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
@@ -72,8 +74,10 @@ export type SetConfigureWifiBodyAction = {|
   type: 'api:SET_CONFIGURE_WIFI_BODY',
   payload: {|
     robot: RobotService,
-    ssid: Ssid,
-    psk: Psk,
+    update: {
+      ssid?: Ssid,
+      psk?: Psk
+    }
   |}
 |}
 
@@ -83,14 +87,18 @@ export type WifiAction =
   | WifiFailureAction
   | SetConfigureWifiBodyAction
 
-export type RobotWifi = ?{
-  list?: ApiCall<void, ListResponse>,
-  status?: ApiCall<void, StatusResponse>,
-  configure?: ApiCall<ConfigureRequest, ConfigureResponse>,
+export type RobotWifiList = ApiCall<void, ListResponse>
+export type RobotWifiStatus = ApiCall<void, StatusResponse>
+export type RobotWifiConfigure = ApiCall<ConfigureRequest, ConfigureResponse>
+
+type RobotWifiState = {
+  list?: RobotWifiList,
+  status?: RobotWifiStatus,
+  configure?: RobotWifiConfigure,
 }
 
-export type WifiState = {
-  [robotName: string]: RobotWifi
+type WifiState = {
+  [robotName: string]: ?RobotWifiState
 }
 
 const LIST_PATH: RequestPath = 'list'
@@ -119,15 +127,14 @@ export function fetchWifiStatus (robot: RobotService): ThunkAction {
 
 export function setConfigureWifiBody (
   robot: RobotService,
-  ssid: Ssid,
-  psk: Psk
+  update: {ssid?: Ssid, psk?: Psk}
 ): SetConfigureWifiBodyAction {
-  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, ssid, psk}}
+  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, update}}
 }
 
 export function configureWifi (robot: RobotService): ThunkAction {
   return (dispatch, getState) => {
-    const robotWifiState = selectWifi(getState())[robot.name] || {}
+    const robotWifiState = selectRobotWifiState(getState(), robot) || {}
     const configureState = robotWifiState.configure || {}
     const body = configureState.request
 
@@ -137,7 +144,7 @@ export function configureWifi (robot: RobotService): ThunkAction {
 
     dispatch(wifiRequest(robot, CONFIGURE_PATH))
 
-    return client(robot, 'POST', `/wifi/${CONFIGURE_PATH}`, body)
+    return client(robot, 'POST', `wifi/${CONFIGURE_PATH}`, body)
       .then((resp) => dispatch(wifiSuccess(robot, CONFIGURE_PATH, resp)))
       .catch((error) => dispatch(wifiFailure(robot, CONFIGURE_PATH, error)))
   }
@@ -163,8 +170,61 @@ export function wifiReducer (state: ?WifiState, action: Action): WifiState {
   return state
 }
 
-export function selectWifi (state: State): WifiState {
-  return state.api.wifi
+export const makeGetRobotWifiStatus = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiStatus => (
+    (state && state.status) ||
+    {inProgress: false, error: null, response: null}
+  )
+)
+
+export const makeGetRobotWifiList = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiList => {
+    const listState = (
+      (state && state.list) ||
+      {inProgress: false, error: null, response: null}
+    )
+
+    if (!listState.response) return listState
+
+    return {
+      ...listState,
+      response: {
+        ...listState.response,
+        list: dedupeNetworkList(listState.response.list)
+      }
+    }
+  }
+)
+
+export const makeGetRobotWifiConfigure = () => createSelector(
+  selectRobotWifiState,
+  (state: ?RobotWifiState): RobotWifiConfigure => (
+    (state && state.configure) ||
+    {inProgress: false, error: null, request: null, response: null}
+  )
+)
+
+function selectRobotWifiState (state: State, props: RobotService) {
+  return state.api.wifi[props.name]
+}
+
+function dedupeNetworkList (list: NetworkList): NetworkList {
+  const {ids, networksById} = list.reduce((result, network) => {
+    const {ssid, active} = network
+
+    if (!result.networksById[ssid]) {
+      result.ids.push(ssid)
+      result.networksById[ssid] = network
+    } else if (active) {
+      result.networksById[ssid].active = true
+    }
+
+    return result
+  }, {ids: [], networksById: {}})
+
+  return ids.map((ssid) => networksById[ssid])
 }
 
 function wifiRequest (
@@ -247,15 +307,19 @@ function reduceSetConfigureWifiBody (
   state: WifiState,
   action: SetConfigureWifiBodyAction
 ): WifiState {
-  const {payload: {ssid, psk, robot: {name}}} = action
+  const {payload: {update, robot: {name}}} = action
   const stateByName = state[name] || {}
   const configureState = stateByName.configure || {}
+  const requestState = configureState.request || {}
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      configure: {...configureState, request: {ssid, psk}}
+      configure: {
+        ...configureState,
+        request: {...requestState, ...update}
+      }
     }
   }
 }

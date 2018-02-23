@@ -9,7 +9,9 @@ import {
   setConfigureWifiBody,
   configureWifi,
   reducer,
-  selectWifi
+  makeGetRobotWifiStatus,
+  makeGetRobotWifiList,
+  makeGetRobotWifiConfigure
 } from '..'
 
 jest.mock('../client')
@@ -22,16 +24,80 @@ const robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
 describe('wifi', () => {
   beforeEach(() => client.__clearMock())
 
-  test('selectWifi returns wifi substate', () => {
+  describe('selectors', () => {
     const state = {
       api: {
         wifi: {
-          opentrons: {}
+          opentrons: {
+            status: {inProgress: false},
+            list: {inProgress: false},
+            configure: {inProgress: false}
+          }
         }
       }
     }
 
-    expect(selectWifi(state)).toBe(state.api.wifi)
+    test('makeGetRobotWifiStatus', () => {
+      const getStatus = makeGetRobotWifiStatus()
+
+      expect(getStatus(state, robot)).toEqual(state.api.wifi.opentrons.status)
+      expect(getStatus(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        response: null
+      })
+    })
+
+    test('makeGetRobotWifiList', () => {
+      const getList = makeGetRobotWifiList()
+
+      expect(getList(state, robot)).toEqual(state.api.wifi.opentrons.list)
+      expect(getList(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        response: null
+      })
+    })
+
+    test('makeGetRobotWifiList dedupes network list', () => {
+      const getList = makeGetRobotWifiList()
+      const state = {
+        api: {
+          wifi: {
+            opentrons: {
+              list: {
+                inProgress: false,
+                response: {
+                  list: [
+                    {ssid: 'foo'},
+                    {ssid: 'foo', active: true},
+                    {ssid: 'bar'}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+
+      expect(getList(state, robot).response.list).toEqual([
+        {ssid: 'foo', active: true},
+        {ssid: 'bar'}
+      ])
+    })
+
+    test('makeGetRobotWifiConfigure', () => {
+      const getConfigure = makeGetRobotWifiConfigure()
+
+      expect(getConfigure(state, robot))
+        .toEqual(state.api.wifi.opentrons.configure)
+      expect(getConfigure(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null
+      })
+    })
   })
 
   describe('fetchWifiList action creator', () => {
@@ -120,7 +186,30 @@ describe('wifi', () => {
     })
   })
 
-  describe('setConfigureWifiBody and configureWifi action creators', () => {
+  describe('setConfigureWifiBody action creator', () => {
+    const ssid = 'some-ssid'
+    const psk = 'some-psk'
+
+    test('works with ssid', () => {
+      const expected = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, update: {ssid}}
+      }
+
+      expect(setConfigureWifiBody(robot, {ssid})).toEqual(expected)
+    })
+
+    test('works with psk', () => {
+      const expected = {
+        type: 'api:SET_CONFIGURE_WIFI_BODY',
+        payload: {robot, update: {psk}}
+      }
+
+      expect(setConfigureWifiBody(robot, {psk})).toEqual(expected)
+    })
+  })
+
+  describe('configureWifi action creator', () => {
     const ssid = 'some-ssid'
     const psk = 'some-psk'
     const response = {ssid, message: 'Success!'}
@@ -136,16 +225,7 @@ describe('wifi', () => {
       }
     }
 
-    test('setConfigureWifiBody creator works', () => {
-      const expected = {
-        type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, ssid, psk}
-      }
-
-      expect(setConfigureWifiBody(robot, ssid, psk)).toEqual(expected)
-    })
-
-    test('configureWifi calls POST /wifi/configure', () => {
+    test('configureWifi calls POST /wifi/configure, GET /wifi/list', () => {
       const store = mockStore(initialState)
 
       client.__setMockResponse(response)
@@ -154,7 +234,7 @@ describe('wifi', () => {
         .then(() => expect(client).toHaveBeenCalledWith(
           robot,
           'POST',
-          '/wifi/configure',
+          'wifi/configure',
           {ssid, psk}
         ))
     })
@@ -391,7 +471,7 @@ describe('wifi', () => {
 
       const action = {
         type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, ssid: 'baz', psk: 'qux'}
+        payload: {robot, update: {ssid: 'baz', psk: 'qux'}}
       }
 
       expect(reducer(state, action).wifi).toEqual({
