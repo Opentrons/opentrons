@@ -8,7 +8,7 @@ import styles from './forms.css'
 // TODO(mc, 2018-02-22): disabled prop
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => void,
+  onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** classes to apply */
   className?: string,
   /** inline label text */

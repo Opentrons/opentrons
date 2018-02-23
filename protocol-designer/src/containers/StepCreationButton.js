@@ -7,18 +7,18 @@ import {addStep, expandAddStepButton} from '../steplist/actions'
 import {selectors} from '../steplist/reducers'
 import {stepIconsByType} from '../steplist/types'
 import type {StepType} from '../steplist/types'
-import type {BaseState} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
 type StepCreationButtonProps = {
   onStepClick?: StepType => (event?: SyntheticEvent<*>) => void,
   onExpandClick?: (event?: SyntheticEvent<*>) => void,
-  onClickAway?: (event?: Event | SyntheticEvent<*>) => void, // TODO is there away around this 2-event union?
+  onClickAway?: (event?: MouseEvent | SyntheticEvent<*>) => void, // TODO is there away around this 2-event union?
   expanded?: boolean
 }
 
 class StepCreationButton extends React.Component<StepCreationButtonProps> {
   ref: ?HTMLDivElement
-  handleAllClicks = (e: Event) => {
+  handleAllClicks = (e: MouseEvent) => {
     if (this.ref && (e.currentTarget instanceof HTMLElement) && !this.ref.contains(e.currentTarget)) {
       this.props.expanded && this.props.onClickAway && this.props.onClickAway(e)
     }
@@ -59,7 +59,7 @@ function mapStateToProps (state: BaseState) {
   })
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
     onStepClick: stepType => () => dispatch(addStep({stepType})),
     onExpandClick: () => dispatch(expandAddStepButton(true)),

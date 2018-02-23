@@ -1,2 +1,2 @@
 // @flow
-export type Page = 'file page' | 'editor page' // TODO rename once pages have real names
+export type Page = 'file' | 'steplist' | 'ingredient-detail' | 'well-selection-modal'

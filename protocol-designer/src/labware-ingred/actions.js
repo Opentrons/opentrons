@@ -8,7 +8,8 @@ import {uuid} from '../utils'
 import {selectors} from './reducers'
 
 import {editableIngredFields} from './types'
-import type {DeckSlot, IngredInputFields, Wells} from './types'
+import type {IngredInputFields, Wells} from './types'
+import type {DeckSlot} from '@opentrons/components'
 
 import type {GetState} from '../types'
 
@@ -159,7 +160,7 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
   const container = selectors.selectedContainer(getState())
   if (!container || !container.containerId) {
     console.warn('Tried to delete ingredient with no selected container')
-    return
+    return null
   }
 
   return dispatch({

@@ -29,7 +29,9 @@ type State = {
 }
 
 class SelectionRect extends React.Component<Props, State> {
-  parentRef: ?any // No support in Flow for SVGElement yet... this should be HTMLElement | SVGElement
+  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
+  // this `parentRef` should be HTMLElement | SVGElement
+  parentRef: ?any
 
   constructor (props: Props) {
     super(props)

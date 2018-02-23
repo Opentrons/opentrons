@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
-import {TitleBar} from '@opentrons/components'
 
 import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
-import ConnectedStepList from '../containers/ConnectedStepList'
+import ConnectedSidebar from '../containers/ConnectedSidebar'
+import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 
 import styles from './ProtocolEditor.css'
 
@@ -21,10 +21,9 @@ export default function ProtocolEditor () {
 
       <div className={styles.wrapper}>
         <ConnectedNav />
-        <ConnectedStepList />
+        <ConnectedSidebar />
         <div className={styles.main_page_wrapper}>
-          {/* TODO Ian 2018-01-24 Connect TitleBar, figure out when it changes */}
-          <TitleBar title='Title' subtitle='Subtitle' />
+          <ConnectedTitleBar />
 
           <div className={styles.main_page_content}>
             <ConnectedMoreOptionsModal />

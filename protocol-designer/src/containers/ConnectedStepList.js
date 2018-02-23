@@ -1,6 +1,6 @@
 // @flow
 import {connect} from 'react-redux'
-import type {BaseState, Dispatch} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
 import {selectors} from '../steplist/reducers'
 import type {StepIdType} from '../steplist/types'
@@ -14,7 +14,7 @@ function mapStateToProps (state: BaseState) {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
     handleStepItemClickById: (id: StepIdType) => () => dispatch(selectStep(id)),
     handleStepItemCollapseToggleById: (id: StepIdType) => () => dispatch(toggleStepCollapsed(id))

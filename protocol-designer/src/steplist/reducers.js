@@ -280,6 +280,12 @@ const allSteps = createSelector(
   }))
 )
 
+const selectedStepSelector = createSelector(
+  allSteps,
+  selectedStepId,
+  (allSteps, selectedStepId) => allSteps && selectedStepId !== null && allSteps[selectedStepId]
+)
+
 // TODO SOON Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} => {
   // TODO LATER Ian 2018-02-14 this should use selectors instead of accessing rootSelector result directly
@@ -361,12 +367,14 @@ const deckSetupMode = createSelector(
 )
 
 export const selectors = {
+  rootSelector,
   stepCreationButtonExpanded: createSelector(
     rootSelector,
     (state: RootState) => state.stepCreationButtonExpanded
   ),
   allSteps,
-  selectedStepId,
+  selectedStep: selectedStepSelector,
+  selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   selectedStepFormData: createSelector(
     (state: BaseState) => rootSelector(state).savedStepForms,
     (state: BaseState) => rootSelector(state).selectedStep,

@@ -1,10 +1,9 @@
 // @flow
+import type {DeckSlot} from '@opentrons/components'
 
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 
 //  ===== LABWARE ===========
-
-export type DeckSlot = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' // TODO merge with DeckSlot in `step-generation`
 
 export type Labware = {| // TODO merge with LabwareData type in `step-generation`
   id: string,
