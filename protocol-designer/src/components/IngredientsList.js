@@ -41,12 +41,10 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
     const { isExpanded } = this.state
 
     return (
-      /* <div className={styles.circle} style={{backgroundColor: swatchColors(parseInt(groupId))}} /> */
-      /* TODO: circle icon, set color with CSS?? But gotta use swatchColors */
       <TitledList
         title={ingredCategoryData.name || 'Unnamed Ingredient'}
         className={styles.ingredient_titled_list}
-        style={{'--swatch-color': swatchColors(parseInt(groupId))}}
+        iconProps={{style: {fill: swatchColors(parseInt(groupId))}}}
         iconName='circle'
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}

@@ -1,13 +1,6 @@
 @import '@opentrons/components';
 
 .ingredient_titled_list {
-  & :first-child > svg {
-    /* TODO Ian 2018-02-21 Is there a better way to color the icon and not the collapse carat? */
-
-    /* Ingredient color passed in from inline style */
-    color: var(--swatch-color);
-  }
-
   & > ol > :last-child {
     padding-bottom: 0;
     border: none;

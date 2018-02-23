@@ -19,7 +19,9 @@ export type IconProps = {
   /** width as a number or string (for nesting inside another SVG) */
   height?: number | string,
   /** height as a number or string (for nesting inside another SVG) */
-  width?: number | string
+  width?: number | string,
+  /** inline style passed into the icon svg */
+  style?: {[string]: string}
 }
 
 /**
@@ -31,7 +33,7 @@ export type IconProps = {
  * ```
  */
 export default function Icon (props: IconProps) {
-  const {x, y, height, width} = props
+  const {x, y, height, width, style} = props
   const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin
@@ -44,7 +46,7 @@ export default function Icon (props: IconProps) {
       viewBox={viewBox}
       className={className}
       fill='currentColor'
-      {...{x, y, height, width}}
+      {...{x, y, height, width, style}}
     >
       <path fillRule='evenodd' d={path} />
     </svg>

@@ -11,7 +11,9 @@ type ListProps = {
   title: string,
   /** optional icon left of the title */
   iconName?: IconName,
-  // TOD(mc, 2018-01-25): enforce <li> children requirement with flow
+  /** props passed down to icon (`className` and `name` are ignored) */
+  iconProps?: $Diff<React.ElementProps<typeof Icon>, {name: *}>,
+  // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
   /** additional classnames */
@@ -27,16 +29,14 @@ type ListProps = {
   /** highlights the whole TitledList if true */
   selected?: boolean,
   /** disables the whole TitledList if true */
-  disabled?: boolean,
-  /** inline style */
-  style?: {[string]: string}
+  disabled?: boolean
 }
 
 /**
  * An ordered list with optional title, icon, and description.
  */
 export default function TitledList (props: ListProps) {
-  const {iconName, disabled, onCollapseToggle, style} = props
+  const {iconName, disabled, onCollapseToggle, iconProps} = props
   const collapsible = onCollapseToggle != null
 
   const onClick = !disabled
@@ -65,10 +65,10 @@ export default function TitledList (props: ListProps) {
   })
 
   return (
-    <div className={className} style={style}>
+    <div className={className}>
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
-          <Icon className={styles.title_bar_icon} name={iconName} />
+          <Icon {...iconProps} className={styles.title_bar_icon} name={iconName} />
         )}
         <h3 className={styles.title}>
           {props.title}
