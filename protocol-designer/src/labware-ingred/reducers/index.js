@@ -587,6 +587,8 @@ const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
 // TODO: prune selectors
 export const selectors = {
+  rootSelector,
+
   activeModals,
   allIngredients,
   allIngredientGroupFields,

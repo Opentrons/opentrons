@@ -9,7 +9,7 @@ import type {Page} from './types'
 
 const page = handleActions({
   NAVIGATE_TO_PAGE: (state, action: ActionType<typeof navigateToPage>) => action.payload
-}, 'file page')
+}, 'file')
 
 export const _allReducers = {
   page
@@ -21,8 +21,4 @@ const rootReducer = combineReducers(_allReducers)
 
 export default rootReducer
 
-const rootSelector = (state: BaseState) => state.navigation
-
-export const selectors = {
-  currentPage: (state: BaseState) => rootSelector(state).page
-}
+export const rootSelector = (state: BaseState) => state.navigation

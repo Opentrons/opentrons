@@ -9,23 +9,15 @@ import SelectablePlate from '../containers/SelectablePlate.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
 
 type Props = {
-  onClose: () => void,
   visible: boolean
 }
 
 export default function IngredientSelectionModal (props: Props) {
-  const {onClose, visible} = props
+  const {visible} = props
   if (!visible) return null
 
   return (
     <div className={styles.ingredient_modal}>
-
-      {/* TODO Ian 2018-02-21 Remove this, add this functionality to Header */}
-      <div style={{float: 'right', color: 'red'}}>
-        <div onClick={() => onClose()}>
-          <p>Back to Deck Map</p>
-        </div>
-      </div>
 
       <IngredientPropertiesForm />
 

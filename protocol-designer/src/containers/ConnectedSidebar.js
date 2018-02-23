@@ -1,37 +1,35 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../navigation'
 
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
 
 import type {BaseState} from '../types'
-
-type SidebarTypes = 'steplist' | 'ingredientslist' | 'filesidebar'
+import type {Page} from '../navigation'
 
 type Props = {
-  sidebar: SidebarTypes
+  page: Page
 }
 
 function Sidebar (props: Props) {
-  switch (props.sidebar) {
+  switch (props.page) {
     case 'steplist':
       return <ConnectedStepList />
-    case 'ingredientslist':
+    case 'ingredient-detail':
       return <IngredientsList />
-    case 'filesidebar':
+    case 'file':
       return <div>TODO: File Sidebar</div>
   }
   return null
 }
 
 function mapStateToProps (state: BaseState): Props {
-  // TODO Ian 2018-02-22 these selectors should maybe go in navigation eventually?
-  const ingredients = selectors.ingredientsForContainer(state)
+  const page = selectors.currentPage(state)
 
   return {
-    sidebar: ingredients ? 'ingredientslist' : 'steplist'
+    page
   }
 }
 
