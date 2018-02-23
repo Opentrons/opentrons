@@ -9,7 +9,9 @@ import {
   setConfigureWifiBody,
   configureWifi,
   reducer,
-  selectWifi
+  makeGetRobotWifiStatus,
+  makeGetRobotWifiList,
+  makeGetRobotWifiConfigure
 } from '..'
 
 jest.mock('../client')
@@ -22,16 +24,80 @@ const robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
 describe('wifi', () => {
   beforeEach(() => client.__clearMock())
 
-  test('selectWifi returns wifi substate', () => {
+  describe('selectors', () => {
     const state = {
       api: {
         wifi: {
-          opentrons: {}
+          opentrons: {
+            status: {inProgress: false},
+            list: {inProgress: false},
+            configure: {inProgress: false}
+          }
         }
       }
     }
 
-    expect(selectWifi(state)).toBe(state.api.wifi)
+    test('makeGetRobotWifiStatus', () => {
+      const getStatus = makeGetRobotWifiStatus()
+
+      expect(getStatus(state, robot)).toEqual(state.api.wifi.opentrons.status)
+      expect(getStatus(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        response: null
+      })
+    })
+
+    test('makeGetRobotWifiList', () => {
+      const getList = makeGetRobotWifiList()
+
+      expect(getList(state, robot)).toEqual(state.api.wifi.opentrons.list)
+      expect(getList(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        response: null
+      })
+    })
+
+    test('makeGetRobotWifiList dedupes network list', () => {
+      const getList = makeGetRobotWifiList()
+      const state = {
+        api: {
+          wifi: {
+            opentrons: {
+              list: {
+                inProgress: false,
+                response: {
+                  list: [
+                    {ssid: 'foo'},
+                    {ssid: 'foo', active: true},
+                    {ssid: 'bar'}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+
+      expect(getList(state, robot).response.list).toEqual([
+        {ssid: 'foo', active: true},
+        {ssid: 'bar'}
+      ])
+    })
+
+    test('makeGetRobotWifiConfigure', () => {
+      const getConfigure = makeGetRobotWifiConfigure()
+
+      expect(getConfigure(state, robot))
+        .toEqual(state.api.wifi.opentrons.configure)
+      expect(getConfigure(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null
+      })
+    })
   })
 
   describe('fetchWifiList action creator', () => {
