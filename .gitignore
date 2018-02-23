@@ -12,6 +12,7 @@ venv/
 env/
 .env/
 
+build/
 api/docs/build/
 develop-eggs/
 dist/

@@ -1,7 +1,9 @@
 import os
 import json
 import logging
+import asyncio
 import subprocess
+from time import sleep
 from threading import Thread
 from aiohttp import web
 from opentrons import robot, __version__
@@ -147,17 +149,72 @@ async def wifi_status(request):
     return web.json_response(connectivity)
 
 
+async def _install(filename, loop):
+    proc = await asyncio.create_subprocess_shell(
+        'pip install --upgrade --force-reinstall --no-deps {}'.format(
+            filename),
+        stdout=asyncio.subprocess.PIPE,
+        loop=loop)
+
+    rd = await proc.stdout.read()
+    res = rd.decode().strip()
+    print(res)
+    await proc.wait()
+    return res
+
+
+async def update_api(request):
+    """
+    This handler accepts a POST request with Content-Type: multipart/form-data
+    and a file field in the body named "whl". The file should be a valid Python
+    wheel to be installed. The received file is install using pip, and then
+    deleted and a success code is returned.
+    """
+    log.debug('Update request received')
+    data = await request.post()
+    filename = data['whl'].filename
+    log.info('Preparing to install: {}'.format(filename))
+    content = data['whl'].file.read()
+
+    with open(filename, 'wb') as wf:
+        wf.write(content)
+
+    res = await _install(filename, request.loop)
+    log.debug('Install complete')
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    log.debug("Result: {}".format(res))
+    return web.json_response({
+        'message': res,
+        'filename': filename
+    })
+
+
+async def restart(request):
+    """
+    Returns OK, then waits approximately 3 seconds and restarts container
+    """
+    def wait_and_restart():
+        log.info('Restarting server')
+        sleep(3)
+        os.system('kill 1')
+    Thread(target=wait_and_restart).start()
+    return web.json_response({"message": "restarting"})
+
+
 async def identify(request):
     Thread(target=lambda: robot.identify(
-        int(request.query.get('seconds', '10')))).run()
-    return web.Response(text='Ok')
+        int(request.query.get('seconds', '10')))).start()
+    return web.json_response({"message": "identifying"})
 
 
 async def turn_on_rail_lights(request):
     robot.turn_on_rail_lights()
-    return web.Response(text='Ok')
+    return web.json_response({"lights": "on"})
 
 
 async def turn_off_rail_lights(request):
     robot.turn_off_rail_lights()
-    return web.Response(text='Ok')
+    return web.json_response({"lights": "off"})
