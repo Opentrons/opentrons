@@ -56,13 +56,16 @@ describe('http api client', () => {
 
     global.fetch = mockResolve({
       ok: false,
-      status: '400',
-      statusText: 'Bad Request'
+      status: 400,
+      statusText: 'Bad Request',
+      json: () => Promise.resolve({message: 'You tried'})
     })
 
     return expect(client(robot, 'GET', 'foo')).rejects
       .toEqual(expect.objectContaining({
-        message: '400 Bad Request'
+        status: 400,
+        statusText: 'Bad Request',
+        message: 'You tried'
       }))
   })
 
@@ -111,13 +114,16 @@ describe('http api client', () => {
 
     global.fetch = mockResolve({
       ok: false,
-      status: '400',
-      statusText: 'Bad Request'
+      status: 400,
+      statusText: 'Bad Request',
+      json: () => Promise.resolve({message: 'You tried'})
     })
 
     return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
       .toEqual(expect.objectContaining({
-        message: '400 Bad Request'
+        status: 400,
+        statusText: 'Bad Request',
+        message: 'You tried'
       }))
   })
 

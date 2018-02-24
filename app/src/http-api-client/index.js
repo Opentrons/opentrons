@@ -10,7 +10,7 @@ export const reducer = combineReducers({
 })
 
 export type {
-  ClientResponseError
+  ApiRequestError
 } from './client'
 
 export type {

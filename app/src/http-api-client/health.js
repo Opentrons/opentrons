@@ -6,7 +6,7 @@ import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
-import client, {type ClientResponseError} from './client'
+import client, {type ApiRequestError} from './client'
 
 type HealthResponse = {
   name: string,
@@ -33,7 +33,7 @@ export type HealthFailureAction = {|
   type: 'api:HEALTH_FAILURE',
   payload: {|
     robot: RobotService,
-    error: ClientResponseError,
+    error: ApiRequestError,
   |}
 |}
 
@@ -123,7 +123,7 @@ function healthSuccess (
 
 function healthFailure (
   robot: RobotService,
-  error: ClientResponseError
+  error: ApiRequestError
 ): HealthFailureAction {
   return {type: 'api:HEALTH_FAILURE', payload: {robot, error}}
 }
