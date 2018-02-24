@@ -44,13 +44,21 @@ async def wifi_list(request):
             proc = subprocess.run(["nmcli", "--terse",
                                    "--fields", "ssid,signal,active",
                                    "device", "wifi", "list"],
-                                  stdout=subprocess.PIPE)
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
             res = "CalledProcessError: {}".format(e.stdout)
         except FileNotFoundError as e:
             res = "FileNotFoundError: {}".format(e)
         else:
-            lines = proc.stdout.decode().split("\n")
+            out = proc.stdout.decode().strip()
+            err = proc.stderr.decode().strip()
+
+            log.debug("'nmcli device wifi list' stdout: {}".format(out))
+            if len(err) > 0:
+                log.error("'nmcli device wifi list' stderr: {}".format(err))
+
+            lines = out.split("\n")
             networks = [x.split(":") for x in lines]
             res["list"] = [
                 {
@@ -83,33 +91,49 @@ async def wifi_configure(request):
     will not be set during development on a laptop, or while running the server
     during test on CI.
     """
+    status = None
     result = {}
+    message = ''
+
     try:
         body = await request.text()
         jbody = json.loads(body)
-        ssid = jbody['ssid']
-        psk = jbody['psk']
-    except Exception as e:
-        result = "Error: {}, type: {}".format(e, type(e))
-        log.warning(result)
-    else:
-        message = ''
-        if ENABLE_NMCLI:
+        ssid = jbody.get('ssid')
+        psk = jbody.get('psk')
+
+        if ssid is None or psk is None:
+            status = 400
+            message = 'Error: "ssid": string, "psk": string are required'
+        elif ENABLE_NMCLI:
             cmd = 'nmcli device wifi connect {} password "{}"'.format(
                 ssid, psk)
-            proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-            # TODO(mc, 2019-02-20): check this string for success or failure
-            #   nmcli success: "Device 'wlan0' successfully activated..."
+            # some nmcli errors go to stdout (e.g. bad psk), while others go to
+            # stderr (e.g. bad ssid), so we pipe both outputs together
+            proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT)
             message = proc.stdout.decode().strip().split("\r")[-1]
+            log.debug("nmcli device wifi connect -> {}".format(message))
+
+            status = 201 if not message.startswith('Error:') else 401
+            result['ssid'] = ssid
         else:
-            message = "Configuration successful. PSK: '{}'".format(psk)
+            status = 200
+            message = 'Configuration unchanged'
+            result['ssid'] = 'a'
 
-        result = {'ssid': ssid, 'message': message}
+    except json.JSONDecodeError as e:
+        log.debug("Error: JSONDecodeError in /wifi/configure: {}".format(e))
+        status = 400
+        message = e.msg
 
-    log.info("Wifi configure result: {}".format(result))
+    except Exception as e:
+        log.warning("Error: {} in /wifi/configure': {}".format(type(e), e))
+        status = 500
+        message = 'An unexpected error occurred.'
 
-    # TODO(mc, 2019-02-20): return error status code if error
-    return web.json_response(result)
+    result['message'] = message
+    log.debug("Wifi configure result: {}".format(result))
+    return web.json_response(data=result, status=status)
 
 
 async def wifi_status(request):
