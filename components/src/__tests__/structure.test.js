@@ -3,7 +3,17 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {PageTabs, TitleBar, VerticalNavBar, NavButton, SidePanel, FILE, Card, LabeledValue} from '..'
+import {
+  PageTabs,
+  TitleBar,
+  VerticalNavBar,
+  NavButton,
+  SidePanel,
+  FILE,
+  Card,
+  RefreshCard,
+  LabeledValue
+} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -218,11 +228,50 @@ describe('SidePanel', () => {
 describe('Card', () => {
   test('renders Card correctly', () => {
     const tree = Renderer.create(
-      <Card title={'title'} >
+      <Card title={'title'}>
         children
         children
         children
       </Card>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('RefreshCard', () => {
+  test('calls refresh on mount', () => {
+    const refresh = jest.fn()
+    Renderer.create(
+      <RefreshCard id='foo' refresh={refresh} />
+    )
+
+    expect(refresh).toHaveBeenCalledTimes(1)
+  })
+
+  test('calls refresh on id change', () => {
+    const refresh = jest.fn()
+    const renderer = Renderer.create(
+      <RefreshCard watch='foo' refresh={refresh} />
+    )
+
+    refresh.mockClear()
+    renderer.update(<RefreshCard watch='bar' refresh={refresh} />)
+    expect(refresh).toHaveBeenCalledTimes(1)
+
+    // test refresh is not called on a different props change
+    refresh.mockClear()
+    renderer.update(<RefreshCard watch='bar' refresh={refresh} refreshing />)
+    expect(refresh).toHaveBeenCalledTimes(0)
+  })
+
+  test('renders correctly', () => {
+    const tree = Renderer.create(
+      <RefreshCard watch='foo' refresh={() => {}} refreshing>
+        child1
+        child2
+        child3
+      </RefreshCard>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
