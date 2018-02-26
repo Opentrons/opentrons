@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
 
-import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
+import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 
 import styles from './ProtocolEditor.css'
 
@@ -28,7 +28,8 @@ export default function ProtocolEditor () {
           <div className={styles.main_page_content}>
             <ConnectedMoreOptionsModal />
             <ConnectedStepEditForm />
-            <ConnectedDeckSetup />
+
+            <ConnectedMainPanel />
           </div>
         </div>
       </div>
