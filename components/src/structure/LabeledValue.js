@@ -21,8 +21,12 @@ export default function LabeledValue (props: Props) {
 
   return (
     <div className={className}>
-      <p className={styles.labeled_value_label}>{label}:</p>
-      <p>{value}</p>
+      <p className={styles.labeled_value_label}>
+        {label}:
+      </p>
+      <p className={styles.labeled_value_value}>
+        {value}
+      </p>
     </div>
   )
 }
