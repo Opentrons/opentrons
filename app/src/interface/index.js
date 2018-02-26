@@ -1,9 +1,6 @@
 // user interface state module
 
 import {makeActionName} from '../util'
-// TODO(mc, 2017-12-15): use module level exports; this is a temporary fix
-// for a circular dependency
-import {actionTypes as robotActionTypes} from '../robot/actions'
 
 export const NAME = 'interface'
 const META_ALERT = `${NAME}:alert`
@@ -65,7 +62,7 @@ export function reducer (state = INITIAL_STATE, action) {
     case actionTypes.SET_CURRENT_PANEL:
       return {...state, isPanelClosed: false, currentPanel: payload.panel}
 
-    case robotActionTypes.DISCONNECT_RESPONSE:
+    case 'robot:DISCONNECT_RESPONSE':
       return {...state, currentPanel: DEFAULT_PANEL}
   }
 
