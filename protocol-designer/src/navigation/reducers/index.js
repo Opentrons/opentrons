@@ -3,9 +3,9 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 
-import type {BaseState} from '../types'
-import {navigateToPage} from './actions'
-import type {Page} from './types'
+import type {BaseState} from '../../types'
+import {navigateToPage} from '../actions'
+import type {Page} from '../types'
 
 const page = handleActions({
   NAVIGATE_TO_PAGE: (state, action: ActionType<typeof navigateToPage>) => action.payload

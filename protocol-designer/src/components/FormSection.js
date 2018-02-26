@@ -10,7 +10,7 @@ type Props = {
   children?: React.Node,
   className?: string,
   /** if defined, carat shows */
-  onCollapseToggle?: (event: SyntheticEvent<>) => void,
+  onCollapseToggle?: (event: SyntheticEvent<>) => mixed,
   collapsed?: boolean
 }
 

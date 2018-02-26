@@ -2,11 +2,13 @@
 import type {RootState as StepList} from './steplist/reducers'
 import type {RootState as Navigation} from './navigation'
 import type {RootState as LabwareIngred} from './labware-ingred/reducers'
+import type {RootState as FileData} from './file-data'
 
 export type BaseState = {
   steplist: StepList,
   navigation: Navigation,
-  labwareIngred: LabwareIngred
+  labwareIngred: LabwareIngred,
+  fileData: FileData
 }
 
 export type GetState = () => BaseState
