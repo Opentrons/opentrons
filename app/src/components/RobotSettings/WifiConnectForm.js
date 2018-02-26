@@ -27,7 +27,7 @@ export default function ConfigureWifiForm (props: Props) {
   } = props
 
   const inputDisabled = props.disabled
-  const formDisabled = inputDisabled || !ssid || !psk || (ssid === activeSsid)
+  const formDisabled = inputDisabled || !ssid || (ssid === activeSsid)
 
   return (
     <Form

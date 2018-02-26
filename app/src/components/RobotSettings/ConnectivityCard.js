@@ -17,7 +17,7 @@ import {
   type RobotWifiConfigure
 } from '../../http-api-client'
 
-import {Card, LabeledValue} from '@opentrons/components'
+import {RefreshCard, LabeledValue} from '@opentrons/components'
 
 import WifiConnectForm from './WifiConnectForm'
 import WifiConnectModal from './WifiConnectModal'
@@ -33,7 +33,8 @@ type DispatchProps = {
   fetchList: () => *,
   configure: () => *,
   setConfigureBody: ({['ssid' | 'psk']: string}) => *,
-  clearConfigureResponse: () => *
+  clearSuccessfulConfigure: () => *,
+  clearFailedConfigure: () => *
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -41,36 +42,51 @@ type Props = OwnProps & StateProps & DispatchProps
 const TITLE = 'Connectivity'
 const CONNECTED_BY_LABEL = 'Connected by'
 
-class ConnectivityCard extends React.Component<Props> {
-  render () {
-    const {
-      ip,
-      wired,
-      setConfigureBody,
-      clearConfigureResponse,
-      configure,
-      listRequest: {
-        response: listResponse
-      },
-      configureRequest: {
-        inProgress: configInProgress,
-        request: configRequest,
-        response: configResponse,
-        error: configError
-      }
-    } = this.props
+export default connect(
+  makeMapStateToProps,
+  mapDispatchToProps
+)(ConnectivityCard)
 
-    const credentials = configRequest || {ssid: '', psk: ''}
-    const list = (listResponse && listResponse.list) || []
+function ConnectivityCard (props: Props) {
+  const {
+    ip,
+    wired,
+    name,
+    fetchList,
+    setConfigureBody,
+    clearSuccessfulConfigure,
+    clearFailedConfigure,
+    configure,
+    listRequest: {
+      inProgress: listInProgress,
+      response: listResponse
+    },
+    configureRequest: {
+      inProgress: configInProgress,
+      request: configRequest,
+      response: configResponse,
+      error: configError
+    }
+  } = props
 
-    const active = list.find((network) => network.active)
-    const listOptions = list.map(({active, ssid}) => ({
-      name: (active ? `${ssid} *` : ssid),
-      value: ssid
-    }))
+  const credentials = configRequest || {ssid: '', psk: ''}
+  const list = (listResponse && listResponse.list) || []
 
-    return (
-      <Card title={TITLE} column>
+  const active = list.find((network) => network.active)
+  const listOptions = list.map(({active, ssid}) => ({
+    name: (active ? `${ssid} *` : ssid),
+    value: ssid
+  }))
+
+  return (
+    <div>
+      <RefreshCard
+        watch={name}
+        refresh={fetchList}
+        refreshing={listInProgress || configInProgress}
+        title={TITLE}
+        column
+      >
         <LabeledValue
           label={CONNECTED_BY_LABEL}
           value={`${wired ? 'USB' : 'WiFi'} - ${ip}`}
@@ -84,32 +100,20 @@ class ConnectivityCard extends React.Component<Props> {
           onChange={setConfigureBody}
           onSubmit={configure}
         />
-        {(configError || configResponse) && (
-          <WifiConnectModal
-            onClose={clearConfigureResponse}
-            error={configError}
-            response={configResponse}
-          />
-        )}
-      </Card>
-    )
-  }
-
-  componentDidMount () {
-    this.props.fetchList()
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.name !== this.props.name) {
-      this.props.fetchList()
-    }
-  }
+      </RefreshCard>
+      {(configError || configResponse) && (
+        <WifiConnectModal
+          onClose={(configError
+            ? clearFailedConfigure
+            : clearSuccessfulConfigure
+          )}
+          error={configError}
+          response={configResponse}
+        />
+      )}
+    </div>
+  )
 }
-
-export default connect(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(ConnectivityCard)
 
 function makeMapStateToProps () {
   const getWifiList = makeGetRobotWifiList()
@@ -126,18 +130,25 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   const fetchList = () => dispatch(fetchWifiList(ownProps))
-  const configure = () => {
-    dispatch(configureWifi(ownProps))
-      .then(fetchList)
-      .then(() => dispatch(robotActions.discover()))
-  }
+  const configure = () => dispatch(configureWifi(ownProps))
 
   const setConfigureBody = (update) => {
     dispatch(setConfigureWifiBody(ownProps, update))
   }
-  const clearConfigureResponse = () => {
-    dispatch(clearConfigureWifiResponse(ownProps))
-  }
 
-  return {fetchList, configure, setConfigureBody, clearConfigureResponse}
+  // TODO(mc, 2018-02-26): handle refreshing the list and kicking off dispatch
+  //   more elegantly and closer to the configure response
+  const clearConfigureAction = clearConfigureWifiResponse(ownProps)
+  const clearFailedConfigure = () => dispatch(clearConfigureAction)
+  const clearSuccessfulConfigure = () => fetchList()
+    .then(() => dispatch(robotActions.discover()))
+    .then(() => dispatch(clearConfigureAction))
+
+  return {
+    fetchList,
+    configure,
+    setConfigureBody,
+    clearSuccessfulConfigure,
+    clearFailedConfigure
+  }
 }

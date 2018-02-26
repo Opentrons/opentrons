@@ -6,7 +6,7 @@ import type {State, ThunkAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
-import client, {type ClientResponseError} from './client'
+import client, {type ApiRequestError} from './client'
 
 type Ssid = string
 
@@ -69,7 +69,7 @@ export type WifiFailureAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-    error: ClientResponseError,
+    error: ApiRequestError,
   |}
 |}
 
@@ -115,27 +115,29 @@ type WifiState = {
   [robotName: string]: ?RobotWifiState
 }
 
-const LIST_PATH: RequestPath = 'list'
-const STATUS_PATH: RequestPath = 'status'
-const CONFIGURE_PATH: RequestPath = 'configure'
+const LIST: RequestPath = 'list'
+const STATUS: RequestPath = 'status'
+const CONFIGURE: RequestPath = 'configure'
 
 export function fetchWifiList (robot: RobotService): ThunkAction {
   return (dispatch) => {
-    dispatch(wifiRequest(robot, LIST_PATH))
+    dispatch(wifiRequest(robot, LIST))
 
-    return client(robot, 'GET', `wifi/${LIST_PATH}`)
-      .then((response) => dispatch(wifiSuccess(robot, LIST_PATH, response)))
-      .catch((error) => dispatch(wifiFailure(robot, LIST_PATH, error)))
+    return client(robot, 'GET', `wifi/${LIST}`).then(
+      (resp: WifiListResponse) => dispatch(wifiSuccess(robot, LIST, resp)),
+      (err: ApiRequestError) => dispatch(wifiFailure(robot, LIST, err))
+    )
   }
 }
 
 export function fetchWifiStatus (robot: RobotService): ThunkAction {
   return (dispatch) => {
-    dispatch(wifiRequest(robot, STATUS_PATH))
+    dispatch(wifiRequest(robot, STATUS))
 
-    return client(robot, 'GET', `wifi/${STATUS_PATH}`)
-      .then((response) => dispatch(wifiSuccess(robot, STATUS_PATH, response)))
-      .catch((error) => dispatch(wifiFailure(robot, STATUS_PATH, error)))
+    return client(robot, 'GET', `wifi/${STATUS}`).then(
+      (resp: WifiStatusResponse) => dispatch(wifiSuccess(robot, STATUS, resp)),
+      (err: ApiRequestError) => dispatch(wifiFailure(robot, STATUS, err))
+    )
   }
 }
 
@@ -162,11 +164,12 @@ export function configureWifi (robot: RobotService): ThunkAction {
       return console.warn('configureWifi called without setConfigureWifiBody')
     }
 
-    dispatch(wifiRequest(robot, CONFIGURE_PATH))
+    dispatch(wifiRequest(robot, CONFIGURE))
 
-    return client(robot, 'POST', `wifi/${CONFIGURE_PATH}`, body)
-      .then((resp) => dispatch(wifiSuccess(robot, CONFIGURE_PATH, resp)))
-      .catch((error) => dispatch(wifiFailure(robot, CONFIGURE_PATH, error)))
+    return client(robot, 'POST', `wifi/${CONFIGURE}`, body).then(
+      (r: WifiConfigureResponse) => dispatch(wifiSuccess(robot, CONFIGURE, r)),
+      (err: ApiRequestError) => dispatch(wifiFailure(robot, CONFIGURE, err))
+    )
   }
 }
 
@@ -269,7 +272,7 @@ function wifiSuccess (
 function wifiFailure (
   robot: RobotService,
   path: RequestPath,
-  error: ClientResponseError
+  error: ApiRequestError
 ): WifiFailureAction {
   return {type: 'api:WIFI_FAILURE', payload: {robot, path, error}}
 }
@@ -341,7 +344,8 @@ function reduceConfigureWifiAction (
   let {request, response, error} = configureState
 
   if (action.type === 'api:SET_CONFIGURE_WIFI_BODY') {
-    request = {...request, ...action.payload.update}
+    const requestState = request || {ssid: '', psk: ''}
+    request = {...requestState, ...action.payload.update}
   } else {
     response = null
     error = null
