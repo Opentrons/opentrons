@@ -20,8 +20,8 @@ def config(monkeypatch, tmpdir):
 def test_clear_config(config):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
-    from opentrons.cli import main
-    main.clear_configuration_and_reload()
+    from opentrons.deck_calibration import dc_main
+    dc_main.clear_configuration_and_reload()
 
     from opentrons import robot
     from opentrons.robot import robot_configs
@@ -32,7 +32,7 @@ def test_clear_config(config):
 def test_save_and_clear_config(config):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
-    from opentrons.cli import main
+    from opentrons.deck_calibration import dc_main
     from opentrons import robot
     import os
 
@@ -42,7 +42,7 @@ def test_save_and_clear_config(config):
     tag = "testing"
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
-    main.backup_configuration_and_reload(tag=tag)
+    dc_main.backup_configuration_and_reload(tag=tag)
 
     from opentrons import robot
     from opentrons.robot import robot_configs
