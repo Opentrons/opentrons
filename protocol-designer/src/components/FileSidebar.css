@@ -1,0 +1,28 @@
+@import '@opentrons/components';
+
+.download_button,
+.bottom_buttons {
+  & button {
+    margin: 1rem 0;
+  }
+}
+
+.download_button {
+  margin: 0 1rem;
+}
+
+.divider {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--c-light-gray);
+}
+
+.bottom_buttons {
+  margin: 1rem 2rem;
+
+  & button {
+    /* Unlike PrimaryButton, OutlineButton isn't 100% width */
+    width: 100%;
+  }
+}
