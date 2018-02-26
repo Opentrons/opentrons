@@ -24,6 +24,7 @@
       "/node_modules/(?!@opentrons/)"
     ],
     "moduleNameMapper": {
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js",
       "\\.(css)$": "identity-obj-proxy"
     }
   },

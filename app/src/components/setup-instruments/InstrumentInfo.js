@@ -4,7 +4,7 @@ import classnames from 'classnames'
 
 import type {Mount} from '../../robot'
 import InfoItem from './InfoItem.js' // move to comp lib?
-import InstrumentDiagram from './InstrumentDiagram.js'
+import {InstrumentDiagram} from '@opentrons/components'
 
 import styles from './instrument.css'
 
@@ -28,7 +28,7 @@ export default function InstrumentInfo (props: InstrumentInfoProps) {
         <InfoItem title={'pipette'} value={props.description} />
         <InfoItem title={'suggested tip type'} value={props.tipType} />
       </div>
-      <InstrumentDiagram channels={props.channels} />
+      <InstrumentDiagram channels={props.channels} className={styles.pipette_icon} />
     </div>
   )
 }

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "jest": {
     "moduleNameMapper": {
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/src/__mocks__/file.js",
       "\\.(css)$": "identity-obj-proxy"
     }
   },
