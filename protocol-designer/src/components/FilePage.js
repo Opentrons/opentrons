@@ -1,16 +1,18 @@
 // @flow
 import React from 'react'
 import {FormGroup, InputField} from '@opentrons/components'
-import type {FilePageFields, FieldConnector} from '../file-data'
+import type {FilePageFields} from '../file-data'
+import type {FormConnector} from '../utils'
 
 import styles from './FilePage.css'
 import formStyles from '../components/Form.css'
 
 type Props = {
-  fieldConnector: FieldConnector<FilePageFields>
+  formConnector: FormConnector<FilePageFields>
 }
 
 export default function FilePage (props: Props) {
+  const {formConnector} = props
   return (
     <div className={styles.file_page}>
       <section>
@@ -20,16 +22,16 @@ export default function FilePage (props: Props) {
 
         <div className={formStyles.row_wrapper}>
           <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
-            <InputField placeholder='Untitled' {...props.fieldConnector('name')} />
+            <InputField placeholder='Untitled' {...formConnector('name')} />
           </FormGroup>
 
           <FormGroup label='Organization/Author:' className={formStyles.column_1_2}>
-            <InputField {...props.fieldConnector('author')} />
+            <InputField {...formConnector('author')} />
           </FormGroup>
         </div>
 
         <FormGroup label='Description:'>
-          <InputField {...props.fieldConnector('description')}/>
+          <InputField {...formConnector('description')}/>
         </FormGroup>
       </section>
 

@@ -7,8 +7,8 @@ import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 
 import {actions, selectors} from '../file-data'
-import type {FilePageFields, FieldConnector} from '../file-data'
-
+import type {FilePageFields} from '../file-data'
+import {formConnectorFactory, type FormConnector} from '../utils'
 export default connect(mapStateToProps, null, mergeProps)(FilePage)
 
 function mapStateToProps (state: BaseState): FilePageFields {
@@ -22,15 +22,17 @@ function mergeProps (
   const values = stateProps
   const {dispatch} = dispatchProps
 
-  const fieldConnector: FieldConnector<FilePageFields> = (accessor) => {
-    return {
-      onChange: (e: SyntheticInputEvent<*>) =>
-        dispatch(actions.updateFileField(accessor, e.currentTarget.value)),
-      value: values[accessor]
+  const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
+    if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
+      dispatch(actions.updateFileField(accessor, e.currentTarget.value))
+    } else {
+      console.warn('Invalid accessor in ConnectedFilePage:', accessor)
     }
   }
 
+  const formConnector: FormConnector<FilePageFields> = formConnectorFactory(onChange, values)
+
   return {
-    fieldConnector
+    formConnector
   }
 }

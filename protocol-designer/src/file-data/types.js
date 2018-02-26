@@ -7,8 +7,3 @@ export type FilePageFields = {|
 |}
 
 export type FilePageFieldAccessors = $Keys<FilePageFields>
-
-export type FieldConnector<P> = (accessor: $Keys<P>) => ({
-  onChange: (e: SyntheticInputEvent<*>) => mixed,
-  value: $Values<P>
-})
