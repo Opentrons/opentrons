@@ -13,6 +13,7 @@ from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.util.log import get_logger
+from opentrons.config import feature_flags as fflags
 
 log = get_logger(__name__)
 
@@ -803,8 +804,7 @@ class Robot(object):
 
         # @TODO (Laura & Andy) Slot and type of trash
         # needs to be pulled from config file
-        # Add fixed trash to the initial deck
-        if os.environ.get('OT2_PROBE_HEIGHT', '') == '55.0':
+        if fflags.short_fixed_trash():
             self._fixed_trash = self.add_container('fixed-trash', '12')
         else:
             self._fixed_trash = self.add_container('tall-fixed-trash', '12')
@@ -924,66 +924,20 @@ class Robot(object):
         ports.extend(drivers.get_serial_ports_list())
         return ports
 
-    # TODO (ben 2017/11/13): rip out or implement these three methods
     def is_connected(self):
         if not self._driver:
             return False
-        return self._driver.is_connected()
+        return not self._driver.simulating
 
     def is_simulating(self):
         if not self._driver:
             return False
         return self._driver.simulating
 
-    def get_connected_port(self):
-        return self._driver.get_connected_port()
-
-    # TODO(artyom 20171030): discuss diagnostics and smoothie reporting
-    # def versions(self):
-    #     # TODO: Store these versions in config
-    #     return {
-    #         'firmware': {
-    #             'version': self._driver.get_firmware_version(),
-    #             'compatible': compatible['firmware']
-    #         },
-    #         'config': {
-    #             'version': self._driver.get_config_version(),
-    #             'compatible': compatible['config']
-    #         },
-    #         'ot_version': {
-    #             'version': self._driver.get_ot_version(),
-    #             'compatible': compatible['ot_version']
-    #         }
-    #     }
-
-    # def diagnostics(self):
-    #     """
-    #     Access diagnostics information for the robot.
-
-    #     Returns
-    #     -------
-    #     Dictionary with the following keys:
-    #         * ``axis_homed`` — axis that are currently in home position.
-    #         * ``switches`` — end stop switches currently hit.
-    #         * ``steps_per_mm`` — steps per millimeter calibration
-    #         values for ``x`` and ``y`` axis.
-    #     """
-    #     # TODO: Store these versions in config
-    #     return {
-    #         'axis_homed': self.axis_homed,
-    #         'switches': self._driver.switch_state(),
-    #         'steps_per_mm': {
-    #             'x': self._driver.get_steps_per_mm('x'),
-    #             'y': self._driver.get_steps_per_mm('y')
-    #         }
-    #     }
-
     @commands.publish.before(command=commands.comment)
     def comment(self, msg):
         pass
 
-    # TODO (artyom, 09182017): implement proper developer experience in light
-    # of Session concept being introduced
     def commands(self):
         return self._commands
 
