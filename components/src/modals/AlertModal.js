@@ -7,7 +7,7 @@ import styles from './modals.css'
 
 type Props = {
   /** optional handler for overlay click */
-  onCloseClick?: () => void,
+  onCloseClick?: () => mixed,
   /** optional modal heading */
   heading?: React.Node,
   /** optional array of `ButtonProps` for `FlatButton`s at bottom of modal */

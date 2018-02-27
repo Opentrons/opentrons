@@ -49,10 +49,10 @@ export const closeIngredientSelector = createAction(
 
 export const editModeIngredientGroup = createAction(
   'EDIT_MODE_INGREDIENT_GROUP',
-  (args:
+  (args: (
     | null // null here means "deselect ingredient group"
     | {| wellName: string, groupId: string |}
-  ) => args
+  )) => args
 )
 
 // ==== Create/delete/modify labware =====

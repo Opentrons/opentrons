@@ -82,6 +82,6 @@ export function alertMiddleware (root) {
       root.alert(message)
     }
 
-    next(action)
+    return next(action)
   }
 }

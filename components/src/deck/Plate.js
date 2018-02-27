@@ -21,7 +21,7 @@ type singleWell = {
   selected: boolean,
   wellName: string,
   maxVolume: number,
-  groupId? : string
+  groupId?: string
 }
 
 type wellDims = { // TODO similar to type in Well.js. DRY it up

@@ -89,7 +89,7 @@ export type RobotState = {|
       }
     },
     pipettes: {
-      [pipetteId: string] : boolean // true if tip is on pipette
+      [pipetteId: string]: boolean // true if tip is on pipette
     }
   }
 |}

@@ -2,7 +2,7 @@
 // health http api module
 import {createSelector} from 'reselect'
 
-import type {State, ThunkAction, Action} from '../types'
+import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
@@ -48,7 +48,7 @@ type HealthState = {
   [robotName: string]: ?RobotHealth
 }
 
-export function fetchHealth (robot: RobotService): ThunkAction {
+export function fetchHealth (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
     dispatch(healthRequest(robot))
 

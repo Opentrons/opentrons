@@ -42,7 +42,7 @@ export const middleware = (store) => (next) => (action) => {
     }
   }
 
-  next(action)
+  return next(action)
 }
 
 // maps a payload object to an analytics label string
