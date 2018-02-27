@@ -1719,8 +1719,8 @@ class PipetteTest(unittest.TestCase):
             mock.call(well.top()),
             mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(plunge - 1), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(plunge - 2), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]
