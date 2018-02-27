@@ -4,7 +4,7 @@ import Renderer from 'react-test-renderer'
 
 import {
   Icon,
-  AlertIcon,
+  NotificationIcon,
   ALERT,
   BACK,
   CLOSE,
@@ -279,14 +279,14 @@ describe('icons', () => {
   })
 })
 
-describe('alert icon', () => {
-  test('AlertIcon renders correctly', () => {
+describe('Notification Icon', () => {
+  test('NotificationIcon renders correctly', () => {
     const tree = Renderer.create(
-      <AlertIcon
-        baseName={FLASK}
+      <NotificationIcon
+        parentName={FLASK}
         className='foo'
-        alertName={CIRCLE}
-        alertClassName={'bar'}
+        childName={CIRCLE}
+        childClassName={'bar'}
       />
     ).toJSON()
 

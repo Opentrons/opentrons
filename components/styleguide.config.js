@@ -89,10 +89,10 @@ module.exports = {
       '@global .dark_background': {
         backgroundColor: 'rgba(0, 0, 0, 0.9)'
       },
-      '@global .alert-icon-parent': {
+      '@global .notification-icon-parent': {
         fill: '#333'
       },
-      '@global .alert-icon-child': {
+      '@global .notification-icon-child': {
         fill: 'orange',
         bottom: '0',
         right: '0',

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`alert icon AlertIcon renders correctly 1`] = `
+exports[`Notification Icon NotificationIcon renders correctly 1`] = `
 <div
   className="icon_wrapper"
 >
