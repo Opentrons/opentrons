@@ -1,5 +1,10 @@
+/* eslint-disable no-use-before-define */
 // @flow
 // application types
+import type {
+  Store as ReduxStore,
+  Dispatch as ReduxDispatch
+} from 'redux'
 
 import typeof reducer from './reducer'
 import type {Action as RobotAction} from './robot'
@@ -11,11 +16,19 @@ export type Action =
   | RobotAction
   | HttpApiAction
 
-// TODO(mc, 2018-02-12): remove this eslint-disable
-//   https://github.com/babel/babel-eslint/issues/485
-/* eslint-disable no-use-before-define */
+export type ThunkAction = (Dispatch, GetState) => ?Action
 
-export type Dispatch = (action: Action | ThunkAction) => any
-export type ThunkAction = (dispatch: Dispatch, getState: () => State) => any
+export type ThunkPromiseAction = (Dispatch, GetState) => Promise<?Action>
 
-/* eslint-enable no-use-before-define */
+export type Store = ReduxStore<State, Action>
+
+export type GetState = () => State
+
+export type ThunkDispatch<A> = (thunk: ThunkAction) => ?A
+
+export type ThunkPromiseDispatch<A> = (thunk: ThunkPromiseAction) => Promise<?A>
+
+export type Dispatch =
+  & ReduxDispatch<Action>
+  & ThunkDispatch<Action>
+  & ThunkPromiseDispatch<Action>

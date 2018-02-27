@@ -2,9 +2,9 @@ module.exports = {
   parser: 'babel-eslint',
 
   extends: [
-    'standard'
+    'standard',
     // TODO(mc, 2018-02-10): plugin:react/recommended
-    // TODO(mc, 2018-02-10): plugin:flowtype/recommended
+    'plugin:flowtype/recommended'
   ],
 
   plugins: [
@@ -17,17 +17,7 @@ module.exports = {
     'react/jsx-uses-vars': 'error'
   },
 
-  globals: {
-    SyntheticEvent: true,
-    SyntheticMouseEvent: true,
-    SyntheticInputEvent: true,
-    $Keys: true,
-    $Values: true,
-    $Call: true,
-    $Diff: true,
-    $PropertyType: true,
-    Class: true
-  },
+  globals: {},
 
   env: {
     node: true,

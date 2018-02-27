@@ -83,9 +83,9 @@ export type ConfirmProbedAction = {|
 |}
 
 export type PipetteCalibrationAction = {|
-  type:
+  type: (
     | 'robot:JOG'
-  ,
+  ),
   payload: {|
     mount: Mount,
     axis?: Axis,
@@ -97,13 +97,13 @@ export type PipetteCalibrationAction = {|
 |}
 
 export type LabwareCalibrationAction = {|
-  type:
+  type: (
     | 'robot:MOVE_TO'
     | 'robot:PICKUP_AND_HOME'
     | 'robot:DROP_TIP_AND_HOME'
     | 'robot:CONFIRM_TIPRACK'
     | 'robot:UPDATE_OFFSET'
-  ,
+  ),
   payload: {|
     mount: Mount,
     slot: Slot
@@ -114,14 +114,14 @@ export type LabwareCalibrationAction = {|
 |}
 
 export type CalibrationSuccessAction = {
-  type:
+  type: (
     | 'robot:MOVE_TO_SUCCESS'
     | 'robot:JOG_SUCCESS'
     | 'robot:PICKUP_AND_HOME_SUCCESS'
     | 'robot:DROP_TIP_AND_HOME_SUCCESS'
     | 'robot:CONFIRM_TIPRACK_SUCCESS'
     | 'robot:UPDATE_OFFSET_SUCCESS'
-  ,
+  ),
   payload: {
     isTiprack?: boolean,
     tipOn?: boolean
@@ -129,14 +129,14 @@ export type CalibrationSuccessAction = {
 }
 
 export type CalibrationFailureAction = {|
-  type:
+  type: (
     | 'robot:MOVE_TO_FAILURE'
     | 'robot:JOG_FAILURE'
     | 'robot:PICKUP_AND_HOME_FAILURE'
     | 'robot:DROP_TIP_AND_HOME_FAILURE'
     | 'robot:CONFIRM_TIPRACK_FAILURE'
     | 'robot:UPDATE_OFFSET_FAILURE'
-  ,
+  ),
   error: true,
   payload: Error
 |}
