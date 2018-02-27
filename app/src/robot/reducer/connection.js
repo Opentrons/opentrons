@@ -12,7 +12,15 @@ import type {
 
 import type {RobotService} from '../types'
 
-import {actionTypes, type ClearConnectResponseAction} from '../actions'
+import type {
+  AddDiscoveredAction,
+  RemoveDiscoveredAction,
+  ConnectAction,
+  ConnectResponseAction,
+  ClearConnectResponseAction,
+  DisconnectAction,
+  DisconnectResponseAction
+} from '../actions'
 
 type State = {
   isScanning: boolean,
@@ -32,18 +40,6 @@ type State = {
   },
 }
 
-// TODO(mc, 2018-01-11): import union of discrete action types from actions
-const {
-  DISCOVER,
-  DISCOVER_FINISH,
-  ADD_DISCOVERED,
-  REMOVE_DISCOVERED,
-  CONNECT,
-  CONNECT_RESPONSE,
-  DISCONNECT,
-  DISCONNECT_RESPONSE
-} = actionTypes
-
 const INITIAL_STATE: State = {
   isScanning: false,
   discovered: [],
@@ -60,17 +56,32 @@ export default function connectionReducer (
   if (state == null) return INITIAL_STATE
 
   switch (action.type) {
-    case DISCOVER: return handleDiscover(state)
-    case DISCOVER_FINISH: return handleDiscoverFinish(state)
-    case ADD_DISCOVERED: return handleAddDiscovered(state, action)
-    case REMOVE_DISCOVERED: return handleRemoveDiscovered(state, action)
-    case CONNECT: return handleConnect(state, action)
-    case CONNECT_RESPONSE: return handleConnectResponse(state, action)
-    case DISCONNECT: return handleDisconnect(state, action)
-    case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
+    case 'robot:DISCOVER':
+      return handleDiscover(state)
+
+    case 'robot:DISCOVER_FINISH':
+      return handleDiscoverFinish(state)
+
+    case 'robot:ADD_DISCOVERED':
+      return handleAddDiscovered(state, action)
+
+    case 'robot:REMOVE_DISCOVERED':
+      return handleRemoveDiscovered(state, action)
+
+    case 'robot:CONNECT':
+      return handleConnect(state, action)
+
+    case 'robot:CONNECT_RESPONSE':
+      return handleConnectResponse(state, action)
 
     case 'robot:CLEAR_CONNECT_RESPONSE':
       return handleClearConnectResponse(state, action)
+
+    case 'robot:DISCONNECT':
+      return handleDisconnect(state, action)
+
+    case 'robot:DISCONNECT_RESPONSE':
+      return handleDisconnectResponse(state, action)
 
     case 'api:HEALTH_SUCCESS':
       return maybeDiscoverWired(state, action)
@@ -96,9 +107,10 @@ function handleDiscoverFinish (state: State): State {
   }
 }
 
-function handleAddDiscovered (state: State, action: any): State {
-  if (!action.payload) return state
-
+function handleAddDiscovered (
+  state: State,
+  action: {payload: $PropertyType<AddDiscoveredAction, 'payload'>}
+): State {
   const {payload} = action
   const {name} = payload
   let {discovered, discoveredByName} = state
@@ -118,8 +130,11 @@ function handleAddDiscovered (state: State, action: any): State {
   return {...state, discovered, discoveredByName}
 }
 
-function handleRemoveDiscovered (state: State, action: any): State {
-  if (!action.payload || state.connectedTo === action.payload.name) {
+function handleRemoveDiscovered (
+  state: State,
+  action: {payload: $PropertyType<RemoveDiscoveredAction, 'payload'>}
+): State {
+  if (state.connectedTo === action.payload.name) {
     return state
   }
 
@@ -132,22 +147,21 @@ function handleRemoveDiscovered (state: State, action: any): State {
   }
 }
 
-function handleConnect (state: State, action: any): State {
-  if (!action.payload) return state
-
+function handleConnect (state: State, action: ConnectAction): State {
   const {payload: {name}} = action
 
   return {...state, connectRequest: {inProgress: true, error: null, name}}
 }
 
-function handleConnectResponse (state: State, action: any): State {
-  const {error: didError} = action
+function handleConnectResponse (
+  state: State,
+  action: ConnectResponseAction
+): State {
+  const error = action.payload.error || null
   let connectedTo = state.connectRequest.name
-  let error = null
   let requestName = ''
 
-  if (didError) {
-    error = action.payload
+  if (error) {
     requestName = connectedTo
     connectedTo = ''
   }
@@ -159,18 +173,19 @@ function handleConnectResponse (state: State, action: any): State {
   }
 }
 
-function handleDisconnect (state: State, action: any): State {
+function handleDisconnect (state: State, action: DisconnectAction): State {
   return {...state, disconnectRequest: {inProgress: true, error: null}}
 }
 
-function handleDisconnectResponse (state, action: any) {
-  const {error: didError} = action
+function handleDisconnectResponse (
+  state: State,
+  action: DisconnectResponseAction
+): State {
+  const error = action.payload.error || null
   let connectedTo = ''
-  let error = null
 
-  if (didError) {
+  if (error) {
     connectedTo = state.connectedTo
-    error = action.payload
   }
 
   return {...state, connectedTo, disconnectRequest: {error, inProgress: false}}

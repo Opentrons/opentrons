@@ -2,7 +2,6 @@
 // robot actions and action types
 // action helpers
 import {makeActionName} from '../util'
-import {tagAction as tagForAnalytics} from '../analytics'
 import {_NAME as NAME} from './constants'
 import type {
   Mount,
@@ -19,8 +18,63 @@ const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}
 
+export type DiscoverAction = {|
+  type: 'robot:DISCOVER',
+  meta: {|
+    robotCommand: true,
+  |},
+|}
+
+export type DiscoverFinishAction = {|
+  type: 'robot:DISCOVER_FINISH',
+|}
+
+export type AddDiscoveredAction = {|
+  type: 'robot:ADD_DISCOVERED',
+  payload: RobotService,
+|}
+
+export type RemoveDiscoveredAction = {|
+  type: 'robot:REMOVE_DISCOVERED',
+  payload: RobotService,
+|}
+
+export type ConnectAction = {|
+  type: 'robot:CONNECT',
+  payload: {|
+    name: string
+  |},
+  meta: {|
+    robotCommand: true
+  |},
+|}
+
+export type ConnectResponseAction = {|
+  type: 'robot:CONNECT_RESPONSE',
+  payload: {|
+    error: ?{message: string}
+  |},
+  meta: {|
+    analytics: true
+  |},
+|}
+
 export type ClearConnectResponseAction = {|
-  type: 'robot:CLEAR_CONNECT_RESPONSE'
+  type: 'robot:CLEAR_CONNECT_RESPONSE',
+|}
+
+export type DisconnectAction = {|
+  type: 'robot:DISCONNECT',
+  meta: {|
+    robotCommand: true
+  |},
+|}
+
+export type DisconnectResponseAction = {|
+  type: 'robot:DISCONNECT_RESPONSE',
+  payload: {|
+    error: ?{message: string}
+  |},
 |}
 
 export type ConfirmProbedAction = {|
@@ -94,16 +148,6 @@ export type CalibrationResponseAction =
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
-  // discovery, connect, and disconnect
-  DISCOVER: makeRobotActionName('DISCOVER'),
-  DISCOVER_FINISH: makeRobotActionName('DISCOVER_FINISH'),
-  ADD_DISCOVERED: makeRobotActionName('ADD_DISCOVERED'),
-  REMOVE_DISCOVERED: makeRobotActionName('REMOVE_DISCOVERED'),
-  CONNECT: makeRobotActionName('CONNECT'),
-  CONNECT_RESPONSE: makeRobotActionName('CONNECT_RESPONSE'),
-  DISCONNECT: makeRobotActionName('DISCONNECT'),
-  DISCONNECT_RESPONSE: makeRobotActionName('DISCONNECT_RESPONSE'),
-
   // protocol loading
   SESSION: makeRobotActionName('SESSION'),
   SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
@@ -133,6 +177,14 @@ export const actionTypes = {
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
+  | DiscoverAction
+  | DiscoverFinishAction
+  | AddDiscoveredAction
+  | RemoveDiscoveredAction
+  | ConnectAction
+  | ConnectResponseAction
+  | DisconnectAction
+  | DisconnectResponseAction
   | ClearConnectResponseAction
   | ConfirmProbedAction
   | PipetteCalibrationAction
@@ -141,53 +193,51 @@ export type Action =
   | CalibrationFailureAction
 
 export const actions = {
-  discover () {
-    return tagForRobotApi({type: actionTypes.DISCOVER})
+  discover (): DiscoverAction {
+    return {type: 'robot:DISCOVER', meta: {robotCommand: true}}
   },
 
-  discoverFinish () {
-    return {type: actionTypes.DISCOVER_FINISH}
+  discoverFinish (): DiscoverFinishAction {
+    return {type: 'robot:DISCOVER_FINISH'}
   },
 
-  connect (name: string) {
-    return tagForRobotApi({type: actionTypes.CONNECT, payload: {name}})
+  connect (name: string): ConnectAction {
+    return {
+      type: 'robot:CONNECT',
+      payload: {name},
+      meta: {robotCommand: true}
+    }
   },
 
-  connectResponse (error: ?Error) {
-    const didError = error != null
-    const action = {type: actionTypes.CONNECT_RESPONSE, error: didError}
-
-    if (didError) return {...action, payload: error}
-
-    return tagForAnalytics(action)
+  connectResponse (error: ?Error): ConnectResponseAction {
+    return {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: {error},
+      meta: {analytics: true}
+    }
   },
 
   clearConnectResponse (): ClearConnectResponseAction {
     return {type: 'robot:CLEAR_CONNECT_RESPONSE'}
   },
 
-  disconnect () {
-    return tagForRobotApi({type: actionTypes.DISCONNECT})
+  disconnect (): DisconnectAction {
+    return {type: 'robot:DISCONNECT', meta: {robotCommand: true}}
   },
 
-  disconnectResponse (error: ?Error) {
-    const action: {type: string, error: boolean, payload?: Error} = {
-      type: actionTypes.DISCONNECT_RESPONSE,
-      error: error != null
+  disconnectResponse (error: ?Error): DisconnectResponseAction {
+    return {
+      type: 'robot:DISCONNECT_RESPONSE',
+      payload: {error}
     }
-
-    if (error) action.payload = error
-
-    return action
   },
 
-  // TODO(mc, 2018-01-23): type RobotService
-  addDiscovered (service: RobotService) {
-    return {type: actionTypes.ADD_DISCOVERED, payload: service}
+  addDiscovered (service: RobotService): AddDiscoveredAction {
+    return {type: 'robot:ADD_DISCOVERED', payload: service}
   },
 
-  removeDiscovered (service: RobotService) {
-    return {type: actionTypes.REMOVE_DISCOVERED, payload: service}
+  removeDiscovered (service: RobotService): RemoveDiscoveredAction {
+    return {type: 'robot:REMOVE_DISCOVERED', payload: service}
   },
 
   // make new session with protocol file

@@ -35,9 +35,9 @@ export default function client (dispatch) {
     const {type} = action
 
     switch (type) {
-      case actionTypes.DISCOVER: return handleDiscover(dispatch, state, action)
-      case actionTypes.CONNECT: return connect(state, action)
-      case actionTypes.DISCONNECT: return disconnect(state, action)
+      case 'robot:DISCOVER': return handleDiscover(dispatch, state, action)
+      case 'robot:CONNECT': return connect(state, action)
+      case 'robot:DISCONNECT': return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
       case 'robot:PICKUP_AND_HOME': return pickupAndHome(state, action)
       case 'robot:DROP_TIP_AND_HOME': return dropTipAndHome(state, action)
