@@ -18,16 +18,6 @@ ul {
   list-style-type: none;
 }
 
-h1 {
-  font-size: fontSizeHuge;
-}
-
-h2 {
-  color: gray;
-  font-size: fontSizeHeader;
-  text-align: center;
-}
-
 label {
   display: inline-block;
 }

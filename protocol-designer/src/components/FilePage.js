@@ -16,9 +16,9 @@ export default function FilePage (props: Props) {
   return (
     <div className={styles.file_page}>
       <section>
-        <h1>
+        <h2>
           Information
-        </h1>
+        </h2>
 
         <div className={formStyles.row_wrapper}>
           <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
@@ -36,9 +36,9 @@ export default function FilePage (props: Props) {
       </section>
 
       <section>
-        <h1>
+        <h2>
           Pipettes
-        </h1>
+        </h2>
       </section>
     </div>
   )

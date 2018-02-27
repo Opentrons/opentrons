@@ -1,0 +1,21 @@
+@import '@opentrons/components';
+@import '../Form.css';
+
+.cancel_continue_button_row {
+  padding-top: 2rem;
+  lost-utility: clearfix;
+
+  & > *:first-child {
+    lost-offset: 2/4;
+  }
+
+  & button {
+    lost-column: 1/4;
+  }
+}
+
+.pipette_text {
+  @apply --font-body-1-dark;
+
+  padding: 2rem 0 1rem 0;
+}
