@@ -11,7 +11,7 @@ import {
   constants as robotConstants
 } from '../../robot'
 
-import {NavButton, FILE, COG, CONNECT, MORE} from '@opentrons/components'
+import {NavButton, FILE, CALIBRATE, CONNECT, MORE} from '@opentrons/components'
 
 export default connect(mapStateToProps, null, mergeProps)(NavButton)
 
@@ -25,25 +25,30 @@ function mapStateToProps (state, ownProps) {
   )
 
   let disabled = false
-  let iconName, isBottom
+  let iconName, isBottom, title
 
   if (name === 'upload') {
     disabled = !isConnected
     iconName = FILE
+    title = 'protocol'
   } else if (name === 'setup') {
     disabled = !isSessionLoaded
-    iconName = COG
+    iconName = CALIBRATE
+    title = 'calibrate'
   } else if (name === 'connect') {
     iconName = CONNECT
+    title = 'robot'
   } else if (name === 'more') {
     iconName = MORE
     isBottom = true
+    title = 'more'
   }
 
   return {
     iconName,
     isBottom,
     disabled,
+    title,
     isCurrent: !isPanelClosed && name === currentPanel
   }
 }
