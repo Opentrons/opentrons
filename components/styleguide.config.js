@@ -88,6 +88,15 @@ module.exports = {
       },
       '@global .dark_background': {
         backgroundColor: 'rgba(0, 0, 0, 0.9)'
+      },
+      '@global .notification-icon-parent': {
+        fill: '#333'
+      },
+      '@global .notification-icon-child': {
+        fill: 'orange',
+        bottom: '0',
+        right: '0',
+        width: '12px'
       }
     }
   }
