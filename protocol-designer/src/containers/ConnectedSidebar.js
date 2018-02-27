@@ -5,6 +5,7 @@ import {selectors} from '../navigation'
 
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
+import FileSidebar from '../components/FileSidebar'
 
 import type {BaseState} from '../types'
 import type {Page} from '../navigation'
@@ -20,7 +21,7 @@ function Sidebar (props: Props) {
     case 'ingredient-detail':
       return <IngredientsList />
     case 'file':
-      return <div>TODO: File Sidebar</div>
+      return <FileSidebar />
   }
   return null
 }
