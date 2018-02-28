@@ -17,6 +17,7 @@ type State = {
 }
 
 type Props = {
+  hideModal: boolean,
   onCancel: () => mixed,
   onSave: State => mixed
 }
@@ -57,6 +58,10 @@ export default class NewFileModal extends React.Component<Props, State> {
   }
 
   render () {
+    if (this.props.hideModal) {
+      return null
+    }
+
     const {name, leftPipette, rightPipette} = this.state
     const canSubmit = (leftPipette !== INVALID && rightPipette !== INVALID) && // neither can be invalid
       (leftPipette || rightPipette) // at least one must not be none (empty string)

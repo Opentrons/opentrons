@@ -14,7 +14,7 @@ type Props = {page: Page}
 
 function MainPanel (props: Props) {
   const {page} = props
-  if (page === 'file') {
+  if (page === 'file-detail') {
     return <ConnectedFilePage />
   }
   // all other pages show the deck setup

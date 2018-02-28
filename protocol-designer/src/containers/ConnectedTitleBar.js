@@ -28,7 +28,7 @@ function mapStateToProps (state: BaseState): StateProps {
   const selectedStep = steplistSelectors.selectedStep(state)
   const stepName = selectedStep && selectedStep.title
 
-  if (_page === 'file') {
+  if (_page === 'file-detail') {
     return {
       _page,
       title: fileName,

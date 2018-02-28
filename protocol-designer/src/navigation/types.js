@@ -1,2 +1,2 @@
 // @flow
-export type Page = 'file' | 'steplist' | 'ingredient-detail' | 'well-selection-modal'
+export type Page = 'file-splash' | 'file-detail' | 'steplist' | 'ingredient-detail' | 'well-selection-modal'

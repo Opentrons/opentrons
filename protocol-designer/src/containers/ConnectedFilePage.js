@@ -24,7 +24,9 @@ function mergeProps (
 
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
-      dispatch(actions.updateFileField(accessor, e.currentTarget.value))
+      dispatch(actions.updateFileFields({
+        [accessor]: e.target.value
+      }))
     } else {
       console.warn('Invalid accessor in ConnectedFilePage:', accessor)
     }

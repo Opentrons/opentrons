@@ -17,8 +17,8 @@ function Nav (props: Props) {
     <VerticalNavBar className={styles.nav_bar}>
       <NavButton
         iconName='file'
-        isCurrent={props.currentPage === 'file'}
-        onClick={props.handleClick('file')} />
+        isCurrent={props.currentPage === 'file-detail'}
+        onClick={props.handleClick('file-detail')} />
 
       <NavButton
         iconName='cog'
