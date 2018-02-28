@@ -13,17 +13,7 @@ from opentrons.robot import robot_configs
 from opentrons import robot, instruments
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.deck_calibration.linal import solve, add_z, apply_transform
-
-
-# Application constants
-SAFE_HEIGHT = 130
-
-left = 'Z'
-right = 'A'
-
-dots = 'dots'
-holes = 'holes'
-
+from opentrons.deck_calibration import *
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
@@ -129,20 +119,6 @@ class CLITool:
     def current_step(self):
         return self._steps[self._steps_index]
 
-    def position(self):
-        """
-        Read position from driver into a tuple and map 3-rd value
-        to the axis of a pipette currently used
-        """
-        try:
-            p = robot._driver.position
-            res = (p['X'], p['Y'], p[self._current_pipette.upper()])
-        except KeyError:
-            # for some reason we are sometimes getting
-            # key error in dict returned from driver
-            pass
-        else:
-            return res
 
     # Methods for backing key-press
     def increase_step(self) -> str:
@@ -161,14 +137,12 @@ class CLITool:
             self._steps_index = self._steps_index - 1
         return 'step: {}'.format(self.current_step())
 
-    def jog(self, axis, direction, step) -> str:
+    def _jog(self, axis, direction, step):
         """
         Move the pipette on `axis` in `direction` by `step` and update the
         position tracker
         """
-        robot._driver.move(
-            {axis: robot._driver.position[axis] + direction * step})
-        self.current_position = self.position()
+        self.current_position = jog(axis, direction, step)
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
     def home(self) -> str:
