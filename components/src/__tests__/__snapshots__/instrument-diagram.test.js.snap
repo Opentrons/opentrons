@@ -5,7 +5,7 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
   className={undefined}
 >
   <img
-    src="test-file-stub"
+    src="pipetteMulti.png"
   />
 </div>
 `;
@@ -15,7 +15,100 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
   className={undefined}
 >
   <img
-    src="test-file-stub"
+    src="pipetteSingle.png"
   />
 </div>
+`;
+
+exports[`InstrumentGroup Renders correctly 1`] = `
+<section
+  className="pipette_group"
+>
+  <div
+    className="pipette left foo"
+  >
+    <div
+      className="pipette_info"
+    >
+      <div
+        className={undefined}
+      >
+        <h2
+          className="title"
+        >
+          pipette
+        </h2>
+        <span
+          className="value"
+        >
+          p300 8-Channel
+        </span>
+      </div>
+      <div
+        className={undefined}
+      >
+        <h2
+          className="title"
+        >
+          suggested tip type
+        </h2>
+        <span
+          className="value"
+        >
+          150
+        </span>
+      </div>
+    </div>
+    <div
+      className="pipette_icon"
+    >
+      <img
+        src="pipetteMulti.png"
+      />
+    </div>
+  </div>
+  <div
+    className="pipette right disabled blah"
+  >
+    <div
+      className="pipette_info"
+    >
+      <div
+        className={undefined}
+      >
+        <h2
+          className="title"
+        >
+          pipette
+        </h2>
+        <span
+          className="value"
+        >
+          p10 Single
+        </span>
+      </div>
+      <div
+        className={undefined}
+      >
+        <h2
+          className="title"
+        >
+          suggested tip type
+        </h2>
+        <span
+          className="value"
+        >
+          10
+        </span>
+      </div>
+    </div>
+    <div
+      className="pipette_icon"
+    >
+      <img
+        src="pipetteSingle.png"
+      />
+    </div>
+  </div>
+</section>
 `;

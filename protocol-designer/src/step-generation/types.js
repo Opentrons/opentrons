@@ -1,6 +1,6 @@
 // @flow
 
-import type {DeckSlot} from '@opentrons/components'
+import type {DeckSlot, Mount, Channels} from '@opentrons/components'
 
 export type MixArgs = {|
   volume: number,
@@ -57,9 +57,7 @@ export type ConsolidateFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type Mount = 'left' | 'right'
-
-export type PipetteChannels = 1 | 8
+export type PipetteChannels = Channels // TODO Ian 2018-02-27 rename PipetteChannels -> Channels
 
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
