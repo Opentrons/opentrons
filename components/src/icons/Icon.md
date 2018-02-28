@@ -7,7 +7,7 @@ const {
   CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
   TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE,
   UPLOAD, COG, CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT,
-  MENU_DOWN, MOVE, PLUS, COPY
+  MENU_DOWN, MOVE, PLUS, COPY, CALIBRATE, RUN
 } = require('./icon-data')
 
 ;<div>
@@ -45,6 +45,8 @@ const {
   <Icon width='64px' name={MOVE} />
   <Icon width='64px' name={PLUS} />
   <Icon width='64px' name={COPY} />
+  <Icon width='64px' name={CALIBRATE} />
+  <Icon width='64px' name={RUN} />
 </div>
 ```
 

@@ -11,13 +11,22 @@
 
 .button {
   display: block;
+  position: relative;
   width: 100%;
-  height: 5rem;
   background-color: transparent;
   border-bottom: var(--bd-light);
   cursor: pointer;
   padding: 1rem;
   color: var(--c-med-gray);
+}
+
+.title {
+  display: block;
+  color: --c-font-dark;
+  font-size: --fs-caption;
+  text-transform: capitalize;
+  text-align: center;
+  margin-top: 0.25rem;
 }
 
 /*
@@ -30,6 +39,12 @@ revisit once we have a need for more than one icon aligned to bottom.
   justify-self: flex-end;
   border-bottom-width: 0;
   border-top: var(--bd-light);
+  padding-top: 0.5rem;
+
+  & > .title {
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .button[disabled] {
@@ -39,12 +54,15 @@ revisit once we have a need for more than one icon aligned to bottom.
 
 .active {
   background-color: var(--c-med-gray);
-  color: var(--c-dark-gray);
+  color: #000;
+
+  & > svg {
+    fill: #000;
+  }
 }
 
 .icon {
   max-width: 100%;
   height: 100%;
-  padding: 1.25rem;
   color: var(--c-med-gray);
 }

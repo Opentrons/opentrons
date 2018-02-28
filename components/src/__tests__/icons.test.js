@@ -34,7 +34,9 @@ import {
   PAUSE,
   ARROW_RIGHT,
   MENU_DOWN,
-  CIRCLE
+  CIRCLE,
+  CALIBRATE,
+  RUN
 } from '..'
 
 describe('icons', () => {
@@ -273,6 +275,22 @@ describe('icons', () => {
   test('MENU_DOWN icon renders correctly', () => {
     const tree = Renderer.create(
       <Icon name={MENU_DOWN} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('CALIBRATE icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={CALIBRATE} className='foo' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('RUN icon renders correctly', () => {
+    const tree = Renderer.create(
+      <Icon name={RUN} className='foo' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
