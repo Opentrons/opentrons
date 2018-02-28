@@ -1,6 +1,12 @@
 // @flow
 import InstrumentDiagram from './InstrumentDiagram'
+import InstrumentGroup from './InstrumentGroup'
+import InstrumentInfo from './InstrumentInfo'
+import InfoItem from './InfoItem'
 
 export {
-  InstrumentDiagram
+  InstrumentDiagram,
+  InstrumentGroup,
+  InstrumentInfo,
+  InfoItem
 }

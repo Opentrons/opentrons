@@ -1,4 +1,5 @@
 // @flow
+import type {Mount} from '@opentrons/components'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -137,7 +138,7 @@ export type FormData = TransferForm | ConsolidateForm | PauseForm
 /* TODO immediately: add ALL fields to this data, split transfer and consolidate apart */
 export type TransferishFormData = {|
   stepType: 'transfer' | 'consolidate',
-  pipette: 'left' | 'right', // TODO: pipette ID vs mount enum is TBD
+  pipette: Mount, // TODO: pipette ID vs mount enum is TBD
   sourceWells: Array<string>,
   destWells: Array<string>,
   sourceLabware: string,
