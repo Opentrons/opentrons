@@ -241,7 +241,6 @@ class Robot(object):
             * Runtime warnings
 
         """
-
         self._actuators = {
             'left': {
                 'carriage': Mover(
@@ -295,7 +294,6 @@ class Robot(object):
         for mount in self._actuators.values():
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
-
         return self
 
     def turn_on_button_light(self):

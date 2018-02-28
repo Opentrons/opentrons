@@ -1,5 +1,5 @@
 from opentrons import robot
-from opentrons.deck_calibration import dc_main
+
 
 # Application constants
 SAFE_HEIGHT = 130
@@ -27,10 +27,8 @@ def position(axis):
 
 
 def jog(axis, direction, step):
-    print(axis)
-    print(direction)
-    print(step)
+
     robot._driver.move(
         {axis: robot._driver.position[axis] + direction * step})
-    print('Gucci')
+
     return position(axis)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# pylama:ignore=C901
+# pylama:ignore=C901,W0401
 
 import asyncio
 import urwid
@@ -17,6 +17,8 @@ from opentrons.deck_calibration import *
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
+
+
 class CLITool:
     """
     Dev notes:
@@ -118,7 +120,6 @@ class CLITool:
 
     def current_step(self):
         return self._steps[self._steps_index]
-
 
     # Methods for backing key-press
     def increase_step(self) -> str:
