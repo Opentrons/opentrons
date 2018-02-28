@@ -1,21 +1,26 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import {PrimaryButton, OutlineButton, SidePanel} from '@opentrons/components'
 import styles from './FileSidebar.css'
 
 type Props = {
   onUploadClick?: () => mixed,
-  onDownloadClick?: () => mixed,
-  onCreateNew?: () => mixed
+  onCreateNew?: () => mixed,
+  downloadData: ?{
+    fileContents: string,
+    fileName: string
+  }
 }
 
 export default function FileSidebar (props: Props) {
   return (
     <SidePanel title='Protocol File' className={styles.file_sidebar}>
-      {props.onDownloadClick &&
+      {props.downloadData &&
         <div>
           <div className={styles.download_button}>
-            <PrimaryButton onClick={props.onDownloadClick}>Download</PrimaryButton>
+            <PrimaryButton Component='a' download={props.downloadData.fileName}
+              href={'data:applicatin/json;charset=utf-8,' + encodeURIComponent(props.downloadData.fileContents)}
+            >Download</PrimaryButton>
           </div>
           <div className={styles.divider} />
         </div>
