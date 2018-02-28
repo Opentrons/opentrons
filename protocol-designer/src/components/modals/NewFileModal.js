@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 import {
-  OutlineButton,
   FormGroup,
   InputField,
   DropdownField,
-  Modal
+  AlertModal
 } from '@opentrons/components'
 
 import styles from './NewFileModal.css'
@@ -62,9 +61,12 @@ export default class NewFileModal extends React.Component<Props, State> {
     const canSubmit = (leftPipette !== INVALID && rightPipette !== INVALID) && // neither can be invalid
       (leftPipette || rightPipette) // at least one must not be none (empty string)
 
-    // NOTE Ian 2018-02-27: This is similar to but not quite the same as ContinueModal in complib
-    return <Modal className={modalStyles.modal}>
-      <div className={modalStyles.modal_contents}>
+    return <AlertModal className={modalStyles.modal}
+      buttons={[
+        {onClick: this.props.onCancel, children: 'Cancel'},
+        {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
+      ]}>
+      <form className={modalStyles.modal_contents}>
         <h2>Create New Protocol</h2>
 
         <FormGroup label='Protocol Name:'>
@@ -85,12 +87,7 @@ export default class NewFileModal extends React.Component<Props, State> {
               value={rightPipette} onChange={this.handleChange('rightPipette')} />
           </FormGroup>
         </div>
-
-        <div className={styles.cancel_continue_button_row}>
-          <OutlineButton onClick={this.props.onCancel}>Cancel</OutlineButton>
-          <OutlineButton onClick={this.handleSubmit} disabled={!canSubmit}>Save</OutlineButton>
-        </div>
-      </div>
-    </Modal>
+      </form>
+    </AlertModal>
   }
 }
