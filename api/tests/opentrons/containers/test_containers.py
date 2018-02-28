@@ -16,7 +16,7 @@ from opentrons.containers.placeable import (
     Slot)
 
 
-def test_containers_create(robot):
+def test_containers_create(user_definition_dirs, robot):
     container_name = 'plate_for_testing_containers_create'
     containers_create(
         name=container_name,

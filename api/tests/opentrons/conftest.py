@@ -6,6 +6,7 @@ import asyncio
 import os
 import re
 import shutil
+import tempfile
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
@@ -110,7 +111,7 @@ def robot(dummy_db):
 def protocol(request):
     try:
         root = request.getfuncargvalue('protocol_file')
-    except Exception as e:
+    except Exception:
         root = request.param
 
     filename = os.path.join(os.path.dirname(__file__), 'data', root)
@@ -139,7 +140,7 @@ def session(loop, test_client, request, main_router):
             root = main_router
         # Assume test fixture has init to attach test loop
         root.init(loop)
-    except Exception as e:
+    except Exception:
         pass
 
     server = rpc.Server(loop=loop, root=root)
@@ -191,6 +192,16 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     yield
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
+@pytest.fixture
+def user_definition_dirs(monkeypatch):
+    tmp_usr_root = tempfile.mkdtemp()
+    os.mkdir(os.path.join(tmp_usr_root, 'definitions'))
+    os.mkdir(os.path.join(tmp_usr_root, 'offsets'))
+    monkeypatch.setenv("USER_DEFN_ROOT", tmp_usr_root)
+    yield
+    monkeypatch.setenv("USER_DEFN_ROOT", '')
 
 
 @pytest.fixture
