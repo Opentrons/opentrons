@@ -20,6 +20,8 @@ function Sidebar (props: Props) {
       return <ConnectedStepList />
     case 'ingredient-detail':
       return <IngredientsList />
+    case 'file-splash':
+      return <ConnectedFileSidebar />
     case 'file-detail':
       return <ConnectedFileSidebar />
   }

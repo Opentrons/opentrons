@@ -26,6 +26,10 @@ function mapStateToProps (state: BaseState): StateProps {
 function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
-    onSave: fields => dispatch(fileActions.updateFileFields(fields))
+    onSave: fields => {
+      dispatch(fileActions.updateFileFields(fields))
+      dispatch(navigationActions.toggleNewProtocolModal(false))
+      dispatch(navigationActions.navigateToPage('file-detail'))
+    }
   }
 }

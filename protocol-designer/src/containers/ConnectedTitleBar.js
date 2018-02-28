@@ -28,6 +28,13 @@ function mapStateToProps (state: BaseState): StateProps {
   const selectedStep = steplistSelectors.selectedStep(state)
   const stepName = selectedStep && selectedStep.title
 
+  if (_page === 'file-splash') {
+    return {
+      _page,
+      title: 'Opentrons Protocol Designer'
+    }
+  }
+
   if (_page === 'file-detail') {
     return {
       _page,

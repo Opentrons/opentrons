@@ -9,13 +9,11 @@ import type {Page} from '../types'
 
 const page = handleActions({
   NAVIGATE_TO_PAGE: (state, action: ActionType<typeof navigateToPage>) => action.payload
-}, 'file-detail') // TODO Ian 2018-02-28 this will start on 'file-splash'
+}, 'file-splash')
 
 const newProtocolModal = handleActions({
   TOGGLE_NEW_PROTOCOL_MODAL: (state, action: ActionType<typeof toggleNewProtocolModal>) =>
-    action.payload,
-  /** Close modal on NewFileModal form submit */
-  UPDATE_FILE_FIELDS: () => false
+    action.payload
 }, false)
 
 export const _allReducers = {

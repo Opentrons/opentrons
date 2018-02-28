@@ -14,6 +14,9 @@ type Props = {page: Page}
 
 function MainPanel (props: Props) {
   const {page} = props
+  if (page === 'file-splash') {
+    return <div>TODO: splash page</div>
+  }
   if (page === 'file-detail') {
     return <ConnectedFilePage />
   }

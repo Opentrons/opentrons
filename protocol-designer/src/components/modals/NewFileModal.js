@@ -35,13 +35,22 @@ const INVALID = 'INVALID'
 
 const pipetteOptionsWithInvalid = [{name: '', value: INVALID}, ...pipetteOptions]
 
+const initialState = {
+  name: '',
+  leftPipette: INVALID,
+  rightPipette: INVALID
+}
+
 export default class NewFileModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = {
-      name: '',
-      leftPipette: INVALID,
-      rightPipette: INVALID
+    this.state = initialState
+  }
+
+  componentWillReceiveProps (nextProps: Props) {
+    // reset form state when modal is hidden
+    if (!this.props.hideModal && nextProps.hideModal) {
+      this.setState(initialState)
     }
   }
 
@@ -75,7 +84,7 @@ export default class NewFileModal extends React.Component<Props, State> {
         <h2>Create New Protocol</h2>
 
         <FormGroup label='Protocol Name:'>
-          <InputField placeholder='untitled' value={name} onChange={this.handleChange('name')} />
+          <InputField placeholder='Untitled' value={name} onChange={this.handleChange('name')} />
         </FormGroup>
 
         <div className={styles.pipette_text}>
