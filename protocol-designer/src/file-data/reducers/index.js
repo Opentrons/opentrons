@@ -2,7 +2,7 @@
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
-import {updateFileField} from '../actions'
+import {updateFileFields} from '../actions'
 
 import type {FilePageFields} from '../types'
 import type {BaseState} from '../../types'
@@ -10,13 +10,15 @@ import type {BaseState} from '../../types'
 const defaultFields = {
   name: '',
   author: '',
-  description: ''
+  description: '',
+  leftPipette: '',
+  rightPipette: ''
 }
 
 const metadataFields = handleActions({
-  UPDATE_FILE_FIELD: (state, action: ActionType<typeof updateFileField>) => ({
+  UPDATE_FILE_FIELDS: (state: FilePageFields, action: ActionType<typeof updateFileFields>) => ({
     ...state,
-    [action.payload.accessor]: action.payload.value
+    ...action.payload
   })
 }, defaultFields)
 

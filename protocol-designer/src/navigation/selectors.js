@@ -15,3 +15,6 @@ export const currentPage: Selector<Page> = (state: BaseState) => {
 
   return ingredients ? 'ingredient-detail' : page
 }
+
+export const newProtocolModal = (state: BaseState) =>
+  navigationRootSelector(state).newProtocolModal

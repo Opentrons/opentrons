@@ -17,6 +17,7 @@ type State = {
 }
 
 type Props = {
+  hideModal: boolean,
   onCancel: () => mixed,
   onSave: State => mixed
 }
@@ -34,13 +35,22 @@ const INVALID = 'INVALID'
 
 const pipetteOptionsWithInvalid = [{name: '', value: INVALID}, ...pipetteOptions]
 
+const initialState = {
+  name: '',
+  leftPipette: INVALID,
+  rightPipette: INVALID
+}
+
 export default class NewFileModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = {
-      name: '',
-      leftPipette: INVALID,
-      rightPipette: INVALID
+    this.state = initialState
+  }
+
+  componentWillReceiveProps (nextProps: Props) {
+    // reset form state when modal is hidden
+    if (!this.props.hideModal && nextProps.hideModal) {
+      this.setState(initialState)
     }
   }
 
@@ -57,6 +67,10 @@ export default class NewFileModal extends React.Component<Props, State> {
   }
 
   render () {
+    if (this.props.hideModal) {
+      return null
+    }
+
     const {name, leftPipette, rightPipette} = this.state
     const canSubmit = (leftPipette !== INVALID && rightPipette !== INVALID) && // neither can be invalid
       (leftPipette || rightPipette) // at least one must not be none (empty string)
@@ -70,7 +84,7 @@ export default class NewFileModal extends React.Component<Props, State> {
         <h2>Create New Protocol</h2>
 
         <FormGroup label='Protocol Name:'>
-          <InputField placeholder='untitled' value={name} onChange={this.handleChange('name')} />
+          <InputField placeholder='Untitled' value={name} onChange={this.handleChange('name')} />
         </FormGroup>
 
         <div className={styles.pipette_text}>
