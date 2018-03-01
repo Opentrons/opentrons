@@ -73,9 +73,7 @@ export type DisconnectAction = {|
 
 export type DisconnectResponseAction = {|
   type: 'robot:DISCONNECT_RESPONSE',
-  payload: {|
-    error: ?{message: string}
-  |},
+  payload: {},
 |}
 
 export type ConfirmProbedAction = {|
@@ -226,10 +224,10 @@ export const actions = {
     return {type: 'robot:DISCONNECT', meta: {robotCommand: true}}
   },
 
-  disconnectResponse (error: ?Error): DisconnectResponseAction {
+  disconnectResponse (): DisconnectResponseAction {
     return {
       type: 'robot:DISCONNECT_RESPONSE',
-      payload: {error}
+      payload: {}
     }
   },
 
