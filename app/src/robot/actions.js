@@ -8,6 +8,7 @@ import type {
   Slot,
   Axis,
   Direction,
+  BaseRobot,
   RobotService,
   ProtocolFile
 } from './types'
@@ -36,7 +37,7 @@ export type AddDiscoveredAction = {|
 
 export type RemoveDiscoveredAction = {|
   type: 'robot:REMOVE_DISCOVERED',
-  payload: RobotService,
+  payload: BaseRobot,
 |}
 
 export type ConnectAction = {|
