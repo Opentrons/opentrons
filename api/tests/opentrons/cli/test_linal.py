@@ -1,5 +1,5 @@
 from math import pi, sin, cos
-from opentrons.deck_calibration.linal import solve, add_z, apply_transform
+from opentrons.cli.linal import solve, add_z, apply_transform
 import numpy as np
 
 
