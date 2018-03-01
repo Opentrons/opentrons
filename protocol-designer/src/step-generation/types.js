@@ -7,8 +7,6 @@ export type MixArgs = {|
   times: number
 |}
 
-// import export type {TransferishFormData} from '../steplist/export types'
-// TODO IMMEDIATELY import this export type and use it in validateAndProcessForm
 export type ConsolidateFormData = {|
   stepType: 'consolidate',
 

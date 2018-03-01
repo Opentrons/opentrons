@@ -1,5 +1,7 @@
 // @flow
 
+import type {ConsolidateFormData} from '../step-generation'
+
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
@@ -49,7 +51,7 @@ export type StepItemData = {|
   description?: string
 |}
 
-type TransferForm = {|
+export type TransferForm = {|
   stepType: 'transfer',
   id: StepIdType,
 
@@ -80,7 +82,7 @@ type TransferForm = {|
   'dispense--blowout--labware'?: string
 |}
 
-type ConsolidateForm = {|
+export type ConsolidateForm = {|
   stepType: 'consolidate',
   id: StepIdType,
 
@@ -111,7 +113,7 @@ type ConsolidateForm = {|
   'dispense--blowout--labware'?: string
 |}
 
-type PauseForm = {|
+export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
@@ -124,9 +126,8 @@ type PauseForm = {|
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
 
-/* TODO immediately: add ALL fields to this data, split transfer and consolidate apart */
-export type TransferishFormData = {|
-  stepType: 'transfer' | 'consolidate',
+export type TransferFormData = {|
+  stepType: 'transfer',
   pipette: string, // pipette ID
   sourceWells: Array<string>,
   destWells: Array<string>,
@@ -145,7 +146,8 @@ export type PauseFormData = {|
   message: string
 |}
 
-export type ProcessedFormData = TransferishFormData | PauseFormData
+// TODO gradually create & use definitions from step-generation/types.js
+export type ProcessedFormData = TransferFormData | PauseFormData | ConsolidateFormData
 
 export type FormModalFields = {
   'step-name': string,

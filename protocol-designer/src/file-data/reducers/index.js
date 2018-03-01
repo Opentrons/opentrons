@@ -24,10 +24,10 @@ const metadataFields = handleActions({
   })
 }, defaultFields)
 
-type PipetteState = {
-  left?: PipetteData,
-  right?: PipetteData
-}
+type PipetteState = {|
+  left: ?PipetteData,
+  right: ?PipetteData
+|}
 
 function createPipette (name: string, mount: Mount) {
   const pipetteData = pipetteDataByName[name]
