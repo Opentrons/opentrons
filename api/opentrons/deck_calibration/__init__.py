@@ -29,7 +29,6 @@ def position(pipette):
 
 def jog(axis, direction, step):
 
-    print('Moving Robot')
     robot._driver.move(
         {axis: robot._driver.position[axis] + direction * step})
 

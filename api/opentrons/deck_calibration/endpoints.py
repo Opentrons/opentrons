@@ -102,7 +102,6 @@ class SessionManager:
         given by the user.
         """
         if self.current_mount:
-            print('In Jog')
             res = jog(
                 data['axis'],
                 float(data['direction']),
