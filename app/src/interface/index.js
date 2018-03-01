@@ -3,7 +3,6 @@
 import {makeActionName} from '../util'
 
 export const NAME = 'interface'
-const META_ALERT = `${NAME}:alert`
 
 export const PANEL_NAMES = ['connect', 'upload', 'setup', 'more']
 export const PANEL_PROPS_BY_NAME = {
@@ -67,21 +66,4 @@ export function reducer (state = INITIAL_STATE, action) {
   }
 
   return state
-}
-
-export function tagAlertAction (action, message) {
-  const meta = action.meta || {}
-  return {...action, meta: {...meta, [META_ALERT]: message}}
-}
-
-export function alertMiddleware (root) {
-  return (store) => (next) => (action) => {
-    const message = action.meta && action.meta[META_ALERT]
-
-    if (message) {
-      root.alert(message)
-    }
-
-    return next(action)
-  }
 }

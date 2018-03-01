@@ -145,7 +145,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles DISCONNECT_RESPONSE success', () => {
+  test('handles DISCONNECT_RESPONSE', () => {
     const state = {
       connection: {
         connectedTo: 'ot',
@@ -157,24 +157,6 @@ describe('robot reducer - connection', () => {
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: '',
       disconnectRequest: {inProgress: false, error: null}
-    })
-  })
-
-  test('handles DISCONNECT_RESPONSE failure', () => {
-    const state = {
-      connection: {
-        connectedTo: 'ot',
-        disconnectRequest: {inProgress: true, error: null}
-      }
-    }
-    const action = {
-      type: 'robot:DISCONNECT_RESPONSE',
-      payload: {error: new Error('AH')}
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      connectedTo: 'ot',
-      disconnectRequest: {inProgress: false, error: new Error('AH')}
     })
   })
 

@@ -86,13 +86,8 @@ describe('robot actions', () => {
       type: 'robot:DISCONNECT_RESPONSE',
       payload: {}
     }
-    const failure = {
-      type: 'robot:DISCONNECT_RESPONSE',
-      payload: {error: new Error('AH')}
-    }
 
     expect(actions.disconnectResponse()).toEqual(success)
-    expect(actions.disconnectResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('session action', () => {

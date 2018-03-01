@@ -181,14 +181,11 @@ function handleDisconnectResponse (
   state: State,
   action: DisconnectResponseAction
 ): State {
-  const error = action.payload.error || null
-  let connectedTo = ''
-
-  if (error) {
-    connectedTo = state.connectedTo
+  return {
+    ...state,
+    connectedTo: '',
+    disconnectRequest: {error: null, inProgress: false}
   }
-
-  return {...state, connectedTo, disconnectRequest: {error, inProgress: false}}
 }
 
 function handleClearConnectResponse (
