@@ -196,31 +196,24 @@ async def update_api(request):
     """
     log.debug('Update request received')
     data = await request.post()
+    filename = data['whl'].filename
+    log.info('Preparing to install: {}'.format(filename))
+    content = data['whl'].file.read()
+
+    with open(filename, 'wb') as wf:
+        wf.write(content)
+
+    res = await _install(filename, request.loop)
+    log.debug('Install complete')
     try:
-        filename = data['whl'].filename
-        log.info('Preparing to install: {}'.format(filename))
-        content = data['whl'].file.read()
-
-        with open(filename, 'wb') as wf:
-            wf.write(content)
-
-        msg = await _install(filename, request.loop)
-        log.debug('Install complete')
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
-        log.debug("Result: {}".format(msg))
-        res = web.json_response({
-            'message': msg,
-            'filename': filename})
-    except Exception as e:
-        res = web.json_response(
-            {'error': 'Exception {} raised by update of {}. Trace: {}'.format(
-                type(e), data, e.__traceback__)},
-            status=500)
-
-    return res
+        os.remove(filename)
+    except OSError:
+        pass
+    log.debug("Result: {}".format(res))
+    return web.json_response({
+        'message': res,
+        'filename': filename
+    })
 
 
 async def restart(request):
