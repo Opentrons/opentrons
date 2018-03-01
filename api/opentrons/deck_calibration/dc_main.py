@@ -101,14 +101,14 @@ class CLITool:
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
-            'q': lambda: self.jog(
+            'q': lambda: self._jog(
                 self._current_pipette, +1, self.current_step()),
-            'a': lambda: self.jog(
+            'a': lambda: self._jog(
                 self._current_pipette, -1, self.current_step()),
-            'up': lambda: self.jog('Y', +1, self.current_step()),
-            'down': lambda: self.jog('Y', -1, self.current_step()),
-            'left': lambda: self.jog('X', -1, self.current_step()),
-            'right': lambda: self.jog('X', +1, self.current_step()),
+            'up': lambda: self._jog('Y', +1, self.current_step()),
+            'down': lambda: self._jog('Y', -1, self.current_step()),
+            'left': lambda: self._jog('X', -1, self.current_step()),
+            'right': lambda: self._jog('X', +1, self.current_step()),
             '1': lambda: self.validate(self._expected_points[1], 1),
             '2': lambda: self.validate(self._expected_points[2], 2),
             '3': lambda: self.validate(self._expected_points[3], 3),
@@ -138,12 +138,23 @@ class CLITool:
             self._steps_index = self._steps_index - 1
         return 'step: {}'.format(self.current_step())
 
+    def _position(self):
+        """
+        Read position from driver into a tuple and map 3-rd value
+        to the axis of a pipette currently used
+        """
+
+        res = position(self._current_pipette)
+
+        return res
+
     def _jog(self, axis, direction, step):
         """
         Move the pipette on `axis` in `direction` by `step` and update the
         position tracker
         """
-        self.current_position = jog(axis, direction, step)
+        jog(axis, direction, step)
+        self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
     def home(self) -> str:
@@ -151,7 +162,7 @@ class CLITool:
         Return the robot to the home position and update the position tracker
         """
         robot.home()
-        self.current_position = self.position()
+        self.current_position = self._position()
         return 'Homed'
 
     def save_point(self) -> str:
@@ -160,7 +171,7 @@ class CLITool:
         current position once the 'Enter' key is pressed to the 'actual points'
         vector.
         """
-        self._actual_points[self._current_point] = self.position()[:-1]
+        self._actual_points[self._current_point] = self._position()[:-1]
 
         msg = 'saved #{}: {}'.format(
             self._current_point, self._actual_points[self._current_point])
@@ -191,7 +202,7 @@ class CLITool:
         return '{}\n{}'.format(res, save_config())
 
     def save_z_value(self) -> str:
-        actual_z = self.position()[-1]
+        actual_z = self._position()[-1]
         expected_z = self._calibration_matrix[2][3] + self._tip_length
         new_z = self._calibration_matrix[2][3] + actual_z - expected_z
         self._calibration_matrix[2][3] = new_z
@@ -209,7 +220,7 @@ class CLITool:
         # TODO                 have to do dot product & etc here
         v = array(list(point) + [1])
         x, y, z, _ = dot(
-            inv(self._calibration_matrix), list(self.position()) + [1])
+            inv(self._calibration_matrix), list(self._position()) + [1])
 
         if z < SAFE_HEIGHT:
             _, _, z, _ = dot(self._calibration_matrix, [x, y, SAFE_HEIGHT, 1])
