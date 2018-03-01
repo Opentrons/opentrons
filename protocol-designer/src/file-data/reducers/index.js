@@ -3,7 +3,7 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
 import {updateFileFields} from '../actions'
-import {pipetteDataByName} from '../pipetteData'
+import {pipetteDataByName, type PipetteName} from '../pipetteData'
 
 import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../../step-generation'
@@ -29,10 +29,11 @@ type PipetteState = {|
   right: ?PipetteData
 |}
 
-function createPipette (name: string, mount: Mount) {
+function createPipette (name: PipetteName, mount: Mount) {
   const pipetteData = pipetteDataByName[name]
   if (!pipetteData) {
-    // TODO IMMEDIATELY handle better!!!!!!
+    // TODO Ian 2018-03-01 I want Flow to enforce `name` is a key in pipetteDataByName,
+    // but it doesn't seem to want to be strict about it
     throw new Error('Invalid pipette name, no entry in pipetteDataByName')
   }
   return {
