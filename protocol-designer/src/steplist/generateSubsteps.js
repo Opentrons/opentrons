@@ -13,7 +13,7 @@ import type {
 
 import type {ConsolidateFormData} from '../step-generation'
 
-// TODO rename and move to types?
+// TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
   errors: {[string]: string},
   validatedForm: ProcessedFormData | null // TODO: incompleteData field when this is null?

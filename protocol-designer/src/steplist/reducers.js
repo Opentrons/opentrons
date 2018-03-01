@@ -266,9 +266,11 @@ const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} =
   })
 }
 
+const orderedStepsSelector = (state: BaseState) => rootSelector(state).orderedSteps
+
 const allSteps = createSelector(
   (state: BaseState) => rootSelector(state).steps,
-  (state: BaseState) => rootSelector(state).orderedSteps,
+  orderedStepsSelector,
   (state: BaseState) => rootSelector(state).collapsedSteps,
   allSubsteps,
   (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
@@ -332,6 +334,7 @@ export const selectors = {
     (state: RootState) => state.stepCreationButtonExpanded
   ),
   allSteps,
+  orderedSteps: orderedStepsSelector,
   selectedStep: selectedStepSelector,
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   selectedStepFormData: createSelector(
