@@ -1,8 +1,8 @@
 // @flow
-import type {Command, StepType, StepIdType, FormData, ProcessedFormData} from './types' /* StepSubItemData, StepIdType */
+import type {StepType, StepIdType, FormData, ProcessedFormData} from './types' /* StepSubItemData, StepIdType */
 import {humanize} from '../utils'
-import flatMap from 'lodash/flatMap'
-import zip from 'lodash/zip'
+// import flatMap from 'lodash/flatMap'
+// import zip from 'lodash/zip'
 
 // TODO rename and move to types?
 export type ValidFormAndErrors = {
@@ -86,7 +86,7 @@ export function validateAndProcessForm (formData: FormData): ValidFormAndErrors 
       validatedForm: (
         !formHasErrors({errors}) &&
         // extra explicit for flow
-        (pipette === 'left' || pipette === 'right') &&
+        pipette &&
         sourceLabware &&
         destLabware
       )
@@ -147,38 +147,39 @@ export function validateAndProcessForm (formData: FormData): ValidFormAndErrors 
   }
 }
 
-export function generateCommands (data: ProcessedFormData): Array<Command> {
-  if (data.stepType === 'transfer') {
-    // TODO: this should be done in validation/preprocessing step
-    const {sourceWells, destWells, volume, pipette, sourceLabware, destLabware} = data
-
-    if (sourceWells.length !== destWells.length) {
-      throw new Error('generateSubsteps expected matching N:N source:dest wells for transfer')
-    }
-
-    // TODO strings should already be numbers, validation should already happen
-    // TODO handle touch tip
-    return flatMap(zip(sourceWells, destWells), ([sourceWell, destWell]): Array<Command> => [
-      {
-        commandType: 'aspirate',
-        volume, // TODO add dispense volume etc
-        pipette,
-        labware: sourceLabware,
-        well: sourceWell
-      },
-      {
-        commandType: 'dispense',
-        volume,
-        pipette,
-        labware: destLabware,
-        well: destWell
-      }
-    ])
-  }
-  // TODO IMMEDIATELY Ian 2018-02-14 why does this keep getting undefined stepType?
-  console.warn('generateCommands only supports transfer, got: ' + data.stepType, data)
-  return [] // TODO
-}
+// TODO Ian 2018-03-01 -- this is the old transfer commands / subcommands - DELETE!
+// export function generateCommands (data: ProcessedFormData): Array<Command> {
+//   if (data.stepType === 'transfer') {
+//     // TODO: this should be done in validation/preprocessing step
+//     const {sourceWells, destWells, volume, pipette, sourceLabware, destLabware} = data
+//
+//     if (sourceWells.length !== destWells.length) {
+//       throw new Error('generateSubsteps expected matching N:N source:dest wells for transfer')
+//     }
+//
+//     // TODO strings should already be numbers, validation should already happen
+//     // TODO handle touch tip
+//     return flatMap(zip(sourceWells, destWells), ([sourceWell, destWell]): Array<Command> => [
+//       {
+//         commandType: 'aspirate',
+//         volume, // TODO add dispense volume etc
+//         pipette,
+//         labware: sourceLabware,
+//         well: sourceWell
+//       },
+//       {
+//         commandType: 'dispense',
+//         volume,
+//         pipette,
+//         labware: destLabware,
+//         well: destWell
+//       }
+//     ])
+//   }
+//   // TODO IMMEDIATELY Ian 2018-02-14 why does this keep getting undefined stepType?
+//   console.warn('generateCommands only supports transfer, got: ' + data.stepType, data)
+//   return [] // TODO
+// }
 
 // export function generateSubsteps (): Array<StepSubItemData> {
 //   // TODO: create substeps from formData. It doesn't show all the aspirate/dispenses because it ignores mix, etc.

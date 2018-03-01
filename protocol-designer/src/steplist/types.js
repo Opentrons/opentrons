@@ -1,19 +1,8 @@
 // @flow
-import type {Mount} from '@opentrons/components'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
-
-export type Command = {
-  commandType: 'aspirate' | 'dispense', // TODO add the rest
-  volume: number,
-  pipette: string,
-  labware: string,
-  well: string,
-  wellOffset?: any, // TODO
-  speed?: number // TODO. In ul/sec
-}
 
 // TODO Ian 2018-01-16 factor out to steplist/constants.js ?
 export const stepIconsByType = {
@@ -138,7 +127,7 @@ export type FormData = TransferForm | ConsolidateForm | PauseForm
 /* TODO immediately: add ALL fields to this data, split transfer and consolidate apart */
 export type TransferishFormData = {|
   stepType: 'transfer' | 'consolidate',
-  pipette: Mount, // TODO: pipette ID vs mount enum is TBD
+  pipette: string, // pipette ID
   sourceWells: Array<string>,
   destWells: Array<string>,
   sourceLabware: string,

@@ -293,7 +293,10 @@ const labwareOptions: (state: BaseState) => Array<{value: string, name: string}>
     }
     return [
       ...acc,
-      {name: containerFields.name, value: containerId}
+      {
+        name: containerFields.name || `${containerFields.slot}: ${containerFields.type}`,
+        value: containerId
+      }
     ]
   }, [])
 )

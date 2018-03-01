@@ -3,7 +3,7 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
-import flatMap from 'lodash/flatMap'
+// import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -12,7 +12,6 @@ import range from 'lodash/range'
 import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
 import type {
-  Command,
   FormData,
   StepItemData,
   StepIdType,
@@ -26,7 +25,6 @@ import {
   type ValidFormAndErrors,
   generateNewForm,
   validateAndProcessForm,
-  generateCommands,
   formHasErrors
 } from './generateSubsteps' // TODO rename generateSubsteps.js to something else
 
@@ -297,65 +295,26 @@ const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} =>
     return {}
   }
 
-  return s.orderedSteps.reduce((acc, stepId) => {
+  if (s.steps[0].stepType !== 'deck-setup') {
+    console.error('Error: expected deck-setup to be first step.', s.orderedSteps)
+  }
+  return s.orderedSteps.slice(1).reduce((acc, stepId) => {
     if (s.steps[stepId].stepType === 'deck-setup') {
-      // const nextStepData = s.savedDeckSetups[stepId] // TODO: need savedDeckSetups in state
-      const nextStepData = { // TODO don't hard-code
-        errors: {},
-        validatedForm: {
-          stepType: 'deck-setup',
-          labware: {
-            sourcePlateId: { // TODO match real type of DeckSetupData
-              slot: '2',
-              type: '96-flat'
-            }
-          },
-          instruments: {
-            p300SingleId: {
-              mount: 'right',
-              model: 300
-            }
-          }
-        }
-      }
-      return {
-        ...acc,
-        [stepId]: nextStepData
-      }
-    } else {
-      const nextStepData = (s.savedStepForms[stepId] && s.steps[stepId])
-        ? validateAndProcessForm(s.savedStepForms[stepId])
-        : {
-          errors: {'form': ['no saved form for step ' + stepId]},
-          validatedForm: null
-        } // TODO revisit
+      throw new Error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
+    }
 
-      return {
-        ...acc,
-        [stepId]: nextStepData
-      }
+    const nextStepData = (s.savedStepForms[stepId] && s.steps[stepId])
+      ? validateAndProcessForm(s.savedStepForms[stepId])
+      : {
+        errors: {'form': ['no saved form for step ' + stepId]},
+        validatedForm: null
+      } // TODO revisit
+
+    return {
+      ...acc,
+      [stepId]: nextStepData
     }
   }, {})
-}
-
-const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
-  // TODO use existing selectors, don't rewrite!!!
-  const forms = validatedForms(state)
-  const orderedSteps = rootSelector(state).orderedSteps
-
-  // don't try to make commands if the step forms are null or if there are any errors.
-  if (orderedSteps.some(stepId => forms[stepId].validatedForm === null)) {
-    return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
-  }
-
-  return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
-    const formDataAndErrors = forms[stepId]
-    if (formDataAndErrors.validatedForm === null) {
-      throw new Error('validatedForm should not be null here') // for flow only, should be fully handled above
-    }
-    // TODO checking if there are some errors is repeated from substeps selector, DRY it up
-    return generateCommands(formDataAndErrors.validatedForm)
-  })
 }
 
 const deckSetupMode = createSelector(
@@ -411,7 +370,6 @@ export const selectors = {
   ),
   allSubsteps,
   validatedForms,
-  commands,
   currentFormErrors: (state: BaseState) => {
     const form = formData(state)
     return form && validateAndProcessForm(form).errors // TODO refactor selectors

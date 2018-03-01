@@ -6,6 +6,7 @@ import {
   DropdownField,
   AlertModal
 } from '@opentrons/components'
+import {pipetteData} from '../../file-data'
 
 import styles from './NewFileModal.css'
 import modalStyles from './modal.css'
@@ -22,18 +23,14 @@ type Props = {
   onSave: State => mixed
 }
 
-const pipetteOptions = [ // TODO: standardize pipette values
-  {name: 'None', value: ''},
-  {name: 'P10 Single-Channel', value: 'p10-single'},
-  {name: 'P10 8-Channel', value: 'p10-8channel'},
-  {name: 'P300 Single-Channel', value: 'p300-single'},
-  {name: 'P300 8-Channel', value: 'p300-8channel'}
-]
-
 // 'invalid' state is just a concern of these dropdowns, not selected pipette state in general
 const INVALID = 'INVALID'
 
-const pipetteOptionsWithInvalid = [{name: '', value: INVALID}, ...pipetteOptions]
+const pipetteOptionsWithInvalid = [
+  {name: '', value: INVALID},
+  {name: 'None', value: ''},
+  ...pipetteData.pipetteOptions
+]
 
 const initialState = {
   name: '',
