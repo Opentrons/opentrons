@@ -14,8 +14,8 @@ export type FilePageFields = {
 
 export type FilePageFieldAccessors = $Keys<FilePageFields>
 
-type ISODate = $Subtype<string> // TODO Ian 2018-02-28 ???
-type VersionString = $Subtype<string> // TODO Ian 2018-02-28 ???
+type MsSinceEpoch = number
+type VersionString = string // eg '1.0.0'
 
 // A JSON protocol
 export type ProtocolFile = {
@@ -25,8 +25,8 @@ export type ProtocolFile = {
     'protocol-name': string,
     author: string,
     description: string,
-    created: ISODate,
-    'last-modified': ISODate | null,
+    created: MsSinceEpoch,
+    'last-modified': MsSinceEpoch | null,
     // TODO LATER string enums for category/subcategory? Or just strings?
     category: string | null,
     subcategory: string | null,

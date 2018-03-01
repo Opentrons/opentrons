@@ -26,7 +26,7 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
         'protocol-name': name,
         author,
         description,
-        created: new Date().toISOString(),
+        created: Date.now(),
         'last-modified': null,
         category: null,
         subcategory: null,

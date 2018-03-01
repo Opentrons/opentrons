@@ -19,7 +19,7 @@ export default function FileSidebar (props: Props) {
         <div>
           <div className={styles.download_button}>
             <PrimaryButton Component='a' download={props.downloadData.fileName}
-              href={'data:applicatin/json;charset=utf-8,' + encodeURIComponent(props.downloadData.fileContents)}
+              href={'data:application/json;charset=utf-8,' + encodeURIComponent(props.downloadData.fileContents)}
             >Download</PrimaryButton>
           </div>
           <div className={styles.divider} />
