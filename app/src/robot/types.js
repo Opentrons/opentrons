@@ -33,9 +33,13 @@ export type JogButtonName =
   | 'up'
   | 'down'
 
+// minimum robot for actions/reducers/middleware to work
+export type BaseRobot = {
+  name: string
+}
+
 // robot MDNS service for connectivity
-export type RobotService = {
-  name: string,
+export type RobotService = BaseRobot & {
   host: string,
   ip: string,
   port: number,

@@ -35,6 +35,8 @@ function dispatchFromWorker (action) {
   } catch (error) {
     console.error('Unable to dispatch action from worker', action, error)
   }
+
+  return action
 }
 
 function errorToPlainObject (error) {

@@ -49,10 +49,10 @@ type RequestPath = 'list' | 'status' | 'configure'
 
 export type WifiRequestAction = {|
   type: 'api:WIFI_REQUEST',
-  payload: {
+  payload: {|
     robot: RobotService,
     path: RequestPath,
-  }
+  |}
 |}
 
 export type WifiSuccessAction = {|

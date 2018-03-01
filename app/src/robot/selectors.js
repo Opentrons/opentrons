@@ -47,9 +47,13 @@ export function getIsScanning (state: State): boolean {
   return connection(state).isScanning
 }
 
+export function getDiscoveredByName (state: State) {
+  return connection(state).discoveredByName
+}
+
 export const getDiscovered = createSelector(
   (state: State) => connection(state).discovered,
-  (state: State) => connection(state).discoveredByName,
+  getDiscoveredByName,
   (state: State) => connection(state).connectedTo,
   (discovered, discoveredByName, connectedTo): Robot[] => {
     const robots = discovered.map((name) => ({
@@ -69,8 +73,12 @@ export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
+export function getConnectedRobotName (state: State) {
+  return connection(state).connectedTo
+}
+
 export const getConnectionStatus = createSelector(
-  (state: State) => connection(state).connectedTo,
+  getConnectedRobotName,
   (state: State) => getConnectRequest(state).inProgress,
   (state: State) => connection(state).disconnectRequest.inProgress,
   (connectedTo, isConnecting, isDisconnecting): ConnectionStatus => {
