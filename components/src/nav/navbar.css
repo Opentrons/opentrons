@@ -22,8 +22,8 @@
 
 .title {
   display: block;
-  color: --c-font-dark;
-  font-size: --fs-caption;
+  color: var(--c-font-dark);
+  font-size: var(--fs-caption);
   text-transform: capitalize;
   text-align: center;
   margin-top: 0.25rem;
@@ -47,9 +47,11 @@ revisit once we have a need for more than one icon aligned to bottom.
   }
 }
 
-.button[disabled] {
+.button[disabled],
+.disabled {
   opacity: 0.3;
   cursor: default;
+  pointer-events: none;
 }
 
 .active {

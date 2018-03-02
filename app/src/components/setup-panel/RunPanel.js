@@ -31,13 +31,11 @@ export default connect(
 )(RunPanel)
 
 function RunPanel (props: RunPanelProps) {
-  const {isRunning, labwareConfirmed, readyToRun, run} = props
-  const runMessage = labwareConfirmed && (<RunMessage />)
+  const {isRunning, readyToRun, run} = props
   const isDisabled = !readyToRun || isRunning
 
   return (
     <div>
-      {readyToRun && runMessage}
       <RunButton onClick={run} disabled={isDisabled} />
     </div>
   )
@@ -58,7 +56,7 @@ function mapDispatchToProps (
   return {
     run: () => {
       dispatch(push('/run'))
-      dispatch(robotActions.run())
+      // dispatch(robotActions.run())
     }
   }
 }

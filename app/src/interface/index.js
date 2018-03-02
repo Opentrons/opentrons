@@ -4,11 +4,12 @@ import {makeActionName} from '../util'
 
 export const NAME = 'interface'
 
-export const PANEL_NAMES = ['connect', 'upload', 'setup', 'more']
+export const PANEL_NAMES = ['connect', 'upload', 'setup', 'run', 'more']
 export const PANEL_PROPS_BY_NAME = {
+  connect: {title: 'Robots'},
   upload: {title: 'Open Protocol'},
   setup: {title: 'Prepare for Run'},
-  connect: {title: 'Robots'},
+  run: {title: 'Execute Run'},
   more: {title: 'Menu'}
 }
 const DEFAULT_PANEL = 'connect'
