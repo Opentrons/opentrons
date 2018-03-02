@@ -23,6 +23,7 @@ function mapStateToProps (state, ownProps) {
   const labware = robotSelectors.getNotTipracks(state)
   const nextLabware = robotSelectors.getNextLabware(state)
   const isTipsProbed = robotSelectors.getInstrumentsCalibrated(state)
+  const isRunning = robotSelectors.getIsRunning(state)
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
@@ -44,13 +45,13 @@ function mapStateToProps (state, ownProps) {
       url: '/robots'
     },
     upload: {
-      disabled: !isConnected,
+      disabled: !isConnected || isRunning,
       iconName: FILE,
       title: 'protocol',
       url: '/upload'
     },
     setup: {
-      disabled: !isSessionLoaded,
+      disabled: !isSessionLoaded || isRunning,
       iconName: CALIBRATE,
       title: 'calibrate',
       url: calibrateUrl
