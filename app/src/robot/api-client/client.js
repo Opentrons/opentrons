@@ -92,6 +92,8 @@ export default function client (dispatch) {
     rpcClient = null
     remote = null
 
+    // TODO(mc, 2018-03-02): refactor this away
+    dispatch(push('/robots'))
     dispatch(actions.disconnectResponse())
   }
 
