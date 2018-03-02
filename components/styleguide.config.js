@@ -86,6 +86,9 @@ module.exports = {
       '@global .height-3-rem': {
         height: '3rem !important'
       },
+      '@global .height-40-rem': {
+        height: '40rem !important'
+      },
       '@global .dark_background': {
         backgroundColor: 'rgba(0, 0, 0, 0.9)'
       },
