@@ -8,7 +8,8 @@ import {
   TitleBar,
   Card,
   RefreshCard,
-  LabeledValue
+  LabeledValue,
+  Splash
 } from '..'
 
 describe('TitleBar', () => {
@@ -189,6 +190,24 @@ describe('LabeledValue', () => {
   test('renders LabeledValue correctly', () => {
     const tree = Renderer.create(
       <LabeledValue label={'Label'} value={'Value'} />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('Splash', () => {
+  test('renders correctly with no props', () => {
+    const tree = Renderer.create(
+      <Splash />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders correctly with custom props', () => {
+    const tree = Renderer.create(
+      <Splash iconName='flask' className='swag' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

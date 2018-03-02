@@ -11,10 +11,9 @@ import {
   type Robot
 } from '../robot'
 
-import {TitleBar} from '@opentrons/components'
+import {TitleBar, Splash} from '@opentrons/components'
 import Page from '../components/Page'
 import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
-import Splash from '../components/Splash'
 
 type StateProps = {
   robot: ?Robot,

@@ -39,6 +39,7 @@ export const COPY = 'copy'
 export const MORE = 'more'
 export const CALIBRATE = 'calibrate'
 export const RUN = 'run'
+export const LOGO = 'logo'
 
 // icon data
 const ICON_DATA_BY_NAME = {
@@ -189,6 +190,11 @@ const ICON_DATA_BY_NAME = {
   [RUN]: {
     viewBox: '0 0 24 24',
     path: 'M18.83 11.58V1.89a.6.6 0 0 0-.61-.62H5a.64.64 0 0 0-.62.64v17.34a.62.62 0 0 0 .62.64h5.45a6.06 6.06 0 1 0 8.41-8.31zm-9.36 5.09a6 6 0 0 0 .4 2.1H5.54V2.48h12.14V11a6 6 0 0 0-8.2 5.66zm4.61 2.81v-5.64l3.72 2.76z'
+  },
+  [LOGO]: {
+    viewBox: '0 0 24 24',
+    // TODO IMMEDIATELY real logo svg
+    path: 'M17.3 9.9C15.1 6.5 12.5 3 12.5 3S9.9 6.5 7.7 9.9c-1.9 2.9-2.5 6.5-.1 9 1.3 1.4 3.1 2.1 4.9 2.1 1.8 0 3.6-.7 4.9-2.1 2.4-2.6 1.8-6.1-.1-9zm-4.9 9.4h-.3c-1.2-.1-2.4-.6-3.3-1.6-.7-.9-1.1-1.9-1.1-2.9 2.4.1 4.4-1.6 6.1-3.1.4-.4 1-.7 1.6-.7h.2c1.3.4 1.9 2.6 1.8 3.7-.1 2.6-2.3 4.7-5 4.6z'
   }
 }
 

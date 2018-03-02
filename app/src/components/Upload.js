@@ -5,8 +5,7 @@ import cx from 'classnames'
 
 import {PANEL_PROPS_BY_NAME} from '../interface'
 
-import {Icon, ALERT, CHECKED, SPINNER} from '@opentrons/components'
-import Splash from './Splash'
+import {Icon, ALERT, CHECKED, SPINNER, Splash} from '@opentrons/components'
 
 import styles from './Upload.css'
 
