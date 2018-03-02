@@ -3,11 +3,8 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
-// import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
-import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
-import range from 'lodash/range'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
@@ -16,7 +13,6 @@ import type {
   StepItemData,
   StepIdType,
   StepSubItemData,
-  PauseFormData,
   FormSectionState,
   FormModalFields
 } from './types'
@@ -26,7 +22,11 @@ import {
   generateNewForm,
   validateAndProcessForm,
   formHasErrors
-} from './generateSubsteps' // TODO rename generateSubsteps.js to something else
+} from './formProcessing'
+
+import {
+  generateSubsteps
+} from './generateSubsteps'
 
 import type {
   AddStepAction,
@@ -219,72 +219,7 @@ const selectedStepId = createSelector(
   (state: RootState) => state.selectedStep
 )
 
-const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} => {
-  const validForms = validatedForms(state)
-  console.log('allSubsteps', {validForms})
-  return mapValues(validForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
-    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (valForm.validatedForm === null || formHasErrors(valForm)) {
-      return null
-    }
-
-    if (valForm.validatedForm.stepType === 'deck-setup') {
-      // No substeps for Deck Setup
-      return null
-    }
-
-    if (valForm.validatedForm.stepType === 'transfer') {
-      const {
-        sourceWells,
-        destWells
-        // sourceLabware, // TODO: show labware & volume, see new designs
-        // destLabware,
-        // volume
-      } = valForm.validatedForm
-
-      return {
-        stepType: 'transfer',
-        parentStepId: stepId,
-        rows: range(sourceWells.length).map(i => ({
-          substepId: i,
-          sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
-          destIngredientName: 'ING2',
-          sourceWell: sourceWells[i],
-          destWell: destWells[i]
-        }))
-      }
-    }
-
-    if (valForm.validatedForm.stepType === 'pause') {
-      // just returns formData
-      const formData: PauseFormData = valForm.validatedForm
-      return formData
-    }
-
-    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
-    return null
-  })
-}
-
 const orderedStepsSelector = (state: BaseState) => rootSelector(state).orderedSteps
-
-const allSteps = createSelector(
-  (state: BaseState) => rootSelector(state).steps,
-  orderedStepsSelector,
-  (state: BaseState) => rootSelector(state).collapsedSteps,
-  allSubsteps,
-  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
-    ...steps[id],
-    collapsed: collapsedSteps[id],
-    substeps: _allSubsteps[id]
-  }))
-)
-
-const selectedStepSelector = createSelector(
-  allSteps,
-  selectedStepId,
-  (allSteps, selectedStepId) => allSteps && selectedStepId !== null && allSteps[selectedStepId]
-)
 
 // TODO SOON Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} => {
@@ -318,6 +253,29 @@ const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} =>
     }
   }, {})
 }
+
+const allSubsteps: (state: BaseState) => {[StepIdType]: StepSubItemData | null} = createSelector(
+  validatedForms,
+  generateSubsteps
+)
+
+const allSteps = createSelector(
+  (state: BaseState) => rootSelector(state).steps,
+  orderedStepsSelector,
+  (state: BaseState) => rootSelector(state).collapsedSteps,
+  allSubsteps,
+  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
+    ...steps[id],
+    collapsed: collapsedSteps[id],
+    substeps: _allSubsteps[id]
+  }))
+)
+
+const selectedStepSelector = createSelector(
+  allSteps,
+  selectedStepId,
+  (allSteps, selectedStepId) => allSteps && selectedStepId !== null && allSteps[selectedStepId]
+)
 
 const deckSetupMode = createSelector(
   (state: BaseState) => rootSelector(state).steps,

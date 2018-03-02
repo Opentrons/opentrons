@@ -23,13 +23,13 @@ export type StepIdType = number
 export type TransferishStepItem = {|
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
-  rows: Array<{
+  rows: Array<{|
     substepId: number, // TODO should this be a string or is this ID properly a number?
     sourceIngredientName?: string,
     destIngredientName?: string,
     sourceWell?: string,
     destWell?: string
-  }>
+  |}>
 |}
 
 export type StepSubItemData = TransferishStepItem | {|
@@ -50,6 +50,8 @@ export type StepItemData = {|
   stepType: StepType,
   description?: string
 |}
+
+export type SubSteps = {[StepIdType]: StepSubItemData | null}
 
 export type TransferForm = {|
   stepType: 'transfer',
