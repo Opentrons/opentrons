@@ -52,8 +52,10 @@ class CalibratorTestCase(unittest.TestCase):
         my_calibrator = Calibrator(deck, calibration_data)
 
         red = deck['A1']['tube_rack']['Red']
-        blue = deck['A1']['tube_rack']['Blue']
 
+        print("Red Deck {}".format(red.coordinates(deck['A1'])))
+        blue = deck['A1']['tube_rack']['Blue']
+        print("Blue Deck {}".format(blue.coordinates(deck['A1'])))
         self.assertEqual(
             my_calibrator.convert(red),
             (13, 18, 3))

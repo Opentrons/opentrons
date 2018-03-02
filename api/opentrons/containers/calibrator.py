@@ -51,8 +51,13 @@ class Calibrator(object):
         placeable, expected = unpack_location(location)
         coordinates_to_deck = placeable.coordinates(placeable.get_deck())
         expected_to_deck = expected + coordinates_to_deck
-
+        print("Actual {}".format(actual))
+        print("Placeable {}".format(placeable))
+        print("Expected {}".format(expected))
+        print("Coordinates deck {}".format(coordinates_to_deck))
+        print("Expected deck {}".format(expected_to_deck))
         delta = actual - expected_to_deck
+        print("Delta {}".format(delta))
         path = placeable.get_path()
         calibration_data = copy.deepcopy(calibration_data)
 
