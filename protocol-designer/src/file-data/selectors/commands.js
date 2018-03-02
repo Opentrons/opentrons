@@ -5,7 +5,8 @@ import reduce from 'lodash/reduce'
 import type {BaseState} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
-import {selectors as fileDataSelectors} from '../../file-data'
+import {equippedPipettes} from './'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -14,11 +15,9 @@ const all96Tips = reduce(
 )
 
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
-  base => base,
-  (s: BaseState) => {
-    const pipettes = fileDataSelectors.equippedPipettes(s)
-    const labware = s.labwareIngred.containers // TODO IMMEDIATELY use selector
-
+  equippedPipettes,
+  labwareIngredSelectors.getLabware,
+  (pipettes, labware) => {
     type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
     type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 
