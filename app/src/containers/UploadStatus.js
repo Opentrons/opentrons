@@ -1,7 +1,6 @@
 // upload progress container
 import {connect} from 'react-redux'
 
-import {actions as interfaceActions} from '../interface'
 import {selectors as robotSelectors} from '../robot'
 import Upload from '../components/Upload'
 
@@ -11,8 +10,4 @@ const mapStateToProps = (state) => ({
   error: robotSelectors.getUploadError(state)
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  openSetupPanel: () => dispatch(interfaceActions.setCurrentPanel('setup'))
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Upload)
+export default connect(mapStateToProps)(Upload)
