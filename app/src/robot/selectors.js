@@ -268,6 +268,15 @@ export const getInstruments = createSelector(
   }
 )
 
+export const getNextInstrument = createSelector(
+  getInstruments,
+  (instruments): ?Instrument => {
+    const nextInst = instruments.find((i) => !i.probed)
+
+    return nextInst || instruments[0]
+  }
+)
+
 // returns the mount of the pipette to use for deckware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
 export const getCalibrator = createSelector(

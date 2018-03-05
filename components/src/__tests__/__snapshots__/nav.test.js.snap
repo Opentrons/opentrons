@@ -2,7 +2,7 @@
 
 exports[`NavButton renders nav button with icon correctly 1`] = `
 <button
-  className="button"
+  className="button disabled"
   disabled="false"
   onClick={undefined}
 >
