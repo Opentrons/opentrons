@@ -3,7 +3,6 @@
 # pylama:skip=1
 
 from collections import namedtuple
-from datetime import datetime
 from opentrons.util import environment
 from opentrons.config import merge, children, build
 from opentrons.config import feature_flags as fflags
@@ -11,6 +10,7 @@ from opentrons.config import feature_flags as fflags
 import json
 import os
 import logging
+import time
 
 log = logging.getLogger(__name__)
 
@@ -214,14 +214,15 @@ def _check_version_and_update(config_json):
 
     if version in migration_functions:
         # backup the loaded configuration json file
-        tag = datetime.now().isoformat().split('.')[0].replace(':', '-')
-        tag += '-v{}'.format(version)
+        tag = '{}-v{}'.format(
+            int(time.time() * 1000),
+            version)
         _save_config_json(config_json, tag=tag)
         # migrate the configuration file
         migrate_func = migration_functions[version]
         config_json = migrate_func(config_json)
         # recursively update the config
-        # until there are no more migration methods for it's version
+        # until there are no more migration methods for its version
         config_json = _check_version_and_update(config_json)
 
     return config_json
