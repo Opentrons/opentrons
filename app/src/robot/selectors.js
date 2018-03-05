@@ -77,6 +77,11 @@ export function getConnectedRobotName (state: State) {
   return connection(state).connectedTo
 }
 
+export const getConnectedRobot = createSelector(
+  getDiscovered,
+  (discovered) => discovered.find((r) => r.isConnected)
+)
+
 export const getConnectionStatus = createSelector(
   getConnectedRobotName,
   (state: State) => getConnectRequest(state).inProgress,

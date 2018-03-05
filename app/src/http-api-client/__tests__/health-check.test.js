@@ -258,11 +258,13 @@ describe('health check', () => {
 
   describe('selectors', () => {
     test('makeGetHealthCheckOk', () => {
+      state.api.healthCheck[name].missed = 2
       const getHealthCheckOk = makeGetHealthCheckOk()
 
-      expect(getHealthCheckOk(state, robot)).toEqual(true)
+      // health check fails if id is cleared and missed threshold exceeded
+      expect(getHealthCheckOk(state, robot)).toEqual(false)
       expect(getHealthCheckOk(state, {name: 'alreadyRunning'})).toEqual(true)
-      expect(getHealthCheckOk(state, {name: 'alreadyMissed'})).toEqual(false)
+      expect(getHealthCheckOk(state, {name: 'alreadyMissed'})).toEqual(true)
       expect(getHealthCheckOk(state, {name: 'foobar'})).toEqual(null)
     })
   })

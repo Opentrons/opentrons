@@ -183,7 +183,9 @@ export const makeGetHealthCheckOk = () => createSelector(
   (state: ?RobotHealthCheck): ?boolean => {
     if (!state) return null
 
-    return state.missed < CHECK_THRESHOLD
+    const failed = state.id == null && state.missed >= CHECK_THRESHOLD
+
+    return !failed
   }
 )
 
