@@ -3,13 +3,14 @@
 import * as actions from './actions'
 import {rootReducer, type RootState} from './reducers'
 import * as selectors from './selectors'
-
+import * as pipetteData from './pipetteData'
 export * from './types'
 
 export {
   actions,
   rootReducer,
-  selectors
+  selectors,
+  pipetteData
 }
 
 export type {
