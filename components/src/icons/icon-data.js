@@ -4,6 +4,7 @@
 // icon names
 export const ALERT = 'alert'
 export const BACK = 'back'
+export const CIRCLE = 'circle'
 export const CLOSE = 'close'
 export const REFRESH = 'refresh'
 export const SPINNER = 'spinner'
@@ -46,6 +47,10 @@ const ICON_DATA_BY_NAME = {
   [BACK]: {
     viewBox: '0 0 24 24',
     path: 'M18 11.242v1.516H8.91l4.166 4.166L12 18l-6-6 6-6 1.076 1.076-4.167 4.166z'
+  },
+  [CIRCLE]: {
+    viewBox: '0 0 24 24',
+    path: 'M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'
   },
   [CLOSE]: {
     viewBox: '0 0 24 24',

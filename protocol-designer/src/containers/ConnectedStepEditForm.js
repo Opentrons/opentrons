@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
+// import type {Dispatch} from 'redux'
 
 import {
   changeFormInput,
@@ -14,7 +14,7 @@ import {
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
 import type {FormData} from '../steplist/types'
-import type {BaseState} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
 import StepEditForm, {type Props as StepEditFormProps} from '../components/StepEditForm'
 
@@ -45,12 +45,12 @@ function mapStateToProps (state: BaseState) {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<any>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
-    onCancel: e => dispatch(cancelStepForm()),
-    onSave: e => dispatch(saveStepForm()),
-    onClickMoreOptions: e => dispatch(openMoreOptionsModal()),
-    onToggleFormSection: (section) => e => dispatch(collapseFormSection(section)),
+    onCancel: () => dispatch(cancelStepForm()),
+    onSave: () => dispatch(saveStepForm()),
+    onClickMoreOptions: () => dispatch(openMoreOptionsModal()),
+    onToggleFormSection: (section) => () => dispatch(collapseFormSection(section)),
     handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
       // TODO Ian 2018-01-26 factor this nasty type handling out
       const dispatchEvent = value => dispatch(changeFormInput({accessor, value}))

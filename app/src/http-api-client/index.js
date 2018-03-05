@@ -9,17 +9,9 @@ export const reducer = combineReducers({
   wifi: wifiReducer
 })
 
-export {fetchHealth, makeGetRobotHealth} from './health'
-
-export {
-  fetchWifiList,
-  fetchWifiStatus,
-  setConfigureWifiBody,
-  configureWifi,
-  makeGetRobotWifiStatus,
-  makeGetRobotWifiList,
-  makeGetRobotWifiConfigure
-} from './wifi'
+export type {
+  ApiRequestError
+} from './client'
 
 export type {
   RobotHealth,
@@ -28,13 +20,29 @@ export type {
 } from './health'
 
 export type {
+  WifiListResponse,
+  WifiStatusResponse,
+  WifiConfigureResponse,
   RobotWifiList,
   RobotWifiStatus,
   RobotWifiConfigure
 } from './wifi'
 
+export type State = $Call<typeof reducer>
+
 export type Action =
   | HealthAction
   | WifiAction
 
-export type State = $Call<typeof reducer>
+export {fetchHealth, makeGetRobotHealth} from './health'
+
+export {
+  fetchWifiList,
+  fetchWifiStatus,
+  setConfigureWifiBody,
+  clearConfigureWifiResponse,
+  configureWifi,
+  makeGetRobotWifiStatus,
+  makeGetRobotWifiList,
+  makeGetRobotWifiConfigure
+} from './wifi'

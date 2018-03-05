@@ -24,6 +24,7 @@ module.exports = {
     $Keys: true,
     $Values: true,
     $Call: true,
+    $Diff: true,
     $PropertyType: true,
     Class: true
   },

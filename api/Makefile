@@ -30,45 +30,21 @@ publish:
 dev:
 	python opentrons/server/main.py -P 31950 opentrons.server.main:init
 
-dist/update.base64: clean
-	rm -rf dist/* && \
+.PHONY: wheel
+wheel:
 	python setup.py bdist_wheel && \
-	tar -C dist -cf /tmp/update . && \
-	echo -e "---OT UPDATE BEGIN---" > dist/update.base64 && \
-	base64 -i /tmp/update | sed -e "s/.\{50\}/&\n/g" >> dist/update.base64 && \
-	echo -e "\n---OT UPDATE END---" >> dist/update.base64
+	ls dist
 
 .PHONY: push
-push: dist/update.base64
-	curl -F 'data=@dist/update.base64' http://\[fd00:0:cafe:fefe::1\]/upload
+push: wheel
+	curl -X POST \
+		-H "Content-Type: multipart/form-data" \
+		-F 'whl=@dist/`ls dist | grep whl`' \
+		http://\[fd00:0:cafe:fefe::1\]/server/update
 
 .PHONY: term
 term:
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@fd00:0:cafe:fefe::1
-
-########## [START] RESIN DEVICE ##########
-
-.PHONY: info_device
-info_device:
-	resin device $(OT_DEVICE_ID)
-
-.PHONY: sync_device
-sync_device: clean
-	resin sync $(OT_DEVICE_ID) --source ./ --destination /usr/src/api --progress
-
-.PHONY: blink_device
-blink_device:
-	resin device identify $(OT_DEVICE_ID)
-
-.PHONY: active_devices
-active_devices:
-	resin devices --app OTone | awk 'NR==1 || /true/'
-
-.PHONY: ssh_device
-ssh_device:
-	resin ssh $(OT_DEVICE_ID)
-
-########## [END] RESIN DEVICE ##########
 
 .PHONY: clean
 clean:

@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import FormSection from './FormSection'
-import styles from './StepEditForm.css'
+import styles from './Form.css'
 import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
 
 import {formConnectorFactory} from '../utils'
@@ -24,10 +24,10 @@ export type Props = {
   pipetteOptions: Options,
   labwareOptions: Options,
   formSectionCollapse: FormSectionState,
-  onCancel: (event: SyntheticEvent<>) => void,
-  onSave: (event: SyntheticEvent<>) => void,
-  onClickMoreOptions: (event: SyntheticEvent<>) => void,
-  onToggleFormSection: (section: FormSectionNames) => any => void,
+  onCancel: (event: SyntheticEvent<>) => mixed,
+  onSave: (event: SyntheticEvent<>) => mixed,
+  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onToggleFormSection: (section: FormSectionNames) => mixed => mixed, // ???
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean

@@ -7,7 +7,7 @@ import {Form, Select, TextInput} from './inputs'
 import styles from './styles.css'
 
 type Props = {
-  wired: ?boolean,
+  disabled: boolean,
   ssid: ?string,
   psk: ?string,
   activeSsid: ?string,
@@ -18,7 +18,6 @@ type Props = {
 
 export default function ConfigureWifiForm (props: Props) {
   const {
-    wired,
     ssid,
     psk,
     activeSsid,
@@ -27,12 +26,13 @@ export default function ConfigureWifiForm (props: Props) {
     onSubmit
   } = props
 
-  const disabled = !wired || !ssid || !psk || (ssid === activeSsid)
+  const inputDisabled = props.disabled
+  const formDisabled = inputDisabled || !ssid || (ssid === activeSsid)
 
   return (
     <Form
       onSubmit={onSubmit}
-      disabled={disabled}
+      disabled={formDisabled}
       className={styles.configure_form}
     >
       <label className={styles.configure_label}>
@@ -41,7 +41,7 @@ export default function ConfigureWifiForm (props: Props) {
           name='ssid'
           value={ssid || activeSsid}
           options={networks}
-          disabled={!wired}
+          disabled={inputDisabled}
           onChange={onChange}
           className={styles.configure_input}
         />
@@ -52,14 +52,14 @@ export default function ConfigureWifiForm (props: Props) {
           type='password'
           name='psk'
           value={psk}
-          disabled={!wired}
+          disabled={inputDisabled}
           onChange={onChange}
           className={styles.configure_input}
         />
       </label>
       <OutlineButton
         type='submit'
-        disabled={disabled}
+        disabled={formDisabled}
         className={styles.configure_button}
       >
         Join

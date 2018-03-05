@@ -1,15 +1,16 @@
 import itertools
 import warnings
+import logging
 
 from opentrons import commands
-
 from opentrons.containers import unpack_location
-
 from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
+
+log = logging.getLogger(__name__)
 
 
 PLUNGER_POSITIONS = {
@@ -257,7 +258,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-    def move_to(self, location, strategy='arc'):
+    def move_to(self, location, strategy=None):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -286,7 +287,16 @@ class Pipette:
         if not location:
             return self
 
-        self._associate_placeable(location)
+        placeable, _ = unpack_location(location)
+
+        if strategy is None:
+            # if no strategy is specified, default to type 'arc'
+            strategy = 'arc'
+            # unless we are still within the same Well, then move directly
+            if placeable == self.previous_placeable:
+                strategy = 'direct'
+
+        self._associate_placeable(placeable)
         self.robot.move_to(
             location,
             instrument=self,
@@ -496,17 +506,27 @@ class Pipette:
         """
         assert self.tip_attached
 
-        # first go to the destination
+        placeable = None
         if location:
             placeable, _ = unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc')
+            # go to top of source, if not already there
+            if placeable != self.previous_placeable:
+                self.move_to(placeable.top())
+        else:
+            placeable = self.previous_placeable
 
-        # setup the plunger above the liquid
+        # if pipette is currently empty, ensure the plunger is at "bottom"
         if self.current_volume == 0:
-            self.robot.poses = self.instrument_actuator.move(
-                self.robot.poses,
-                x=self._get_plunger_position('bottom')
-            )
+            pos, _, _ = pose_tracker.absolute(
+                self.robot.poses, self.instrument_actuator)
+            if pos != self._get_plunger_position('bottom'):
+                # move to top of well to avoid touching liquid
+                if placeable:
+                    self.move_to(placeable.top())
+                self.robot.poses = self.instrument_actuator.move(
+                    self.robot.poses,
+                    x=self._get_plunger_position('bottom')
+                )
 
         # then go inside the location
         if location:
@@ -520,16 +540,10 @@ class Pipette:
         """
         assert self.tip_attached
 
-        # first go to the destination
-        if location:
-            placeable, _ = unpack_location(location)
-            self.move_to(placeable.top(), strategy='arc')
-
-        # then go inside the location
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(min(location.z_size(), 1))
-            self.move_to(location, strategy='direct')
+            self.move_to(location)
 
     def retract(self, safety_margin=10):
         '''
@@ -647,7 +661,7 @@ class Pipette:
         """
         assert self.tip_attached
 
-        self.move_to(location, strategy='arc')
+        self.move_to(location)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=self._get_plunger_position('blow_out')
@@ -708,7 +722,7 @@ class Pipette:
         # if no location specified, use the previously
         # associated placeable to get Well dimensions
         if location:
-            self.move_to(location, strategy='arc')
+            self.move_to(location)
         else:
             location = self.previous_placeable
 
@@ -823,7 +837,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3):
+    def pick_up_tip(self, location=None, presses=3, increment=1):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -844,6 +858,10 @@ class Pipette:
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
             not desireable, but could be used for dry-run)
+        increment: :int
+            The additional distance to travel on each successive press (e.g.:
+            if presses=3 and increment=1, then the first press will travel down
+            into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm
 
         Returns
         -------
@@ -881,13 +899,13 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(
-                self, location, presses, plunge_depth):
+                self, location, presses, plunge_depth, increment):
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
             )
             self.current_volume = 0
-            self.move_to(self.current_tip().top(0), strategy='arc')
+            self.move_to(self.current_tip().top(0))
 
             for i in range(int(presses)):
                 # move nozzle down into the tip
@@ -895,8 +913,9 @@ class Pipette:
                 self.instrument_mover.push_current()
                 self.instrument_mover.set_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
+                dist = plunge_depth + (-1 * increment * i)
                 self.move_to(
-                    self.current_tip().top(plunge_depth),
+                    self.current_tip().top(dist),
                     strategy='direct')
                 # move nozzle back up
                 self.instrument_mover.pop_current()
@@ -907,6 +926,7 @@ class Pipette:
             self._add_tip(
                 length=self._tip_length
             )
+            self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, abs(plunge_depth))
 
@@ -916,7 +936,8 @@ class Pipette:
             self,
             location=location,
             presses=presses,
-            plunge_depth=DEFAULT_TIP_PRESS_MM)
+            plunge_depth=DEFAULT_TIP_PRESS_MM,
+            increment=increment)
 
     def drop_tip(self, location=None, home_after=True):
         """
@@ -978,7 +999,7 @@ class Pipette:
         @commands.publish.both(command=commands.drop_tip)
         def _drop_tip(location, instrument=self):
             if location:
-                self.move_to(location, strategy='arc')
+                self.move_to(location)
 
             pos_bottom = self._get_plunger_position('bottom')
             pos_drop_tip = self._get_plunger_position('drop_tip')
@@ -1072,6 +1093,7 @@ class Pipette:
             self.robot.poses = self.instrument_actuator.home(
                 self.robot.poses)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
+            self.previous_placeable = None  # no longer inside a placeable
 
         _home(self.mount)
         return self

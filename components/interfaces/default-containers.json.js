@@ -1,3 +1,5 @@
+import type {LabwareLocations} from '../src/labware-types'
+
 declare module './src/default-containers.json' {
   declare var containers: {
     [containerType: string]: {
@@ -5,16 +7,7 @@ declare module './src/default-containers.json' {
         x: number,
         y: number
       },
-      locations: {
-        [wellName: string]: {
-          x: number,
-          y: number,
-          z: number,
-          depth: number,
-          diameter: number,
-          'total-liquid-volume': number
-        }
-      }
+      locations: LabwareLocations
     }
   }
 }

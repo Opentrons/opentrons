@@ -15,7 +15,8 @@ module.exports = {
     module: {
       rules: [
         rules.js,
-        rules.localCss
+        rules.localCss,
+        rules.images
       ]
     },
     plugins: [
@@ -55,6 +56,10 @@ module.exports = {
       components: 'src/deck/[A-Z]*.js'
     },
     {
+      name: 'Instrument Diagram',
+      components: 'src/instrument-diagram/[A-Z]*.js'
+    },
+    {
       name: 'Structure',
       components: 'src/structure/[A-Z]*.js'
     }
@@ -83,6 +88,15 @@ module.exports = {
       },
       '@global .dark_background': {
         backgroundColor: 'rgba(0, 0, 0, 0.9)'
+      },
+      '@global .notification-icon-parent': {
+        fill: '#333'
+      },
+      '@global .notification-icon-child': {
+        fill: 'orange',
+        bottom: '0',
+        right: '0',
+        width: '12px'
       }
     }
   }

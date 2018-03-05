@@ -11,13 +11,14 @@ import styles from './structure.css'
 type Props = {
   title: React.Node,
   subtitle?: React.Node,
-  onBackClick?: () => void,
+  onBackClick?: () => mixed,
   backClickDisabled?: boolean,
+  backButtonLabel?: string,
   className?: string
 }
 
 export default function TitleBar (props: Props) {
-  const {title, subtitle, onBackClick, backClickDisabled, className} = props
+  const {title, subtitle, onBackClick, backClickDisabled, backButtonLabel, className} = props
 
   const separator = subtitle && (
     <span className={styles.separator}>
@@ -34,12 +35,12 @@ export default function TitleBar (props: Props) {
   const backButton = onBackClick && (
     <FlatButton
       className={styles.back_button}
-      title='back'
+      title={backButtonLabel || 'back'}
       iconName={CHEVRON_LEFT}
       onClick={onBackClick}
       disabled={backClickDisabled}
     >
-      Back
+      {backButtonLabel || 'Back'}
     </FlatButton>
   )
 

@@ -7,7 +7,7 @@ import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticEvent<>) => mixed,
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */

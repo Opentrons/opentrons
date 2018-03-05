@@ -13,7 +13,7 @@ export type DropdownOption = {
 // TODO(mc, 2018-02-22): disabled prop
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => void,
+  onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is selected */
   value?: ?string,
   /** Array of {name, value} data */

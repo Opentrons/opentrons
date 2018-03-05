@@ -7,6 +7,7 @@ import {
   fetchWifiList,
   fetchWifiStatus,
   setConfigureWifiBody,
+  clearConfigureWifiResponse,
   configureWifi,
   reducer,
   makeGetRobotWifiStatus,
@@ -209,6 +210,15 @@ describe('wifi', () => {
     })
   })
 
+  test('clearConfigureWifiResponse action creator', () => {
+    const expected = {
+      type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
+      payload: {robot}
+    }
+
+    expect(clearConfigureWifiResponse(robot)).toEqual(expected)
+  })
+
   describe('configureWifi action creator', () => {
     const ssid = 'some-ssid'
     const psk = 'some-psk'
@@ -225,7 +235,7 @@ describe('wifi', () => {
       }
     }
 
-    test('configureWifi calls POST /wifi/configure, GET /wifi/list', () => {
+    test('calls POST /wifi/configure, GET /wifi/list', () => {
       const store = mockStore(initialState)
 
       client.__setMockResponse(response)
@@ -239,7 +249,7 @@ describe('wifi', () => {
         ))
     })
 
-    test('configureWifi dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
+    test('dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
       const store = mockStore(initialState)
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
@@ -255,7 +265,7 @@ describe('wifi', () => {
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
-    test('configureWifi dispatches WIFI_REQUEST and WIFI_FAILURE', () => {
+    test('dispatches WIFI_REQUEST and WIFI_FAILURE', () => {
       const error = {name: 'ResponseError', status: '400'}
       const store = mockStore(initialState)
       const expectedActions = [
@@ -486,6 +496,37 @@ describe('wifi', () => {
       })
     })
 
+    test('handles CLEAR_CONFIGURE_WIFI_RESPONSE', () => {
+      const state = {
+        wifi: {
+          opentrons: {
+            configure: {
+              request: {ssid: 'baz', psk: ''},
+              inProgress: false,
+              error: new Error('AH'),
+              response: {ssid: 'foo', message: 'bar'}
+            }
+          }
+        }
+      }
+
+      const action = {
+        type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
+        payload: {robot}
+      }
+
+      expect(reducer(state, action).wifi).toEqual({
+        opentrons: {
+          configure: {
+            request: {ssid: 'baz', psk: ''},
+            inProgress: false,
+            error: null,
+            response: null
+          }
+        }
+      })
+    })
+
     test('handles WIFI_REQUEST', () => {
       const state = {
         wifi: {
@@ -534,7 +575,7 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           configure: {
-            request: null,
+            request: {ssid: 'baz', psk: ''},
             inProgress: false,
             error: null,
             response: {ssid: 'baz', message: 'qux'}
@@ -548,6 +589,7 @@ describe('wifi', () => {
         wifi: {
           opentrons: {
             configure: {
+              request: {ssid: 'baz', psk: 'qux'},
               inProgress: true,
               error: null,
               response: {ssid: 'foo', message: 'bar'}
@@ -563,7 +605,7 @@ describe('wifi', () => {
       expect(reducer(state, action).wifi).toEqual({
         opentrons: {
           configure: {
-            request: null,
+            request: {ssid: 'baz', psk: 'qux'},
             inProgress: false,
             error: {name: 'ResponseError'},
             response: {ssid: 'foo', message: 'bar'}
