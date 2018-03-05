@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/ui/__mocks__/file.js",
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js",
       "\\.(css)$": "identity-obj-proxy"
     },
     "collectCoverageFrom": [

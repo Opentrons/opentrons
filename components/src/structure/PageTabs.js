@@ -10,8 +10,8 @@ import styles from './structure.css'
 type TabProps = {
   title: string,
   href: string,
-  isActive: bool,
-  isDisabled: bool
+  isActive: boolean,
+  isDisabled: boolean
 }
 
 export type PageTabProps = {

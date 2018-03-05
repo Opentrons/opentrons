@@ -42,6 +42,7 @@ export default function LabwareDropdown (props: LabwareDropdownProps) {
       containerType={item[0]}
       displayName={item[1]}
       onContainerChoose={onContainerChoose}
+      // TODO Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
       containerImgUrl={item.length >= 3 ? `http://docs.opentrons.com/_images/${item[2]}.png` : undefined}
     />
   )

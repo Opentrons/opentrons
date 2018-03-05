@@ -1,15 +1,11 @@
 @import './grid.css';
 
-.modal {
-  z-index: 100;
-}
-
 .big_text_box {
   height: 12rem;
 }
 
 .button_row {
-  /* TODO replicated in StepEditForm.css -- does this pattern exist anywhere else? */
+  /* TODO replicated in Form.css -- does this pattern exist anywhere else? */
   lost-utility: clearfix;
   margin-top: 2rem;
 

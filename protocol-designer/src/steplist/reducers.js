@@ -3,21 +3,16 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
-import flatMap from 'lodash/flatMap'
 import max from 'lodash/max'
-import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
-import range from 'lodash/range'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
 import type {
-  Command,
   FormData,
   StepItemData,
   StepIdType,
   StepSubItemData,
-  PauseFormData,
   FormSectionState,
   FormModalFields
 } from './types'
@@ -26,9 +21,12 @@ import {
   type ValidFormAndErrors,
   generateNewForm,
   validateAndProcessForm,
-  generateCommands,
   formHasErrors
-} from './generateSubsteps' // TODO rename generateSubsteps.js to something else
+} from './formProcessing'
+
+import {
+  generateSubsteps
+} from './generateSubsteps'
 
 import type {
   AddStepAction,
@@ -221,64 +219,7 @@ const selectedStepId = createSelector(
   (state: RootState) => state.selectedStep
 )
 
-const allSubsteps = (state: BaseState): {[StepIdType]: StepSubItemData | null} => {
-  const validForms = validatedForms(state)
-  console.log('allSubsteps', {validForms})
-  return mapValues(validForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
-    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (valForm.validatedForm === null || formHasErrors(valForm)) {
-      return null
-    }
-
-    if (valForm.validatedForm.stepType === 'deck-setup') {
-      // No substeps for Deck Setup
-      return null
-    }
-
-    if (valForm.validatedForm.stepType === 'transfer') {
-      const {
-        sourceWells,
-        destWells
-        // sourceLabware, // TODO: show labware & volume, see new designs
-        // destLabware,
-        // volume
-      } = valForm.validatedForm
-
-      return {
-        stepType: 'transfer',
-        parentStepId: stepId,
-        rows: range(sourceWells.length).map(i => ({
-          substepId: i,
-          sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
-          destIngredientName: 'ING2',
-          sourceWell: sourceWells[i],
-          destWell: destWells[i]
-        }))
-      }
-    }
-
-    if (valForm.validatedForm.stepType === 'pause') {
-      // just returns formData
-      const formData: PauseFormData = valForm.validatedForm
-      return formData
-    }
-
-    console.warn('allSubsteps doesnt support step type: ' + valForm.validatedForm.stepType)
-    return null
-  })
-}
-
-const allSteps = createSelector(
-  (state: BaseState) => rootSelector(state).steps,
-  (state: BaseState) => rootSelector(state).orderedSteps,
-  (state: BaseState) => rootSelector(state).collapsedSteps,
-  allSubsteps,
-  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
-    ...steps[id],
-    collapsed: collapsedSteps[id],
-    substeps: _allSubsteps[id]
-  }))
-)
+const orderedStepsSelector = (state: BaseState) => rootSelector(state).orderedSteps
 
 // TODO SOON Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms
 const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} => {
@@ -291,66 +232,50 @@ const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} =>
     return {}
   }
 
-  return s.orderedSteps.reduce((acc, stepId) => {
+  if (s.steps[0].stepType !== 'deck-setup') {
+    console.error('Error: expected deck-setup to be first step.', s.orderedSteps)
+  }
+  return s.orderedSteps.slice(1).reduce((acc, stepId) => {
     if (s.steps[stepId].stepType === 'deck-setup') {
-      // const nextStepData = s.savedDeckSetups[stepId] // TODO: need savedDeckSetups in state
-      const nextStepData = { // TODO don't hard-code
-        errors: {},
-        validatedForm: {
-          stepType: 'deck-setup',
-          labware: {
-            sourcePlateId: { // TODO match real type of DeckSetupData
-              slot: '2',
-              type: '96-flat'
-            }
-          },
-          instruments: {
-            p300SingleId: {
-              mount: 'right',
-              model: 300
-            }
-          }
-        }
-      }
-      return {
-        ...acc,
-        [stepId]: nextStepData
-      }
-    } else {
-      const nextStepData = (s.savedStepForms[stepId] && s.steps[stepId])
-        ? validateAndProcessForm(s.savedStepForms[stepId])
-        : {
-          errors: {'form': ['no saved form for step ' + stepId]},
-          validatedForm: null
-        } // TODO revisit
+      throw new Error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
+    }
 
-      return {
-        ...acc,
-        [stepId]: nextStepData
-      }
+    const nextStepData = (s.savedStepForms[stepId] && s.steps[stepId])
+      ? validateAndProcessForm(s.savedStepForms[stepId])
+      : {
+        errors: {'form': ['no saved form for step ' + stepId]},
+        validatedForm: null
+      } // TODO revisit
+
+    return {
+      ...acc,
+      [stepId]: nextStepData
     }
   }, {})
 }
 
-const commands = (state: BaseState): Array<Command> | 'ERROR COULD NOT GENERATE COMMANDS (TODO)' => {
-  // TODO use existing selectors, don't rewrite!!!
-  const forms = validatedForms(state)
-  const orderedSteps = rootSelector(state).orderedSteps
+const allSubsteps: (state: BaseState) => {[StepIdType]: StepSubItemData | null} = createSelector(
+  validatedForms,
+  generateSubsteps
+)
 
-  // don't try to make commands if the step forms are null or if there are any errors.
-  if (orderedSteps.some(stepId => forms[stepId].validatedForm === null)) {
-    return 'ERROR COULD NOT GENERATE COMMANDS (TODO)'
-  }
+const allSteps = createSelector(
+  (state: BaseState) => rootSelector(state).steps,
+  orderedStepsSelector,
+  (state: BaseState) => rootSelector(state).collapsedSteps,
+  allSubsteps,
+  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
+    ...steps[id],
+    collapsed: collapsedSteps[id],
+    substeps: _allSubsteps[id]
+  }))
+)
 
-  return orderedSteps && flatMap(orderedSteps, (stepId): Array<Command> => {
-    const formDataAndErrors = forms[stepId]
-    if (formDataAndErrors.validatedForm === null) {
-      throw new Error('validatedForm should not be null here') // for flow only, should be fully handled above
-    }
-    // TODO checking if there are some errors is repeated from substeps selector, DRY it up
-    return generateCommands(formDataAndErrors.validatedForm)
-  })
-}
+const selectedStepSelector = createSelector(
+  allSteps,
+  selectedStepId,
+  (allSteps, selectedStepId) => allSteps && selectedStepId !== null && allSteps[selectedStepId]
+)
 
 const deckSetupMode = createSelector(
   (state: BaseState) => rootSelector(state).steps,
@@ -361,12 +286,15 @@ const deckSetupMode = createSelector(
 )
 
 export const selectors = {
+  rootSelector,
   stepCreationButtonExpanded: createSelector(
     rootSelector,
     (state: RootState) => state.stepCreationButtonExpanded
   ),
   allSteps,
-  selectedStepId,
+  orderedSteps: orderedStepsSelector,
+  selectedStep: selectedStepSelector,
+  selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   selectedStepFormData: createSelector(
     (state: BaseState) => rootSelector(state).savedStepForms,
     (state: BaseState) => rootSelector(state).selectedStep,
@@ -403,7 +331,6 @@ export const selectors = {
   ),
   allSubsteps,
   validatedForms,
-  commands,
   currentFormErrors: (state: BaseState) => {
     const form = formData(state)
     return form && validateAndProcessForm(form).errors // TODO refactor selectors

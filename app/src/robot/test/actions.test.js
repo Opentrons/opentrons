@@ -1,11 +1,10 @@
 // robot actions tests
-import {tagAction as tagForAnalytics} from '../../analytics'
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
   test('DISCOVER action', () => {
     const expected = {
-      type: actionTypes.DISCOVER,
+      type: 'robot:DISCOVER',
       meta: {robotCommand: true}
     }
 
@@ -14,7 +13,7 @@ describe('robot actions', () => {
 
   test('DISCOVER_FINISH action', () => {
     const expected = {
-      type: actionTypes.DISCOVER_FINISH
+      type: 'robot:DISCOVER_FINISH'
     }
 
     expect(actions.discoverFinish()).toEqual(expected)
@@ -24,7 +23,7 @@ describe('robot actions', () => {
     const name = 'Opentrons XYZ123'
     const host = '123456.local'
     const expected = {
-      type: actionTypes.ADD_DISCOVERED,
+      type: 'robot:ADD_DISCOVERED',
       payload: {host, name}
     }
 
@@ -34,7 +33,7 @@ describe('robot actions', () => {
   test('REMOVE_DISCOVERED action', () => {
     const service = {name: 'ot'}
     const expected = {
-      type: actionTypes.REMOVE_DISCOVERED,
+      type: 'robot:REMOVE_DISCOVERED',
       payload: service
     }
 
@@ -43,7 +42,7 @@ describe('robot actions', () => {
 
   test('CONNECT action', () => {
     const expected = {
-      type: actionTypes.CONNECT,
+      type: 'robot:CONNECT',
       payload: {name: 'ot'},
       meta: {robotCommand: true}
     }
@@ -52,14 +51,15 @@ describe('robot actions', () => {
   })
 
   test('CONNECT_RESPONSE action', () => {
-    const success = tagForAnalytics({
-      type: actionTypes.CONNECT_RESPONSE,
-      error: false
-    })
+    const success = {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: {},
+      meta: {analytics: true}
+    }
     const failure = {
-      type: actionTypes.CONNECT_RESPONSE,
-      error: true,
-      payload: new Error('AH')
+      type: 'robot:CONNECT_RESPONSE',
+      payload: {error: new Error('AH')},
+      meta: {analytics: true}
     }
 
     expect(actions.connectResponse()).toEqual(success)
@@ -74,7 +74,7 @@ describe('robot actions', () => {
 
   test('DISCONNECT action', () => {
     const expected = {
-      type: actionTypes.DISCONNECT,
+      type: 'robot:DISCONNECT',
       meta: {robotCommand: true}
     }
 
@@ -83,17 +83,11 @@ describe('robot actions', () => {
 
   test('DISCONNECT_RESPONSE action', () => {
     const success = {
-      type: actionTypes.DISCONNECT_RESPONSE,
-      error: false
-    }
-    const failure = {
-      type: actionTypes.DISCONNECT_RESPONSE,
-      error: true,
-      payload: new Error('AH')
+      type: 'robot:DISCONNECT_RESPONSE',
+      payload: {}
     }
 
     expect(actions.disconnectResponse()).toEqual(success)
-    expect(actions.disconnectResponse(new Error('AH'))).toEqual(failure)
   })
 
   test('session action', () => {

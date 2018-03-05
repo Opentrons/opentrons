@@ -3,10 +3,18 @@ import * as componentLibrary from '@opentrons/components'
 
 export const { humanize, wellNameSplit } = componentLibrary
 
+export type FormConnectorFactory<F> = (
+  handleChange: (accessor: F) => (e: SyntheticInputEvent<*>) => mixed,
+  formData: F
+) => FormConnector<F>
+
+export type FormConnector<F> = (accessor: $Keys<F>) =>
+  {onChange: (e: SyntheticInputEvent<*>) => mixed, value: $Values<F>}
+
 export const formConnectorFactory = (
-  handleChange: (string) => (e: SyntheticEvent<*>) => void,
-  formData: {}
-) => (accessor: string): {| onChange: any, value: any |} => ({
+  handleChange: (accessor: string) => (e: SyntheticInputEvent<*>) => mixed,
+  formData: Object
+): FormConnector<*> => (accessor: string) => ({
   // Uses single accessor string to pass onChange & value into form fields
   // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
   onChange: handleChange(accessor),

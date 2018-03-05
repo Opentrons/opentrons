@@ -498,6 +498,7 @@ class Container(Placeable):
         super(Container, self).__init__(*args, **kwargs)
         self.grid = None
         self.grid_transposed = None
+        self.ordering = None
 
     def invalidate_grid(self):
         """

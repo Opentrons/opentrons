@@ -5,6 +5,7 @@
 from collections import namedtuple
 from opentrons.util import environment
 from opentrons.config import merge, children, build
+from opentrons.config import feature_flags as fflags
 
 import json
 import os
@@ -78,10 +79,9 @@ robot_config = namedtuple(
 
 
 def _get_default():
-    try:
-        probe_height = float(
-            os.environ.get('OT2_PROBE_HEIGHT', DEFAULT_PROBE_HEIGHT))
-    except ValueError:
+    if fflags.short_fixed_trash():
+        probe_height = 55.0
+    else:
         probe_height = DEFAULT_PROBE_HEIGHT
 
     return robot_config(

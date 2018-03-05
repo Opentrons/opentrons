@@ -133,8 +133,10 @@ class RpcContext extends EventEmitter {
     return this.callRemote(null, 'get_object_by_id', [typeId])
   }
 
-  // close the websocket
+  // remove all event listeners and close the websocket
   close () {
+    this.removeAllListeners()
+    this._ws.removeAllListeners()
     this._ws.close()
   }
 

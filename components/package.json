@@ -20,6 +20,10 @@
   "jest": {
     "moduleNameMapper": {
       "\\.(css)$": "identity-obj-proxy"
+    },
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/src/__mocks__/file.js"
     }
   },
   "devDependencies": {

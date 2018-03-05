@@ -1,8 +1,8 @@
 // @flow
-
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
+import type {DeckSlot} from '../robot-types'
 
 import {
   SLOTNAME_MATRIX,
@@ -18,7 +18,7 @@ import {
 import styles from './Deck.css'
 
 export type LabwareComponentProps = {
-  slot: string,
+  slot: DeckSlot,
   width: number,
   height: number
 }
@@ -70,8 +70,8 @@ export default function Deck (props: Props) {
 function renderLabware (LabwareComponent): React.Node[] {
   return flatMap(
     SLOTNAME_MATRIX,
-    (columns: string[], row: number): React.Node[] => {
-      return columns.map((slot: string, col: number) => {
+    (columns: Array<DeckSlot>, row: number): React.Node[] => {
+      return columns.map((slot: DeckSlot, col: number) => {
         if (slot === TRASH_SLOTNAME) return null
 
         const transform = `translate(${[

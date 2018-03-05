@@ -3,16 +3,17 @@ All available icons:
 ```js
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
-  ALERT, BACK, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
+  ALERT, BACK, CIRCLE, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
   CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
   TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE,
   UPLOAD, COG, CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT,
-  MENU_DOWN, MOVE, PLUS, COPY
+  MENU_DOWN, MOVE, PLUS, COPY, CALIBRATE, RUN, LOGO
 } = require('./icon-data')
 
 ;<div>
   <Icon width='64px' name={ALERT} />
   <Icon width='64px' name={BACK} />
+  <Icon width='64px' name={CIRCLE} />
   <Icon width='64px' name={CLOSE} />
   <Icon width='64px' name={REFRESH} />
   <Icon width='64px' name={SPINNER} />
@@ -44,6 +45,9 @@ const {
   <Icon width='64px' name={MOVE} />
   <Icon width='64px' name={PLUS} />
   <Icon width='64px' name={COPY} />
+  <Icon width='64px' name={CALIBRATE} />
+  <Icon width='64px' name={RUN} />
+  <Icon width='64px' name={LOGO} />
 </div>
 ```
 

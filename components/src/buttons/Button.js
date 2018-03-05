@@ -7,11 +7,11 @@ import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticEvent<>) => mixed,
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
-  disabled?: bool,
+  disabled?: boolean,
   /** optional Icon name */
   iconName?: IconName,
   /** classes to apply */

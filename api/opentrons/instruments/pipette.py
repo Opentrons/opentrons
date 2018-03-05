@@ -1,15 +1,16 @@
 import itertools
 import warnings
+import logging
 
 from opentrons import commands
-
 from opentrons.containers import unpack_location
-
 from opentrons.containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
+
+log = logging.getLogger(__name__)
 
 
 PLUNGER_POSITIONS = {
@@ -836,7 +837,7 @@ class Pipette:
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3):
+    def pick_up_tip(self, location=None, presses=3, increment=1):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -857,6 +858,10 @@ class Pipette:
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
             not desireable, but could be used for dry-run)
+        increment: :int
+            The additional distance to travel on each successive press (e.g.:
+            if presses=3 and increment=1, then the first press will travel down
+            into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm
 
         Returns
         -------
@@ -894,7 +899,7 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(
-                self, location, presses, plunge_depth):
+                self, location, presses, plunge_depth, increment):
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
@@ -908,8 +913,9 @@ class Pipette:
                 self.instrument_mover.push_current()
                 self.instrument_mover.set_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
+                dist = plunge_depth + (-1 * increment * i)
                 self.move_to(
-                    self.current_tip().top(plunge_depth),
+                    self.current_tip().top(dist),
                     strategy='direct')
                 # move nozzle back up
                 self.instrument_mover.pop_current()
@@ -930,7 +936,8 @@ class Pipette:
             self,
             location=location,
             presses=presses,
-            plunge_depth=DEFAULT_TIP_PRESS_MM)
+            plunge_depth=DEFAULT_TIP_PRESS_MM,
+            increment=increment)
 
     def drop_tip(self, location=None, home_after=True):
         """

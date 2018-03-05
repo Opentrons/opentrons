@@ -6,10 +6,13 @@ import mapValues from 'lodash/mapValues'
 
 import {selectors as steplist} from '../steplist/reducers'
 import {selectors as labwareIngred} from '../labware-ingred/reducers'
+import {selectors as fileDataSelectors} from '../file-data'
 import type {BaseState} from '../types'
 
+type Selector = (BaseState) => mixed
+
 type Props = {
-  selectors: Object | Array<*>
+  selectors: {[string]: Selector}
 }
 
 type State = {
@@ -60,16 +63,17 @@ class SelectorDebugger extends React.Component<Props, State> {
 }
 
 function callSelectors (selectors, state) {
-  return mapValues(selectors, selector => selector(state))
+  return mapValues(selectors, (selector: Selector) => selector(state))
 }
 
-function mapStateToProps (state: BaseState) {
+function mapStateToProps (state: BaseState): Props {
   return {
     selectors: {
+      fileData: callSelectors(fileDataSelectors, state),
       steplist: callSelectors(steplist, state),
       labwareIngred: callSelectors(labwareIngred, state)
     }
   }
 }
 
-export default connect(mapStateToProps, () => {})(SelectorDebugger)
+export default connect(mapStateToProps)(SelectorDebugger)

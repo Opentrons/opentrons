@@ -1,0 +1,30 @@
+@import '@opentrons/components';
+
+:root {
+  --run-panel-padding: 0.5rem;
+}
+
+.run_button {
+  width: calc(100% - 2 * var(--run-panel-padding));
+  margin: 0.5rem;
+}
+
+.start_time {
+  padding: var(--run-panel-padding);
+  margin-bottom: 0.5rem;
+  font-size: var(--fs-body-2);
+  color: var(--c-med-gray);
+  text-transform: uppercase;
+}
+
+.run_time {
+  padding: var(--run-panel-padding);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-huge);
+  color: var(--c-med-gray);
+  text-transform: uppercase;
+
+  & > p {
+    font-size: var(--fs-body-2);
+  }
+}
