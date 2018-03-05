@@ -119,7 +119,7 @@ class Pipette:
             dispense_speed=DEFAULT_DISPENSE_SPEED,
             aspirate_flow_rate=None,
             dispense_flow_rate=None,
-            tip_length=51.7):  # TODO (andy): remove this, move to tip-rack
+            fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
         self.robot = robot
 
@@ -190,7 +190,7 @@ class Pipette:
 
         # TODO (andy): remove from pipette, move to tip-rack
         self.robot.config.tip_length[self.name] = \
-            self.robot.config.tip_length.get(self.name, tip_length)
+            self.robot.config.tip_length.get(self.name, fallback_tip_length)
 
     def reset(self):
         """
