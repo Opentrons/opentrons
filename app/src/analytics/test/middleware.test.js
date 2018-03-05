@@ -1,6 +1,9 @@
 // tests for the analytics middleware
 import gtmConfig from '../gtm-config'
+import makeEvent from '../make-event'
 import {NAME, tagAction, middleware} from '../'
+
+jest.mock('../make-event')
 
 const createStore = () => {
   const eventsMap = {}
@@ -10,7 +13,7 @@ const createStore = () => {
   }
 
   const next = jest.fn()
-  const invoke = (action) => middleware(eventsMap)(store)(next)(action)
+  const invoke = (action) => middleware(store)(next)(action)
 
   return {store, next, invoke, eventsMap}
 }
@@ -45,18 +48,18 @@ describe('analytics middleware', () => {
   })
 
   test('adds details from the events map to the data layer', () => {
-    const {next, invoke, eventsMap} = createStore()
+    const {next, invoke} = createStore()
     const action = tagAction({type: 'FOO_TYPE'})
 
-    eventsMap.FOO_TYPE = jest.fn(() => ({
+    makeEvent.mockReturnValue({
       name: 'name',
       category: 'cat',
       payload: {}
-    }))
+    })
 
     invoke(action)
     expect(next).toHaveBeenCalledWith(action)
-    expect(eventsMap.FOO_TYPE).toHaveBeenCalledWith({state: true}, action)
+    expect(makeEvent).toHaveBeenCalledWith({state: true}, action)
     expect(dataLayer).toEqual([
       {
         event: 'OT_EVENT',
@@ -68,14 +71,14 @@ describe('analytics middleware', () => {
   })
 
   test('adds a primitive payload as a label to the dataLayer', () => {
-    const {next, invoke, eventsMap} = createStore()
+    const {next, invoke} = createStore()
     const action = tagAction({type: 'FOO_TYPE'})
 
-    eventsMap.FOO_TYPE = jest.fn(() => ({
+    makeEvent.mockReturnValue({
       name: 'name',
       category: 'cat',
       payload: 'foo'
-    }))
+    })
 
     invoke(action)
     expect(next).toHaveBeenCalledWith(action)
@@ -90,14 +93,14 @@ describe('analytics middleware', () => {
   })
 
   test('adds a payload object as a stringified label to the dataLayer', () => {
-    const {next, invoke, eventsMap} = createStore()
+    const {next, invoke} = createStore()
     const action = tagAction({type: 'FOO_TYPE'})
 
-    eventsMap.FOO_TYPE = jest.fn(() => ({
+    makeEvent.mockReturnValue({
       name: 'name',
       category: 'cat',
       payload: {foo: 'bar', baz: 'qux', fizz: 42}
-    }))
+    })
 
     invoke(action)
     expect(next).toHaveBeenCalledWith(action)

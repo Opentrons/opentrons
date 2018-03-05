@@ -2,7 +2,7 @@
 // wifi http api module
 import {createSelector} from 'reselect'
 
-import type {State, ThunkAction, Action} from '../types'
+import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
@@ -49,10 +49,10 @@ type RequestPath = 'list' | 'status' | 'configure'
 
 export type WifiRequestAction = {|
   type: 'api:WIFI_REQUEST',
-  payload: {
+  payload: {|
     robot: RobotService,
     path: RequestPath,
-  }
+  |}
 |}
 
 export type WifiSuccessAction = {|
@@ -100,10 +100,8 @@ export type WifiAction =
 
 export type RobotWifiList = ApiCall<void, WifiListResponse>
 export type RobotWifiStatus = ApiCall<void, WifiStatusResponse>
-export type RobotWifiConfigure = ApiCall<
-  ConfigureRequest,
-  WifiConfigureResponse
->
+export type RobotWifiConfigure =
+  ApiCall<ConfigureRequest, WifiConfigureResponse>
 
 type RobotWifiState = {
   list?: RobotWifiList,
@@ -119,7 +117,7 @@ const LIST: RequestPath = 'list'
 const STATUS: RequestPath = 'status'
 const CONFIGURE: RequestPath = 'configure'
 
-export function fetchWifiList (robot: RobotService): ThunkAction {
+export function fetchWifiList (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
     dispatch(wifiRequest(robot, LIST))
 
@@ -130,7 +128,7 @@ export function fetchWifiList (robot: RobotService): ThunkAction {
   }
 }
 
-export function fetchWifiStatus (robot: RobotService): ThunkAction {
+export function fetchWifiStatus (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
     dispatch(wifiRequest(robot, STATUS))
 
@@ -154,14 +152,15 @@ export function clearConfigureWifiResponse (
   return {type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE', payload: {robot}}
 }
 
-export function configureWifi (robot: RobotService): ThunkAction {
+export function configureWifi (robot: RobotService): ThunkPromiseAction {
   return (dispatch, getState) => {
     const robotWifiState = selectRobotWifiState(getState(), robot) || {}
     const configureState = robotWifiState.configure || {}
     const body = configureState.request
 
     if (!body) {
-      return console.warn('configureWifi called without setConfigureWifiBody')
+      console.warn('configureWifi called without setConfigureWifiBody')
+      return Promise.resolve()
     }
 
     dispatch(wifiRequest(robot, CONFIGURE))

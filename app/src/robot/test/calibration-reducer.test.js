@@ -25,14 +25,17 @@ describe('robot reducer - calibration', () => {
   test('handles DISCONNECT_RESPONSE success', () => {
     const expected = reducer(undefined, {}).calibration
     const state = {calibration: {dummy: 'state'}}
-    const action = {type: actionTypes.DISCONNECT_RESPONSE, error: false}
+    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
 
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
   test('handles DISCONNECT_RESPONSE failure', () => {
     const state = {calibration: {dummy: 'state'}}
-    const action = {type: actionTypes.DISCONNECT_RESPONSE, error: true}
+    const action = {
+      type: 'robot:DISCONNECT_RESPONSE',
+      payload: {error: new Error('AH')}
+    }
 
     expect(reducer(state, action).calibration).toEqual(state.calibration)
   })

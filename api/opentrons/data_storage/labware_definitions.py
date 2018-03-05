@@ -107,14 +107,20 @@ Notes:
 # on the robot, and fall back to paths relative to this file within the source
 # repository for development purposes
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
-DEFAULT_DEFN_DIR = os.environ.get(
-    'LABWARE_DEF',
-    os.path.abspath(os.path.join(
-        FILE_DIR, '..', '..', '..', 'labware-definitions', 'definitions')))
-USER_DEFN_ROOT = os.environ.get(
-    'USER_DEFN_ROOT',
-    os.path.abspath(os.path.join(
-        FILE_DIR, '..', '..', '..', 'labware-definitions', 'user')))
+
+
+def default_definition_dir():
+    return os.environ.get(
+        'LABWARE_DEF',
+        os.path.abspath(os.path.join(
+            FILE_DIR, '..', '..', '..', 'labware-definitions', 'definitions')))
+
+
+def user_defn_root():
+    return os.environ.get(
+        'USER_DEFN_ROOT',
+        os.path.abspath(os.path.join(
+            FILE_DIR, '..', '..', '..', 'labware-definitions', 'user')))
 
 
 def _load_definition(path: str, labware_name: str) -> dict:
@@ -186,7 +192,7 @@ def _load(default_defn_dir: str,
 
 
 def load_json(labware_name: str) -> dict:
-    return _load(DEFAULT_DEFN_DIR, USER_DEFN_ROOT, labware_name)
+    return _load(default_definition_dir(), user_defn_root(), labware_name)
 
 
 def _list_labware(path: str) -> List[str]:
@@ -198,8 +204,10 @@ def _list_labware(path: str) -> List[str]:
 
 
 def list_all_labware() -> List[str]:
-    user_list = [] + _list_labware(os.path.join(USER_DEFN_ROOT, 'definitions'))
-    default_list = [] + _list_labware(DEFAULT_DEFN_DIR)
+    user_list = [] + _list_labware(
+        os.path.join(user_defn_root(), 'definitions'))
+    default_list = [] + _list_labware(
+        default_definition_dir())
     return sorted(list(set(user_list + default_list)))
 
 
@@ -227,8 +235,10 @@ def save_user_definition(defn: dict) -> bool:
         `opentrons.data_storage.serializers.labware_to_json`
     :return: success code
     """
-    return _save_user_definition(
-        os.path.join(USER_DEFN_ROOT, 'definitions'), defn)
+    defn_dir = os.path.join(user_defn_root(), 'definitions')
+    if not os.path.exists(defn_dir):
+        os.makedirs(defn_dir, exist_ok=True)
+    return _save_user_definition(defn_dir, defn)
 
 
 def save_labware_offset(name: str, offset: dict) -> bool:
@@ -240,5 +250,7 @@ def save_labware_offset(name: str, offset: dict) -> bool:
         definition file, as determined by calibration
     :return: success code
     """
-    return _save_offset(
-        os.path.join(USER_DEFN_ROOT, 'offsets'), name, offset)
+    offset_dir = os.path.join(user_defn_root(), 'offsets')
+    if not os.path.exists(offset_dir):
+        os.makedirs(offset_dir, exist_ok=True)
+    return _save_offset(offset_dir, name, offset)

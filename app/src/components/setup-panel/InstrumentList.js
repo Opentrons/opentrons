@@ -14,7 +14,7 @@ import InstrumentListItem from './InstrumentListItem'
 
 type Props = {
   instruments: Instrument[],
-  isRunning: bool,
+  isRunning: boolean,
 }
 
 const TITLE = 'Pipette Calibration'

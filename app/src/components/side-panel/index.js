@@ -16,6 +16,7 @@ import ConnectPanel from '../connect-panel'
 import UploadPanel from '../upload-panel'
 import SetupPanel from '../setup-panel'
 import MenuPanel from '../menu-panel'
+import RunPanel from '../run-panel'
 
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(NavPanel)
@@ -25,6 +26,7 @@ const PANELS_BY_NAME = {
   connect: ConnectPanel,
   upload: UploadPanel,
   setup: SetupPanel,
+  run: RunPanel,
   more: MenuPanel
 }
 

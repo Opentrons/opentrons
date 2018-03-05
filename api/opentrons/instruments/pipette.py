@@ -934,6 +934,7 @@ class Pipette:
                     strategy='direct')
             self._add_tip(
                 length=self._tip_length
+
             )
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
@@ -1031,6 +1032,7 @@ class Pipette:
             self.current_tip(None)
             self._remove_tip(
                 length=self._tip_length
+
             )
 
             return self

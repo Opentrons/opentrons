@@ -10,7 +10,7 @@ import type {
 import {AlertModal} from '@opentrons/components'
 
 type Props = {
-  onClose: () => *,
+  onClose: () => mixed,
   error: ?ApiRequestError,
   response: ?WifiConfigureResponse
 }

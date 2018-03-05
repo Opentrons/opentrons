@@ -27,7 +27,7 @@ def _json_to_well(
     return well, well_coordinates
 
 
-def json_to_container(json_defn: dict) -> Container:
+def json_to_labware(json_defn: dict) -> Container:
     container_data = json_defn.copy()
     container = Container()
     container._coordinates = Vector(0, 0, 0)
@@ -36,6 +36,7 @@ def json_to_container(json_defn: dict) -> Container:
     for well_name, json_well in wells.items():
         well, coordinates = _json_to_well(json_well)
         container.add(well, well_name, coordinates)
+    container.ordering = json_defn['ordering']
 
     return container
 
@@ -47,24 +48,28 @@ def _well_to_json(well: Well) -> dict:
     return well_json
 
 
-# TODO (ben 20180207): rename everything to "labware"
-def container_to_json(container: Container) -> dict:
-    metadata = {'name': container.get_name()}
+def labware_to_json(container: Container, container_name: str=None) -> dict:
+    if container_name is None:
+        container_name = container.get_name()
+    metadata = {'name': container_name}
     wells = {
         well_name: _well_to_json(well)
         for well_name, well in container.children_by_name.items()}
-    groups = {}
-    for w in wells.keys():
-        num = int(w[1:])
-        if num in groups.keys():
-            groups[num].append(w)
-        else:
-            groups[num] = [w]
+    if container.ordering:
+        ordering = container.ordering
+    else:
+        groups = {}
+        for w in wells.keys():
+            num = int(w[1:])
+            if num in groups.keys():
+                groups[num].append(w)
+            else:
+                groups[num] = [w]
+        ordering = [sorted(groups[idx]) for idx in sorted(groups.keys())]
 
-    ordering = [sorted(groups[idx]) for idx in sorted(groups.keys())]
     return {'metadata': metadata, 'wells': wells, 'ordering': ordering}
 
 
 # Aliases until we get rid of "container" nomenclature
-labware_to_json = container_to_json
-json_to_labware = json_to_container
+container_to_json = labware_to_json
+json_to_container = json_to_labware

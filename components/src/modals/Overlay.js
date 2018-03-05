@@ -6,7 +6,7 @@ import styles from './modals.css'
 
 type OverlayProps = {
   /** optional onClick handler */
-  onClick?: (event: SyntheticEvent<>) => void
+  onClick?: (event: SyntheticEvent<>) => mixed
 }
 
 /**

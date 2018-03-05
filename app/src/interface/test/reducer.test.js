@@ -1,6 +1,5 @@
 // interface reducer test
 
-import {actionTypes as robotActionTypes} from '../../robot'
 import {reducer, actionTypes} from '../'
 
 describe('interface reducer', () => {
@@ -38,7 +37,7 @@ describe('interface reducer', () => {
 
   test('handles robot:DISCONNECT_RESPONSE', () => {
     const state = {isPanelClosed: true, currentPanel: 'upload'}
-    const action = {type: robotActionTypes.DISCONNECT_RESPONSE}
+    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
 
     expect(reducer(state, action)).toEqual({
       isPanelClosed: true,

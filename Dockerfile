@@ -9,7 +9,7 @@ ENV RUNNING_ON_PI=1
 # connecting to Host OS services
 ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # Add persisted data directory where new python packages are being installed
-ENV PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
+ENV PYTHONPATH=$PYTHONPATH/data/packages/usr/local/lib/python3.6/site-packages
 ENV PATH=$PATH:/data/packages/usr/local/bin
 # Port name for connecting to smoothie over serial, i.e. /dev/ttyAMA0
 ENV OT_SMOOTHIE_ID=AMA
@@ -60,7 +60,8 @@ RUN pip install pipenv==9.0.3 jupyter
 # Copy server files and data into the container. Note: any directories that
 # you wish to copy into the container must be excluded from the .dockerignore
 # file, or you will encounter a copy error
-ENV LABWARE_DEF=/etc/labware
+ENV LABWARE_DEF /etc/labware
+ENV USER_DEFN_ROOT /data/user_storage/opentrons_data/labware
 COPY ./compute/conf/jupyter_notebook_config.py /root/.jupyter/
 COPY ./labware-definitions/definitions /etc/labware
 COPY ./api /tmp/api

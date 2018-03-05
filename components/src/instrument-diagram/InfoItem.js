@@ -9,6 +9,10 @@ type Props = {
   className?: string,
 }
 
+/**
+ * Used by `InstrumentInfo` for its titled values.
+ * But if you're using this, you probably want `LabeledValue` instead.
+ */
 export default function InfoItem (props: Props) {
   const {title, value, className} = props
   return (

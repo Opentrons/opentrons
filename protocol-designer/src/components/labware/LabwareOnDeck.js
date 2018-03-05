@@ -99,7 +99,7 @@ type LabwareOnDeckProps = {
 
   setCopyLabwareMode: (containerId: string) => void,
   labwareToCopy: string, // ?
-  copyLabware : (slot: string) => void,
+  copyLabware: (slot: string) => void,
 
   height: number,
   width: number,

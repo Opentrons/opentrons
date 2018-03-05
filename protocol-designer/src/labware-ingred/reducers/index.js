@@ -272,6 +272,9 @@ const rootReducer = combineReducers({
 // SELECTORS
 const rootSelector = (state: BaseState): RootState => state.labwareIngred
 
+// TODO Ian 2018-03-02 when you do selector cleanup, use this one more widely instead of .containers
+const getLabware = (state: BaseState) => rootSelector(state).containers
+
 const _loadedContainersBySlot = (containers: ContainersState) =>
   reduce(containers, (acc, container: Labware, containerId) => (container.slot)
     ? {...acc, [container.slot]: container.type}
@@ -293,7 +296,10 @@ const labwareOptions: (state: BaseState) => Array<{value: string, name: string}>
     }
     return [
       ...acc,
-      {name: containerFields.name, value: containerId}
+      {
+        name: containerFields.name || `${containerFields.slot}: ${containerFields.type}`,
+        value: containerId
+      }
     ]
   }, [])
 )
@@ -597,6 +603,7 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   labwareToCopy,
+  getLabware,
   canAdd,
   wellContentsSelectedContainer,
   numWellsSelected,

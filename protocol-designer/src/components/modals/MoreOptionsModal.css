@@ -1,9 +1,5 @@
 @import './grid.css';
 
-.modal {
-  z-index: 100;
-}
-
 .big_text_box {
   height: 12rem;
 }
