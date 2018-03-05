@@ -35,8 +35,8 @@ async def test_wifi_configure(virtual_smoothie_env, loop, test_client):
     cli = await loop.create_task(test_client(app))
 
     expected = json.dumps({
-        'ssid': 'this',
-        'message': "Configuration successful. PSK: 'that'"
+        'ssid': 'a',
+        'message': 'Configuration unchanged'
     })
     resp = await cli.post('/wifi/configure',
                           json={'ssid': 'this', 'psk': 'that'})

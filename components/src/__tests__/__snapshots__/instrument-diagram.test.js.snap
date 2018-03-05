@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
+<div
+  className={undefined}
+>
+  <img
+    src="test-file-stub"
+  />
+</div>
+`;
+
+exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
+<div
+  className={undefined}
+>
+  <img
+    src="test-file-stub"
+  />
+</div>
+`;

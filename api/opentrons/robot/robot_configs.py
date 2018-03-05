@@ -6,6 +6,7 @@ from collections import namedtuple
 from datetime import datetime
 from opentrons.util import environment
 from opentrons.config import merge, children, build
+from opentrons.config import feature_flags as fflags
 
 import json
 import os
@@ -54,6 +55,9 @@ DEFAULT_MAX_SPEEDS = {
 DEFAULT_CURRENT_STRING = ' '.join(
     ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
+DEFAULT_PROBE_HEIGHT = 77.0
+
+
 robot_config = namedtuple(
     'robot_config',
     [
@@ -76,51 +80,57 @@ robot_config = namedtuple(
 )
 
 
-default = robot_config(
-    name='Ada Lovelace',
-    version=1,
-    steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
-    acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-    current='M907 ' + DEFAULT_CURRENT_STRING,
-    probe_center=(295.0, 300.0, 55.0),
-    probe_dimensions=(35.0, 40.0, 60.0),
-    gantry_calibration=[  # "safe" offset, overwrote in factory calibration
-        [ 1.00, 0.00, 0.00,  0.00],
-        [ 0.00, 1.00, 0.00,  0.00],
-        [ 0.00, 0.00, 1.00,  0.00],
-        [ 0.00, 0.00, 0.00,  1.00]
-    ],
-    # left relative to right
-    instrument_offset={
-        'right': {
-            'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, 0.0, 0.0)
+def _get_default():
+    if fflags.short_fixed_trash():
+        probe_height = 55.0
+    else:
+        probe_height = DEFAULT_PROBE_HEIGHT
+
+    return robot_config(
+        name='Ada Lovelace',
+        version=1,
+        steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
+        acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
+        current='M907 ' + DEFAULT_CURRENT_STRING,
+        probe_center=(295.0, 300.0, probe_height),
+        probe_dimensions=(35.0, 40.0, probe_height + 5.0),
+        gantry_calibration=[  # "safe" offset, overwrote in factory calibration
+            [ 1.00, 0.00, 0.00,  0.00],
+            [ 0.00, 1.00, 0.00,  0.00],
+            [ 0.00, 0.00, 1.00,  0.00],
+            [ 0.00, 0.00, 0.00,  1.00]
+        ],
+        # left relative to right
+        instrument_offset={
+            'right': {
+                'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+                'multi': (0.0, 0.0, 0.0)  # numbers are from CAD
+            },
+            'left': {
+                'single': (0.0, 0.0, 0.0),        # numbers are from CAD
+                'multi': (0.0, 0.0, 0.0) # numbers are from CAD
+            }
         },
-        'left': {
-            'single': (0.0, 0.0, 0.0),
-            'multi': (0.0, 0.0, 0.0)
-        }
-    },
-    tip_length={
-        'Pipette': 51.7 # TODO (andy): move to tip-rack
-    },
-    serial_speed=115200,
-    default_current=DEFAULT_CURRENT,
-    default_max_speed=DEFAULT_MAX_SPEEDS,
-    plunger_current_low=PLUNGER_CURRENT_LOW,
-    plunger_current_high=PLUNGER_CURRENT_HIGH
-)
+        tip_length={
+            'Pipette': 51.7 # TODO (andy): move to tip-rack
+        },
+        serial_speed=115200,
+        default_current=DEFAULT_CURRENT,
+        default_max_speed=DEFAULT_MAX_SPEEDS,
+        plunger_current_low=PLUNGER_CURRENT_LOW,
+        plunger_current_high=PLUNGER_CURRENT_HIGH
+    )
 
 
 def load(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
-    result = default
+    result = _get_default()
 
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
             local = _check_version_and_update(local)
-            result = robot_config(**merge([default._asdict(), local]))
+            result = robot_config(**merge([result._asdict(), local]))
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
 
@@ -128,7 +138,12 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
-    _default = children(default._asdict())
+    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if tag:
+        root, ext = os.path.splitext(filename)
+        filename = "{}-{}{}".format(root, tag, ext)
+    _default = children(_get_default()._asdict())
+
     diff = build([
         item for item in children(config._asdict())
         if item not in _default
@@ -180,6 +195,7 @@ def _migrate_zero_to_one(config_json):
     # add a version number to the config, and set to 1
     config_json['version'] = 1
     # overwrite instrument_offset to the default
+    default = _get_default()
     config_json['instrument_offset'] = default.instrument_offset.copy()
     config_json['tip_length'] = default.tip_length.copy()
     return config_json

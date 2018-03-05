@@ -5,9 +5,10 @@ import {Icon} from '../icons'
 // import globalStyles from '../styles/index.css'
 import styles from './forms.css'
 
+// TODO(mc, 2018-02-22): disabled prop
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticEvent<>) => void,
+  onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** classes to apply */
   className?: string,
   /** inline label text */
@@ -17,19 +18,33 @@ type Props = {
   /** optional units string, appears to the right of input text */
   units?: string,
   /** current value of text in box, defaults to '' */
-  value?: string,
+  value?: ?string,
   /** if included, InputField will use error style and display error instead of caption */
   error?: ?string,
   /** optional caption. hidden when `error` is given */
   caption?: string,
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string
+  secondaryCaption?: string,
+  /** optional input type (default "text") */
+  type?: 'text' | 'password'
 }
 
 export default function InputField (props: Props) {
   const error = props.error != null
+  const labelClass = cx(styles.form_field, props.className, {
+    [styles.error]: error
+  })
+
+  if (!props.label) {
+    return (
+      <div className={labelClass}>
+        <Input {...props} />
+      </div>
+    )
+  }
+
   return (
-    <label className={cx(styles.form_field, props.className, {[styles.error]: error})}>
+    <label className={labelClass}>
       <div className={styles.label_text}>
         {props.label && error &&
           <div className={styles.error_icon}>
@@ -38,21 +53,30 @@ export default function InputField (props: Props) {
         }
         {props.label}
       </div>
-      <div>
-        <div className={styles.input_field}>
-          <input
-            type='text' /* TODO: support number ? */
-            value={props.value || ''}
-            placeholder={props.placeholder}
-            onChange={props.onChange}
-          />
-          {props.units && <div className={styles.suffix}>{props.units}</div>}
-        </div>
-        <div className={styles.input_caption}>
-          <span>{error ? props.error : props.caption}</span>
-          <span className={styles.right}>{props.secondaryCaption}</span>
-        </div>
-      </div>
+      <Input {...props} />
     </label>
+  )
+}
+
+// TODO(mc, 2018-02-21): maybe simplify further and split out?
+function Input (props: Props) {
+  const error = props.error != null
+
+  return (
+    <div className={styles.input_field_container}>
+      <div className={styles.input_field}>
+        <input
+          type={props.type || 'text'}
+          value={props.value || ''}
+          placeholder={props.placeholder}
+          onChange={props.onChange}
+        />
+        {props.units && <div className={styles.suffix}>{props.units}</div>}
+      </div>
+      <div className={styles.input_caption}>
+        <span>{error ? props.error : props.caption}</span>
+        <span className={styles.right}>{props.secondaryCaption}</span>
+      </div>
+    </div>
   )
 }

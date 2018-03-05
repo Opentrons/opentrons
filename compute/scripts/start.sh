@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-python /usr/local/bin/setup_gpio.py
-
 radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
 
 # mdns announcement
@@ -10,12 +8,17 @@ announce_mdns.py &
 # serve static pages and proxy HTTP services
 nginx
 
-# SSH, updates, etc
+# enable SSH over ethernet
 inetd -e /etc/inetd.conf
 
 # Home robot
 echo "Homing Robot... this may take a few seconds."
 python -c "from opentrons import robot; robot.connect(); robot.home()"
+
+# Start Jupyter Notebook server
+echo "Starting Jupyter Notebook server"
+mkdir -p /data/user_storage/opentrons_data/jupyter
+jupyter notebook --allow-root &
 
 # Check if config exists, and alert if not found
 echo "Checking for deck calibration data..."

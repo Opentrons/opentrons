@@ -1,43 +1,124 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-// import cx from 'classnames'
+// @flow
+import * as React from 'react'
+import isNil from 'lodash/isNil'
+import {
+  FlatButton,
+  PrimaryButton,
+  CheckboxField,
+  DropdownField,
+  InputField
+} from '@opentrons/components'
+
 import styles from './IngredientPropertiesForm.css'
+import formStyles from './Form.css'
 
-import Button from './Button.js'
+type SetStateCallback = (...args: Array<*>) => *
 
-const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...otherProps}) => {
-  const ElementType = (otherProps.type === 'textarea')
-    ? 'textarea'
-    : 'input'
+type IngredInputs = {
+  groupId?: string,
 
-  return <ElementType
-    id={accessor}
-    checked={otherProps.type === 'checkbox' && getSubstate(accessor) === true}
-    value={getSubstate(accessor) || ''} // getSubstate = (inputKey) => stateOfThatKey
-    onChange={e => otherProps.type === 'checkbox'
-      ? setSubstate(accessor, !getSubstate(accessor))
-      : setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)} // setSubstate = (inputKey, inputValue) => {...}
-    {...otherProps}
-  />
+  name: string | null,
+  volume: number | null,
+  description: string | null,
+  concentration: string | null,
+  individualize: boolean,
+  serializeName: string | null
 }
 
-class IngredientPropertiesForm extends React.Component {
-  static propTypes = {
-    onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    numWellsSelected: PropTypes.number.isRequired,
-    selectedWellsMaxVolume: PropTypes.number.isRequired,
+// type Accessor = $Keys<IngredInputs>
+type Accessor =
+  | 'name'
+  | 'volume'
+  | 'description'
+  | 'concentration'
+  | 'individualize'
+  | 'serializeName'
 
-    selectedIngredientProperties: PropTypes.shape({
-      name: PropTypes.string,
-      volume: PropTypes.number,
-      description: PropTypes.string,
-      groupId: PropTypes.string
-    })
+type AllIngredGroupFields = {
+  [ingredGroupId: string]: IngredInputs
+}
+
+type SetSubstate = (accessor: string, value: string | boolean | number) => mixed
+type GetSubstate = (accessor: Accessor) => string | boolean | number | null
+
+type FieldProps = {|
+  accessor: Accessor,
+  numeric?: boolean,
+  type?: string,
+  label?: string,
+  units?: string,
+  error?: string,
+  placeholder?: string
+|}
+
+const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
+  (props: FieldProps) => { /* otherProps */
+    const {setSubstate, getSubstate} = args
+    const {accessor, numeric, type, placeholder} = props
+
+    if (!type || type === 'input') {
+      return <InputField
+        label={props.label}
+        units={props.units}
+        error={props.error}
+        value={(getSubstate(accessor) || '').toString()}
+        onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
+          setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)
+        }
+      />
+    }
+
+    if (type === 'checkbox') {
+      return <CheckboxField
+        label={props.label}
+        value={getSubstate(accessor) === true}
+        onChange={(e: SyntheticInputEvent<*>) => setSubstate(accessor, !getSubstate(accessor))}
+      />
+    }
+
+    // TODO Ian 2018-02-21 make Textbox component and get rid of this
+    const ElementType = (type === 'textarea')
+      ? 'textarea'
+      : 'input'
+
+    return <ElementType
+      id={accessor}
+      value={getSubstate(accessor) || ''}
+      onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
+        setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)}
+      type={type}
+      placeholder={placeholder}
+    />
   }
 
-  constructor (props) {
+type Props = {
+  onSave: ({copyGroupId: ?string} & IngredInputs) => void,
+  onCancel: () => void,
+  onDelete: (groupId: string) => void,
+  numWellsSelected: number,
+  selectedWellsMaxVolume: number,
+
+  selectedIngredientProperties: {
+    name: string,
+    volume: number,
+    description: string,
+    groupId: string
+  },
+
+  allIngredientGroupFields: ?AllIngredGroupFields,
+  allIngredientNamesIds: Array<{ingredientId: string, name: string}>,
+  editingIngredGroupId: string
+} & IngredInputs
+
+type State = {
+  input: IngredInputs,
+  copyGroupId: ?string
+}
+
+class IngredientPropertiesForm extends React.Component<Props, State> {
+  Field: $Call<typeof makeInputField, *>
+
+  constructor (props: Props) {
     super(props)
     this.state = {
       input: {
@@ -57,16 +138,16 @@ class IngredientPropertiesForm extends React.Component {
       setSubstate: (inputKey, inputValue) => {
         this.setState({...this.state, input: {...this.state.input, [inputKey]: inputValue}})
       },
-      getSubstate: inputKey => this.state.input[inputKey]
+      getSubstate: (inputKey) => this.state.input[inputKey]
     })
   }
 
-  resetInputState = (ingredGroupId, nextIngredGroupFields, cb) => {
+  resetInputState = (ingredGroupId: string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
     // nextIngredGroupFields allows you to update with nextProps
-    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields)
+    const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId in allIngredientGroupFields) {
       const { name, volume, description, concentration, individualize, serializeName } = this.state.input
@@ -98,12 +179,24 @@ class IngredientPropertiesForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps (nextProps: Props) {
     this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
   }
 
-  selectExistingIngred = ingredGroupId => {
+  selectExistingIngred = (ingredGroupId: string) => {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
+  }
+
+  handleDelete = (selectedIngredientFields: *) => (e: SyntheticEvent<*>) => {
+    const {onDelete} = this.props
+
+    const groupToDelete = selectedIngredientFields && selectedIngredientFields.groupId
+    if (groupToDelete) {
+      window.confirm('Are you sure you want to delete all ingredients in this group?') &&
+        onDelete(groupToDelete)
+    } else {
+      console.warn('Tried to delete in IngredientPropertiesForm, with no groupId to delete!')
+    }
   }
 
   render () {
@@ -111,14 +204,13 @@ class IngredientPropertiesForm extends React.Component {
       numWellsSelected,
       onSave,
       onCancel,
-      onDelete,
       allIngredientNamesIds,
       allIngredientGroupFields,
       editingIngredGroupId,
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && allIngredientGroupFields[editingIngredGroupId]
+    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId.toString()]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields
@@ -133,79 +225,65 @@ class IngredientPropertiesForm extends React.Component {
     }
 
     return (
-      <div className={styles.ingredient_properties_entry}>
-        <h1>
+      <div className={formStyles.form}> {/* Was: styles.ingredient_properties_entry */}
+        <h1 className={styles.ingred_form_header}>
           <div>Ingredient Properties</div>
           <div>{numWellsSelected} Well(s) Selected</div>
         </h1>
 
         <form>
-          <div className={styles.middle_row}>
-            <span className={styles.two_thirds}>
-              <label>Name</label>
-              <Field accessor='name' />
+          <div className={formStyles.field_row}>
+            <span className={formStyles.column_2_3}>
+              <Field accessor='name' label='Name' />
             </span>
             {!editMode && <span>
-              {/* TODO make this a Field??? */}
-              <select onChange={e => this.selectExistingIngred(parseInt(e.target.value, 10))}>
-                <option value=''>Select existing ingredient</option>
-                {allIngredientNamesIds.map(({ingredientId, name}, i) =>
-                  <option key={i} value={ingredientId}>{name}</option>
-                )}
-              </select>
+              <DropdownField
+                onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
+                options={[
+                  {name: 'Select Existing Ingredient', value: ''},
+                  ...allIngredientNamesIds.map(({ingredientId, name}) => ({
+                    name,
+                    value: ingredientId
+                  }))
+                ]}
+              />
             </span>}
           </div>
-          <div className={styles.middle_row}>
-            <span>
-              <span className={styles.checkbox}>
-                <Field accessor='individualize' type='checkbox' />
-                <label> Serialize Name </label>
+          <div className={formStyles.field_row}>
+              <span>
+                <Field accessor='individualize' type='checkbox' label='Serialize Name' />
               </span>
-              {individualize && <Field accessor='serializeName' placeholder='Sample' />}
-            </span>
-            <span className={styles.serialize_name_example}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
+              <span>
+                {individualize && <Field accessor='serializeName' placeholder='Sample' />}
+              </span>
           </div>
-          <div className={styles.middle_row}>
-            <span style={{borderColor: maxVolExceeded && 'red'}}>
-              <label>Volume (µL)</label>
-              {maxVolExceeded && // TODO: clean up the styling for this
-                <label style={{color: 'red'}}>
-                  Warning: exceeded max volume per well: {selectedWellsMaxVolume}uL
-                </label>}
-              <Field numeric accessor='volume' />
+          <div className={formStyles.field_row}>
+            <span>
+              <Field numeric accessor='volume' label='Volume' units='µL'
+                error={maxVolExceeded
+                  ? `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
+                  : undefined}
+              />
             </span>
             <span>
-              <label>Concentration</label>
-              <Field accessor='concentration' />
-            </span>
-          </div>
-          <div className={styles.flex_row}>
-            <span>
+              {/* TODO Ian 2018-02-21 make TextareaField component and use here */}
               <label>Description</label>
               <Field accessor='description' type='textarea' />
             </span>
           </div>
         </form>
 
-        {/* editMode &&
-          <div><label>Editing: "{selectedIngredientFields.name}"</label></div> */}
-
-        {/* <span>
-          <label>Color Swatch</label>
-          <div className={styles.circle} style={{backgroundColor: 'red'}} />
-        </span> */}
         <div className={styles.button_row}>
-          <Button /* disabled={TODO: validate input here} */
-            onClick={e => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+          <FlatButton /* disabled={TODO: validate input here} */
+            onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
           >
             Save
-          </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          </FlatButton>
+          <FlatButton onClick={onCancel}>Cancel</FlatButton>
           {editMode &&
-            <Button className={styles.delete_ingred} onClick={() =>
-              window.confirm('Are you sure you want to delete all ingredients in this group?') &&
-              onDelete(selectedIngredientFields.groupId)
-            }>Delete Ingredient</Button>
+            <PrimaryButton onClick={this.handleDelete(selectedIngredientFields)}>
+              Delete Ingredient
+            </PrimaryButton>
           }
         </div>
       </div>

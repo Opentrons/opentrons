@@ -7,7 +7,7 @@ import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticEvent<>) => mixed,
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
@@ -20,9 +20,14 @@ export type ButtonProps = {
   inverted?: boolean,
   /** contents of the button */
   children?: React.Node,
+  /** type of button (default "button") */
+  type?: 'submit' | 'reset' | 'button',
   /** custom element or component to use instead of `<button>` */
-  Component?: React.ElementType
+  Component?: React.ElementType,
 }
+
+// props to strip if using a custom component
+const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
 
 /**
  * Basic, unstyled button. You probably want to use a styled button
@@ -37,11 +42,12 @@ export default function Button (props: ButtonProps) {
   const {title, disabled, className} = props
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
+  const type = props.type || 'button'
 
   // pass all props if using a custom component
   const buttonProps = !props.Component
-    ? {title, disabled, onClick, className}
-    : {...omit(props, ['iconName', 'children', 'Component']), onClick}
+    ? {type, title, disabled, onClick, className}
+    : {...omit(props, STRIP_PROPS), onClick}
 
   return (
     <Component {...buttonProps}>

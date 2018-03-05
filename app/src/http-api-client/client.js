@@ -3,23 +3,27 @@
 
 import type {RobotService} from '../robot'
 
-type Method = 'GET'
+type Method = 'GET' | 'POST'
 
-export type ClientResponseError = {
+export type ApiRequestError = {
   name: string,
   message: string,
   url?: string,
   status?: number,
-  statusText?: string
+  statusText?: string,
 }
 
 // not a real Error or Response so it can be copied across worker boundries
-function ResponseError (response: Response): ClientResponseError {
+function ResponseError (
+  response: Response,
+  body: ?{message: ?string}
+): ApiRequestError {
   const {status, statusText, url} = response
+  const message = (body && body.message) || `${status} ${statusText}`
 
   return {
     name: 'ResponseError',
-    message: `${status} ${statusText}`,
+    message,
     status,
     statusText,
     url
@@ -27,7 +31,7 @@ function ResponseError (response: Response): ClientResponseError {
 }
 
 // not a real Error so it can be copied across worker boundries
-function FetchError (error: Error): ClientResponseError {
+function FetchError (error: Error): ApiRequestError {
   return {name: error.name, message: error.message}
 }
 
@@ -35,12 +39,12 @@ const HEADERS = {
   'Content-Type': 'application/json'
 }
 
-export default function client (
+export default function client<T, U> (
   robot: RobotService,
   method: Method,
   path: string,
-  body?: {}
-): Promise<any> {
+  body?: T
+): Promise<U> {
   const url = `http://${robot.ip}:${robot.port}/${path}`
   const options = {
     method,
@@ -53,12 +57,14 @@ export default function client (
   return fetch(url, options).then(jsonFromResponse, fetchErrorFromError)
 }
 
-function jsonFromResponse (response: Response): Promise<*> {
-  if (!response.ok) {
-    return Promise.reject(ResponseError(response))
-  }
-
-  return response.json().catch(fetchErrorFromError)
+function jsonFromResponse<T> (response: Response): Promise<T> {
+  return response.json()
+    .then(
+      (body) => response.ok
+        ? (body: T)
+        : Promise.reject(ResponseError(response, (body: ?{message: ?string}))),
+      fetchErrorFromError
+    )
 }
 
 function fetchErrorFromError (error: Error): Promise<*> {

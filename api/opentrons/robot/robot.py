@@ -6,12 +6,14 @@ from numpy import add, subtract
 from opentrons import commands, containers, drivers, helpers
 from opentrons.broker import subscribe
 from opentrons.containers import Container
-from opentrons.data_storage import database
+from opentrons.data_storage import database, old_container_loading,\
+    database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.util.log import get_logger
+from opentrons.config import feature_flags as fflags
 
 log = get_logger(__name__)
 
@@ -109,9 +111,24 @@ class InstrumentMotor(object):
 
 
 def _setup_container(container_name):
-    container = database.load_container(container_name)
-    container.properties['type'] = container_name
+    try:
+        container = database.load_container(container_name)
 
+    # Database.load_container throws ValueError when a container name is not
+    # found.
+    except ValueError:
+        # First must populate "get persisted container" list
+        old_container_loading.load_all_containers_from_disk()
+        # Load container from old json file
+        container = old_container_loading.get_persisted_container(
+            container_name)
+        # Rotate coordinates to fit the new deck map
+        rotated_container = database_migration.rotate_container_for_alpha(
+            container)
+        # Save to the new database
+        database.save_new_container(rotated_container, container_name)
+
+    container.properties['type'] = container_name
     container_x, container_y, container_z = container._coordinates
 
     # infer z from height
@@ -275,6 +292,12 @@ class Robot(object):
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
         self.clear_commands()
+
+        # update the position of each Mover
+        self._driver.update_position()
+        for mount in self._actuators.values():
+            for mover in mount.values():
+                self.poses = mover.update_pose_from_driver(self.poses)
 
         return self
 
@@ -788,8 +811,10 @@ class Robot(object):
 
         # @TODO (Laura & Andy) Slot and type of trash
         # needs to be pulled from config file
-        # Add fixed trash to the initial deck
-        self._fixed_trash = self.add_container('fixed-trash', '12')
+        if fflags.short_fixed_trash():
+            self._fixed_trash = self.add_container('fixed-trash', '12')
+        else:
+            self._fixed_trash = self.add_container('tall-fixed-trash', '12')
 
     @property
     def deck(self):
@@ -825,11 +850,12 @@ class Robot(object):
 
     def add_container(self, name, slot, label=None, share=False):
         container = _setup_container(name)
-        location = self._get_placement_location(slot)
-        if self._is_available_slot(location, share, slot, name):
-            location.add(container, label or name)
-        self.add_container_to_pose_tracker(location, container)
-        self.max_deck_height.cache_clear()
+        if container is not None:
+            location = self._get_placement_location(slot)
+            if self._is_available_slot(location, share, slot, name):
+                location.add(container, label or name)
+            self.add_container_to_pose_tracker(location, container)
+            self.max_deck_height.cache_clear()
         return container
 
     def add_module(self, module, slot, label=None):
@@ -905,66 +931,20 @@ class Robot(object):
         ports.extend(drivers.get_serial_ports_list())
         return ports
 
-    # TODO (ben 2017/11/13): rip out or implement these three methods
     def is_connected(self):
         if not self._driver:
             return False
-        return self._driver.is_connected()
+        return not self._driver.simulating
 
     def is_simulating(self):
         if not self._driver:
             return False
         return self._driver.simulating
 
-    def get_connected_port(self):
-        return self._driver.get_connected_port()
-
-    # TODO(artyom 20171030): discuss diagnostics and smoothie reporting
-    # def versions(self):
-    #     # TODO: Store these versions in config
-    #     return {
-    #         'firmware': {
-    #             'version': self._driver.get_firmware_version(),
-    #             'compatible': compatible['firmware']
-    #         },
-    #         'config': {
-    #             'version': self._driver.get_config_version(),
-    #             'compatible': compatible['config']
-    #         },
-    #         'ot_version': {
-    #             'version': self._driver.get_ot_version(),
-    #             'compatible': compatible['ot_version']
-    #         }
-    #     }
-
-    # def diagnostics(self):
-    #     """
-    #     Access diagnostics information for the robot.
-
-    #     Returns
-    #     -------
-    #     Dictionary with the following keys:
-    #         * ``axis_homed`` — axis that are currently in home position.
-    #         * ``switches`` — end stop switches currently hit.
-    #         * ``steps_per_mm`` — steps per millimeter calibration
-    #         values for ``x`` and ``y`` axis.
-    #     """
-    #     # TODO: Store these versions in config
-    #     return {
-    #         'axis_homed': self.axis_homed,
-    #         'switches': self._driver.switch_state(),
-    #         'steps_per_mm': {
-    #             'x': self._driver.get_steps_per_mm('x'),
-    #             'y': self._driver.get_steps_per_mm('y')
-    #         }
-    #     }
-
     @commands.publish.before(command=commands.comment)
     def comment(self, msg):
         pass
 
-    # TODO (artyom, 09182017): implement proper developer experience in light
-    # of Session concept being introduced
     def commands(self):
         return self._commands
 

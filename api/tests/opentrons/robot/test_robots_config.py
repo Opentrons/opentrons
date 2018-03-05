@@ -1,47 +1,17 @@
-import pytest
-
-
-@pytest.fixture
-def config(monkeypatch, tmpdir):
-    from collections import namedtuple
+def test_old_probe_height(monkeypatch):
     from opentrons.robot import robot_configs
-    from opentrons.util import environment
 
-    monkeypatch.setenv('APP_DATA_DIR', str(tmpdir))
-    environment.refresh()
+    monkeypatch.setenv('OT2_PROBE_HEIGHT', '55.0')
+    cfg = robot_configs.load()
+    monkeypatch.delenv('OT2_PROBE_HEIGHT')
 
-    test_config = namedtuple('test_config', 'key1, key2')
-
-    monkeypatch.setattr(
-        robot_configs,
-        'robot_config',
-        test_config
-    )
-
-    monkeypatch.setattr(
-        robot_configs,
-        'default',
-        test_config(key1='value1', key2='value2')
-    )
-
-    return robot_configs
+    assert cfg.probe_center[2] == 55.0
+    assert cfg.probe_dimensions[2] == 60.0
 
 
-def test_config(config, tmpdir):
-    filename = str(tmpdir.join('config.json'))
+def test_default_probe_height():
+    from opentrons.robot import robot_configs
 
-    settings = config.load()
-    settings = settings._replace(key1='new-value1')
-    assert config.save(settings) == {'key1': 'new-value1'}
-    with open(filename) as file:
-        assert ''.join(file) == \
-            '{\n    "key1": "new-value1"\n}'
-
-    settings = settings._replace(key2='new-value2')
-    assert config.save(settings) == {
-        'key1': 'new-value1',
-        'key2': 'new-value2'
-    }
-    with open(filename) as file:
-        assert ''.join(file) == \
-            '{\n    "key1": "new-value1",\n    "key2": "new-value2"\n}'
+    cfg = robot_configs.load()
+    assert cfg.probe_center[2] == 77.0
+    assert cfg.probe_dimensions[2] == 82.0

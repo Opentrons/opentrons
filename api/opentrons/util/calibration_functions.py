@@ -20,11 +20,12 @@ Z_SWITCH_OFFSET_MM = 5.0
 
 Z_DECK_CLEARANCE = 15.0
 Z_PROBE_CLEARANCE = 5.0
+Z_PROBE_START_CLEARANCE = 20
 
 BOUNCE_DISTANCE_MM = 5.0
 
 SWITCH_CLEARANCE = 7.5  # How far to move outside the probe box before probing
-Z_CROSSOVER_CLEARANCE = 20  # Z mm between tip and probe
+Z_CROSSOVER_CLEARANCE = Z_PROBE_CLEARANCE + 30  # Z mm between tip and probe
 
 
 def calibrate_container_with_delta(
@@ -67,11 +68,11 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,          -rel_z_start,  size_x),  # NOQA
-        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,          -rel_z_start, -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,          -rel_z_start,  size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,          -rel_z_start, -size_y),  # NOQA
-        ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_CROSSOVER_CLEARANCE, -size_z)   # NOQA
+        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,            -rel_z_start,  size_x),  # NOQA
+        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,            -rel_z_start, -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,            -rel_z_start,  size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,            -rel_z_start, -size_y),  # NOQA
+        ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_PROBE_START_CLEARANCE, -size_z)   # NOQA
     ]
 
     acc = []

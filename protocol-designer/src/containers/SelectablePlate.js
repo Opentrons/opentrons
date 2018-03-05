@@ -1,35 +1,50 @@
-import { connect } from 'react-redux'
-import get from 'lodash/get'
+// @flow
+import {connect} from 'react-redux'
 
 import SelectablePlate from '../components/SelectablePlate.js'
 import { selectors } from '../labware-ingred/reducers'
 import { preselectWells, selectWells } from '../labware-ingred/actions'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
 import { getCollidingWells } from '../utils.js'
+import type {BaseState} from '../types'
 
-export default connect(
-  (state, ownProps) => {
-    const selectedContainerId = get(selectors.selectedContainer(state), 'containerId')
-    const containerId = ownProps.containerId || selectedContainerId
+type OwnProps = {
+  containerId?: string,
+  cssFillParent?: boolean
+}
 
-    const isSelectedContainer = containerId === selectedContainerId
+function mapStateToProps (state: BaseState, ownProps: OwnProps) {
+  const selectedContainer = selectors.selectedContainer(state)
+  const selectedContainerId = selectedContainer && selectedContainer.containerId
+  const containerId = ownProps.containerId || selectedContainerId
 
-    return {
-      wellContents: isSelectedContainer
-        ? selectors.wellContentsSelectedContainer(state)
-        : selectors.allWellMatricesById(state)[containerId],
-      containerType: selectors.containerById(containerId)(state).type
-    }
-  },
-  {
-    // HACK-Y action mapping
-    onSelectionMove: (e, rect) => preselectWells({
-      wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
-      append: e.shiftKey
-    }),
-    onSelectionDone: (e, rect) => selectWells({
-      wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
-      append: e.shiftKey
-    })
+  const isSelectedContainer = containerId === selectedContainerId
+
+  if (containerId === null) {
+    console.warn('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    return {}
   }
-)(SelectablePlate)
+
+  const containerById = selectors.containerById(containerId)(state)
+
+  return {
+    wellContents: isSelectedContainer
+      ? selectors.wellContentsSelectedContainer(state)
+      : selectors.allWellMatricesById(state)[containerId],
+    containerType: containerById && containerById.type
+  }
+}
+
+const mapDispatchToProps = {
+  // HACK-Y action mapping
+  onSelectionMove: (e, rect) => preselectWells({
+    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+    append: e.shiftKey
+  }),
+  onSelectionDone: (e, rect) => selectWells({
+    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+    append: e.shiftKey
+  })
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectablePlate)

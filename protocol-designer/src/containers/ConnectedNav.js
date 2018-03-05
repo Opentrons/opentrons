@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from '../types'
+import type {ThunkDispatch, BaseState} from '../types'
 import {connect} from 'react-redux'
 
 import {NavButton, VerticalNavBar} from '@opentrons/components'
@@ -17,24 +17,24 @@ function Nav (props: Props) {
     <VerticalNavBar className={styles.nav_bar}>
       <NavButton
         iconName='file'
-        isCurrent={props.currentPage === 'file page'}
-        onClick={props.handleClick('file page')} />
+        isCurrent={props.currentPage === 'file'}
+        onClick={props.handleClick('file')} />
 
       <NavButton
         iconName='cog'
-        isCurrent={props.currentPage === 'editor page'}
-        onClick={props.handleClick('editor page')} />
+        isCurrent={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
+        onClick={props.handleClick('steplist')} />
     </VerticalNavBar>
   )
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: BaseState) {
   return {
     currentPage: selectors.currentPage(state)
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
     handleClick: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName))
   }

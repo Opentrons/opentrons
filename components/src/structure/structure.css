@@ -86,6 +86,7 @@
 
 /* Card and card content styles */
 .card {
+  position: relative;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
   padding: 1rem;
 }
@@ -93,6 +94,7 @@
 .card_title {
   @apply --font-header-dark;
 
+  margin-top: 0;
   margin-bottom: 0.5rem;
   font-weight: --fw-regular;
 }
@@ -107,6 +109,14 @@
   flex-direction: column;
 }
 
+.refresh_card_icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.25rem;
+  color: var(--c-font-dark);
+}
+
 .disabled {
   pointer-events: none;
   background-color: transparent;
@@ -118,9 +128,18 @@
 
 .labeled_value {
   @apply --font-body-2-dark;
+
+  & svg {
+    height: var(--fs-body-2);
+  }
 }
 
 .labeled_value_label {
   font-weight: var(--fw-semibold);
+}
+
+.labeled_value_label,
+.labeled_value_value {
+  margin-top: 0;
   margin-bottom: 0.25rem;
 }

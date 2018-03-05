@@ -4,6 +4,7 @@
 // icon names
 export const ALERT = 'alert'
 export const BACK = 'back'
+export const CIRCLE = 'circle'
 export const CLOSE = 'close'
 export const REFRESH = 'refresh'
 export const SPINNER = 'spinner'
@@ -35,6 +36,7 @@ export const MENU_DOWN = 'menu down'
 export const MOVE = 'move'
 export const PLUS = 'plus'
 export const COPY = 'copy'
+export const MORE = 'more'
 
 // icon data
 const ICON_DATA_BY_NAME = {
@@ -45,6 +47,10 @@ const ICON_DATA_BY_NAME = {
   [BACK]: {
     viewBox: '0 0 24 24',
     path: 'M18 11.242v1.516H8.91l4.166 4.166L12 18l-6-6 6-6 1.076 1.076-4.167 4.166z'
+  },
+  [CIRCLE]: {
+    viewBox: '0 0 24 24',
+    path: 'M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'
   },
   [CLOSE]: {
     viewBox: '0 0 24 24',
@@ -169,6 +175,10 @@ const ICON_DATA_BY_NAME = {
   [COPY]: {
     viewBox: '0 0 24 24',
     path: 'M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z'
+  },
+  [MORE]: {
+    viewBox: '0 0 24 24',
+    path: 'M5.5 10A2.5 2.5 0 1 1 3 12.5 2.5 2.5 0 0 1 5.5 10zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5z'
   }
 }
 

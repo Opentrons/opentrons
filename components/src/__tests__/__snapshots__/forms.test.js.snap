@@ -12,6 +12,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
       className=""
       fill="currentColor"
       height={undefined}
+      style={undefined}
       version="1.1"
       viewBox="0 0 24 24"
       width="100%"
@@ -50,6 +51,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
       className=""
       fill="currentColor"
       height={undefined}
+      style={undefined}
       version="1.1"
       viewBox="0 0 24 24"
       width="100%"
@@ -78,7 +80,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
 
 exports[`DropdownField renders correctly with a falsey value 1`] = `
 <div
-  className={undefined}
+  className="foo"
 >
   <div
     className="dropdown_field"
@@ -117,6 +119,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -140,7 +143,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
 
 exports[`DropdownField renders correctly with a value 1`] = `
 <div
-  className={undefined}
+  className="foo"
 >
   <div
     className="dropdown_field"
@@ -174,6 +177,7 @@ exports[`DropdownField renders correctly with a value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -222,7 +226,9 @@ exports[`InputField renders correctly 1`] = `
   >
     Input field
   </div>
-  <div>
+  <div
+    className="input_field_container"
+  >
     <div
       className="input_field"
     >
@@ -265,6 +271,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -301,6 +308,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -337,6 +345,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -380,6 +389,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -416,6 +426,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -452,6 +463,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -495,6 +507,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -531,6 +544,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
@@ -567,6 +581,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
         className=""
         fill="currentColor"
         height={undefined}
+        style={undefined}
         version="1.1"
         viewBox="0 0 24 24"
         width="100%"
