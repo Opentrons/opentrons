@@ -1,8 +1,0 @@
-@import '@opentrons/components';
-
-.splash {
-  @apply --absolute-fill;
-
-  z-index: -1;
-  background: url(../img/opentrons_logo.png) no-repeat center center;
-}

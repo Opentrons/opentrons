@@ -1,14 +1,12 @@
 // @flow
 
-import type {DeckSlot} from '@opentrons/components'
+import type {DeckSlot, Mount, Channels} from '@opentrons/components'
 
 export type MixArgs = {|
   volume: number,
   times: number
 |}
 
-// import export type {TransferishFormData} from '../steplist/export types'
-// TODO IMMEDIATELY import this export type and use it in validateAndProcessForm
 export type ConsolidateFormData = {|
   stepType: 'consolidate',
 
@@ -57,9 +55,7 @@ export type ConsolidateFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type Mount = 'left' | 'right'
-
-export type PipetteChannels = 1 | 8
+export type PipetteChannels = Channels // TODO Ian 2018-02-27 rename PipetteChannels -> Channels
 
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
@@ -89,7 +85,7 @@ export type RobotState = {|
       }
     },
     pipettes: {
-      [pipetteId: string] : boolean // true if tip is on pipette
+      [pipetteId: string]: boolean // true if tip is on pipette
     }
   }
 |}

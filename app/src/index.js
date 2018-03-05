@@ -8,14 +8,10 @@ import thunk from 'redux-thunk'
 import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
-import {alertMiddleware} from './interface'
+import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {middleware as analyticsMiddleware} from './analytics'
 import reducer from './reducer'
-
-// analytics events map
-// in a separate file for separation of concerns / DI / cicular dep prevention
-import analyticsEventsMap from './analytics/events-map'
 
 // components
 import App from './components/App'
@@ -25,8 +21,8 @@ const history = createHistory()
 const middleware = applyMiddleware(
   thunk,
   robotApiMiddleware(),
-  analyticsMiddleware(analyticsEventsMap),
-  alertMiddleware(window),
+  healthCheckMiddleware,
+  analyticsMiddleware,
   routerMiddleware(history)
 )
 

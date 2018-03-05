@@ -28,7 +28,7 @@ type DispatchProps = {
 }
 
 type Props = {
-  probed: bool,
+  probed: boolean,
   onPrepareClick: () => void
 }
 

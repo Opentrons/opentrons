@@ -16,7 +16,7 @@ from opentrons.containers.placeable import (
     Slot)
 
 
-def test_containers_create(robot):
+def test_containers_create(user_definition_dirs, robot):
     container_name = 'plate_for_testing_containers_create'
     containers_create(
         name=container_name,
@@ -24,8 +24,7 @@ def test_containers_create(robot):
         spacing=(9, 9),
         diameter=4,
         depth=8,
-        volume=1000,
-        save=True)
+        volume=1000)
 
     p = containers_load(robot, container_name, '1')
     assert len(p) == 96
@@ -41,16 +40,6 @@ def test_containers_create(robot):
 
     database.delete_container(container_name)
     assert container_name not in containers_list()
-
-    container_name = 'other_plate_for_testing_containers_create'
-    p = containers_create(
-        name=container_name,
-        grid=(8, 12),
-        spacing=(9, 9),
-        diameter=4,
-        depth=8,
-        save=False)
-    assert p['C3'].max_volume() == 0
 
 
 class ContainerTestCase(unittest.TestCase):

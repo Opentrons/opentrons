@@ -1,6 +1,5 @@
 // mock health module
 'use strict'
-
 const health = module.exports = jest.genMockFromModule('../health')
 
 health.__mockThunk = jest.fn(() => new Promise((resolve) => {
@@ -8,3 +7,5 @@ health.__mockThunk = jest.fn(() => new Promise((resolve) => {
 }))
 
 health.fetchHealth = jest.fn(() => health.__mockThunk)
+
+health.healthReducer.mockReturnValue({})

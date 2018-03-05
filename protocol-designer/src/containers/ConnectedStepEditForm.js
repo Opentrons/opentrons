@@ -13,6 +13,7 @@ import {
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
+import {selectors as fileDataSelectors} from '../file-data'
 import type {FormData} from '../steplist/types'
 import type {BaseState, ThunkDispatch} from '../types'
 
@@ -36,11 +37,7 @@ function mapStateToProps (state: BaseState) {
     formData: selectors.formData(state),
     formSectionCollapse: selectors.formSectionCollapse(state),
     canSave: selectors.currentFormCanBeSaved(state),
-    /* NOTE: when pipette selection page exists, pipettes will come from that saved pipette state */
-    pipetteOptions: [
-      {name: '10 μL Single', value: 'p10SingleId'},
-      {name: '300 μL Multi-Channel', value: 'p300multiId'}
-    ],
+    pipetteOptions: fileDataSelectors.equippedPipetteOptions(state),
     labwareOptions: labwareIngredSelectors.labwareOptions(state)
   }
 }

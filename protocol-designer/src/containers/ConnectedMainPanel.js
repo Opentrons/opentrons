@@ -1,6 +1,7 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
+import {Splash} from '@opentrons/components'
 
 import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedFilePage from '../containers/ConnectedFilePage'
@@ -14,7 +15,10 @@ type Props = {page: Page}
 
 function MainPanel (props: Props) {
   const {page} = props
-  if (page === 'file') {
+  if (page === 'file-splash') {
+    return <Splash />
+  }
+  if (page === 'file-detail') {
     return <ConnectedFilePage />
   }
   // all other pages show the deck setup

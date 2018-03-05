@@ -11,6 +11,8 @@ import type {
 
 import {actionTypes} from '../actions'
 
+import type {Action, DisconnectResponseAction} from '../actions'
+
 type Request = {
   inProgress: boolean,
   error: ?{message: string}
@@ -40,17 +42,8 @@ export type State = {
   runTime: number,
 }
 
-// TODO(mc, 2018-01-11): import union of discrete action types from actions
-type Action = {
-  type: string,
-  payload?: any,
-  error?: boolean,
-  meta?: {}
-}
-
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
-  DISCONNECT_RESPONSE,
   SESSION,
   SESSION_RESPONSE,
   RUN,
@@ -91,7 +84,9 @@ export default function sessionReducer (
   action: Action
 ): State {
   switch (action.type) {
-    case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
+    case 'robot:DISCONNECT_RESPONSE':
+      return handleDisconnectResponse(state, action)
+
     case SESSION: return handleSession(state, action)
     case SESSION_RESPONSE: return handleSessionResponse(state, action)
     case RUN: return handleRun(state, action)
@@ -108,12 +103,15 @@ export default function sessionReducer (
   return state
 }
 
-function handleDisconnectResponse (state, action) {
-  if (action.error) return state
+function handleDisconnectResponse (
+  state: State,
+  action: DisconnectResponseAction
+): State {
+  if (action.payload.error) return state
   return INITIAL_STATE
 }
 
-function handleSession (state, action) {
+function handleSession (state: State, action: any): State {
   if (!action.payload || !action.payload.file) return state
 
   const {payload: {file: {name}}} = action
@@ -122,7 +120,7 @@ function handleSession (state, action) {
   return {...state, name, sessionRequest}
 }
 
-function handleSessionResponse (state, action) {
+function handleSessionResponse (state: State, action: any): State {
   const {error, payload} = action
 
   if (error) {
@@ -136,11 +134,11 @@ function handleSessionResponse (state, action) {
   }
 }
 
-function handleRun (state, action) {
+function handleRun (state: State, action: any): State {
   return {...state, runTime: 0, runRequest: {inProgress: true, error: null}}
 }
 
-function handleRunResponse (state, action) {
+function handleRunResponse (state: State, action: any): State {
   const {error, payload} = action
 
   if (error) return {...state, runRequest: {inProgress: false, error: payload}}
@@ -148,15 +146,15 @@ function handleRunResponse (state, action) {
   return {...state, runRequest: {inProgress: false, error: null}}
 }
 
-function handleTickRunTime (state, action) {
+function handleTickRunTime (state: State, action: any): State {
   return {...state, runTime: Date.now()}
 }
 
-function handlePause (state, action) {
+function handlePause (state: State, action: any): State {
   return {...state, pauseRequest: {inProgress: true, error: null}}
 }
 
-function handlePauseResponse (state, action) {
+function handlePauseResponse (state: State, action: any): State {
   const {error, payload} = action
 
   if (error) {
@@ -166,11 +164,11 @@ function handlePauseResponse (state, action) {
   return {...state, pauseRequest: {inProgress: false, error: null}}
 }
 
-function handleResume (state, action) {
+function handleResume (state: State, action: any): State {
   return {...state, resumeRequest: {inProgress: true, error: null}}
 }
 
-function handleResumeResponse (state, action) {
+function handleResumeResponse (state: State, action: any): State {
   const {error, payload} = action
 
   if (error) {
@@ -180,11 +178,11 @@ function handleResumeResponse (state, action) {
   return {...state, resumeRequest: {inProgress: false, error: null}}
 }
 
-function handleCancel (state, action) {
+function handleCancel (state: State, action: any): State {
   return {...state, cancelRequest: {inProgress: true, error: null}}
 }
 
-function handleCancelResponse (state, action) {
+function handleCancelResponse (state: State, action: any): State {
   const {error, payload} = action
 
   if (error) {

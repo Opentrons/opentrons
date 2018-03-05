@@ -11,6 +11,7 @@ import {
 import type {FormModalFields} from '../../steplist/types'
 import {formConnectorFactory} from '../../utils'
 import styles from './MoreOptionsModal.css'
+import modalStyles from './modal.css'
 
 type Props = {
   onDelete: (event: SyntheticEvent<>) => void,
@@ -24,8 +25,8 @@ type Props = {
 export default function (props: Props) {
   const formConnector = formConnectorFactory(props.handleChange, props.formData)
   return (
-    !props.hideModal && <Modal onCloseClick={props.onCancel} className={styles.modal}>
-      <div>
+    !props.hideModal && <Modal onCloseClick={props.onCancel} className={modalStyles.modal}>
+      <div className={modalStyles.modal_contents}>
         <FormGroup label='Step Name' className={styles.column_1_2}>
           <InputField {...formConnector('step-name')} />
         </FormGroup>
