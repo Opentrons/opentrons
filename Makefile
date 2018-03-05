@@ -59,10 +59,10 @@ lint: lint-py lint-js lint-css
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
 
+# TODO(mc, 2018-02-05): bring flow back
 .PHONY: lint-js
 lint-js:
 	eslint '**/*.js'
-	flow
 
 .PHONY: lint-css
 lint-css:
