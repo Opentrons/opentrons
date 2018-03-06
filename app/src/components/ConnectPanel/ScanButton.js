@@ -6,7 +6,7 @@ import styles from './connect-panel.css'
 
 type Props = {
   isScanning: boolean,
-  onScanClick: () => void,
+  onScanClick: () => mixed,
   inTitleBar?: boolean,
   found: boolean
 }

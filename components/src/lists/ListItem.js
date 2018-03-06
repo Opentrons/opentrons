@@ -34,7 +34,6 @@ export default function ListItem (props: ListItemProps) {
     : undefined
 
   const className = classnames(props.className, styles.list_item, {
-    [styles.list_item_link]: url,
     [styles.disabled]: isDisabled,
     [styles.clickable]: onClick
   })

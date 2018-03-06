@@ -7,6 +7,7 @@ import {
   selectors as robotSelectors
 } from '../../robot'
 
+import {SidePanel} from '@opentrons/components'
 import UploadInput from './UploadInput'
 import UploadWarning from './UploadWarning'
 
@@ -21,11 +22,13 @@ function UploadPanel (props) {
   const warning = props.isSessionLoaded && (<UploadWarning />)
 
   return (
-    <div>
-      <UploadInput {...props} isButton />
-      <UploadInput {...props} />
-      {warning}
-    </div>
+    <SidePanel title='Open Protocol'>
+      <div>
+        <UploadInput {...props} isButton />
+        <UploadInput {...props} />
+        {warning}
+      </div>
+    </SidePanel>
   )
 }
 
