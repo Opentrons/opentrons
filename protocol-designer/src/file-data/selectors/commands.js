@@ -5,7 +5,7 @@ import reduce from 'lodash/reduce'
 import type {BaseState} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
-import {equippedPipettes} from './'
+import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 
 const all96Tips = reduce(
