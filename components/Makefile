@@ -60,4 +60,4 @@ test:
 
 .PHONY: install-types
 install-types:
-	flow-typed install --ignoreDeps=dev --packageDir=..
+	flow-typed install --ignoreDeps=dev --packageDir=.. --flowVersion=0.61.0
