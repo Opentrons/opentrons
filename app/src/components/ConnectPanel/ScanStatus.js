@@ -6,7 +6,7 @@ import ScanButton from './ScanButton'
 import styles from './connect-panel.css'
 
 type Props = {
-  onScanClick: () => void,
+  onScanClick: () => mixed,
   isScanning: boolean,
   found: boolean
 }

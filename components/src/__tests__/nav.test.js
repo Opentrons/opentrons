@@ -29,14 +29,13 @@ describe('NavButton', () => {
       <NavButton
         onClick={onClick}
         disabled={false}
-        isCurrent={true}
         iconName={FILE}
       />
     ).root.findByType('button')
 
     button.props.onClick()
     expect(button.props.disabled).toBe(false)
-    expect(button.props.className).toEqual('button active')
+    expect(button.props.className).toEqual('button')
     expect(onClick).toHaveBeenCalled()
   })
 
