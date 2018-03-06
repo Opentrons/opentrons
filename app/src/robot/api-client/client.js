@@ -202,7 +202,7 @@ export default function client (dispatch) {
     remote.calibration_manager.move_to(instrument, labware)
       .then(() => {
         dispatch(actions.moveToResponse())
-        dispatch(push(`/setup-deck/${slot}/confirm`))
+        dispatch(push(`/calibrate/labware/${slot}/confirm`))
       })
       .catch((error) => dispatch(actions.moveToResponse(error)))
   }

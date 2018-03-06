@@ -65,12 +65,12 @@ function mapStateToProps (state): StateProps {
 
   if (nextInstrument) {
     _button = {
-      href: `/setup-instruments/${nextInstrument.mount}`,
+      href: `/calibrate/instruments/${nextInstrument.mount}`,
       text: 'Continue to Next Pipette'
     }
   } else if (nextLabware) {
     _button = {
-      href: `/setup-deck/${nextLabware.slot}`,
+      href: `/calibrate/labware/${nextLabware.slot}`,
       text: 'Continue to Labware setup'
     }
   }
