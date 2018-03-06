@@ -17,8 +17,6 @@ type NavButtonProps= {
   className?: string,
   /** disabled attribute (setting disabled removes onClick) */
   disabled?: boolean,
-  /** highlights navbutton if true */
-  isCurrent?: boolean,
   /** optional title to display below the icon */
   title?: string,
   /** Icon name for button's icon */
@@ -29,7 +27,6 @@ export default function NavButton (props: NavButtonProps) {
   const className = classnames(
     styles.button,
     {[styles.disabled]: props.disabled},
-    {[styles.active]: props.isCurrent},
     {[styles.bottom]: props.isBottom},
     props.className
   )

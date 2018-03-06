@@ -238,38 +238,40 @@ export const getInstruments = createSelector(
     tipOnByMount,
     calibrationRequest
   ): Instrument[] => {
-    return Object.keys(instrumentsByMount).filter(isMount).map((mount) => {
-      const instrument = instrumentsByMount[mount]
+    return INSTRUMENT_MOUNTS
+      .filter((mount) => instrumentsByMount[mount] != null)
+      .map((mount) => {
+        const instrument = instrumentsByMount[mount]
 
-      const probed = probedByMount[mount] || false
-      const tipOn = tipOnByMount[mount] || false
-      let calibration: InstrumentCalibrationStatus = 'unprobed'
+        const probed = probedByMount[mount] || false
+        const tipOn = tipOnByMount[mount] || false
+        let calibration: InstrumentCalibrationStatus = 'unprobed'
 
-      // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
-      // TODO(mc: 2018-01-23): handle probe error state better
-      if (calibrationRequest.mount === mount && !calibrationRequest.error) {
-        if (calibrationRequest.type === 'MOVE_TO_FRONT') {
-          calibration = calibrationRequest.inProgress
-            ? 'preparing-to-probe'
-            : 'ready-to-probe'
-        } else if (calibrationRequest.type === 'PROBE_TIP') {
-          if (calibrationRequest.inProgress) {
-            calibration = 'probing'
-          } else if (!probed) {
-            calibration = 'probed-tip-on'
-          } else {
-            calibration = 'probed'
+        // TODO(mc: 2018-01-10): rethink instrument level "calibration" prop
+        // TODO(mc: 2018-01-23): handle probe error state better
+        if (calibrationRequest.mount === mount && !calibrationRequest.error) {
+          if (calibrationRequest.type === 'MOVE_TO_FRONT') {
+            calibration = calibrationRequest.inProgress
+              ? 'preparing-to-probe'
+              : 'ready-to-probe'
+          } else if (calibrationRequest.type === 'PROBE_TIP') {
+            if (calibrationRequest.inProgress) {
+              calibration = 'probing'
+            } else if (!probed) {
+              calibration = 'probed-tip-on'
+            } else {
+              calibration = 'probed'
+            }
           }
         }
-      }
 
-      return {
-        ...instrument,
-        calibration,
-        probed,
-        tipOn
-      }
-    })
+        return {
+          ...instrument,
+          calibration,
+          probed,
+          tipOn
+        }
+      })
   }
 )
 
