@@ -393,19 +393,32 @@ class Robot(object):
         self._instruments[mount] = instrument
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
-        # We are creating two pose_tracker entries for instrument
-        # one id(instrument) to store it's offset vector and another
-        # with zero offset, which can be increased/decreased by
-        # tip length for pickup and drop tip
+
+        # instrument_offset is the distance found (with tip-probe) between
+        # the pipette's expected position, and the actual position
+        # this is expected to be no greater than ~3mm
+        # Z is not included, because Z offsets found during tip-probe are used
+        # to determined the tip's length
         cx, cy, _ = self.config.instrument_offset[mount][instrument.type]
+
+        # model_offset is the expected position of the pipette, determined
+        # by designed dimensions of that model (eg: p10-multi vs p300-single)
         mx, my, mz = instrument.model_offset
-        if mount == 'left':
-            mx -= X_DISTANCE_BETWEEN_MOUNTS
+
+        # X distance between gantry's left and right mounts (aka carriages)
+        mount_x_offset = {'left': -X_DISTANCE_BETWEEN_MOUNTS, 'right': 0}
+
+        # combine each offset to get the pipette's position relative to gantry
+        _x, _y, _z = (
+            mx + cx + mount_x_offset[mount],
+            my + cy,
+            mz
+        )
         self.poses = pose_tracker.add(
             self.poses,
             instrument,
             parent=mount,
-            point=(mx + cx, my + cy, mz)
+            point=(_x, _y, _z)
         )
 
     def add_warning(self, warning_msg):
