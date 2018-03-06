@@ -1,5 +1,5 @@
 // connection reducer tests
-import {reducer, actionTypes} from '../'
+import {reducer} from '../'
 
 const getState = (state) => state.connection
 
@@ -21,7 +21,7 @@ describe('robot reducer - connection', () => {
     const state = {
       connection: {isScanning: false}
     }
-    const action = {type: actionTypes.DISCOVER}
+    const action = {type: 'robot:DISCOVER'}
 
     expect(getState(reducer(state, action))).toEqual({
       isScanning: true
@@ -32,7 +32,7 @@ describe('robot reducer - connection', () => {
     const state = {
       connection: {isScanning: true}
     }
-    const action = {type: actionTypes.DISCOVER_FINISH}
+    const action = {type: 'robot:DISCOVER_FINISH'}
 
     expect(getState(reducer(state, action))).toEqual({
       isScanning: false
@@ -51,7 +51,7 @@ describe('robot reducer - connection', () => {
       }
     }
     const action = {
-      type: actionTypes.CONNECT,
+      type: 'robot:CONNECT',
       payload: {name: 'ot'}
     }
 
@@ -72,11 +72,37 @@ describe('robot reducer - connection', () => {
         }
       }
     }
-    const action = {type: actionTypes.CONNECT_RESPONSE, error: false}
+    const action = {type: 'robot:CONNECT_RESPONSE', payload: {}}
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
       connectRequest: {inProgress: false, error: null, name: ''}
+    })
+  })
+
+  test('handles CONNECT_RESPONSE failure', () => {
+    const state = {
+      connection: {
+        connectedTo: '',
+        connectRequest: {
+          inProgress: true,
+          error: null,
+          name: 'ot'
+        }
+      }
+    }
+    const action = {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: {error: new Error('AH')}
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      connectedTo: '',
+      connectRequest: {
+        inProgress: false,
+        error: new Error('AH'),
+        name: 'ot'
+      }
     })
   })
 
@@ -100,33 +126,6 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles CONNECT_RESPONSE failure', () => {
-    const state = {
-      connection: {
-        connectedTo: '',
-        connectRequest: {
-          inProgress: true,
-          error: null,
-          name: 'ot'
-        }
-      }
-    }
-    const action = {
-      type: actionTypes.CONNECT_RESPONSE,
-      error: true,
-      payload: new Error('AH')
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      connectedTo: '',
-      connectRequest: {
-        inProgress: false,
-        error: new Error('AH'),
-        name: 'ot'
-      }
-    })
-  })
-
   test('handles DISCONNECT action', () => {
     const state = {
       connection: {
@@ -138,7 +137,7 @@ describe('robot reducer - connection', () => {
         }
       }
     }
-    const action = {type: actionTypes.DISCONNECT}
+    const action = {type: 'robot:DISCONNECT'}
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
@@ -146,37 +145,18 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles DISCONNECT_RESPONSE success', () => {
+  test('handles DISCONNECT_RESPONSE', () => {
     const state = {
       connection: {
         connectedTo: 'ot',
         disconnectRequest: {inProgress: true, error: null}
       }
     }
-    const action = {type: actionTypes.DISCONNECT_RESPONSE, error: false}
+    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: '',
       disconnectRequest: {inProgress: false, error: null}
-    })
-  })
-
-  test('handles DISCONNECT_RESPONSE failure', () => {
-    const state = {
-      connection: {
-        connectedTo: 'ot',
-        disconnectRequest: {inProgress: true, error: null}
-      }
-    }
-    const action = {
-      type: actionTypes.DISCONNECT_RESPONSE,
-      error: true,
-      payload: new Error('AH')
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      connectedTo: 'ot',
-      disconnectRequest: {inProgress: false, error: new Error('AH')}
     })
   })
 
@@ -190,7 +170,7 @@ describe('robot reducer - connection', () => {
       }
     }
     const action = {
-      type: actionTypes.ADD_DISCOVERED,
+      type: 'robot:ADD_DISCOVERED',
       payload: {host: '123456.local', name: 'bar'}
     }
 
@@ -213,7 +193,7 @@ describe('robot reducer - connection', () => {
       }
     }
     const action = {
-      type: actionTypes.ADD_DISCOVERED,
+      type: 'robot:ADD_DISCOVERED',
       payload: {host: 'abcdef.local', name: 'foo'}
     }
 
@@ -236,7 +216,7 @@ describe('robot reducer - connection', () => {
       }
     }
     const action = {
-      type: actionTypes.REMOVE_DISCOVERED,
+      type: 'robot:REMOVE_DISCOVERED',
       payload: {name: 'foo'}
     }
 

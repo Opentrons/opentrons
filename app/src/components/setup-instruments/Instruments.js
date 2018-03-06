@@ -1,9 +1,10 @@
 // @flow
+import * as React from 'react'
 import {connect} from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
-import type InstrumentInfoProps from './InstrumentInfo'
-import InstrumentGroup from './InstrumentGroup'
+// import type InstrumentInfoProps from './InstrumentInfo'
+import {InstrumentGroup, InstrumentInfo} from '@opentrons/components'
 
 import {
   constants as robotConstants,
@@ -15,7 +16,7 @@ type OwnProps = {
 }
 
 type StateProps = {
-  instruments: InstrumentInfoProps[]
+  instruments: Array<React.ElementProps<typeof InstrumentInfo>>
 }
 
 export default connect(mapStateToProps)(InstrumentGroup)

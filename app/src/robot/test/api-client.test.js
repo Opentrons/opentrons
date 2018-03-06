@@ -4,7 +4,6 @@ import {push} from 'react-router-redux'
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
-import {tagAlertAction} from '../../interface'
 import {NAME, actions, constants} from '../'
 
 import MockSession from './__mocks__/session'
@@ -114,45 +113,15 @@ describe('api client', () => {
     })
 
     test('disconnects RPC client on DISCONNECT message', () => {
+      const expected = actions.disconnectResponse()
+
       return sendConnect()
         .then(() => sendDisconnect())
         .then(() => expect(rpcClient.close).toHaveBeenCalled())
-    })
-
-    test('dispatch DISCONNECT_RESPONSE if rpcClient closes', () => {
-      const expected = actions.disconnectResponse()
-      let emitDisconnect
-
-      return sendConnect()
-        .then(() => {
-          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
-            args[0] === 'close'
-          ))[1]
-          expect(typeof emitDisconnect).toBe('function')
-        })
-        .then(() => sendDisconnect())
-        .then(() => emitDisconnect())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('dispatch DISCONNECT_RESPONSE w/ alert if unexpected close', () => {
-      const expected = tagAlertAction(
-        actions.disconnectResponse(),
-        expect.stringMatching(/unexpected/i)
-      )
-      let emitDisconnect
-
-      return sendConnect()
-        .then(() => {
-          emitDisconnect = rpcClient.on.mock.calls.find((args) => (
-            args[0] === 'close'
-          ))[1]
-          expect(typeof emitDisconnect).toBe('function')
-        })
-        .then(() => emitDisconnect())
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
-    })
-
+    // TODO(mc, 2018-03-01): rethink / remove this behavior
     test('dispatch push to /run if connect to running session', () => {
       const expected = push('/run')
       session.state = constants.RUNNING

@@ -10,6 +10,7 @@ import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
 
 import styles from './Plate.css'
 import Well from './Well'
+import type {LabwareLocations} from '../labware-types'
 
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
@@ -20,7 +21,7 @@ type singleWell = {
   selected: boolean,
   wellName: string,
   maxVolume: number,
-  groupId? : string
+  groupId?: string
 }
 
 type wellDims = { // TODO similar to type in Well.js. DRY it up
@@ -52,22 +53,15 @@ function FallbackPlate () {
   )
 }
 
-export default class Plate extends React.Component<PlateProps> {
-  constructor (props: PlateProps) {
-    super(props)
-    // TODO Ian 2017-12-12 A prettier way to bind `this` w/ flow still happy? https://github.com/facebook/flow/issues/1517
-    const self: any = this
-    self.createLabels = this.createLabels.bind(this)
-    self.createWell = this.createWell.bind(this)
-    self.getContainerData = this.getContainerData.bind(this)
-  }
+type LabwareData = {
+  originOffset: {x: number, y: number},
+  firstWell: wellDims,
+  containerLocations: LabwareLocations,
+  allWellNames: Array<string>
+}
 
-  getContainerData (): {
-    originOffset: {x: number, y: number},
-    firstWell: wellDims,
-    containerLocations: any,
-    allWellNames: Array<string>
-  } {
+export default class Plate extends React.Component<PlateProps> {
+  getContainerData = (): LabwareData => {
     const { containerType } = this.props
 
     if (!(containerType in defaultContainers.containers)) {
@@ -84,7 +78,7 @@ export default class Plate extends React.Component<PlateProps> {
     return { originOffset, firstWell, containerLocations, allWellNames }
   }
 
-  createWell (wellName: string) {
+  createWell = (wellName: string) => {
     const { selectable, wellContents } = this.props
     const { originOffset, firstWell, containerLocations } = this.getContainerData()
     const singleWellContents: singleWell = wellContents[wellName]
@@ -118,7 +112,7 @@ export default class Plate extends React.Component<PlateProps> {
     } />
   }
 
-  createLabels () {
+  createLabels = () => {
     const { originOffset, containerLocations, allWellNames } = this.getContainerData()
 
     const allWellsSplit = allWellNames.map(wellNameSplit)

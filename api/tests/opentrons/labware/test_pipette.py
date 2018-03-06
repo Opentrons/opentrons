@@ -1389,6 +1389,7 @@ class PipetteTest(unittest.TestCase):
             mock.call(self.plate[0],
                       instrument=self.p200,
                       strategy='arc'),
+
             mock.call(
                 (self.plate[0], (6.40, 3.20, 10.50)),
                 instrument=self.p200,
@@ -1498,6 +1499,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
 
+        print(self.p200.tip_racks)
+
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
@@ -1509,7 +1512,7 @@ class PipetteTest(unittest.TestCase):
             self.p200.aspirate.mock_calls,
             [
                 mock.call.aspirate(volume=50,
-                                   location=self.p200.tip_racks[0][0],
+                                   location=None,
                                    rate=1.0),
                 mock.call.aspirate(50, rate=1.0)
             ]
@@ -1683,14 +1686,41 @@ class PipetteTest(unittest.TestCase):
 
         self.assertEqual(self.p200.drop_tip.mock_calls, expected)
 
+    def test_direct_movement_within_well(self):
+        self.robot.move_to = mock.Mock()
+        self.p200.move_to(self.plate[0])
+        self.p200.move_to(self.plate[0].top())
+        self.p200.move_to(self.plate[0].bottom())
+        self.p200.move_to(self.plate[1])
+        self.p200.move_to(self.plate[2])
+        self.p200.move_to(self.plate[2].bottom())
+
+        expected = [
+            mock.call(
+                self.plate[0], instrument=self.p200, strategy='arc'),
+            mock.call(
+                self.plate[0].top(), instrument=self.p200, strategy='direct'),
+            mock.call(
+                self.plate[0].bottom(), instrument=self.p200, strategy='direct'),
+            mock.call(
+                self.plate[1], instrument=self.p200, strategy='arc'),
+            mock.call(
+                self.plate[2], instrument=self.p200, strategy='arc'),
+            mock.call(
+                self.plate[2].bottom(), instrument=self.p200, strategy='direct')
+        ]
+        from pprint import pprint
+        pprint(self.robot.move_to.mock_calls)
+        self.assertEqual(self.robot.move_to.mock_calls, expected)
+
     def build_pick_up_tip(self, well):
         plunge = -10
         return [
-            mock.call(well.top(), strategy='arc'),
+            mock.call(well.top()),
             mock.call(well.top(plunge), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(plunge - 1), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(plunge - 2), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]

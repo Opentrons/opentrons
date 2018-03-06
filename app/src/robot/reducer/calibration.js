@@ -7,6 +7,7 @@ import type {Mount, Slot} from '../types'
 import {actionTypes} from '../actions'
 import type {
   Action,
+  DisconnectResponseAction,
   ConfirmProbedAction,
   PipetteCalibrationAction,
   LabwareCalibrationAction,
@@ -56,7 +57,6 @@ export type State = {
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
   SESSION,
-  DISCONNECT_RESPONSE,
   SET_DECK_POPULATED,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
@@ -141,8 +141,10 @@ export default function calibrationReducer (
     case 'robot:UPDATE_OFFSET_FAILURE':
       return handleUpdateOffsetFailure(state, action)
 
+    case 'robot:DISCONNECT_RESPONSE':
+      return handleDisconnectResponse(state, action)
+
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
-    case DISCONNECT_RESPONSE: return handleDisconnectResponse(state, action)
     case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
@@ -156,8 +158,11 @@ export default function calibrationReducer (
   return state
 }
 
-function handleDisconnectResponse (state: State, action: any): State {
-  if (action.error) return state
+function handleDisconnectResponse (
+  state: State,
+  action: DisconnectResponseAction
+): State {
+  if (action.payload.error) return state
   return INITIAL_STATE
 }
 

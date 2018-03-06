@@ -1,65 +1,69 @@
 // nav button container
 import {connect} from 'react-redux'
-
-import {
-  actions as interfaceActions,
-  selectors as interfaceSelectors
-} from '../../interface'
+import {withRouter} from 'react-router'
 
 import {
   selectors as robotSelectors,
   constants as robotConstants
 } from '../../robot'
 
-import {NavButton, FILE, COG, CONNECT, MORE} from '@opentrons/components'
+import {NavButton, FILE, CALIBRATE, CONNECT, RUN, MORE} from '@opentrons/components'
 
-export default connect(mapStateToProps, null, mergeProps)(NavButton)
+export default withRouter(connect(mapStateToProps)(NavButton))
 
 function mapStateToProps (state, ownProps) {
   const {name} = ownProps
-  const isPanelClosed = interfaceSelectors.getIsPanelClosed(state)
-  const currentPanel = interfaceSelectors.getCurrentPanel(state)
   const isSessionLoaded = robotSelectors.getSessionIsLoaded(state)
+  const nextInstrument = robotSelectors.getNextInstrument(state)
+  const labware = robotSelectors.getNotTipracks(state)
+  const nextLabware = robotSelectors.getNextLabware(state)
+  const isTipsProbed = robotSelectors.getInstrumentsCalibrated(state)
+  const isRunning = robotSelectors.getIsRunning(state)
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
-
-  let disabled = false
-  let iconName, isBottom
-
-  if (name === 'upload') {
-    disabled = !isConnected
-    iconName = FILE
-  } else if (name === 'setup') {
-    disabled = !isSessionLoaded
-    iconName = COG
-  } else if (name === 'connect') {
-    iconName = CONNECT
-  } else if (name === 'more') {
-    iconName = MORE
-    isBottom = true
+  let calibrateUrl
+  if (isSessionLoaded & isTipsProbed) {
+    calibrateUrl = nextLabware
+     ? `/setup-deck/${nextLabware.slot}`
+     : `/setup-deck/${labware[0].slot}`
+  } else if (isSessionLoaded) {
+    calibrateUrl = `/setup-instruments/${nextInstrument.mount}`
+  } else {
+    calibrateUrl = '#'
   }
 
-  return {
-    iconName,
-    isBottom,
-    disabled,
-    isCurrent: !isPanelClosed && name === currentPanel
+  const NAV_ITEM_BY_NAME = {
+    connect: {
+      iconName: CONNECT,
+      title: 'robot',
+      url: '/robots'
+    },
+    upload: {
+      disabled: !isConnected || isRunning,
+      iconName: FILE,
+      title: 'protocol',
+      url: '/upload'
+    },
+    setup: {
+      disabled: !isSessionLoaded || isRunning,
+      iconName: CALIBRATE,
+      title: 'calibrate',
+      url: calibrateUrl
+    },
+    run: {
+      disabled: !isTipsProbed,
+      iconName: RUN,
+      title: 'run',
+      url: '/run'
+    },
+    more: {
+      iconName: MORE,
+      isBottom: true,
+      title: 'more',
+      url: '/menu/app'
+    }
   }
-}
 
-function mergeProps (stateProps, dispatchProps, ownProps) {
-  const {dispatch} = dispatchProps
-  const {name} = ownProps
-  /* TODO (ka 2018-2-8): leaving this commented out in the event we need to
-  bring back the collapsible panel.
-  const clickAction = isCurrent
-    ? interfaceActions.closePanel()
-    : interfaceActions.setCurrentPanel(name) */
-
-  return {
-    ...ownProps,
-    ...stateProps,
-    onClick: () => dispatch(interfaceActions.setCurrentPanel(name))
-  }
+  return NAV_ITEM_BY_NAME[name]
 }

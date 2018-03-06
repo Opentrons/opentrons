@@ -1,13 +1,15 @@
 // @flow
 // common robot types
-
+import type {Channels, Mount} from '@opentrons/components'
 import typeof reducer from './reducer'
 
 export type State = $Call<reducer>
 
-export type Channels = 1 | 8
-
-export type Mount = 'left' | 'right'
+// TODO Ian 2018-02-27 files that import from here should just import from @opentrons/components directly
+export type {
+  Mount,
+  Channels
+}
 
 export type Slot =
   | '1'
@@ -33,9 +35,13 @@ export type JogButtonName =
   | 'up'
   | 'down'
 
+// minimum robot for actions/reducers/middleware to work
+export type BaseRobot = {
+  name: string
+}
+
 // robot MDNS service for connectivity
-export type RobotService = {
-  name: string,
+export type RobotService = BaseRobot & {
   host: string,
   ip: string,
   port: number,

@@ -1,5 +1,6 @@
 // nav bar component
 import React from 'react'
+
 import {VerticalNavBar} from '@opentrons/components'
 import NavButton from './NavButton'
 

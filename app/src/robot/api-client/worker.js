@@ -16,8 +16,18 @@ self.onmessage = function handleIncoming (event) {
 
 function dispatchFromWorker (action) {
   // webworkers cannot post Error objects, so convert them to plain objects
-  if (action.error === true) {
-    action.payload = errorToPlainObject(action.payload)
+  if (action.payload) {
+    if (action.error === true) {
+      action = Object.assign({}, action, {
+        payload: errorToPlainObject(action.payload)
+      })
+    } else if (action.payload.error) {
+      action = Object.assign({}, action, {
+        payload: Object.assign({}, action.payload, {
+          error: errorToPlainObject(action.payload.error)
+        })
+      })
+    }
   }
 
   try {
@@ -25,6 +35,8 @@ function dispatchFromWorker (action) {
   } catch (error) {
     console.error('Unable to dispatch action from worker', action, error)
   }
+
+  return action
 }
 
 function errorToPlainObject (error) {

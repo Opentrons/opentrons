@@ -7,6 +7,7 @@ from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
+from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
 
 from argparse import ArgumentParser
@@ -80,9 +81,13 @@ def init(loop=None):
     server.app.router.add_get('/wifi/list', endp.wifi_list)
     server.app.router.add_post('/wifi/configure', endp.wifi_configure)
     server.app.router.add_get('/wifi/status', endp.wifi_status)
-    server.app.router.add_get('/identify', endp.identify)
-    server.app.router.add_get('/lights/on', endp.turn_on_rail_lights)
-    server.app.router.add_get('/lights/off', endp.turn_off_rail_lights)
+    server.app.router.add_post('/identify', endp.identify)
+    server.app.router.add_post('/lights/on', endp.turn_on_rail_lights)
+    server.app.router.add_post('/lights/off', endp.turn_off_rail_lights)
+    server.app.router.add_post('/server/update', endp.update_api)
+    server.app.router.add_post('/server/restart', endp.restart)
+    server.app.router.add_get('/calibration/deck', dc_endp.start)
+    server.app.router.add_post('/calibration/deck', dc_endp.dispatch)
     return server.app
 
 

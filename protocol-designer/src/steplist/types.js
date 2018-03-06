@@ -1,18 +1,10 @@
 // @flow
 
+import type {ConsolidateFormData} from '../step-generation'
+
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
-
-export type Command = {
-  commandType: 'aspirate' | 'dispense', // TODO add the rest
-  volume: number,
-  pipette: string,
-  labware: string,
-  well: string,
-  wellOffset?: any, // TODO
-  speed?: number // TODO. In ul/sec
-}
 
 // TODO Ian 2018-01-16 factor out to steplist/constants.js ?
 export const stepIconsByType = {
@@ -31,13 +23,13 @@ export type StepIdType = number
 export type TransferishStepItem = {|
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
-  rows: Array<{
+  rows: Array<{|
     substepId: number, // TODO should this be a string or is this ID properly a number?
     sourceIngredientName?: string,
     destIngredientName?: string,
     sourceWell?: string,
     destWell?: string
-  }>
+  |}>
 |}
 
 export type StepSubItemData = TransferishStepItem | {|
@@ -59,7 +51,9 @@ export type StepItemData = {|
   description?: string
 |}
 
-type TransferForm = {|
+export type SubSteps = {[StepIdType]: StepSubItemData | null}
+
+export type TransferForm = {|
   stepType: 'transfer',
   id: StepIdType,
 
@@ -90,7 +84,7 @@ type TransferForm = {|
   'dispense--blowout--labware'?: string
 |}
 
-type ConsolidateForm = {|
+export type ConsolidateForm = {|
   stepType: 'consolidate',
   id: StepIdType,
 
@@ -121,7 +115,7 @@ type ConsolidateForm = {|
   'dispense--blowout--labware'?: string
 |}
 
-type PauseForm = {|
+export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
@@ -134,10 +128,9 @@ type PauseForm = {|
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
 
-/* TODO immediately: add ALL fields to this data, split transfer and consolidate apart */
-export type TransferishFormData = {|
-  stepType: 'transfer' | 'consolidate',
-  pipette: 'left' | 'right', // TODO: pipette ID vs mount enum is TBD
+export type TransferFormData = {|
+  stepType: 'transfer',
+  pipette: string, // pipette ID
   sourceWells: Array<string>,
   destWells: Array<string>,
   sourceLabware: string,
@@ -155,7 +148,8 @@ export type PauseFormData = {|
   message: string
 |}
 
-export type ProcessedFormData = TransferishFormData | PauseFormData
+// TODO gradually create & use definitions from step-generation/types.js
+export type ProcessedFormData = TransferFormData | PauseFormData | ConsolidateFormData
 
 export type FormModalFields = {
   'step-name': string,

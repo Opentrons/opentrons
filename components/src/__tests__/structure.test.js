@@ -3,7 +3,14 @@ import React from 'react'
 import {MemoryRouter} from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {PageTabs, TitleBar, VerticalNavBar, NavButton, SidePanel, FILE, Card, LabeledValue} from '..'
+import {
+  PageTabs,
+  TitleBar,
+  Card,
+  RefreshCard,
+  LabeledValue,
+  Splash
+} from '..'
 
 describe('TitleBar', () => {
   test('adds an h1 with the title', () => {
@@ -126,99 +133,10 @@ describe('PageTabs', () => {
   })
 })
 
-describe('VerticalNavBar', () => {
-  test('renders correctly', () => {
-    const onClick = () => {}
-    const tree = Renderer.create(
-      <VerticalNavBar onClick={onClick} className='c'>
-        children
-      </VerticalNavBar>
-    ).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-})
-
-describe('NavButton', () => {
-  test('creates a button with props', () => {
-    const onClick = jest.fn()
-    const button = Renderer.create(
-      <NavButton
-        onClick={onClick}
-        disabled={false}
-        isCurrent
-        iconName={FILE}
-      />
-    ).root.findByType('button')
-
-    button.props.onClick()
-    expect(button.props.disabled).toBe(false)
-    expect(button.props.className).toEqual('button active')
-    expect(onClick).toHaveBeenCalled()
-  })
-
-  test('adds svg icon to button by name', () => {
-    const icon = Renderer.create(
-      <NavButton iconName={FILE} />
-    ).root.findByType('svg')
-
-    expect(icon).toBeDefined()
-  })
-
-  test('renders nav button with icon correctly', () => {
-    const tree = Renderer.create(
-      <NavButton iconName={FILE} disabled='false' />
-    ).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-})
-
-describe('SidePanel', () => {
-  test('renders sidebar with title', () => {
-    const heading = Renderer.create(
-      <SidePanel title={'title'} />
-    ).root.findByType('h2')
-    expect(heading).toBeDefined()
-    expect(heading.children).toEqual(['title'])
-  })
-
-  test('renders close button when onClick is present', () => {
-    const onClick = jest.fn()
-    const button = Renderer.create(
-      <SidePanel title={'title'} onCloseClick={onClick} />
-    ).root.findByType('button')
-
-    expect(button).toBeDefined()
-    button.props.onClick()
-    expect(onClick).toHaveBeenCalled()
-  })
-
-  test('renders closed panel when onClick present and isOpen is false', () => {
-    const onClick = jest.fn()
-    const panel = Renderer.create(
-      <SidePanel title={'title'} isClosed='true' onCloseClick={onClick} />
-    ).root.findByType('div')
-
-    expect(panel.props.className).toEqual('panel closed')
-  })
-
-  test('renders SidePanel correctly', () => {
-    const onClick = jest.fn()
-    const tree = Renderer.create(
-      <SidePanel title={'title'} onCloseClick={onClick} isClosed='true'>
-        children
-      </SidePanel>
-    ).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-})
-
 describe('Card', () => {
   test('renders Card correctly', () => {
     const tree = Renderer.create(
-      <Card title={'title'} >
+      <Card title={'title'}>
         children
         children
         children
@@ -229,10 +147,67 @@ describe('Card', () => {
   })
 })
 
+describe('RefreshCard', () => {
+  test('calls refresh on mount', () => {
+    const refresh = jest.fn()
+    Renderer.create(
+      <RefreshCard id='foo' refresh={refresh} />
+    )
+
+    expect(refresh).toHaveBeenCalledTimes(1)
+  })
+
+  test('calls refresh on id change', () => {
+    const refresh = jest.fn()
+    const renderer = Renderer.create(
+      <RefreshCard watch='foo' refresh={refresh} />
+    )
+
+    refresh.mockClear()
+    renderer.update(<RefreshCard watch='bar' refresh={refresh} />)
+    expect(refresh).toHaveBeenCalledTimes(1)
+
+    // test refresh is not called on a different props change
+    refresh.mockClear()
+    renderer.update(<RefreshCard watch='bar' refresh={refresh} refreshing />)
+    expect(refresh).toHaveBeenCalledTimes(0)
+  })
+
+  test('renders correctly', () => {
+    const tree = Renderer.create(
+      <RefreshCard watch='foo' refresh={() => {}} refreshing>
+        child1
+        child2
+        child3
+      </RefreshCard>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
 describe('LabeledValue', () => {
   test('renders LabeledValue correctly', () => {
     const tree = Renderer.create(
       <LabeledValue label={'Label'} value={'Value'} />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('Splash', () => {
+  test('renders correctly with no props', () => {
+    const tree = Renderer.create(
+      <Splash />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders correctly with custom props', () => {
+    const tree = Renderer.create(
+      <Splash iconName='flask' className='swag' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

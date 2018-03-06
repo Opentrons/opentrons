@@ -1,0 +1,9 @@
+@import '@opentrons/components';
+
+.file_page h1 {
+  @apply var(--font-header-dark);
+}
+
+.file_page section {
+  margin: 0 2.5rem;
+}

@@ -3,10 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import {PANEL_PROPS_BY_NAME} from '../interface'
-
-import {Icon, ALERT, CHECKED, SPINNER} from '@opentrons/components'
-import Splash from './Splash'
+import {Icon, ALERT, CHECKED, SPINNER, Splash} from '@opentrons/components'
 
 import styles from './Upload.css'
 
@@ -16,7 +13,6 @@ const UPLOAD_SUCCESS_MESSAGE = 'Your protocol has successfully loaded.'
 Upload.propTypes = {
   name: PropTypes.string.isRequired,
   inProgress: PropTypes.bool.isRequired,
-  openSetupPanel: PropTypes.func.isRequired,
   error: PropTypes.shape({
     message: PropTypes.string.isRequired
   })
@@ -42,7 +38,7 @@ export default function Upload (props) {
 }
 
 function UploadResults (props) {
-  const {name, error, openSetupPanel} = props
+  const {name, error} = props
   const message = error
     ? UPLOAD_ERROR_MESSAGE
     : UPLOAD_SUCCESS_MESSAGE
@@ -67,17 +63,8 @@ function UploadResults (props) {
     // instructions for a successful upload
     instructions = (
       <p className={styles.details}>
-        <span>Use the</span>
-        <span
-          role='button'
-          onClick={openSetupPanel}
-          className={styles.open_setup_link}
-        >
-          {` ${PANEL_PROPS_BY_NAME.setup.title} `}
-        </span>
-        <span>
-          panel to set up your pipettes and labware for the run
-        </span>
+        Continue to the Calibrate page to set up your pipettes and labware for
+        the run
       </p>
     )
   }

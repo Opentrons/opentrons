@@ -8,7 +8,7 @@ import {type IconName, Icon} from '../icons'
 
 type GroupProps = {
   /** text of title */
-  title: string,
+  title?: string,
   /** optional icon left of the title */
   iconName?: IconName,
   /** children, most likely one or more TitledList */
@@ -31,14 +31,16 @@ export default function SidePanelGroup (props: GroupProps) {
 
   return (
     <div className={className}>
-      <div className={styles.title_bar}>
-        {iconName && (
-          <Icon className={styles.title_bar_icon} name={iconName} />
-        )}
-        <h2 className={styles.title}>
-          {props.title}
-        </h2>
-      </div>
+      {props.title && (
+        <div className={styles.title_bar}>
+          {iconName && (
+            <Icon className={styles.title_bar_icon} name={iconName} />
+          )}
+          <h2 className={styles.title}>
+            {props.title}
+          </h2>
+        </div>
+      )}
       {props.children}
     </div>
   )

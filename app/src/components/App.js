@@ -1,10 +1,9 @@
 import React from 'react'
-import {Switch, Route} from 'react-router'
+import {Switch, Route, Redirect} from 'react-router'
 
-import NavPanel from './side-panel'
 import NavBar from './nav-bar'
 
-import Home from '../pages/Home'
+import SidePanel from '../pages/SidePanel'
 import Robots from '../pages/Robots'
 import AppSettingsPage from '../pages/AppSettings'
 import Upload from '../pages/Upload'
@@ -19,11 +18,11 @@ export default function App () {
   return (
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />
-      <NavPanel />
+      <SidePanel />
       <Switch>
-        <Route exact path='/' component={Home} />
-        <Route exact path='/menu/app' component={AppSettingsPage} />
+        <Redirect exact from='/' to='/robots' />
         <Route path='/robots/:name?' component={Robots} />
+        <Route exact path='/menu/app' component={AppSettingsPage} />
         <Route path='/upload' component={Upload} />
         <Route path='/setup-instruments/:mount' component={SetupInstruments} />
         <Route path='/setup-deck/:slot' component={SetupDeck} />

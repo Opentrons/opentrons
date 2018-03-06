@@ -1,6 +1,7 @@
 // analytics module
 // pushes events to GTM's data layer
 import gtmConfig from './gtm-config'
+import makeEvent from './make-event'
 
 // grab the data layer (and create it if it doesn't exist)
 const {DATA_LAYER_NAME} = gtmConfig
@@ -21,32 +22,27 @@ export function tagAction (action) {
   return {...action, meta: {...meta, [NAME]: true}}
 }
 
-export const middleware = function createAnalyticsMiddleware (eventsMap) {
-  return (store) => (next) => (action) => {
-    const meta = action.meta && action.meta[NAME]
+export const middleware = (store) => (next) => (action) => {
+  const meta = action.meta && action.meta[NAME]
 
-    if (meta) {
-      const {type} = action
-      const mapper = eventsMap[type]
+  if (meta) {
+    const {type} = action
+    const event = makeEvent(store.getState(), action)
 
-      if (!mapper) {
-        // TODO(mc, 2017-11-20): use a proper logger rather than console
-        console.warn(`Warning: no analytics mapper found for action ${type}`)
-        return next(action)
-      }
-
-      const event = mapper(store.getState(), action)
-
+    if (event) {
       dataLayer.push({
         event: CUSTOM_EVENT_NAME,
         action: event.name,
         category: event.category,
         label: mapPayloadToLabel(event.payload)
       })
+    } else {
+      // TODO(mc, 2017-11-20): use a proper logger rather than console
+      console.warn(`Warning: no analytics mapper found for action ${type}`)
     }
-
-    next(action)
   }
+
+  return next(action)
 }
 
 // maps a payload object to an analytics label string
