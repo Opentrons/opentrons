@@ -86,11 +86,16 @@ def _parse_axis_values(raw_axis_values):
     }
 
 
-def _parse_instrument_values(hex_str):
-    return {
-        pair.split(':')[0]: bytearray.fromhex(pair.split(':')[1])
-        for pair in hex_str.strip().split(' ')[1:]
+def _parse_instrument_id(smoothie_response):
+    '''
+    {
+        'R': bytearray(______)
     }
+    '''
+    items = smoothie_response.split('\n')[0].strip().split(':')
+    mount = items[0]
+    identifier = bytearray.fromhex(items[1])
+    return {mount: identifier}
 
 
 def _byte_array_to_hex_string(byte_array):
@@ -172,15 +177,17 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
-    def _scan_instruments(self):
-        res = self._send_command(GCODES['SCAN_INSTRUMENTS'])
-        return {
-            line.strip()[0]: _parse_instrument_values(line)['id']
-            for line in res.split('\n')
-            if line
-        }
+    def _read_instrument_id(self, mount):
+        res = self._send_command(GCODES['SCAN_INSTRUMENTS'] + mount)
+        try:
+            res = _parse_instrument_id(res)
+            assert mount in res
+            assert len(res[mount]) == 8
+            return res[mount]
+        except:
+            return None
 
-    def _write_instrument(self, mount, byte_array):
+    def _write_instrument_id(self, mount, byte_array):
         if not isinstance(byte_array, bytearray):
             raise ValueError(
                 'Expected {0}, not {1}'.format(bytearray, type(byte_array)))

@@ -8,6 +8,22 @@ from collections import namedtuple
 DEFAULT_ASPIRATE_SECONDS = 2
 DEFAULT_DISPENSE_SECONDS = 1
 
+# model-specific ID's, saved with each Pipette's memory
+# used to identifiy what model pipette is currently connected to machine
+PIPETTE_MODEL_IDENTIFIERS = {
+    'single': {
+        '10': bytearray([1, 1]),
+        '50': bytearray([1, 5]),
+        '300': bytearray([1, 30]),
+        '1000': bytearray([1, 100])
+    },
+    'multi': {
+        '10': bytearray([8, 1]),
+        '50': bytearray([8, 5]),
+        '300': bytearray([8, 30])
+    }
+}
+
 pipette_config = namedtuple(
     'pipette_config',
     [
