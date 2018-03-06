@@ -27,7 +27,7 @@ def scan_instruments(robot):
     return found_instruments
 
 
-def select_mount(robot, found_instruments):
+def select_mount(found_instruments):
     '''
     User selects which mount to write the data to (L or R)
     '''
@@ -81,7 +81,7 @@ def write_identifier(robot, mount, byte_array):
     '''
     print()
     if 'Y' not in input('Ready to save the ID? (Y or N):  ').upper():
-        raise Exception('No writing ID to pipette, and exiting script')
+        raise Exception('Not writing ID to pipette, and exiting script')
     robot._driver._write_instrument_id(mount, byte_array)
     read_id = robot._driver._read_instrument_id(mount)
     if read_id != byte_array:
@@ -108,7 +108,7 @@ def _ask_for_pipette_volume(num_channels):
             str(n) + (' or ' if (i < len(possible_sizes.keys()) - 1) else '')
             for i, n in enumerate(list(possible_sizes.keys()))
         ])
-    ) 
+    )
     pipette_volume = input(volume_question).strip()
     new_id_byte_array = possible_sizes.get(pipette_volume)
     assert new_id_byte_array
@@ -136,13 +136,13 @@ def _random_byte_list(num):
 
 
 def _byte_array_to_string(b):
-    return ''.join('%02x'%i for i in b)
+    return ''.join('%02x' % i for i in b)
 
 
 if __name__ == "__main__":
     robot = connect_to_robot()
     found_instruments = scan_instruments(robot)
-    mount = select_mount(robot, found_instruments)
+    mount = select_mount(found_instruments)
     new_id = generate_id()
     write_identifier(robot, mount, new_id)
     print()

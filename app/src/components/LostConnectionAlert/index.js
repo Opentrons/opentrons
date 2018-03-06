@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
+import {push} from 'react-router-redux'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 
@@ -61,6 +62,9 @@ function makeMapStateToProps () {
 
 function mapDispatchToProps (dispatch: Dispatch) {
   return {
-    disconnect: () => dispatch(robotActions.disconnect())
+    disconnect: () => {
+      dispatch(push('/robots'))
+      dispatch(robotActions.disconnect())
+    }
   }
 }

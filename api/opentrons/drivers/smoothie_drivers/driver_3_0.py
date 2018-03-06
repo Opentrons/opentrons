@@ -62,8 +62,8 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
-          'SCAN_INSTRUMENTS': 'M369',
-          'WRITE_INSTRUMENT': 'M370',
+          'READ_INSTRUMENT_ID': 'M369',
+          'WRITE_INSTRUMENT_ID': 'M370',
           'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907'}
 
@@ -178,13 +178,13 @@ class SmoothieDriver_3_0_0:
         self._update_position(updated_position)
 
     def _read_instrument_id(self, mount):
-        res = self._send_command(GCODES['SCAN_INSTRUMENTS'] + mount)
+        res = self._send_command(GCODES['READ_INSTRUMENT_ID'] + mount)
         try:
             res = _parse_instrument_id(res)
             assert mount in res
             assert len(res[mount]) == 8
             return res[mount]
-        except:
+        except Exception:
             return None
 
     def _write_instrument_id(self, mount, byte_array):
@@ -192,7 +192,7 @@ class SmoothieDriver_3_0_0:
             raise ValueError(
                 'Expected {0}, not {1}'.format(bytearray, type(byte_array)))
         byte_string = _byte_array_to_hex_string(byte_array)
-        command = GCODES['WRITE_INSTRUMENT'] + mount + byte_string
+        command = GCODES['WRITE_INSTRUMENT_ID'] + mount + byte_string
         self._send_command(command)
 
     # FIXME (JG 9/28/17): Should have a more thought out
