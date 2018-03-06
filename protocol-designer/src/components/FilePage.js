@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import {FormGroup, InputField} from '@opentrons/components'
+import {FormGroup, InputField, InstrumentGroup, type InstrumentInfoProps} from '@opentrons/components'
 import type {FilePageFields} from '../file-data'
 import type {FormConnector} from '../utils'
 
@@ -8,11 +8,12 @@ import styles from './FilePage.css'
 import formStyles from '../components/Form.css'
 
 type Props = {
-  formConnector: FormConnector<FilePageFields>
+  formConnector: FormConnector<FilePageFields>,
+  instruments: Array<InstrumentInfoProps>
 }
 
 export default function FilePage (props: Props) {
-  const {formConnector} = props
+  const {formConnector, instruments} = props
   return (
     <div className={styles.file_page}>
       <section>
@@ -39,6 +40,7 @@ export default function FilePage (props: Props) {
         <h2>
           Pipettes
         </h2>
+        <InstrumentGroup instruments={instruments} />
       </section>
     </div>
   )

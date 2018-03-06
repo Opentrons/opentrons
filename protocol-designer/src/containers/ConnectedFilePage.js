@@ -9,17 +9,30 @@ import FilePage from '../components/FilePage'
 import {actions, selectors} from '../file-data'
 import type {FilePageFields} from '../file-data'
 import {formConnectorFactory, type FormConnector} from '../utils'
+
 export default connect(mapStateToProps, null, mergeProps)(FilePage)
 
-function mapStateToProps (state: BaseState): FilePageFields {
-  return selectors.fileFormValues(state)
+type Props = React.ElementProps<typeof FilePage>
+type StateProps = {
+  instruments: $PropertyType<Props, 'instruments'>,
+  _values: {[string]: string}
+}
+
+function mapStateToProps (state: BaseState): StateProps {
+  const formValues = selectors.fileFormValues(state)
+  const pipetteData = selectors.pipettesForInstrumentGroup(state)
+
+  return {
+    _values: formValues,
+    instruments: pipetteData
+  }
 }
 
 function mergeProps (
-  stateProps: FilePageFields,
+  stateProps: StateProps,
   dispatchProps: {dispatch: Dispatch<*>}
-): React.ElementProps<typeof FilePage> {
-  const values = stateProps
+): Props {
+  const {instruments, _values} = stateProps
   const {dispatch} = dispatchProps
 
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
@@ -32,9 +45,10 @@ function mergeProps (
     }
   }
 
-  const formConnector: FormConnector<FilePageFields> = formConnectorFactory(onChange, values)
+  const formConnector: FormConnector<FilePageFields> = formConnectorFactory(onChange, _values)
 
   return {
-    formConnector
+    formConnector,
+    instruments
   }
 }
