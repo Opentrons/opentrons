@@ -10,6 +10,7 @@ from opentrons.config import feature_flags as fflags
 import json
 import os
 import logging
+import time
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +80,7 @@ robot_config = namedtuple(
     'robot_config',
     [
         'name',
+        'version',
         'steps_per_mm',
         'acceleration',
         'gantry_calibration',
@@ -105,6 +107,7 @@ def _get_default():
 
     return robot_config(
         name='Ada Lovelace',
+        version=1,
         steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
         probe_center=(295.0, 300.0, probe_height),
@@ -115,26 +118,18 @@ def _get_default():
             [ 0.00, 0.00, 1.00,  0.00],
             [ 0.00, 0.00, 0.00,  1.00]
         ],
-        # left relative to right
         instrument_offset={
             'right': {
-                'single': (0.0, 0.0, 0.0),        # numbers are from CAD
-                'multi': (0.0, (9 * 3.5), -25.8)  # numbers are from CAD
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
             },
             'left': {
-                'single': (-34, 0.0, 0.0),        # numbers are from CAD
-                'multi': (-34,  (9 * 3.5), -25.8) # numbers are from CAD
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
             }
         },
         tip_length={
-            'left': {
-                'single': 51.7,
-                'multi': 51.7
-            },
-            'right': {
-                'single': 51.7,
-                'multi': 51.7
-            }
+            'Pipette': 51.7 # TODO (andy): move to tip-rack
         },
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
@@ -153,6 +148,7 @@ def load(filename=None):
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
+            local = _check_version_and_update(local)
             result = robot_config(**merge([result._asdict(), local]))
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
@@ -161,6 +157,7 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
+
     filename = filename or environment.get_path('OT_CONFIG_FILE')
     if tag:
         root, ext = os.path.splitext(filename)
@@ -171,10 +168,7 @@ def save(config, filename=None, tag=None):
         item for item in children(config._asdict())
         if item not in _default
     ])
-
-    with open(filename, 'w') as file:
-        json.dump(diff, file, sort_keys=True, indent=4)
-        return diff
+    return _save_config_json(diff, filename=filename, tag=tag)
 
 
 def clear(filename=None):
@@ -182,3 +176,48 @@ def clear(filename=None):
     log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)
+
+
+def _save_config_json(config_json, filename=None, tag=None):
+    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    if tag:
+        root, ext = os.path.splitext(filename)
+        filename = "{}-{}{}".format(root, tag, ext)
+
+    with open(filename, 'w') as file:
+        json.dump(config_json, file, sort_keys=True, indent=4)
+        return config_json
+
+
+def _check_version_and_update(config_json):
+    migration_functions = {
+        0: _migrate_zero_to_one
+    }
+
+    version = config_json.get('version', 0)
+
+    if version in migration_functions:
+        # backup the loaded configuration json file
+        tag = '{}-v{}'.format(
+            int(time.time() * 1000),
+            version)
+        _save_config_json(config_json, tag=tag)
+        # migrate the configuration file
+        migrate_func = migration_functions[version]
+        config_json = migrate_func(config_json)
+        # recursively update the config
+        # until there are no more migration methods for its version
+        config_json = _check_version_and_update(config_json)
+
+    return config_json
+
+
+def _migrate_zero_to_one(config_json):
+    # add a version number to the config, and set to 1
+    config_json['version'] = 1
+    # overwrite instrument_offset to the default
+    _default = _get_default()
+    config_json['instrument_offset'] = _default.instrument_offset.copy()
+    config_json['tip_length'] = _default.tip_length.copy()
+    return config_json
+

@@ -296,9 +296,9 @@ def clear_configuration_and_reload():
 
 
 def backup_configuration(tag):
-    from datetime import datetime
+    import time
     if not tag:
-        tag = datetime.now().isoformat(timespec="seconds")
+        tag = str(int(time.time() * 1000))
     robot_configs.save(robot.config, tag=tag)
 
 

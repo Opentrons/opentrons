@@ -67,6 +67,7 @@ def test_plunger_commands(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
+    smoothie.home()
     smoothie.simulating = False
 
     def write_with_log(command, connection, timeout):
@@ -92,7 +93,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
         ['G91 G0Y-20 G90 M400'],               # move Y motor away from switch
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 M400'],  # set current back
+        ['M907 Y0.3 M400'],  # set current back
         ['G4P0.05 M400'],                      # delay for current
         ['G0F24000 M400'],                      # set back to default speed
         ['M907 Y0.3 M400'],                    # activate X motor for HOME
@@ -116,7 +117,6 @@ def test_plunger_commands(smoothie, monkeypatch):
 
         ['M114.2 M400']                       # Get position
     ]
-    # from pprint import pprint
     # for i in range(len(expected)):
     #     print(expected[i][0] == command_log[i], expected[i], command_log[i])
     fuzzy_assert(result=command_log, expected=expected)
@@ -193,10 +193,10 @@ def test_set_current(model):
 
     current_log = []
 
-    def set_current_mock(self, target, axes_dwelling=False):
+    def set_current_mock(self, target, axes_active=True):
         nonlocal current_log
         current_log.append(target)
-        set_current(target, axes_dwelling)
+        set_current(target, axes_active)
 
     driver.set_current = types.MethodType(set_current_mock, driver)
 
@@ -213,7 +213,6 @@ def test_set_current(model):
         {'X': 1.5, 'Y': 1.75},
         {'A': 0.1},
         {'A': 1.0},
-        {'A': 1.0, 'B': 0.1, 'C': 0.1, 'X': 1.5, 'Y': 1.75, 'Z': 0.1},
         {'A': 0.1}
     ]
     # from pprint import pprint

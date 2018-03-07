@@ -130,7 +130,7 @@ function mergeProps (
       onClick: () => {
         if (_calibratorMount) {
           dispatch(robotActions.moveTo(_calibratorMount, _buttonTarget.slot))
-          dispatch(push(`/setup-deck/${_buttonTarget.slot}`))
+          dispatch(push(`/calibrate/labware/${_buttonTarget.slot}`))
         }
       },
       text: 'foobar'

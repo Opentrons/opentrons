@@ -18,7 +18,7 @@ from opentrons.drivers.rpi_drivers import gpio
 log = logging.getLogger(__name__)
 
 ERROR_KEYWORD = 'error'
-ALARM_KEYWORD = 'ALARM'
+ALARM_KEYWORD = 'alarm'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
@@ -119,8 +119,8 @@ class SmoothieDriver_3_0_0:
         # motor current settings
         self._saved_current_settings = config.low_current.copy()
         self._current_settings = self._saved_current_settings.copy()
-        self._axes_dwelling = {
-            ax: True
+        self._active_axes = {
+            ax: False
             for ax in AXES
         }
 
@@ -255,7 +255,7 @@ class SmoothieDriver_3_0_0:
     def pop_axis_max_speed(self):
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
-    def set_current(self, settings, axes_dwelling=False):
+    def set_current(self, settings, axes_active=True):
         '''
         Sets the current in mA by axis.
 
@@ -263,9 +263,8 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        # remove axes from
-        self._axes_dwelling.update({
-            ax: axes_dwelling
+        self._active_axes.update({
+            ax: axes_active
             for ax in settings.keys()
         })
         self._current_settings.update(settings)
@@ -282,11 +281,21 @@ class SmoothieDriver_3_0_0:
         self._saved_current_settings.update(self._current_settings)
 
     def pop_current(self):
-        self.set_current(self._saved_current_settings)
+        # only update axes that change their amperage
+        # this prevents non-active axes from incidentally being activated
+        diff_current = {
+            ax: self._saved_current_settings[ax]
+            for ax in AXES
+            if self._saved_current_settings[ax] != self._current_settings[ax]
+        }
+        self.set_current(diff_current)
 
     def dwell_axes(self, axes):
         '''
-        Sets motors to low current, for when they are not moving
+        Sets motors to low current, for when they are not moving.
+
+        Dwell for XYZA axes is only called after HOMING
+        Dwell for BC axes is called after both HOMING and MOVING
 
         axes:
             String containing the axes to set to low current (eg: 'XYZABC')
@@ -295,16 +304,17 @@ class SmoothieDriver_3_0_0:
         dwelling_currents = {
             ax: self._config.low_current[ax]
             for ax in axes
-            if (self._axes_dwelling[ax] is False) or
-            (self.current[ax] > self._config.low_current[ax])
+            if self._active_axes[ax] is True
         }
         if dwelling_currents:
-            self.set_current(dwelling_currents, axes_dwelling=True)
+            self.set_current(dwelling_currents, axes_active=False)
 
     def activate_axes(self, axes):
         '''
         Sets motors to a high current, for when they are moving
         and/or must hold position
+
+        Activating XYZABC axes before both HOMING and MOVING
 
         axes:
             String containing the axes to set to high current (eg: 'XYZABC')
@@ -313,11 +323,10 @@ class SmoothieDriver_3_0_0:
         active_currents = {
             ax: self._config.high_current[ax]
             for ax in axes
-            if (self._axes_dwelling[ax] is True) or
-            (self.current[ax] < self._config.high_current[ax])
+            if self._active_axes[ax] is False
         }
         if active_currents:
-            self.set_current(active_currents, axes_dwelling=False)
+            self.set_current(active_currents, axes_active=True)
 
     # ----------- Private functions --------------- #
 
@@ -354,7 +363,8 @@ class SmoothieDriver_3_0_0:
                 command_line, self._connection, timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
-            if ERROR_KEYWORD in ret_code or ALARM_KEYWORD in ret_code:
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
                 self._reset_from_error()
                 raise SmoothieError(ret_code)
 
@@ -415,7 +425,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.set_current(self._config.low_current, axes_dwelling=True)
+        self.set_current(self._config.low_current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()

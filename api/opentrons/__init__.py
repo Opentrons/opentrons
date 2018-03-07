@@ -130,7 +130,13 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
+        if aspirate_flow_rate:
+            config = config._replace(aspirate_flow_rate=aspirate_flow_rate)
+        if dispense_flow_rate:
+            config = config._replace(dispense_flow_rate=dispense_flow_rate)
+
         p = self.Pipette(
+            model_offset=config.model_offset,
             mount=mount,
             name=config.name,
             trash_container=trash_container,
@@ -138,7 +144,8 @@ class InstrumentsWrapper(object):
             channels=config.channels,
             ul_per_mm=config.ul_per_mm,
             aspirate_flow_rate=config.aspirate_flow_rate,
-            dispense_flow_rate=config.dispense_flow_rate)
+            dispense_flow_rate=config.dispense_flow_rate,
+            fallback_tip_length=config.tip_length)  # TODO move to labware
 
         p.plunger_positions = config.plunger_positions.copy()
         p.set_pick_up_current(config.pick_up_current)

@@ -23,7 +23,7 @@ export default function InstrumentListItem (props: Props) {
   const confirmed = instrument && instrument.probed
   const isDisabled = !instrument || isRunning
   const url = !isDisabled
-    ? `/setup-instruments/${mount}`
+    ? `/calibrate/instruments/${mount}`
     : '#'
 
   const iconName: IconName = confirmed

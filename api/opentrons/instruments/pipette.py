@@ -103,6 +103,7 @@ class Pipette:
     def __init__(
             self,
             robot,
+            model_offset=(0, 0, 0),
             mount=None,
             axis=None,
             mount_obj=None,
@@ -116,7 +117,8 @@ class Pipette:
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
             dispense_speed=DEFAULT_DISPENSE_SPEED,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
         self.robot = robot
 
@@ -134,6 +136,8 @@ class Pipette:
 
         self.mount = mount
         self.channels = channels
+
+        self.model_offset = model_offset
 
         self.tip_attached = False
         self.instrument_actuator = None
@@ -182,6 +186,10 @@ class Pipette:
 
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
+
+        # TODO (andy): remove from pipette, move to tip-rack
+        self.robot.config.tip_length[self.name] = \
+            self.robot.config.tip_length.get(self.name, fallback_tip_length)
 
     def reset(self):
         """
@@ -1615,7 +1623,7 @@ class Pipette:
     def _tip_length(self):
         # TODO (andy): tip length should be retrieved from tip-rack's labware
         # definition, unblocking ability to use multiple types of tips
-        return self.robot.config.tip_length[self.mount][self.type]
+        return self.robot.config.tip_length[self.name]
 
     def set_speed(self, aspirate=None, dispense=None):
         """
