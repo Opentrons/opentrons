@@ -28,7 +28,6 @@ class CalibrationManager:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
         self.state = state
-        robot._use_safest_height = (state in ['probing', 'moving'])
         self._on_state_changed()
 
     def tip_probe(self, instrument):
@@ -148,4 +147,7 @@ class CalibrationManager:
         }
 
     def _on_state_changed(self):
+        robot._use_safest_height = (self.state in ['probing', 'moving'])
+        if self.state == 'ready':
+            robot._driver.dwell_axes('XYZABC')
         publish(CalibrationManager.TOPIC, self._snapshot())
