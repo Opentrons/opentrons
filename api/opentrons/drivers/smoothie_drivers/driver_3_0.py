@@ -591,10 +591,24 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
-    def turn_on_button_light(self):
+    def turn_on_red_button_light(self):
+        gpio.set_high(gpio.OUTPUT_PINS['RED_BUTTON'])
+        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
+        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_on_green_button_light(self):
+        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
+        gpio.set_high(gpio.OUTPUT_PINS['GREEN_BUTTON'])
+        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+
+    def turn_on_blue_button_light(self):
+        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
+        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
         gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
 
     def turn_off_button_light(self):
+        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
+        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
         gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
 
     def turn_on_rail_lights(self):
@@ -602,6 +616,12 @@ class SmoothieDriver_3_0_0:
 
     def turn_off_rail_lights(self):
         gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
+    def read_button(self):
+        return gpio.read(gpio.INPUT_PINS['BUTTON_INPUT'])
+
+    def read_window_switches(self):
+        return gpio.read(gpio.INPUT_PINS['WINDOW_INPUT'])
 
     def kill(self):
         """

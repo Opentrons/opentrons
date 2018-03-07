@@ -300,7 +300,7 @@ class Robot(object):
         return self
 
     def turn_on_button_light(self):
-        self._driver.turn_on_button_light()
+        self._driver.turn_on_blue_button_light()
 
     def turn_off_button_light(self):
         self._driver.turn_off_button_light()
@@ -319,7 +319,7 @@ class Robot(object):
         for i in range(seconds):
             self.turn_off_button_light()
             sleep(0.25)
-            self.turn_on_button_light()
+            self.turn_on_blue_button_light()
             sleep(0.25)
 
     def setup_gantry(self):
