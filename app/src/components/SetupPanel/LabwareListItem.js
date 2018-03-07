@@ -24,7 +24,7 @@ export default function LabwareListItem (props: Props) {
     onClick
   } = props
 
-  const url = `/setup-deck/${slot}`
+  const url = `/calibrate/labware/${slot}`
   const iconName = confirmed
     ? CHECKED
     : UNCHECKED

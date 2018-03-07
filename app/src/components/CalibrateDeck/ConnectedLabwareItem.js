@@ -48,7 +48,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
       showName: highlighted || confirmed,
       showUnconfirmed: true,
       showSpinner: highlighted && labware.calibration === 'moving-to-slot',
-      url: `/setup-deck/${slot}`
+      url: `/calibrate/labware/${slot}`
     }
   }
 }

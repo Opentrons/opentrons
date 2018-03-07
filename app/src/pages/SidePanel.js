@@ -15,8 +15,7 @@ export default function NavPanel () {
       <Route path='/robots' component={ConnectPanel} />
       <Route path='/menu' component={MenuPanel} />
       <Route path='/upload' component={UploadPanel} />
-      <Route path='/setup-instruments' component={SetupPanel} />
-      <Route path='/setup-deck' component={SetupPanel} />
+      <Route path='/calibrate' component={SetupPanel} />
       <Route path='/run' component={RunPanel} />
     </Switch>
   )

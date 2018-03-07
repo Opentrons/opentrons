@@ -21,7 +21,7 @@ function mapStateToProps (state, ownProps: OwnProps): PageTabProps {
 
   const pages = robotConstants.INSTRUMENT_MOUNTS.map((mount) => ({
     title: mount,
-    href: `/setup-instruments/${mount}`,
+    href: `/calibrate/instruments/${mount}`,
     isActive: mount === ownProps.mount,
     isDisabled: !instruments.some((inst) => inst.mount === mount)
   }))

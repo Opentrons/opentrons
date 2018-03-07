@@ -7,8 +7,7 @@ import SidePanel from '../pages/SidePanel'
 import Robots from '../pages/Robots'
 import AppSettingsPage from '../pages/AppSettings'
 import Upload from '../pages/Upload'
-import SetupInstruments from '../pages/SetupInstruments'
-import SetupDeck from '../pages/SetupDeck'
+import Calibrate from '../pages/Calibrate'
 import Run from '../pages/Run'
 
 import './App.global.css'
@@ -24,8 +23,7 @@ export default function App () {
         <Route path='/robots/:name?' component={Robots} />
         <Route exact path='/menu/app' component={AppSettingsPage} />
         <Route path='/upload' component={Upload} />
-        <Route path='/setup-instruments/:mount' component={SetupInstruments} />
-        <Route path='/setup-deck/:slot' component={SetupDeck} />
+        <Route path='/calibrate' component={Calibrate} />
         <Route path='/run' component={Run} />
       </Switch>
     </div>
