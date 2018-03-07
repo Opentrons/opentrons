@@ -1,3 +1,7 @@
+from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+    _byte_array_to_ascii_string
+
+
 def connect_to_robot():
     '''
     Connect over Serial to the Smoothieware motor driver
@@ -17,13 +21,17 @@ def scan_instruments(robot):
     print()
     found_instruments = {}
     for mount in 'LR':
-        res = robot._driver._read_instrument_id(mount)
-        if res:
-            found_instruments[mount] = res
+        read_id = robot._driver._read_pipette_id(mount)
+        read_model = robot._driver._read_pipette_model(mount)
+        if read_id and read_model:
+            found_instruments[mount] = {
+                'id': read_id,
+                'model': read_model
+            }
     if found_instruments:
         print('Previously-Written Pipettes Found:')
-        for mount, identifier in found_instruments.items():
-            print(' ', mount, ': ', _byte_array_to_string(identifier))
+        for mount, data in found_instruments.items():
+            print('\t', mount, ':\r\n\t\tid:', data['id'], '\r\n\t\tmodel:', data['model'])
     return found_instruments
 
 
@@ -43,7 +51,7 @@ def select_mount(found_instruments):
         confirm_msg += 'Proceed and overwrite? (Y or N):  '
         confirm = input(confirm_msg).upper()
         if 'N' in confirm:
-            return
+            raise Exception('Not writing new data, exiting script')
     return mount
 
 
@@ -56,32 +64,38 @@ def generate_id():
     '''
     print()
     num_channels = _ask_for_number_of_channels()
-    model_byte_array = _ask_for_pipette_volume(num_channels)
-    print('Pipette model: {}'.format(_byte_array_to_string(model_byte_array)))
+    model_string = _ask_for_pipette_volume(num_channels)
+    print('Pipette model: {}'.format(model_string))
 
     print()
     # unique section of serial number is 6-bytes long
-    length_of_unique_id = 6
-    unique_byte_array = _user_submitted_id(length_of_unique_id)
-    print('Unique ID: {}'.format(_byte_array_to_string(unique_byte_array)))
-    print()
-    combined_id = model_byte_array + unique_byte_array
-    print('Combined ID: {0}'.format(_byte_array_to_string(combined_id)))
-    return combined_id
+    max_length_of_unique_id = 32
+    unique_id_string = _user_submitted_id(max_length_of_unique_id)
+    print('Unique ID: {}'.format(unique_id_string))
+    return (model_string, unique_id_string)
 
 
-def write_identifier(robot, mount, byte_array):
+def write_identifiers(robot, mount, new_id, new_model):
     '''
     Send a bytearray to the specified mount, so that Smoothieware can
     save the bytes to the pipette's memory
     '''
     print()
-    print('Ok, now hold down the button on the pipette')
+    print('Ok, now HOLD down the BUTTON on the pipette')
     if 'Y' not in input('Ready to save the ID? (Y or N):  ').upper():
         raise Exception('Not writing ID to pipette, and exiting script')
-    robot._driver._write_instrument_id(mount, byte_array)
-    read_id = robot._driver._read_instrument_id(mount)
-    if read_id != byte_array:
+
+    robot._driver._write_pipette_id(mount, new_id)
+    read_id = robot._driver._read_pipette_id(mount)
+    _assert_the_same(new_id, read_id)
+
+    robot._driver._write_pipette_model(mount, new_model)
+    read_model = robot._driver._read_pipette_model(mount)
+    _assert_the_same(new_model, read_model)
+
+
+def _assert_the_same(a, b):
+    if a != b:
         raise Exception('Failed Writing: Are you holding down the button?')
 
 
@@ -107,35 +121,31 @@ def _ask_for_pipette_volume(num_channels):
         ])
     )
     pipette_volume = input(volume_question).strip()
-    new_id_byte_array = possible_sizes.get(pipette_volume)
-    assert new_id_byte_array
-    return new_id_byte_array
+    new_model_string = possible_sizes.get(pipette_volume)
+    assert new_model_string
+    return new_model_string
 
 
-def _user_submitted_id(num):
+def _user_submitted_id(max_length):
     '''
     User can enter a serial number as a string of HEX values
     Length of byte array must equal `num`
     '''
-    manual_id_msg = 'Enter an {}-byte hex ID:  '.format(num)
-    manual_id = input(manual_id_msg).upper().strip()
-    if len(manual_id) / 2 != num:
-        length_msg = 'long' if len(manual_id) / 2 > num else 'short'
-        bad_id_msg = 'Please enter {0}-byte HEX string, \
-            {1} is too {2}'.format(num, manual_id, length_msg)
+    id_msg = 'Enter serial number'
+    id_msg += ' (case-sensitive, max {} characters): '.format(max_length)
+    manual_id = input(id_msg).strip()
+    if len(manual_id) > max_length:
+        bad_id_msg = 'Please enter serial-number less than {0}-characters,'
+        bad_id_msg += '{1} is too long'.format(max_length, manual_id)
         raise Exception(bad_id_msg)
-    return bytearray.fromhex(manual_id)
-
-
-def _byte_array_to_string(b):
-    return ''.join('%02x' % i for i in b)
+    return manual_id
 
 
 if __name__ == "__main__":
     robot = connect_to_robot()
     found_instruments = scan_instruments(robot)
     mount = select_mount(found_instruments)
-    new_id = generate_id()
-    write_identifier(robot, mount, new_id)
+    new_model, new_id = generate_id()
+    write_identifiers(robot, mount, new_id, new_model)
     print()
     print('SUCCESS! Exiting script now\n\n')

@@ -64,12 +64,16 @@ GCODES = {'HOME': 'G28.2',
           'SET_SPEED': 'G0F',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
+          'READ_INSTRUMENT_MODEL': 'M371',
+          'WRITE_INSTRUMENT_MODEL': 'M372',
           'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
+
+PIPETTE_DATA_LENGTH = 32
 
 
 def _parse_axis_values(raw_axis_values):
@@ -86,19 +90,26 @@ def _parse_axis_values(raw_axis_values):
     }
 
 
-def _parse_instrument_id(smoothie_response):
-    '''
-    {
-        'R': bytearray(______)
-    }
-    '''
+def _parse_instrument_data(smoothie_response):
     items = smoothie_response.split('\n')[0].strip().split(':')
     mount = items[0]
-    identifier = bytearray.fromhex(items[1])
-    return {mount: identifier}
+    # data received from Smoothieware is stringified HEX values
+    # because of how Smoothieware handles GCODE messages
+    data = bytearray.fromhex(items[1])
+    return {mount: data}
+
+
+def _byte_array_to_ascii_string(byte_array):
+    # remove trailing null characters
+    for c in [b'\x00', b'\xFF']:
+        if c in byte_array:
+            byte_array = byte_array[:byte_array.index(c)]
+    return byte_array.decode()
 
 
 def _byte_array_to_hex_string(byte_array):
+    # data must be sent as stringified HEX values
+    # because of how Smoothieware parses GCODE messages
     return ''.join('%02x' % b for b in byte_array)
 
 
@@ -177,23 +188,40 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
-    def _read_instrument_id(self, mount):
-        res = self._send_command(GCODES['READ_INSTRUMENT_ID'] + mount)
+    def _read_from_pipette(self, gcode, mount):
+        res = self._send_command(gcode + mount)
         try:
-            res = _parse_instrument_id(res)
+            res = _parse_instrument_data(res)
             assert mount in res
-            assert len(res[mount]) == 8
-            return res[mount]
-        except Exception:
+            assert len(res[mount]) == PIPETTE_DATA_LENGTH
+            return _byte_array_to_ascii_string(res[mount])
+        except Exception as e:
             return None
 
-    def _write_instrument_id(self, mount, byte_array):
-        if not isinstance(byte_array, bytearray):
+    def _write_to_pipette(self, gcode, mount, data_string):
+        if not isinstance(data_string, str):
             raise ValueError(
-                'Expected {0}, not {1}'.format(bytearray, type(byte_array)))
-        byte_string = _byte_array_to_hex_string(byte_array)
-        command = GCODES['WRITE_INSTRUMENT_ID'] + mount + byte_string
+                'Expected {0}, not {1}'.format(str, type(byte_array)))
+        byte_string = _byte_array_to_hex_string(
+            bytearray(data_string.encode()))
+        command = gcode + mount + byte_string
         self._send_command(command)
+
+    def _read_pipette_id(self, mount):
+        return self._read_from_pipette(
+            GCODES['READ_INSTRUMENT_ID'], mount)
+
+    def _read_pipette_model(self, mount):
+        return self._read_from_pipette(
+            GCODES['READ_INSTRUMENT_MODEL'], mount)
+
+    def _write_pipette_id(self, mount, data_string):
+        self._write_to_pipette(
+            GCODES['WRITE_INSTRUMENT_ID'], mount, data_string)
+
+    def _write_pipette_model(self, mount, data_string):
+        self._write_to_pipette(
+            GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running

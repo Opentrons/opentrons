@@ -12,15 +12,15 @@ DEFAULT_DISPENSE_SECONDS = 1
 # used to identifiy what model pipette is currently connected to machine
 PIPETTE_MODEL_IDENTIFIERS = {
     'single': {
-        '10': bytearray([1, 1]),
-        '50': bytearray([1, 5]),
-        '300': bytearray([1, 30]),
-        '1000': bytearray([1, 100])
+        '10': 'p10_single_v1',
+        '50': 'p50_single_v1',
+        '300': 'p300_single_v1',
+        '1000': 'p1000_single_v1'
     },
     'multi': {
-        '10': bytearray([8, 1]),
-        '50': bytearray([8, 5]),
-        '300': bytearray([8, 30])
+        '10': 'p10_multi_v1',
+        '50': 'p50_multi_v1',
+        '300': 'p300_multi_v1',
     }
 }
 
