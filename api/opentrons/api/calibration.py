@@ -148,6 +148,4 @@ class CalibrationManager:
 
     def _on_state_changed(self):
         robot._use_safest_height = (self.state in ['probing', 'moving'])
-        if self.state == 'ready':
-            robot._driver.dwell_axes('XYZABC')
         publish(CalibrationManager.TOPIC, self._snapshot())

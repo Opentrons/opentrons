@@ -243,8 +243,6 @@ class Session(object):
         }
 
     def _on_state_changed(self):
-        if self.state != 'running':
-            robot._driver.dwell_axes('XYZABC')
         publish(Session.TOPIC, self._snapshot())
 
 
