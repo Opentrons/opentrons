@@ -210,7 +210,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId.toString()]
+    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields

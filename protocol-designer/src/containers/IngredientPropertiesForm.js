@@ -10,7 +10,6 @@ export default connect(
     numWellsSelected: selectors.numWellsSelected(state),
     selectedWellsMaxVolume: selectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),
-    editingIngredGroupId: selectors.selectedIngredientGroupId(state), // TODO should this be renamed? inconsistent prop vs selector
     allIngredientGroupFields: selectors.allIngredientGroupFields(state)
   }),
   {

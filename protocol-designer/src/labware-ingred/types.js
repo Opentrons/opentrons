@@ -19,20 +19,18 @@ type IngredInstance = {|
   volume: number
 |}
 
-export type WellContents = { // non-ingredient well state
+export type WellContents = {| // non-ingredient well state
   preselected: boolean,
   selected: boolean,
   highlighted: boolean,
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
   groupId?: string // TODO Ian 2018-03-07 this should be color, not groupId.
-}
+|}
 
 export type AllWellContents = {
   [wellName: string]: WellContents
 }
-
-export type WellMatrices = {[containerId: string]: Array<Array<string>>}
 
 // ==== INGREDIENTS ====
 
@@ -46,11 +44,11 @@ export type IngredInputFields = {|
 
 export type IngredientGroup = {|
   groupId: string,
-  name?: string,
-  volume?: number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
-  description?: string,
-  serializeName?: string,
-  individualize?: boolean,
+  name: ?string,
+  volume: ?number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
+  description: ?string,
+  serializeName: ?string,
+  individualize: ?boolean,
   instances: {
     [labwareId: string]: {
       [wellName: string]: IngredInstance
@@ -64,6 +62,7 @@ export type AllIngredGroups = {
 
 export type IngredGroupForLabware = {
   ...IngredientGroup,
+  groupId: string,
   wells: {
     [wellName: string]: IngredInstance
   }
@@ -73,15 +72,6 @@ export type IngredGroupForLabware = {
 export type IngredsForLabware = {
   [groupId: string]: IngredGroupForLabware
 }
-
-export const singleWellFields = [
-  'highlighted',
-  'preselected',
-  'selected',
-  'wellName',
-  'maxVolume',
-  'groupId'
-]
 
 export const editableIngredFields = [
   'name',

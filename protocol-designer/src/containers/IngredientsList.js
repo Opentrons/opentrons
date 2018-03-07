@@ -17,13 +17,13 @@ function mapStateToProps (state: BaseState): PropsWithoutActions {
   // TODO Ian 2018-02-21 put these selectors in Header
   // const activeModals = selectors.activeModals(state)
   // const container = selectors.selectedContainer(state)
-
+  const selectedIngredientGroup = selectors.selectedIngredientGroup(state)
   return {
     // slot: activeModals.ingredientSelection.slot || '1',
     // containerName: container ? container.name : 'No Name',
     // containerType: container ? container.type : 'No type',
     ingredients: selectors.ingredientsForContainer(state),
-    selectedIngredientGroupId: selectors.selectedIngredientGroupId(state),
+    selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
     selected: false
   }
 }

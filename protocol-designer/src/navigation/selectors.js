@@ -1,4 +1,5 @@
 // @flow
+import isEmpty from 'lodash/isEmpty'
 import type {BaseState, Selector} from '../types'
 // import {createSelector} from 'reselect'
 
@@ -13,7 +14,7 @@ export const currentPage: Selector<Page> = (state: BaseState) => {
   const ingredients = labwareIngredSelectors.ingredientsForContainer(state)
   const page = navigationRootSelector(state).page
 
-  return ingredients ? 'ingredient-detail' : page
+  return !isEmpty(ingredients) ? 'ingredient-detail' : page
 }
 
 export const newProtocolModal = (state: BaseState) =>

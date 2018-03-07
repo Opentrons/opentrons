@@ -16,15 +16,13 @@ import type {DeckSlot} from '@opentrons/components'
 
 import {
   editableIngredFields,
-  persistedIngredFields,
-  singleWellFields
+  persistedIngredFields
 } from '../types'
 
 import type {
   IngredInputFields,
   Labware,
   Wells,
-  WellMatrices,
   WellContents,
   AllWellContents,
   IngredientGroup,
@@ -303,13 +301,13 @@ const _loadedContainersBySlot = (containers: ContainersState) =>
   , {})
 
 const loadedContainersBySlot = createSelector(
-  (state: BaseState) => rootSelector(state).containers,
+  getLabware,
   containers => _loadedContainersBySlot(containers)
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
 const labwareOptions: (state: BaseState) => Array<{value: string, name: string}> = createSelector(
-  state => rootSelector(state).containers,
+  getLabware,
   containers => reduce(containers, (acc, containerFields: Labware, containerId) => {
     // TODO Ian 2018-02-16 more robust way to filter out tipracks?
     if (!containerFields.type || containerFields.type.startsWith('tiprack')) {
@@ -359,7 +357,7 @@ const selectedContainerSlot = createSelector(
 type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
 
 const containersBySlot: Selector<ContainersBySlot> = createSelector(
-  (state: BaseState) => rootSelector(state).containers,
+  getLabware,
   containers => reduce(
     containers,
     (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
@@ -388,15 +386,6 @@ const allIngredients: (BaseState) => AllIngredGroups = createSelector(
       }
     }
   }, {})
-)
-
-// returns selected group id (index in array of all ingredients), or undefined.
-// groupId is a string eg '42'
-const selectedIngredientGroupId = createSelector(
-  rootSelector,
-  (state: RootState) => state.selectedIngredientGroup
-    ? state.selectedIngredientGroup.groupId
-    : null
 )
 
 const ingredFields = [...editableIngredFields, 'groupId']
@@ -464,6 +453,7 @@ const _ingredientsForContainerId = (allIngredients: AllIngredGroups, containerId
   }, {})
 }
 
+// TODO rename to "ingredients for selected container", or delete
 const ingredientsForContainer: BaseState => IngredsForLabware = createSelector(
   allIngredients,
   selectedContainerSelector,
@@ -482,6 +472,7 @@ const ingredientsForContainer: BaseState => IngredsForLabware = createSelector(
         return {
           ...acc,
           [ingredGroupId]: {
+            groupId: ingredGroupId,
             ...omit(ingredGroup, ['instances']),
             wells: instances
           }
@@ -499,7 +490,7 @@ const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?st
 
 const _getWellContents = (
   containerType: ?string,
-  ingredientsForContainer: IngredsForLabware,
+  __ingredientsForContainer: IngredsForLabware,
   selectedWells: ?{
     preselected: Wells,
     selected: Wells
@@ -520,16 +511,19 @@ const _getWellContents = (
   }
   const allLocations = containerData.locations
 
-  return reduce(allLocations, (acc, location: JsonWellData, wellName: string): AllWellContents => {
-    const groupIdObj = Object.keys(ingredientsForContainer).reduce((acc, groupId) => {
-      const instances = ingredientsForContainer[groupId].instances
-      return (instances && instances[wellName])
-        ? {...acc, groupId: true}
-        : acc
-    }
-    , {})
+  const allIngredGroupIds = Object.keys(__ingredientsForContainer)
 
-    const groupIds = Object.keys(groupIdObj)
+  function groupIdsForWell (wellName: string): Array<string> {
+    return allIngredGroupIds.filter((groupId: string) =>
+      __ingredientsForContainer[groupId] &&
+      __ingredientsForContainer[groupId].wells &&
+      __ingredientsForContainer[groupId].wells[wellName]
+    )
+  }
+
+  return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
+    const groupIds = groupIdsForWell(wellName)
+    const groupIdFields = groupIds ? {groupId: groupIds[0], groupIds} : {}
 
     const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
 
@@ -541,19 +535,21 @@ const _getWellContents = (
         highlighted: isHighlighted, // TODO remove 'highlighted' state?
         maxVolume: location['total-liquid-volume'] || Infinity,
         hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-        groupIds
+        ...groupIdFields // TODO Ian 2018-03-07 this should be a color, >1 => gray
         // ...ingredData // TODO contents of ingredData (_ingredAtWell) is hard to follow, needs to be cleaned up
       }
     }
   }, {})
 }
 
-const allWellMatricesById = createSelector(
+type AllWellMatrices = {[labwareId: string]: AllWellContents}
+const allWellMatricesById: (BaseState) => AllWellMatrices = createSelector(
   allIngredients,
-  (state: BaseState) => rootSelector(state).containers,
+  // ingredientsForContainer,
+  getLabware,
   (_allIngredients, _containers) => reduce(
     _containers,
-    (acc: WellMatrices, container: Labware, containerId: string): WellMatrices => {
+    (acc: AllWellMatrices, container: Labware, containerId: string): * => {
       const wellContents = _getWellContents(
         container.type,
         _ingredientsForContainerId(_allIngredients, containerId),
@@ -564,19 +560,16 @@ const allWellMatricesById = createSelector(
       return {
         ...acc,
         [containerId]: reduce(
-          wellContents,
-          (acc: {[wellName: string]: AllWellContents}, singleWell: WellContents, wellName: *) => ({
-            ...acc,
+          wellContents || [],
+          (acc2: AllWellContents, singleWell: WellContents, wellName: string | number): AllWellContents => ({ // TODO Ian 2018-03-07 why string | number?
+            ...acc2,
             [wellName]: {
-              ...pick(singleWell, singleWellFields),
+              ...singleWell,
               wellName
             }
-          }),
-          {}
-        )
+          }), {})
       }
-    },
-  {})
+    }, {})
 )
 
 const wellContentsSelectedContainer = createSelector(
@@ -609,6 +602,8 @@ const activeModals = createSelector(
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
+const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).selectedIngredientGroup
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -627,12 +622,11 @@ export const selectors = {
   numWellsSelected,
   selectedWellsMaxVolume,
   selectedWellNames,
+  selectedIngredientGroup: getSelectedIngredientGroup,
   selectedContainerSlot,
   selectedContainer: selectedContainerSelector,
   containerById,
   ingredientsForContainer,
-  // selectedIngredientProperties,
-  selectedIngredientGroupId,
   labwareOptions
 }
 
