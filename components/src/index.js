@@ -24,6 +24,7 @@ export * from './structure'
 export * from './nav'
 export * from './lists'
 export * from './modals'
+export * from './alerts'
 
 // Pure Types
 export * from './robot-types'

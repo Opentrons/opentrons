@@ -32,6 +32,14 @@ module.exports = {
   // TODO(mc, 2017-12-22): generate these sections automatically by walking src
   sections: [
     {
+      name: 'Alerts',
+      components: 'src/alerts/[A-Z]*.js'
+    },
+    {
+      name: 'Nav',
+      components: 'src/nav/[A-Z]*.js'
+    },
+    {
       name: 'Buttons',
       components: 'src/buttons/[A-Z]*.js'
     },
