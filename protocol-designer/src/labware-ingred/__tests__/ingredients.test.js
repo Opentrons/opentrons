@@ -1,6 +1,5 @@
 import {ingredients, ingredLocations} from '../reducers'
-
-const ingredientsInitialState = {}
+import omit from 'lodash/omit'
 
 describe('DELETE_INGREDIENT action', () => {
   const deleteGroup3 = {
@@ -10,12 +9,12 @@ describe('DELETE_INGREDIENT action', () => {
 
   test('delete ingredient by ingredient group id, when group id does NOT exist', () => {
     expect(ingredients(
-      ingredientsInitialState,
+      {},
       deleteGroup3
     )).toEqual({})
 
     expect(ingredLocations(
-      ingredientsInitialState,
+      {},
       deleteGroup3
     )).toEqual({})
   })
@@ -26,7 +25,6 @@ describe('DELETE_INGREDIENT action', () => {
       '3': {
         name: 'Buffer',
         wellDetailsByLocation: null,
-        volume: 100,
         concentration: '50 mol/ng',
         description: '',
         individualize: false
@@ -35,9 +33,19 @@ describe('DELETE_INGREDIENT action', () => {
     }
 
     const prevLocationsState = {
-      '2': { container1Id: ['A1', 'A2'] },
-      '3': { container1Id: ['A1', 'B1', 'C1'] },
-      '4': { container1Id: ['C1', 'C2'] }
+      '2': { container1Id: [
+        {well: 'A1', volume: 123},
+        {well: 'A2', volume: 123}
+      ] },
+      '3': { container1Id: [
+        {well: 'A1', volume: 111},
+        {well: 'B1', volume: 111},
+        {well: 'C1', volume: 111}
+      ] },
+      '4': { container1Id: [
+        {well: 'C1', volume: 100},
+        {well: 'C2', volume: 100}
+      ] }
     }
 
     expect(ingredients(
@@ -52,8 +60,15 @@ describe('DELETE_INGREDIENT action', () => {
       prevLocationsState,
       deleteGroup3
     )).toEqual({
-      '2': { container1Id: ['A1', 'A2'] },
-      '4': { container1Id: ['C1', 'C2'] }
+      '2': { container1Id: [
+        {well: 'A1', volume: 123},
+        {well: 'A2', volume: 123}
+      ] },
+      // 3 is deleted
+      '4': { container1Id: [
+        {well: 'C1', volume: 100},
+        {well: 'C2', volume: 100}
+      ] }
     })
   })
 })
@@ -69,7 +84,6 @@ describe('COPY_LABWARE action', () => {
       '3': {
         name: 'Buffer',
         wellDetailsByLocation: null,
-        volume: 100,
         concentration: '50 mol/ng',
         description: '',
         individualize: false
@@ -77,7 +91,6 @@ describe('COPY_LABWARE action', () => {
       '4': {
         name: 'Other Ingred',
         wellDetailsByLocation: null,
-        volume: 10,
         concentration: '100%',
         description: '',
         individualize: false
@@ -86,11 +99,21 @@ describe('COPY_LABWARE action', () => {
 
     const prevLocationsState = {
       '3': {
-        myTrough: ['A1', 'B1', 'C1'],
-        otherContainer: ['D4', 'E4']
+        myTrough: [
+          {well: 'A1', volume: 101},
+          {well: 'B1', volume: 102},
+          {well: 'C1', volume: 103}
+        ],
+        otherContainer: [
+          {well: 'D4', volume: 201},
+          {well: 'E4', volume: 202}
+        ]
       },
       '4': {
-        otherContainer: ['A4', 'B4']
+        otherContainer: [
+          {well: 'A4', volume: 301},
+          {well: 'B4', volume: 302}
+        ]
       }
     }
 
@@ -104,12 +127,26 @@ describe('COPY_LABWARE action', () => {
       copyLabwareAction
     )).toEqual({
       '3': {
-        myTrough: ['A1', 'B1', 'C1'],
-        newContainer: ['A1', 'B1', 'C1'], // <-- new
-        otherContainer: ['D4', 'E4']
+        myTrough: [
+          {well: 'A1', volume: 101},
+          {well: 'B1', volume: 102},
+          {well: 'C1', volume: 103}
+        ],
+        newContainer: [ // this is newly copied
+          {well: 'A1', volume: 101},
+          {well: 'B1', volume: 102},
+          {well: 'C1', volume: 103}
+        ],
+        otherContainer: [
+          {well: 'D4', volume: 201},
+          {well: 'E4', volume: 202}
+        ]
       },
       '4': {
-        otherContainer: ['A4', 'B4']
+        otherContainer: [
+          {well: 'A4', volume: 301},
+          {well: 'B4', volume: 302}
+        ]
       }
     })
   })
@@ -123,6 +160,8 @@ describe('EDIT_INGREDIENT action', () => {
     description: 'far out!',
     individualize: false
   }
+
+  const resultingIngred = omit(ingredFields, ['volume'])
 
   test('new ingredient', () => {
     const newIngredAction = {
@@ -139,7 +178,7 @@ describe('EDIT_INGREDIENT action', () => {
       {},
       newIngredAction)
     ).toEqual({
-      '0': {...ingredFields}
+      '0': {...resultingIngred}
     })
 
     expect(ingredLocations(
@@ -147,7 +186,11 @@ describe('EDIT_INGREDIENT action', () => {
       newIngredAction
     )).toEqual({
       '0': {
-        container1Id: ['A1', 'A2', 'A3']
+        container1Id: [
+          {well: 'A1', volume: 250},
+          {well: 'A2', volume: 250},
+          {well: 'A3', volume: 250}
+        ]
       }
     })
   })
@@ -170,19 +213,23 @@ describe('EDIT_INGREDIENT action', () => {
     }
 
     const prevIngredState = {
-      0: {...ingredFields}
+      0: {...resultingIngred}
     }
 
     expect(ingredients(
       prevIngredState,
       copyIngredAction
     )).toEqual({
-      0: {...ingredFields} // no new ingredient group created
+      0: {...resultingIngred} // no new ingredient group created
     })
 
     const prevLocationsState = {
       0: {
-        container1Id: ['A1', 'A2', 'A3']
+        container1Id: [
+          {well: 'A1', volume: 250},
+          {well: 'A2', volume: 250},
+          {well: 'A3', volume: 250}
+        ]
       }
     }
 
@@ -191,7 +238,13 @@ describe('EDIT_INGREDIENT action', () => {
       copyIngredAction
     )).toEqual({
       0: {
-        container1Id: ['A1', 'A2', 'A3', 'B1', 'B2']
+        container1Id: [
+          {well: 'A1', volume: 250},
+          {well: 'A2', volume: 250},
+          {well: 'A3', volume: 250},
+          {well: 'B1', volume: 250},
+          {well: 'B2', volume: 250}
+        ]
       }
     })
   })
