@@ -18,8 +18,8 @@ type GenericRect = {
 }
 
 type Props = {
-  onSelectionMove?: (e: MouseEvent, GenericRect) => void,
-  onSelectionDone?: (e: MouseEvent, GenericRect) => void,
+  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
+  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
   svg?: boolean, // set true if this is an embedded SVG
   children?: React.Node
 }
