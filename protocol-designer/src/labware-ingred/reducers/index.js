@@ -15,7 +15,7 @@ import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants
 import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
-import {editableIngredFields} from '../types'
+import {persistedIngredFields} from '../types'
 import type {
   IngredInputFields,
   Labware,
@@ -69,8 +69,8 @@ type SelectedIngredientGroupState = {|
 const selectedIngredientGroup = handleActions({
   // selected ingredient group to edit
   // TODO: SelectedIngredientGroupState is type of payload, type the action though
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) => action.payload,
-
+  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
+    action.payload,
   OPEN_INGREDIENT_SELECTOR: () => null,
   EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
   DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
@@ -154,7 +154,7 @@ export const ingredients = handleActions({
       // is a new ingredient
       return {
         ...state,
-        [groupId]: pick(action.payload, editableIngredFields)
+        [groupId]: pick(action.payload, persistedIngredFields)
       }
     }
 
@@ -167,7 +167,7 @@ export const ingredients = handleActions({
     return {
       ...state,
       [groupId]: {
-        ...pick(action.payload, editableIngredFields)
+        ...pick(action.payload, persistedIngredFields)
       }
     }
   },
@@ -192,6 +192,13 @@ export const ingredLocations = handleActions({
   EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
     const { groupId, containerId, isUnchangedClone } = action.payload
 
+    function mapWellWithVol (well) {
+      return {
+        well,
+        volume: action.payload.volume
+      }
+    }
+
     if (isUnchangedClone) {
       // for an unchanged clone, just add the new wells.
       return {
@@ -200,7 +207,7 @@ export const ingredLocations = handleActions({
           ...state[groupId],
           [containerId]: uniq([
             ...(state[groupId][containerId] || []),
-            ...action.payload.wells
+            ...action.payload.wells.map(mapWellWithVol)
           ])
         }
       }
@@ -209,7 +216,7 @@ export const ingredLocations = handleActions({
     return {
       ...state,
       [groupId]: {
-        [containerId]: action.payload.wells
+        [containerId]: action.payload.wells.map(mapWellWithVol)
       }
     }
   },

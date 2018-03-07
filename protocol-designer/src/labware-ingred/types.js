@@ -72,3 +72,11 @@ export const editableIngredFields = [
   'description',
   'individualize'
 ]
+
+export const persistedIngredFields = [
+  'name',
+  'serializeName',
+  'concentration',
+  'description',
+  'individualize'
+]
