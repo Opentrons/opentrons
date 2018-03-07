@@ -1,7 +1,3 @@
-from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-    _byte_array_to_ascii_string
-
-
 def connect_to_robot():
     '''
     Connect over Serial to the Smoothieware motor driver
@@ -31,7 +27,10 @@ def scan_instruments(robot):
     if found_instruments:
         print('Previously-Written Pipettes Found:')
         for mount, data in found_instruments.items():
-            print('\t', mount, ':\r\n\t\tid:', data['id'], '\r\n\t\tmodel:', data['model'])
+            print(
+                '\t', mount, ':\r\n\t\tid:',
+                data['id'], '\r\n\t\tmodel:', data['model']
+            )
     return found_instruments
 
 

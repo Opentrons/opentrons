@@ -2,6 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
+import {Link} from 'react-router-dom'
 
 import {Icon, ALERT, CHECKED, SPINNER, Splash} from '@opentrons/components'
 
@@ -63,8 +64,9 @@ function UploadResults (props) {
     // instructions for a successful upload
     instructions = (
       <p className={styles.details}>
-        Continue to the Calibrate page to set up your pipettes and labware for
-        the run
+        <span>{'Continue to '}</span>
+        <Link to='/calibrate'>Calibrate</Link>
+        <span>{' to set up your pipettes and labware for the run'}</span>
       </p>
     )
   }

@@ -201,7 +201,7 @@ class SmoothieDriver_3_0_0:
     def _write_to_pipette(self, gcode, mount, data_string):
         if not isinstance(data_string, str):
             raise ValueError(
-                'Expected {0}, not {1}'.format(str, type(byte_array)))
+                'Expected {0}, not {1}'.format(str, type(data_string)))
         byte_string = _byte_array_to_hex_string(
             bytearray(data_string.encode()))
         command = gcode + mount + byte_string

@@ -15,11 +15,8 @@ export default function DefaultCopy () {
           <Route path='/upload' render={() => (
             "If you've uploaded a protocol to your robot, it should re-open when you reconnect."
           )} />
-          <Route path='/setup-instruments' render={() => (
-            'Pipette calibration progress has been lost, so please redo it after you reconnect.'
-          )} />
-          <Route path='/setup-deck' render={() => (
-            'Pipette and deck calibration progress has been lost, so please redo it after you reconnect.'
+          <Route path='/calibrate' render={() => (
+            'Calibration progress has been lost, so please redo it after you reconnect.'
           )} />
           <Route path='/run' render={() => (
             'If your robot is still running, it will complete the protocol, and you may track its progress once you reconnect.'

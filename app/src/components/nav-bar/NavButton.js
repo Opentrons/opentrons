@@ -25,10 +25,10 @@ function mapStateToProps (state, ownProps) {
   let calibrateUrl
   if (isSessionLoaded & isTipsProbed) {
     calibrateUrl = nextLabware
-     ? `/setup-deck/${nextLabware.slot}`
-     : `/setup-deck/${labware[0].slot}`
+     ? `/calibrate/labware/${nextLabware.slot}`
+     : `/calibrate/labware/${labware[0].slot}`
   } else if (isSessionLoaded) {
-    calibrateUrl = `/setup-instruments/${nextInstrument.mount}`
+    calibrateUrl = `/calibrate/instruments/${nextInstrument.mount}`
   } else {
     calibrateUrl = '#'
   }

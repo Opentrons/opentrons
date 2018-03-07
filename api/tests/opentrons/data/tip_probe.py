@@ -16,13 +16,13 @@ def introduce_error(config, poses, instrument, error):
 
     mount = instrument.mount
     _type = instrument.type
+    _name = instrument.name
 
     config.instrument_offset[mount][_type] = tuple(
         array((dx, dy, 0)) + config.instrument_offset[mount][_type]
     )
 
-    config.tip_length[mount][_type] = \
-        config.tip_length[mount][_type] + dz
+    config.tip_length[_name] = config.tip_length[_name] + dz
 
     return update(
         poses,
@@ -55,12 +55,13 @@ def test_instrument(calibration_manager, robot, instrument, error):
 
     mount = instrument.mount
     _type = instrument.type
+    _name = instrument.name
 
     calibration_manager.tip_probe(instrument)
 
     return (
         robot.config.instrument_offset[mount][_type],
-        robot.config.tip_length[mount][_type]
+        robot.config.tip_length[_name]
     )
 
 
