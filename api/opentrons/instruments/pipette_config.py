@@ -21,6 +21,21 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 DEFAULT_ASPIRATE_SECONDS = 2
 DEFAULT_DISPENSE_SECONDS = 1
 
+# model-specific ID's, saved with each Pipette's memory
+# used to identifiy what model pipette is currently connected to machine
+PIPETTE_MODEL_IDENTIFIERS = {
+    'single': {
+        '10': 'p10_single_v1',
+        '50': 'p50_single_v1',
+        '300': 'p300_single_v1',
+        '1000': 'p1000_single_v1'
+    },
+    'multi': {
+        '10': 'p10_multi_v1',
+        '50': 'p50_multi_v1',
+        '300': 'p300_multi_v1',
+    }
+}
 
 pipette_config = namedtuple(
     'pipette_config',
