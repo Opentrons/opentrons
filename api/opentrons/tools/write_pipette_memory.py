@@ -62,11 +62,7 @@ def generate_id():
     print()
     # unique section of serial number is 6-bytes long
     length_of_unique_id = 6
-    confirm = input('Auto-generate an unique ID number? (Y or N):  ').upper()
-    if 'Y' in confirm:
-        unique_byte_array = _random_byte_list(length_of_unique_id)
-    else:
-        unique_byte_array = _user_submitted_id(length_of_unique_id)
+    unique_byte_array = _user_submitted_id(length_of_unique_id)
     print('Unique ID: {}'.format(_byte_array_to_string(unique_byte_array)))
     print()
     combined_id = model_byte_array + unique_byte_array
@@ -129,11 +125,6 @@ def _user_submitted_id(num):
             {1} is too {2}'.format(num, manual_id, length_msg)
         raise Exception(bad_id_msg)
     return bytearray.fromhex(manual_id)
-
-
-def _random_byte_list(num):
-    from random import randint
-    return bytearray([randint(0, 255) for i in range(num)])
 
 
 def _byte_array_to_string(b):
