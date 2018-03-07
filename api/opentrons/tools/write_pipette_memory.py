@@ -80,6 +80,7 @@ def write_identifier(robot, mount, byte_array):
     save the bytes to the pipette's memory
     '''
     print()
+    print('Ok, now hold down the button on the pipette')
     if 'Y' not in input('Ready to save the ID? (Y or N):  ').upper():
         raise Exception('Not writing ID to pipette, and exiting script')
     robot._driver._write_instrument_id(mount, byte_array)
