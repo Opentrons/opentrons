@@ -425,7 +425,7 @@ const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
   getLabware,
   getIngredientGroups,
   getIngredientLocations,
-  (_labware, _ingredientGroups, _ingredLocations) => { // TODO IMMEDIATELY Ian 2018-03-08 fix this weird typing error
+  (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
     const allLabwareIds = Object.keys(_labware)
     const allIngredIds = Object.keys(_ingredientGroups)
 
@@ -522,7 +522,7 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
   getSelectedContainer,
   getSelectedWells,
   getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
-  (_labware, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
+  (_labware: ContainersState, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
     const allLabwareIds = Object.keys(_labware)
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
