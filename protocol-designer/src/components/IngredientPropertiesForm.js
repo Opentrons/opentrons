@@ -80,13 +80,6 @@ type Props = {
   numWellsSelected: number,
   selectedWellsMaxVolume: number,
 
-  // selectedIngredientProperties: {
-  //   name: string,
-  //   volume: number,
-  //   description: string,
-  //   groupId: string
-  // },
-
   allIngredientGroupFields: ?AllIngredGroupFields,
   allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
   editingIngredGroupId: string | null,
