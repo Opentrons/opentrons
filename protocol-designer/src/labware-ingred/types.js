@@ -44,11 +44,11 @@ export type IngredInputFields = {|
 
 export type IngredientGroup = {|
   groupId: string,
-  name: ?string,
-  volume: ?number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
-  description: ?string,
-  serializeName: ?string,
-  individualize: ?boolean,
+  name: string,
+  volume: number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
+  description: string,
+  individualize: boolean,
+  serializeName: string,
   instances: {
     [labwareId: string]: {
       [wellName: string]: IngredInstance
@@ -61,16 +61,19 @@ export type AllIngredGroups = {
 }
 
 export type IngredGroupForLabware = {
-  ...IngredientGroup,
+  ...IngredInputFields,
   groupId: string,
   wells: {
     [wellName: string]: IngredInstance
   }
 }
 
-// Like AllIngredGroups, but no labwareId key. Here, labwareId has already been given
 export type IngredsForLabware = {
   [groupId: string]: IngredGroupForLabware
+}
+
+export type IngredsForAllLabware = {
+  [labwareId: string]: IngredsForLabware
 }
 
 export const editableIngredFields = [
@@ -87,3 +90,26 @@ export const persistedIngredFields = [
   'description',
   'individualize'
 ]
+
+export type IngredInputs = {
+  groupId?: string,
+
+  name: string | null,
+  volume: number | null,
+  description: string | null,
+  concentration: string | null,
+  individualize: boolean,
+  serializeName: string | null
+}
+
+export type IngredGroupAccessor =
+  | 'name'
+  | 'volume'
+  | 'description'
+  | 'concentration'
+  | 'individualize'
+  | 'serializeName'
+
+export type AllIngredGroupFields = {
+  [ingredGroupId: string]: IngredInputs
+}

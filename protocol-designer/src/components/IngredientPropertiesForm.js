@@ -12,31 +12,13 @@ import {
 import styles from './IngredientPropertiesForm.css'
 import formStyles from './Form.css'
 
+import type {
+  IngredInputs,
+  IngredGroupAccessor as Accessor,
+  AllIngredGroupFields
+} from '../labware-ingred/types'
+
 type SetStateCallback = (...args: Array<*>) => *
-
-type IngredInputs = {
-  groupId?: string,
-
-  name: string | null,
-  volume: number | null,
-  description: string | null,
-  concentration: string | null,
-  individualize: boolean,
-  serializeName: string | null
-}
-
-// type Accessor = $Keys<IngredInputs>
-type Accessor =
-  | 'name'
-  | 'volume'
-  | 'description'
-  | 'concentration'
-  | 'individualize'
-  | 'serializeName'
-
-type AllIngredGroupFields = {
-  [ingredGroupId: string]: IngredInputs
-}
 
 type SetSubstate = (accessor: string, value: string | boolean | number) => mixed
 type GetSubstate = (accessor: Accessor) => string | boolean | number | null

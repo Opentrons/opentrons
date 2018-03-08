@@ -5,13 +5,20 @@ import {selectors} from '../reducers'
 const baseIngredFields = {
   groupId: '0',
   name: 'Some Ingred',
-  serializeName: null,
-  // concentration: null,
   description: null,
-  individualize: false
+  individualize: false,
+  serializeName: null
 }
 
-const containersStateXXSingleIngred = {
+const baseIngredFields2 = {
+  groupId: '1',
+  name: 'Second Ingred',
+  description: 'Nice',
+  individualize: false,
+  serializeName: null
+}
+
+const containerState = {
   'default-trash': {
     id: 'default-trash',
     type: 'trash-box',
@@ -22,15 +29,28 @@ const containersStateXXSingleIngred = {
     slot: '10',
     type: '96-flat',
     name: 'Labware 1'
+  },
+  container2Id: {
+    slot: '8',
+    type: '96-deep-well',
+    name: 'Labware 2'
+  },
+  container3Id: {
+    slot: '9',
+    type: 'tube-rack-2ml',
+    name: 'Labware 3'
   }
 }
 
-const labwareIngredStateXXSingleIngred = {
+const baseStateXXSingleIngred = {
+  containers: containerState,
+
   ingredients: {
     '0': {
       ...baseIngredFields
     }
   },
+
   ingredLocations: {
     '0': {
       'container1Id': {
@@ -40,6 +60,36 @@ const labwareIngredStateXXSingleIngred = {
         B1: {
           volume: 150
         }
+      }
+    }
+  }
+}
+
+const baseStateXXTwoIngred = {
+  containers: containerState,
+
+  ingredients: {
+    '0': baseIngredFields,
+    '1': baseIngredFields2
+  },
+
+  ingredLocations: {
+    '0': {
+      container1Id: {
+        A1: {volume: 100},
+        B1: {volume: 150}
+      },
+      container2Id: {
+        A2: {volume: 105},
+        B2: {volume: 155}
+      }
+    },
+    '1': {
+      container2Id: {
+        H1: {volume: 111}
+      },
+      container3Id: {
+        H2: {volume: 222}
       }
     }
   }
@@ -65,7 +115,7 @@ const allIngredientsXXSingleIngred = {
 describe('allIngredients selector', () => {
   test('combines ingredients and ingredLocations', () => {
     expect(
-      selectors.allIngredients.resultFunc(labwareIngredStateXXSingleIngred)
+      selectors.allIngredients.resultFunc(baseStateXXSingleIngred)
     ).toEqual(allIngredientsXXSingleIngred)
   })
 })
@@ -81,79 +131,89 @@ describe('allIngredientNamesIds selector', () => {
   })
 })
 
-describe('ingredientsForContainer selector', () => {
-  test('returns {} with no labware selected', () => {
+describe('allIngredientGroupFields', () => {
+  test('no ingreds - return empty obj', () => {
     expect(
-      selectors.ingredientsForContainer.resultFunc(
-        allIngredientsXXSingleIngred,
-        null
-      )
+      selectors.allIngredientGroupFields.resultFunc({})
     ).toEqual({})
   })
 
-  test('returns {} when selected labware contains no ingreds', () => {
+  test('select fields from all ingred groups', () => {
     expect(
-      selectors.ingredientsForContainer.resultFunc(
-        allIngredientsXXSingleIngred,
-        {containerId: 'someEmptyContainerId'}
-      )
-    ).toEqual({})
-  })
-
-  test('gets all ingredient groups, for the currently selected labware', () => {
-    expect(
-      selectors.ingredientsForContainer.resultFunc(
-        allIngredientsXXSingleIngred, // from allIngredients selector
-        {containerId: 'container1Id'} // selected labware obj
-      )
+      selectors.allIngredientGroupFields.resultFunc(allIngredientsXXSingleIngred)
     ).toEqual({
       '0': {
-        ...baseIngredFields,
-        wells: {
-          A1: {
-            volume: 100
-          },
-          B1: {
-            volume: 150
-          }
-        }
+        ...baseIngredFields
       }
     })
   })
 })
 
-describe('allWellMatricesById selector', () => {
-  const result = selectors.allWellMatricesById.resultFunc(
-    allIngredientsXXSingleIngred,
-    containersStateXXSingleIngred
-  )
-
-  const baseWellData = {
-    highlighted: false,
-    preselected: false,
-    selected: false,
-    maxVolume: 400
-  }
-
-  test('A1 & B1 should have groupId 0', () => {
-    expect(result.container1Id.A1).toEqual({
-      ...baseWellData,
-      wellName: 'A1',
-      groupId: '0'
-    })
-
-    expect(result.container1Id.B1).toEqual({
-      ...baseWellData,
-      wellName: 'B1',
-      groupId: '0'
+describe('ingredientsByLabware', () => {
+  test('selects ingredients by labware: single ingred case', () => {
+    expect(
+      selectors.ingredientsByLabware.resultFunc(
+        baseStateXXSingleIngred.containers,
+        baseStateXXSingleIngred.ingredients,
+        baseStateXXSingleIngred.ingredLocations
+      )
+    ).toEqual({
+      'container1Id': {
+        '0': {
+          ...baseIngredFields,
+          wells: {
+            A1: {volume: 100},
+            B1: {volume: 150}
+          }
+        }
+      },
+      'container2Id': {},
+      'container3Id': {},
+      'default-trash': {}
     })
   })
 
-  test('H12 should have no groupId', () => {
-    // empty well
-    expect(result.container1Id.H12).toEqual({
-      ...baseWellData,
-      wellName: 'H12'
+  test('selects ingredients by labware: two ingred case', () => {
+    expect(
+      selectors.ingredientsByLabware.resultFunc(
+        baseStateXXTwoIngred.containers,
+        baseStateXXTwoIngred.ingredients,
+        baseStateXXTwoIngred.ingredLocations
+      )
+    ).toEqual({
+      container1Id: {
+        '0': {
+          ...baseIngredFields,
+          wells: {
+            A1: {volume: 100},
+            B1: {volume: 150}
+          }
+        }
+      },
+      container2Id: {
+        '0': {
+          ...baseIngredFields,
+          wells: {
+            A2: {volume: 105},
+            B2: {volume: 155}
+          }
+        },
+        '1': {
+          ...baseIngredFields2,
+          wells: {
+            H1: {volume: 111}
+          }
+        }
+      },
+      container3Id: {
+        '1': {
+          ...baseIngredFields2,
+          wells: {
+            H2: {volume: 222}
+          }
+        }
+      },
+      'default-trash': {}
     })
   })
 })

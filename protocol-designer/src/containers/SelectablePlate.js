@@ -30,7 +30,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps) {
   return {
     wellContents: isSelectedContainer
       ? selectors.wellContentsSelectedContainer(state)
-      : selectors.allWellMatricesById(state)[containerId],
+      : selectors.ingredientsByLabware(state)[containerId],
     containerType: containerById && containerById.type
   }
 }
