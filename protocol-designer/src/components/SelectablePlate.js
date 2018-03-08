@@ -9,8 +9,8 @@ import type {AllWellContents} from '../labware-ingred/types'
 export type Props = {
   wellContents: AllWellContents,
   containerType: string,
-  onSelectionMove: *,
-  onSelectionDone: *,
+  onSelectionMove: () => mixed, // TODO Ian 2018-03-08 type these 2 fns
+  onSelectionDone: () => mixed,
   containerId: string,
   selectable: boolean
 }

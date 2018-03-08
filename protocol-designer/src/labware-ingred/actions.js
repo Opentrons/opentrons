@@ -2,7 +2,6 @@
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
-import omit from 'lodash/omit'
 
 import {uuid} from '../utils'
 import {selectors} from './reducers'
@@ -185,31 +184,48 @@ export type EditIngredient = {
   }
 }
 
-export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
+export const editIngredient = (payload: {|
+  ...IngredInputFields,
+  groupId: string | null,
+  copyGroupId: string | null
+|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
   const allIngredients = selectors.getIngredientGroups(state)
 
-  const isUnchangedClone = allIngredients[payload.copyGroupId] &&
-    editableIngredFields.every(field =>
-      allIngredients[payload.copyGroupId][field] === payload[field]
-    )
+  const {groupId, copyGroupId, ...inputFields} = payload
 
-  if (!isUnchangedClone) {
-    console.log('not clone', allIngredients[payload.copyGroupId])
+  if (!container) {
+    throw new Error('No container selected, cannot edit ingredient')
   }
 
-  // TODO Ian 2018-02-19 make selector, or factor out as util.
-  const nextGroupId = (max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0
-  console.log('ingred ID assignment', Object.keys(allIngredients), {nextGroupId}) // TODO IMMEDIATELY remove this log
+  if (groupId && copyGroupId === null) {
+    // Not a copy, just an edit
+    return dispatch({
+      type: 'EDIT_INGREDIENT',
+      payload: {
+        ...inputFields,
+        groupId: groupId,
+        containerId: container.containerId,
+        wells: selectors.selectedWellNames(state),
+        isUnchangedClone: true
+      }
+    })
+  }
 
-  const groupId = (isUnchangedClone)
-    ? payload.copyGroupId
-    : nextGroupId
+  const isUnchangedClone = copyGroupId !== null &&
+    allIngredients[copyGroupId] &&
+    editableIngredFields.every(field =>
+      allIngredients[copyGroupId][field] === payload[field]
+    )
+
+  // TODO Ian 2018-02-19 make selector
+  const nextGroupId: string = ((max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0).toString()
 
   const name = (
-    allIngredients[payload.copyGroupId] &&
-    allIngredients[payload.copyGroupId].name === payload.name
+    copyGroupId &&
+    allIngredients[copyGroupId] &&
+    allIngredients[copyGroupId].name === payload.name
     )
     ? (payload.name || '') + ' copy' // todo: copy 2, copy 3 etc.
     : payload.name
@@ -217,11 +233,11 @@ export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFie
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
-      ...omit(payload, ['copyGroupId']),
+      ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
       name,
       containerId: container && container.containerId,
-      groupId,
+      groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
       wells: selectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
       isUnchangedClone
     }

@@ -19,9 +19,6 @@ function mapStateToProps (state: BaseState): PropsWithoutActions {
   const container = selectors.selectedContainer(state)
   const selectedIngredientGroup = selectors.selectedIngredientGroup(state)
   return {
-    // slot: activeModals.ingredientSelection.slot || '1',
-    // containerName: container ? container.name : 'No Name',
-    // containerType: container ? container.type : 'No type',
     ingredients: container ? selectors.ingredientsByLabware(state)[container.containerId] : {},
     selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
     selected: false

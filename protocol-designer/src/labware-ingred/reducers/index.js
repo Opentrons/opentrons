@@ -331,18 +331,8 @@ const labwareOptions: (state: BaseState) => Array<{value: string, name: string}>
 
 const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
 
-// TODO just use container selector
-const containerById = (containerId: string) => (state: BaseState) => {
-  const container = rootSelector(state).containers
-  return container && container[containerId]
-    ? {
-      ...container[containerId],
-      containerId
-    }
-    : null
-}
-
 // TODO: containerId should be intrinsic to container reducer?
+// Or should this selector just return the ID?
 const getSelectedContainer = createSelector(
   rootSelector,
   state => (state.selectedContainer === null)
@@ -402,9 +392,9 @@ const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelect
     }), {})
 )
 
-const selectedWellNames = createSelector(
+const selectedWellNames: Selector<Array<string>> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells.selected,
-  selectedWells => Object.values(selectedWells)
+  selectedWells => Object.keys(selectedWells)
 )
 
 const numWellsSelected = createSelector(
@@ -431,7 +421,7 @@ const selectedWellsMaxVolume: Selector<number> = createSelector(
   }
 )
 
-export const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
+const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
   getLabware,
   getIngredientGroups,
   getIngredientLocations,
@@ -472,11 +462,11 @@ const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?st
 const _getWellContents = (
   containerType: ?string,
   __ingredientsForContainer: IngredsForLabware,
-  selectedWells: ?{
+  selectedWells: {
     preselected: Wells,
     selected: Wells
-  },
-  highlightedWells: ?Wells
+  } | null,
+  highlightedWells: Wells | null
 ): AllWellContents | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
@@ -504,7 +494,7 @@ const _getWellContents = (
 
   return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
     const groupIds = groupIdsForWell(wellName)
-    const groupIdFields = groupIds ? {groupId: groupIds[0], groupIds} : {}
+    const groupIdFields = {groupId: groupIds[0] || null}
 
     const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
 
@@ -514,30 +504,44 @@ const _getWellContents = (
         preselected: selectedWells ? wellName in selectedWells.preselected : false,
         selected: selectedWells ? wellName in selectedWells.selected : false,
         highlighted: isHighlighted, // TODO remove 'highlighted' state?
+        hovered: !!(highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1),
+
         maxVolume: location['total-liquid-volume'] || Infinity,
-        hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-        ...groupIdFields // TODO Ian 2018-03-07 this should be a color, >1 => gray
-        // ...ingredData // TODO contents of ingredData (_ingredAtWell) is hard to follow, needs to be cleaned up
+        ...groupIdFields // TODO Ian 2018-03-07 this should be a color, >1 => gray ?
       }
     }
   }, {})
 }
 
-const wellContentsSelectedContainer = createSelector(
-  selectedContainerType,
+const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells // wells are selected only for the selected container.
+const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
+
+const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
+  getLabware,
   ingredientsByLabware,
   getSelectedContainer,
-  (state: BaseState) => rootSelector(state).selectedWells, // wells are selected only for the selected container.
-  (state: BaseState) => rootSelector(state).highlightedIngredients.wells,
-  (_selectedContainerType, _ingredsForLabware, selectedContainer, selectedWells, highlightedWells) => {
-    return selectedContainer
-      ? _getWellContents(
-        _selectedContainerType,
-        _ingredsForLabware[selectedContainer.containerId],
-        selectedWells,
-        highlightedWells
-      )
-      : {}
+  getSelectedWells,
+  getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
+  (_labware, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
+    const allLabwareIds = Object.keys(_labware)
+
+    return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
+      const ingredsForLabware = _ingredsByLabware[labwareId]
+      const isSelectedLabware = _selectedLabware && (_selectedLabware.containerId === labwareId)
+      // Skip labware ids with no ingreds
+      return {
+        ...acc,
+        [labwareId]: (ingredsForLabware)
+          ? _getWellContents(
+          _labware[labwareId].type,
+          ingredsForLabware,
+          // Only give _getWellContents the selection data if it's a selected container
+          isSelectedLabware ? _selectedWells : null,
+          isSelectedLabware ? _highlightedWells : null
+        )
+        : null
+      }
+    }, {})
   }
 )
 
@@ -567,6 +571,7 @@ export const selectors = {
   rootSelector,
 
   getIngredientGroups,
+  getLabware,
 
   activeModals,
   allIngredientGroupFields,
@@ -574,18 +579,16 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   labwareToCopy,
-  getLabware,
   canAdd,
-  wellContentsSelectedContainer,
   numWellsSelected,
   selectedWellsMaxVolume,
   selectedWellNames,
   selectedIngredientGroup: getSelectedIngredientGroup,
   selectedContainerSlot,
   selectedContainer: getSelectedContainer,
-  containerById,
   ingredientsByLabware,
-  labwareOptions
+  labwareOptions,
+  wellContentsAllLabware
 }
 
 export default rootReducer

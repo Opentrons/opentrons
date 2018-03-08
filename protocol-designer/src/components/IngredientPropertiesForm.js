@@ -166,7 +166,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
   }
 
   selectExistingIngred = (ingredGroupId: string) => {
-    this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
+    this.resetInputState(ingredGroupId, undefined, () => this.setState({
+      ...this.state,
+      copyGroupId: ingredGroupId
+    }))
   }
 
   handleDelete = (e: SyntheticEvent<*>) => {
@@ -202,7 +205,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
     if (!editMode && !addMode) {
-      console.log({editMode, addMode, selectedIngredientFields, editingIngredGroupId, allIngredientGroupFields})
       // Don't show anything, we're not editing or adding
       return null
     }
@@ -258,7 +260,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
         <div className={styles.button_row}>
           <FlatButton /* disabled={TODO: validate input here} */
-            onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+            onClick={() => onSave({
+              ...this.state.input,
+              groupId: editingIngredGroupId,
+              copyGroupId: this.state.copyGroupId})}
           >
             Save
           </FlatButton>

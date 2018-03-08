@@ -20,7 +20,6 @@ const baseIngredFields2 = {
 
 const containerState = {
   'default-trash': {
-    id: 'default-trash',
     type: 'trash-box',
     name: 'Trash',
     slot: '12'
@@ -112,6 +111,69 @@ const allIngredientsXXSingleIngred = {
   }
 }
 
+const ingredsByLabwareXXSingleIngred = {
+  'container1Id': {
+    '0': {
+      ...baseIngredFields,
+      wells: {
+        A1: {volume: 100},
+        B1: {volume: 150}
+      }
+    }
+  },
+  'container2Id': {},
+  'container3Id': {},
+  'default-trash': {}
+}
+
+const ingredsByLabwareXXTwoIngred = {
+  container1Id: {
+    '0': {
+      ...baseIngredFields,
+      wells: {
+        A1: {volume: 100},
+        B1: {volume: 150}
+      }
+    }
+  },
+  container2Id: {
+    '0': {
+      ...baseIngredFields,
+      wells: {
+        A2: {volume: 105},
+        B2: {volume: 155}
+      }
+    },
+    '1': {
+      ...baseIngredFields2,
+      wells: {
+        H1: {volume: 111}
+      }
+    }
+  },
+  container3Id: {
+    '1': {
+      ...baseIngredFields2,
+      wells: {
+        H2: {volume: 222}
+      }
+    }
+  },
+  'default-trash': {}
+}
+
+const defaultWellContents = {
+  highlighted: false,
+  hovered: false,
+  preselected: false,
+  selected: false,
+  groupId: null
+}
+
+const container1MaxVolume = 400
+
+// ==============================
+
 describe('allIngredientNamesIds selector', () => {
   test('selects names & ids from allIngredients selector result', () => {
     expect(
@@ -149,20 +211,7 @@ describe('ingredientsByLabware', () => {
         baseStateXXSingleIngred.ingredients,
         baseStateXXSingleIngred.ingredLocations
       )
-    ).toEqual({
-      'container1Id': {
-        '0': {
-          ...baseIngredFields,
-          wells: {
-            A1: {volume: 100},
-            B1: {volume: 150}
-          }
-        }
-      },
-      'container2Id': {},
-      'container3Id': {},
-      'default-trash': {}
-    })
+    ).toEqual(ingredsByLabwareXXSingleIngred)
   })
 
   test('selects ingredients by labware: two ingred case', () => {
@@ -172,40 +221,68 @@ describe('ingredientsByLabware', () => {
         baseStateXXTwoIngred.ingredients,
         baseStateXXTwoIngred.ingredLocations
       )
-    ).toEqual({
-      container1Id: {
-        '0': {
-          ...baseIngredFields,
-          wells: {
-            A1: {volume: 100},
-            B1: {volume: 150}
-          }
-        }
+    ).toEqual(ingredsByLabwareXXTwoIngred)
+  })
+})
+
+describe('wellContentsAllLabware', () => {
+  const singleIngredResult = selectors.wellContentsAllLabware.resultFunc(
+    containerState, // all labware
+    ingredsByLabwareXXSingleIngred,
+    {containerId: 'container1Id'}, // selected labware
+    {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
+    {A3: 'A3'} // highlighted (TODO: is this used?)
+  )
+
+  // TODO: 2nd test case
+  // const twoIngredResult = selectors.wellContentsAllLabware.resultFunc(
+  //   containerState, // all labware
+  //   ingredsByLabwareXXTwoIngred,
+  //   containerState.container2Id, // selected labware
+  //   {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
+  //   {A3: 'A3'} // highlighted (TODO: is this used?)
+  // )
+
+  test('container has expected number of wells', () => {
+    expect(Object.keys(singleIngredResult.container1Id).length).toEqual(96)
+  })
+
+  test('selects well contents of all labware (for Plate props)', () => {
+    expect(
+      singleIngredResult
+    ).toMatchObject({
+      'default-trash': {
+        A1: defaultWellContents
       },
       container2Id: {
-        '0': {
-          ...baseIngredFields,
-          wells: {
-            A2: {volume: 105},
-            B2: {volume: 155}
-          }
-        },
-        '1': {
-          ...baseIngredFields2,
-          wells: {
-            H1: {volume: 111}
-          }
-        }
+        A1: defaultWellContents
       },
       container3Id: {
-        '1': {
-          ...baseIngredFields2,
-          wells: {
-            H2: {volume: 222}
-          }
-        }
+        A1: defaultWellContents
       },
-      'default-trash': {}
+
+      container1Id: {
+        A1: {
+          ...defaultWellContents,
+          selected: true,
+          groupId: '0',
+          maxVolume: container1MaxVolume
+        },
+        A2: {
+          ...defaultWellContents,
+          maxVolume: container1MaxVolume
+        },
+        B1: {
+          ...defaultWellContents,
+          selected: true,
+          groupId: '0',
+          maxVolume: container1MaxVolume
+        },
+        B2: {
+          ...defaultWellContents,
+          maxVolume: container1MaxVolume
+        }
+      }
     })
   })
 })

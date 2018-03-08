@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import {connect} from 'react-redux'
 
 import SelectablePlate from '../components/SelectablePlate.js'
@@ -13,25 +14,32 @@ type OwnProps = {
   cssFillParent?: boolean
 }
 
-function mapStateToProps (state: BaseState, ownProps: OwnProps) {
+type Props = React.ElementProps<typeof SelectablePlate>
+
+type DispatchProps = {
+  // TODO Ian 2018-03-08 type these functions
+  onSelectionMove: (e: mixed, rect: mixed) => mixed,
+  onSelectionDone: (e: mixed, rect: mixed) => mixed
+}
+
+type StateProps = $Diff<Props, DispatchProps>
+
+function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const selectedContainer = selectors.selectedContainer(state)
   const selectedContainerId = selectedContainer && selectedContainer.containerId
   const containerId = ownProps.containerId || selectedContainerId
 
-  const isSelectedContainer = containerId === selectedContainerId
-
   if (containerId === null) {
-    console.warn('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
-    return {}
+    throw new Error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
   }
 
-  const containerById = selectors.containerById(containerId)(state)
+  const labware = selectors.getLabware(state)[containerId]
 
   return {
-    wellContents: isSelectedContainer
-      ? selectors.wellContentsSelectedContainer(state)
-      : selectors.ingredientsByLabware(state)[containerId],
-    containerType: containerById && containerById.type
+    containerId,
+    wellContents: selectors.wellContentsAllLabware(state)[containerId],
+    containerType: labware.type,
+    selectable: selectedContainerId === containerId
   }
 }
 

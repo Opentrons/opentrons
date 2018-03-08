@@ -46,7 +46,7 @@ function OccupiedDeckSlotOverlay ({
       {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
       <ClickableText onClick={() =>
-          window.confirm(`Are you sure you want to permanently delete ${containerName} in slot ${slot}?`) &&
+          window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
           deleteContainer({containerId, slot, containerType})
       }
         iconName='close' y='75%' text='Delete Labware' />
@@ -77,14 +77,14 @@ type LabwareOnDeckProps = {
 
   containerId: string,
   containerType: string,
-  containerName: string,
+  containerName: ?string,
 
   // canAdd: boolean,
 
   activeModals: {
     ingredientSelection: ?{
-      containerName: string,
-      slot: string
+      containerName: ?string,
+      slot: ?string
     },
     labwareSelection: boolean
   },
@@ -98,11 +98,11 @@ type LabwareOnDeckProps = {
   // closeLabwareSelector: ({slot: string}) => mixed,
 
   setCopyLabwareMode: (containerId: string) => void,
-  labwareToCopy: string, // ?
+  labwareToCopy: string | false,
   copyLabware: (slot: string) => void,
 
-  height: number,
-  width: number,
+  height?: number,
+  width?: number,
   highlighted: boolean,
 
   deckSetupMode: boolean

@@ -25,7 +25,7 @@ export type WellContents = {| // non-ingredient well state
   highlighted: boolean,
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
-  groupId?: string // TODO Ian 2018-03-07 this should be color, not groupId.
+  groupId: string | null // TODO Ian 2018-03-07 this should be color, not groupId.
 |}
 
 export type AllWellContents = {
@@ -92,8 +92,6 @@ export const persistedIngredFields = [
 ]
 
 export type IngredInputs = {
-  groupId?: string,
-
   name: string | null,
   volume: number | null,
   description: string | null,
