@@ -1,6 +1,6 @@
 // @flow
-import React from 'react'
-import {FormGroup, InputField, InstrumentGroup, type InstrumentInfoProps} from '@opentrons/components'
+import * as React from 'react'
+import {FormGroup, InputField, InstrumentGroup} from '@opentrons/components'
 import type {FilePageFields} from '../file-data'
 import type {FormConnector} from '../utils'
 
@@ -9,7 +9,7 @@ import formStyles from '../components/Form.css'
 
 type Props = {
   formConnector: FormConnector<FilePageFields>,
-  instruments: Array<InstrumentInfoProps>
+  instruments: React.ElementProps<typeof InstrumentGroup>
 }
 
 export default function FilePage (props: Props) {
@@ -40,7 +40,7 @@ export default function FilePage (props: Props) {
         <h2>
           Pipettes
         </h2>
-        <InstrumentGroup instruments={instruments} />
+        <InstrumentGroup {...instruments} />
       </section>
     </div>
   )

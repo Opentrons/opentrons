@@ -24,7 +24,10 @@ function mapStateToProps (state: BaseState): StateProps {
 
   return {
     _values: formValues,
-    instruments: pipetteData
+    instruments: {
+      left: pipetteData.find(i => i.mount === 'left'),
+      right: pipetteData.find(i => i.mount === 'right')
+    }
   }
 }
 

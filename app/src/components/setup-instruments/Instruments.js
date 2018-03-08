@@ -40,7 +40,10 @@ export default function Instruments (props: Props) {
     }
   })
 
+  const left = instruments.find(i => i.mount === 'left')
+  const right = instruments.find(i => i.mount === 'right')
+
   return (
-    <InstrumentGroup instruments={instruments} />
+    <InstrumentGroup {...{left, right}} />
   )
 }
