@@ -23,12 +23,16 @@ class Calibrator(object):
                 placeable,
                 coordinates=Vector(0, 0, 0)):
         coordinates = Vector(coordinates)
+        #print("Coordinates {}".format(coordinates))
         path = placeable.get_trace()
 
         adjusted_coordinates = Vector(0, 0, 0)
         for item in path:
+            #print("Item {}".format(item))
             c = self.calibrated_coordinates.get(item, item._coordinates)
+            #print("Calibrated Coordinates {}".format(c))
             adjusted_coordinates += c
+            #print("Adjusted {}".format(adjusted_coordinates))
 
         return coordinates + adjusted_coordinates
 
@@ -51,11 +55,15 @@ class Calibrator(object):
         placeable, expected = unpack_location(location)
         coordinates_to_deck = placeable.coordinates(placeable.get_deck())
         expected_to_deck = expected + coordinates_to_deck
+        print("Expected to Deck {}".format(expected_to_deck))
         print("Actual {}".format(actual))
         print("Placeable {}".format(placeable))
         print("Expected {}".format(expected))
         print("Coordinates deck {}".format(coordinates_to_deck))
         print("Expected deck {}".format(expected_to_deck))
+        print("X {}".format(actual[0]))
+        print("Y {}".format(actual[1]))
+        print("Z {}".format(actual[2]))
         delta = actual - expected_to_deck
         print("Delta {}".format(delta))
         path = placeable.get_path()

@@ -19,7 +19,7 @@ def unpack_location(location):
     coordinates = None
     placeable = None
     if isinstance(location, Placeable):
-        placeable, coordinates = location.top()
+        placeable, coordinates = location.bottom()
     elif isinstance(location, tuple):
         placeable, coordinates = location
     else:
