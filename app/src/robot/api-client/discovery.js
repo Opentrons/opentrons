@@ -86,7 +86,7 @@ function withIp (service) {
 
   // API doesn't listen on all interfaces when running locally
   // this hostname check is only for handling that situation
-  if (service.host === os.hostname()) {
+  if (service.host && service.host.endsWith(os.hostname())) {
     ip = 'localhost'
     // emulate a wired robot when running locally
     service = {...service, wired: true}
