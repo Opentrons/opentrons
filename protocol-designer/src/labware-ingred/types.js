@@ -79,7 +79,7 @@ export type IngredsForAllLabware = {
 export const editableIngredFields = [
   'name',
   'serializeName',
-  'volume',
+  // 'volume',
   'description',
   'individualize'
 ]
@@ -97,7 +97,6 @@ export type IngredInputs = {
   name: string | null,
   volume: number | null,
   description: string | null,
-  concentration: string | null,
   individualize: boolean,
   serializeName: string | null
 }
@@ -106,7 +105,6 @@ export type IngredGroupAccessor =
   | 'name'
   | 'volume'
   | 'description'
-  | 'concentration'
   | 'individualize'
   | 'serializeName'
 

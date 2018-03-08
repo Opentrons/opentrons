@@ -27,7 +27,7 @@ import type {
   // WellContents,
   AllWellContents,
   // IngredientGroup,
-  AllIngredGroups,
+  // AllIngredGroups,
   IngredsForLabware,
   IngredsForAllLabware
   // IngredGroupForLabware
@@ -381,21 +381,9 @@ const selectedContainerType = createSelector(
   (slot, allContainers) => slot && allContainers[slot]
 )
 
-const allIngredients: (BaseState) => AllIngredGroups = createSelector(
-  rootSelector,
-  state => reduce(state.ingredients, (acc, ingredData: IngredInputFields, ingredId) => {
-    return {
-      ...acc,
-      [ingredId]: {
-        ...ingredData,
-        instances: state.ingredLocations[ingredId]
-      }
-    }
-  }, {})
-)
-
 const ingredFields = [...editableIngredFields, 'groupId']
 
+// TODO move these to types.js
 type IngredGroupField = {
   groupId: string,
   ...IngredInputFields
@@ -405,9 +393,9 @@ type IngredGroupFields = {
   [ingredGroupId: string]: IngredGroupField
 }
 const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelector(
-  allIngredients,
-  (_allIngredients) => reduce(
-    _allIngredients,
+  getIngredientGroups,
+  (ingreds) => reduce(
+    ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
       ...acc,
       [ingredGroupId]: pick(ingredGroup, ingredFields)
@@ -423,14 +411,14 @@ const numWellsSelected = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
 
-const selectedWellsMaxVolume = createSelector(
+const selectedWellsMaxVolume: Selector<number> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells,
   selectedContainerType,
   (selectedWells, selectedContainerType) => {
     const selectedWellNames = Object.keys(selectedWells.selected)
     if (!selectedContainerType) {
       console.warn('No container type selected, cannot get max volume')
-      return null
+      return Infinity
     }
     const maxVolumesByWell = getMaxVolumes(selectedContainerType)
     const maxVolumesList = (selectedWellNames.length > 0)
@@ -439,7 +427,7 @@ const selectedWellsMaxVolume = createSelector(
       // when no wells selected (eg editing ingred group), look at all volumes.
       // TODO LATER: look at filled wells, not all wells.
       : Object.values(maxVolumesByWell)
-    return min(maxVolumesList)
+    return min(maxVolumesList.map(n => parseInt(n)))
   }
 )
 
@@ -447,7 +435,7 @@ export const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelect
   getLabware,
   getIngredientGroups,
   getIngredientLocations,
-  (_labware, _ingredientGroups, _ingredLocations) => {
+  (_labware, _ingredientGroups, _ingredLocations) => { // TODO IMMEDIATELY Ian 2018-03-08 fix this weird typing error
     const allLabwareIds = Object.keys(_labware)
     const allIngredIds = Object.keys(_ingredientGroups)
 
@@ -472,55 +460,13 @@ export const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelect
         [labwareId]: ingredsForThisLabware
       }
     }, {})
-    // const ingredGroupConvert = (ingredGroup: IngredientGroup, groupId: string): IngredGroupForLabware => ({
-    //   ...pick(ingredGroup, editableIngredFields),
-    //   groupId,
-    //   wells: ingredGroup.instances[containerId]
-    // })
-    //
-    // return Object.keys(allIngredients).reduce((acc: IngredsForLabware, ingredGroupId: string) => {
-    //   const ingredGroup = allIngredients[ingredGroupId]
-    //
-    //   return (ingredGroup.locations && ingredGroup.locations.containerId)
-    //   ? {...acc, [ingredGroupId]: ingredGroupConvert(ingredGroup, ingredGroupId)}
-    //   : acc
-    // }, {})
   }
 )
 
-// // TODO rename to "ingredients for selected container", or delete
-// const ingredientsForContainer: BaseState => IngredsForLabware = createSelector(
-//   allIngredients,
-//   getSelectedContainer,
-//   (_allIngredients, selectedContainer) => {
-//     return (selectedContainer && selectedContainer.containerId)
-//     // ? _ingredientsForContainerId(_allIngredients, selectedContainer.containerId)
-//     ? reduce(
-//       _allIngredients,
-//       (acc: IngredsForLabware, ingredGroup: IngredientGroup, ingredGroupId: string) => {
-//         const instances = ingredGroup.instances[selectedContainer.containerId]
-//
-//         if (!instances) {
-//           return acc
-//         }
-//
-//         return {
-//           ...acc,
-//           [ingredGroupId]: {
-//             groupId: ingredGroupId,
-//             ...omit(ingredGroup, ['instances']),
-//             wells: instances
-//           }
-//         }
-//       }, {})
-//     : {}
-//   }
-// )
-
 const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
-  allIngredients,
-  allIngreds => Object.keys(allIngreds).map(ingredId =>
-      ({ingredientId: ingredId, name: allIngreds[ingredId].name}))
+  getIngredientGroups,
+  ingreds => Object.keys(ingreds).map(ingredId =>
+      ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
 
 const _getWellContents = (
@@ -577,36 +523,6 @@ const _getWellContents = (
   }, {})
 }
 
-// const allWellMatricesById = ingredientsByLabware // TODO collapse these 2 together
-// const allWellMatricesById: (BaseState) => AllWellMatrices = createSelector(
-//   allIngredients,
-//   // ingredientsForContainer,
-//   getLabware,
-//   (_allIngredients, _containers) => reduce(
-//     _containers,
-//     (acc: AllWellMatrices, container: Labware, containerId: string): * => {
-//       const wellContents = _getWellContents(
-//         container.type,
-//         ingredientsByLabware(_allIngredients)[containerId],
-//         null, // selectedWells is only for the selected container, so treat as empty selection.
-//         null // so is highlightedWells
-//       )
-//       // TODO IMMEDIATELY clean this mess up
-//       return {
-//         ...acc,
-//         [containerId]: reduce(
-//           wellContents || [],
-//           (acc2: AllWellContents, singleWell: WellContents, wellName: string | number): AllWellContents => ({ // TODO Ian 2018-03-07 why string | number?
-//             ...acc2,
-//             [wellName]: {
-//               ...singleWell,
-//               wellName
-//             }
-//           }), {})
-//       }
-//     }, {})
-// )
-
 const wellContentsSelectedContainer = createSelector(
   selectedContainerType,
   ingredientsByLabware,
@@ -650,11 +566,11 @@ const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).sel
 export const selectors = {
   rootSelector,
 
+  getIngredientGroups,
+
   activeModals,
-  allIngredients,
   allIngredientGroupFields,
   allIngredientNamesIds,
-  // allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
   labwareToCopy,

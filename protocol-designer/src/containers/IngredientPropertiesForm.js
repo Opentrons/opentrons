@@ -1,17 +1,36 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../labware-ingred/actions'
 import { selectors } from '../labware-ingred/reducers'
 import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 import type {BaseState} from '../types'
 
-export default connect(
-  (state: BaseState) => ({
+type Props = React.ElementProps<typeof IngredientPropertiesForm>
+
+type DispatchProps = {
+  onSave: *,
+  onCancel: *,
+  onDelete: *
+}
+
+type StateProps = $Diff<Props, DispatchProps>
+
+function mapStateToProps (state: BaseState): StateProps {
+  const selectedIngredGroup = selectors.selectedIngredientGroup(state)
+  return {
+    editingIngredGroupId: selectedIngredGroup && selectedIngredGroup.groupId,
     numWellsSelected: selectors.numWellsSelected(state),
     selectedWellsMaxVolume: selectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),
     allIngredientGroupFields: selectors.allIngredientGroupFields(state)
-  }),
+  }
+}
+
+// TODO Ian 2018-03-08 also type mapDispatchToProps
+
+export default connect(
+  mapStateToProps,
   {
     onSave: editIngredient,
     onCancel: () => editModeIngredientGroup(null), // call with no args

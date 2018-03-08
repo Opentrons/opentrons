@@ -112,14 +112,6 @@ const allIngredientsXXSingleIngred = {
   }
 }
 
-describe('allIngredients selector', () => {
-  test('combines ingredients and ingredLocations', () => {
-    expect(
-      selectors.allIngredients.resultFunc(baseStateXXSingleIngred)
-    ).toEqual(allIngredientsXXSingleIngred)
-  })
-})
-
 describe('allIngredientNamesIds selector', () => {
   test('selects names & ids from allIngredients selector result', () => {
     expect(

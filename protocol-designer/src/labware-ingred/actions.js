@@ -188,16 +188,20 @@ export type EditIngredient = {
 export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
-  const allIngredients = selectors.allIngredients(state)
+  const allIngredients = selectors.getIngredientGroups(state)
 
   const isUnchangedClone = allIngredients[payload.copyGroupId] &&
     editableIngredFields.every(field =>
       allIngredients[payload.copyGroupId][field] === payload[field]
     )
 
+  if (!isUnchangedClone) {
+    console.log('not clone', allIngredients[payload.copyGroupId])
+  }
+
   // TODO Ian 2018-02-19 make selector, or factor out as util.
   const nextGroupId = (max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0
-  console.log(Object.keys(allIngredients), {nextGroupId})
+  console.log('ingred ID assignment', Object.keys(allIngredients), {nextGroupId}) // TODO IMMEDIATELY remove this log
 
   const groupId = (isUnchangedClone)
     ? payload.copyGroupId
