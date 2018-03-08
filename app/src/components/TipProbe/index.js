@@ -1,14 +1,8 @@
 // @flow
-// TipProbe container
+// TipProbe controls
 import * as React from 'react'
-import {connect} from 'react-redux'
 
-import {
-  selectors as robotSelectors,
-  type InstrumentCalibrationStatus,
-  type Mount,
-  type Channels
-} from '../../robot'
+import type {Instrument, InstrumentCalibrationStatus} from '../../robot'
 
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import UnprobedPanel from './UnprobedPanel'
@@ -17,22 +11,12 @@ import AttachTipPanel from './AttachTipPanel'
 import RemoveTipPanel from './RemoveTipPanel'
 import ContinuePanel from './ContinuePanel'
 
-type OwnProps = {
-  mount: Mount,
-  confirmTipProbeUrl: string,
+type Props = Instrument & {
+  confirmTipProbeUrl: string
 }
-
-type StateProps = {
-  calibration: InstrumentCalibrationStatus,
-  channels: Channels,
-  volume: number,
-  probed: boolean,
-}
-
-type TipProbeProps = OwnProps & StateProps
 
 const PANEL_BY_CALIBRATION: {
-  [InstrumentCalibrationStatus]: React.ComponentType<TipProbeProps>
+  [InstrumentCalibrationStatus]: React.ComponentType<Props>
 } = {
   'unprobed': UnprobedPanel,
   'preparing-to-probe': InstrumentMovingPanel,
@@ -42,23 +26,7 @@ const PANEL_BY_CALIBRATION: {
   'probed': ContinuePanel
 }
 
-export default connect(mapStateToProps)(TipProbe)
-
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const instruments = robotSelectors.getInstruments(state)
-  const currentInstrument = instruments
-    .find((inst) => inst.mount === ownProps.mount)
-
-  // TODO(mc, 2018-01-22): this should never happen; refactor so this
-  //   check isn't necessary
-  if (!currentInstrument || !currentInstrument.calibration) {
-    throw new Error('no currentInstrument or has no calibration status')
-  }
-
-  return currentInstrument
-}
-
-function TipProbe (props: TipProbeProps) {
+export default function TipProbe (props: Props) {
   const {mount, probed, calibration} = props
   const title = `${mount} pipette calibration`
 

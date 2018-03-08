@@ -1,30 +1,25 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
-// import type InstrumentInfoProps from './InstrumentInfo'
-import {InstrumentGroup, InstrumentInfo} from '@opentrons/components'
+import type {Instrument} from '../../robot'
+import {constants as robotConstants} from '../../robot'
 
-import {
-  constants as robotConstants,
-  selectors as robotSelectors
-} from '../../robot'
+import {InstrumentGroup} from '@opentrons/components'
 
-type OwnProps = {
-  mount: ?string
+type Props = {
+  instruments: Array<Instrument>,
+  currentInstrument: ?Instrument
 }
 
-type StateProps = {
-  instruments: Array<React.ElementProps<typeof InstrumentInfo>>
-}
+export default function Instruments (props: Props) {
+  const {currentInstrument, instruments: allInstruments} = props
+  const currentMount = currentInstrument
+    ? currentInstrument.mount
+    : null
 
-export default connect(mapStateToProps)(InstrumentGroup)
-
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const currentMount = ownProps.mount
-  const allInstruments = robotSelectors.getInstruments(state)
-
+  // TODO(mc, 2018-03-07): refactor when InstrumentGroup switches to object
+  //   of instruments keyed by mount instead of array
   const instruments = robotConstants.INSTRUMENT_MOUNTS.map((mount) => {
     const inst = allInstruments.find((i) => i.mount === mount)
     const isDisabled = !inst || mount !== currentMount
@@ -45,5 +40,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
     }
   })
 
-  return {instruments}
+  return (
+    <InstrumentGroup instruments={instruments} />
+  )
 }
