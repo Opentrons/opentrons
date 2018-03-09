@@ -9,6 +9,7 @@ import type {BaseState} from '../types'
 
 type OwnProps = {
   containerId?: string,
+  selectable?: boolean,
   cssFillParent?: boolean
 }
 
@@ -36,7 +37,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     containerId,
     wellContents: selectors.wellContentsAllLabware(state)[containerId],
     containerType: labware.type,
-    selectable: selectedContainerId === containerId
+    selectable: ownProps.selectable
   }
 }
 

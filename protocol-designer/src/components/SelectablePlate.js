@@ -13,7 +13,7 @@ export type Props = {
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
   containerId: string,
-  selectable: boolean
+  selectable?: boolean
 }
 
 export default function SelectablePlate (props: Props) {
@@ -31,6 +31,7 @@ export default function SelectablePlate (props: Props) {
     wellContents={wellContents}
     containerType={containerType}
     containerId={containerId}
+    showLabels={selectable}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect
