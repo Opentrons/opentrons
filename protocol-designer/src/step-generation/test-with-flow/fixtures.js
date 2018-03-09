@@ -1,5 +1,6 @@
 // @flow
 import {tiprackWellNamesFlat} from '../'
+import type {RobotState} from '../'
 
 // export const wellNames96 = flatMap(
 //   'ABCDEFGH'.split(''),
@@ -31,7 +32,37 @@ export const p300Multi = {
   channels: 8
 }
 
-export const getBasicRobotState = () => ({
+export const basicLiquidState = {
+  pipettes: {
+    p300SingleId: { '0': {} },
+    p300MultiId: { '0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {} }
+  },
+  labware: {
+    sourcePlateId: {
+      A1: {},
+      A2: {},
+      A3: {},
+      A4: {},
+      A5: {},
+      A6: {},
+      A7: {},
+      A8: {},
+      A9: {},
+      A10: {},
+      A11: {},
+      A12: {}
+    },
+    destPlateId: tiprackWellNamesFlat.reduce((acc, well) => ({
+      // Eg {A1: {}, B1: {}, ...etc}
+      [well]: {}
+    }), {}),
+    trashId: {
+      A1: {}
+    }
+  }
+}
+
+export const getBasicRobotState = (): RobotState => ({
   instruments: {
     p300SingleId: p300Single,
     p300MultiId: p300Multi
@@ -58,6 +89,7 @@ export const getBasicRobotState = () => ({
       name: 'Trash'
     }
   },
+
   tipState: {
     tipracks: {
       tiprack1Id: {...filledTiprackWells}
@@ -66,5 +98,7 @@ export const getBasicRobotState = () => ({
       p300SingleId: false,
       p300MultiId: false
     }
-  }
+  },
+
+  liquidState: basicLiquidState
 })

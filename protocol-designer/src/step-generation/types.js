@@ -70,6 +70,8 @@ export type LabwareData = {
   slot: DeckSlot
 }
 
+type TipId = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7'
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
   instruments: {
@@ -86,6 +88,26 @@ export type RobotState = {|
     },
     pipettes: {
       [pipetteId: string]: boolean // true if tip is on pipette
+    }
+  },
+  liquidState: {
+    pipettes: {
+      [pipetteId: string]: {
+        [tipId: TipId]: {
+          [ingredGroup: string]: {
+            volume: number
+          }
+        }
+      }
+    },
+    labware: {
+      [labwareId: string]: {
+        [well: string]: {
+          [ingredGroup: string]: {
+            volume: number
+          }
+        }
+      }
     }
   }
 |}

@@ -1,7 +1,8 @@
 // @flow
-import {filledTiprackWells, p300Single, p300Multi} from './fixtures'
+import {filledTiprackWells, p300Single, p300Multi, basicLiquidState} from './fixtures'
 import {dropTip, type RobotState} from '../'
 
+// TODO use a fixture, standardize
 const makeRobotState = ({singleHasTips, multiHasTips}: {singleHasTips: boolean, multiHasTips: boolean}): RobotState => ({
   instruments: {
     p300SingleId: p300Single,
@@ -43,7 +44,8 @@ const makeRobotState = ({singleHasTips, multiHasTips}: {singleHasTips: boolean, 
       p300SingleId: singleHasTips,
       p300MultiId: multiHasTips
     }
-  }
+  },
+  liquidState: basicLiquidState
 })
 
 describe('replaceTip: single channel', () => {
