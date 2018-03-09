@@ -24,23 +24,23 @@ describe('InstrumentDiagram', () => {
 describe('InstrumentGroup', () => {
   test('Renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentGroup instruments={[
-        {
+      <InstrumentGroup
+        left={{
           mount: 'left',
           description: 'p300 8-Channel',
           tipType: '150',
           channels: 8,
           className: 'foo'
-        },
-        {
+        }}
+        right={{
           mount: 'right',
           description: 'p10 Single',
           tipType: '10',
           channels: 1,
           isDisabled: true,
           className: 'blah'
-        }
-      ]}/>
+        }}
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
