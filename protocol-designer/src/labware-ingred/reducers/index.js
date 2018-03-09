@@ -3,28 +3,34 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
-import get from 'lodash/get'
 import min from 'lodash/min'
 import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
-import uniq from 'lodash/uniq'
 
 import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants.js'
 import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
-import {editableIngredFields} from '../types'
+
+import {
+  editableIngredFields,
+  persistedIngredFields
+} from '../types'
+
 import type {
   IngredInputFields,
+  AllIngredGroupFields,
   Labware,
   Wells,
-  WellMatrices,
-//  WellContents,
-// WellDetails,
+  // WellContents,
   AllWellContents,
-  Ingredient
+  // IngredientGroup,
+  // AllIngredGroups,
+  IngredsForLabware,
+  IngredsForAllLabware
+  // IngredGroupForLabware
 } from '../types'
 import type {BaseState, Selector, JsonWellData, VolumeJson} from '../../types'
 import * as actions from '../actions'
@@ -69,8 +75,8 @@ type SelectedIngredientGroupState = {|
 const selectedIngredientGroup = handleActions({
   // selected ingredient group to edit
   // TODO: SelectedIngredientGroupState is type of payload, type the action though
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) => action.payload,
-
+  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
+    action.payload,
   OPEN_INGREDIENT_SELECTOR: () => null,
   EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
   DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
@@ -154,7 +160,7 @@ export const ingredients = handleActions({
       // is a new ingredient
       return {
         ...state,
-        [groupId]: pick(action.payload, editableIngredFields)
+        [groupId]: pick(action.payload, persistedIngredFields)
       }
     }
 
@@ -167,7 +173,7 @@ export const ingredients = handleActions({
     return {
       ...state,
       [groupId]: {
-        ...pick(action.payload, editableIngredFields)
+        ...pick(action.payload, persistedIngredFields)
       }
     }
   },
@@ -184,7 +190,10 @@ export const ingredients = handleActions({
 
 type LocationsState = {
   [ingredGroupId: string]: {
-    [containerId: string]: Array<string> // array of well names
+    [containerId: string]: {
+      [wellName: string]: {
+        volume: number}
+    }
   }
 }
 
@@ -192,16 +201,25 @@ export const ingredLocations = handleActions({
   EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
     const { groupId, containerId, isUnchangedClone } = action.payload
 
+    function wellsWithVol (acc, well) {
+      return {
+        ...acc,
+        [well]: {
+          volume: action.payload.volume
+        }
+      }
+    }
+
     if (isUnchangedClone) {
       // for an unchanged clone, just add the new wells.
       return {
         ...state,
         [groupId]: {
           ...state[groupId],
-          [containerId]: uniq([
-            ...(state[groupId][containerId] || []),
-            ...action.payload.wells
-          ])
+          [containerId]: {
+            ...state[groupId][containerId],
+            ...action.payload.wells.reduce(wellsWithVol, {})
+          }
         }
       }
     }
@@ -209,7 +227,7 @@ export const ingredLocations = handleActions({
     return {
       ...state,
       [groupId]: {
-        [containerId]: action.payload.wells
+        [containerId]: action.payload.wells.reduce(wellsWithVol, {})
       }
     }
   },
@@ -221,7 +239,10 @@ export const ingredLocations = handleActions({
         ...state,
         [groupId]: {
           ...state[groupId],
-          [containerId]: state[groupId][containerId].filter(well => well !== wellName)
+          [containerId]: pickBy(
+            state[groupId][containerId],
+            (wellData: *, wellKey: string) => wellKey !== wellName
+          )
         }
       }
     }
@@ -275,6 +296,10 @@ const rootSelector = (state: BaseState): RootState => state.labwareIngred
 // TODO Ian 2018-03-02 when you do selector cleanup, use this one more widely instead of .containers
 const getLabware = (state: BaseState) => rootSelector(state).containers
 
+// TODO Ian 2018-03-08 use these instead of direct access in other selectors
+const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
+const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
+
 const _loadedContainersBySlot = (containers: ContainersState) =>
   reduce(containers, (acc, container: Labware, containerId) => (container.slot)
     ? {...acc, [container.slot]: container.type}
@@ -282,13 +307,13 @@ const _loadedContainersBySlot = (containers: ContainersState) =>
   , {})
 
 const loadedContainersBySlot = createSelector(
-  (state: BaseState) => rootSelector(state).containers,
+  getLabware,
   containers => _loadedContainersBySlot(containers)
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
 const labwareOptions: (state: BaseState) => Array<{value: string, name: string}> = createSelector(
-  state => rootSelector(state).containers,
+  getLabware,
   containers => reduce(containers, (acc, containerFields: Labware, containerId) => {
     // TODO Ian 2018-02-16 more robust way to filter out tipracks?
     if (!containerFields.type || containerFields.type.startsWith('tiprack')) {
@@ -306,19 +331,9 @@ const labwareOptions: (state: BaseState) => Array<{value: string, name: string}>
 
 const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
 
-// TODO just use container selector
-const containerById = (containerId: string) => (state: BaseState) => {
-  const container = rootSelector(state).containers
-  return container && container[containerId]
-    ? {
-      ...container[containerId],
-      containerId
-    }
-    : null
-}
-
 // TODO: containerId should be intrinsic to container reducer?
-const selectedContainerSelector = createSelector(
+// Or should this selector just return the ID?
+const getSelectedContainer = createSelector(
   rootSelector,
   state => (state.selectedContainer === null)
     ? null
@@ -331,14 +346,14 @@ const selectedContainerSelector = createSelector(
 // Currently selected container's slot
 // TODO flow type container so this doesn't need its own selector
 const selectedContainerSlot = createSelector(
-  selectedContainerSelector,
+  getSelectedContainer,
   container => container && container.slot
 )
 
 type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
 
 const containersBySlot: Selector<ContainersBySlot> = createSelector(
-  (state: BaseState) => rootSelector(state).containers,
+  getLabware,
   containers => reduce(
     containers,
     (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
@@ -356,60 +371,9 @@ const selectedContainerType = createSelector(
   (slot, allContainers) => slot && allContainers[slot]
 )
 
-// _ingredAtWell: Given ingredientsForContainer obj and wellName (eg 'A1'),
-// returns the ingred data for that well, or `null`
-const _ingredAtWell = (ingredientsForContainer: Array<Ingredient>) =>
-  (wellName: string): Ingredient | null => {
-    const matchedIngred = ingredientsForContainer.find(ingred => {
-      const wells = Array.isArray(ingred.wells)
-      ? ingred.wells
-      : Object.keys(ingred.wells)
-      return wells.includes(wellName)
-    })
-    const matchedKey = matchedIngred && matchedIngred.groupId
+const ingredFields = [...editableIngredFields, 'groupId']
 
-    if (matchedKey) {
-      const matchedIngred = ingredientsForContainer[parseInt(matchedKey)]
-
-      return matchedIngred
-    }
-
-    return null
-  }
-
-type IngredView = {
-  [labwareId: string]: {|
-      ...IngredInputFields,
-      locations: {
-        [containerId: string]: Wells
-      }
-  |}
-}
-
-const allIngredients: (BaseState) => IngredView = createSelector(
-  rootSelector,
-  state => reduce(state.ingredients, (acc, ingredData: IngredInputFields, ingredId) => {
-    return {
-      ...acc,
-      [ingredId]: {
-        ...ingredData,
-        locations: state.ingredLocations[ingredId]
-      }
-    }
-  }, {})
-)
-
-// returns selected group id (index in array of all ingredients), or undefined.
-// groupId is a string eg '42'
-const selectedIngredientGroupId = createSelector(
-  rootSelector,
-  (state: RootState) => state.selectedIngredientGroup
-    ? state.selectedIngredientGroup.groupId
-    : null
-)
-
-const ingredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId']
-
+// TODO move these to types.js
 type IngredGroupField = {
   groupId: string,
   ...IngredInputFields
@@ -418,33 +382,33 @@ type IngredGroupField = {
 type IngredGroupFields = {
   [ingredGroupId: string]: IngredGroupField
 }
-const allIngredientGroupFields = createSelector(
-  allIngredients,
-  (_allIngredients) => reduce(
-    _allIngredients,
+const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelector(
+  getIngredientGroups,
+  (ingreds) => reduce(
+    ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
       ...acc,
       [ingredGroupId]: pick(ingredGroup, ingredFields)
     }), {})
 )
 
-const selectedWellNames = createSelector(
+const selectedWellNames: Selector<Array<string>> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells.selected,
-  selectedWells => Object.values(selectedWells)
+  selectedWells => Object.keys(selectedWells)
 )
 
 const numWellsSelected = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells,
   selectedWells => Object.keys(selectedWells.selected).length)
 
-const selectedWellsMaxVolume = createSelector(
+const selectedWellsMaxVolume: Selector<number> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells,
   selectedContainerType,
   (selectedWells, selectedContainerType) => {
     const selectedWellNames = Object.keys(selectedWells.selected)
     if (!selectedContainerType) {
       console.warn('No container type selected, cannot get max volume')
-      return null
+      return Infinity
     }
     const maxVolumesByWell = getMaxVolumes(selectedContainerType)
     const maxVolumesList = (selectedWellNames.length > 0)
@@ -453,56 +417,56 @@ const selectedWellsMaxVolume = createSelector(
       // when no wells selected (eg editing ingred group), look at all volumes.
       // TODO LATER: look at filled wells, not all wells.
       : Object.values(maxVolumesByWell)
-    return min(maxVolumesList)
+    return min(maxVolumesList.map(n => parseInt(n)))
   }
 )
 
-const _ingredientsForContainerId = (allIngredients, containerId): Array<Ingredient> => {
-  const ingredGroupFromIdx = (allIngredients, idx) => allIngredients && allIngredients[idx]
+const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
+  getLabware,
+  getIngredientGroups,
+  getIngredientLocations,
+  (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
+    const allLabwareIds = Object.keys(_labware)
+    const allIngredIds = Object.keys(_ingredientGroups)
 
-  const ingredGroupConvert = (ingredGroup, groupId): Ingredient => ({
-    ...ingredGroup, // TODO IMMEDIATELY. Which fields are required?
-    groupId,
-    // Convert deck-wide data to container-specific
-    wells: ingredGroup.locations[containerId],
-    wellDetails: get(ingredGroup, ['wellDetailsByLocation', containerId]),
-    // Hide the deck-wide data
-    wellDetailsByLocation: null
-  })
+    return allLabwareIds.reduce((acc: IngredsForAllLabware, labwareId: string) => {
+      const ingredsForThisLabware: IngredsForLabware = allIngredIds.reduce(
+        (ingredAcc: IngredsForLabware, ingredId: string) => {
+          if (_ingredLocations[ingredId] && _ingredLocations[ingredId][labwareId]) {
+            return {
+              ...ingredAcc,
+              [ingredId]: {
+                groupId: ingredId,
+                ..._ingredientGroups[ingredId],
+                wells: _ingredLocations[ingredId][labwareId]
+              }
+            }
+          }
+          return ingredAcc
+        }, {})
 
-  return Object.keys(allIngredients).reduce((acc, idx) => {
-    const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
-
-    return (ingredGroup.locations && containerId in ingredGroup.locations)
-      ? [...acc, ingredGroupConvert(ingredGroup, idx)]
-      : acc
-  }, [])
-}
-
-const ingredientsForContainer: BaseState => Array<Ingredient> | null = createSelector(
-  allIngredients,
-  selectedContainerSelector,
-  (_allIngredients, selectedContainer) => {
-    return (selectedContainer)
-    ? _ingredientsForContainerId(_allIngredients, selectedContainer.containerId)
-    : null
+      return {
+        ...acc,
+        [labwareId]: ingredsForThisLabware
+      }
+    }, {})
   }
 )
 
 const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
-  allIngredients,
-  allIngreds => Object.keys(allIngreds).map(ingredId =>
-      ({ingredientId: ingredId, name: allIngreds[ingredId].name}))
+  getIngredientGroups,
+  ingreds => Object.keys(ingreds).map(ingredId =>
+      ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
 
 const _getWellContents = (
   containerType: ?string,
-  ingredientsForContainer: Array<Ingredient> | null,
-  selectedWells: ?{
+  __ingredientsForContainer: IngredsForLabware,
+  selectedWells: {
     preselected: Wells,
     selected: Wells
-  },
-  highlightedWells: ?Wells
+  } | null,
+  highlightedWells: Wells | null
 ): AllWellContents | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
@@ -518,11 +482,19 @@ const _getWellContents = (
   }
   const allLocations = containerData.locations
 
-  return reduce(allLocations, (acc, location: JsonWellData, wellName: string): AllWellContents => {
-    // get ingred data, or set to null if the well is empty
-    const ingredData = (!ingredientsForContainer)
-      ? null
-      : _ingredAtWell(ingredientsForContainer)(wellName)
+  const allIngredGroupIds = Object.keys(__ingredientsForContainer)
+
+  function groupIdsForWell (wellName: string): Array<string> {
+    return allIngredGroupIds.filter((groupId: string) =>
+      __ingredientsForContainer[groupId] &&
+      __ingredientsForContainer[groupId].wells &&
+      __ingredientsForContainer[groupId].wells[wellName]
+    )
+  }
+
+  return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
+    const groupIds = groupIdsForWell(wellName)
+    const groupIdFields = {groupId: groupIds[0] || null}
 
     const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
 
@@ -532,44 +504,45 @@ const _getWellContents = (
         preselected: selectedWells ? wellName in selectedWells.preselected : false,
         selected: selectedWells ? wellName in selectedWells.selected : false,
         highlighted: isHighlighted, // TODO remove 'highlighted' state?
+        hovered: !!(highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1),
+
         maxVolume: location['total-liquid-volume'] || Infinity,
-        hovered: highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1,
-        ...ingredData // TODO contents of ingredData (_ingredAtWell) is hard to follow, needs to be cleaned up
+        ...groupIdFields // TODO Ian 2018-03-07 this should be a color, >1 => gray ?
       }
     }
   }, {})
 }
 
-const allWellMatricesById = createSelector(
-  allIngredients,
-  (state: BaseState) => rootSelector(state).containers,
-  (_allIngredients, _containers) => reduce(
-    _containers,
-    (acc: WellMatrices, container: Labware, containerId: string): WellMatrices => {
-      const wellContents = _getWellContents(
-        container.type,
-        _ingredientsForContainerId(_allIngredients, containerId),
-        null, // selectedWells is only for the selected container, so treat as empty selection.
-        null // so is highlightedWells
-      )
+const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells // wells are selected only for the selected container.
+const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
 
+const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
+  getLabware,
+  ingredientsByLabware,
+  getSelectedContainer,
+  getSelectedWells,
+  getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
+  (_labware: ContainersState, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
+    const allLabwareIds = Object.keys(_labware)
+
+    return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
+      const ingredsForLabware = _ingredsByLabware[labwareId]
+      const isSelectedLabware = _selectedLabware && (_selectedLabware.containerId === labwareId)
+      // Skip labware ids with no ingreds
       return {
         ...acc,
-        [containerId]: wellContents
+        [labwareId]: (ingredsForLabware)
+          ? _getWellContents(
+          _labware[labwareId].type,
+          ingredsForLabware,
+          // Only give _getWellContents the selection data if it's a selected container
+          isSelectedLabware ? _selectedWells : null,
+          isSelectedLabware ? _highlightedWells : null
+        )
+        : null
       }
-    },
-  {})
-)
-
-const wellContentsSelectedContainer = createSelector(
-  selectedContainerType,
-  ingredientsForContainer,
-  (state: BaseState) => rootSelector(state).selectedWells, // wells are selected only for the selected container.
-  (state: BaseState) => rootSelector(state).highlightedIngredients.wells,
-  (_selectedContainerType, _ingredsForContainer, selectedWells, highlightedWells) =>
-    _getWellContents(
-      _selectedContainerType, _ingredsForContainer, selectedWells, highlightedWells
-    )
+    }, {})
+  }
 )
 
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
@@ -591,31 +564,31 @@ const activeModals = createSelector(
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
+const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).selectedIngredientGroup
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
 
+  getIngredientGroups,
+  getLabware,
+
   activeModals,
-  allIngredients,
   allIngredientGroupFields,
   allIngredientNamesIds,
-  allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
   labwareToCopy,
-  getLabware,
   canAdd,
-  wellContentsSelectedContainer,
   numWellsSelected,
   selectedWellsMaxVolume,
   selectedWellNames,
+  selectedIngredientGroup: getSelectedIngredientGroup,
   selectedContainerSlot,
-  selectedContainer: selectedContainerSelector,
-  containerById,
-  ingredientsForContainer,
-  // selectedIngredientProperties,
-  selectedIngredientGroupId,
-  labwareOptions
+  selectedContainer: getSelectedContainer,
+  ingredientsByLabware,
+  labwareOptions,
+  wellContentsAllLabware
 }
 
 export default rootReducer

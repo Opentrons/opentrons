@@ -12,31 +12,13 @@ import {
 import styles from './IngredientPropertiesForm.css'
 import formStyles from './Form.css'
 
+import type {
+  IngredInputs,
+  IngredGroupAccessor as Accessor,
+  AllIngredGroupFields
+} from '../labware-ingred/types'
+
 type SetStateCallback = (...args: Array<*>) => *
-
-type IngredInputs = {
-  groupId?: string,
-
-  name: string | null,
-  volume: number | null,
-  description: string | null,
-  concentration: string | null,
-  individualize: boolean,
-  serializeName: string | null
-}
-
-// type Accessor = $Keys<IngredInputs>
-type Accessor =
-  | 'name'
-  | 'volume'
-  | 'description'
-  | 'concentration'
-  | 'individualize'
-  | 'serializeName'
-
-type AllIngredGroupFields = {
-  [ingredGroupId: string]: IngredInputs
-}
 
 type SetSubstate = (accessor: string, value: string | boolean | number) => mixed
 type GetSubstate = (accessor: Accessor) => string | boolean | number | null
@@ -76,7 +58,7 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
       />
     }
 
-    // TODO Ian 2018-02-21 make Textbox component and get rid of this
+    // TODO Ian 2018-02-21 make Textbox/Textarea component and get rid of this
     const ElementType = (type === 'textarea')
       ? 'textarea'
       : 'input'
@@ -98,17 +80,12 @@ type Props = {
   numWellsSelected: number,
   selectedWellsMaxVolume: number,
 
-  selectedIngredientProperties: {
-    name: string,
-    volume: number,
-    description: string,
-    groupId: string
-  },
-
   allIngredientGroupFields: ?AllIngredGroupFields,
-  allIngredientNamesIds: Array<{ingredientId: string, name: string}>,
-  editingIngredGroupId: string
-} & IngredInputs
+  allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
+  editingIngredGroupId: string | null,
+
+  initialIngreds?: IngredInputs
+}
 
 type State = {
   input: IngredInputs,
@@ -120,15 +97,15 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
   constructor (props: Props) {
     super(props)
+    const {name, volume, description, individualize, serializeName} = (props.initialIngreds || {})
     this.state = {
       input: {
-        name: this.props.name || null,
-        volume: this.props.volume || null,
-        description: this.props.description || null,
-        concentration: this.props.concentration || null,
-        individualize: this.props.individualize || false,
-        serializeName: this.props.individualize
-          ? this.props.serializeName || this.props.name || null
+        name: name || null,
+        volume: volume || null,
+        description: description || null,
+        individualize: individualize || false,
+        serializeName: individualize
+          ? serializeName || name || null
           : null
       },
       copyGroupId: null
@@ -142,15 +119,15 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     })
   }
 
-  resetInputState = (ingredGroupId: string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
+  resetInputState = (ingredGroupId: ?string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
     // nextIngredGroupFields allows you to update with nextProps
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
-    if (ingredGroupId in allIngredientGroupFields) {
-      const { name, volume, description, concentration, individualize, serializeName } = this.state.input
+    if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
+      const { name, volume, description, individualize, serializeName } = this.state.input
       const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,
@@ -158,7 +135,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: newIngredFields.name || name,
           volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
-          concentration: newIngredFields.concentration || concentration,
           individualize: newIngredFields.individualize || individualize,
           serializeName: newIngredFields.serializeName || serializeName
         }
@@ -171,7 +147,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: null,
           volume: null,
           description: null,
-          concentration: null,
           individualize: false,
           serializeName: null
         }
@@ -184,13 +159,16 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
   }
 
   selectExistingIngred = (ingredGroupId: string) => {
-    this.resetInputState(ingredGroupId, undefined, () => this.setState({...this.state, copyGroupId: ingredGroupId}))
+    this.resetInputState(ingredGroupId, undefined, () => this.setState({
+      ...this.state,
+      copyGroupId: ingredGroupId
+    }))
   }
 
-  handleDelete = (selectedIngredientFields: *) => (e: SyntheticEvent<*>) => {
-    const {onDelete} = this.props
+  handleDelete = (e: SyntheticEvent<*>) => {
+    const {onDelete, editingIngredGroupId} = this.props
 
-    const groupToDelete = selectedIngredientFields && selectedIngredientFields.groupId
+    const groupToDelete = editingIngredGroupId
     if (groupToDelete) {
       window.confirm('Are you sure you want to delete all ingredients in this group?') &&
         onDelete(groupToDelete)
@@ -210,7 +188,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId.toString()]
+    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId]
     const { volume, individualize } = this.state.input
 
     const editMode = selectedIngredientFields
@@ -242,7 +220,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 options={[
                   {name: 'Select Existing Ingredient', value: ''},
                   ...allIngredientNamesIds.map(({ingredientId, name}) => ({
-                    name,
+                    name: name || `(unnamed: ${ingredientId})`,
                     value: ingredientId
                   }))
                 ]}
@@ -275,13 +253,16 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
         <div className={styles.button_row}>
           <FlatButton /* disabled={TODO: validate input here} */
-            onClick={() => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
+            onClick={() => onSave({
+              ...this.state.input,
+              groupId: editingIngredGroupId,
+              copyGroupId: this.state.copyGroupId})}
           >
             Save
           </FlatButton>
           <FlatButton onClick={onCancel}>Cancel</FlatButton>
           {editMode &&
-            <PrimaryButton onClick={this.handleDelete(selectedIngredientFields)}>
+            <PrimaryButton onClick={this.handleDelete}>
               Delete Ingredient
             </PrimaryButton>
           }

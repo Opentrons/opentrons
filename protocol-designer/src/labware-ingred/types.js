@@ -12,40 +12,25 @@ export type Wells = {
   [wellName: string]: string // eg A1: 'A1'.
 }
 
-type WellDatum = {|
-  name: string,
-  volume: number,
-  concentration: string
+type IngredInstance = {|
+  labwareId: string,
+  groupId: string,
+  well: string,
+  volume: number
 |}
 
-export type WellDetails = {|
-  [wellName: string]: WellDatum
-|}
-
-type WellDetailsByLocation = {|
-  [containerId: string]: WellDetails
-|}
-
-type WellJawn = {|
-  wells: Wells | Array<string>, // TODO standardize what type of wells: obj or array?
-  wellDetails: WellDetails,
-  wellDetailsByLocation: WellDetailsByLocation | null
-|}
-
-export type WellContents = {
+export type WellContents = {| // non-ingredient well state
   preselected: boolean,
   selected: boolean,
   highlighted: boolean,
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
-  groupId?: string
-}
+  groupId: string | null // TODO Ian 2018-03-07 this should be color, not groupId.
+|}
 
 export type AllWellContents = {
   [wellName: string]: WellContents
 }
-
-export type WellMatrices = {[containerId: string]: Array<Array<string>>}
 
 // ==== INGREDIENTS ====
 
@@ -53,22 +38,74 @@ export type IngredInputFields = {|
   name: ?string,
   volume: ?string,
   description: ?string,
-  concentration: ?string,
   individualize: boolean,
   serializeName: ?string
 |}
 
-export type Ingredient = {
-    ...IngredInputFields, // TODO IMMEDIATELY is this a part of it?
-    ...WellJawn,
-    groupId: string
+export type IngredientGroup = {|
+  groupId: string,
+  name: string,
+  volume: number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
+  description: string,
+  individualize: boolean,
+  serializeName: string,
+  instances: {
+    [labwareId: string]: {
+      [wellName: string]: IngredInstance
+    }
+  }
+|}
+
+export type AllIngredGroups = {
+  [groupId: string]: IngredientGroup
+}
+
+export type IngredGroupForLabware = {
+  ...IngredInputFields,
+  groupId: string,
+  wells: {
+    [wellName: string]: IngredInstance
+  }
+}
+
+export type IngredsForLabware = {
+  [groupId: string]: IngredGroupForLabware
+}
+
+export type IngredsForAllLabware = {
+  [labwareId: string]: IngredsForLabware
 }
 
 export const editableIngredFields = [
   'name',
   'serializeName',
-  'volume',
-  'concentration',
+  // 'volume',
   'description',
   'individualize'
 ]
+
+export const persistedIngredFields = [
+  'name',
+  'serializeName',
+  'description',
+  'individualize'
+]
+
+export type IngredInputs = {
+  name: string | null,
+  volume: number | null,
+  description: string | null,
+  individualize: boolean,
+  serializeName: string | null
+}
+
+export type IngredGroupAccessor =
+  | 'name'
+  | 'volume'
+  | 'description'
+  | 'individualize'
+  | 'serializeName'
+
+export type AllIngredGroupFields = {
+  [ingredGroupId: string]: IngredInputs
+}

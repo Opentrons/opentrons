@@ -1,5 +1,6 @@
 // @flow
 import * as componentLibrary from '@opentrons/components'
+import type {BoundingRect, GenericRect} from './collision-types'
 
 export const { humanize, wellNameSplit } = componentLibrary
 
@@ -27,7 +28,7 @@ export const uuid = () => new Date().getTime() + '.' + Math.random()
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
 
-export const transpose = (matrix: Array<Array<any>>) => matrix[0].map((_col, i) =>
+export const transpose = (matrix: Array<Array<mixed>>) => matrix[0].map((_col, i) =>
   matrix.map(row => row[i])
 )
 
@@ -52,17 +53,23 @@ export const wellNameToXY = (wellName: string) => {
 
 // Collision detection for SelectionRect / SelectablePlate
 
-type Rect = {x: number, y: number, width: number, height: number}
-
-export const rectCollision = (rect1: Rect, rect2: any) => ( // TODO rect2 should be Rect. But the getBoundingClientRect doesn't always return x/y https://github.com/facebook/flow/issues/5357
+export const rectCollision = (rect1: BoundingRect, rect2: BoundingRect) => (
   rect1.x < rect2.x + rect2.width &&
   rect1.x + rect1.width > rect2.x &&
   rect1.y < rect2.y + rect2.height &&
   rect1.height + rect1.y > rect2.y
 )
 
-type RectPositions = {x0: number, y0: number, x1: number, y1: number}
-export const getCollidingWells = (rectPositions: RectPositions, selectableClassname: string) => {
+export function clientRectToBoundingRect (rect: ClientRect): BoundingRect {
+  return {
+    x: rect.left,
+    y: rect.top,
+    width: rect.width,
+    height: rect.height
+  }
+}
+
+export const getCollidingWells = (rectPositions: GenericRect, selectableClassname: string) => {
   // Returns obj of selected wells under a collision rect
   // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
   const { x0, y0, x1, y1 } = rectPositions
@@ -77,7 +84,10 @@ export const getCollidingWells = (rectPositions: RectPositions, selectableClassn
   const selectableElems = [...document.querySelectorAll('.' + selectableClassname)]
 
   const collidedElems = selectableElems.filter((selectableElem, i) =>
-    rectCollision(selectionBoundingRect, selectableElem.getBoundingClientRect())
+    rectCollision(
+      selectionBoundingRect,
+      clientRectToBoundingRect(selectableElem.getBoundingClientRect())
+    )
   )
 
   const collidedWellData = collidedElems.reduce((acc, elem) => {
