@@ -5,12 +5,13 @@ import { Plate } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
 import type {AllWellContents} from '../labware-ingred/types'
+import type {RectEvent} from '../collision-types'
 
 export type Props = {
   wellContents: AllWellContents,
   containerType: string,
-  onSelectionMove: () => mixed, // TODO Ian 2018-03-08 type these 2 fns
-  onSelectionDone: () => mixed,
+  onSelectionMove: RectEvent,
+  onSelectionDone: RectEvent,
   containerId: string,
   selectable: boolean
 }

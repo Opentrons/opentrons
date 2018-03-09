@@ -2,20 +2,7 @@
 import * as React from 'react'
 
 import styles from './SelectionRect.css'
-
-type DragRect = {
-  xStart: number,
-  yStart: number,
-  xDynamic: number,
-  yDynamic: number
-}
-
-type GenericRect = {
-  x0: number,
-  x1: number,
-  y0: number,
-  y1: number
-}
+import type {DragRect, GenericRect} from '../collision-types'
 
 type Props = {
   onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
