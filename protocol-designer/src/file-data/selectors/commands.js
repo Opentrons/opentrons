@@ -15,16 +15,12 @@ const all96Tips = reduce(
   {}
 )
 
-type LiquidState = { // TODO import
-  [labwareId: string]: {
-    [well: string]: {
-      [ingredGroup: string]: {
-        volume: number
-      }
-    }
-  }
-}
-const getLabwareLiquidState: Selector<LiquidState> = createSelector(
+type LiquidState = $PropertyType<StepGeneration.RobotState, 'liquidState'>
+type LabwareLiquidState = $PropertyType<LiquidState, 'labware'>
+/** getLabwareLiquidState reshapes data from labwareIngreds.ingredLocations reducer
+  * to match RobotState.liquidState.labware's shape
+  */
+export const getLabwareLiquidState: Selector<LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLabware,
   labwareIngredSelectors.getIngredientLocations,
   (labware, ingredLocs) => {
