@@ -74,3 +74,27 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
     }
   }, {source: {}, dest: {}})
 }
+
+/** The converse of splitLiquid. Adds all of one liquid to the other.
+  * The args are called 'source' and 'dest', but here they're interchangable.
+  */
+export function mergeLiquid (source: LiquidVolumeState, dest: LiquidVolumeState): LiquidVolumeState {
+  return {
+    // include all ingreds exclusive to 'dest'
+    ...dest,
+
+    ...reduce(source, (acc: LiquidVolumeState, ingredState: Vol, ingredId: string) => {
+      const isCommonIngred = ingredId in dest
+      const ingredVolume = isCommonIngred
+        // sum volumes of ingredients common to 'source' and 'dest'
+        ? ingredState.volume + dest[ingredId].volume
+        // include all ingreds exclusive to 'source'
+        : ingredState.volume
+
+      return {
+        ...acc,
+        [ingredId]: {volume: ingredVolume}
+      }
+    }, {})
+  }
+}

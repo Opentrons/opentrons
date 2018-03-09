@@ -1,5 +1,5 @@
 // @flow
-import {repeatArray, reduceCommandCreators, splitLiquid} from '../utils'
+import {repeatArray, reduceCommandCreators, splitLiquid, mergeLiquid} from '../utils'
 
 describe('repeatArray', () => {
   test('repeat array of objects', () => {
@@ -168,5 +168,40 @@ describe('splitLiquid', () => {
     expect(
       () => splitLiquid(999, {ingred1: {volume: 10}})
     ).toThrowError(/exceeds source volume/)
+  })
+})
+
+describe('mergeLiquid', () => {
+  test('merge ingreds 1 2 with 2 3 to get 1 2 3', () => {
+    expect(mergeLiquid(
+      {
+        ingred1: {volume: 30},
+        ingred2: {volume: 40}
+      },
+      {
+        ingred2: {volume: 15},
+        ingred3: {volume: 25}
+      }
+    )).toEqual({
+      ingred1: {volume: 30},
+      ingred2: {volume: 55},
+      ingred3: {volume: 25}
+    })
+  })
+
+  test('merge ingreds 3 with 1 2 to get 1 2 3', () => {
+    expect(mergeLiquid(
+      {
+        ingred3: {volume: 25}
+      },
+      {
+        ingred1: {volume: 30},
+        ingred2: {volume: 40}
+      }
+    )).toEqual({
+      ingred1: {volume: 30},
+      ingred2: {volume: 40},
+      ingred3: {volume: 25}
+    })
   })
 })
