@@ -13,7 +13,7 @@ inetd -e /etc/inetd.conf
 
 # Home robot
 echo "Homing Robot... this may take a few seconds."
-python -c "from opentrons import robot; robot.connect(); robot.home()"
+python -c "from opentrons import robot; robot.connect()"
 
 # Start Jupyter Notebook server
 echo "Starting Jupyter Notebook server"
