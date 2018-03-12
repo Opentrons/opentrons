@@ -1,16 +1,19 @@
-const definitions = require('./build/labware.json')
+// @flow
+import type {LabwareDefinition} from './types'
+import getLabware from './getLabware'
 
 const offset8Channel = 9 // offset in mm
 const tipPositions = [0, 1, 2, 3, 4, 5, 6, 7].map(tipNo => (7 - tipNo) * offset8Channel)
 
 /** Find first well at given (x, y) coordinates. Assumes ONLY ONE well at each (x, y) */
-function findWellAt (labwareName, x, y) {
-  const labware = definitions[labwareName]
-  return Object.keys(labware.wells).find(wellName => {
+function findWellAt (labwareName: string, x: number, y: number): ?string {
+  const labware: {wells: $PropertyType<LabwareDefinition, 'wells'>} = getLabware(labwareName)
+  return Object.keys(labware.wells).find((wellName: string) => {
     const well = labware.wells[wellName]
-    if (well.diameter) {
+    const {diameter} = well
+    if (typeof diameter === 'number') {
       // circular well
-      return Math.sqrt(Math.pow(x - well.x, 2) + Math.pow(y - well.y, 2)) <= well.diameter
+      return Math.sqrt(Math.pow(x - well.x, 2) + Math.pow(y - well.y, 2)) <= diameter
     } else if (well.width && well.length) {
       // rectangular well
       // For rectangular wells, (x, y) is at the center.
@@ -25,8 +28,8 @@ function findWellAt (labwareName, x, y) {
 }
 
 // "topWell" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
-function computeWellAccess (labwareName, topWellName) {
-  const labware = definitions[labwareName]
+export default function computeWellAccess (labwareName: string, topWellName: string): Array<string> | null {
+  const labware = getLabware(labwareName)
   const topWell = labware.wells[topWellName]
   if (!topWell) {
     // well does not exist in labware
@@ -35,16 +38,14 @@ function computeWellAccess (labwareName, topWellName) {
   const offsetTipPositions = tipPositions.map(origPos => topWell.y - tipPositions[0] + origPos)
   const x = topWell.x
 
-  const wellsAccessed = offsetTipPositions.map(tipPos => findWellAt(labwareName, x, tipPos))
+  // Return null for containers with any undefined wells
+  const wellsAccessed = offsetTipPositions.reduce((acc: Array<string> | null, tipPos) => {
+    const wellForTip = findWellAt(labwareName, x, tipPos)
+    if (acc === null || !wellForTip) {
+      return null
+    }
+    return acc.concat(wellForTip)
+  }, [])
 
-  // TODO: we would use the .every to return null for containers with undefined wells
-  // return wellsAccessed
-  return wellsAccessed.every(w => w !== undefined) ? wellsAccessed : null
+  return wellsAccessed
 }
-
-// Example
-['96-flat', '384-plate', 'trough-12row', 'tube-rack-.75ml', 'trash-box', 'T25-flask', 'fixed-trash'].forEach(testLabware => {
-  ['A1', 'A2', 'B1'].forEach(topWell => {
-    console.log(testLabware, topWell, computeWellAccess(testLabware, topWell))
-  })
-})

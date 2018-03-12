@@ -10,6 +10,7 @@ API_DIR := api
 COMPONENTS_DIR := components
 APP_DIR := app
 APP_SHELL_DIR := app-shell
+LABWARE_DEFINITIONS_DIR := labware-definitions
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
 # install all project dependencies
@@ -23,6 +24,7 @@ install:
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) install
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) install
 	$(MAKE) install-types
 
 .PHONY: install-types
