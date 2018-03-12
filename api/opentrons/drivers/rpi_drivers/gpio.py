@@ -88,14 +88,13 @@ def _read_value(path):
     Reads value of specified path.
     :param path: A valid system path
     """
-    base_command = "cat {0}"
-    # There is no common method for redirecting stderr to a null sink, so the
-    # command string is platform-dependent
+    read_value = 0
     if platform == 'win32':
-        command = "{0} > NUL".format(base_command)
+        pass
     else:
-        command = "exec 2> /dev/null; {0}".format(base_command)
-    system(command.format(path))
+        with open(path) as f:
+            read_value = int(f.read())
+    return read_value
 
 
 def set_high(pin):
@@ -137,7 +136,7 @@ def read(pin):
     :param pin: An integer corresponding to the GPIO number of the pin in RPi
       GPIO board numbering (not physical pin numbering)
     """
-    _read_value("{0}/gpio{1}/value".format(_path_prefix, pin))
+    return _read_value("{0}/gpio{1}/value".format(_path_prefix, pin))
 
 
 def initialize():

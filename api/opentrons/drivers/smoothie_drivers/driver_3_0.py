@@ -583,25 +583,26 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
-    def turn_on_red_button_light(self):
-        gpio.set_high(gpio.OUTPUT_PINS['RED_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
-
-    def turn_on_green_button_light(self):
-        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
-        gpio.set_high(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
-
     def turn_on_blue_button_light(self):
-        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-        gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+        self._set_button_light(b=True)
+
+    def turn_on_red_button_light(self):
+        self._set_button_light(r=True)
 
     def turn_off_button_light(self):
-        gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+        self._set_button_light(r=False, g=False, b=False)
+
+    def _set_button_light(self, r=False, g=False, b=False):
+        color_pins = {
+            gpio.OUTPUT_PINS['RED_BUTTON']: r,
+            gpio.OUTPUT_PINS['GREEN_BUTTON']: g,
+            gpio.OUTPUT_PINS['BLUE_BUTTON']: b
+        }
+        for pin, state in color_pins.items():
+            if state:
+                gpio.set_high(pin)
+            else:
+                gpio.set_low(pin)
 
     def turn_on_rail_lights(self):
         gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
