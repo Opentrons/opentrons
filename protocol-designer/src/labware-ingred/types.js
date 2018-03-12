@@ -12,7 +12,14 @@ export type Wells = {
   [wellName: string]: string // eg A1: 'A1'.
 }
 
-type IngredInstance = {|
+export type IngredInstance = {
+  [containerId: string]: {
+    [wellName: string]: {
+      volume: number}
+  }
+}
+
+type IngredInstanceFlat = {|
   labwareId: string,
   groupId: string,
   well: string,
@@ -51,7 +58,7 @@ export type IngredientGroup = {|
   serializeName: string,
   instances: {
     [labwareId: string]: {
-      [wellName: string]: IngredInstance
+      [wellName: string]: IngredInstanceFlat
     }
   }
 |}
@@ -64,7 +71,7 @@ export type IngredGroupForLabware = {
   ...IngredInputFields,
   groupId: string,
   wells: {
-    [wellName: string]: IngredInstance
+    [wellName: string]: IngredInstanceFlat
   }
 }
 

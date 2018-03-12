@@ -24,13 +24,10 @@ import type {
   AllIngredGroupFields,
   Labware,
   Wells,
-  // WellContents,
   AllWellContents,
-  // IngredientGroup,
-  // AllIngredGroups,
   IngredsForLabware,
-  IngredsForAllLabware
-  // IngredGroupForLabware
+  IngredsForAllLabware,
+  IngredInstance
 } from '../types'
 import type {BaseState, Selector, JsonWellData, VolumeJson} from '../../types'
 import * as actions from '../actions'
@@ -189,12 +186,7 @@ export const ingredients = handleActions({
 }, {})
 
 type LocationsState = {
-  [ingredGroupId: string]: {
-    [containerId: string]: {
-      [wellName: string]: {
-        volume: number}
-    }
-  }
+  [ingredGroupId: string]: IngredInstance
 }
 
 export const ingredLocations = handleActions({
@@ -571,6 +563,7 @@ export const selectors = {
   rootSelector,
 
   getIngredientGroups,
+  getIngredientLocations,
   getLabware,
 
   activeModals,

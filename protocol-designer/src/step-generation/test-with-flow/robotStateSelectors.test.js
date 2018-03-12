@@ -1,9 +1,10 @@
 // @flow
-import {filledTiprackWells, emptyTiprackWells, p300Single} from './fixtures'
+import {filledTiprackWells, emptyTiprackWells, p300Single, basicLiquidState} from './fixtures'
 import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
 
 describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -37,7 +38,8 @@ describe('sortLabwareBySlot', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
     expect(sortLabwareBySlot(robotState)).toEqual(['one', 'two', 'six', 'eleven'])
   })
@@ -55,7 +57,8 @@ describe('sortLabwareBySlot', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
     expect(sortLabwareBySlot(robotState)).toEqual([])
   })
@@ -119,6 +122,7 @@ describe('_getNextTip', () => {
 
 describe('getNextTiprack - single-channel', () => {
   test('single tiprack, missing A1', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -155,7 +159,8 @@ describe('getNextTiprack - single-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(1, robotState)
@@ -165,6 +170,7 @@ describe('getNextTiprack - single-channel', () => {
   })
 
   test('single tiprack, empty, should return null', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -191,7 +197,8 @@ describe('getNextTiprack - single-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(1, robotState)
@@ -200,6 +207,7 @@ describe('getNextTiprack - single-channel', () => {
   })
 
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -243,7 +251,8 @@ describe('getNextTiprack - single-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(1, robotState)
@@ -253,6 +262,7 @@ describe('getNextTiprack - single-channel', () => {
   })
 
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -298,7 +308,8 @@ describe('getNextTiprack - single-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(1, robotState)
@@ -313,6 +324,7 @@ describe('getNextTiprack - single-channel', () => {
 
 describe('getNextTiprack - 8-channel', () => {
   test('single tiprack, totally full', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -346,7 +358,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -356,6 +369,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   test('single tiprack, partially full', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -394,7 +408,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -430,7 +445,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -439,6 +455,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   test('single tiprack, a well missing from each column, should return null', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -486,7 +503,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -495,6 +513,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -546,7 +565,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -556,6 +576,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -632,7 +653,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)
@@ -642,6 +664,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   test('multiple tipracks, all empty, should return null', () => {
+    // TODO use a fixture, standardize
     const robotState = {
       instruments: {
         p300SingleId: p300Single
@@ -729,7 +752,8 @@ describe('getNextTiprack - 8-channel', () => {
         pipettes: {
           p300SingleId: false
         }
-      }
+      },
+      liquidState: basicLiquidState
     }
 
     const result = getNextTiprack(8, robotState)

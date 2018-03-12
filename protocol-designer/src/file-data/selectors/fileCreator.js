@@ -70,9 +70,9 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
       instruments,
       labware,
 
-      commands: timeline.map(timelineItem => ({
+      commands: timeline.map((timelineItem, i) => ({
         annotation: {
-          name: 'TODO Name',
+          name: `TODO Name ${i}`,
           description: 'todo description'
         },
         commands: timelineItem.commands.reduce((acc, c) => [...acc, c], [])
