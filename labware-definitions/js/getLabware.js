@@ -1,5 +1,5 @@
 // @flow
-import type {AllLabwareDefinitions, LabwareDefinition} from './types'
+import type {LabwareDefinition} from './types'
 import definitions from '../build/labware.js'
 
 export default function getLabware (labwareName: string): LabwareDefinition {
