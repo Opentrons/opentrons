@@ -11,6 +11,10 @@ nginx
 # enable SSH over ethernet
 inetd -e /etc/inetd.conf
 
+# Home robot
+echo "Homing Robot... this may take a few seconds."
+python -c "from opentrons import robot; robot.connect(); robot.home()"
+
 # Start Jupyter Notebook server
 echo "Starting Jupyter Notebook server"
 mkdir -p /data/user_storage/opentrons_data/jupyter
