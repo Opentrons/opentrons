@@ -16,6 +16,10 @@ build:
 
 # TODO: flow-typed?
 
+.PHONY: test
+test:
+	echo 'no tests for labware-definitions yet!'
+
 .PHONY: clean
 clean:
 	shx rm -rf build

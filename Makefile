@@ -24,7 +24,7 @@ install:
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) install
-	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) install
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
 	$(MAKE) install-types
 
 .PHONY: install-types
@@ -52,6 +52,10 @@ test-app:
 .PHONY: test-pd
 test-pd:
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
+
+.PHONY: test-labware-definitions
+test-labware-definitions:
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) test
 
 # lints and typechecks
 .PHONY: lint

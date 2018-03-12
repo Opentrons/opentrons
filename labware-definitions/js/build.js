@@ -1,8 +1,7 @@
 // This build script is run by `make install`
-// TODO Ian 2018-03-12: use dynamic import of .json with webpackMode: "eager" ??
 
-// Merge all JSON files into a single .js file, build/labware.js,
-// with each filename as a key in the final JS object.
+// Merge all JSON files into a single JSON file, build/labware.json,
+// with each filename as a key in the final JSON file.
 const fs = require('fs')
 const path = require('path')
 const glob = require('glob')
@@ -28,17 +27,17 @@ glob(path.join(__dirname, '..', 'definitions', '*.json'), (error, files) => {
 
   const jsonOutput = JSON.stringify(output)
 
-  // fs.writeFileSync(
-  //   path.join(buildDir, 'labware.json'),
-  //   jsonOutput
-  // )
-
   fs.writeFileSync(
-    path.join(buildDir, 'labware.js'),
-    `// @flow
-import type {AllLabwareDefinitions} from '../js/types'
-const labwareDefinitions: AllLabwareDefinitions = ${jsonOutput}
-export default labwareDefinitions
-`
+    path.join(buildDir, 'labware.json'),
+    jsonOutput
   )
+
+//   fs.writeFileSync(
+//     path.join(buildDir, 'labware.js'),
+//     `// @flow
+// import type {AllLabwareDefinitions} from '../js/types'
+// const labwareDefinitions: AllLabwareDefinitions = ${jsonOutput}
+// export default labwareDefinitions
+// `
+//   )
 })
