@@ -4,34 +4,42 @@ from opentrons import robot
 
 
 d = robot._driver
-button_state = d.read_button()
-
-button_color_index = 0
-strips_state = 0
 
 
-def button_busy_while():
-    while True:
-        new_state = d.read_button()
-        if new_state != button_state and new_state == 0:
-            button_color_index += 1
-            if button_color_index % 3 == 0:
-                d._set_button_light(r=True)
-            elif button_color_index % 3 == 1:
-                d._set_button_light(g=True)
-            elif button_color_index % 3 == 2:
-                d._set_button_light(b=True)
-            strips_state = 1 - strips_state
-            if strips_state:
-                d.turn_on_rail_lights()
-            else:
-                d.turn_off_rail_lights()
-        button_state = new_state
+def get_state_of_inputs():
+    smoothie_switches = d.switch_state
+    probe = smoothie_switches['Probe']
+    endstops = {ax: val for ax, val in smoothie_switches if ax != 'Probe'}
+    return {
+        'button': d.read_button(),
+        'windows': d.read_window_switches(),
+        'probe': probe,
+        'endstops': endstops
+    }
 
 
-def turn_off_all_lights():
+def set_lights(state):
+
+    if state['windows']:
+        d.turn_on_rail_lights()
+    else:
+        d.turn_off_rail_lights()
+
+    red, green, blue = (False, False, False)
+
+    if not all(state['endstops'].values()):
+        red = True
+    if state['probe']:
+        green = True
+    if state['button']:
+        blue = True
+
+    d._set_button_light(red=red, green=green, blue=blue)
+
+
+def reset_lights():
     d.turn_off_rail_lights()
-    d.turn_off_button_light()
+    d._set_button_light(blue=True)
 
 
 if __name__ == "__main__":
@@ -42,9 +50,12 @@ if __name__ == "__main__":
     print('')
     print('Press CTRL-C at any time to quit')
 
-    # turn off all lights at the beginning
-    turn_off_all_lights()
-    atexit.register(turn_off_all_lights)
+    # reset the lights at the end
+    atexit.register(reset_lights)
+
+    robot.connect()
 
     # enter button-read loop
-    button_busy_while()
+    while True:
+        state = get_state_of_inputs()
+        set_lights(state)
