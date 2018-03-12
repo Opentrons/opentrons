@@ -338,6 +338,9 @@ class SmoothieDriver_3_0_0:
     # ----------- Private functions --------------- #
 
     def _reset_from_error(self):
+        # smoothieware will ignore new messages for a short time
+        # after it has entered an error state, so sleep for some milliseconds
+        sleep(0.1)
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
     # Potential place for command optimization (buffering, flushing, etc)
@@ -428,7 +431,6 @@ class SmoothieDriver_3_0_0:
 
     def _setup(self):
         self._smoothie_reset()
-        self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.current)
         self._send_command(self._config.steps_per_mm)
