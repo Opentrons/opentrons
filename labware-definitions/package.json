@@ -10,5 +10,8 @@
     "url": "https://github.com/Opentrons/opentrons.git"
   },
   "author": "Opentrons Labworks",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "shx": "^0.2.2"
+  }
 }
