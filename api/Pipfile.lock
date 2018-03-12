@@ -29,7 +29,7 @@
     "default": {
         "aiohttp": {
             "hashes": [
-                "sha256:c7b8a47315e8c0b79a008e33eca4299baa002efd4b53ace068f0894133a8933e",
+                "sha256:abc8a47315e8c0b79a008e33eca4299baa002efd4b53ace068f0894133a8933e",
                 "sha256:8b2c9b1f43e12fe8837455ce4caf3a8621c3ab474219f11bd0270ca1c0735fc7",
                 "sha256:6a12fa57d0608da29060c6fac531d049317422eecb23f509f8fae5b9a24c5b79",
                 "sha256:b7b5a4e34d3a4d9ecce4aa9e172a0fd13c8f5acee46afeb5944c4489f71701c1",
