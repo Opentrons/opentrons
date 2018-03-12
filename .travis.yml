@@ -9,7 +9,7 @@ matrix:
   include:
     - os: linux
       sudo: false
-      python: "3.5"
+      python: "3.6"
       env:
         - PUBLIC_REPO="$(git remote -v | tail -n 1 | sed s/.*opentrons\.git.*/true/g)"
       addons:
@@ -30,16 +30,18 @@ cache:
     - $HOME/.pyenv
     - $HOME/.cache/brew
 
+# TODO(mc, 2018-04-12): can this be removed? Don't think we publishing to pypa
 before_install:
   - >  # load keys needed to publish to pypa only when building from public repo
     if [[ "$PUBLIC_REPO" == "true" ]]; then (openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d) fi;
 
 install:
   - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
-  - node --version
   - make install
 
 script:
+  - python --version
+  - node --version
   - "export OT_TIME_SUFFIX=-$(date -u '+%Y-%m-%d_%H-%M')"
   - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
   - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
@@ -110,7 +112,6 @@ deploy:
 
 env:
   global:
-  - OT_PYTHON_VERSION: '3.5.3'
   - ENCRYPTION_LABEL: c6cefc96bb2c
   - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
   - secure: XBRwYt3Bowc3klVy6FyXIfeyOBzFzrzMwRJbIz54L8Ov7o2qV8l+5M16iyOy8O8C1qTFMVyCmW3K+xHPQaMstq7rPeVACwJ9VpyQciaDAWVujhyhuN94hU0YtmB1KtmPUHdYCuD25eL5HJ2GDjmYqq/XUYyuX67rrPxT5b5z7Yf4kdkPyBIa5c+KyklYmJLdHGBJUuOfM7qvxOo7nlMyzU+LfgvtqM15g7eQIvXGDydi59lT6FOpW9J9h4Z2Nwmc2lHjxCxi5SI2NIR7K5DsqjtRi0eMcr1m098CA/T1Oh4c5qlG8Uoi+KpOcfcTuAP3VSFdbMgRFmtQ3gwJ71ZPB7GeqvLXSgriACl12n0uienOYrb6/X1Nujsl7Pxjh8KMiIBRcX2/46ecyeN+gP+6u9ic5mPRMFky1e2dqbbUTIeAw7397ufvtIPb0qW4mUMdu4NMkiRg01aF5ZmgVMXvnvQm/xyF+SC0Qtj9uOjZUzsj5DVnLuLHekP3OYpxRzFFzpjBZmdwCsEtwHH8PmuG/owa6Jmf4aXN50dgCL6oRPjWoH213jOdjplGI7ZMZXAigGrN9sT9Om67ZWNuN/TYgy+K3QIp2ELC6MmpJNuH9n8M1pCtynitSyvuW5YhG/j7VH3TKDogID3FOgPYAjfC0EshHt+Kl2GddaR3bpCa3XA=

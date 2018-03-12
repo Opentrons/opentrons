@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# TODO(mc, 2018-03-12): OT_PYTHON_VERSION env var was removed in favor of
+#   pyenv + pipenv. this file will need to be refactored if needed again
 
 trap 'exit' ERR
 
