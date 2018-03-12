@@ -340,15 +340,6 @@ class SmoothieDriver_3_0_0:
     def _reset_from_error(self):
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
-    def _hard_reset_smoothie(self):
-        log.debug('Halting Smoothie (simulating: {})'.format(self.simulating))
-        if self.simulating:
-            pass
-        else:
-            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
-            sleep(0.1)
-            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
-
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
         """
@@ -436,6 +427,7 @@ class SmoothieDriver_3_0_0:
         self.pop_axis_max_speed()
 
     def _setup(self):
+        self._reset_smoothie()
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.current)
@@ -631,9 +623,45 @@ class SmoothieDriver_3_0_0:
         Smoothie code to return Smoothie to a normal waiting state and reset
         any other state needed for the driver.
         """
-        self._hard_reset_smoothie()
-        sleep(0.1)
+        self._smoothie_hard_halt()
         self._reset_from_error()
         self._setup()
+
+    def _smoothie_reset(self):
+        log.debug('Resetting Smoothie (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
+            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            # wait for all the junk to be printed from after reset
+            serial_communication.write_and_return(
+                '\r\n', self._connection, timeout=5)
+
+    def _smoothie_programming_mode(self):
+        log.debug('Setting Smoothie to ISP mode (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
+            gpio.set_low(gpio.OUTPUT_PINS['ISP'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+
+    def _smoothie_hard_halt(self):
+        log.debug('Halting Smoothie (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
+            sleep(0.1)
+            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
 
     # ----------- END Public interface ------------ #
