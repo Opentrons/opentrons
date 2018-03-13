@@ -26,6 +26,42 @@ def test_parse_axis_values(smoothie):
         drv._parse_axis_values(bad_data)
 
 
+def test_dwell_and_activate_axes(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    command_log = []
+    smoothie._setup()
+    smoothie.simulating = False
+
+    def write_with_log(command, connection, timeout):
+        command_log.append(command)
+        return serial_communication.DRIVER_ACK.decode()
+
+    def _parse_axis_values(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+
+    smoothie.activate_axes('X')
+    smoothie.dwell_axes('X')
+    smoothie.activate_axes('XYBC')
+    smoothie.dwell_axes('XC')
+    smoothie.dwell_axes('BCY')
+    expected = [
+        ['M907 X1.5 M400'], ['G4P0.05 M400'],
+        ['M907 X0.3 M400'], ['G4P0.05 M400'],
+        ['M907 B0.5 C0.5 X1.5 Y1.75'], ['G4P0.05 M400'],
+        ['M907 C0.1 X0.3 M400'], ['G4P0.05 M400'],
+        ['M907 B0.1 Y0.3 M400'], ['G4P0.05 M400'],
+    ]
+    # from pprint import pprint
+    # for i in range(len(expected)):
+    #     pprint(expected[i][0] == command_log[i], expected[i], command_log[i])
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_disable_motor(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
@@ -60,6 +96,8 @@ def test_plunger_commands(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
+    smoothie._setup()
+    smoothie.home()
     smoothie.simulating = False
 
     def write_with_log(command, connection, timeout):
@@ -75,34 +113,48 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 B0.5 C0.5 M400'],               # Set plunger current high
+        ['M907 A1.0 B0.5 C0.5 Z1.0 M400'],     # Set axes motors high
         ['G4P0.05 M400'],                      # Dwell
         ['G28.2[ABCZ]+ M400'],                 # Home
-        ['M907 B0.1 C0.1 M400'],               # Set plunger current low
+        ['M907 A0.1 B0.1 C0.1 Z0.1 M400'],     # Set axes motors low
         ['G4P0.05 M400'],                      # Dwell
+
         ['M907 Y0.8 M400'],                    # set Y motor to low current
         ['G4P0.05 M400'],                      # delay for current
         ['G0F3000 M400'],                      # set Y motor to low speed
-        ['G0Y-20 M400'],                       # move Y motor away from switch
-        ['M907 A1.0 B0.1 C0.1 X1.5 Y1.75 Z1.0 M400'],  # set current back
+        ['G91 G0Y-20 G90 M400'],               # move Y motor away from switch
+        ['M907 Y0.3 M400'],  # set current back
         ['G4P0.05 M400'],                      # delay for current
         ['G0F24000 M400'],                      # set back to default speed
+        ['M907 Y0.3 M400'],                    # activate X motor for HOME
+        ['G4P0.05 M400'],
+        ['M907 X1.5 M400'],                    # activate X motor for HOME
+        ['G4P0.05 M400'],
         ['G28.2X M400'],                       # home X
+        ['M907 X0.3 M400'],                    # end of HOME dwells X axis
+        ['G4P0.05 M400'],
+
+        ['M907 Y1.75 M400'],
+        ['G4P0.05 M400'],
         ['G28.2Y M400'],                        # home Y
         ['M203.1 Y8 M400'],                     # lower speed on Y for retract
-        ['G91 G0Y-3 G90'],                          # retract Y
+        ['G91 G0Y-3 G90 M400'],                      # retract Y
         ['G28.2Y M400'],                        # home Y
-        ['G91 G0Y-3 G90'],                          # retract Y
-        ['M203.1 A100 B70 C70 X600 Y400 Z100 M400'],  # return to norm speed
+        ['G91 G0Y-3 G90 M400'],                      # retract Y
+        ['M203.1 A100 B50 C50 X600 Y400 Z100 M400'],  # return to norm speed
+        ['M907 Y0.3 M400'],                    # end of HOME dwells X axis
+        ['G4P0.05 M400'],
         ['M114.2 M400']                       # Get position
     ]
-    # from pprint import pprint
-    # pprint(command_log)
+    # for i in range(len(expected)):
+    #     print(expected[i][0] == command_log[i], expected[i], command_log[i])
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
+        ['M907 A1.0 X1.5 Y1.75 Z1.0 M400'],
+        ['G4P0.05 M400'],
         ['G0.+ M400']                         # Move (non-plunger)
     ]
     # from pprint import pprint
@@ -114,7 +166,7 @@ def test_plunger_commands(smoothie, monkeypatch):
     expected = [
         ['M907 B0.5 M400'],
         ['G4P0.05 M400'],
-        ['G0B2.3 G0B2 M400'],
+        ['G0B2 M400'],
         ['M907 B0.1 M400'],
         ['G4P0.05 M400']
     ]
@@ -143,8 +195,6 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_functional(smoothie):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
-
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
     smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
@@ -156,16 +206,15 @@ def test_functional(smoothie):
     smoothie.home(axis='abc', disabled='')
     assert smoothie.position == position(
         1, 1, 3,
-        HOMED_POSITION['A'],
-        HOMED_POSITION['B'],
-        HOMED_POSITION['C'])
+        smoothie.homed_position['A'],
+        smoothie.homed_position['B'],
+        smoothie.homed_position['C'])
 
     smoothie.home(disabled='')
-    assert smoothie.position == HOMED_POSITION
+    assert smoothie.position == smoothie.homed_position
 
 
 def test_set_current(model):
-    from opentrons.robot.robot_configs import DEFAULT_CURRENT
     import types
     driver = model.robot._driver
 
@@ -173,10 +222,10 @@ def test_set_current(model):
 
     current_log = []
 
-    def set_current_mock(self, target):
+    def set_current_mock(self, target, axes_active=True):
         nonlocal current_log
         current_log.append(target)
-        set_current(target)
+        set_current(target, axes_active)
 
     driver.set_current = types.MethodType(set_current_mock, driver)
 
@@ -186,15 +235,21 @@ def test_set_current(model):
 
     # Instrument in `model` is configured to right mount, which is the A axis
     # on the Smoothie (see `Robot._actuators`)
-    expected = [{'A': 0.1}, DEFAULT_CURRENT]
-    from pprint import pprint
-    pprint(current_log)
+    expected = [
+        {'C': 0.5},
+        {'C': 0.1},
+        {'A': 1.0},
+        {'X': 1.5, 'Y': 1.75},
+        {'A': 0.1},
+        {'A': 1.0},
+        {'A': 0.1}
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
     assert current_log == expected
 
 
 def test_fast_home(model):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION, \
-        Y_SWITCH_BACK_OFF_MM
     import types
     driver = model.robot._driver
 
@@ -206,14 +261,12 @@ def test_fast_home(model):
         coords.append(target)
         move(target)
 
-    target_y = driver.position['Y'] - Y_SWITCH_BACK_OFF_MM
-
     driver.move = types.MethodType(move_mock, driver)
 
     assert coords == []
     driver.fast_home(axis='X', safety_margin=12)
-    assert coords == [{'X': HOMED_POSITION['X'] - 12}, {'Y': target_y}]
-    assert driver.position['X'] == HOMED_POSITION['X']
+    assert coords == [{'X': driver.homed_position['X'] - 12}]
+    assert driver.position['X'] == driver.homed_position['X']
 
 
 def test_switch_state(model):
