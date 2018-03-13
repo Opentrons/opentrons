@@ -41,7 +41,7 @@ exports[`Notification Icon NotificationIcon renders correctly 1`] = `
 </div>
 `;
 
-exports[`icons ALERT icon renders correctly 1`] = `
+exports[`icons alert renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -61,7 +61,7 @@ exports[`icons ALERT icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons ARROW_RIGHT icon renders correctly 1`] = `
+exports[`icons arrow right renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -81,7 +81,7 @@ exports[`icons ARROW_RIGHT icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons BACK icon renders correctly 1`] = `
+exports[`icons back renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -101,7 +101,7 @@ exports[`icons BACK icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CALIBRATE icon renders correctly 1`] = `
+exports[`icons calibrate renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -121,27 +121,7 @@ exports[`icons CALIBRATE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHECKED icon renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M9.6,18 L3.6,12 L5.292,10.296 L9.6,14.604 L18.708,5.496 L20.4,7.2 L9.6,18 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons CHECKED_BOX icon renders correctly 1`] = `
+exports[`icons checked box renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -161,7 +141,7 @@ exports[`icons CHECKED_BOX icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHECKED_RADIO icon renders correctly 1`] = `
+exports[`icons checked radio renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -181,7 +161,27 @@ exports[`icons CHECKED_RADIO icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHEVRON_DOWN icon renders correctly 1`] = `
+exports[`icons checked renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M9.6,18 L3.6,12 L5.292,10.296 L9.6,14.604 L18.708,5.496 L20.4,7.2 L9.6,18 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons chevron down renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -201,7 +201,7 @@ exports[`icons CHEVRON_DOWN icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHEVRON_LEFT icon renders correctly 1`] = `
+exports[`icons chevron left renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -221,7 +221,7 @@ exports[`icons CHEVRON_LEFT icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHEVRON_RIGHT icon renders correctly 1`] = `
+exports[`icons chevron right renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -241,7 +241,7 @@ exports[`icons CHEVRON_RIGHT icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CHEVRON_UP icon renders correctly 1`] = `
+exports[`icons chevron up renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -261,7 +261,27 @@ exports[`icons CHEVRON_UP icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CLOSE icon renders correctly 1`] = `
+exports[`icons circle renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons close renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -281,7 +301,7 @@ exports[`icons CLOSE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons COG icon renders correctly 1`] = `
+exports[`icons cog renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -301,7 +321,7 @@ exports[`icons COG icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CONNECT icon renders correctly 1`] = `
+exports[`icons connect renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -321,7 +341,7 @@ exports[`icons CONNECT icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons CONSOLIDATE icon renders correctly 1`] = `
+exports[`icons consolidate renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -341,7 +361,7 @@ exports[`icons CONSOLIDATE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons DISTRIBUTE icon renders correctly 1`] = `
+exports[`icons distribute renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -361,7 +381,27 @@ exports[`icons DISTRIBUTE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons FILE icon renders correctly 1`] = `
+exports[`icons error renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.66 11.66 0 0 0 12 .33zm5.83 15.86l-1.64 1.64L12 13.65l-4.19 4.18-1.64-1.64L10.35 12 6.17 7.81l1.64-1.64L12 10.35l4.19-4.19 1.64 1.64-4.18 4.2z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons file renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -381,7 +421,7 @@ exports[`icons FILE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons FLASK icon renders correctly 1`] = `
+exports[`icons flask renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -401,7 +441,27 @@ exports[`icons FLASK icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons MENU_DOWN icon renders correctly 1`] = `
+exports[`icons logo renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 50 50"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M46.79 24.83A21.79 21.79 0 1 1 21.23 3.38l.83 5.31a16.42 16.42 0 1 0 5.87 0l.83-5.31a21.82 21.82 0 0 1 18.03 21.45zm-28.14-3.14c3-4.52 6.34-9.23 6.35-9.23s3.37 4.72 6.35 9.23c2.56 3.9 3.31 8.71.15 12.13a8.76 8.76 0 0 1-6.5 2.83 8.76 8.76 0 0 1-6.46-2.82c-3.19-3.43-2.45-8.24.11-12.14zm0 6.62a5.8 5.8 0 0 0 1.42 3.88 6.29 6.29 0 0 0 4.35 2.16h.45a6.38 6.38 0 0 0 6.59-6.17c.05-1.54-.66-4.47-2.41-5a1.65 1.65 0 0 0-.31-.06 2.93 2.93 0 0 0-2.09.91c-2.17 2.08-4.73 4.46-7.96 4.28z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons menu down renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -421,7 +481,7 @@ exports[`icons MENU_DOWN icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons MIX icon renders correctly 1`] = `
+exports[`icons mix renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -441,7 +501,7 @@ exports[`icons MIX icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons PAUSE icon renders correctly 1`] = `
+exports[`icons pause renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -461,7 +521,7 @@ exports[`icons PAUSE icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons REFRESH icon renders correctly 1`] = `
+exports[`icons refresh renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -481,7 +541,7 @@ exports[`icons REFRESH icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons RUN icon renders correctly 1`] = `
+exports[`icons run renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -501,7 +561,7 @@ exports[`icons RUN icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons SPINNER icon renders correctly 1`] = `
+exports[`icons spinner renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -521,7 +581,7 @@ exports[`icons SPINNER icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons TOGGLED_OFF icon renders correctly 1`] = `
+exports[`icons toggled off renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -541,7 +601,7 @@ exports[`icons TOGGLED_OFF icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons TOGGLED_ON icon renders correctly 1`] = `
+exports[`icons toggled on renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -561,27 +621,7 @@ exports[`icons TOGGLED_ON icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons UNCHECKED icon renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M12,21.6 C6.6980664,21.6 2.4,17.3019336 2.4,12 C2.4,6.6980664 6.6980664,2.4 12,2.4 C14.5460783,2.4 16.9878759,3.41142567 18.7882251,5.2117749 C20.5885743,7.01212413 21.6,9.4539217 21.6,12 C21.6,17.3019336 17.3019336,21.6 12,21.6 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons UNCHECKED_BOX icon renders correctly 1`] = `
+exports[`icons unchecked box renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -601,7 +641,7 @@ exports[`icons UNCHECKED_BOX icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons UNCHECKED_RADIO icon renders correctly 1`] = `
+exports[`icons unchecked radio renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -621,7 +661,27 @@ exports[`icons UNCHECKED_RADIO icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons USB icon renders correctly 1`] = `
+exports[`icons unchecked renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,21.6 C6.6980664,21.6 2.4,17.3019336 2.4,12 C2.4,6.6980664 6.6980664,2.4 12,2.4 C14.5460783,2.4 16.9878759,3.41142567 18.7882251,5.2117749 C20.5885743,7.01212413 21.6,9.4539217 21.6,12 C21.6,17.3019336 17.3019336,21.6 12,21.6 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons usb renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -641,7 +701,27 @@ exports[`icons USB icon renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons WIFI icon renders correctly 1`] = `
+exports[`icons warning renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons wifi renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
