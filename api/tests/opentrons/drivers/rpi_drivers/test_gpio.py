@@ -21,15 +21,28 @@ def test_init_sequence(monkeypatch):
         (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['HALT'])),            # NOQA
         (gpio.OUTPUT_PINS['GREEN_BUTTON'], "{}/export".format(gpio._path_prefix)),                          # NOQA
         (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['GREEN_BUTTON'])),    # NOQA
+        (gpio.OUTPUT_PINS['AUDIO_ENABLE'], "{}/export".format(gpio._path_prefix)),                          # NOQA
+        (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['AUDIO_ENABLE'])),    # NOQA
+        (gpio.OUTPUT_PINS['ISP'], "{}/export".format(gpio._path_prefix)),                                   # NOQA
+        (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['ISP'])),             # NOQA
+        (gpio.OUTPUT_PINS['RESET'], "{}/export".format(gpio._path_prefix)),                                 # NOQA
+        (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['RESET'])),           # NOQA
         (gpio.OUTPUT_PINS['RED_BUTTON'], "{}/export".format(gpio._path_prefix)),                            # NOQA
         (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['RED_BUTTON'])),      # NOQA
         # Write HALT high
         (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['HALT'])),               # NOQA
+        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['ISP'])),                # NOQA
+        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['RESET'])),              # NOQA
+        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['AUDIO_ENABLE'])),       # NOQA
         # Enable input pins
         (gpio.INPUT_PINS['BUTTON_INPUT'], "{}/export".format(gpio._path_prefix)),                           # NOQA
-        (gpio.IN, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.INPUT_PINS['BUTTON_INPUT']))      # NOQA
+        (gpio.IN, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.INPUT_PINS['BUTTON_INPUT'])),      # NOQA
+        (gpio.INPUT_PINS['WINDOW_INPUT'], "{}/export".format(gpio._path_prefix)),                           # NOQA
+        (gpio.IN, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.INPUT_PINS['WINDOW_INPUT']))       # NOQA
     ]
-
+    # from pprint import pprint
+    # pprint(init_log)
+    # pprint(expected_log)
     assert init_log == expected_log
 
 

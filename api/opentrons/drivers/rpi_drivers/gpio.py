@@ -34,13 +34,13 @@ HIGH = "1"
 #   the Pi to the Smoothie.
 OUTPUT_PINS = {
     'FRAME_LEDS': 6,
-    'RED_BUTTON': 26,
-    'GREEN_BUTTON': 19,
     'BLUE_BUTTON': 13,
-    'AUDIO_ENABLE': 21,
     'HALT': 18,
+    'GREEN_BUTTON': 19,
+    'AUDIO_ENABLE': 21,
+    'ISP': 23,
     'RESET': 24,
-    'ISP': 23
+    'RED_BUTTON': 26
 }
 
 INPUT_PINS = {
@@ -149,8 +149,8 @@ def initialize():
         _enable_pin(pin, OUT)
 
     # smoothieware programming pins, must be in a known state (HIGH)
-    set_high(OUTPUT_PINS['ISP'])
     set_high(OUTPUT_PINS['HALT'])
+    set_high(OUTPUT_PINS['ISP'])
     set_high(OUTPUT_PINS['RESET'])
 
     # audio-enable pin can stay HIGH always, unless there is noise coming
