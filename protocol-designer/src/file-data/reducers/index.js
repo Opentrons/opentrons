@@ -2,7 +2,7 @@
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
-import {updateFileFields} from '../actions'
+import {updateFileFields, updatePipettes} from '../actions'
 import {pipetteDataByName, type PipetteName} from '../pipetteData'
 
 import type {Mount} from '@opentrons/components'
@@ -12,9 +12,7 @@ import type {FilePageFields} from '../types'
 const defaultFields = {
   name: '',
   author: '',
-  description: '',
-  leftPipette: '',
-  rightPipette: ''
+  description: ''
 }
 
 const metadataFields = handleActions({
@@ -45,17 +43,16 @@ function createPipette (name: PipetteName, mount: Mount) {
 }
 
 const pipettes = handleActions({
-  UPDATE_FILE_FIELDS: (state: PipetteState, action: ActionType<typeof updateFileFields>) => {
-    const leftPipetteName = action.payload.leftPipette
-    const rightPipetteName = action.payload.rightPipette
+  UPDATE_PIPETTES: (state: PipetteState, action: ActionType<typeof updatePipettes>) => {
+    const {left, right} = action.payload // left and/or right pipette names, eg 'P10 Single-Channel'
 
     return {
-      left: leftPipetteName
-        ? createPipette(leftPipetteName, 'left')
-        : state.left,
-      right: rightPipetteName
-        ? createPipette(rightPipetteName, 'right')
-        : state.right
+      left: left
+        ? createPipette(left, 'left')
+        : null,
+      right: right
+        ? createPipette(right, 'right')
+        : null
     }
   }
 }, {left: null, right: null})

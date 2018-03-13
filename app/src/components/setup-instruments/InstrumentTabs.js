@@ -1,30 +1,29 @@
 // @flow
 // instrument tabs bar container
 // used for left/right pipette selection during pipette calibration
+import * as React from 'react'
 
-import {connect} from 'react-redux'
-import {PageTabs, type PageTabProps} from '@opentrons/components'
-import {
-  constants as robotConstants,
-  selectors as robotSelectors,
-  type Mount
-} from '../../robot'
+import type {Instrument} from '../../robot'
+import {constants as robotConstants} from '../../robot'
 
-export default connect(mapStateToProps)(PageTabs)
+import {PageTabs} from '@opentrons/components'
 
-type OwnProps = {
-  mount: Mount
+type Props = {
+  instruments: Array<Instrument>,
+  currentInstrument: ?Instrument
 }
 
-function mapStateToProps (state, ownProps: OwnProps): PageTabProps {
-  const instruments = robotSelectors.getInstruments(state)
+export default function InstrumentTabs (props: Props) {
+  const {instruments, currentInstrument} = props
 
   const pages = robotConstants.INSTRUMENT_MOUNTS.map((mount) => ({
     title: mount,
     href: `/calibrate/instruments/${mount}`,
-    isActive: mount === ownProps.mount,
+    isActive: currentInstrument != null && mount === currentInstrument.mount,
     isDisabled: !instruments.some((inst) => inst.mount === mount)
   }))
 
-  return {pages}
+  return (
+    <PageTabs pages={pages} />
+  )
 }

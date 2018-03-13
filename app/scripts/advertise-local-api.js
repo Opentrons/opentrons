@@ -12,12 +12,20 @@ const LOCAL_API_HEALTH_URL = `http://localhost:${LOCAL_API_PORT}/health`
 const NAME = `Opentrons on ${LOCAL_API_HOST}`
 const SERVICE = {
   name: NAME,
-  host: LOCAL_API_HOST,
+  host: NAME,
   port: LOCAL_API_PORT,
   type: 'http'
 }
 
 startPolling()
+
+process.on('SIGINT', () => {
+  console.log('Unpublishing all dev MDNS services')
+  bonjour.unpublishAll(() => {
+    console.log('All MDNS services unpublished')
+    process.exit(0)
+  })
+})
 
 function startPolling () {
   setTimeout(pollAndPublish, LOCAL_API_POLL_INTERVAL_MS)

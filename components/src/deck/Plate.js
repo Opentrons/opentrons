@@ -15,14 +15,14 @@ import type {LabwareLocations} from '../labware-types'
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
-type singleWell = {
+type singleWell = {|
   highlighted: boolean,
   preselected: boolean,
   selected: boolean,
   wellName: string,
   maxVolume: number,
-  groupId?: string
-}
+  groupId: string | null
+|}
 
 type wellDims = { // TODO similar to type in Well.js. DRY it up
   x: number,

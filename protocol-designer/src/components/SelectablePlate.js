@@ -5,14 +5,15 @@ import { Plate } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
 import type {AllWellContents} from '../labware-ingred/types'
+import type {RectEvent} from '../collision-types'
 
 export type Props = {
   wellContents: AllWellContents,
   containerType: string,
-  onSelectionMove: *,
-  onSelectionDone: *,
+  onSelectionMove: RectEvent,
+  onSelectionDone: RectEvent,
   containerId: string,
-  selectable: boolean
+  selectable?: boolean
 }
 
 export default function SelectablePlate (props: Props) {
@@ -30,6 +31,7 @@ export default function SelectablePlate (props: Props) {
     wellContents={wellContents}
     containerType={containerType}
     containerId={containerId}
+    showLabels={selectable}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect
