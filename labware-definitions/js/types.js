@@ -13,7 +13,8 @@ export type LabwareDefinition = {
       width: number,
       x: number,
       y: number,
-      z: number
+      z: number,
+      'total-liquid-volume': number
     }
   }
 }

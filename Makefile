@@ -35,7 +35,7 @@ install-types:
 
 # all tests
 .PHONY: test
-test: test-api test-components test-app test-pd
+test: test-api test-components test-app test-pd test-labware-definitions
 
 .PHONY: test-api
 test-api:
