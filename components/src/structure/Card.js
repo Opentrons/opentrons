@@ -10,7 +10,7 @@ type Props = {
   /** Title for card */
   title: React.Node,
   /** Optional description or message for card */
-  description: string,
+  description?: string,
   /** Card content, displays in a flex-row by default */
   children: React.Node,
   /** Displays card content in a flex-column */
