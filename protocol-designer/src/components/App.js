@@ -11,10 +11,6 @@ import ProtocolEditor from './ProtocolEditor'
 import 'normalize.css'
 import '../css/globals.css'
 
-// TODO: remove this, for DEBUGGING only
-import * as labwareDefs from '@opentrons/labware-definitions'
-window.labwareDefs = labwareDefs
-
 export default function App () {
   return (
     <HashRouter>
