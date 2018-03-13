@@ -32,10 +32,12 @@ export const p300Multi = {
   channels: 8
 }
 
+export const all8ChTipIds = ['0', '1', '2', '3', '4', '5', '6', '7']
+
 export const basicLiquidState = {
   pipettes: {
     p300SingleId: { '0': {} },
-    p300MultiId: { '0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {} }
+    p300MultiId: all8ChTipIds.reduce((acc, tipId) => ({...acc, [tipId]: {}}), {})
   },
   labware: {
     sourcePlateId: {
