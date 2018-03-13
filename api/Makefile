@@ -2,13 +2,17 @@
 
 SHELL := /bin/bash
 
+python := pipenv run python
+pipenv_opts := --dev
+pipenv_opts += $(and $(CI),--ignore-pipfile)
+
 .PHONY: install
 install:
-	pipenv install --ignore-pipfile --system --dev
+	pipenv install $(pipenv_opts)
 
 .PHONY: test
 test:
-	python -m pytest \
+	$(python) -m pytest \
 		--cov=opentrons \
 		--cov-report term-missing:skip-covered \
 		--cov-report xml:coverage.xml \
@@ -16,7 +20,7 @@ test:
 
 .PHONY: lint
 lint:
-	python -m pylama opentrons tests
+	$(python) -m pylama opentrons tests
 
 .PHONY: docs
 docs:
@@ -28,11 +32,11 @@ publish:
 
 .PHONY: dev
 dev:
-	python opentrons/server/main.py -P 31950 opentrons.server.main:init
+	$(python) opentrons/server/main.py -P 31950 opentrons.server.main:init
 
 .PHONY: wheel
 wheel:
-	python setup.py bdist_wheel && \
+	$(python) setup.py bdist_wheel && \
 	ls dist
 
 .PHONY: push

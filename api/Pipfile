@@ -4,6 +4,9 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[requires]
+
+python_version = "3.6"
 
 [packages]
 
@@ -21,3 +24,4 @@ numpydoc = "==0.6.0"
 sphinx = "==1.4.8"
 twine = "==1.8.1"
 wheel = "==0.30.0"
+coverage = "==4.4.2"
