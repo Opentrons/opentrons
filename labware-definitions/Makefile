@@ -8,6 +8,8 @@ PATH := $(shell yarn bin):$(PATH)
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
 
+BUILD_DIR := build
+
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
 cover ?= true
@@ -26,7 +28,7 @@ install:
 
 .PHONY: build
 build:
-	node js/build.js
+	shx mkdir -p $(BUILD_DIR) && node js/scripts/build.js $(BUILD_DIR)
 
 # TODO: flow-typed?
 
@@ -39,4 +41,4 @@ test:
 
 .PHONY: clean
 clean:
-	shx rm -rf build
+	shx rm -rf $(BUILD_DIR)

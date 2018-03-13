@@ -1,8 +1,9 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
+import schema from '../schema'
 
-const definitionsGlobPath = path.join(__dirname, '..', '..', 'definitions', '*.json')
+const definitionsGlobPath = path.join(__dirname, '../../definitions/*.json')
 
 // JSON Schema defintion & setup
 
@@ -10,62 +11,6 @@ const ajv = new Ajv({
   allErrors: true,
   jsonPointers: true
 })
-
-const NumberType = {
-  type: 'number'
-}
-
-const PositiveNumber = {
-  type: 'number',
-  minimum: 0
-}
-
-const schema = {
-  type: 'object',
-  required: ['metadata', 'ordering', 'wells'],
-  additionalProperties: false,
-  properties: {
-
-    metadata: {
-      type: 'object',
-      required: ['name'],
-      properties: {
-
-        name: {type: 'string'}
-      }
-    },
-    ordering: {
-      type: 'array',
-      items: {
-        type: 'array',
-        items: {type: 'string'}
-      }
-    },
-    wells: {
-      type: 'object',
-      patternProperties: {
-        '.*': { // TODO: use ^[A-Z]+[1-9]+[0-9]*$ (eg A1, AB16, not A03) -- but make sure invalid well keys fail instead of slip past
-          type: 'object',
-          required: ['height', 'length', 'width', 'x', 'y', 'z'],
-          properties: {
-
-            height: NumberType,
-            length: PositiveNumber,
-            width: PositiveNumber,
-            x: NumberType,
-            y: NumberType,
-            z: NumberType,
-
-            // Optional
-            diameter: PositiveNumber, // NOTE: presence of diameter indicates a circular well
-            depth: PositiveNumber, // TODO Ian 2018-03-12: depth should be required, but is missing in MALDI-plate
-            'total-liquid-volume': PositiveNumber
-          }
-        }
-      }
-    }
-  }
-}
 
 const validate = ajv.compile(schema)
 
