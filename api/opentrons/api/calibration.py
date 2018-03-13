@@ -97,17 +97,13 @@ class CalibrationManager:
         )
         self._set_state('ready')
 
-    def move_to(self, instrument, container):
-        if not isinstance(container, Container):
-            raise ValueError(
-                'Invalid object type {0}. Expected models.Container'
-                .format(type(container)))
+    def move_to(self, instrument, target):
 
         inst = instrument._instrument
-        log.info('Moving {} to {} in {}'.format(
-            instrument.name, container.name, container.slot))
+        log.info('Moving {} to {}'.format(
+            instrument.name, target))
         self._set_state('moving')
-        inst.move_to(container._container[0])
+        inst.move_to(target)
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):
@@ -121,7 +117,7 @@ class CalibrationManager:
             axis=axis,
             robot=inst.robot
         )
-        self._set_state('ready')
+        self._set_state('ready') 
 
     def home(self, instrument):
         inst = instrument._instrument

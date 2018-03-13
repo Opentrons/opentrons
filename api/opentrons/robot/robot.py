@@ -991,10 +991,18 @@ class Robot(object):
             dst=well
         )
 
+        print("This is the Delta {}".format(delta))
+
+        delta_x = delta[0]
+        delta_y = delta[1]
+        delta_z = delta[2] + well.z_size()
         self.poses = calib.calibrate_container_with_delta(
             self.poses,
             container,
-            *delta, save
+            delta_x,
+            delta_y,
+            delta_z,
+            save
         )
 
         self.max_deck_height.cache_clear()

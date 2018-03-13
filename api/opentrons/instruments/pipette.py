@@ -539,6 +539,7 @@ class Pipette:
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
+                log.info("Min location {}".format(location.z_size()))
                 location = location.bottom(min(location.z_size(), 1))
             self.move_to(location, strategy='direct')
 

@@ -157,7 +157,7 @@ async def test_jog_calibrate(
         dst=robot.deck)
     coordinates1 = container.coordinates()
 
-    main_router.calibration_manager.move_to(model.instrument, model.container)
+    main_router.calibration_manager.move_to(model.instrument, model.container._container[0].bottom())
     main_router.calibration_manager.jog(model.instrument, 1, 'x')
     main_router.calibration_manager.jog(model.instrument, 2, 'y')
     main_router.calibration_manager.jog(model.instrument, 3, 'z')
