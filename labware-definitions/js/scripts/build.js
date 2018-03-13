@@ -8,13 +8,8 @@ const glob = require('glob')
 
 const buildDir = process.argv[2]
 
-let buildDirIsValidDir = false
-try {
-  buildDirIsValidDir = fs.statSync(buildDir).isDirectory()
-} catch (e) {}
-
-if (!buildDirIsValidDir) {
-  throw new Error('build.js requires a build directory argument. "' + buildDir + '" is not a directory.')
+if (!buildDir) {
+  throw new Error('build.js requires a build directory given as an argument. eg `node js/scripts/build.js path/to/build/`')
 }
 
 let output = {}
