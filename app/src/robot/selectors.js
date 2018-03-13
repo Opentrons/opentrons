@@ -3,6 +3,7 @@
 import padStart from 'lodash/padStart'
 import sortBy from 'lodash/sortBy'
 import {createSelector} from 'reselect'
+import type {ContextRouter} from 'react-router'
 
 import type {State} from '../types'
 
@@ -319,7 +320,7 @@ export function getLabwareBySlot (state: State) {
 export const getLabware = createSelector(
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
-  (state: State) => getCalibrationRequest(state),
+  getCalibrationRequest,
   (labwareBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(labwareBySlot)
       .filter(isSlot)
@@ -419,3 +420,11 @@ export function getOffsetUpdateInProgress (state: State): boolean {
 export function getJogDistance (state: State): number {
   return calibration(state).jogDistance
 }
+
+// get current instrument selector factory
+// to be used by a react-router Route component
+export const makeGetCurrentInstrument = () => createSelector(
+  (_, props: ContextRouter) => props.match.params.mount,
+  getInstruments,
+  (mount, instruments) => instruments.find((i) => i.mount === mount)
+)

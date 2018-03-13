@@ -1,7 +1,8 @@
 // @flow
-import {filledTiprackWells, emptyTiprackWells, p300Single, p300Multi} from './fixtures'
+import {filledTiprackWells, emptyTiprackWells, p300Single, p300Multi, basicLiquidState} from './fixtures'
 import {replaceTip} from '../'
 
+// TODO use a fixture, standardize
 describe('replaceTip: single channel', () => {
   const robotInitialState = {
     instruments: {
@@ -42,7 +43,8 @@ describe('replaceTip: single channel', () => {
       pipettes: {
         p300SingleId: false
       }
-    }
+    },
+    liquidState: basicLiquidState
   }
 
   test('Single-channel: first tip', () => {
@@ -263,6 +265,7 @@ describe('replaceTip: single channel', () => {
 })
 
 describe('replaceTip: multi-channel', () => {
+  // TODO use a fixture, standardize
   const robotInitialState = {
     instruments: {
       p300MultiId: p300Multi
@@ -302,7 +305,8 @@ describe('replaceTip: multi-channel', () => {
       pipettes: {
         p300MultiId: false
       }
-    }
+    },
+    liquidState: basicLiquidState
   }
 
   test('multi-channel, all tipracks have tips', () => {

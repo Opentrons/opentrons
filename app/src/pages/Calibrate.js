@@ -11,8 +11,14 @@ export default function Calibrate (props: ContextRouter) {
 
   return (
     <Switch>
-      <Route path={`${path}/instruments/:mount`} component={SetupInstruments} />
-      <Route path={`${path}/labware/:slot`} component={SetupDeck} />
+      <Route
+        path={`${path}/instruments/:mount?`}
+        component={SetupInstruments}
+      />
+      <Route
+        path={`${path}/labware/:slot`}
+        component={SetupDeck}
+      />
     </Switch>
   )
 }

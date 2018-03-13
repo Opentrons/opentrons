@@ -27,8 +27,17 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     onSave: fields => {
-      dispatch(fileActions.updateFileFields(fields))
+      dispatch(fileActions.updateFileFields({
+        name: fields.name || ''
+      }))
+
+      dispatch(fileActions.updatePipettes({
+        left: fields.leftPipette,
+        right: fields.rightPipette
+      }))
+
       dispatch(navigationActions.toggleNewProtocolModal(false))
+
       dispatch(navigationActions.navigateToPage('file-detail'))
     }
   }

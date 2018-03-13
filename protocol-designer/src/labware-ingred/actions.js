@@ -2,16 +2,16 @@
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
-import omit from 'lodash/omit'
 
-import {uuid} from '../utils'
+import { SELECTABLE_WELL_CLASS } from '../constants'
+import {uuid, getCollidingWells} from '../utils'
 import {selectors} from './reducers'
 
+import type {GetState} from '../types'
 import {editableIngredFields} from './types'
 import type {IngredInputFields, Wells} from './types'
 import type {DeckSlot} from '@opentrons/components'
-
-import type {GetState} from '../types'
+import type {GenericRect} from '../collision-types'
 
 // Payload mappers
 const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
@@ -87,19 +87,25 @@ export const modifyContainer = createAction(
 
 // ===== Preselect / select wells in plate
 
-type WellSelectionArgs = {|
+type WellSelectionPayload = {|
   wells: Wells,
   append: boolean // true if user is holding shift key
 |}
 
 export const preselectWells = createAction(
   'PRESELECT_WELLS',
-  (args: WellSelectionArgs) => args
+  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
+    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+    append: e.shiftKey
+  })
 )
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  (args: WellSelectionArgs) => args
+  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
+    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+    append: e.shiftKey
+  })
 )
 
 // ===== well hovering =====
@@ -185,27 +191,48 @@ export type EditIngredient = {
   }
 }
 
-export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFields|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
+export const editIngredient = (payload: {|
+  ...IngredInputFields,
+  groupId: string | null,
+  copyGroupId: string | null
+|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.selectedContainer(state)
-  const allIngredients = selectors.allIngredients(state)
+  const allIngredients = selectors.getIngredientGroups(state)
 
-  const isUnchangedClone = allIngredients[payload.copyGroupId] &&
+  const {groupId, copyGroupId, ...inputFields} = payload
+
+  if (!container) {
+    throw new Error('No container selected, cannot edit ingredient')
+  }
+
+  if (groupId && copyGroupId === null) {
+    // Not a copy, just an edit
+    return dispatch({
+      type: 'EDIT_INGREDIENT',
+      payload: {
+        ...inputFields,
+        groupId: groupId,
+        containerId: container.containerId,
+        wells: selectors.selectedWellNames(state),
+        isUnchangedClone: true
+      }
+    })
+  }
+
+  const isUnchangedClone = copyGroupId !== null &&
+    allIngredients[copyGroupId] &&
     editableIngredFields.every(field =>
-      allIngredients[payload.copyGroupId][field] === payload[field]
+      allIngredients[copyGroupId][field] === payload[field]
     )
 
-  // TODO Ian 2018-02-19 make selector, or factor out as util.
-  const nextGroupId = (max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0
-  console.log(Object.keys(allIngredients), {nextGroupId})
-
-  const groupId = (isUnchangedClone)
-    ? payload.copyGroupId
-    : nextGroupId
+  // TODO Ian 2018-02-19 make selector
+  const nextGroupId: string = ((max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0).toString()
 
   const name = (
-    allIngredients[payload.copyGroupId] &&
-    allIngredients[payload.copyGroupId].name === payload.name
+    copyGroupId &&
+    allIngredients[copyGroupId] &&
+    allIngredients[copyGroupId].name === payload.name
     )
     ? (payload.name || '') + ' copy' // todo: copy 2, copy 3 etc.
     : payload.name
@@ -213,11 +240,11 @@ export const editIngredient = (payload: {|copyGroupId: string, ...IngredInputFie
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
-      ...omit(payload, ['copyGroupId']),
+      ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
       name,
       containerId: container && container.containerId,
-      groupId,
+      groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
       wells: selectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
       isUnchangedClone
     }

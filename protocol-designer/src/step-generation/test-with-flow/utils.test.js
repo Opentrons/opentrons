@@ -1,5 +1,5 @@
 // @flow
-import {repeatArray, reduceCommandCreators} from '../utils'
+import {repeatArray, reduceCommandCreators, splitLiquid, mergeLiquid} from '../utils'
 
 describe('repeatArray', () => {
   test('repeat array of objects', () => {
@@ -42,5 +42,166 @@ describe('reduceCommandCreators', () => {
       'command: add 1',
       'command: multiply by 2'
     ])
+  })
+})
+
+describe('splitLiquid', () => {
+  const singleIngred = {
+    ingred1: {volume: 100}
+  }
+
+  const twoIngred = {
+    ingred1: {volume: 100},
+    ingred2: {volume: 300}
+  }
+
+  test('simple split with 1 ingredient in source', () => {
+    expect(splitLiquid(
+      60,
+      singleIngred
+    )).toEqual({
+      source: {ingred1: {volume: 40}},
+      dest: {ingred1: {volume: 60}}
+    })
+  })
+
+  test('get 0 volume in source when you split it all', () => {
+    expect(splitLiquid(
+      100,
+      singleIngred
+    )).toEqual({
+      source: {ingred1: {volume: 0}},
+      dest: {ingred1: {volume: 100}}
+    })
+  })
+
+  test('split with 2 ingredients in source', () => {
+    expect(splitLiquid(
+      20,
+      twoIngred
+    )).toEqual({
+      source: {
+        ingred1: {volume: 95},
+        ingred2: {volume: 285}
+      },
+      dest: {
+        ingred1: {volume: 5},
+        ingred2: {volume: 15}
+      }
+    })
+  })
+
+  test('split all with 2 ingredients', () => {
+    expect(splitLiquid(
+      400,
+      twoIngred
+    )).toEqual({
+      source: {
+        ingred1: {volume: 0},
+        ingred2: {volume: 0}
+      },
+      dest: twoIngred
+    })
+  })
+
+  test('taking out 0 volume results in same source, empty dest', () => {
+    expect(splitLiquid(
+      0,
+      twoIngred
+    )).toEqual({
+      source: twoIngred,
+      dest: {
+        ingred1: {volume: 0},
+        ingred2: {volume: 0}
+      }
+    })
+  })
+
+  test('split with 2 ingreds, one has 0 vol', () => {
+    expect(splitLiquid(
+      50,
+      {
+        ingred1: {volume: 200},
+        ingred2: {volume: 0}
+      }
+    )).toEqual({
+      source: {
+        ingred1: {volume: 150},
+        ingred2: {volume: 0}
+      },
+      dest: {
+        ingred1: {volume: 50},
+        ingred2: {volume: 0}
+      }
+    })
+  })
+
+  test('split with 2 ingredients, floating-point volume', () => {
+    expect(splitLiquid(
+      1000 / 3, // ~333.33
+      twoIngred
+    )).toEqual({
+      source: {
+        ingred1: {volume: 100 - (0.25 * 1000 / 3)},
+        ingred2: {volume: 50}
+      },
+      dest: {
+        ingred1: {volume: 0.25 * 1000 / 3},
+        ingred2: {volume: 250}
+      }
+    })
+  })
+
+  test('splitting with no ingredients in source raises error', () => {
+    expect(
+      () => splitLiquid(100, {})
+    ).toThrowError(/no volume in source/)
+  })
+
+  test('splitting with 0 volume in source raises error', () => {
+    expect(
+      () => splitLiquid(100, {ingred1: {volume: 0}})
+    ).toThrowError(/no volume in source/)
+  })
+
+  test('splitting with excessive volume raises error', () => {
+    expect(
+      () => splitLiquid(999, {ingred1: {volume: 10}})
+    ).toThrowError(/exceeds source volume/)
+  })
+})
+
+describe('mergeLiquid', () => {
+  test('merge ingreds 1 2 with 2 3 to get 1 2 3', () => {
+    expect(mergeLiquid(
+      {
+        ingred1: {volume: 30},
+        ingred2: {volume: 40}
+      },
+      {
+        ingred2: {volume: 15},
+        ingred3: {volume: 25}
+      }
+    )).toEqual({
+      ingred1: {volume: 30},
+      ingred2: {volume: 55},
+      ingred3: {volume: 25}
+    })
+  })
+
+  test('merge ingreds 3 with 1 2 to get 1 2 3', () => {
+    expect(mergeLiquid(
+      {
+        ingred3: {volume: 25}
+      },
+      {
+        ingred1: {volume: 30},
+        ingred2: {volume: 40}
+      }
+    )).toEqual({
+      ingred1: {volume: 30},
+      ingred2: {volume: 40},
+      ingred3: {volume: 25}
+    })
   })
 })

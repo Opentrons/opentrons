@@ -9,7 +9,7 @@ import { SELECTABLE_WELL_CLASS, swatchColors } from '../constants.js'
 
 type Props = {
   wellName: string,
-  groupId: string, // TODO Ian 2017-12-13 groupId represents an Ingredient Group ID, should be handled outside of this component.
+  groupId: string | null, // TODO Ian 2017-12-13 groupId represents an Ingredient Group ID, should be handled outside of this component.
   selectable: boolean,
   selected: boolean,
   preselected: boolean,

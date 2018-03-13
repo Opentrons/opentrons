@@ -5,11 +5,7 @@ import type {Command} from '../step-generation/types'
 export type FilePageFields = {
   name: string,
   author: string,
-  description: string,
-
-  // pipettes are empty string '' if user selects 'None'
-  leftPipette: string,
-  rightPipette: string
+  description: string
 }
 
 export type FilePageFieldAccessors = $Keys<FilePageFields>

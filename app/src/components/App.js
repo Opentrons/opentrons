@@ -19,9 +19,10 @@ export default function App () {
       <NavBar />
       <SidePanel />
       <Switch>
+        <Redirect from='(.*)/index.html' to='/' />
         <Redirect exact from='/' to='/robots' />
         <Route path='/robots/:name?' component={Robots} />
-        <Route exact path='/menu/app' component={AppSettingsPage} />
+        <Route path='/menu/app' component={AppSettingsPage} />
         <Route path='/upload' component={Upload} />
         <Route path='/calibrate' component={Calibrate} />
         <Route path='/run' component={Run} />

@@ -1,12 +1,11 @@
 // @flow
 import React from 'react'
-import get from 'lodash/get'
 
 import {IconButton, SidePanel, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {Ingredient} from '../labware-ingred/types'
+import type {IngredGroupForLabware, IngredsForLabware} from '../labware-ingred/types'
 
 type DeleteIngredient = (args: {wellName: string, groupId: string}) => void // TODO get from action type?
 type EditModeIngredientGroup = (args: {groupId: string}) => void
@@ -19,7 +18,7 @@ type CommonProps = {|
 |}
 
 type CardProps = {|
-  ingredCategoryData: Ingredient,
+  ingredGroup: IngredGroupForLabware,
   ...CommonProps
 |}
 
@@ -36,13 +35,13 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
   toggleAccordion = () => this.setState({isExpanded: !this.state.isExpanded})
 
   render () {
-    const {ingredCategoryData, editModeIngredientGroup, deleteIngredient, selected} = this.props
-    const { groupId, serializeName, description } = ingredCategoryData
+    const {ingredGroup, editModeIngredientGroup, deleteIngredient, selected} = this.props
+    const { groupId, serializeName, individualize, description, name, wells } = ingredGroup
     const { isExpanded } = this.state
 
     return (
       <TitledList
-        title={ingredCategoryData.name || 'Unnamed Ingredient'}
+        title={name || 'Unnamed Ingredient'}
         className={styles.ingredient_titled_list}
         iconProps={{style: {fill: swatchColors(parseInt(groupId))}}}
         iconName='circle'
@@ -58,22 +57,22 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <span>Name</span>
           <span />
         </div>
-        {/* TODO Ian 2018-02-21 don't need to typecheck for isArray when Ingredient.wells is standardized */}
-        {Array.isArray(ingredCategoryData.wells) && ingredCategoryData.wells.map((wellName, i) =>
-          <IngredIndividual key={i}
-            name={ingredCategoryData.individualize
-              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${serializeName || 'Sample'} ${i + 1}`)
+        {Object.keys(wells).map((well, i) => { // TODO sort keys
+          const {volume} = wells[well]
+          return <IngredIndividual key={well}
+            name={individualize
+              ? `${serializeName || 'Sample'} ${i + 1}` // TODO IMMED SORT AND NUMBER
               : ''
             }
-            wellName={wellName}
+            wellName={well}
             canDelete
-            volume={get(ingredCategoryData, ['wellDetails', wellName, 'volume'], ingredCategoryData.volume)}
+            volume={volume}
             // concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
             groupId={groupId}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
           />
-        )}
+        })}
       </TitledList>
     )
   }
@@ -118,16 +117,13 @@ function IngredIndividual (props: IndividProps) {
 }
 
 export type Props = {
-  ingredients: Array<Ingredient> | null,
+  ingredients: IngredsForLabware,
   selectedIngredientGroupId: string | null,
   ...CommonProps
 }
 
 export default function IngredientsList (props: Props) {
   const {
-    // slot,
-    // containerName,
-    // containerType,
     ingredients,
     editModeIngredientGroup,
     deleteIngredient,
@@ -136,20 +132,13 @@ export default function IngredientsList (props: Props) {
 
   return (
     <SidePanel title='Ingredients'>
-        {/* <div className={styles.ingred_list_header_label}>
-          <div className={styles.flex_row}>
-            <div>Slot {slot}</div>
-            <div className={styles.container_type}>{humanize(containerType)}</div>
-          </div>
-          <div className={styles.container_name}>{containerName}</div>
-        </div> */}
 
-        {ingredients && ingredients.map((ingredCategoryData, i) =>
+        {ingredients && Object.keys(ingredients).map((i) =>
           <IngredGroupCard key={i}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
-            ingredCategoryData={ingredCategoryData}
-            selected={selectedIngredientGroupId === ingredCategoryData.groupId}
+            ingredGroup={ingredients[i]}
+            selected={selectedIngredientGroupId === ingredients[i].groupId}
           />)
         }
     </SidePanel>

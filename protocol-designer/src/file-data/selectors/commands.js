@@ -2,11 +2,12 @@
 import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-import type {BaseState} from '../../types'
+import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
-import {equippedPipettes} from './'
+import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import type {IngredInstance} from '../../labware-ingred/types'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -14,10 +15,45 @@ const all96Tips = reduce(
   {}
 )
 
+type LiquidState = $PropertyType<StepGeneration.RobotState, 'liquidState'>
+type LabwareLiquidState = $PropertyType<LiquidState, 'labware'>
+/** getLabwareLiquidState reshapes data from labwareIngreds.ingredLocations reducer
+  * to match RobotState.liquidState.labware's shape
+  */
+export const getLabwareLiquidState: Selector<LabwareLiquidState> = createSelector(
+  labwareIngredSelectors.getLabware,
+  labwareIngredSelectors.getIngredientLocations,
+  (labware, ingredLocs) => {
+    const allLabwareIds = Object.keys(labware)
+
+    type WellVolume = {volume: number}
+
+    function getAllIngredsForLabware (labwareId: string) {
+      return reduce(ingredLocs, (ingredAcc: {[wellName: string]: WellVolume}, ingredGroupData: IngredInstance, ingredGroupId: string) => {
+        return {
+          ...ingredAcc,
+          ...reduce(ingredGroupData[labwareId], (wellAcc, wellData: WellVolume, wellName: string) => ({
+            ...wellAcc,
+            [wellName]: {
+              ...ingredAcc[wellName],
+              [ingredGroupId]: wellData
+            }
+          }), {})
+        }
+      }, {})
+    }
+    return allLabwareIds.reduce((acc, labwareId) => ({
+      ...acc,
+      [labwareId]: getAllIngredsForLabware(labwareId)
+    }), {})
+  }
+)
+
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   equippedPipettes,
   labwareIngredSelectors.getLabware,
-  (pipettes, labware) => {
+  getLabwareLiquidState,
+  (pipettes, labware, labwareLiquidState) => {
     type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
     type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 
@@ -44,12 +80,26 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
         }),
       {})
 
+    const pipetteLiquidState = reduce(
+      pipettes,
+      (acc, pipetteData: StepGeneration.PipetteData, pipetteId: string) => ({
+        ...acc,
+        [pipetteId]: (pipetteData.channels > 1)
+          ? {'0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
+          : {'0': {}}
+      }),
+    {})
+
     return {
       instruments: pipettes,
       labware,
       tipState: {
         tipracks,
         pipettes: pipetteTipState
+      },
+      liquidState: {
+        pipettes: pipetteLiquidState,
+        labware: labwareLiquidState
       }
     }
   }

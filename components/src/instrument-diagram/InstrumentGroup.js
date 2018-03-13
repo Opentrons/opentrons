@@ -6,7 +6,8 @@ import InstrumentInfo, {type InstrumentInfoProps} from './InstrumentInfo'
 import styles from './instrument.css'
 
 type Props = {
-  instruments: Array<InstrumentInfoProps>
+  left?: InstrumentInfoProps,
+  right?: InstrumentInfoProps
 }
 
 /**
@@ -14,15 +15,12 @@ type Props = {
  * Takes an array of `InstrumentInfo` props.
  */
 export default function InstrumentGroup (props: Props) {
-  const {instruments} = props
+  const {left, right} = props
 
   return (
     <section className={styles.pipette_group}>
-      {instruments.map((instrument) => {
-        return (
-          <InstrumentInfo key={instrument.mount} {...instrument} />
-        )
-      })}
+      {left && <InstrumentInfo {...left} />}
+      {right && <InstrumentInfo {...right} />}
     </section>
   )
 }

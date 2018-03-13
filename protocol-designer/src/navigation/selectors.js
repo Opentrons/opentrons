@@ -10,10 +10,10 @@ import type {Page} from './types'
 
 export const currentPage: Selector<Page> = (state: BaseState) => {
   // If we're in ingredient detail mode, override the nav button page state
-  const ingredients = labwareIngredSelectors.ingredientsForContainer(state)
+  const selectedContainer = labwareIngredSelectors.selectedContainer(state)
   const page = navigationRootSelector(state).page
 
-  return ingredients ? 'ingredient-detail' : page
+  return selectedContainer ? 'ingredient-detail' : page
 }
 
 export const newProtocolModal = (state: BaseState) =>

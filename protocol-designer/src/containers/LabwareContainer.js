@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {selectors} from '../labware-ingred/reducers'
@@ -25,13 +26,32 @@ type OwnProps = {
   slot: DeckSlot
 }
 
-function mapStateToProps (state: BaseState, ownProps: OwnProps) {
+type Props = React.ElementProps<typeof LabwareOnDeck>
+
+type DispatchProps = {
+  createContainer: mixed,
+  deleteContainer: mixed,
+  modifyContainer: mixed,
+
+  openIngredientSelector: mixed,
+  openLabwareSelector: mixed,
+
+  closeLabwareSelector: mixed,
+
+  setCopyLabwareMode: mixed,
+  copyLabware: mixed
+}
+
+type StateProps = $Diff<Props, DispatchProps>
+
+function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const container = selectors.containersBySlot(state)[ownProps.slot]
   const containerInfo = (container)
     ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
     : {}
   return {
     ...containerInfo,
+    slot: ownProps.slot,
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
     labwareToCopy: selectors.labwareToCopy(state),
