@@ -29,11 +29,6 @@ def test_init_sequence(monkeypatch):
         (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['RESET'])),           # NOQA
         (gpio.OUTPUT_PINS['RED_BUTTON'], "{}/export".format(gpio._path_prefix)),                            # NOQA
         (gpio.OUT, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.OUTPUT_PINS['RED_BUTTON'])),      # NOQA
-        # Write HALT high
-        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['HALT'])),               # NOQA
-        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['ISP'])),                # NOQA
-        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['RESET'])),              # NOQA
-        (gpio.HIGH, "{0}/gpio{1}/value".format(gpio._path_prefix, gpio.OUTPUT_PINS['AUDIO_ENABLE'])),       # NOQA
         # Enable input pins
         (gpio.INPUT_PINS['BUTTON_INPUT'], "{}/export".format(gpio._path_prefix)),                           # NOQA
         (gpio.IN, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.INPUT_PINS['BUTTON_INPUT'])),      # NOQA

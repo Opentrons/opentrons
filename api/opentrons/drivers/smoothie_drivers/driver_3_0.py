@@ -18,7 +18,7 @@ from opentrons.drivers.rpi_drivers import gpio
 log = logging.getLogger(__name__)
 
 ERROR_KEYWORD = 'error'
-ALARM_KEYWORD = 'ALARM'
+ALARM_KEYWORD = 'alarm'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
@@ -145,14 +145,22 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
-        self._saved_current_settings = config.default_current.copy()
+
+        # motor current settings
+        self._saved_current_settings = config.low_current.copy()
         self._current_settings = self._saved_current_settings.copy()
+        self._active_axes = {
+            ax: False
+            for ax in AXES
+        }
+
+        # motor speed settings
         self._max_speed_settings = config.default_max_speed.copy()
         self._saved_max_speed_settings = self._max_speed_settings.copy()
-
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
 
+        # position after homing
         self._homed_position = HOMED_POSITION.copy()
 
     @property
@@ -312,7 +320,7 @@ class SmoothieDriver_3_0_0:
     def pop_axis_max_speed(self):
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
-    def set_current(self, settings):
+    def set_current(self, settings, axes_active=True):
         '''
         Sets the current in mA by axis.
 
@@ -320,6 +328,10 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
+        self._active_axes.update({
+            ax: axes_active
+            for ax in settings.keys()
+        })
         self._current_settings.update(settings)
         values = ['{}{}'.format(axis, value)
                   for axis, value in sorted(settings.items())]
@@ -348,7 +360,52 @@ class SmoothieDriver_3_0_0:
         self._saved_current_settings.update(self._current_settings)
 
     def pop_current(self):
-        self.set_current(self._saved_current_settings)
+        # only update axes that change their amperage
+        # this prevents non-active axes from incidentally being activated
+        diff_current = {
+            ax: self._saved_current_settings[ax]
+            for ax in AXES
+            if self._saved_current_settings[ax] != self._current_settings[ax]
+        }
+        self.set_current(diff_current)
+
+    def dwell_axes(self, axes):
+        '''
+        Sets motors to low current, for when they are not moving.
+
+        Dwell for XYZA axes is only called after HOMING
+        Dwell for BC axes is called after both HOMING and MOVING
+
+        axes:
+            String containing the axes to set to low current (eg: 'XYZABC')
+        '''
+        axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
+        dwelling_currents = {
+            ax: self._config.low_current[ax]
+            for ax in axes
+            if self._active_axes[ax] is True
+        }
+        if dwelling_currents:
+            self.set_current(dwelling_currents, axes_active=False)
+
+    def activate_axes(self, axes):
+        '''
+        Sets motors to a high current, for when they are moving
+        and/or must hold position
+
+        Activating XYZABC axes before both HOMING and MOVING
+
+        axes:
+            String containing the axes to set to high current (eg: 'XYZABC')
+        '''
+        axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
+        active_currents = {
+            ax: self._config.high_current[ax]
+            for ax in axes
+            if self._active_axes[ax] is False
+        }
+        if active_currents:
+            self.set_current(active_currents, axes_active=True)
 
     # ----------- Private functions --------------- #
 
@@ -373,35 +430,15 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            # TODO (ben 20171117): modify all axes to dwell at low current
-            moving_plungers = []
-            if GCODES['MOVE'] in command or GCODES['HOME'] in command:
-                moving_plungers = [ax for ax in 'BC' if ax in command]
-
-            if moving_plungers:
-                self.set_current({
-                    axis: self._config.plunger_current_high
-                    for axis in moving_plungers
-                })
 
             command_line = command + ' M400'
             ret_code = serial_communication.write_and_return(
                 command_line, self._connection, timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
-            smoothie_error = False
-            if ERROR_KEYWORD in ret_code or ALARM_KEYWORD in ret_code:
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
                 self._reset_from_error()
-                smoothie_error = True
-
-            if moving_plungers:
-                self.set_current({
-                    axis: self._config.plunger_current_low
-                    for axis in moving_plungers
-                })
-
-            # ensure we lower plunger currents before raising an exception
-            if smoothie_error:
                 raise SmoothieError(ret_code)
 
             return ret_code
@@ -414,15 +451,26 @@ class SmoothieDriver_3_0_0:
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
         # move away from the Y endstop switch
-        target_coord = {'Y': self.position['Y'] - Y_SWITCH_BACK_OFF_MM}
-        self.move(target_coord)
+        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+            GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
+            GCODES['MOVE'],             # move towards front of machine
+            str(-Y_SWITCH_BACK_OFF_MM),
+            GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
+        )
+        self._send_command(relative_retract_command)
         self.pop_current()
         self.pop_speed()
+        self.dwell_axes('Y')
 
         # now it is safe to home the X axis
-        self._send_command(GCODES['HOME'] + 'X')
+        try:
+            self.activate_axes('X')
+            self._send_command(GCODES['HOME'] + 'X')
+        finally:
+            self.dwell_axes('X')
 
     def _home_y(self):
+        self.activate_axes('Y')
         # home the Y at normal speed (fast)
         self._send_command(GCODES['HOME'] + 'Y')
 
@@ -433,23 +481,24 @@ class SmoothieDriver_3_0_0:
         # retract, then home, then retract again
         relative_retract_command = '{0} {1}Y{2} {3}'.format(
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
-            GCODES['MOVE'],  # move 3 millimeters away from switch
+            GCODES['MOVE'],             # move 3 millimeters away from switch
             str(-Y_RETRACT_DISTANCE),
-            GCODES['ABSOLUTE_COORDS']  # set back to absolute coordinate system
+            GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
-        self._send_command(relative_retract_command)
-        self._send_command(GCODES['HOME'] + 'Y')
-        self._send_command(relative_retract_command)
-
-        # bring max speeds back to normal
-        self.pop_axis_max_speed()
+        try:
+            self._send_command(relative_retract_command)
+            self._send_command(GCODES['HOME'] + 'Y')
+            self._send_command(relative_retract_command)
+            self.pop_axis_max_speed()  # bring max speeds back to normal
+        finally:
+            self.dwell_axes('Y')
 
     def _setup(self):
         self._reset_from_error()
         self._send_command(self._config.acceleration)
-        self._send_command(self._config.current)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
+        self.set_current(self._config.low_current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
@@ -490,7 +539,14 @@ class SmoothieDriver_3_0_0:
             if backlash_coords != target_coords:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
-            self._send_command(command)
+            try:
+                self.activate_axes(target.keys())
+                self._send_command(command)
+            finally:
+                # dwell pipette motors because they get hot
+                plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
+                if plunger_axis_moved:
+                    self.dwell_axes(plunger_axis_moved)
             self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
@@ -531,7 +587,12 @@ class SmoothieDriver_3_0_0:
             else:
                 # if we are homing neither the X nor Y axes, simple home
                 command = GCODES['HOME'] + axes
-                self._send_command(command, timeout=30)
+                try:
+                    self.activate_axes(axes)
+                    self._send_command(command, timeout=30)
+                finally:
+                    # always dwell an axis after it has been homed
+                    self.dwell_axes(axes)
 
         # Only update axes that have been selected for homing
         homed = {

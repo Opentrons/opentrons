@@ -2,6 +2,7 @@ api/**
 **/node_modules/**
 **/coverage/**
 **/dist/**
+**/build/**
 **/venv/**
 
 # flow

@@ -4,6 +4,7 @@ from copy import copy
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
 from opentrons import robot
+from opentrons.config import feature_flags as fflags
 
 from .models import Container
 
@@ -28,7 +29,6 @@ class CalibrationManager:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
         self.state = state
-        robot._use_safest_height = (state in ['probing', 'moving'])
         self._on_state_changed()
 
     def tip_probe(self, instrument):
@@ -105,10 +105,20 @@ class CalibrationManager:
                 .format(type(container)))
 
         inst = instrument._instrument
+        cont = container._container
+
+        if fflags.calibrate_to_bottom():
+            if 'tiprack' in container.name:
+                target = cont[0]
+            else:
+                target = cont[0].bottom()
+        else:
+            target = cont[0]
+
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
-        inst.move_to(container._container[0])
+        inst.move_to(target)
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):
@@ -148,4 +158,5 @@ class CalibrationManager:
         }
 
     def _on_state_changed(self):
+        robot._use_safest_height = (self.state in ['probing', 'moving'])
         publish(CalibrationManager.TOPIC, self._snapshot())

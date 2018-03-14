@@ -14,14 +14,16 @@ def unpack_location(location):
     Returns (:Placeable:, :Vector:) tuple
 
     If :location: is :Placeable: it will get converted to
-    (:Placeable:, :Vector: corresponting to the top)
+    (:Placeable:, :Vector: corresponding to the top)
     """
     coordinates = None
     placeable = None
     if isinstance(location, Placeable):
         placeable, coordinates = location.top()
+
     elif isinstance(location, tuple):
         placeable, coordinates = location
+
     else:
         raise ValueError(
             'Location should be (Placeable, (x, y, z)) or Placeable'
