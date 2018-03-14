@@ -152,6 +152,8 @@ def load(filename=None):
             result = robot_config(**merge([result._asdict(), local]))
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
+    except json.decoder.JSONDecodeError:
+        log.warning('Config {0} is corrupt. Loading defaults'.format(filename))
 
     return result
 
