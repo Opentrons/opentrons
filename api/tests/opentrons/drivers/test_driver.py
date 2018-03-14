@@ -249,6 +249,52 @@ def test_set_current(model):
     assert current_log == expected
 
 
+def test_parse_pipette_data():
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+        _parse_instrument_data, _byte_array_to_hex_string
+    msg = 'TestsRule!!'
+    mount = 'L'
+    good_data = mount + ': ' + _byte_array_to_hex_string(msg.encode())
+    parsed = _parse_instrument_data(good_data).get(mount)
+    assert parsed.decode() == msg
+
+
+def test_read_and_write_pipettes(model):
+    import types
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODES
+
+    driver = model.robot._driver
+    _old_send_command = driver._send_command
+
+    written_id = ''
+    written_model = ''
+    mount = 'L'
+
+    def _new_send_message(self, command, timeout=None):
+        nonlocal written_id, written_model, mount
+        if GCODES['READ_INSTRUMENT_ID'] in command:
+            return mount + ': ' + written_id
+        elif GCODES['READ_INSTRUMENT_MODEL'] in command:
+            return mount + ': ' + written_model
+        if GCODES['WRITE_INSTRUMENT_ID'] in command:
+            written_id = command[command.index(mount) + 1:]
+        elif GCODES['WRITE_INSTRUMENT_MODEL'] in command:
+            written_model = command[command.index(mount) + 1:]
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    test_id = 'TestsRock!!'
+    test_model = 'TestPipette'
+    driver.write_pipette_id('left', test_id)
+    read_id = driver.read_pipette_id('left')
+    assert read_id == test_id
+    driver.write_pipette_model('left', test_model)
+    read_model = driver.read_pipette_model('left')
+    assert read_model == test_model
+
+    driver._send_command = types.MethodType(_old_send_command, driver)
+
+
 def test_fast_home(model):
     import types
     driver = model.robot._driver

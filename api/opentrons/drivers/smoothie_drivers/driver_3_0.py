@@ -74,8 +74,6 @@ GCODES = {'HOME': 'G28.2',
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
-PIPETTE_DATA_LENGTH = 32
-
 
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
@@ -94,9 +92,13 @@ def _parse_axis_values(raw_axis_values):
 def _parse_instrument_data(smoothie_response):
     items = smoothie_response.split('\n')[0].strip().split(':')
     mount = items[0]
-    # data received from Smoothieware is stringified HEX values
-    # because of how Smoothieware handles GCODE messages
-    data = bytearray.fromhex(items[1])
+    try:
+        # data received from Smoothieware is stringified HEX values
+        # because of how Smoothieware handles GCODE messages
+        data = bytearray.fromhex(items[1])
+    except ValueError:
+        raise ParseError('Unexpected response from Smoothieware: {}'.format(
+            smoothie_response))
     return {mount: data}
 
 
@@ -197,38 +199,56 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
-    def _read_from_pipette(self, gcode, mount):
-        res = self._send_command(gcode + mount)
-        try:
-            res = _parse_instrument_data(res)
-            assert mount in res
-            assert len(res[mount]) == PIPETTE_DATA_LENGTH
-            return _byte_array_to_ascii_string(res[mount])
-        except Exception as e:
-            return None
+    def read_pipette_id(self, mount):
+        '''
+        Reads in an attached pipette's UUID
+        The UUID is unique to this pipette, and is a string of unknown length
 
-    def _write_to_pipette(self, gcode, mount, data_string):
-        if not isinstance(data_string, str):
-            raise ValueError(
-                'Expected {0}, not {1}'.format(str, type(data_string)))
-        byte_string = _byte_array_to_hex_string(
-            bytearray(data_string.encode()))
-        command = gcode + mount + byte_string
-        self._send_command(command)
-
-    def _read_pipette_id(self, mount):
+        mount:
+            String (str) with value 'left' or 'right'
+        '''
         return self._read_from_pipette(
             GCODES['READ_INSTRUMENT_ID'], mount)
 
-    def _read_pipette_model(self, mount):
+    def read_pipette_model(self, mount):
+        '''
+        Reads an attached pipette's MODEL
+        The MODEL is a unique string for this model of pipette
+
+        mount:
+            String (str) with value 'left' or 'right'
+        '''
         return self._read_from_pipette(
             GCODES['READ_INSTRUMENT_MODEL'], mount)
 
-    def _write_pipette_id(self, mount, data_string):
+    def write_pipette_id(self, mount, data_string):
+        '''
+        Writes to an attached pipette's UUID memory location
+        The UUID is unique to this pipette, and is a string of unknown length
+
+        NOTE: To enable write-access to the pipette, it's button must be held
+
+        mount:
+            String (str) with value 'left' or 'right'
+        data_string:
+            String (str) that is of unknown length, and should be unique to
+            this one pipette
+        '''
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_ID'], mount, data_string)
 
-    def _write_pipette_model(self, mount, data_string):
+    def write_pipette_model(self, mount, data_string):
+        '''
+        Writes to an attached pipette's MODEL memory location
+        The MODEL is a unique string for this model of pipette
+
+        NOTE: To enable write-access to the pipette, it's button must be held
+
+        mount:
+            String (str) with value 'left' or 'right'
+        data_string:
+            String (str) that is unique to this model of pipette
+        '''
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
 
@@ -520,6 +540,61 @@ class SmoothieDriver_3_0_0:
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
+
+    def _read_from_pipette(self, gcode, mount):
+        '''
+        Read from an attached pipette's internal memory. The gcode used
+        determines which portion of memory is read and returned.
+
+        gcode:
+            String (str) containing a GCode
+            either 'READ_INSTRUMENT_ID' or 'READ_INSTRUMENT_MODEL'
+        mount:
+            String (str) with value 'left' or 'right'
+        '''
+        allowed_mounts = {'left': 'L', 'right': 'R'}
+        mount = allowed_mounts.get(mount)
+        if not mount:
+            raise ValueError('Unexpected mount: {}'.format(mount))
+        try:
+            res = self._send_command(gcode + mount)
+            res = _parse_instrument_data(res)
+            assert mount in res
+            # data is read/written as strings of HEX characters
+            # to avoid firmware weirdness in how it parses GCode arguments
+            return _byte_array_to_ascii_string(res[mount])
+        except (ParseError, AssertionError, SmoothieError):
+            pass
+
+    def _write_to_pipette(self, gcode, mount, data_string):
+        '''
+        Write to an attached pipette's internal memory. The gcode used
+        determines which portion of memory is written to.
+
+        NOTE: To enable write-access to the pipette, it's button must be held
+
+        gcode:
+            String (str) containing a GCode
+            either 'WRITE_INSTRUMENT_ID' or 'WRITE_INSTRUMENT_MODEL'
+        mount:
+            String (str) with value 'left' or 'right'
+        data_string:
+            String (str) that is of unkown length
+        '''
+        allowed_mounts = {'left': 'L', 'right': 'R'}
+        mount = allowed_mounts.get(mount)
+        if not mount:
+            raise ValueError('Unexpected mount: {}'.format(mount))
+        if not isinstance(data_string, str):
+            raise ValueError(
+                'Expected {0}, not {1}'.format(str, type(data_string)))
+        # data is read/written as strings of HEX characters
+        # to avoid firmware weirdness in how it parses GCode arguments
+        byte_string = _byte_array_to_hex_string(
+            bytearray(data_string.encode()))
+        command = gcode + mount + byte_string
+        self._send_command(command)
+
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
