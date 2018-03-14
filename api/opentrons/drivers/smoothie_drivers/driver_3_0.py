@@ -429,6 +429,15 @@ class SmoothieDriver_3_0_0:
         (the axis for plunger control) do current ramp-up and ramp-down, so
         that plunger motors rest at a low current to prevent burn-out.
 
+        In the case of a limit-switch alarm during any command other than home,
+        the robot should home the axis from the alarm and then raise a
+        SmoothieError. The robot should *not* recover and continue to run the
+        protocol, as this could result in unpredicable handling of liquids.
+        When a SmoothieError is raised, the user should inspect the physical
+        configuration of the robot and the protocol and determine why the limit
+        switch was hit unexpectedly. This is usually due to an undetected
+        collision in a previous move command.
+
         :param command: the GCODE to submit to the robot
         :param timeout: the time to wait before returning (indefinite wait if
             this is set to none
@@ -445,6 +454,9 @@ class SmoothieDriver_3_0_0:
             if (ERROR_KEYWORD in ret_code.lower()) or \
                     (ALARM_KEYWORD in ret_code.lower()):
                 self._reset_from_error()
+                error_axis = ret_code.strip()[-1]
+                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                    self.home(error_axis)
                 raise SmoothieError(ret_code)
 
             return ret_code
