@@ -1,26 +1,30 @@
 // @flow
-import omit from 'lodash/omit'
+import merge from 'lodash/merge' // NOTE careful this mutates its first arg
 import aspirate from '../aspirate'
-import {getBasicRobotState} from './fixtures' // all8ChTipIds
-const AIR = 'air' // TODO get from constants
+import {createRobotStateFixture, createRobotState, all8ChTipIds} from './fixtures'
+import {AIR} from '../utils'
 
 describe('aspirate', () => {
-  const initialRobotState = getBasicRobotState()
-  const robotStateWithTip = {
-    ...initialRobotState,
-    tipState: {
-      ...initialRobotState.tipState,
-      pipettes: {
-        ...initialRobotState.tipState.pipettes,
-        p300SingleId: true,
-        p300MultiId: true
-      }
-    }
-  }
+  const initialRobotState = createRobotState({
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillPipetteTips: false,
+    fillTiprackTips: true
+  })
+  const robotStateWithTip = createRobotState({
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillPipetteTips: true,
+    fillTiprackTips: true
+  })
 
   // Fixtures without liquidState key, for use with `toMatchObject`
-  // const initialRobotStateNoLiquidState = omit(initialRobotState, ['liquidState'])
-  const robotStateWithTipNoLiquidState = omit(robotStateWithTip, ['liquidState'])
+  const robotStateWithTipNoLiquidState = createRobotStateFixture({
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillPipetteTips: true,
+    fillTiprackTips: true
+  })
 
   test('aspirate with tip', () => {
     const result = aspirate({
@@ -69,28 +73,47 @@ describe('aspirate', () => {
   })
 
   describe('liquid tracking:', () => {
-    // TODO IMMEDIATELY factor up to fixtures
-    const initialRobotWithIngred = {
-      ...robotStateWithTip,
-      liquidState: {
-        ...robotStateWithTip.liquidState,
-        labware: {
-          ...robotStateWithTip.liquidState.labware,
-          sourcePlateId: {
-            A1: {ingred1: {volume: 300}},
-            A2: {ingred1: {volume: 150}, ingred2: {volume: 150}}
-          },
-          destPlateId: {
-            A1: {ingred1: {volume: 200}},
-            B1: {ingred1: {volume: 150}},
-            A6: {ingred1: {volume: 200}, ingred2: {volume: 100}},
-            B6: {ingred1: {volume: 60}, ingred2: {volume: 70}}
+    const initialRobotWithIngred = merge(
+      {},
+      robotStateWithTip,
+      {
+        liquidState: {
+          labware: {
+            sourcePlateId: {
+              A1: {ingred1: {volume: 300}},
+              A2: {ingred1: {volume: 150}, ingred2: {volume: 150}}
+            },
+            destPlateId: {
+              A1: {ingred1: {volume: 200}},
+              B1: {ingred1: {volume: 150}},
+              A6: {ingred1: {volume: 200}, ingred2: {volume: 100}},
+              B6: {ingred1: {volume: 60}, ingred2: {volume: 70}}
+            }
           }
         }
       }
-    }
+    )
 
-    // Assertion for fixture
+    const robotWithLiquidInTipsNoAir = merge(
+      {},
+      initialRobotWithIngred,
+      {
+        liquidState: {
+          pipettes: {
+            p300SingleId: {'0': {ingred1: {volume: 30}}},
+            p300MultiId: all8ChTipIds.reduce((acc, tipIndex) => ({
+              ...acc,
+              [tipIndex]: {ingred1: {volume: 30}}
+            }), {})
+          }
+        }
+      }
+    )
+
+    // TODO Ian 2018-03-14 also do tests for tips that contain air
+    // (prereq: need to define behavior in liquid tracking for that)
+
+    // Assertion for fixture. Alternatively, could re-declare the fixtures for this set of tests
     if (initialRobotWithIngred.labware.destPlateId.type !== '96-flat') {
       throw new Error('This set of tests expects destPlateId to be "96-flat"')
     }
@@ -100,103 +123,132 @@ describe('aspirate', () => {
     }
 
     describe('...single-channel pipette', () => {
-      test('aspirate from single-ingredient well', () => {
-        const result = aspirate({
-          pipette: 'p300SingleId',
-          volume: 50,
-          labware: 'destPlateId',
-          well: 'A1'
-        })(initialRobotWithIngred)
+      describe('...fresh tip', () => {
+        test('aspirate from single-ingredient well', () => {
+          const result = aspirate({
+            pipette: 'p300SingleId',
+            volume: 50,
+            labware: 'destPlateId',
+            well: 'A1'
+          })(initialRobotWithIngred)
 
-        expect(result.robotState.liquidState).toEqual({
-          pipettes: {
-            ...initialRobotWithIngred.liquidState.pipettes,
-            p300SingleId: {
-              '0': {ingred1: {volume: 50}}
+          expect(result.robotState.liquidState).toEqual({
+            pipettes: {
+              ...initialRobotWithIngred.liquidState.pipettes,
+              p300SingleId: {
+                '0': {ingred1: {volume: 50}}
+              }
+            },
+            labware: {
+              ...initialRobotWithIngred.liquidState.labware,
+              destPlateId: {
+                ...initialRobotWithIngred.liquidState.labware.destPlateId,
+                A1: {ingred1: {volume: 150}}
+              }
             }
-          },
-          labware: {
-            ...initialRobotWithIngred.liquidState.labware,
-            destPlateId: {
-              ...initialRobotWithIngred.liquidState.labware.destPlateId,
-              A1: {ingred1: {volume: 150}}
+          })
+        })
+
+        test('aspirate everything + air from a single-ingredient well', () => {
+          const result = aspirate({
+            pipette: 'p300SingleId',
+            volume: 300,
+            labware: 'destPlateId',
+            well: 'A1'
+          })(initialRobotWithIngred)
+
+          expect(result.robotState.liquidState).toEqual({
+            pipettes: {
+              ...initialRobotWithIngred.liquidState.pipettes,
+              p300SingleId: {
+                '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}}
+              }
+            },
+            labware: {
+              ...initialRobotWithIngred.liquidState.labware,
+              destPlateId: {
+                ...initialRobotWithIngred.liquidState.labware.destPlateId,
+                A1: {ingred1: {volume: 0}}
+              }
             }
-          }
+          })
+        })
+
+        test('aspirate from two-ingredient well', () => {
+          const result = aspirate({
+            pipette: 'p300SingleId',
+            volume: 60,
+            labware: 'destPlateId',
+            well: 'A6'
+          })(initialRobotWithIngred)
+
+          expect(result.robotState.liquidState).toEqual({
+            pipettes: {
+              ...initialRobotWithIngred.liquidState.pipettes,
+              p300SingleId: {
+                '0': {ingred1: {volume: 40}, ingred2: {volume: 20}}
+              }
+            },
+            labware: {
+              ...initialRobotWithIngred.liquidState.labware,
+              destPlateId: {
+                ...initialRobotWithIngred.liquidState.labware.destPlateId,
+                A6: {ingred1: {volume: 200 - 40}, ingred2: {volume: 100 - 20}}
+              }
+            }
+          })
+        })
+
+        test('aspirate everything + air from two-ingredient well', () => {
+          const result = aspirate({
+            pipette: 'p300SingleId',
+            volume: 150,
+            labware: 'destPlateId',
+            well: 'B6'
+          })(initialRobotWithIngred)
+
+          expect(result.robotState.liquidState).toEqual({
+            pipettes: {
+              ...initialRobotWithIngred.liquidState.pipettes,
+              p300SingleId: {
+                '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}}
+              }
+            },
+            labware: {
+              ...initialRobotWithIngred.liquidState.labware,
+              destPlateId: {
+                ...initialRobotWithIngred.liquidState.labware.destPlateId,
+                B6: {ingred1: {volume: 0}, ingred2: {volume: 0}}
+              }
+            }
+          })
         })
       })
 
-      test('aspirate everything + air from a single-ingredient well', () => {
-        const result = aspirate({
-          pipette: 'p300SingleId',
-          volume: 300,
-          labware: 'destPlateId',
-          well: 'A1'
-        })(initialRobotWithIngred)
+      describe('...tip already containing liquid', () => {
+        test('aspirate from single-ingredient well', () => {
+          const result = aspirate({
+            pipette: 'p300SingleId',
+            volume: 50,
+            labware: 'destPlateId',
+            well: 'A1'
+          })(robotWithLiquidInTipsNoAir)
 
-        expect(result.robotState.liquidState).toEqual({
-          pipettes: {
-            ...initialRobotWithIngred.liquidState.pipettes,
-            p300SingleId: {
-              '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}}
+          expect(result.robotState.liquidState).toEqual({
+            pipettes: {
+              ...robotWithLiquidInTipsNoAir.liquidState.pipettes,
+              p300SingleId: {
+                '0': {ingred1: {volume: 30 + 50}}
+              }
+            },
+            labware: {
+              ...robotWithLiquidInTipsNoAir.liquidState.labware,
+              destPlateId: {
+                ...robotWithLiquidInTipsNoAir.liquidState.labware.destPlateId,
+                A1: {ingred1: {volume: 150}}
+              }
             }
-          },
-          labware: {
-            ...initialRobotWithIngred.liquidState.labware,
-            destPlateId: {
-              ...initialRobotWithIngred.liquidState.labware.destPlateId,
-              A1: {ingred1: {volume: 0}}
-            }
-          }
-        })
-      })
-
-      test('aspirate from two-ingredient well', () => {
-        const result = aspirate({
-          pipette: 'p300SingleId',
-          volume: 60,
-          labware: 'destPlateId',
-          well: 'A6'
-        })(initialRobotWithIngred)
-
-        expect(result.robotState.liquidState).toEqual({
-          pipettes: {
-            ...initialRobotWithIngred.liquidState.pipettes,
-            p300SingleId: {
-              '0': {ingred1: {volume: 40}, ingred2: {volume: 20}}
-            }
-          },
-          labware: {
-            ...initialRobotWithIngred.liquidState.labware,
-            destPlateId: {
-              ...initialRobotWithIngred.liquidState.labware.destPlateId,
-              A6: {ingred1: {volume: 200 - 40}, ingred2: {volume: 100 - 20}}
-            }
-          }
-        })
-      })
-
-      test('aspirate everything + air from two-ingredient well', () => {
-        const result = aspirate({
-          pipette: 'p300SingleId',
-          volume: 150,
-          labware: 'destPlateId',
-          well: 'B6'
-        })(initialRobotWithIngred)
-
-        expect(result.robotState.liquidState).toEqual({
-          pipettes: {
-            ...initialRobotWithIngred.liquidState.pipettes,
-            p300SingleId: {
-              '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}}
-            }
-          },
-          labware: {
-            ...initialRobotWithIngred.liquidState.labware,
-            destPlateId: {
-              ...initialRobotWithIngred.liquidState.labware.destPlateId,
-              B6: {ingred1: {volume: 0}, ingred2: {volume: 0}}
-            }
-          }
+          })
         })
       })
     })

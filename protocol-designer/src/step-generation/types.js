@@ -70,7 +70,10 @@ export type LabwareData = {
   slot: DeckSlot
 }
 
-type TipId = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7'
+/** tips are numbered 0-7. 0 is the furthest to the back of the robot.
+  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
+  */
+type TipId = string
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|

@@ -3,7 +3,7 @@
 import {computeWellAccess} from '@opentrons/labware-definitions'
 import range from 'lodash/range'
 import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
-import {splitLiquid} from './utils'
+import {mergeLiquid, splitLiquid} from './utils'
 
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
   /** Aspirate with given args. Requires tip. */
@@ -45,13 +45,26 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
   }
 
   // TODO unify this: for each tip, a well (except for trough :/ )
-  const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => ({
-    ...acc,
-    [tipIndex]: splitLiquid(
-      volume / pipetteData.channels,
-      prevRobotState.liquidState.labware[labware][wellsForTips[tipIndex]]
+  // TODO standardize a way in command generators and in tests to get 8-channel tip IDs/indicies (ie: either use lodash/range, or import const)
+  const allWellsShared = wellsForTips.length > 1 && wellsForTips.every(w => w && w === wellsForTips[0])
+
+  const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => {
+    const prevTipLiquidState = prevRobotState.liquidState.pipettes[pipette][tipIndex]
+    const prevSourceLiquidState = prevRobotState.liquidState.labware[labware][wellsForTips[tipIndex]]
+
+    const newLiquidFromWell = splitLiquid(
+      allWellsShared ? volume / pipetteData.channels : volume,
+      prevSourceLiquidState
     ).dest
-  }), {})
+
+    return {
+      ...acc,
+      [tipIndex]: mergeLiquid(
+        prevTipLiquidState,
+        newLiquidFromWell
+      )
+    }
+  }, {})
 
   const labwareLiquidState = {
     ...prevRobotState.liquidState.labware[labware],
