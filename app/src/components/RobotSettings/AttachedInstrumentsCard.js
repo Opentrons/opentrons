@@ -1,17 +1,11 @@
-// @flow
 // RobotSettings card for wifi status
 import * as React from 'react'
-import {type StateInstrument} from '../../robot'
 import InstrumentInfo from './InstrumentInfo'
 import {Card} from '@opentrons/components'
 
-type Props = {
-  left: StateInstrument,
-  right: StateInstrument
-}
 const TITLE = 'Pipettes'
 
-export default function AttachedInstrumentsCard (props: Props) {
+export default function AttachedInstrumentsCard (props) {
   // TODO (ka 2018-3-14): not sure where this will be comining from in state so mocking it up for styling purposes
   // here I am assuming they key and  mount will always exist and some sort of presence of a pipette indicator will affect InstrumentInfo
   // delete channels and volume in either elft or right to view value and button message change
