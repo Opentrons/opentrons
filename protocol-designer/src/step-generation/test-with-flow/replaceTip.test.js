@@ -1,6 +1,6 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState, getTiprackTipstate} from './fixtures'
+import {createRobotState, getTiprackTipstate, getTipColumn} from './fixtures'
 import {replaceTip} from '../'
 
 // TODO use a fixture, standardize
@@ -99,16 +99,7 @@ describe('replaceTip: single channel', () => {
       {
         tipState: {
           tipracks: {
-            [tiprack1Id]: {
-              A1: false,
-              B1: false,
-              C1: false,
-              D1: false,
-              E1: false,
-              F1: false,
-              G1: false,
-              H1: false
-            }
+            [tiprack1Id]: getTipColumn(1, false)
           },
           pipettes: {
             p300SingleId: false
@@ -255,7 +246,7 @@ describe('replaceTip: multi-channel', () => {
       {
         tipState: {
           tipracks: {
-            [tiprack1Id]: {A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
+            [tiprack1Id]: getTipColumn(1, false)
           },
           pipettes: {
             p300MultiId: true
@@ -344,8 +335,11 @@ describe('replaceTip: multi-channel', () => {
       {
         tipState: {
           tipracks: {
-            [tiprack1Id]: {...getTiprackTipstate(true), A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
-            [tiprack2Id]: {...getTiprackTipstate(true)}
+            [tiprack1Id]: {
+              ...getTiprackTipstate(true),
+              ...getTipColumn(1, false)
+            },
+            [tiprack2Id]: getTiprackTipstate(true)
           },
           pipettes: {
             p300MultiId: true

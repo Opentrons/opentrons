@@ -1,5 +1,5 @@
 // @flow
-import {createRobotState, createEmptyLiquidState, filledTiprackWells, emptyTiprackWells} from './fixtures'
+import {createRobotState, createEmptyLiquidState, getTiprackTipstate} from './fixtures'
 
 describe('createEmptyLiquidState fixture generator', () => {
   test('labware', () => {
@@ -39,51 +39,45 @@ describe('createEmptyLiquidState fixture generator', () => {
 })
 
 // TODO IMMEDIATELY: update to use refactored createRobotStateFixture fn
-describe.skip('createRobotState fixture generator', () => {
+describe('createRobotState fixture generator', () => {
   describe('tip filling', () => {
-    const tipFillingOptions = ['full', 'empty']
+    const tipFillingOptions = [true, false]
 
     tipFillingOptions.forEach(fillTiprackTips => {
-      test('tiprack tips: ' + fillTiprackTips, () => {
+      test('tiprack tips: ' + (fillTiprackTips ? 'full' : 'empty'), () => {
         const result = createRobotState({
-          labware: {tiprack1: {type: 'tiprack-200ul', slot: '1', name: ''}},
-          pipetteTips: 'empty',
-          tiprackTips: fillTiprackTips
+          sourcePlateType: 'trough-12row',
+          destPlateType: '96-flat',
+          fillPipetteTips: false,
+          fillTiprackTips,
+          tipracks: [200, 200]
         })
 
-        expect(result).toHaveProperty('tipState.tipracks.tiprack1')
-        expect(result.tipState.tipracks['tiprack1']).toEqual(fillTiprackTips === 'full'
-          ? filledTiprackWells
-          : emptyTiprackWells
-        )
+        const tiprackIds = ['tiprack1Id', 'tiprack2Id']
+        tiprackIds.forEach(tiprackId => {
+          expect(result).toHaveProperty(`tipState.tipracks.${tiprackId}`)
+
+          expect(result.tipState.tipracks[tiprackId]).toEqual(
+            getTiprackTipstate(fillTiprackTips)
+          )
+        })
       })
     })
 
     tipFillingOptions.forEach(fillPipetteTips => {
-      test('tiprack tips ' + fillPipetteTips, () => {
+      test('tiprack tips ' + (fillPipetteTips ? 'full' : 'empty'), () => {
         const result = createRobotState({
-          labware: {},
-          leftPipette: 'p300Single',
-          rightPipette: 'p10Multi',
-          pipetteTips: fillPipetteTips,
-          tiprackTips: 'empty'
+          sourcePlateType: 'trough-12row',
+          destPlateType: '96-flat',
+          fillPipetteTips,
+          fillTiprackTips: true,
+          tipracks: [200, 200]
         })
 
-        const tipIsFull = fillPipetteTips === 'full'
-
-        expect(result).toHaveProperty('tipState.pipettes.left')
-        expect(result.tipState.pipettes.left).toEqual({'0': tipIsFull})
-
-        expect(result).toHaveProperty('tipState.pipettes.right')
-        expect(result.tipState.pipettes.right).toEqual({
-          '0': tipIsFull,
-          '1': tipIsFull,
-          '2': tipIsFull,
-          '3': tipIsFull,
-          '4': tipIsFull,
-          '5': tipIsFull,
-          '6': tipIsFull,
-          '7': tipIsFull
+        const pipetteIds = ['p300SingleId', 'p300MultiId']
+        pipetteIds.forEach(pipetteId => {
+          expect(result).toHaveProperty(`tipState.pipettes.${pipetteId}`)
+          expect(result.tipState.pipettes[pipetteId]).toEqual(fillPipetteTips)
         })
       })
     })

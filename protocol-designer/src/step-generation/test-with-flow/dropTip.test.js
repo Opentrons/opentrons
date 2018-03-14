@@ -16,8 +16,8 @@ function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) 
     {
       tipState: {
         pipettes: {
-          p300Single: args.singleHasTips,
-          p300Multi: args.multiHasTips
+          p300SingleId: args.singleHasTips,
+          p300MultiId: args.multiHasTips
         }
       }
     }
@@ -26,10 +26,10 @@ function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) 
 
 describe('replaceTip: single channel', () => {
   test('drop tip if there is a tip', () => {
-    const result = dropTip('p300Single')(makeRobotState({singleHasTips: true, multiHasTips: true}))
+    const result = dropTip('p300SingleId')(makeRobotState({singleHasTips: true, multiHasTips: true}))
     expect(result.commands).toEqual([{
       command: 'drop-tip',
-      pipette: 'p300Single',
+      pipette: 'p300SingleId',
       labware: 'trashId',
       well: 'A1'
     }])
@@ -38,7 +38,7 @@ describe('replaceTip: single channel', () => {
 
   test('no tip on pipette, ignore dropTip', () => {
     const initialRobotState = makeRobotState({singleHasTips: false, multiHasTips: true})
-    const result = dropTip('p300Single')(initialRobotState)
+    const result = dropTip('p300SingleId')(initialRobotState)
     expect(result.commands).toEqual([])
     expect(result.robotState).toEqual(initialRobotState)
   })
@@ -46,10 +46,10 @@ describe('replaceTip: single channel', () => {
 
 describe('Multi-channel dropTip', () => {
   test('drop tip if there is a tip', () => {
-    const result = dropTip('p300Multi')(makeRobotState({singleHasTips: true, multiHasTips: true}))
+    const result = dropTip('p300MultiId')(makeRobotState({singleHasTips: true, multiHasTips: true}))
     expect(result.commands).toEqual([{
       command: 'drop-tip',
-      pipette: 'p300Multi',
+      pipette: 'p300MultiId',
       labware: 'trashId',
       well: 'A1'
     }])
@@ -58,7 +58,7 @@ describe('Multi-channel dropTip', () => {
 
   test('no tip on pipette, ignore dropTip', () => {
     const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: false})
-    const result = dropTip('p300Multi')(initialRobotState)
+    const result = dropTip('p300MultiId')(initialRobotState)
     expect(result.commands).toEqual([])
     expect(result.robotState).toEqual(initialRobotState)
   })
