@@ -33,6 +33,8 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
 type Vol = {volume: number}
 type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
+export const AIR = 'air' // TODO use Symbol?
+
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
   source: LiquidVolumeState,
@@ -44,12 +46,30 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
     0
   )
 
+  if (AIR in sourceLiquidState) {
+    throw new Error(`Invalid source liquid state: source cannot contain air (key '${AIR}' cannot exist in sourceLiquidState object)`)
+  }
+
   if (totalSourceVolume === 0) {
-    throw new Error('Cannot split liquid: no volume in source')
+    // Splitting from empty source
+    return {
+      source: sourceLiquidState,
+      dest: {[AIR]: {volume}}
+    }
   }
 
   if (volume > totalSourceVolume) {
-    throw new Error(`Cannot split liquid: volume ${volume} exceeds source volume ${totalSourceVolume}`)
+    // Take all of source, plus air
+    return {
+      source: Object.keys(sourceLiquidState).reduce((acc, ingredId) => ({ // TODO mapvalues?
+        ...acc,
+        [ingredId]: {volume: 0}
+      }), {}),
+      dest: {
+        ...sourceLiquidState,
+        [AIR]: {volume: volume - totalSourceVolume}
+      }
+    }
   }
 
   const ratios: {[ingredId: string]: number} = reduce(

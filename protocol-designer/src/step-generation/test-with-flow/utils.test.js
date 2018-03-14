@@ -1,5 +1,5 @@
 // @flow
-import {repeatArray, reduceCommandCreators, splitLiquid, mergeLiquid} from '../utils'
+import {repeatArray, reduceCommandCreators, splitLiquid, mergeLiquid, AIR} from '../utils'
 
 describe('repeatArray', () => {
   test('repeat array of objects', () => {
@@ -152,22 +152,37 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('splitting with no ingredients in source raises error', () => {
+  test('splitting with no ingredients in source just splits "air"', () => {
     expect(
-      () => splitLiquid(100, {})
-    ).toThrowError(/no volume in source/)
+      splitLiquid(100, {})
+    ).toEqual({
+      source: {},
+      dest: {[AIR]: {volume: 100}}
+    })
   })
 
-  test('splitting with 0 volume in source raises error', () => {
+  test('splitting with 0 volume in source just splits "air"', () => {
     expect(
-      () => splitLiquid(100, {ingred1: {volume: 0}})
-    ).toThrowError(/no volume in source/)
+      splitLiquid(100, {ingred1: {volume: 0}})
+    ).toEqual({
+      source: {ingred1: {volume: 0}},
+      dest: {[AIR]: {volume: 100}}
+    })
   })
 
-  test('splitting with excessive volume raises error', () => {
+  test('splitting with excessive volume leaves "air" in dest', () => {
     expect(
-      () => splitLiquid(999, {ingred1: {volume: 10}})
-    ).toThrowError(/exceeds source volume/)
+      splitLiquid(100, {ingred1: {volume: 50}, ingred2: {volume: 20}})
+    ).toEqual({
+      source: {ingred1: {volume: 0}, ingred2: {volume: 0}},
+      dest: {ingred1: {volume: 50}, ingred2: {volume: 20}, [AIR]: {volume: 30}}
+    })
+  })
+
+  test('splitting with air in source should throw error', () => {
+    expect(
+      () => splitLiquid(50, {ingred1: {volume: 100}, [AIR]: {volume: 20}})
+    ).toThrow(/source cannot contain air/)
   })
 })
 

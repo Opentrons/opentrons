@@ -1,4 +1,5 @@
 // @flow
+import omit from 'lodash/omit'
 import aspirate from '../aspirate'
 import {getBasicRobotState} from './fixtures' // all8ChTipIds
 const AIR = 'air' // TODO get from constants
@@ -17,6 +18,10 @@ describe('aspirate', () => {
     }
   }
 
+  // Fixtures without liquidState key, for use with `toMatchObject`
+  // const initialRobotStateNoLiquidState = omit(initialRobotState, ['liquidState'])
+  const robotStateWithTipNoLiquidState = omit(robotStateWithTip, ['liquidState'])
+
   test('aspirate with tip', () => {
     const result = aspirate({
       pipette: 'p300SingleId',
@@ -33,7 +38,7 @@ describe('aspirate', () => {
       well: 'A1'
     }])
 
-    expect(result.robotState).toEqual(robotStateWithTip)
+    expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
   })
 
   test('aspirate with volume > pipette max vol should throw error', () => {
@@ -189,7 +194,7 @@ describe('aspirate', () => {
             ...initialRobotWithIngred.liquidState.labware,
             destPlateId: {
               ...initialRobotWithIngred.liquidState.labware.destPlateId,
-              A6: {ingred1: {volume: 0}, ingred2: {volume: 0}}
+              B6: {ingred1: {volume: 0}, ingred2: {volume: 0}}
             }
           }
         })
@@ -260,7 +265,7 @@ describe('aspirate', () => {
       test('aspirate from single-ingredient common well (trough-12row)', () => {
         const result = aspirate({
           pipette: 'p300MultiId',
-          volume: 150,
+          volume: 100,
           labware: 'sourcePlateId',
           well: 'A1'
         })(initialRobotWithIngred)
@@ -271,7 +276,7 @@ describe('aspirate', () => {
             p300MultiId: {
               ...(Array.from('01234567').reduce((acc, tipId) => ({
                 ...acc,
-                [tipId]: {ingred1: {volume: 150 / 8}} // aspirate volume divided among the 8 tips
+                [tipId]: {ingred1: {volume: 100 / 8}} // aspirate volume divided among the 8 tips
               }), {}))
             }
           },
@@ -279,7 +284,7 @@ describe('aspirate', () => {
             ...initialRobotWithIngred.liquidState.labware,
             sourcePlateId: {
               ...initialRobotWithIngred.liquidState.labware.sourcePlateId,
-              A1: {ingred1: {volume: 150}}
+              A1: {ingred1: {volume: 200}}
             }
           }
         })
