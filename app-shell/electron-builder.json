@@ -10,6 +10,13 @@
       "filter": ["**/*"]
     }
   ],
+  "extraResources": [
+    {
+      "from": "../api/dist",
+      "to": "./api/dist",
+      "filter": ["**/*"]
+    }
+  ],
   "artifactName": "opentrons-v${version}-${os}-${arch}${env.OT_TIME_SUFFIX}${env.OT_BRANCH_SUFFIX}${env.OT_COMMIT_SUFFIX}.${ext}",
   "asar": true,
   "dmg": {

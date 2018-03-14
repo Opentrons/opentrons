@@ -8,6 +8,9 @@ PATH := $(shell yarn bin):$(PATH)
 # ui directory for production build
 ui_dir := ../app
 
+# api directory for robot API update bundled in production build
+api_dir := ../api
+
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
 
@@ -15,7 +18,7 @@ env := cross-env NODE_ENV
 #####################################################################
 
 .PHONY: all
-all: clean package
+all: package
 
 .PHONY: install
 install:
@@ -36,27 +39,34 @@ clean:
 ui:
 	$(MAKE) -C $(ui_dir)
 
+.PHONY: api
+api:
+	$(MAKE) -C $(api_dir) wheel
+
+.PHONY: package-deps
+package-deps: clean ui api
+
 .PHONY: package
-package: ui
+package: package-deps
 	electron-builder --dir
 
 .PHONY: dist-posix
-dist-posix: clean ui
+dist-posix: package-deps
 	electron-builder --linux --mac --publish never
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-osx
-dist-osx: clean ui
+dist-osx: package-deps
 	electron-builder --mac --publish never
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
-dist-linux: clean ui
+dist-linux: package-deps
 	electron-builder --linux --publish never
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-win
-dist-win: clean ui
+dist-win: package-deps
 	electron-builder --win --x64 --publish never
 	$(MAKE) _dist-collect-artifacts
 

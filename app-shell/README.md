@@ -62,16 +62,18 @@ This section details production build instructions for the desktop application.
 *   `make dist-posix` - Create macOS and Linux apps simultaneously
 *   `make dist-win` - Create a Windows distributable of the app
 
+#### production builds
+
 All packages and/or distributables will be placed in `app-shell/dist`. After running `make package`, you can launch the production app with:
 
-*   macOS: `./dist/mac/Opentrons.app/Contents/MacOS/Opentrons\ Run`
-*   Linux: `./dist/linux-unpacked/opentrons-run`
-*   Windows: `TODO`
+*   macOS: `./dist/mac/Opentrons.app/Contents/MacOS/Opentrons`
+*   Linux: `./dist/linux-unpacked/ot-app-desktop`
+*   Windows: `./dist/win-unpacked/Opentrons.exe`
 
 To run the production app in debug mode, set the `DEBUG` environment variable. For example, on macOS:
 
 ```shell
-DEBUG=1 `./dist/mac/Opentrons.app/Contents/MacOS/Opentrons\ Run`
+DEBUG=1 ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons
 ```
 
 [style-guide]: https://standardjs.com
