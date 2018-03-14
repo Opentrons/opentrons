@@ -32,13 +32,18 @@ def calibrate_container_with_delta(
         pose_tree, container, delta_x,
         delta_y, delta_z, save, new_container_name=None
 ):
+
     delta = Point(delta_x, delta_y, delta_z)
+
     new_coordinates = change_base(
         pose_tree,
         src=container,
         dst=container.parent) + delta
+
     pose_tree = update(pose_tree, container, new_coordinates)
+
     container._coordinates = container._coordinates + delta
+
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
     elif save:

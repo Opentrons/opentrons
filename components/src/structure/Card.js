@@ -9,6 +9,8 @@ import styles from './structure.css'
 type Props = {
   /** Title for card */
   title: React.Node,
+  /** Optional description or message for card */
+  description?: string,
   /** Card content, displays in a flex-row by default */
   children: React.Node,
   /** Displays card content in a flex-column */
@@ -32,6 +34,13 @@ export default function Card (props: Props) {
   return (
     <section className={style}>
       <h3 className={styles.card_title}>{title}</h3>
+      {props.description &&
+        (<p
+          className={styles.card_description}
+          >
+          {props.description}
+        </p>)
+      }
       <div className={childrenStyle}>
         {children}
       </div>

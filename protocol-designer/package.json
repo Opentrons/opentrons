@@ -11,13 +11,10 @@
   "private": true,
   "version": "3.0.0",
   "description": "Protocol designer app",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "jest",
-    "flow": "flow check",
-    "lint": "standard; stylelint '**/*.css'",
-    "build": "cross-env NODE_ENV=production webpack -p && cp index.html dist/",
-    "start": "cross-env NODE_ENV=development webpack-dev-server --hot"
+    "test": "make test",
+    "start": "make dev"
   },
   "jest": {
     "transformIgnorePatterns": [

@@ -314,6 +314,50 @@ def test_switch_state(model):
     assert driver.switch_state == expected
 
 
+def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
+    """
+    This functions as a contract test around recovery from a limit-switch hit.
+    Note that this *does not* itself guarantee correct physical behavior--this
+    interaction has been designed and tested on the robot manually and then
+    encoded in this test. If requirements change around physical behavior, then
+    this test will need to be revised.
+    """
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import (
+        serial_communication, GCODES, SmoothieError)
+
+    driver = model.robot._driver
+    model.robot.home()
+    cmd_list = []
+
+    def write_mock(command, serial_connection, timeout):
+        nonlocal cmd_list
+        cmd_list.append(command)
+        if GCODES['MOVE'] in command:
+            return "ALARM: Hard limit +C"
+        elif GCODES['CURRENT_POSITION'] in command:
+            return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+        else:
+            return "ok"
+
+    monkeypatch.setattr(serial_communication, 'write_and_return', write_mock)
+
+    driver.simulating = False
+    # This will cause a limit-switch error and not back off
+    with pytest.raises(SmoothieError):
+        driver.move({'C': 100})
+
+    assert [c.split(' ')[0] for c in cmd_list] == [
+        'M907',        # set current up
+        'G4P0.05',     # dwell
+        'G0C100.3',    # move C (with backlash compensation)
+        'M999',        # reset from error
+        'G28.2C',      # home
+        'M907',        # set current
+        'G4P0.05',     # dwell
+        'M114.2'       # get current position
+    ]
+
+
 def test_pause_resume(model):
     """
     This test has to use an ugly work-around with the `simulating` member of

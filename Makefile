@@ -10,6 +10,7 @@ API_DIR := api
 COMPONENTS_DIR := components
 APP_DIR := app
 APP_SHELL_DIR := app-shell
+LABWARE_DEFINITIONS_DIR := labware-definitions
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
 # install all project dependencies
@@ -19,10 +20,11 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 #   https://github.com/electron-userland/electron-builder/issues/2222
 .PHONY: install
 install:
-	pip install pipenv==9.0.3
+	pip install pipenv==11.6.8
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) install
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
 	$(MAKE) install-types
 
 .PHONY: install-types
@@ -33,7 +35,7 @@ install-types:
 
 # all tests
 .PHONY: test
-test: test-api test-components test-app test-pd
+test: test-api test-components test-app test-pd test-labware-definitions
 
 .PHONY: test-api
 test-api:
@@ -50,6 +52,10 @@ test-app:
 .PHONY: test-pd
 test-pd:
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
+
+.PHONY: test-labware-definitions
+test-labware-definitions:
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) test
 
 # lints and typechecks
 .PHONY: lint

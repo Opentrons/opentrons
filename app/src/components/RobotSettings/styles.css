@@ -17,6 +17,7 @@
 
 .column_50 {
   display: inline-block;
+  vertical-align: top;
   width: calc(50% - (0.5 * var(--robot_settings_card_spacing)));
 
   &:not(:last-child) {

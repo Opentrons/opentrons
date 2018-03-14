@@ -578,10 +578,6 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
-    # DEPRECATED
-    def move_plunger(self, *args, **kwargs):
-        self._driver.move_plunger(*args, **kwargs)
-
     def head_speed(
             self, combined_speed=None,
             x=None, y=None, z=None, a=None, b=None, c=None):
@@ -991,10 +987,25 @@ class Robot(object):
             dst=well
         )
 
+        if fflags.calibrate_to_bottom():
+
+            delta_x = delta[0]
+            delta_y = delta[1]
+            if 'tiprack' in container.get_type():
+                delta_z = delta[2]
+            else:
+                delta_z = delta[2] + well.z_size()
+        else:
+            delta_x = delta[0]
+            delta_y = delta[1]
+            delta_z = delta[2]
         self.poses = calib.calibrate_container_with_delta(
             self.poses,
             container,
-            *delta, save
+            delta_x,
+            delta_y,
+            delta_z,
+            save
         )
 
         self.max_deck_height.cache_clear()

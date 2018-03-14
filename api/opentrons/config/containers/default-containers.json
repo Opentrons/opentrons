@@ -10064,7 +10064,8 @@
           "tube-rack-.75ml": {
                "origin-offset": {
                     "x": 13.5,
-                    "y": 15
+                    "y": 15,
+                    "z": 55
                },
                "locations": {
                     "A1": {
@@ -10265,7 +10266,8 @@
           "tube-rack-2ml": {
                "origin-offset": {
                     "x": 13,
-                    "y": 16
+                    "y": 16,
+                    "z": 52
                },
                "locations": {
                     "A1": {
@@ -10466,14 +10468,15 @@
           "tube-rack-15_50ml": {
                "origin-offset": {
                     "x": 11,
-                    "y": 19
+                    "y": 19,
+                    "z": 5
                },
                "locations": {
                     "A1": {
                          "x": 0,
                          "y": 0,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10481,7 +10484,7 @@
                          "x": 31.5,
                          "y": 0,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10489,7 +10492,7 @@
                          "x": 63,
                          "y": 0,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10497,7 +10500,7 @@
                          "x": 0,
                          "y": 22.7,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10505,7 +10508,7 @@
                          "x": 31.5,
                          "y": 22.7,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10513,7 +10516,7 @@
                          "x": 63,
                          "y": 22.7,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 17,
                          "total-liquid-volume": 15000
                     },
@@ -10521,7 +10524,7 @@
                          "x": 5.9,
                          "y": 51.26,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 30,
                          "total-liquid-volume": 50000
                     },
@@ -10529,7 +10532,7 @@
                          "x": 51.26,
                          "y": 51.26,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 30,
                          "total-liquid-volume": 50000
                     },
@@ -10537,7 +10540,7 @@
                          "x": 5.9,
                          "y": 87.1,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 30,
                          "total-liquid-volume": 50000
                     },
@@ -10545,7 +10548,7 @@
                          "x": 51.26,
                          "y": 87.1,
                          "z": 0,
-                         "depth": 76.81281249999999,
+                         "depth": 115,
                          "diameter": 30,
                          "total-liquid-volume": 50000
                     }

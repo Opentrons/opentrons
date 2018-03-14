@@ -12,6 +12,7 @@
   --fw-bold: 800;
   --fw-semibold: 600;
   --fw-regular: 400;
+  --fw-light: 300;
 
   --font-huge-dark: {
     font-size: var(--fs-huge);
