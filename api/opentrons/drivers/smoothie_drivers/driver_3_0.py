@@ -445,7 +445,7 @@ class SmoothieDriver_3_0_0:
         self.pop_axis_max_speed()
 
     def _setup(self):
-        self._smoothie_reset()
+        self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.current)
         self._send_command(self._config.steps_per_mm)

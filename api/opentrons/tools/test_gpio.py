@@ -21,9 +21,9 @@ def get_state_of_inputs():
 
 def set_lights(state):
     if state['windows']:
-        robot._driver.turn_on_rail_lights()
-    else:
         robot._driver.turn_off_rail_lights()
+    else:
+        robot._driver.turn_on_rail_lights()
     red, green, blue = (False, False, False)
     if any(state['endstops'].values()):
         red = True

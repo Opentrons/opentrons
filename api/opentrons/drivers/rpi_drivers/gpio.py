@@ -148,14 +148,5 @@ def initialize():
     for pin in sorted(OUTPUT_PINS.values()):
         _enable_pin(pin, OUT)
 
-    # smoothieware programming pins, must be in a known state (HIGH)
-    set_high(OUTPUT_PINS['HALT'])
-    set_high(OUTPUT_PINS['ISP'])
-    set_high(OUTPUT_PINS['RESET'])
-
-    # audio-enable pin can stay HIGH always, unless there is noise coming
-    # from the amplifier, then we can set to LOW to disable the amplifier
-    set_high(OUTPUT_PINS['AUDIO_ENABLE'])
-
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
