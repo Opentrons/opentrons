@@ -16,9 +16,9 @@ def scan_instruments(robot):
     '''
     print()
     found_instruments = {}
-    for mount in 'LR':
-        read_id = robot._driver._read_pipette_id(mount)
-        read_model = robot._driver._read_pipette_model(mount)
+    for mount in ['left', 'right']:
+        read_id = robot._driver.read_pipette_id(mount)
+        read_model = robot._driver.read_pipette_model(mount)
         if read_id and read_model:
             found_instruments[mount] = {
                 'id': read_id,
@@ -39,11 +39,12 @@ def select_mount(found_instruments):
     User selects which mount to write the data to (L or R)
     '''
     print()
-    mount_msg = 'Select which side pipette to write to (L or R):  '
+    mount_msg = 'Select which side pipette to write to (enter "l" or "r"):  '
     res = input(mount_msg)
-    mount = res.strip().upper()[0]
+    mount = res.strip().upper()[0].upper()
     if mount not in 'LR':
         raise Exception('Unknown mount: {}'.format(res))
+    mount = {'L': 'left', 'R': 'right'}.get(mount)
     print('Writing to mount {}'.format(mount))
     if mount in found_instruments:
         confirm_msg = 'Pipette {} already has data. '.format(mount)
@@ -84,12 +85,12 @@ def write_identifiers(robot, mount, new_id, new_model):
     if 'Y' not in input('Ready to save the ID? (Y or N):  ').upper():
         raise Exception('Not writing ID to pipette, and exiting script')
 
-    robot._driver._write_pipette_id(mount, new_id)
-    read_id = robot._driver._read_pipette_id(mount)
+    robot._driver.write_pipette_id(mount, new_id)
+    read_id = robot._driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id)
 
-    robot._driver._write_pipette_model(mount, new_model)
-    read_model = robot._driver._read_pipette_model(mount)
+    robot._driver.write_pipette_model(mount, new_model)
+    read_model = robot._driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
 
 

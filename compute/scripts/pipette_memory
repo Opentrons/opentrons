@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+python -m opentrons.tools.write_pipette_memory

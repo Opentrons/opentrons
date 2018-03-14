@@ -37,12 +37,15 @@ OUTPUT_PINS = {
     'BLUE_BUTTON': 13,
     'HALT': 18,
     'GREEN_BUTTON': 19,
-    # 'RESET': 24,  # Not currently used--slower restart and noisy serial resp
+    'AUDIO_ENABLE': 21,
+    'ISP': 23,
+    'RESET': 24,
     'RED_BUTTON': 26
 }
 
 INPUT_PINS = {
-    'BUTTON_INPUT': 5
+    'BUTTON_INPUT': 5,
+    'WINDOW_INPUT': 20
 }
 
 _path_prefix = "/sys/class/gpio"
@@ -80,6 +83,20 @@ def _write_value(value, path):
     system(command.format(value, path))
 
 
+def _read_value(path):
+    """
+    Reads value of specified path.
+    :param path: A valid system path
+    """
+    read_value = 0
+    if platform == 'win32':
+        pass
+    else:
+        with open(path) as f:
+            read_value = int(f.read())
+    return read_value
+
+
 def set_high(pin):
     """
     Sets a pin high by number. This pin must have been previously initialized
@@ -110,6 +127,18 @@ def set_low(pin):
     _write_value(LOW, "{0}/gpio{1}/value".format(_path_prefix, pin))
 
 
+def read(pin):
+    """
+    Reads a pin's value. This pin must have been previously initialized
+    and set up as with direction of IN, otherwise this operation will not
+    behave as expected.
+
+    :param pin: An integer corresponding to the GPIO number of the pin in RPi
+      GPIO board numbering (not physical pin numbering)
+    """
+    return _read_value("{0}/gpio{1}/value".format(_path_prefix, pin))
+
+
 def initialize():
     """
     All named pins in OUTPUT_PINS and INPUT_PINS are exported, and set the
@@ -118,8 +147,6 @@ def initialize():
     """
     for pin in sorted(OUTPUT_PINS.values()):
         _enable_pin(pin, OUT)
-
-    set_high(OUTPUT_PINS['HALT'])
 
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
