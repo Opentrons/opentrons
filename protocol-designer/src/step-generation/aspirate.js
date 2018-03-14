@@ -49,7 +49,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
   const allWellsShared = wellsForTips.length > 1 && wellsForTips.every(w => w && w === wellsForTips[0])
 
   const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => {
-    const prevTipLiquidState = prevRobotState.liquidState.pipettes[pipette][tipIndex]
+    const prevTipLiquidState = prevRobotState.liquidState.pipettes[pipette][tipIndex.toString()]
     const prevSourceLiquidState = prevRobotState.liquidState.labware[labware][wellsForTips[tipIndex]]
 
     const newLiquidFromWell = splitLiquid(

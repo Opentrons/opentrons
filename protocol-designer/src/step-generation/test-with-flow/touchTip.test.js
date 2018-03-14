@@ -1,19 +1,17 @@
 // @flow
 import touchTip from '../touchTip'
-import {getBasicRobotState} from './fixtures'
+import {createRobotState} from './fixtures'
 
 describe('touchTip', () => {
-  const initialRobotState = getBasicRobotState()
-  const robotStateWithTip = {
-    ...initialRobotState,
-    tipState: {
-      ...initialRobotState.tipState,
-      pipettes: {
-        ...initialRobotState.tipState.pipettes,
-        p300SingleId: true
-      }
-    }
+  const _robotFixtureArgs = {
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillTiprackTips: true,
+    fillPipetteTips: false,
+    tipracks: [200, 200]
   }
+  const initialRobotState = createRobotState(_robotFixtureArgs)
+  const robotStateWithTip = createRobotState({..._robotFixtureArgs, fillPipetteTips: true})
 
   test('touchTip with tip', () => {
     const result = touchTip({

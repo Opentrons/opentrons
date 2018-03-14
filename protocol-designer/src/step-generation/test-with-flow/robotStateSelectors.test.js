@@ -1,14 +1,22 @@
 // @flow
-import {filledTiprackWells, emptyTiprackWells, p300Single, basicLiquidState} from './fixtures'
+import {p300Single, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
 import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
+
+// just a blank liquidState to appease flow
+const basicLiquidState = {
+  pipettes: {},
+  labware: {}
+}
 
 describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
     // TODO use a fixture, standardize
+    const _instrumentsState = {
+      p300SingleId: p300Single
+    }
+
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single
-      },
+      instruments: _instrumentsState,
       labware: {
         six: {
           slot: '6',
@@ -33,13 +41,17 @@ describe('sortLabwareBySlot', () => {
       },
       tipState: {
         tipracks: {
-          tiprack1Id: {...filledTiprackWells}
+          tiprack1Id: getTiprackTipstate(true)
         },
         pipettes: {
           p300SingleId: false
         }
       },
-      liquidState: basicLiquidState
+      liquidState: createEmptyLiquidState({
+        sourcePlateType: '96-flat',
+        destPlateType: '96-flat',
+        pipettes: _instrumentsState
+      })
     }
     expect(sortLabwareBySlot(robotState)).toEqual(['one', 'two', 'six', 'eleven'])
   })
@@ -52,13 +64,18 @@ describe('sortLabwareBySlot', () => {
       labware: {},
       tipState: {
         tipracks: {
-          tiprack1Id: {...filledTiprackWells}
+          tiprack1Id: getTiprackTipstate(true)
         },
         pipettes: {
           p300SingleId: false
         }
       },
-      liquidState: basicLiquidState
+      liquidState: {
+        pipettes: {},
+        labware: {
+          p300SingleId: {'0': {}}
+        }
+      }
     }
     expect(sortLabwareBySlot(robotState)).toEqual([])
   })
@@ -66,55 +83,34 @@ describe('sortLabwareBySlot', () => {
 
 describe('_getNextTip', () => {
   test('full tiprack should start at A1', () => {
-    const result = _getNextTip(1, {...filledTiprackWells})
+    const result = _getNextTip(1, {...getTiprackTipstate(true)})
     expect(result).toEqual('A1')
   })
 
   test('missing A1, go to B1', () => {
-    const result = _getNextTip(1, {...filledTiprackWells, A1: false})
+    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false})
     expect(result).toEqual('B1')
   })
 
   test('missing A1 and B1, go to C1', () => {
-    const result = _getNextTip(1, {...filledTiprackWells, A1: false, B1: false})
+    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false, B1: false})
     expect(result).toEqual('C1')
   })
 
   test('missing first column, go to A2', () => {
     const result = _getNextTip(1, {
-      ...filledTiprackWells,
-      A1: false,
-      B1: false,
-      C1: false,
-      D1: false,
-      E1: false,
-      F1: false,
-      G1: false,
-      H1: false
+      ...getTiprackTipstate(true),
+      ...getTipColumn(1, false)
     })
     expect(result).toEqual('A2')
   })
 
   test('missing a few random tips, go to lowest col, then lowest row', () => {
     const result = _getNextTip(1, {
-      ...filledTiprackWells,
-      A1: false,
-      B1: false,
-      C1: false,
-      D1: false,
-      E1: false,
-      F1: false,
-      G1: false,
-      H1: false,
-
-      A2: false,
-      B2: false,
-      C2: false,
-      D2: true,
-      E2: false,
-      F2: false,
-      G2: false,
-      H2: false
+      ...getTiprackTipstate(true),
+      ...getTipColumn(1, false),
+      ...getTipColumn(2, false),
+      D2: true
     })
     expect(result).toEqual('D2')
   })
@@ -152,7 +148,7 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false
           }
         },
@@ -193,7 +189,7 @@ describe('getNextTiprack - single-channel', () => {
         }
       },
       tipState: {
-        tipracks: {...emptyTiprackWells},
+        tipracks: {...getTiprackTipstate(false)},
         pipettes: {
           p300SingleId: false
         }
@@ -242,10 +238,10 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells
+            ...getTiprackTipstate(true)
           },
           tiprack11Id: {
-            ...filledTiprackWells
+            ...getTiprackTipstate(true)
           }
         },
         pipettes: {
@@ -297,11 +293,11 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false
           },
           tiprack11Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false
           }
         },
@@ -353,7 +349,7 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tipState: {
         tipracks: {
-          tiprack2Id: {...filledTiprackWells}
+          tiprack2Id: {...getTiprackTipstate(true)}
         },
         pipettes: {
           p300SingleId: false
@@ -399,7 +395,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A5: false
@@ -441,7 +437,7 @@ describe('getNextTiprack - 8-channel', () => {
         }
       },
       tipState: {
-        tipracks: {...emptyTiprackWells},
+        tipracks: {...getTiprackTipstate(false)},
         pipettes: {
           p300SingleId: false
         }
@@ -485,7 +481,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             F1: false,
             B2: false,
             C3: false,
@@ -553,13 +549,13 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells
+            ...getTiprackTipstate(true)
           },
           tiprack3Id: {
-            ...filledTiprackWells
+            ...getTiprackTipstate(true)
           },
           tiprack10Id: {
-            ...filledTiprackWells
+            ...getTiprackTipstate(true)
           }
         },
         pipettes: {
@@ -616,7 +612,8 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
+            // empty diagona, 8-channel cannot use
             F1: false,
             B2: false,
             C3: false,
@@ -631,7 +628,8 @@ describe('getNextTiprack - 8-channel', () => {
             F12: false
           },
           tiprack3Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
+            // empty row, 8-channel cannot use
             A1: false,
             A2: false,
             A3: false,
@@ -646,7 +644,7 @@ describe('getNextTiprack - 8-channel', () => {
             A12: false
           },
           tiprack10Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false
           }
         },
@@ -704,7 +702,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             F1: false,
             B2: false,
             C3: false,
@@ -719,7 +717,7 @@ describe('getNextTiprack - 8-channel', () => {
             F12: false
           },
           tiprack3Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A3: false,
@@ -734,7 +732,7 @@ describe('getNextTiprack - 8-channel', () => {
             A12: false
           },
           tiprack10Id: {
-            ...filledTiprackWells,
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A3: false,

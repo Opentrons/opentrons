@@ -1,9 +1,16 @@
 // @flow
 import blowout from '../blowout'
-import {getBasicRobotState} from './fixtures'
+import {createRobotState} from './fixtures'
 
 describe('blowout', () => {
-  const initialRobotState = getBasicRobotState()
+  const initialRobotState = createRobotState({
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillTiprackTips: true,
+    fillPipetteTips: false,
+    tipracks: [200, 200]
+  })
+
   const robotStateWithTip = {
     ...initialRobotState,
     tipState: {

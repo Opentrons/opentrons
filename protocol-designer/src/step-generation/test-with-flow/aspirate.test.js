@@ -9,13 +9,15 @@ describe('aspirate', () => {
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
     fillPipetteTips: false,
-    fillTiprackTips: true
+    fillTiprackTips: true,
+    tipracks: [200, 200]
   })
   const robotStateWithTip = createRobotState({
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
     fillPipetteTips: true,
-    fillTiprackTips: true
+    fillTiprackTips: true,
+    tipracks: [200, 200]
   })
 
   // Fixtures without liquidState key, for use with `toMatchObject`
@@ -23,7 +25,8 @@ describe('aspirate', () => {
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
     fillPipetteTips: true,
-    fillTiprackTips: true
+    fillTiprackTips: true,
+    tipracks: [200, 200]
   })
 
   test('aspirate with tip', () => {

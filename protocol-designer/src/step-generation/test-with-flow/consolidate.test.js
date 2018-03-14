@@ -1,39 +1,49 @@
 // @flow
+import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import {getBasicRobotState, filledTiprackWells} from './fixtures'
+import {createRobotState, getTipColumn, getTiprackTipstate} from './fixtures'
 import {consolidate} from '../'
 
-const robotInitialState = getBasicRobotState()
+const robotInitialState = createRobotState({
+  sourcePlateType: 'trough-12row',
+  destPlateType: '96-flat',
+  fillTiprackTips: true,
+  fillPipetteTips: false,
+  tipracks: [200, 200]
+})
 
-const robotStatePickedUpOneTip = {
-  ...robotInitialState,
-  tipState: {
-    tipracks: {
-      ...robotInitialState.tipState.tipracks,
-      tiprack1Id: {...filledTiprackWells, A1: false}
-    },
-    pipettes: {
-      ...robotInitialState.tipState.pipettes,
-      p300SingleId: true
+const robotStatePickedUpOneTip = merge(
+  {},
+  robotInitialState,
+  {
+    tipState: {
+      tipracks: {
+        tiprack1Id: {A1: false}
+      },
+      pipettes: {
+        p300SingleId: true
+      }
     }
   }
-}
+)
 
-const robotStatePickedUpMultiTips = {
-  ...robotInitialState,
-  tipState: {
-    tipracks: {
-      ...robotInitialState.tipState.tipracks,
-      tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false}
-    },
-    pipettes: {
-      ...robotInitialState.tipState.pipettes,
-      p300MultiId: true
+const robotStatePickedUpMultiTips = merge(
+  {},
+  robotInitialState,
+  {
+    tipState: {
+      tipracks: {
+        tiprack1Id: getTipColumn(1, false)
+      },
+      pipettes: {
+        p300MultiId: true
+      }
     }
   }
-}
+)
 
 // fixtures without 'liquidState' key for use with `toMatchObject`
+// TODO IMMEDIATELY: use fixture generator fns
 const robotInitialStateNoLiquidState = omit(robotInitialState, ['liquidState'])
 const robotStatePickedUpOneTipNoLiquidState = omit(robotStatePickedUpOneTip, ['liquidState'])
 const robotStatePickedUpMultiTipsNoLiquidState = omit(robotStatePickedUpMultiTips, ['liquidState'])
@@ -245,7 +255,7 @@ describe('consolidate single-channel', () => {
       tipState: {
         tipracks: {
           ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {...filledTiprackWells, A1: false, B1: false}
+          tiprack1Id: {...getTiprackTipstate(true), A1: false, B1: false}
         },
         pipettes: {
           ...robotInitialState.tipState.pipettes,

@@ -1,10 +1,11 @@
 // @flow
 import {getLabware} from '@opentrons/labware-definitions'
+import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import {tiprackWellNamesFlat} from '../'
-import type {RobotState, PipetteData} from '../'
+import type {RobotState, PipetteData, LabwareData} from '../'
 
 // export const wellNames96 = flatMap(
 //   'ABCDEFGH'.split(''),
@@ -12,15 +13,22 @@ import type {RobotState, PipetteData} from '../'
 // )
 
 // Eg {A1: true, B1: true, ...}
-export const filledTiprackWells = tiprackWellNamesFlat.reduce(
-  (acc, wellName) => ({...acc, [wellName]: true}),
-  {}
-)
+type WellTipState = {[wellName: string]: boolean}
+export function getTiprackTipstate (filled: ?boolean): WellTipState {
+  return tiprackWellNamesFlat.reduce(
+    (acc, wellName) => ({...acc, [wellName]: !!filled}),
+    {}
+  )
+}
 
-export const emptyTiprackWells = tiprackWellNamesFlat.reduce(
-  (acc, wellName) => ({...acc, [wellName]: false}),
-  {}
-)
+// Eg A2 B2 C2 D2 E2 F2 G2 H2 keys
+export function getTipColumn<T> (index: number, filled: T): {[well: string]: T} {
+  return Array.from('ABCDEFGH').map(wellLetter => `${wellLetter}${index}`).reduce((acc, well) => ({
+    ...acc,
+    [well]: filled
+  }), {})
+}
+
 // TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
 // which should in turn be lifted out to a general pipette data project?
 export const p300Single = {
@@ -107,13 +115,15 @@ export function createEmptyLiquidState (args: {
 type SubtractLiquidState = {liquidState: *}
 type RobotStateNoLiquidState = $Diff<RobotState, SubtractLiquidState>
 
-/** RobotState with empty liquid state */
-export function createRobotState (args: {
+type CreateRobotArgs = {
   sourcePlateType: string,
   destPlateType: string,
+  tipracks: Array<10 | 200 | 1000>,
   fillPipetteTips?: boolean,
   fillTiprackTips?: boolean
-}): RobotState {
+}
+/** RobotState with empty liquid state */
+export function createRobotState (args: CreateRobotArgs): RobotState {
   const {labware, instruments, tipState} = createRobotStateFixture(args)
 
   return {
@@ -128,46 +138,62 @@ export function createRobotState (args: {
 }
 
 /** RobotState without liquidState key, for use with jest's `toMatchObject` */
-export function createRobotStateFixture (args: {
-  sourcePlateType: string,
-  destPlateType: string,
-  fillPipetteTips?: boolean,
-  fillTiprackTips?: boolean
-}): RobotStateNoLiquidState {
+export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiquidState {
+  function _getTiprackSlot (tiprackIndex: number, occupiedSlots: Array<string>): string {
+    const slot = (tiprackIndex + 1).toString()
+    if (occupiedSlots.includes(slot)) {
+      throw new Error(`Cannot create tiprack at slot ${slot}, slot is occupied by other labware`)
+    }
+    return slot.toString()
+  }
+
   const instruments = {
     p300SingleId: p300Single,
     p300MultiId: p300Multi
   }
 
+  const baseLabware = {
+    sourcePlateId: {
+      slot: '10',
+      type: args.sourcePlateType, // WAS: 'trough-12row'. TODO IMMEDIATELY: remove this comment
+      name: 'Source Plate'
+    },
+    destPlateId: {
+      slot: '11',
+      type: args.destPlateType, // WAS: '96-flat'. TODO IMMEDIATELY: remove this comment
+      name: 'Destination Plate'
+    },
+    trashId: {
+      slot: '12',
+      type: 'fixed-trash',
+      name: 'Trash'
+    }
+  }
+
+  const occupiedSlots = map(baseLabware, (labwareData: LabwareData, labwareId) => labwareData.slot)
+
+  const tiprackLabware = args.tipracks.reduce((acc, tiprackVolume, tiprackIndex) => ({
+    ...acc,
+    [`tiprack${tiprackIndex + 1}Id`]: {
+      slot: _getTiprackSlot(tiprackIndex, occupiedSlots),
+      type: `tiprack-${tiprackVolume}ul`,
+      name: `Tip rack ${tiprackIndex + 1}`
+    }
+  }), {})
+
   return {
     instruments,
+
     labware: {
-      tiprack1Id: {
-        slot: '7',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      sourcePlateId: {
-        slot: '10',
-        type: args.sourcePlateType, // WAS: 'trough-12row'. TODO IMMEDIATELY: remove this comment
-        name: 'Source (Buffer)'
-      },
-      destPlateId: {
-        slot: '11',
-        type: args.destPlateType, // WAS: '96-flat'. TODO IMMEDIATELY: remove this comment
-        name: 'Destination Plate'
-      },
-      trashId: {
-        slot: '12',
-        type: 'fixed-trash',
-        name: 'Trash'
-      }
+      ...baseLabware,
+      ...tiprackLabware
     },
 
     tipState: {
-      tipracks: {
-        tiprack1Id: args.fillTiprackTips ? filledTiprackWells : emptyTiprackWells
-      },
+      tipracks: Object.keys(tiprackLabware).reduce((acc, tiprackId) => ({
+        ...acc,
+        [tiprackId]: getTiprackTipstate(args.fillTiprackTips)
+      }), {}),
       pipettes: {
         p300SingleId: !!args.fillPipetteTips,
         p300MultiId: !!args.fillPipetteTips
