@@ -7,6 +7,7 @@ const {app, dialog, Menu, BrowserWindow} = require('electron')
 const log = require('electron-log')
 
 const initializeMenu = require('./menu')
+const initializeApiUpdate = require('./api-update')
 
 // TODO(mc, 2018-01-06): replace dev and debug vars with feature vars
 const DEV_MODE = process.env.NODE_ENV === 'development'
@@ -31,6 +32,7 @@ function startUp () {
 
   createWindow()
   initializeMenu()
+  initializeApiUpdate()
   load()
 
   if (DEV_MODE || DEBUG_MODE) {
