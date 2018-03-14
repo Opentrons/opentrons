@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import {LabeledValue, OutlineButton} from '@opentrons/components'
+import {LabeledValue, OutlineButton, InstrumentDiagram} from '@opentrons/components'
 import styles from './styles.css'
 
 const LEFT_LABEL = 'Left pipette'
@@ -30,7 +30,9 @@ export default function InstrumentInfo (props) {
       <OutlineButton disabled>
         {buttonText}
       </OutlineButton>
-      <div className={styles.image}></div>
+      <div className={styles.image}>
+        {props.channels && (<InstrumentDiagram channels={props.channels}/>)}
+      </div>
     </div>
   )
 }

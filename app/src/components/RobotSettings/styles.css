@@ -70,6 +70,14 @@
   position: relative;
   top: -4rem;
   border: 1px solid var(--c-light-gray);
+  overflow: hidden;
+}
+
+.image div img {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  top: -40%;
 }
 
 .right {
