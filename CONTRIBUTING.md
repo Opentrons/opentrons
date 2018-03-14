@@ -95,15 +95,15 @@ Individual projects may have additional instructions, so be sure to check out th
 
 Your computer will need the following tools installed to be able to develop with the Opentrons platform:
 
-*   macOS 10.11+, Linux, or Windows 10 with Cygwin
-*   Python 3.5.3  - [pyenv](https://github.com/pyenv/pyenv) is optional, but recommended
+*   macOS 10.11+, Linux, or Windows 10
+*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux)
 
     ``` shell
     # pyenv on macOS: install with shared framework option
-    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.3
+    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.6.4
 
     # pyenv on Linux: install with shared library option
-    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.3
+    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.6.4
     ```
 
 *   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
@@ -117,6 +117,8 @@ Your computer will need the following tools installed to be able to develop with
 *   [yarn][yarn-install] - JavaScript package manager
 
 *   GNU Make - we use [Makefiles][] to manage our builds
+
+*   cURL - used to push development updates to robots
 
 Once you're set up, clone the repository and install all project dependencies:
 
