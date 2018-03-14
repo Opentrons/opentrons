@@ -8,6 +8,15 @@ Basic usage:
 </Card>
 ```
 
+Optional description or message to display under title:
+```js
+<Card title='Hello Title Card' description={'some sort of description about the buttons and values below'}>
+  <LabeledValue label={'Label'} value={'Value'} />
+  <LabeledValue label={'Label'} value={'Value'} />
+  <LabeledValue label={'Label'} value={'Value'} />
+</Card>
+```
+
 Display content in a flex-column:
 ```js
 <Card title='Hello Title Card' column>

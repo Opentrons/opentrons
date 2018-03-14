@@ -99,6 +99,12 @@
   font-weight: --fw-regular;
 }
 
+.card_description {
+  @apply --font-body-2-dark;
+
+  margin: 1rem 0;
+}
+
 .card_content {
   display: flex;
   flex-direction: row;
