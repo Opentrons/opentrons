@@ -429,17 +429,26 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Private functions --------------- #
 
-    def _reset_from_error(self):
-        self._send_command(GCODES['RESET_FROM_ERROR'])
+    def _wait_for_ack(self):
+        '''
+        In the case where smoothieware has just been reset, we want to
+        ignore all the garbage it spits out
 
-    def _hard_reset_smoothie(self):
-        log.debug('Halting Smoothie (simulating: {})'.format(self.simulating))
-        if self.simulating:
+        This methods writes a sequence of newline characters, which will
+        guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
+        '''
+        try:
+            self._send_command('\r\n', timeout=3)
+        except SmoothieError:
+            # because a bunch of junk is printed out after boot/reset that we
+            # ignore, don't worry if there is an error or alarm message inside
             pass
-        else:
-            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
-            sleep(0.1)
-            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
+
+    def _reset_from_error(self):
+        # smoothieware will ignore new messages for a short time
+        # after it has entered an error state, so sleep for some milliseconds
+        sleep(0.1)
+        self._send_command(GCODES['RESET_FROM_ERROR'])
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=None):
@@ -532,6 +541,7 @@ class SmoothieDriver_3_0_0:
             self.dwell_axes('Y')
 
     def _setup(self):
+        self._wait_for_ack()
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
@@ -754,17 +764,39 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
-    def turn_on_button_light(self):
-        gpio.set_high(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+    def turn_on_blue_button_light(self):
+        self._set_button_light(blue=True)
+
+    def turn_on_red_button_light(self):
+        self._set_button_light(red=True)
 
     def turn_off_button_light(self):
-        gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
+        self._set_button_light(red=False, green=False, blue=False)
+
+    def _set_button_light(self, red=False, green=False, blue=False):
+        color_pins = {
+            gpio.OUTPUT_PINS['RED_BUTTON']: red,
+            gpio.OUTPUT_PINS['GREEN_BUTTON']: green,
+            gpio.OUTPUT_PINS['BLUE_BUTTON']: blue
+        }
+        for pin, state in color_pins.items():
+            if state:
+                gpio.set_high(pin)
+            else:
+                gpio.set_low(pin)
 
     def turn_on_rail_lights(self):
         gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
 
     def turn_off_rail_lights(self):
         gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
+
+    def read_button(self):
+        # button is normal-HIGH, so invert
+        return not bool(gpio.read(gpio.INPUT_PINS['BUTTON_INPUT']))
+
+    def read_window_switches(self):
+        return bool(gpio.read(gpio.INPUT_PINS['WINDOW_INPUT']))
 
     def kill(self):
         """
@@ -774,9 +806,46 @@ class SmoothieDriver_3_0_0:
         Smoothie code to return Smoothie to a normal waiting state and reset
         any other state needed for the driver.
         """
-        self._hard_reset_smoothie()
-        sleep(0.1)
+        self._smoothie_hard_halt()
         self._reset_from_error()
         self._setup()
+
+    def _smoothie_reset(self):
+        log.debug('Resetting Smoothie (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
+            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            sleep(0.25)
+            self._wait_for_ack()
+
+    def _smoothie_programming_mode(self):
+        log.debug('Setting Smoothie to ISP mode (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
+            gpio.set_low(gpio.OUTPUT_PINS['ISP'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            sleep(0.25)
+
+    def _smoothie_hard_halt(self):
+        log.debug('Halting Smoothie (simulating: {})'.format(
+            self.simulating))
+        if self.simulating:
+            pass
+        else:
+            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
+            sleep(0.25)
+            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
+            sleep(0.25)
 
     # ----------- END Public interface ------------ #
