@@ -17,3 +17,10 @@ def short_fixed_trash(): return _get_feature_flag('OT2_PROBE_HEIGHT')
 #          serializers.py)
 # - False: Use sqlite db
 def split_labware_definitions(): return _get_feature_flag('SPLIT_LABWARE_DEF')
+
+
+# calibrate_to_bottom
+# - True:  You must calibrate your containers to bottom
+# - False: Otherwise the default
+# will be that you calibrate to the top
+def calibrate_to_bottom(): return _get_feature_flag('CALIBRATE_BOTTOM')
