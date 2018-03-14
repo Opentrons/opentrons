@@ -578,10 +578,6 @@ class Robot(object):
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
-    # DEPRECATED
-    def move_plunger(self, *args, **kwargs):
-        self._driver.move_plunger(*args, **kwargs)
-
     def head_speed(
             self, combined_speed=None,
             x=None, y=None, z=None, a=None, b=None, c=None):
