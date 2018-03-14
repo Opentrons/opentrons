@@ -409,6 +409,21 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Private functions --------------- #
 
+    def _wait_for_ack(self):
+        '''
+        In the case where smoothieware has just been reset, we want to
+        ignore all the garbage it spits out
+
+        This methods writes a sequence of newline characters, which will
+        guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
+        '''
+        try:
+            self._send_command('\r\n', timeout=3)
+        except SmoothieError:
+            # because a bunch of junk is printed out after boot/reset that we
+            # ignore, don't worry if there is an error or alarm message inside
+            pass
+
     def _reset_from_error(self):
         # smoothieware will ignore new messages for a short time
         # after it has entered an error state, so sleep for some milliseconds
@@ -494,6 +509,7 @@ class SmoothieDriver_3_0_0:
             self.dwell_axes('Y')
 
     def _setup(self):
+        self._wait_for_ack()
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
@@ -718,9 +734,7 @@ class SmoothieDriver_3_0_0:
             sleep(0.25)
             gpio.set_high(gpio.OUTPUT_PINS['RESET'])
             sleep(0.25)
-            # wait for all the junk to be printed from after reset
-            serial_communication.write_and_return(
-                '\r\n', self._connection, timeout=5)
+            self._wait_for_ack()
 
     def _smoothie_programming_mode(self):
         log.debug('Setting Smoothie to ISP mode (simulating: {})'.format(

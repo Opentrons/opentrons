@@ -20,14 +20,5 @@ sleep(0.25)
 gpio.set_high(gpio.OUTPUT_PINS['RESET'])
 sleep(0.25)
 
-# smoothieware hasn't finished booting until it responds b'ok\r\nok\r\n'
-smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
-c = serial_communication.connect(
-    device_name=smoothie_id,
-    baudrate=robot.config.serial_speed
-)
-serial_communication.write_and_return('\r\n', c, timeout=5)
-c.close()
-
 # turn light to blue
 robot.turn_on_button_light()
