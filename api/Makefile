@@ -63,13 +63,8 @@ wheel: clean
 push: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
-		-F 'whl=@dist/'`ls dist | grep whl` \
-		http://10.10.1.161:31950/server/update
-
-.PHONY: restart
-restart: 
-	curl -X POST \
-		http://10.10.1.161:31950/server/restart
+		-F "whl=@$(wheel)" \
+		http://$(host)/server/update
 
 # TODO(mc, 2018-03-14): use $(host) var
 .PHONY: term
