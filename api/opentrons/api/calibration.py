@@ -4,6 +4,7 @@ from copy import copy
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
 from opentrons import robot
+from opentrons.config import feature_flags as fflags
 
 from .models import Container
 
@@ -97,11 +98,25 @@ class CalibrationManager:
         )
         self._set_state('ready')
 
-    def move_to(self, instrument, target):
+    def move_to(self, instrument, container):
+        if not isinstance(container, Container):
+            raise ValueError(
+                'Invalid object type {0}. Expected models.Container'
+                .format(type(container)))
 
         inst = instrument._instrument
-        log.info('Moving {} to {}'.format(
-            instrument.name, target))
+        cont = container._container
+
+        if fflags.calibrate_to_bottom():
+            if 'tiprack' in container.name:
+                target = cont[0]
+            else:
+                target = cont[0].bottom()
+        else:
+            target = cont[0]
+
+        log.info('Moving {} to {} in {}'.format(
+            instrument.name, container.name, container.slot))
         self._set_state('moving')
         inst.move_to(target)
         self._set_state('ready')
@@ -117,7 +132,7 @@ class CalibrationManager:
             axis=axis,
             robot=inst.robot
         )
-        self._set_state('ready') 
+        self._set_state('ready')
 
     def home(self, instrument):
         inst = instrument._instrument

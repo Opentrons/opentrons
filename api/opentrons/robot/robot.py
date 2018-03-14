@@ -991,11 +991,18 @@ class Robot(object):
             dst=well
         )
 
-        print("This is the Delta {}".format(delta))
+        if fflags.calibrate_to_bottom():
 
-        delta_x = delta[0]
-        delta_y = delta[1]
-        delta_z = delta[2] + well.z_size()
+            delta_x = delta[0]
+            delta_y = delta[1]
+            if 'tiprack' in container.get_type():
+                delta_z = delta[2]
+            else:
+                delta_z = delta[2] + well.z_size()
+        else:
+            delta_x = delta[0]
+            delta_y = delta[1]
+            delta_z = delta[2]
         self.poses = calib.calibrate_container_with_delta(
             self.poses,
             container,
