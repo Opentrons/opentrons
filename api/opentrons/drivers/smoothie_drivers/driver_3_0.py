@@ -74,8 +74,6 @@ GCODES = {'HOME': 'G28.2',
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
-PIPETTE_DATA_LENGTH = 32
-
 
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
@@ -562,7 +560,6 @@ class SmoothieDriver_3_0_0:
             res = self._send_command(gcode + mount)
             res = _parse_instrument_data(res)
             assert mount in res
-            assert len(res[mount]) == PIPETTE_DATA_LENGTH
             # data is read/written as strings of HEX characters
             # to avoid firmware weirdness in how it parses GCode arguments
             return _byte_array_to_ascii_string(res[mount])
