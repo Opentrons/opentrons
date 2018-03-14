@@ -28,8 +28,7 @@ CLASSIFIERS = [
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
     'Topic :: Scientific/Engineering',
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
@@ -38,10 +37,10 @@ DESCRIPTION = (
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'pyserial',
-    'aiohttp',
-    'numpy',
-    'urwid']
+    'pyserial==3.2.1',
+    'aiohttp==2.3.8',
+    'numpy==1.12.1',
+    'urwid==1.3.1']
 
 
 def read(*parts):
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     write_version_file()
 
     setup(
-        python_requires='>=3.5',
+        python_requires='>=3.6',
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
