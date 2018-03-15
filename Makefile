@@ -40,8 +40,11 @@ uninstall:
 
 .PHONY: install-types
 install-types:
-	$(MAKE) -C $(COMPONENTS_DIR) install-types
+	flow-typed install jest@^20.0.4 --flowVersion=0.61.0 # TODO Ian 2018-03-15: use jest version in package.json
+	# install type definitions for all projects, project-by-project
 	$(MAKE) -C $(APP_DIR) install-types
+	$(MAKE) -C $(COMPONENTS_DIR) install-types
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) install-types
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install-types
 
 # all tests
@@ -71,7 +74,7 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '**/*.js'
-	flow
+	flow check
 
 .PHONY: lint-css
 lint-css:
