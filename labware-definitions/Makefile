@@ -35,6 +35,7 @@ build:
 .PHONY: test
 test:
 	$(env)=test jest \
+		--runInBand \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
