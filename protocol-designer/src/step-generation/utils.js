@@ -1,6 +1,7 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
+import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import type {CommandCreator, RobotState} from './types'
@@ -33,7 +34,10 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
 type Vol = {volume: number}
 type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
-export const AIR = 'air' // TODO use Symbol?
+// TODO Ian 2018-03-15 use Symbol, or other way to ensure no conflict with ingredGroupId keys?
+// However, Flow doesn't like Symbol keys.
+// (this conflict is unlikely, since ingredGroupIds are strings of numbers)
+export const AIR = 'air'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
@@ -61,10 +65,7 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
   if (volume > totalSourceVolume) {
     // Take all of source, plus air
     return {
-      source: Object.keys(sourceLiquidState).reduce((acc, ingredId) => ({ // TODO mapvalues?
-        ...acc,
-        [ingredId]: {volume: 0}
-      }), {}),
+      source: mapValues(sourceLiquidState, () => ({volume: 0})),
       dest: {
         ...sourceLiquidState,
         [AIR]: {volume: volume - totalSourceVolume}

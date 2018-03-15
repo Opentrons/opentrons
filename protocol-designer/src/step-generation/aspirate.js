@@ -44,16 +44,21 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     )
   }
 
-  // TODO unify this: for each tip, a well (except for trough :/ )
-  // TODO standardize a way in command generators and in tests to get 8-channel tip IDs/indicies (ie: either use lodash/range, or import const)
-  const allWellsShared = wellsForTips.length > 1 && wellsForTips.every(w => w && w === wellsForTips[0])
+  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
+  // allWellsShared: eg in a trough, all wells are shared by an 8-channel
+  // (for single-channel, "all wells" are always shared because there is only 1 well)
+  // NOTE Ian 2018-03-15: there is no support for a case where some but not all wells are shared.
+  // Eg, some unusual labware that allows 2 tips to a well will not work with the implementation below.
+  // Low-priority TODO.
 
+  // Blend tip's liquid contents (if any) with liquid of the source
+  // to update liquid state in all pipette tips
   const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => {
     const prevTipLiquidState = prevRobotState.liquidState.pipettes[pipette][tipIndex.toString()]
     const prevSourceLiquidState = prevRobotState.liquidState.labware[labware][wellsForTips[tipIndex]]
 
     const newLiquidFromWell = splitLiquid(
-      allWellsShared ? volume / pipetteData.channels : volume,
+      allWellsShared ? volume / pipetteData.channels : volume, // divide source volume across shared tips
       prevSourceLiquidState
     ).dest
 
@@ -66,6 +71,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     }
   }, {})
 
+  // Remove liquid from source well(s)
   const labwareLiquidState = {
     ...prevRobotState.liquidState.labware[labware],
     ...wellsForTips.reduce((acc, well) => ({
