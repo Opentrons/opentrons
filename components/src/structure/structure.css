@@ -109,6 +109,10 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+
+  & > button {
+    height: 3rem;
+  }
 }
 
 .card_column {
@@ -133,7 +137,9 @@
 }
 
 .labeled_value {
-  @apply --font-body-2-dark;
+  @apply --font-body-1-dark;
+
+  line-height: 1.5;
 
   & svg {
     height: var(--fs-body-2);

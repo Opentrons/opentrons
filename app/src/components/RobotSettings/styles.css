@@ -50,3 +50,47 @@
   float: right;
   margin-top: 0.5rem;
 }
+
+.instrument_card {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 4rem;
+  padding-top: 1rem;
+  width: 49.5%;
+
+  & > button {
+    width: 8rem;
+  }
+}
+
+.image {
+  height: 8rem;
+  width: 1.75rem;
+  position: relative;
+  top: -4rem;
+  border: 1px solid var(--c-light-gray);
+  overflow: hidden;
+}
+
+.image div img {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  top: -40%;
+}
+
+.right {
+  & > div {
+    order: 2;
+  }
+
+  & > .image {
+    order: 1;
+  }
+
+  & > button {
+    order: 3;
+  }
+}
