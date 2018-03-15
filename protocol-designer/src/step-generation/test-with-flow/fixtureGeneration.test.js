@@ -38,7 +38,6 @@ describe('createEmptyLiquidState fixture generator', () => {
   })
 })
 
-// TODO IMMEDIATELY: update to use refactored createRobotStateFixture fn
 describe('createRobotState fixture generator', () => {
   describe('tip filling', () => {
     const tipFillingOptions = [true, false]
