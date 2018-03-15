@@ -65,18 +65,22 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
 
     rel_x_start = (size_x / 2) + SWITCH_CLEARANCE
     rel_y_start = (size_y / 2) + SWITCH_CLEARANCE
-
+    print("Instrument Model Offset {}".format(instrument.model_offset[2]))
     # Ensure that the nozzle will clear the probe unit and tip will clear deck
     nozzle_safe_z = (size_z - tip_length) + Z_PROBE_CLEARANCE
-    rel_z_start = center.z - max(Z_DECK_CLEARANCE, nozzle_safe_z)
+    rel_z_start = abs(instrument.model_offset[2]) - max(Z_DECK_CLEARANCE, nozzle_safe_z)  # NOQA
+    print("Center Z {}".format(center.z))
 
+    max_calc = max(Z_DECK_CLEARANCE, nozzle_safe_z)
+    print("Max of nozzle and clearance {}".format(max_calc))
+    print("rel_z_start {}".format(rel_z_start))
     # Each list item defines axis we are probing for, starting position vector
     # relative to probe top center and travel distance
     hot_spots = [
-        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,            -rel_z_start,  size_x),  # NOQA
-        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,            -rel_z_start, -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,            -rel_z_start,  size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,            -rel_z_start, -size_y),  # NOQA
+        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,            rel_z_start,  size_x),  # NOQA
+        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,            rel_z_start, -size_x),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,            rel_z_start,  size_y),  # NOQA
+        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,            rel_z_start, -size_y),  # NOQA
         ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_PROBE_START_CLEARANCE, -size_z)   # NOQA
     ]
 
