@@ -1,8 +1,9 @@
 import atexit
-import logging
 import os
 import socket
 import subprocess
+
+from opentrons.util import environment
 
 
 def record_camera(filepath):
@@ -41,14 +42,15 @@ def copy_to_usb_drive_and_back(filepath):
         raise Exception('Failed writing to USB drive')
 
 
-def start_server(filepath):
+def start_server(folder, filepath):
     print_bars()
     print('OPEN YOUR WEB BROWSER TO --> {0}:8000/{1}'.format(
         this_wifi_ip_address(),
         filepath.split('/')[-1]
         ))
     print_bars()
-    subprocess.check_output('python -m http.server', shell=True)
+    subprocess.check_output(
+        'cd {} && python -m http.server'.format(folder), shell=True)
 
 
 def print_bars():
@@ -68,10 +70,10 @@ def erase_data(filepath):
 
 
 if __name__ == "__main__":
-    video_file_path = os.path.join(
-        os.path.dirname(__file__), './cam_test.mp4')
+    data_folder_path = environment.get_path('APP_DATA_DIR')
+    video_file_path = os.path.join(data_folder_path, './cam_test.mp4')
     atexit.register(erase_data, video_file_path)
     record_camera(video_file_path)
     copy_to_usb_drive_and_back(video_file_path)
-    start_server(video_file_path)
+    start_server(data_folder_path, video_file_path)
     exit()
