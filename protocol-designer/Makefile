@@ -11,15 +11,6 @@ env := cross-env NODE_ENV
 # dev server port
 port ?= 8080
 
-# watch, coverage, and update snapshot variables for tests
-watch ?= false
-cover ?= true
-updateSnapshot ?= false
-
-ifeq ($(watch), true)
-	cover := false
-endif
-
 # standard targets
 #####################################################################
 
@@ -51,14 +42,6 @@ dev:
 
 # checks
 #####################################################################
-
-.PHONY: test
-test:
-	$(env)=test jest \
-		--runInBand \
-		--coverage=$(cover) \
-		--watch=$(watch) \
-		--updateSnapshot=$(updateSnapshot)
 
 .PHONY: install-types
 install-types:

@@ -9,6 +9,35 @@
     "protocol-designer",
     "webpack-config"
   ],
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css)$": "identity-obj-proxy"
+    },
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@opentrons/)"
+    ],
+    "collectCoverageFrom": [
+      "(app|components|labware\\-definitions|protocol\\-designer)/**/*.js",
+      "!components/interfaces/**",
+      "!**/node_modules/**",
+      "!**/__mocks__/**",
+      "!**/dist/**",
+      "!**/build/**",
+      "!**/webpack*",
+      "!**/webpack/**",
+      "!**/coverage/**",
+      "!**/test/**",
+      "!**/flow-typed/**"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ]
+  },
   "devDependencies": {
     "babel-eslint": "7.2.3",
     "eslint": "3.19.0",
@@ -21,6 +50,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.66.0",
     "flow-typed": "^2.2.3",
+    "jest": "^20.0.4",
     "stylelint": "^8.4.0",
     "stylelint-config-standard": "^18.0.0"
   }

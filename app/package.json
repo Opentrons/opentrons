@@ -21,31 +21,9 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js",
-      "\\.(css)$": "identity-obj-proxy"
-    },
-    "collectCoverageFrom": [
-      "**/*.js",
-      "!**/node_modules/**",
-      "!**/__mocks__/**",
-      "!**/dist/**",
-      "!**/webpack*",
-      "!**/webpack/**",
-      "!**/coverage/**",
-      "!**/test/**",
-      "!**/flow-typed/**"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "text"
-    ]
-  },
   "devDependencies": {
     "@opentrons/webpack-config": "3.0.0-beta.1",
     "babel-core": "^6.25.0",
-    "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
@@ -63,7 +41,6 @@
     "handlebars-loader": "^1.6.0",
     "html-webpack-plugin": "^2.28.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^20.0.4",
     "portfinder": "^1.0.13",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
