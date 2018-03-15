@@ -1,6 +1,7 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
+import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import type {CommandCreator, RobotState} from './types'
@@ -33,6 +34,11 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
 type Vol = {volume: number}
 type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
+// TODO Ian 2018-03-15 use Symbol, or other way to ensure no conflict with ingredGroupId keys?
+// However, Flow doesn't like Symbol keys.
+// (this conflict is unlikely, since ingredGroupIds are strings of numbers)
+export const AIR = '__air__'
+
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
   source: LiquidVolumeState,
@@ -44,12 +50,27 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
     0
   )
 
+  if (AIR in sourceLiquidState) {
+    throw new Error(`Invalid source liquid state: source cannot contain air (key '${AIR}' cannot exist in sourceLiquidState object)`)
+  }
+
   if (totalSourceVolume === 0) {
-    throw new Error('Cannot split liquid: no volume in source')
+    // Splitting from empty source
+    return {
+      source: sourceLiquidState,
+      dest: {[AIR]: {volume}}
+    }
   }
 
   if (volume > totalSourceVolume) {
-    throw new Error(`Cannot split liquid: volume ${volume} exceeds source volume ${totalSourceVolume}`)
+    // Take all of source, plus air
+    return {
+      source: mapValues(sourceLiquidState, () => ({volume: 0})),
+      dest: {
+        ...sourceLiquidState,
+        [AIR]: {volume: volume - totalSourceVolume}
+      }
+    }
   }
 
   const ratios: {[ingredId: string]: number} = reduce(

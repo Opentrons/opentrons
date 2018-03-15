@@ -1,24 +1,57 @@
 // @flow
-import {getBasicRobotState, filledTiprackWells} from './fixtures'
+import merge from 'lodash/merge'
+import {createRobotStateFixture, createEmptyLiquidState, getTipColumn, getTiprackTipstate} from './fixtures'
 import {consolidate} from '../'
 
-describe('consolidate single-channel', () => {
-  const robotInitialState = getBasicRobotState()
+const robotInitialStateNoLiquidState = createRobotStateFixture({
+  sourcePlateType: 'trough-12row',
+  destPlateType: '96-flat',
+  fillTiprackTips: true,
+  fillPipetteTips: false,
+  tipracks: [200, 200]
+})
 
-  const robotStatePickedUpOneTip = {
-    ...robotInitialState,
+const emptyLiquidState = createEmptyLiquidState({
+  sourcePlateType: 'trough-12row',
+  destPlateType: '96-flat',
+  pipettes: robotInitialStateNoLiquidState.instruments
+})
+
+const robotStatePickedUpOneTipNoLiquidState = merge(
+  {},
+  robotInitialStateNoLiquidState,
+  {
     tipState: {
       tipracks: {
-        ...robotInitialState.tipState.tipracks,
-        tiprack1Id: {...filledTiprackWells, A1: false}
+        tiprack1Id: {A1: false}
       },
       pipettes: {
-        ...robotInitialState.tipState.pipettes,
         p300SingleId: true
       }
     }
   }
+)
 
+const robotStatePickedUpMultiTipsNoLiquidState = merge(
+  {},
+  robotInitialStateNoLiquidState,
+  {
+    tipState: {
+      tipracks: {
+        tiprack1Id: getTipColumn(1, false)
+      },
+      pipettes: {
+        p300MultiId: true
+      }
+    }
+  }
+)
+
+// Fixtures with empty liquidState
+const robotInitialState = {...robotInitialStateNoLiquidState, liquidState: emptyLiquidState}
+const robotStatePickedUpOneTip = {...robotStatePickedUpOneTipNoLiquidState, liquidState: emptyLiquidState}
+
+describe('consolidate single-channel', () => {
   const baseData = {
     stepType: 'consolidate',
     name: 'Consolidate Test',
@@ -52,7 +85,8 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTip)
 
     expect(result.commands).toEqual([
       {
@@ -144,7 +178,7 @@ describe('consolidate single-channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('Single-channel with exceeding pipette max: with changeTip="always"', () => {
@@ -219,12 +253,12 @@ describe('consolidate single-channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
+    expect(result.robotState).toMatchObject({
+      ...robotInitialStateNoLiquidState,
       tipState: {
         tipracks: {
           ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {...filledTiprackWells, A1: false, B1: false}
+          tiprack1Id: {...getTiprackTipstate(true), A1: false, B1: false}
         },
         pipettes: {
           ...robotInitialState.tipState.pipettes,
@@ -294,7 +328,7 @@ describe('consolidate single-channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('Single-channel with exceeding pipette max: with changeTip="never"', () => {
@@ -351,7 +385,7 @@ describe('consolidate single-channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('disposal vol should be taken from first well', () => {
@@ -427,7 +461,7 @@ describe('consolidate single-channel', () => {
         well: 'A1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix on aspirate should mix before aspirate in first well of chunk only', () => {
@@ -577,7 +611,7 @@ describe('consolidate single-channel', () => {
         well: 'B1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix on aspirate with disposal vol', () => {
@@ -742,7 +776,7 @@ describe('consolidate single-channel', () => {
         well: 'A1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix after dispense', () => {
@@ -892,7 +926,7 @@ describe('consolidate single-channel', () => {
       }
       // done mix 2
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix after dispense with blowout to trash: first mix, then blowout', () => {
@@ -1055,7 +1089,7 @@ describe('consolidate single-channel', () => {
         well: 'A1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix after dispense with disposal volume: dispose, then mix (?)', () => {
@@ -1220,7 +1254,7 @@ describe('consolidate single-channel', () => {
         well: 'B1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
@@ -1318,7 +1352,7 @@ describe('consolidate single-channel', () => {
         well: 'B1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('touch-tip after aspirate should touch tip after every aspirate command', () => {
@@ -1405,7 +1439,7 @@ describe('consolidate single-channel', () => {
         well: 'B1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('touch-tip after dispense should touch tip after dispense on destination well', () => {
@@ -1480,27 +1514,11 @@ describe('consolidate single-channel', () => {
         well: 'B1'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 })
 
 describe('consolidate multi-channel', () => {
-  const robotInitialState = getBasicRobotState()
-
-  const robotStatePickedUpOneTip = {
-    ...robotInitialState,
-    tipState: {
-      tipracks: {
-        ...robotInitialState.tipState.tipracks,
-        tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false}
-      },
-      pipettes: {
-        ...robotInitialState.tipState.pipettes,
-        p300MultiId: true
-      }
-    }
-  }
-
   const baseData = {
     stepType: 'consolidate',
     name: 'Consolidate Test',
@@ -1583,10 +1601,10 @@ describe('consolidate multi-channel', () => {
         well: 'A12'
       }
     ])
-    expect(result.robotState).toEqual(robotStatePickedUpOneTip)
+    expect(result.robotState).toMatchObject(robotStatePickedUpMultiTipsNoLiquidState)
   })
 
-  // TODO later: address different multi-channel layouts of plates?
+  // TODO Ian 2018-03-14: address different multi-channel layouts of plates
   test.skip('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12')
 
   test.skip('multi-channel trough A1 A2 A3 A4 to 96-plate A12')
