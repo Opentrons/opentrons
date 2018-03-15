@@ -155,12 +155,12 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
   const baseLabware = {
     sourcePlateId: {
       slot: '10',
-      type: args.sourcePlateType, // WAS: 'trough-12row'. TODO IMMEDIATELY: remove this comment
+      type: args.sourcePlateType,
       name: 'Source Plate'
     },
     destPlateId: {
       slot: '11',
-      type: args.destPlateType, // WAS: '96-flat'. TODO IMMEDIATELY: remove this comment
+      type: args.destPlateType,
       name: 'Destination Plate'
     },
     trashId: {

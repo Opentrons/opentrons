@@ -1,10 +1,9 @@
 // @flow
 import merge from 'lodash/merge'
-import omit from 'lodash/omit'
-import {createRobotState, getTipColumn, getTiprackTipstate} from './fixtures'
+import {createRobotStateFixture, createEmptyLiquidState, getTipColumn, getTiprackTipstate} from './fixtures'
 import {consolidate} from '../'
 
-const robotInitialState = createRobotState({
+const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
   destPlateType: '96-flat',
   fillTiprackTips: true,
@@ -12,9 +11,15 @@ const robotInitialState = createRobotState({
   tipracks: [200, 200]
 })
 
-const robotStatePickedUpOneTip = merge(
+const emptyLiquidState = createEmptyLiquidState({
+  sourcePlateType: 'trough-12row',
+  destPlateType: '96-flat',
+  pipettes: robotInitialStateNoLiquidState.instruments
+})
+
+const robotStatePickedUpOneTipNoLiquidState = merge(
   {},
-  robotInitialState,
+  robotInitialStateNoLiquidState,
   {
     tipState: {
       tipracks: {
@@ -27,9 +32,9 @@ const robotStatePickedUpOneTip = merge(
   }
 )
 
-const robotStatePickedUpMultiTips = merge(
+const robotStatePickedUpMultiTipsNoLiquidState = merge(
   {},
-  robotInitialState,
+  robotInitialStateNoLiquidState,
   {
     tipState: {
       tipracks: {
@@ -42,11 +47,9 @@ const robotStatePickedUpMultiTips = merge(
   }
 )
 
-// fixtures without 'liquidState' key for use with `toMatchObject`
-// TODO IMMEDIATELY: use fixture generator fns
-const robotInitialStateNoLiquidState = omit(robotInitialState, ['liquidState'])
-const robotStatePickedUpOneTipNoLiquidState = omit(robotStatePickedUpOneTip, ['liquidState'])
-const robotStatePickedUpMultiTipsNoLiquidState = omit(robotStatePickedUpMultiTips, ['liquidState'])
+// Fixtures with empty liquidState
+const robotInitialState = {...robotInitialStateNoLiquidState, liquidState: emptyLiquidState}
+const robotStatePickedUpOneTip = {...robotStatePickedUpOneTipNoLiquidState, liquidState: emptyLiquidState}
 
 describe('consolidate single-channel', () => {
   const baseData = {
