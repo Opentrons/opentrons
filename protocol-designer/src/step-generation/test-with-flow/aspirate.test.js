@@ -76,6 +76,10 @@ describe('aspirate', () => {
   })
 
   describe('liquid tracking:', () => {
+    // Unlike the above tests, these tests rely on the fixure labware types matching the following:
+    expect(robotStateWithTip.labware.destPlateId.type).toBe('96-flat')
+    expect(robotStateWithTip.labware.sourcePlateId.type).toBe('trough-12row')
+
     const initialRobotWithIngred = merge(
       {},
       robotStateWithTip,
@@ -115,15 +119,6 @@ describe('aspirate', () => {
 
     // TODO Ian 2018-03-14 also do tests for tips that contain air
     // (prereq: need to define behavior in liquid tracking for that)
-
-    // Assertion for fixture. Alternatively, could re-declare the fixtures for this set of tests
-    if (initialRobotWithIngred.labware.destPlateId.type !== '96-flat') {
-      throw new Error('This set of tests expects destPlateId to be "96-flat"')
-    }
-
-    if (initialRobotWithIngred.labware.sourcePlateId.type !== 'trough-12row') {
-      throw new Error('This set of tests expects sourcePlateId to be "trough-12row"')
-    }
 
     describe('...single-channel pipette', () => {
       describe('...fresh tip', () => {

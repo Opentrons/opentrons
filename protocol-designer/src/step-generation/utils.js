@@ -37,7 +37,7 @@ type LiquidVolumeState = {[ingredGroup: string]: Vol}
 // TODO Ian 2018-03-15 use Symbol, or other way to ensure no conflict with ingredGroupId keys?
 // However, Flow doesn't like Symbol keys.
 // (this conflict is unlikely, since ingredGroupIds are strings of numbers)
-export const AIR = 'air'
+export const AIR = '__air__'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
