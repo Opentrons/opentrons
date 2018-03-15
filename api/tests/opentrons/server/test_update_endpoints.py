@@ -3,7 +3,7 @@ import json
 import tempfile
 from aiohttp import web
 from opentrons.server.main import init, log_init
-from opentrons.server import endpoints
+from opentrons.server.endpoints import (control, update)
 
 
 async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
@@ -11,7 +11,7 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_restart(request):
         return web.json_response(test_data)
-    monkeypatch.setattr(endpoints, 'restart', mock_restart)
+    monkeypatch.setattr(control, 'restart', mock_restart)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
@@ -34,7 +34,7 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_install(filename, loop):
         return msg
-    monkeypatch.setattr(endpoints, '_install', mock_install)
+    monkeypatch.setattr(update, '_install', mock_install)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))

@@ -7,6 +7,7 @@ from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
+from opentrons.server.endpoints import (wifi, control, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
 
@@ -19,11 +20,7 @@ def log_init():
     """
     Function that sets log levels and format strings. Checks for the
     OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
-    :return:
     """
-    # TODO(artyom): might as well use this:
-    # https://pypi.python.org/pypi/logging-color-formatter
-
     default_log_level = 'INFO'
     ot_log_level = os.environ.get('OT_LOG_LEVEL', default_log_level)
     if ot_log_level not in logging._nameToLevel:
@@ -78,16 +75,17 @@ def init(loop=None):
     """
     server = Server(MainRouter(), loop=loop)
     server.app.router.add_get('/health', endp.health)
-    server.app.router.add_get('/wifi/list', endp.wifi_list)
-    server.app.router.add_post('/wifi/configure', endp.wifi_configure)
-    server.app.router.add_get('/wifi/status', endp.wifi_status)
-    server.app.router.add_post('/identify', endp.identify)
-    server.app.router.add_post('/lights/on', endp.turn_on_rail_lights)
-    server.app.router.add_post('/lights/off', endp.turn_off_rail_lights)
-    server.app.router.add_post('/server/update', endp.update_api)
-    server.app.router.add_post('/server/restart', endp.restart)
+    server.app.router.add_get('/wifi/list', wifi.list_networks)
+    server.app.router.add_post('/wifi/configure', wifi.configure)
+    server.app.router.add_get('/wifi/status', wifi.status)
+    server.app.router.add_post('/identify', control.identify)
+    server.app.router.add_post('/lights/on', control.turn_on_rail_lights)
+    server.app.router.add_post('/lights/off', control.turn_off_rail_lights)
+    server.app.router.add_post('/server/update', update.install_api)
+    server.app.router.add_post('/server/restart', control.restart)
     server.app.router.add_get('/calibration/deck', dc_endp.start)
     server.app.router.add_post('/calibration/deck', dc_endp.dispatch)
+    server.app.router.add_get('/pipettes', control.get_attached_pipettes)
     return server.app
 
 
