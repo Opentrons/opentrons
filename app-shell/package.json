@@ -2,7 +2,7 @@
   "name": "ot-app-desktop",
   "productName": "Opentrons",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.0-beta.0",
   "description": "Opentrons decktop application shell",
   "main": "lib/main.js",
   "scripts": {
