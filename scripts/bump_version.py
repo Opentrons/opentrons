@@ -1,10 +1,46 @@
 import os
 import json
 import argparse
-from subprocess import run
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 REPO_DIR = os.path.split(FILE_DIR)[0]
+
+
+def read_json_file(filepath):
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+    return data
+
+
+def write_json_file(filepath, data):
+    with open(filepath, 'w') as file:
+        json.dump(data, file, indent=2)
+        file.write('\n')
+
+
+def update_js_pkg(pkg, version, all_pkgs):
+    """
+    Updates the "version" field of a project's package.json and bumps the
+    version of any monorepo sibling dependencies in the "dependencies" or
+    "devDependencies" object
+    """
+    deps = pkg.get('dependencies')
+    dev_deps = pkg.get('devDependencies')
+    dep_names = [dep_pkg['name'] for dep_pkg in all_pkgs]
+
+    for name in dep_names:
+        if deps and name in deps:
+            deps[name] = version
+        if dev_deps and name in dev_deps:
+            dev_deps[name] = version
+
+    pkg['version'] = version
+    if deps:
+        pkg['dependencies'] = deps
+    if dev_deps:
+        pkg['devDependencies'] = dev_deps
+
+    return pkg
 
 
 def main():
@@ -20,7 +56,7 @@ def main():
     If --bugfix is specified, the bugfix will be incremented by 1 (and others
         left unchanged)
     If --sync is specified, all sub-projects are updated with the contents of
-        version.json in the root of the repo (this is primarily for cases when
+        package.json in the root of the repo (this is primarily for cases when
         the version should be hard-set outside of normal sequence--this should
         not be used in normal operation, generally only to undo an accidental
         bump or such)
@@ -34,36 +70,18 @@ def main():
     group.add_argument('--sync', action='store_true')
     args = parser.parse_args()
 
-    ver_file = os.path.join(REPO_DIR, "package.json")
+    package_file = os.path.join(REPO_DIR, "package.json")
+    pkg = read_json_file(package_file)
+    pkg_version = pkg['version']
 
-    with open(ver_file, 'r') as version_data:
-        current_version = json.load(version_data)
+    print('Package version: {}'.format(pkg_version))
 
-    split_ver = current_version['version'].split('-')
+    split_ver = pkg_version.split('-')
     major, minor, bugfix = [int(x) for x in split_ver[0].split('.')]
     tags = ''
     if len(split_ver) > 1:
         tags = ''.join(['-{}'.format(tag) for tag in split_ver[1:]])
 
-    # # For branch-dependent operations
-    # current_branch = run(
-    #     "git rev-parse --abbrev-ref HEAD",
-    #     shell=True,
-    #     stdout=PIPE,
-    #     encoding="UTF-8"
-    # ).stdout
-
-    # if 'v3a' not in current_branch:
-    #     print("Current branch: {}".format(current_branch))
-    #     rev_hash = run(
-    #         "git rev-parse --short HEAD",
-    #         shell=True,
-    #         stdout=PIPE,
-    #         encoding="UTF-8"
-    #     ).stdout
-    #     current_version = "{}-{}".format(current_version, rev_hash)
-
-    print("Prior version: {}".format(current_version))
     if args.major:
         major = major + 1
         minor = 0
@@ -76,17 +94,25 @@ def main():
 
     new_version = "{}.{}.{}{}".format(major, minor, bugfix, tags)
     print("Setting all sub-projects to version: {}".format(new_version))
-    current_version["version"] = new_version
+    pkg["version"] = new_version
 
-    with open(ver_file, 'w') as version_data:
-        json.dump(current_version, version_data, indent=2)
+    write_json_file(package_file, pkg)
 
     # JS sub-projects
-    for project in ['components', 'app', 'protocol-designer']:
-        print('Updating version field in package.json for {}'.format(project))
-        pkg_file = os.path.join(REPO_DIR, project, 'package.json')
-        command = """sed -i 's/.*version.*/  "version": "{}",/g' {}""".format(new_version, pkg_file)  # NOQA
-        run(command)
+    # TODO(mc, 2018-03-15): move app-shell to workspaces when possible;
+    #   currently blocked by electron-builder#2222
+    js_project_names = pkg['workspaces'] + ['app-shell']
+    js_pkg_files = [
+        os.path.join(REPO_DIR, name, 'package.json')
+        for name in js_project_names
+    ]
+    js_pkgs = [read_json_file(filename) for filename in js_pkg_files]
+    js_projects = zip(js_project_names, js_pkg_files, js_pkgs)
+
+    for name, project_pkg_file, project_pkg in js_projects:
+        print('Updating version in package.json for {}'.format(name))
+        project_pkg = update_js_pkg(project_pkg, new_version, js_pkgs)
+        write_json_file(project_pkg_file, project_pkg)
 
     # Python sub-projects
     for project in ['api']:
