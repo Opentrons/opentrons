@@ -46,6 +46,7 @@ RUN apk add --update \
       py3-zmq \
       py3-urwid \
       py3-numpy \
+      ffmpeg \
       && rm -rf /var/cache/apk/*
 
 # Resin's python base container compiles python from scratch and doesn't have
