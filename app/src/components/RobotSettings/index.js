@@ -5,7 +5,7 @@ import * as React from 'react'
 import type {Robot} from '../../robot'
 
 import StatusCard from './StatusCard'
-import AttachedInstrumentsCard from './AttachedInstrumentsCard'
+// import AttachedInstrumentsCard from './AttachedInstrumentsCard'
 import InformationCard from './InformationCard'
 import ConnectivityCard from './ConnectivityCard'
 import ConnectAlertModal from './ConnectAlertModal'
@@ -19,9 +19,9 @@ export default function RobotSettings (props: Props) {
       <div className={styles.row}>
         <StatusCard {...props} />
       </div>
-      <div className={styles.row}>
-        <AttachedInstrumentsCard {...props} />
-      </div>
+      {/* <div className={styles.row}>
+      <AttachedInstrumentsCard {...props} />
+      </div> */}
       <div className={styles.row}>
         <InformationCard {...props} />
       </div>
