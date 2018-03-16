@@ -1,52 +1,28 @@
 // @flow
-import {filledTiprackWells, p300Single, p300Multi, basicLiquidState} from './fixtures'
-import {dropTip, type RobotState} from '../'
+import merge from 'lodash/merge'
+import {createRobotState} from './fixtures'
+import dropTip from '../dropTip'
 
-// TODO use a fixture, standardize
-const makeRobotState = ({singleHasTips, multiHasTips}: {singleHasTips: boolean, multiHasTips: boolean}): RobotState => ({
-  instruments: {
-    p300SingleId: p300Single,
-    p300MultiId: p300Multi
-  },
-  labware: {
-    tiprack1Id: {
-      slot: '1',
-      type: 'tiprack-200uL',
-      name: 'Tip rack'
-    },
-    tiprack10Id: {
-      slot: '10',
-      type: 'tiprack-200uL',
-      name: 'Tip rack'
-    },
-    sourcePlateId: {
-      slot: '11',
-      type: 'trough-12row',
-      name: 'Source (Buffer)'
-    },
-    destPlateId: {
-      slot: '8',
-      type: '96-flat',
-      name: 'Destination Plate'
-    },
-    trashId: {
-      slot: '12',
-      type: 'fixed-trash',
-      name: 'Trash'
+function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) {
+  return merge(
+    {},
+    createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      tipracks: [200, 200],
+      fillPipetteTips: false,
+      fillTiprackTips: true
+    }),
+    {
+      tipState: {
+        pipettes: {
+          p300SingleId: args.singleHasTips,
+          p300MultiId: args.multiHasTips
+        }
+      }
     }
-  },
-  tipState: {
-    tipracks: {
-      tiprack1Id: {...filledTiprackWells},
-      tiprack10Id: {...filledTiprackWells}
-    },
-    pipettes: {
-      p300SingleId: singleHasTips,
-      p300MultiId: multiHasTips
-    }
-  },
-  liquidState: basicLiquidState
-})
+  )
+}
 
 describe('replaceTip: single channel', () => {
   test('drop tip if there is a tip', () => {

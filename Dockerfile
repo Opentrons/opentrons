@@ -47,6 +47,7 @@ RUN apk add --update \
       py3-urwid \
       py3-numpy \
       ffmpeg \
+      alsa-utils \
       && rm -rf /var/cache/apk/*
 
 # Resin's python base container compiles python from scratch and doesn't have

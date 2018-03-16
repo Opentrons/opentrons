@@ -1,193 +1,159 @@
 // @flow
-import {filledTiprackWells, emptyTiprackWells, p300Single, p300Multi, basicLiquidState} from './fixtures'
+import merge from 'lodash/merge'
+import {createRobotState, getTiprackTipstate, getTipColumn} from './fixtures'
 import {replaceTip} from '../'
 
 // TODO use a fixture, standardize
-describe('replaceTip: single channel', () => {
-  const robotInitialState = {
-    instruments: {
-      p300SingleId: p300Single
-    },
-    labware: {
-      tiprack1Id: {
-        slot: '1',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      tiprack10Id: {
-        slot: '10',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      sourcePlateId: {
-        slot: '11',
-        type: 'trough-12row',
-        name: 'Source (Buffer)'
-      },
-      destPlateId: {
-        slot: '8',
-        type: '96-flat',
-        name: 'Destination Plate'
-      },
-      trashId: {
-        slot: '12',
-        type: 'fixed-trash',
-        name: 'Trash'
-      }
-    },
-    tipState: {
-      tipracks: {
-        tiprack1Id: {...filledTiprackWells},
-        tiprack10Id: {...filledTiprackWells}
-      },
-      pipettes: {
-        p300SingleId: false
-      }
-    },
-    liquidState: basicLiquidState
-  }
+const tiprack1Id = 'tiprack1Id'
+const tiprack2Id = 'tiprack2Id'
 
+const labwareTypes1 = {
+  sourcePlateType: 'trough-12row',
+  destPlateType: '96-flat'
+}
+
+const robotInitialState = createRobotState({
+  ...labwareTypes1,
+  fillTiprackTips: true,
+  fillPipetteTips: false,
+  tipracks: [200, 200]
+})
+
+describe('replaceTip: single channel', () => {
   test('Single-channel: first tip', () => {
     const result = replaceTip('p300SingleId')(robotInitialState)
 
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300SingleId',
-      labware: 'tiprack1Id',
+      labware: tiprack1Id,
       well: 'A1'
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false
+    expect(result.robotState).toEqual(merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false
+            }
+          },
+          pipettes: {
+            p300SingleId: true
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    ))
   })
 
   test('Single-channel: second tip B1', () => {
-    const result = replaceTip('p300SingleId')({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false
+    const result = replaceTip('p300SingleId')(merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false
+            }
+          },
+          pipettes: {
+            p300SingleId: false
           }
-        },
-        pipettes: {
-          p300SingleId: false
         }
       }
-    })
+    ))
 
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300SingleId',
-      labware: 'tiprack1Id',
+      labware: tiprack1Id,
       well: 'B1'
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false,
-            B1: false
+    expect(result.robotState).toEqual(merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false,
+              B1: false
+            }
+          },
+          pipettes: {
+            p300SingleId: true
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    ))
   })
 
   test('Single-channel: ninth tip (next column)', () => {
-    const result = replaceTip('p300SingleId')({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false,
-            B1: false,
-            C1: false,
-            D1: false,
-            E1: false,
-            F1: false,
-            G1: false,
-            H1: false
+    const initialTestRobotState = merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: getTipColumn(1, false)
+          },
+          pipettes: {
+            p300SingleId: false
           }
-        },
-        pipettes: {
-          p300SingleId: false
         }
       }
-    })
+    )
+
+    const result = replaceTip('p300SingleId')(initialTestRobotState)
 
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300SingleId',
-      labware: 'tiprack1Id',
+      labware: tiprack1Id,
       well: 'A2'
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false,
-            B1: false,
-            C1: false,
-            D1: false,
-            E1: false,
-            F1: false,
-            G1: false,
-            H1: false,
-            A2: false
+    expect(result.robotState).toEqual(merge(
+      {},
+      initialTestRobotState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A2: false
+            }
+          },
+          pipettes: {
+            p300SingleId: true
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    ))
   })
 
   test('Single-channel: pipette already has tip, so tip will be replaced.', () => {
-    const result = replaceTip('p300SingleId')({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false
+    const initialTestRobotState = merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false
+            }
+          },
+          pipettes: {
+            p300SingleId: true
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    )
+
+    const result = replaceTip('p300SingleId')(initialTestRobotState)
 
     expect(result.commands).toEqual([
       {
@@ -199,138 +165,95 @@ describe('replaceTip: single channel', () => {
       {
         command: 'pick-up-tip',
         pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
+        labware: tiprack1Id,
         well: 'B1'
       }
     ])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false,
-            B1: false
+    expect(result.robotState).toEqual(merge(
+      {},
+      initialTestRobotState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              B1: false
+            }
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    ))
   })
 
   test('Single-channel: used all tips in first rack, move to second rack', () => {
-    const result = replaceTip('p300SingleId')({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {...emptyTiprackWells}
-        },
-        pipettes: {
-          p300SingleId: false
+    const initialTestRobotState = merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: getTiprackTipstate(false)
+          },
+          pipettes: {
+            p300SingleId: false
+          }
         }
       }
-    })
+    )
+
+    const result = replaceTip('p300SingleId')(initialTestRobotState)
 
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300SingleId',
-      labware: 'tiprack10Id',
+      labware: tiprack2Id,
       well: 'A1'
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {
-            ...emptyTiprackWells
+    expect(result.robotState).toEqual(merge(
+      {},
+      initialTestRobotState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack2Id]: {
+              A1: false
+            }
           },
-          tiprack10Id: {
-            ...filledTiprackWells,
-            A1: false
+          pipettes: {
+            p300SingleId: true
           }
-        },
-        pipettes: {
-          p300SingleId: true
         }
       }
-    })
+    ))
   })
 })
 
 describe('replaceTip: multi-channel', () => {
-  // TODO use a fixture, standardize
-  const robotInitialState = {
-    instruments: {
-      p300MultiId: p300Multi
-    },
-    labware: {
-      tiprack1Id: {
-        slot: '1',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      tiprack10Id: {
-        slot: '10',
-        type: 'tiprack-200uL',
-        name: 'Tip rack'
-      },
-      sourcePlateId: {
-        slot: '11',
-        type: 'trough-12row',
-        name: 'Source (Buffer)'
-      },
-      destPlateId: {
-        slot: '8',
-        type: '96-flat',
-        name: 'Destination Plate'
-      },
-      trashId: {
-        slot: '12',
-        type: 'fixed-trash',
-        name: 'Trash'
-      }
-    },
-    tipState: {
-      tipracks: {
-        tiprack1Id: {...filledTiprackWells},
-        tiprack10Id: {...filledTiprackWells}
-      },
-      pipettes: {
-        p300MultiId: false
-      }
-    },
-    liquidState: basicLiquidState
-  }
-
   test('multi-channel, all tipracks have tips', () => {
     const result = replaceTip('p300MultiId')(robotInitialState)
 
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300MultiId',
-      labware: 'tiprack1Id',
+      labware: tiprack1Id,
       well: 'A1'
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotInitialState,
-      tipState: {
-        tipracks: {
-          tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
-          tiprack10Id: {...filledTiprackWells}
-        },
-        pipettes: {
-          p300MultiId: true
+    expect(result.robotState).toEqual(merge(
+      {},
+      robotInitialState,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: getTipColumn(1, false)
+          },
+          pipettes: {
+            p300MultiId: true
+          }
         }
       }
-    })
+    ))
   })
 
   test('multi-channel, missing tip in first row', () => {
@@ -339,8 +262,8 @@ describe('replaceTip: multi-channel', () => {
       tipState: {
         ...robotInitialState.tipState,
         tipracks: {
-          tiprack1Id: {...filledTiprackWells, A1: false},
-          tiprack10Id: {...filledTiprackWells}
+          [tiprack1Id]: {...getTiprackTipstate(true), A1: false},
+          [tiprack2Id]: getTiprackTipstate(true)
         }
       }
     }
@@ -349,35 +272,35 @@ describe('replaceTip: multi-channel', () => {
     expect(result.commands).toEqual([{
       command: 'pick-up-tip',
       pipette: 'p300MultiId',
-      labware: 'tiprack1Id',
+      labware: tiprack1Id,
       well: 'A2' // get from next row
     }])
 
-    expect(result.robotState).toEqual({
-      ...robotStateWithTipA1Missing,
-      tipState: {
-        ...robotStateWithTipA1Missing.tipState,
-        tipracks: {
-          tiprack1Id: {
-            ...filledTiprackWells,
-            A1: false,
-            // Column 2 now empty
-            A2: false,
-            B2: false,
-            C2: false,
-            D2: false,
-            E2: false,
-            F2: false,
-            G2: false,
-            H2: false
+    expect(result.robotState).toEqual(merge(
+      {},
+      robotStateWithTipA1Missing,
+      {
+        tipState: {
+
+          tipracks: {
+            [tiprack1Id]: {
+              // Column 2 now empty
+              A2: false,
+              B2: false,
+              C2: false,
+              D2: false,
+              E2: false,
+              F2: false,
+              G2: false,
+              H2: false
+            }
           },
-          tiprack10Id: {...filledTiprackWells}
-        },
-        pipettes: {
-          p300MultiId: true
+          pipettes: {
+            p300MultiId: true
+          }
         }
       }
-    })
+    ))
   })
 
   test('Multi-channel: pipette already has tip, so tip will be replaced.', () => {
@@ -401,22 +324,28 @@ describe('replaceTip: multi-channel', () => {
       {
         command: 'pick-up-tip',
         pipette: 'p300MultiId',
-        labware: 'tiprack1Id',
+        labware: tiprack1Id,
         well: 'A1' // get from next row
       }
     ])
 
-    expect(result.robotState).toEqual({
-      ...robotStateWithTipsOnMulti,
-      tipState: {
-        tipracks: {
-          tiprack1Id: {...filledTiprackWells, A1: false, B1: false, C1: false, D1: false, E1: false, F1: false, G1: false, H1: false},
-          tiprack10Id: {...filledTiprackWells}
-        },
-        pipettes: {
-          p300MultiId: true
+    expect(result.robotState).toEqual(merge(
+      {},
+      robotStateWithTipsOnMulti,
+      {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              ...getTiprackTipstate(true),
+              ...getTipColumn(1, false)
+            },
+            [tiprack2Id]: getTiprackTipstate(true)
+          },
+          pipettes: {
+            p300MultiId: true
+          }
         }
       }
-    })
+    ))
   })
 })

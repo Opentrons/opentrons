@@ -930,6 +930,18 @@ class Robot(object):
         self.reset()
         self.home()
 
+    def get_attached_pipettes(self):
+        """
+        Gets model names of attached pipettes
+
+        :return: :dict with keys 'left' and 'right' and a model string for each
+            mount, or 'uncommissioned' if no model string available
+        """
+        return {
+            'left': self._driver.read_pipette_model('left'),
+            'right': self._driver.read_pipette_model('right')
+        }
+
     def get_serial_ports_list(self):
         ports = []
         # TODO: Store these settings in config
