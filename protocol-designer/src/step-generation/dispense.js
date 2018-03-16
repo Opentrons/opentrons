@@ -105,7 +105,17 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
 
   return {
     commands,
-    robotState: prevRobotState // TODO LATER deep clone robotState and manipulate it for liquid tracking here?
+    robotState: {
+      ...prevRobotState,
+      liquidState: _updateLiquidState({
+        pipetteId: pipette,
+        pipetteData: prevRobotState.instruments[pipette],
+        labwareId: labware,
+        labwareType: prevRobotState.labware[labware].type,
+        volume,
+        well
+      }, prevRobotState.liquidState)
+    }
   }
 }
 
