@@ -46,6 +46,7 @@ RUN apk add --update \
       py3-zmq \
       py3-urwid \
       py3-numpy \
+      ffmpeg \
       alsa-utils \
       && rm -rf /var/cache/apk/*
 
