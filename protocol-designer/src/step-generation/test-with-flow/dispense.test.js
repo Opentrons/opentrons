@@ -79,8 +79,10 @@ describe('dispense', () => {
 
     beforeEach(() => {
       dispenseSingleCh150ToA1Args = {
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
+        labwareId: 'sourcePlateId',
+        labwareType: '96-flat',
+        pipetteId: 'p300SingleId',
+        pipetteData: p300Single,
         volume: 150,
         well: 'A1'
       }
@@ -118,7 +120,7 @@ describe('dispense', () => {
           labware: {
             sourcePlateId: {
               A1: {ingred1: {volume: 150}},
-              A2: {},
+              A2: {}, // TODO IMMEDIATELY: look for all empty well checks, toMatchObject is too permissive?
               B1: {}
             }
           }
@@ -259,17 +261,17 @@ describe('dispense', () => {
           pipettes: {
             p300SingleId: {
               '0': {
-                ingred1: {volume: 10},
-                ingred2: {volume: 40}
+                ingred1: {volume: 20},
+                ingred2: {volume: 80}
               }
             }
           },
           labware: {
             sourcePlateId: {
               A1: {
-                ingred1: {volume: 40},
-                ingred2: {volume: 160 + 40},
-                ingred3: {volume: 20}
+                ingred1: {volume: 0 + (50 - 20)},
+                ingred2: {volume: 25 + (200 - 80)},
+                ingred3: {volume: 0 + 20}
               },
               A2: {},
               B1: {}
@@ -309,11 +311,11 @@ describe('dispense', () => {
             expectedLabwareMatch: {
               sourcePlateId: {
                 A1: {
-                  ingred1: {volume: 40 + (6 * 150)},
-                  ingred2: {volume: 25 + 200},
+                  ingred1: {volume: 6 * 150},
+                  ingred2: {volume: 25 + 150},
                   ingred3: {volume: 20}
                 },
-                B1: {}
+                A2: {}
               }
             }
           },
@@ -374,7 +376,14 @@ describe('dispense', () => {
           )
 
           const result = _updateLiquidState(
-            dispenseSingleCh150ToA1Args,
+            {
+              pipetteId: 'p300MultiId',
+              pipetteData: p300Multi,
+              volume: 150,
+              labwareId: 'sourcePlateId',
+              labwareType,
+              well: 'A1'
+            },
             initialLiquidState
           )
 
