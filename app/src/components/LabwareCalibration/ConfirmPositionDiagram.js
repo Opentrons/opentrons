@@ -5,13 +5,20 @@ import * as React from 'react'
 import type {Labware, Instrument} from '../../robot'
 
 import styles from './styles.css'
-import plateSingleSrc from '../../img/labware/plate_single.png'
-import plateMultiSrc from '../../img/labware/plate_multi.png'
-import troughSingleSrc from '../../img/labware/trough_single.png'
-import troughMultiSrc from '../../img/labware/trough_multi.png'
-import tubeSingleSrc from '../../img/labware/tuberack_single.png'
-import tiprackSingleSrc from '../../img/labware/tiprack_single.png'
-import tiprackMultiSrc from '../../img/labware/tiprack_multi.png'
+
+import plate96SingleSrc from './images/96-well-plate-calibration-single.png'
+import plate96MultiSrc from './images/96-well-plate-calibration-multi.png'
+
+import plate384SingleSrc from './images/384-well-plate-calibration-single.png'
+import plate384MultiSrc from './images/384-well-plate-calibration-multi.png'
+
+import troughSingleSrc from './images/trough-calibration-single.png'
+import troughMultiSrc from './images/trough-calibration-multi.png'
+
+import tiprackSingleSrc from './images/tiprack-calibration-single.png'
+import tiprackMultiSrc from './images/tiprack-calibration-multi.png'
+
+import tubeRackSrc from './images/tube-rack-calibration.png'
 
 type Props = Labware & {
   calibrator: Instrument,
@@ -19,16 +26,12 @@ type Props = Labware & {
 }
 
 export default function ConfirmPositionDiagram (props: Props) {
-  const {type, isTiprack, calibrator: {mount, channels}} = props
+  const {type, isTiprack, calibrator: {channels}} = props
   const multi = channels === 8
-  const calibrator = `${mount} ${multi ? 'multi' : 'single'}-channel pipette`
-  const targetLocation = multi ? 'column 1' : 'A1'
-  const target = (isTiprack ? 'tip' : 'well') + (multi ? 's' : '')
-  const tipOrNozzle = isTiprack ? 'nozzle' : 'tip'
-  const calibrationDescription = `${tipOrNozzle}${multi ? 's are ' : ' is '}`
-
   let diagramSrc
 
+  // TODO(mc, 2018-03-2018): move to labware-definitions? Generate via
+  //   components library? Refactor somehow is what I'm saying
   if (isTiprack) {
     diagramSrc = multi
       ? tiprackMultiSrc
@@ -39,25 +42,22 @@ export default function ConfirmPositionDiagram (props: Props) {
       : troughSingleSrc
   } else if (type.includes('tube-rack')) {
     // TODO(mc, 2018-02-07): tube rack with multi??
-    diagramSrc = tubeSingleSrc
+    // consider `assert` here
+    if (multi) console.warn('Warning: calibrating tube-rack w/ multi-channel')
+    diagramSrc = tubeRackSrc
+  } else if (type.includes('384')) {
+    diagramSrc = multi
+      ? plate384MultiSrc
+      : plate384SingleSrc
   } else {
     diagramSrc = multi
-      ? plateMultiSrc
-      : plateSingleSrc
+      ? plate96MultiSrc
+      : plate96SingleSrc
   }
 
   return (
     <div className={styles.position_diagram}>
-      <h3 className={styles.diagram_title}>
-        Calibrate pipette to {type}
-      </h3>
       <img className={styles.diagram_image} src={diagramSrc} />
-      <p className={styles.diagram_instructions}>
-        Jog the {calibrator} until the {calibrationDescription} centered
-        above and flush with the top of the {targetLocation} {target} as
-        illustrated above.
-        {isTiprack && ` Then try picking up the ${target}.`}
-      </p>
     </div>
   )
 }
