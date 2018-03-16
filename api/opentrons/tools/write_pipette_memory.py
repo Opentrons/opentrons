@@ -87,11 +87,13 @@ def write_identifiers(robot, mount, new_id, new_model):
 
     robot._driver.write_pipette_id(mount, new_id)
     read_id = robot._driver.read_pipette_id(mount)
-    _assert_the_same(new_id, read_id)
+    print('Just Read ID: ', read_id['pipette_id'])
+    _assert_the_same(new_id, read_id['pipette_id'])
 
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
-    _assert_the_same(new_model, read_model)
+    print('Just Read MODEL: ', read_model['model'])
+    _assert_the_same(new_model, read_model['model'])
 
 
 def _assert_the_same(a, b):
@@ -141,11 +143,17 @@ def _user_submitted_id(max_length):
     return manual_id
 
 
-if __name__ == "__main__":
-    robot = connect_to_robot()
+def main(robot):
+    print('\n')
     found_instruments = scan_instruments(robot)
     mount = select_mount(found_instruments)
     new_model, new_id = generate_id()
     write_identifiers(robot, mount, new_id, new_model)
-    print()
-    print('SUCCESS! Exiting script now\n\n')
+    input_message = '\nSUCCESS! Write another pipette?? (Y or N): '
+    if 'y' in input(input_message).lower():
+        main(robot)
+
+
+if __name__ == "__main__":
+    robot = connect_to_robot()
+    main(robot)
