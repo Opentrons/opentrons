@@ -29,10 +29,14 @@ async def test_get_pipettes(
 
     dummy_by_mount = {
         'left': {
-            'model': 'p10_multi'
+            'model': 'p10_multi',
+            'mount_axis': 'z',
+            'plunger_axis': 'b'
         },
         'right': {
-            'model': 'p300_single'
+            'model': 'p300_single',
+            'mount_axis': 'a',
+            'plunger_axis': 'c'
         }
     }
 
@@ -88,3 +92,99 @@ async def test_disengage_axes(
     result2 = await res2.text()
     assert res2.status == 200
     assert json.loads(result2) == alltrue
+
+
+async def test_robot_info(loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    res = await cli.get('/robot/positions')
+    assert res.status == 200
+
+    text = await res.text()
+    body = json.loads(text)
+    assert body['positions']['change_pipette']['target'] == 'mount'
+    assert len(body['positions']['change_pipette']['left']) == 3
+    assert len(body['positions']['change_pipette']['right']) == 3
+    assert body['positions']['attach_tip']['target'] == 'pipette'
+    assert len(body['positions']['attach_tip']['point']) == 3
+
+
+async def test_move_bad_request(loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    data0 = {
+        'target': 'other'
+    }
+    res = await cli.post('/robot/move', json=data0)
+    assert res.status == 400
+
+    data1 = {
+        'target': 'mount',
+        'point': (1, 2, 3, 4)
+    }
+    res = await cli.post('/robot/move', json=data1)
+    assert res.status == 400
+
+    data2 = {
+        'target': 'mount',
+        'point': (1, 2, 3),
+        'mount': 'middle'
+    }
+    res = await cli.post('/robot/move', json=data2)
+    assert res.status == 400
+
+    data3 = {
+        'target': 'pipette',
+        'point': (1, 2, 3),
+        'mount': 'left',
+        'model': 'p9000+'
+    }
+    res = await cli.post('/robot/move', json=data3)
+    assert res.status == 400
+
+
+async def test_move_mount(virtual_smoothie_env, loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    robot.home()
+    # from opentrons.trackers import pose_tracker
+    # print("Before: {}".format(tuple(
+    #             pose_tracker.absolute(
+    #                 robot.poses, robot._actuators['right']['carriage']))))
+    data = {
+        'target': 'mount',
+        'point': [100, 200, 50],
+        'mount': 'right'
+    }
+    res = await cli.post('/robot/move', json=data)
+    assert res.status == 200
+    # text = await res.text()
+    # print("After: {}".format(tuple(
+    #             pose_tracker.absolute(
+    #                 robot.poses, robot._actuators['right']['carriage']))))
+    # print("=-> Result: {}".format(text))
+
+
+async def test_move_pipette(loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    robot.home()
+    # from opentrons.trackers import pose_tracker
+    # print("Before: {}".format(tuple(
+    #             pose_tracker.absolute(
+    #                 robot.poses, robot._actuators['right']['carriage']))))
+    data = {
+        'target': 'pipette',
+        'point': [100, 200, 50],
+        'mount': 'right',
+        'model': 'p300_single'
+    }
+    res = await cli.post('/robot/move', json=data)
+    assert res.status == 200
+    # text = await res.text()
+    # print("Final: {}".format(tuple(
+    #             pose_tracker.absolute(
+    #                 robot.poses, robot._actuators['right']['carriage']))))
+    # print("=-> Result: {}".format(text))

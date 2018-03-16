@@ -937,9 +937,21 @@ class Robot(object):
         :return: :dict with keys 'left' and 'right' and a model string for each
             mount, or 'uncommissioned' if no model string available
         """
+        left_data = self._driver.read_pipette_model('left')
+        if left_data:
+            left_data.update({
+                'mount_axis': 'z',
+                'plunger_axis': 'b'
+            })
+        right_data = self._driver.read_pipette_model('right')
+        if right_data:
+            right_data.update({
+                'mount_axis': 'a',
+                'plunger_axis': 'c'
+            })
         return {
-            'left': self._driver.read_pipette_model('left'),
-            'right': self._driver.read_pipette_model('right')
+            'left': left_data,
+            'right': right_data
         }
 
     def get_serial_ports_list(self):

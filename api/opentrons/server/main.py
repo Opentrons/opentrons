@@ -104,6 +104,10 @@ def init(loop=None):
         '/motors/engaged', control.get_engaged_axes)
     server.app.router.add_post(
         '/motors/disengage', control.disengage_axes)
+    server.app.router.add_get(
+        '/robot/positions', control.position_info)
+    server.app.router.add_post(
+        '/robot/move', control.move)
     return server.app
 
 

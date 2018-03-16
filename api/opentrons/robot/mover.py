@@ -43,7 +43,7 @@ class Mover:
             src=self._src,
             dst=self._dst,
             point=Point(*defaults(x, y, z)))
-
+        # print("Arguments: {}".format((x, y, z)))
         driver_target = {}
 
         if 'x' in self._axis_mapping:
@@ -57,7 +57,7 @@ class Mover:
         if 'z' in self._axis_mapping:
             assert z is not None, "Value must be set for each axis mapped"
             driver_target[self._axis_mapping['z']] = dst_z
-
+        # print("Driver target: {}".format(driver_target))
         self._driver.move(driver_target)
 
         # Update pose with the new value. Since stepper motors are open loop

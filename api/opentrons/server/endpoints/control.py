@@ -4,7 +4,9 @@ import logging
 from time import sleep
 from aiohttp import web
 from threading import Thread
-from opentrons import robot
+from opentrons import robot, instruments
+from opentrons.instruments import pipette_config
+from opentrons.trackers import pose_tracker
 
 log = logging.getLogger(__name__)
 
@@ -19,10 +21,14 @@ async def get_attached_pipettes(request):
     ```
     {
       'left': {
-        'model': 'p300_single'
+        'model': 'p300_single',
+        'mount_axis': 'z',
+        'plunger_axis': 'b'
       },
       'right': {
-        'model': 'p10_multi'
+        'model': 'p10_multi',
+        'mount_axis': 'a',
+        'plunger_axis': 'c'
       }
     }
     ```
@@ -67,6 +73,103 @@ async def disengage_axes(request):
         robot._driver.disengage_axis("".join(axes))
         message = "Disengaged axes: {}".format(axes)
         status = 200
+    return web.json_response({"message": message}, status=status)
+
+
+async def position_info(request):
+    """
+    Positions determined experimentally by issuing move commands. Change
+    pipette position offsets the mount to the left or right such that a user
+    can easily access the pipette mount screws with a screwdriver. Attach tip
+    position places either pipette roughly in the front-center of the deck area
+    """
+    return web.json_response({
+        'positions': {
+            'change_pipette': {
+                'target': 'mount',
+                'left': (66, 60, 40.5),
+                'right': (266, 60, 40.5)
+            },
+            'attach_tip': {
+                'target': 'pipette',
+                'point': (200, 90, 150)
+            }
+        }
+    })
+
+
+def _validate_move_data(data):
+    error = False
+    message = ''
+    target = data.get('target')
+    if target not in ['mount', 'pipette']:
+        message = "Invalid target key: '{}' (target must be one of " \
+                  "'mount' or 'pipette'".format(target)
+        error = True
+    point = data.get('point')
+    if type(point) == list:
+        point = tuple(point)
+    if type(point) is not tuple:
+        message = "Point must be an ordered iterable. Got: {}".format(
+            type(point))
+        error = True
+    if point is not None and len(point) is not 3:
+        message = "Point must have 3 values--got {}".format(point)
+        error = True
+    mount = data.get('mount')
+    if mount not in ['left', 'right']:
+        message = "Mount '{}' not supported, must be 'left' or " \
+                  "'right'".format(mount)
+        error = True
+    if target == 'pipette':
+        model = data.get('model')
+        if model not in pipette_config.configs.keys():
+            message = "Model '{}' not recognized, must be one " \
+                      "of {}".format(model, pipette_config.configs.keys())
+            error = True
+    else:
+        model = None
+    return target, point, mount, model, message, error
+
+
+async def move(request):
+    """
+    Moves the robot to the specified position as provided by the `control.info`
+    endpoint response
+
+    Post body must include the following keys:
+    - 'target': either 'mount' or 'pipette'
+    - 'point': a tuple of 3 floats for x, y, z
+    - 'mount': must be 'left' or 'right'
+
+    If 'target' is 'pipette', body must also contain:
+    - 'model': must be a valid pipette model (as defined in `pipette_config`)
+    """
+    req = await request.text()
+    data = json.loads(req)
+
+    target, point, mount, model, message, error = _validate_move_data(data)
+    if error:
+        status = 400
+    else:
+        status = 200
+        if target == 'mount':
+            robot.poses = robot._actuators[mount]['carriage'].move(
+                robot.poses, x=point[0], y=point[1], z=point[2])
+            new_position = tuple(
+                pose_tracker.absolute(
+                    robot.poses, robot._actuators[mount]['carriage']))
+            message = "Move complete. New position: {}".format(new_position)
+        elif target == 'pipette':
+            config = pipette_config.load(model)
+            pipette = instruments._create_pipette_from_config(
+                config=config,
+                mount=mount)
+            pipette.move_to((robot.deck, point))
+            new_position = tuple(
+                pose_tracker.absolute(pipette.robot.poses, pipette))
+            message = "Move complete. New position: {}".format(new_position)
+
     return web.json_response({"message": message}, status=status)
 
 
