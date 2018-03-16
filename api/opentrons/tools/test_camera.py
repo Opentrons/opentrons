@@ -20,10 +20,14 @@ def copy_to_usb_drive_and_back(filepath):
     if os.path.exists('/mnt/usbdrive') is False:
         os.system('mkdir /mnt/usbdrive')
     # find the storage device
-    for l in 'abcdefgh':
-        if os.path.exists('/dev/sd{}1'.format(l)):
-            # mount it
-            os.system('mount /dev/sd{}1 /mnt/usbdrive'.format(l))
+    sdn1_devices = [
+        '/dev/sd{}1'.format(l)
+        for l in 'abcdefgh'
+        if os.path.exists('/dev/sd{}1'.format(l))
+    ]
+    if len(sdn1_devices) == 0:
+        raise Exception('USB drive not found')
+    os.system('mount {} /mnt/usbdrive'.format(sdn1_devices[0]))
     # move the file to and from it
     name = filepath.split('/')[-1]
     print_bars()
