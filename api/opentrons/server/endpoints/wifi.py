@@ -1,34 +1,14 @@
 import os
 import json
 import logging
-import asyncio
 import subprocess
-from time import sleep
-from threading import Thread
 from aiohttp import web
-from opentrons import robot, __version__
 
 log = logging.getLogger(__name__)
 ENABLE_NMCLI = os.environ.get('ENABLE_NETWORKING_ENDPOINTS', '')
 
-# TODO(mc, 2018-02-22): this naming logic is copied instead of shared
-#   from compute/scripts/anounce_mdns.py
-NAME = 'opentrons-{}'.format(
-    os.environ.get('RESIN_DEVICE_NAME_AT_INIT', 'dev'))
 
-
-async def health(request):
-    res = {
-        'name': NAME,
-        'api_version': __version__,
-        'fw_version': robot.fw_version
-    }
-    return web.json_response(
-        headers={'Access-Control-Allow-Origin': '*'},
-        body=json.dumps(res))
-
-
-async def wifi_list(request):
+async def list_networks(request):
     """
     Get request will return a list of discovered ssids.
 
@@ -79,7 +59,7 @@ async def wifi_list(request):
     return web.json_response(res)
 
 
-async def wifi_configure(request):
+async def configure(request):
     """
     Post request should include a json body with fields "ssid" and "psk" for
     network name and password respectively. Robot will attempt to connect to
@@ -136,7 +116,7 @@ async def wifi_configure(request):
     return web.json_response(data=result, status=status)
 
 
-async def wifi_status(request):
+async def status(request):
     """
     Get request will return the status of the wifi connection from the
     RaspberryPi to the internet.
@@ -171,81 +151,3 @@ async def wifi_status(request):
 
     # TODO(mc, 2019-02-20): return error status code if error
     return web.json_response(connectivity)
-
-
-async def _install(filename, loop):
-    proc = await asyncio.create_subprocess_shell(
-        'pip install --upgrade --force-reinstall --no-deps {}'.format(
-            filename),
-        stdout=asyncio.subprocess.PIPE,
-        loop=loop)
-
-    rd = await proc.stdout.read()
-    res = rd.decode().strip()
-    print(res)
-    await proc.wait()
-    return res
-
-
-async def update_api(request):
-    """
-    This handler accepts a POST request with Content-Type: multipart/form-data
-    and a file field in the body named "whl". The file should be a valid Python
-    wheel to be installed. The received file is install using pip, and then
-    deleted and a success code is returned.
-    """
-    log.debug('Update request received')
-    data = await request.post()
-    try:
-        filename = data['whl'].filename
-        log.info('Preparing to install: {}'.format(filename))
-        content = data['whl'].file.read()
-
-        with open(filename, 'wb') as wf:
-            wf.write(content)
-
-        msg = await _install(filename, request.loop)
-        log.debug('Install complete')
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
-        log.debug("Result: {}".format(msg))
-        res = web.json_response({
-            'message': msg,
-            'filename': filename})
-    except Exception as e:
-        res = web.json_response(
-            {'error': 'Exception {} raised by update of {}. Trace: {}'.format(
-                type(e), data, e.__traceback__)},
-            status=500)
-
-    return res
-
-
-async def restart(request):
-    """
-    Returns OK, then waits approximately 3 seconds and restarts container
-    """
-    def wait_and_restart():
-        log.info('Restarting server')
-        sleep(3)
-        os.system('kill 1')
-    Thread(target=wait_and_restart).start()
-    return web.json_response({"message": "restarting"})
-
-
-async def identify(request):
-    Thread(target=lambda: robot.identify(
-        int(request.query.get('seconds', '10')))).start()
-    return web.json_response({"message": "identifying"})
-
-
-async def turn_on_rail_lights(request):
-    robot.turn_on_rail_lights()
-    return web.json_response({"lights": "on"})
-
-
-async def turn_off_rail_lights(request):
-    robot.turn_off_rail_lights()
-    return web.json_response({"lights": "off"})

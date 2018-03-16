@@ -207,19 +207,20 @@ class SmoothieDriver_3_0_0:
         mount:
             String (str) with value 'left' or 'right'
         '''
-        return self._read_from_pipette(
-            GCODES['READ_INSTRUMENT_ID'], mount)
+        res = self._read_from_pipette(GCODES['READ_INSTRUMENT_ID'], mount)
+        if res:
+            return {'pipette_id': res}
 
     def read_pipette_model(self, mount):
         '''
         Reads an attached pipette's MODEL
         The MODEL is a unique string for this model of pipette
 
-        mount:
-            String (str) with value 'left' or 'right'
+        :return :dict with key 'model' and model string as value, or None
         '''
-        return self._read_from_pipette(
-            GCODES['READ_INSTRUMENT_MODEL'], mount)
+        res = self._read_from_pipette(GCODES['READ_INSTRUMENT_MODEL'], mount)
+        if res:
+            return {'model': res}
 
     def write_pipette_id(self, mount, data_string):
         '''
