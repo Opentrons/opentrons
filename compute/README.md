@@ -1,15 +1,5 @@
 # Opentrons Compute
 
-
-
-* [Overview](#overview)
-* [Container](#container)
-* [Running Container](#runtime)
-* [Flashing a device](#flashing)
-* [Deploying a container](#deployment)
-* [Things to know](#misc)
-
-
 Welcome to the compute directory! The Opentrons API runs on a Raspberry Pi 3 running ResinOS.
 The pieces of the system that deal with logistics of running the Opentrons API within this enviornment
 are part of compute. This includes troubleshooting, network management, and updating.
@@ -17,12 +7,47 @@ are part of compute. This includes troubleshooting, network management, and upda
 
 ## Overview
 
-The Opentrons API lives in a running docker container within ResinOS. If you are not familiar with Resin,
+The Opentrons API server runs in a Docker container with ResinOS as the host. If you are not familiar with Resin,
 we recommend checking out their docs (https://docs.resin.io/introduction/). We'll also be assuming some
 basic knowledge of Resin moving forward. In case you're feeling lazy, We'll paste some basic
 info here - though we recommend at least reading this https://docs.resin.io/management/applications/
 
-**Application:**
+ResinOS provides fleet managment and remote troubleshooting capabilities when a robot is connected to the
+internet. In most respects it should be transparent to the API server (in other words, the server generally
+operates as if it is installed directly onto the host OS). If you're curious, see Resin's docs and/or the
+"More info about Resin" section below. One side effect of this is that changes that happen to the server
+outside of persistent storage (`/data` and its sub-directories) will not remain after a reboot.
+
+### Jupyter Notebook server
+A Jupyter Notebook server is hosted on the server on port 48888 (on all interfaces). You can connect to this
+server by opening a browser on your computer and navigating to <robot_ip_address>:48888. From this screen you
+can interact with Jupyter as normal. Notebook files can be up/downloaded, run, and modified, and will be saved
+in persistent storage so they will be not be removed on reboot.
+
+### Feature flags
+Feature flags are used to control whether or not an experimental/beta code path is enabled or disabled (changes should
+be disabled by default). Feature flag status is controlled by environment variables. See the `opentrons.config.feature_flags` module for current feature flags and what they do.
+
+**Resin environment variables**
+https://docs.resin.io/runtime/runtime/
+
+### User boot scripts
+Users may need to include custom boot scripts to run when the robot is powered on. As an example, enabling a network
+configuration that is not supported by the default command included in the server (adding a custom cert, perhaps).
+This or any other boot action can be accomplished by adding a bash script to the `/data/boot.d/` directory on the
+robot. The script must:
+
+- be executable
+- have a shebang line at the start of the file (usually `#!/usr/bin/env bash`)
+- have a name that only includes alphanumeric characters, dash (`-`), and underscore (`_`)
+
+Scripts in that directory will be executed in alphabetical order. The most straight-forward way to guarantee exectution
+order is to prefix file names with numbers (e.g.: `00-configure-wifi` and `05-do-something-else`).
+
+## More info about Resin
+
+### Application
+
 An application is a group of devices of the same type that all run the same code. When you provision a device,
 it is added to a specific application, but can be migrated to another application at any time.
 (https://docs.resin.io/management/applications/)
@@ -37,10 +62,17 @@ name for each one.
 
 **Deploying code to an application**
 Each application has an associated git endpoint, which follows the syntax <USERNAME>@git.resin.io:<USERNAME>/<APPNAME>.git.
-In the top-right corner of your application page, you'll find the command to add this endpoint as a git remote.
+In the top-right corner of your application page, you'll find the command to add this endpoint as a git remote. Once you have
+added a git remote, you can push a branch to the application with git. For example, if your remote is named "resin" and your
+branch is named "feature_add-endpoint", the command would be:
 
+```
+git push resin feature_add-endpoint:master
+```
 
-## Container
+Note that this deploys that branch to *all* of the devices on that application!
+
+### Container
 
 See `/Dockerfile` for details.
 
@@ -60,58 +92,24 @@ Services:
 
 Tools:
   * `nmcli` — manage network connections (https://fedoraproject.org/wiki/Networking/CLI)
-  * `python -m opentrons.cli.main` — factory calibration
-  * `make -C api push` (from host machine with USB connected) — package and upload latest API to a connected robot
 
 Ethernet over USB static IPv6 address `fd00:0:cafe:fefe::1`
 
-## Running Container
-
-There are a few small things to note about the runtime environment of compute device
-such as enviornment variables in the `OT` and `RESIN` namespaces.
-
-**OT environment variables**
-`OT_SMOOTHIE_ID`: Prefix of the smoothie id to enable automatic connection
-
-**Resin environment variables**
-https://docs.resin.io/runtime/runtime/
-
-
-
-## Flashing a device
+### Flashing a device
 Flashing a device means associating some device with some resin application. For the RPi, this is done by flashing
 an sd card with an image that is associated with some resin application.
 
-The getting started guide (https://docs.resin.io/raspberrypi3/nodejs/getting-started/)
-from resin is clear and concise so I'm going to avoid rewriting it here.
+### Things to know
+*Resin or compute gotchas*
 
-Once you have your first image, you can expedite future flashes by using the following command:
-` resin os initialize PATH_TO_RESIN_IMAGE --type 'raspberrypi3' `
-You will be prompted to interactively select the drive to flash.
-More information on the Resin cli can be found here: https://docs.resin.io/tools/cli/#os-download-60-type-62-.
+**ResinOS version**
 
-
-## Deploying a container
-You deploy a container to an application (a group/fleet of devices that all run the same code).
-This means that when you deploy a container the image is built and, if the build is successful, deployed to
-all connected devices associated with that application. If a new device is added to the container or an existing
-device comes online later, they will download the new container on boot.
-
-Check out the docker guide on deployment https://docs.resin.io/raspberrypi3/nodejs/getting-started/#deploy-code.
-
-Currently Opentrons has 3 applications:
-- devbots
-- testingbots
-- usertestingbots
-
-However, this list is subject to change. When adding remote targets, as indicated in the resin docs, we recommend
-naming the targets according to the application they correspond to so you can run `git push devbots`.
-
-
-## Things to know
-Here are some things to know - many of these are resin or compute gotchas.
+Currently, the most recent version of ResinOS
+includes a breaking change in the way that serial ports are managed. Until this is resolved, you will need to use
+ResinOS v2.7.5+rev1.
 
 **Communicating over serial**
+
 Make sure that `RESIN_HOST_CONFIG_dtoverlay` is set to `pi3-miniuart-bt` for the Fleet configuration on any fleet of bots.
 This allows the Pi to utilize the uart pins to communicate with smoothie. Without this envvar set, serial communication
 between the pi and smoothie will not work.

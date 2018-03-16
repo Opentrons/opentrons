@@ -15,6 +15,10 @@ inetd -e /etc/inetd.conf
 echo "Homing Robot... this may take a few seconds."
 python -c "from opentrons import robot; robot.connect(); robot.home()"
 
+# If user boot script exists, run it
+mkdir -p /data/boot.d
+run-parts /data/boot.d
+
 # Start Jupyter Notebook server
 echo "Starting Jupyter Notebook server"
 mkdir -p /data/user_storage/opentrons_data/jupyter
