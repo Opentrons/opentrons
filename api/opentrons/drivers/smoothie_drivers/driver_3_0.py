@@ -96,7 +96,7 @@ def _parse_instrument_data(smoothie_response):
         # data received from Smoothieware is stringified HEX values
         # because of how Smoothieware handles GCODE messages
         data = bytearray.fromhex(items[1])
-    except ValueError:
+    except (ValueError, IndexError):
         raise ParseError('Unexpected response from Smoothieware: {}'.format(
             smoothie_response))
     return {mount: data}
