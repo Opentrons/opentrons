@@ -33,6 +33,13 @@ export function createTipLiquidState<T> (channels: number, contents: T): {[tipId
   }), {})
 }
 
+export function createLabwareLiquidState<T> (labwareType: string, contents: T): {[well: string]: T} {
+  return mapValues(
+    getWellsForLabware(labwareType),
+    () => contents
+  )
+}
+
 // TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
 // which should in turn be lifted out to a general pipette data project?
 export const p300Single = {
@@ -61,11 +68,20 @@ export function getWellsForLabware (labwareType: string) {
 }
 
 export function createEmptyLiquidState (args: {
-  sourcePlateType: string,
-  destPlateType: string,
+  sourcePlateType?: string,
+  destPlateType?: string,
   pipettes: $PropertyType<RobotState, 'instruments'>
 }) {
   const {sourcePlateType, destPlateType, pipettes} = args
+
+  const sourceLabware = sourcePlateType
+    ? {sourcePlateId: createLabwareLiquidState(sourcePlateType, {})}
+    : {}
+
+  const destLabware = destPlateType
+    ? {destPlateId: createLabwareLiquidState(destPlateType, {})}
+    : {}
+
   return {
     pipettes: reduce(
       pipettes,
@@ -74,8 +90,8 @@ export function createEmptyLiquidState (args: {
         [pipetteId]: createTipLiquidState(pipetteData.channels, {})
       }), {}),
     labware: {
-      sourcePlateId: mapValues(getWellsForLabware(sourcePlateType), () => ({})),
-      destPlateId: mapValues(getWellsForLabware(destPlateType), () => ({})),
+      ...sourceLabware,
+      ...destLabware,
       trashId: {A1: {}}
     }
   }
@@ -86,7 +102,7 @@ type RobotStateNoLiquidState = $Diff<RobotState, SubtractLiquidState>
 
 type CreateRobotArgs = {
   sourcePlateType: string,
-  destPlateType: string,
+  destPlateType?: string,
   tipracks: Array<10 | 200 | 1000>,
   fillPipetteTips?: boolean,
   fillTiprackTips?: boolean
@@ -121,16 +137,22 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
     p300MultiId: p300Multi
   }
 
+  const destLabware = args.destPlateType
+    ? {
+      destPlateId: {
+        slot: '11',
+        type: args.destPlateType,
+        name: 'Destination Plate'
+      }
+    }
+    : {}
+
   const baseLabware = {
+    ...destLabware,
     sourcePlateId: {
       slot: '10',
       type: args.sourcePlateType,
       name: 'Source Plate'
-    },
-    destPlateId: {
-      slot: '11',
-      type: args.destPlateType,
-      name: 'Destination Plate'
     },
     trashId: {
       slot: '12',
