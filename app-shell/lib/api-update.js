@@ -43,12 +43,8 @@ function initialize () /*: Promise<void> */ {
     })
 }
 
-function getUpdateAvailable (robotHealth /*: RobotHealth */) /*: boolean */ {
-  if (robotHealth.response && robotHealth.response.api_version) {
-    return semver.gt(LATEST_VERSION, robotHealth.response.api_version)
-  }
-
-  return false
+function getUpdateAvailable (robotVersion /*: string */) /*: boolean */ {
+  return semver.gt(LATEST_VERSION, robotVersion)
 }
 
 function getUpdateFile () /*: Promise<string> */ {

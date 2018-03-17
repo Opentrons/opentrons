@@ -1,15 +1,16 @@
 // @flow
 // server endpoints http api module
 import {remote} from 'electron'
+import {createSelector} from 'reselect'
 
-import type {ThunkPromiseAction, Action} from '../types'
+import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
 
 // remote module paths relative to app-shell/lib/main.js
-const {getUpdateFile} = remote.require('./api-update')
+const {getUpdateAvailable, getUpdateFile} = remote.require('./api-update')
 
 type RequestPath = 'update' | 'restart'
 
@@ -114,7 +115,33 @@ export function serverReducer (
   action: Action
 ): ServerState {
   if (state == null) return {}
+
+  let robotName
+  switch (action.type) {
+    case 'api:HEALTH_SUCCESS':
+      robotName = action.payload.robot.name
+
+      return {
+        ...state,
+        [robotName]: {
+          ...state[robotName],
+          updateAvailable: getUpdateAvailable(
+            action.payload.health.api_version
+          )
+        }
+      }
+  }
+
   return state
+}
+
+export const makeGetRobotUpdateAvailable = () => createSelector(
+  selectRobotServerState,
+  (state: ?RobotServerState): boolean => !!(state && state.updateAvailable)
+)
+
+function selectRobotServerState (state: State, props: RobotService) {
+  return state.api.server[props.name]
 }
 
 function makeUpdateRequestBody () {
