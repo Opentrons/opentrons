@@ -13,6 +13,11 @@ import {
 jest.mock('electron')
 jest.mock('../client')
 
+const REQUESTS_TO_TEST = [
+  {path: 'update', response: {message: 'foo', filename: 'bar'}},
+  {path: 'restart', response: {message: 'restarting'}}
+]
+
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 
@@ -98,32 +103,91 @@ describe('server API client', () => {
   })
 
   describe('reducer', () => {
-    test('sets updateAvailable on HEALTH_SUCCESS', () => {
-      let state = {
-        server: {
-          opentrons: {
-            updateAvailable: false
-          }
-        }
+    let state
+
+    beforeEach(() => (state = {
+      server: {
+        [robot.name]: {}
       }
+    }))
+
+    test('sets updateAvailable on HEALTH_SUCCESS', () => {
       const health = {name, api_version: '4.5.6', fw_version: '7.8.9'}
       const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
 
+      // test update available
+      state.server[robot.name].updateAvailable = false
       mockApiUpdate.getUpdateAvailable.mockReturnValueOnce(true)
+
       expect(reducer(state, action).server).toEqual({
-        opentrons: {updateAvailable: true}
+        [robot.name]: {updateAvailable: true}
       })
       expect(mockApiUpdate.getUpdateAvailable)
         .toHaveBeenCalledWith(health.api_version)
 
-      state.server.opentrons.updateAvailable = true
+      // test no update available
       electron.__clearMock()
+      state.server[robot.name].updateAvailable = true
       mockApiUpdate.getUpdateAvailable.mockReturnValueOnce(true)
+
       expect(reducer(state, action).server).toEqual({
-        opentrons: {updateAvailable: true}
+        [robot.name]: {updateAvailable: true}
       })
       expect(mockApiUpdate.getUpdateAvailable)
         .toHaveBeenCalledWith(health.api_version)
+    })
+
+    REQUESTS_TO_TEST.forEach((request) => {
+      const {path, response} = request
+
+      test(`handles SERVER_REQUEST for /server/${path}`, () => {
+        const action = {type: 'api:SERVER_REQUEST', payload: {robot, path}}
+
+        expect(reducer(state, action).server).toEqual({
+          [robot.name]: {
+            [path]: {inProgress: true, error: null, response: null}
+          }
+        })
+      })
+
+      test(`handles SERVER_SUCCESS for /server/${path}`, () => {
+        const action = {
+          type: 'api:SERVER_SUCCESS',
+          payload: {robot, path, response}
+        }
+
+        state.server[robot.name][path] = {
+          inProgress: true,
+          error: null,
+          response: null
+        }
+
+        expect(reducer(state, action).server).toEqual({
+          [robot.name]: {
+            [path]: {response, inProgress: false, error: null}
+          }
+        })
+      })
+
+      test(`handles SERVER_FAILURE for /server/${path}`, () => {
+        const error = {message: 'ahhhh'}
+        const action = {
+          type: 'api:SERVER_FAILURE',
+          payload: {robot, path, error}
+        }
+
+        state.server[robot.name][path] = {
+          inProgress: true,
+          error: null,
+          response
+        }
+
+        expect(reducer(state, action).server).toEqual({
+          [robot.name]: {
+            [path]: {error, inProgress: false, response: null}
+          }
+        })
+      })
     })
   })
 })
