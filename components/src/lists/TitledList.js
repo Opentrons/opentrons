@@ -69,8 +69,8 @@ export default function TitledList (props: ListProps) {
   })
 
   return (
-    <div className={className} {...{onMouseEnter, onMouseLeave}}>
-      <div onClick={onClick} className={titleBarClass}>
+    <div className={className}>
+      <div {...{onClick, onMouseEnter, onMouseLeave}} className={titleBarClass}>
         {iconName && (
           <Icon {...iconProps} className={styles.title_bar_icon} name={iconName} />
         )}
