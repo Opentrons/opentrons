@@ -7,7 +7,10 @@ import {
   p300Single,
   p300Multi
 } from './fixtures'
-import dispense, {_updateLiquidState} from '../dispense'
+import dispense from '../dispense'
+
+// TODO Ian 2018-03-19 now that this fn is factored out, should eventually factor apart the tests as well
+import _updateLiquidState from '../dispenseUpdateLiquidState'
 
 describe('dispense', () => {
   describe('tip tracking & commands:', () => {

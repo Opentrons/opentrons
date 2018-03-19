@@ -1,7 +1,16 @@
 // @flow
 import merge from 'lodash/merge'
+import omit from 'lodash/omit'
 import {createRobotState} from './fixtures'
 import dropTip from '../dropTip'
+
+import updateLiquidState from '../dispenseUpdateLiquidState'
+
+jest.mock('../dispenseUpdateLiquidState')
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) {
   return merge(
@@ -33,7 +42,12 @@ describe('replaceTip: single channel', () => {
       labware: 'trashId',
       well: 'A1'
     }])
-    expect(result.robotState).toEqual(makeRobotState({singleHasTips: false, multiHasTips: true}))
+    expect(result.robotState).toMatchObject(
+      omit(
+        makeRobotState({singleHasTips: false, multiHasTips: true}),
+        'liquidState'
+      )
+    )
   })
 
   test('no tip on pipette, ignore dropTip', () => {
@@ -53,7 +67,12 @@ describe('Multi-channel dropTip', () => {
       labware: 'trashId',
       well: 'A1'
     }])
-    expect(result.robotState).toEqual(makeRobotState({singleHasTips: true, multiHasTips: false}))
+    expect(result.robotState).toMatchObject(
+      omit(
+        makeRobotState({singleHasTips: true, multiHasTips: false}),
+        'liquidState'
+      )
+    )
   })
 
   test('no tip on pipette, ignore dropTip', () => {
@@ -61,5 +80,27 @@ describe('Multi-channel dropTip', () => {
     const result = dropTip('p300MultiId')(initialRobotState)
     expect(result.commands).toEqual([])
     expect(result.robotState).toEqual(initialRobotState)
+  })
+})
+
+describe('liquid tracking', () => {
+  test('dropTip calls dispenseUpdateLiquidState with the max volume of the pipette', () => {
+    const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: true})
+
+    dropTip('p300MultiId')(initialRobotState)
+
+    expect(updateLiquidState).toHaveBeenCalledTimes(1)
+
+    // trickery for Flow -- there's no .mock on updateLiquidState fn
+    const mockCalls: any = updateLiquidState
+    const updateArgs: Array<mixed> = mockCalls.mock.calls[0]
+
+    expect(updateArgs[0]).toMatchObject({
+      pipetteId: 'p300MultiId',
+      labwareId: 'trashId',
+      volume: 300, // pipette's max vol
+      well: 'A1'
+    })
+    expect(updateArgs[1]).toEqual(initialRobotState.liquidState)
   })
 })

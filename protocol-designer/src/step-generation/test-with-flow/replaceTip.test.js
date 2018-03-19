@@ -1,7 +1,13 @@
 // @flow
 import merge from 'lodash/merge'
+import omit from 'lodash/omit'
 import {createRobotState, getTiprackTipstate, getTipColumn} from './fixtures'
 import {replaceTip} from '../'
+
+const matchWithoutLiquidState = robotState => matchObj =>
+  expect(robotState).toMatchObject(
+    omit(robotState, 'liquidState')
+  )
 
 // TODO use a fixture, standardize
 const tiprack1Id = 'tiprack1Id'
@@ -170,19 +176,21 @@ describe('replaceTip: single channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual(merge(
-      {},
-      initialTestRobotState,
-      {
-        tipState: {
-          tipracks: {
-            [tiprack1Id]: {
-              B1: false
+    matchWithoutLiquidState(result.robotState)(
+      merge(
+        {},
+        initialTestRobotState,
+        {
+          tipState: {
+            tipracks: {
+              [tiprack1Id]: {
+                B1: false
+              }
             }
           }
         }
-      }
-    ))
+      )
+    )
   })
 
   test('Single-channel: used all tips in first rack, move to second rack', () => {
@@ -329,7 +337,7 @@ describe('replaceTip: multi-channel', () => {
       }
     ])
 
-    expect(result.robotState).toEqual(merge(
+    matchWithoutLiquidState(result.robotState)(merge(
       {},
       robotStateWithTipsOnMulti,
       {

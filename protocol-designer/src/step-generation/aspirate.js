@@ -53,6 +53,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
+  // TODO Ian 2018-03-19 factor this out, like dispenseUpdateLiquidState is
   const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => {
     const prevTipLiquidState = prevRobotState.liquidState.pipettes[pipette][tipIndex.toString()]
     const prevSourceLiquidState = prevRobotState.liquidState.labware[labware][wellsForTips[tipIndex]]

@@ -1,6 +1,7 @@
 // @flow
-// import cloneDeep from 'lodash/cloneDeep'
 import type {RobotState, CommandCreator, PipetteLabwareFields} from './'
+
+import updateLiquidState from './dispenseUpdateLiquidState'
 
 const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState: RobotState) => {
   /** Blowout with given args. Requires tip. */
@@ -25,7 +26,17 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState:
 
   return {
     commands,
-    robotState: prevRobotState // TODO LATER deep clone robotState and manipulate it for liquid tracking here?
+    robotState: {
+      ...prevRobotState,
+      liquidState: updateLiquidState({
+        pipetteId: pipette,
+        pipetteData,
+        labwareId: labware,
+        labwareType: prevRobotState.labware[labware].type,
+        volume: pipetteData.maxVolume, // update liquid state as if it was a dispense, but with max volume of pipette
+        well
+      }, prevRobotState.liquidState)
+    }
   }
 }
 
