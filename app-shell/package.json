@@ -24,13 +24,14 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
     "cross-env": "^5.0.1",
-    "electron": "1.6.11",
+    "electron": "1.8.3",
     "electron-builder": "19.52.1",
     "shx": "^0.2.2"
   },
   "dependencies": {
     "electron-debug": "^1.1.0",
     "electron-devtools-installer": "^2.2.0",
-    "electron-log": "^2.2.9"
+    "electron-log": "^2.2.9",
+    "semver": "^5.5.0"
   }
 }
