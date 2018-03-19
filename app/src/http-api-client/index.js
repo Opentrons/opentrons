@@ -2,12 +2,14 @@
 // robot HTTP API client module
 import {combineReducers} from 'redux'
 import {healthReducer, type HealthAction} from './health'
-import {wifiReducer, type WifiAction} from './wifi'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
+import {serverReducer, type ServerAction} from './server'
+import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
   health: healthReducer,
   healthCheck: healthCheckReducer,
+  server: serverReducer,
   wifi: wifiReducer
 })
 
@@ -35,6 +37,7 @@ export type State = $Call<typeof reducer>
 export type Action =
   | HealthAction
   | HealthCheckAction
+  | ServerAction
   | WifiAction
 
 export {
@@ -51,6 +54,11 @@ export {
   healthCheckMiddleware,
   makeGetHealthCheckOk
 } from './health-check'
+
+export {
+  updateRobotServer,
+  restartRobotServer
+} from './server'
 
 export {
   fetchWifiList,

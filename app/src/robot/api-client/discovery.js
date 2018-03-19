@@ -3,7 +3,9 @@ import os from 'os'
 import net from 'net'
 import Bonjour from 'bonjour'
 
-import {fetchHealth} from '../../http-api-client'
+// import directly from health to avoid importing other parts
+// of the api client (most importantly, the electron remote)
+import {fetchHealth} from '../../http-api-client/health'
 
 import {actions} from '../actions'
 import {getIsScanning} from '../selectors'

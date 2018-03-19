@@ -43,7 +43,8 @@ describe('http api client', () => {
         'http://1.2.3.4:8080/foo',
         {
           method: 'GET',
-          headers: {'Content-Type': 'application/json'}
+          headers: {},
+          body: undefined
         }
       ))
   })
