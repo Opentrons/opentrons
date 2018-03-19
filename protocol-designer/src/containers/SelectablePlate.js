@@ -35,15 +35,16 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
+  const prevStepId = stepId === null ? 0 : Math.max(stepId - 1, 0)
   const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
 
-  const wellContents = (stepId !== null) && allWellContentsForSteps[stepId]
-    ? allWellContentsForSteps[stepId][containerId]
+  const wellContents = allWellContentsForSteps[prevStepId]
+    ? allWellContentsForSteps[prevStepId][containerId]
     : {}
 
   return {
     containerId,
-    // wellContents: selectors.wellContentsAllLabware(state)[containerId], // TODO don't need this selector anymore
+    // wellContents: selectors.wellContentsAllLabware(state)[containerId], // TODO Ian 2018-03-19 don't need this selector anymore? Remove
     wellContents,
     containerType: labware.type,
     selectable: ownProps.selectable

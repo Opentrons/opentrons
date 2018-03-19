@@ -175,10 +175,12 @@ function _wellContentsForLabware (labwareLiquids: LabwareLiquidState): WellConte
       highlighted: false,
       maxVolume: 123, // TODO refactor so all these fields aren't needed
       wellName: well,
-      groupId: Object.keys(wellContents).filter(groupId =>
-        wellContents[groupId] &&
-        wellContents[groupId].volume > 0
-      )
+      groupId: wellContents
+        ? Object.keys(wellContents).filter(groupId =>
+          wellContents[groupId] &&
+          wellContents[groupId].volume > 0
+        )
+        : null
     })
   )
 }
