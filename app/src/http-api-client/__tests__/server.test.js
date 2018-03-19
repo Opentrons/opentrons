@@ -5,7 +5,7 @@ import electron from 'electron'
 
 import client from '../client'
 import {
-  makeGetRobotUpdateAvailable,
+  makeGetAvailableRobotUpdate,
   restartRobotServer,
   reducer
 } from '..'
@@ -37,19 +37,19 @@ describe('server API client', () => {
       state = {
         api: {
           server: {
-            opentrons: {
-              updateAvailable: true
+            [robot.name]: {
+              availableUpdate: '42.0.0'
             }
           }
         }
       }
     })
 
-    test('makeGetRobotUpdateAvailable', () => {
-      const getUpdateAvailable = makeGetRobotUpdateAvailable()
+    test('makeGetRobotAvailableUpdate', () => {
+      const getAvailableUpdate = makeGetAvailableRobotUpdate()
 
-      expect(getUpdateAvailable(state, robot)).toEqual(true)
-      expect(getUpdateAvailable(state, {name: 'foo'})).toEqual(false)
+      expect(getAvailableUpdate(state, robot)).toEqual('42.0.0')
+      expect(getAvailableUpdate(state, {name: 'foo'})).toEqual(null)
     })
   })
 
@@ -111,29 +111,29 @@ describe('server API client', () => {
       }
     }))
 
-    test('sets updateAvailable on HEALTH_SUCCESS', () => {
+    test('sets availableUpdate on HEALTH_SUCCESS', () => {
       const health = {name, api_version: '4.5.6', fw_version: '7.8.9'}
       const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
 
       // test update available
-      state.server[robot.name].updateAvailable = false
-      mockApiUpdate.getUpdateAvailable.mockReturnValueOnce(true)
+      state.server[robot.name].availableUpdate = null
+      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce('42.0.0')
 
       expect(reducer(state, action).server).toEqual({
-        [robot.name]: {updateAvailable: true}
+        [robot.name]: {availableUpdate: '42.0.0'}
       })
-      expect(mockApiUpdate.getUpdateAvailable)
+      expect(mockApiUpdate.getAvailableUpdate)
         .toHaveBeenCalledWith(health.api_version)
 
       // test no update available
       electron.__clearMock()
-      state.server[robot.name].updateAvailable = true
-      mockApiUpdate.getUpdateAvailable.mockReturnValueOnce(true)
+      state.server[robot.name].availableUpdate = '42.0.0'
+      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce(null)
 
       expect(reducer(state, action).server).toEqual({
-        [robot.name]: {updateAvailable: true}
+        [robot.name]: {availableUpdate: null}
       })
-      expect(mockApiUpdate.getUpdateAvailable)
+      expect(mockApiUpdate.getAvailableUpdate)
         .toHaveBeenCalledWith(health.api_version)
     })
 

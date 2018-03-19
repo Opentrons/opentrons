@@ -24,7 +24,7 @@ let updateFile
 
 module.exports = {
   initialize,
-  getUpdateAvailable,
+  getAvailableUpdate,
   getUpdateFile
 }
 
@@ -43,8 +43,10 @@ function initialize () /*: Promise<void> */ {
     })
 }
 
-function getUpdateAvailable (robotVersion /*: string */) /*: boolean */ {
+function getAvailableUpdate (robotVersion /*: string */) /*: ?string */ {
   return semver.gt(LATEST_VERSION, robotVersion)
+    ? LATEST_VERSION
+    : null
 }
 
 function getUpdateFile () /*: Promise<string> */ {

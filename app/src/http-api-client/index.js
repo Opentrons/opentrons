@@ -58,7 +58,7 @@ export {
 export {
   updateRobotServer,
   restartRobotServer,
-  makeGetRobotUpdateAvailable
+  makeGetAvailableRobotUpdate
 } from './server'
 
 export {

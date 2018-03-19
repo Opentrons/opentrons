@@ -10,7 +10,7 @@ import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
 
 // remote module paths relative to app-shell/lib/main.js
-const {getUpdateAvailable, getUpdateFile} = remote.require('./api-update')
+const {getAvailableUpdate, getUpdateFile} = remote.require('./api-update')
 
 type RequestPath = 'update' | 'restart'
 
@@ -64,7 +64,7 @@ export type RobotServerRestart = ApiCall<void, ServerRestartResponse>
 type RobotServerState = {
   update?: ?RobotServerUpdate,
   restart?: ?RobotServerRestart,
-  updateAvailable?: boolean
+  availableUpdate?: ?string
 }
 
 type ServerState = {
@@ -167,7 +167,7 @@ export function serverReducer (
         ...state,
         [name]: {
           ...state[name],
-          updateAvailable: getUpdateAvailable(
+          availableUpdate: getAvailableUpdate(
             action.payload.health.api_version
           )
         }
@@ -177,9 +177,11 @@ export function serverReducer (
   return state
 }
 
-export const makeGetRobotUpdateAvailable = () => createSelector(
+export const makeGetAvailableRobotUpdate = () => createSelector(
   selectRobotServerState,
-  (state: ?RobotServerState): boolean => !!(state && state.updateAvailable)
+  (state: ?RobotServerState): ?string => (
+    state && state.availableUpdate
+  ) || null
 )
 
 function selectRobotServerState (state: State, props: RobotService) {
