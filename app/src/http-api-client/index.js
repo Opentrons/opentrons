@@ -24,6 +24,11 @@ export type {
 } from './health'
 
 export type {
+  RobotServerUpdate,
+  RobotServerRestart
+} from './server'
+
+export type {
   WifiListResponse,
   WifiStatusResponse,
   WifiConfigureResponse,
@@ -58,7 +63,9 @@ export {
 export {
   updateRobotServer,
   restartRobotServer,
-  makeGetAvailableRobotUpdate
+  makeGetAvailableRobotUpdate,
+  makeGetRobotUpdateRequest,
+  makeGetRobotRestartRequest
 } from './server'
 
 export {

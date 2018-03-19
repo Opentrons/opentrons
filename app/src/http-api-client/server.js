@@ -1,7 +1,7 @@
 // @flow
 // server endpoints http api module
 import {remote} from 'electron'
-import {createSelector} from 'reselect'
+import {createSelector, type Selector} from 'reselect'
 
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
@@ -83,7 +83,7 @@ export function updateRobotServer (
   return (dispatch) => {
     dispatch(serverRequest(robot, UPDATE))
 
-    return makeUpdateRequestBody()
+    return getUpdateRequestBody()
       .then((body) => client(robot, 'POST', 'server/update', body))
       .then(
         (response: ServerUpdateResponse) =>
@@ -162,33 +162,55 @@ export function serverReducer (
 
     case 'api:HEALTH_SUCCESS':
       ({robot: {name}} = action.payload)
+      let stateByName = state[name]
+      const previousUpdate = stateByName && stateByName.availableUpdate
+      const availableUpdate =
+        getAvailableUpdate(action.payload.health.api_version)
 
-      return {
-        ...state,
-        [name]: {
-          ...state[name],
-          availableUpdate: getAvailableUpdate(
-            action.payload.health.api_version
-          )
-        }
+      if (availableUpdate !== previousUpdate) {
+        stateByName = {...stateByName, update: null, restart: null}
       }
+
+      return {...state, [name]: {...stateByName, availableUpdate}}
   }
 
   return state
 }
 
-export const makeGetAvailableRobotUpdate = () => createSelector(
-  selectRobotServerState,
-  (state: ?RobotServerState): ?string => (
-    state && state.availableUpdate
-  ) || null
-)
+export const makeGetAvailableRobotUpdate = () => {
+  const selector: Selector<State, RobotService, ?string> = createSelector(
+    selectRobotServerState,
+    (state) => (state && state.availableUpdate) || null
+  )
+
+  return selector
+}
+
+export const makeGetRobotUpdateRequest = () => {
+  const selector: Selector<State, RobotService, RobotServerUpdate> =
+    createSelector(
+      selectRobotServerState,
+      (state) => (state && state.update) || {inProgress: false}
+    )
+
+  return selector
+}
+
+export const makeGetRobotRestartRequest = () => {
+  const selector: Selector<State, RobotService, RobotServerRestart> =
+    createSelector(
+      selectRobotServerState,
+      (state) => (state && state.restart) || {inProgress: false}
+    )
+
+  return selector
+}
 
 function selectRobotServerState (state: State, props: RobotService) {
   return state.api.server[props.name]
 }
 
-function makeUpdateRequestBody () {
+function getUpdateRequestBody () {
   return getUpdateFile()
     .then((file) => {
       const formData = new FormData()
