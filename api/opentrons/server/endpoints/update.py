@@ -3,6 +3,8 @@ import logging
 import asyncio
 from aiohttp import web
 
+from opentrons import robot
+
 log = logging.getLogger(__name__)
 
 
@@ -22,14 +24,15 @@ async def _install(filename, loop):
 
 async def _update_firmware(filename, loop):
     # ensure there is a reference to the port
-    from opentrons import robot
-    robot.connect()
-    driver = robot._driver
-    port = str(driver._connection.port)  # get port name
-    driver._connection.close()
-    driver._smoothie_programming_mode()
+    if not robot.is_connected():
+        robot.connect()
+    # get port name
+    d = robot._driver
+    port = str(d.port)
+    d.disconnect()
+    d._smoothie_programming_mode()
 
-    # run lpc21isp, THIS WILL AROUND 1 MINUTE TO COMPLETE
+    # run lpc21isp, THIS WILL TAKE AROUND 1 MINUTE TO COMPLETE
     update_cmd = 'lpc21isp -wipe -donotstart {0} {1} {2} 12000'.format(
         filename, port, robot.config.serial_speed)
     proc = await asyncio.create_subprocess_shell(
@@ -41,9 +44,9 @@ async def _update_firmware(filename, loop):
     await proc.wait()
 
     # reconnect to port
-    driver._connection.open()
-    driver._smoothie_reset()
-    driver._setup()
+    d.connect()
+    d._smoothie_reset()
+    d._setup()
 
     return res
 
