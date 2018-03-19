@@ -116,15 +116,57 @@ export function serverReducer (
 ): ServerState {
   if (state == null) return {}
 
-  let robotName
+  let name
+  let path
   switch (action.type) {
-    case 'api:HEALTH_SUCCESS':
-      robotName = action.payload.robot.name
+    case 'api:SERVER_REQUEST':
+      ({path, robot: {name}} = action.payload)
 
       return {
         ...state,
-        [robotName]: {
-          ...state[robotName],
+        [name]: {
+          ...state[name],
+          [path]: {inProgress: true, response: null, error: null}
+        }
+      }
+
+    case 'api:SERVER_SUCCESS':
+      ({path, robot: {name}} = action.payload)
+
+      return {
+        ...state,
+        [name]: {
+          ...state[name],
+          [path]: {
+            response: action.payload.response,
+            inProgress: false,
+            error: null
+          }
+        }
+      }
+
+    case 'api:SERVER_FAILURE':
+      ({path, robot: {name}} = action.payload)
+
+      return {
+        ...state,
+        [name]: {
+          ...state[name],
+          [path]: {
+            error: action.payload.error,
+            inProgress: false,
+            response: null
+          }
+        }
+      }
+
+    case 'api:HEALTH_SUCCESS':
+      ({robot: {name}} = action.payload)
+
+      return {
+        ...state,
+        [name]: {
+          ...state[name],
           updateAvailable: getUpdateAvailable(
             action.payload.health.api_version
           )
