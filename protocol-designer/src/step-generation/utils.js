@@ -34,9 +34,6 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
 type Vol = {volume: number}
 type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
-// TODO Ian 2018-03-15 use Symbol, or other way to ensure no conflict with ingredGroupId keys?
-// However, Flow doesn't like Symbol keys.
-// (this conflict is unlikely, since ingredGroupIds are strings of numbers)
 export const AIR = '__air__'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
@@ -46,13 +43,19 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
 } {
   const totalSourceVolume = reduce(
     sourceLiquidState,
-    (acc: number, ingredState: Vol) => acc + ingredState.volume,
+    (acc: number, ingredState: Vol, ingredId: string) => {
+      // air is not included in the total volume
+      return (ingredId === AIR)
+        ? acc
+        : acc + ingredState.volume
+    },
     0
   )
 
-  if (AIR in sourceLiquidState) {
-    throw new Error(`Invalid source liquid state: source cannot contain air (key '${AIR}' cannot exist in sourceLiquidState object)`)
-  }
+  // TODO Ian 2018-03-19 figure out what to do with air warning reporting
+  // if (AIR in sourceLiquidState) {
+  //   console.warn('Splitting liquid with air present', sourceLiquidState)
+  // }
 
   if (totalSourceVolume === 0) {
     // Splitting from empty source
