@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import omit from 'lodash/omit'
 
 import {Icon, type IconName} from '../icons'
@@ -47,7 +48,11 @@ export default function Button (props: ButtonProps) {
   // pass all props if using a custom component
   const buttonProps = !props.Component
     ? {type, title, disabled, onClick, className}
-    : {...omit(props, STRIP_PROPS), onClick}
+    : {
+      ...omit(props, STRIP_PROPS),
+      className: cx(className, {[styles.disabled]: disabled}),
+      onClick
+    }
 
   return (
     <Component {...buttonProps}>

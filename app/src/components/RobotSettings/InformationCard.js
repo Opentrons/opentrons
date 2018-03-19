@@ -2,23 +2,26 @@
 // RobotSettings card for robot status
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {
   fetchHealth,
   makeGetRobotHealth,
-  makeGetRobotUpdateAvailable,
+  makeGetAvailableRobotUpdate,
   type RobotHealth
 } from '../../http-api-client'
 
-import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
+import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 
-type OwnProps = Robot
+type OwnProps = Robot & {
+  updateUrl: string
+}
 
 type StateProps = {
   healthRequest: RobotHealth,
-  updateAvailable: boolean
+  availableUpdate: ?string
 }
 
 type DispatchProps = {
@@ -31,57 +34,56 @@ const TITLE = 'Information'
 const NAME_LABEL = 'Robot Name'
 const SERVER_VERSION_LABEL = 'Server version'
 
-class InformationCard extends React.Component<Props> {
-  render () {
-    const {
-      name,
-      updateAvailable,
-      healthRequest: {response: health}
-    } = this.props
-
-    const realName = (health && health.name) || name
-    const version = (health && health.api_version) || 'Unknown'
-    const updateText = updateAvailable
-      ? 'Update'
-      : 'Updated'
-
-    return (
-      <Card title={TITLE}>
-        <LabeledValue
-          label={NAME_LABEL}
-          value={realName}
-        />
-        <LabeledValue
-          label={SERVER_VERSION_LABEL}
-          value={version}
-        />
-        <OutlineButton disabled>
-          {updateText}
-        </OutlineButton>
-      </Card>
-    )
-  }
-
-  componentDidMount () {
-    this.props.fetchHealth()
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.name !== this.props.name) {
-      this.props.fetchHealth()
-    }
-  }
-}
-
 export default connect(makeMapStateToProps, mapDispatchToProps)(InformationCard)
+
+function InformationCard (props: Props) {
+  const {
+    name,
+    availableUpdate,
+    fetchHealth,
+    updateUrl,
+    healthRequest: {inProgress, response: health}
+  } = props
+
+  const realName = (health && health.name) || name
+  const version = (health && health.api_version) || 'Unknown'
+  const updateText = availableUpdate
+    ? 'Update'
+    : 'Updated'
+
+  return (
+    <RefreshCard
+      watch={name}
+      refresh={fetchHealth}
+      refreshing={inProgress}
+      title={TITLE}
+    >
+      <LabeledValue
+        label={NAME_LABEL}
+        value={realName}
+      />
+      <LabeledValue
+        label={SERVER_VERSION_LABEL}
+        value={version}
+      />
+      <OutlineButton
+        Component={Link}
+        to={updateUrl}
+        disabled={!availableUpdate}
+      >
+        {updateText}
+      </OutlineButton>
+    </RefreshCard>
+  )
+}
 
 function makeMapStateToProps () {
   const getRobotHealth = makeGetRobotHealth()
-  const getRobotUpdateAvailable = makeGetRobotUpdateAvailable()
+  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
 
   return (state: State, ownProps: OwnProps): StateProps => ({
     healthRequest: getRobotHealth(state, ownProps),
-    updateAvailable: getRobotUpdateAvailable(state, ownProps)
+    availableUpdate: getAvailableRobotUpdate(state, ownProps)
   })
 }
 
