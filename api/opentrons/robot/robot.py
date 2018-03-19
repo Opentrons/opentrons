@@ -953,7 +953,7 @@ class Robot(object):
     def is_connected(self):
         if not self._driver:
             return False
-        return not self._driver.simulating
+        return self._driver.is_connected()
 
     def is_simulating(self):
         if not self._driver:
