@@ -269,7 +269,20 @@ class SmoothieDriver_3_0_0:
         self._setup()
 
     def disconnect(self):
+        if self._connection:
+            self._connection.close()
         self.simulating = True
+
+    def is_connected(self):
+        if not self._connection:
+            return False
+        return self._connection.is_open
+
+    @property
+    def port(self):
+        if not self._connection:
+            return None
+        return self._connection.port
 
     def get_fw_version(self):
         version = 'Virtual Smoothie'

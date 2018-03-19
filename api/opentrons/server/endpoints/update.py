@@ -3,6 +3,8 @@ import logging
 import asyncio
 from aiohttp import web
 
+from opentrons import robot
+
 log = logging.getLogger(__name__)
 
 
@@ -17,6 +19,39 @@ async def _install(filename, loop):
     res = rd.decode().strip()
     print(res)
     await proc.wait()
+    return res
+
+
+async def _update_firmware(filename, loop):
+    # ensure there is a reference to the port
+    if not robot.is_connected():
+        robot.connect()
+
+    # get port name
+    port = str(robot._driver.port)
+    # set smoothieware into programming mode
+    robot._driver._smoothie_programming_mode()
+    # close the port so other application can access it
+    robot._driver._connection.close()
+
+    # run lpc21isp, THIS WILL TAKE AROUND 1 MINUTE TO COMPLETE
+    update_cmd = 'lpc21isp -wipe -donotstart {0} {1} {2} 12000'.format(
+        filename, port, robot.config.serial_speed)
+    proc = await asyncio.create_subprocess_shell(
+        update_cmd,
+        stdout=asyncio.subprocess.PIPE,
+        loop=loop)
+    rd = await proc.stdout.read()
+    res = rd.decode().strip()
+    await proc.wait()
+
+    # re-open the port
+    robot._driver._connection.open()
+    # reset smoothieware
+    robot._driver._smoothie_reset()
+    # run setup gcodes
+    robot._driver._setup()
+
     return res
 
 
@@ -39,6 +74,42 @@ async def install_api(request):
 
         msg = await _install(filename, request.loop)
         log.debug('Install complete')
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
+        log.debug("Result: {}".format(msg))
+        res = web.json_response({
+            'message': msg,
+            'filename': filename})
+    except Exception as e:
+        res = web.json_response(
+            {'error': 'Exception {} raised by update of {}. Trace: {}'.format(
+                type(e), data, e.__traceback__)},
+            status=500)
+    return res
+
+
+async def update_firmware(request):
+    """
+    This handler accepts a POST request with Content-Type: multipart/form-data
+    and a file field in the body named "hex". The file should be a valid HEX
+    image to be flashed to the LPC1769. The received file is flashed using
+    lpc21isp, and then deleted and a success code is returned.
+    """
+    log.debug('Update Firmware request received')
+    data = await request.post()
+    try:
+        filename = data['hex'].filename
+        log.info('Flashing image "{}", this will take about 1 minute'.format(
+            filename))
+        content = data['hex'].file.read()
+
+        with open(filename, 'wb') as wf:
+            wf.write(content)
+
+        msg = await _update_firmware(filename, request.loop)
+        log.debug('Firmware Update complete')
         try:
             os.remove(filename)
         except OSError:

@@ -82,6 +82,8 @@ def init(loop=None):
     server.app.router.add_post('/lights/on', control.turn_on_rail_lights)
     server.app.router.add_post('/lights/off', control.turn_off_rail_lights)
     server.app.router.add_post('/server/update', update.install_api)
+    server.app.router.add_post(
+        '/server/update_firmware', update.update_firmware)
     server.app.router.add_post('/server/restart', control.restart)
     server.app.router.add_get('/calibration/deck', dc_endp.start)
     server.app.router.add_post('/calibration/deck', dc_endp.dispatch)
