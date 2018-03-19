@@ -1,13 +1,14 @@
 // @flow
 import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {IngredInstance} from '../../labware-ingred/types'
+import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -110,15 +111,27 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    // Skip the first step in orderedSteps -- it's the initial deck setup.
-    const orderedNonDeckSteps = orderedSteps.slice(1)
-
-    const result = orderedNonDeckSteps.reduce((acc, stepId) => {
+    const result = orderedSteps.reduce((acc, stepId) => {
       if (!isEmpty(acc.formErrors)) {
         // stop reducing if there are errors
         return acc
       }
       const form = forms[stepId]
+
+      if (stepId === 0) {
+        // first stepId is initial deck setup.
+        return {
+          ...acc,
+          timeline: [
+            ...acc.timeline,
+            {
+              commands: [],
+              robotState: initialRobotState
+            }
+          ]
+        }
+      }
+
       if (!form.validatedForm) {
         return {
           ...acc,
@@ -149,5 +162,38 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
     }
 
     return result.timeline
+  }
+)
+
+function _wellContentsForLabware (labwareLiquids: LabwareLiquidState): WellContents {
+  console.log({labwareLiquids})
+  return mapValues(
+    labwareLiquids,
+    (wellContents: {[groupId: string]: {volume: number}}, well: string) => ({
+      preselected: false,
+      selected: false,
+      highlighted: false,
+      maxVolume: 123, // TODO refactor so all these fields aren't needed
+      wellName: well,
+      groupId: Object.keys(wellContents).filter(groupId =>
+        wellContents[groupId] &&
+        wellContents[groupId].volume > 0
+      )
+    })
+  )
+}
+
+export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
+  robotStateTimeline,
+  (_robotStateTimeline) => {
+    const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
+    return liquidStateTimeline.map(
+      liquidState => reduce(
+        liquidState,
+        (acc, labwareLiquids: LabwareLiquidState, labwareId: string) => ({
+          ...acc,
+          [labwareId]: _wellContentsForLabware(labwareLiquids)
+        }), {})
+    )
   }
 )

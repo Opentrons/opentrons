@@ -4,6 +4,8 @@ import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import SelectablePlate from '../components/SelectablePlate.js'
 import { selectors } from '../labware-ingred/reducers'
+import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as fileSelectors} from '../file-data'
 import { preselectWells, selectWells } from '../labware-ingred/actions'
 import type {BaseState} from '../types'
 
@@ -32,10 +34,17 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   }
 
   const labware = selectors.getLabware(state)[containerId]
+  const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
+  const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
+
+  const wellContents = (stepId !== null) && allWellContentsForSteps[stepId]
+    ? allWellContentsForSteps[stepId][containerId]
+    : {}
 
   return {
     containerId,
-    wellContents: selectors.wellContentsAllLabware(state)[containerId],
+    // wellContents: selectors.wellContentsAllLabware(state)[containerId], // TODO don't need this selector anymore
+    wellContents,
     containerType: labware.type,
     selectable: ownProps.selectable
   }

@@ -18,6 +18,8 @@ type StepItemProps = {
   sourceLabwareName?: string,
   destLabwareName?: string,
   onClick?: (event: SyntheticEvent<>) => void,
+  onMouseEnter?: (event: SyntheticEvent<>) => mixed,
+  onMouseLeave?: (event: SyntheticEvent<>) => mixed,
   onCollapseToggle?: (event: SyntheticEvent<>) => void,
   children?: React.Node
 }
@@ -32,6 +34,8 @@ export default function StepItem (props: StepItemProps) {
     collapsed,
     selected,
     onClick,
+    onMouseEnter,
+    onMouseLeave,
     onCollapseToggle,
     children
   } = props
@@ -47,7 +51,7 @@ export default function StepItem (props: StepItemProps) {
     <TitledList
       className={styles.step_item}
       description={Description}
-      {...{iconName, title, selected, onClick, onCollapseToggle: onCollapseToggle, collapsed}}
+      {...{iconName, title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
     >
       {showLabwareHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <span>{sourceLabwareName}</span>

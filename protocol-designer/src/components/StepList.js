@@ -15,7 +15,8 @@ type StepListProps = {
   selectedStepId?: number,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
   handleStepItemClickById?: number => (event?: SyntheticEvent<>) => void,
-  handleStepItemCollapseToggleById?: number => (event?: SyntheticEvent<>) => void
+  handleStepItemCollapseToggleById?: number => (event?: SyntheticEvent<>) => void,
+  handleStepHoverById?: (number | null) => (event?: SyntheticEvent<>) => mixed
 }
 
 function generateSubsteps (substeps) {
@@ -58,6 +59,8 @@ export default function StepList (props: StepListProps) {
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
+          onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(step.id)}
+          onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
           onCollapseToggle={
             (step.stepType === 'deck-setup' || !props.handleStepItemCollapseToggleById)
               ? null // Deck Setup steps are not collapsible

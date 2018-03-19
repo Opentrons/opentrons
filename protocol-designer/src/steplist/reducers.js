@@ -161,6 +161,12 @@ const selectedStep = handleActions({
   DELETE_STEP: () => null
 }, INITIAL_DECK_SETUP_ID)
 
+type HoveredStepState = SelectedStepState
+
+const hoveredStep = handleActions({
+  HOVER_ON_STEP: (state: HoveredStepState, action) => action.payload
+}, null)
+
 type StepCreationButtonExpandedState = boolean
 
 const stepCreationButtonExpanded = handleActions({
@@ -181,6 +187,7 @@ export type RootState = {|
   collapsedSteps: CollapsedStepsState,
   orderedSteps: OrderedStepsState,
   selectedStep: SelectedStepState,
+  hoveredStep: HoveredStepState,
   stepCreationButtonExpanded: StepCreationButtonExpandedState
 |}
 
@@ -193,6 +200,7 @@ export const _allReducers = {
   collapsedSteps,
   orderedSteps,
   selectedStep,
+  hoveredStep,
   stepCreationButtonExpanded
 }
 
@@ -217,6 +225,19 @@ const formModalData = createSelector(
 const selectedStepId = createSelector(
   rootSelector,
   (state: RootState) => state.selectedStep
+)
+
+const hoveredStepId = createSelector(
+  rootSelector,
+  (state: RootState) => state.hoveredStep
+)
+
+const hoveredOrSelectedStepId = createSelector(
+  hoveredStepId,
+  selectedStepId,
+  (hoveredId, selectedId) => hoveredId !== null
+    ? hoveredId
+    : selectedId
 )
 
 const orderedStepsSelector = (state: BaseState) => rootSelector(state).orderedSteps
@@ -274,7 +295,15 @@ const allSteps = createSelector(
 const selectedStepSelector = createSelector(
   allSteps,
   selectedStepId,
-  (allSteps, selectedStepId) => allSteps && selectedStepId !== null && allSteps[selectedStepId]
+  (allSteps, selectedStepId) => {
+    const stepId = selectedStepId
+
+    if (!allSteps || stepId === null) {
+      return null
+    }
+
+    return allSteps[stepId]
+  }
 )
 
 const deckSetupMode = createSelector(
@@ -295,6 +324,7 @@ export const selectors = {
   orderedSteps: orderedStepsSelector,
   selectedStep: selectedStepSelector,
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
+  hoveredOrSelectedStepId,
   selectedStepFormData: createSelector(
     (state: BaseState) => rootSelector(state).savedStepForms,
     (state: BaseState) => rootSelector(state).selectedStep,
