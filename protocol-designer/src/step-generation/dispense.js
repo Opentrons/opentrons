@@ -7,6 +7,8 @@ import {splitLiquid, mergeLiquid} from './utils'
 import type {RobotState, CommandCreator, AspirateDispenseArgs, PipetteData} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
+type LocationLiquidState = {[ingredId: string]: {volume: number}}
+
 export function _updateLiquidState (
   args: {
     pipetteId: string,
@@ -19,7 +21,7 @@ export function _updateLiquidState (
   prevLiquidState: LiquidState
 ): LiquidState {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
-  type Ingreds = {[ingredId: string]: {volume: number}} // TODO import a type
+  type Ingreds = LocationLiquidState
   type SourceAndDest = {|source: Ingreds, dest: Ingreds|}
 
   // remove liquid from pipette tips,
@@ -27,7 +29,7 @@ export function _updateLiquidState (
   // and dests are "droplets" that need to be merged to dest well contents
   const splitLiquidStates: {[tipId: string]: SourceAndDest} = mapValues(
     prevLiquidState.pipettes[pipetteId],
-    (prevTipLiquidState: {[ingredId: string]: {volume: number}}) =>
+    (prevTipLiquidState: LocationLiquidState) =>
       splitLiquid(
         volume,
         prevTipLiquidState
@@ -38,7 +40,7 @@ export function _updateLiquidState (
     ? [well]
     : computeWellAccess(labwareType, well)
 
-  // TODO Ian 2018-03-16: duplicated in aspirate.js
+  // TODO Ian 2018-03-16: duplicated in aspirate.js. Candidate for a util
   if (!wellsForTips) {
     throw new Error(pipetteData.channels === 1
       ? `Invalid well: ${well}`
@@ -86,7 +88,6 @@ export function _updateLiquidState (
   }
 }
 
-// TODO Ian 2018-02-12 dispense is almost identical to aspirate, what will change? Should they share code?
 const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
   /** Dispense with given args. Requires tip. */
   const {pipette, volume, labware, well} = args
