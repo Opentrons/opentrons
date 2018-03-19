@@ -6,6 +6,8 @@ import electron from 'electron'
 import client from '../client'
 import {
   makeGetAvailableRobotUpdate,
+  makeGetRobotUpdateRequest,
+  makeGetRobotRestartRequest,
   restartRobotServer,
   reducer
 } from '..'
@@ -38,7 +40,9 @@ describe('server API client', () => {
         api: {
           server: {
             [robot.name]: {
-              availableUpdate: '42.0.0'
+              availableUpdate: '42.0.0',
+              update: {inProgress: true, error: null, response: null},
+              restart: {inProgress: true, error: null, response: null}
             }
           }
         }
@@ -50,6 +54,24 @@ describe('server API client', () => {
 
       expect(getAvailableUpdate(state, robot)).toEqual('42.0.0')
       expect(getAvailableUpdate(state, {name: 'foo'})).toEqual(null)
+    })
+
+    test('makeGetRobotUpdateRequest', () => {
+      const getUpdateRequest = makeGetRobotUpdateRequest()
+
+      expect(getUpdateRequest(state, robot))
+        .toBe(state.api.server[robot.name].update)
+      expect(getUpdateRequest(state, {name: 'foo'}))
+        .toEqual({inProgress: false})
+    })
+
+    test('makeGetRobotUpdateRequest', () => {
+      const getRestartRequest = makeGetRobotRestartRequest()
+
+      expect(getRestartRequest(state, robot))
+        .toBe(state.api.server[robot.name].restart)
+      expect(getRestartRequest(state, {name: 'foo'}))
+        .toEqual({inProgress: false})
     })
   })
 
@@ -120,7 +142,7 @@ describe('server API client', () => {
       mockApiUpdate.getAvailableUpdate.mockReturnValueOnce('42.0.0')
 
       expect(reducer(state, action).server).toEqual({
-        [robot.name]: {availableUpdate: '42.0.0'}
+        [robot.name]: {availableUpdate: '42.0.0', update: null, restart: null}
       })
       expect(mockApiUpdate.getAvailableUpdate)
         .toHaveBeenCalledWith(health.api_version)
@@ -131,10 +153,26 @@ describe('server API client', () => {
       mockApiUpdate.getAvailableUpdate.mockReturnValueOnce(null)
 
       expect(reducer(state, action).server).toEqual({
-        [robot.name]: {availableUpdate: null}
+        [robot.name]: {availableUpdate: null, update: null, restart: null}
       })
       expect(mockApiUpdate.getAvailableUpdate)
         .toHaveBeenCalledWith(health.api_version)
+    })
+
+    test('clears update and restart if availableUpdate changes', () => {
+      const health = {name, api_version: '4.5.6', fw_version: '7.8.9'}
+      const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
+
+      state.server[robot.name] = {
+        availableUpdate: '4.5.6',
+        update: {},
+        restart: {}
+      }
+      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce(null)
+
+      expect(reducer(state, action).server).toEqual({
+        [robot.name]: {availableUpdate: null, update: null, restart: null}
+      })
     })
 
     REQUESTS_TO_TEST.forEach((request) => {

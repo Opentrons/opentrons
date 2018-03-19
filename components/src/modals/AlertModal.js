@@ -11,7 +11,7 @@ type Props = {
   /** optional modal heading */
   heading?: React.Node,
   /** optional array of `ButtonProps` for `FlatButton`s at bottom of modal */
-  buttons?: Array<ButtonProps>,
+  buttons?: Array<?ButtonProps>,
   /** modal contents */
   children: React.Node,
   /** optional classes to apply */
@@ -36,7 +36,7 @@ export default function AlertModal (props: Props) {
       </div>
       {buttons && (
         <div className={styles.alert_modal_buttons}>
-          {buttons.map((button, index) => (
+          {buttons.filter(Boolean).map((button, index) => (
             <FlatButton key={index} {...button} />
           ))}
         </div>
