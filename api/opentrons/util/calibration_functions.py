@@ -7,6 +7,9 @@ from opentrons.robot import robot_configs
 from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
 
+import logging
+
+log = logging.getLogger(__name__)
 
 # The X and Y switch offsets are to position relative to the *opposite* axes
 # during calibration, to make the tip hit the raised end of the switch plate,
@@ -18,7 +21,7 @@ X_SWITCH_OFFSET_MM = 2.0
 Y_SWITCH_OFFSET_MM = 5.0
 Z_SWITCH_OFFSET_MM = 5.0
 
-Z_DECK_CLEARANCE = 15.0
+Z_DECK_CLEARANCE = 5.0
 Z_PROBE_CLEARANCE = 5.0
 Z_PROBE_START_CLEARANCE = 20
 
@@ -58,40 +61,36 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         tip_length = robot.config.tip_length[instrument.name]
     instrument._add_tip(tip_length)
 
-    # probe_dimensions is the external bounding box of the probe unit
-    size_x, size_y, size_z = robot.config.probe_dimensions
     # probe_center is the point at the center of the switch pcb
     center = Point(*robot.config.probe_center)
 
-    rel_x_start = (size_x / 2) + SWITCH_CLEARANCE
-    rel_y_start = (size_y / 2) + SWITCH_CLEARANCE
-    print("Instrument Model Offset {}".format(instrument.model_offset[2]))
-    # Ensure that the nozzle will clear the probe unit and tip will clear deck
-    nozzle_safe_z = (size_z - tip_length) + Z_PROBE_CLEARANCE
-    rel_z_start = abs(instrument.model_offset[2]) - max(Z_DECK_CLEARANCE, nozzle_safe_z)  # NOQA
-    print("Center Z {}".format(center.z))
+    hot_spots = _calculate_hotspots(
+        robot,
+        tip_length,
+        SWITCH_CLEARANCE,
+        X_SWITCH_OFFSET_MM,
+        Y_SWITCH_OFFSET_MM,
+        Z_SWITCH_OFFSET_MM,
+        Z_DECK_CLEARANCE,
+        Z_PROBE_CLEARANCE,
+        Z_PROBE_START_CLEARANCE)
 
-    max_calc = max(Z_DECK_CLEARANCE, nozzle_safe_z)
-    print("Max of nozzle and clearance {}".format(max_calc))
-    print("rel_z_start {}".format(rel_z_start))
-    # Each list item defines axis we are probing for, starting position vector
-    # relative to probe top center and travel distance
-    hot_spots = [
-        ('x',       -rel_x_start, X_SWITCH_OFFSET_MM,            rel_z_start,  size_x),  # NOQA
-        ('x',        rel_x_start, X_SWITCH_OFFSET_MM,            rel_z_start, -size_x),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,       -rel_y_start,            rel_z_start,  size_y),  # NOQA
-        ('y', Y_SWITCH_OFFSET_MM,        rel_y_start,            rel_z_start, -size_y),  # NOQA
-        ('z',                0.0, Z_SWITCH_OFFSET_MM, Z_PROBE_START_CLEARANCE, -size_z)   # NOQA
-    ]
+    # The saved axis positions from limit switch response
+    axis_pos = []
 
-    acc = []
-
-    safe_height = center.z + Z_CROSSOVER_CLEARANCE
+    safe_height = _calculate_safeheight(robot, Z_CROSSOVER_CLEARANCE)
 
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
-    for axis, *probing_vector, distance in hot_spots:
-        x, y, z = array(probing_vector) + center
+    for axis, x, y, z, distance in hot_spots:
+        if axis == 'z':
+
+            x = x + center.x
+            y = y + center.y
+            z = z + center.z
+        else:
+            x = x + center.x
+            y = y + center.y
 
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
@@ -102,17 +101,21 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         # Tip position is stored in accumulator and averaged for each axis
         # to be used for more accurate positioning for the next axis
         value = absolute(robot.poses, instrument)[axis_index]
-        acc.append(value)
+        axis_pos.append(value)
 
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
         # except Z, we're only probing that once
         if axis == 'z':
-            center = center._replace(**{axis: acc[0]})
-            acc.clear()
-        elif len(acc) == 2:
-            center = center._replace(**{axis: (acc[0] + acc[1]) / 2.0})
-            acc.clear()
+            center = center._replace(**{axis: axis_pos[0]})
+            axis_pos.clear()
+        elif len(axis_pos) == 2:
+            center = center._replace(**{axis:
+                                        (axis_pos[0] + axis_pos[1]) / 2.0})
+
+            axis_pos.clear()
+
+        log.debug("Current axis positions for {}: {}".format(axis, axis_pos))
 
         # Bounce back to release end stop
         bounce = value + (BOUNCE_DISTANCE_MM * (-distance / abs(distance)))
@@ -120,9 +123,76 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         robot.poses = instrument._move(robot.poses, **{axis: bounce})
         robot.poses = instrument._move(robot.poses, z=safe_height)
 
+        log.debug("Updated center point tip probe {}".format(center))
+
     instrument._remove_tip(tip_length)
 
     return center
+
+
+def _calculate_hotspots(
+        robot,
+        tip_length,
+        switch_clearance,
+        x_switch_offset,
+        y_switch_offset,
+        z_switch_offset,
+        deck_clearance,
+        z_probe_clearance,
+        z_start_clearance):
+
+    # probe_dimensions is the external bounding box of the probe unit
+    size_x, size_y, size_z = robot.config.probe_dimensions
+
+    rel_x_start = (size_x / 2) + switch_clearance
+    rel_y_start = (size_y / 2) + switch_clearance
+
+    # Ensure that the nozzle will clear the probe unit and tip will clear deck
+    nozzle_safe_z = round((size_z - tip_length) + z_probe_clearance, 3)
+
+    z_start = max(deck_clearance, nozzle_safe_z)
+
+    # Each list item defines axis we are probing for, starting position vector
+    # relative to probe top center and travel distance
+    neg_x = ('x',
+             -rel_x_start,
+             x_switch_offset,
+             z_start,
+             size_x)
+    pos_x = ('x',
+             rel_x_start,
+             x_switch_offset,
+             z_start,
+             -size_x)
+    neg_y = ('y',
+             y_switch_offset,
+             -rel_y_start,
+             z_start,
+             size_y)
+    pos_y = ('y',
+             y_switch_offset,
+             rel_y_start,
+             z_start,
+             -size_y)
+    z = ('z',
+         0.0,
+         z_switch_offset,
+         z_start_clearance,
+         -size_z)
+
+    return [
+        neg_x,
+        pos_x,
+        neg_y,
+        pos_y,
+        z
+    ]
+
+
+def _calculate_safeheight(robot, z_crossover_clearance):
+    center = Point(*robot.config.probe_center)
+
+    return center.z + z_crossover_clearance
 
 
 def update_instrument_config(instrument, measured_center) -> (Point, float):
@@ -140,6 +210,7 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
 
     dx, dy, dz = array(measured_center) - config.probe_center
 
+    log.debug("This is measured probe center dx {}".format(Point(dx, dy, dz)))
     # any Z offset will adjust the tip length, so instruments have Z=0 offset
     old_x, old_y, _ = instrument_offset[instrument.mount][instrument.type]
     instrument_offset[instrument.mount][instrument.type] = \

@@ -15,8 +15,8 @@ def _get_uuid() -> str:
 
 class SessionManager:
     """
-    Creates a session manager to handle all commands required for changing
-    pipettes.
+    Creates a session manager to handle all commands required for factory
+    calibration.
     Before issuing a movement command, the following must be done:
     1. Create a session manager
     2. Initialize a pipette
