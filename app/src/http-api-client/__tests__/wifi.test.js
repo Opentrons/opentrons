@@ -41,7 +41,9 @@ describe('wifi', () => {
     test('makeGetRobotWifiStatus', () => {
       const getStatus = makeGetRobotWifiStatus()
 
-      expect(getStatus(state, robot)).toEqual(state.api.wifi.opentrons.status)
+      expect(getStatus(state, robot))
+        .toEqual(state.api.wifi.opentrons.status)
+
       expect(getStatus(state, {name: 'foo'})).toEqual({
         inProgress: false,
         error: null,

@@ -8,6 +8,7 @@ import type {Robot} from '../../robot'
 import {
   fetchHealth,
   makeGetRobotHealth,
+  makeGetRobotUpdateAvailable,
   type RobotHealth
 } from '../../http-api-client'
 
@@ -16,7 +17,8 @@ import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
 type OwnProps = Robot
 
 type StateProps = {
-  healthRequest: RobotHealth
+  healthRequest: RobotHealth,
+  updateAvailable: boolean
 }
 
 type DispatchProps = {
@@ -31,9 +33,17 @@ const SERVER_VERSION_LABEL = 'Server version'
 
 class InformationCard extends React.Component<Props> {
   render () {
-    const {name, healthRequest: {response: health}} = this.props
+    const {
+      name,
+      updateAvailable,
+      healthRequest: {response: health}
+    } = this.props
+
     const realName = (health && health.name) || name
     const version = (health && health.api_version) || 'Unknown'
+    const updateText = updateAvailable
+      ? 'Update'
+      : 'Updated'
 
     return (
       <Card title={TITLE}>
@@ -46,7 +56,7 @@ class InformationCard extends React.Component<Props> {
           value={version}
         />
         <OutlineButton disabled>
-          Updated
+          {updateText}
         </OutlineButton>
       </Card>
     )
@@ -67,9 +77,11 @@ export default connect(makeMapStateToProps, mapDispatchToProps)(InformationCard)
 
 function makeMapStateToProps () {
   const getRobotHealth = makeGetRobotHealth()
+  const getRobotUpdateAvailable = makeGetRobotUpdateAvailable()
 
   return (state: State, ownProps: OwnProps): StateProps => ({
-    healthRequest: getRobotHealth(state, ownProps)
+    healthRequest: getRobotHealth(state, ownProps),
+    updateAvailable: getRobotUpdateAvailable(state, ownProps)
   })
 }
 
