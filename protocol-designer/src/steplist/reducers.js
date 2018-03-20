@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
+import reduce from 'lodash/reduce'
 import max from 'lodash/max'
 import omit from 'lodash/omit'
 
@@ -242,56 +243,113 @@ const hoveredOrSelectedStepId: Selector<StepIdType | typeof END_STEP | null> = c
     : selectedId
 )
 
-const orderedStepsSelector = (state: BaseState) => rootSelector(state).orderedSteps
+const getSteps = createSelector(
+  rootSelector,
+  (state: RootState) => state.steps
+)
 
-// TODO SOON Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms
-const validatedForms = (state: BaseState): {[StepIdType]: ValidFormAndErrors} => {
-  // TODO LATER Ian 2018-02-14 this should use selectors instead of accessing rootSelector result directly
-  const s = rootSelector(state)
-  if (s.orderedSteps.length === 0) {
-    // No steps -- since initial Deck Setup step exists in default Redux state,
-    // this probably should never happen
-    console.warn('validatedForms called with no steps in "orderedSteps"')
-    return {}
-  }
+const getCollapsedSteps = createSelector(
+  rootSelector,
+  (state: RootState) => state.collapsedSteps
+)
 
-  if (s.steps[0].stepType !== 'deck-setup') {
-    console.error('Error: expected deck-setup to be first step.', s.orderedSteps)
-  }
-  return s.orderedSteps.slice(1).reduce((acc, stepId) => {
-    if (s.steps[stepId].stepType === 'deck-setup') {
-      throw new Error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
+const orderedStepsSelector = createSelector(
+  rootSelector,
+  (state: RootState) => state.orderedSteps
+)
+
+/** This is just a simple selector, but has some debugging logic. TODO Ian 2018-03-20: use assert here */
+const getSavedForms = createSelector(
+  getSteps,
+  orderedStepsSelector,
+  (state: BaseState) => rootSelector(state).savedStepForms,
+  (_steps, _orderedSteps, _savedStepForms) => {
+    if (_orderedSteps.length === 0) {
+      // No steps -- since initial Deck Setup step exists in default Redux state,
+      // this probably should never happen
+      console.warn('validatedForms called with no steps in "orderedSteps"')
+      return []
     }
 
-    const nextStepData = (s.savedStepForms[stepId] && s.steps[stepId])
-      ? validateAndProcessForm(s.savedStepForms[stepId])
-      : {
-        errors: {'form': ['no saved form for step ' + stepId]},
-        validatedForm: null
-      } // TODO revisit
-
-    return {
-      ...acc,
-      [stepId]: nextStepData
+    if (_steps[0].stepType !== 'deck-setup') {
+      console.error('Error: expected deck-setup to be first step.', _orderedSteps)
     }
-  }, {})
-}
 
-const allSubsteps: (state: BaseState) => {[StepIdType]: StepSubItemData | null} = createSelector(
+    if (_orderedSteps.slice(1).some(stepId => _steps[stepId].stepType === 'deck-setup')) {
+      console.error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
+    }
+
+    return _savedStepForms
+  }
+)
+
+// TODO Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms (eg deck setup steps)
+const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelector(
+  getSteps,
+  getSavedForms,
+  orderedStepsSelector,
+  (_steps, _savedStepForms, _orderedSteps) => {
+    const orderedNonDeckSteps = _orderedSteps.slice(1)
+
+    return reduce(orderedNonDeckSteps, (acc, stepId) => {
+      const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
+        ? validateAndProcessForm(_savedStepForms[stepId])
+        // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
+        : {
+          errors: {'form': ['no saved form for step ' + stepId]},
+          validatedForm: null
+        } // TODO Ian 2018-03-20 revisit "no saved form for step"
+
+      return {
+        ...acc,
+        [stepId]: nextStepData
+      }
+    }, {})
+  }
+)
+
+const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSelector(
   validatedForms,
   generateSubsteps
 )
 
+// TODO Ian 2018-03-20 use selectors, don't create them here
+/** All Step data needed for Step List */
 const allSteps = createSelector(
-  (state: BaseState) => rootSelector(state).steps,
+  getSteps,
   orderedStepsSelector,
-  (state: BaseState) => rootSelector(state).collapsedSteps,
+  getCollapsedSteps,
   allSubsteps,
-  (steps, orderedSteps, collapsedSteps, _allSubsteps) => orderedSteps.map(id => ({
-    ...steps[id],
-    collapsed: collapsedSteps[id],
-    substeps: _allSubsteps[id]
-  }))
+  getSavedForms,
+  (state: BaseState) => state.labwareIngred.containers, // TODO Ian 2018-03-20 use proper selector, from labware-ingred
+  (steps, orderedSteps, collapsedSteps, _allSubsteps, _savedForms, _labware) => {
+    return orderedSteps.map(id => {
+      const savedForm = (_savedForms && _savedForms[id]) || {}
+
+      function getLabwareName (labwareId: ?string) {
+        return (labwareId)
+          ? _labware[labwareId] && _labware[labwareId].name
+          : null
+      }
+
+      const additionalFormFields = (savedForm.stepType === 'transfer' || savedForm.stepType === 'distribute' || savedForm.stepType === 'consolidate')
+        ? {
+          sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
+          destLabwareName: getLabwareName(savedForm['dispense--labware'])
+        }
+        : {}
+
+      return {
+        ...steps[id],
+
+        description: savedForm['step-details'],
+        ...additionalFormFields,
+
+        collapsed: collapsedSteps[id],
+        substeps: _allSubsteps[id]
+      }
+    })
+  }
 )
 
 const selectedStepSelector = createSelector(
@@ -309,10 +367,10 @@ const selectedStepSelector = createSelector(
 )
 
 const deckSetupMode = createSelector(
-  (state: BaseState) => rootSelector(state).steps,
-  (state: BaseState) => rootSelector(state).selectedStep,
-  (steps, selectedStep) => (typeof selectedStep === 'number' && steps[selectedStep])
-    ? steps[selectedStep].stepType === 'deck-setup'
+  getSteps,
+  selectedStepId,
+  (steps, selectedStepId) => (selectedStepId !== null && steps[selectedStepId])
+    ? steps[selectedStepId].stepType === 'deck-setup'
     : false
 )
 
@@ -328,9 +386,9 @@ export const selectors = {
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   hoveredOrSelectedStepId,
   selectedStepFormData: createSelector(
-    (state: BaseState) => rootSelector(state).savedStepForms,
-    (state: BaseState) => rootSelector(state).selectedStep,
-    (state: BaseState) => rootSelector(state).steps,
+    getSavedForms,
+    selectedStepId,
+    getSteps,
     (savedStepForms, selectedStepId, steps) => {
       if (selectedStepId === null) {
         // no step selected
@@ -354,9 +412,9 @@ export const selectors = {
   formData,
   formModalData,
   nextStepId: createSelector( // generates the next step ID to use
-    (state: BaseState) => rootSelector(state).steps,
-    (steps): number => {
-      const allStepIds = Object.keys(steps).map(stepId => parseInt(stepId))
+    getSteps,
+    (_steps): number => {
+      const allStepIds = Object.keys(_steps).map(stepId => parseInt(stepId))
       return allStepIds.length === 0
         ? 0
         : max(allStepIds) + 1

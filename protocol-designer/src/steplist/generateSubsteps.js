@@ -39,13 +39,15 @@ function _transferSubsteps (form: *, stepId: StepIdType) {
 function _consolidateSubsteps (form: *, stepId: StepIdType) {
   const {
     sourceWells,
-    destWell
+    destWell,
+    volume
   } = form
 
   const destWellSubstep = {
     destWell,
-    sourceIngredientName: 'ING1',
-    destIngredientName: 'ING2'
+    sourceIngredientName: 'ING1', // TODO Ian 2018-03-20 proper ingredient name & groupId/color
+    destIngredientName: 'ING2',
+    volume: volume * sourceWells.length
   }
 
   return {
@@ -55,7 +57,8 @@ function _consolidateSubsteps (form: *, stepId: StepIdType) {
       ...sourceWells.map((sourceWell, i) => ({
         substepId: i,
         sourceWell: sourceWell,
-        sourceIngredientName: 'ING1'
+        sourceIngredientName: 'ING1',
+        volume: volume
       })),
       destWellSubstep
     ]

@@ -53,10 +53,7 @@ function generateSubsteps (substeps) {
 
 export default function StepList (props: StepListProps) {
   return (
-    <SidePanel
-      title='Protocol Step List'
-      onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
-    >
+    <SidePanel title='Protocol Step List'>
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
