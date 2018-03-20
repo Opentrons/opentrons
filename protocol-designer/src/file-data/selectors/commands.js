@@ -166,7 +166,6 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
 )
 
 function _wellContentsForLabware (labwareLiquids: LabwareLiquidState): WellContents {
-  console.log({labwareLiquids})
   return mapValues(
     labwareLiquids,
     (wellContents: {[groupId: string]: {volume: number}}, well: string) => ({
