@@ -332,7 +332,12 @@ const allSteps = createSelector(
           : null
       }
 
-      const additionalFormFields = (savedForm.stepType === 'transfer' || savedForm.stepType === 'distribute' || savedForm.stepType === 'consolidate')
+      // optional form fields for "transferish" steps
+      const additionalFormFields = (
+        savedForm.stepType === 'transfer' ||
+        savedForm.stepType === 'distribute' ||
+        savedForm.stepType === 'consolidate'
+      )
         ? {
           sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
           destLabwareName: getLabwareName(savedForm['dispense--labware'])
@@ -342,8 +347,8 @@ const allSteps = createSelector(
       return {
         ...steps[id],
 
-        description: savedForm['step-details'],
         ...additionalFormFields,
+        description: savedForm['step-details'],
 
         collapsed: collapsedSteps[id],
         substeps: _allSubsteps[id]

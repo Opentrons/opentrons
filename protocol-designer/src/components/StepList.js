@@ -21,7 +21,7 @@ type StepListProps = {
   handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed
 }
 
-function generateSubsteps (substeps) {
+function generateSubstepItems (substeps) {
   if (!substeps) {
     // no substeps, form is probably not finished (or it's "deck-setup" stepType)
     return null
@@ -75,7 +75,7 @@ export default function StepList (props: StepListProps) {
             'collapsed'
           ])}
         >
-          {generateSubsteps(step.substeps)}
+          {generateSubstepItems(step.substeps)}
         </StepItem>
       ))}
       <TitledList title='END' iconName='check'
