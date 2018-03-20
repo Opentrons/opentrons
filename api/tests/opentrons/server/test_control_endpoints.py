@@ -1,4 +1,5 @@
 import json
+from opentrons import robot
 from opentrons.server.main import init
 from opentrons.drivers.smoothie_drivers import driver_3_0
 
@@ -45,3 +46,36 @@ async def test_get_pipettes(
     text = await resp.text()
     assert resp.status == 200
     assert text == expected
+
+
+async def test_disengage_axes(
+        virtual_smoothie_env, loop, test_client, monkeypatch):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    def mock_send(self, command, timeout=None):
+        pass
+
+    monkeypatch.setattr(
+        driver_3_0.SmoothieDriver_3_0_0, '_send_command', mock_send)
+
+    alltrue = {
+        "X": True, "Y": True, "Z": True, "A": True, "B": True, "C": True}
+    res0 = await cli.get('/robot/axes/engaged')
+    result0 = await res0.text()
+    assert res0.status == 200
+    assert json.loads(result0) == alltrue
+    postres = await cli.post('/robot/axes/disengage', json={'axes': 'XB'})
+    assert postres.status == 200
+    xbfalse = {
+        "X": False, "Y": True, "Z": True, "A": True, "B": False, "C": True}
+    res1 = await cli.get('/robot/axes/engaged')
+    result1 = await res1.text()
+    assert res1.status == 200
+    assert json.loads(result1) == xbfalse
+
+    robot.home()
+    res2 = await cli.get('/robot/axes/engaged')
+    result2 = await res2.text()
+    assert res2.status == 200
+    assert json.loads(result2) == alltrue

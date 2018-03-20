@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 from time import sleep
 from aiohttp import web
@@ -31,6 +32,40 @@ async def get_attached_pipettes(request):
     mount will report `'model': 'uncommissioned'`
     """
     return web.json_response(robot.get_attached_pipettes())
+
+
+async def get_engaged_axes(request):
+    """
+    Query driver for engaged state by axis. Response keys will be axes XYZABC
+    and keys will be True for engaged and False for disengaged. Axes must be
+    manually disengaged, and are automatically re-engaged whenever a "move" or
+    "home" command is called on that axis.
+
+    Response shape example:
+        {"X": True, "Y": False, "Z": True, "A": True, "B": False, "C": False}
+    """
+    return web.json_response(robot._driver.engaged_axes)
+
+
+async def disengage_axes(request):
+    """
+    Disengage axes (turn off power) primarily in order to reduce heat
+    consumption.
+    :param request: Must contain an "axes" field with a single stirng of axes
+        to disengage (captial letters, must be some of "XYZABC")
+    :return: message and status code
+    """
+    data = await request.text()
+    axes = json.loads(data).get('axes')
+    invalid_axes = [ax for ax in axes if ax not in 'XYZABC']
+    if invalid_axes:
+        message = "Invalid axes: {}".format(invalid_axes)
+        status = 400
+    else:
+        robot._driver.disengage_axis(axes)
+        message = "Disengaged axes: {}".format(axes)
+        status = 200
+    return web.json_response({"message": message}, status=status)
 
 
 async def identify(request):

@@ -151,10 +151,20 @@ class SmoothieDriver_3_0_0:
         # motor current settings
         self._saved_current_settings = config.low_current.copy()
         self._current_settings = self._saved_current_settings.copy()
-        self._active_axes = {
-            ax: False
-            for ax in AXES
-        }
+
+        # Active axes are axes that are in use. An axis might be disabled if
+        # a motor has had a failure and the robot is operating without that
+        # axis until it can be repaired. This will be an unusual circumstance.
+        self._active_axes = {ax: False for ax in AXES}
+
+        # Engaged axes are axes that have not been disengaged (GCode M18) since
+        # their last "move" or "home" operations. Disengaging an axis stops the
+        # power output to the associated motor, primarily for the purpose of
+        # reducing heat. When a "disengage" command is sent for an axis, this
+        # dict should be updated to False for that axis, and when a "move" or
+        # "home" command is sent for an axis, that axis should be updated to
+        # True.
+        self.engaged_axes = {ax: True for ax in AXES}
 
         # motor speed settings
         self._max_speed_settings = config.default_max_speed.copy()
@@ -376,7 +386,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
 
-    def _disengage_axis(self, axes):
+    def disengage_axis(self, axes):
         '''
         Disable the stepper-motor-driver's 36v output to motor
         This is a safe GCODE to send to Smoothieware, as it will automatically
@@ -389,6 +399,8 @@ class SmoothieDriver_3_0_0:
         axes = ''.join(set(axes.upper()) & set(AXES))
         if axes:
             self._send_command(GCODES['DISENGAGE_MOTOR'] + axes)
+            for axis in axes:
+                self.engaged_axes[axis] = False
 
     def push_current(self):
         self._saved_current_settings.update(self._current_settings)
@@ -658,6 +670,8 @@ class SmoothieDriver_3_0_0:
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
                 self.activate_axes(target.keys())
+                for axis in target.keys():
+                    self.engaged_axes[axis] = True
                 self._send_command(command)
             finally:
                 # dwell pipette motors because they get hot
@@ -717,6 +731,8 @@ class SmoothieDriver_3_0_0:
             for ax in ''.join(home_sequence)
         }
         self.update_position(default=homed)
+        for axis in ''.join(home_sequence):
+            self.engaged_axes[axis] = True
 
         # coordinate after homing might not synce with default in API
         # so update this driver's homed position using current coordinates
@@ -771,6 +787,7 @@ class SmoothieDriver_3_0_0:
 
     def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
+            self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             self._send_command(command=command, timeout=30)
             self.update_position(self.position)
@@ -778,6 +795,7 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
+    # TODO (ben 20180320): we should probably move these to the gpio driver
     def turn_on_blue_button_light(self):
         self._set_button_light(blue=True)
 
