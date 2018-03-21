@@ -6,36 +6,36 @@ import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
 
-beforeEach(() => {
-  initialRobotState = createRobotState({
-    sourcePlateType: 'trough-12row',
-    destPlateType: '96-flat',
-    fillTiprackTips: true,
-    fillPipetteTips: false,
-    tipracks: [200, 200]
-  })
+describe('blowout', () => {
+  let initialRobotState
+  let robotStateWithTip
 
-  robotStateWithTip = {
-    ...initialRobotState,
-    tipState: {
-      ...initialRobotState.tipState,
-      pipettes: {
-        ...initialRobotState.tipState.pipettes,
-        p300SingleId: true
+  beforeEach(() => {
+    initialRobotState = createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      fillTiprackTips: true,
+      fillPipetteTips: false,
+      tipracks: [200, 200]
+    })
+
+    robotStateWithTip = {
+      ...initialRobotState,
+      tipState: {
+        ...initialRobotState.tipState,
+        pipettes: {
+          ...initialRobotState.tipState.pipettes,
+          p300SingleId: true
+        }
       }
     }
-  }
 
-  // $FlowFixMe: mock methods
-  updateLiquidState.mockClear()
-  // $FlowFixMe: mock methods
-  updateLiquidState.mockReturnValue(initialRobotState.liquidState)
-})
+    // $FlowFixMe: mock methods
+    updateLiquidState.mockClear()
+    // $FlowFixMe: mock methods
+    updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+  })
 
-let initialRobotState
-let robotStateWithTip
-
-describe('blowout', () => {
   test('blowout with tip', () => {
     const result = blowout({
       pipette: 'p300SingleId',
