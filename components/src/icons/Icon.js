@@ -21,7 +21,9 @@ export type IconProps = {
   /** height as a number or string (for nesting inside another SVG) */
   width?: number | string,
   /** inline style passed into the icon svg */
-  style?: {[string]: string}
+  style?: {[string]: string},
+  /** optional children */
+  children?: React.Node,
 }
 
 /**
@@ -49,6 +51,7 @@ export default function Icon (props: IconProps) {
       {...{x, y, height, width, style}}
     >
       <path fillRule='evenodd' d={path} />
+      {props.children}
     </svg>
   )
 }

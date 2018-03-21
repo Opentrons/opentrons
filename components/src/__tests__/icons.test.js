@@ -94,7 +94,7 @@ describe('Notification Icon', () => {
   test('NotificationIcon renders correctly', () => {
     const tree = Renderer.create(
       <NotificationIcon
-        parentName={FLASK}
+        name={FLASK}
         className='foo'
         childName={CIRCLE}
         childClassName={'bar'}
