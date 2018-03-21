@@ -11,6 +11,7 @@ import {
 } from '@opentrons/components'
 
 import type {Mount, Instrument} from '../../robot'
+import styles from './styles.css'
 
 type Props = {
   isRunning: boolean,
@@ -45,9 +46,11 @@ export default function InstrumentListItem (props: Props) {
       confirmed={confirmed}
       iconName={iconName}
     >
-      <span>{capitalize(mount)}</span>
-      <span>{description}</span>
-      <span>{name}</span>
+      <div className={styles.item_info}>
+        <span>{capitalize(mount)}</span>
+        <span>{description}</span>
+        <span>{name}</span>
+      </div>
     </ListItem>
   )
 }
