@@ -1,26 +1,21 @@
 // @flow
 import * as React from 'react'
 
-import Icon from './Icon'
-import cx from 'classnames'
+import Icon, {type IconProps} from './Icon'
+import iconData, {type IconName} from './icon-data'
 
-import {type IconName} from './icon-data'
-import styles from './icons.css'
-
-type Props = {
-  /** name constant of the main icon to display */
-  parentName: IconName,
-  /** classes to apply to main icon */
-  className?: string,
-  /** name constant of the secondary notifcation icon to display */
-  childName: IconName,
-  /** classes to apply to notification icon.
-  * Position, color, size, and toggle visibility with notificationClassName. */
+type Props = IconProps & {
+  /** name constant of the optional notifcation icon to display */
+  childName: ?IconName,
+  /** classes to apply (e.g. for color) to notification icon */
   childClassName?: string
 }
 
+const SCALE_FACTOR = 3
+
 /**
- * Inline SVG icon component with additional nested notification icon
+ * Inline SVG icon component with additional nested notification icon. Takes
+ * all the same props as Icon in addition to the ones listed above.
  *
  * If you need access to the IconName type, you can:
  * ```js
@@ -29,16 +24,24 @@ type Props = {
  */
 
 export default function NotificationIcon (props: Props) {
+  const {name, childName} = props
+  const {viewBox} = iconData[name]
+  const [x, y, width, height] = viewBox.split(' ').map(Number)
+  const scaledWidth = width / SCALE_FACTOR
+  const scaledHeight = height / SCALE_FACTOR
+
   return (
-    <div className={styles.icon_wrapper}>
-      <Icon
-        name={props.parentName}
-        className={props.className}
-      />
-      <Icon
-        name={props.childName}
-        className={cx(styles.child_icon, props.childClassName)}
-      />
-    </div>
+    <Icon {...props}>
+      {childName && (
+        <Icon
+          name={childName}
+          className={props.childClassName}
+          x={x + (SCALE_FACTOR - 1) * scaledWidth}
+          y={y + (SCALE_FACTOR - 1) * scaledHeight}
+          width={scaledWidth}
+          height={scaledHeight}
+        />
+      )}
+    </Icon>
   )
 }

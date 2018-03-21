@@ -98,9 +98,6 @@ exports[`ListItem renders ListItem with icon correctly 1`] = `
       fillRule="evenodd"
     />
   </svg>
-  <span
-    className="info"
-  />
 </li>
 `;
 
@@ -108,11 +105,7 @@ exports[`ListItem renders ListItem without icon correctly 1`] = `
 <li
   className="list_item disabled"
   onClick={undefined}
->
-  <span
-    className="info"
-  />
-</li>
+/>
 `;
 
 exports[`TitledList renders TitledList with children correctly 1`] = `

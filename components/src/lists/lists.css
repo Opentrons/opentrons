@@ -61,7 +61,9 @@
 .list_item {
   @apply --font-body-1-dark;
 
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
   line-height: 1.25;
   margin: 0;
@@ -71,6 +73,10 @@
   &.active {
     background-color: var(--c-bg-selected-light);
   }
+}
+
+a.list_item {
+  text-decoration: none;
 }
 
 .list_alert {
@@ -83,17 +89,9 @@
 }
 
 .item_icon {
+  flex: none;
   height: calc(1.25 * var(--fs-body-1));
-  padding-right: 0.5rem;
-}
-
-.info {
-  width: calc(100% - 2rem);
-  display: inline-flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  vertical-align: top;
+  margin-right: 0.5rem;
 }
 
 .disabled {
