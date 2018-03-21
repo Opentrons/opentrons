@@ -42,12 +42,6 @@ export default function ListItem (props: ListItemProps) {
     <Icon className={styles.item_icon} name={iconName} />
   )
 
-  const children = (
-    <span className={styles.info}>
-      {props.children}
-    </span>
-  )
-
   if (url) {
     return (
       <li>
@@ -59,7 +53,7 @@ export default function ListItem (props: ListItemProps) {
           activeClassName={activeClassName}
         >
           {itemIcon}
-          {children}
+          {props.children}
         </NavLink>
       </li>
     )
@@ -68,7 +62,7 @@ export default function ListItem (props: ListItemProps) {
   return (
     <li onClick={onClick} className={className}>
       {itemIcon}
-      {children}
+      {props.children}
     </li>
   )
 }

@@ -104,7 +104,7 @@ module.exports = {
         color: '#4a4a4a'
       },
       '@global .orange': {
-        color: 'orange'
+        color: '#f5a623'
       }
     }
   }
