@@ -8,8 +8,33 @@ import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
 
+let initialRobotState
+let robotStateWithTip
+
 beforeEach(() => {
-  jest.resetAllMocks()
+  initialRobotState = createRobotState({
+    sourcePlateType: 'trough-12row',
+    destPlateType: '96-flat',
+    fillTiprackTips: true,
+    fillPipetteTips: false,
+    tipracks: [200, 200]
+  })
+
+  robotStateWithTip = {
+    ...initialRobotState,
+    tipState: {
+      ...initialRobotState.tipState,
+      pipettes: {
+        ...initialRobotState.tipState.pipettes,
+        p300SingleId: true
+      }
+    }
+  }
+
+  // $FlowFixMe: mock methods
+  updateLiquidState.mockClear()
+  // $FlowFixMe: mock methods
+  updateLiquidState.mockReturnValue(initialRobotState.liquidState)
 })
 
 function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) {
@@ -89,18 +114,16 @@ describe('liquid tracking', () => {
 
     dropTip('p300MultiId')(initialRobotState)
 
-    expect(updateLiquidState).toHaveBeenCalledTimes(1)
-
-    // trickery for Flow -- there's no .mock on updateLiquidState fn
-    const mockCalls: any = updateLiquidState
-    const updateArgs: Array<mixed> = mockCalls.mock.calls[0]
-
-    expect(updateArgs[0]).toMatchObject({
-      pipetteId: 'p300MultiId',
-      labwareId: 'trashId',
-      volume: 300, // pipette's max vol
-      well: 'A1'
-    })
-    expect(updateArgs[1]).toEqual(initialRobotState.liquidState)
+    expect(updateLiquidState).toHaveBeenCalledWith(
+      {
+        pipetteId: 'p300MultiId',
+        labwareId: 'trashId',
+        volume: 300, // pipette's max vol
+        well: 'A1',
+        labwareType: 'fixed-trash',
+        pipetteData: robotStateWithTip.instruments.p300MultiId
+      },
+      robotStateWithTip.liquidState
+    )
   })
 })
