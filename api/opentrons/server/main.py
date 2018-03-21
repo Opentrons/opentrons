@@ -101,9 +101,9 @@ def init(loop=None):
     server.app.router.add_get(
         '/pipettes', control.get_attached_pipettes)
     server.app.router.add_get(
-        '/robot/axes/engaged', control.get_engaged_axes)
+        '/motors/engaged', control.get_engaged_axes)
     server.app.router.add_post(
-        '/robot/axes/disengage', control.disengage_axes)
+        '/motors/disengage', control.disengage_axes)
     return server.app
 
 

@@ -398,6 +398,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes.upper()) & set(AXES))
         if axes:
+            log.debug("Disengaging axes: {}".format(axes))
             self._send_command(GCODES['DISENGAGE_MOTOR'] + axes)
             for axis in axes:
                 self.engaged_axes[axis] = False

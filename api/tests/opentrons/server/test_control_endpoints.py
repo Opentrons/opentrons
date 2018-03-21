@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from opentrons import robot
 from opentrons.server.main import init
 from opentrons.drivers.smoothie_drivers import driver_3_0
@@ -60,22 +61,30 @@ async def test_disengage_axes(
         driver_3_0.SmoothieDriver_3_0_0, '_send_command', mock_send)
 
     alltrue = {
-        "X": True, "Y": True, "Z": True, "A": True, "B": True, "C": True}
-    res0 = await cli.get('/robot/axes/engaged')
+        "x": {"enabled": True},
+        "y": {"enabled": True},
+        "z": {"enabled": True},
+        "a": {"enabled": True},
+        "b": {"enabled": True},
+        "c": {"enabled": True}}
+    res0 = await cli.get('/motors/engaged')
     result0 = await res0.text()
     assert res0.status == 200
     assert json.loads(result0) == alltrue
-    postres = await cli.post('/robot/axes/disengage', json={'axes': 'XB'})
+
+    postres = await cli.post('/motors/disengage', json={'axes': ['X', 'B']})
     assert postres.status == 200
-    xbfalse = {
-        "X": False, "Y": True, "Z": True, "A": True, "B": False, "C": True}
-    res1 = await cli.get('/robot/axes/engaged')
+
+    xbfalse = deepcopy(alltrue)
+    xbfalse["x"]["enabled"] = False
+    xbfalse["b"]["enabled"] = False
+    res1 = await cli.get('/motors/engaged')
     result1 = await res1.text()
     assert res1.status == 200
     assert json.loads(result1) == xbfalse
 
     robot.home()
-    res2 = await cli.get('/robot/axes/engaged')
+    res2 = await cli.get('/motors/engaged')
     result2 = await res2.text()
     assert res2.status == 200
     assert json.loads(result2) == alltrue
