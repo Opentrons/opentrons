@@ -8,11 +8,11 @@ import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
-import {END_STEP} from './types'
 import type {
   FormData,
   StepItemData,
   StepIdType,
+  EndStepId,
   StepSubItemData,
   FormSectionState,
   FormModalFields
@@ -48,6 +48,7 @@ import {
   saveStepForm,
   changeFormInput,
   expandAddStepButton,
+  hoverOnStep,
   toggleStepCollapsed
 } from './actions'
 
@@ -155,7 +156,7 @@ const orderedSteps = handleActions({
     state.filter(stepId => stepId !== action.payload)
 }, [INITIAL_DECK_SETUP_ID])
 
-type SelectedStepState = null | StepIdType
+type SelectedStepState = null | StepIdType | EndStepId
 
 const selectedStep = handleActions({
   SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
@@ -165,7 +166,7 @@ const selectedStep = handleActions({
 type HoveredStepState = SelectedStepState
 
 const hoveredStep = handleActions({
-  HOVER_ON_STEP: (state: HoveredStepState, action) => action.payload
+  HOVER_ON_STEP: (state: HoveredStepState, action: ActionType<typeof hoverOnStep>) => action.payload
 }, null)
 
 type StepCreationButtonExpandedState = boolean
@@ -299,7 +300,7 @@ const selectedStepSelector = createSelector(
   (allSteps, selectedStepId) => {
     const stepId = selectedStepId
 
-    if (!allSteps || stepId === null) {
+    if (!allSteps || stepId === null || stepId === '__end__') {
       return null
     }
 
@@ -310,7 +311,7 @@ const selectedStepSelector = createSelector(
 const deckSetupMode = createSelector(
   (state: BaseState) => rootSelector(state).steps,
   (state: BaseState) => rootSelector(state).selectedStep,
-  (steps, selectedStep) => (selectedStep !== null && steps[selectedStep])
+  (steps, selectedStep) => (typeof selectedStep === 'number' && steps[selectedStep])
     ? steps[selectedStep].stepType === 'deck-setup'
     : false
 )
@@ -336,7 +337,7 @@ export const selectors = {
         return false
       }
 
-      if (selectedStepId === END_STEP || steps[selectedStepId].stepType === 'deck-setup') {
+      if (selectedStepId === '__end__' || steps[selectedStepId].stepType === 'deck-setup') {
         // End step has no stepType
         // Deck Setup step has no form data
         return false
@@ -372,7 +373,7 @@ export const selectors = {
     selectedStepId,
     allSteps,
     (formData, selectedStepId, allSteps): boolean | null =>
-      ((selectedStepId !== null) && allSteps[selectedStepId] && formData)
+      ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
         ? !formHasErrors(
           validateAndProcessForm(formData)
         )

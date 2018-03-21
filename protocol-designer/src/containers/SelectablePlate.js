@@ -35,8 +35,16 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
-  const prevStepId = stepId === null ? 0 : Math.max(stepId - 1, 0)
   const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
+
+  let prevStepId = 0 // initial liquid state if stepId is null
+  if (stepId === '__end__') {
+    // last liquid state
+    prevStepId = allWellContentsForSteps.length - 1
+  }
+  if (typeof stepId === 'number') {
+    prevStepId = Math.max(stepId - 1, 0)
+  }
 
   const wellContents = allWellContentsForSteps[prevStepId]
     ? allWellContentsForSteps[prevStepId][containerId]

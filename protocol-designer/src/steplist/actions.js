@@ -2,7 +2,6 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-import {END_STEP} from './types'
 import type {StepType, StepIdType, FormSectionNames, FormModalFields, EndStepId} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 
@@ -93,25 +92,20 @@ export const toggleStepCollapsed = (payload: StepIdType): ToggleStepCollapsedAct
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',
-  payload: StepIdType
+  payload: StepIdType | EndStepId
 }
 
 export const selectStep = (stepId: StepIdType | EndStepId): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const selectStepAction = {
+    const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
       payload: stepId
     }
 
-    if (typeof stepId !== 'number') {
+    if (stepId === '__end__') {
       // End step has no form
       dispatch(cancelStepForm())
       dispatch(selectStepAction)
-
-      if (stepId !== END_STEP) {
-        // TODO Ian 2018-03-21 candidate for an assert
-        console.warn(`selectStep got non-number stepId "${stepId}", expected "${END_STEP}" or number`)
-      }
 
       return
     }
@@ -133,7 +127,7 @@ export const selectStep = (stepId: StepIdType | EndStepId): ThunkAction<*> =>
     }
   }
 
-export const hoverOnStep = (stepId: StepIdType | typeof END_STEP | null) => ({
+export const hoverOnStep = (stepId: StepIdType | '__end__' | null): * => ({
   type: 'HOVER_ON_STEP',
   payload: stepId
 })
