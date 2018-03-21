@@ -10,9 +10,9 @@ type SidePanelProps= {
   title: string,
   children: React.Node,
   isClosed?: boolean,
-  onCloseClick?: (event: SyntheticEvent<>) => void,
-  onMouseEnter?: (event: SyntheticEvent<>) => mixed,
-  onMouseLeave?: (event: SyntheticEvent<>) => mixed,
+  onCloseClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
 }
 
 export default function SidePanel (props: SidePanelProps) {
