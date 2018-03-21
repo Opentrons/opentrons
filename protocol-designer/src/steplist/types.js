@@ -17,6 +17,7 @@ export const stepIconsByType = {
 }
 
 export const END_STEP = '__end__' // Special ID of "End" pseudo-step
+export type EndStepId = '__end__'
 
 export type StepType = $Keys<typeof stepIconsByType>
 

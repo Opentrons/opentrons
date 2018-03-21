@@ -3,7 +3,7 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
 import {END_STEP} from './types'
-import type {StepType, StepIdType, FormSectionNames, FormModalFields} from './types'
+import type {StepType, StepIdType, FormSectionNames, FormModalFields, EndStepId} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 
 // Update Form input (onChange on inputs)
@@ -96,17 +96,24 @@ export type SelectStepAction = {
   payload: StepIdType
 }
 
-export const selectStep = (stepId: StepIdType | typeof END_STEP): ThunkAction<*> =>
+export const selectStep = (stepId: StepIdType | EndStepId): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const selectStepAction = {
       type: 'SELECT_STEP',
       payload: stepId
     }
 
-    if (stepId === END_STEP || typeof stepId !== 'number') { // type check is to appease flow
+    if (typeof stepId !== 'number') {
       // End step has no form
       dispatch(cancelStepForm())
       dispatch(selectStepAction)
+
+      if (stepId !== END_STEP) {
+        // TODO Ian 2018-03-21 candidate for an assert
+        console.warn(`selectStep got non-number stepId "${stepId}", expected "${END_STEP}" or number`)
+      }
+
+      return
     }
 
     const stepData = selectors.allSteps(getState())[stepId]
