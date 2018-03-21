@@ -39,6 +39,16 @@ describe('TitledList', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  test('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
+    function someFn () {}
+
+    const tree = Renderer.create(
+      <TitledList title='foo' onMouseEnter={someFn} onMouseLeave={someFn}/>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
   test('renders TitledList with optional icon correctly', () => {
     const tree = Renderer.create(
       <TitledList title='foo' icon={FLASK} />

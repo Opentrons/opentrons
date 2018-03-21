@@ -10,7 +10,9 @@ type SidePanelProps= {
   title: string,
   children: React.Node,
   isClosed?: boolean,
-  onCloseClick?: (event: SyntheticEvent<>) => void
+  onCloseClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
 }
 
 export default function SidePanel (props: SidePanelProps) {
@@ -26,7 +28,7 @@ export default function SidePanel (props: SidePanelProps) {
   const className = classnames(styles.panel, {[styles.closed]: !open})
 
   return (
-    <div className={className}>
+    <div className={className} onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
       <div className={styles.title_bar}>
         <h2 className={styles.title}>
           {props.title}

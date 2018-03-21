@@ -21,9 +21,13 @@ type ListProps = {
   /** component with descriptive text about the list */
   description?: React.Node,
   /** optional click action (on title div, not children) */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  /** optional mouseEnter action */
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  /** optional mouseLeave action */
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticEvent<>) => void,
+  onCollapseToggle?: (event: SyntheticMouseEvent<>) => void,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
   /** highlights the whole TitledList if true */
@@ -36,7 +40,7 @@ type ListProps = {
  * An ordered list with optional title, icon, and description.
  */
 export default function TitledList (props: ListProps) {
-  const {iconName, disabled, onCollapseToggle, iconProps} = props
+  const {iconName, disabled, onCollapseToggle, iconProps, onMouseEnter, onMouseLeave} = props
   const collapsible = onCollapseToggle != null
 
   const onClick = !disabled
@@ -45,7 +49,7 @@ export default function TitledList (props: ListProps) {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = e => {
+  const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
     if (onCollapseToggle && !disabled) {
       e.stopPropagation()
       onCollapseToggle(e)
@@ -65,7 +69,7 @@ export default function TitledList (props: ListProps) {
   })
 
   return (
-    <div className={className}>
+    <div className={className} {...{onMouseEnter, onMouseLeave}}>
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
           <Icon {...iconProps} className={styles.title_bar_icon} name={iconName} />

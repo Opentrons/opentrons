@@ -118,6 +118,8 @@ exports[`ListItem renders ListItem without icon correctly 1`] = `
 exports[`TitledList renders TitledList with children correctly 1`] = `
 <div
   className="titled_list"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"
@@ -139,9 +141,30 @@ exports[`TitledList renders TitledList with children correctly 1`] = `
 </div>
 `;
 
+exports[`TitledList renders TitledList with onMouseEnter & onMouseLeave correctly 1`] = `
+<div
+  className="titled_list"
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+>
+  <div
+    className="title_bar"
+    onClick={undefined}
+  >
+    <h3
+      className="title"
+    >
+      foo
+    </h3>
+  </div>
+</div>
+`;
+
 exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 <div
   className="titled_list"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"
@@ -159,6 +182,8 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
 exports[`TitledList renders TitledList without icon correctly 1`] = `
 <div
   className="titled_list"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"
@@ -176,6 +201,8 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
 exports[`TitledList renders collapsed TitledList correctly 1`] = `
 <div
   className="titled_list"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"
@@ -213,6 +240,8 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
 exports[`TitledList renders expanded TitledList correctly 1`] = `
 <div
   className="titled_list"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"

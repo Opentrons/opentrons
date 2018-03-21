@@ -29,6 +29,8 @@ exports[`NavButton renders nav button with icon correctly 1`] = `
 exports[`SidePanel renders SidePanel correctly 1`] = `
 <div
   className="panel closed"
+  onMouseEnter={undefined}
+  onMouseLeave={undefined}
 >
   <div
     className="title_bar"

@@ -117,6 +117,11 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
     }
   }
 
+export const hoverOnStep = (stepId: StepIdType | null) => ({
+  type: 'HOVER_ON_STEP',
+  payload: stepId
+})
+
 export type SaveStepFormAction = {
   type: 'SAVE_STEP_FORM',
   payload: {
