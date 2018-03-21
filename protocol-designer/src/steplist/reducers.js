@@ -8,6 +8,7 @@ import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
 import type {BaseState} from '../types'
+import {END_STEP} from './types'
 import type {
   FormData,
   StepItemData,
@@ -335,7 +336,8 @@ export const selectors = {
         return false
       }
 
-      if (steps[selectedStepId].stepType === 'deck-setup') {
+      if (selectedStepId === END_STEP || steps[selectedStepId].stepType === 'deck-setup') {
+        // End step has no stepType
         // Deck Setup step has no form data
         return false
       }

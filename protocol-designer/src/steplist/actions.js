@@ -2,6 +2,7 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
+import {END_STEP} from './types'
 import type {StepType, StepIdType, FormSectionNames, FormModalFields} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 
@@ -95,15 +96,23 @@ export type SelectStepAction = {
   payload: StepIdType
 }
 
-export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
+export const selectStep = (stepId: StepIdType | typeof END_STEP): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
+    const selectStepAction = {
+      type: 'SELECT_STEP',
+      payload: stepId
+    }
+
+    if (stepId === END_STEP || typeof stepId !== 'number') { // type check is to appease flow
+      // End step has no form
+      dispatch(cancelStepForm())
+      dispatch(selectStepAction)
+    }
+
     const stepData = selectors.allSteps(getState())[stepId]
     const stepType = stepData && stepData.stepType
 
-    dispatch({
-      type: 'SELECT_STEP',
-      payload: stepId
-    })
+    dispatch(selectStepAction)
 
     // 'deck-setup' steps don't use a Step Form, all others do
     if (stepType === 'deck-setup') {
@@ -117,7 +126,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
     }
   }
 
-export const hoverOnStep = (stepId: StepIdType | null) => ({
+export const hoverOnStep = (stepId: StepIdType | typeof END_STEP | null) => ({
   type: 'HOVER_ON_STEP',
   payload: stepId
 })

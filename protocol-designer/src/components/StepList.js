@@ -2,21 +2,23 @@
 import * as React from 'react'
 import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
-import {SidePanel} from '@opentrons/components'
+import {SidePanel, TitledList} from '@opentrons/components'
 
-import type {StepItemData, StepSubItemData} from '../steplist/types'
+import {END_STEP, type StepItemData, type StepSubItemData, type StepIdType} from '../steplist/types'
 import StepItem from '../components/StepItem'
 import TransferishSubstep from '../components/TransferishSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
 
 // import styles from '../components/StepItem.css' // TODO: Ian 2018-01-11 This is just for "Labware & Ingredient Setup" right now, can remove later
 
+type StepIdTypeWithEnd = StepIdType | typeof END_STEP
+
 type StepListProps = {
-  selectedStepId?: number,
+  selectedStepId?: StepIdTypeWithEnd,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
-  handleStepItemClickById?: number => (event?: SyntheticEvent<>) => void,
-  handleStepItemCollapseToggleById?: number => (event?: SyntheticEvent<>) => void,
-  handleStepHoverById?: (number | null) => (event?: SyntheticEvent<>) => mixed
+  handleStepItemClickById?: StepIdTypeWithEnd => (event?: SyntheticEvent<>) => mixed,
+  handleStepItemCollapseToggleById?: StepIdTypeWithEnd => (event?: SyntheticEvent<>) => mixed,
+  handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed
 }
 
 function generateSubsteps (substeps) {
@@ -79,7 +81,11 @@ export default function StepList (props: StepListProps) {
           {generateSubsteps(step.substeps)}
         </StepItem>
       ))}
-
+      <TitledList title='END' iconName='check'
+        onClick={props.handleStepItemClickById && props.handleStepItemClickById(END_STEP)}
+        onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(END_STEP)}
+        selected={props.selectedStepId === END_STEP}
+      />
       <StepCreationButton />
     </SidePanel>
   )
