@@ -8,6 +8,7 @@ import {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
+  getAnyRobotUpdateAvailable,
   restartRobotServer,
   reducer
 } from '..'
@@ -72,6 +73,21 @@ describe('server API client', () => {
         .toBe(state.api.server[robot.name].restart)
       expect(getRestartRequest(state, {name: 'foo'}))
         .toEqual({inProgress: false})
+    })
+
+    test('getAnyRobotUpdateAvailable is true if any robot has update', () => {
+      state.api.server.anotherBot = {availableUpdate: null}
+      expect(getAnyRobotUpdateAvailable(state)).toBe(true)
+
+      state = {
+        api: {
+          server: {
+            ...state.api.server,
+            [robot.name]: {availableUpdate: null}
+          }
+        }
+      }
+      expect(getAnyRobotUpdateAvailable(state)).toBe(false)
     })
   })
 
