@@ -150,8 +150,6 @@ exports[`TitledList renders TitledList with onMouseEnter & onMouseLeave correctl
   <div
     className="title_bar"
     onClick={undefined}
-    onMouseEnter={undefined}
-    onMouseLeave={undefined}
   >
     <h3
       className="title"
