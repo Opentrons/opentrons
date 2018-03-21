@@ -23,20 +23,13 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  dispatch: Dispatch
+  onScanClick: () => mixed
 }
 
-type Props = {
-  ...StateProps,
-  onScanClick: () => mixed,
-  robots: Array<Robot & {
-    onConnectClick: () => mixed,
-    onDisconnectClick: () => mixed,
-  }>,
-}
+type Props = StateProps & DispatchProps
 
 export default withRouter(
-  connect(mapStateToProps, null, mergeProps)(ConnectPanel)
+  connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
 )
 
 function ConnectPanel (props: Props) {
@@ -64,21 +57,8 @@ function mapStateToProps (state: State): StateProps {
   }
 }
 
-function mergeProps (
-  stateProps: StateProps,
-  dispatchProps: DispatchProps
-): Props {
-  const {found, isScanning} = stateProps
-  const {dispatch} = dispatchProps
-
-  // TODO(mc, 2017-11-13): memoize with reselect
-  const robots = stateProps.robots.map((robot) => ({
-    ...robot,
-    onConnectClick: () => dispatch(robotActions.connect(robot.name)),
-    onDisconnectClick: () => dispatch(robotActions.disconnect())
-  }))
-
-  const onScanClick = () => dispatch(robotActions.discover())
-
-  return {found, isScanning, robots, onScanClick}
+function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
+  return {
+    onScanClick: () => dispatch(robotActions.discover())
+  }
 }
