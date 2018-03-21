@@ -1,5 +1,4 @@
 // @flow
-import omit from 'lodash/omit'
 import blowout from '../blowout'
 import {createRobotState} from './fixtures'
 
@@ -8,11 +7,7 @@ import updateLiquidState from '../dispenseUpdateLiquidState'
 jest.mock('../dispenseUpdateLiquidState')
 
 beforeEach(() => {
-  jest.resetAllMocks()
-})
-
-describe('blowout', () => {
-  const initialRobotState = createRobotState({
+  initialRobotState = createRobotState({
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
     fillTiprackTips: true,
@@ -20,7 +15,7 @@ describe('blowout', () => {
     tipracks: [200, 200]
   })
 
-  const robotStateWithTip = {
+  robotStateWithTip = {
     ...initialRobotState,
     tipState: {
       ...initialRobotState.tipState,
@@ -31,6 +26,16 @@ describe('blowout', () => {
     }
   }
 
+  // $FlowFixMe: mock methods
+  updateLiquidState.mockClear()
+  // $FlowFixMe: mock methods
+  updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+})
+
+let initialRobotState
+let robotStateWithTip
+
+describe('blowout', () => {
   test('blowout with tip', () => {
     const result = blowout({
       pipette: 'p300SingleId',
@@ -45,7 +50,7 @@ describe('blowout', () => {
       well: 'A1'
     }])
 
-    expect(result.robotState).toMatchObject(omit(robotStateWithTip, 'liquidState'))
+    expect(result.robotState).toEqual(robotStateWithTip)
   })
 
   test('blowout with invalid pipette ID should throw error', () => {
@@ -72,18 +77,14 @@ describe('blowout', () => {
         well: 'A1'
       })(robotStateWithTip)
 
-      expect(updateLiquidState).toHaveBeenCalledTimes(1)
-      // trickery for Flow -- there's no .mock on updateLiquidState fn
-      const mockCalls: any = updateLiquidState
-      const updateArgs: Array<mixed> = mockCalls.mock.calls[0]
-
-      expect(updateArgs[0]).toMatchObject({
+      expect(updateLiquidState).toHaveBeenCalledWith({
         pipetteId: 'p300SingleId',
         labwareId: 'sourcePlateId',
         volume: 300, // pipette's max vol
-        well: 'A1'
-      })
-      expect(updateArgs[1]).toEqual(robotStateWithTip.liquidState)
+        well: 'A1',
+        labwareType: 'trough-12row',
+        pipetteData: robotStateWithTip.instruments.p300SingleId
+      }, robotStateWithTip.liquidState)
     })
   })
 })
