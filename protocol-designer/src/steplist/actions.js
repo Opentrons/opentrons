@@ -127,7 +127,7 @@ export const selectStep = (stepId: StepIdType | EndStepId): ThunkAction<*> =>
     }
   }
 
-export const hoverOnStep = (stepId: StepIdType | '__end__' | null): * => ({
+export const hoverOnStep = (stepId: StepIdType | EndStepId | null): * => ({
   type: 'HOVER_ON_STEP',
   payload: stepId
 })

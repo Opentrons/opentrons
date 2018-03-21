@@ -8,6 +8,7 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileSelectors} from '../file-data'
 import { preselectWells, selectWells } from '../labware-ingred/actions'
 import type {BaseState} from '../types'
+import {END_STEP} from '../steplist/types'
 
 type OwnProps = {
   containerId?: string,
@@ -38,7 +39,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
 
   let prevStepId = 0 // initial liquid state if stepId is null
-  if (stepId === '__end__') {
+  if (stepId === END_STEP) {
     // last liquid state
     prevStepId = allWellContentsForSteps.length - 1
   }
