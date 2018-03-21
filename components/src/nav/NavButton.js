@@ -4,7 +4,8 @@ import {NavLink} from 'react-router-dom'
 import classnames from 'classnames'
 
 import styles from './navbar.css'
-import {type IconName, Icon} from '../icons'
+import {Button} from '../buttons'
+import {NotificationIcon, CIRCLE, type IconName} from '../icons'
 
 type NavButtonProps= {
   /** optional click event for nav button */
@@ -20,38 +21,48 @@ type NavButtonProps= {
   /** optional title to display below the icon */
   title?: string,
   /** Icon name for button's icon */
-  iconName: IconName
+  iconName: IconName,
+  /** Display a notification dot */
+  notification?: boolean,
 }
 
 export default function NavButton (props: NavButtonProps) {
+  const {url} = props
   const className = classnames(
     styles.button,
     {[styles.disabled]: props.disabled},
     {[styles.bottom]: props.isBottom},
     props.className
   )
-  if (props.url) {
-    return (
-      <NavLink
-        className={className}
-        disabled={props.disabled}
-        onClick={props.onClick}
-        to={props.url}
-        activeClassName={styles.active}
-      >
-        <Icon name={props.iconName} className={styles.icon} />
-        {props.title && (<span className={styles.title}>{props.title}</span>)}
-      </NavLink>
-    )
+
+  let buttonProps = {
+    className: className,
+    disabled: props.disabled,
+    onClick: props.onClick
   }
+
+  if (url) {
+    buttonProps = {
+      ...buttonProps,
+      Component: NavLink,
+      to: url,
+      activeClassName: styles.active
+    }
+  }
+
   return (
-    <button
-      className={className}
-      disabled={props.disabled}
-      onClick={props.onClick}
-    >
-      <Icon name={props.iconName} className={styles.icon} />
-      {props.title && (<span className={styles.title}>{props.title}</span>)}
-    </button>
+    <Button {...buttonProps}>
+      <NotificationIcon
+        name={props.iconName}
+        childName={props.notification ? CIRCLE : null}
+        className={styles.icon}
+        childClassName={styles.notification}
+      />
+      {props.title && (
+        <span className={styles.title}>
+          {props.title}
+        </span>
+      )}
+    </Button>
   )
 }
