@@ -36,18 +36,20 @@ export default function LabwareListItem (props: Props) {
       onClick={onClick}
       iconName={iconName}
     >
-      <span>Slot {slot}</span>
-      {isTiprack && (
-        <span>
-          <span className={styles.tiprack_item_mount}>
-            {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
+      <div className={styles.item_info}>
+        <span>Slot {slot}</span>
+        {isTiprack && (
+          <span>
+            <span className={styles.tiprack_item_mount}>
+              {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
+            </span>
+            Tiprack
           </span>
-          Tiprack
+        )}
+        <span>
+          {type}
         </span>
-      )}
-      <span>
-        {type}
-      </span>
+      </div>
     </ListItem>
   )
 }

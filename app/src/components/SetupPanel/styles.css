@@ -11,25 +11,8 @@
   padding-right: 0.75rem;
 }
 
-.run_message {
-  margin: 1rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-}
-
-.run_message_item {
-  margin-bottom: 0.5rem;
-}
-
-.run_message_item:last-child {
-  margin-bottom: 0;
-}
-
-.button_run {
-  margin: 1rem;
-  width: calc(100% - 2rem);
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.item_info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
 }
