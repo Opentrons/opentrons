@@ -79,9 +79,9 @@ def test_disable_motor(smoothie, monkeypatch):
                         write_with_log)
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
-    smoothie._disengage_axis('X')
-    smoothie._disengage_axis('XYZ')
-    smoothie._disengage_axis('ABCD')
+    smoothie.disengage_axis('X')
+    smoothie.disengage_axis('XYZ')
+    smoothie.disengage_axis('ABCD')
     expected = [
         ['M18X M400'],
         ['M18[XYZ]+ M400'],

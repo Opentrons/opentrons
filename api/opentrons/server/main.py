@@ -74,20 +74,36 @@ def init(loop=None):
     routes for methods defined in opentrons.server.endpoints
     """
     server = Server(MainRouter(), loop=loop)
-    server.app.router.add_get('/health', endp.health)
-    server.app.router.add_get('/wifi/list', wifi.list_networks)
-    server.app.router.add_post('/wifi/configure', wifi.configure)
-    server.app.router.add_get('/wifi/status', wifi.status)
-    server.app.router.add_post('/identify', control.identify)
-    server.app.router.add_post('/lights/on', control.turn_on_rail_lights)
-    server.app.router.add_post('/lights/off', control.turn_off_rail_lights)
-    server.app.router.add_post('/server/update', update.install_api)
+    server.app.router.add_get(
+        '/health', endp.health)
+    server.app.router.add_get(
+        '/wifi/list', wifi.list_networks)
+    server.app.router.add_post(
+        '/wifi/configure', wifi.configure)
+    server.app.router.add_get(
+        '/wifi/status', wifi.status)
+    server.app.router.add_post(
+        '/identify', control.identify)
+    server.app.router.add_post(
+        '/lights/on', control.turn_on_rail_lights)
+    server.app.router.add_post(
+        '/lights/off', control.turn_off_rail_lights)
+    server.app.router.add_post(
+        '/server/update', update.install_api)
     server.app.router.add_post(
         '/server/update_firmware', update.update_firmware)
-    server.app.router.add_post('/server/restart', control.restart)
-    server.app.router.add_get('/calibration/deck', dc_endp.start)
-    server.app.router.add_post('/calibration/deck', dc_endp.dispatch)
-    server.app.router.add_get('/pipettes', control.get_attached_pipettes)
+    server.app.router.add_post(
+        '/server/restart', control.restart)
+    server.app.router.add_get(
+        '/calibration/deck', dc_endp.start)
+    server.app.router.add_post(
+        '/calibration/deck', dc_endp.dispatch)
+    server.app.router.add_get(
+        '/pipettes', control.get_attached_pipettes)
+    server.app.router.add_get(
+        '/motors/engaged', control.get_engaged_axes)
+    server.app.router.add_post(
+        '/motors/disengage', control.disengage_axes)
     return server.app
 
 
