@@ -2,8 +2,7 @@
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {computeWellAccess} from '@opentrons/labware-definitions'
-import {splitLiquid, mergeLiquid} from './utils'
+import {splitLiquid, mergeLiquid, getWellsForTips} from './utils'
 import type {RobotState, PipetteData} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
@@ -36,19 +35,20 @@ export default function updateLiquidState (
       )
   )
 
-  const wellsForTips = (pipetteData.channels === 1)
-    ? [well]
-    : computeWellAccess(labwareType, well)
-
-  // TODO Ian 2018-03-16: duplicated in aspirate.js. Candidate for a util
-  if (!wellsForTips) {
-    throw new Error(pipetteData.channels === 1
-      ? `Invalid well: ${well}`
-      : `Labware id "${labwareId}", type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
-    )
-  }
-  // TODO Also duplicated:
-  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
+  const {wellsForTips, allWellsShared} = getWellsForTips(pipetteData.channels, labwareType, well)
+  // const wellsForTips = (pipetteData.channels === 1)
+  //   ? [well]
+  //   : computeWellAccess(labwareType, well)
+  //
+  // // TODO Ian 2018-03-16: duplicated in aspirate.js. Candidate for a util
+  // if (!wellsForTips) {
+  //   throw new Error(pipetteData.channels === 1
+  //     ? `Invalid well: ${well}`
+  //     : `Labware id "${labwareId}", type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
+  //   )
+  // }
+  // // TODO Also duplicated:
+  // const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
 
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared

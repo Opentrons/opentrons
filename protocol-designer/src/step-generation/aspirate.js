@@ -1,6 +1,4 @@
 // @flow
-// import cloneDeep from 'lodash/cloneDeep'
-import {computeWellAccess} from '@opentrons/labware-definitions'
 import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
 import updateLiquidState from './aspirateUpdateLiquidState'
 
@@ -29,19 +27,6 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     labware,
     well
   }]
-
-  const labwareType = prevRobotState.labware[labware].type
-
-  const wellsForTips = (pipetteData.channels === 1)
-    ? [well]
-    : computeWellAccess(labwareType, well)
-
-  if (!wellsForTips) {
-    throw new Error(pipetteData.channels === 1
-      ? `Invalid well: ${well}`
-      : `Labware id "${labware}", type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
-    )
-  }
 
   const robotState = {
     ...prevRobotState,
