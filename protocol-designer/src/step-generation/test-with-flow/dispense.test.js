@@ -36,15 +36,6 @@ describe('dispense', () => {
   })
 
   describe('tip tracking & commands:', () => {
-    beforeEach(() => {
-      // updateLiquidState acts as pass-thru for non-liquid-tracking tests
-
-      // $FlowFixMe: mock methods
-      // _updateLiquidState.mockClear()
-      // $FlowFixMe: mock methods
-      // _updateLiquidState.mockReturnValue(initialRobotState.liquidState)
-    })
-
     test('dispense with tip', () => {
       const result = dispense({
         pipette: 'p300SingleId',
@@ -78,8 +69,14 @@ describe('dispense', () => {
   })
 
   describe('liquid tracking', () => {
+    const mockLiquidReturnValue = 'expected liquid state'
+    beforeEach(() => {
+      // $FlowFixMe
+      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+    })
+
     test('dispense calls dispenseUpdateLiquidState with specified volume of pipette', () => {
-      dispense({
+      const result = dispense({
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
@@ -97,6 +94,8 @@ describe('dispense', () => {
         },
         robotStateWithTip.liquidState
       )
+
+      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })

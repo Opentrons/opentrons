@@ -70,8 +70,14 @@ describe('blowout', () => {
   })
 
   describe('liquid tracking', () => {
+    const mockLiquidReturnValue = 'expected liquid state'
+    beforeEach(() => {
+      // $FlowFixMe
+      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+    })
+
     test('blowout calls dispenseUpdateLiquidState with max volume of pipette', () => {
-      blowout({
+      const result = blowout({
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1'
@@ -85,6 +91,8 @@ describe('blowout', () => {
         labwareType: 'trough-12row',
         pipetteData: robotStateWithTip.instruments.p300SingleId
       }, robotStateWithTip.liquidState)
+
+      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })

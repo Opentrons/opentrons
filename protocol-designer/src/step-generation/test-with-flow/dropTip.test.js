@@ -1,6 +1,5 @@
 // @flow
 import merge from 'lodash/merge'
-import omit from 'lodash/omit'
 import {createRobotState} from './fixtures'
 import dropTip from '../dropTip'
 
@@ -68,11 +67,8 @@ describe('dropTip', () => {
         labware: 'trashId',
         well: 'A1'
       }])
-      expect(result.robotState).toMatchObject(
-        omit(
-          makeRobotState({singleHasTips: false, multiHasTips: true}),
-          'liquidState'
-        )
+      expect(result.robotState).toEqual(
+        makeRobotState({singleHasTips: false, multiHasTips: true})
       )
     })
 
@@ -93,11 +89,8 @@ describe('dropTip', () => {
         labware: 'trashId',
         well: 'A1'
       }])
-      expect(result.robotState).toMatchObject(
-        omit(
-          makeRobotState({singleHasTips: true, multiHasTips: false}),
-          'liquidState'
-        )
+      expect(result.robotState).toEqual(
+        makeRobotState({singleHasTips: true, multiHasTips: false})
       )
     })
 
@@ -110,10 +103,16 @@ describe('dropTip', () => {
   })
 
   describe('liquid tracking', () => {
+    const mockLiquidReturnValue = 'expected liquid state'
+    beforeEach(() => {
+      // $FlowFixMe
+      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+    })
+
     test('dropTip calls dispenseUpdateLiquidState with the max volume of the pipette', () => {
       const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: true})
 
-      dropTip('p300MultiId')(initialRobotState)
+      const result = dropTip('p300MultiId')(initialRobotState)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
@@ -126,6 +125,8 @@ describe('dropTip', () => {
         },
         robotStateWithTip.liquidState
       )
+
+      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })
