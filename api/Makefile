@@ -56,7 +56,8 @@ dev:
 
 .PHONY: wheel
 wheel: clean
-	$(python) setup.py bdist_wheel && \
+	$(python) setup.py bdist_wheel
+	shx rm -rf build
 	shx ls dist
 
 .PHONY: push
@@ -64,7 +65,12 @@ push: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wheel)" \
-		http://$(host)/server/update
+		http://$(host):31950/server/update
+
+.PHONY: restart
+restart:
+	curl -X POST http://$(host):31950/server/restart
+
 
 # TODO(mc, 2018-03-14): use $(host) var
 .PHONY: term
