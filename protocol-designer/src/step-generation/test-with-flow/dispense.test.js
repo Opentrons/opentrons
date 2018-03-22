@@ -75,7 +75,7 @@ describe('dispense', () => {
       updateLiquidState.mockReturnValue(mockLiquidReturnValue)
     })
 
-    test('dispense calls dispenseUpdateLiquidState with specified volume of pipette', () => {
+    test('dispense calls dispenseUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
       const result = dispense({
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
@@ -87,7 +87,7 @@ describe('dispense', () => {
         {
           pipetteId: 'p300SingleId',
           labwareId: 'sourcePlateId',
-          volume: 152, // TODO IMMEDIATELY
+          volume: 152,
           well: 'A1',
           labwareType: 'trough-12row',
           pipetteData: robotStateWithTip.instruments.p300SingleId

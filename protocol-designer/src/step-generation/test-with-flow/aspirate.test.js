@@ -2,20 +2,29 @@
 import aspirate from '../aspirate'
 import {createRobotStateFixture, createRobotState} from './fixtures'
 
+import updateLiquidState from '../aspirateUpdateLiquidState'
+
+jest.mock('../aspirateUpdateLiquidState')
+
 describe('aspirate', () => {
-  const initialRobotState = createRobotState({
-    sourcePlateType: 'trough-12row',
-    destPlateType: '96-flat',
-    fillPipetteTips: false,
-    fillTiprackTips: true,
-    tipracks: [200, 200]
-  })
-  const robotStateWithTip = createRobotState({
-    sourcePlateType: 'trough-12row',
-    destPlateType: '96-flat',
-    fillPipetteTips: true,
-    fillTiprackTips: true,
-    tipracks: [200, 200]
+  let initialRobotState
+  let robotStateWithTip
+
+  beforeEach(() => {
+    initialRobotState = createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      fillPipetteTips: false,
+      fillTiprackTips: true,
+      tipracks: [200, 200]
+    })
+    robotStateWithTip = createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      fillPipetteTips: true,
+      fillTiprackTips: true,
+      tipracks: [200, 200]
+    })
   })
 
   // Fixtures without liquidState key, for use with `toMatchObject`
@@ -71,5 +80,36 @@ describe('aspirate', () => {
       labware: 'sourcePlateId',
       well: 'A1'
     })(initialRobotState)).toThrow(/Attempted to aspirate with no tip on pipette/)
+  })
+
+  describe('liquid tracking', () => {
+    const mockLiquidReturnValue = 'expected liquid state'
+    beforeEach(() => {
+      // $FlowFixMe
+      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+    })
+
+    test('aspirate calls aspirateUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
+      const result = aspirate({
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A1',
+        volume: 152
+      })(robotStateWithTip)
+
+      expect(updateLiquidState).toHaveBeenCalledWith(
+        {
+          pipetteId: 'p300SingleId',
+          labwareId: 'sourcePlateId',
+          volume: 152,
+          well: 'A1',
+          labwareType: 'trough-12row',
+          pipetteData: robotStateWithTip.instruments.p300SingleId
+        },
+        robotStateWithTip.liquidState
+      )
+
+      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+    })
   })
 })
