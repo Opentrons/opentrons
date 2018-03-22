@@ -16,8 +16,8 @@ export const stepIconsByType = {
   'deck-setup': 'flask'
 }
 
-export const END_STEP = '__end__' // Special ID of "End" pseudo-step
-export type EndStepId = '__end__'
+export const END_STEP: '__end__' = '__end__' // Special ID of "End" pseudo-step.
+// NOTE: explicit type annotation so that typeof END_STEP is `'__end__'` and not `string`
 
 export type StepType = $Keys<typeof stepIconsByType>
 

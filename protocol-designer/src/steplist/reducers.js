@@ -7,12 +7,12 @@ import max from 'lodash/max'
 import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
-import type {BaseState} from '../types'
+import type {BaseState, Selector} from '../types'
+import {END_STEP} from './types'
 import type {
   FormData,
   StepItemData,
   StepIdType,
-  EndStepId,
   StepSubItemData,
   FormSectionState,
   FormModalFields
@@ -156,7 +156,7 @@ const orderedSteps = handleActions({
     state.filter(stepId => stepId !== action.payload)
 }, [INITIAL_DECK_SETUP_ID])
 
-type SelectedStepState = null | StepIdType | EndStepId
+type SelectedStepState = null | StepIdType | typeof END_STEP
 
 const selectedStep = handleActions({
   SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
@@ -234,7 +234,7 @@ const hoveredStepId = createSelector(
   (state: RootState) => state.hoveredStep
 )
 
-const hoveredOrSelectedStepId = createSelector(
+const hoveredOrSelectedStepId: Selector<StepIdType | typeof END_STEP | null> = createSelector(
   hoveredStepId,
   selectedStepId,
   (hoveredId, selectedId) => hoveredId !== null

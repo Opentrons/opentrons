@@ -16,8 +16,8 @@ type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 type StepListProps = {
   selectedStepId?: StepIdTypeWithEnd,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
-  handleStepItemClickById?: StepIdTypeWithEnd => (event?: SyntheticEvent<>) => mixed,
-  handleStepItemCollapseToggleById?: StepIdTypeWithEnd => (event?: SyntheticEvent<>) => mixed,
+  handleStepItemClickById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
+  handleStepItemCollapseToggleById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
   handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed
 }
 

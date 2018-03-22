@@ -38,7 +38,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
   const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
 
-  let prevStepId = 0 // initial liquid state if stepId is null
+  let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
     // last liquid state
     prevStepId = allWellContentsForSteps.length - 1

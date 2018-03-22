@@ -2,9 +2,11 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-import type {StepType, StepIdType, FormSectionNames, FormModalFields, EndStepId} from './types'
+import {END_STEP} from './types'
+import type {StepType, StepIdType, FormSectionNames, FormModalFields} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 
+type EndStepId = typeof END_STEP
 // Update Form input (onChange on inputs)
 
 type ChangeFormPayload = {
