@@ -4,6 +4,7 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+import {computeWellAccess} from '@opentrons/labware-definitions'
 import type {CommandCreator, RobotState} from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
@@ -121,4 +122,27 @@ export function mergeLiquid (source: LiquidVolumeState, dest: LiquidVolumeState)
       }
     }, {})
   }
+}
+
+export function getWellsForTips (channels: 1 | 8, labwareType: string, well: string) {
+  // Array of wells corresponding to the tip at each position.
+  const wellsForTips = (channels === 1)
+    ? [well]
+    : computeWellAccess(labwareType, well)
+
+  if (!wellsForTips) {
+    throw new Error(channels === 1
+      ? `Invalid well: ${well}`
+      : `Labware type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
+    )
+  }
+
+  // allWellsShared: eg in a trough, all wells are shared by an 8-channel
+  // (for single-channel, "all wells" are always shared because there is only 1 well)
+  // NOTE Ian 2018-03-15: there is no support for a case where some but not all wells are shared.
+  // Eg, some unusual labware that allows 2 tips to a well will not work with the implementation below.
+  // Low-priority TODO.
+  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
+
+  return {wellsForTips, allWellsShared}
 }
