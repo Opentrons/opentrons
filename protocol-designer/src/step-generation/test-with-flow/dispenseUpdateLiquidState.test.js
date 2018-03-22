@@ -66,7 +66,7 @@ describe('...single-channel pipette', () => {
       labware: {
         sourcePlateId: {
           A1: {ingred1: {volume: 150}},
-          A2: {}, // TODO IMMEDIATELY: look for all empty well checks, toMatchObject is too permissive?
+          A2: {},
           B1: {}
         }
       }

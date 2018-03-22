@@ -2,8 +2,8 @@
 import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
 import updateLiquidState from './aspirateUpdateLiquidState'
 
+/** Aspirate with given args. Requires tip. */
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
-  /** Aspirate with given args. Requires tip. */
   const {pipette, volume, labware, well} = args
 
   const pipetteData = prevRobotState.instruments[pipette]

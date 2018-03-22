@@ -20,8 +20,7 @@ export default function updateLiquidState (
   prevLiquidState: LiquidState
 ): LiquidState {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
-  type Ingreds = LocationLiquidState
-  type SourceAndDest = {|source: Ingreds, dest: Ingreds|}
+  type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
@@ -36,26 +35,13 @@ export default function updateLiquidState (
   )
 
   const {wellsForTips, allWellsShared} = getWellsForTips(pipetteData.channels, labwareType, well)
-  // const wellsForTips = (pipetteData.channels === 1)
-  //   ? [well]
-  //   : computeWellAccess(labwareType, well)
-  //
-  // // TODO Ian 2018-03-16: duplicated in aspirate.js. Candidate for a util
-  // if (!wellsForTips) {
-  //   throw new Error(pipetteData.channels === 1
-  //     ? `Invalid well: ${well}`
-  //     : `Labware id "${labwareId}", type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
-  //   )
-  // }
-  // // TODO Also duplicated:
-  // const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
 
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared
   // merge all liquid into the single well
   ? {[well]: reduce(
     splitLiquidStates,
-    (wellLiquidStateAcc, splitLiquidStateForTip: {|source: Ingreds, dest: Ingreds|}) =>
+    (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) =>
     mergeLiquid(
       wellLiquidStateAcc,
       splitLiquidStateForTip.dest

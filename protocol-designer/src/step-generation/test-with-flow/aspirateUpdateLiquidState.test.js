@@ -1,12 +1,10 @@
 // @flow
-// import merge from 'lodash/merge' // NOTE careful this mutates its first arg
 import {AIR} from '../utils'
 import {
   createEmptyLiquidState,
   createTipLiquidState,
   p300Single,
   p300Multi
-  // all8ChTipIds
 } from './fixtures'
 
 import updateLiquidState from '../aspirateUpdateLiquidState'
@@ -14,7 +12,7 @@ import updateLiquidState from '../aspirateUpdateLiquidState'
 function getBlankLiquidState (sourcePlateType: ?string) {
   return createEmptyLiquidState({
     // leave sourcePlateType undefined for tests that don't care
-    // TODO: should this `pipettes` arg be createEmptyLiquidState default?
+    // TODO Ian 2018-03-22: should this `pipettes` arg be createEmptyLiquidState default?
     sourcePlateType: sourcePlateType || '96-flat',
     pipettes: {
       p300SingleId: p300Single,
@@ -22,40 +20,6 @@ function getBlankLiquidState (sourcePlateType: ?string) {
     }
   })
 }
-
-// OLD INITIAL LIQUID STATE
-//   return {
-//     labware: {
-//       sourcePlateId: {
-//         A1: {ingred1: {volume: 300}},
-//         A2: {ingred1: {volume: 150}, ingred2: {volume: 150}}
-//       },
-//       destPlateId: {
-//         A1: {ingred1: {volume: 200}},
-//         B1: {ingred1: {volume: 150}},
-//         A6: {ingred1: {volume: 200}, ingred2: {volume: 100}},
-//         B6: {ingred1: {volume: 60}, ingred2: {volume: 70}}
-//       }
-//     }
-//   }
-// }
-
-// const robotWithLiquidInTipsNoAir = merge(
-//   {},
-//   getInitialLiquidState(),
-//   {
-//     liquidState: {
-//       pipettes: {
-//         p300SingleId: {'0': {ingred1: {volume: 30}}},
-//         p300MultiId: all8ChTipIds.reduce((acc, tipIndex) => ({
-//           ...acc,
-//           [tipIndex]: {ingred1: {volume: 30}}
-//         }), {})
-//       }
-//     }
-//   }
-// )
-
 // TODO Ian 2018-03-14 also do tests for tips that contain air
 // (prereq: need to define behavior in liquid tracking for that)
 
