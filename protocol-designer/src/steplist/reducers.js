@@ -374,7 +374,7 @@ const selectedStepSelector = createSelector(
 const deckSetupMode = createSelector(
   getSteps,
   selectedStepId,
-  (steps, selectedStepId) => (selectedStepId !== null && steps[selectedStepId])
+  (steps, selectedStepId) => (selectedStepId !== null && selectedStepId !== '__end__' && steps[selectedStepId])
     ? steps[selectedStepId].stepType === 'deck-setup'
     : false
 )
