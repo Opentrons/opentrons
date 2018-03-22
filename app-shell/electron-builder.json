@@ -2,13 +2,13 @@
   "appId": "com.opentrons.ot-app",
   "electronVersion": "1.8.3",
   "files": [
-    "node_modules/**/*",
-    "lib/**/*",
+    "**/*",
     {
       "from": "../app/dist",
       "to": "./ui",
       "filter": ["**/*"]
-    }
+    },
+    "!Makefile"
   ],
   "extraResources": [
     {

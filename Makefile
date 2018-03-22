@@ -15,17 +15,19 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 
 # install all project dependencies
 # front-end dependecies handled by yarn
-# TODO(mc, 2018-01-06): remove separate install for app-shell when
-#   electron-builder can resolve yarn workspace deps
-#   https://github.com/electron-userland/electron-builder/issues/2222
 .PHONY: install
 install:
 	pip install pipenv==11.6.8
 	$(MAKE) -C $(API_DIR) install
 	yarn
-	$(MAKE) -C $(APP_SHELL_DIR) install
 	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
 	$(MAKE) install-types
+
+# uninstall all project dependencies
+# TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
+.PHONY: uninstall
+uninstall:
+	shx rm -rf '**/node_modules'
 
 .PHONY: install-types
 install-types:
