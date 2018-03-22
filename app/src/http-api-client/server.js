@@ -206,8 +206,18 @@ export const makeGetRobotRestartRequest = () => {
   return selector
 }
 
+export const getAnyRobotUpdateAvailable: Selector<State, void, boolean> =
+  createSelector(
+    selectServerState,
+    (state) => Object.keys(state).some((name) => state[name].availableUpdate)
+  )
+
+function selectServerState (state: State) {
+  return state.api.server
+}
+
 function selectRobotServerState (state: State, props: RobotService) {
-  return state.api.server[props.name]
+  return selectServerState(state)[props.name]
 }
 
 function getUpdateRequestBody () {

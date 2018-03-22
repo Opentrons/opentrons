@@ -65,7 +65,8 @@ export {
   restartRobotServer,
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
-  makeGetRobotRestartRequest
+  makeGetRobotRestartRequest,
+  getAnyRobotUpdateAvailable
 } from './server'
 
 export {

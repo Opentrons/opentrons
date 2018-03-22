@@ -5,6 +5,8 @@ exports[`NavButton renders nav button with icon correctly 1`] = `
   className="button disabled"
   disabled="false"
   onClick={undefined}
+  title={undefined}
+  type="button"
 >
   <svg
     aria-hidden="true"

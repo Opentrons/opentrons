@@ -1,5 +1,6 @@
 // @flow
 // nav button container
+import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 
@@ -9,6 +10,7 @@ import {
   selectors as robotSelectors,
   constants as robotConstants
 } from '../../robot'
+import {getAnyRobotUpdateAvailable} from '../../http-api-client'
 
 import type {IconName} from '@opentrons/components'
 import {NavButton, FILE, CALIBRATE, CONNECT, RUN, MORE} from '@opentrons/components'
@@ -19,8 +21,8 @@ type OwnProps = {
 
 type StateProps = {
   iconName: IconName,
-  title: string,
-  url: string
+  title?: string,
+  url?: string
 }
 
 export default withRouter(connect(mapStateToProps)(NavButton))
@@ -36,6 +38,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
+  const robotNotification = getAnyRobotUpdateAvailable(state)
 
   // TODO(mc, 2018-03-08): move this logic to the Calibrate page
   let calibrateUrl
@@ -51,11 +54,12 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
     }
   }
 
-  const NAV_ITEM_BY_NAME = {
+  const NAV_ITEM_BY_NAME: {[string]: React.ElementProps<typeof NavButton>} = {
     connect: {
       iconName: CONNECT,
       title: 'robot',
-      url: '/robots'
+      url: '/robots',
+      notification: robotNotification
     },
     upload: {
       disabled: !isConnected || isRunning,
