@@ -3,7 +3,7 @@ All available icons:
 ```js
 // import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
 const {
-  ALERT, BACK, CIRCLE, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECKED, UNCHECKED,
+  ALERT, BACK, CIRCLE, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECK, CHECKED, UNCHECKED,
   CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
   TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE,
   UPLOAD, COG, CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT,
@@ -20,6 +20,7 @@ const {
   <Icon width='64px' name={USB} />
   <Icon width='64px' name={WIFI} />
   <Icon width='64px' name={FLASK} />
+  <Icon width='64px' name={CHECK} />
   <Icon width='64px' name={CHECKED} />
   <Icon width='64px' name={UNCHECKED} />
   <Icon width='64px' name={CHECKED_RADIO} />
