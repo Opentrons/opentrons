@@ -148,7 +148,7 @@ SVG icons that take `color` from their parent.
 
 ```js
 import {Icon, BACK, CLOSE, REFRESH, USB, WIFI, FLASK, CHECKED, UNCHECKED,
-CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, PROTOCOL, COG, CONNECT } from '@opentrons/components'
+'chevron-up', 'chevron-down', 'chevron-left', 'chevron-right', PROTOCOL, COG, CONNECT } from '@opentrons/components'
 ```
 
  prop      | flow type | required | description

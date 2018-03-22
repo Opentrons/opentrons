@@ -8,11 +8,7 @@ import type {Labware, JogButtonName} from '../../robot'
 import {
   PrimaryButton,
   Icon,
-  type IconName,
-  CHEVRON_UP,
-  CHEVRON_RIGHT,
-  CHEVRON_DOWN,
-  CHEVRON_LEFT
+  type IconName
 } from '@opentrons/components'
 
 import styles from './styles.css'
@@ -27,12 +23,12 @@ export type JogControlsProps = Labware & {
 }
 
 const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
-  left: CHEVRON_LEFT,
-  right: CHEVRON_RIGHT,
-  back: CHEVRON_UP,
-  forward: CHEVRON_DOWN,
-  up: CHEVRON_UP,
-  down: CHEVRON_DOWN
+  left: 'chevron-left',
+  right: 'chevron-right',
+  back: 'chevron-up',
+  forward: 'chevron-down',
+  up: 'chevron-up',
+  down: 'chevron-down'
 }
 
 export default function JogControls (props: JogControlsProps) {

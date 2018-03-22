@@ -25,6 +25,10 @@ const SCALE_FACTOR = 3
 
 export default function NotificationIcon (props: Props) {
   const {name, childName} = props
+  if (!(name in iconData)) {
+    console.error(`"${name}" is not a valid Icon name`)
+    return null
+  }
   const {viewBox} = iconData[name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)
   const scaledWidth = width / SCALE_FACTOR

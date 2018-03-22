@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon, CHECKED, WARNING, ERROR} from '../icons'
+import {Icon} from '../icons'
 import {IconButton} from '../buttons'
 import styles from './alerts.css'
 
@@ -25,15 +25,15 @@ export type AlertProps = {
 
 const ALERT_PROPS_BY_TYPE = {
   success: {
-    iconName: CHECKED,
+    iconName: 'check-circle',
     className: styles.success
   },
   warning: {
-    iconName: WARNING,
+    iconName: 'alert-circle',
     className: styles.warning
   },
   error: {
-    iconName: ERROR,
+    iconName: 'close-circle',
     className: styles.error
   }
 }

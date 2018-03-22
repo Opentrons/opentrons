@@ -5,8 +5,7 @@ import Renderer from 'react-test-renderer'
 import {
   VerticalNavBar,
   NavButton,
-  SidePanel,
-  FILE
+  SidePanel
 } from '..'
 
 describe('VerticalNavBar', () => {
@@ -29,7 +28,7 @@ describe('NavButton', () => {
       <NavButton
         onClick={onClick}
         disabled={false}
-        iconName={FILE}
+        iconName='ot-file'
       />
     ).root.findByType('button')
 
@@ -41,7 +40,7 @@ describe('NavButton', () => {
 
   test('adds svg icon to button by name', () => {
     const icon = Renderer.create(
-      <NavButton iconName={FILE} />
+      <NavButton iconName='ot-file' />
     ).root.findByType('svg')
 
     expect(icon).toBeDefined()
@@ -49,7 +48,7 @@ describe('NavButton', () => {
 
   test('renders nav button with icon correctly', () => {
     const tree = Renderer.create(
-      <NavButton iconName={FILE} disabled='false' />
+      <NavButton iconName='ot-file' disabled='false' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

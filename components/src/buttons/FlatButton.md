@@ -34,14 +34,14 @@ With icon:
 
 ```js
 <div>
-  <FlatButton onClick={() => alert('you clicked me')} iconName='flask'>
+  <FlatButton onClick={() => alert('you clicked me')} iconName='flask-outline'>
     {'Click me!'}
   </FlatButton>
 </div>
 ```
 ```js
 <div className='dark_background'>
-  <FlatButton onClick={() => alert('you clicked me')} iconName='flask' inverted>
+  <FlatButton onClick={() => alert('you clicked me')} iconName='flask-outline' inverted>
     {'Click me!'}
   </FlatButton>
 </div>
@@ -55,7 +55,7 @@ Use the inspector on this example to see that the "button" is a `<div>` with the
 <FlatButton
   Component='div'
   role='button'
-  iconName={'flask'}
+  iconName='flask-outline'
   onClick={() => alert('click!')}
 >
   {"I'm a div!"}
@@ -66,7 +66,7 @@ Use the inspector on this example to see that the "button" is a `<div>` with the
   <FlatButton
     Component='div'
     role='button'
-    iconName={'flask'}
+    iconName='flask-outline'
     onClick={() => alert('click!')}
     inverted
   >

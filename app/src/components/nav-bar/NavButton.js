@@ -13,7 +13,7 @@ import {
 import {getAnyRobotUpdateAvailable} from '../../http-api-client'
 
 import type {IconName} from '@opentrons/components'
-import {NavButton, FILE, CALIBRATE, CONNECT, RUN, MORE} from '@opentrons/components'
+import {NavButton} from '@opentrons/components'
 
 type OwnProps = {
   name: string
@@ -56,31 +56,31 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
 
   const NAV_ITEM_BY_NAME: {[string]: React.ElementProps<typeof NavButton>} = {
     connect: {
-      iconName: CONNECT,
+      iconName: 'ot-connect',
       title: 'robot',
       url: '/robots',
       notification: robotNotification
     },
     upload: {
       disabled: !isConnected || isRunning,
-      iconName: FILE,
+      iconName: 'ot-file',
       title: 'protocol',
       url: '/upload'
     },
     setup: {
       disabled: !isSessionLoaded || isRunning,
-      iconName: CALIBRATE,
+      iconName: 'ot-calibrate',
       title: 'calibrate',
       url: calibrateUrl
     },
     run: {
       disabled: !isTipsProbed,
-      iconName: RUN,
+      iconName: 'ot-run',
       title: 'run',
       url: '/run'
     },
     more: {
-      iconName: MORE,
+      iconName: 'dots-horizontal',
       isBottom: true,
       title: 'more',
       url: '/menu/app'

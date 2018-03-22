@@ -27,7 +27,7 @@ export default class RefreshCard extends React.Component<Props> {
     return (
       <Card {...this.props}>
         <IconButton
-          name={refreshing ? 'spinner' : 'refresh'}
+          name={refreshing ? 'ot-spinner' : 'refresh'}
           className={styles.refresh_card_icon}
           spin={refreshing}
           disabled={refreshing}

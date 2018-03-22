@@ -6,12 +6,7 @@ import cx from 'classnames'
 import {
   ListItem,
   IconButton,
-  NotificationIcon,
-  USB,
-  WIFI,
-  CIRCLE,
-  TOGGLED_OFF,
-  TOGGLED_ON
+  NotificationIcon
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
@@ -51,8 +46,8 @@ export function RobotListItem (props: ItemProps) {
   NavLink gets ActiveClassName in ListItem
   */
   const toggleIcon = isConnected
-    ? TOGGLED_ON
-    : TOGGLED_OFF
+    ? 'ot-toggle-switch-on'
+    : 'ot-toggle-switch-off'
 
   return (
     <ListItem
@@ -61,9 +56,9 @@ export function RobotListItem (props: ItemProps) {
       activeClassName={styles.active}
     >
       <NotificationIcon
-        name={wired ? USB : WIFI}
+        name={wired ? 'usb' : 'wifi'}
         className={styles.robot_item_icon}
-        childName={availableUpdate ? CIRCLE : null}
+        childName={availableUpdate ? 'circle' : null}
         childClassName={styles.notification}
       />
 

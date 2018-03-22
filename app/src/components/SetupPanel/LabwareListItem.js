@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import type {Labware} from '../../robot'
 
-import {ListItem, CHECKED, UNCHECKED} from '@opentrons/components'
+import {ListItem} from '@opentrons/components'
 import styles from './styles.css'
 
 type LabwareItemProps = {
@@ -26,8 +26,8 @@ export default function LabwareListItem (props: Props) {
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed
-    ? CHECKED
-    : UNCHECKED
+    ? 'check-circle'
+    : 'checkbox-blank-circle-outline'
 
   return (
     <ListItem

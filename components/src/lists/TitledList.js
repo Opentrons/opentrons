@@ -4,7 +4,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import {type IconName, Icon, CHEVRON_DOWN, CHEVRON_RIGHT} from '../icons'
+import {type IconName, Icon} from '../icons'
 
 type ListProps = {
   /** text of title */
@@ -84,7 +84,7 @@ export default function TitledList (props: ListProps) {
           >
             <Icon
               className={styles.title_bar_icon}
-              name={props.collapsed ? CHEVRON_DOWN : CHEVRON_RIGHT}
+              name={props.collapsed ? 'chevron-down' : 'chevron-right'}
             />
           </div>
         )}

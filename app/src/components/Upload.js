@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import cx from 'classnames'
 import {Link} from 'react-router-dom'
 
-import {Icon, ALERT, CHECKED, SPINNER, Splash} from '@opentrons/components'
+import {Icon, Splash} from '@opentrons/components'
 
 import styles from './Upload.css'
 
@@ -28,7 +28,7 @@ export default function Upload (props) {
   }
 
   const content = inProgress
-    ? (<Icon name={SPINNER} spin className={styles.status_icon} />)
+    ? (<Icon name='ot-spinner' spin className={styles.status_icon} />)
     : (<UploadResults {...props} />)
 
   return (
@@ -100,8 +100,8 @@ function StatusIcon (props) {
   })
 
   const iconName = success
-    ? CHECKED
-    : ALERT
+    ? 'check-circle'
+    : 'alert'
 
   return (
     <Icon name={iconName} className={iconClassName} />

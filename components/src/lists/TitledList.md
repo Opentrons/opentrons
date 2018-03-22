@@ -3,7 +3,7 @@ Basic usage:
 ```js
 <TitledList
   title='Titled List With Icon'
-  iconName='flask'
+  iconName='flask-outline'
 >
   <ListItem>Something 1</ListItem>
   <ListItem>Something 2</ListItem>

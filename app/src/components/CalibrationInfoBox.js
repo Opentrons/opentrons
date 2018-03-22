@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import classnames from 'classnames'
-import {Icon, UNCHECKED, CHECKED} from '@opentrons/components'
+import {Icon} from '@opentrons/components'
 import styles from './calibration-info.css'
 
 type Props = {
@@ -15,8 +15,8 @@ export default function CalibrationInfoBox (props: Props) {
   const {className, confirmed, title, children} = props
 
   const iconName = confirmed
-    ? CHECKED
-    : UNCHECKED
+    ? 'check-circle'
+    : 'checkbox-blank-circle-outline'
 
   return (
     <section className={classnames(styles.info_box, className)}>

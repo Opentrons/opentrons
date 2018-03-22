@@ -3,7 +3,6 @@
 import * as React from 'react'
 import classnames from 'classnames'
 import {IconButton} from '../buttons'
-import {CLOSE} from '../icons'
 import styles from './SidePanel.css'
 
 type SidePanelProps= {
@@ -22,7 +21,7 @@ export default function SidePanel (props: SidePanelProps) {
       title='close panel'
       onClick={props.onCloseClick}
       className={styles.button_close}
-      name={CLOSE}
+      name='close'
     />
   )
   const className = classnames(styles.panel, {[styles.closed]: !open})
