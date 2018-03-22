@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
 
 import type {State, Dispatch} from '../../types'
@@ -28,9 +27,7 @@ type DispatchProps = {
 
 type Props = StateProps & DispatchProps
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
-)
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
 
 function ConnectPanel (props: Props) {
   return (
@@ -38,6 +35,7 @@ function ConnectPanel (props: Props) {
       <div>
         <RobotList>
           {props.robots.map((robot) => (
+            // $FlowFixMe: flow-typed withRouter def throwing bogus errors
             <RobotItem key={robot.name} {...robot} />
           ))}
         </RobotList>

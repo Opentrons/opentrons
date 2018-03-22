@@ -1,6 +1,7 @@
 // @flow
 // item in a RobotList
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
@@ -20,7 +21,9 @@ type DP = {
   disconnect: () => mixed
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(RobotListItem)
+export default withRouter(
+  connect(makeMapStateToProps, mapDispatchToProps)(RobotListItem)
+)
 
 function makeMapStateToProps () {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
