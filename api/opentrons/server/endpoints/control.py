@@ -35,7 +35,7 @@ async def get_attached_pipettes(request):
 
     If a pipette is "uncommissioned" (e.g.: does not have a model string
     written to on-board memory), or if no pipette is present, the corresponding
-    mount will report `'model': 'uncommissioned'`
+    mount will report `'model': null`
     """
     return web.json_response(robot.get_attached_pipettes())
 
@@ -87,8 +87,8 @@ async def position_info(request):
         'positions': {
             'change_pipette': {
                 'target': 'mount',
-                'left': (66, 60, 40.5),
-                'right': (266, 60, 40.5)
+                'left': (325, 40, 30),
+                'right': (65, 40, 30)
             },
             'attach_tip': {
                 'target': 'pipette',
@@ -115,6 +115,11 @@ def _validate_move_data(data):
         error = True
     if point is not None and len(point) is not 3:
         message = "Point must have 3 values--got {}".format(point)
+        error = True
+    if target is 'mount' and float(point[2]) < 30:
+        message = "Sending a mount to a z position lower than 30 can cause " \
+                  "a collision with the deck or reach the end of the Z axis " \
+                  "movement screw. Z values for mount movement must be >= 30"
         error = True
     mount = data.get('mount')
     if mount not in ['left', 'right']:
@@ -154,12 +159,7 @@ async def move(request):
     else:
         status = 200
         if target == 'mount':
-            robot.poses = robot._actuators[mount]['carriage'].move(
-                robot.poses, x=point[0], y=point[1], z=point[2])
-            new_position = tuple(
-                pose_tracker.absolute(
-                    robot.poses, robot._actuators[mount]['carriage']))
-            message = "Move complete. New position: {}".format(new_position)
+            message = _move_mount(mount, point)
         elif target == 'pipette':
             config = pipette_config.load(model)
             pipette = instruments._create_pipette_from_config(
@@ -171,6 +171,40 @@ async def move(request):
             message = "Move complete. New position: {}".format(new_position)
 
     return web.json_response({"message": message}, status=status)
+
+
+def _move_mount(mount, point):
+    """
+    The carriage moves the mount in the Z axis, and the gantry moves in X and Y
+
+    Mount movements do not have the same protections calculated in to an
+    existing `move` command like Pipette does, so the safest thing is to home
+    the Z axis, then move in X and Y, then move down to the specified Z height
+    """
+    carriage = robot._actuators[mount]['carriage']
+
+    # Home both carriages, to prevent collisions and to ensure that the other
+    # mount doesn't block the one being moved (mount moves are primarily for
+    # changing pipettes, so we don't want the other pipette blocking access)
+    robot.poses = carriage.home(robot.poses)
+    other_mount = 'left' if mount == 'right' else 'right'
+    robot.poses = robot._actuators[other_mount]['carriage'].home(robot.poses)
+
+    robot.gantry.move(
+        robot.poses, x=point[0], y=point[1])
+    robot.poses = carriage.move(
+        robot.poses, z=point[2])
+
+    # These x and y values are hard to interpret because of some internals of
+    # pose tracker. It's mostly z that matters for this operation anyway
+    x, y, _ = tuple(
+        pose_tracker.absolute(
+            robot.poses, robot._actuators[mount]['carriage']))
+    _, _, z = tuple(
+        pose_tracker.absolute(
+            robot.poses, robot.gantry))
+    new_position = (x, y, z)
+    return "Move complete. New position: {}".format(new_position)
 
 
 async def identify(request):

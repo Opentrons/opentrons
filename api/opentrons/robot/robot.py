@@ -937,18 +937,16 @@ class Robot(object):
         :return: :dict with keys 'left' and 'right' and a model string for each
             mount, or 'uncommissioned' if no model string available
         """
-        left_data = self._driver.read_pipette_model('left')
-        if left_data:
-            left_data.update({
+        left_data = {
                 'mount_axis': 'z',
                 'plunger_axis': 'b'
-            })
-        right_data = self._driver.read_pipette_model('right')
-        if right_data:
-            right_data.update({
+            }
+        left_data.update(self._driver.read_pipette_model('left'))
+        right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c'
-            })
+            }
+        right_data.update(self._driver.read_pipette_model('right'))
         return {
             'left': left_data,
             'right': right_data

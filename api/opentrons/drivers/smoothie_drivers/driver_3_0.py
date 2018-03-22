@@ -228,9 +228,8 @@ class SmoothieDriver_3_0_0:
 
         :return :dict with key 'model' and model string as value, or None
         '''
-        res = self._read_from_pipette(GCODES['READ_INSTRUMENT_MODEL'], mount)
-        if res:
-            return {'model': res}
+        return {'model': self._read_from_pipette(
+            GCODES['READ_INSTRUMENT_MODEL'], mount)}
 
     def write_pipette_id(self, mount, data_string):
         '''

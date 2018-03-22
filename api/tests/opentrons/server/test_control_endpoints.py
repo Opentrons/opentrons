@@ -15,11 +15,22 @@ async def test_get_pipettes_uncommissioned(
 
     monkeypatch.setattr(driver_3_0, '_parse_instrument_data', mock_parse_fail)
 
-    expected = '{"left": null, "right": null}'
+    expected = {
+        "left": {
+            "mount_axis": "z",
+            "plunger_axis": "b",
+            "model": None
+        },
+        "right": {
+            "mount_axis": "a",
+            "plunger_axis": "c",
+            "model": None
+        }
+    }
     resp = await cli.get('/pipettes')
     text = await resp.text()
     assert resp.status == 200
-    assert text == expected
+    assert json.loads(text) == expected
 
 
 async def test_get_pipettes(
@@ -27,7 +38,7 @@ async def test_get_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    dummy_by_mount = {
+    expected = {
         'left': {
             'model': 'p10_multi',
             'mount_axis': 'z',
@@ -41,16 +52,15 @@ async def test_get_pipettes(
     }
 
     def mock_parse_p300(self, gcode, mount):
-        return dummy_by_mount[mount]['model']
+        return expected[mount]['model']
 
     monkeypatch.setattr(
         driver_3_0.SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_p300)
 
-    expected = json.dumps(dummy_by_mount)
     resp = await cli.get('/pipettes')
     text = await resp.text()
     assert resp.status == 200
-    assert text == expected
+    assert json.loads(text) == expected
 
 
 async def test_disengage_axes(
@@ -94,7 +104,7 @@ async def test_disengage_axes(
     assert json.loads(result2) == alltrue
 
 
-async def test_robot_info(loop, test_client):
+async def test_robot_info(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
@@ -110,7 +120,7 @@ async def test_robot_info(loop, test_client):
     assert len(body['positions']['attach_tip']['point']) == 3
 
 
-async def test_move_bad_request(loop, test_client):
+async def test_move_bad_request(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
@@ -167,7 +177,7 @@ async def test_move_mount(virtual_smoothie_env, loop, test_client):
     # print("=-> Result: {}".format(text))
 
 
-async def test_move_pipette(loop, test_client):
+async def test_move_pipette(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
     robot.home()
