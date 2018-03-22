@@ -24,10 +24,6 @@ all: package
 install:
 	yarn
 
-.PHONY: uninstall
-uninstall:
-	shx rm -rf node_modules
-
 .PHONY: clean
 clean:
 	shx rm -rf dist

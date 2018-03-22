@@ -99,9 +99,7 @@ def main():
     write_json_file(package_file, pkg)
 
     # JS sub-projects
-    # TODO(mc, 2018-03-15): move app-shell to workspaces when possible;
-    #   currently blocked by electron-builder#2222
-    js_project_names = pkg['workspaces'] + ['app-shell']
+    js_project_names = pkg['workspaces']
     js_pkg_files = [
         os.path.join(REPO_DIR, name, 'package.json')
         for name in js_project_names

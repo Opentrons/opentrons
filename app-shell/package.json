@@ -3,11 +3,10 @@
   "productName": "Opentrons",
   "private": true,
   "version": "3.0.0-beta.0",
-  "description": "Opentrons decktop application shell",
+  "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
-    "start": "make dev",
-    "postinstall": "electron-builder install-app-deps"
+    "start": "make dev"
   },
   "repository": {
     "type": "git",
@@ -25,7 +24,7 @@
   "devDependencies": {
     "cross-env": "^5.0.1",
     "electron": "1.8.3",
-    "electron-builder": "19.52.1",
+    "electron-builder": "20.6.2",
     "shx": "^0.2.2"
   },
   "dependencies": {

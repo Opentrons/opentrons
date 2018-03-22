@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "app",
+    "app-shell",
     "components",
     "labware-definitions",
     "protocol-designer",
