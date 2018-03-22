@@ -9,7 +9,7 @@ import {
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
 
-function getBlankLiquidState (sourcePlateType) {
+function getBlankLiquidState (sourcePlateType: ?string) {
   return createEmptyLiquidState({
     // leave sourcePlateType undefined for tests that don't care
     // TODO: should this `pipettes` arg be createEmptyLiquidState default?
