@@ -110,10 +110,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
-  & > button {
-    height: 3rem;
-  }
 }
 
 .card_column {
