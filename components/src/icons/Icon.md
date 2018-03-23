@@ -4,7 +4,7 @@ All available icons:
 const iconData = require('./icon-data').default
 
 ;<div className='icon-showcase'>
-  {Object.keys(iconData).map(iconName =>
+  {Object.keys(iconData).sort().map(iconName =>
     <span key={iconName}>
       <Icon width='64px' name={iconName} />
       <span>{iconName}</span>
