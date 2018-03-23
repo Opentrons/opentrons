@@ -21,8 +21,14 @@
       "/node_modules/(?!@opentrons/)"
     ],
     "collectCoverageFrom": [
-      "(app|components|labware\\-definitions|protocol\\-designer)/**/*.js",
+      "**/*.js",
+      "!.eslintrc.js",
+      "!.stylelintrc.js",
+      "!api/**",
+      "!webpack-config/**",
+      "!**/scripts/**",
       "!components/interfaces/**",
+      "!components/styleguide.config.js",
       "!**/node_modules/**",
       "!**/__mocks__/**",
       "!**/dist/**",
@@ -31,6 +37,7 @@
       "!**/webpack/**",
       "!**/coverage/**",
       "!**/test/**",
+      "!**/test-with-flow/**",
       "!**/flow-typed/**"
     ],
     "coverageReporters": [
