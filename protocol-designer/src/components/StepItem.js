@@ -53,6 +53,10 @@ export default function StepItem (props: StepItemProps) {
       description={Description}
       {...{iconName, title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
     >
+      {showLabwareHeader && <li className={styles.aspirate_dispense}>
+          <span>ASPIRATE</span>
+          <span>DISPENSE</span>
+      </li>}
       {showLabwareHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <span>{sourceLabwareName}</span>
         <Icon name={iconName} />

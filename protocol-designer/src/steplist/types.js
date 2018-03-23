@@ -31,7 +31,8 @@ export type TransferishStepItem = {|
     sourceIngredientName?: string,
     destIngredientName?: string,
     sourceWell?: string,
-    destWell?: string
+    destWell?: string,
+    volume?: number
   |}>
 |}
 
@@ -51,12 +52,20 @@ export type StepItemData = {|
   id: StepIdType,
   title: string,
   stepType: StepType,
-  description?: string
+  description?: string,
+  sourceLabwareName?: string,
+  destLabwareName?: string
 |}
 
 export type SubSteps = {[StepIdType]: StepSubItemData | null}
 
+export type FormModalFields = {|
+  'step-name': string,
+  'step-details': string
+|}
+
 export type TransferForm = {|
+  ...FormModalFields,
   stepType: 'transfer',
   id: StepIdType,
 
@@ -88,6 +97,7 @@ export type TransferForm = {|
 |}
 
 export type ConsolidateForm = {|
+  ...FormModalFields,
   stepType: 'consolidate',
   id: StepIdType,
 
@@ -119,6 +129,7 @@ export type ConsolidateForm = {|
 |}
 
 export type PauseForm = {|
+  ...FormModalFields,
   stepType: 'pause',
   id: StepIdType,
 
@@ -126,7 +137,7 @@ export type PauseForm = {|
   'pause-hour'?: string,
   'pause-minute'?: string,
   'pause-second'?: string,
-  'pause-message'?: string,
+  'pause-message'?: string
 |}
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
@@ -153,8 +164,3 @@ export type PauseFormData = {|
 
 // TODO gradually create & use definitions from step-generation/types.js
 export type ProcessedFormData = TransferFormData | PauseFormData | ConsolidateFormData
-
-export type FormModalFields = {
-  'step-name': string,
-  'step-details': string
-}

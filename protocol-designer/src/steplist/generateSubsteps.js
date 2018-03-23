@@ -16,10 +16,8 @@ import type {
 function _transferSubsteps (form: *, stepId: StepIdType) {
   const {
     sourceWells,
-    destWells
-    // sourceLabware, // TODO: show labware & volume, see new designs
-    // destLabware,
-    // volume
+    destWells,
+    volume
   } = form
 
   return {
@@ -31,7 +29,8 @@ function _transferSubsteps (form: *, stepId: StepIdType) {
       sourceIngredientName: 'ING1', // TODO get ingredients for source/dest wells
       destIngredientName: 'ING2',
       sourceWell: sourceWells[i],
-      destWell: destWells[i]
+      destWell: destWells[i],
+      volume
     }))
   }
 }
@@ -39,29 +38,34 @@ function _transferSubsteps (form: *, stepId: StepIdType) {
 function _consolidateSubsteps (form: *, stepId: StepIdType) {
   const {
     sourceWells,
-    destWell
+    destWell,
+    volume
   } = form
 
   const destWellSubstep = {
     destWell,
-    sourceIngredientName: 'ING1',
-    destIngredientName: 'ING2'
+    sourceIngredientName: 'ING1', // TODO Ian 2018-03-20 proper ingredient name & groupId/color
+    destIngredientName: 'ING2',
+    volume: volume * sourceWells.length
   }
 
   return {
     stepType: 'consolidate',
     parentStepId: stepId,
+    // TODO Ian 2018-03-02 break up steps when pipette too small
     rows: [
       ...sourceWells.map((sourceWell, i) => ({
         substepId: i,
         sourceWell: sourceWell,
-        sourceIngredientName: 'ING1'
+        sourceIngredientName: 'ING1',
+        volume: volume
       })),
       destWellSubstep
     ]
   }
 }
 
+// NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (validatedForms: {[StepIdType]: ValidFormAndErrors}): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?

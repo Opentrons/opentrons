@@ -1,7 +1,8 @@
-/* TODO Ian 2018-01-11 Use shades of gray for arrows and text */
+@import '@opentrons/components';
 
 .step_item {
   margin: 0.25rem 0;
+  color: var(--c-dark-gray);
 }
 
 .step_item ol {
@@ -28,7 +29,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 0.5rem;
+  padding: 0.5rem;
+  border-top: 2px solid var(--c-light-gray);
+  text-align: center;
 }
 
 .step_subitem > * {
@@ -41,14 +44,34 @@
 .step_subitem svg {
   flex: 1;
   height: 1.5rem;
+  color: var(--c-med-gray);
+}
+
+.step_subitem .volume_cell {
+  color: var(--c-med-gray);
+  overflow: visible;
+  text-align: right;
 }
 
 /* Step Subitem Column Header */
 
 .step_subitem_column_header {
   composes: step_subitem;
+  border: none;
 }
 
 .step_subitem_column_header > * {
   flex: 2;
+}
+
+/* Aspirate / dispense headers */
+.aspirate_dispense {
+  display: flex;
+  padding: 0.5rem;
+  font-size: var(--fs-body-1);
+  text-align: center;
+}
+
+.aspirate_dispense * {
+  flex: 1;
 }
