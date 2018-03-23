@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Liquid Handling</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7952 2016-07-26 18:15:59Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+.subscript {
+  vertical-align: sub;
+  font-size: smaller }
+
+.superscript {
+  vertical-align: super;
+  font-size: smaller }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left, table.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right, table.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table.align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+.align-top    {
+  vertical-align: top }
+
+.align-middle {
+  vertical-align: middle }
+
+.align-bottom {
+  vertical-align: bottom }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="liquid-handling">
+<h1 class="title">Liquid Handling</h1>
+
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 3)</p>
+<p>Unknown directive type &quot;testsetup&quot;.</p>
+<pre class="literal-block">
+.. testsetup:: *
+
+  from opentrons import robot
+  robot.reset()
+
+</pre>
+</div>
+<p>The <tt class="docutils literal">instruments</tt> module gives your protocol access to the <tt class="docutils literal">Pipette</tt>, which is what you will be primarily using to create protocol commands.</p>
+<hr class="docutils" />
+<div class="section" id="creating-a-pipette">
+<h1>Creating a Pipette</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 20)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: pipettes
+
+    '''
+    Examples in this section require the following
+    '''
+    from opentrons import instruments
+
+</pre>
+</div>
+<div class="section" id="axis-and-max-volume">
+<h2>Axis and Max Volume</h2>
+<p>To use a pipette, you must give it a mount. The mount can be either <tt class="docutils literal">'left'</tt> or <tt class="docutils literal">'right'</tt>. The available pipette classes are <tt class="docutils literal">P300_Single</tt>, <tt class="docutils literal">P300_Multi</tt>, <tt class="docutils literal">P10_Single</tt>, and <tt class="docutils literal">P10_Multi</tt>. Right and left are defined as with the user in front of the robot door, facing the robot.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 32)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: pipettes
+
+    pipette = instruments.P300_Single(mount='right')
+
+</pre>
+</div>
+</div>
+<div class="section" id="plunger-speeds">
+<h2>Plunger Speeds</h2>
+<p>The speeds at which the pipette will aspirate and dispense can be set through <tt class="docutils literal">aspirate_flow_rate</tt> and <tt class="docutils literal">dispense_flow_rate</tt>. The values are in microliters/second.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 41)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: pipettes
+
+    pipette = instruments.P300_Multi(
+        mount='left',
+        aspirate_flow_rate=200,
+        dispense_flow_rate=400)
+
+
+</pre>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tip-handling">
+<h1>Tip Handling</h1>
+<p>When we handle liquids with a pipette, we are constantly exchanging old, used tips for new ones to prevent cross-contamination between our wells. To help with this constant need, we describe in this section a few methods for getting new tips, and removing tips from a pipette.</p>
+<hr class="docutils" />
+<p>This section demonstrates the options available for controlling tips</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 61)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tips
+
+    '''
+    Examples in this section expect the following
+    '''
+    from opentrons import labware, instruments
+
+    trash = labware.load('point', '11')
+    tiprack = labware.load('GEB-tiprack-300ul', '4')
+
+    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
+
+</pre>
+</div>
+<div class="section" id="pick-up-tip">
+<h2>Pick Up Tip</h2>
+<p>Before any liquid handling can be done, your pipette must have a tip on it. The command <tt class="docutils literal">pick_up_tip()</tt> will move the pipette over to the specified tip, the press down into it to create a vacuum seal. The below example picks up the tip at location <tt class="docutils literal">'A1'</tt>.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 78)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tips
+
+    pipette.pick_up_tip(tiprack.wells('A1'))
+
+</pre>
+</div>
+</div>
+<div class="section" id="drop-tip">
+<h2>Drop Tip</h2>
+<p>Once finished with a tip, the pipette will autonomously remove the tip when we call <tt class="docutils literal">drop_tip()</tt>. We can specify where to drop the tip by passing in a location. The below example drops the tip back at its originating location on the tip rack.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 87)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tips
+
+    pipette.drop_tip(tiprack.wells('A1'))
+
+</pre>
+</div>
+<p>Instead of returning a tip to the tip rack, we can also drop it in a trash container.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 93)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tips
+
+    pipette.pick_up_tip(tiprack.wells('A2'))
+    pipette.drop_tip(trash)
+
+</pre>
+</div>
+</div>
+<div class="section" id="return-tip">
+<h2>Return Tip</h2>
+<p>When we need to return the tip to its originating location on the tip rack, we can simply call <tt class="docutils literal">return_tip()</tt>. The example below will automatically return the tip to <tt class="docutils literal">'A3'</tt> on the tip rack.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 103)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tips
+
+    pipette.pick_up_tip(tiprack.wells('A3'))
+    pipette.return_tip()
+
+</pre>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tips-iterating">
+<h2>Tips Iterating</h2>
+<p>Automatically iterate through tips and drop tip in trash by attaching containers to a pipette</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 115)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tipsiterating
+
+    '''
+    Examples in this section expect the following
+    '''
+    from opentrons import labware, instruments
+
+    trash = labware.load('point', '11')
+    tip_rack_1 = labware.load('tiprack-200ul', '4')
+    tip_rack_2 = labware.load('tiprack-200ul', '5')
+
+    pipette = instruments.P300_Single(mount='left', tip_racks=[tip_rack_1, tip_rack_2])
+
+</pre>
+</div>
+<div class="section" id="attach-tip-rack-to-pipette">
+<h3>Attach Tip Rack to Pipette</h3>
+<p>Tip racks and trash containers can be &quot;attached&quot; to a pipette when the pipette is created. This give the pipette the ability to automatically iterate through tips, and to automatically send the tip to the trash container.</p>
+<p>If no trash container is specified, the pipette defaults to the fixed trash that is built into the deck of the robot. You can specify a trash container with the option <tt class="docutils literal">trash_container=TRASH_CONTAINER</tt>. If you want to force no trash container, use <tt class="docutils literal">trash_container=None</tt> (this will cause tips to be returned to the tiprack).</p>
+<p>Multiple tip racks are can be attached with the option <tt class="docutils literal"><span class="pre">tip_racks=[RACK_1,</span> RACK_2, <span class="pre">etc...</span> ]</tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <tt class="docutils literal">tip_racks=</tt> option expects us to give it a Python list, containing each tip rack we want to attach. If we are only attaching one tip rack, then the list will have a length of one, like the following:</p>
+<p class="last"><tt class="docutils literal"><span class="pre">tip_racks=[tiprack]</span></tt></p>
+</div>
+</div>
+<div class="section" id="iterating-through-tips">
+<h3>Iterating Through Tips</h3>
+<p>Now that we have two tip racks attached to the pipette, we can automatically step through each tip whenever we call <tt class="docutils literal">pick_up_tip()</tt>. We then have the option to either <tt class="docutils literal">return_tip()</tt> to the tip rack, or we can <tt class="docutils literal">drop_tip()</tt> to remove the tip in the attached trash container.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 149)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tipsiterating
+
+    pipette.pick_up_tip()  # picks up tip_rack_1:A1
+    pipette.return_tip()
+    pipette.pick_up_tip()  # picks up tip_rack_1:A2
+    pipette.drop_tip()     # automatically drops in trash
+
+    # use loop to pick up tips tip_rack_1:A3 through tip_rack_2:H12
+    for i in range(94 + 96):
+        pipette.pick_up_tip()
+        pipette.return_tip()
+
+</pre>
+</div>
+<p>If we try to <tt class="docutils literal">pick_up_tip()</tt> again when all the tips have been used, the Opentrons API will show you an error.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you run the cell above, and then uncomment and run the cell below, you will get an error because the pipette is out of tips.</p>
+</div>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 167)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tipsiterating
+
+    # this will raise an exception if run after the previous code block
+    # pipette.pick_up_tip()
+
+
+</pre>
+</div>
+</div>
+<div class="section" id="select-starting-tip">
+<h3>Select Starting Tip</h3>
+<p>Calls to <tt class="docutils literal">pick_up_tip()</tt> will by default start at the attached tip rack's <tt class="docutils literal">'A1'</tt> location. If you however want to start automatic tip iterating at a different tip, you can use <tt class="docutils literal">start_at_tip()</tt>.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 178)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tipsiterating
+
+    pipette.reset()
+
+    pipette.start_at_tip(tip_rack_1['C3'])
+    pipette.pick_up_tip()  # pick up C3 from &quot;tip_rack_1&quot;
+    pipette.return_tip()
+
+</pre>
+</div>
+</div>
+<div class="section" id="get-current-tip">
+<h3>Get Current Tip</h3>
+<p>Get the source location of the pipette's current tip by calling <tt class="docutils literal">current_tip()</tt>. If the tip was from the <tt class="docutils literal">'A1'</tt> position on our tip rack, <tt class="docutils literal">current_tip()</tt> will return that position.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 191)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: tipsiterating
+
+    print(pipette.current_tip())  # is holding no tip
+
+    pipette.pick_up_tip()
+    print(pipette.current_tip())  # is holding the next available tip
+
+    pipette.return_tip()
+    print(pipette.current_tip())  # is holding no tip
+
+</pre>
+</div>
+<p>will print out...</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 203)</p>
+<p>Unknown directive type &quot;testoutput&quot;.</p>
+<pre class="literal-block">
+.. testoutput:: tipsiterating
+
+    None
+    &lt;Well D3&gt;
+    None
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="liquid-control">
+<h1>Liquid Control</h1>
+<p>This is the fun section, where we get to move things around and pipette! This section describes the <tt class="docutils literal">Pipette</tt> object's many liquid-handling commands, as well as how to move the <tt class="docutils literal">robot</tt>.</p>
+<hr class="docutils" />
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 219)</p>
+<p>Unknown directive type &quot;testsetup&quot;.</p>
+<pre class="literal-block">
+.. testsetup:: liquid
+
+    from opentrons import containers, instruments, robot
+
+    robot.reset()
+
+    plate = containers.load('96-flat', '4')
+    pipette = instruments.P300_Single(mount='right')
+
+</pre>
+</div>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 228)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    '''
+    Examples in this section expect the following
+    '''
+    from opentrons import containers, instruments
+
+    plate = containers.load('96-flat', '4')
+    pipette = instruments.P300_Single(mount='right')
+
+
+</pre>
+</div>
+<div class="section" id="aspirate">
+<h2>Aspirate</h2>
+<p>To aspirate is to pull liquid up into the pipette's tip. When calling aspirate on a pipette, we can specify how many micoliters, and at which location, to draw liquid from:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 244)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.aspirate(50, plate.wells('A1'))  # aspirate 50uL from plate:A1
+
+</pre>
+</div>
+<p>Now our pipette's tip is holding 50uL.</p>
+<p>We can also simply specify how many microliters to aspirate, and not mention a location. The pipette in this circumstance will aspirate from it's current location (which we previously set as <tt class="docutils literal"><span class="pre">plate.wells('A1'))</span></tt>.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 252)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.aspirate(50)                     # aspirate 50uL from current position
+
+</pre>
+</div>
+<p>Now our pipette's tip is holding 100uL.</p>
+<p>We can also specify only the location to aspirate from. If we do not tell the pipette how many micoliters to aspirate, it will by default fill up the remaining volume in it's tip. In this example, since we already have 100uL in the tip, the pipette will aspirate another 100uL</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 260)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.aspirate(plate.wells('A2'))      # aspirate until pipette fills from plate:A2
+
+
+</pre>
+</div>
+</div>
+<div class="section" id="dispense">
+<h2>Dispense</h2>
+<p>To dispense is to push out liquid from the pipette's tip. It's usage in the Opentrons API is nearly identical to <tt class="docutils literal">aspirate()</tt>, in that you can specify microliters and location, only microliters, or only a location:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 270)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.dispense(50, plate.wells('B1')) # dispense 50uL to plate:B1
+    pipette.dispense(50)                    # dispense 50uL to current position
+    pipette.dispense(plate.wells('B2'))     # dispense until pipette empties to plate:B2
+
+</pre>
+</div>
+<p>That final dispense without specifying a micoliter amount will dispense all remaining liquids in the tip to <tt class="docutils literal"><span class="pre">plate.wells('B2')</span></tt>, and now our pipette is empty.</p>
+</div>
+<div class="section" id="blow-out">
+<h2>Blow Out</h2>
+<p>To blow out is to push an extra amount of air through the pipette's tip, so as to make sure that any remaining droplets are expelled.</p>
+<p>When calling <tt class="docutils literal">blow_out()</tt> on a pipette, we have the option to specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from it's current position.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 285)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.blow_out()                  # blow out over current location
+    pipette.blow_out(plate.wells('B3')) # blow out over current plate:B3
+
+
+</pre>
+</div>
+</div>
+<div class="section" id="touch-tip">
+<h2>Touch Tip</h2>
+<p>To touch tip is to move the pipette's currently attached tip to the edges of a well, for the purpose of knocking off any droplets that might be hanging from the tip.</p>
+<p>When calling <tt class="docutils literal">touch_tip()</tt> on a pipette, we have the option to specify a location where the tip will touch the inner walls. If no location is specified, the pipette will touch tip inside it's current location.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 298)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.touch_tip()                  # touch tip within current location
+    pipette.touch_tip(-2)                # touch tip 2mm below the top of the current location
+    pipette.touch_tip(plate.wells('B1')) # touch tip within plate:B1
+
+
+</pre>
+</div>
+</div>
+<div class="section" id="mix">
+<h2>Mix</h2>
+<p>Mixing is simply performing a series of <tt class="docutils literal">aspirate()</tt> and <tt class="docutils literal">dispense()</tt> commands in a row on a single location. However, instead of having to write those commands out every time, the Opentrons API allows you to simply say <tt class="docutils literal">mix()</tt>.</p>
+<p>The mix command takes three arguments: <tt class="docutils literal">mix(repetitions, volume, location)</tt></p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 312)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.mix(4, 100, plate.wells('A2'))   # mix 4 times, 100uL, in plate:A2
+    pipette.mix(3, 50)                       # mix 3 times, 50uL, in current location
+    pipette.mix(2)                           # mix 2 times, pipette's max volume, in current location
+
+
+</pre>
+</div>
+</div>
+<div class="section" id="air-gap">
+<h2>Air Gap</h2>
+<p>Some liquids need an extra amount of air in the pipette's tip to prevent it from sliding out. A call to <tt class="docutils literal">air_gap()</tt> with a microliter amount will aspirate that much air into the tip.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 324)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: liquid
+
+    pipette.aspirate(100, plate.wells('B4'))
+    pipette.air_gap(20)
+
+</pre>
+</div>
+<hr class="docutils" />
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 331)</p>
+<p>Unknown directive type &quot;testsetup&quot;.</p>
+<pre class="literal-block">
+.. testsetup:: moving
+
+    from opentrons import robot, containers, instruments
+
+    robot.reset()
+
+    tiprack = containers.load('GEB-tiprack-300ul', '1')
+    plate = containers.load('96-flat', '4')
+
+    pipette = instruments.P300_Single(mount='right')
+
+</pre>
+</div>
+</div>
+</div>
+<div class="section" id="moving">
+<h1>Moving</h1>
+<p>Demonstrates the different ways to control the movement of the Opentrons liquid handler during a protocol run.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 348)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    '''
+    Examples in this section expect the following
+    '''
+    from opentrons import containers, instruments, robot
+
+    tiprack = containers.load('GEB-tiprack-300ul', '1')
+    plate = containers.load('96-flat', '4')
+
+    pipette = instruments.P300_Single(mount='right')
+
+</pre>
+</div>
+<div class="section" id="move-to">
+<h2>Move To</h2>
+<p>Pipette's are able to <tt class="docutils literal">move_to()</tt> any location on the deck.</p>
+<p>For example, we can move to the first tip in our tip rack:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 367)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    pipette.move_to(tiprack.wells('A1'))
+
+</pre>
+</div>
+<p>You can also specify at what height you would like the robot to move to inside of a location using <tt class="docutils literal">top()</tt> and <tt class="docutils literal">bottom()</tt> methods on that location.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 373)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    pipette.move_to(plate.wells('A1').bottom())  # move to the bottom of well A1
+    pipette.move_to(plate.wells('A1').top())     # move to the top of well A1
+    pipette.move_to(plate.wells('A1').bottom(2)) # move to 2mm above the bottom of well A1
+    pipette.move_to(plate.wells('A1').top(-2))   # move to 2mm below the top of well A1
+
+</pre>
+</div>
+<p>The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to mive in a straight line to the target location, you can set the movement strategy to <tt class="docutils literal">'direct'</tt>.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 382)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    pipette.move_to(plate.wells('A1'), strategy='direct')
+
+</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Moving with <tt class="docutils literal"><span class="pre">strategy='direct'</span></tt> will run the risk of colliding with things on your deck. Be very careful when using the option.</p>
+</div>
+<p>Usually the <tt class="docutils literal"><span class="pre">strategy='direct'</span></tt> option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use 'direct' movements inside that well, then finally move on to a different well.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 392)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    pipette.move_to(plate.wells('A1'))
+    pipette.move_to(plate.wells('A1').bottom(1), strategy='direct')
+    pipette.move_to(plate.wells('A1').top(-2), strategy='direct')
+    pipette.move_to(plate.wells('A1'))
+
+</pre>
+</div>
+</div>
+<div class="section" id="delay">
+<h2>Delay</h2>
+<p>To have your protocol pause for any given number of minutes or seconds, simply call <tt class="docutils literal">delay()</tt> on your pipette. The value passed into <tt class="docutils literal">delay()</tt> is the number of minutes or seconds the robot will wait until moving on to the next commands.</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/jerry/Desktop/Work/Opentrons 3.0/opentrons/api/docs/source/pipettes.rst</tt>, line 404)</p>
+<p>Unknown directive type &quot;testcode&quot;.</p>
+<pre class="literal-block">
+.. testcode:: moving
+
+    pipette.delay(seconds=2)             # pause for 2 seconds
+    pipette.delay(minutes=5)             # pause for 5 minutes
+    pipette.delay(minutes=5, seconds=2)  # pause for 5 minutes and 2 seconds
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

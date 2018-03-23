@@ -550,35 +550,30 @@ class Pipette:
                 location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location, strategy='direct')
 
-<<<<<<< HEAD
     def _position_for_dispense(self, location=None, clearance=0.5):
         """
         Position this :any:`Pipette` for an dispense
         """
-=======
-    def _position_for_dispense(self, location=None):
-        assert self.tip_attached
->>>>>>> Remove dead code, overly fragile tests, and clean up test code to use correct objects
 
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location)
 
-    def retract(self, safety_margin=10):
-        '''
-        Move the pipette's mount upwards and away from the deck
+        def retract(self, safety_margin=10):
+            '''
+            Move the pipette's mount upwards and away from the deck
 
-        Parameters
-        ----------
-        safety_margin: int
-            Distance in millimeters awey from the limit switch,
-            used during the mount's `fast_home()` method
-        '''
-        self.previous_placeable = None  # it is no longer inside a placeable
-        self.robot.poses = self.instrument_mover.fast_home(
-            self.robot.poses, safety_margin)
-        return self
+            Parameters
+            ----------
+            safety_margin: int
+                Distance in millimeters awey from the limit switch,
+                used during the mount's `fast_home()` method
+            '''
+            self.previous_placeable = None  # it is no longer inside a placeable
+            self.robot.poses = self.instrument_mover.fast_home(
+                self.robot.poses, safety_margin)
+            return self
 
     @commands.publish.both(command=commands.mix)
     def mix(self,
