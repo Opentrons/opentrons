@@ -79,24 +79,36 @@ def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
     parsed_values = parsed_values[2:]
     if len(parsed_values) != 6:
+        log.warning("Unexpected response in _parse_axis_values: {}".format(
+            raw_axis_values))
         raise ParseError('Unexpected response from Smoothieware: {}'.format(
             raw_axis_values))
-    return {
-        s.split(':')[0].upper(): round(
-            float(s.split(':')[1]),
-            GCODE_ROUNDING_PRECISION)
-        for s in parsed_values
-    }
+    try:
+        data = {
+            s.split(':')[0].upper(): round(
+                float(s.split(':')[1]),
+                GCODE_ROUNDING_PRECISION)
+            for s in parsed_values
+        }
+    except (ValueError, IndexError) as e:
+        log.error("Data format error in _parse_axis_values: {}".format(e))
+        raise e
+    except Exception as e:
+        log.error("Unexpected! {}".format(e))
+        raise e
+    return data
 
 
 def _parse_instrument_data(smoothie_response):
-    items = smoothie_response.split('\n')[0].strip().split(':')
-    mount = items[0]
     try:
+        items = smoothie_response.split('\n')[0].strip().split(':')
+        mount = items[0]
         # data received from Smoothieware is stringified HEX values
         # because of how Smoothieware handles GCODE messages
         data = bytearray.fromhex(items[1])
     except (ValueError, IndexError):
+        log.error("Unexpected response in _parse_instrument_data: {}".format(
+            smoothie_response))
         raise ParseError('Unexpected response from Smoothieware: {}'.format(
             smoothie_response))
     return {mount: data}
@@ -104,28 +116,43 @@ def _parse_instrument_data(smoothie_response):
 
 def _byte_array_to_ascii_string(byte_array):
     # remove trailing null characters
-    for c in [b'\x00', b'\xFF']:
-        if c in byte_array:
-            byte_array = byte_array[:byte_array.index(c)]
-    return byte_array.decode()
+    try:
+        for c in [b'\x00', b'\xFF']:
+            if c in byte_array:
+                byte_array = byte_array[:byte_array.index(c)]
+        res = byte_array.decode()
+    except Exception as e:
+        log.error("Totally unexpected! {}".format(e))
+        raise e
+    return res
 
 
 def _byte_array_to_hex_string(byte_array):
     # data must be sent as stringified HEX values
     # because of how Smoothieware parses GCODE messages
-    return ''.join('%02x' % b for b in byte_array)
+    try:
+        res = ''.join('%02x' % b for b in byte_array)
+    except Exception as e:
+        log.error("Even more unexpected! {}".format(e))
+        raise e
+    return res
 
 
 def _parse_switch_values(raw_switch_values):
-    # probe has a space after it's ":" for some reasone
-    if 'Probe: ' in raw_switch_values:
-        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
-    parsed_values = raw_switch_values.strip().split(' ')
-    return {
-        s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
-        for s in parsed_values
-        if any([n in s for n in ['max', 'Probe']])
-    }
+    try:
+        # probe has a space after it's ":" for some reason
+        if 'Probe: ' in raw_switch_values:
+            raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
+        parsed_values = raw_switch_values.strip().split(' ')
+        res = {
+            s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
+            for s in parsed_values
+            if any([n in s for n in ['max', 'Probe']])
+        }
+    except Exception as e:
+        log.error("Thoroughly unexpected! {}".format(e))
+        raise e
+    return res
 
 
 class SmoothieError(Exception):
@@ -332,6 +359,7 @@ class SmoothieDriver_3_0_0:
         self._combined_speed = float(value)
         speed_per_min = int(self._combined_speed * SEC_PER_MIN)
         command = GCODES['SET_SPEED'] + str(speed_per_min)
+        log.debug("set_speed: {}".format(command))
         self._send_command(command)
 
     def push_speed(self):
@@ -355,6 +383,7 @@ class SmoothieDriver_3_0_0:
             GCODES['SET_MAX_SPEED'],
             ' '.join(values)
         )
+        log.debug("set_axis_max_speed: {}".format(command))
         self._send_command(command)
 
     def push_axis_max_speed(self):
@@ -382,6 +411,7 @@ class SmoothieDriver_3_0_0:
             GCODES['SET_CURRENT'],
             ' '.join(values)
         )
+        log.debug("set_current: {}".format(command))
         self._send_command(command)
         self.delay(CURRENT_CHANGE_DELAY)
 
@@ -397,7 +427,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes.upper()) & set(AXES))
         if axes:
-            log.debug("Disengaging axes: {}".format(axes))
+            log.debug("disengage_axis: {}".format(axes))
             self._send_command(GCODES['DISENGAGE_MOTOR'] + axes)
             for axis in axes:
                 self.engaged_axes[axis] = False
@@ -474,6 +504,7 @@ class SmoothieDriver_3_0_0:
         # smoothieware will ignore new messages for a short time
         # after it has entered an error state, so sleep for some milliseconds
         sleep(0.1)
+        log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
     # Potential place for command optimization (buffering, flushing, etc)
@@ -517,6 +548,7 @@ class SmoothieDriver_3_0_0:
             return ret_code
 
     def _home_x(self):
+        log.debug("_home_x")
         # move the gantry forward on Y axis with low power
         self.push_current()
         self.push_speed()
@@ -543,6 +575,7 @@ class SmoothieDriver_3_0_0:
             self.dwell_axes('X')
 
     def _home_y(self):
+        log.debug("_home_y")
         self.activate_axes('Y')
         # home the Y at normal speed (fast)
         self._send_command(GCODES['HOME'] + 'Y')
@@ -567,6 +600,7 @@ class SmoothieDriver_3_0_0:
             self.dwell_axes('Y')
 
     def _setup(self):
+        log.debug("_setup")
         self._wait_for_ack()
         self._reset_from_error()
         self._send_command(self._config.acceleration)
@@ -629,6 +663,7 @@ class SmoothieDriver_3_0_0:
         byte_string = _byte_array_to_hex_string(
             bytearray(data_string.encode()))
         command = gcode + mount + byte_string
+        log.debug("_write_to_pipette: {}".format(command))
         self._send_command(command)
 
     # ----------- END Private functions ----------- #
@@ -672,6 +707,7 @@ class SmoothieDriver_3_0_0:
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
+                log.debug("move: {}".format(command))
                 self._send_command(command)
             finally:
                 # dwell pipette motors because they get hot
@@ -720,6 +756,7 @@ class SmoothieDriver_3_0_0:
                 command = GCODES['HOME'] + axes
                 try:
                     self.activate_axes(axes)
+                    log.debug("home: {}".format(command))
                     self._send_command(command, timeout=30)
                 finally:
                     # always dwell an axis after it has been homed
@@ -783,12 +820,14 @@ class SmoothieDriver_3_0_0:
             code=GCODES['DWELL'],
             seconds=seconds
         )
+        log.debug("delay: {}".format(command))
         self._send_command(command)
 
     def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
             self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
+            log.debug("probe_axis: {}".format(command))
             self._send_command(command=command, timeout=30)
             self.update_position(self.position)
             return self.position
@@ -838,6 +877,7 @@ class SmoothieDriver_3_0_0:
         Smoothie code to return Smoothie to a normal waiting state and reset
         any other state needed for the driver.
         """
+        log.debug("kill")
         self._smoothie_hard_halt()
         self._reset_from_error()
         self._setup()

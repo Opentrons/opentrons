@@ -81,6 +81,7 @@ def _attempt_command_recovery(command, serial_conn):
     with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
         response = _write_to_device_and_return(command, device)
     if response is None:
+        log.debug("No valid response during _attempt_command_recovery")
         raise RuntimeError(
             "Recovery attempted - no valid smoothie response "
             "for command: {} in {} seconds".format(command, RECOVERY_TIMEOUT))
