@@ -416,6 +416,7 @@ export const selectors = {
   orderedSteps: orderedStepsSelector,
   selectedStep: selectedStepSelector,
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
+  hoveredStepId,
   hoveredOrSelectedStepId,
   selectedStepFormData: createSelector(
     getSavedForms,

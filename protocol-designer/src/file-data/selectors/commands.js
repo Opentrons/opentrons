@@ -10,6 +10,7 @@ import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {getAllWellsForLabware} from '../../constants'
 import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
+import type {ProcessedFormData} from '../../steplist/types'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -211,16 +212,49 @@ function _wellContentsForLabware (
   )
 }
 
+function _getSelectedWellsForStep (form: ProcessedFormData, labwareId: string): Array<string> {
+  if (form.stepType === 'transfer') {
+    if (form.sourceLabware === labwareId) {
+      return form.sourceWells
+    }
+    if (form.destLabware === labwareId) {
+      return form.destWells
+    }
+  }
+  if (form.stepType === 'consolidate') {
+    if (form.sourceLabware === labwareId) {
+      return form.sourceWells
+    }
+    if (form.destLabware === labwareId) {
+      return [form.destWell]
+    }
+  }
+  // TODO Ian 2018-03-23 once distribute is supported
+  // if (form.stepType === 'distribute') {
+  //   ...
+  // }
+  return []
+}
+
 export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
   robotStateTimeline,
-  (_robotStateTimeline) => {
+  steplistSelectors.validatedForms,
+  steplistSelectors.hoveredStepId,
+  (_robotStateTimeline, _forms, _hoveredStepId) => {
     const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
     return liquidStateTimeline.map(
       (liquidState, timelineIdx) => mapValues(
         liquidState,
         (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
           const labwareType = _robotStateTimeline[timelineIdx].robotState.labware[labwareId].type
-          const selectedWells = ['A3', 'A4'] // TODO IMMEDIATELY
+          const formIdx = timelineIdx + 1 // add 1 to make up for
+
+          const form = _forms[formIdx] && _forms[formIdx].validatedForm
+          const selectedWells = (form && _hoveredStepId === formIdx)
+            // only show selected wells when user is **hovering** over the step
+            ? _getSelectedWellsForStep(form, labwareId)
+            : []
+
           return _wellContentsForLabware(
             labwareLiquids,
             labwareId,

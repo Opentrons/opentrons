@@ -55,7 +55,6 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   return {
     containerId,
-    // wellContents: selectors.wellContentsAllLabware(state)[containerId], // TODO Ian 2018-03-19 don't need this selector anymore? Remove
     wellContents,
     containerType: labware.type,
     selectable: ownProps.selectable
