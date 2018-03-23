@@ -9,7 +9,7 @@
   },
   "name": "protocol-designer",
   "private": true,
-  "version": "3.0.0-beta.0",
+  "version": "3.0.0-beta.1",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "scripts": {
@@ -31,7 +31,7 @@
   "homepage": "https://github.com/OpenTrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.0.0-beta.0",
+    "@opentrons/components": "3.0.0-beta.1",
     "classnames": "^2.2.5",
     "google-fonts-webpack-plugin": "^0.4.3",
     "lodash": "^4.17.4",
@@ -47,7 +47,7 @@
     "reselect": "^3.0.1"
   },
   "devDependencies": {
-    "@opentrons/webpack-config": "3.0.0-beta.0",
+    "@opentrons/webpack-config": "3.0.0-beta.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
     "babel-jest": "^20.0.3",
