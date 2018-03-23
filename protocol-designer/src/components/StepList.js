@@ -81,12 +81,13 @@ export default function StepList (props: StepListProps) {
           {generateSubstepItems(step.substeps)}
         </StepItem>
       ))}
+
+      <StepCreationButton />
       <TitledList title='END' iconName='check'
         onClick={props.handleStepItemClickById && props.handleStepItemClickById(END_STEP)}
         onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(END_STEP)}
         selected={props.selectedStepId === END_STEP}
       />
-      <StepCreationButton />
     </SidePanel>
   )
 }
