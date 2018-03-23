@@ -40,7 +40,7 @@ uninstall:
 
 .PHONY: install-types
 install-types:
-	flow-typed install jest@^20.0.4 --flowVersion=0.61.0 # TODO Ian 2018-03-15: use jest version in package.json
+	flow-typed install --flowVersion=0.61.0
 	# install type definitions for all projects, project-by-project
 	$(MAKE) -C $(APP_DIR) install-types
 	$(MAKE) -C $(COMPONENTS_DIR) install-types
