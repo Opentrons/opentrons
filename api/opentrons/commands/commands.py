@@ -128,6 +128,21 @@ def distribute(instrument, volume, source, dest):
     )
 
 
+def move_to(location, strategy):
+    text = 'Moving to {location} with strategy {strategy}'.format(
+        location=location,
+        strategy=strategy
+    )
+    return make_command(
+        name=types.MOVE_TO,
+        payload={
+            'location': location,
+            'strategy': strategy,
+            'text': text
+        }
+    )
+
+
 def transfer(instrument, volume, source, dest):
     text = 'Transferring {volume} from {source} to {dest}'.format(
         volume=volume,
