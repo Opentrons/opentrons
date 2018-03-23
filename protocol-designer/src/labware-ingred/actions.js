@@ -143,7 +143,7 @@ export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>,
       fromContainer,
       toContainer: uuid() + ':' + fromContainer.split(':')[1],
       // 'toContainer' is the containerId of the new clone.
-      // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'default-trash'.
+      // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'FIXED_TRASH_ID'.
       toSlot: slot
     }
   })

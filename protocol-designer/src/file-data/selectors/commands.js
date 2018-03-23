@@ -8,6 +8,7 @@ import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {getAllWellsForLabware} from '../../constants'
 import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
 
 const all96Tips = reduce(
@@ -165,22 +166,48 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
   }
 )
 
-function _wellContentsForLabware (labwareLiquids: LabwareLiquidState): WellContents {
-  return mapValues(
-    labwareLiquids,
-    (wellContents: {[groupId: string]: {volume: number}}, well: string) => ({
-      preselected: false,
-      selected: false,
-      highlighted: false,
-      maxVolume: 123, // TODO refactor so all these fields aren't needed
-      wellName: well,
-      groupId: wellContents
-        ? Object.keys(wellContents).filter(groupId =>
-          wellContents[groupId] &&
-          wellContents[groupId].volume > 0
-        )
-        : null
-    })
+type LiquidVolumeState = {[groupId: string]: {volume: number}} // TODO IMMEDIATELY: import this, don't declare
+type SingleLabwareLiquidState = {[well: string]: {[ingredGroupId: string]: {volume: number}}} // TODO IMMEDIATELY IMPORT TYPE
+
+function _wellContentsForWell (
+  liquidVolState: LiquidVolumeState,
+  well: string
+): WellContents {
+  // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
+  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId =>
+      liquidVolState[groupId] &&
+      liquidVolState[groupId].volume > 0
+    )
+
+  return {
+    preselected: false,
+    selected: false,
+    highlighted: false,
+    maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
+    wellName: well,
+    groupId: ingredGroupIdsWithContent[0] || null // TODO Ian 2018-03-23 show 'gray' when there are multiple group ids.
+  }
+}
+
+function _wellContentsForLabware (
+  labwareLiquids: SingleLabwareLiquidState,
+  labwareId: string,
+  labwareType: string,
+  selectedWells: Array<string>
+): AllWellContents {
+  const allWellsForContainer = getAllWellsForLabware(labwareType)
+
+  return reduce(
+    allWellsForContainer,
+    (wellAcc, well: string): {[well: string]: WellContents} => ({
+      ...wellAcc,
+      [well]: {
+        ..._wellContentsForWell(labwareLiquids[well], well),
+        // "mix in" selected state
+        selected: selectedWells.includes(well)
+      }
+    }),
+    {}
   )
 }
 
@@ -189,12 +216,19 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
   (_robotStateTimeline) => {
     const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
     return liquidStateTimeline.map(
-      liquidState => reduce(
+      (liquidState, timelineIdx) => mapValues(
         liquidState,
-        (acc, labwareLiquids: LabwareLiquidState, labwareId: string) => ({
-          ...acc,
-          [labwareId]: _wellContentsForLabware(labwareLiquids)
-        }), {})
+        (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
+          const labwareType = _robotStateTimeline[timelineIdx].robotState.labware[labwareId].type
+          const selectedWells = ['A3', 'A4'] // TODO IMMEDIATELY
+          return _wellContentsForLabware(
+            labwareLiquids,
+            labwareId,
+            labwareType,
+            selectedWells
+          )
+        }
+      )
     )
   }
 )

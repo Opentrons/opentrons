@@ -9,7 +9,7 @@ import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
-import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants.js'
+import {getMaxVolumes, defaultContainers, sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
@@ -85,9 +85,9 @@ type ContainersState = {
 }
 
 const initialLabwareState = {
-  'default-trash': {
-    id: 'default-trash',
-    type: 'trash-box',
+  [FIXED_TRASH_ID]: {
+    id: FIXED_TRASH_ID,
+    type: 'trash-box', // TODO Ian 2018-03-23 Change to 'fixed-trash' using new defs
     name: 'Trash',
     slot: '12'
   }

@@ -5,7 +5,7 @@ import {getLabwareLiquidState} from '../selectors'
 // you should export fixures for each labwareState & ingredLocs
 // then import here instead of copy-paste
 const labwareState = {
-  'default-trash': {
+  'FIXED_TRASH_ID': {
     type: 'trash-box',
     name: 'Trash',
     slot: '12'
@@ -87,7 +87,7 @@ describe('getLabwareLiquidState', () => {
           '1': {volume: 222}
         }
       },
-      'default-trash': {}
+      'FIXED_TRASH_ID': {}
     })
   })
 })

@@ -19,7 +19,7 @@ const baseIngredFields2 = {
 }
 
 const containerState = {
-  'default-trash': {
+  'FIXED_TRASH_ID': {
     type: 'trash-box',
     name: 'Trash',
     slot: '12'
@@ -123,7 +123,7 @@ const ingredsByLabwareXXSingleIngred = {
   },
   'container2Id': {},
   'container3Id': {},
-  'default-trash': {}
+  'FIXED_TRASH_ID': {}
 }
 
 const ingredsByLabwareXXTwoIngred = {
@@ -159,7 +159,7 @@ const ingredsByLabwareXXTwoIngred = {
       }
     }
   },
-  'default-trash': {}
+  'FIXED_TRASH_ID': {}
 }
 
 const defaultWellContents = {
@@ -251,7 +251,7 @@ describe('wellContentsAllLabware', () => {
     expect(
       singleIngredResult
     ).toMatchObject({
-      'default-trash': {
+      'FIXED_TRASH_ID': {
         A1: defaultWellContents
       },
       container2Id: {
