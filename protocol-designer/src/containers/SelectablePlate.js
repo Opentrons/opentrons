@@ -47,9 +47,11 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     prevStepId = Math.max(stepId - 1, 0)
   }
 
-  const wellContents = allWellContentsForSteps[prevStepId]
-    ? allWellContentsForSteps[prevStepId][containerId]
-    : {}
+  const wellContents = (steplistSelectors.deckSetupMode(state))
+    // selection for deck setup
+    ? selectors.wellContentsAllLabware(state)[containerId]
+    // well contents for step, not deck setup mode
+    : allWellContentsForSteps[prevStepId] ? allWellContentsForSteps[prevStepId][containerId] : {}
 
   return {
     containerId,
