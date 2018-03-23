@@ -74,6 +74,7 @@ def init(loop=None):
     routes for methods defined in opentrons.server.endpoints
     """
     server = Server(MainRouter(), loop=loop)
+
     server.app.router.add_get(
         '/health', endp.health)
     server.app.router.add_get(
@@ -108,6 +109,7 @@ def init(loop=None):
         '/robot/positions', control.position_info)
     server.app.router.add_post(
         '/robot/move', control.move)
+
     return server.app
 
 

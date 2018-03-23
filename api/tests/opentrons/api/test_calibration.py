@@ -1,7 +1,10 @@
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
+
 import pytest
+
+from opentrons.util import calibration_functions
 
 state = partial(state, 'calibration')
 
@@ -35,6 +38,67 @@ async def test_tip_probe(main_router, model):
 
     await main_router.wait_until(state('probing'))
     await main_router.wait_until(state('ready'))
+
+
+async def test_correct_hotspots(main_router, model):
+
+    robot = model.robot
+
+    tip_length = robot.config.tip_length[model.instrument._instrument.name]
+    switch_clearance = 7.5
+    x_switch_offset = 5.0
+    y_switch_offset = 2.0
+    z_switch_offset = 5.0
+    deck_clearance = 5.0
+    z_probe_clearance = 5.0
+    z_start_clearance = 20.0
+
+    size_x, size_y, size_z = robot.config.probe_dimensions
+
+    rel_x_start = (size_x / 2) + switch_clearance
+    rel_y_start = (size_y / 2) + switch_clearance
+
+    nozzle_safe_z = round((size_z - tip_length) + z_probe_clearance, 3)
+    z_start = max(deck_clearance, nozzle_safe_z)
+    expected = [('x',
+                 -rel_x_start,
+                 x_switch_offset,
+                 z_start,
+                 size_x),
+                ('x',
+                 rel_x_start,
+                 x_switch_offset,
+                 z_start,
+                 -size_x),
+                ('y',
+                 y_switch_offset,
+                 -rel_y_start,
+                 z_start,
+                 size_y),
+                ('y',
+                y_switch_offset,
+                rel_y_start,
+                z_start,
+                -size_y),
+                ('z',
+                 0.0,
+                 z_switch_offset,
+                 z_start_clearance,
+                 -size_z)
+                ]
+
+    actual = calibration_functions._calculate_hotspots(
+        robot,
+        tip_length,
+        switch_clearance,
+        x_switch_offset,
+        y_switch_offset,
+        z_switch_offset,
+        deck_clearance,
+        z_probe_clearance,
+        z_start_clearance)
+
+    assert expected == actual
 
 
 async def test_move_to_front(main_router, model):
