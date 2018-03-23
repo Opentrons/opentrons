@@ -145,7 +145,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
   const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
 
   return (
-    <LabwareContainer {...{height, width, slot}} highlighted={deckSetupMode && highlighted}>
+    <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
         ? <SlotWithContainer {...{containerType, containerName, containerId}} />
