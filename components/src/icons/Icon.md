@@ -1,67 +1,22 @@
 All available icons:
 
 ```js
-// import {ALERT, BACK, REFRESH, etc.} from @opentrons/components
-const {
-  ALERT, BACK, CIRCLE, CLOSE, REFRESH, SPINNER, USB, WIFI, FLASK, CHECK, CHECKED, UNCHECKED,
-  CHECKED_RADIO, UNCHECKED_RADIO, CHECKED_BOX, UNCHECKED_BOX, TOGGLED_OFF,
-  TOGGLED_ON, CHEVRON_UP, CHEVRON_DOWN, CHEVRON_LEFT, CHEVRON_RIGHT, FILE,
-  UPLOAD, COG, CONNECT, CONSOLIDATE, DISTRIBUTE, MIX, PAUSE, ARROW_RIGHT,
-  MENU_DOWN, MOVE, PLUS, COPY, CALIBRATE, RUN, LOGO, WARNING, ERROR
-} = require('./icon-data')
+const iconData = require('./icon-data').default
 
-;<div>
-  <Icon width='64px' name={ALERT} />
-  <Icon width='64px' name={BACK} />
-  <Icon width='64px' name={CIRCLE} />
-  <Icon width='64px' name={CLOSE} />
-  <Icon width='64px' name={REFRESH} />
-  <Icon width='64px' name={SPINNER} />
-  <Icon width='64px' name={USB} />
-  <Icon width='64px' name={WIFI} />
-  <Icon width='64px' name={FLASK} />
-  <Icon width='64px' name={CHECK} />
-  <Icon width='64px' name={CHECKED} />
-  <Icon width='64px' name={UNCHECKED} />
-  <Icon width='64px' name={CHECKED_RADIO} />
-  <Icon width='64px' name={UNCHECKED_RADIO} />
-  <Icon width='64px' name={CHECKED_BOX} />
-  <Icon width='64px' name={UNCHECKED_BOX} />
-  <Icon width='64px' name={TOGGLED_OFF} />
-  <Icon width='64px' name={TOGGLED_ON} />
-  <Icon width='64px' name={CHEVRON_UP} />
-  <Icon width='64px' name={CHEVRON_DOWN} />
-  <Icon width='64px' name={CHEVRON_LEFT} />
-  <Icon width='64px' name={CHEVRON_RIGHT} />
-  <Icon width='64px' name={FILE} />
-  <Icon width='64px' name={UPLOAD} />
-  <Icon width='64px' name={COG} />
-  <Icon width='64px' name={CONNECT} />
-  <Icon width='64px' name={CONSOLIDATE} />
-  <Icon width='64px' name={DISTRIBUTE} />
-  <Icon width='64px' name={MIX} />
-  <Icon width='64px' name={PAUSE} />
-  <Icon width='64px' name={ARROW_RIGHT} />
-  <Icon width='64px' name={MENU_DOWN} />
-  <Icon width='64px' name={MOVE} />
-  <Icon width='64px' name={PLUS} />
-  <Icon width='64px' name={COPY} />
-  <Icon width='64px' name={CALIBRATE} />
-  <Icon width='64px' name={RUN} />
-  <Icon width='64px' name={LOGO} />
-  <Icon width='64px' name={WARNING} />
-  <Icon width='64px' name={ERROR} />
+;<div className='icon-showcase'>
+  {Object.keys(iconData).sort().map(iconName =>
+    <span key={iconName}>
+      <Icon width='64px' name={iconName} />
+      <span>{iconName}</span>
+    </span>)}
 </div>
 ```
 
 Spin any icon!
 
 ```js
-// import {REFRESH, SPINNER} from @opentrons/components
-const {REFRESH, SPINNER} = require('./icon-data')
-
 ;<div>
-  <Icon width='64px' name={SPINNER} spin />
-  <Icon width='64px' name={REFRESH} spin />
+  <Icon width='64px' name='ot-spinner' spin />
+  <Icon width='64px' name='refresh' spin />
 </div>
 ```

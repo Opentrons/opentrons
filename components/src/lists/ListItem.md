@@ -5,7 +5,7 @@ ListItem example:
   <ListItem>
     Plain item
   </ListItem>
-  <ListItem iconName='flask'>
+  <ListItem iconName='flask-outline'>
     This item has an icon
   </ListItem>
   <ListItem onClick={() => alert('clicked!')}>

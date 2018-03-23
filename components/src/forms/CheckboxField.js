@@ -23,7 +23,7 @@ export default function CheckboxField (props: Props) {
   return (
     <label className={cx(styles.form_field, props.className)}>
       <div className={cx(styles.checkbox_icon, {[styles.error]: error})}>
-        <Icon name={props.value ? 'checked box' : 'unchecked box'} width='100%' />
+        <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
       </div>
       <input
         className={cx(styles.input_field, styles.accessibly_hidden)}

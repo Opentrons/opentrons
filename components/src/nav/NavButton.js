@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import styles from './navbar.css'
 import {Button} from '../buttons'
-import {NotificationIcon, CIRCLE, type IconName} from '../icons'
+import {NotificationIcon, type IconName} from '../icons'
 
 type NavButtonProps= {
   /** optional click event for nav button */
@@ -54,7 +54,7 @@ export default function NavButton (props: NavButtonProps) {
     <Button {...buttonProps}>
       <NotificationIcon
         name={props.iconName}
-        childName={props.notification ? CIRCLE : null}
+        childName={props.notification ? 'circle' : null}
         className={styles.icon}
         childClassName={styles.notification}
       />

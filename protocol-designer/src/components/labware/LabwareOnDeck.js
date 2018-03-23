@@ -42,7 +42,7 @@ function OccupiedDeckSlotOverlay ({
           iconName='plus' y='25%' text='Edit Ingredients' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
-        iconName='move' y='50%' text='Copy Labware' />
+        iconName='cursor-move' y='50%' text='Copy Labware' />
       {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
       <ClickableText onClick={() =>
@@ -166,7 +166,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
               <ClickableText onClick={e => openLabwareSelector({slot})}
                 iconName='plus' y='40%' text='Add Labware' />
               <ClickableText onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
-                iconName='copy' y='65%' text='Add Copy' />
+                iconName='content-copy' y='65%' text='Add Copy' />
             </g>
         )
       }

@@ -14,7 +14,7 @@ import {
   makeGetRobotRestartRequest
 } from '../../http-api-client'
 
-import {AlertModal, Icon, SPINNER} from '@opentrons/components'
+import {AlertModal, Icon} from '@opentrons/components'
 
 type OwnProps = Robot
 
@@ -37,7 +37,7 @@ const RESTART_MSG = 'Restart your robot to finish the update. It may take severa
 const DONE_MSG = 'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
 
 // TODO(mc, 2018-03-19): prop or component for text-height icons
-const Spinner = () => (<Icon name={SPINNER} height='1em' spin />)
+const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
 export default connect(makeMapStateToProps, mapDispatchToProps)(UpdateModal)
 

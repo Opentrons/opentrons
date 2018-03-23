@@ -4,10 +4,7 @@ import capitalize from 'lodash/capitalize'
 
 import {
   ListItem,
-  CHECKED,
-  UNCHECKED,
-  type
-  IconName
+  type IconName
 } from '@opentrons/components'
 
 import type {Mount, Instrument} from '../../robot'
@@ -28,8 +25,8 @@ export default function InstrumentListItem (props: Props) {
     : '#'
 
   const iconName: IconName = confirmed
-    ? CHECKED
-    : UNCHECKED
+    ? 'check-circle'
+    : 'checkbox-blank-circle-outline'
 
   const description = instrument
     ? `${capitalize(instrument.channels === 8 ? 'multi' : 'single')}-channel`

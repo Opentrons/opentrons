@@ -36,6 +36,12 @@ export type IconProps = {
  */
 export default function Icon (props: IconProps) {
   const {x, y, height, width, style} = props
+
+  if (!(props.name in ICON_DATA_BY_NAME)) {
+    console.error(`"${props.name}" is not a valid Icon name`)
+    return null
+  }
+
   const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin

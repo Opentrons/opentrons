@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Icon, PrimaryButton, SPINNER} from '@opentrons/components'
+import {Icon, PrimaryButton} from '@opentrons/components'
 
 import styles from './connect-panel.css'
 
@@ -18,7 +18,7 @@ export default function ScanButton (props: Props) {
 
   if (isScanning) {
     return (
-      <Icon name={SPINNER} className={styles.scan_progress} spin />
+      <Icon name='ot-spinner' className={styles.scan_progress} spin />
     )
   }
 

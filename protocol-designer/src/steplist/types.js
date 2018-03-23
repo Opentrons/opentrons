@@ -1,5 +1,5 @@
 // @flow
-
+import type {IconName} from '@opentrons/components'
 import type {ConsolidateFormData} from '../step-generation'
 
 // sections of the form that are expandable/collapsible
@@ -7,13 +7,13 @@ export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
 
 // TODO Ian 2018-01-16 factor out to steplist/constants.js ?
-export const stepIconsByType = {
-  'transfer': 'arrow right',
-  'distribute': 'distribute',
-  'consolidate': 'consolidate',
-  'mix': 'mix',
+export const stepIconsByType: {[string]: IconName} = {
+  'transfer': 'ot-transfer',
+  'distribute': 'ot-distribute',
+  'consolidate': 'ot-consolidate',
+  'mix': 'ot-mix',
   'pause': 'pause',
-  'deck-setup': 'flask'
+  'deck-setup': 'flask-outline'
 }
 
 export const END_STEP: '__end__' = '__end__' // Special ID of "End" pseudo-step.

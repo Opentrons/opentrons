@@ -4,81 +4,12 @@ import Renderer from 'react-test-renderer'
 
 import {
   Icon,
-  NotificationIcon,
-  ALERT,
-  BACK,
-  CLOSE,
-  REFRESH,
-  SPINNER,
-  USB,
-  WIFI,
-  FLASK,
-  CHECKED,
-  UNCHECKED,
-  CHECKED_RADIO,
-  UNCHECKED_RADIO,
-  CHECKED_BOX,
-  UNCHECKED_BOX,
-  TOGGLED_OFF,
-  TOGGLED_ON,
-  CHEVRON_UP,
-  CHEVRON_DOWN,
-  CHEVRON_LEFT,
-  CHEVRON_RIGHT,
-  FILE,
-  COG,
-  CONNECT,
-  CONSOLIDATE,
-  DISTRIBUTE,
-  MIX,
-  PAUSE,
-  ARROW_RIGHT,
-  MENU_DOWN,
-  CIRCLE,
-  CALIBRATE,
-  RUN,
-  LOGO,
-  WARNING,
-  ERROR
+  NotificationIcon
 } from '..'
 
-const icons = [
-  ALERT,
-  BACK,
-  CLOSE,
-  REFRESH,
-  SPINNER,
-  USB,
-  WIFI,
-  FLASK,
-  CHECKED,
-  UNCHECKED,
-  CHECKED_RADIO,
-  UNCHECKED_RADIO,
-  CHECKED_BOX,
-  UNCHECKED_BOX,
-  TOGGLED_OFF,
-  TOGGLED_ON,
-  CHEVRON_UP,
-  CHEVRON_DOWN,
-  CHEVRON_LEFT,
-  CHEVRON_RIGHT,
-  FILE,
-  COG,
-  CONNECT,
-  CONSOLIDATE,
-  DISTRIBUTE,
-  MIX,
-  PAUSE,
-  ARROW_RIGHT,
-  MENU_DOWN,
-  CIRCLE,
-  CALIBRATE,
-  RUN,
-  LOGO,
-  WARNING,
-  ERROR
-]
+import IconData from '../icons/icon-data'
+
+const icons = Object.keys(IconData)
 
 describe('icons', () => {
   icons.forEach((icon) => test(`${icon} renders correctly`, () => {
@@ -94,10 +25,10 @@ describe('Notification Icon', () => {
   test('NotificationIcon renders correctly', () => {
     const tree = Renderer.create(
       <NotificationIcon
-        name={FLASK}
+        name='flask-outline'
         className='foo'
-        childName={CIRCLE}
-        childClassName={'bar'}
+        childName='circle'
+        childClassName='bar'
       />
     ).toJSON()
 

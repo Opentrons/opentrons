@@ -31,7 +31,7 @@ export default function RadioGroup (props: Props) {
         <label key={radio.value} className={cx(styles.form_field, props.className)}>
           <div className={styles.checkbox_icon}>
             <Icon
-              name={radio.value === props.value ? 'checked radio' : 'unchecked radio'}
+              name={radio.value === props.value ? 'radiobox-marked' : 'radiobox-blank'}
               width='100%'
             />
           </div>

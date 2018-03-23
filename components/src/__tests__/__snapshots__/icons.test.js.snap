@@ -57,7 +57,7 @@ exports[`icons alert renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons arrow right renders correctly 1`] = `
+exports[`icons alert-circle renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -71,13 +71,13 @@ exports[`icons arrow right renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M0 10.8h15.5V8l8.5 5-8.5 4.9v-2.8H0z"
+    d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
     fillRule="evenodd"
   />
 </svg>
 `;
 
-exports[`icons back renders correctly 1`] = `
+exports[`icons arrow-left renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -97,7 +97,7 @@ exports[`icons back renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons calibrate renders correctly 1`] = `
+exports[`icons check renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -111,53 +111,13 @@ exports[`icons calibrate renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M4.43 18.84v-.82H.99V19h1.99L.94 21.62v.86h3.5v-.97H2.36l2.07-2.67zm6.8-12.85h1.12l-.02-1.65 1.51-2.82h-1.27L11.8 3.2l-.81-1.68H9.68l1.55 2.76v1.71zm1.35 1.39h-1.55v6.28L5.2 16.85l.74 1.35 5.83-3.23 5.91 3.23.74-1.35-5.84-3.19V7.38zm9.04 12.79l1.37-2.15h-1.31l-.7 1.25-.69-1.25h-1.34l1.37 2.19-1.43 2.27h.2l1.13-.05.75-1.27.74 1.32h1.36l-1.45-2.31z"
+    d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
     fillRule="evenodd"
   />
 </svg>
 `;
 
-exports[`icons checked box renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M10 17l-5-5 1.4-1.4 3.6 3.6 7.6-7.6L19 8m0-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons checked radio renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M12 20a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 5a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons checked renders correctly 1`] = `
+exports[`icons check-circle renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -177,7 +137,67 @@ exports[`icons checked renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons chevron down renders correctly 1`] = `
+exports[`icons checkbox-blank-circle-outline renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,21.6 C6.6980664,21.6 2.4,17.3019336 2.4,12 C2.4,6.6980664 6.6980664,2.4 12,2.4 C14.5460783,2.4 16.9878759,3.41142567 18.7882251,5.2117749 C20.5885743,7.01212413 21.6,9.4539217 21.6,12 C21.6,17.3019336 17.3019336,21.6 12,21.6 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons checkbox-blank-outline renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons checkbox-marked renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M10 17l-5-5 1.4-1.4 3.6 3.6 7.6-7.6L19 8m0-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons chevron-down renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -197,7 +217,7 @@ exports[`icons chevron down renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons chevron left renders correctly 1`] = `
+exports[`icons chevron-left renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -217,7 +237,7 @@ exports[`icons chevron left renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons chevron right renders correctly 1`] = `
+exports[`icons chevron-right renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -237,7 +257,7 @@ exports[`icons chevron right renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons chevron up renders correctly 1`] = `
+exports[`icons chevron-up renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -297,87 +317,7 @@ exports[`icons close renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons cog renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M23.933 10.489v3.022c-1.177.356-2.333.711-3.51 1.045-.09.022-.134.066-.156.155-.156.422-.334.822-.511 1.245-.045.088-.045.133 0 .222a213.885 213.885 0 0 0 1.688 3.11c.045.09.045.134-.022.2-.666.668-1.31 1.312-1.978 1.979-.022.022-.044.044-.088.066-.045-.022-.067-.044-.112-.066-1.022-.556-2.066-1.111-3.088-1.667-.067-.044-.134-.044-.223 0l-1.266.533a.2.2 0 0 0-.134.134c-.244.844-.51 1.689-.755 2.533-.09.333-.2.644-.29.978h-2.866c-.11 0-.155-.022-.2-.156-.333-1.133-.666-2.244-1-3.378a.2.2 0 0 0-.133-.133c-.422-.178-.867-.355-1.289-.533-.067-.022-.111-.045-.2 0l-1.6.866c-.533.29-1.089.578-1.6.867l-2.156-2.155a.486.486 0 0 0 .067-.112c.556-1.022 1.111-2.066 1.667-3.088a.167.167 0 0 0 0-.2c-.178-.423-.356-.845-.534-1.29a.2.2 0 0 0-.133-.133c-1.133-.333-2.267-.689-3.4-1.022C.044 13.49 0 13.467 0 13.378v-2.822c0-.09.022-.112.111-.134C1.244 10.09 2.4 9.756 3.533 9.4a.268.268 0 0 0 .111-.111c.178-.422.356-.867.556-1.311a.245.245 0 0 0 0-.178c-.356-.667-.733-1.333-1.089-2.022-.222-.4-.444-.8-.644-1.2l.044-.045L4.556 2.49c.066-.067.11-.045.155 0 1.045.555 2.089 1.133 3.133 1.689a.167.167 0 0 0 .2 0c.423-.178.823-.356 1.245-.511.089-.023.133-.067.155-.156.356-1.178.69-2.333 1.045-3.511h3.022a298.91 298.91 0 0 1 1.045 3.511.299.299 0 0 0 .133.156l1.267.533a.245.245 0 0 0 .177 0c.445-.244.911-.489 1.356-.733.622-.334 1.267-.69 1.867-1.023.71.712 1.444 1.423 2.155 2.156-.022.022-.044.067-.067.111-.555 1.022-1.11 2.067-1.666 3.089-.045.089-.045.133 0 .222.178.4.355.822.51 1.222.045.09.068.134.179.156 1.133.4 2.31.756 3.466 1.089zm-7.4 1.533a4.605 4.605 0 0 0-4.577-4.6c-2.512 0-4.578 2.045-4.6 4.578 0 2.533 2.044 4.6 4.577 4.6 2.556.022 4.6-2.044 4.6-4.578z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons connect renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M17.3 9.9C15.1 6.5 12.5 3 12.5 3S9.9 6.5 7.7 9.9c-1.9 2.9-2.5 6.5-.1 9 1.3 1.4 3.1 2.1 4.9 2.1 1.8 0 3.6-.7 4.9-2.1 2.4-2.6 1.8-6.1-.1-9zm-4.9 9.4h-.3c-1.2-.1-2.4-.6-3.3-1.6-.7-.9-1.1-1.9-1.1-2.9 2.4.1 4.4-1.6 6.1-3.1.4-.4 1-.7 1.6-.7h.2c1.3.4 1.9 2.6 1.8 3.7-.1 2.6-2.3 4.7-5 4.6z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons consolidate renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M15.5 14.4c-1.6 0-2.6.2-3.3.5-.7.3-1.2.7-1.8 1.2-.4.4-.8.9-1.4 1.4-.7.6-1.6 1.3-2.8 1.8-1.5.7-3.5 1.1-6.2 1.1v-4c2.2 0 3.6-.3 4.6-.7.9-.4 1.6-.9 2.3-1.6.4-.4.9-.9 1.5-1.4-.6-.5-1.1-1-1.5-1.4-.8-.8-1.4-1.3-2.3-1.7-1-.4-2.4-.7-4.6-.7v-4c2.7 0 4.7.4 6.2 1.1 1.2.5 2.1 1.2 2.8 1.8.5.5 1 .9 1.4 1.3.6.6 1.1.9 1.8 1.2.7.3 1.7.5 3.3.5V7.4l8.5 5-8.5 4.9v-2.9"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons distribute renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M15.5 16v-2.9l8.5 5-8.5 4.9v-3c-1.3 0-2.4-.3-3.4-.7-1.1-.4-2.1-1-2.9-1.6-1.7-1.2-3-2.3-4.8-3.1-1.2-.5-2.5-.8-4.4-.8V9.3c1.9 0 3.2-.3 4.4-.8 1.7-.7 3.1-1.9 4.8-3.1.8-.6 1.8-1.2 2.9-1.6 1-.4 2.2-.7 3.4-.7V.4l8.5 5-8.5 4.9V7.1c-1.1.1-1.9.3-2.7.7-.7.3-1.4.8-2.1 1.4-1 .7-2.1 1.6-3.5 2.3 1.4.8 2.5 1.6 3.5 2.3.8.6 1.4 1 2.1 1.4.8.5 1.6.7 2.7.8z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons error renders correctly 1`] = `
+exports[`icons close-circle renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -397,7 +337,7 @@ exports[`icons error renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons file renders correctly 1`] = `
+exports[`icons content-copy renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -411,13 +351,53 @@ exports[`icons file renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M20.907 0H3.803C3.334.044 3 .356 3 .822c0 1.822.022 3.645.022 5.467v11.355c0 1.823-.022 3.645-.022 5.467 0 .467.334.8.803.822H7.37c2.051 0 3.88.023 6.199 0 .736 0 1.383-.289 1.918-.777.535-.49 1.048-.956 1.538-1.49a201.554 201.554 0 0 0 2.989-3.177c.379-.4.713-.822 1.025-1.267a3.17 3.17 0 0 0 .58-1.844c.045-4.867.045-9.711.067-14.578.022-.444-.312-.778-.78-.8zm-2.074 16.444c-1.115.312-2.275.312-3.434.334-.424 0-.647.155-.736.555-.045.2-.023.867-.023 1.09-.066 1-.044 1.6-.178 2.6-.134.866-.624 1.51-1.762 1.488-2.586-.022-8.005 0-8.161 0V1.556h15.61v13.222c.022 1-.536 1.466-1.316 1.666z"
+    d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"
     fillRule="evenodd"
   />
 </svg>
 `;
 
-exports[`icons flask renders correctly 1`] = `
+exports[`icons cursor-move renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons dots-horizontal renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M5.5 10A2.5 2.5 0 1 1 3 12.5 2.5 2.5 0 0 1 5.5 10zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons flask-outline renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -437,27 +417,7 @@ exports[`icons flask renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons logo renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 50 50"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M46.79 24.83A21.79 21.79 0 1 1 21.23 3.38l.83 5.31a16.42 16.42 0 1 0 5.87 0l.83-5.31a21.82 21.82 0 0 1 18.03 21.45zm-28.14-3.14c3-4.52 6.34-9.23 6.35-9.23s3.37 4.72 6.35 9.23c2.56 3.9 3.31 8.71.15 12.13a8.76 8.76 0 0 1-6.5 2.83 8.76 8.76 0 0 1-6.46-2.82c-3.19-3.43-2.45-8.24.11-12.14zm0 6.62a5.8 5.8 0 0 0 1.42 3.88 6.29 6.29 0 0 0 4.35 2.16h.45a6.38 6.38 0 0 0 6.59-6.17c.05-1.54-.66-4.47-2.41-5a1.65 1.65 0 0 0-.31-.06 2.93 2.93 0 0 0-2.09.91c-2.17 2.08-4.73 4.46-7.96 4.28z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons menu down renders correctly 1`] = `
+exports[`icons menu-down renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -477,7 +437,127 @@ exports[`icons menu down renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons mix renders correctly 1`] = `
+exports[`icons ot-calibrate renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M4.43 18.84v-.82H.99V19h1.99L.94 21.62v.86h3.5v-.97H2.36l2.07-2.67zm6.8-12.85h1.12l-.02-1.65 1.51-2.82h-1.27L11.8 3.2l-.81-1.68H9.68l1.55 2.76v1.71zm1.35 1.39h-1.55v6.28L5.2 16.85l.74 1.35 5.83-3.23 5.91 3.23.74-1.35-5.84-3.19V7.38zm9.04 12.79l1.37-2.15h-1.31l-.7 1.25-.69-1.25h-1.34l1.37 2.19-1.43 2.27h.2l1.13-.05.75-1.27.74 1.32h1.36l-1.45-2.31z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-connect renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M17.3 9.9C15.1 6.5 12.5 3 12.5 3S9.9 6.5 7.7 9.9c-1.9 2.9-2.5 6.5-.1 9 1.3 1.4 3.1 2.1 4.9 2.1 1.8 0 3.6-.7 4.9-2.1 2.4-2.6 1.8-6.1-.1-9zm-4.9 9.4h-.3c-1.2-.1-2.4-.6-3.3-1.6-.7-.9-1.1-1.9-1.1-2.9 2.4.1 4.4-1.6 6.1-3.1.4-.4 1-.7 1.6-.7h.2c1.3.4 1.9 2.6 1.8 3.7-.1 2.6-2.3 4.7-5 4.6z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-consolidate renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M15.5 14.4c-1.6 0-2.6.2-3.3.5-.7.3-1.2.7-1.8 1.2-.4.4-.8.9-1.4 1.4-.7.6-1.6 1.3-2.8 1.8-1.5.7-3.5 1.1-6.2 1.1v-4c2.2 0 3.6-.3 4.6-.7.9-.4 1.6-.9 2.3-1.6.4-.4.9-.9 1.5-1.4-.6-.5-1.1-1-1.5-1.4-.8-.8-1.4-1.3-2.3-1.7-1-.4-2.4-.7-4.6-.7v-4c2.7 0 4.7.4 6.2 1.1 1.2.5 2.1 1.2 2.8 1.8.5.5 1 .9 1.4 1.3.6.6 1.1.9 1.8 1.2.7.3 1.7.5 3.3.5V7.4l8.5 5-8.5 4.9v-2.9"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-distribute renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M15.5 16v-2.9l8.5 5-8.5 4.9v-3c-1.3 0-2.4-.3-3.4-.7-1.1-.4-2.1-1-2.9-1.6-1.7-1.2-3-2.3-4.8-3.1-1.2-.5-2.5-.8-4.4-.8V9.3c1.9 0 3.2-.3 4.4-.8 1.7-.7 3.1-1.9 4.8-3.1.8-.6 1.8-1.2 2.9-1.6 1-.4 2.2-.7 3.4-.7V.4l8.5 5-8.5 4.9V7.1c-1.1.1-1.9.3-2.7.7-.7.3-1.4.8-2.1 1.4-1 .7-2.1 1.6-3.5 2.3 1.4.8 2.5 1.6 3.5 2.3.8.6 1.4 1 2.1 1.4.8.5 1.6.7 2.7.8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-file renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M20.907 0H3.803C3.334.044 3 .356 3 .822c0 1.822.022 3.645.022 5.467v11.355c0 1.823-.022 3.645-.022 5.467 0 .467.334.8.803.822H7.37c2.051 0 3.88.023 6.199 0 .736 0 1.383-.289 1.918-.777.535-.49 1.048-.956 1.538-1.49a201.554 201.554 0 0 0 2.989-3.177c.379-.4.713-.822 1.025-1.267a3.17 3.17 0 0 0 .58-1.844c.045-4.867.045-9.711.067-14.578.022-.444-.312-.778-.78-.8zm-2.074 16.444c-1.115.312-2.275.312-3.434.334-.424 0-.647.155-.736.555-.045.2-.023.867-.023 1.09-.066 1-.044 1.6-.178 2.6-.134.866-.624 1.51-1.762 1.488-2.586-.022-8.005 0-8.161 0V1.556h15.61v13.222c.022 1-.536 1.466-1.316 1.666z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-logo renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 50 50"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M46.79 24.83A21.79 21.79 0 1 1 21.23 3.38l.83 5.31a16.42 16.42 0 1 0 5.87 0l.83-5.31a21.82 21.82 0 0 1 18.03 21.45zm-28.14-3.14c3-4.52 6.34-9.23 6.35-9.23s3.37 4.72 6.35 9.23c2.56 3.9 3.31 8.71.15 12.13a8.76 8.76 0 0 1-6.5 2.83 8.76 8.76 0 0 1-6.46-2.82c-3.19-3.43-2.45-8.24.11-12.14zm0 6.62a5.8 5.8 0 0 0 1.42 3.88 6.29 6.29 0 0 0 4.35 2.16h.45a6.38 6.38 0 0 0 6.59-6.17c.05-1.54-.66-4.47-2.41-5a1.65 1.65 0 0 0-.31-.06 2.93 2.93 0 0 0-2.09.91c-2.17 2.08-4.73 4.46-7.96 4.28z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-mix renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -492,6 +572,106 @@ exports[`icons mix renders correctly 1`] = `
 >
   <path
     d="M7.8 2.4v10.3H3.4V2.4h4.4zM5.6 21.5L.4 12.7h10.3l-5.1 8.8zm10.5.1V11.2h4.4v10.4h-4.4zm2.3-19.2l5.2 8.8H13.2l5.2-8.8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-run renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M18.83 11.58V1.89a.6.6 0 0 0-.61-.62H5a.64.64 0 0 0-.62.64v17.34a.62.62 0 0 0 .62.64h5.45a6.06 6.06 0 1 0 8.41-8.31zm-9.36 5.09a6 6 0 0 0 .4 2.1H5.54V2.48h12.14V11a6 6 0 0 0-8.2 5.66zm4.61 2.81v-5.64l3.72 2.76z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-spinner renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 512 512"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-toggle-switch-off renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19.2 7.8h-7.61a6.3 6.3 0 1 0 0 8.4h7.61a4.2 4.2 0 0 0 0-8.4zM6.9 17.3a5.3 5.3 0 1 1 5.3-5.3 5.31 5.31 0 0 1-5.3 5.3z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-toggle-switch-on renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M17.1,5.7a6.28,6.28,0,0,0-4.69,2.1H4.8a4.2,4.2,0,1,0,0,8.4h7.61A6.3,6.3,0,1,0,17.1,5.7Zm-5.42,9.5H4.8a3.2,3.2,0,1,1,0-6.4h6.88a6.26,6.26,0,0,0,0,6.4Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-transfer renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M0 10.8h15.5V8l8.5 5-8.5 4.9v-2.8H0z"
     fillRule="evenodd"
   />
 </svg>
@@ -517,6 +697,66 @@ exports[`icons pause renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons plus renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons radiobox-blank renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons radiobox-marked renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 20a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 5a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons refresh renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -537,7 +777,7 @@ exports[`icons refresh renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons run renders correctly 1`] = `
+exports[`icons settings renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -551,33 +791,13 @@ exports[`icons run renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M18.83 11.58V1.89a.6.6 0 0 0-.61-.62H5a.64.64 0 0 0-.62.64v17.34a.62.62 0 0 0 .62.64h5.45a6.06 6.06 0 1 0 8.41-8.31zm-9.36 5.09a6 6 0 0 0 .4 2.1H5.54V2.48h12.14V11a6 6 0 0 0-8.2 5.66zm4.61 2.81v-5.64l3.72 2.76z"
+    d="M23.933 10.489v3.022c-1.177.356-2.333.711-3.51 1.045-.09.022-.134.066-.156.155-.156.422-.334.822-.511 1.245-.045.088-.045.133 0 .222a213.885 213.885 0 0 0 1.688 3.11c.045.09.045.134-.022.2-.666.668-1.31 1.312-1.978 1.979-.022.022-.044.044-.088.066-.045-.022-.067-.044-.112-.066-1.022-.556-2.066-1.111-3.088-1.667-.067-.044-.134-.044-.223 0l-1.266.533a.2.2 0 0 0-.134.134c-.244.844-.51 1.689-.755 2.533-.09.333-.2.644-.29.978h-2.866c-.11 0-.155-.022-.2-.156-.333-1.133-.666-2.244-1-3.378a.2.2 0 0 0-.133-.133c-.422-.178-.867-.355-1.289-.533-.067-.022-.111-.045-.2 0l-1.6.866c-.533.29-1.089.578-1.6.867l-2.156-2.155a.486.486 0 0 0 .067-.112c.556-1.022 1.111-2.066 1.667-3.088a.167.167 0 0 0 0-.2c-.178-.423-.356-.845-.534-1.29a.2.2 0 0 0-.133-.133c-1.133-.333-2.267-.689-3.4-1.022C.044 13.49 0 13.467 0 13.378v-2.822c0-.09.022-.112.111-.134C1.244 10.09 2.4 9.756 3.533 9.4a.268.268 0 0 0 .111-.111c.178-.422.356-.867.556-1.311a.245.245 0 0 0 0-.178c-.356-.667-.733-1.333-1.089-2.022-.222-.4-.444-.8-.644-1.2l.044-.045L4.556 2.49c.066-.067.11-.045.155 0 1.045.555 2.089 1.133 3.133 1.689a.167.167 0 0 0 .2 0c.423-.178.823-.356 1.245-.511.089-.023.133-.067.155-.156.356-1.178.69-2.333 1.045-3.511h3.022a298.91 298.91 0 0 1 1.045 3.511.299.299 0 0 0 .133.156l1.267.533a.245.245 0 0 0 .177 0c.445-.244.911-.489 1.356-.733.622-.334 1.267-.69 1.867-1.023.71.712 1.444 1.423 2.155 2.156-.022.022-.044.067-.067.111-.555 1.022-1.11 2.067-1.666 3.089-.045.089-.045.133 0 .222.178.4.355.822.51 1.222.045.09.068.134.179.156 1.133.4 2.31.756 3.466 1.089zm-7.4 1.533a4.605 4.605 0 0 0-4.577-4.6c-2.512 0-4.578 2.045-4.6 4.578 0 2.533 2.044 4.6 4.577 4.6 2.556.022 4.6-2.044 4.6-4.578z"
     fillRule="evenodd"
   />
 </svg>
 `;
 
-exports[`icons spinner renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 512 512"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons toggled off renders correctly 1`] = `
+exports[`icons upload renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"
@@ -591,87 +811,7 @@ exports[`icons toggled off renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M19.2 7.8h-7.61a6.3 6.3 0 1 0 0 8.4h7.61a4.2 4.2 0 0 0 0-8.4zM6.9 17.3a5.3 5.3 0 1 1 5.3-5.3 5.31 5.31 0 0 1-5.3 5.3z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons toggled on renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M17.1,5.7a6.28,6.28,0,0,0-4.69,2.1H4.8a4.2,4.2,0,1,0,0,8.4h7.61A6.3,6.3,0,1,0,17.1,5.7Zm-5.42,9.5H4.8a3.2,3.2,0,1,1,0-6.4h6.88a6.26,6.26,0,0,0,0,6.4Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons unchecked box renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons unchecked radio renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons unchecked renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M12,21.6 C6.6980664,21.6 2.4,17.3019336 2.4,12 C2.4,6.6980664 6.6980664,2.4 12,2.4 C14.5460783,2.4 16.9878759,3.41142567 18.7882251,5.2117749 C20.5885743,7.01212413 21.6,9.4539217 21.6,12 C21.6,17.3019336 17.3019336,21.6 12,21.6 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
+    d="M7.714 18.353v-8.47H2L12 0l10 9.882h-5.714v8.47H7.714zM2 24v-2.824h20V24H2z"
     fillRule="evenodd"
   />
 </svg>
@@ -692,26 +832,6 @@ exports[`icons usb renders correctly 1`] = `
 >
   <path
     d="M15.677 11.32h1.132v2.265h-3.396V4.528h2.264L12.281 0 8.885 4.528h2.264v9.057H7.753v-2.343c.792-.42 1.358-1.223 1.358-2.185 0-1.37-1.12-2.491-2.49-2.491s-2.49 1.12-2.49 2.49c0 .963.565 1.767 1.358 2.186v2.343a2.256 2.256 0 0 0 2.264 2.264h3.396v3.453a2.492 2.492 0 0 0-1.358 2.207 2.49 2.49 0 0 0 4.98 0 2.49 2.49 0 0 0-1.358-2.207v-3.453h3.396a2.256 2.256 0 0 0 2.265-2.264V11.32h1.132V6.792h-4.529v4.529z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
-exports[`icons warning renders correctly 1`] = `
-<svg
-  aria-hidden="true"
-  className="foo"
-  fill="currentColor"
-  height={undefined}
-  style={undefined}
-  version="1.1"
-  viewBox="0 0 24 24"
-  width={undefined}
-  x={undefined}
-  y={undefined}
->
-  <path
-    d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
     fillRule="evenodd"
   />
 </svg>

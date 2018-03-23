@@ -29,7 +29,7 @@ With icon:
 
 ```js
 <div style={{width: '16rem'}}>
-  <PrimaryButton onClick={() => alert('you clicked me')} iconName='flask'>
+  <PrimaryButton onClick={() => alert('you clicked me')} iconName='flask-outline'>
     {'Click for alert'}
   </PrimaryButton>
 </div>
@@ -44,7 +44,7 @@ Use the inspector on this example to see that the "button" is a `<div>` with the
   <PrimaryButton
     Component='div'
     role='button'
-    iconName={'flask'}
+    iconName='flask-outline'
     onClick={() => alert('click!')}
   >
     {"I'm a div!"}

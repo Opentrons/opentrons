@@ -207,7 +207,7 @@ describe('Splash', () => {
 
   test('renders correctly with custom props', () => {
     const tree = Renderer.create(
-      <Splash iconName='flask' className='swag' />
+      <Splash iconName='flask-outline' className='swag' />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

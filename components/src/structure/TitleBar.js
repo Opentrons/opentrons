@@ -5,7 +5,6 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import {FlatButton} from '../buttons'
-import {CHEVRON_LEFT} from '../icons'
 import styles from './structure.css'
 
 type Props = {
@@ -36,7 +35,7 @@ export default function TitleBar (props: Props) {
     <FlatButton
       className={styles.back_button}
       title={backButtonLabel || 'back'}
-      iconName={CHEVRON_LEFT}
+      iconName={'chevron-left'}
       onClick={onBackClick}
       disabled={backClickDisabled}
     >

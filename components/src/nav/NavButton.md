@@ -4,7 +4,7 @@ Basic Usage:
 <div style={{width: '5rem'}}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    iconName='connect'
+    iconName='ot-connect'
   />
 </div>
 ```
@@ -14,7 +14,7 @@ Disabled:
 <div style={{width: '5rem'}}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    iconName='connect'
+    iconName='ot-connect'
     disabled
   />
 </div>
@@ -26,7 +26,7 @@ Currently Selected:
 <div style={{width: '5rem'}}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    iconName='connect'
+    iconName='ot-connect'
     isCurrent={true}
   />
 </div>
@@ -39,7 +39,7 @@ Optional Title:
   <NavButton
     onClick={() => alert('you clicked me')}
     title='connect'
-    iconName='connect'
+    iconName='ot-connect'
     title='connect'
   />
 </div>

@@ -8,13 +8,13 @@
   <IconButton
     onClick={() => alert('you clicked me')}
     title='left'
-    name='chevron left'
+    name='chevron-left'
     className='height-3-rem'
   />
   <IconButton
     onClick={() => alert("can't click")}
     title='in progress'
-    name='spinner'
+    name='ot-spinner'
     className='width-3-rem'
     disabled
     spin
@@ -27,14 +27,14 @@
   <IconButton
     onClick={() => alert('you clicked me')}
     title='left'
-    name='chevron left'
+    name='chevron-left'
     className='height-3-rem'
     inverted
   />
   <IconButton
     onClick={() => alert("can't click")}
     title='in progress'
-    name='spinner'
+    name='ot-spinner'
     className='width-3-rem'
     disabled
     spin

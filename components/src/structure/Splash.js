@@ -16,7 +16,7 @@ type Props = {
 export default function Splash (props: Props) {
   return (
     <div className={cx(styles.splash, props.className)}>
-      <Icon name={props.iconName || 'logo'} />
+      <Icon name={props.iconName || 'ot-logo'} />
     </div>
   )
 }

@@ -3,7 +3,7 @@ Basic usage:
 ```js
 <SidePanelGroup
 title='Side Panel Group Title'
-iconName='flask'
+iconName='flask-outline'
 >
   <TitledList
     title='Titled List 1'
@@ -26,7 +26,7 @@ The entire SidePanelGroup may be disabled with the `disabled` prop. Pointer even
 ```js
 <SidePanelGroup
   title='Disabled Side Panel Group Title'
-  iconName='flask'
+  iconName='flask-outline'
   disabled
 >
   <TitledList

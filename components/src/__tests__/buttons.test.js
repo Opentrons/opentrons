@@ -2,7 +2,6 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {FLASK} from '../icons'
 import {Button, FlatButton, PrimaryButton, OutlineButton, IconButton} from '..'
 
 describe('buttons', () => {
@@ -49,7 +48,7 @@ describe('buttons', () => {
 
   test('Button with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <Button onClick={onClick} title='t' className='c' iconName={FLASK}>
+      <Button onClick={onClick} title='t' className='c' iconName='flask-outline'>
         children
       </Button>
     ).toJSON()
@@ -69,7 +68,7 @@ describe('buttons', () => {
 
   test('PrimaryButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <PrimaryButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+      <PrimaryButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
         children
       </PrimaryButton>
     ).toJSON()
@@ -89,7 +88,7 @@ describe('buttons', () => {
 
   test('FlatButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <FlatButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+      <FlatButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
         children
       </FlatButton>
     ).toJSON()
@@ -119,7 +118,7 @@ describe('buttons', () => {
 
   test('OutlineButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <OutlineButton onClick={onClick} title='t' className='c' iconName={FLASK}>
+      <OutlineButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
         children
       </OutlineButton>
     ).toJSON()

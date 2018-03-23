@@ -9,7 +9,6 @@ import {
   Icon,
   LabwareContainer,
   Plate,
-  SPINNER,
   type LabwareComponentProps
 } from '@opentrons/components'
 
@@ -68,7 +67,7 @@ export default function LabwareItem (props: LabwareItemProps) {
             <Icon
               x='10%' y='10%' width='80%' height='80%'
               className={styles.spinner}
-              name={SPINNER}
+              name='ot-spinner'
               spin
             />
           </g>

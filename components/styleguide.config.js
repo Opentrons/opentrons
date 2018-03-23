@@ -85,6 +85,24 @@ module.exports = {
       '@global .display-block': {
         display: 'block'
       },
+
+      '@global .icon-showcase': {
+        display: 'grid',
+        gridTemplateColumns: 'auto auto auto'
+      },
+      '@global .icon-showcase span': {
+        display: 'flex',
+        height: '2rem',
+        alignItems: 'center',
+        margin: '0.25rem'
+      },
+      '@global .icon-showcase > span > svg': {
+        height: '100%'
+      },
+      '@global .icon-showcase > span > span': {
+        paddingLeft: '1rem'
+      },
+
       '@global .width-auto': {
         width: 'auto !important'
       },
