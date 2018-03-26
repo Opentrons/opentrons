@@ -15,9 +15,7 @@ You can download the latest version of the app from `our website`_.
 Connect to Robot
 --------------------
 
-Make sure your robot is turned on, and your laptop is connected via USB cable.
-
-Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.
+Make sure your robot is turned on, and your laptop is connected via USB cable or Wifi.
 
 .. screenshot button with port drop down
 
@@ -26,7 +24,7 @@ Go to the select port drop down, and refresh if no ports are shown.  Once the po
 
 .. important::
 
-	Every time you connect to the robot, you need to home all axes before doing anything else.
+	When you connect to the robot, home all axes before doing anything else.
 
 .. note::
 
@@ -48,9 +46,9 @@ Your ``.py`` protocol file can load into the App, through either clicking the "U
 
 .. note::
 
-    Make sure that when saving a protocol file, it ends with the ``.py`` file extension. This will ensure the App and other programs are able to properly read it.
+	Make sure that when saving a protocol file, it ends with the ``.py`` file extension. This will ensure the App and other programs are able to properly read it.
 
-    For example, ``my_protocol_file.py``
+	For example, ``my_protocol_file.py``
 
 If successfully loaded, your Python protocol will be simulated in the background to detect any errors. While this is happening, you will see the word "Upload" replaced by the word "Processing". Once finished, the App will fill the calibration section of the App with your containers and pipettes.
 

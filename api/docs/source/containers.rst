@@ -34,7 +34,7 @@ If you are interested in using your own container that is not included in the AP
 **********************
 
 Placing containers on the robot deck
-=====
+====================================
 
 The robot deck is made up of slots labeled A1, A2, A3, B1, and so on.
 
@@ -44,7 +44,7 @@ To tell the robot what containers will be on the deck for your protocol, use `co
 
 .. code-block:: python
 
-  samples_rack = containers.load('tube-rack-2ml', slot='B1')
+  samples_rack = containers.load('tube-rack-2ml', slot='4')
 
 Putting multiple containers in the same slot
 -----
@@ -53,8 +53,8 @@ Some containers might only take up half a slot. You must explicitly say `share=T
 
 .. code-block:: python
 
-  tubes = containers.load('T25-flask', slot='C1')
-  more_tubes = containers.load('T25-flask', slot='C1', share=True)
+  tubes = containers.load('T25-flask', slot='7')
+  more_tubes = containers.load('T25-flask', slot='7', share=True)
 
 **********************
 
@@ -72,10 +72,21 @@ You can access the point position as ``my_container.wells('A1')`` or ``my_contai
 **********************
 
 Tipracks
-==========
+========
+
+GEB-tiprack-300ul
+-----------------
+
+Tip rack for a 300 uL pipette (single or 8-channel)
+
+.. code-block:: python
+
+    containers.load('GEB-tiprack-300ul', slot)
+
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
 tiprack-10ul
--------------
+-----------------
 
 Tip rack for a 10 uL pipette (single or 8-channel)
 
@@ -83,7 +94,7 @@ Tip rack for a 10 uL pipette (single or 8-channel)
 
     containers.load('tiprack-10ul', slot)
 
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/Tiprack-10ul.png
 
@@ -109,7 +120,7 @@ Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
     containers.load('tiprack-200ul', slot)
 
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/Tiprack-200ul.png
 
@@ -122,7 +133,7 @@ Tip rack for a 1000 uL pipette (single or 8-channel)
 
     containers.load('tiprack-1000ul', slot)
 
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/Tiprack-1000.png
 
@@ -145,13 +156,13 @@ Troughs
 ========
 
 trough-12row
--------------
+------------
 
 12 row reservoir
 
 .. code-block:: python
 
-    containers.load('trough-12row', slot)
+    containers.load('trough-12row', '8')
 
 **Accessing Rows:** *single channel* ``['A1']-['A12']``, *8-channel* ``['A1']-['A12']``
 
@@ -214,7 +225,7 @@ See dimensions in diagram below.
 
     containers.load('96-deep-well', slot)
 
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/96-Deep-Well.png
 
@@ -227,7 +238,7 @@ See dimensions in diagram below.
 
     containers.load('96-PCR-tall', slot)
 
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/96-PCR-Tall.png
 
@@ -240,7 +251,7 @@ See dimensions in diagram below.
 
     containers.load('96-PCR-flat', slot)
 
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['H1']``
 
 .. image:: img/labware_lib/96-PCR-Flatt.png
 
@@ -266,7 +277,7 @@ See dimensions in diagram below.
 
     containers.load('384-plate', slot)
 
-**Accessing Wells:** *single channel* ``['A1']-['P24']``, *multi-channel* ``['A1']-['A24]``
+**Accessing Wells:** *single channel* ``['A1']-['P24']``, *multi-channel* ``['A1']-['P1]``
 
 .. image:: img/labware_lib/384-plate.png
 
@@ -302,13 +313,13 @@ Labware is loaded with two arguments: 1) the container type, and 2) the deck slo
 
 .. testcode:: containers
 
-    p = containers.load('96-flat', 'B1')
+    p = containers.load('96-flat', '4')
 
 A third optional argument can be used to give a container a unique name.
 
 .. testcode:: containers_2
 
-    p = containers.load('96-flat', 'B1', 'any-name-you-want')
+    p = containers.load('96-flat', '4', 'any-name-you-want')
 
 Unique names are useful in a few scenarios. First, they allow the container to have independant calibration data from other containers in the same slot. In the example above, the container named 'any-name-you-want' will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.
 
@@ -322,9 +333,9 @@ Names can also be used to place multiple containers in the same slot all at once
 
 .. testcode:: containers
 
-    fa = containers.load('T25-flask', 'D1', 'flask_a')
-    fb = containers.load('T25-flask', 'D1', 'flask_b', share=True)
-    fc = containers.load('T25-flask', 'D1', 'flask_c', share=True)
+    fa = containers.load('T25-flask', '10', 'flask_a')
+    fb = containers.load('T25-flask', '10', 'flask_b', share=True)
+    fc = containers.load('T25-flask', '10', 'flask_c', share=True)
 
 Create
 ======
@@ -335,50 +346,20 @@ Through the API's call containers.create(), you can create simple grid container
 
 .. testcode:: containers_custom
 
-    custom_plate = containers.create(
-        '3x6_plate',                    # name of you container
-        grid=(3, 6),                    # specify amount of (columns, rows)
-        spacing=(12, 12),               # distances (mm) between each (column, row)
-        diameter=5,                     # diameter (mm) of each well on the plate
-        depth=10,                       # depth (mm) of each well on the plate
-        volume=200,                     # optional: volume capacity of each well (uL)
-        save=False)
+    from sqlite3 import IntegrityError
 
-When you create your custom container it will return the custom plate. If you would like to save this container to the robot's containers library you can pass save=True and it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
+    try:
+        custom_plate = containers.create(
+            '3x6_plate',                    # name of you container
+            grid=(3, 6),                    # specify amount of (columns, rows)
+            spacing=(12, 12),               # distances (mm) between each (column, row)
+            diameter=5,                     # diameter (mm) of each well on the plate
+            depth=10,                       # depth (mm) of each well on the plate
+            volume=200)                     # optional: volume capacity of each well (uL)
+    except IntegrityError:
+        pass
 
-.. testcode:: containers_custom
-
-    for well in custom_plate.wells():
-        print(well)
-
-will print out...
-
-.. testoutput:: containers_custom
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    <Well A1>
-    <Well B1>
-    <Well C1>
-    <Well A2>
-    <Well B2>
-    <Well C2>
-    <Well A3>
-    <Well B3>
-    <Well C3>
-    <Well A4>
-    <Well B4>
-    <Well C4>
-    <Well A5>
-    <Well B5>
-    <Well C5>
-    <Well A6>
-    <Well B6>
-    <Well C6>
-
-.. testsetup:: pipettes
-
-    from opentrons import instruments, robot
-    robot.reset()
+When you create your custom container it will return the custom plate. The container is saved in the robot's container library, which means you can use containers.load() to use the custom container you've created in this and any future protocol. Note that the try-except block in this example is useful so that you can include a ``containers.create`` statement in a protocol, and it will create it if it does not exist, or just move on if it does exist. This may or may not be correct for your system.
 
 **********************
 
@@ -387,7 +368,7 @@ will print out...
     from opentrons import containers, robot
 
     robot.reset()
-    plate = containers.load('96-flat', 'A1')
+    plate = containers.load('96-flat', '1')
 
 ******************
 Accessing Wells
@@ -409,7 +390,7 @@ The OT-One deck and containers are all set up with the same coordinate system - 
     '''
     from opentrons import containers
 
-    plate = containers.load('96-flat', 'A1')
+    plate = containers.load('96-flat', '1')
 
 Wells by Name
 -------------
@@ -440,19 +421,19 @@ You can access a specific row or column by using the ``rows()`` and ``cols()`` m
 
 .. testcode:: individualwells
 
-    column = plate.cols('A')
-    row = plate.rows('1')
+    column = plate.cols('1')
+    row = plate.rows('A')
 
-    print('Column "A" has', len(column), 'wells')
-    print('Row "1" has', len(row), 'wells')
+    print('Column "1" has', len(column), 'wells')
+    print('Row "A" has', len(row), 'wells')
 
 will print out...
 
 .. testoutput:: individualwells
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    Column "A" has 12 wells
-    Row "1" has 8 wells
+    Column "1" has 8 wells
+    Row "A" has 12 wells
 
 The ``rows()`` or ``cols()`` methods can be used in combination with the ``wells()`` method to access wells within that row or column. In the example below, both lines refer to well ``'A1'``.
 
@@ -485,7 +466,7 @@ When describing a liquid transfer, we can point to groups of wells for the liqui
     '''
     from opentrons import containers
 
-    plate = containers.load('96-flat', 'B1')
+    plate = containers.load('96-flat', '4')
 
 Wells
 -----
@@ -653,39 +634,6 @@ Columns and Rows
 
 Columns and Rows
 The same arguments described above can be used with ``rows()`` and ``cols()`` to create lists of rows or columns.
-
-Here is an example of iterating through rows:
-
-.. testcode:: multiwells
-
-    for r in plate.rows('2', length=3, step=-2):
-        print(r)
-
-will print out...
-
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    <WellSeries: <Well A12><Well B12><Well C12><Well D12><Well E12><Well F12><Well G12><Well H12>>
-    <WellSeries: <Well A10><Well B10><Well C10><Well D10><Well E10><Well F10><Well G10><Well H10>>
-
-And here is an example of iterating through columns:
-
-.. testcode:: multiwells
-
-    for c in plate.cols('B', to='F', step=2):
-        print(c)
-
-will print out...
-
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6><Well B7><Well B8><Well B9><Well B10><Well B11><Well B12>>
-    <WellSeries: <Well D1><Well D2><Well D3><Well D4><Well D5><Well D6><Well D7><Well D8><Well D9><Well D10><Well D11><Well D12>>
-    <WellSeries: <Well F1><Well F2><Well F3><Well F4><Well F5><Well F6><Well F7><Well F8><Well F9><Well F10><Well F11><Well F12>>
-
 
 Slices
 ------

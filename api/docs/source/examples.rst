@@ -15,15 +15,13 @@ All examples on this page assume the following containers and pipette:
 
   from opentrons import robot, containers, instruments
 
-  plate = containers.load('96-flat', 'B1')
-  trough = containers.load('trough-12row', 'C1')
+  plate = containers.load('96-flat', '4')
+  trough = containers.load('trough-12row', '7')
 
-  tiprack_1 = containers.load('tiprack-200ul', 'A1')
-  tiprack_2 = containers.load('tiprack-200ul', 'A2')
+  tiprack_1 = containers.load('tiprack-200ul', '1')
+  tiprack_2 = containers.load('tiprack-200ul', '2')
 
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200,
+  p300 = instruments.P300_Single(mount='right',
       tip_racks=[tiprack_2])
 
 ******************************
@@ -36,16 +34,16 @@ Moving 100uL from one well to another:
 
 .. testcode:: examples
 
-  p200.transfer(100, plate.wells('A1'), plate.wells('B1'))
+  p300.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
 If you prefer to not use the ``.transfer()`` command, the following pipette commands will create the some results:
 
 .. testcode:: examples
 
-  p200.pick_up_tip()
-  p200.aspirate(100, plate.wells('A1'))
-  p200.dispense(100, plate.wells('A1'))
-  p200.return_tip()
+  p300.pick_up_tip()
+  p300.aspirate(100, plate.wells('A1'))
+  p300.dispense(100, plate.wells('A1'))
+  p300.return_tip()
 
 ******************************
 
@@ -63,7 +61,7 @@ Loops in Python allows your protocol to perform many actions, or act upon many w
 
   # ranges() starts at 0 and stops at 12, creating a range of 0-11
   for i in range(12):
-    p200.distribute(20, trough.wells(i), plate.rows(i))
+    p300.distribute(20, trough.wells(i), plate.rows(i))
 
 ******************************
 
@@ -75,14 +73,14 @@ The Opentrons liquid handler can do some things that a human cannot do with a pi
 
 .. testcode:: examples
 
-  p200.pick_up_tip()
+  p300.pick_up_tip()
 
   for well in trough.wells():
-    p200.aspirate(5, well).air_gap(10)
+    p300.aspirate(5, well).air_gap(10)
 
-  p200.dispense(plate.wells('A1'))
+  p300.dispense(plate.wells('A1'))
 
-  p200.return_tip()
+  p300.return_tip()
 
 ******************************
 
@@ -94,7 +92,7 @@ This example first spreads a dilutent to all wells of a plate. It then dilutes 8
 
 .. testcode:: examples
 
-  p200.distribute(50, trough.wells('A12'), plate.wells())  # dilutent
+  p300.distribute(50, trough.wells('A12'), plate.wells())  # dilutent
 
   # loop through each column
   for i in range(8):
@@ -104,10 +102,10 @@ This example first spreads a dilutent to all wells of a plate. It then dilutes 8
     column = plate.cols(i)
 
     # transfer 10uL of source to first well in column
-    p200.transfer(10, source, column.wells('1'))
+    p300.transfer(10, source, column.wells('1'))
 
     # dilute the sample down the column
-    p200.transfer(
+    p300.transfer(
       10, column.wells('1', to='11'), column.wells('2', to='12'),
       mix_after=(3, 25))
 
@@ -137,7 +135,7 @@ Deposit various volumes of liquids into the same plate of wells, and automatical
     89, 90, 91, 92, 93, 94, 95, 96
   ]
 
-  p200.distribute(water_volumes, trough.wells('A12'), plate)
+  p300.distribute(water_volumes, trough.wells('A12'), plate)
 
 The final volumes can also be read from a CSV, and opened by your protocol.
 
@@ -178,7 +176,7 @@ The final volumes can also be read from a CSV, and opened by your protocol.
               volumes.append(float(v))  # save the volume
 
       # distribute those volumes to the plate
-      p200.distribute(volumes, trough.wells('A1'), plate.wells())
+      p300.distribute(volumes, trough.wells('A1'), plate.wells())
 
 
 
@@ -192,19 +190,19 @@ This example shows how to deposit liquid around the edge of a well.
 
 .. testcode:: examples
 
-  p200.pick_up_tip()
+  p300.pick_up_tip()
 
   # rotate around the edge of the well, dropping 10ul at a time
   theta = 0.0
-  while p200.current_volume > 0:
+  while p300.current_volume > 0:
       # we can move around a circle with radius (r) and theta (degrees)
       well_edge = plate.wells('B1').from_center(r=1.0, theta=theta, h=0.9)
 
       # combine a Well with a Vector in a tuple
       destination = (plate.wells('B1'), well_edge)
-      p200.move_to(destination, strategy='direct')  # move straight there
-      p200.dispense(10)
+      p300.move_to(destination, strategy='direct')  # move straight there
+      p300.dispense(10)
 
       theta += 0.314
 
-  p200.drop_tip()
+  p300.drop_tip()

@@ -27,57 +27,23 @@ Creating a Pipette
 Axis and Max Volume
 ===================
 
-To create a ``Pipette``, you must give it an axis and a max_volume. The axis can be either ``'a'`` or ``'b'``, and the volume is whatever your hand pipette is calibrated for. In this example, we are using a 200uL pipette.
+To use a pipette, you must give it a mount. The mount can be either ``'left'`` or ``'right'``. The available pipette classes are ``P300_Single``, ``P300_Multi``, ``P10_Single``, and ``P10_Multi``. Right and left are defined as with the user in front of the robot door, facing the robot.
 
 .. testcode:: pipettes
 
-    pipette = instruments.Pipette(
-        axis='b',
-        name='my-p200',
-        max_volume=200)
-
-Minimum Volume
-==============
-
-The minimum allowed volume can be set for each pipette. If your protocol attempts to aspirate or dispense a volume below this volume, the API will give you a warning.
-
-.. testcode:: pipettes
-
-    pipette = instruments.Pipette(
-        axis='b',
-        name='my-p200',
-        max_volume=200,
-        min_volume=20)
-
-Channels
-========
-
-Pipettes can also be assigned a number of channels, either ``channel=1`` or ``channel=8``. If you do not specify, it will default to ``channel=1`` channel.
-
-.. testcode:: pipettes
-
-    pipette = instruments.Pipette(
-        axis='b',
-        name='my-p200-multichannel',
-        max_volume=200,
-        min_volume=20,
-        channels=8)
+    pipette = instruments.P300_Single(mount='right')
 
 Plunger Speeds
 ==============
 
-The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed`` and ``dispense_speed``. The values are in millimeters/minute, and default to ``aspirate_speed=300`` and ``dispense_speed=500``.
+The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_flow_rate`` and ``dispense_flow_rate``. The values are in microliters/second.
 
 .. testcode:: pipettes
 
-    pipette = instruments.Pipette(
-        axis='b',
-        name='my-p200-multichannel',
-        max_volume=200,
-        min_volume=20,
-        channels=8,
-        aspirate_speed=200,
-        dispense_speed=600)
+    pipette = instruments.P300_Multi(
+        mount='left',
+        aspirate_flow_rate=200,
+        dispense_flow_rate=400)
 
 
 **********************
@@ -99,10 +65,10 @@ This section demonstrates the options available for controlling tips
     '''
     from opentrons import containers, instruments
 
-    trash = containers.load('point', 'D2')
-    tiprack = containers.load('tiprack-200ul', 'B1')
+    trash = containers.load('point', '11')
+    tiprack = containers.load('GEB-tiprack-300ul', '4')
 
-    pipette = instruments.Pipette(axis='a')
+    pipette = instruments.P300_Single(mount='left')
 
 Pick Up Tip
 ===========
@@ -153,26 +119,20 @@ Automatically iterate through tips and drop tip in trash by attaching containers
     '''
     from opentrons import containers, instruments
 
-    trash = containers.load('point', 'D2')
-    tip_rack_1 = containers.load('tiprack-200ul', 'B1')
-    tip_rack_2 = containers.load('tiprack-200ul', 'B2')
+    trash = containers.load('point', '11')
+    tip_rack_1 = containers.load('tiprack-200ul', '4')
+    tip_rack_2 = containers.load('tiprack-200ul', '5')
+
+    pipette = instruments.P300_Single(mount='left')
 
 Attach Tip Rack to Pipette
 --------------------------
 
 Tip racks and trash containers can be "attached" to a pipette when the pipette is created. This give the pipette the ability to automatically iterate through tips, and to automatically send the tip to the trash container.
 
-Trash containers can be attached with the option ``trash_container=TRASH_CONTAINER``.
+If no trash container is specified, the pipette defaults to the fixed trash that is built into the deck of the robot. You can specify a trash container with the option ``trash_container=TRASH_CONTAINER``. If you want to force no trash container, use ``trash_container=None`` (this will cause tips to be returned to the tiprack).
 
 Multiple tip racks are can be attached with the option ``tip_racks=[RACK_1, RACK_2, etc... ]``.
-
-.. testcode:: tipsiterating
-
-    pipette = instruments.Pipette(
-        axis='b',
-        tip_racks=[tip_rack_1, tip_rack_2],
-        trash_container=trash
-    )
 
 .. note::
 
@@ -262,8 +222,8 @@ This is the fun section, where we get to move things around and pipette! This se
 
     robot.reset()
 
-    plate = containers.load('96-flat', 'B1')
-    pipette = instruments.Pipette(axis='b', max_volume=200)
+    plate = containers.load('96-flat', '4')
+    pipette = instruments.P300_Single(mount='right')
 
 .. testcode:: liquid
 
@@ -272,8 +232,8 @@ This is the fun section, where we get to move things around and pipette! This se
     '''
     from opentrons import containers, instruments
 
-    plate = containers.load('96-flat', 'B1')
-    pipette = instruments.Pipette(axis='b', max_volume=200)
+    plate = containers.load('96-flat', '4')
+    pipette = instruments.P300_Single(mount='right')
 
 
 Aspirate
@@ -374,10 +334,10 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
 
     robot.reset()
 
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    plate = containers.load('96-flat', 'B1')
+    tiprack = containers.load('GEB-tiprack-300ul', '1')
+    plate = containers.load('96-flat', '4')
 
-    pipette = instruments.Pipette(axis='b')
+    pipette = instruments.P300_Single(mount='right')
 
 ******
 Moving
@@ -392,10 +352,10 @@ Demonstrates the different ways to control the movement of the Opentrons liquid 
     '''
     from opentrons import containers, instruments, robot
 
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    plate = containers.load('96-flat', 'B1')
+    tiprack = containers.load('GEB-tiprack-300ul', '1')
+    plate = containers.load('96-flat', '4')
 
-    pipette = instruments.Pipette(axis='b')
+    pipette = instruments.P300_Single(mount='right')
 
 Move To
 =======

@@ -172,12 +172,14 @@ class Robot(object):
     >>> from opentrons import robot, instruments, containers
     >>> robot.reset() # doctest: +ELLIPSIS
     <opentrons.robot.robot.Robot object at ...>
-    >>> plate = containers.load('96-flat', 'A1', 'plate')
-    >>> p200 = instruments.Pipette(axis='b')
-    >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
+    >>> plate = containers.load('96-flat', '1', 'plate')
+    >>> tiprack = containers.load('GEB-tiprack-300ul', '2')
+    >>> p300 = instruments.P300_Single(mount='right', tip_racks=[tiprack])
+    >>> p300.pick_up_tip()
+    >>> p300.aspirate(200, plate[0]) # doctest: +ELLIPSIS
     <opentrons.instruments.pipette.Pipette object at ...>
     >>> robot.commands()
-    ['Aspirating 200 uL from <Well A1> at 1.0 speed']
+    ['Aspirating 200 uL from well A1 in "1" at 1.0 speed']
     """
 
     def __init__(self, config=None):
