@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import opentrons.util.calibration_functions as calib
 from numpy import add, subtract
-from opentrons import commands, containers, drivers, helpers
+from opentrons import commands, containers, drivers
 from opentrons.broker import subscribe
 from opentrons.containers import Container
 from opentrons.data_storage import database, old_container_loading,\
@@ -319,7 +319,7 @@ class Robot(object):
         for i in range(seconds):
             self.turn_off_button_light()
             sleep(0.25)
-            self.turn_on_blue_button_light()
+            self.turn_on_button_light()
             sleep(0.25)
 
     def setup_gantry(self):
@@ -480,15 +480,6 @@ class Robot(object):
             self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
         return motor_obj
 
-    def flip_coordinates(self, coordinates):
-        """
-        Flips between Deck and Robot coordinate systems.
-
-        TODO: Add image explaining coordinate systems.
-        """
-        dimensions = self._driver.get_dimensions()
-        return helpers.flip_coordinates(coordinates, dimensions)
-
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -510,21 +501,6 @@ class Robot(object):
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
-
-        # device = None
-        # if not port or port == drivers.VIRTUAL_SMOOTHIE_PORT:
-        #     device = drivers.get_virtual_driver(options)
-        # else:
-        #     device = drivers.get_serial_driver(port)
-        #
-        # self._driver = device
-        # self.smoothie_drivers['live'] = device
-
-        # set virtual smoothie do have same dimensions as real smoothie
-        # ot_v = device.ot_version
-        # self.smoothie_drivers['simulate'].ot_version = ot_v
-        # self.smoothie_drivers['simulate_switches'].ot_version = ot_v
-        # self.smoothie_drivers['null'].ot_version = ot_v
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -552,8 +528,8 @@ class Robot(object):
 
         Examples
         --------
-        >>> from opentrons import Robot
-        >>> robot.connect('Virtual Smoothie')
+        >>> from opentrons import robot
+        >>> robot.connect()
         >>> robot.home()
         """
 
@@ -640,7 +616,7 @@ class Robot(object):
 
         Examples
         --------
-        >>> from opentrons import Robot
+        >>> from opentrons import robot
         >>> robot.reset() # doctest: +ELLIPSIS
         <opentrons.robot.robot.Robot object at ...>
         >>> robot.connect('Virtual Smoothie')
