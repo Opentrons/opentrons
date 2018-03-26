@@ -207,6 +207,50 @@ def _move_mount(mount, point):
     return "Move complete. New position: {}".format(new_position)
 
 
+async def home_pipette(request):
+    """
+    Home Pipette simultaneously checks that:
+    1. The pipette is actually connected (will throw an error if you try
+    to home a non-connected pipette)
+    2. The motor is no longer disengaged
+    :param request: Information obtained from a POST request.
+        The content type is application/json.
+        The correct packet form should be as follows:
+        {
+        'mount': Can be 'right' or 'left' represents pipette mounts
+        'model': Can be from the list of pipettes found under
+        pipette_config.configs
+        }
+    :return: A success or non-success message.
+    """
+    req = await request.text()
+    data = json.loads(req)
+
+    model = data.get('model')
+    mount = data.get('mount')
+
+    try:
+
+        assert mount in ['left', 'right']
+        assert model in pipette_config.configs.keys()
+
+        config = pipette_config.load(model)
+        pipette = instruments._create_pipette_from_config(
+            config=config,
+            mount=mount)
+
+        pipette.home()
+
+        message = "{} on {} mount homed successfully.".format(model, mount)
+        status = 200
+
+    except AssertionError as e:
+        status = 400
+        message = "Received incorrect data from the pipette."
+
+    return web.json_response({"message": message}, status=status)
+
+
 async def identify(request):
     Thread(target=lambda: robot.identify(
         int(request.query.get('seconds', '10')))).start()

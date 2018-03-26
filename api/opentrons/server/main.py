@@ -109,6 +109,8 @@ def init(loop=None):
         '/robot/positions', control.position_info)
     server.app.router.add_post(
         '/robot/move', control.move)
+    server.app.router.add_post(
+        '/robot/home_pipette', control.home_pipette)
 
     return server.app
 
