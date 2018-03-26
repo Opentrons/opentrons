@@ -3,7 +3,6 @@
 const path = require('path')
 const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const GoogleFontsPlugin = require('google-fonts-webpack-plugin')
 
 const {rules} = require('@opentrons/webpack-config')
 
@@ -43,10 +42,6 @@ module.exports = {
       filename: 'bundle.css',
       disable: DEV,
       ignoreOrder: true
-    }),
-
-    new GoogleFontsPlugin({
-      fonts: [{ family: 'Open Sans' }]
     })
   ]
 }
