@@ -143,6 +143,36 @@ async def test_home_pipette_bad_request(
 
     assert res.status == 400
 
+    test_data_2 = {
+        'model': 'fake_pipette',
+        'mount': 'left'}
+
+    res2 = await cli.post('/robot/home_pipette', json=test_data_2)
+
+    assert res2.status == 400
+
+    test_data_3 = {
+        'model': 'p300_single',
+        'mount': 'fake_mount'}
+
+    res3 = await cli.post('/robot/home_pipette', json=test_data_3)
+
+    assert res3.status == 400
+
+    test_data_4 = {
+        'mount': 'left'}
+
+    res4 = await cli.post('/robot/home_pipette', json=test_data_4)
+
+    assert res4.status == 400
+
+    test_data_5 = {
+        'model': 'p300_single'}
+
+    res5 = await cli.post('/robot/home_pipette', json=test_data_5)
+
+    assert res5.status == 400
+
 
 async def test_move_bad_request(virtual_smoothie_env, loop, test_client):
     app = init(loop)

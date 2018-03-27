@@ -209,10 +209,10 @@ def _move_mount(mount, point):
 
 async def home_pipette(request):
     """
-    Home Pipette simultaneously checks that:
-    1. The pipette is actually connected (will throw an error if you try
-    to home a non-connected pipette)
-    2. The motor is no longer disengaged
+    This initializes a call to pipette.home() which, as a side effect will:
+        1. Check the pipette is actually connected (will throw an error if you
+        try to home a non-connected pipette)
+        2. Re-engages the motor
     :param request: Information obtained from a POST request.
         The content type is application/json.
         The correct packet form should be as follows:
@@ -246,7 +246,7 @@ async def home_pipette(request):
 
     except AssertionError as e:
         status = 400
-        message = "Received incorrect data from the pipette."
+        message = "Received incorrectly formatted data."
 
     return web.json_response({"message": message}, status=status)
 
