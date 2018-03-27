@@ -4,6 +4,7 @@ from opentrons.instruments import pipette_config
 from opentrons import instruments
 from opentrons.deck_calibration import jog
 import logging
+import json
 
 session = None
 log = logging.getLogger(__name__)
@@ -113,12 +114,36 @@ class SessionManager:
 
 async def start(request):
     """
-    Begins the session manager for factory calibration
-    :return: The current session ID token
+    Begins the session manager for factory calibration, if a session is not
+    already in progress, or if the "force" key is specified in the request.
+    :return: The current session ID token or an error message
     """
     global session
-    session = SessionManager()
-    return web.json_response({'token': session.id}, status=201)
+
+    try:
+        body = await request.json()
+    except json.decoder.JSONDecodeError:
+        log.debug("No body in {}".format(request))
+        body = {}
+
+    if not session or body.get('force'):
+        session = SessionManager()
+        data = {'token': session.id}
+        status = 201
+    else:
+        data = {'message': 'Error, session in progress. Use "force" key in'
+                           ' request body to override'}
+        status = 409
+    return web.json_response(data, status=status)
+
+
+async def release(request):
+    """
+    Release a session
+    """
+    global session
+    session = None
+    return web.json_response({"message": "calibration session released"})
 
 
 async def dispatch(request):
