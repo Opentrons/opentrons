@@ -109,6 +109,10 @@ def init(loop=None):
         '/robot/positions', control.position_info)
     server.app.router.add_post(
         '/robot/move', control.move)
+    server.app.router.add_get(
+        '/settings', update.get_feature_flag)
+    server.app.router.add_post(
+        '/settings/set', update.set_feature_flag)
 
     return server.app
 
