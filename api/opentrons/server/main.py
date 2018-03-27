@@ -95,8 +95,10 @@ def init(loop=None):
         '/server/update_firmware', update.update_firmware)
     server.app.router.add_post(
         '/server/restart', control.restart)
-    server.app.router.add_get(
-        '/calibration/deck', dc_endp.start)
+    server.app.router.add_post(
+        '/calibration/deck/start', dc_endp.start)
+    server.app.router.add_post(
+        '/calibration/deck/release', dc_endp.release)
     server.app.router.add_post(
         '/calibration/deck', dc_endp.dispatch)
     server.app.router.add_get(
@@ -111,6 +113,10 @@ def init(loop=None):
         '/robot/move', control.move)
     server.app.router.add_post(
         '/robot/home_pipette', control.home_pipette)
+    server.app.router.add_get(
+        '/settings', update.get_feature_flag)
+    server.app.router.add_post(
+        '/settings/set', update.set_feature_flag)
 
     return server.app
 

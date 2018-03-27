@@ -1,9 +1,7 @@
-def test_old_probe_height(monkeypatch):
+def test_old_probe_height(monkeypatch, short_trash_flag):
     from opentrons.robot import robot_configs
 
-    monkeypatch.setenv('OT2_PROBE_HEIGHT', '55.0')
     cfg = robot_configs.load()
-    monkeypatch.delenv('OT2_PROBE_HEIGHT')
 
     assert cfg.probe_center[2] == 55.0
     assert cfg.probe_dimensions[2] == 60.0

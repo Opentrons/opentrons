@@ -1,19 +1,9 @@
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
-
-import pytest
-
 from opentrons.util import calibration_functions
 
 state = partial(state, 'calibration')
-
-
-@pytest.fixture
-def calibrate_bottom_env(monkeypatch):
-    monkeypatch.setenv('CALIBRATE_BOTTOM', 'true')
-    yield
-    monkeypatch.delenv('CALIBRATE_BOTTOM', '')
 
 
 async def test_tip_probe(main_router, model):
@@ -176,7 +166,7 @@ async def test_move_to_top(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_move_to_bottom(main_router, model, calibrate_bottom_env):
+async def test_move_to_bottom(main_router, model, calibrate_bottom_flag):
 
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
@@ -233,7 +223,7 @@ async def test_jog_calibrate_bottom(
         user_definition_dirs,
         main_router,
         model,
-        calibrate_bottom_env):
+        calibrate_bottom_flag):
 
     # Check that the feature flag correctly implements calibrate to bottom
     from numpy import array, isclose
