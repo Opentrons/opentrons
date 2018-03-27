@@ -1,8 +1,6 @@
 {
-  "name": "ot-app-desktop",
-  "productName": "Opentrons",
-  "private": true,
-  "version": "3.0.0-beta.1",
+  "name": "@opentrons/app-shell",
+  "version": "3.0.0-beta.2",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
@@ -25,12 +23,14 @@
     "cross-env": "^5.0.1",
     "electron": "1.8.3",
     "electron-builder": "20.6.2",
+    "electron-publisher-s3": "20.7.0",
     "shx": "^0.2.2"
   },
   "dependencies": {
     "electron-debug": "^1.1.0",
     "electron-devtools-installer": "^2.2.0",
     "electron-log": "^2.2.9",
+    "electron-updater": "2.21.3",
     "semver": "^5.5.0"
   }
 }

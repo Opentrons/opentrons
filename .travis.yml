@@ -1,17 +1,19 @@
-language: python
+# opentrons travis configuration
 
 matrix:
-  # Set fast_finish to false to wait for OSX build to finish
-  # We need both builds when we want to push an app update
-  # Otherwise with fast_finish: true
-  # the success of Linux build is enough for CI purposes
-  fast_finish: true
+  fast_finish: false
   include:
     - os: linux
       sudo: false
-      python: "3.6"
+      language: python
+      python: '3.6'
+      # TODO(mc, 2018-10-25): enable api docs on linux after BM's fixup work
       env:
-        - PUBLIC_REPO="$(git remote -v | tail -n 1 | sed s/.*opentrons\.git.*/true/g)"
+        LINT=true
+        BUILD_APP=true
+        BUILD_PD=true
+        BUILD_COMPONENTS=true
+        BUILD_API_DOCS=false
       addons:
         apt:
           sources: &common_sources
@@ -22,67 +24,70 @@ matrix:
             - graphicsmagick # electron-builder dependency
             - xvfb
 
-# More: https://docs.travis-ci.com/user/caching/
+    - os: osx
+      language: generic
+      if: type != pull_request AND (tag IS present OR branch IN (master, edge))
+      env:
+        LINT=false
+        BUILD_APP=true
+        BUILD_PD=false
+        BUILD_COMPONENTS=false
+        BUILD_API_DOCS=false
+
 cache:
   pip: true
   yarn: true
   directories:
     - $HOME/.pyenv
-    - $HOME/.cache/brew
+    - $HOME/Library/Caches/Homebrew
 
-# TODO(mc, 2018-04-12): can this be removed? Don't think we publishing to pypa
 before_install:
-  - >  # load keys needed to publish to pypa only when building from public repo
-    if [[ "$PUBLIC_REPO" == "true" ]]; then (openssl aes-256-cbc -K $encrypted_f176ff9ac49f_key -iv $encrypted_f176ff9ac49f_iv -in .pypirc.enc -out $HOME/.pypirc -d) fi;
+  # source these scripts because they modify $PATH
+  - source scripts/travis-env.sh
+  - source scripts/travis-install.sh
 
 install:
-  - source scripts/install-${TRAVIS_OS_NAME} # OS-specific installs
   - make install
 
 script:
-  - python --version
-  - node --version
-  - "export OT_TIME_SUFFIX=-$(date -u '+%Y-%m-%d_%H-%M')"
-  - "export OT_BRANCH_SUFFIX=-${TRAVIS_BRANCH}"
-  - "export OT_COMMIT_SUFFIX=-${TRAVIS_COMMIT:0:7}"
   - make test
-  - make lint
-  # TODO (artyom 20171030): bring this back once the API is stable and documentation is fixed
-  # - > # Make docs on linux only
-  #   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (make -C api docs > /dev/null) fi;
-  # build components library
-  - make -C components build
-  # build protocol designer
-  - make -C protocol-designer build
-  # build run app
-  - make -C app-shell dist-posix
+  - if [[ $LINT = true ]]; then make lint; fi
+  - if [[ $BUILD_COMPONENTS = true ]]; then make -C components build; fi
+  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer build; fi
+  - if [[ $BUILD_APP = true ]]; then make -C app-shell dist-$APP_OS_TARGET; fi
+  - if [[ $BUILD_API_DOCS = true ]]; then (make -C api docs > /dev/null); fi
 
 after_success:
   - make coverage
 
-# Deploy the build version in an S3 bucket
 deploy:
+  # TODO(mc, 2018-03-25): api docs deploy
+  - provider: script
+    skip_cleanup: true
+    script: echo "not implemented!"
+    on:
+        condition: $BUILD_API_DOCS = true
+        repo: Opentrons/opentrons
+        tags: true
+
+  # app deploy
   - provider: s3
+    skip_cleanup: true
+    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
-    bucket: ot-app-builds
-    skip_cleanup: true
+    bucket: $OT_BUCKET_APP
+    upload-dir: $OT_FOLDER_APP
     local-dir: $(pwd)/app-shell/dist/publish
-    upload-dir: ci-builds
     acl: public_read
     on:
-      condition: $TRAVIS_TEST_RESULT = 0
+      condition: $BUILD_APP = true
       repo: Opentrons/opentrons
       all_branches: true
 
-  # Publish API to PyPI and Anaconda
-  - provider: script
-    skip_cleanup: true
-    script: make -C api publish
-    on:
-      tags: true
-
+  # protocol designer deploy
   - provider: s3
+    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: opentrons-protocol-designer
@@ -90,13 +95,16 @@ deploy:
     local-dir: $(pwd)/protocol-designer/dist/
     upload-dir: $TRAVIS_BRANCH
     acl: public_read
+    # TODO(mc, 2018-03-26): why is this region not default?
     region: us-west-2
     on:
-      condition: $TRAVIS_TEST_RESULT = 0
+      condition: $BUILD_PD = true
       repo: Opentrons/opentrons
       all_branches: true
 
+  # components library deploy
   - provider: s3
+    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: opentrons-components
@@ -104,17 +112,25 @@ deploy:
     local-dir: $(pwd)/components/dist/
     upload-dir: $TRAVIS_BRANCH
     acl: public_read
+    # TODO(mc, 2018-03-26): why is this region not default?
     region: us-west-2
     on:
-      condition: $TRAVIS_TEST_RESULT = 0
+      condition: $BUILD_COMPONENTS = true
       repo: Opentrons/opentrons
       all_branches: true
 
 env:
   global:
-  - ENCRYPTION_LABEL: c6cefc96bb2c
-  - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
-  - secure: XBRwYt3Bowc3klVy6FyXIfeyOBzFzrzMwRJbIz54L8Ov7o2qV8l+5M16iyOy8O8C1qTFMVyCmW3K+xHPQaMstq7rPeVACwJ9VpyQciaDAWVujhyhuN94hU0YtmB1KtmPUHdYCuD25eL5HJ2GDjmYqq/XUYyuX67rrPxT5b5z7Yf4kdkPyBIa5c+KyklYmJLdHGBJUuOfM7qvxOo7nlMyzU+LfgvtqM15g7eQIvXGDydi59lT6FOpW9J9h4Z2Nwmc2lHjxCxi5SI2NIR7K5DsqjtRi0eMcr1m098CA/T1Oh4c5qlG8Uoi+KpOcfcTuAP3VSFdbMgRFmtQ3gwJ71ZPB7GeqvLXSgriACl12n0uienOYrb6/X1Nujsl7Pxjh8KMiIBRcX2/46ecyeN+gP+6u9ic5mPRMFky1e2dqbbUTIeAw7397ufvtIPb0qW4mUMdu4NMkiRg01aF5ZmgVMXvnvQm/xyF+SC0Qtj9uOjZUzsj5DVnLuLHekP3OYpxRzFFzpjBZmdwCsEtwHH8PmuG/owa6Jmf4aXN50dgCL6oRPjWoH213jOdjplGI7ZMZXAigGrN9sT9Om67ZWNuN/TYgy+K3QIp2ELC6MmpJNuH9n8M1pCtynitSyvuW5YhG/j7VH3TKDogID3FOgPYAjfC0EshHt+Kl2GddaR3bpCa3XA=
+    - OT_BUILD: $TRAVIS_BUILD_NUMBER
+    - OT_BRANCH: $TRAVIS_BRANCH
+    - OT_TAG: $TRAVIS_TAG
+
+    - OT_BUCKET_APP: opentrons-app
+    - OT_FOLDER_APP: builds
+
+    # TODO(mc, 2018-03-25): delete/move these to GH pages deploy as appropriate
+    - ENCRYPTION_LABEL: c6cefc96bb2c
+    - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
 
 notifications:
   email:
