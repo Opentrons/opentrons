@@ -71,6 +71,28 @@ push: wheel
 restart:
 	curl -X POST http://$(host):31950/server/restart
 
+.PHONY: change-right
+change-right:
+	curl -X POST \
+		-H "Content-Type: application/json" \
+		-d '{"target": "mount", "mount": "right", "point": [65, 40, 30]}' \
+		http://$(host):31950/robot/move
+	curl -X POST \
+		-H "Content-Type: application/json" \
+		-d '{"axes": ["c"]}' \
+		http://$(host):31950/motors/disengage
+
+
+.PHONY: change-left
+change-left:
+	curl -X POST \
+		-H "Content-Type: application/json" \
+		-d '{"target": "mount", "mount": "left", "point": [325, 40, 30]}' \
+		http://$(host):31950/robot/move
+	curl -X POST \
+		-H "Content-Type: application/json" \
+		-d '{"axes": ["b"]}' \
+		http://$(host):31950/motors/disengage
 
 # TODO(mc, 2018-03-14): use $(host) var
 .PHONY: term
