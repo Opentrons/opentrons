@@ -17,8 +17,11 @@ def scan_instruments(robot):
     print()
     found_instruments = {}
     for mount in ['left', 'right']:
-        read_id = robot._driver.read_pipette_id(mount)
-        read_model = robot._driver.read_pipette_model(mount)
+        try:
+            read_id = robot._driver.read_pipette_id(mount)
+            read_model = robot._driver.read_pipette_model(mount)
+        except Exception:
+            continue
         if read_id and read_model:
             found_instruments[mount] = {
                 'id': read_id,
