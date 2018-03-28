@@ -18,28 +18,23 @@ env := cross-env NODE_ENV
 noop := cd .
 
 # build and publish options
-# TODO(mc, 2018-03-27): move all this to some sort of envfile
-mainline_branches := master edge $(OT_TAG)
-feature_branch := $(filter-out $(mainline_branches),$(OT_BRANCH))
-
 dist_files := "dist/**/Opentrons-v*"
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
-# build suffix to add to artifacts
-# if branch is master or edge -> b$(BUILD_NUMBER)
-# if branch is something else -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
-# else -> dev
-branch_suffix := $(and $(feature_branch),-$(feature_branch))
-build := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
+# TODO(mc, 2018-03-27): move all this to some sort of envfile
+# build id suffix to add to artifacts
+# if no build number -> dev
+# if tagged build (branch == tag) -> b$(BUILD_NUMBER)
+# if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
+branch := $(filter-out $(OT_TAG),$(OT_BRANCH))
+branch_suffix := $(and $(branch),-$(branch))
+build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
 # only copy update files publish directory on tagged builds
 publish_update := $(OT_TAG)
 
-builder := $(env)=production BUILD=$(build) electron-builder \
-	--publish=never \
-	-c.publish.bucket=$(OT_BUCKET_APP) \
-	-c.publish.path=$(OT_FOLDER_APP)
+builder := $(env)=production BUILD_ID=$(build_id) electron-builder -p never
 
 # standard targets
 #####################################################################
@@ -108,4 +103,4 @@ _dist-collect-artifacts:
 
 .PHONY: dev
 dev:
-	$(env)=development PORT=$(port) electron lib/main.js
+	$(env)=development PORT=$(port) electron .

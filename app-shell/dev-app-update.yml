@@ -1,0 +1,5 @@
+provider: s3
+bucket: opentrons-app
+path: builds
+# TODO(mc, 2018-03-28): switch to latest when we have a "latest" release
+channel: beta
