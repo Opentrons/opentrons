@@ -1,13 +1,12 @@
 // @flow
 // robot HTTP API client
 
+import type {Error} from '../types'
 import type {RobotService} from '../robot'
 
 type Method = 'GET' | 'POST'
 
-export type ApiRequestError = {
-  name: string,
-  message: string,
+export type ApiRequestError = Error & {
   url?: string,
   status?: number,
   statusText?: string,
