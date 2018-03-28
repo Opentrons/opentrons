@@ -60,6 +60,13 @@ export type ConnectResponseAction = {|
   |},
 |}
 
+export type ReturnTipResponseAction = {|
+  type: 'robot:RETURN_TIP_RESPONSE',
+  payload: {|
+    error: ?{message: string}
+  |}
+|}
+
 export type ClearConnectResponseAction = {|
   type: 'robot:CLEAR_CONNECT_RESPONSE',
 |}
@@ -120,6 +127,7 @@ export type CalibrationSuccessAction = {
     | 'robot:DROP_TIP_AND_HOME_SUCCESS'
     | 'robot:CONFIRM_TIPRACK_SUCCESS'
     | 'robot:UPDATE_OFFSET_SUCCESS'
+    | 'robot:RETURN_TIP_SUCCESS'
   ),
   payload: {
     isTiprack?: boolean,
@@ -135,6 +143,7 @@ export type CalibrationFailureAction = {|
     | 'robot:DROP_TIP_AND_HOME_FAILURE'
     | 'robot:CONFIRM_TIPRACK_FAILURE'
     | 'robot:UPDATE_OFFSET_FAILURE'
+    | 'robot:RETURN_TIP_FAILURE'
   ),
   error: true,
   payload: Error
@@ -158,6 +167,9 @@ export const actionTypes = {
   MOVE_TO_FRONT_RESPONSE: makeRobotActionName('MOVE_TO_FRONT_RESPONSE'),
   PROBE_TIP: makeRobotActionName('PROBE_TIP'),
   PROBE_TIP_RESPONSE: makeRobotActionName('PROBE_TIP_RESPONSE'),
+
+  RETURN_TIP: makeRobotActionName('RETURN_TIP'),
+  RETURN_TIP_RESPONSE: makeRobotActionName('RETURN_TIP_RESPONSE'),
   TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
   CONFIRM_LABWARE: makeRobotActionName('CONFIRM_LABWARE'),
 
@@ -190,6 +202,7 @@ export type Action =
   | LabwareCalibrationAction
   | CalibrationResponseAction
   | CalibrationFailureAction
+  | ReturnTipResponseAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -373,6 +386,20 @@ export const actions = {
 
   confirmProbed (instrument: Mount): ConfirmProbedAction {
     return {type: 'robot:CONFIRM_PROBED', payload: instrument}
+  },
+
+  returnTip (instrument: Mount) {
+    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {instrument}})
+  },
+
+  returnTipResponse (error: ?Error = null) {
+    const action: {type: string, error: boolean, payload?: Error} = {
+      type: actionTypes.RETURN_TIP_RESPONSE,
+      error: error != null
+    }
+    if (error) action.payload = error
+
+    return action
   },
 
   moveTo (mount: Mount, slot: Slot): LabwareCalibrationAction {
