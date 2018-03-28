@@ -101,7 +101,7 @@ function ConnectivityCard (props: Props) {
           onSubmit={configure}
         />
       </RefreshCard>
-      {(configError || configResponse) && (
+      {(!!configError || !!configResponse) && (
         <WifiConnectModal
           onClose={(configError
             ? clearFailedConfigure

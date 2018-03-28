@@ -18,7 +18,7 @@
       "filter": ["**/*"]
     }
   ],
-  "artifactName": "${productName}-v${version}-${os}-${env.BUILD}.${ext}",
+  "artifactName": "${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}",
   "asar": true,
   "dmg": {
     "backgroundColor": "white",
@@ -55,7 +55,9 @@
     "category": "Science"
   },
   "publish": {
-    "provider": "s3"
+    "provider": "s3",
+    "bucket": "${env.OT_BUCKET_APP}",
+    "path": "${env.OT_FOLDER_APP}"
   },
   "generateUpdatesFilesForAllChannels": true
 }

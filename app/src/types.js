@@ -9,6 +9,7 @@ import type {
 import typeof reducer from './reducer'
 import type {Action as RobotAction} from './robot'
 import type {Action as HttpApiAction} from './http-api-client'
+import type {ShellAction} from './shell'
 
 export type State = $Call<reducer>
 
@@ -17,6 +18,7 @@ export type GetState = () => State
 export type Action =
   | RobotAction
   | HttpApiAction
+  | ShellAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 
@@ -43,3 +45,5 @@ type PlainDispatch = ReduxDispatch<Action>
 type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
+
+export type Error = {name: string, message: string}
