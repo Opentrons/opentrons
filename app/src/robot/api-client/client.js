@@ -43,6 +43,7 @@ export default function client (dispatch) {
       case 'robot:MOVE_TO': return moveTo(state, action)
       case 'robot:JOG': return jog(state, action)
       case 'robot:UPDATE_OFFSET': return updateOffset(state, action)
+      case actionTypes.RETURN_TIP: return returnTip(state, action)
       case actionTypes.RUN: return run(state, action)
       case actionTypes.PAUSE: return pause(state, action)
       case actionTypes.RESUME: return resume(state, action)
@@ -186,6 +187,18 @@ export default function client (dispatch) {
     remote.calibration_manager.tip_probe(instrument)
       .then(() => dispatch(actions.probeTipResponse()))
       .catch((error) => dispatch(actions.probeTipResponse(error)))
+  }
+
+  function returnTip (state, action) {
+    const {payload: {instrument: mount}} = action
+    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+
+    // FIXME(mc, 2017-10-05): DEBUG CODE
+    // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
+
+    remote.calibration_manager.return_tip(instrument)
+    .then(() => dispatch(actions.returnTipRepsonse()))
+    .catch((error) => dispatch(actions.returnTipRepsonse(error)))
   }
 
   function moveTo (state, action) {
