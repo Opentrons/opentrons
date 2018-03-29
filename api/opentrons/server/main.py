@@ -98,8 +98,6 @@ def init(loop=None):
     server.app.router.add_post(
         '/calibration/deck/start', dc_endp.start)
     server.app.router.add_post(
-        '/calibration/deck/release', dc_endp.release)
-    server.app.router.add_post(
         '/calibration/deck', dc_endp.dispatch)
     server.app.router.add_get(
         '/pipettes', control.get_attached_pipettes)
