@@ -1,26 +1,43 @@
 // @flow
-// App info card with version and updated
-// TODO (ka 2018-2-22): make this a container once app info and update action are in place.
+// app info card with version and updated
 import * as React from 'react'
+import {Link} from 'react-router-dom'
 
-import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
+import type {ShellUpdate} from '../../shell'
+import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 
-import {version} from '../../../../package.json'
+type Props = ShellUpdate & {
+  checkForUpdates: () => mixed
+}
 
 const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
-const VERSION_VALUE = version
 
-export default function AppInfoCard () {
+export default function AppInfoCard (props: Props) {
+  const {
+    current,
+    checkForUpdates,
+    checkInProgress,
+    available
+  } = props
+
   return (
-    <Card title={TITLE}>
+    <RefreshCard
+      title={TITLE}
+      refreshing={checkInProgress}
+      refresh={checkForUpdates}
+    >
       <LabeledValue
         label={VERSION_LABEL}
-        value={VERSION_VALUE}
+        value={current}
       />
-      <OutlineButton disabled>
-        updated
+      <OutlineButton
+        Component={Link}
+        to='/menu/app/update'
+        disabled={!available}
+      >
+        {available ? 'update' : 'updated'}
       </OutlineButton>
-    </Card>
+    </RefreshCard>
   )
 }

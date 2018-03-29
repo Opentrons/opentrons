@@ -8,7 +8,7 @@ import styles from './structure.css'
 
 type Props = React.ElementProps<typeof Card> & {
   /** a change in the watch prop will trigger a refresh */
-  watch: string,
+  watch?: string,
   /** refreshing flag */
   refreshing: boolean,
   /** refresh function */

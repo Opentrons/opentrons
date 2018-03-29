@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/labware-definitions",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "description": "Default labware definitions for Opentrons robots",
   "scripts": {
     "test": "echo \"No test specified--see API labware definitions tests\" && exit 1"

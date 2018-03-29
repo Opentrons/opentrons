@@ -19,6 +19,7 @@
 
 .modal_contents {
   z-index: 1;
+  width: 100%;
   padding: 1rem;
   background-color: white;
 }
