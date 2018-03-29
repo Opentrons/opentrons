@@ -16,6 +16,8 @@ from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons.config import feature_flags as ff
+from opentrons.server.main import init
+from opentrons.deck_calibration import endpoints
 
 # Uncomment to enable logging during tests
 
@@ -125,6 +127,24 @@ def short_trash_flag(monkeypatch):
     monkeypatch.delenv('short-fixed-trash', '')
 
 # -----end feature flag fixtures-----------
+
+
+@pytest.fixture
+async def async_client(virtual_smoothie_env, loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    endpoints.session = None
+    return cli
+
+
+@pytest.fixture
+def dc_session(virtual_smoothie_env, monkeypatch):
+    """
+    Mock session manager for deck calibation
+    """
+    ses = endpoints.SessionManager()
+    monkeypatch.setattr(endpoints, 'session', ses)
+    return ses
 
 
 @pytest.fixture
