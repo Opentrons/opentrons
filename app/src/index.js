@@ -8,6 +8,7 @@ import thunk from 'redux-thunk'
 import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
+import {checkForShellUpdates} from './shell'
 import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {middleware as analyticsMiddleware} from './analytics'
@@ -52,8 +53,12 @@ if (module.hot) {
   module.hot.accept('./components/App', renderApp)
 }
 
+// TODO(mc, 2018-03-29): developer mode in app settings
 if (process.env.NODE_ENV === 'development') {
   global.store = store
 }
+
+// kickoff an initial update check at launch
+store.dispatch(checkForShellUpdates())
 
 renderApp()
