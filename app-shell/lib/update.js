@@ -37,7 +37,7 @@ function checkForUpdates () {
 
     function handleError (error) {
       cleanup()
-      reject(error)
+      reject(PlainObjectError(error))
     }
 
     function cleanup () {
@@ -61,7 +61,7 @@ function downloadUpdate () {
 
     function handleError (error) {
       cleanup()
-      reject(error)
+      reject(PlainObjectError(error))
     }
 
     function cleanup () {
@@ -73,4 +73,10 @@ function downloadUpdate () {
 
 function quitAndInstall () {
   return updater.quitAndInstall()
+}
+
+// TODO(mc, 2018-03-29): this only exists to support RPC in a webworker;
+//   remove when RPC is gone
+function PlainObjectError (error) {
+  return {name: error.name, message: error.message}
 }
