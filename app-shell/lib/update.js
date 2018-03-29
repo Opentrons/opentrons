@@ -2,33 +2,75 @@
 'use strict'
 
 const log = require('electron-log')
-const {autoUpdater} = require('electron-updater')
-const semver = require('semver')
+const {autoUpdater: updater} = require('electron-updater')
 
-autoUpdater.logger = log
-autoUpdater.autoDownload = false
+updater.logger = log
+updater.autoDownload = false
 
 module.exports = {
   getCurrentVersion,
-  checkForUpdates
+  checkForUpdates,
+  downloadUpdate,
+  quitAndInstall
 }
 
 function getCurrentVersion () {
-  return autoUpdater.currentVersion
+  return updater.currentVersion
 }
 
 function checkForUpdates () {
-  return autoUpdater.checkForUpdates()
-    .then((result) => {
-      const {updateInfo: {version}} = result
+  return new Promise((resolve, reject) => {
+    updater.once('update-available', handleUpdateAvailable)
+    updater.once('update-not-available', handleUpdateNotAvailable)
+    updater.once('error', handleError)
+    updater.checkForUpdates()
 
-      // TODO(mc, 2018-03-28): electron-updater doesn't indicate if an
-      //   update is available through the promise result interface;
-      //   re-evaluate this custom logic
-      if (semver.gt(version, getCurrentVersion())) {
-        return version
-      }
+    function handleUpdateAvailable (info) {
+      cleanup()
+      resolve(Object.assign({updateAvailable: true}, info))
+    }
 
-      return null
-    })
+    function handleUpdateNotAvailable (info) {
+      cleanup()
+      resolve(Object.assign({updateAvailable: false}, info))
+    }
+
+    function handleError (error) {
+      cleanup()
+      reject(error)
+    }
+
+    function cleanup () {
+      updater.removeListener('update-available', handleUpdateAvailable)
+      updater.removeListener('update-not-available', handleUpdateNotAvailable)
+      updater.removeListener('error', handleError)
+    }
+  })
+}
+
+function downloadUpdate () {
+  return new Promise((resolve, reject) => {
+    updater.once('update-downloaded', handleUpdateDownloaded)
+    updater.once('error', handleError)
+    updater.downloadUpdate()
+
+    function handleUpdateDownloaded () {
+      cleanup()
+      resolve()
+    }
+
+    function handleError (error) {
+      cleanup()
+      reject(error)
+    }
+
+    function cleanup () {
+      updater.removeListener('update-downloaded', handleUpdateDownloaded)
+      updater.removeListener('error', handleError)
+    }
+  })
+}
+
+function quitAndInstall () {
+  return updater.quitAndInstall()
 }

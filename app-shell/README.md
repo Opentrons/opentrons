@@ -76,20 +76,29 @@ DEBUG=1 ./dist/mac/Opentrons.app/Contents/MacOS/Opentrons
 
 There are a series of tasks designed to be run in CI to create distributable versions of the app.
 
-*   `make dist-osx` - Create a macOS distributable of the app
-*   `make dist-linux` - Create a Linux distributable of the app
-*   `make dist-posix` - Create macOS and Linux apps simultaneously
-*   `make dist-win` - Create a Windows distributable of the app
+```shell
+# Create a macOS distributable of the app
+make dist-osx OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
 
-These tasks need the following environment variables defined:
+# Create a Linux distributable of the app
+make dist-linux OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
 
- name          | description   | why
--------------- | ------------- | -------------------------------------
- OT_BRANCH     | Branch name   | Sometimes added to the artifact name
- OT_BUILD      | Build number  | Appended to the artifact name
- OT_TAG        | Tag name      | Flags autoupdate files to be published
- OT_BUCKET_APP | AWS S3 bucket | Artifact deploy bucket
- OT_FOLDER_APP | AWS S3 folder | Artifact deploy folder in bucket
+# Create macOS and Linux apps simultaneously
+make dist-posix OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+
+# Create a Windows distributable of the app
+make dist-win OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+```
+
+These tasks use the following environment variables defined:
+
+ name          | description   | required | description
+-------------- | ------------- | -------- | -----------------------------
+ OT_BUCKET_APP | AWS S3 bucket | yes      | Artifact deploy bucket
+ OT_FOLDER_APP | AWS S3 folder | yes      | Artifact deploy folder in bucket
+ OT_BRANCH     | Branch name   | no       | Sometimes added to the artifact name
+ OT_BUILD      | Build number  | no       | Appended to the artifact name
+ OT_TAG        | Tag name      | no       | Flags autoupdate files to be published
 
 The release channel is set according to the version string:
 
