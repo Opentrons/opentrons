@@ -12,8 +12,8 @@ nginx
 inetd -e /etc/inetd.conf
 
 # Home robot
-echo "Homing Robot... this may take a few seconds."
-python -c "from opentrons import robot; robot.connect(); robot.home()"
+# echo "Homing Robot... this may take a few seconds."
+# python -c "from opentrons import robot; robot.connect(); robot.home()"
 
 # If user boot script exists, run it
 mkdir -p /data/boot.d
