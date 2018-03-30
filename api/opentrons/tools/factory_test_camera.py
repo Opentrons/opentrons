@@ -12,13 +12,13 @@ def record_camera(filepath):
     print_bars()
     # record 1 second of video from the USB camera
     c = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:00:01 {}'
-    os.system(c.format(filepath))
+    res = os.system(c.format(filepath))
 
 
 def copy_to_usb_drive_and_back(filepath):
     # create the mount directory
     if os.path.exists('/mnt/usbdrive') is False:
-        os.system('mkdir /mnt/usbdrive')
+        subprocess.check_output('mkdir /mnt/usbdrive')
     # find the storage device
     sdn1_devices = [
         '/dev/sd{}1'.format(l)
@@ -27,16 +27,16 @@ def copy_to_usb_drive_and_back(filepath):
     ]
     if len(sdn1_devices) == 0:
         raise Exception('USB drive not found')
-    os.system('mount {} /mnt/usbdrive'.format(sdn1_devices[0]))
+    subprocess.check_output('mount {} /mnt/usbdrive'.format(sdn1_devices[0]))
     # move the file to and from it
     name = filepath.split('/')[-1]
     print_bars()
     print('Moving video recording to USB drive...')
-    os.system('mv {0} /mnt/usbdrive/{1}'.format(filepath, name))
+    subprocess.check_output('mv {0} /mnt/usbdrive/{1}'.format(filepath, name))
     if os.path.exists('/mnt/usbdrive/{}'.format(name)):
         print('Success')
         print('Moving video recording back to local storage...')
-        os.system('mv /mnt/usbdrive/{0} {1}'.format(name, filepath))
+        subprocess.check_output('mv /mnt/usbdrive/{0} {1}'.format(name, filepath))
         if os.path.exists(filepath):
             print('Success')
             print_bars()
