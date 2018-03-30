@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.3",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",
@@ -27,7 +27,7 @@
     }
   },
   "devDependencies": {
-    "@opentrons/webpack-config": "3.0.0-beta.1",
+    "@opentrons/webpack-config": "3.0.0-beta.3",
     "babel-core": "^6.26.0",
     "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.2",

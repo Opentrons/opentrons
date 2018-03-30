@@ -1,19 +1,9 @@
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
-
-import pytest
-
 from opentrons.util import calibration_functions
 
 state = partial(state, 'calibration')
-
-
-@pytest.fixture
-def calibrate_bottom_env(monkeypatch):
-    monkeypatch.setenv('CALIBRATE_BOTTOM', 'true')
-    yield
-    monkeypatch.delenv('CALIBRATE_BOTTOM', '')
 
 
 async def test_tip_probe(main_router, model):
@@ -176,19 +166,6 @@ async def test_move_to_top(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_move_to_bottom(main_router, model, calibrate_bottom_env):
-
-    with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
-        main_router.calibration_manager.move_to(
-            model.instrument,
-            model.container)
-
-        move_to.assert_called_with(model.container._container[0].bottom())
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
 async def test_jog(main_router, model):
     with mock.patch('opentrons.util.calibration_functions.jog_instrument') as jog:  # NOQA
         for distance, axis in zip((1, 2, 3), 'xyz'):
@@ -233,7 +210,7 @@ async def test_jog_calibrate_bottom(
         user_definition_dirs,
         main_router,
         model,
-        calibrate_bottom_env):
+        calibrate_bottom_flag):
 
     # Check that the feature flag correctly implements calibrate to bottom
     from numpy import array, isclose
@@ -247,11 +224,13 @@ async def test_jog_calibrate_bottom(
         src=container[0],
         dst=robot.deck)
     coordinates1 = container.coordinates()
+    height = container['A1'].properties['height']
 
     main_router.calibration_manager.move_to(model.instrument, model.container)
     main_router.calibration_manager.jog(model.instrument, 1, 'x')
     main_router.calibration_manager.jog(model.instrument, 2, 'y')
     main_router.calibration_manager.jog(model.instrument, 3, 'z')
+    main_router.calibration_manager.jog(model.instrument, -height, 'z')
 
     # Todo: make tests use a tmp dir instead of a real one
     main_router.calibration_manager.update_container_offset(

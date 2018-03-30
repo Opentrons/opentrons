@@ -3,6 +3,8 @@
 
 const path = require('path')
 
+jest.mock('electron-updater', () => ({autoUpdater: {}}))
+
 const __mockRemotes = {}
 
 const __clearMock = () => {

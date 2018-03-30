@@ -11,6 +11,7 @@ import {
   constants as robotConstants
 } from '../../robot'
 import {getAnyRobotUpdateAvailable} from '../../http-api-client'
+import {getShellUpdate} from '../../shell'
 
 import type {IconName} from '@opentrons/components'
 import {NavButton} from '@opentrons/components'
@@ -39,6 +40,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
   const robotNotification = getAnyRobotUpdateAvailable(state)
+  const moreNotification = getShellUpdate(state).available != null
 
   // TODO(mc, 2018-03-08): move this logic to the Calibrate page
   let calibrateUrl
@@ -83,7 +85,8 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
       iconName: 'dots-horizontal',
       isBottom: true,
       title: 'more',
-      url: '/menu/app'
+      url: '/menu/app',
+      notification: moreNotification
     }
   }
 

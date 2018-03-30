@@ -4,6 +4,7 @@ import asyncio
 from aiohttp import web
 
 from opentrons import robot
+from opentrons.config import feature_flags as ff
 
 log = logging.getLogger(__name__)
 
@@ -124,3 +125,34 @@ async def update_firmware(request):
                 type(e), data, e.__traceback__)},
             status=500)
     return res
+
+
+async def set_feature_flag(request):
+    """
+    Post body must include the keys 'key' and 'value'. The values of these two
+    entries will be set in the settings file as a key-value pair.
+    """
+    try:
+        data = await request.json()
+        flag_name = data.get('key')
+        flag_value = data.get('value')
+        log.debug("Set feature flag '{}' to '{}' (prior value: '{}')".format(
+            flag_name, flag_value, ff.get_feature_flag(flag_name)))
+
+        ff.set_feature_flag(flag_name, flag_value)
+
+        message = "Set '{}' to '{}'".format(flag_name, flag_value)
+        status = 200
+    except Exception as e:
+        message = 'Error: {}'.format(e)
+        status = 400
+    return web.json_response({'message': message}, status=status)
+
+
+async def get_feature_flag(request):
+    """
+    URI path should specify the {flag} match parameter. The 'all' flag is
+    reserved to return the dict of all managed settings.
+    """
+    res = ff.get_all_feature_flags()
+    return web.json_response(res)

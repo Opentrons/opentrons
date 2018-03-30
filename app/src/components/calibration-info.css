@@ -33,7 +33,7 @@
 .info_left,
 .info_right {
   flex: 0 0 50%;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1rem;
 
   & p {
     @apply --font-body-2-dark;

@@ -15,6 +15,9 @@ import pytest
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
+from opentrons.config import feature_flags as ff
+from opentrons.server.main import init
+from opentrons.deck_calibration import endpoints
 
 # Uncomment to enable logging during tests
 
@@ -99,6 +102,49 @@ def dummy_db(tmpdir):
     yield None
     database.change_database(MAIN_TESTER_DB)
     os.remove(temp_db_path)
+
+
+# -------feature flag fixtures-------------
+@pytest.fixture
+def calibrate_bottom_flag(monkeypatch):
+    tmpd = tempfile.TemporaryDirectory()
+    monkeypatch.setattr(
+        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
+
+    ff.set_feature_flag('calibrate-to-bottom', 'true')
+    yield
+    monkeypatch.delenv('calibrate-to-bottom', '')
+
+
+@pytest.fixture
+def short_trash_flag(monkeypatch):
+    tmpd = tempfile.TemporaryDirectory()
+    monkeypatch.setattr(
+        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
+
+    ff.set_feature_flag('short-fixed-trash', 'true')
+    yield
+    monkeypatch.delenv('short-fixed-trash', '')
+
+# -----end feature flag fixtures-----------
+
+
+@pytest.fixture
+async def async_client(virtual_smoothie_env, loop, test_client):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    endpoints.session = None
+    return cli
+
+
+@pytest.fixture
+def dc_session(virtual_smoothie_env, monkeypatch):
+    """
+    Mock session manager for deck calibation
+    """
+    ses = endpoints.SessionManager()
+    monkeypatch.setattr(endpoints, 'session', ses)
+    return ses
 
 
 @pytest.fixture

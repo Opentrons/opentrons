@@ -4,7 +4,6 @@ from copy import copy
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
 from opentrons import robot
-from opentrons.config import feature_flags as fflags
 
 from .models import Container
 
@@ -107,13 +106,7 @@ class CalibrationManager:
         inst = instrument._instrument
         cont = container._container
 
-        if fflags.calibrate_to_bottom():
-            if 'tiprack' in container.name:
-                target = cont[0]
-            else:
-                target = cont[0].bottom()
-        else:
-            target = cont[0]
+        target = cont[0]
 
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))

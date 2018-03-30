@@ -461,6 +461,21 @@ autoprefixer@^7.1.1, autoprefixer@^7.1.2:
     postcss "^6.0.16"
     postcss-value-parser "^3.2.3"
 
+aws-sdk@^2.212.1:
+  version "2.213.1"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.213.1.tgz#bcbfdf1fd7439a948bf53c46bd90c97b4a64925b"
+  dependencies:
+    buffer "4.9.1"
+    events "1.1.1"
+    ieee754 "1.1.8"
+    jmespath "0.15.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    uuid "3.1.0"
+    xml2js "0.4.17"
+    xmlbuilder "4.2.1"
+
 aws-sign2@~0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.6.0.tgz#14342dd38dbcc94d0e5b87d763cd63612c0e794f"
@@ -1415,7 +1430,7 @@ buffer-xor@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/buffer-xor/-/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
 
-buffer@^4.3.0:
+buffer@4.9.1, buffer@^4.3.0:
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.1.tgz#6d1bb601b07a4efced97094132093027c95bc298"
   dependencies:
@@ -1445,7 +1460,7 @@ builder-util-runtime@4.1.0:
     fs-extra-p "^4.5.2"
     sax "^1.2.4"
 
-builder-util-runtime@^4.0.5, builder-util-runtime@^4.1.0, builder-util-runtime@^4.2.0:
+builder-util-runtime@^4.0.5, builder-util-runtime@^4.1.0, builder-util-runtime@^4.2.0, builder-util-runtime@~4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/builder-util-runtime/-/builder-util-runtime-4.2.0.tgz#c56aa18d34390143da031c418c9d3a055fbd3522"
   dependencies:
@@ -1492,7 +1507,7 @@ builder-util@5.6.7:
     stat-mode "^0.2.2"
     temp-file "^3.1.1"
 
-builder-util@^5.6.5, builder-util@^5.6.7:
+builder-util@^5.6.5, builder-util@^5.6.7, builder-util@^5.7.1:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/builder-util/-/builder-util-5.7.2.tgz#049b4365993f34519c9d56589494cda2257b24d3"
   dependencies:
@@ -2911,6 +2926,29 @@ electron-publish@20.6.1:
     lazy-val "^1.0.3"
     mime "^2.2.0"
 
+electron-publish@~20.7.0:
+  version "20.7.0"
+  resolved "https://registry.yarnpkg.com/electron-publish/-/electron-publish-20.7.0.tgz#1bdc02365b199cd817e635bcd251670a39e014ce"
+  dependencies:
+    bluebird-lst "^1.0.5"
+    builder-util "^5.7.1"
+    builder-util-runtime "^4.2.0"
+    chalk "^2.3.2"
+    fs-extra-p "^4.5.2"
+    lazy-val "^1.0.3"
+    mime "^2.2.0"
+
+electron-publisher-s3@20.7.0:
+  version "20.7.0"
+  resolved "https://registry.yarnpkg.com/electron-publisher-s3/-/electron-publisher-s3-20.7.0.tgz#3c2cc2f8b5959258883d646996e88c276224cb33"
+  dependencies:
+    aws-sdk "^2.212.1"
+    bluebird-lst "^1.0.5"
+    builder-util "^5.7.1"
+    electron-publish "~20.7.0"
+    fs-extra-p "^4.5.2"
+    mime "^2.2.0"
+
 electron-releases@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/electron-releases/-/electron-releases-2.1.0.tgz#c5614bf811f176ce3c836e368a0625782341fd4e"
@@ -2920,6 +2958,20 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.30:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.30.tgz#9666f532a64586651fc56a72513692e820d06a80"
   dependencies:
     electron-releases "^2.1.0"
+
+electron-updater@2.21.3:
+  version "2.21.3"
+  resolved "https://registry.yarnpkg.com/electron-updater/-/electron-updater-2.21.3.tgz#767bfe6a2a5513cb11c79f94efef6d1ff01fb058"
+  dependencies:
+    bluebird-lst "^1.0.5"
+    builder-util-runtime "~4.2.0"
+    electron-is-dev "^0.3.0"
+    fs-extra-p "^4.5.2"
+    js-yaml "^3.11.0"
+    lazy-val "^1.0.3"
+    lodash.isequal "^4.5.0"
+    semver "^5.5.0"
+    source-map-support "^0.5.4"
 
 electron@1.8.3:
   version "1.8.3"
@@ -3270,7 +3322,7 @@ eventemitter3@1.x.x:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-1.2.0.tgz#1c86991d816ad1e504750e73874224ecf3bec508"
 
-events@^1.0.0:
+events@1.1.1, events@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
 
@@ -4407,7 +4459,7 @@ identity-obj-proxy@^3.0.0:
   dependencies:
     harmony-reflect "^1.4.6"
 
-ieee754@^1.1.4:
+ieee754@1.1.8, ieee754@^1.1.4:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
 
@@ -5201,6 +5253,10 @@ jest@^20.0.4:
   dependencies:
     jest-cli "^20.0.4"
 
+jmespath@0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
+
 joi@^9.2.0:
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/joi/-/joi-9.2.0.tgz#3385ac790192130cbe230e802ec02c9215bbfeda"
@@ -5549,6 +5605,10 @@ lodash.camelcase@^4.3.0:
 lodash.cond@^4.3.0:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/lodash.cond/-/lodash.cond-4.5.2.tgz#f471a1da486be60f6ab955d17115523dd1d255d5"
+
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
 
 lodash.isplainobject@^4.0.6:
   version "4.0.6"
@@ -8298,7 +8358,11 @@ sanitize-filename@^1.6.1:
   dependencies:
     truncate-utf8-bytes "^1.0.0"
 
-sax@^1.2.1, sax@^1.2.4, sax@~1.2.1:
+sax@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.1.tgz#7b8e656190b228e81a66aea748480d828cd2d37a"
+
+sax@>=0.6.0, sax@^1.2.1, sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
@@ -9540,6 +9604,13 @@ url-to-options@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/url-to-options/-/url-to-options-1.0.1.tgz#1505a03a289a48cbd7a434efbaeec5055f5633a9"
 
+url@0.10.3:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/url/-/url-0.10.3.tgz#021e4d9c7705f21bbf37d03ceb58767402774c64"
+  dependencies:
+    punycode "1.3.2"
+    querystring "0.2.0"
+
 url@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/url/-/url-0.11.0.tgz#3838e97cfc60521eb73c525a8e55bfdd9e2e28f1"
@@ -9591,7 +9662,7 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
 
-uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
+uuid@3.1.0, uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
 
@@ -9969,6 +10040,19 @@ xml-char-classes@^1.0.0:
 xml-name-validator@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-2.0.1.tgz#4d8b8f1eccd3419aa362061becef515e1e559635"
+
+xml2js@0.4.17:
+  version "0.4.17"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.17.tgz#17be93eaae3f3b779359c795b419705a8817e868"
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "^4.1.0"
+
+xmlbuilder@4.2.1, xmlbuilder@^4.1.0:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-4.2.1.tgz#aa58a3041a066f90eaa16c2f5389ff19f3f461a5"
+  dependencies:
+    lodash "^4.0.0"
 
 xmlbuilder@8.2.2:
   version "8.2.2"
