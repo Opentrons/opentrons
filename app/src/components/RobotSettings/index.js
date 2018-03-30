@@ -5,7 +5,7 @@ import {Route} from 'react-router'
 import type {Robot} from '../../robot'
 
 import StatusCard from './StatusCard'
-// import AttachedInstrumentsCard from './AttachedInstrumentsCard'
+import AttachedInstrumentsCard from './AttachedInstrumentsCard'
 import InformationCard from './InformationCard'
 import ConnectivityCard from './ConnectivityCard'
 import CalibrationCard from './CalibrationCard'
@@ -23,9 +23,9 @@ export default function RobotSettings (props: Props) {
       <div className={styles.row}>
         <StatusCard {...props} />
       </div>
-      {/* <div className={styles.row}>
-      <AttachedInstrumentsCard {...props} />
-      </div> */}
+      <div className={styles.row}>
+        <AttachedInstrumentsCard {...props} />
+      </div>
       <div className={styles.row}>
         <InformationCard {...props} updateUrl={updateUrl} />
       </div>
