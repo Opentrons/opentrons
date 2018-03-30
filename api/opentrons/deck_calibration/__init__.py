@@ -10,6 +10,12 @@ right = 'A'
 dots = 'dots'
 holes = 'holes'
 
+# Indicies into calibration matrix
+xyz_column = 3
+x_row = 0
+y_row = 1
+z_row = 2
+
 
 def position(axis: str):
     """
@@ -28,9 +34,11 @@ def jog(axis, direction, step):
     return position(axis)
 
 
-def get_z(rbt: Robot) -> float:
-    return rbt.config.gantry_calibration[2][3]
-
-
-def set_z(rbt: Robot, value: float):
-    rbt.config.gantry_calibration[2][3] = value
+def set_calibration_value(rbt: Robot, axis: str, value: float):
+    if axis is 'x':
+        row = x_row
+    elif axis is 'y':
+        row = y_row
+    else:
+        row = z_row
+    rbt.config.gantry_calibration[row][xyz_column] = value
