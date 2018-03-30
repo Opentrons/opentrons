@@ -1,8 +1,8 @@
 from aiohttp import web
 from uuid import uuid1
 from opentrons.instruments import pipette_config
-from opentrons import instruments, robot
-from opentrons.deck_calibration import jog, position, get_z, set_z
+from opentrons import instruments
+from opentrons.deck_calibration import jog, position
 import logging
 import json
 
@@ -27,6 +27,13 @@ class SessionManager:
         self.id = _get_uuid()
         self.pipettes = {}
         self.current_mount = None
+        self.tip_length = None
+        self.points = {
+            '1': None,
+            '2': None,
+            '3': None
+        }
+        self.z_value = None
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -98,6 +105,67 @@ async def set_current_mount(params):
     return web.json_response({'message': msg}, status=status)
 
 
+async def attach_tip(data):
+    """
+    Attach a tip to the current pipette
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
+    {
+    'token': UUID token from current session start
+    'command': 'attach tip'
+    'tip-length': a float representing how much the length of a pipette
+        increases when a tip is added
+    }
+    """
+    global session
+    tip_length = data.get('tip-length')
+    mount = 'left' if session.current_mount == 'Z' else 'right'
+    if not session.current_mount:
+        message = "Error: current mount must be set before attaching tip"
+        status = 400
+    elif not tip_length:
+        message = 'Error: "tip-length" must be specified in request'
+        status = 400
+    elif session.pipettes[mount].tip_attached:
+        message = "Error: tip already attached"
+        status = 400
+    else:
+        session.tip_length = tip_length
+        session.pipettes[mount]._add_tip(tip_length)
+        message = "Tip length set: {}".format(session.tip_length)
+        status = 200
+    return web.json_response({'message': message}, status=status)
+
+
+async def detach_tip(data):
+    """
+    Detach the tip from the current pipette
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
+    {
+    'token': UUID token from current session start
+    'command': 'detach tip'
+    }
+    """
+    global session
+    mount = 'left' if session.current_mount == 'Z' else 'right'
+    if not session.current_mount:
+        message = "Error: current mount must be set before attaching tip"
+        status = 400
+    elif not session.pipettes[mount].tip_attached:
+        message = "Error: no tip attached"
+        status = 400
+    else:
+        pip = session.pipettes[mount]
+        pip._remove_tip(session.tip_length)
+        session.tip_length = None
+        message = "Tip removed"
+        status = 200
+    return web.json_response({'message': message}, status=status)
+
+
 async def run_jog(data):
     """
     Allow the user to jog the selected pipette around the deck map
@@ -126,6 +194,34 @@ async def run_jog(data):
     return web.json_response({'message': message}, status=status)
 
 
+async def save_xy(data):
+    """
+    Save the current XY values for the calibration data
+        The correct packet form should be as follows:
+    {
+    'token': UUID token from current session start
+    'command': 'save xy'
+    'point': an integer [1, 2, or 3] of the calibration point to save
+    }
+    """
+    global session
+    valid_points = list(session.points.keys())
+    point = data.get('point')
+    if point not in valid_points:
+        message = 'point must be one of {}'.format(valid_points)
+        status = 400
+    elif not session.current_mount:
+        message = "Mount must be set before calibrating"
+        status = 400
+    else:
+        x, y, _ = position(session.current_mount)
+        session.points[point] = (x, y)
+        message = "Saved point {} value: {}".format(
+            point, session.points[point])
+        status = 200
+    return web.json_response({'message': message}, status=status)
+
+
 async def save_z(data):
     """
     Save the current Z height value for the calibration data
@@ -133,18 +229,15 @@ async def save_z(data):
     {
     'token': UUID token from current session start
     'command': 'save z'
-    'tip-length': a float representing how much the length of a pipette
-        increases when a tip is added
     }
     """
-    tip_length = data.get('tip-length')
-    if not tip_length:
-        message = "tip-length must be specified"
+    if not session.tip_length:
+        message = "Tip length must be set before calibrating"
         status = 400
     else:
         actual_z = position(session.current_mount)[-1]
-        set_z(robot, actual_z - tip_length)
-        message = "Saved z: {}".format(get_z(robot))
+        session.z_value = actual_z - session.tip_length
+        message = "Saved z: {}".format(session.z_value)
         status = 200
     return web.json_response({'message': message}, status=status)
 
@@ -163,6 +256,9 @@ async def release(data):
 router = {'jog': run_jog,
           'init pipette': init_pipette,
           'select pipette': set_current_mount,
+          'save xy': save_xy,
+          'attach tip': attach_tip,
+          'detach tip': detach_tip,
           'save z': save_z,
           'release': release}
 
