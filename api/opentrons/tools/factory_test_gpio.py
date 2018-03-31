@@ -74,7 +74,7 @@ def test_smoothie_gpio():
     assert not r
     print('\tPassed')
 
-    print('\tTesting RESET pin...')
+    print('\tRESET')
     # toggle the RESET line to LOW, and make sure it is NOT dead
     d._smoothie_reset()
     r = serial_communication.write_and_return('M119', d._connection, timeout=1)
@@ -84,14 +84,12 @@ def test_smoothie_gpio():
 
 def test_switches_and_lights():
     print('\n')
-    print('Button, Switches, and LEDs Test')
+    print('BUTTON\t--> BLUE')
+    print('PROBE\t--> GREEN')
+    print('ENDSTOP\t--> RED')
+    print('WINDOW\t--> LIGHTS')
     print('')
-    print('Press button\t\t--> Button turns BLUE')
-    print('Press tip-probe\t\t--> Button turns GREEN')
-    print('Press endstop\t\t--> Button turns RED')
-    print('Press window switches\t--> LED Strips turn ON')
-    print('')
-    print('Press CTRL-C at any time to quit')
+    print('Quit\t--> CTRL-C')
     print('')
     # enter button-read loop
     robot.connect()

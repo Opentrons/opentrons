@@ -68,15 +68,15 @@ def _find_storage_device():
     if os.path.exists(USB_MOUNT_FILEPATH) is False:
         subprocess.check_output('mkdir {}'.format(USB_MOUNT_FILEPATH),
             shell=True)
-    sdn1_devices = [
-        '/dev/sd{}1'.format(l)
-        for l in 'abcdefgh'
-        if os.path.exists('/dev/sd{}1'.format(l))
-    ]
-    if len(sdn1_devices) == 0:
-        print(RESULT_SPACE.format(FAIL))
-        return
     if os.path.ismount(USB_MOUNT_FILEPATH) == False:
+        sdn1_devices = [
+            '/dev/sd{}1'.format(l)
+            for l in 'abcdefgh'
+            if os.path.exists('/dev/sd{}1'.format(l))
+        ]
+        if len(sdn1_devices) == 0:
+            print(RESULT_SPACE.format(FAIL))
+            return
         try:
             subprocess.check_output(
                 'mount {0} {1}'.format(sdn1_devices[0], USB_MOUNT_FILEPATH),
