@@ -8,7 +8,7 @@ from opentrons.util import environment
 
 
 RESULT_SPACE = '\t- {}'
-FAIL = 'FAIL'
+FAIL = 'FAIL\t*** !!! ***'
 PASS = 'PASS'
 
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
@@ -92,7 +92,7 @@ def test_smoothie_gpio():
     from opentrons.drivers.rpi_drivers import gpio
     from opentrons.drivers.smoothie_drivers import serial_communication
 
-    print('CONNECT:')
+    print('CONNECT')
     robot.connect()
     d = robot._driver
     # make sure the driver is currently working as expected
@@ -103,7 +103,7 @@ def test_smoothie_gpio():
     else:
         print(RESULT_SPACE.format(FAIL))
 
-    print('DATA LOSS:')
+    print('DATA LOSS')
     data = [
         serial_communication.write_and_return('version\r\n', d._connection, timeout=1)  #NOQA
         for i in range(100)
@@ -113,7 +113,7 @@ def test_smoothie_gpio():
     else:
         print(RESULT_SPACE.format(FAIL))
 
-    print('HALT:')
+    print('HALT')
     # drop the HALT line LOW, and make sure there is an error state
     gpio.set_low(gpio.OUTPUT_PINS['HALT'])
     sleep(0.25)
@@ -154,12 +154,12 @@ def test_smoothie_gpio():
 
 def test_switches_and_lights():
     print('\n')
-    print('BUTTON\t--> BLUE')
-    print('PROBE\t--> GREEN')
-    print('ENDSTOP\t--> RED')
-    print('WINDOW\t--> LIGHTS')
+    print('* BUTTON\t--> BLUE')
+    print('* PROBE\t\t--> GREEN')
+    print('* ENDSTOP\t--> RED')
+    print('* WINDOW\t--> LIGHTS')
     print('')
-    print('Quit\t--> CTRL-C')
+    print('Next\t--> CTRL-C')
     print('')
     # enter button-read loop
     robot.connect()
@@ -168,6 +168,7 @@ def test_switches_and_lights():
             state = _get_state_of_inputs()
             _set_lights(state)
     except KeyboardInterrupt:
+        print()
         pass
 
 
@@ -213,7 +214,7 @@ def copy_to_usb_drive_and_back(filepath):
 
 
 def start_server(folder, filepath):
-    print('\nOPEN --> {0}:8000/{1}\n\n'.format(
+    print('\nOPEN\t--> {0}:8000/{1}\n'.format(
         _this_wifi_ip_address(),
         filepath.split('/')[-1]
         ))
@@ -223,6 +224,7 @@ def start_server(folder, filepath):
             'cd {} && python -m http.server > /dev/null'.format(folder),
             shell=True)
     except KeyboardInterrupt:
+        print()
         pass
 
 
