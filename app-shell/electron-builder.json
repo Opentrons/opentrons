@@ -1,5 +1,4 @@
 {
-  "productName": "Opentrons",
   "appId": "com.opentrons.app",
   "electronVersion": "1.8.3",
   "files": [

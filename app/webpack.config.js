@@ -10,6 +10,8 @@ const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
 const {rules: namedRules} = require('@opentrons/webpack-config')
 const devServerConfig = require('./webpack/dev-server')
+
+const {productName} = require('@opentrons/app-shell/package.json')
 const {description, author} = require('./package.json')
 const gtmConfig = require('./src/analytics/gtm-config')
 
@@ -56,7 +58,7 @@ const plugins = [
   }),
 
   new HtmlWebpackPlugin({
-    title: 'OT App',
+    title: productName,
     template: './src/index.hbs',
     description,
     author,
