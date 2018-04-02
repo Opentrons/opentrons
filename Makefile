@@ -13,6 +13,15 @@ APP_SHELL_DIR := app-shell
 LABWARE_DEFINITIONS_DIR := labware-definitions
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
+# watch, coverage, and update snapshot variables for tests
+watch ?= false
+cover ?= true
+updateSnapshot ?= false
+
+ifeq ($(watch), true)
+	cover := false
+endif
+
 # install all project dependencies
 # front-end dependecies handled by yarn
 .PHONY: install
@@ -31,33 +40,28 @@ uninstall:
 
 .PHONY: install-types
 install-types:
-	$(MAKE) -C $(COMPONENTS_DIR) install-types
+	flow-typed install --flowVersion=0.61.0
+	# install type definitions for all projects, project-by-project
 	$(MAKE) -C $(APP_DIR) install-types
+	$(MAKE) -C $(COMPONENTS_DIR) install-types
+	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) install-types
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install-types
 
 # all tests
 .PHONY: test
-test: test-api test-components test-app test-pd test-labware-definitions
+test: test-api test-js
 
 .PHONY: test-api
 test-api:
 	$(MAKE) -C $(API_DIR) test
 
-.PHONY: test-components
-test-components:
-	$(MAKE) -C $(COMPONENTS_DIR) test
-
-.PHONY: test-app
-test-app:
-	$(MAKE) -C $(APP_DIR) test
-
-.PHONY: test-pd
-test-pd:
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
-
-.PHONY: test-labware-definitions
-test-labware-definitions:
-	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) test
+.PHONY: test-js
+test-js:
+	jest \
+		--runInBand \
+		--coverage=$(cover) \
+		--watch=$(watch) \
+		--updateSnapshot=$(updateSnapshot)
 
 # lints and typechecks
 .PHONY: lint
@@ -70,7 +74,7 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '**/*.js'
-	flow
+	flow check
 
 .PHONY: lint-css
 lint-css:
