@@ -6,6 +6,7 @@ from typing import Dict
 
 from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.instruments.pipette_config import configs
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -244,9 +245,15 @@ class SmoothieDriver_3_0_0:
         mount:
             String (str) with value 'left' or 'right'
         '''
-        res = self._read_from_pipette(GCODES['READ_INSTRUMENT_ID'], mount)
+        if self.simulating:
+            res = '1234567890'
+        else:
+            res = self._read_from_pipette(GCODES['READ_INSTRUMENT_ID'], mount)
         if res:
-            return {'pipette_id': res}
+            ret = {'pipette_id': res}
+        else:
+            ret = {'message': 'Error: Pipette ID read failed'}
+        return ret
 
     def read_pipette_model(self, mount):
         '''
@@ -255,8 +262,12 @@ class SmoothieDriver_3_0_0:
 
         :return :dict with key 'model' and model string as value, or None
         '''
-        return {'model': self._read_from_pipette(
-            GCODES['READ_INSTRUMENT_MODEL'], mount)}
+        if self.simulating:
+            res = list(configs.values())[0].name
+        else:
+            res = self._read_from_pipette(
+                GCODES['READ_INSTRUMENT_MODEL'], mount)
+        return {'model': res}
 
     def write_pipette_id(self, mount, data_string):
         '''

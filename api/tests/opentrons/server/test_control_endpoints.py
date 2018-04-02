@@ -2,7 +2,8 @@ import json
 from copy import deepcopy
 from opentrons import robot
 from opentrons.server.main import init
-from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+from opentrons.instruments.pipette_config import configs
 
 
 async def test_get_pipettes_uncommissioned(
@@ -10,10 +11,11 @@ async def test_get_pipettes_uncommissioned(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    def mock_parse_fail(smoothie_response):
-        return ''
+    def mock_parse_fail(self, gcode, mount):
+        pass
 
-    monkeypatch.setattr(driver_3_0, '_parse_instrument_data', mock_parse_fail)
+    monkeypatch.setattr(
+        SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_fail)
 
     expected = {
         "left": {
@@ -27,7 +29,10 @@ async def test_get_pipettes_uncommissioned(
             "model": None
         }
     }
+
+    robot._driver.simulating = False
     resp = await cli.get('/pipettes')
+    robot._driver.simulating = True
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
@@ -40,22 +45,16 @@ async def test_get_pipettes(
 
     expected = {
         'left': {
-            'model': 'p10_multi',
+            'model': list(configs.values())[0].name,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': 'p300_single',
+            'model': list(configs.values())[0].name,
             'mount_axis': 'a',
             'plunger_axis': 'c'
         }
     }
-
-    def mock_parse_p300(self, gcode, mount):
-        return expected[mount]['model']
-
-    monkeypatch.setattr(
-        driver_3_0.SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_p300)
 
     resp = await cli.get('/pipettes')
     text = await resp.text()
@@ -72,7 +71,7 @@ async def test_disengage_axes(
         pass
 
     monkeypatch.setattr(
-        driver_3_0.SmoothieDriver_3_0_0, '_send_command', mock_send)
+        SmoothieDriver_3_0_0, '_send_command', mock_send)
 
     alltrue = {
         "x": {"enabled": True},
