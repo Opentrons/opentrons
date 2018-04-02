@@ -1,5 +1,6 @@
 {
   "name": "@opentrons/app-shell",
+  "productName": "Opentrons",
   "version": "3.0.0-beta.3",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
