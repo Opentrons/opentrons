@@ -15,10 +15,24 @@ slot_1_lower_left = (12.13, 6.0)
 slot_3_lower_right = (380.87, 6.0)
 slot_10_upper_left = (12.13, 351.5)
 
+# Safe points are defined as 5mm toward the center of the deck in x and y, and
+# 10mm above the deck. User is expect to jog to the critical point from the
+# corresponding safe point, to avoid collision depending on direction of
+# misalignment between the deck and the gantry.
+slot_1_safe_point = (slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
+slot_3_safe_point = (slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
+slot_10_safe_point = (slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+
 expected_points = {
     '1': slot_1_lower_left,
     '2': slot_3_lower_right,
     '3': slot_10_upper_left}
+
+
+safe_points = {
+    '1': slot_1_safe_point,
+    '2': slot_3_safe_point,
+    '3': slot_10_safe_point}
 
 
 def _get_uuid() -> str:

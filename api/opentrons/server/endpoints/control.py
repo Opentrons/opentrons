@@ -7,6 +7,7 @@ from threading import Thread
 from opentrons import robot, instruments
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
+from opentrons.deck_calibration.endpoints import safe_points
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +94,18 @@ async def position_info(request):
             'attach_tip': {
                 'target': 'pipette',
                 'point': (200, 90, 150)
+            },
+            'initial_calibration_1': {
+                'target': 'pipette',
+                'point': safe_points['1']
+            },
+            'initial_calibration_2': {
+                'target': 'pipette',
+                'point': safe_points['2']
+            },
+            'initial_calibration_3': {
+                'target': 'pipette',
+                'point': safe_points['3']
             }
         }
     })
