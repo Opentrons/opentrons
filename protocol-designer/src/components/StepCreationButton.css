@@ -1,0 +1,10 @@
+.step_creation_button {
+  position: relative;
+  padding: 0 2rem;
+}
+
+.buttons_popover {
+  position: absolute;
+  left: 2rem;
+  right: 2rem;
+}
