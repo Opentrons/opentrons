@@ -3,7 +3,10 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import electron from 'electron'
 
-import {mockResolvedValue, mockRejectedValue} from '../../../__tests__/util'
+import {
+  mockResolvedValue,
+  mockRejectedValue
+} from '../../../__util__/mock-promise'
 
 import {
   checkForShellUpdates,
