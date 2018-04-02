@@ -244,27 +244,31 @@ function _getSelectedWellsForStep (
 
   const getWells = (wells: Array<string>) => _wellsForPipette(pipetteChannels, labwareType, wells)
 
+  let wells = []
+
+  // If we're moving liquids within a single labware,
+  // both the source and dest wells together need to be selected.
   if (form.stepType === 'transfer') {
     if (form.sourceLabware === labwareId) {
-      return getWells(form.sourceWells)
+      wells.push(...getWells(form.sourceWells))
     }
     if (form.destLabware === labwareId) {
-      return getWells(form.destWells)
+      wells.push(...getWells(form.destWells))
     }
   }
   if (form.stepType === 'consolidate') {
     if (form.sourceLabware === labwareId) {
-      return getWells(form.sourceWells)
+      wells.push(...getWells(form.sourceWells))
     }
     if (form.destLabware === labwareId) {
-      return getWells([form.destWell])
+      wells.push(...getWells([form.destWell]))
     }
   }
   // TODO Ian 2018-03-23 once distribute is supported
   // if (form.stepType === 'distribute') {
   //   ...
   // }
-  return []
+  return wells
 }
 
 export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
