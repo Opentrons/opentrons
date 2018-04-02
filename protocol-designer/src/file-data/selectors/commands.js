@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import {computeWellAccess} from '@opentrons/labware-definitions'
 import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
@@ -212,21 +213,51 @@ function _wellContentsForLabware (
   )
 }
 
-function _getSelectedWellsForStep (form: ProcessedFormData, labwareId: string): Array<string> {
+function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: Array<string>): Array<string> {
+  // `wells` is all the wells that pipette's channel 1 interacts with.
+  if (pipetteChannels === 8) {
+    return wells.reduce((acc, well) => {
+      const setOfWellsForMulti = computeWellAccess(labwareType, well)
+
+      return setOfWellsForMulti
+        ? [...acc, ...setOfWellsForMulti]
+        : acc // setOfWellsForMulti is null
+    }, [])
+  }
+  // single-channel
+  return wells
+}
+
+function _getSelectedWellsForStep (
+  form: ProcessedFormData,
+  labwareId: string,
+  robotState: StepGeneration.RobotState
+): Array<string> {
+  if (form.stepType === 'pause') {
+    return []
+  }
+
+  const pipetteId = form.pipette
+  // TODO Ian 2018-04-02 use robotState selectors here
+  const pipetteChannels = robotState.instruments[pipetteId].channels
+  const labwareType = robotState.labware[labwareId].type
+
+  const getWells = (wells: Array<string>) => _wellsForPipette(pipetteChannels, labwareType, wells)
+
   if (form.stepType === 'transfer') {
     if (form.sourceLabware === labwareId) {
-      return form.sourceWells
+      return getWells(form.sourceWells)
     }
     if (form.destLabware === labwareId) {
-      return form.destWells
+      return getWells(form.destWells)
     }
   }
   if (form.stepType === 'consolidate') {
     if (form.sourceLabware === labwareId) {
-      return form.sourceWells
+      return getWells(form.sourceWells)
     }
     if (form.destLabware === labwareId) {
-      return [form.destWell]
+      return getWells([form.destWell])
     }
   }
   // TODO Ian 2018-03-23 once distribute is supported
@@ -246,13 +277,14 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
       (liquidState, timelineIdx) => mapValues(
         liquidState,
         (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
-          const labwareType = _robotStateTimeline[timelineIdx].robotState.labware[labwareId].type
-          const formIdx = timelineIdx + 1 // add 1 to make up for
+          const robotState = _robotStateTimeline[timelineIdx].robotState
+          const labwareType = robotState.labware[labwareId].type
+          const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
 
           const form = _forms[formIdx] && _forms[formIdx].validatedForm
           const selectedWells = (form && _hoveredStepId === formIdx)
             // only show selected wells when user is **hovering** over the step
-            ? _getSelectedWellsForStep(form, labwareId)
+            ? _getSelectedWellsForStep(form, labwareId, robotState)
             : []
 
           return _wellContentsForLabware(

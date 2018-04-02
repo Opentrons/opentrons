@@ -54,7 +54,7 @@ export default function updateLiquidState (
       ...acc,
       [wellForTip]: mergeLiquid(
         splitLiquidStates[`${tipIdx}`].dest,
-        prevLiquidState.labware[labwareId][wellForTip]
+        prevLiquidState.labware[labwareId][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
       )
     }
   }, {})
