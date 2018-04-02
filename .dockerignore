@@ -1,4 +1,5 @@
 *
 !/labware-definitions/**
+!/media/**
 !/compute/**
 !/api/**
