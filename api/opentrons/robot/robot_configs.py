@@ -112,7 +112,7 @@ def _get_default():
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
         probe_center=(295.0, 300.0, probe_height),
         probe_dimensions=(35.0, 40.0, probe_height + 5.0),
-        gantry_calibration=[  # "safe" offset, overwrote in factory calibration
+        gantry_calibration=[
             [ 1.00, 0.00, 0.00,  0.00],
             [ 0.00, 1.00, 0.00,  0.00],
             [ 0.00, 0.00, 1.00,  0.00],
@@ -171,6 +171,13 @@ def save(config, filename=None, tag=None):
         if item not in _default
     ])
     return _save_config_json(diff, filename=filename, tag=tag)
+
+
+def backup_configuration(config, tag=None):
+    import time
+    if not tag:
+        tag = str(int(time.time() * 1000))
+    save(config, tag=tag)
 
 
 def clear(filename=None):

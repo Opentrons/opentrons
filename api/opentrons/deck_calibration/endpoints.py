@@ -1,13 +1,38 @@
 from aiohttp import web
 from uuid import uuid1
 from opentrons.instruments import pipette_config
-from opentrons import instruments
+from opentrons import instruments, robot
+from opentrons.robot import robot_configs
 from opentrons.deck_calibration import jog, position
+from opentrons.deck_calibration.linal import add_z, solve
 import logging
 import json
 
 session = None
 log = logging.getLogger(__name__)
+
+slot_1_lower_left = (12.13, 6.0)
+slot_3_lower_right = (380.87, 6.0)
+slot_10_upper_left = (12.13, 351.5)
+
+# Safe points are defined as 5mm toward the center of the deck in x and y, and
+# 10mm above the deck. User is expect to jog to the critical point from the
+# corresponding safe point, to avoid collision depending on direction of
+# misalignment between the deck and the gantry.
+slot_1_safe_point = (slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
+slot_3_safe_point = (slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
+slot_10_safe_point = (slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+
+expected_points = {
+    '1': slot_1_lower_left,
+    '2': slot_3_lower_right,
+    '3': slot_10_upper_left}
+
+
+safe_points = {
+    '1': slot_1_safe_point,
+    '2': slot_3_safe_point,
+    '3': slot_10_safe_point}
 
 
 def _get_uuid() -> str:
@@ -28,12 +53,11 @@ class SessionManager:
         self.pipettes = {}
         self.current_mount = None
         self.tip_length = None
-        self.points = {
-            '1': None,
-            '2': None,
-            '3': None
-        }
+        self.points = {k: None for k in expected_points.keys()}
         self.z_value = None
+
+        default = robot_configs._get_default().gantry_calibration
+        robot.config = robot.config._replace(gantry_calibration=default)
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -49,10 +73,11 @@ async def init_pipette(data):
     The content type is application/json.
     The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'init pipette'
-    'mount': Can be 'right' or 'left' represents pipette mounts
-    'model': Can be from the list of pipettes found in `pipette_config.configs`
+      'token': UUID token from current session start
+      'command': 'init pipette'
+      'mount': Can be 'right' or 'left' represents pipette mounts
+      'model': Can be from the list of pipettes found
+          in `pipette_config.configs`
     }
     :return: The pipette types currently mounted.
     """
@@ -82,13 +107,14 @@ async def init_pipette(data):
 async def set_current_mount(params):
     """
     Choose the pipette in which to execute commands
+
     :param params: Information obtained from a POST request.
     The content type is application/json.
     The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'select pipette'
-    'mount': Can be 'right' or 'left' represents pipette mounts
+      'token': UUID token from current session start
+      'command': 'select pipette'
+      'mount': Can be 'right' or 'left' represents pipette mounts
     }
     :return: The selected pipette
     """
@@ -108,13 +134,14 @@ async def set_current_mount(params):
 async def attach_tip(data):
     """
     Attach a tip to the current pipette
+
     :param data: Information obtained from a POST request.
     The content type is application/json.
     The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'attach tip'
-    'tip-length': a float representing how much the length of a pipette
+      'token': UUID token from current session start
+      'command': 'attach tip'
+      'tip-length': a float representing how much the length of a pipette
         increases when a tip is added
     }
     """
@@ -141,12 +168,13 @@ async def attach_tip(data):
 async def detach_tip(data):
     """
     Detach the tip from the current pipette
+
     :param data: Information obtained from a POST request.
     The content type is application/json.
     The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'detach tip'
+      'token': UUID token from current session start
+      'command': 'detach tip'
     }
     """
     global session
@@ -169,15 +197,16 @@ async def detach_tip(data):
 async def run_jog(data):
     """
     Allow the user to jog the selected pipette around the deck map
+
     :param data: Information obtained from a POST request.
     The content type is application/json
     The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'jog'
-    'axis': The current axis you wish to move
-    'direction': The direction you wish to move (+ or -)
-    'step': The increment you wish to move
+      'token': UUID token from current session start
+      'command': 'jog'
+      'axis': The current axis you wish to move
+      'direction': The direction you wish to move (+ or -)
+      'step': The increment you wish to move
     }
     :return: The position you are moving to based on axis, direction, step
     given by the user.
@@ -197,11 +226,14 @@ async def run_jog(data):
 async def save_xy(data):
     """
     Save the current XY values for the calibration data
-        The correct packet form should be as follows:
+
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'save xy'
-    'point': an integer [1, 2, or 3] of the calibration point to save
+      'token': UUID token from current session start
+      'command': 'save xy'
+      'point': an integer [1, 2, or 3] of the calibration point to save
     }
     """
     global session
@@ -225,10 +257,13 @@ async def save_xy(data):
 async def save_z(data):
     """
     Save the current Z height value for the calibration data
-        The correct packet form should be as follows:
+
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
     {
-    'token': UUID token from current session start
-    'command': 'save z'
+      'token': UUID token from current session start
+      'command': 'save z'
     }
     """
     if not session.tip_length:
@@ -242,9 +277,52 @@ async def save_z(data):
     return web.json_response({'message': message}, status=status)
 
 
+def save_transform(data):
+    """
+    Calculate the transormation matrix that calibrates the gantry to the deck
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
+    {
+      'token': UUID token from current session start
+      'command': 'save transform'
+    }
+    """
+    if any([v is None for v in session.points.values()]):
+        message = "Not all points have been saved"
+        status = 400
+    else:
+        # expected values based on mechanical drawings of the robot
+        expected = [expected_points[p] for p in sorted(expected_points.keys())]
+        # measured data
+        actual = [session.points[p] for p in sorted(session.points.keys())]
+        # Generate a 2 dimensional transform matrix from the two matricies
+        flat_matrix = solve(expected, actual)
+        # Add the z component to form the 3 dimensional transform
+        calibration_matrix = add_z(flat_matrix, session.z_value)
+
+        robot.config = robot.config._replace(
+            gantry_calibration=list(
+                map(lambda i: list(i), calibration_matrix)))
+
+        robot_configs.save(robot.config)
+        robot_configs.backup_configuration(robot.config)
+        message = "Config file saved and backed up"
+        status = 200
+    return web.json_response({'message': message}, status=status)
+
+
 async def release(data):
     """
     Release a session
+
+    :param data: Information obtained from a POST request.
+    The content type is application/json.
+    The correct packet form should be as follows:
+    {
+      'token': UUID token from current session start
+      'command': 'release'
+    }
     """
     global session
     session = None
@@ -260,6 +338,7 @@ router = {'jog': run_jog,
           'attach tip': attach_tip,
           'detach tip': detach_tip,
           'save z': save_z,
+          'save transform': save_transform,
           'release': release}
 
 
