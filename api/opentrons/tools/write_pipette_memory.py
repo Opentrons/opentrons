@@ -4,6 +4,16 @@ from opentrons.instruments.pipette_config import PIPETTE_MODEL_IDENTIFIERS
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
+MODELS = {
+    'P10S': PIPETTE_MODEL_IDENTIFIERS['single']['10'],
+    'P10M': PIPETTE_MODEL_IDENTIFIERS['multi']['10'],
+    'P50S': PIPETTE_MODEL_IDENTIFIERS['single']['50'],
+    'P50M': PIPETTE_MODEL_IDENTIFIERS['multi']['50'],
+    'P300S': PIPETTE_MODEL_IDENTIFIERS['single']['300'],
+    'P300M': PIPETTE_MODEL_IDENTIFIERS['multi']['300'],
+    'P1000S': PIPETTE_MODEL_IDENTIFIERS['single']['1000']
+}
+
 
 def connect_to_robot():
     '''
@@ -48,21 +58,11 @@ def _user_submitted_barcode(max_length):
 
 def _parse_model_from_barcode(barcode):
     model = None
-    try:
-        for year in range(18, 100):
-            try:
-                model = barcode[:barcode.index('20{}'.format(year))]
-            except ValueError:
-                continue
-            # example: "P300S", or "P10M"
-            assert model[0] == 'P'
-            pipette_volume = int(model[1:-1])
-            num_channels = {'S': 'single', 'M': 'multi'}[model[-1]]
-            possible_sizes = PIPETTE_MODEL_IDENTIFIERS[num_channels]
-            model = possible_sizes[str(pipette_volume)]
+    for key in MODELS.keys():
+        if key in barcode:
+            model = MODELS[key]
             break
-        assert model
-    except Exception:
+    if not model:
         raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
     return model
 
@@ -73,6 +73,8 @@ def main(robot):
         model = _parse_model_from_barcode(barcode)
         write_identifiers(robot, 'right', barcode, model)
         print('PASS: Saved -> {}'.format(barcode))
+    except KeyboardInterrupt:
+        exit()
     except Exception as e:
         print('FAIL: {}'.format(e))
     main(robot)

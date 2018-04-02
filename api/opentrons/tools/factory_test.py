@@ -172,6 +172,17 @@ def test_switches_and_lights():
         pass
 
 
+def test_speaker():
+    print('Speaker')
+    print('Next\t--> CTRL-C')
+    try:
+        subprocess.check_output(
+            'aplay /etc/audio/speaker-test.wav', shell=True)
+    except KeyboardInterrupt:
+        pass
+        print()
+
+
 def record_camera(filepath):
     print('USB Camera')
     # record 1 second of video from the USB camera
@@ -233,6 +244,7 @@ if __name__ == "__main__":
     atexit.register(_erase_data, VIDEO_FILEPATH)
     test_smoothie_gpio()
     test_switches_and_lights()
+    test_speaker()
     record_camera(VIDEO_FILEPATH)
     copy_to_usb_drive_and_back(VIDEO_FILEPATH)
     start_server(DATA_FOLDER, VIDEO_FILEPATH)
