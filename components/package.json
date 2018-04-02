@@ -4,9 +4,6 @@
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",
-  "scripts": {
-    "test": "make test"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"
@@ -17,19 +14,9 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css)$": "identity-obj-proxy"
-    },
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "<rootDir>/src/__mocks__/file.js"
-    }
-  },
   "devDependencies": {
     "@opentrons/webpack-config": "3.0.0-beta.3",
     "babel-core": "^6.26.0",
-    "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
@@ -39,7 +26,6 @@
     "cross-env": "^5.1.1",
     "flow-typed": "^2.2.3",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^20.0.4",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
     "postcss-import": "^11.0.0",

@@ -14,14 +14,6 @@ env := cross-env NODE_ENV
 # dev server port
 port ?= 8090
 
-# watch and coverage variables for tests
-watch ?= false
-cover ?= true
-
-ifeq ($(watch), true)
-	cover := false
-endif
-
 # standard targets
 #####################################################################
 
@@ -69,10 +61,6 @@ dev-shell:
 
 # checks
 #####################################################################
-
-.PHONY: test
-test:
-	$(env)=test jest '.*\.test\.js' --coverage=$(cover) --watch=$(watch)
 
 .PHONY: install-types
 install-types:

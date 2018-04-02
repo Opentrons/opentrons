@@ -3,12 +3,14 @@
 import {combineReducers} from 'redux'
 import {healthReducer, type HealthAction} from './health'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
+import {pipettesReducer, type PipettesAction} from './pipettes'
 import {serverReducer, type ServerAction} from './server'
 import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
   health: healthReducer,
   healthCheck: healthCheckReducer,
+  pipettes: pipettesReducer,
   server: serverReducer,
   wifi: wifiReducer
 })
@@ -42,6 +44,7 @@ export type State = $Call<typeof reducer>
 export type Action =
   | HealthAction
   | HealthCheckAction
+  | PipettesAction
   | ServerAction
   | WifiAction
 
@@ -59,6 +62,11 @@ export {
   healthCheckMiddleware,
   makeGetHealthCheckOk
 } from './health-check'
+
+export {
+  fetchPipettes,
+  makeGetRobotPipettes
+} from './pipettes'
 
 export {
   updateRobotServer,

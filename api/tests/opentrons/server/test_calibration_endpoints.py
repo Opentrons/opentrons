@@ -17,28 +17,85 @@ async def test_init_pipette(dc_session):
     assert actual == expected
 
 
-async def test_save_z(dc_session):
+async def test_add_and_remove_tip(dc_session):
     robot.reset()
     mount = 'left'
     pip = instruments.P10_Single(mount=mount)
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = 'Z'
 
+    # Check malformed packet
+    res0 = await endpoints.attach_tip({})
+    assert res0.status == 400
+    assert dc_session.tip_length is None
+    assert not pip.tip_attached
+
+    # Check correct attach command
+    tip_length = 50
+    res1 = await endpoints.attach_tip({'tip-length': tip_length})
+    assert res1.status == 200
+    assert dc_session.tip_length == tip_length
+    assert pip.tip_attached
+
+    # Check command in wrong state (tip already attached)
+    res2 = await endpoints.attach_tip({'tip-length': tip_length + 5})
+    assert res2.status == 400
+    assert dc_session.tip_length == tip_length
+    assert pip.tip_attached
+
+    # Check correct detach command
+    res3 = await endpoints.detach_tip({})
+    assert res3.status == 200
+    assert dc_session.tip_length is None
+    assert not pip.tip_attached
+
+    # Check command in wrong state (no tip)
+    res4 = await endpoints.detach_tip({})
+    assert res4.status == 400
+
+
+async def test_save_xy(dc_session):
+    robot.reset()
+    mount = 'left'
+    pip = instruments.P10_Single(mount=mount)
+    dc_session.pipettes = {mount: pip}
+    dc_session.current_mount = 'Z'
+    dc_session.tip_length = 25
+    dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
+
     robot.home()
+    x = 100
+    y = 101
+    dc_session.pipettes.get(mount).move_to((robot.deck, (x, y, 102)))
 
-    tip_length = 25
-    dc_session.pipettes.get(mount)._add_tip(tip_length)
-
+    point = '1'
     data = {
-        'tip-length': tip_length
+        'point': point
     }
+    await endpoints.save_xy(data)
+
+    actual = dc_session.points[point]
+    expected = (robot._driver.position['X'], robot._driver.position['Y'])
+    assert actual == expected
+
+
+async def test_save_z(dc_session):
+    robot.reset()
+    mount = 'left'
+    pip = instruments.P10_Single(mount=mount)
+    dc_session.pipettes = {mount: pip}
+    dc_session.current_mount = 'Z'
+    dc_session.tip_length = 25
+    dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
+
+    robot.home()
 
     z_target = 80.0
     dc_session.pipettes.get(mount).move_to((robot.deck, (0, 0, z_target)))
 
-    await endpoints.save_z(data)
+    await endpoints.save_z({})
 
-    new_z = dc.get_z(robot)
+    new_z = dc_session.z_value
     pipette_z_offset = pipette_config.p10_single.model_offset[-1]
     expected_z = z_target - pipette_z_offset
     assert new_z == expected_z

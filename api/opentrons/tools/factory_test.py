@@ -14,6 +14,7 @@ PASS = 'PASS'
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
 DATA_FOLDER = environment.get_path('APP_DATA_DIR')
 VIDEO_FILEPATH = os.path.join(DATA_FOLDER, './cam_test.mp4')
+AUDIO_FILE_PATH = '/etc/audio/speaker-test.wav'
 
 
 def _find_storage_device():
@@ -177,7 +178,7 @@ def test_speaker():
     print('Next\t--> CTRL-C')
     try:
         subprocess.check_output(
-            'aplay /etc/audio/speaker-test.wav', shell=True)
+            'aplay {}'.format(AUDIO_FILE_PATH), shell=True)
     except KeyboardInterrupt:
         pass
         print()

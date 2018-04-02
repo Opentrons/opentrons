@@ -2,9 +2,6 @@
   "name": "@opentrons/labware-definitions",
   "version": "3.0.0-beta.3",
   "description": "Default labware definitions for Opentrons robots",
-  "scripts": {
-    "test": "echo \"No test specified--see API labware definitions tests\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"
@@ -15,14 +12,13 @@
   "dependencies": {},
   "devDependencies": {
     "ajv": "^6.2.1",
-    "babel-jest": "^20.0.3",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "cross-env": "^5.0.1",
+    "flow-typed": "^2.2.3",
     "glob": "^7.1.2",
-    "jest": "^20.0.4",
     "shx": "^0.2.2"
   }
 }

@@ -12,19 +12,6 @@
   "version": "3.0.0-beta.3",
   "description": "Protocol designer app",
   "main": "src/index.js",
-  "scripts": {
-    "test": "make test",
-    "start": "make dev"
-  },
-  "jest": {
-    "transformIgnorePatterns": [
-      "/node_modules/(?!@opentrons/)"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js",
-      "\\.(css)$": "identity-obj-proxy"
-    }
-  },
   "bugs": {
     "url": "https://github.com/OpenTrons/opentrons/issues"
   },
@@ -49,7 +36,6 @@
     "@opentrons/webpack-config": "3.0.0-beta.3",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
-    "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
@@ -60,7 +46,6 @@
     "css-loader": "^0.28.4",
     "extract-text-webpack-plugin": "^3.0.2",
     "flow-typed": "^2.2.3",
-    "jest": "^20.0.4",
     "lost": "^8.2.0",
     "postcss": "^6.0.16",
     "postcss-cssnext": "^3.0.2",
