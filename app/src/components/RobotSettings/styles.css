@@ -56,6 +56,7 @@
   display: flex;
   position: relative;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   height: 4rem;
   padding-top: 1rem;
@@ -66,20 +67,22 @@
   }
 }
 
-.image {
-  height: 8rem;
-  width: 1.75rem;
-  position: relative;
-  top: -4rem;
-  border: 1px solid var(--c-light-gray);
-  overflow: hidden;
+.instrument_diagram {
+  height: 100%;
+  padding: 0 0 0.5rem;
+  text-align: center;
+
+  & * {
+    height: 100%;
+    width: auto;
+  }
 }
 
-.image div img {
-  width: 100%;
-  height: auto;
-  position: absolute;
-  top: -40%;
+.image {
+  height: 8rem;
+  width: 2.25rem;
+  margin-top: -3rem;
+  border: 1px solid var(--c-light-gray);
 }
 
 .right {

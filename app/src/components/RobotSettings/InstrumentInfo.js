@@ -1,37 +1,58 @@
+// @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {LabeledValue, OutlineButton, InstrumentDiagram} from '@opentrons/components'
+
+import type {Mount} from '../../robot'
+
+import {
+  LabeledValue,
+  OutlineButton,
+  InstrumentDiagram
+} from '@opentrons/components'
 import styles from './styles.css'
 
-const LEFT_LABEL = 'Left pipette'
-const RIGHT_LABEL = 'Right pipette'
-export default function InstrumentInfo (props) {
-  const label = props.mount === 'left'
-    ? LEFT_LABEL
-    : RIGHT_LABEL
-  const value = props.volume
-    ? `${props.channels}-channel p${props.volume}`
-    : 'no pipette attached'
-  const buttonText = props.volume
+type Props = {
+  mount: Mount,
+  model: ?string,
+}
+
+// TODO(mc, 2018-03-30): volume and channels should come from the API
+const RE_CHANNELS = /p\d+_(single|multi)/
+
+const LABEL_BY_MOUNT = {
+  left: 'Left pipette',
+  right: 'Right pipette'
+}
+
+export default function InstrumentInfo (props: Props) {
+  const {mount, model} = props
+  const label = LABEL_BY_MOUNT[mount]
+  const channelsMatch = model && model.match(RE_CHANNELS)
+  const channels = channelsMatch && channelsMatch[1]
+  const buttonText = props.model
     ? 'change'
     : 'attach'
-  const className = cx(
-    styles.instrument_card, {
-      [styles.left]: props.mount === 'left',
-      [styles.right]: props.mount === 'right'
-    }
-  )
+
+  const className = cx(styles.instrument_card, {
+    [styles.right]: props.mount === 'right'
+  })
+
   return (
     <div className={className}>
       <LabeledValue
         label={label}
-        value={value}
+        value={(model || 'None').split('_').join(' ')}
       />
       <OutlineButton disabled>
         {buttonText}
       </OutlineButton>
       <div className={styles.image}>
-        {props.channels && (<InstrumentDiagram channels={props.channels}/>)}
+        {channels && (
+          <InstrumentDiagram
+            channels={channels === 'multi' ? 8 : 1}
+            className={styles.instrument_diagram}
+          />
+        )}
       </div>
     </div>
   )

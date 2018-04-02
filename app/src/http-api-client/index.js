@@ -26,6 +26,11 @@ export type {
 } from './health'
 
 export type {
+  Pipette,
+  RobotPipettes
+} from './pipettes'
+
+export type {
   RobotServerUpdate,
   RobotServerRestart
 } from './server'
