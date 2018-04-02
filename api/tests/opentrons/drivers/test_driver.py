@@ -286,11 +286,15 @@ def test_read_and_write_pipettes(model):
     test_id = 'TestsRock!!'
     test_model = 'TestPipette'
     driver.write_pipette_id('left', test_id)
+    driver.simulating = False
     read_id = driver.read_pipette_id('left')
+    driver.simulating = True
     assert read_id == {'pipette_id': test_id}
 
     driver.write_pipette_model('left', test_model)
+    driver.simulating = False
     read_model = driver.read_pipette_model('left')
+    driver.simulating = True
     assert read_model == {'model': test_model}
 
     driver._send_command = types.MethodType(_old_send_command, driver)
