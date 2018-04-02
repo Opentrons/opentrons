@@ -56,6 +56,9 @@ class SessionManager:
         self.points = {k: None for k in expected_points.keys()}
         self.z_value = None
 
+        default = robot_configs._get_default().gantry_calibration
+        robot.config = robot.config._replace(gantry_calibration=default)
+
 
 # -------------- Route Fns -----------------------------------------------
 # Note: endpoints should not call these functions directly, to ensure that

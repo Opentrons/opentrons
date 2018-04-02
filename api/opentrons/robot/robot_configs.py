@@ -112,7 +112,7 @@ def _get_default():
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
         probe_center=(295.0, 300.0, probe_height),
         probe_dimensions=(35.0, 40.0, probe_height + 5.0),
-        gantry_calibration=[  # "safe" offset, overwrote in factory calibration
+        gantry_calibration=[
             [ 1.00, 0.00, 0.00,  0.00],
             [ 0.00, 1.00, 0.00,  0.00],
             [ 0.00, 0.00, 1.00,  0.00],
