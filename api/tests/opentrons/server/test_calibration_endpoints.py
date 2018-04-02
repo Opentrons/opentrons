@@ -3,6 +3,7 @@ from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.instruments import pipette_config
+from opentrons.robot import robot_configs
 
 
 # ------------ Function tests (unit) ----------------------
@@ -99,6 +100,30 @@ async def test_save_z(dc_session):
     pipette_z_offset = pipette_config.p10_single.model_offset[-1]
     expected_z = z_target - pipette_z_offset
     assert new_z == expected_z
+
+
+async def test_save_calibration_file(dc_session, monkeypatch):
+    robot.reset()
+    dc_session.points = {
+        k: (v[0], v[1] + 0.3)
+        for k, v in endpoints.expected_points.items()}
+    dc_session.z_value = 0.2
+
+    persisted_data = []
+
+    def dummy_save(config, filename=None, tag=None):
+        nonlocal persisted_data
+        persisted_data.append((config, filename, tag))
+
+    monkeypatch.setattr(robot_configs, 'save', dummy_save)
+
+    endpoints.save_transform({})
+
+    expected = robot.config.gantry_calibration
+    assert len(persisted_data) == 2
+    assert persisted_data[0][0].gantry_calibration == expected
+    assert persisted_data[1][0].gantry_calibration == expected
+    assert persisted_data[1][-1] is not None
 
 
 # ------------ Session and token tests ----------------------

@@ -296,10 +296,7 @@ def clear_configuration_and_reload():
 
 
 def backup_configuration(tag):
-    import time
-    if not tag:
-        tag = str(int(time.time() * 1000))
-    robot_configs.save(robot.config, tag=tag)
+    robot_configs.backup_configuration(robot.config, tag)
 
 
 def backup_configuration_and_reload(tag=None):

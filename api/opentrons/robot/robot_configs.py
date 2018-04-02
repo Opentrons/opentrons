@@ -173,6 +173,13 @@ def save(config, filename=None, tag=None):
     return _save_config_json(diff, filename=filename, tag=tag)
 
 
+def backup_configuration(config, tag=None):
+    import time
+    if not tag:
+        tag = str(int(time.time() * 1000))
+    save(config, tag=tag)
+
+
 def clear(filename=None):
     filename = filename or environment.get_path('OT_CONFIG_FILE')
     log.info('Deleting config file: {}'.format(filename))
