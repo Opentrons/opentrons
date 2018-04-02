@@ -18,9 +18,9 @@ VIDEO_FILEPATH = os.path.join(DATA_FOLDER, './cam_test.mp4')
 
 def _find_storage_device():
     if os.path.exists(USB_MOUNT_FILEPATH) is False:
-        subprocess.check_output('mkdir {}'.format(USB_MOUNT_FILEPATH),
-            shell=True)
-    if os.path.ismount(USB_MOUNT_FILEPATH) == False:
+        subprocess.check_output(
+            'mkdir {}'.format(USB_MOUNT_FILEPATH), shell=True)
+    if os.path.ismount(USB_MOUNT_FILEPATH) is False:
         sdn1_devices = [
             '/dev/sd{}1'.format(l)
             for l in 'abcdefgh'
