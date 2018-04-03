@@ -47,7 +47,7 @@ RUN apk add --update \
       py3-urwid \
       py3-numpy \
       ffmpeg \
-      alsa-utils \
+      mpg123 \
       && rm -rf /var/cache/apk/*
 
 # Resin's python base container compiles python from scratch and doesn't have
@@ -63,9 +63,11 @@ RUN pip install pipenv==9.0.3 jupyter
 # you wish to copy into the container must be excluded from the .dockerignore
 # file, or you will encounter a copy error
 ENV LABWARE_DEF /etc/labware
+ENV AUDIO_FILES /etc/audio
 ENV USER_DEFN_ROOT /data/user_storage/opentrons_data/labware
 COPY ./compute/conf/jupyter_notebook_config.py /root/.jupyter/
 COPY ./labware-definitions/definitions /etc/labware
+COPY ./audio/ /etc/audio
 COPY ./api /tmp/api
 COPY ./compute/avahi_tools /tmp/avahi_tools
 

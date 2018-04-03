@@ -1,4 +1,5 @@
 *
 !/labware-definitions/**
+!/audio/**
 !/compute/**
 !/api/**
