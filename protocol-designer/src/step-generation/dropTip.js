@@ -1,5 +1,6 @@
 // @flow
 import type {CommandCreator, RobotState} from './'
+import {FIXED_TRASH_ID} from '../constants'
 import cloneDeep from 'lodash/cloneDeep'
 import updateLiquidState from './dispenseUpdateLiquidState'
 
@@ -12,8 +13,6 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
     }
   }
 
-  const trashId = 'trashId'
-
   const nextRobotState: RobotState = cloneDeep(prevRobotState)
 
   nextRobotState.tipState.pipettes[pipetteId] = false
@@ -22,7 +21,7 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
     {
       command: 'drop-tip',
       pipette: pipetteId,
-      labware: trashId, // TODO Ian 2018-02-09 will we always have this trash in robotState? If so, put the ID in constants (or cooked into RobotState type itself).
+      labware: FIXED_TRASH_ID,
       well: 'A1' // TODO: Is 'A1' of the trash always the right place to drop tips?
     }
   ]
@@ -34,7 +33,7 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
       liquidState: updateLiquidState({
         pipetteId: pipetteId,
         pipetteData: prevRobotState.instruments[pipetteId],
-        labwareId: trashId,
+        labwareId: FIXED_TRASH_ID,
         labwareType: 'fixed-trash',
         volume: prevRobotState.instruments[pipetteId].maxVolume, // update liquid state as if it was a dispense, but with max volume of pipette
         well: 'A1'

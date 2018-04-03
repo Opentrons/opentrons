@@ -373,10 +373,37 @@ const selectedStepSelector = createSelector(
 
 const deckSetupMode = createSelector(
   getSteps,
-  selectedStepId,
+  hoveredOrSelectedStepId,
   (steps, selectedStepId) => (selectedStepId !== null && selectedStepId !== '__end__' && steps[selectedStepId])
     ? steps[selectedStepId].stepType === 'deck-setup'
     : false
+)
+
+/** Array of labware (labwareId's) involved in hovered Step, or [] */
+const hoveredStepLabware: Selector<Array<string>> = createSelector(
+  validatedForms,
+  hoveredStepId,
+  (_forms, _hoveredStep) => {
+    const blank = []
+    if (typeof _hoveredStep !== 'number' || !_forms[_hoveredStep]) {
+      return blank
+    }
+
+    const stepForm = _forms[_hoveredStep].validatedForm
+
+    if (
+      !stepForm ||
+      stepForm === null ||
+      stepForm.stepType === 'pause' // no labware involved
+    ) {
+      return blank
+    }
+
+    const src = stepForm.sourceLabware
+    const dest = stepForm.destLabware
+
+    return [src, dest]
+  }
 )
 
 export const selectors = {
@@ -389,6 +416,7 @@ export const selectors = {
   orderedSteps: orderedStepsSelector,
   selectedStep: selectedStepSelector,
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
+  hoveredStepId,
   hoveredOrSelectedStepId,
   selectedStepFormData: createSelector(
     getSavedForms,
@@ -446,7 +474,8 @@ export const selectors = {
     rootSelector,
     s => s.formSectionCollapse
   ),
-  deckSetupMode
+  deckSetupMode,
+  hoveredStepLabware
 }
 
 export default rootReducer

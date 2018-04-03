@@ -45,19 +45,27 @@ type DispatchProps = {
 type StateProps = $Diff<Props, DispatchProps>
 
 function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
+  const {slot} = ownProps
   const container = selectors.containersBySlot(state)[ownProps.slot]
   const containerInfo = (container)
     ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
     : {}
+
+  const deckSetupMode = steplistSelectors.deckSetupMode(state)
   return {
     ...containerInfo,
-    slot: ownProps.slot,
+    slot,
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
     labwareToCopy: selectors.labwareToCopy(state),
-    highlighted: selectors.selectedContainerSlot(state) === ownProps.slot ||
-      selectors.canAdd(state) === ownProps.slot,
-    deckSetupMode: steplistSelectors.deckSetupMode(state)
+    highlighted: (deckSetupMode)
+      // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
+      // or when targeted by an open "Add Labware" modal
+      ? (selectors.selectedContainerSlot(state) === slot ||
+      selectors.canAdd(state) === slot)
+      // outside of deckSetupMode, labware is highlighted when step/substep is hovered
+      : steplistSelectors.hoveredStepLabware(state).includes(container && container.containerId),
+    deckSetupMode
   }
 }
 
