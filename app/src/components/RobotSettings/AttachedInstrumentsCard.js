@@ -40,8 +40,8 @@ function AttachedInstrumentsCard (props: Props) {
       refresh={props.fetchPipettes}
       refreshing={props.inProgress}
     >
-      <InstrumentInfo mount='left' {...props.left} />
-      <InstrumentInfo mount='right' {...props.right} />
+      <InstrumentInfo mount='left' name={props.name} {...props.left} />
+      <InstrumentInfo mount='right' name={props.name} {...props.right} />
     </RefreshCard>
   )
 }
