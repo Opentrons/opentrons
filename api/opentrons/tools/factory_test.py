@@ -14,7 +14,7 @@ PASS = 'PASS'
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
 DATA_FOLDER = environment.get_path('APP_DATA_DIR')
 VIDEO_FILEPATH = os.path.join(DATA_FOLDER, './cam_test.mp4')
-AUDIO_FILE_PATH = '/etc/audio/speaker-test.wav'
+AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3'
 
 
 def _find_storage_device():
