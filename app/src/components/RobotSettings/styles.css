@@ -94,7 +94,7 @@
     order: 1;
   }
 
-  & > button {
+  & > a {
     order: 3;
   }
 }

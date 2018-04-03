@@ -1,0 +1,16 @@
+@import '@opentrons/components';
+
+.alert_list {
+  list-style-type: none;
+  padding-left: 3rem;
+  margin-top: 1rem;
+
+  & > li {
+    line-height: 2;
+  }
+}
+
+.alert_button {
+  width: auto;
+  padding: initial 1.5rem;
+}
