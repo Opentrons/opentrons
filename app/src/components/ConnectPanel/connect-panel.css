@@ -7,6 +7,8 @@
 
 .robot_item {
   text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .robot_item_icon {
@@ -59,7 +61,7 @@
 }
 
 .scan_progress {
-  width: 5rem;
+  width: 1.9rem;
 }
 
 .scan_button {
