@@ -93,7 +93,7 @@ module.exports = {
   // fonts
   // TODO(mc, 2017-09-12): Add other font-types to the regex if we need them
   fonts: {
-    test: /\.woff2?(\?v=\d+\.\d+\.\d+)?$/,
+    test: /\.(?:ttf|woff2?(?:\?v=\d+\.\d+\.\d+)?)$/,
     use: 'url-loader'
   },
 
