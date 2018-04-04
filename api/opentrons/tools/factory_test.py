@@ -19,8 +19,7 @@ AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3'
 
 def _find_storage_device():
     if os.path.exists(USB_MOUNT_FILEPATH) is False:
-        subprocess.check_output(
-            'mkdir {}'.format(USB_MOUNT_FILEPATH), shell=True)
+        run_quiet_process('mkdir {}'.format(USB_MOUNT_FILEPATH))
     if os.path.ismount(USB_MOUNT_FILEPATH) is False:
         sdn1_devices = [
             '/dev/sd{}1'.format(l)
@@ -31,9 +30,8 @@ def _find_storage_device():
             print(RESULT_SPACE.format(FAIL))
             return
         try:
-            subprocess.check_output(
-                'mount {0} {1}'.format(sdn1_devices[0], USB_MOUNT_FILEPATH),
-                shell=True)
+            run_quiet_process(
+                'mount {0} {1}'.format(sdn1_devices[0], USB_MOUNT_FILEPATH))
         except Exception:
             print(RESULT_SPACE.format(FAIL))
             return
@@ -86,6 +84,10 @@ def _set_lights(state):
     if state['button']:
         blue = True
     robot._driver._set_button_light(red=red, green=green, blue=blue)
+
+
+def run_quiet_process(command):
+    subprocess.check_output('{} &> /dev/null'.format(command), shell=True)
 
 
 def test_smoothie_gpio():
@@ -177,8 +179,7 @@ def test_speaker():
     print('Speaker')
     print('Next\t--> CTRL-C')
     try:
-        subprocess.check_output(
-            'aplay {}'.format(AUDIO_FILE_PATH), shell=True)
+        run_quiet_process('mpg123 {}'.format(AUDIO_FILE_PATH))
     except KeyboardInterrupt:
         pass
         print()
@@ -187,9 +188,9 @@ def test_speaker():
 def record_camera(filepath):
     print('USB Camera')
     # record 1 second of video from the USB camera
-    c = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:00:01 {} -loglevel quiet > /dev/null'  # NOQA
+    c = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:00:01 {} -loglevel quiet'  # NOQA
     try:
-        subprocess.check_output(c.format(filepath), shell=True)
+        run_quiet_process(c.format(filepath))
         print(RESULT_SPACE.format(PASS))
     except Exception:
         print(RESULT_SPACE.format(FAIL))
@@ -203,17 +204,15 @@ def copy_to_usb_drive_and_back(filepath):
         # move the file to and from it
         name = filepath.split('/')[-1]
         try:
-            subprocess.check_output(
-                'mv {0} /mnt/usbdrive/{1}'.format(filepath, name),
-                shell=True)
+            run_quiet_process(
+                'mv {0} /mnt/usbdrive/{1}'.format(filepath, name))
         except Exception:
             print(RESULT_SPACE.format(FAIL))
             return
         if os.path.exists('/mnt/usbdrive/{}'.format(name)):
             try:
-                subprocess.check_output(
-                    'mv /mnt/usbdrive/{0} {1}'.format(name, filepath),
-                    shell=True)
+                run_quiet_process(
+                    'mv /mnt/usbdrive/{0} {1}'.format(name, filepath))
             except Exception:
                 print(RESULT_SPACE.format(FAIL))
                 return
@@ -232,9 +231,7 @@ def start_server(folder, filepath):
         ))
     print('\nQuit\t--> CTRL-C\n\n\n')
     try:
-        subprocess.check_output(
-            'cd {} && python -m http.server > /dev/null'.format(folder),
-            shell=True)
+        run_quiet_process('cd {} && python -m http.server'.format(folder))
     except KeyboardInterrupt:
         print()
         pass
