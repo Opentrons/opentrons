@@ -1,6 +1,9 @@
 [ignore]
 .*/dist/.*
 .*/test/.*
+.*/coverage/.*
+.*/docs/.*
+api/.*
 
 [include]
 
