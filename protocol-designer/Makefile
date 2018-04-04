@@ -39,10 +39,3 @@ build:
 .PHONY: dev
 dev:
 	$(env)=development webpack-dev-server --hot
-
-# checks
-#####################################################################
-
-.PHONY: install-types
-install-types:
-	flow-typed install --packageDir=.. --flowVersion=0.61.0

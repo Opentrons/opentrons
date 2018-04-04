@@ -21,11 +21,6 @@ install:
 build:
 	shx mkdir -p $(BUILD_DIR) && node js/scripts/build.js $(BUILD_DIR)
 
-.PHONY: install-types
-install-types:
-	flow-typed install --ignoreDeps=dev --packageDir=.. --flowVersion=0.61.0
-
-
 .PHONY: clean
 clean:
 	shx rm -rf $(BUILD_DIR)

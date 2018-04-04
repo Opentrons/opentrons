@@ -30,7 +30,6 @@ install:
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
-	$(MAKE) install-types
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
@@ -38,14 +37,13 @@ install:
 uninstall:
 	shx rm -rf '**/node_modules'
 
+# install flow typed definitions for all JS projects that use flow
+# typedefs are commited, so only needs to be run when we want to update
 .PHONY: install-types
 install-types:
-	flow-typed install --flowVersion=0.61.0
-	# install type definitions for all projects, project-by-project
-	$(MAKE) -C $(APP_DIR) install-types
-	$(MAKE) -C $(COMPONENTS_DIR) install-types
-	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) install-types
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) install-types
+	flow-mono align-versions
+	flow-mono install-types --overwrite --flowVersion=0.61.0
+	flow-typed install --overwrite --flowVersion=0.61.0
 
 # all tests
 .PHONY: test

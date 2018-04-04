@@ -58,10 +58,3 @@ dev-mdns:
 dev-shell:
 	wait-on http-get://localhost:$(port) && \
 	$(MAKE) -C $(shell_dir) dev port=$(port)
-
-# checks
-#####################################################################
-
-.PHONY: install-types
-install-types:
-	flow-typed install --ignoreDeps=dev --packageDir=.. --flowVersion=0.61.0

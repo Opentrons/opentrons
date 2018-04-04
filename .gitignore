@@ -55,7 +55,6 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
-flow-typed
 
 # Translations
 *.mo

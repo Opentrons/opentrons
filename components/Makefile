@@ -38,10 +38,3 @@ build:
 .PHONY: dev
 dev:
 	$(env)=development styleguidist server
-
-# checks
-#####################################################################
-
-.PHONY: install-types
-install-types:
-	flow-typed install --ignoreDeps=dev --packageDir=.. --flowVersion=0.61.0
