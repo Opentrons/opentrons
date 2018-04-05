@@ -195,7 +195,7 @@ function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<Consol
   const mixFirstAspirate = formData['aspirate--mix--checkbox']
     ? {
       volume: parseFloat(formData['aspirate--mix--volume']),
-      times: parseInt(formData['aspirate--mix--time']) // TODO handle unparseable
+      times: parseInt(formData['aspirate--mix--times']) // TODO handle unparseable
     }
     : null
 

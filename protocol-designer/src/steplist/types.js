@@ -112,7 +112,7 @@ export type ConsolidateForm = {|
   'aspirate--air-gap--volume'?: string,
   'aspirate--mix--checkbox'?: boolean,
   'aspirate--mix--volume'?: string,
-  'aspirate--mix--time'?: string,
+  'aspirate--mix--times'?: string,
   'aspirate--disposal-vol--checkbox'?: boolean,
   'aspirate--disposal-vol--volume'?: string,
   'aspirate--change-tip'?: 'once' | 'never' | 'always',
