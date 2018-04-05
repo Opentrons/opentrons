@@ -110,6 +110,8 @@ export type LabwareData = {
   */
 type TipId = string
 
+export type LocationLiquidState = {[ingredGroup: string]: {volume: number}}
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
   instruments: {
@@ -131,20 +133,12 @@ export type RobotState = {|
   liquidState: {
     pipettes: {
       [pipetteId: string]: {
-        [tipId: TipId]: {
-          [ingredGroup: string]: {
-            volume: number
-          }
-        }
+        [tipId: TipId]: LocationLiquidState
       }
     },
     labware: {
       [labwareId: string]: {
-        [well: string]: {
-          [ingredGroup: string]: {
-            volume: number
-          }
-        }
+        [well: string]: LocationLiquidState
       }
     }
   }

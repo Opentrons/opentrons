@@ -13,7 +13,7 @@ import {getAllWellsForLabware} from '../../constants'
 import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
 import type {ProcessedFormData} from '../../steplist/types'
 
-const all96Tips = reduce(
+const all96Tips = reduce( // TODO Ian 2018-04-05 mapValues
   StepGeneration.tiprackWellNamesFlat,
   (acc: {[string]: boolean}, wellName: string) => ({...acc, [wellName]: true}),
   {}
@@ -21,6 +21,8 @@ const all96Tips = reduce(
 
 type LiquidState = $PropertyType<StepGeneration.RobotState, 'liquidState'>
 type LabwareLiquidState = $PropertyType<LiquidState, 'labware'>
+type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
+
 /** getLabwareLiquidState reshapes data from labwareIngreds.ingredLocations reducer
   * to match RobotState.liquidState.labware's shape
   */
@@ -152,8 +154,7 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
       }
 
       if (form.validatedForm.stepType === 'consolidate') {
-        const validatedForm: StepGeneration.ConsolidateFormData = form.validatedForm
-        const nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
+        const nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
         return {
           ...acc,
           timeline: [...acc.timeline, nextCommandsAndState],
@@ -162,8 +163,7 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
       }
 
       if (form.validatedForm.stepType === 'transfer') {
-        const validatedForm: StepGeneration.TransferFormData = form.validatedForm
-        const nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
+        const nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
         return {
           ...acc,
           timeline: [...acc.timeline, nextCommandsAndState],
@@ -188,11 +188,8 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
   }
 )
 
-type LiquidVolumeState = {[groupId: string]: {volume: number}} // TODO IMMEDIATELY: import this, don't declare
-type SingleLabwareLiquidState = {[well: string]: {[ingredGroupId: string]: {volume: number}}} // TODO IMMEDIATELY IMPORT TYPE
-
 function _wellContentsForWell (
-  liquidVolState: LiquidVolumeState,
+  liquidVolState: StepGeneration.LocationLiquidState,
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}

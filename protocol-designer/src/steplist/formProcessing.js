@@ -59,16 +59,13 @@ export function formHasErrors (form: {errors: {[string]: string}}): boolean {
 }
 
 function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferFormData> {
-  // TODO when transfer is supported in step-generation,
-  // combine this with consolidate since args are similar
+  // TODO LATER Ian 2018-04-05 combine this with consolidate since args are similar
   // and clean up the parsing errors
   const pipette = formData['aspirate--pipette']
   const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
   const destWells = formData['dispense--wells'] ? formData['dispense--wells'].split(',') : []
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
-
-  // TODO Ian 2018-04-02 several of these fields are the same btw transfer & consolidate, factor 'em out
 
   const blowout = formData['dispense--blowout--labware']
 
