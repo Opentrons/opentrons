@@ -23,6 +23,16 @@ type ValidationAndErrors<F> = {
   validatedForm: F | null
 }
 
+function getMixData (formData, checkboxField, volumeField, timesField) {
+  // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
+  const checkbox = formData[checkboxField]
+  const volume = parseFloat(formData[volumeField])
+  const times = parseInt(formData[timesField])
+  return (checkbox && volume > 0 && times > 0)
+    ? {volume, times}
+    : null
+}
+
 export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
   // Add default values to a new step form
   const baseForm = {
@@ -58,7 +68,24 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 
+  // TODO Ian 2018-04-02 several of these fields are the same btw transfer & consolidate, factor 'em out
+
+  const blowout = formData['dispense--blowout--labware']
+
+  const delayAfterDispense = formData['dispense--delay--checkbox']
+    ? ((parseFloat(formData['dispense--delay-minutes']) || 0) * 60) +
+      (parseFloat(formData['dispense--delay-seconds'] || 0))
+    : null
+
+  const changeTip = formData['aspirate--change-tip'] || 'always'
+  // It's radiobutton, so one should always be selected.
+  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
+
   const volume = parseFloat(formData['dispense--volume'])
+
+  const disposalVolume = formData['aspirate--disposal-vol--checkbox']
+    ? (parseFloat(formData['aspirate--disposal-vol--volume']) || null)
+    : null
 
   const requiredFieldErrors = [
     'aspirate--pipette',
@@ -99,7 +126,32 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         destWells,
         sourceLabware,
         destLabware,
-        volume
+        volume,
+        changeTip,
+        blowout,
+        delayAfterDispense,
+
+        mixBeforeAspirate: getMixData(
+          formData,
+          'aspirate--mix--checkbox',
+          'aspirate--mix--volume',
+          'aspirate--mix--times'
+        ),
+
+        mixInDestination: getMixData(
+          formData,
+          'dispense--mix--checkbox',
+          'dispense--mix--volume',
+          'dispense--mix--times'
+        ),
+
+        disposalVolume,
+        preWetTip: !!(formData['aspirate--pre-wet-tip']),
+        touchTipAfterAspirate: !!(formData['aspirate--touch-tip']),
+        touchTipAfterDispense: false, // TODO Ian 2018-04-03 field not in form
+
+        description: 'description would be here TODO', // TODO Ian 2018-03-01 get from form
+        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
       }
       : null
   }
