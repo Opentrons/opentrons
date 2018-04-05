@@ -15,3 +15,27 @@
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
+
+.modal {
+  @apply --modal;
+
+  padding: 6rem 4rem;
+}
+
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.modal_contents {
+  z-index: 1;
+  width: 100%;
+  max-width: 32rem;
+  min-height: 20rem;
+  padding: 2rem;
+  margin: auto;
+  background-color: white;
+  border-radius: 0.5rem;
+}

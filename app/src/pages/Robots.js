@@ -54,6 +54,7 @@ function RobotSettingsPage (props: Props) {
         return (
           <ChangePipette
             backUrl={url}
+            baseUrl={props.match.url}
             robot={robot}
             mount={mount}
           />
