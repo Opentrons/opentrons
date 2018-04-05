@@ -567,7 +567,7 @@ describe('advanced options', () => {
         }
       }
 
-      // helper fn for less verbose `commands` below
+      // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
         {
@@ -651,7 +651,7 @@ describe('advanced options', () => {
         }
       }
 
-      // helper fn for less verbose `commands` below
+      // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
         {
@@ -720,7 +720,56 @@ describe('advanced options', () => {
         ...mixCommands
       ])
     })
-    test('delay after dispense') // TODO
+
+    test.skip('delay after dispense', () => { // TODO Ian 2018-04-05 support delay in transfer. REMOVE SKIP
+      transferArgs = {
+        ...transferArgs,
+        volume: 350,
+        delayAfterDispense: 100
+      }
+
+      const result = transfer(transferArgs)(robotInitialState)
+
+      const delayCommand = {
+        command: 'delay',
+        wait: 100,
+        message: null
+      }
+
+      expect(result.commands).toEqual([
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'B1'
+        },
+        delayCommand,
+
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'B1'
+        },
+        delayCommand
+      ])
+    })
     test('blowout should blowout in specified labware after each dispense') // TODO
   })
 })
