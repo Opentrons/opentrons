@@ -1,20 +1,6 @@
 // @flow
-
 import type {DeckSlot, Mount, Channels} from '@opentrons/components'
-
-export type MixArgs = {|
-  volume: number,
-  times: number
-|}
-
-type SharedFormDataFields = {|
-  /** Optional user-readable name for this step */
-  name: ?string,
-  /** Optional user-readable description/notes for this step */
-  description: ?string,
-|}
-
-type ChangeTipOptions = 'always' | 'once' | 'never'
+import type {MixArgs, SharedFormDataFields, ChangeTipOptions} from '../form-types'
 
 export type ConsolidateFormData = {|
   ...SharedFormDataFields,
@@ -106,13 +92,11 @@ export type TransferFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type PipetteChannels = Channels // TODO Ian 2018-02-27 rename PipetteChannels -> Channels
-
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
   maxVolume: number,
-  channels: PipetteChannels
+  channels: Channels
 |}
 
 export type LabwareData = {

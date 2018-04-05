@@ -109,12 +109,21 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
+type RobotStateTimelineAcc = {
+  formErrors: {[string]: string},
+  timeline: Array<{|
+    commands: Array<StepGeneration.Command>,
+    robotState: StepGeneration.RobotState
+  |}>,
+  robotState: StepGeneration.RobotState
+}
+
 export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.CommandCreator, *>> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result = orderedSteps.reduce((acc, stepId) => {
+    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId) => {
       if (!isEmpty(acc.formErrors)) {
         // stop reducing if there are errors
         return acc
@@ -143,7 +152,8 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
       }
 
       if (form.validatedForm.stepType === 'consolidate') {
-        const nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
+        const validatedForm: StepGeneration.ConsolidateFormData = form.validatedForm
+        const nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
         return {
           ...acc,
           timeline: [...acc.timeline, nextCommandsAndState],
@@ -151,7 +161,17 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         }
       }
 
-      // TODO don't ignore everything that's not consolidate
+      if (form.validatedForm.stepType === 'transfer') {
+        const validatedForm: StepGeneration.TransferFormData = form.validatedForm
+        const nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
+        return {
+          ...acc,
+          timeline: [...acc.timeline, nextCommandsAndState],
+          robotState: nextCommandsAndState.robotState
+        }
+      }
+
+      // TODO don't ignore everything that's not consolidate/transfer
       return {
         ...acc,
         formErrors: {...acc.formErrors, 'STEP NOT IMPLEMENTED': form.validatedForm.stepType}

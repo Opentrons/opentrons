@@ -1,6 +1,7 @@
 // @flow
 import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
-import type {PipetteChannels, RobotState} from './'
+import type {Channels} from '@opentrons/components'
+import type {RobotState} from './'
 import sortBy from 'lodash/sortBy'
 
 // SELECTOR UTILITIES
@@ -12,7 +13,7 @@ export function sortLabwareBySlot (robotState: RobotState) {
 // SELECTORS
 
 export function _getNextTip (
-  pipetteChannels: PipetteChannels,
+  pipetteChannels: Channels,
   tiprackWellsState: {[wellName: string]: boolean
 }): string | null {
   /** Given a tiprack's wells state, return the well of the next available tip
@@ -31,7 +32,7 @@ export function _getNextTip (
   return fullColumn ? fullColumn[0] : null
 }
 
-export function getNextTiprack (pipetteChannels: PipetteChannels, robotState: RobotState) {
+export function getNextTiprack (pipetteChannels: Channels, robotState: RobotState) {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
     For 8-channel pipette, tipracks need a full column of tips.
