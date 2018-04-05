@@ -5,11 +5,8 @@ import {connect} from 'react-redux'
 import {withRouter, Route, Redirect, type ContextRouter} from 'react-router'
 
 import type {State, Dispatch} from '../types'
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-  type Robot
-} from '../robot'
+import type {Robot, Mount} from '../robot'
+import {selectors as robotSelectors, actions as robotActions} from '../robot'
 
 import {TitleBar, Splash} from '@opentrons/components'
 import Page from '../components/Page'
@@ -51,14 +48,17 @@ function RobotSettingsPage (props: Props) {
       <TitleBar title={robot.name} />
       <RobotSettings {...robot} />
 
-      <Route path={`${url}/pipettes/:mount`} render={(props) => (
-        // $FlowFixMe: params.mount is a ?string, ChangePipette wants Mount
-        <ChangePipette
-          backUrl={url}
-          robot={robot}
-          mount={props.match.params.mount}
-        />
-      )} />
+      <Route path={`${url}/pipettes/:mount`} render={(props) => {
+        const mount: Mount = (props.match.params.mount: any)
+
+        return (
+          <ChangePipette
+            backUrl={url}
+            robot={robot}
+            mount={mount}
+          />
+        )
+      }} />
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
