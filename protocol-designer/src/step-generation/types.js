@@ -1,19 +1,11 @@
 // @flow
-
 import type {DeckSlot, Mount, Channels} from '@opentrons/components'
-
-export type MixArgs = {|
-  volume: number,
-  times: number
-|}
+import type {MixArgs, SharedFormDataFields, ChangeTipOptions} from '../form-types'
 
 export type ConsolidateFormData = {|
-  stepType: 'consolidate',
+  ...SharedFormDataFields,
 
-  /** Optional user-readable name for this step */
-  name: ?string,
-  /** Optional user-readable description/notes for this step */
-  description: ?string,
+  stepType: 'consolidate',
 
   pipette: string, // PipetteId. TODO IMMEDIATELY/SOON make this match in the form
 
@@ -38,7 +30,7 @@ export type ConsolidateFormData = {|
     'once': get a new tip at the beginning of the consolidate step, and use it throughout
     'never': reuse the tip from the last step
   */
-  changeTip: 'always' | 'once' | 'never', // TODO extract this enum as its own export type
+  changeTip: ChangeTipOptions,
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
@@ -55,13 +47,56 @@ export type ConsolidateFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type PipetteChannels = Channels // TODO Ian 2018-02-27 rename PipetteChannels -> Channels
+export type TransferFormData = {|
+  // TODO IMMEDIATELY use "mixin types" for shared fields across FormData types.
+  ...SharedFormDataFields,
+  stepType: 'transfer',
+
+  pipette: string, // PipetteId. TODO IMMEDIATELY/SOON make this match in the form
+
+  sourceWells: Array<string>,
+  destWells: Array<string>,
+
+  sourceLabware: string,
+  destLabware: string,
+  /** Volume to aspirate from each source well. Different volumes across the
+    source wells isn't currently supported
+  */
+  volume: number,
+
+  // ===== ASPIRATE SETTINGS =====
+  /** Pre-wet tip with ??? uL liquid from the first source well. */
+  preWetTip: boolean,
+  /** Touch tip after every aspirate */
+  touchTipAfterAspirate: boolean,
+  /**
+    For transfer, changeTip means:
+    'always': before each aspirate, get a fresh tip
+    'once': get a new tip at the beginning of the transfer step, and use it throughout
+    'never': reuse the tip from the last step
+  */
+  changeTip: ChangeTipOptions,
+  /** Mix in first well in chunk */
+  mixBeforeAspirate: ?MixArgs,
+  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
+  disposalVolume: ?number,
+
+  // ===== DISPENSE SETTINGS =====
+  /** Mix in destination well after dispense */
+  mixInDestination: ?MixArgs,
+  /** Touch tip in destination well after dispense */
+  touchTipAfterDispense: boolean,
+  /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
+  delayAfterDispense: ?number,
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string // TODO LATER LabwareId export type here instead of string?
+|}
 
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
   maxVolume: number,
-  channels: PipetteChannels
+  channels: Channels
 |}
 
 export type LabwareData = {
@@ -74,6 +109,8 @@ export type LabwareData = {
   * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
   */
 type TipId = string
+
+export type LocationLiquidState = {[ingredGroup: string]: {volume: number}}
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
@@ -96,20 +133,12 @@ export type RobotState = {|
   liquidState: {
     pipettes: {
       [pipetteId: string]: {
-        [tipId: TipId]: {
-          [ingredGroup: string]: {
-            volume: number
-          }
-        }
+        [tipId: TipId]: LocationLiquidState
       }
     },
     labware: {
       [labwareId: string]: {
-        [well: string]: {
-          [ingredGroup: string]: {
-            volume: number
-          }
-        }
+        [well: string]: LocationLiquidState
       }
     }
   }

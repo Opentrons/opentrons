@@ -13,7 +13,7 @@ import {getAllWellsForLabware} from '../../constants'
 import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
 import type {ProcessedFormData} from '../../steplist/types'
 
-const all96Tips = reduce(
+const all96Tips = reduce( // TODO Ian 2018-04-05 mapValues
   StepGeneration.tiprackWellNamesFlat,
   (acc: {[string]: boolean}, wellName: string) => ({...acc, [wellName]: true}),
   {}
@@ -21,6 +21,8 @@ const all96Tips = reduce(
 
 type LiquidState = $PropertyType<StepGeneration.RobotState, 'liquidState'>
 type LabwareLiquidState = $PropertyType<LiquidState, 'labware'>
+type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
+
 /** getLabwareLiquidState reshapes data from labwareIngreds.ingredLocations reducer
   * to match RobotState.liquidState.labware's shape
   */
@@ -109,12 +111,21 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
+type RobotStateTimelineAcc = {
+  formErrors: {[string]: string},
+  timeline: Array<{|
+    commands: Array<StepGeneration.Command>,
+    robotState: StepGeneration.RobotState
+  |}>,
+  robotState: StepGeneration.RobotState
+}
+
 export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.CommandCreator, *>> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result = orderedSteps.reduce((acc, stepId) => {
+    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId) => {
       if (!isEmpty(acc.formErrors)) {
         // stop reducing if there are errors
         return acc
@@ -151,7 +162,16 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         }
       }
 
-      // TODO don't ignore everything that's not consolidate
+      if (form.validatedForm.stepType === 'transfer') {
+        const nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+        return {
+          ...acc,
+          timeline: [...acc.timeline, nextCommandsAndState],
+          robotState: nextCommandsAndState.robotState
+        }
+      }
+
+      // TODO don't ignore everything that's not consolidate/transfer
       return {
         ...acc,
         formErrors: {...acc.formErrors, 'STEP NOT IMPLEMENTED': form.validatedForm.stepType}
@@ -168,11 +188,8 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
   }
 )
 
-type LiquidVolumeState = {[groupId: string]: {volume: number}} // TODO IMMEDIATELY: import this, don't declare
-type SingleLabwareLiquidState = {[well: string]: {[ingredGroupId: string]: {volume: number}}} // TODO IMMEDIATELY IMPORT TYPE
-
 function _wellContentsForWell (
-  liquidVolState: LiquidVolumeState,
+  liquidVolState: StepGeneration.LocationLiquidState,
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}

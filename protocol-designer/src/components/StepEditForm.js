@@ -102,7 +102,7 @@ export default function StepEditForm (props: Props) {
                 <div className={styles.field_row}>
                   <CheckboxField label='Mix' {...formConnector('aspirate--mix--checkbox')} />
                   <InputField units='μL' {...formConnector('aspirate--mix--volume')} />
-                  <InputField units='Times' {...formConnector('aspirate--mix--time')} />
+                  <InputField units='Times' {...formConnector('aspirate--mix--times')} />
                 </div>
                 <div className={styles.field_row}>
                   <CheckboxField label='Disposal volume' className={styles.column_2_3}

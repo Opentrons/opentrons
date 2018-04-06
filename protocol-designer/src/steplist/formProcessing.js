@@ -23,6 +23,16 @@ type ValidationAndErrors<F> = {
   validatedForm: F | null
 }
 
+function getMixData (formData, checkboxField, volumeField, timesField) {
+  // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
+  const checkbox = formData[checkboxField]
+  const volume = parseFloat(formData[volumeField])
+  const times = parseInt(formData[timesField])
+  return (checkbox && volume > 0 && times > 0)
+    ? {volume, times}
+    : null
+}
+
 export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
   // Add default values to a new step form
   const baseForm = {
@@ -49,8 +59,7 @@ export function formHasErrors (form: {errors: {[string]: string}}): boolean {
 }
 
 function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferFormData> {
-  // TODO when transfer is supported in step-generation,
-  // combine this with consolidate since args are similar
+  // TODO LATER Ian 2018-04-05 combine this with consolidate since args are similar
   // and clean up the parsing errors
   const pipette = formData['aspirate--pipette']
   const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
@@ -58,7 +67,22 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 
+  const blowout = formData['dispense--blowout--labware']
+
+  const delayAfterDispense = formData['dispense--delay--checkbox']
+    ? ((parseFloat(formData['dispense--delay-minutes']) || 0) * 60) +
+      (parseFloat(formData['dispense--delay-seconds'] || 0))
+    : null
+
+  const changeTip = formData['aspirate--change-tip'] || 'always'
+  // It's radiobutton, so one should always be selected.
+  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
+
   const volume = parseFloat(formData['dispense--volume'])
+
+  const disposalVolume = formData['aspirate--disposal-vol--checkbox']
+    ? (parseFloat(formData['aspirate--disposal-vol--volume']) || null)
+    : null
 
   const requiredFieldErrors = [
     'aspirate--pipette',
@@ -99,7 +123,32 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         destWells,
         sourceLabware,
         destLabware,
-        volume
+        volume,
+        changeTip,
+        blowout,
+        delayAfterDispense,
+
+        mixBeforeAspirate: getMixData(
+          formData,
+          'aspirate--mix--checkbox',
+          'aspirate--mix--volume',
+          'aspirate--mix--times'
+        ),
+
+        mixInDestination: getMixData(
+          formData,
+          'dispense--mix--checkbox',
+          'dispense--mix--volume',
+          'dispense--mix--times'
+        ),
+
+        disposalVolume,
+        preWetTip: !!(formData['aspirate--pre-wet-tip']),
+        touchTipAfterAspirate: !!(formData['aspirate--touch-tip']),
+        touchTipAfterDispense: false, // TODO Ian 2018-04-03 field not in form
+
+        description: 'description would be here TODO', // TODO Ian 2018-03-01 get from form
+        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
       }
       : null
   }
@@ -146,7 +195,7 @@ function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<Consol
   const mixFirstAspirate = formData['aspirate--mix--checkbox']
     ? {
       volume: parseFloat(formData['aspirate--mix--volume']),
-      times: parseInt(formData['aspirate--mix--time']) // TODO handle unparseable
+      times: parseInt(formData['aspirate--mix--times']) // TODO handle unparseable
     }
     : null
 

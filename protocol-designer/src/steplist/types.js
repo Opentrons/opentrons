@@ -1,6 +1,7 @@
 // @flow
 import type {IconName} from '@opentrons/components'
 import type {ConsolidateFormData} from '../step-generation'
+import type {MixArgs, SharedFormDataFields, ChangeTipOptions} from '../form-types'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -78,7 +79,7 @@ export type TransferForm = {|
   'aspirate--air-gap--volume'?: string,
   'aspirate--mix--checkbox'?: boolean,
   'aspirate--mix--volume'?: string,
-  'aspirate--mix--time'?: string,
+  'aspirate--mix--times'?: string,
   'aspirate--disposal-vol--checkbox'?: boolean,
   'aspirate--disposal-vol--volume'?: string,
   'aspirate--change-tip'?: 'once' | 'never' | 'always',
@@ -111,7 +112,7 @@ export type ConsolidateForm = {|
   'aspirate--air-gap--volume'?: string,
   'aspirate--mix--checkbox'?: boolean,
   'aspirate--mix--volume'?: string,
-  'aspirate--mix--time'?: string,
+  'aspirate--mix--times'?: string,
   'aspirate--disposal-vol--checkbox'?: boolean,
   'aspirate--disposal-vol--volume'?: string,
   'aspirate--change-tip'?: 'once' | 'never' | 'always',
@@ -143,13 +144,48 @@ export type PauseForm = {|
 export type FormData = TransferForm | ConsolidateForm | PauseForm
 
 export type TransferFormData = {|
+  // TODO Ian 2018-04-05 use "mixin types" like SharedFormDataFields for shared fields across FormData types.
+  ...SharedFormDataFields,
   stepType: 'transfer',
-  pipette: string, // pipette ID
+
+  pipette: string, // PipetteId. TODO IMMEDIATELY/SOON make this match in the form
+
   sourceWells: Array<string>,
   destWells: Array<string>,
+
   sourceLabware: string,
   destLabware: string,
-  volume: number
+  /** Volume to aspirate from each source well. Different volumes across the
+    source wells isn't currently supported
+  */
+  volume: number,
+
+  // ===== ASPIRATE SETTINGS =====
+  /** Pre-wet tip with ??? uL liquid from the first source well. */
+  preWetTip: boolean,
+  /** Touch tip after every aspirate */
+  touchTipAfterAspirate: boolean,
+  /**
+    For transfer, changeTip means:
+    'always': before each aspirate, get a fresh tip
+    'once': get a new tip at the beginning of the transfer step, and use it throughout
+    'never': reuse the tip from the last step
+  */
+  changeTip: ChangeTipOptions,
+  /** Mix in first well in chunk */
+  mixBeforeAspirate: ?MixArgs,
+  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
+  disposalVolume: ?number,
+
+  // ===== DISPENSE SETTINGS =====
+  /** Mix in destination well after dispense */
+  mixInDestination: ?MixArgs,
+  /** Touch tip in destination well after dispense */
+  touchTipAfterDispense: boolean,
+  /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
+  delayAfterDispense: ?number,
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
 export type PauseFormData = {|

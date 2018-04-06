@@ -4,7 +4,6 @@ import {mergeLiquid, splitLiquid, getWellsForTips} from './utils'
 import type {RobotState, PipetteData} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
-// type LocationLiquidState = {[ingredId: string]: {volume: number}}
 
 export default function updateLiquidState (
   args: {
