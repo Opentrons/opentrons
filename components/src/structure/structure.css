@@ -146,10 +146,10 @@
 
 .labeled_value_label {
   font-weight: var(--fw-semibold);
-}
-
-.labeled_value_label,
-.labeled_value_value {
   margin-top: 0;
   margin-bottom: 0.25rem;
+}
+
+.labeled_value_value {
+  margin: 0;
 }
