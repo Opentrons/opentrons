@@ -53,6 +53,8 @@ import {
   toggleStepCollapsed
 } from './actions'
 
+import type {PipetteData} from '../step-generation/types'
+
 type FormState = FormData | null
 
 // the `form` state holds temporary form info that is saved or thrown away with "cancel".
@@ -310,7 +312,24 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
 
 const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSelector(
   validatedForms,
-  generateSubsteps
+  state => (state.fileData.pipettes
+    ? reduce(state.fileData.pipettes, (acc, pipetteData: ?PipetteData) => {
+      return (pipetteData)
+      ? {
+        ...acc,
+        [pipetteData.id]: pipetteData
+      }
+      : acc
+    }, {})
+    : {}), // TODO IMMEDIATELY IMPORT SELECTOR FROM file-data HACK HACK HACK
+
+  state => reduce(state.labwareIngred.containers, (acc, containerData, containerId) => ({
+    ...acc,
+    [containerId]: containerData.type
+  }), {}), // TODO IMPORT SELECTOR FROM labwareIngred HACK HACK
+
+  (_validatedForms, _pipetteData, _allLabwareTypes) =>
+    generateSubsteps(_validatedForms, _pipetteData, _allLabwareTypes)
 )
 
 // TODO Ian 2018-03-20 use selectors, don't create them here

@@ -75,3 +75,10 @@
 .aspirate_dispense * {
   flex: 1;
 }
+
+/* Multi-channel row representing a single channel */
+.step_subitem_channel_row {
+  composes: step_subitem;
+  border-bottom: 1px var(--c-med-gray) dashed;
+  background-color: var(--c-light-gray);
+}

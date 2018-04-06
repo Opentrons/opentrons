@@ -24,18 +24,39 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type StepIdType = number
 
-export type TransferishStepItem = {|
+export type StepItemSourceDestRow = {|
+  substepId: number, // TODO should this be a string or is this ID properly a number?
+  sourceIngredientName?: string,
+  destIngredientName?: string,
+  sourceWell?: string,
+  destWell?: string
+|}
+
+export type StepItemSourceDestRowMulti = {|
+  ...StepItemSourceDestRow,
+  channelId: number
+|}
+
+export type TransferishStepItemSingleChannel = {|
+  multichannel: false,
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
   rows: Array<{|
-    substepId: number, // TODO should this be a string or is this ID properly a number?
-    sourceIngredientName?: string,
-    destIngredientName?: string,
-    sourceWell?: string,
-    destWell?: string,
+    ...StepItemSourceDestRow,
     volume?: number
   |}>
 |}
+
+export type TransferishStepItemMultiChannel = {|
+  multichannel: true,
+  stepType: 'transfer' | 'consolidate' | 'distribute',
+  parentStepId: StepIdType,
+  volume?: number, // uniform volume for all steps
+  multiRows: Array<Array<StepItemSourceDestRowMulti>> // Array of arrays.
+  // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
+|}
+
+export type TransferishStepItem = TransferishStepItemSingleChannel | TransferishStepItemMultiChannel
 
 export type StepSubItemData = TransferishStepItem | {|
   stepType: 'pause',
