@@ -6,7 +6,7 @@ import {TitleBar, Overlay} from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = $React.ElementProps<typeof TitleBar> & {
+type Props = React.ElementProps<typeof TitleBar> & {
   children?: React.Node
 }
 

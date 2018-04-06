@@ -9,18 +9,27 @@ import styles from './styles.css'
 type Props = {
   robot: Robot,
   mount: Mount,
-  backUrl: string,
+  closeUrl: string,
+  moveToFront: () => mixed,
 }
 
 const HEADING = 'Before continuing, remove from deck:'
+const CANCEL_TEXT = 'cancel'
+const CONTINUE_TEXT = 'move pipette to front'
 
 export default function ChangePipette (props: Props) {
+  const {moveToFront, closeUrl} = props
+
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: 'cancel', Component: Link, to: props.backUrl},
-        {children: 'move pipette to front', className: styles.alert_button}
+        {children: CANCEL_TEXT, Component: Link, to: closeUrl},
+        {
+          children: CONTINUE_TEXT,
+          className: styles.alert_button,
+          onClick: moveToFront
+        }
       ]}
     >
       <ul className={styles.alert_list}>

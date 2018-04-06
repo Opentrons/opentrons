@@ -48,13 +48,14 @@ function RobotSettingsPage (props: Props) {
       <TitleBar title={robot.name} />
       <RobotSettings {...robot} />
 
-      <Route path={`${url}/pipettes/:mount`} render={(props) => {
-        const mount: Mount = (props.match.params.mount: any)
+      <Route path={`${url}/pipettes/:mount`} render={(routeProps) => {
+        const routeMatch = routeProps.match
+        const mount: Mount = (routeMatch.params.mount: any)
 
         return (
           <ChangePipette
-            backUrl={url}
-            baseUrl={props.match.url}
+            closeUrl={url}
+            baseUrl={routeMatch.url}
             robot={robot}
             mount={mount}
           />

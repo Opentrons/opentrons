@@ -6,14 +6,15 @@ import {Route} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
 
-// import {TitleBar, DropdownField} from '@opentrons/components'
 import TitledModal from './TitledModal'
 // import ClearDeckAlertModal from './ClearDeckAlertModal'
+import AttachPipetteTitle from './AttachPipetteTitle'
+import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
 
 type OP = {
   robot: Robot,
   mount: Mount,
-  backUrl: string,
+  closeUrl: string,
   baseUrl: string,
 }
 
@@ -23,36 +24,42 @@ type SP = {
 }
 
 type DP = {
-  onBackClick: () => mixed,
-  onPipetteSelect: () => mixed,
+  close: () => mixed,
+  back: () => mixed,
+  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   moveToFront: () => mixed,
 }
 
 const TITLE = 'Pipette Setup'
 
-// TODO(mc, 2018-04-05): pull from external library
+// TODO(mc, 2018-04-05): pull from external pipettes library
 const PIPETTES = [
-  {name: 'p10_single', value: 'Single-channel P10'},
-  {name: 'p50_single', value: 'Single-channel P50'},
-  {name: 'p300_single', value: 'Single-channel P300'},
-  {name: 'p1000_single', value: 'Single-channel P1000'},
-  {name: 'p10_multi', value: 'Multi-channel P10'},
-  {name: 'p50_multi', value: 'Multi-channel P50'},
-  {name: 'p300_multi', value: 'Multi-channel P300'}
+  {value: 'p10_single', name: 'Single-Channel P10'},
+  {value: 'p50_single', name: 'Single-Channel P50'},
+  {value: 'p300_single', name: 'Single-Channel P300'},
+  {value: 'p1000_single', name: 'Single-Channel P1000'},
+  {value: 'p10_multi', name: '8-Channel P10'},
+  {value: 'p50_multi', name: '8-Channel P50'},
+  {value: 'p300_multi', name: '8-Channel P300'}
 ]
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChangePipette)
 
 function ChangePipette (props: OP & SP & DP) {
-  const {mount, moveToFront, moveToFrontRequest, onPipetteSelect, onBackClick} = props
+  const {mount, /* moveToFront, moveToFrontRequest, */ onPipetteSelect} = props
 
   // if (!moveToFrontRequest.inProgress && !moveToFrontRequest.response) {
   //   return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
   // }
 
   return (
-    <Route path={`${props.baseUrl}/:model`} children={(routeProps) => {
-      const selectedPipette = routeProps.match && routeProps.match.params.model
+    <Route path={`${props.baseUrl}/:model?`} render={(routeProps) => {
+      const {match: {params: {model}}} = routeProps
+      // TODO(mc, 2018-04-05): pull from external library
+      const pipette = PIPETTES.find((p) => p.value === model)
+      const onBackClick = pipette
+        ? props.back
+        : props.close
 
       return (
         <TitledModal
@@ -60,16 +67,10 @@ function ChangePipette (props: OP & SP & DP) {
           subtitle={`${mount} carriage`}
           onBackClick={onBackClick}
         >
-          <h2>Attach {selectedPipette || ''} Pipette</h2>
-
-            <label>Select the pipette you wish to attach:</label>
-
-          <span>
-            <DropdownField
-              options={PIPETTES}
-              onChange={onPipetteSelect}
-            />
-          </span>
+          <AttachPipetteTitle name={pipette && pipette.name} />
+          {!pipette && (
+            <PipetteSelection options={PIPETTES} onChange={onPipetteSelect} />
+          )}
         </TitledModal>
       )
     }} />
@@ -88,11 +89,12 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {backUrl, baseUrl} = ownProps
+  const {closeUrl, baseUrl} = ownProps
   const changeUrl = `${baseUrl}/attach`
   return {
-    onBackClick: () => dispatch(push(backUrl)),
-    onPipetteSelect: (event: SyntheticInputEvent<*>) => {
+    close: () => dispatch(push(closeUrl)),
+    back: () => dispatch(push(baseUrl)),
+    onPipetteSelect: (event: SyntheticInputEvent<>) => {
       dispatch(push(`${baseUrl}/${event.target.value}`))
     },
     // TODO(mc, 2018-04-04): implement

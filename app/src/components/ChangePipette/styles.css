@@ -19,7 +19,7 @@
 .modal {
   @apply --modal;
 
-  padding: 6rem 4rem;
+  padding: 6rem 3rem;
 }
 
 .title_bar {
@@ -32,25 +32,30 @@
 .modal_contents {
   z-index: 1;
   width: 100%;
+  max-width: 42rem;
   min-height: 32rem;
   padding: 2rem;
   margin: auto;
   background-color: white;
   border-radius: 0.5rem;
+}
 
-  & span {
-    max-width: 55%;
-    display: block;
-  }
+.attach_pipette_title {
+  @apply --font-header-dark;
 
-  & h2 {
-    @apply --font-header-dark;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
 
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
+.pipette_selection {
+  display: block;
+  width: 55%;
+}
 
-  & label {
-    @apply --font-body-2-dark;
-  }
+.pipette_selection_label {
+  @apply --font-body-2-dark;
+
+  display: block;
+  margin-bottom: 0.5rem;
 }
