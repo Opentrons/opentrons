@@ -5,8 +5,11 @@ import re
 import functools
 
 from collections import OrderedDict
+from itertools import chain
+from typing import List
 
 from opentrons.util.vector import Vector
+from opentrons.config import feature_flags as ff
 
 
 def unpack_location(location):
@@ -492,22 +495,11 @@ class Slot(Placeable):
 
 
 class Container(Placeable):
-    """
-    Class representing a container, also implements grid behavior
-    """
-
     def __init__(self, *args, **kwargs):
         super(Container, self).__init__(*args, **kwargs)
         self.grid = None
         self.grid_transposed = None
         self.ordering = None
-
-    def invalidate_grid(self):
-        """
-        Invalidates pre-calcualted grid structure for rows and colums
-        """
-        self.grid = None
-        self.grid_transposed = None
 
     def calculate_grid(self):
         """
@@ -527,15 +519,24 @@ class Container(Placeable):
         from indexes. Currently only Letter+Number names are supported
         """
         columns = OrderedDict()
-        index_pattern = r'^([A-Za-z]+)([0-9]+)$'
-        for name in self.children_by_name:
-            match = re.match(index_pattern, name)
-            if match:
-                row, col = match.groups(0)
-                if col not in columns:
-                    columns[col] = OrderedDict()
-                columns[col][row] = (row, col)
-
+        if ff.split_labware_definitions():
+            # implementing this for compatibility, but new refactors and
+            # features should use `ordering` directly
+            for i, col in enumerate(self.ordering):
+                col_idx = str(i + 1)
+                columns[col_idx] = OrderedDict()
+                for well in col:
+                    row_idx = well[0]
+                    columns[col_idx][row_idx] = (row_idx, col_idx)
+        else:
+            index_pattern = r'^([A-Za-z]+)([0-9]+)$'
+            for name in self.children_by_name:
+                match = re.match(index_pattern, name)
+                if match:
+                    row, col = match.groups(0)
+                    if col not in columns:
+                        columns[col] = OrderedDict()
+                    columns[col][row] = (row, col)
         return columns
 
     def transpose(self, rows):
@@ -606,7 +607,7 @@ class Container(Placeable):
         """
         return self.columns
 
-    def well(self, name=None):
+    def well(self, name=None) -> Well:
         """
         Returns well by :name:
         """
@@ -616,7 +617,6 @@ class Container(Placeable):
         """
         Returns child Well or list of child Wells
         """
-
         if len(args) and isinstance(args[0], list):
             args = args[0]
 
@@ -645,6 +645,16 @@ class Container(Placeable):
         Passes all arguments to Wells() and returns result
         """
         return self.wells(*args, **kwargs)
+
+    def get_children_list(self) -> List[Well]:
+        if ff.split_labware_definitions():
+            # t = [[self.ordering[row][col]
+            #       for row in range(len(self.ordering))]
+            #      for col in range(len(self.ordering[0]))]
+            # return [self[i] for i in list(chain.from_iterable(t))]
+            return [self[i] for i in list(chain.from_iterable(self.ordering))]
+        else:
+            return super(Container, self).get_children_list()
 
     def _parse_wells_to_and_length(self, *args, **kwargs):
         start = args[0] if len(args) else 0
@@ -680,6 +690,7 @@ class Container(Placeable):
                 wrapped_wells[start + total_kids::step][:length])
 
     def _parse_wells_x_y(self, *args, **kwargs):
+        # deprecated
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
         if x is None and isinstance(y, int):
@@ -705,6 +716,7 @@ class WellSeries(Container):
     """
 
     def __init__(self, wells, name=None):
+        # super(WellSeries, self).__init__()
         if isinstance(wells, dict):
             self.items = wells
             self.values = list(wells.values())

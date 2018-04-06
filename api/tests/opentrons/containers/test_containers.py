@@ -14,6 +14,7 @@ from opentrons.containers.placeable import (
     Well,
     Deck,
     Slot)
+from opentrons.config import feature_flags as ff
 
 
 def test_containers_create(user_definition_dirs, robot):
@@ -38,8 +39,9 @@ def test_containers_create(user_definition_dirs, robot):
 
     assert container_name in containers_list()
 
-    database.delete_container(container_name)
-    assert container_name not in containers_list()
+    if not ff.split_labware_definitions():
+        database.delete_container(container_name)
+        assert container_name not in containers_list()
 
 
 class ContainerTestCase(unittest.TestCase):
@@ -49,13 +51,17 @@ class ContainerTestCase(unittest.TestCase):
     def tearDown(self):
         del self.robot
 
-    def generate_plate(self, wells, cols, spacing, offset, radius):
+    def generate_plate(self, wells, cols, spacing, offset, radius, height=0):
         c = Container()
-
+        c.ordering = []
+        n_rows = int(wells / cols)
+        for i in range(n_rows):
+            c.ordering.append([])
         for i in range(0, wells):
-            well = Well(properties={'radius': radius})
+            well = Well(properties={'radius': radius, 'height': height})
             row, col = divmod(i, cols)
-            name = chr(row + ord('A')) + str(1 + col)
+            name = chr(col + ord('A')) + str(1 + row)
+            c.ordering[row].append(name)
             coordinates = (col * spacing[0] + offset[0],
                            row * spacing[1] + offset[1],
                            0)
@@ -150,7 +156,7 @@ class ContainerTestCase(unittest.TestCase):
     def test_next(self):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
         well = c['A1']
-        expected = c.get_child_by_name('A2')
+        expected = c.get_child_by_name('B1')
 
         self.assertEqual(next(well), expected)
 
@@ -158,7 +164,7 @@ class ContainerTestCase(unittest.TestCase):
         c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         self.assertEqual(c[3], c.get_child_by_name('B2'))
-        self.assertEqual(c[1], c.get_child_by_name('A2'))
+        self.assertEqual(c[1], c.get_child_by_name('B1'))
 
     def test_named_well(self):
         deck = Deck()

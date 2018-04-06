@@ -234,6 +234,11 @@ class SmoothieDriver_3_0_0:
                     raise e
                 else:
                     self.update_position(default=default, is_retry=True)
+            # except ParseError:
+            #     log.warning("ParseError: falling back to last known position "
+            #                 "with defaults")
+            #     updated_position = self._position.copy()
+            #     updated_position.update(**default)
 
         self._update_position(updated_position)
 

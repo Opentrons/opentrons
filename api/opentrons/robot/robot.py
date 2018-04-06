@@ -131,9 +131,10 @@ def _setup_container(container_name):
     container.properties['type'] = container_name
     container_x, container_y, container_z = container._coordinates
 
-    # infer z from height
-    if container_z == 0 and 'height' in container[0].properties:
-        container_z = container[0].properties['height']
+    if not fflags.split_labware_definitions():
+        # infer z from height
+        if container_z == 0 and 'height' in container[0].properties:
+            container_z = container[0].properties['height']
 
     from opentrons.util.vector import Vector
     container._coordinates = Vector(
@@ -864,7 +865,6 @@ class Robot(object):
             pose_tracker.Point(*container._coordinates))
 
         for well in container:
-            # TODO JG 10/6/17: Stop tracking wells inconsistently
             center_x, center_y, _ = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
             self.poses = pose_tracker.add(
@@ -997,6 +997,10 @@ class Robot(object):
             delta_x = delta[0]
             delta_y = delta[1]
             delta_z = delta[2]
+
+        # if fflags.split_labware_definitions():
+        #     delta_z = delta_z - well.z_size()
+
         self.poses = calib.calibrate_container_with_delta(
             self.poses,
             container,

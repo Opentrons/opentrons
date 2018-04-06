@@ -207,7 +207,7 @@ list_tuples = [(plate.wells('A1'),
 
 pipette_single.transfer(60, H20, well_series)
 pipette_single.transfer(60, H20, list_WS)
-pipette_single.transfer(60, H20, list_list)
+# pipette_single.transfer(60, H20, list_list)
 pipette_single.transfer(60, H20, list_tuples)
 
-pipette_single.drop_tip()
+# pipette_single.drop_tip()

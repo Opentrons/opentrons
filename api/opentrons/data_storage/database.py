@@ -150,7 +150,7 @@ def _calculate_offset(labware: Container) -> dict:
 # ======================== Public Functions ======================== #
 def save_new_container(container: Container, container_name: str) -> bool:
     if fflags.split_labware_definitions():
-        warnings.warn('save_new_container is deprecated, please use save_labware')  # noqa
+        # warnings.warn('save_new_container is deprecated, please use save_labware')  # noqa
         res = save_labware(container, container_name)
     else:
         db_conn = sqlite3.connect(database_path)
@@ -166,7 +166,7 @@ def save_labware(labware: Container, labware_name: str) -> bool:
 
 def load_container(container_name: str) -> Container:
     if fflags.split_labware_definitions():
-        warnings.warn('save_new_container is deprecated, please use save_labware')  # noqa
+        # warnings.warn('save_new_container is deprecated, please use save_labware')  # noqa
         res = load_labware(container_name)
     else:
         db_conn = sqlite3.connect(database_path)
@@ -181,7 +181,7 @@ def load_labware(labware_name: str) -> Container:
 
 def overwrite_container(container: Container) -> bool:
     if fflags.split_labware_definitions():
-        warnings.warn('overwrite_container is deprecated, please use save_labware_offset')  # noqa
+        # warnings.warn('overwrite_container is deprecated, please use save_labware_offset')  # noqa
         res = save_labware_offset(container)
     else:
         db_conn = sqlite3.connect(database_path)
@@ -209,7 +209,7 @@ def delete_container(container_name) -> bool:
 
 def list_all_containers() -> List[str]:
     if fflags.split_labware_definitions():
-        warnings.warn('list_all_containers is deprecated, please use list_all_labware')  # noqa
+        # warnings.warn('list_all_containers is deprecated, please use list_all_labware')  # noqa
         res = list_all_labware()
     else:
         db_conn = sqlite3.connect(database_path)
@@ -233,21 +233,24 @@ def load_module(module_name: str) -> Container:
 def change_database(db_path: str):
     global database_path
     if fflags.split_labware_definitions():
-        warnings.warn('database operations no longer have an effect')
+        # warnings.warn('database operations no longer have an effect')
+        pass
     database_path = db_path
 
 
 def get_version():
     '''Get the Opentrons-defined database version'''
     if fflags.split_labware_definitions():
-        warnings.warn('database operations no longer have an effect')
+        # warnings.warn('database operations no longer have an effect')
+        pass
     db_conn = sqlite3.connect(database_path)
     return _get_db_version(db_conn)
 
 
 def set_version(version):
     if fflags.split_labware_definitions():
-        warnings.warn('database operations no longer have an effect')
+        # warnings.warn('database operations no longer have an effect')
+        pass
     db_conn = sqlite3.connect(database_path)
     db_queries.set_user_version(db_conn, version)
 
