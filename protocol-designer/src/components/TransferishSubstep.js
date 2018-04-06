@@ -45,8 +45,8 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
       volume,
       rowGroup,
       groupKey,
-      sourceIngredientName,
-      destIngredientName
+      sourceIngredientName
+      // destIngredientName
     } = this.props
 
     const sourceWellRange = `${rowGroup[0].sourceWell || ''}:${last(rowGroup).sourceWell || ''}`
@@ -62,7 +62,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
           <span className={styles.emphasized_cell}>{sourceWellRange}</span>
           <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
           <span className={styles.emphasized_cell}>{destWellRange}</span>
-          <span>{destIngredientName}</span>
+          {/* <span>{destIngredientName}</span> */}
           <span className={styles.inner_carat} onClick={() => this.handleToggleCollapsed()}>
             <Icon name={collapsed ? 'chevron-down' : 'chevron-right'} />
           </span>
@@ -98,8 +98,8 @@ export default function TransferishSubstep (props: StepSubItemProps) {
             : null
           }
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-          sourceIngredientName='SRC'
-          destIngredientName='DEST'
+          sourceIngredientName='ING11'
+          destIngredientName='ING12'
         />
       )}
     </li>
