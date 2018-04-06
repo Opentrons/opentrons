@@ -55,7 +55,7 @@ def _write_to_device_and_return(cmd, device_connection):
     - Formats command
     - Wait for ack return
     - return parsed response'''
-    command = cmd + '\r\n'
+    command = cmd + '\r\n\r\n'
     device_connection.write(command.encode())
 
     response = device_connection.read_until(DRIVER_ACK)
@@ -91,10 +91,12 @@ def _attempt_command_recovery(command, serial_conn):
 def write_and_return(
         command, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
     '''Write a command and return the response'''
+    log.info('Write -> {}'.format(command))
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(command, device_connection)
+    log.info('Read <- {}'.format(response))
     return response
 
 
