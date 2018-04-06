@@ -5,6 +5,7 @@ from opentrons.util import environment
 
 
 LOG_FILENAME = environment.get_path('LOG_FILE')
+SERIAL_LOG_FILENAME = environment.get_path('SERIAL_LOG_FILE')
 
 logging_config = dict(
     version=1,
@@ -30,10 +31,24 @@ logging_config = dict(
             'level': logging.INFO,
             'backupCount': 3
         },
+        'serial': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'basic',
+            'filename': SERIAL_LOG_FILENAME,
+            'maxBytes': 5000000,
+            'level': logging.DEBUG,
+            'backupCount': 3
+        }
     },
     root={
         'handlers': ['file'],
         'level': logging.DEBUG
+    },
+    loggers={
+        'opentrons.drivers.smoothie_drivers.serial_communication': {
+            'handlers': ['serial'],
+            'level': logging.DEBUG
+        }
     }
 )
 

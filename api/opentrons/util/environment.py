@@ -50,6 +50,7 @@ def refresh():
         'OT_CONFIG_FILE': os.path.join(APP_DATA_DIR, 'config.json'),
         'LOG_DIR': os.path.join(APP_DATA_DIR, 'logs'),
         'LOG_FILE': os.path.join(APP_DATA_DIR, 'logs', 'api.log'),
+        'SERIAL_LOG_FILE': os.path.join(APP_DATA_DIR, 'logs', 'serial.log'),
         'CONTAINERS_DIR': os.path.join(APP_DATA_DIR, 'containers'),
         'CONTAINERS_FILE':
             os.path.join(

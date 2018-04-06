@@ -91,12 +91,12 @@ def _attempt_command_recovery(command, serial_conn):
 def write_and_return(
         command, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
     '''Write a command and return the response'''
-    log.info('Write -> {}'.format(command))
+    log.debug('Write -> {}'.format(command))
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(command, device_connection)
-    log.info('Read <- {}'.format(response))
+    log.debug('Read <- {}'.format(response))
     return response
 
 
