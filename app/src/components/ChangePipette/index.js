@@ -6,9 +6,9 @@ import {Route} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
 
-import {TitleBar, DropdownField} from '@opentrons/components'
+// import {TitleBar, DropdownField} from '@opentrons/components'
 import TitledModal from './TitledModal'
-import ClearDeckAlertModal from './ClearDeckAlertModal'
+// import ClearDeckAlertModal from './ClearDeckAlertModal'
 
 type OP = {
   robot: Robot,
@@ -61,11 +61,15 @@ function ChangePipette (props: OP & SP & DP) {
           onBackClick={onBackClick}
         >
           <h2>Attach {selectedPipette || ''} Pipette</h2>
-          <label></label>
-          <DropdownField
-            options={PIPETTES}
-            onChange={onPipetteSelect}
-          />
+
+            <label>Select the pipette you wish to attach:</label>
+
+          <span>
+            <DropdownField
+              options={PIPETTES}
+              onChange={onPipetteSelect}
+            />
+          </span>
         </TitledModal>
       )
     }} />
@@ -94,6 +98,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     // TODO(mc, 2018-04-04): implement
     moveToFront: () => {
       console.log('MOVE TO FRONT NOT IMPLEMENTED')
+      console.log(baseUrl)
       dispatch(push(changeUrl))
     }
   }

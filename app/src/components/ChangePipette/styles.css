@@ -32,10 +32,25 @@
 .modal_contents {
   z-index: 1;
   width: 100%;
-  max-width: 32rem;
-  min-height: 20rem;
+  min-height: 32rem;
   padding: 2rem;
   margin: auto;
   background-color: white;
   border-radius: 0.5rem;
+
+  & span {
+    max-width: 55%;
+    display: block;
+  }
+
+  & h2 {
+    @apply --font-header-dark;
+
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  & label {
+    @apply --font-body-2-dark;
+  }
 }
