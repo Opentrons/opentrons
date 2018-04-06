@@ -354,6 +354,10 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
+        if self.simulating:
+            sim_switches = {ax: False for ax in AXES}
+            sim_switches.update({'Probe': False})
+            return sim_switches
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
@@ -493,6 +497,38 @@ class SmoothieDriver_3_0_0:
         }
         if active_currents:
             self.set_current(active_currents, axes_active=True)
+
+    def unstick_axes(self, axes):
+        '''
+        Some axes (specifically plunger axis in OT2) build up static friction
+        over time. To get over this, the robot can move that plunger at normal
+        current and a very slow speed to increase the torque, removing the
+        static friction
+
+        axes:
+            String containing each axis to be moved. Ex: 'BC' or 'ZABC'
+        '''
+        for ax in axes:
+            if ax not in AXES:
+                raise ValueError('Unknown axes: {}'.format(axes))
+
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({ax: 1 for ax in axes})
+
+        moving_axes = {
+            ax: self.position[ax] - 3  # move away (-) from switch
+            for ax in axes
+        }
+        # incase axes is pressing endstop, home it slowly instead of moving
+        homing_axes = ''.join([ax for ax in axes if self.switch_state[ax]])
+
+        try:
+            if moving_axes:
+                self.move(moving_axes)
+            if homing_axes:
+                self.home(homing_axes)
+        finally:
+            self.pop_axis_max_speed()
 
     # ----------- Private functions --------------- #
 

@@ -537,7 +537,14 @@ class Robot(object):
         # and to make sure tips are not in the liquid while
         # homing plungers. Z/A axis will automatically home before X/Y
         self.poses = self.gantry.home(self.poses)
-        # Then plungers
+
+        # explicitly update carriage Mover positions (axes ZA) in pose tree
+        # because their Mover.home() commands aren't used here
+        for a in self._actuators.values():
+            self.poses = a['carriage'].update_pose_from_driver(self.poses)
+
+        # Then plungers, first un-sticking any built up static friction
+        self._driver.unstick_axes('BC')
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
 
@@ -545,11 +552,6 @@ class Robot(object):
         # to prevent robot.move_to() from using risky path optimization
         self._previous_instrument = None
         self._prev_container = None
-
-        # explicitly update carriage Mover positions in pose tree
-        # because their Mover.home() commands aren't used here
-        for a in self._actuators.values():
-            self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
