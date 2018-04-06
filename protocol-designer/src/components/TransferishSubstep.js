@@ -8,7 +8,6 @@ import styles from './StepItem.css'
 import type {
   TransferishStepItem,
   StepItemSourceDestRowMulti
-  // TransferishStepItemMultiChannel
 } from '../steplist/types'
 
 export type StepSubItemProps = {|
@@ -17,7 +16,7 @@ export type StepSubItemProps = {|
 
 type MultiChannelSubstepProps = {
   groupKey: number,
-  volume: ?number,
+  volume: ?string,
   rowGroup: Array<StepItemSourceDestRowMulti>,
   sourceIngredientName: ?string,
   destIngredientName: ?string
@@ -61,13 +60,10 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
         <li className={styles.step_subitem}>
           <span>{sourceIngredientName}</span>
           <span className={styles.emphasized_cell}>{sourceWellRange}</span>
-          <span className={styles.volume_cell}>{
-            typeof volume === 'number' &&
-            `${parseFloat(volume.toFixed(VOLUME_DIGITS))} μL`
-          }</span>
+          <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
           <span className={styles.emphasized_cell}>{destWellRange}</span>
           <span>{destIngredientName}</span>
-          <span onClick={() => this.handleToggleCollapsed()}>
+          <span className={styles.inner_carat} onClick={() => this.handleToggleCollapsed()}>
             <Icon name={collapsed ? 'chevron-down' : 'chevron-right'} />
           </span>
         </li>
@@ -77,10 +73,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
           <li className={styles.step_subitem_channel_row} key={rowKey}>
             <span>{row.sourceIngredientName}</span>
             <span className={styles.emphasized_cell}>{row.sourceWell}</span>
-            <span className={styles.volume_cell}>{
-              typeof volume === 'number' &&
-              `${parseFloat(volume.toFixed(VOLUME_DIGITS))} μL`
-            }</span>
+            <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
             <span className={styles.emphasized_cell}>{row.destWell}</span>
             <span>{row.destIngredientName}</span>
           </li>
@@ -100,7 +93,10 @@ export default function TransferishSubstep (props: StepSubItemProps) {
         <MultiChannelSubstep
           groupKey={groupKey}
           rowGroup={rowGroup}
-          volume={substeps.volume}
+          volume={typeof substeps.volume === 'number'
+            ? parseFloat(substeps.volume.toFixed(VOLUME_DIGITS)).toString()
+            : null
+          }
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
           sourceIngredientName='SRC'
           destIngredientName='DEST'
