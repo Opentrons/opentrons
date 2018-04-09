@@ -271,28 +271,30 @@ async def test_jog_calibrate_top(
     robot = model.robot
 
     container = model.container._container
-    # pos1 = pose_tracker.change_base(
-    #     robot.poses,
-    #     src=container[0],
-    #     dst=robot.deck)
-    pos1 = pose_tracker.absolute(robot.poses, container[0])
-    coord1 = container[0]._coordinates
+    pos1 = pose_tracker.change_base(
+        robot.poses,
+        src=container[0],
+        dst=robot.deck)
+    coordinates1 = container.coordinates()
 
     main_router.calibration_manager.move_to(model.instrument, model.container)
     main_router.calibration_manager.jog(model.instrument, 1, 'x')
     main_router.calibration_manager.jog(model.instrument, 2, 'y')
     main_router.calibration_manager.jog(model.instrument, 3, 'z')
 
+    # Todo: make tests use a tmp dir instead of a real one
     main_router.calibration_manager.update_container_offset(
         model.container,
         model.instrument
     )
 
     pos2 = pose_tracker.absolute(robot.poses, container[0])
-    coord2 = container[0]._coordinates
+    coordinates2 = container.coordinates()
 
     assert isclose(pos1 + (1, 2, 3), pos2).all()
-    assert isclose(array(list(coord1)) + (1, 2, 3), array(list(coord2))).all()
+    assert isclose(
+        array([*coordinates1]) + (1, 2, 3),
+        array([*coordinates2])).all()
 
     main_router.calibration_manager.pick_up_tip(
         model.instrument,

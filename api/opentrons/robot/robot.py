@@ -865,8 +865,10 @@ class Robot(object):
             pose_tracker.Point(*container._coordinates))
 
         for well in container:
-            center_x, center_y, _ = well.top()[1]
+            center_x, center_y, center_z = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
+            if not fflags.split_labware_definitions():
+                center_z = 0
             self.poses = pose_tracker.add(
                 self.poses,
                 well,
@@ -874,7 +876,7 @@ class Robot(object):
                 pose_tracker.Point(
                     center_x + offset_x,
                     center_y + offset_y,
-                    offset_z
+                    center_z + offset_z
                 )
             )
 
@@ -976,6 +978,8 @@ class Robot(object):
                                             save: bool
                                             ):
         '''Calibrates a container using the bottom of the first well'''
+        # TODO: figure out how delta needs to change now that a different point
+        # TODO: is tracked in pose_tracker for labware
         well = container[0]
 
         # Get the relative position of well with respect to instrument
@@ -1022,6 +1026,9 @@ class Robot(object):
         :return: Calibrated height of container in mm from
         deck as the reference point
         """
+        # if fflags.split_labware_definitions():
+        #     offset = placeable[0].top()[1]
+        # else:
         offset = placeable.top()[1]
         placeable_coordinate = add(
             pose_tracker.absolute(

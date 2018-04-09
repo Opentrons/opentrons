@@ -495,11 +495,22 @@ class Slot(Placeable):
 
 
 class Container(Placeable):
+    """
+    Class representing a container, also implements grid behavior
+    """
+
     def __init__(self, *args, **kwargs):
         super(Container, self).__init__(*args, **kwargs)
         self.grid = None
         self.grid_transposed = None
         self.ordering = None
+
+    def invalidate_grid(self):
+        """
+        Invalidates pre-calcualted grid structure for rows and colums
+        """
+        self.grid = None
+        self.grid_transposed = None
 
     def calculate_grid(self):
         """
@@ -537,6 +548,7 @@ class Container(Placeable):
                     if col not in columns:
                         columns[col] = OrderedDict()
                     columns[col][row] = (row, col)
+
         return columns
 
     def transpose(self, rows):
@@ -607,7 +619,7 @@ class Container(Placeable):
         """
         return self.columns
 
-    def well(self, name=None) -> Well:
+    def well(self, name=None):
         """
         Returns well by :name:
         """
@@ -617,6 +629,7 @@ class Container(Placeable):
         """
         Returns child Well or list of child Wells
         """
+
         if len(args) and isinstance(args[0], list):
             args = args[0]
 
@@ -648,10 +661,6 @@ class Container(Placeable):
 
     def get_children_list(self) -> List[Well]:
         if ff.split_labware_definitions():
-            # t = [[self.ordering[row][col]
-            #       for row in range(len(self.ordering))]
-            #      for col in range(len(self.ordering[0]))]
-            # return [self[i] for i in list(chain.from_iterable(t))]
             return [self[i] for i in list(chain.from_iterable(self.ordering))]
         else:
             return super(Container, self).get_children_list()
@@ -690,7 +699,6 @@ class Container(Placeable):
                 wrapped_wells[start + total_kids::step][:length])
 
     def _parse_wells_x_y(self, *args, **kwargs):
-        # deprecated
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
         if x is None and isinstance(y, int):
@@ -716,7 +724,6 @@ class WellSeries(Container):
     """
 
     def __init__(self, wells, name=None):
-        # super(WellSeries, self).__init__()
         if isinstance(wells, dict):
             self.items = wells
             self.values = list(wells.values())
