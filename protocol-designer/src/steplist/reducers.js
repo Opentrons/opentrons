@@ -327,7 +327,7 @@ const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSele
 )
 
 /** All Step data needed for Step List */
-const allSteps = createSelector(
+const allSteps: Selector<any> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
   getSteps,
   orderedStepsSelector,
   getCollapsedSteps,

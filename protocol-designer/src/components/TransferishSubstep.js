@@ -7,19 +7,22 @@ import styles from './StepItem.css'
 
 import type {
   TransferishStepItem,
-  StepItemSourceDestRowMulti
+  StepItemSourceDestRowMulti,
+  SelectSubstepPayload
 } from '../steplist/types'
 
 export type StepSubItemProps = {|
   substeps: TransferishStepItem
 |}
 
-type MultiChannelSubstepProps = {
+type MultiChannelSubstepProps = {|
   volume: ?string,
   rowGroup: Array<StepItemSourceDestRowMulti>,
   sourceIngredientName: ?string,
-  destIngredientName: ?string
-}
+  destIngredientName: ?string,
+  onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
+|}
 
 const VOLUME_DIGITS = 1
 const DEFAULT_COLLAPSED_STATE = true
@@ -60,7 +63,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const collapsed = this.state.collapsed
 
     return (
-      <ol>
+      <ol onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}>
         {/* TODO special class for this substep subheader thing?? */}
         <li className={styles.step_subitem}>
           <span>{sourceIngredientName}</span>
@@ -88,9 +91,14 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
   }
 }
 
+type TransferishSubstepProps = {|
+  ...StepSubItemProps,
+  onSelectSubstep: SelectSubstepPayload => mixed
+|}
+
 // This "transferish" substep component is for transfer/distribute/consolidate
-export default function TransferishSubstep (props: StepSubItemProps) {
-  const {substeps} = props
+export default function TransferishSubstep (props: TransferishSubstepProps) {
+  const {substeps, onSelectSubstep} = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
     return <li>
@@ -102,6 +110,11 @@ export default function TransferishSubstep (props: StepSubItemProps) {
             ? substeps.volume.toFixed(VOLUME_DIGITS)
             : null
           }
+          onMouseEnter={() => onSelectSubstep({
+            stepId: substeps.parentStepId,
+            substepId: groupKey
+          })}
+          onMouseLeave={() => onSelectSubstep(null)}
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
           sourceIngredientName='ING11'
           destIngredientName='ING12'
@@ -112,7 +125,14 @@ export default function TransferishSubstep (props: StepSubItemProps) {
 
   // single-channel row item
   return substeps.rows.map((row, key) =>
-    <li key={key} className={styles.step_subitem} /* onMouseOver={onMouseOver} */>
+    <li key={key}
+      className={styles.step_subitem}
+      onMouseEnter={() => onSelectSubstep({
+        stepId: substeps.parentStepId,
+        substepId: row.substepId
+      })}
+      onMouseLeave={() => onSelectSubstep(null)}
+    >
       <span>{row.sourceIngredientName}</span>
       <span className={styles.emphasized_cell}>{row.sourceWell}</span>
       <span className={styles.volume_cell}>{
