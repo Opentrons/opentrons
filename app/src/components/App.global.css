@@ -8,7 +8,7 @@
   padding: 0;
 
   /* TODO(mc, 2018-04-04): just use "system-ui"? */
-  font-family: sans;
+  font-family: 'Open Sans';
 }
 
 html,
@@ -26,7 +26,7 @@ a {
 
 /* TODO(mc, 2018-04-04): just use "system-ui"? */
 .sans {
-  font-family: sans;
+  font-family: 'Open Sans';
 }
 
 .trons {
@@ -46,7 +46,7 @@ button:focus {
   height: 2.5rem;
   line-height: 2.5rem;
   border-radius: 2px;
-  font-family: 'sans';
+  font-family: 'Open Sans';
   font-size: 14px;
   text-transform: uppercase;
   cursor: pointer;

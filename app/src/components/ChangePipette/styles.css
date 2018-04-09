@@ -32,9 +32,9 @@
 .modal_contents {
   z-index: 1;
   width: 100%;
-  max-width: 42rem;
+  max-width: 48rem;
   min-height: 32rem;
-  padding: 2rem;
+  padding: 2rem 1.25rem;
   margin: auto;
   background-color: white;
   border-radius: 0.5rem;
@@ -58,4 +58,56 @@
 
   display: block;
   margin-bottom: 0.5rem;
+}
+
+.instructions {
+  display: flex;
+  align-content: stretch;
+  width: 100%;
+}
+
+.step {
+  @apply --font-body-2-dark;
+
+  width: 50%;
+  padding: 0 1.25rem;
+  vertical-align: top;
+
+  &:not(:last-child) {
+    margin-right: 1.25rem;
+  }
+
+  & > * {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.step_legend {
+  display: inline;
+  margin: 0;
+  padding: 0 0.75rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
+.screwdriver {
+  overflow: visible;
+  display: block;
+  width: 8rem;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.check_pipette_button {
+  display: block;
+  width: 20rem;
+  margin: 2rem auto 0 auto;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
 }

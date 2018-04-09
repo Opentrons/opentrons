@@ -2,7 +2,7 @@
 /* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
 .run_log_wrapper {
   box-sizing: border-box;
-  font-family: 'sans';
+  font-family: 'Open Sans';
   overflow-y: scroll;
   border: 1rem solid white;
   max-height: 44rem;

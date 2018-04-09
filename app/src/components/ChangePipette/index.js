@@ -10,6 +10,8 @@ import TitledModal from './TitledModal'
 // import ClearDeckAlertModal from './ClearDeckAlertModal'
 import AttachPipetteTitle from './AttachPipetteTitle'
 import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
+import AttachPipetteInstructions from './AttachPipetteInstructions'
+import CheckPipettesButton from './CheckPipettesButton'
 
 type OP = {
   robot: Robot,
@@ -34,13 +36,13 @@ const TITLE = 'Pipette Setup'
 
 // TODO(mc, 2018-04-05): pull from external pipettes library
 const PIPETTES = [
-  {value: 'p10_single', name: 'Single-Channel P10'},
-  {value: 'p50_single', name: 'Single-Channel P50'},
-  {value: 'p300_single', name: 'Single-Channel P300'},
-  {value: 'p1000_single', name: 'Single-Channel P1000'},
-  {value: 'p10_multi', name: '8-Channel P10'},
-  {value: 'p50_multi', name: '8-Channel P50'},
-  {value: 'p300_multi', name: '8-Channel P300'}
+  {value: 'p10_single', name: 'Single-Channel P10', channels: '1'},
+  {value: 'p50_single', name: 'Single-Channel P50', channels: '1'},
+  {value: 'p300_single', name: 'Single-Channel P300', channels: '1'},
+  {value: 'p1000_single', name: 'Single-Channel P1000', channels: '1'},
+  {value: 'p10_multi', name: '8-Channel P10', channels: '8'},
+  {value: 'p50_multi', name: '8-Channel P50', channels: '8'},
+  {value: 'p300_multi', name: '8-Channel P300', channels: '8'}
 ]
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChangePipette)
@@ -54,7 +56,7 @@ function ChangePipette (props: OP & SP & DP) {
 
   return (
     <Route path={`${props.baseUrl}/:model?`} render={(routeProps) => {
-      const {match: {params: {model}}} = routeProps
+      const {match: {url, params: {model}}} = routeProps
       // TODO(mc, 2018-04-05): pull from external library
       const pipette = PIPETTES.find((p) => p.value === model)
       const onBackClick = pipette
@@ -70,6 +72,15 @@ function ChangePipette (props: OP & SP & DP) {
           <AttachPipetteTitle name={pipette && pipette.name} />
           {!pipette && (
             <PipetteSelection options={PIPETTES} onChange={onPipetteSelect} />
+          )}
+          {pipette && (
+            <AttachPipetteInstructions
+              mount={mount}
+              channels={pipette.channels}
+            />
+          )}
+          {pipette && (
+            <CheckPipettesButton url={`${url}/confirm`} />
           )}
         </TitledModal>
       )
@@ -91,6 +102,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {closeUrl, baseUrl} = ownProps
   const changeUrl = `${baseUrl}/attach`
+
   return {
     close: () => dispatch(push(closeUrl)),
     back: () => dispatch(push(baseUrl)),
