@@ -42,12 +42,13 @@ function _transferSubsteps (
     console.warn(`Pipette "${form.pipette}" does not exist, step ${stepId} can't determine channels`)
   }
 
-  const sourceLabwareType = allLabwareTypes[form.sourceLabware]
-  const destLabwareType = allLabwareTypes[form.destLabware]
-
   if (pipetteData[form.pipette] && pipetteData[form.pipette].channels > 1) {
-    const channels = pipetteData[form.pipette].channels
     // multichannel
+    const channels = pipetteData[form.pipette].channels
+
+    const sourceLabwareType = allLabwareTypes[form.sourceLabware]
+    const destLabwareType = allLabwareTypes[form.destLabware]
+
     return {
       ...commonFields,
       multichannel: true,
@@ -99,6 +100,47 @@ function _consolidateSubsteps (
     volume
   } = form
 
+  const commonFields = {
+    stepType: 'consolidate',
+    parentStepId: stepId
+  }
+
+  // TODO Ian 2018-04-09 ~7 lines identical to transfer multichannel handling, candidate for util fn?
+  // TODO Ian 2018-04-06 use assert here
+  if (!pipetteData[form.pipette]) {
+    console.warn(`Pipette "${form.pipette}" does not exist, step ${stepId} can't determine channels`)
+  }
+
+  if (pipetteData[form.pipette] && pipetteData[form.pipette].channels > 1) {
+    // multichannel
+    const channels = pipetteData[form.pipette].channels
+
+    const sourceLabwareType = allLabwareTypes[form.sourceLabware]
+    const destLabwareType = allLabwareTypes[form.destLabware]
+
+    const destWellsForTips = getWellsForTips(channels, destLabwareType, destWell).wellsForTips
+
+    return {
+      ...commonFields,
+      multichannel: true,
+      volume,
+      multiRows: range(sourceWells.length).map(i => {
+        const isLastGroup = i + 1 === sourceWells.length
+        const sourceWellsForTips = getWellsForTips(channels, sourceLabwareType, sourceWells[i]).wellsForTips
+
+        return range(channels).map(channel => ({
+          substepId: i,
+          // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
+          sourceIngredientName: 'ING1',
+          destIngredientName: isLastGroup ? 'ING2' : null,
+          sourceWell: sourceWellsForTips[channel],
+          destWell: isLastGroup ? destWellsForTips[channel] : null, // only show dest wells on last group
+          volume
+        }))
+      }) // TODO concat the final source : dest
+    }
+  }
+
   const destWellSubstep = {
     destWell,
     sourceIngredientName: 'ING1', // TODO Ian 2018-03-20 proper ingredient name & groupId/color
@@ -107,8 +149,8 @@ function _consolidateSubsteps (
   }
 
   return {
-    stepType: 'consolidate',
-    parentStepId: stepId,
+    ...commonFields,
+    multichannel: false,
     // TODO Ian 2018-03-02 break up steps when pipette too small
     rows: [
       ...sourceWells.map((sourceWell, i) => ({

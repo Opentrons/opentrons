@@ -47,8 +47,15 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
       // destIngredientName
     } = this.props
 
-    const sourceWellRange = `${rowGroup[0].sourceWell || ''}:${last(rowGroup).sourceWell || ''}`
-    const destWellRange = `${rowGroup[0].destWell || ''}:${last(rowGroup).destWell || ''}`
+    const lastGroupSourceWell = last(rowGroup).sourceWell
+    const sourceWellRange = (rowGroup[0].sourceWell && lastGroupSourceWell)
+      ? `${rowGroup[0].sourceWell}:${lastGroupSourceWell}`
+      : ''
+
+    const lastGroupDestWell = last(rowGroup).destWell
+    const destWellRange = (rowGroup[0].destWell && lastGroupDestWell)
+      ? `${rowGroup[0].destWell}:${lastGroupDestWell}`
+      : ''
 
     const collapsed = this.state.collapsed
 
