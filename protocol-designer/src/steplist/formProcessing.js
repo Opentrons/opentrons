@@ -4,6 +4,7 @@ import type {
   StepType,
   StepIdType,
   FormData,
+  BlankForm,
   ProcessedFormData,
   TransferForm,
   ConsolidateForm,
@@ -33,7 +34,7 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
     : null
 }
 
-export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
+export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
   // Add default values to a new step form
   const baseForm = {
     id: stepId,

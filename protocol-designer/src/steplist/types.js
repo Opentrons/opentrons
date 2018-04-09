@@ -164,6 +164,12 @@ export type PauseForm = {|
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
 
+export type BlankForm = {
+  ...FormModalFields,
+  stepType: StepType,
+  id: StepIdType
+}
+
 export type TransferFormData = {|
   // TODO Ian 2018-04-05 use "mixin types" like SharedFormDataFields for shared fields across FormData types.
   ...SharedFormDataFields,
