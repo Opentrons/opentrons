@@ -1,9 +1,7 @@
 # pylama:ignore=E501
 
 import unittest
-
 from unittest import mock
-
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
@@ -12,10 +10,6 @@ from opentrons.containers.placeable import unpack_location, Container, Well
 from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
 from numpy import isclose
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 def test_pipette_models(robot):
@@ -234,7 +228,6 @@ class PipetteTest(unittest.TestCase):
     def test_set_max_volume(self):
         import warnings
         warnings.filterwarnings('error')
-
         self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
         self.assertRaises(
             UserWarning, Pipette, self.robot, mount='right', max_volume=200)
