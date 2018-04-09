@@ -12,5 +12,102 @@
 
 .alert_button {
   width: auto;
-  padding: initial 1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.modal {
+  @apply --modal;
+
+  padding: 6rem 3rem;
+}
+
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.modal_contents {
+  z-index: 1;
+  width: 100%;
+  max-width: 48rem;
+  min-height: 32rem;
+  padding: 2rem 1.25rem;
+  margin: auto;
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+.attach_pipette_title {
+  @apply --font-header-dark;
+
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.pipette_selection {
+  display: block;
+  width: 55%;
+}
+
+.pipette_selection_label {
+  @apply --font-body-2-dark;
+
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.instructions {
+  display: flex;
+  align-content: stretch;
+  width: 100%;
+}
+
+.step {
+  @apply --font-body-2-dark;
+
+  width: 50%;
+  padding: 0 1.25rem;
+  vertical-align: top;
+
+  &:not(:last-child) {
+    margin-right: 1.25rem;
+  }
+
+  & > * {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.step_legend {
+  display: inline;
+  margin: 0;
+  padding: 0 0.75rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
+.screwdriver {
+  overflow: visible;
+  display: block;
+  width: 8rem;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.check_pipette_button {
+  display: block;
+  width: 20rem;
+  margin: 2rem auto 0 auto;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
 }

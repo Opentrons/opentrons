@@ -2,10 +2,10 @@
 /* stylelint-disable font-family-no-missing-generic-family-keyword  */
 
 .wrapper {
-  width: 1024px;
+  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: row;
-  font-family: 'sans';
+  font-family: 'Open Sans';
   position: fixed;
 }

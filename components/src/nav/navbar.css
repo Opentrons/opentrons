@@ -3,7 +3,7 @@
 .navbar {
   flex: none;
   position: relative;
-  width: 5rem;
+  width: 4.5rem;
   height: 100%;
   background-color: var(--c-bg-light);
   border-right: var(--bd-light);
