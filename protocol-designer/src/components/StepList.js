@@ -5,7 +5,7 @@ import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
 import {END_STEP} from '../steplist/types'
-import type {StepItemData, StepSubItemData, StepIdType, SelectSubstepPayload} from '../steplist/types'
+import type {StepItemData, StepSubItemData, StepIdType, SubstepIdentifier} from '../steplist/types'
 
 import StepItem from '../components/StepItem'
 import TransferishSubstep from '../components/TransferishSubstep'
@@ -15,14 +15,15 @@ type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
 type StepListProps = {
   selectedStepId: StepIdTypeWithEnd | null,
+  hoveredSubstep: SubstepIdentifier,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
-  handleSubstepHover: SelectSubstepPayload => mixed,
+  handleSubstepHover: SubstepIdentifier => mixed,
   handleStepItemClickById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
   handleStepItemCollapseToggleById?: (StepIdType) => (event?: SyntheticEvent<>) => mixed,
   handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed,
 }
 
-function generateSubstepItems (substeps, onSelectSubstep) {
+function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
   if (!substeps) {
     // no substeps, form is probably not finished (or it's "deck-setup" stepType)
     return null
@@ -35,6 +36,7 @@ function generateSubstepItems (substeps, onSelectSubstep) {
     // all these step types share the same substep display
     return <TransferishSubstep
       substeps={substeps}
+      hoveredSubstep={hoveredSubstep}
       onSelectSubstep={onSelectSubstep} // TODO use action
     />
   }
@@ -66,7 +68,10 @@ export default function StepList (props: StepListProps) {
               ? null // Deck Setup steps are not collapsible
               : props.handleStepItemCollapseToggleById(step.id)
           }
-          selected={!isNil(props.selectedStepId) && step.id === props.selectedStepId}
+          selected={
+            props.hoveredSubstep === null && // don't show selected border on the Step when there's a Substep being hovered
+            !isNil(props.selectedStepId) && step.id === props.selectedStepId
+          }
           {...pick(step, [
             'title',
             'stepType',
@@ -78,7 +83,7 @@ export default function StepList (props: StepListProps) {
             'collapsed'
           ])}
         >
-          {generateSubstepItems(step.substeps, props.handleSubstepHover)}
+          {generateSubstepItems(step.substeps, props.handleSubstepHover, props.hoveredSubstep)}
         </StepItem>
       ))}
 

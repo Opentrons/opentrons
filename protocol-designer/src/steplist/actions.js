@@ -3,7 +3,7 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
 import {END_STEP} from './types'
-import type {StepType, StepIdType, FormSectionNames, FormModalFields, SelectSubstepPayload} from './types'
+import type {StepType, StepIdType, FormSectionNames, FormModalFields, SubstepIdentifier} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 
 type EndStepId = typeof END_STEP
@@ -97,8 +97,8 @@ export type SelectStepAction = {
   payload: StepIdType | EndStepId
 }
 
-export const selectSubstep = (payload: SelectSubstepPayload) => ({
-  type: 'SELECT_SUBSTEP',
+export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
+  type: 'HOVER_ON_SUBSTEP',
   payload: payload
 })
 

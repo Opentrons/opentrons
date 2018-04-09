@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import last from 'lodash/last'
 import {Icon} from '@opentrons/components'
 
@@ -8,7 +9,7 @@ import styles from './StepItem.css'
 import type {
   TransferishStepItem,
   StepItemSourceDestRowMulti,
-  SelectSubstepPayload
+  SubstepIdentifier
 } from '../steplist/types'
 
 export type StepSubItemProps = {|
@@ -20,6 +21,7 @@ type MultiChannelSubstepProps = {|
   rowGroup: Array<StepItemSourceDestRowMulti>,
   sourceIngredientName: ?string,
   destIngredientName: ?string,
+  highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
 |}
@@ -46,6 +48,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const {
       volume,
       rowGroup,
+      highlighted,
       sourceIngredientName
       // destIngredientName
     } = this.props
@@ -63,7 +66,11 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const collapsed = this.state.collapsed
 
     return (
-      <ol onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}>
+      <ol
+        onMouseEnter={this.props.onMouseEnter}
+        onMouseLeave={this.props.onMouseLeave}
+        className={highlighted ? styles.highlighted_substep : ''}
+      >
         {/* TODO special class for this substep subheader thing?? */}
         <li className={styles.step_subitem}>
           <span>{sourceIngredientName}</span>
@@ -93,12 +100,13 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
 
 type TransferishSubstepProps = {|
   ...StepSubItemProps,
-  onSelectSubstep: SelectSubstepPayload => mixed
+  onSelectSubstep: SubstepIdentifier => mixed,
+  hoveredSubstep: SubstepIdentifier
 |}
 
 // This "transferish" substep component is for transfer/distribute/consolidate
 export default function TransferishSubstep (props: TransferishSubstepProps) {
-  const {substeps, onSelectSubstep} = props
+  const {substeps, onSelectSubstep, hoveredSubstep} = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
     return <li>
@@ -118,18 +126,29 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
           sourceIngredientName='ING11'
           destIngredientName='ING12'
+          highlighted={!!hoveredSubstep &&
+            hoveredSubstep.stepId === substeps.parentStepId &&
+            hoveredSubstep.substepId === groupKey
+          }
         />
       )}
     </li>
   }
 
   // single-channel row item
-  return substeps.rows.map((row, key) =>
-    <li key={key}
-      className={styles.step_subitem}
+  return substeps.rows.map((row, substepId) =>
+    <li key={substepId}
+      className={cx(
+        styles.step_subitem,
+        {[styles.highlighted_substep]:
+          !!hoveredSubstep &&
+          hoveredSubstep.stepId === substeps.parentStepId &&
+          substepId === hoveredSubstep.substepId
+        }
+      )}
       onMouseEnter={() => onSelectSubstep({
         stepId: substeps.parentStepId,
-        substepId: row.substepId
+        substepId
       })}
       onMouseLeave={() => onSelectSubstep(null)}
     >

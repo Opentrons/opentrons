@@ -18,7 +18,8 @@ import type {
   StepIdType,
   StepSubItemData,
   FormSectionState,
-  FormModalFields
+  FormModalFields,
+  SubstepIdentifier
 } from './types'
 
 import {
@@ -49,6 +50,7 @@ import type {
 import {
   cancelStepForm, // TODO try collapsing them all into a single Action type
   saveStepForm,
+  hoverOnSubstep,
   changeFormInput,
   expandAddStepButton,
   hoverOnStep,
@@ -178,6 +180,10 @@ const hoveredStep = handleActions({
   HOVER_ON_STEP: (state: HoveredStepState, action: ActionType<typeof hoverOnStep>) => action.payload
 }, null)
 
+const hoveredSubstep = handleActions({
+  HOVER_ON_SUBSTEP: (state: SubstepIdentifier, action: ActionType<typeof hoverOnSubstep>) => action.payload
+}, null)
+
 type StepCreationButtonExpandedState = boolean
 
 const stepCreationButtonExpanded = handleActions({
@@ -199,6 +205,7 @@ export type RootState = {|
   orderedSteps: OrderedStepsState,
   selectedStep: SelectedStepState,
   hoveredStep: HoveredStepState,
+  hoveredSubstep: SubstepIdentifier,
   stepCreationButtonExpanded: StepCreationButtonExpandedState
 |}
 
@@ -212,6 +219,7 @@ export const _allReducers = {
   orderedSteps,
   selectedStep,
   hoveredStep,
+  hoveredSubstep,
   stepCreationButtonExpanded
 }
 
@@ -241,6 +249,11 @@ const selectedStepId = createSelector(
 const hoveredStepId = createSelector(
   rootSelector,
   (state: RootState) => state.hoveredStep
+)
+
+const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
+  rootSelector,
+  (state: RootState) => state.hoveredSubstep
 )
 
 const hoveredOrSelectedStepId: Selector<StepIdType | typeof END_STEP | null> = createSelector(
@@ -490,6 +503,7 @@ export const selectors = {
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   hoveredStepId,
   hoveredOrSelectedStepId,
+  getHoveredSubstep,
   selectedStepFormData: selectedStepFormDataSelector,
   formData,
   formModalData,
