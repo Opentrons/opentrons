@@ -195,7 +195,7 @@ def test_delay_calls(monkeypatch):
     p200.delay(seconds=4, minutes=1)
 
     assert 'pause' in cmd
-    assert 'sleep 64' in cmd
+    assert 'sleep 64.0' in cmd
     assert 'resume' in cmd
 
 
