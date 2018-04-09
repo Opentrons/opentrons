@@ -1,6 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
-import type {BaseState} from '../../types'
+import type {BaseState, Selector} from '../../types'
 import reduce from 'lodash/reduce'
 import type {DropdownOption} from '@opentrons/components'
 import type {PipetteData} from '../../step-generation'
@@ -47,7 +47,7 @@ export const equippedPipetteOptions: BaseState => Array<DropdownOption> = create
 // TODO LATER factor out into own file
 // Shows pipettes by ID, not mount
 type PipettesById = {[pipetteId: string]: PipetteData}
-export const equippedPipettes = createSelector(
+export const equippedPipettes: Selector<PipettesById> = createSelector(
   rootSelector,
   pipettes => reduce(pipettes, (acc: PipettesById, pipetteData: ?PipetteData): PipettesById => {
     return (pipetteData)

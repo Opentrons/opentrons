@@ -32,11 +32,7 @@ function generateSubstepItems (substeps) {
     substeps.stepType === 'distribute'
   ) {
     // all these step types share the same substep display
-    return <TransferishSubstep
-      rows={substeps.rows}
-      parentStepId={substeps.parentStepId}
-      stepType={substeps.stepType}
-    />
+    return <TransferishSubstep substeps={substeps} />
   }
 
   if (substeps.stepType === 'pause') {
