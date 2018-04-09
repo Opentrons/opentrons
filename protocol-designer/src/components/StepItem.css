@@ -1,5 +1,39 @@
 @import '@opentrons/components';
 
+:root {
+  --step_subitem: {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem;
+    border-top: 2px solid var(--c-light-gray);
+    text-align: center;
+
+    & > * {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    & svg {
+      flex: 1;
+      height: 1.5rem;
+      color: var(--c-med-gray);
+    }
+
+    & .volume_cell {
+      color: var(--c-med-gray);
+      overflow: visible;
+      text-align: right;
+    }
+  };
+}
+
+.step_subitem {
+  @apply --step_subitem;
+}
+
 .step_item {
   margin: 0.25rem 0;
   color: var(--c-dark-gray);
@@ -23,40 +57,11 @@
   font-weight: bold;
 }
 
-/* Step Subitem */
-
-.step_subitem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.5rem;
-  border-top: 2px solid var(--c-light-gray);
-  text-align: center;
-}
-
-.step_subitem > * {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.step_subitem svg {
-  flex: 1;
-  height: 1.5rem;
-  color: var(--c-med-gray);
-}
-
-.step_subitem .volume_cell {
-  color: var(--c-med-gray);
-  overflow: visible;
-  text-align: right;
-}
-
 /* Step Subitem Column Header */
 
 .step_subitem_column_header {
-  composes: step_subitem;
+  @apply --step_subitem;
+
   border: none;
 }
 
@@ -82,7 +87,8 @@
 
 /* Multi-channel row representing a single channel */
 .step_subitem_channel_row {
-  composes: step_subitem;
+  @apply --step_subitem;
+
   border-bottom: 1px var(--c-med-gray) dashed;
   background-color: var(--c-light-gray);
 }
