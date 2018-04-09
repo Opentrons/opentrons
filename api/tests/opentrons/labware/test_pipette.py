@@ -4,7 +4,6 @@ import unittest
 
 from unittest import mock
 
-from opentrons.api import Session
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
@@ -17,6 +16,7 @@ from numpy import isclose
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def test_pipette_models(robot):
     from opentrons import instruments, robot
@@ -1624,7 +1624,6 @@ class PipetteTest(unittest.TestCase):
 
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
-    
     def test_tip_tracking_chain_multi_channel(self):
         # TODO (ben 20171130): revise this test to make more sense in the
         # context of required tip pick_up/drop sequencing, etc.
