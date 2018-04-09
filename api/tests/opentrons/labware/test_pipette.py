@@ -1,7 +1,10 @@
 # pylama:ignore=E501
 
 import unittest
+
 from unittest import mock
+
+from opentrons.api import Session
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
@@ -11,6 +14,9 @@ from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
 from numpy import isclose
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 def test_pipette_models(robot):
     from opentrons import instruments, robot
@@ -228,6 +234,7 @@ class PipetteTest(unittest.TestCase):
     def test_set_max_volume(self):
         import warnings
         warnings.filterwarnings('error')
+
         self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
         self.assertRaises(
             UserWarning, Pipette, self.robot, mount='right', max_volume=200)
@@ -1617,13 +1624,7 @@ class PipetteTest(unittest.TestCase):
 
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
-    def test_assert_on_double_pick_up_tip(self):
-        self.p200.pick_up_tip()
-        self.assertRaises(AssertionError, self.p200.pick_up_tip)
-
-    def test_assert_on_drop_without_tip(self):
-        self.assertRaises(AssertionError, self.p200.drop_tip)
-
+    
     def test_tip_tracking_chain_multi_channel(self):
         # TODO (ben 20171130): revise this test to make more sense in the
         # context of required tip pick_up/drop sequencing, etc.
