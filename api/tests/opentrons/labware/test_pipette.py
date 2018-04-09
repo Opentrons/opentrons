@@ -1617,13 +1617,6 @@ class PipetteTest(unittest.TestCase):
 
         self.assertRaises(RuntimeWarning, self.p200.pick_up_tip)
 
-    def test_assert_on_double_pick_up_tip(self):
-        self.p200.pick_up_tip()
-        self.assertRaises(AssertionError, self.p200.pick_up_tip)
-
-    def test_assert_on_drop_without_tip(self):
-        self.assertRaises(AssertionError, self.p200.drop_tip)
-
     def test_tip_tracking_chain_multi_channel(self):
         # TODO (ben 20171130): revise this test to make more sense in the
         # context of required tip pick_up/drop sequencing, etc.

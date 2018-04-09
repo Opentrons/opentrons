@@ -373,7 +373,8 @@ class Pipette:
         >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot aspirate without a tip attached.")
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -474,7 +475,8 @@ class Pipette:
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot dispense without a tip attached.")
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -512,7 +514,6 @@ class Pipette:
         Position this :any:`Pipette` for an aspiration,
         given it's current state
         """
-        assert self.tip_attached
 
         placeable = None
         if location:
@@ -546,7 +547,6 @@ class Pipette:
         """
         Position this :any:`Pipette` for an dispense
         """
-        assert self.tip_attached
 
         if location:
             if isinstance(location, Placeable):
@@ -621,7 +621,8 @@ class Pipette:
         >>> p200.mix(3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot mix without a tip attached.")
 
         if volume is None:
             volume = self.max_volume
@@ -667,7 +668,8 @@ class Pipette:
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot 'blow out' without a tip attached.")
 
         self.move_to(location)
         self.robot.poses = self.instrument_actuator.move(
@@ -719,7 +721,8 @@ class Pipette:
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot touch tip without a tip attached.")
 
         height_offset = 0
 
@@ -788,7 +791,8 @@ class Pipette:
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot perform air_gap without a tip attached.")
 
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
@@ -836,7 +840,8 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot return tip without tip attached.")
 
         if not self.current_tip():
             self.robot.add_warning(
@@ -894,7 +899,8 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert not self.tip_attached
+        if self.tip_attached:
+            log.warning("There is already a tip attached to this pipette.")
 
         if not location:
             location = self.get_next_tip()
@@ -988,7 +994,8 @@ class Pipette:
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot drop tip without a tip attached.")
 
         if not location and self.trash_container:
             location = self.trash_container
@@ -1734,26 +1741,26 @@ class Pipette:
         return pose_tree
 
     def _add_tip(self, length):
-        assert not self.tip_attached
-        x, y, z = pose_tracker.change_base(
-            self.robot.poses,
-            src=self,
-            dst=self.mount)
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses, self, pose_tracker.Point(
-                x, y, z - length))
-        self.tip_attached = True
+        if not self.tip_attached:
+            x, y, z = pose_tracker.change_base(
+                self.robot.poses,
+                src=self,
+                dst=self.mount)
+            self.robot.poses = pose_tracker.update(
+                self.robot.poses, self, pose_tracker.Point(
+                    x, y, z - length))
+            self.tip_attached = True
 
     def _remove_tip(self, length):
-        assert self.tip_attached
-        x, y, z = pose_tracker.change_base(
-            self.robot.poses,
-            src=self,
-            dst=self.mount)
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses, self, pose_tracker.Point(
-                x, y, z + length))
-        self.tip_attached = False
+        if self.tip_attached:
+            x, y, z = pose_tracker.change_base(
+                self.robot.poses,
+                src=self,
+                dst=self.mount)
+            self.robot.poses = pose_tracker.update(
+                self.robot.poses, self, pose_tracker.Point(
+                    x, y, z + length))
+            self.tip_attached = False
 
     def _max_deck_height(self):
         mount_max_height = self.instrument_mover.axis_maximum(
