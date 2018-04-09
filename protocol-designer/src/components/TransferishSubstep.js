@@ -15,7 +15,6 @@ export type StepSubItemProps = {|
 |}
 
 type MultiChannelSubstepProps = {
-  groupKey: number,
   volume: ?string,
   rowGroup: Array<StepItemSourceDestRowMulti>,
   sourceIngredientName: ?string,
@@ -44,7 +43,6 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const {
       volume,
       rowGroup,
-      groupKey,
       sourceIngredientName
       // destIngredientName
     } = this.props
@@ -55,7 +53,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const collapsed = this.state.collapsed
 
     return (
-      <ol key={groupKey}>
+      <ol>
         {/* TODO special class for this substep subheader thing?? */}
         <li className={styles.step_subitem}>
           <span>{sourceIngredientName}</span>
@@ -64,7 +62,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
           <span className={styles.emphasized_cell}>{destWellRange}</span>
           {/* <span>{destIngredientName}</span> */}
           <span className={styles.inner_carat} onClick={() => this.handleToggleCollapsed()}>
-            <Icon name={collapsed ? 'chevron-down' : 'chevron-right'} />
+            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
           </span>
         </li>
 
@@ -91,7 +89,7 @@ export default function TransferishSubstep (props: StepSubItemProps) {
     return <li>
       {substeps.multiRows.map((rowGroup, groupKey) =>
         <MultiChannelSubstep
-          groupKey={groupKey}
+          key={groupKey}
           rowGroup={rowGroup}
           volume={typeof substeps.volume === 'number'
             ? parseFloat(substeps.volume.toFixed(VOLUME_DIGITS)).toString()
