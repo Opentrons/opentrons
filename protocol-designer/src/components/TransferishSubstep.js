@@ -99,7 +99,7 @@ export default function TransferishSubstep (props: StepSubItemProps) {
           key={groupKey}
           rowGroup={rowGroup}
           volume={typeof substeps.volume === 'number'
-            ? parseFloat(substeps.volume.toFixed(VOLUME_DIGITS)).toString()
+            ? substeps.volume.toFixed(VOLUME_DIGITS)
             : null
           }
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
