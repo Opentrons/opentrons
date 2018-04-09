@@ -69,11 +69,15 @@
   display: flex;
   padding: 0.5rem;
   font-size: var(--fs-body-1);
-  text-align: center;
+  text-align: left;
+
+  & .spacer {
+    flex: 1;
+  }
 }
 
 .aspirate_dispense * {
-  flex: 1;
+  flex: 2;
 }
 
 /* Multi-channel row representing a single channel */
