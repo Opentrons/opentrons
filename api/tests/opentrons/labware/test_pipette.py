@@ -3,6 +3,7 @@
 import unittest
 from unittest import mock
 from opentrons.robot.robot import Robot
+from opentrons import instruments
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
 # from opentrons.util.vector import Vector
@@ -166,6 +167,36 @@ def test_dispense_move_to(robot):
 
     current_pos = pose_tracker.absolute(robot.poses, p200)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
+
+
+def test_delay_calls(monkeypatch):
+    from opentrons import robot
+    from opentrons.instruments import pipette
+    robot.reset()
+    p200 = instruments.P300_Single(mount='right')
+
+    cmd = []
+
+    def mock_pause():
+        nonlocal cmd
+        cmd.append('pause')
+
+    def mock_resume():
+        nonlocal cmd
+        cmd.append('resume')
+
+    def mock_sleep(seconds):
+        cmd.append("sleep {}".format(seconds))
+
+    monkeypatch.setattr(robot, 'pause', mock_pause)
+    monkeypatch.setattr(robot, 'resume', mock_resume)
+    monkeypatch.setattr(pipette, '_sleep', mock_sleep)
+
+    p200.delay(seconds=4, minutes=1)
+
+    assert 'pause' in cmd
+    assert 'sleep 64' in cmd
+    assert 'resume' in cmd
 
 
 class PipetteTest(unittest.TestCase):
@@ -452,20 +483,6 @@ class PipetteTest(unittest.TestCase):
     #         current_pos,
     #         {'a': 0, 'b': 10.0}
     #     )
-
-    def test_delay(self):
-        self.p200.delay(1)
-
-        self.assertEqual(
-            self.robot.commands()[-1],
-            "Delaying for 0m 1s")
-
-        self.robot.clear_commands()
-        self.p200.delay(seconds=12, minutes=10)
-
-        self.assertEqual(
-            self.robot.commands()[-1],
-            "Delaying for 10m 12s")
 
     def test_set_speed(self):
         self.p200.set_speed(aspirate=100)

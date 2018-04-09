@@ -1,6 +1,7 @@
 import itertools
 import warnings
 import logging
+import time
 
 from opentrons import commands
 from opentrons.containers import unpack_location
@@ -31,6 +32,10 @@ DEFAULT_PLUNGE_CURRENT = 0.1
 
 SHAKE_OFF_TIPS_SPEED = 50
 SHAKE_OFF_TIPS_DISTANCE = 2
+
+
+def _sleep(seconds):
+    time.sleep(seconds)
 
 
 class PipetteTip:
@@ -1301,14 +1306,16 @@ class Pipette:
         ----------
 
         seconds: float
-            The number of seconds to freeeze in place.
+            The number of seconds to freeze in place.
         """
 
         minutes += int(seconds / 60)
         seconds = seconds % 60
         seconds += float(minutes * 60)
 
-        self.instrument_actuator.delay(seconds)
+        self.robot.pause()
+        _sleep(seconds)
+        self.robot.resume()
 
         return self
 
