@@ -17,7 +17,7 @@ import type {
 
 import type {PipetteData} from '../step-generation/types'
 
-type AllPipetteData = {[pipetteId: string]: ?PipetteData} // TODO make general type, key by ID not mount?
+type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
 type AllLabwareTypes = {[labwareId: string]: string}
 
 function _transferSubsteps (
