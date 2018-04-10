@@ -1,7 +1,9 @@
 """
 Z-Stage Subassembly Test:
-Travel 3x full z-stage motions @ max machine speed using 80% current. Record for any lost steps
-Travel 3x full z-stage motions @ min pickup tip current *80% current @ pickup tip speed. Record for any lost steps
+Travel 3x full z-stage motions @ max machine speed using 80% current.
+Record for any lost steps
+Travel 3x full z-stage motions @ min pickup tip current *80% current
+    @ pickup tip speed. Record for any lost steps
 
 
 Author: Carlos Fernandez
@@ -11,18 +13,15 @@ QC Gantry Test
 """
 
 import atexit
-import os, sys
-import time
-import datetime
 import optparse
 
-from colorama import init, Fore, Back, Style
+from colorama import Fore, Style
 
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 
-def setup(motor_current, max_speed ):
+def setup(motor_current, max_speed):
     robot._driver.set_current({"Z": motor_current, "A": motor_current})
     robot._driver.set_axis_max_speed({'Z': max_speed, 'A': max_speed})
     robot._driver.set_speed(max_speed)
@@ -31,20 +30,20 @@ def setup(motor_current, max_speed ):
 def pick_up_motion(max_dist, max_speed, low_speed):
     zero = 100
     zero_1 = 5
-    
-    #Descent Z z to 100mm
+
+    # Descent Z z to 100mm
     setup(options.high_current, max_speed)
     robot._driver.set_speed(max_speed)
     robot._driver.move({'Z': zero, 'A': zero})
-    #Press Action
+    # Press Action
     setup(options.low_current, max_speed)
     robot._driver.set_speed(low_speed)
     robot._driver.move({'Z': zero_1, 'A': zero_1})
-    #Retract Action
+    # Retract Action
     setup(options.high_current, max_speed)
     robot._driver.set_speed(max_speed)
     robot._driver.move({'Z': zero, 'A': zero})
-    #Jog up
+    # Jog up
     robot._driver.set_speed(max_speed)
     robot._driver.move({'Z': max_dist, 'A': max_dist})
 
@@ -68,10 +67,10 @@ def test_axis(axis, tolerance):
     except SmoothieError:
         raise Exception('Test Failed: Pressing too soon')
     if axis == 'Y':
-        if robot._driver.switch_state[axis] != False:
+        if robot._driver.switch_state[axis] is not False:
             raise Exception('Test Failed: Pressing too soon')
         robot._driver.move({axis: points[1]})
-        if robot._driver.switch_state[axis] != True:
+        if robot._driver.switch_state[axis] is not True:
             raise Exception('Test Failed: Not hitting switch')
     else:
         try:
@@ -80,7 +79,7 @@ def test_axis(axis, tolerance):
         except SmoothieError:
             pass
     robot._driver.pop_speed()
-     
+
 
 def _exit_test():
     robot._driver._smoothie_reset()
@@ -89,10 +88,7 @@ def _exit_test():
     print(Style.RESET_ALL)
 
 
-if __name__ == '__main__':
-
-    atexit.register(_exit_test)
-
+def get_options():
     parser = optparse.OptionParser(usage='usage: %prog [options] ')
     parser.add_option(
         "-m",
@@ -127,7 +123,7 @@ if __name__ == '__main__':
         dest="low_current",
         type="float",
         default=0.05,
-        help="low z motor current")    
+        help="low z motor current")
     parser.add_option(
         "-c",
         "--cycles",
@@ -142,30 +138,37 @@ if __name__ == '__main__':
         type="float",
         default=0.5,
         help="Axis tolerance in millimeters")
-    options, args = parser.parse_args(args=None, values=None)
-    
+    return parser.parse_args(args=None, values=None)
+
+
+def run_z_stage():
+    for cycle in range(options.cycles):
+        pick_up_motion(options.distance, options.max_speed, 30)
+        try:
+            print(Fore.CYAN + "Testing Z")
+            test_axis('Z', options.tolerance)
+        except Exception as e:
+            print(Fore.RED + "FAIL: {}".format(e))
+        try:
+            print(Fore.CYAN + "Testing A")
+            test_axis('A', options.tolerance)
+        except Exception as e:
+            print(Fore.RED + "FAIL: {}".format(e))
+
+
+if __name__ == '__main__':
+    atexit.register(_exit_test)
+    options, args = get_options()
     try:
         robot.connect()
         print(Fore.CYAN + "In Progress.. ")
         setup(options.high_current, options.max_speed)
         robot._driver.home("ZA")
-        for cycle in range(options.cycles):
-            pick_up_motion(options.distance, options.max_speed, 30)
-            try:
-                print(Fore.CYAN + "Testing Z")
-                test_axis('Z', options.tolerance)
-            except Exception as e:
-                print(Fore.RED + "FAIL: {}".format(e))
-            try:
-                print(Fore.CYAN + "Testing A")
-                test_axis('A', options.tolerance)
-            except Exception as e:
-                print(Fore.RED + "FAIL: {}".format(e))
-        
+        run_z_stage()
     except KeyboardInterrupt:
         print(Fore.YELLOW + "Test Cancelled")
         exit()
     except Exception as e:
         print(Fore.RED + "FAIL: {}".format(e))
-        exit()  
+        exit()
     print(Style.BRIGHT + Fore.GREEN + "PASS")

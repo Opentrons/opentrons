@@ -9,19 +9,14 @@ Author: Carlos Fernandez
 """
 
 import atexit
-import time
-import collections
-import datetime
-import serial
 import optparse
-import os, sys
-from colorama import init, Fore, Back, Style
+from colorama import Fore, Style
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 
-def setup(motor_current, max_speed ):
-    robot._driver.set_current({'X': motor_current, 'Y': motor_current + 0.2 })
+def setup(motor_current, max_speed):
+    robot._driver.set_current({'X': motor_current, 'Y': motor_current + 0.2})
     robot._driver.set_axis_max_speed({'X': max_speed, 'Y': max_speed})
     robot._driver.set_speed(max_speed)
 
@@ -29,20 +24,19 @@ def setup(motor_current, max_speed ):
 def bowtie_pattern(X_max, Y_max):
     zero = 10
     offset = 5
-    y_offset = 20
-    robot._driver.move({'X': zero,'Y': zero + offset})
-    robot._driver.move({'X': zero,'Y': Y_max})
-    robot._driver.move({'X': X_max,'Y': zero})
-    robot._driver.move({'X': X_max,'Y': Y_max})
+    robot._driver.move({'X': zero, 'Y': zero + offset})
+    robot._driver.move({'X': zero, 'Y': Y_max})
+    robot._driver.move({'X': X_max, 'Y': zero})
+    robot._driver.move({'X': X_max, 'Y': Y_max})
 
 
 def hourglass_pattern(X_max, Y_max):
     zero = 10
     offset = 5
-    robot._driver.move({'X': zero,'Y': zero + offset})
-    robot._driver.move({'X': X_max,'Y': zero + offset})
-    robot._driver.move({'X': zero,'Y': Y_max})
-    robot._driver.move({'X': X_max,'Y': Y_max})
+    robot._driver.move({'X': zero, 'Y': zero + offset})
+    robot._driver.move({'X': X_max, 'Y': zero + offset})
+    robot._driver.move({'X': zero, 'Y': Y_max})
+    robot._driver.move({'X': X_max, 'Y': Y_max})
 
 
 def test_axis(axis, tolerance):
@@ -58,7 +52,7 @@ def test_axis(axis, tolerance):
     retract = retract_amounts[axis]
     expected_point = robot._driver.homed_position[axis] + retract
     points = [expected_point - tolerance, expected_point + tolerance]
-    #expected_point = home_position + retract
+    # expected_point = home_position + retract
     # safe distance from switch?
     robot._driver.push_speed()
     robot._driver.set_speed(10)
@@ -67,10 +61,10 @@ def test_axis(axis, tolerance):
     except SmoothieError:
         raise Exception('Test Failed: Pressing too soon')
     if axis == 'Y':
-        if robot._driver.switch_state[axis] != False:
+        if robot._driver.switch_state[axis] is not False:
             raise Exception('Test Failed: Pressing too soon')
         robot._driver.move({axis: points[1]})
-        if robot._driver.switch_state[axis] != True:
+        if robot._driver.switch_state[axis] is not True:
             raise Exception('Test Failed: Not hitting switch')
     else:
         try:
@@ -79,6 +73,32 @@ def test_axis(axis, tolerance):
         except SmoothieError:
             pass
     robot._driver.pop_speed()
+
+
+def run_x_axis():
+    # Test X Axis
+    for cycle in range(cycles):
+        print(Fore.CYAN + "Testing X")
+        setup(1.2, 600)
+        hourglass_pattern(b_x_max, b_y_max)
+        try:
+            test_axis('X', options.tolerance)
+        except Exception as e:
+            print(Fore.RED + "FAIL: {}".format(e))
+
+
+def run_y_axis():
+    # Test Y Axis
+    for cycle in range(cycles):
+        print(Fore.CYAN + "Testing Y")
+        setup(1.2, 600)
+        bowtie_pattern(b_x_max, b_y_max)
+        try:
+            test_axis('Y', options.tolerance)
+        except Exception as e:
+            print(Fore.RED + "FAIL: {}".format(e))
+        finally:
+            robot._driver.home('Y')  # we tell it to home Y manually
 
 
 def _exit_test():
@@ -105,31 +125,12 @@ if __name__ == '__main__':
     b_y_max = 320
 
     cycles = 3
-    
+
     try:
         robot.connect()
         robot.home()
-        #Test X Axis
-        for cycle in range(cycles):
-            print(Fore.CYAN + "Testing X")
-            setup(1.2, 600)
-            hourglass_pattern(b_x_max, b_y_max)
-            try:
-                test_axis('X', options.tolerance)
-            except Exception as e:
-                print(Fore.RED + "FAIL: {}".format(e))
-            
-        #Test Y Axis
-        for cycle in range(cycles):
-            print(Fore.CYAN + "Testing Y")
-            setup(1.2, 600)
-            bowtie_pattern(b_x_max, b_y_max)
-            try:
-                test_axis('Y', options.tolerance)
-            except Exception as e:
-                print(Fore.RED + "FAIL: {}".format(e))
-            finally:
-                robot._driver.home('Y')  # we tell it to home Y manually
+        run_x_axis()
+        run_y_axis()
     except KeyboardInterrupt:
         print(Fore.YELLOW + "Test Cancelled")
         robot._driver.turn_on_blue_button_light()
@@ -137,6 +138,6 @@ if __name__ == '__main__':
     except Exception as e:
         robot._driver.turn_on_red_button_light()
         print(Fore.RED + "FAIL: {}".format(e))
-        
+
     robot._driver._set_button_light(red=False, green=True, blue=False)
     print(Style.BRIGHT + Fore.GREEN + "PASS")
