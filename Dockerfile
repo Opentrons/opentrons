@@ -57,7 +57,7 @@ RUN apk add --update \
 # site-packages and cleaning up the one created by python3 package.
 RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
-RUN pip install pipenv==9.0.3 jupyter
+RUN pip install pipenv==9.0.3 jupyter colorama
 
 # Copy server files and data into the container. Note: any directories that
 # you wish to copy into the container must be excluded from the .dockerignore
