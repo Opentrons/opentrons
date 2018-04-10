@@ -1,5 +1,14 @@
 @import '@opentrons/components';
 
+:root {
+
+  --bg-modal-transparent: {
+    max-width: 30rem;
+    padding-top: 3rem;
+    background-color: transparent;
+  };
+}
+
 .alert_list {
   list-style-type: none;
   padding-left: 3rem;
@@ -40,12 +49,24 @@
   border-radius: 0.5rem;
 }
 
+.in_progress_contents {
+  @apply --bg-modal-transparent;
+  @apply --font-body-2-light;
+  @apply --center-children;
+
+  flex-direction: column;
+  font-style: italic;
+  text-align: center;
+}
+
+.in_progress_icon {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}
+
 .confirm_pipette_contents {
   @apply --font-header-light;
-
-  max-width: 30rem;
-  padding-top: 3rem;
-  background-color: transparent;
+  @apply --bg-modal-transparent;
 }
 
 .confirm_status {
