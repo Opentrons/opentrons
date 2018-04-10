@@ -4,7 +4,7 @@ import * as React from 'react'
 import styles from './styles.css'
 
 type Props = {
-  name: ?string,
+  name?: string,
 }
 
 export default function AttachPipetteTitle (props: Props) {
