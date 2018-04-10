@@ -28,7 +28,7 @@
     cursor: pointer;
     color: var(--c-font-dark);
     background: transparent;
-    border-radius: 2px;
+    border-radius: var(--bd-radius-default);
 
     &:hover {
       background-color: color(var(--c-bg-light) shade(5%));
