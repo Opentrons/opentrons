@@ -59,7 +59,19 @@ function ChangePipette (props: OP & SP & DP) {
 
   return (
     <Switch>
-      <Route exact path={baseUrl} component={SelectPipette} />
+      <Route exact path={baseUrl} render={() => (
+        <TitledModal
+          title={TITLE}
+          subtitle={subtitle}
+          onBackClick={props.close}
+        >
+          <AttachPipetteTitle />
+          <PipetteSelection
+            options={PIPETTES}
+            onChange={onPipetteSelect}
+          />
+        </TitledModal>
+      )} />
       <Route path={`${baseUrl}/:model`} render={(routeProps) => {
         const {match: {url: urlWithModel, params: {model}}} = routeProps
         const pipette = PIPETTES.find((p) => p.value === model)
@@ -107,22 +119,6 @@ function ChangePipette (props: OP & SP & DP) {
       }} />
     </Switch>
   )
-
-  function SelectPipette () {
-    return (
-      <TitledModal
-        title={TITLE}
-        subtitle={subtitle}
-        onBackClick={props.close}
-      >
-        <AttachPipetteTitle />
-        <PipetteSelection
-          options={PIPETTES}
-          onChange={onPipetteSelect}
-        />
-      </TitledModal>
-    )
-  }
 }
 
 function mapStateToProps (state: State, ownProps: OP): SP {
