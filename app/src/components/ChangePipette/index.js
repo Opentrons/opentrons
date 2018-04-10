@@ -14,6 +14,7 @@ import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
 import AttachPipetteInstructions from './AttachPipetteInstructions'
 import CheckPipettesButton from './CheckPipettesButton'
 import ConfirmPipette from './ConfirmPipette'
+import RequestInProgressModal from './RequestInProgressModal'
 
 type OP = {
   robot: Robot,
@@ -50,12 +51,26 @@ const PIPETTES = [
 export default connect(mapStateToProps, mapDispatchToProps)(ChangePipette)
 
 function ChangePipette (props: OP & SP & DP) {
-  const {mount, baseUrl, closeUrl, onPipetteSelect} = props
+  const {mount, baseUrl, closeUrl, onPipetteSelect, moveToFrontRequest} = props
   const subtitle = `${mount} carriage`
+  const progressMessage = mount === 'right'
+    ? 'Right pipette carriage moving to front and left.'
+    : 'Left pipette carriage moving to front and right.'
 
   // if (!moveToFrontRequest.inProgress && !moveToFrontRequest.response) {
   //   return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
   // }
+
+  if (moveToFrontRequest.inProgress) {
+    return (
+      <RequestInProgressModal
+        title={TITLE}
+        subtitle={subtitle}
+        onBackClick={props.close}
+        mount={mount}
+        message={progressMessage}
+      />)
+  }
 
   return (
     <Switch>
