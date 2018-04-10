@@ -130,7 +130,8 @@ def _subprocess(cmd: str) -> (str, str):
     :param cmd: a command string to execute in a subprocess shell
     :return: (stdout, stderr)
     """
-    proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.run(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out = proc.stdout.decode().strip()
     err = proc.stderr.decode().strip()
     return out, err
