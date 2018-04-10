@@ -11,7 +11,7 @@ import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {getAllWellsForLabware} from '../../constants'
 import type {IngredInstance, WellContents, AllWellContents} from '../../labware-ingred/types'
-import type {ProcessedFormData} from '../../steplist/types'
+import type {ProcessedFormData, StepSubItemData} from '../../steplist/types'
 
 const all96Tips = reduce( // TODO Ian 2018-04-05 mapValues
   StepGeneration.tiprackWellNamesFlat,
@@ -288,11 +288,52 @@ function _getSelectedWellsForStep (
   return wells
 }
 
+/** Scan through given substep rows to get a list of source/dest wells for the given labware */
+function _getSelectedWellsForSubstep (
+  form: ProcessedFormData,
+  labwareId: string,
+  substeps: StepSubItemData | null,
+  substepId: number
+): Array<string> {
+  if (substeps === null) {
+    return []
+  }
+
+  function getWells (wellField): Array<string> {
+    if (substeps && substeps.rows && substeps.rows[substepId]) {
+      // single-channel
+      const well = substeps.rows[substepId][wellField]
+      return well ? [well] : []
+    }
+
+    if (substeps && substeps.multiRows && substeps.multiRows[substepId]) {
+      // multi-channel
+      return substeps.multiRows[substepId].reduce((acc, multiRow) => {
+        const well = multiRow[wellField]
+        return well ? [...acc, well] : acc
+      }, [])
+    }
+    return []
+  }
+
+  let wells: Array<string> = []
+  if (form.sourceLabware && form.sourceLabware === labwareId) {
+    wells.push(...getWells('sourceWell'))
+  }
+  if (form.destLabware && form.destLabware === labwareId) {
+    wells.push(...getWells('destWell'))
+  }
+
+  return wells
+}
+
 export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
   robotStateTimeline,
   steplistSelectors.validatedForms,
   steplistSelectors.hoveredStepId,
-  (_robotStateTimeline, _forms, _hoveredStepId) => {
+  steplistSelectors.getHoveredSubstep,
+  steplistSelectors.allSubsteps,
+  (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
     const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
     return liquidStateTimeline.map(
       (liquidState, timelineIdx) => mapValues(
@@ -303,10 +344,23 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
           const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
 
           const form = _forms[formIdx] && _forms[formIdx].validatedForm
-          const selectedWells = (form && _hoveredStepId === formIdx)
+
+          let selectedWells = []
+          if (form && _hoveredStepId === formIdx) {
             // only show selected wells when user is **hovering** over the step
-            ? _getSelectedWellsForStep(form, labwareId, robotState)
-            : []
+            if (_hoveredSubstep) {
+              // wells for hovered substep
+              selectedWells = _getSelectedWellsForSubstep(
+                form,
+                labwareId,
+                _allSubsteps[_hoveredSubstep.stepId],
+                _hoveredSubstep.substepId
+              )
+            } else {
+              // wells for step overall
+              selectedWells = _getSelectedWellsForStep(form, labwareId, robotState)
+            }
+          }
 
           return _wellContentsForLabware(
             labwareLiquids,

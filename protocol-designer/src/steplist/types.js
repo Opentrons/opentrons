@@ -25,7 +25,7 @@ export type StepType = $Keys<typeof stepIconsByType>
 export type StepIdType = number
 
 export type SubstepIdentifier = {|
-  stepId: string | number,
+  stepId: StepIdType,
   substepId: number
 |} | null
 
