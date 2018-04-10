@@ -40,6 +40,53 @@
   border-radius: 0.5rem;
 }
 
+.confirm_pipette_contents {
+  @apply --font-header-light;
+
+  max-width: 30rem;
+  padding-top: 3rem;
+  background-color: transparent;
+}
+
+.confirm_status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.confirm_icon {
+  display: inline-block;
+  width: 2.5rem;
+  margin-right: 0.75rem;
+
+  /* TODO(ka, 2018-04-09): this green doesn't match screens (#51B75F) */
+  &.success {
+    color: var(--c-green);
+  }
+
+  /* TODO(ka, 2018-04-09): this red doesn't match screens (#EA5A75) */
+  &.failure {
+    color: var(--c-red);
+  }
+}
+
+.confirm_diagram {
+  display: block;
+  margin: 1rem auto;
+  max-width: 100%;
+  width: 14rem;
+}
+
+.confirm_failure_instructions {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.confirm_button {
+  margin-bottom: 0.75rem;
+}
+
 .attach_pipette_title {
   @apply --font-header-dark;
 

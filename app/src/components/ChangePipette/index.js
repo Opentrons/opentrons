@@ -2,16 +2,18 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-import {Route} from 'react-router'
+import {Switch, Route, Redirect} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
 
 import TitledModal from './TitledModal'
 // import ClearDeckAlertModal from './ClearDeckAlertModal'
+import ExitAlertModal from './ExitAlertModal'
 import AttachPipetteTitle from './AttachPipetteTitle'
 import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
 import AttachPipetteInstructions from './AttachPipetteInstructions'
 import CheckPipettesButton from './CheckPipettesButton'
+import ConfirmPipette from './ConfirmPipette'
 
 type OP = {
   robot: Robot,
@@ -48,43 +50,74 @@ const PIPETTES = [
 export default connect(mapStateToProps, mapDispatchToProps)(ChangePipette)
 
 function ChangePipette (props: OP & SP & DP) {
-  const {mount, /* moveToFront, moveToFrontRequest, */ onPipetteSelect} = props
+  const {mount, baseUrl, closeUrl, onPipetteSelect} = props
+  const subtitle = `${mount} carriage`
 
   // if (!moveToFrontRequest.inProgress && !moveToFrontRequest.response) {
   //   return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
   // }
 
   return (
-    <Route path={`${props.baseUrl}/:model?`} render={(routeProps) => {
-      const {match: {url, params: {model}}} = routeProps
-      // TODO(mc, 2018-04-05): pull from external library
-      const pipette = PIPETTES.find((p) => p.value === model)
-      const onBackClick = pipette
-        ? props.back
-        : props.close
-
-      return (
+    <Switch>
+      <Route exact path={baseUrl} render={() => (
         <TitledModal
           title={TITLE}
-          subtitle={`${mount} carriage`}
-          onBackClick={onBackClick}
+          subtitle={subtitle}
+          onBackClick={props.close}
         >
-          <AttachPipetteTitle name={pipette && pipette.name} />
-          {!pipette && (
-            <PipetteSelection options={PIPETTES} onChange={onPipetteSelect} />
-          )}
-          {pipette && (
-            <AttachPipetteInstructions
-              mount={mount}
-              channels={pipette.channels}
-            />
-          )}
-          {pipette && (
-            <CheckPipettesButton url={`${url}/confirm`} />
-          )}
+          <AttachPipetteTitle />
+          <PipetteSelection
+            options={PIPETTES}
+            onChange={onPipetteSelect}
+          />
         </TitledModal>
-      )
-    }} />
+      )} />
+      <Route path={`${baseUrl}/:model`} render={(routeProps) => {
+        const {match: {url: urlWithModel, params: {model}}} = routeProps
+        const pipette = PIPETTES.find((p) => p.value === model)
+        const confirmUrl = `${urlWithModel}/confirm`
+        const exitUrl = `${urlWithModel}/exit`
+        const onBackClick = props.back
+
+        // guard against bad model strings
+        if (!pipette) return (<Redirect to={baseUrl} />)
+
+        return (
+          <Switch>
+            <Route path={exitUrl} render={() => (
+              <ExitAlertModal cancelUrl={confirmUrl} continueUrl={closeUrl} />
+            )} />
+            <Route path={confirmUrl} render={() => (
+              <ConfirmPipette
+                title={TITLE}
+                subtitle={subtitle}
+                onBackClick={onBackClick}
+                error={null}
+                direction='attach'
+                mount={mount}
+                exit={props.close}
+                exitUrl={exitUrl}
+                {...pipette}
+              />
+            )} />
+            <Route render={() => (
+              <TitledModal
+                title={TITLE}
+                subtitle={subtitle}
+                onBackClick={onBackClick}
+              >
+                <AttachPipetteTitle name={pipette.name} />
+                <AttachPipetteInstructions
+                  mount={mount}
+                  channels={pipette.channels}
+                />
+                <CheckPipettesButton url={confirmUrl} />
+              </TitledModal>
+            )} />
+          </Switch>
+        )
+      }} />
+    </Switch>
   )
 }
 
@@ -112,7 +145,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     // TODO(mc, 2018-04-04): implement
     moveToFront: () => {
       console.log('MOVE TO FRONT NOT IMPLEMENTED')
-      console.log(baseUrl)
       dispatch(push(changeUrl))
     }
   }

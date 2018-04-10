@@ -9,16 +9,19 @@ import styles from './styles.css'
 // TODO(mc, 2018-04-06): flow does not like numbers as object keys
 export type Channels = '1' | '8'
 
-type Direction = 'attach' | 'detach'
+export type Direction = 'attach' | 'detach'
 
 type Diagram = 'screws' | 'tab'
 
-type Props = {
-  step: 'one' | 'two',
+type DiagramProps = {
   direction: Direction,
   mount: Mount,
   channels: Channels,
   diagram: Diagram,
+}
+
+type Props = DiagramProps & {
+  step: 'one' | 'two',
   children: React.Node,
 }
 
@@ -72,8 +75,8 @@ const DIAGRAMS: {[Direction]: {[Mount]: {[Channels]: {[Diagram]: string}}}} = {
 }
 
 export default function InstructionStep (props: Props) {
-  const {direction, mount, channels, diagram} = props
-  const diagramSrc = DIAGRAMS[direction][mount][channels][diagram]
+  const {diagram} = props
+  const diagramSrc = getDiagramSrc(props)
 
   return (
     <fieldset className={styles.step}>
@@ -89,4 +92,10 @@ export default function InstructionStep (props: Props) {
       <img src={diagramSrc} className={styles.diagram} />
     </fieldset>
   )
+}
+
+export function getDiagramSrc (props: DiagramProps): string {
+  const {direction, mount, channels, diagram} = props
+
+  return DIAGRAMS[direction][mount][channels][diagram]
 }
