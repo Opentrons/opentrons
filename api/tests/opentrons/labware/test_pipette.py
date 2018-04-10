@@ -17,6 +17,22 @@ def test_pipette_models(robot):
     from opentrons import instruments, robot
 
     robot.reset()
+    p = instruments.P10_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 10
+    p = instruments.P10_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 10
+
+    robot.reset()
+    p = instruments.P50_Single(mount='left')
+    assert p.channels == 1
+    assert p.max_volume > 50
+    p = instruments.P50_Multi(mount='right')
+    assert p.channels == 8
+    assert p.max_volume > 50
+
+    robot.reset()
     p = instruments.P300_Single(mount='left')
     assert p.channels == 1
     assert p.max_volume > 300
@@ -25,12 +41,9 @@ def test_pipette_models(robot):
     assert p.max_volume > 300
 
     robot.reset()
-    p = instruments.P10_Single(mount='left')
+    p = instruments.P1000_Single(mount='left')
     assert p.channels == 1
-    assert p.max_volume > 10
-    p = instruments.P10_Multi(mount='right')
-    assert p.channels == 8
-    assert p.max_volume > 10
+    assert p.max_volume > 1000
 
 
 def test_pipette_max_deck_height(robot):
