@@ -69,7 +69,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
       <ol
         onMouseEnter={this.props.onMouseEnter}
         onMouseLeave={this.props.onMouseLeave}
-        className={highlighted ? styles.highlighted_substep : ''}
+        className={cx(styles.substep, {[styles.highlighted]: highlighted})}
       >
         {/* TODO special class for this substep subheader thing?? */}
         <li className={styles.step_subitem}>
@@ -140,7 +140,7 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
     <li key={substepId}
       className={cx(
         styles.step_subitem,
-        {[styles.highlighted_substep]:
+        {[styles.highlighted]:
           !!hoveredSubstep &&
           hoveredSubstep.stepId === substeps.parentStepId &&
           substepId === hoveredSubstep.substepId
