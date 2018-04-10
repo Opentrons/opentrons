@@ -89,8 +89,8 @@ p10_multi = pipette_config(
 p50_single = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
+        'bottom': 4,
+        'blow_out': 2,
         'drop_tip': -2.5
     },
     pick_up_current=0.1,
@@ -106,8 +106,8 @@ p50_single = pipette_config(
 p50_multi = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
+        'bottom': 4,
+        'blow_out': 2,
         'drop_tip': -4
     },
     pick_up_current=0.3,
