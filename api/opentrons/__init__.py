@@ -79,6 +79,42 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
+    def P50_Single(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
+
+        config = pipette_config.load('p50_single')
+
+        return self._create_pipette_from_config(
+            config=config,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
+    def P50_Multi(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
+
+        config = pipette_config.load('p50_multi')
+
+        return self._create_pipette_from_config(
+            config=config,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
     def P300_Single(
             self,
             mount,
@@ -106,6 +142,24 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None):
 
         config = pipette_config.load('p300_multi')
+
+        return self._create_pipette_from_config(
+            config=config,
+            mount=mount,
+            trash_container=trash_container,
+            tip_racks=tip_racks,
+            aspirate_flow_rate=aspirate_flow_rate,
+            dispense_flow_rate=dispense_flow_rate)
+
+    def P1000_Single(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None):
+
+        config = pipette_config.load('p1000_single')
 
         return self._create_pipette_from_config(
             config=config,

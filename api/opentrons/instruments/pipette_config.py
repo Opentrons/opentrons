@@ -55,9 +55,9 @@ pipette_config = namedtuple(
 p10_single = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 2,
-        'blow_out': 0,
-        'drop_tip': -6
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -72,9 +72,9 @@ p10_single = pipette_config(
 p10_multi = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 2,
-        'blow_out': 0,
-        'drop_tip': -6
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -5
     },
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -86,12 +86,46 @@ p10_multi = pipette_config(
     tip_length=40  # TODO (andy): remove from pipette, move to tip-rack
 )
 
+p50_single = pipette_config(
+    plunger_positions={
+        'top': 18,
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -2.5
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
+    ul_per_mm=3.08,
+    channels=1,
+    name='p50_single',
+    model_offset=(0.0, 0.0, Z_OFFSET_P50),
+    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
+)
+
+p50_multi = pipette_config(
+    plunger_positions={
+        'top': 18,
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -4
+    },
+    pick_up_current=0.3,
+    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
+    ul_per_mm=3.08,
+    channels=8,
+    name='p50_multi',
+    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
+)
+
 p300_single = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 2,
-        'blow_out': 0,
-        'drop_tip': -3.5
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -2.5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -106,9 +140,9 @@ p300_single = pipette_config(
 p300_multi = pipette_config(
     plunger_positions={
         'top': 18,
-        'bottom': 2,
-        'blow_out': 0,
-        'drop_tip': -5
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -4
     },
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -120,12 +154,32 @@ p300_multi = pipette_config(
     tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
 )
 
+p1000_single = pipette_config(
+    plunger_positions={
+        'top': 18,
+        'bottom': 3,
+        'blow_out': 1,
+        'drop_tip': -2.5
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
+    ul_per_mm=61.69,
+    channels=1,
+    name='p1000_single',
+    model_offset=(0.0, 0.0, Z_OFFSET_P1000),
+    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
+)
+
 
 configs = {
     'p10_single': p10_single,
     'p10_multi': p10_multi,
+    'p50_single': p50_single,
+    'p50_multi': p50_multi,
     'p300_single': p300_single,
-    'p300_multi': p300_multi
+    'p300_multi': p300_multi,
+    'p1000_single': p1000_single
 }
 
 
