@@ -10,7 +10,6 @@ Author: Carlos Fernandez
 
 import atexit
 import optparse
-from colorama import Fore, Style
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
@@ -78,25 +77,25 @@ def test_axis(axis, tolerance):
 def run_x_axis():
     # Test X Axis
     for cycle in range(cycles):
-        print(Fore.CYAN + "Testing X")
+        print("Testing X")
         setup(1.2, 600)
         hourglass_pattern(b_x_max, b_y_max)
         try:
             test_axis('X', options.tolerance)
         except Exception as e:
-            print(Fore.RED + "FAIL: {}".format(e))
+            print("FAIL: {}".format(e))
 
 
 def run_y_axis():
     # Test Y Axis
     for cycle in range(cycles):
-        print(Fore.CYAN + "Testing Y")
+        print("Testing Y")
         setup(1.2, 600)
         bowtie_pattern(b_x_max, b_y_max)
         try:
             test_axis('Y', options.tolerance)
         except Exception as e:
-            print(Fore.RED + "FAIL: {}".format(e))
+            print("FAIL: {}".format(e))
         finally:
             robot._driver.home('Y')  # we tell it to home Y manually
 
@@ -105,7 +104,6 @@ def _exit_test():
     robot._driver._smoothie_reset()
     robot._driver._setup()
     robot._driver.disengage_axis('XYZABC')
-    print(Style.RESET_ALL)
 
 
 if __name__ == '__main__':
@@ -132,12 +130,12 @@ if __name__ == '__main__':
         run_x_axis()
         run_y_axis()
     except KeyboardInterrupt:
-        print(Fore.YELLOW + "Test Cancelled")
+        print("Test Cancelled")
         robot._driver.turn_on_blue_button_light()
         exit()
     except Exception as e:
         robot._driver.turn_on_red_button_light()
-        print(Fore.RED + "FAIL: {}".format(e))
+        print("FAIL: {}".format(e))
 
     robot._driver._set_button_light(red=False, green=True, blue=False)
-    print(Style.BRIGHT + Fore.GREEN + "PASS")
+    print("PASS")

@@ -15,8 +15,6 @@ QC Gantry Test
 import atexit
 import optparse
 
-from colorama import Fore, Style
-
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
@@ -85,7 +83,6 @@ def _exit_test():
     robot._driver._smoothie_reset()
     robot._driver._setup()
     robot._driver.disengage_axis('XYZABC')
-    print(Style.RESET_ALL)
 
 
 def get_options():
@@ -145,15 +142,15 @@ def run_z_stage():
     for cycle in range(options.cycles):
         pick_up_motion(options.distance, options.max_speed, 30)
         try:
-            print(Fore.CYAN + "Testing Z")
+            print("Testing Z")
             test_axis('Z', options.tolerance)
         except Exception as e:
-            print(Fore.RED + "FAIL: {}".format(e))
+            print("FAIL: {}".format(e))
         try:
-            print(Fore.CYAN + "Testing A")
+            print("Testing A")
             test_axis('A', options.tolerance)
         except Exception as e:
-            print(Fore.RED + "FAIL: {}".format(e))
+            print("FAIL: {}".format(e))
 
 
 if __name__ == '__main__':
@@ -161,14 +158,14 @@ if __name__ == '__main__':
     options, args = get_options()
     try:
         robot.connect()
-        print(Fore.CYAN + "In Progress.. ")
+        print("In Progress.. ")
         setup(options.high_current, options.max_speed)
         robot._driver.home("ZA")
         run_z_stage()
     except KeyboardInterrupt:
-        print(Fore.YELLOW + "Test Cancelled")
+        print("Test Cancelled")
         exit()
     except Exception as e:
-        print(Fore.RED + "FAIL: {}".format(e))
+        print("FAIL: {}".format(e))
         exit()
-    print(Style.BRIGHT + Fore.GREEN + "PASS")
+    print("PASS")
