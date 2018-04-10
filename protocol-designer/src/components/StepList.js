@@ -4,24 +4,26 @@ import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
-import {END_STEP, type StepItemData, type StepSubItemData, type StepIdType} from '../steplist/types'
+import {END_STEP} from '../steplist/types'
+import type {StepItemData, StepSubItemData, StepIdType, SubstepIdentifier} from '../steplist/types'
+
 import StepItem from '../components/StepItem'
 import TransferishSubstep from '../components/TransferishSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
 
-// import styles from '../components/StepItem.css' // TODO: Ian 2018-01-11 This is just for "Labware & Ingredient Setup" right now, can remove later
-
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
 type StepListProps = {
-  selectedStepId?: StepIdTypeWithEnd,
+  selectedStepId: StepIdTypeWithEnd | null,
+  hoveredSubstep: SubstepIdentifier,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
+  handleSubstepHover: SubstepIdentifier => mixed,
   handleStepItemClickById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
-  handleStepItemCollapseToggleById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
-  handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed
+  handleStepItemCollapseToggleById?: (StepIdType) => (event?: SyntheticEvent<>) => mixed,
+  handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed,
 }
 
-function generateSubstepItems (substeps) {
+function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
   if (!substeps) {
     // no substeps, form is probably not finished (or it's "deck-setup" stepType)
     return null
@@ -32,7 +34,11 @@ function generateSubstepItems (substeps) {
     substeps.stepType === 'distribute'
   ) {
     // all these step types share the same substep display
-    return <TransferishSubstep substeps={substeps} />
+    return <TransferishSubstep
+      substeps={substeps}
+      hoveredSubstep={hoveredSubstep}
+      onSelectSubstep={onSelectSubstep} // TODO use action
+    />
   }
 
   if (substeps.stepType === 'pause') {
@@ -62,7 +68,10 @@ export default function StepList (props: StepListProps) {
               ? null // Deck Setup steps are not collapsible
               : props.handleStepItemCollapseToggleById(step.id)
           }
-          selected={!isNil(props.selectedStepId) && step.id === props.selectedStepId}
+          selected={
+            props.hoveredSubstep === null && // don't show selected border on the Step when there's a Substep being hovered
+            !isNil(props.selectedStepId) && step.id === props.selectedStepId
+          }
           {...pick(step, [
             'title',
             'stepType',
@@ -74,7 +83,7 @@ export default function StepList (props: StepListProps) {
             'collapsed'
           ])}
         >
-          {generateSubstepItems(step.substeps)}
+          {generateSubstepItems(step.substeps, props.handleSubstepHover, props.hoveredSubstep)}
         </StepItem>
       ))}
 

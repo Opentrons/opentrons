@@ -24,6 +24,11 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type StepIdType = number
 
+export type SubstepIdentifier = {|
+  stepId: string | number,
+  substepId: number
+|} | null
+
 export type StepItemSourceDestRow = {|
   substepId: number, // TODO should this be a string or is this ID properly a number?
   sourceIngredientName?: string,
