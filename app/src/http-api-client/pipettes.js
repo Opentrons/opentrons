@@ -15,7 +15,7 @@ export type Pipette = {
   plunger_axis: string,
 }
 
-type PipettesResponse = {
+export type PipettesResponse = {
   right: Pipette,
   left: Pipette,
 }
@@ -53,9 +53,6 @@ export type RobotPipettes = ApiCall<void, PipettesResponse>
 type PipettesState = {
   [robotName: string]: ?RobotPipettes
 }
-
-// DEBUG(mc, 2018-03-30): remove before merge
-global.fetchPipettes = fetchPipettes
 
 export function fetchPipettes (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
