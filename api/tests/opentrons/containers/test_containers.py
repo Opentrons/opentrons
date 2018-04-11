@@ -14,6 +14,8 @@ from opentrons.containers.placeable import (
     Well,
     Deck,
     Slot)
+from opentrons.config import feature_flags as ff
+from tests.opentrons import generate_plate
 
 
 def test_containers_create(user_definition_dirs, robot):
@@ -38,8 +40,9 @@ def test_containers_create(user_definition_dirs, robot):
 
     assert container_name in containers_list()
 
-    database.delete_container(container_name)
-    assert container_name not in containers_list()
+    if not ff.split_labware_definitions():
+        database.delete_container(container_name)
+        assert container_name not in containers_list()
 
 
 class ContainerTestCase(unittest.TestCase):
@@ -48,19 +51,6 @@ class ContainerTestCase(unittest.TestCase):
 
     def tearDown(self):
         del self.robot
-
-    def generate_plate(self, wells, cols, spacing, offset, radius):
-        c = Container()
-
-        for i in range(0, wells):
-            well = Well(properties={'radius': radius})
-            row, col = divmod(i, cols)
-            name = chr(row + ord('A')) + str(1 + col)
-            coordinates = (col * spacing[0] + offset[0],
-                           row * spacing[1] + offset[1],
-                           0)
-            c.add(well, name, coordinates)
-        return c
 
     def test_load_same_slot_force(self):
         container_name = '96-flat'
@@ -132,33 +122,33 @@ class ContainerTestCase(unittest.TestCase):
             ValueError, placeable.unpack_location, 1)
 
     def test_iterate_without_parent(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         self.assertRaises(
             Exception, next, c)
 
     def test_back_container_getitem(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         self.assertRaises(TypeError, c.__getitem__, (1, 1))
 
     def test_iterator(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         res = [well.coordinates() for well in c]
         expected = [(0, 0, 0), (5, 0, 0), (0, 5, 0), (5, 5, 0)]
 
         self.assertListEqual(res, expected)
 
     def test_next(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         well = c['A1']
-        expected = c.get_child_by_name('A2')
+        expected = c.get_child_by_name('B1')
 
         self.assertEqual(next(well), expected)
 
     def test_int_index(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         self.assertEqual(c[3], c.get_child_by_name('B2'))
-        self.assertEqual(c[1], c.get_child_by_name('A2'))
+        self.assertEqual(c[1], c.get_child_by_name('B1'))
 
     def test_named_well(self):
         deck = Deck()
@@ -174,7 +164,7 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEqual(deck['A1'][0]['Red'], red)
 
     def test_generate_plate(self):
-        c = self.generate_plate(
+        c = generate_plate(
             wells=96,
             cols=8,
             spacing=(10, 15),
@@ -188,7 +178,7 @@ class ContainerTestCase(unittest.TestCase):
     def test_coordinates(self):
         deck = Deck()
         slot = Slot()
-        plate = self.generate_plate(
+        plate = generate_plate(
             wells=96,
             cols=8,
             spacing=(10, 15),
@@ -216,7 +206,7 @@ class ContainerTestCase(unittest.TestCase):
     def test_well_from_center(self):
         deck = Deck()
         slot = Slot()
-        plate = self.generate_plate(
+        plate = generate_plate(
             wells=4,
             cols=2,
             spacing=(10, 10),

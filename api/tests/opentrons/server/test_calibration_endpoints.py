@@ -97,8 +97,11 @@ async def test_save_z(dc_session):
     await endpoints.save_z({})
 
     new_z = dc_session.z_value
+    print("=-> New Z: {}".format(new_z))
     pipette_z_offset = pipette_config.p10_single.model_offset[-1]
+    print("=-> Offset Z: {}".format(pipette_z_offset))
     expected_z = z_target - pipette_z_offset
+    print("=-> Expected Z: {}".format(expected_z))
     assert new_z == expected_z
 
 

@@ -111,9 +111,9 @@ def calibrate_bottom_flag(monkeypatch):
     monkeypatch.setattr(
         ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
 
-    ff.set_feature_flag('calibrate-to-bottom', 'true')
+    ff.set_feature_flag('calibrate-to-bottom', True)
     yield
-    monkeypatch.delenv('calibrate-to-bottom', '')
+    ff.set_feature_flag('calibrate-to-bottom', False)
 
 
 @pytest.fixture
@@ -122,9 +122,20 @@ def short_trash_flag(monkeypatch):
     monkeypatch.setattr(
         ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
 
-    ff.set_feature_flag('short-fixed-trash', 'true')
+    ff.set_feature_flag('short-fixed-trash', True)
     yield
-    monkeypatch.delenv('short-fixed-trash', '')
+    ff.set_feature_flag('short-fixed-trash', False)
+
+
+@pytest.fixture
+def split_labware_def(monkeypatch):
+    tmpd = tempfile.TemporaryDirectory()
+    monkeypatch.setattr(
+        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
+
+    ff.set_feature_flag('split-labware-def', True)
+    yield
+    ff.set_feature_flag('split-labware-def', False)
 
 # -----end feature flag fixtures-----------
 
