@@ -109,9 +109,7 @@ def test_robot_move_to(virtual_smoothie_env):
     robot.reset()
     robot.home()
     p300 = instruments.P300_Single(mount='right')
-    print("before")
     robot.move_to((robot._deck, (100, 0, 0)), p300)
-    print("after")
     assert isclose(
         pose_tracker.absolute(
             robot.poses,
