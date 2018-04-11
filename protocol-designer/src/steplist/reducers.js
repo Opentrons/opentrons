@@ -62,6 +62,9 @@ import type {LabwareData} from '../step-generation/types'
 // External selectors
 import {equippedPipettes} from '../file-data/selectors/pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+// import {allWellContentsForSteps} from '../file-data/selectors/commands' // TODO IMMEDIATELY this circular import breaks stuff FIXME
+
+const allWellContentsForSteps = () => ({}) // TODO HACK
 
 type FormState = FormData | null
 
@@ -333,9 +336,10 @@ const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSele
   validatedForms,
   equippedPipettes,
   labwareIngredSelectors.getLabware,
-  (_validatedForms, _pipetteData, _allLabware) => {
+  allWellContentsForSteps,
+  (_validatedForms, _pipetteData, _allLabware, _allWellContentsForSteps) => {
     const allLabwareTypes: {[labwareId: string]: string} = mapValues(_allLabware, (l: LabwareData) => l.type)
-    return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes)
+    return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes, _allWellContentsForSteps)
   }
 )
 

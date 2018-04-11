@@ -5,7 +5,7 @@ import styles from './Pill.css'
 
 type Props = {
   /** background color of pill (any CSS color string) */
-  color?: string,
+  color?: ?string,
   /** text black, instead of default white */
   invertTextColor?: ?boolean,
   /** additional class name */

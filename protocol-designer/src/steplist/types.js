@@ -29,10 +29,15 @@ export type SubstepIdentifier = {|
   substepId: number
 |} | null
 
+export type NamedIngred = {|
+  id: number,
+  name: string
+|}
+
 export type StepItemSourceDestRow = {|
   substepId: number, // TODO should this be a string or is this ID properly a number?
-  sourceIngredientName?: string,
-  destIngredientName?: string,
+  sourceIngredients?: Array<NamedIngred>,
+  destIngredients?: Array<NamedIngred>,
   sourceWell?: string,
   destWell?: string
 |}

@@ -2,7 +2,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 import last from 'lodash/last'
+import uniqBy from 'lodash/uniqBy'
+
 import {Icon} from '@opentrons/components'
+import IngredPill from './IngredPill'
 
 import styles from './StepItem.css'
 
@@ -19,8 +22,6 @@ export type StepSubItemProps = {|
 type MultiChannelSubstepProps = {|
   volume: ?string,
   rowGroup: Array<StepItemSourceDestRowMulti>,
-  sourceIngredientName: ?string,
-  destIngredientName: ?string,
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
@@ -48,9 +49,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
     const {
       volume,
       rowGroup,
-      highlighted,
-      sourceIngredientName
-      // destIngredientName
+      highlighted
     } = this.props
 
     const lastGroupSourceWell = last(rowGroup).sourceWell
@@ -73,7 +72,13 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
       >
         {/* TODO special class for this substep subheader thing?? */}
         <li className={styles.step_subitem}>
-          <span>{sourceIngredientName}</span>
+          <IngredPill ingreds={uniqBy(
+            rowGroup.reduce((acc, row) => (row.sourceIngredients)
+              ? [...acc, ...row.sourceIngredients]
+              : acc,
+            []),
+            ingred => ingred.id
+          )}>{'TODO'}</IngredPill>
           <span className={styles.emphasized_cell}>{sourceWellRange}</span>
           <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
           <span className={styles.emphasized_cell}>{destWellRange}</span>
@@ -86,11 +91,11 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
         {!collapsed && rowGroup.map((row, rowKey) =>
           // Channel rows (1 for each channel in multi-channel pipette)
           <li className={styles.step_subitem_channel_row} key={rowKey}>
-            <span>{row.sourceIngredientName}</span>
+            <IngredPill ingreds={row.sourceIngredients} />
             <span className={styles.emphasized_cell}>{row.sourceWell}</span>
             <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
             <span className={styles.emphasized_cell}>{row.destWell}</span>
-            <span>{row.destIngredientName}</span>
+            <IngredPill ingreds={row.destIngredients} />
           </li>
       )}
       </ol>
@@ -124,8 +129,6 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
           })}
           onMouseLeave={() => onSelectSubstep(null)}
           // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-          sourceIngredientName='ING11'
-          destIngredientName='ING12'
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&
             hoveredSubstep.substepId === groupKey
@@ -152,14 +155,14 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
       })}
       onMouseLeave={() => onSelectSubstep(null)}
     >
-      <span>{row.sourceIngredientName}</span>
+      <IngredPill ingreds={row.sourceIngredients} />
       <span className={styles.emphasized_cell}>{row.sourceWell}</span>
       <span className={styles.volume_cell}>{
         typeof row.volume === 'number' &&
         `${parseFloat(row.volume.toFixed(VOLUME_DIGITS))} μL`
       }</span>
       <span className={styles.emphasized_cell}>{row.destWell}</span>
-      <span>{row.destIngredientName}</span>
+      <IngredPill ingreds={row.destIngredients} />
     </li>
   )
 }

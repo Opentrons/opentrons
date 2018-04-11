@@ -16,6 +16,7 @@ import type {
 } from './types'
 
 import type {PipetteData} from '../step-generation/types'
+import type {AllWellContents} from '../labware-ingred/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
 type AllLabwareTypes = {[labwareId: string]: string}
@@ -24,7 +25,8 @@ function _transferSubsteps (
   form: *,
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
-  stepId: StepIdType
+  stepId: StepIdType,
+  allWellContents: {[labwareId: string]: AllWellContents} // TODO IMMEDIATELY search and replace with the type
 ) {
   const {
     sourceWells,
@@ -62,8 +64,8 @@ function _transferSubsteps (
             substepId: i,
             channelId: channel,
             // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-            sourceIngredientName: 'ING1',
-            destIngredientName: 'ING2',
+            sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+            destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
             sourceWell: sourceWellsForTips[channel],
             destWell: destWellsForTips[channel]
           })
@@ -79,8 +81,8 @@ function _transferSubsteps (
     rows: range(sourceWells.length).map(i => ({
       substepId: i,
       // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-      sourceIngredientName: 'ING1',
-      destIngredientName: 'ING2',
+      sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+      destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
       sourceWell: sourceWells[i],
       destWell: destWells[i],
       volume
@@ -92,7 +94,8 @@ function _consolidateSubsteps (
   form: *,
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
-  stepId: StepIdType
+  stepId: StepIdType,
+  allWellContents: {[labwareId: string]: AllWellContents}
 ) {
   const {
     sourceWells,
@@ -128,23 +131,28 @@ function _consolidateSubsteps (
         const isLastGroup = i + 1 === sourceWells.length
         const sourceWellsForTips = getWellsForTips(channels, sourceLabwareType, sourceWells[i]).wellsForTips
 
-        return range(channels).map(channel => ({
-          substepId: i,
-          // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-          sourceIngredientName: 'ING1',
-          destIngredientName: isLastGroup ? 'ING2' : null,
-          sourceWell: sourceWellsForTips[channel],
-          destWell: isLastGroup ? destWellsForTips[channel] : null, // only show dest wells on last group
-          volume
-        }))
+        return range(channels).map(channel => {
+          const sourceWell = sourceWellsForTips[channel]
+          // only show dest wells on last group
+          const destWell = isLastGroup ? destWellsForTips[channel] : null
+          const destIngredients = isLastGroup ? [{id: 1, name: 'ING2'}] : null  // TODO CONNECT
+
+          return {
+            substepId: i,
+            sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+            destIngredients,
+            sourceWell,
+            destWell,
+            volume
+          }
+        })
       }) // TODO concat the final source : dest
     }
   }
 
   const destWellSubstep = {
     destWell,
-    sourceIngredientName: 'ING1', // TODO Ian 2018-03-20 proper ingredient name & groupId/color
-    destIngredientName: 'ING2',
+    destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
     volume: volume * sourceWells.length
   }
 
@@ -155,9 +163,9 @@ function _consolidateSubsteps (
     rows: [
       ...sourceWells.map((sourceWell, i) => ({
         substepId: i,
-        sourceWell: sourceWell,
-        sourceIngredientName: 'ING1',
-        volume: volume
+        sourceWell,
+        sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+        volume
       })),
       destWellSubstep
     ]
@@ -168,9 +176,12 @@ function _consolidateSubsteps (
 export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
   allPipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes
+  allLabwareTypes: AllLabwareTypes,
+  allWellContentsForSteps: Array<{[labwareId: string]: AllWellContents}>
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
+    const allWellContents = allWellContentsForSteps[stepId]
+
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
     if (valForm.validatedForm === null || formHasErrors(valForm)) {
       return null
@@ -182,7 +193,7 @@ export function generateSubsteps (
     }
 
     if (valForm.validatedForm.stepType === 'transfer') {
-      return _transferSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId)
+      return _transferSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId, allWellContents)
     }
 
     if (valForm.validatedForm.stepType === 'pause') {
@@ -192,7 +203,7 @@ export function generateSubsteps (
     }
 
     if (valForm.validatedForm.stepType === 'consolidate') {
-      return _consolidateSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId)
+      return _consolidateSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId, allWellContents)
     }
 
     console.warn('allSubsteps doesnt support step type: ', valForm.validatedForm.stepType, stepId)
