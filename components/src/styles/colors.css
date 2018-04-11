@@ -19,6 +19,8 @@
   /* Misc */
   --c-overlay: rgba(0, 0, 0, 0.7);
   --c-plate-bg: #ccc;
+  --c-white: #fff;
+  --c-black: #000;
   --c-green: #7ed321;
   --c-red: #f00000;
   --c-orange: #f5a623;

@@ -1,0 +1,11 @@
+@import '..';
+
+.pill {
+  border-radius: var(--bd-radius-pill);
+  color: var(--c-white);
+  padding: 0.5em;
+}
+
+.invert_text {
+  color: var(--c-black);
+}

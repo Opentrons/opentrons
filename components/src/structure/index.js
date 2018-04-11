@@ -6,6 +6,7 @@ import Card from './Card'
 import RefreshCard from './RefreshCard'
 import Splash from './Splash'
 import LabeledValue from './LabeledValue'
+import Pill from './Pill'
 
 // types
 export type {PageTabProps} from './PageTabs'
@@ -16,5 +17,6 @@ export {
   Card,
   RefreshCard,
   Splash,
-  LabeledValue
+  LabeledValue,
+  Pill
 }
