@@ -9,6 +9,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 host ?= \[fd00:0:cafe:fefe::1\]
 # make push wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
+firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
 python := pipenv run python
@@ -66,6 +67,13 @@ push: wheel
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wheel)" \
 		http://$(host):31950/server/update
+
+.PHONY: flash
+flash:
+	curl -X POST \
+		-H "Content-Type: multipart/form-data" \
+		-F "hex=@$(firmware)" \
+		http://$(host):31950/server/update_firmware
 
 .PHONY: restart
 restart:
