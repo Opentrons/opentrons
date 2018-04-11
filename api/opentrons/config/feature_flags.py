@@ -1,8 +1,8 @@
 import os
 import json
 
-SETTINGS_PATH = '/data/settings.json'
-
+# SETTINGS_PATH = '/data/settings.json'
+SETTINGS_PATH = os.path.join(os.getenv('HOME'), 'settings.json')
 
 def get_feature_flag(name: str) -> bool:
     settings = get_all_feature_flags()
