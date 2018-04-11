@@ -211,8 +211,7 @@ function _wellContentsForWell (
 function _wellContentsForLabware (
   labwareLiquids: SingleLabwareLiquidState,
   labwareId: string,
-  labwareType: string,
-  selectedWells: Array<string>
+  labwareType: string
 ): AllWellContents {
   const allWellsForContainer = getAllWellsForLabware(labwareType)
 
@@ -220,11 +219,7 @@ function _wellContentsForLabware (
     allWellsForContainer,
     (wellAcc, well: string): {[well: string]: WellContents} => ({
       ...wellAcc,
-      [well]: {
-        ..._wellContentsForWell(labwareLiquids[well], well),
-        // "mix in" selected state
-        selected: selectedWells.includes(well)
-      }
+      [well]: _wellContentsForWell(labwareLiquids[well], well)
     }),
     {}
   )
@@ -327,46 +322,87 @@ function _getSelectedWellsForSubstep (
   return wells
 }
 
-export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
+type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
+type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
+export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>> = createSelector(
   robotStateTimeline,
   steplistSelectors.validatedForms,
   steplistSelectors.hoveredStepId,
   steplistSelectors.getHoveredSubstep,
   steplistSelectors.allSubsteps,
   (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
+    function highlightedWellsForLabwareAtStep (
+      labwareLiquids: SingleLabwareLiquidState,
+      labwareId: string,
+      robotState: StepGeneration.RobotState,
+      form: ProcessedFormData,
+      formIdx: number
+    ): AllWellHighlights {
+      let selectedWells: Array<string> = []
+      if (form && _hoveredStepId === formIdx) {
+        // only show selected wells when user is **hovering** over the step
+        if (_hoveredSubstep) {
+          // wells for hovered substep
+          selectedWells = _getSelectedWellsForSubstep(
+            form,
+            labwareId,
+            _allSubsteps[_hoveredSubstep.stepId],
+            _hoveredSubstep.substepId
+          )
+        } else {
+          // wells for step overall
+          selectedWells = _getSelectedWellsForStep(form, labwareId, robotState)
+        }
+      }
+
+      // return selected wells eg {A1: true, B4: true}
+      const selectedWellsResult = selectedWells.reduce((acc, well) => ({...acc, [well]: true}), {})
+      console.log({selectedWellsResult, selectedWells, robotState, form, formIdx, _hoveredSubstep, _hoveredStepId})
+      return selectedWellsResult
+    }
+
+    function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {
+      const robotState = _robotStateTimeline[timelineIdx].robotState
+      const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
+      const form = _forms[formIdx] && _forms[formIdx].validatedForm
+
+      // replace value of each labware with highlighted wells info
+      return mapValues(
+        liquidState,
+        (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => (form)
+          ? highlightedWellsForLabwareAtStep(
+            labwareLiquids,
+            labwareId,
+            robotState,
+            form,
+            formIdx
+          )
+        : {} // no form -> no highlighted wells
+      )
+    }
+
     const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
+    return liquidStateTimeline.map(highlightedWellsForTimelineFrame)
+  }
+)
+
+export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
+  robotStateTimeline,
+  steplistSelectors.validatedForms,
+  (_robotStateTimeline, _forms) => {
+    const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
+
     return liquidStateTimeline.map(
       (liquidState, timelineIdx) => mapValues(
         liquidState,
         (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
           const robotState = _robotStateTimeline[timelineIdx].robotState
           const labwareType = robotState.labware[labwareId].type
-          const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
-
-          const form = _forms[formIdx] && _forms[formIdx].validatedForm
-
-          let selectedWells = []
-          if (form && _hoveredStepId === formIdx) {
-            // only show selected wells when user is **hovering** over the step
-            if (_hoveredSubstep) {
-              // wells for hovered substep
-              selectedWells = _getSelectedWellsForSubstep(
-                form,
-                labwareId,
-                _allSubsteps[_hoveredSubstep.stepId],
-                _hoveredSubstep.substepId
-              )
-            } else {
-              // wells for step overall
-              selectedWells = _getSelectedWellsForStep(form, labwareId, robotState)
-            }
-          }
 
           return _wellContentsForLabware(
             labwareLiquids,
             labwareId,
-            labwareType,
-            selectedWells
+            labwareType
           )
         }
       )

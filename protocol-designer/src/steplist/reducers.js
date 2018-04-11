@@ -64,7 +64,7 @@ import {equippedPipettes} from '../file-data/selectors/pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 // import {allWellContentsForSteps} from '../file-data/selectors/commands' // TODO IMMEDIATELY this circular import breaks stuff FIXME
 
-const allWellContentsForSteps = () => ({}) // TODO HACK
+const allWellContentsForSteps = () => [] // TODO HACK
 
 type FormState = FormData | null
 
