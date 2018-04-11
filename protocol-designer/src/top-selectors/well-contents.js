@@ -30,7 +30,7 @@ function _wellContentsForWell (
     highlighted: false,
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
-    groupId: ingredGroupIdsWithContent[0] || null // TODO Ian 2018-03-23 show 'gray' when there are multiple group ids.
+    groupIds: ingredGroupIdsWithContent
   }
 }
 

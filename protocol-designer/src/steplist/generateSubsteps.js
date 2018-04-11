@@ -20,13 +20,13 @@ import type {AllWellContents} from '../labware-ingred/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
 type AllLabwareTypes = {[labwareId: string]: string}
-
+type WellContentsByLabware = {[labwareId: string]: AllWellContents}
 function _transferSubsteps (
   form: *,
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
   stepId: StepIdType,
-  allWellContents: {[labwareId: string]: AllWellContents} // TODO IMMEDIATELY search and replace with the type
+  allWellContents: WellContentsByLabware
 ) {
   const {
     sourceWells,
@@ -59,17 +59,22 @@ function _transferSubsteps (
         const sourceWellsForTips = getWellsForTips(channels, sourceLabwareType, sourceWells[i]).wellsForTips
         const destWellsForTips = getWellsForTips(channels, destLabwareType, destWells[i]).wellsForTips
 
-        return range(channels).map(channel =>
-          ({
+        return range(channels).map(channel => {
+          const sourceWell = sourceWellsForTips[channel]
+          const destWell = destWellsForTips[channel]
+
+          const sourceIngredients = allWellContents[form.sourceLabware][sourceWell].groupIds
+
+          return {
             substepId: i,
             channelId: channel,
             // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-            sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+            sourceIngredients,
             destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
-            sourceWell: sourceWellsForTips[channel],
-            destWell: destWellsForTips[channel]
-          })
-        )
+            sourceWell,
+            destWell
+          }
+        })
       })
     }
   }
@@ -95,7 +100,7 @@ function _consolidateSubsteps (
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
   stepId: StepIdType,
-  allWellContents: {[labwareId: string]: AllWellContents}
+  allWellContents: WellContentsByLabware
 ) {
   const {
     sourceWells,
@@ -177,7 +182,7 @@ export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
   allPipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
-  allWellContentsForSteps: Array<{[labwareId: string]: AllWellContents}>
+  allWellContentsForSteps: Array<WellContentsByLabware>
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const allWellContents = allWellContentsForSteps[stepId]
