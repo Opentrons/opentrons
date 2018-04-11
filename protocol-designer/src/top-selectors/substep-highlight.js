@@ -146,9 +146,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       }
 
       // return selected wells eg {A1: true, B4: true}
-      const selectedWellsResult = selectedWells.reduce((acc, well) => ({...acc, [well]: true}), {})
-      console.log({selectedWellsResult, selectedWells, robotState, form, formIdx, _hoveredSubstep, _hoveredStepId})
-      return selectedWellsResult
+      return selectedWells.reduce((acc, well) => ({...acc, [well]: true}), {})
     }
 
     function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {

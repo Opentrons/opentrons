@@ -36,11 +36,6 @@ function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
 
 function getFillColor (groupIds: Array<string>): ?string {
   const FALLBACK_COLOR = 'gray'
-  if (!groupIds) {
-    // TODO DEBUG
-    console.warn('falsey groupIds ?!?!')
-    return 'black'
-  }
 
   if (groupIds.length === 0) {
     return null
