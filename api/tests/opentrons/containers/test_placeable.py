@@ -7,22 +7,10 @@ from opentrons.containers.placeable import (
     Deck,
     Slot)
 from opentrons.util.vector import Vector
+from tests.opentrons import generate_plate
 
 
 class PlaceableTestCase(unittest.TestCase):
-    def generate_plate(self, wells, cols, spacing, offset, radius, height=0):
-        c = Container()
-
-        for i in range(0, wells):
-            well = Well(properties={'radius': radius, 'height': height})
-            row, col = divmod(i, cols)
-            name = chr(col + ord('A')) + str(1 + row)
-            coordinates = (col * spacing[0] + offset[0],
-                           row * spacing[1] + offset[1],
-                           0)
-            c.add(well, name, coordinates)
-        return c
-
     def assertWellSeriesEqual(self, w1, w2):
         if hasattr(w1, '__len__') and hasattr(w2, '__len__'):
             if len(w1) != len(w2):
@@ -40,43 +28,43 @@ class PlaceableTestCase(unittest.TestCase):
             self.assertEquals(w1, w2)
 
     def test_get_name(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         expected = '<Well A1>'
         self.assertEqual(str(c['A1']), expected)
         expected = '<Container>'
         self.assertEqual(str(c), expected)
 
     def test_iterator(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         res = [well.coordinates() for well in c]
         expected = [(0, 0, 0), (5, 0, 0), (0, 5, 0), (5, 5, 0)]
 
         self.assertListEqual(res, expected)
 
     def test_next(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         well = c['A1']
         expected = c.get_child_by_name('B1')
 
         self.assertEqual(next(well), expected)
 
     def test_cycle(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         cycle_iter = c.cycle()
         for n in range(3):
             for i in range(4):
                 self.assertEqual(next(cycle_iter), c[i])
 
     def test_iter_method(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         cycle_iter = c.iter()
         for i in range(4):
             self.assertEqual(next(cycle_iter), c[i])
 
     def test_chain_method(self):
-        a = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        b = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        a = generate_plate(4, 2, (5, 5), (0, 0), 5)
+        b = generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
         cycle_iter = a.chain(b, c)
         for i in range(4):
             self.assertEqual(next(cycle_iter), a[i])
@@ -86,14 +74,14 @@ class PlaceableTestCase(unittest.TestCase):
             self.assertEqual(next(cycle_iter), c[i])
 
     def test_int_index(self):
-        c = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         self.assertEqual(c[3], c.get_child_by_name('B2'))
         self.assertEqual(c[1], c.get_child_by_name('B1'))
 
     def test_add_placeables(self):
-        a = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        b = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        a = generate_plate(4, 2, (5, 5), (0, 0), 5)
+        b = generate_plate(4, 2, (5, 5), (0, 0), 5)
 
         result = a + b
         self.assertEqual(len(result), 8)
@@ -123,7 +111,7 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertEqual(deck['A1'][0]['Red'], red)
 
     def test_generate_plate(self):
-        c = self.generate_plate(
+        c = generate_plate(
             wells=96,
             cols=8,
             spacing=(10, 15),
@@ -137,7 +125,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_coordinates(self):
         deck = Deck()
         slot = Slot()
-        plate = self.generate_plate(
+        plate = generate_plate(
             wells=96,
             cols=8,
             spacing=(10, 15),
@@ -165,7 +153,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_well_from_center(self):
         deck = Deck()
         slot = Slot()
-        plate = self.generate_plate(
+        plate = generate_plate(
             wells=4,
             cols=2,
             spacing=(10, 10),
@@ -186,8 +174,8 @@ class PlaceableTestCase(unittest.TestCase):
             (5.0, 10.0, 0))
 
     def test_get_all_children(self):
-        c1 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
-        c2 = self.generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c1 = generate_plate(4, 2, (5, 5), (0, 0), 5)
+        c2 = generate_plate(4, 2, (5, 5), (0, 0), 5)
         deck = Deck()
         deck.add(c1, "A1", (0, 0, 0))
         deck.add(c2, "A2", (50, 50, 50))
@@ -196,7 +184,7 @@ class PlaceableTestCase(unittest.TestCase):
     def test_top_bottom(self):
         deck = Deck()
         slot = Slot()
-        plate = self.generate_plate(
+        plate = generate_plate(
             wells=4,
             cols=2,
             spacing=(10, 10),
@@ -229,7 +217,7 @@ class PlaceableTestCase(unittest.TestCase):
             (plate['A1'], Vector(5, 2.5, 20.00)))
 
     def test_slice_with_strings(self):
-        c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+        c = generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
         self.assertWellSeriesEqual(c['A1':'A2'], c[0:8])
         self.assertWellSeriesEqual(c['A12':], c.cols[-1][0:])
         self.assertWellSeriesEqual(c.cols['4':'8'], c.cols[3:7])
@@ -237,7 +225,7 @@ class PlaceableTestCase(unittest.TestCase):
         self.assertWellSeriesEqual(c.rows['B']['1':'7'], c.rows[1][0:6])
 
     def test_wells(self):
-        c = self.generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
+        c = generate_plate(96, 8, (9, 9), (16, 11), 2.5, 40)
 
         self.assertWellSeriesEqual(c.well(0), c[0])
         self.assertWellSeriesEqual(c.well('A2'), c['A2'])

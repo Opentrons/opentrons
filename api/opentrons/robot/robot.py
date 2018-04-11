@@ -641,6 +641,8 @@ class Robot(object):
             ),
             offset.coordinates
         )
+        # print()
+        # print("=-> target: {}".format(target))
 
         if self._previous_instrument:
             if self._previous_instrument != instrument:
