@@ -1472,12 +1472,11 @@ class Pipette:
         if volume < 0:
             raise RuntimeError(
                 "Volume must be a positive number, got {}.".format(volume))
-            volume = 0
         if volume > self.max_volume:
             raise RuntimeError(
                 "{0}µl exceeds pipette's maximum volume ({1}ul).".format(
                     volume, self.max_volume))
-        if volume < self.min_volume and volume > 0:
+        if volume < self.min_volume:
             self.robot.add_warning(
                 "{0}µl is less than pipette's min_volume ({1}ul).".format(
                     volume, self.min_volume))

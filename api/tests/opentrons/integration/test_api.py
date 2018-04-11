@@ -10,6 +10,7 @@ from opentrons.trackers import pose_tracker
 @pytest.fixture
 def smoke():
     robot.connect()
+    robot.reset()
     robot.home()
     robot._driver.log.clear()
     from tests.opentrons.data import smoke  # NOQA
