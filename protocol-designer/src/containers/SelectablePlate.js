@@ -6,7 +6,8 @@ import mapValues from 'lodash/mapValues'
 import SelectablePlate from '../components/SelectablePlate.js'
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
-import {selectors as fileSelectors} from '../file-data'
+import * as highlightSelectors from '../top-selectors/substep-highlight'
+import * as wellContentsSelectors from '../top-selectors/well-contents'
 import {preselectWells, selectWells} from '../labware-ingred/actions'
 
 import {END_STEP} from '../steplist/types'
@@ -40,7 +41,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
-  const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
+  const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
@@ -52,7 +53,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     prevStepId = Math.max(stepId - 1, 0)
   }
 
-  const highlightedWells = deckSetupMode ? {} : fileSelectors.wellHighlightsForSteps(state)[prevStepId]
+  const highlightedWells = deckSetupMode ? {} : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
 
   let wellContents = {}
   if (deckSetupMode) {

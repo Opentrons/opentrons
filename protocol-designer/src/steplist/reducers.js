@@ -5,18 +5,19 @@ import type { ActionType } from 'redux-actions'
 import { createSelector } from 'reselect'
 import reduce from 'lodash/reduce'
 import max from 'lodash/max'
-import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
-import type {BaseState, Selector} from '../types'
+
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+
 import {END_STEP} from './types'
+import type {BaseState, Selector} from '../types'
 import type {
   FormData,
   BlankForm,
   StepItemData,
   StepIdType,
-  StepSubItemData,
   FormSectionState,
   FormModalFields,
   SubstepIdentifier
@@ -28,10 +29,6 @@ import {
   validateAndProcessForm,
   formHasErrors
 } from './formProcessing'
-
-import {
-  generateSubsteps
-} from './generateSubsteps'
 
 import type {
   AddStepAction,
@@ -56,15 +53,6 @@ import {
   hoverOnStep,
   toggleStepCollapsed
 } from './actions'
-
-import type {LabwareData} from '../step-generation/types'
-
-// External selectors
-import {equippedPipettes} from '../file-data/selectors/pipettes'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-// import {allWellContentsForSteps} from '../file-data/selectors/commands' // TODO IMMEDIATELY this circular import breaks stuff FIXME
-
-const allWellContentsForSteps = () => [] // TODO HACK
 
 type FormState = FormData | null
 
@@ -332,74 +320,6 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
   }
 )
 
-const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSelector(
-  validatedForms,
-  equippedPipettes,
-  labwareIngredSelectors.getLabware,
-  allWellContentsForSteps,
-  (_validatedForms, _pipetteData, _allLabware, _allWellContentsForSteps) => {
-    const allLabwareTypes: {[labwareId: string]: string} = mapValues(_allLabware, (l: LabwareData) => l.type)
-    return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes, _allWellContentsForSteps)
-  }
-)
-
-/** All Step data needed for Step List */
-const allSteps: Selector<any> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
-  getSteps,
-  orderedStepsSelector,
-  getCollapsedSteps,
-  allSubsteps,
-  getSavedForms,
-  labwareIngredSelectors.getLabware,
-  (steps, orderedSteps, collapsedSteps, _allSubsteps, _savedForms, _labware) => {
-    return orderedSteps.map(id => {
-      const savedForm = (_savedForms && _savedForms[id]) || {}
-
-      function getLabwareName (labwareId: ?string) {
-        return (labwareId)
-          ? _labware[labwareId] && _labware[labwareId].name
-          : null
-      }
-
-      // optional form fields for "transferish" steps
-      const additionalFormFields = (
-        savedForm.stepType === 'transfer' ||
-        savedForm.stepType === 'distribute' ||
-        savedForm.stepType === 'consolidate'
-      )
-        ? {
-          sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
-          destLabwareName: getLabwareName(savedForm['dispense--labware'])
-        }
-        : {}
-
-      return {
-        ...steps[id],
-
-        ...additionalFormFields,
-        description: savedForm['step-details'],
-
-        collapsed: collapsedSteps[id],
-        substeps: _allSubsteps[id]
-      }
-    })
-  }
-)
-
-const selectedStepSelector = createSelector(
-  allSteps,
-  selectedStepId,
-  (allSteps, selectedStepId) => {
-    const stepId = selectedStepId
-
-    if (!allSteps || stepId === null || stepId === '__end__') {
-      return null
-    }
-
-    return allSteps[stepId]
-  }
-)
-
 /** True if app is in Deck Setup Mode. */
 const deckSetupMode: Selector<boolean> = createSelector(
   getSteps,
@@ -481,7 +401,68 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
   return form && validateAndProcessForm(form).errors // TODO refactor selectors
 }
 
-const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
+const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
+  rootSelector,
+  s => s.formSectionCollapse
+)
+
+/** All Step data EXCEPT substeps */
+export const allSteps: Selector<Array<any>> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
+  getSteps,
+  orderedStepsSelector,
+  getCollapsedSteps,
+  getSavedForms,
+  labwareIngredSelectors.getLabware,
+  (steps, orderedSteps, collapsedSteps, _savedForms, _labware) => {
+    return orderedSteps.map(id => {
+      const savedForm = (_savedForms && _savedForms[id]) || {}
+
+      function getLabwareName (labwareId: ?string) {
+        return (labwareId)
+          ? _labware[labwareId] && _labware[labwareId].name
+          : null
+      }
+
+      // optional form fields for "transferish" steps
+      const additionalFormFields = (
+        savedForm.stepType === 'transfer' ||
+        savedForm.stepType === 'distribute' ||
+        savedForm.stepType === 'consolidate'
+      )
+        ? {
+          sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
+          destLabwareName: getLabwareName(savedForm['dispense--labware'])
+        }
+        : {}
+
+      return {
+        ...steps[id],
+
+        ...additionalFormFields,
+        description: savedForm['step-details'],
+
+        collapsed: collapsedSteps[id]
+        // substeps: _allSubsteps[id] // TODO Add back in in higher-order selector
+      }
+    })
+  }
+)
+
+export const selectedStepSelector = createSelector(
+  allSteps,
+  selectedStepId,
+  (_allSteps, selectedStepId) => {
+    const stepId = selectedStepId
+
+    if (!_allSteps || stepId === null || stepId === '__end__') {
+      return null
+    }
+
+    return _allSteps[stepId]
+  }
+)
+
+export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   formData,
   selectedStepId,
   allSteps,
@@ -493,17 +474,15 @@ const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
       : null
 )
 
-const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
-  rootSelector,
-  s => s.formSectionCollapse
-)
-
 export const selectors = {
   rootSelector,
-  stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
+
   allSteps,
-  orderedSteps: orderedStepsSelector,
+  currentFormCanBeSaved,
   selectedStep: selectedStepSelector,
+
+  stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
+  orderedSteps: orderedStepsSelector,
   selectedStepId, // TODO replace with selectedStep: selectedStepSelector
   hoveredStepId,
   hoveredOrSelectedStepId,
@@ -512,13 +491,17 @@ export const selectors = {
   formData,
   formModalData,
   nextStepId,
-  allSubsteps,
   validatedForms,
   currentFormErrors,
-  currentFormCanBeSaved,
   formSectionCollapse: formSectionCollapseSelector,
   deckSetupMode,
-  hoveredStepLabware
+  hoveredStepLabware,
+
+  // NOTE: these are exposed only for substeps/selectors.js
+  getSteps,
+  orderedStepsSelector,
+  getCollapsedSteps,
+  getSavedForms
 }
 
 export default rootReducer
