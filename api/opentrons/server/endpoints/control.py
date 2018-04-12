@@ -230,8 +230,9 @@ async def home(request):
         The content type is application/json.
         The correct packet form should be as follows:
         {
-        'target': Can be, 'robot' or 'pipette' 'right' or 'left' represents pipette mounts
-        pipette_config.configs
+        'target': Can be, 'robot' or 'pipette' 'right' or 'left'
+        represents pipette mounts
+        'mount': 'left' or 'right', only matters if target is pipette
         }
     :return: A success or non-success message.
     """
