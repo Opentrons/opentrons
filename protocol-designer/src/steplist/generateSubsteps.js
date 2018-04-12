@@ -63,14 +63,29 @@ function _transferSubsteps (
           const sourceWell = sourceWellsForTips[channel]
           const destWell = destWellsForTips[channel]
 
-          const sourceIngredients = allWellContents[form.sourceLabware][sourceWell].groupIds
+          function fakeHackGroupIdsToIngred (groupIds: Array<string>) {
+            // HACK HACK HACK
+            // TODO Ian 2018-04-11 need to pass this in -- should it be pre-processed, eg instead of using wellContents?
+            return groupIds.map(id => ({
+              id: parseInt(id),
+              name: id
+            }))
+          }
+
+          const sourceIngredients = fakeHackGroupIdsToIngred(
+            allWellContents[form.sourceLabware][sourceWell].groupIds
+          )
+
+          const destIngredients = fakeHackGroupIdsToIngred(
+            // TODO Ian 2018-04-11 should dest be PREVIOUS liquid state?
+            allWellContents[form.destLabware][destWell].groupIds
+          )
 
           return {
             substepId: i,
             channelId: channel,
-            // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
             sourceIngredients,
-            destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
+            destIngredients,
             sourceWell,
             destWell
           }
