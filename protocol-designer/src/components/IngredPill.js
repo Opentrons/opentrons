@@ -16,7 +16,8 @@ function IngredPill (props: Props) {
   const {ingreds} = props
 
   if (!ingreds || ingreds.length === 0) {
-    return <span />
+    // Invisible Pill, but has correct height/margin/etc for spacing
+    return <Pill />
   }
 
   const color = (ingreds.length === 1)
