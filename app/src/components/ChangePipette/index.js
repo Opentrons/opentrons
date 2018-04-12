@@ -2,12 +2,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-import {Switch, Route, Redirect} from 'react-router'
+import {Switch, Route, Redirect, withRouter} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
-
+import {moveToChangePipette, fetchPipettes, makeGetRobotMove, makeGetRobotPipettes} from '../../http-api-client'
+import type {RobotMoveState, PipettesResponse} from '../../http-api-client'
 import TitledModal from './TitledModal'
-// import ClearDeckAlertModal from './ClearDeckAlertModal'
+import ClearDeckAlertModal from './ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
 import AttachPipetteTitle from './AttachPipetteTitle'
 import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
@@ -24,8 +25,8 @@ type OP = {
 }
 
 type SP = {
-  // TODO(mc, 2018-04-04): drive with API client
-  moveToFrontRequest: {inProgress: boolean, response: ?{}, error: ?{}}
+  moveRequest: RobotMoveState,
+  pipettes: ?PipettesResponse
 }
 
 type DP = {
@@ -33,6 +34,7 @@ type DP = {
   back: () => mixed,
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   moveToFront: () => mixed,
+  confirmPipette: (string) => () => mixed,
 }
 
 const TITLE = 'Pipette Setup'
@@ -48,20 +50,24 @@ const PIPETTES = [
   {value: 'p300_multi', name: '8-Channel P300', channels: '8'}
 ]
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChangePipette)
+export default withRouter(
+  connect(makeMapStateToProps, mapDispatchToProps)(ChangePipette)
+)
 
 function ChangePipette (props: OP & SP & DP) {
-  const {mount, baseUrl, closeUrl, onPipetteSelect, moveToFrontRequest} = props
+  const {mount, baseUrl, closeUrl, onPipetteSelect, moveRequest, moveToFront, confirmPipette, pipettes: attachedPipettes} = props
   const subtitle = `${mount} carriage`
   const progressMessage = mount === 'right'
     ? 'Right pipette carriage moving to front and left.'
     : 'Left pipette carriage moving to front and right.'
 
-  // if (!moveToFrontRequest.inProgress && !moveToFrontRequest.response) {
-  //   return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
-  // }
+  console.log(baseUrl)
 
-  if (moveToFrontRequest.inProgress) {
+  if (!moveRequest.inProgress && !moveRequest.response) {
+    return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
+  }
+
+  if (moveRequest.inProgress) {
     return (
       <RequestInProgressModal
         title={TITLE}
@@ -93,6 +99,7 @@ function ChangePipette (props: OP & SP & DP) {
         const confirmUrl = `${urlWithModel}/confirm`
         const exitUrl = `${urlWithModel}/exit`
         const onBackClick = props.back
+        const confirm = confirmPipette(confirmUrl)
 
         // guard against bad model strings
         if (!pipette) return (<Redirect to={baseUrl} />)
@@ -107,11 +114,12 @@ function ChangePipette (props: OP & SP & DP) {
                 title={TITLE}
                 subtitle={subtitle}
                 onBackClick={onBackClick}
-                error={null}
+                success={attachedPipettes && attachedPipettes[mount].model === model}
                 direction='attach'
                 mount={mount}
                 exit={props.close}
                 exitUrl={exitUrl}
+                confirm={confirm}
                 {...pipette}
               />
             )} />
@@ -126,7 +134,7 @@ function ChangePipette (props: OP & SP & DP) {
                   mount={mount}
                   channels={pipette.channels}
                 />
-                <CheckPipettesButton url={confirmUrl} />
+                <CheckPipettesButton onClick={confirm} />
               </TitledModal>
             )} />
           </Switch>
@@ -136,31 +144,33 @@ function ChangePipette (props: OP & SP & DP) {
   )
 }
 
-function mapStateToProps (state: State, ownProps: OP): SP {
-  return {
-    // TODO(mc, 2018-04-04): implement
-    moveToFrontRequest: {
-      inProgress: false,
-      response: null,
-      error: null
+function makeMapStateToProps () {
+  const getRobotMove = makeGetRobotMove()
+  const getRobotPipettes = makeGetRobotPipettes()
+
+  return (state: State, ownProps: OP): SP => {
+    return {
+      moveRequest: getRobotMove(state, ownProps.robot),
+      pipettes: getRobotPipettes(state, ownProps.robot).response
     }
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {closeUrl, baseUrl} = ownProps
-  const changeUrl = `${baseUrl}/attach`
-
+  const {closeUrl, baseUrl, robot, mount} = ownProps
   return {
     close: () => dispatch(push(closeUrl)),
     back: () => dispatch(push(baseUrl)),
     onPipetteSelect: (event: SyntheticInputEvent<>) => {
       dispatch(push(`${baseUrl}/${event.target.value}`))
     },
-    // TODO(mc, 2018-04-04): implement
     moveToFront: () => {
-      console.log('MOVE TO FRONT NOT IMPLEMENTED')
-      dispatch(push(changeUrl))
+      console.log('move to front')
+      dispatch(moveToChangePipette(robot, mount))
+    },
+    confirmPipette: (confirmUrl) => () => {
+      dispatch(fetchPipettes(robot))
+        .then(() => dispatch(push(confirmUrl)))
     }
   }
 }

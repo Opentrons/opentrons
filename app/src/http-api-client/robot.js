@@ -1,7 +1,7 @@
 // @flow
 //  HTTP API client module for /robot/**
-
-import type {ThunkPromiseAction, Action} from '../types'
+import {createSelector, type Selector} from 'reselect'
+import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
 
 import type {ApiCall} from './types'
@@ -72,6 +72,13 @@ type RobotFailureAction = {|
   |}
 |}
 
+type ClearMoveResponseAction = {|
+  type: 'api:CLEAR_ROBOT_MOVE_RESPONSE',
+  payload: {|
+    robot: BaseRobot
+  |}
+|}
+
 type SetMovePositionAction = {|
   type: 'api:SET_ROBOT_MOVE_POSITION',
   payload: {|
@@ -85,6 +92,7 @@ export type RobotAction =
   | RobotSuccessAction
   | RobotFailureAction
   | SetMovePositionAction
+  | ClearMoveResponseAction
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
@@ -98,9 +106,6 @@ type RobotState = {
 }
 
 const MOVE: RequestPath = 'move'
-
-// DEBUG
-global.moveToChangePipette = moveToChangePipette
 
 export function moveToChangePipette (
   robot: RobotService,
@@ -131,6 +136,12 @@ function setRobotMovePosition (
   position: PositionName
 ): SetMovePositionAction {
   return {type: 'api:SET_ROBOT_MOVE_POSITION', payload: {robot, position}}
+}
+
+export function clearRobotMoveResponse (
+  robot: RobotService
+): ClearMoveResponseAction {
+  return {type: 'api:CLEAR_ROBOT_MOVE_RESPONSE', payload: {robot}}
 }
 
 export function robotReducer (state: ?RobotState, action: Action): RobotState {
@@ -199,6 +210,17 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
           movePosition: action.payload.position
         }
       }
+    case 'api:CLEAR_ROBOT_MOVE_RESPONSE':
+      ({robot: {name}} = action.payload)
+      stateByName = state[name] || {}
+
+      return {
+        ...state,
+        [name]: {
+          ...stateByName,
+          move: {...stateByName.move, response: null}
+        }
+      }
   }
 
   return state
@@ -229,4 +251,29 @@ function robotFailure (
   error: ApiRequestError
 ): RobotFailureAction {
   return {type: 'api:ROBOT_FAILURE', payload: {robot, path, error}}
+}
+
+export type RobotMoveState = RobotMove & {
+  position: ?PositionName,
+}
+
+export const makeGetRobotMove = () => {
+  const selector: Selector<State, BaseRobot, RobotMoveState> = createSelector(
+    selectRobotState,
+    (state) => state && state.move
+      ? {...state.move, position: state.movePosition || null}
+      : {
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null,
+        position: null
+      }
+  )
+
+  return selector
+}
+
+function selectRobotState (state: State, props: BaseRobot): ?RobotByNameState {
+  return state.api.robot[props.name]
 }
