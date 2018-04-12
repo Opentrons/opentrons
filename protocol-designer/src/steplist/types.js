@@ -34,14 +34,15 @@ export type NamedIngred = {|
   name: string
 |}
 
-export type NamedIngredsByLabwareAllSteps = Array<{[labwareId: string]: {[well: string]: NamedIngred}}>
+export type NamedIngredsByLabware = {[labwareId: string]: {[well: string]: Array<NamedIngred>}}
+export type NamedIngredsByLabwareAllSteps = Array<NamedIngredsByLabware>
 
 export type StepItemSourceDestRow = {|
   substepId: number, // TODO should this be a string or is this ID properly a number?
   sourceIngredients?: Array<NamedIngred>,
   destIngredients?: Array<NamedIngred>,
-  sourceWell?: string,
-  destWell?: string
+  sourceWell?: ?string,
+  destWell?: ?string
 |}
 
 export type StepItemSourceDestRowMulti = {|
@@ -55,6 +56,7 @@ export type TransferishStepItemSingleChannel = {|
   parentStepId: StepIdType,
   rows: Array<{|
     ...StepItemSourceDestRow,
+    substepId: number,
     volume?: number
   |}>
 |}
@@ -68,6 +70,7 @@ export type TransferishStepItemMultiChannel = {|
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
+// TODO IMMEDIATELY Rename. It's TransferishSubsteps!
 export type TransferishStepItem = TransferishStepItemSingleChannel | TransferishStepItemMultiChannel
 
 export type StepSubItemData = TransferishStepItem | {|

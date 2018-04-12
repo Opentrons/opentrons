@@ -13,42 +13,47 @@ import type {
   StepIdType,
   SubSteps,
   PauseFormData,
+  TransferFormData,
+  TransferishStepItem,
   NamedIngredsByLabwareAllSteps
 } from './types'
 
-import type {PipetteData} from '../step-generation/types'
+import type {
+  PipetteData,
+  ConsolidateFormData
+} from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
 type AllLabwareTypes = {[labwareId: string]: string}
+
 function _transferSubsteps (
-  form: *,
-  pipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes,
-  stepId: StepIdType,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
-) {
+  form: TransferFormData,
+  transferLikeFields: *
+): TransferishStepItem {
   const {
     sourceWells,
-    destWells,
-    volume
+    destWells
   } = form
+
+  const {
+    stepId,
+    pipette,
+    volume,
+    sourceLabwareType,
+    destLabwareType,
+    sourceWellIngreds,
+    destWellIngreds
+  } = transferLikeFields
 
   const commonFields = {
     stepType: 'transfer',
     parentStepId: stepId
   }
 
-  // TODO Ian 2018-04-06 use assert here
-  if (!pipetteData[form.pipette]) {
-    console.warn(`Pipette "${form.pipette}" does not exist, step ${stepId} can't determine channels`)
-  }
+  const channels = pipette.channels
 
-  if (pipetteData[form.pipette] && pipetteData[form.pipette].channels > 1) {
+  if (channels > 1) {
     // multichannel
-    const channels = pipetteData[form.pipette].channels
-
-    const sourceLabwareType = allLabwareTypes[form.sourceLabware]
-    const destLabwareType = allLabwareTypes[form.destLabware]
 
     return {
       ...commonFields,
@@ -62,20 +67,10 @@ function _transferSubsteps (
           const sourceWell = sourceWellsForTips[channel]
           const destWell = destWellsForTips[channel]
 
-          // function fakeHackGroupIdsToIngred (groupIds: Array<string>): Array<NamedIngred> {
-          //   // HACK HACK HACK
-          //   // TODO Ian 2018-04-11 need to pass this in -- should it be pre-processed, eg instead of using wellContents?
-          //   return groupIds.map(id => ({
-          //     id: parseInt(id),
-          //     name: id
-          //   }))
-          // }
-          const sourceIngredients = namedIngredsByLabwareAllSteps[stepId][form.sourceLabware][sourceWell]
-
-          // TODO Ian 2018-04-11 dest should be PREVIOUS liquid state?
-          const destIngredients = (stepId > 0)
-            ? namedIngredsByLabwareAllSteps[stepId - 1][form.destLabware][destWell]
-            : {}
+          const sourceIngredients = sourceWellIngreds[sourceWell]
+          const destIngredients = destWellIngreds
+            ? destWellIngreds[destWell]
+            : []
 
           return {
             substepId: i,
@@ -94,48 +89,49 @@ function _transferSubsteps (
     ...commonFields,
     multichannel: false,
     // TODO Ian 2018-03-02 break up steps when pipette too small
-    rows: range(sourceWells.length).map(i => ({
-      substepId: i,
-      // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
-      sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
-      destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
-      sourceWell: sourceWells[i],
-      destWell: destWells[i],
-      volume
-    }))
+    rows: range(sourceWells.length).map(i => {
+      const sourceWell = sourceWells[i]
+      const destWell = destWells[i]
+      return {
+        substepId: i,
+        sourceIngredients: sourceWellIngreds[sourceWell],
+        destIngredients: destWellIngreds ? destWellIngreds[destWell] : [],
+        sourceWell,
+        destWell,
+        volume
+      }
+    })
   }
 }
 
 function _consolidateSubsteps (
-  form: *,
-  pipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes,
-  stepId: StepIdType,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
-) {
+  form: ConsolidateFormData,
+  transferLikeFields: *
+): TransferishStepItem {
   const {
     sourceWells,
-    destWell,
-    volume
+    destWell
   } = form
+
+  const {
+    stepId,
+    pipette,
+    volume,
+    sourceLabwareType,
+    destLabwareType,
+    sourceWellIngreds,
+    destWellIngreds
+  } = transferLikeFields
 
   const commonFields = {
     stepType: 'consolidate',
     parentStepId: stepId
   }
 
-  // TODO Ian 2018-04-09 ~7 lines identical to transfer multichannel handling, candidate for util fn?
-  // TODO Ian 2018-04-06 use assert here
-  if (!pipetteData[form.pipette]) {
-    console.warn(`Pipette "${form.pipette}" does not exist, step ${stepId} can't determine channels`)
-  }
+  const channels = pipette.channels
 
-  if (pipetteData[form.pipette] && pipetteData[form.pipette].channels > 1) {
+  if (channels > 1) {
     // multichannel
-    const channels = pipetteData[form.pipette].channels
-
-    const sourceLabwareType = allLabwareTypes[form.sourceLabware]
-    const destLabwareType = allLabwareTypes[form.destLabware]
 
     const destWellsForTips = getWellsForTips(channels, destLabwareType, destWell).wellsForTips
 
@@ -149,27 +145,31 @@ function _consolidateSubsteps (
 
         return range(channels).map(channel => {
           const sourceWell = sourceWellsForTips[channel]
-          // only show dest wells on last group
-          const destWell = isLastGroup ? destWellsForTips[channel] : null
-          const destIngredients = isLastGroup ? [{id: 1, name: 'ING2'}] : null  // TODO CONNECT
+          const destWell = destWellsForTips[channel]
+
+          // only show dest ingreds on last group
+          const destIngredients = isLastGroup ? destWellIngreds[destWell] : []
 
           return {
             substepId: i,
-            sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+            channelId: channel,
+            sourceIngredients: sourceWellIngreds[sourceWell],
             destIngredients,
             sourceWell,
-            destWell,
-            volume
+            destWell: isLastGroup ? destWell : null // only show dest wells on last group
+            // volume
           }
         })
-      }) // TODO concat the final source : dest
+      })
     }
   }
 
+  // dest well is only shown at the end, last substep
   const destWellSubstep = {
     destWell,
-    destIngredients: [{id: 1, name: 'ING2'}], // TODO CONNECT
-    volume: volume * sourceWells.length
+    destIngredients: destWellIngreds[destWell],
+    volume: volume * sourceWells.length,
+    substepId: sourceWells.length
   }
 
   return {
@@ -180,7 +180,7 @@ function _consolidateSubsteps (
       ...sourceWells.map((sourceWell, i) => ({
         substepId: i,
         sourceWell,
-        sourceIngredients: [{id: 0, name: 'ING1'}], // TODO CONNECT
+        sourceIngredients: sourceWellIngreds[sourceWell],
         volume
       })),
       destWellSubstep
@@ -212,24 +212,60 @@ export function generateSubsteps (
       return formData
     }
 
-    if (valForm.validatedForm.stepType === 'transfer') {
-      return _transferSubsteps(
-        valForm.validatedForm,
-        allPipetteData,
-        allLabwareTypes,
-        stepId,
-        namedIngredsByLabwareAllSteps
-      )
-    }
+    // Handle all TransferLike substeps
+    if (
+      valForm.validatedForm.stepType === 'transfer' ||
+      valForm.validatedForm.stepType === 'consolidate'
+    ) {
+      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[stepId - 1]
 
-    if (valForm.validatedForm.stepType === 'consolidate') {
-      return _consolidateSubsteps(
-        valForm.validatedForm,
-        allPipetteData,
-        allLabwareTypes,
+      const {
+        pipette: pipetteId,
+        sourceLabware,
+        destLabware,
+        volume
+      } = valForm.validatedForm
+
+      // TODO Ian 2018-04-06 use assert here
+      if (!allPipetteData[pipetteId]) {
+        console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
+      }
+
+      const sourceWellIngreds = namedIngredsByLabware[sourceLabware]
+      const destWellIngreds = namedIngredsByLabware[destLabware]
+
+      const sourceLabwareType = allLabwareTypes[sourceLabware]
+      const destLabwareType = allLabwareTypes[destLabware]
+
+      // fields common to all transferlike substep generator fns
+      const transferLikeFields = {
         stepId,
-        namedIngredsByLabwareAllSteps
-      )
+
+        pipette: allPipetteData[pipetteId],
+        volume,
+
+        sourceLabwareType,
+        destLabwareType,
+
+        sourceWellIngreds,
+        destWellIngreds
+      }
+
+      if (valForm.validatedForm.stepType === 'transfer') {
+        return _transferSubsteps(
+          valForm.validatedForm,
+          transferLikeFields
+        )
+      }
+
+      if (valForm.validatedForm.stepType === 'consolidate') {
+        return _consolidateSubsteps(
+          valForm.validatedForm,
+          transferLikeFields
+        )
+      }
+
+      // unreachable here
     }
 
     console.warn('allSubsteps doesnt support step type: ', valForm.validatedForm.stepType, stepId)
