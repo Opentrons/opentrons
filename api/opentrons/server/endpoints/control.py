@@ -220,7 +220,7 @@ def _move_mount(mount, point):
     return "Move complete. New position: {}".format(new_position)
 
 
-async def home_pipette(request):
+async def home(request):
     """
     This initializes a call to pipette.home() which, as a side effect will:
         1. Check the pipette is actually connected (will throw an error if you
@@ -230,8 +230,7 @@ async def home_pipette(request):
         The content type is application/json.
         The correct packet form should be as follows:
         {
-        'mount': Can be 'right' or 'left' represents pipette mounts
-        'model': Can be from the list of pipettes found under
+        'target': Can be, 'robot' or 'pipette' 'right' or 'left' represents pipette mounts
         pipette_config.configs
         }
     :return: A success or non-success message.
@@ -239,23 +238,30 @@ async def home_pipette(request):
     req = await request.text()
     data = json.loads(req)
 
-    model = data.get('model')
-    mount = data.get('mount')
+    target = data.get('target')
 
     try:
+        assert target in ['robot', 'pipette']
 
-        assert mount in ['left', 'right']
-        assert model in pipette_config.configs.keys()
+        if target == 'robot':
+            robot.home()
+            status = 200
+            message = "Homing robot."
+        else:
+            try:
+                mount = data.get('mount')
+                assert mount in ['left', 'right']
 
-        config = pipette_config.load(model)
-        pipette = instruments._create_pipette_from_config(
-            config=config,
-            mount=mount)
+                pipette = instruments.Pipette(mount=mount)
 
-        pipette.home()
+                pipette.home()
 
-        message = "{} on {} mount homed successfully.".format(model, mount)
-        status = 200
+                status = 200
+                message = "Pipette on {} homed successfully.".format(mount)
+
+            except AssertionError as e:
+                status = 400
+                message = "Expected 'left' or 'right' as values for mount."
 
     except AssertionError as e:
         status = 400

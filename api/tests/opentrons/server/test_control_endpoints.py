@@ -124,10 +124,23 @@ async def test_home_pipette(virtual_smoothie_env, loop, test_client):
     cli = await loop.create_task(test_client(app))
 
     test_data = {
-        'model': 'p300_single',
+        'target': 'pipette',
         'mount': 'left'}
 
-    res = await cli.post('/robot/home_pipette', json=test_data)
+    res = await cli.post('/robot/home', json=test_data)
+
+    assert res.status == 200
+
+
+async def test_home_robot(virtual_smoothie_env, loop, test_client):
+
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    test_data = {
+        'target': 'robot'}
+
+    res = await cli.post('/robot/home', json=test_data)
 
     assert res.status == 200
 
@@ -138,39 +151,31 @@ async def test_home_pipette_bad_request(
     cli = await loop.create_task(test_client(app))
 
     test_data = {}
-    res = await cli.post('/robot/home_pipette', json=test_data)
+    res = await cli.post('/robot/home', json=test_data)
 
     assert res.status == 400
 
     test_data_2 = {
-        'model': 'fake_pipette',
-        'mount': 'left'}
+        'target': 'pipette',
+        'mount': 'fake_mount'}
 
-    res2 = await cli.post('/robot/home_pipette', json=test_data_2)
+    res2 = await cli.post('/robot/home', json=test_data_2)
 
     assert res2.status == 400
 
     test_data_3 = {
-        'model': 'p300_single',
-        'mount': 'fake_mount'}
+        'mount': 'left'}
 
-    res3 = await cli.post('/robot/home_pipette', json=test_data_3)
+    res3 = await cli.post('/robot/home', json=test_data_3)
 
     assert res3.status == 400
 
     test_data_4 = {
-        'mount': 'left'}
+        'target': 'pipette'}
 
-    res4 = await cli.post('/robot/home_pipette', json=test_data_4)
+    res4 = await cli.post('/robot/home', json=test_data_4)
 
     assert res4.status == 400
-
-    test_data_5 = {
-        'model': 'p300_single'}
-
-    res5 = await cli.post('/robot/home_pipette', json=test_data_5)
-
-    assert res5.status == 400
 
 
 async def test_move_bad_request(virtual_smoothie_env, loop, test_client):
