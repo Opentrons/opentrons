@@ -2,6 +2,8 @@
 
 // ========= STYLE ================
 
+export const MIXED_WELL_COLOR = '#9b9b9b' // NOTE: matches `--c-med-gray` in colors.css
+
 // TODO factor into CSS or constants or elsewhere
 export const swatchColors = (n: number) => {
   const colors = [

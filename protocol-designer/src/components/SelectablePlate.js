@@ -2,7 +2,12 @@
 // Wrap Plate with a SelectionRect.
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import {swatchColors, Plate, type SingleWell} from '@opentrons/components'
+import {
+  swatchColors,
+  Plate,
+  MIXED_WELL_COLOR,
+  type SingleWell
+} from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
 import type {AllWellContents, WellContents} from '../labware-ingred/types'
@@ -35,8 +40,6 @@ function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
 }
 
 function getFillColor (groupIds: Array<string>): ?string {
-  const FALLBACK_COLOR = 'gray'
-
   if (groupIds.length === 0) {
     return null
   }
@@ -45,7 +48,7 @@ function getFillColor (groupIds: Array<string>): ?string {
     return swatchColors(parseInt(groupIds[0]))
   }
 
-  return FALLBACK_COLOR
+  return MIXED_WELL_COLOR
 }
 
 export default function SelectablePlate (props: Props) {
