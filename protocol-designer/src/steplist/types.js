@@ -34,6 +34,8 @@ export type NamedIngred = {|
   name: string
 |}
 
+export type NamedIngredsByLabwareAllSteps = Array<{[labwareId: string]: {[well: string]: NamedIngred}}>
+
 export type StepItemSourceDestRow = {|
   substepId: number, // TODO should this be a string or is this ID properly a number?
   sourceIngredients?: Array<NamedIngred>,

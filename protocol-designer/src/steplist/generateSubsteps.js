@@ -12,21 +12,20 @@ import {
 import type {
   StepIdType,
   SubSteps,
-  PauseFormData
+  PauseFormData,
+  NamedIngredsByLabwareAllSteps
 } from './types'
 
 import type {PipetteData} from '../step-generation/types'
-import type {AllWellContents} from '../labware-ingred/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
 type AllLabwareTypes = {[labwareId: string]: string}
-type WellContentsByLabware = {[labwareId: string]: AllWellContents}
 function _transferSubsteps (
   form: *,
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
   stepId: StepIdType,
-  allWellContents: WellContentsByLabware
+  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
 ) {
   const {
     sourceWells,
@@ -63,23 +62,20 @@ function _transferSubsteps (
           const sourceWell = sourceWellsForTips[channel]
           const destWell = destWellsForTips[channel]
 
-          function fakeHackGroupIdsToIngred (groupIds: Array<string>) {
-            // HACK HACK HACK
-            // TODO Ian 2018-04-11 need to pass this in -- should it be pre-processed, eg instead of using wellContents?
-            return groupIds.map(id => ({
-              id: parseInt(id),
-              name: id
-            }))
-          }
+          // function fakeHackGroupIdsToIngred (groupIds: Array<string>): Array<NamedIngred> {
+          //   // HACK HACK HACK
+          //   // TODO Ian 2018-04-11 need to pass this in -- should it be pre-processed, eg instead of using wellContents?
+          //   return groupIds.map(id => ({
+          //     id: parseInt(id),
+          //     name: id
+          //   }))
+          // }
+          const sourceIngredients = namedIngredsByLabwareAllSteps[stepId][form.sourceLabware][sourceWell]
 
-          const sourceIngredients = fakeHackGroupIdsToIngred(
-            allWellContents[form.sourceLabware][sourceWell].groupIds
-          )
-
-          const destIngredients = fakeHackGroupIdsToIngred(
-            // TODO Ian 2018-04-11 should dest be PREVIOUS liquid state?
-            allWellContents[form.destLabware][destWell].groupIds
-          )
+          // TODO Ian 2018-04-11 dest should be PREVIOUS liquid state?
+          const destIngredients = (stepId > 0)
+            ? namedIngredsByLabwareAllSteps[stepId - 1][form.destLabware][destWell]
+            : {}
 
           return {
             substepId: i,
@@ -115,7 +111,7 @@ function _consolidateSubsteps (
   pipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
   stepId: StepIdType,
-  allWellContents: WellContentsByLabware
+  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
 ) {
   const {
     sourceWells,
@@ -197,11 +193,9 @@ export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
   allPipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
-  allWellContentsForSteps: Array<WellContentsByLabware>
+  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
-    const allWellContents = allWellContentsForSteps[stepId]
-
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
     if (valForm.validatedForm === null || formHasErrors(valForm)) {
       return null
@@ -212,18 +206,30 @@ export function generateSubsteps (
       return null
     }
 
-    if (valForm.validatedForm.stepType === 'transfer') {
-      return _transferSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId, allWellContents)
-    }
-
     if (valForm.validatedForm.stepType === 'pause') {
       // just returns formData
       const formData: PauseFormData = valForm.validatedForm
       return formData
     }
 
+    if (valForm.validatedForm.stepType === 'transfer') {
+      return _transferSubsteps(
+        valForm.validatedForm,
+        allPipetteData,
+        allLabwareTypes,
+        stepId,
+        namedIngredsByLabwareAllSteps
+      )
+    }
+
     if (valForm.validatedForm.stepType === 'consolidate') {
-      return _consolidateSubsteps(valForm.validatedForm, allPipetteData, allLabwareTypes, stepId, allWellContents)
+      return _consolidateSubsteps(
+        valForm.validatedForm,
+        allPipetteData,
+        allLabwareTypes,
+        stepId,
+        namedIngredsByLabwareAllSteps
+      )
     }
 
     console.warn('allSubsteps doesnt support step type: ', valForm.validatedForm.stepType, stepId)

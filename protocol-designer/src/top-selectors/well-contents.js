@@ -7,10 +7,12 @@ import reduce from 'lodash/reduce'
 import * as StepGeneration from '../step-generation'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {getAllWellsForLabware} from '../constants'
 
 import type {Selector} from '../types'
 import type {WellContents, AllWellContents} from '../labware-ingred/types'
+import type {NamedIngredsByLabwareAllSteps} from '../steplist/types'
 
 type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
 
@@ -73,4 +75,24 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
       )
     )
   }
+)
+
+/** NamedIngred-formatted contents of wells, across all steps on the timeline */
+export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = createSelector(
+  allWellContentsForSteps,
+  labwareIngredSelectors.getIngredientGroups,
+  (_allWellContentsForSteps, _ingredientGroups) =>
+    _allWellContentsForSteps.map(stepWellContents =>
+      mapValues(stepWellContents, (labwareContents: AllWellContents, labwareId: string) =>
+        mapValues(labwareContents, (wellContents: WellContents, wellId: string) => {
+          return wellContents.groupIds
+            .filter(id => id in _ingredientGroups) // strip out __air__, etc pseudo-ingreds not in ingredientGroups
+            .map(id => ({
+              id: parseInt(id),
+              name: _ingredientGroups[id].name
+              // NOTE: serializeName is available too, but is being deprecated?
+            }))
+        })
+      )
+    )
 )

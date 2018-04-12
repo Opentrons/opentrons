@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import {equippedPipettes} from '../file-data/selectors/pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
-import {allWellContentsForSteps} from './well-contents'
+import {namedIngredsByLabware} from './well-contents'
 
 import {
   generateSubsteps
@@ -22,10 +22,10 @@ export const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = cre
   steplistSelectors.validatedForms,
   equippedPipettes,
   labwareIngredSelectors.getLabware,
-  allWellContentsForSteps,
-  (_validatedForms, _pipetteData, _allLabware, _allWellContentsForSteps) => {
+  namedIngredsByLabware,
+  (_validatedForms, _pipetteData, _allLabware, _namedIngredsByLabware) => {
     const allLabwareTypes: {[labwareId: string]: string} = mapValues(_allLabware, (l: LabwareData) => l.type)
-    return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes, _allWellContentsForSteps)
+    return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes, _namedIngredsByLabware)
   }
 )
 
