@@ -230,9 +230,8 @@ async def home(request):
         The content type is application/json.
         The correct packet form should be as follows:
         {
-        'target': Can be, 'robot' or 'pipette' 'right' or 'left'
-        represents pipette mounts
-        'mount': 'left' or 'right', only matters if target is pipette
+        'target': Can be, 'robot' or 'pipette'
+        'mount': 'left' or 'right', only used if target is pipette
         }
     :return: A success or non-success message.
     """
@@ -241,32 +240,29 @@ async def home(request):
 
     target = data.get('target')
 
-    try:
-        assert target in ['robot', 'pipette']
+    if target in ['robot', 'pipette']:
 
         if target == 'robot':
             robot.home()
+
             status = 200
             message = "Homing robot."
         else:
-            try:
-                mount = data.get('mount')
-                assert mount in ['left', 'right']
-
+            mount = data.get('mount')
+            if mount in ['left', 'right']:
                 pipette = instruments.Pipette(mount=mount)
-
                 pipette.home()
 
                 status = 200
                 message = "Pipette on {} homed successfully.".format(mount)
-
-            except AssertionError as e:
+            else:
                 status = 400
-                message = "Expected 'left' or 'right' as values for mount."
+                message = "Expected 'left' or 'right' as values for mount" \
+                          "got {} instead.".format(mount)
 
-    except AssertionError as e:
+    else:
         status = 400
-        message = "Received incorrectly formatted data."
+        message = "Expected 'robot' or 'pipette' got {}.".format(target)
 
     return web.json_response({"message": message}, status=status)
 
