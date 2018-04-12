@@ -514,7 +514,7 @@ class Pipette:
 
         return self
 
-    def _position_for_aspirate(self, location=None, clearance=0.5):
+    def _position_for_aspirate(self, location=None, clearance=1.0):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
