@@ -6,6 +6,7 @@ from opentrons.trackers.pose_tracker import (
 from opentrons.robot import robot_configs
 from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
+from opentrons.config import feature_flags as ff
 
 import logging
 
@@ -36,6 +37,8 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
 
+    if ff.split_labware_definitions():
+        delta_z = delta_z - container[0].properties['height']
     delta = Point(delta_x, delta_y, delta_z)
 
     new_coordinates = change_base(
@@ -45,7 +48,11 @@ def calibrate_container_with_delta(
 
     pose_tree = update(pose_tree, container, new_coordinates)
 
-    container._coordinates = container._coordinates + delta
+    if ff.split_labware_definitions():
+        for well in container.wells():
+            well._coordinates = well._coordinates + delta
+    else:
+        container._coordinates = container._coordinates + delta
 
     if save and new_container_name:
         database.save_new_container(container, new_container_name)
