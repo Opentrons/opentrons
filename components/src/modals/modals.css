@@ -39,6 +39,7 @@
 .alert_modal_buttons {
   float: right;
   margin-top: 1rem;
+
   & button {
     margin-left: 1rem;
   }
