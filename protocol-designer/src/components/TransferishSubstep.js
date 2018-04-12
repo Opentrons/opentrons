@@ -12,23 +12,111 @@ import styles from './StepItem.css'
 import type {
   TransferishStepItem,
   StepItemSourceDestRowMulti,
-  SubstepIdentifier
+  SubstepIdentifier,
+  NamedIngred
 } from '../steplist/types'
 
 export type StepSubItemProps = {|
   substeps: TransferishStepItem
 |}
 
+const DEFAULT_COLLAPSED_STATE = true
+
+function wellRange (sourceWells: string | ?Array<?string>): ?string {
+  if (typeof sourceWells === 'string') {
+    return sourceWells
+  }
+
+  if (!sourceWells || sourceWells.length === 0) {
+    return null
+  }
+
+  if (sourceWells.length === 1) {
+    return sourceWells[0]
+  }
+
+  const firstWell = sourceWells[0]
+  const lastWell = last(sourceWells)
+
+  if (firstWell && lastWell) {
+    return `${firstWell || ''}:${lastWell || ''}`
+  }
+
+  return firstWell || lastWell
+}
+
+const VOLUME_DIGITS = 1
+
+function formatVolume (inputVolume: ?string | ?number): ?string {
+  if (typeof inputVolume === 'number') {
+    // don't add digits to numbers with nothing to the right of the decimal
+    const digits = inputVolume.toString().split('.')[1]
+      ? VOLUME_DIGITS
+      : 0
+    return inputVolume.toFixed(digits)
+  }
+
+  return inputVolume
+}
+
+type SubstepRowProps = {|
+  volume?: ?number | ?string,
+  /** if true, hide 'μL' on volume */
+  hideVolumeUnits?: boolean,
+
+  sourceWells?: ?string | ?Array<?string>,
+  destWells?: ?string | ?Array<?string>,
+
+  className?: string,
+
+  sourceIngredients?: Array<NamedIngred>,
+  destIngredients?: Array<NamedIngred>,
+
+  collapsible?: boolean,
+  collapsed?: boolean,
+  toggleCollapsed?: (e: SyntheticMouseEvent<*>) => mixed,
+
+  onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
+|}
+
+function SubstepRow (props: SubstepRowProps) {
+  const sourceWellRange = wellRange(props.sourceWells)
+  const destWellRange = wellRange(props.destWells)
+
+  const formattedVolume = formatVolume(props.volume)
+
+  return (
+    <li className={props.className}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
+    >
+      <IngredPill ingreds={props.sourceIngredients} />
+      <span className={styles.emphasized_cell}>{sourceWellRange}</span>
+      <span className={styles.volume_cell}>{
+        formattedVolume && (props.hideVolumeUnits
+          ? formattedVolume
+          : `${formattedVolume} μL`
+        )
+      }</span>
+      <span className={styles.emphasized_cell}>{destWellRange}</span>
+      {props.collapsible
+        ? <span className={styles.inner_carat} onClick={props.toggleCollapsed}>
+          <Icon name={props.collapsed ? 'chevron-down' : 'chevron-up'} />
+        </span>
+        : <IngredPill ingreds={props.destIngredients} />
+      }
+    </li>
+  )
+}
+
 type MultiChannelSubstepProps = {|
-  volume: ?string,
+  volume: ?string | ?number,
   rowGroup: Array<StepItemSourceDestRowMulti>,
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
 |}
-
-const VOLUME_DIGITS = 1
-const DEFAULT_COLLAPSED_STATE = true
 
 class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {collapsed: boolean}> {
   constructor (props: MultiChannelSubstepProps) {
@@ -52,16 +140,6 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
       highlighted
     } = this.props
 
-    const lastGroupSourceWell = last(rowGroup).sourceWell
-    const sourceWellRange = (rowGroup[0].sourceWell && lastGroupSourceWell)
-      ? `${rowGroup[0].sourceWell}:${lastGroupSourceWell}`
-      : ''
-
-    const lastGroupDestWell = last(rowGroup).destWell
-    const destWellRange = (rowGroup[0].destWell && lastGroupDestWell)
-      ? `${rowGroup[0].destWell}:${lastGroupDestWell}`
-      : ''
-
     const collapsed = this.state.collapsed
 
     return (
@@ -70,33 +148,36 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
         onMouseLeave={this.props.onMouseLeave}
         className={cx(styles.substep, {[styles.highlighted]: highlighted})}
       >
-        {/* TODO special class for this substep subheader thing?? */}
-        <li className={styles.step_subitem}>
-          <IngredPill ingreds={uniqBy(
+        {/* Header row */}
+        <SubstepRow
+          className={styles.step_subitem}
+          sourceIngredients={uniqBy(
             rowGroup.reduce((acc, row) => (row.sourceIngredients)
               ? [...acc, ...row.sourceIngredients]
               : acc,
             []),
             ingred => ingred.id
-          )}>{'TODO'}</IngredPill>
-          <span className={styles.emphasized_cell}>{sourceWellRange}</span>
-          <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
-          <span className={styles.emphasized_cell}>{destWellRange}</span>
-          {/* <span>{destIngredientName}</span> */}
-          <span className={styles.inner_carat} onClick={() => this.handleToggleCollapsed()}>
-            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
-          </span>
-        </li>
+          )}
+          sourceWells={rowGroup.map(row => row.sourceWell)}
+          destWells={rowGroup.map(row => row.destWell)}
+          volume={volume}
+          collapsible
+          collapsed={collapsed}
+          toggleCollapsed={this.handleToggleCollapsed}
+        />
 
         {!collapsed && rowGroup.map((row, rowKey) =>
-          // Channel rows (1 for each channel in multi-channel pipette)
-          <li className={styles.step_subitem_channel_row} key={rowKey}>
-            <IngredPill ingreds={row.sourceIngredients} />
-            <span className={styles.emphasized_cell}>{row.sourceWell}</span>
-            <span className={styles.volume_cell}>{volume && `${volume} μL`}</span>
-            <span className={styles.emphasized_cell}>{row.destWell}</span>
-            <IngredPill ingreds={row.destIngredients} />
-          </li>
+          // Channel rows (1 for each channel in multi-channel pipette
+          <SubstepRow
+            key={rowKey}
+            className={styles.step_subitem_channel_row}
+            volume={volume}
+            hideVolumeUnits
+            sourceIngredients={row.sourceIngredients}
+            sourceWells={row.sourceWell}
+            destWells={row.destWell}
+            destIngredients={row.destIngredients}
+          />
       )}
       </ol>
     )
@@ -119,16 +200,12 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
         <MultiChannelSubstep
           key={groupKey}
           rowGroup={rowGroup}
-          volume={typeof substeps.volume === 'number'
-            ? substeps.volume.toFixed(VOLUME_DIGITS)
-            : null
-          }
+          volume={substeps.volume}
           onMouseEnter={() => onSelectSubstep({
             stepId: substeps.parentStepId,
             substepId: groupKey
           })}
           onMouseLeave={() => onSelectSubstep(null)}
-          // TODO LATER Ian 2018-04-06 ingredient name & color passed in from store
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&
             hoveredSubstep.substepId === groupKey
@@ -140,7 +217,8 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
 
   // single-channel row item
   return substeps.rows.map((row, substepId) =>
-    <li key={substepId}
+    <SubstepRow
+      key={substepId}
       className={cx(
         styles.step_subitem,
         {[styles.highlighted]:
@@ -154,15 +232,11 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
         substepId
       })}
       onMouseLeave={() => onSelectSubstep(null)}
-    >
-      <IngredPill ingreds={row.sourceIngredients} />
-      <span className={styles.emphasized_cell}>{row.sourceWell}</span>
-      <span className={styles.volume_cell}>{
-        typeof row.volume === 'number' &&
-        `${parseFloat(row.volume.toFixed(VOLUME_DIGITS))} μL`
-      }</span>
-      <span className={styles.emphasized_cell}>{row.destWell}</span>
-      <IngredPill ingreds={row.destIngredients} />
-    </li>
+      volume={row.volume} // TODO IMMEDIATELY PARSE!!
+      sourceIngredients={row.sourceIngredients}
+      sourceWells={row.sourceWell}
+      destIngredients={row.destIngredients}
+      destWells={row.destWell}
+    />
   )
 }
