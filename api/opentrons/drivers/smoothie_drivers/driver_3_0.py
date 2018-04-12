@@ -627,6 +627,8 @@ class SmoothieDriver_3_0_0:
         Read from an attached pipette's internal memory. The gcode used
         determines which portion of memory is read and returned.
 
+        All motors must be disengaged to consistently read over I2C lines
+
         gcode:
             String (str) containing a GCode
             either 'READ_INSTRUMENT_ID' or 'READ_INSTRUMENT_MODEL'
@@ -638,6 +640,8 @@ class SmoothieDriver_3_0_0:
         if not mount:
             raise ValueError('Unexpected mount: {}'.format(mount))
         try:
+            self.disengage_axis('XYZABC')
+            self.delay(CURRENT_CHANGE_DELAY)
             res = self._send_command(gcode + mount)
             res = _parse_instrument_data(res)
             assert mount in res
