@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import {FlatButton, type ButtonProps} from '../buttons'
+import {OutlineButton, type ButtonProps} from '../buttons'
 import Modal from './Modal'
 import styles from './modals.css'
 
@@ -37,7 +37,7 @@ export default function AlertModal (props: Props) {
       {buttons && (
         <div className={styles.alert_modal_buttons}>
           {buttons.filter(Boolean).map((button, index) => (
-            <FlatButton key={index} {...button} />
+            <OutlineButton key={index} {...button} />
           ))}
         </div>
       )}
