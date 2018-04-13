@@ -38,10 +38,15 @@ def serial_with_temp_timeout(serial_connection, timeout):
     serial_connection.timeout = saved_timeout
 
 
-def _parse_smoothie_response(response):
+def _parse_smoothie_response(response, command):
     if DRIVER_ACK in response:
         parsed_response = response.split(DRIVER_ACK)[0]
-        return parsed_response
+        # smoothieware can enter a weird state, where it repeats back
+        # the sent command at the beginning of its response
+        # This checks for this echo, and strips the command from the response
+        if command in parsed_response:
+            parsed_response = parsed_response.replace(command, b'')
+        return parsed_response.strip()
     else:
         return None
 
@@ -60,7 +65,7 @@ def _write_to_device_and_return(cmd, device_connection):
 
     response = device_connection.read_until(DRIVER_ACK)
 
-    clean_response = _parse_smoothie_response(response)
+    clean_response = _parse_smoothie_response(response, cmd)
     if clean_response:
         return clean_response.decode()
     return ''

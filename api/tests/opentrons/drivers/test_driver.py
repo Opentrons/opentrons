@@ -8,6 +8,24 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
+def test_remove_serial_echo(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers.serial_communication import \
+        _parse_smoothie_response
+    smoothie_response = b'ok\r\nok\r\n'
+    command = b'G28.2B'
+    res = _parse_smoothie_response(smoothie_response, command)
+    assert res == b''
+    res = _parse_smoothie_response(command + smoothie_response, command)
+    assert res == b''
+    res = _parse_smoothie_response(
+        b'\r\n' + command + b'\r\n\r\n' + smoothie_response, command)
+    assert res == b''
+    res = _parse_smoothie_response(
+        b'\r\n' + command + b'\r\n\r\nsome-data\r\nok\r\n' + smoothie_response,
+        command)
+    assert res == b'some-data'
+
+
 def test_parse_axis_values(smoothie):
     from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
     good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
