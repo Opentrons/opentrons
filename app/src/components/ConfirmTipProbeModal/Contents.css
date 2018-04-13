@@ -3,15 +3,24 @@
 
 .attention {
   @apply --font-header-dark;
+
+  margin-bottom: 1rem;
 }
 
 .list {
   @apply --font-body-2-dark;
 
   list-style: none;
-  padding-left: 1rem;
+  padding-left: 2rem;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 2rem;
 }
 
 .list li {
   margin-top: 0.75rem;
+}
+
+.diagram {
+  max-width: 40%;
 }
