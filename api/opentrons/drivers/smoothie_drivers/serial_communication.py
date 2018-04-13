@@ -45,7 +45,7 @@ def _parse_smoothie_response(response, command):
         # the sent command at the beginning of its response
         # This checks for this echo, and strips the command from the response
         if command in parsed_response:
-            parsed_response = parsed_response.replace(command, '')
+            parsed_response = parsed_response.replace(command, b'')
         return parsed_response.strip()
     else:
         return None
