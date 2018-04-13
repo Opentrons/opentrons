@@ -125,7 +125,7 @@ def init(loop=None):
     server.app.router.add_post(
         '/robot/move', control.move)
     server.app.router.add_post(
-        '/robot/home_pipette', control.home_pipette)
+        '/robot/home', control.home)
     server.app.router.add_get(
         '/settings', update.get_feature_flag)
     server.app.router.add_post(
