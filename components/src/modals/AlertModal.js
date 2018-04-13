@@ -37,7 +37,7 @@ export default function AlertModal (props: Props) {
       {buttons && (
         <div className={styles.alert_modal_buttons}>
           {buttons.filter(Boolean).map((button, index) => (
-            <OutlineButton key={index} {...button} />
+            <OutlineButton key={index} {...button} className={styles.alert_button}/>
           ))}
         </div>
       )}

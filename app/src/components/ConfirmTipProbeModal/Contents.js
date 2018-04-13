@@ -2,7 +2,7 @@
 // contents of the ContinueTipProbeModal container
 import * as React from 'react'
 
-import removeTrashSrc from './trash@3x.png'
+import removeTrashSrc from './img/trash@3x.png'
 import styles from './Contents.css'
 
 export default function () {
