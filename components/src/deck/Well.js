@@ -1,15 +1,14 @@
 // @flow
 import React from 'react'
 import cx from 'classnames'
-import isNil from 'lodash/isNil'
 
 import styles from './Well.css'
-import { SELECTABLE_WELL_CLASS, swatchColors } from '../constants.js'
+import {SELECTABLE_WELL_CLASS} from '../constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
 type Props = {
   wellName: string,
-  groupId: string | null, // TODO Ian 2017-12-13 groupId represents an Ingredient Group ID, should be handled outside of this component.
+  fillColor?: ?string,
   selectable: boolean,
   selected: boolean,
   preselected: boolean,
@@ -29,15 +28,13 @@ type Props = {
 export default function Well (props: Props) {
   const {
     wellName,
-    groupId,
+    fillColor,
     selectable,
     selected,
     preselected,
     wellLocation,
     svgOffset
   } = props
-
-  const isFilled = !isNil(groupId)
 
   const className = cx(styles.well, {
     [SELECTABLE_WELL_CLASS]: selectable,
@@ -46,9 +43,7 @@ export default function Well (props: Props) {
   })
 
   const style = {
-    '--fill-color': isFilled
-      ? swatchColors(parseInt(groupId, 10))
-      : 'transparent'
+    '--fill-color': fillColor || 'transparent'
   }
 
   const commonProps = {

@@ -175,6 +175,22 @@ make dev
 make push
 ```
 
+### Releasing (for Opentrons developers)
+
+Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability. As we move from prerelease to release, several of the manual steps below will be automated in CI and/or scripted.
+
+1.  Manually bump the `version` field in repo-level `package.json`
+    *   The rest of these steps will refer to the bump as `${version}`
+2.  `python scripts/bump_version.py --sync && make install`
+3.  `git commit -am 'release: ${version}'`
+4.  Open a PR into `edge`
+5.  Merge the PR once approved
+6.  Verify that CI is green on `edge` and test the build artifacts
+7.  Pull latest `edge` to your machine
+8.  `git tag -a v${version} -m 'release: ${version}'`
+9.  `git push --tags`
+
+
 ## Prior Art
 
 This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!

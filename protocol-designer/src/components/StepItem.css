@@ -1,5 +1,46 @@
 @import '@opentrons/components';
 
+:root {
+  --step_subitem: {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem;
+    border-top: 2px solid var(--c-light-gray);
+    text-align: center;
+  };
+
+  --subitem_cell: {
+    flex: 2;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  };
+}
+
+.step_subitem {
+  @apply --step_subitem;
+
+  & > * {
+    @apply --subitem_cell;
+
+    flex: 1;
+  }
+
+  & svg {
+    /* Subitem group carat */
+    flex: 1;
+    height: 1.5rem;
+    color: var(--c-med-gray);
+  }
+
+  & .volume_cell {
+    color: var(--c-med-gray);
+    overflow: visible;
+    text-align: right;
+  }
+}
+
 .step_item {
   margin: 0.25rem 0;
   color: var(--c-dark-gray);
@@ -10,11 +51,6 @@
   margin: 0;
 }
 
-/* Last .step_subitem */
-.step_item ol li:last-child {
-  border-bottom: none;
-}
-
 .step_item h3 {
   text-transform: uppercase;
 }
@@ -23,45 +59,25 @@
   font-weight: bold;
 }
 
-/* Step Subitem */
-
-.step_subitem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.5rem;
-  border-top: 2px solid var(--c-light-gray);
-  text-align: center;
-}
-
-.step_subitem > * {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.step_subitem svg {
-  flex: 1;
-  height: 1.5rem;
-  color: var(--c-med-gray);
-}
-
-.step_subitem .volume_cell {
-  color: var(--c-med-gray);
-  overflow: visible;
-  text-align: right;
-}
-
 /* Step Subitem Column Header */
 
 .step_subitem_column_header {
-  composes: step_subitem;
-  border: none;
-}
+  @apply --step_subitem;
 
-.step_subitem_column_header > * {
-  flex: 2;
+  border: none;
+
+  & svg {
+    /* Source labware -> Dest Labware arrow icon */
+    flex: 1;
+    height: 1.5rem;
+    color: var(--c-med-gray);
+  }
+
+  & > * {
+    @apply --subitem_cell;
+
+    text-align: left;
+  }
 }
 
 /* Aspirate / dispense headers */
@@ -69,9 +85,41 @@
   display: flex;
   padding: 0.5rem;
   font-size: var(--fs-body-1);
-  text-align: center;
+  text-align: left;
+
+  & .spacer {
+    flex: 1;
+  }
+
+  & * {
+    flex: 2;
+  }
 }
 
-.aspirate_dispense * {
-  flex: 1;
+/* Multi-channel row representing a single channel */
+.step_subitem_channel_row {
+  @apply --step_subitem;
+
+  border-bottom: 1px var(--c-med-gray) dashed;
+  background-color: var(--c-light-gray);
+
+  & > * {
+    @apply --subitem_cell;
+  }
+}
+
+/* Inner collapse carat */
+
+.inner_carat {
+  @apply --clickable;
+}
+
+.substep {
+  /* Invisible border for padding */
+  border: 2px solid transparent;
+}
+
+.highlighted {
+  /* TODO Ian 2018-04-09 this border for highlight is also in lists.css in complib. Export from complib as class? */
+  border: 2px solid var(--c-blue);
 }

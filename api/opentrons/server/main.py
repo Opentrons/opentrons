@@ -8,6 +8,7 @@ from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
 from opentrons.server.endpoints import (wifi, control, update)
+from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
 
@@ -30,6 +31,8 @@ def log_init():
 
     level_value = logging._nameToLevel[ot_log_level]
 
+    serial_log_filename = environment.get_path('SERIAL_LOG_FILE')
+
     logging_config = dict(
         version=1,
         formatters={
@@ -41,7 +44,15 @@ def log_init():
         handlers={
             'debug': {
                 'class': 'logging.StreamHandler',
+                'formatter': 'basic'
+            },
+            'serial': {
+                'class': 'logging.handlers.RotatingFileHandler',
                 'formatter': 'basic',
+                'filename': serial_log_filename,
+                'maxBytes': 5000000,
+                'level': logging.DEBUG,
+                'backupCount': 3
             }
         },
         loggers={
@@ -60,6 +71,10 @@ def log_init():
             'opentrons.drivers.smoothie_drivers.driver_3_0': {
                 'handlers': ['debug'],
                 'level': level_value
+            },
+            'opentrons.drivers.smoothie_drivers.serial_communication': {
+                'handlers': ['serial'],
+                'level': logging.DEBUG
             }
         }
     )
@@ -110,7 +125,7 @@ def init(loop=None):
     server.app.router.add_post(
         '/robot/move', control.move)
     server.app.router.add_post(
-        '/robot/home_pipette', control.home_pipette)
+        '/robot/home', control.home)
     server.app.router.add_get(
         '/settings', update.get_feature_flag)
     server.app.router.add_post(

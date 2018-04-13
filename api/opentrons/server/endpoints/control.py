@@ -220,7 +220,7 @@ def _move_mount(mount, point):
     return "Move complete. New position: {}".format(new_position)
 
 
-async def home_pipette(request):
+async def home(request):
     """
     This initializes a call to pipette.home() which, as a side effect will:
         1. Check the pipette is actually connected (will throw an error if you
@@ -230,36 +230,39 @@ async def home_pipette(request):
         The content type is application/json.
         The correct packet form should be as follows:
         {
-        'mount': Can be 'right' or 'left' represents pipette mounts
-        'model': Can be from the list of pipettes found under
-        pipette_config.configs
+        'target': Can be, 'robot' or 'pipette'
+        'mount': 'left' or 'right', only used if target is pipette
         }
     :return: A success or non-success message.
     """
     req = await request.text()
     data = json.loads(req)
 
-    model = data.get('model')
-    mount = data.get('mount')
+    target = data.get('target')
 
-    try:
+    if target in ['robot', 'pipette']:
 
-        assert mount in ['left', 'right']
-        assert model in pipette_config.configs.keys()
+        if target == 'robot':
+            robot.home()
 
-        config = pipette_config.load(model)
-        pipette = instruments._create_pipette_from_config(
-            config=config,
-            mount=mount)
+            status = 200
+            message = "Homing robot."
+        else:
+            mount = data.get('mount')
+            if mount in ['left', 'right']:
+                pipette = instruments.Pipette(mount=mount)
+                pipette.home()
 
-        pipette.home()
+                status = 200
+                message = "Pipette on {} homed successfully.".format(mount)
+            else:
+                status = 400
+                message = "Expected 'left' or 'right' as values for mount" \
+                          "got {} instead.".format(mount)
 
-        message = "{} on {} mount homed successfully.".format(model, mount)
-        status = 200
-
-    except AssertionError as e:
+    else:
         status = 400
-        message = "Received incorrectly formatted data."
+        message = "Expected 'robot' or 'pipette' got {}.".format(target)
 
     return web.json_response({"message": message}, status=status)
 

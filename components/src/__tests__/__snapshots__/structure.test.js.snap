@@ -63,6 +63,32 @@ exports[`PageTabs renders PageTabs correctly 1`] = `
 </nav>
 `;
 
+exports[`Pill renders Pill correctly 1`] = `
+<span
+  className="pill foo"
+  style={
+    Object {
+      "backgroundColor": "blue",
+    }
+  }
+>
+  Blue
+</span>
+`;
+
+exports[`Pill renders Pill correctly with inverted text 1`] = `
+<span
+  className="pill foo invert_text"
+  style={
+    Object {
+      "backgroundColor": "blue",
+    }
+  }
+>
+  Blue
+</span>
+`;
+
 exports[`RefreshCard renders correctly 1`] = `
 <section
   className="card"

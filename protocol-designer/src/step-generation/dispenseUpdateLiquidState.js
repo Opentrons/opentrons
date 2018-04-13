@@ -3,10 +3,9 @@ import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {splitLiquid, mergeLiquid, getWellsForTips} from './utils'
-import type {RobotState, PipetteData} from './'
+import type {RobotState, LocationLiquidState, PipetteData} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
-type LocationLiquidState = {[ingredId: string]: {volume: number}}
 
 export default function updateLiquidState (
   args: {

@@ -9,7 +9,8 @@ import {
   Card,
   RefreshCard,
   LabeledValue,
-  Splash
+  Splash,
+  Pill
 } from '..'
 
 describe('TitleBar', () => {
@@ -208,6 +209,24 @@ describe('Splash', () => {
   test('renders correctly with custom props', () => {
     const tree = Renderer.create(
       <Splash iconName='flask-outline' className='swag' />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('Pill', () => {
+  test('renders Pill correctly', () => {
+    const tree = Renderer.create(
+      <Pill color='blue' className='foo'>Blue</Pill>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('renders Pill correctly with inverted text', () => {
+    const tree = Renderer.create(
+      <Pill color='blue' className='foo' invertTextColor>Blue</Pill>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

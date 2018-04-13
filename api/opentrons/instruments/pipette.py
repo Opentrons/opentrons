@@ -1,6 +1,7 @@
 import itertools
 import warnings
 import logging
+import time
 
 from opentrons import commands
 from opentrons.containers import unpack_location
@@ -31,6 +32,10 @@ DEFAULT_PLUNGE_CURRENT = 0.1
 
 SHAKE_OFF_TIPS_SPEED = 50
 SHAKE_OFF_TIPS_DISTANCE = 2
+
+
+def _sleep(seconds):
+    time.sleep(seconds)
 
 
 class PipetteTip:
@@ -373,7 +378,8 @@ class Pipette:
         >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot aspirate without a tip attached.")
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -474,7 +480,8 @@ class Pipette:
         >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot dispense without a tip attached.")
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -507,12 +514,11 @@ class Pipette:
 
         return self
 
-    def _position_for_aspirate(self, location=None):
+    def _position_for_aspirate(self, location=None, clearance=1.0):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
         """
-        assert self.tip_attached
 
         placeable = None
         if location:
@@ -539,18 +545,17 @@ class Pipette:
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(min(location.z_size(), 1))
+                location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location, strategy='direct')
 
-    def _position_for_dispense(self, location=None):
+    def _position_for_dispense(self, location=None, clearance=0.5):
         """
         Position this :any:`Pipette` for an dispense
         """
-        assert self.tip_attached
 
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(min(location.z_size(), 1))
+                location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location)
 
     def retract(self, safety_margin=10):
@@ -621,7 +626,8 @@ class Pipette:
         >>> p200.mix(3) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot mix without a tip attached.")
 
         if volume is None:
             volume = self.max_volume
@@ -667,7 +673,8 @@ class Pipette:
         >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot 'blow out' without a tip attached.")
 
         self.move_to(location)
         self.robot.poses = self.instrument_actuator.move(
@@ -719,7 +726,8 @@ class Pipette:
         >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot touch tip without a tip attached.")
 
         height_offset = 0
 
@@ -788,7 +796,8 @@ class Pipette:
         >>> p200.air_gap(50) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot perform air_gap without a tip attached.")
 
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
@@ -836,7 +845,8 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot return tip without tip attached.")
 
         if not self.current_tip():
             self.robot.add_warning(
@@ -894,7 +904,8 @@ class Pipette:
         >>> p200.return_tip() # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert not self.tip_attached
+        if self.tip_attached:
+            log.warning("There is already a tip attached to this pipette.")
 
         if not location:
             location = self.get_next_tip()
@@ -988,7 +999,8 @@ class Pipette:
         >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
         <opentrons.instruments.pipette.Pipette object at ...>
         """
-        assert self.tip_attached
+        if not self.tip_attached:
+            log.warning("Cannot drop tip without a tip attached.")
 
         if not location and self.trash_container:
             location = self.trash_container
@@ -1294,14 +1306,16 @@ class Pipette:
         ----------
 
         seconds: float
-            The number of seconds to freeeze in place.
+            The number of seconds to freeze in place.
         """
 
         minutes += int(seconds / 60)
         seconds = seconds % 60
         seconds += float(minutes * 60)
 
-        self.instrument_actuator.delay(seconds)
+        self.robot.pause()
+        _sleep(seconds)
+        self.robot.resume()
 
         return self
 
@@ -1458,12 +1472,11 @@ class Pipette:
         if volume < 0:
             raise RuntimeError(
                 "Volume must be a positive number, got {}.".format(volume))
-            volume = 0
         if volume > self.max_volume:
             raise RuntimeError(
                 "{0}µl exceeds pipette's maximum volume ({1}ul).".format(
                     volume, self.max_volume))
-        if volume < self.min_volume and volume > 0:
+        if volume < self.min_volume:
             self.robot.add_warning(
                 "{0}µl is less than pipette's min_volume ({1}ul).".format(
                     volume, self.min_volume))
@@ -1734,26 +1747,26 @@ class Pipette:
         return pose_tree
 
     def _add_tip(self, length):
-        assert not self.tip_attached
-        x, y, z = pose_tracker.change_base(
-            self.robot.poses,
-            src=self,
-            dst=self.mount)
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses, self, pose_tracker.Point(
-                x, y, z - length))
-        self.tip_attached = True
+        if not self.tip_attached:
+            x, y, z = pose_tracker.change_base(
+                self.robot.poses,
+                src=self,
+                dst=self.mount)
+            self.robot.poses = pose_tracker.update(
+                self.robot.poses, self, pose_tracker.Point(
+                    x, y, z - length))
+            self.tip_attached = True
 
     def _remove_tip(self, length):
-        assert self.tip_attached
-        x, y, z = pose_tracker.change_base(
-            self.robot.poses,
-            src=self,
-            dst=self.mount)
-        self.robot.poses = pose_tracker.update(
-            self.robot.poses, self, pose_tracker.Point(
-                x, y, z + length))
-        self.tip_attached = False
+        if self.tip_attached:
+            x, y, z = pose_tracker.change_base(
+                self.robot.poses,
+                src=self,
+                dst=self.mount)
+            self.robot.poses = pose_tracker.update(
+                self.robot.poses, self, pose_tracker.Point(
+                    x, y, z + length))
+            self.tip_attached = False
 
     def _max_deck_height(self):
         mount_max_height = self.instrument_mover.axis_maximum(

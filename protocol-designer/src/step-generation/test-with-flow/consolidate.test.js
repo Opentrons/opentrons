@@ -1516,6 +1516,9 @@ describe('consolidate single-channel', () => {
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
+
+  test('delay after dispense') // TODO Ian 2018-04-05 support delay in consolidate
+  test('air gap') // TODO Ian 2018-04-05 determine air gap behavior
 })
 
 describe('consolidate multi-channel', () => {

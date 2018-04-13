@@ -19,7 +19,7 @@
 
 .run_time {
   padding: var(--run-panel-padding);
-  font-weight: var(--fw-bold);
+  font-weight: var(--fw-semibold);
   font-size: var(--fs-huge);
   color: var(--c-med-gray);
   text-transform: uppercase;

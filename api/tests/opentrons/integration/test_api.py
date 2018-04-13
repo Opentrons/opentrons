@@ -10,6 +10,7 @@ from opentrons.trackers import pose_tracker
 @pytest.fixture
 def smoke():
     robot.connect()
+    robot.reset()
     robot.home()
     robot._driver.log.clear()
     from tests.opentrons.data import smoke  # NOQA
@@ -50,7 +51,12 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
 
 
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
-async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db):  # NOQA
+async def test_load_jog_save_run(
+        main_router, protocol, protocol_file, dummy_db, monkeypatch):
+    import tempfile
+    temp = tempfile.gettempdir()
+    monkeypatch.setenv('USER_DEFN_ROOT', temp)
+
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))

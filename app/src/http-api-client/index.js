@@ -4,6 +4,7 @@ import {combineReducers} from 'redux'
 import {healthReducer, type HealthAction} from './health'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
 import {pipettesReducer, type PipettesAction} from './pipettes'
+import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
 import {wifiReducer, type WifiAction} from './wifi'
 
@@ -11,6 +12,7 @@ export const reducer = combineReducers({
   health: healthReducer,
   healthCheck: healthCheckReducer,
   pipettes: pipettesReducer,
+  robot: robotReducer,
   server: serverReducer,
   wifi: wifiReducer
 })
@@ -27,8 +29,13 @@ export type {
 
 export type {
   Pipette,
+  PipettesResponse,
   RobotPipettes
 } from './pipettes'
+
+export type {
+  RobotMoveState
+} from './robot'
 
 export type {
   RobotServerUpdate,
@@ -50,6 +57,7 @@ export type Action =
   | HealthAction
   | HealthCheckAction
   | PipettesAction
+  | RobotAction
   | ServerAction
   | WifiAction
 
@@ -72,6 +80,12 @@ export {
   fetchPipettes,
   makeGetRobotPipettes
 } from './pipettes'
+
+export {
+  moveToChangePipette,
+  makeGetRobotMove,
+  clearRobotMoveResponse
+} from './robot'
 
 export {
   updateRobotServer,

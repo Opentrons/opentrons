@@ -1,0 +1,16 @@
+@import '..';
+
+.pill {
+  border-radius: var(--bd-radius-pill);
+  color: var(--c-white);
+  padding: 0.5em;
+}
+
+.pill:empty::before {
+  /* zero width space to give empty pill the same line height */
+  content: "\200b";
+}
+
+.invert_text {
+  color: var(--c-black);
+}

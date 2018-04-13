@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.6",
   "description": "Opentrons desktop application UI",
   "main": "src/index.js",
   "repository": {
@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
-    "@opentrons/app-shell": "3.0.0-beta.3",
-    "@opentrons/webpack-config": "3.0.0-beta.3",
+    "@opentrons/app-shell": "3.0.0-beta.6",
+    "@opentrons/webpack-config": "3.0.0-beta.6",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -57,7 +57,7 @@
     "ws": "3.1.0"
   },
   "dependencies": {
-    "@opentrons/components": "3.0.0-beta.3",
+    "@opentrons/components": "3.0.0-beta.6",
     "bonjour": "^3.5.0",
     "classnames": "^2.2.5",
     "electron": "1.8.3",

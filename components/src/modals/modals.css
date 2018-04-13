@@ -10,7 +10,7 @@
 .overlay {
   @apply --absolute-fill;
 
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .clickable {
@@ -39,4 +39,8 @@
 .alert_modal_buttons {
   float: right;
   margin-top: 1rem;
+}
+
+.alert_button {
+  margin-left: 1rem;
 }

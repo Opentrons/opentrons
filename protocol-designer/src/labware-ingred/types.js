@@ -21,7 +21,7 @@ export type IngredInstance = {
 
 type IngredInstanceFlat = {|
   labwareId: string,
-  groupId: string,
+  groupIds: Array<string>,
   well: string,
   volume: number
 |}
@@ -32,7 +32,7 @@ export type WellContents = {| // non-ingredient well state
   highlighted: boolean,
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
-  groupId: string | null // TODO Ian 2018-03-07 this should be color, not groupId.
+  groupIds: Array<string>
 |}
 
 export type AllWellContents = {

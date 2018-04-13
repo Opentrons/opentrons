@@ -486,7 +486,6 @@ const _getWellContents = (
 
   return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
     const groupIds = groupIdsForWell(wellName)
-    const groupIdFields = {groupId: groupIds[0] || null}
 
     const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
 
@@ -499,7 +498,7 @@ const _getWellContents = (
         hovered: !!(highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1),
 
         maxVolume: location['total-liquid-volume'] || Infinity,
-        ...groupIdFields // TODO Ian 2018-03-07 this should be a color, >1 => gray ?
+        groupIds
       }
     }
   }, {})

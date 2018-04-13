@@ -55,11 +55,13 @@ export default function StepItem (props: StepItemProps) {
     >
       {showLabwareHeader && <li className={styles.aspirate_dispense}>
           <span>ASPIRATE</span>
+          <span className={styles.spacer}/>
           <span>DISPENSE</span>
       </li>}
       {showLabwareHeader && <li className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <span>{sourceLabwareName}</span>
-        <Icon name={iconName} />
+        {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
+        <Icon name='ot-transfer' />
         <span>{destLabwareName}</span>
       </li>}
       {children}

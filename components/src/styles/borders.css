@@ -1,5 +1,8 @@
 @import './colors.css';
 
 :root {
-  --bd-light: 2px solid var(--c-light-gray);
+  --bd-radius-default: 2px;
+  --bd-radius-pill: 12px;
+  --bd-width-default: 2px;
+  --bd-light: var(--bd-width-default) solid var(--c-light-gray);
 }

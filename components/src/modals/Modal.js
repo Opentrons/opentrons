@@ -10,7 +10,9 @@ type ModalProps = {
   /** modal contents */
   children: React.Node,
   /** classes to apply */
-  className?: string
+  className?: string,
+  /** classes to apply to the contents box */
+  contentsClassName?: string
 }
 
 /**
@@ -21,7 +23,7 @@ export default function Modal (props: ModalProps) {
   return (
     <div className={cx(styles.modal, props.className)}>
       <Overlay onClick={props.onCloseClick} />
-      <div className={styles.modal_contents}>
+      <div className={cx(styles.modal_contents, props.contentsClassName)}>
         {props.children}
       </div>
     </div>

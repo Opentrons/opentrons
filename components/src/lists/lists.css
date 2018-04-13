@@ -22,8 +22,12 @@
   background-color: white;
 }
 
+.titled_list {
+  border: var(--bd-width-default) solid transparent;
+}
+
 .titled_list_selected {
-  border: 2px solid var(--c-blue);
+  border-color: var(--c-blue);
 }
 
 .title_bar {

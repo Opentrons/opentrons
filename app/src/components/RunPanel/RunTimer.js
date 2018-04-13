@@ -18,7 +18,7 @@ export default function RunTimer (props: TimeProps) {
   return (
     <div>
       <div className={styles.run_time}>
-        <p>Estimated Run Time: </p>
+        <p>Run Time: </p>
         {runTime}
       </div>
       <div className={styles.start_time}>Start Time: {startTimeStamp}</div>

@@ -2,22 +2,24 @@
 // contents of the ContinueTipProbeModal container
 import * as React from 'react'
 
+import removeTrashSrc from './img/trash@3x.png'
 import styles from './Contents.css'
 
 export default function () {
   return (
     <div>
       <p className={styles.attention}>
-        Before continuing:
+        Before continuing remove from deck:
       </p>
       <ol className={styles.list}>
         <li>
-          Remove all labware from the deck
+          All labware
         </li>
         <li>
-          Remove the trash bin cover
+          Trash bin
         </li>
       </ol>
+      <img className={styles.diagram} src={removeTrashSrc} />
     </div>
   )
 }

@@ -262,20 +262,21 @@ async def test_jog_calibrate_top(
         dummy_db,
         user_definition_dirs,
         main_router,
-        model):
+        model,
+        monkeypatch):
 
     # Check that the old behavior remains the same without the feature flag
     from numpy import array, isclose
     from opentrons.trackers import pose_tracker
+    import tempfile
+    temp = tempfile.gettempdir()
+    monkeypatch.setenv('USER_DEFN_ROOT', temp)
 
     robot = model.robot
 
     container = model.container._container
-    pos1 = pose_tracker.change_base(
-        robot.poses,
-        src=container[0],
-        dst=robot.deck)
-    coordinates1 = container.coordinates()
+    pos1 = pose_tracker.absolute(robot.poses, container[0])
+    coordinates1 = container[0].coordinates()
 
     main_router.calibration_manager.move_to(model.instrument, model.container)
     main_router.calibration_manager.jog(model.instrument, 1, 'x')
@@ -289,7 +290,7 @@ async def test_jog_calibrate_top(
     )
 
     pos2 = pose_tracker.absolute(robot.poses, container[0])
-    coordinates2 = container.coordinates()
+    coordinates2 = container[0].coordinates()
 
     assert isclose(pos1 + (1, 2, 3), pos2).all()
     assert isclose(

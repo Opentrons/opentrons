@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="24" viewBox="0 0 128 24">
+    <defs>
+        <path id="b" d="M371 206h629v119H371z"/>
+        <filter id="a" width="101.3%" height="106.7%" x="-.6%" y="-1.7%" filterUnits="objectBoundingBox">
+            <feOffset dy="2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+            <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="1"/>
+            <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.330474411 0"/>
+        </filter>
+    </defs>
+    <g fill="none" fill-rule="evenodd" transform="translate(-442 -236)">
+        <use fill="#000" filter="url(#a)" xlink:href="#b"/>
+        <use fill="#FFF" xlink:href="#b"/>
+        <text fill="#4A4A4A" font-family="OpenSans-Regular, Open Sans" font-size="18">
+            <tspan x="394" y="245">Pipettes</tspan>
+        </text>
+        <path fill="#000" fill-opacity=".9" d="M352 0h672v768H352z"/>
+        <rect width="574" height="627" x="399" y="89" fill="#FFF" rx="8"/>
+        <rect width="252" height="435" x=".5" y="10.5" stroke="#9B9B9B" opacity=".614" rx="1" transform="translate(422 161)"/>
+        <g>
+            <g transform="translate(489 240)">
+                <rect width="3.737" height="3" y=".5" fill="#939393" rx="1"/>
+                <rect width="43.905" height="3.5" x="2.335" fill="#939393" rx="1"/>
+                <rect width="43.905" height="2" x="2.335" y="2" fill="#6C6C6C" rx="1"/>
+                <rect width="1" height="4" x=".467" fill="#939393" rx=".5"/>
+                <rect width="1" height="1.5" x=".467" y="2.5" fill="#6C6C6C" rx=".5"/>
+                <rect width="1" height="1.5" x=".467" y="2" fill="#6C6C6C" rx=".5"/>
+                <path fill="#6C6C6C" d="M0 2h2.987a.75.75 0 0 1 0 1.5H1a1 1 0 0 1-1-1V2z"/>
+                <path fill="#6C6C6C" d="M.467 2h2.52a.75.75 0 0 1 0 1.5h-1.52a1 1 0 0 1-1-1V2z"/>
+                <path stroke="#D5D5D5" stroke-width=".5" d="M2.585 2h42.471v1H2.585z" opacity=".663"/>
+                <path stroke="#D5D5D5" stroke-width=".5" d="M.25 2h1.835v1H.25z" opacity=".572"/>
+                <path stroke="#D5D5D5" stroke-width=".5" d="M.25.75h1.835v1H.25z" opacity=".213"/>
+            </g>
+            <g transform="translate(527.2 237)">
+                <rect width="1.968" height="7.652" y="1.435" fill="#FF4747" rx=".984"/>
+                <rect width="1.968" height="9.087" x="40.832" y=".957" fill="#FF4747" rx=".984"/>
+                <rect width="2.46" height="9.565" x="1.476" y=".478" fill="#2E2E2E" rx="1"/>
+                <path fill="#2E2E2E" stroke="#2E2E2E" stroke-linecap="square" d="M2.962 4.635a1.009 1.009 0 0 1-.01-.142v-1.87a1 1 0 0 1 1-1h.32c.322 0 .609.153.792.39a2.99 2.99 0 0 1 1.258-.11c1.413.175 3.141.172 5.186-.01 3.19-.283 5.613-.675 7.266-1.176a1 1 0 0 1 1.29.957v3.819H2.952v-.614a3 3 0 0 1 .01-.244z"/>
+                <path fill="#2E2E2E" d="M20.694 0h19.203a2 2 0 0 1 2 2v3.538H20.694a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z"/>
+                <path fill="#2E2E2E" stroke="#2E2E2E" stroke-linecap="square" d="M2.962 6.119c-.007.046-.01.094-.01.142V8.13a1 1 0 0 0 1 1h.32a.998.998 0 0 0 .792-.39 2.99 2.99 0 0 0 1.258.111c1.413-.175 3.141-.172 5.186.01 3.19.283 5.613.675 7.266 1.176a1 1 0 0 0 1.29-.957V5.26H2.952v.614a3 3 0 0 0 .01.245z"/>
+                <path fill="#2E2E2E" d="M20.694 10.799h19.203a2 2 0 0 0 2-2V5.26H20.694a2 2 0 0 0-2 2v1.538a2 2 0 0 0 2 2z"/>
+                <path fill="#FFF" fill-opacity=".619" d="M20.205 5.182v.079H2.476a1 1 0 0 1-1-1V1.554a1 1 0 0 1 1-1h.305a1 1 0 0 1 .998.933.996.996 0 0 1 .426-.095h.305c.325 0 .614.155.796.395a2.99 2.99 0 0 1 1.267-.114c1.4.173 3.11.169 5.132-.012 3.164-.283 5.567-.674 7.21-1.173a1 1 0 0 1 .551-.01C19.816.18 20.269 0 20.765 0h19.051a2 2 0 0 1 2 2v3.26H20.765a2 2 0 0 1-.56-.078z" opacity=".118"/>
+            </g>
+            <text fill="#4A4A4A" font-family="OpenSans-Regular, Open Sans" font-size="12" transform="translate(442 235)">
+                <tspan x="0" y="13">2.5mm</tspan> <tspan x="0" y="25">screwdriver </tspan>
+            </text>
+        </g>
+    </g>
+</svg>

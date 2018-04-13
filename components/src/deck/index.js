@@ -2,6 +2,7 @@
 import Deck from './Deck'
 import LabwareContainer from './LabwareContainer'
 import Plate from './Plate'
+import type {SingleWell} from './Plate'
 import Well from './Well'
 
 import {ContainerNameOverlay} from './ContainerNameOverlay'
@@ -19,4 +20,8 @@ export {
   Plate,
   SlotOverlay,
   Well
+}
+
+export type {
+  SingleWell
 }
