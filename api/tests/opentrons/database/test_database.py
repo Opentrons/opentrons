@@ -36,11 +36,11 @@ def test_well_from_container_load():
 def test_container_parse():
     robot.reset()
     plate = containers_load(robot, '96-flat', '1')
-    assert database._parse_container_obj(plate) == {
-        'x': 14.34,
-        'y': 11.24,
-        'z': 10.50
-    }
+    if ff.split_labware_definitions():
+        expected = {'x': 0, 'y': 0, 'z': 0}
+    else:
+        expected = {'x': 14.34, 'y': 11.24, 'z': 10.50}
+    assert database._parse_container_obj(plate) == expected
 
 
 def test_load_persisted_container():

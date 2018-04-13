@@ -283,7 +283,6 @@ async def test_jog_calibrate_top(
     main_router.calibration_manager.jog(model.instrument, 2, 'y')
     main_router.calibration_manager.jog(model.instrument, 3, 'z')
 
-    # Todo: make tests use a tmp dir instead of a real one
     main_router.calibration_manager.update_container_offset(
         model.container,
         model.instrument

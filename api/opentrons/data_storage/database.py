@@ -8,15 +8,16 @@ from opentrons.util.vector import Vector
 from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
+import logging
 
+log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')
 
 # ======================== Private Functions ======================== #
 
 
 def _parse_container_obj(container: Container):
-    # TODO: figure out how the output of this fn is used--what needs to change
-    # TODO: since all container._coordinates are now (0, 0, 0)
+    # Note: in the new labware system, container coordinates are always (0,0,0)
     return dict(zip('xyz', container._coordinates))
 
 
@@ -141,10 +142,14 @@ def _calculate_offset(labware: Container) -> dict:
     base_well = base_definition['wells'][first_well]
     new_well = new_definition['wells'][first_well]
 
+    slot_coords = labware.parent.coordinates()
+
     x, y, z = [
-        new_well[axis] - base_well[axis]
+        new_well[axis] - base_well[axis] - slot_coords[axis]
         for axis in 'xyz'
     ]
+    log.debug("Calculated offset for {} in {}: {}".format(
+        labware.get_name(), labware.get_parent(), (x, y, z)))
     return {'x': x, 'y': y, 'z': z}
 # ======================== END Private Functions ======================== #
 
