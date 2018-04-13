@@ -182,10 +182,10 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
   className="title_bar"
 >
   <button
-    className="button_flat back_button"
+    className="button_flat inverted"
     disabled={undefined}
     onClick={[Function]}
-    title="back"
+    title="Back"
     type="button"
   >
     <svg
@@ -205,7 +205,7 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
         fillRule="evenodd"
       />
     </svg>
-    Back
+    back
   </button>
   <div
     className="title_wrapper"

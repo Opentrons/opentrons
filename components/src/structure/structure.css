@@ -12,6 +12,7 @@
 .title_bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   text-transform: uppercase;
   background-color: var(--c-dark-gray);
 }
@@ -44,16 +45,6 @@
 
 .separator {
   padding: 0 1.75rem;
-}
-
-.back_button {
-  margin-right: auto;
-  color: var(--c-font-light);
-
-  &:hover {
-    color: color(var(--c-font-light) shade(10%));
-    background-color: transparent;
-  }
 }
 
 .page_tabs {
