@@ -1,7 +1,20 @@
 import os
 import json
 
-SETTINGS_PATH = '/data/settings.json'
+
+# In order to specify a location for the settings.json file, export the
+# OT_SETTINGS_DIR environment variable. For example,
+# `export OT_SETTINGS_DIR=$HOME` would cause the server to look in the user's
+# home directory for a file named 'settings.json'. Primarily used to override
+# feature flags during development.
+OVERRIDE_SETTINGS_DIR = os.environ.get('OT_SETTINGS_DIR')
+DEFAULT_SETTINGS_DIR = '/data'
+SETTINGS_FILE = 'settings.json'
+
+if OVERRIDE_SETTINGS_DIR:
+    SETTINGS_PATH = os.path.join(OVERRIDE_SETTINGS_DIR, SETTINGS_FILE)
+else:
+    SETTINGS_PATH = os.path.join(DEFAULT_SETTINGS_DIR, SETTINGS_FILE)
 
 
 def get_feature_flag(name: str) -> bool:

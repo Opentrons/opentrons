@@ -5,8 +5,10 @@ import re
 import functools
 
 from collections import OrderedDict
+from itertools import chain
 
 from opentrons.util.vector import Vector
+from opentrons.config import feature_flags as ff
 
 
 def unpack_location(location):
@@ -527,14 +529,24 @@ class Container(Placeable):
         from indexes. Currently only Letter+Number names are supported
         """
         columns = OrderedDict()
-        index_pattern = r'^([A-Za-z]+)([0-9]+)$'
-        for name in self.children_by_name:
-            match = re.match(index_pattern, name)
-            if match:
-                row, col = match.groups(0)
-                if col not in columns:
-                    columns[col] = OrderedDict()
-                columns[col][row] = (row, col)
+        if ff.split_labware_definitions():
+            # implementing this for compatibility, but new refactors and
+            # features should use `ordering` directly
+            for i, col in enumerate(self.ordering):
+                col_idx = str(i + 1)
+                columns[col_idx] = OrderedDict()
+                for well in col:
+                    row_idx = well[0]
+                    columns[col_idx][row_idx] = (row_idx, col_idx)
+        else:
+            index_pattern = r'^([A-Za-z]+)([0-9]+)$'
+            for name in self.children_by_name:
+                match = re.match(index_pattern, name)
+                if match:
+                    row, col = match.groups(0)
+                    if col not in columns:
+                        columns[col] = OrderedDict()
+                    columns[col][row] = (row, col)
 
         return columns
 
@@ -645,6 +657,12 @@ class Container(Placeable):
         Passes all arguments to Wells() and returns result
         """
         return self.wells(*args, **kwargs)
+
+    def get_children_list(self):
+        if ff.split_labware_definitions():
+            return [self[i] for i in list(chain.from_iterable(self.ordering))]
+        else:
+            return super(Container, self).get_children_list()
 
     def _parse_wells_to_and_length(self, *args, **kwargs):
         start = args[0] if len(args) else 0

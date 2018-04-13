@@ -262,11 +262,15 @@ async def test_jog_calibrate_top(
         dummy_db,
         user_definition_dirs,
         main_router,
-        model):
+        model,
+        monkeypatch):
 
     # Check that the old behavior remains the same without the feature flag
     from numpy import array, isclose
     from opentrons.trackers import pose_tracker
+    import tempfile
+    temp = tempfile.gettempdir()
+    monkeypatch.setenv('USER_DEFN_ROOT', temp)
 
     robot = model.robot
 
