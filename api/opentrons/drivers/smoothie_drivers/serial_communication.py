@@ -44,6 +44,8 @@ def _parse_smoothie_response(response, command):
         # smoothieware can enter a weird state, where it repeats back
         # the sent command at the beginning of its response
         # This checks for this echo, and strips the command from the response
+        if isinstance(command, str):
+            command = command.encode()
         if command in parsed_response:
             parsed_response = parsed_response.replace(command, b'')
         return parsed_response.strip()
@@ -65,7 +67,7 @@ def _write_to_device_and_return(cmd, device_connection):
 
     response = device_connection.read_until(DRIVER_ACK)
 
-    clean_response = _parse_smoothie_response(response, cmd)
+    clean_response = _parse_smoothie_response(response, cmd.encode())
     if clean_response:
         return clean_response.decode()
     return ''
