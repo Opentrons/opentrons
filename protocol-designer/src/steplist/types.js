@@ -29,12 +29,20 @@ export type SubstepIdentifier = {|
   substepId: number
 |} | null
 
+export type NamedIngred = {|
+  id: number,
+  name: string
+|}
+
+export type NamedIngredsByLabware = {[labwareId: string]: {[well: string]: Array<NamedIngred>}}
+export type NamedIngredsByLabwareAllSteps = Array<NamedIngredsByLabware>
+
 export type StepItemSourceDestRow = {|
   substepId: number, // TODO should this be a string or is this ID properly a number?
-  sourceIngredientName?: string,
-  destIngredientName?: string,
-  sourceWell?: string,
-  destWell?: string
+  sourceIngredients?: Array<NamedIngred>,
+  destIngredients?: Array<NamedIngred>,
+  sourceWell?: ?string,
+  destWell?: ?string
 |}
 
 export type StepItemSourceDestRowMulti = {|
@@ -42,17 +50,18 @@ export type StepItemSourceDestRowMulti = {|
   channelId: number
 |}
 
-export type TransferishStepItemSingleChannel = {|
+export type TransferLikeSubstepItemSingleChannel = {|
   multichannel: false,
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
   rows: Array<{|
     ...StepItemSourceDestRow,
+    substepId: number,
     volume?: number
   |}>
 |}
 
-export type TransferishStepItemMultiChannel = {|
+export type TransferLikeSubstepItemMultiChannel = {|
   multichannel: true,
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
@@ -61,9 +70,9 @@ export type TransferishStepItemMultiChannel = {|
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
-export type TransferishStepItem = TransferishStepItemSingleChannel | TransferishStepItemMultiChannel
+export type TransferLikeSubstepItem = TransferLikeSubstepItemSingleChannel | TransferLikeSubstepItemMultiChannel
 
-export type StepSubItemData = TransferishStepItem | {|
+export type StepSubItemData = TransferLikeSubstepItem | {|
   stepType: 'pause',
   waitForUserInput: false,
   hours: number,

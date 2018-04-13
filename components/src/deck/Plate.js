@@ -15,13 +15,13 @@ import type {LabwareLocations} from '../labware-types'
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
-type singleWell = {|
+export type SingleWell = {|
   highlighted: boolean,
   preselected: boolean,
   selected: boolean,
   wellName: string,
   maxVolume: number,
-  groupId: string | null
+  fillColor?: ?string
 |}
 
 type wellDims = { // TODO similar to type in Well.js. DRY it up
@@ -35,7 +35,7 @@ type wellDims = { // TODO similar to type in Well.js. DRY it up
 
 export type PlateProps = {
   containerType: string,
-  wellContents: {[string]: singleWell}, // Keyed by wellName, eg 'A1'
+  wellContents: {[string]: SingleWell}, // Keyed by wellName, eg 'A1'
   showLabels?: boolean,
   selectable?: boolean
 }
@@ -81,7 +81,7 @@ export default class Plate extends React.Component<PlateProps> {
   createWell = (wellName: string) => {
     const { selectable, wellContents } = this.props
     const { originOffset, firstWell, containerLocations } = this.getContainerData()
-    const singleWellContents: singleWell = wellContents[wellName]
+    const singleWellContents: SingleWell = wellContents[wellName]
 
     // rectangular wells are centered around x, y
     const svgOffset = (typeof firstWell.width === 'number' && typeof firstWell.length === 'number')
@@ -96,13 +96,13 @@ export default class Plate extends React.Component<PlateProps> {
 
     const wellLocation = containerLocations[wellName]
 
-    const { preselected = false, selected = false, groupId = undefined } = (singleWellContents || {}) // ignored/removed: highlighed, hovered
+    const { preselected = false, selected = false, fillColor = '' } = (singleWellContents || {}) // ignored/removed: highlighed, hovered
 
     return <Well
       key={wellName}
       {...{
         wellName,
-        groupId,
+        fillColor,
         selectable,
         selected,
         preselected,

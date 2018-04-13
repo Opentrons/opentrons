@@ -2,13 +2,18 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
+import mapValues from 'lodash/mapValues'
 import SelectablePlate from '../components/SelectablePlate.js'
-import { selectors } from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
-import {selectors as fileSelectors} from '../file-data'
-import { preselectWells, selectWells } from '../labware-ingred/actions'
-import type {BaseState} from '../types'
+import * as highlightSelectors from '../top-selectors/substep-highlight'
+import * as wellContentsSelectors from '../top-selectors/well-contents'
+import {preselectWells, selectWells} from '../labware-ingred/actions'
+
 import {END_STEP} from '../steplist/types'
+
+import type {WellContents} from '../labware-ingred/types'
+import type {BaseState} from '../types'
 
 type OwnProps = {
   containerId?: string,
@@ -36,7 +41,8 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
-  const allWellContentsForSteps = fileSelectors.allWellContentsForSteps(state)
+  const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+  const deckSetupMode = steplistSelectors.deckSetupMode(state)
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
@@ -47,11 +53,27 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     prevStepId = Math.max(stepId - 1, 0)
   }
 
-  const wellContents = (steplistSelectors.deckSetupMode(state))
+  const highlightedWells = deckSetupMode ? {} : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
+
+  let wellContents = {}
+  if (deckSetupMode) {
     // selection for deck setup
-    ? selectors.wellContentsAllLabware(state)[containerId]
+    wellContents = selectors.wellContentsAllLabware(state)[containerId]
+  } else {
     // well contents for step, not deck setup mode
-    : allWellContentsForSteps[prevStepId] ? allWellContentsForSteps[prevStepId][containerId] : {}
+    const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])
+      ? allWellContentsForSteps[prevStepId][containerId]
+      : {}
+    // TODO Ian 2018-04-11 separate out selected/highlighted state from wellContents props of Plate,
+    // so you don't have to do this merge
+    wellContents = mapValues(
+      wellContentsWithoutHighlight,
+      (wellContents: WellContents, well: string) => ({
+        ...wellContents,
+        selected: highlightedWells && highlightedWells[containerId] && highlightedWells[containerId][well]
+      })
+    )
+  }
 
   return {
     containerId,

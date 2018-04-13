@@ -6,6 +6,7 @@ import type {BaseState, ThunkDispatch} from '../types'
 import {selectors} from '../steplist/reducers'
 import type {StepIdType, SubstepIdentifier} from '../steplist/types'
 import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
+import * as substepSelectors from '../top-selectors/substeps'
 import StepList from '../components/StepList'
 
 type StepIdTypeWithEnd = StepIdType | '__end__' // TODO import this; also used in StepList
@@ -22,7 +23,7 @@ type DispatchProps = $Diff<Props, StateProps>
 
 function mapStateToProps (state: BaseState): StateProps {
   return {
-    steps: selectors.allSteps(state),
+    steps: substepSelectors.allStepsWithSubsteps(state),
     selectedStepId: selectors.hoveredOrSelectedStepId(state),
     hoveredSubstep: selectors.getHoveredSubstep(state)
   }

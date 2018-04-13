@@ -4,7 +4,7 @@ Selectable `96-flat` example, with row/column labels and with well A1 filled:
 <svg height='200' width='300' viewBox='0 0 125 90'>
   <Plate
     containerType='96-flat'
-    wellContents={{A1: {groupId: 0}}}
+    wellContents={{A1: {fillColor: 'green'}}}
     showLabels
   />
 </svg>

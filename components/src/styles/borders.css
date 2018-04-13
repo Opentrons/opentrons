@@ -2,6 +2,7 @@
 
 :root {
   --bd-radius-default: 2px;
+  --bd-radius-pill: 12px;
   --bd-width-default: 2px;
   --bd-light: var(--bd-width-default) solid var(--c-light-gray);
 }

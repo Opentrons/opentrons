@@ -166,8 +166,7 @@ const defaultWellContents = {
   highlighted: false,
   hovered: false,
   preselected: false,
-  selected: false,
-  groupId: null
+  selected: false
 }
 
 const container1MaxVolume = 400
@@ -265,7 +264,6 @@ describe('wellContentsAllLabware', () => {
         A1: {
           ...defaultWellContents,
           selected: true,
-          groupId: '0',
           maxVolume: container1MaxVolume
         },
         A2: {
@@ -275,7 +273,6 @@ describe('wellContentsAllLabware', () => {
         B1: {
           ...defaultWellContents,
           selected: true,
-          groupId: '0',
           maxVolume: container1MaxVolume
         },
         B2: {
