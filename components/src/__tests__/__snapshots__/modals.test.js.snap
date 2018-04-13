@@ -25,7 +25,7 @@ exports[`modals AlertModal renders correctly 1`] = `
       className="alert_modal_buttons"
     >
       <button
-        className="button_outline"
+        className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
         title={undefined}
@@ -34,7 +34,7 @@ exports[`modals AlertModal renders correctly 1`] = `
         a
       </button>
       <button
-        className="button_outline"
+        className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
         title={undefined}
@@ -67,7 +67,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
       className="alert_modal_buttons"
     >
       <button
-        className="button_outline"
+        className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
         title="Cancel"
@@ -76,7 +76,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
         Cancel
       </button>
       <button
-        className="button_outline"
+        className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
         title="Continue"
