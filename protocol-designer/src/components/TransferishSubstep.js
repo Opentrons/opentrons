@@ -10,14 +10,14 @@ import IngredPill from './IngredPill'
 import styles from './StepItem.css'
 
 import type {
-  TransferishStepItem,
+  TransferLikeSubstepItem,
   StepItemSourceDestRowMulti,
   SubstepIdentifier,
   NamedIngred
 } from '../steplist/types'
 
 export type StepSubItemProps = {|
-  substeps: TransferishStepItem
+  substeps: TransferLikeSubstepItem
 |}
 
 const DEFAULT_COLLAPSED_STATE = true
@@ -232,7 +232,7 @@ export default function TransferishSubstep (props: TransferishSubstepProps) {
         substepId
       })}
       onMouseLeave={() => onSelectSubstep(null)}
-      volume={row.volume} // TODO IMMEDIATELY PARSE!!
+      volume={row.volume}
       sourceIngredients={row.sourceIngredients}
       sourceWells={row.sourceWell}
       destIngredients={row.destIngredients}

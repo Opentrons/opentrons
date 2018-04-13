@@ -14,7 +14,7 @@ import type {
   SubSteps,
   PauseFormData,
   TransferFormData,
-  TransferishStepItem,
+  TransferLikeSubstepItem,
   NamedIngredsByLabwareAllSteps
 } from './types'
 
@@ -29,7 +29,7 @@ type AllLabwareTypes = {[labwareId: string]: string}
 function _transferSubsteps (
   form: TransferFormData,
   transferLikeFields: *
-): TransferishStepItem {
+): TransferLikeSubstepItem {
   const {
     sourceWells,
     destWells
@@ -107,7 +107,7 @@ function _transferSubsteps (
 function _consolidateSubsteps (
   form: ConsolidateFormData,
   transferLikeFields: *
-): TransferishStepItem {
+): TransferLikeSubstepItem {
   const {
     sourceWells,
     destWell

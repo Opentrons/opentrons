@@ -50,7 +50,7 @@ export type StepItemSourceDestRowMulti = {|
   channelId: number
 |}
 
-export type TransferishStepItemSingleChannel = {|
+export type TransferLikeSubstepItemSingleChannel = {|
   multichannel: false,
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
@@ -61,7 +61,7 @@ export type TransferishStepItemSingleChannel = {|
   |}>
 |}
 
-export type TransferishStepItemMultiChannel = {|
+export type TransferLikeSubstepItemMultiChannel = {|
   multichannel: true,
   stepType: 'transfer' | 'consolidate' | 'distribute',
   parentStepId: StepIdType,
@@ -70,10 +70,9 @@ export type TransferishStepItemMultiChannel = {|
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
-// TODO IMMEDIATELY Rename. It's TransferishSubsteps!
-export type TransferishStepItem = TransferishStepItemSingleChannel | TransferishStepItemMultiChannel
+export type TransferLikeSubstepItem = TransferLikeSubstepItemSingleChannel | TransferLikeSubstepItemMultiChannel
 
-export type StepSubItemData = TransferishStepItem | {|
+export type StepSubItemData = TransferLikeSubstepItem | {|
   stepType: 'pause',
   waitForUserInput: false,
   hours: number,
