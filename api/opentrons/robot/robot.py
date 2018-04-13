@@ -544,8 +544,7 @@ class Robot(object):
         for a in self._actuators.values():
             self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
-        # Then plungers, first un-sticking any built up static friction
-        self._driver.unstick_axes('BC')
+        # Then plungers
         self.poses = self._actuators['left']['plunger'].home(self.poses)
         self.poses = self._actuators['right']['plunger'].home(self.poses)
 

@@ -515,12 +515,16 @@ class SmoothieDriver_3_0_0:
         self.push_axis_max_speed()
         self.set_axis_max_speed({ax: 1 for ax in axes})
 
+        # only need to request switch state once
+        state_of_switches = self.switch_state
+
         moving_axes = {
             ax: self.position[ax] - 3  # move away (-) from switch
             for ax in axes
+            if not state_of_switches[ax]
         }
         # incase axes is pressing endstop, home it slowly instead of moving
-        homing_axes = ''.join([ax for ax in axes if self.switch_state[ax]])
+        homing_axes = ''.join([ax for ax in axes if state_of_switches[ax]])
 
         try:
             if moving_axes:
@@ -584,12 +588,16 @@ class SmoothieDriver_3_0_0:
                 command_line, self._connection, timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
+            # OR if it tried to home an axis, then timed out
             if (ERROR_KEYWORD in ret_code.lower()) or \
                     (ALARM_KEYWORD in ret_code.lower()):
                 self._reset_from_error()
                 error_axis = ret_code.strip()[-1]
-                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
-                    self.home(error_axis)
+                if GCODES['HOME'] not in command:
+                    if error_axis in 'XYZA':
+                        self.home(error_axis)
+                    elif error_axis in 'BC':
+                        self.unstick_axes(error_axis)
                 raise SmoothieError(ret_code)
 
             return ret_code
