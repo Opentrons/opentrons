@@ -18,10 +18,10 @@ type Props = {
   channels: Channels,
   direction: Direction,
   mount: Mount,
-  error?: ?{message: ?string},
+  success: ?boolean,
   exitUrl: string,
   exit: () => mixed,
-  // confirm: () => mixed,
+  confirm: () => mixed,
   onBackClick: () => mixed,
 }
 
@@ -52,16 +52,16 @@ export default function ConfirmPipette (props: Props) {
 }
 
 function Status (props: Props) {
-  const {name, error} = props
-  const iconName = error ? 'close-circle' : 'check-circle'
+  const {name, success} = props
+  const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
-    [styles.success]: !error,
-    [styles.failure]: error
+    [styles.success]: success,
+    [styles.failure]: !success
   })
 
-  const message = error
-    ? `Unable to detect ${name}.`
-    : `${name} succesfully attached.`
+  const message = success
+    ? `${name} succesfully attached.`
+    : `Unable to detect ${name}.`
 
   return (
     <div className={styles.confirm_status}>
@@ -72,7 +72,7 @@ function Status (props: Props) {
 }
 
 function FailureToDetect (props: Props) {
-  if (!props.error) return null
+  if (props.success) return null
 
   return (
     <div>
@@ -83,7 +83,7 @@ function FailureToDetect (props: Props) {
       <p className={styles.confirm_failure_instructions}>
         Check again to ensure that white connector tab is plugged into pipette.
       </p>
-      <PrimaryButton className={styles.confirm_button}>
+      <PrimaryButton className={styles.confirm_button} onClick={props.confirm}>
         have robot check connection again
       </PrimaryButton>
     </div>

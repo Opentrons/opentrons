@@ -29,8 +29,13 @@ export type {
 
 export type {
   Pipette,
+  PipettesResponse,
   RobotPipettes
 } from './pipettes'
+
+export type {
+  RobotMoveState
+} from './robot'
 
 export type {
   RobotServerUpdate,
@@ -77,7 +82,9 @@ export {
 } from './pipettes'
 
 export {
-  moveToChangePipette
+  moveToChangePipette,
+  makeGetRobotMove,
+  clearRobotMoveResponse
 } from './robot'
 
 export {

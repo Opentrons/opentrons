@@ -514,7 +514,7 @@ class Pipette:
 
         return self
 
-    def _position_for_aspirate(self, location=None):
+    def _position_for_aspirate(self, location=None, clearance=1.0):
         """
         Position this :any:`Pipette` for an aspiration,
         given it's current state
@@ -545,17 +545,17 @@ class Pipette:
         # then go inside the location
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(min(location.z_size(), 1))
+                location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location, strategy='direct')
 
-    def _position_for_dispense(self, location=None):
+    def _position_for_dispense(self, location=None, clearance=0.5):
         """
         Position this :any:`Pipette` for an dispense
         """
 
         if location:
             if isinstance(location, Placeable):
-                location = location.bottom(min(location.z_size(), 1))
+                location = location.bottom(min(location.z_size(), clearance))
             self.move_to(location)
 
     def retract(self, safety_margin=10):

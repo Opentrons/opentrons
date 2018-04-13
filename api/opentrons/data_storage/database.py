@@ -15,6 +15,8 @@ database_path = environment.get_path('DATABASE_FILE')
 
 
 def _parse_container_obj(container: Container):
+    # TODO: figure out how the output of this fn is used--what needs to change
+    # TODO: since all container._coordinates are now (0, 0, 0)
     return dict(zip('xyz', container._coordinates))
 
 

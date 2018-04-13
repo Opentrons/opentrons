@@ -5,9 +5,10 @@ from unittest import mock
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
-from opentrons.containers.placeable import unpack_location, Container, Well
+from opentrons.containers.placeable import unpack_location
 from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
+from tests.opentrons import generate_plate
 
 
 class PipetteTest(unittest.TestCase):
@@ -1053,19 +1054,6 @@ class PipetteTest(unittest.TestCase):
         # context of required tip pick_up/drop sequencing, etc.
 
         total_tips_per_plate = 4
-
-        def generate_plate(wells, cols, spacing, offset, radius):
-            c = Container()
-
-            for i in range(0, wells):
-                well = Well(properties={'radius': radius})
-                row, col = divmod(i, cols)
-                name = chr(row + ord('A')) + str(1 + col)
-                coordinates = (col * spacing[0] + offset[0],
-                               row * spacing[1] + offset[1],
-                               0)
-                c.add(well, name, coordinates)
-            return c
 
         self.tiprack1 = generate_plate(
             total_tips_per_plate, 2, (5, 5), (0, 0), 5)
