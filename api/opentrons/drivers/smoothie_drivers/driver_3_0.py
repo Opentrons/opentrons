@@ -640,12 +640,10 @@ class SmoothieDriver_3_0_0:
         if not mount:
             raise ValueError('Unexpected mount: {}'.format(mount))
         try:
-            # EMI interference from plunger's motor has been found to prevent
-            # I2C lines from communicating between Smoothieware and the
-            # pipette's onboard EEPROM. To avoid, turn off just that motor
-            axis_lookup = {'L': 'B', 'R': 'C'}
-            plunger_axis = axis_lookup.get(mount)
-            self.disengage_axis(plunger_axis)
+            # EMI interference from both plunger motors has been found to
+            # prevent the I2C lines from communicating between Smoothieware and
+            # pipette's onboard EEPROM. To avoid, turn off both plunger motors
+            self.disengage_axis('BC')
             self.delay(CURRENT_CHANGE_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
@@ -679,12 +677,10 @@ class SmoothieDriver_3_0_0:
         if not isinstance(data_string, str):
             raise ValueError(
                 'Expected {0}, not {1}'.format(str, type(data_string)))
-        # EMI interference from plunger's motor has been found to prevent
-        # I2C lines from communicating between Smoothieware and the
-        # pipette's onboard EEPROM. To avoid, turn off just that motor
-        axis_lookup = {'L': 'B', 'R': 'C'}
-        plunger_axis = axis_lookup.get(mount)
-        self.disengage_axis(plunger_axis)
+        # EMI interference from both plunger motors has been found to
+        # prevent the I2C lines from communicating between Smoothieware and
+        # pipette's onboard EEPROM. To avoid, turn off both plunger motors
+        self.disengage_axis('BC')
         self.delay(CURRENT_CHANGE_DELAY)
         # data is read/written as strings of HEX characters
         # to avoid firmware weirdness in how it parses GCode arguments
