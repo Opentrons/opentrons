@@ -247,6 +247,8 @@ def start_server(folder, filepath):
 if __name__ == "__main__":
     atexit.register(_reset_lights)
     atexit.register(_erase_data, VIDEO_FILEPATH)
+    _reset_lights()
+    _erase_data(VIDEO_FILEPATH)
     test_smoothie_gpio()
     test_switches_and_lights()
     test_speaker()
