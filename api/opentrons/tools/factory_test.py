@@ -107,6 +107,11 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
     print('DATA LOSS')
+    for i in range(10):
+        serial_communication.write_and_return(
+            'version\r\n',
+            d._connection,
+            timeout=1)
     data = [
         serial_communication.write_and_return('version\r\n', d._connection, timeout=1)  #NOQA
         for i in range(100)
@@ -117,20 +122,28 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
     print('HALT')
+    d._connection.reset_input_buffer()
     # drop the HALT line LOW, and make sure there is an error state
     gpio.set_low(gpio.OUTPUT_PINS['HALT'])
     sleep(0.25)
     gpio.set_high(gpio.OUTPUT_PINS['HALT'])
     sleep(0.25)
 
-    d._connection.readline()
-    r = d._connection.readline().decode()
-    if 'ALARM' in r:
-        print(RESULT_SPACE.format(PASS))
-        serial_communication.write_and_return(
-            'M999', d._connection, timeout=1)
-    else:
-        print(RESULT_SPACE.format(FAIL))
+    old_timeout = int(d._connection.timeout)
+    d._connection.timeout = 1  # 1 second
+    cycles = 5
+    for i in range(cycles):
+        r = d._connection.readline().decode()
+        if 'ALARM' in r:
+            print(RESULT_SPACE.format(PASS))
+            serial_communication.write_and_return(
+                'M999', d._connection, timeout=1)
+            break
+        elif i >= cycles - 1:
+            print(RESULT_SPACE.format(FAIL))
+
+    d._reset_from_error()
+    d._connection.timeout = old_timeout
 
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
@@ -240,6 +253,8 @@ def start_server(folder, filepath):
 if __name__ == "__main__":
     atexit.register(_reset_lights)
     atexit.register(_erase_data, VIDEO_FILEPATH)
+    _reset_lights()
+    _erase_data(VIDEO_FILEPATH)
     test_smoothie_gpio()
     test_switches_and_lights()
     test_speaker()
