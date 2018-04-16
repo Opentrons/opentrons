@@ -20,9 +20,6 @@ log = get_logger(__name__)
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
-# distance in millimeters between the left and right mounts (aka carriages)
-X_DISTANCE_BETWEEN_MOUNTS = 34
-
 
 class InstrumentMosfet(object):
     """
@@ -406,15 +403,19 @@ class Robot(object):
         # by designed dimensions of that model (eg: p10-multi vs p300-single)
         mx, my, mz = instrument.model_offset
 
-        # X distance between gantry's left and right mounts (aka carriages)
-        mount_x_offset = {'left': -X_DISTANCE_BETWEEN_MOUNTS, 'right': 0}
-
         # combine each offset to get the pipette's position relative to gantry
         _x, _y, _z = (
-            mx + cx + mount_x_offset[mount],
+            mx + cx,
             my + cy,
             mz
         )
+        # if it's the left mount, apply the offset from right pipette
+        if mount is 'left':
+            _x, _y, _z = (
+               _x + self.config.left_mount_offset[0],
+               _y + self.config.left_mount_offset[1],
+               _z + self.config.left_mount_offset[2]
+            )
         self.poses = pose_tracker.add(
             self.poses,
             instrument,

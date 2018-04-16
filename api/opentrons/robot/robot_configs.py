@@ -75,6 +75,8 @@ DEFAULT_CURRENT_STRING = ' '.join(
 
 DEFAULT_PROBE_HEIGHT = 77.0
 
+# distance in millimeters between the left and right mounts (aka carriages)
+X_DISTANCE_BETWEEN_MOUNTS = 34
 
 robot_config = namedtuple(
     'robot_config',
@@ -94,7 +96,8 @@ robot_config = namedtuple(
         'default_current',
         'low_current',
         'high_current',
-        'default_max_speed'
+        'default_max_speed',
+        'left_mount_offset'
     ]
 )
 
@@ -131,6 +134,7 @@ def _get_default():
         tip_length={
             'Pipette': 51.7 # TODO (andy): move to tip-rack
         },
+        left_mount_offset=(-X_DISTANCE_BETWEEN_MOUNTS, 0, 0),
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
         low_current=LOW_CURRENT,
