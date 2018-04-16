@@ -1,3 +1,4 @@
+# pylama:ignore=E252
 import sqlite3
 # import warnings
 from typing import List
@@ -92,8 +93,6 @@ def _create_well_obj_in_db(db, container_name: str, well: Well):
     )
 
 
-# FIXME: This has ugly output because of the way that
-# wells are added to containers. fix this by fixing placeables....
 def _load_well_object_from_db(db, well_data):
     container_name, location, x, y, z, \
         depth, volume, diameter, length, width = well_data
@@ -136,8 +135,8 @@ def _get_db_version(db):
 
 def _calculate_offset(labware: Container) -> dict:
     new_definition = serializers.labware_to_json(labware)
-    base_definition = ldef.load_json(new_definition['metadata']['name'])
-
+    base_definition = ldef.load_json(
+        new_definition['metadata']['name'], with_offset=False)
     first_well = list(base_definition['wells'].keys())[0]
     base_well = base_definition['wells'][first_well]
     new_well = new_definition['wells'][first_well]

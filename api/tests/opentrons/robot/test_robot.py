@@ -156,7 +156,7 @@ def test_drop_tip_default_trash(virtual_smoothie_env):
 
 def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
     import tempfile
-    temp = tempfile.gettempdir()
+    temp = tempfile.mkdtemp()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)
     robot.reset()
 
@@ -178,7 +178,7 @@ def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
 def test_calibrate_labware_new(
         virtual_smoothie_env, monkeypatch, split_labware_def):
     import tempfile
-    temp = tempfile.gettempdir()
+    temp = tempfile.mkdtemp()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)
     robot.reset()
 

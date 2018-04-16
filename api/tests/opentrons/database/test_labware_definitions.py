@@ -48,15 +48,26 @@ def test_load_offset():
 
 def test_load_labware():
     # Tests for finding definition and offset file in user definition dir
-    lw = ldef._load(test_defn_root, test_user_defn_root, test_lw_name)
+    lw = ldef._load(
+        test_defn_root, test_user_defn_root, test_lw_name, with_offset=True)
     assert lw['wells']['A1']['x'] == expected_final_x
     assert lw['wells']['A1']['y'] == expected_final_y
     assert lw['wells']['A1']['z'] == expected_final_z
 
     # Tests for finding definition in default dir and no offset file
     real_lw_name = '6-well-plate'
-    real_lw = ldef._load(test_defn_root, test_user_defn_root, real_lw_name)
+    real_lw = ldef._load(
+        test_defn_root, test_user_defn_root, real_lw_name, with_offset=True)
     assert real_lw['metadata']['name'] == real_lw_name
+
+
+def test_load_without_offset():
+    # Tests for loading definition without offset, even if offset file exists
+    lw = ldef._load(
+        test_defn_root, test_user_defn_root, test_lw_name, with_offset=False)
+    assert lw['wells']['A1']['x'] == expected_x
+    assert lw['wells']['A1']['y'] == expected_y
+    assert lw['wells']['A1']['z'] == expected_z
 
 
 def test_list_labware():

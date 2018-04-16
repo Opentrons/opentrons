@@ -1,3 +1,4 @@
+# pylama:ignore=E252
 import os
 import json
 from typing import List
@@ -147,15 +148,13 @@ def _load_offset(path: str, labware_name: str) -> dict:
                 offs = json.load(offs_f)
     except FileNotFoundError:
         pass
-    # from pprint import pprint
-    # print("Offsets:")
-    # pprint(offs)
     return offs
 
 
 def _load(default_defn_dir: str,
           user_defn_root_path: str,
-          labware_name: str) -> dict:
+          labware_name: str,
+          with_offset: bool) -> dict:
     """
     Try to find definition file in <user_defn_root_path>/definitions first,
     then fall back to <default_defn_dir>. If a definition is found in either
@@ -167,6 +166,8 @@ def _load(default_defn_dir: str,
     :param default_defn_dir: Opentrons default labware definition directory
     :param user_defn_root_path: User labware definition directory
     :param labware_name: Name of labware definition file (without extension)
+    :param with_offset: A boolean flag to control whether the offset file
+        should also be loaded and applied, if one exists
     :return: a dict of the definition with offset applied to each well
     """
     defn_dir = os.path.join(user_defn_root_path, 'definitions')
@@ -176,7 +177,7 @@ def _load(default_defn_dir: str,
         lw = _load_definition(default_defn_dir, labware_name)
     if not lw:
         raise FileNotFoundError
-    offs = _load_offset(offset_dir, labware_name)
+    offs = _load_offset(offset_dir, labware_name) if with_offset else None
 
     if offs:
         for well in lw['wells'].keys():
@@ -185,14 +186,12 @@ def _load(default_defn_dir: str,
                 offset = offs[axis]
                 lw['wells'][well][axis] = round(default_value + offset, 2)
 
-    # from pprint import pprint
-    # print("Labware with offsets:")
-    # pprint(lw)
     return lw
 
 
-def load_json(labware_name: str) -> dict:
-    return _load(default_definition_dir(), user_defn_root(), labware_name)
+def load_json(labware_name: str, with_offset: bool=True) -> dict:
+    return _load(
+        default_definition_dir(), user_defn_root(), labware_name, with_offset)
 
 
 def _list_labware(path: str) -> List[str]:
