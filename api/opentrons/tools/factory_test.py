@@ -107,6 +107,11 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
     print('DATA LOSS')
+    for i in range(10):
+        serial_communication.write_and_return(
+            'version\r\n',
+            d._connection,
+            timeout=1)
     data = [
         serial_communication.write_and_return('version\r\n', d._connection, timeout=1)  #NOQA
         for i in range(100)
@@ -117,6 +122,7 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
     print('HALT')
+    d._connection.reset_input_buffer()
     # drop the HALT line LOW, and make sure there is an error state
     gpio.set_low(gpio.OUTPUT_PINS['HALT'])
     sleep(0.25)
