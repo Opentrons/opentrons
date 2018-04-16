@@ -19,7 +19,10 @@ initialState = {subtitle: 'Subpage'}
   <TitleBar
     title='Page'
     subtitle={state.subtitle}
-    onBackClick={() => setState({subtitle: null})}
+    back={{
+      children: 'back',
+      onClick: () => setState({subtitle: null})
+    }}
   />
   <FlatButton onClick={() => setState({subtitle: 'Subpage'})}>
     Go to Subpage

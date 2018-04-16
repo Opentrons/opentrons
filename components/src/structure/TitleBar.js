@@ -4,20 +4,31 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {FlatButton} from '../buttons'
+import {FlatButton, type ButtonProps} from '../buttons'
 import styles from './structure.css'
 
 type Props = {
   title: React.Node,
   subtitle?: React.Node,
+  back?: ButtonProps,
+  className?: string,
+
+  // TODO(mc, 2018-04-13): deprecate these props
   onBackClick?: () => mixed,
   backClickDisabled?: boolean,
   backButtonLabel?: string,
-  className?: string
 }
 
 export default function TitleBar (props: Props) {
-  const {title, subtitle, onBackClick, backClickDisabled, backButtonLabel, className} = props
+  const {
+    title,
+    subtitle,
+    className,
+    onBackClick,
+    backClickDisabled,
+    backButtonLabel
+  } = props
+  let {back} = props
 
   const separator = subtitle && (
     <span className={styles.separator}>
@@ -31,21 +42,30 @@ export default function TitleBar (props: Props) {
     </h2>
   )
 
-  const backButton = onBackClick && (
-    <FlatButton
-      className={styles.back_button}
-      title={backButtonLabel || 'back'}
-      iconName={'chevron-left'}
-      onClick={onBackClick}
-      disabled={backClickDisabled}
-    >
-      {backButtonLabel || 'Back'}
-    </FlatButton>
-  )
+  // TODO(mc, 2018-04-13): deprecate these props
+  if (!back && onBackClick) {
+    back = {
+      onClick: onBackClick,
+      disabled: backClickDisabled,
+      title: backButtonLabel || 'Back',
+      children: backButtonLabel || 'back'
+    }
+  }
+
+  if (back) {
+    back.children = back.children || 'back'
+    back.title = back.title || 'Back'
+  }
 
   return (
     <header className={cx(styles.title_bar, className)}>
-      {backButton}
+      {back && (
+        <FlatButton
+          inverted
+          iconName={'chevron-left'}
+          {...back}
+        />
+      )}
       <div className={styles.title_wrapper}>
         <h1 className={styles.title}>
           {title}

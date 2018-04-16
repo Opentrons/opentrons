@@ -1,27 +1,78 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
-import {Switch, Route, Redirect, withRouter} from 'react-router'
+import {push, goBack} from 'react-router-redux'
+import {Switch, Route, withRouter, type Match} from 'react-router'
+
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
-import {moveToChangePipette, fetchPipettes, makeGetRobotMove, makeGetRobotPipettes} from '../../http-api-client'
 import type {RobotMoveState, PipettesResponse} from '../../http-api-client'
-import TitledModal from './TitledModal'
+import type {Pipette, ChangePipetteProps} from './types'
+
+import {moveToChangePipette, fetchPipettes, makeGetRobotMove, makeGetRobotPipettes} from '../../http-api-client'
+import PIPETTES from './pipettes'
 import ClearDeckAlertModal from './ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
-import AttachPipetteTitle from './AttachPipetteTitle'
-import PipetteSelection, {type PipetteSelectionProps} from './PipetteSelection'
-import AttachPipetteInstructions from './AttachPipetteInstructions'
-import CheckPipettesButton from './CheckPipettesButton'
+import type {PipetteSelectionProps} from './PipetteSelection'
+import AttachPipette from './AttachPipette'
 import ConfirmPipette from './ConfirmPipette'
 import RequestInProgressModal from './RequestInProgressModal'
 
-type OP = {
+type Props = {
+  match: Match,
   robot: Robot,
+  parentUrl: string,
+}
+
+const TITLE = 'Pipette Setup'
+// used to guarentee mount param in route is left or right
+const RE_MOUNT = '(left|right)'
+// used to guarentee model param in route is a pipettes model
+const RE_MODEL = `(${PIPETTES.map(p => p.model).join('|')})`
+
+const ConnectedChangePipetteRouter = withRouter(
+  connect(makeMapStateToProps, mapDispatchToProps)(ChangePipetteRouter)
+)
+
+export default function ChangePipette (props: Props) {
+  const {robot, parentUrl, match: {path}} = props
+
+  return (
+    <Route
+      path={`${path}/:mount${RE_MOUNT}/:model${RE_MODEL}?`}
+      render={(propsWithMount) => {
+        const {match: {params, url: baseUrl}} = propsWithMount
+        const mount: Mount = (params.mount: any)
+        const pipette = PIPETTES.find(p => p.model === params.model)
+
+        return (
+          <ConnectedChangePipetteRouter
+            robot={robot}
+            title={TITLE}
+            subtitle={`${mount} carriage`}
+            mount={mount}
+            pipette={pipette}
+            direction='attach'
+            parentUrl={parentUrl}
+            baseUrl={baseUrl}
+            confirmUrl={`${baseUrl}/confirm`}
+            exitUrl={`${baseUrl}/exit`}
+          />
+        )
+      }}
+    />
+  )
+}
+
+type OP = {
+  subtitle: string,
   mount: Mount,
-  closeUrl: string,
+  robot: Robot,
+  pipette: ?Pipette,
   baseUrl: string,
+  confirmUrl: string,
+  exitUrl: string,
+  parentUrl: string,
 }
 
 type SP = {
@@ -30,116 +81,36 @@ type SP = {
 }
 
 type DP = {
-  close: () => mixed,
+  exit: () => mixed,
   back: () => mixed,
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   moveToFront: () => mixed,
-  confirmPipette: (string) => () => mixed,
+  checkPipette: () => mixed,
+  confirmPipette: () => mixed,
 }
 
-const TITLE = 'Pipette Setup'
-
-// TODO(mc, 2018-04-05): pull from external pipettes library
-const PIPETTES = [
-  {value: 'p10_single', name: 'Single-Channel P10', channels: '1'},
-  {value: 'p50_single', name: 'Single-Channel P50', channels: '1'},
-  {value: 'p300_single', name: 'Single-Channel P300', channels: '1'},
-  {value: 'p1000_single', name: 'Single-Channel P1000', channels: '1'},
-  {value: 'p10_multi', name: '8-Channel P10', channels: '8'},
-  {value: 'p50_multi', name: '8-Channel P50', channels: '8'},
-  {value: 'p300_multi', name: '8-Channel P300', channels: '8'}
-]
-
-export default withRouter(
-  connect(makeMapStateToProps, mapDispatchToProps)(ChangePipette)
-)
-
-function ChangePipette (props: OP & SP & DP) {
-  const {mount, baseUrl, closeUrl, onPipetteSelect, moveRequest, moveToFront, confirmPipette, pipettes: attachedPipettes} = props
-  const subtitle = `${mount} carriage`
-  const progressMessage = mount === 'right'
-    ? 'Right pipette carriage moving to front and left.'
-    : 'Left pipette carriage moving to front and right.'
-
-  console.log(baseUrl)
+function ChangePipetteRouter (props: ChangePipetteProps) {
+  const {baseUrl, confirmUrl, exitUrl, moveRequest} = props
 
   if (!moveRequest.inProgress && !moveRequest.response) {
-    return (<ClearDeckAlertModal {...props} onContinueClick={moveToFront} />)
+    return (<ClearDeckAlertModal {...props} />)
   }
 
   if (moveRequest.inProgress) {
-    return (
-      <RequestInProgressModal
-        title={TITLE}
-        subtitle={subtitle}
-        onBackClick={props.close}
-        mount={mount}
-        message={progressMessage}
-      />)
+    return (<RequestInProgressModal {...props} />)
   }
 
   return (
     <Switch>
       <Route exact path={baseUrl} render={() => (
-        <TitledModal
-          title={TITLE}
-          subtitle={subtitle}
-          onBackClick={props.close}
-        >
-          <AttachPipetteTitle />
-          <PipetteSelection
-            options={PIPETTES}
-            onChange={onPipetteSelect}
-          />
-        </TitledModal>
+        <AttachPipette {...props} />
       )} />
-      <Route path={`${baseUrl}/:model`} render={(routeProps) => {
-        const {match: {url: urlWithModel, params: {model}}} = routeProps
-        const pipette = PIPETTES.find((p) => p.value === model)
-        const confirmUrl = `${urlWithModel}/confirm`
-        const exitUrl = `${urlWithModel}/exit`
-        const onBackClick = props.back
-        const confirm = confirmPipette(confirmUrl)
-
-        // guard against bad model strings
-        if (!pipette) return (<Redirect to={baseUrl} />)
-
-        return (
-          <Switch>
-            <Route path={exitUrl} render={() => (
-              <ExitAlertModal cancelUrl={confirmUrl} continueUrl={closeUrl} />
-            )} />
-            <Route path={confirmUrl} render={() => (
-              <ConfirmPipette
-                title={TITLE}
-                subtitle={subtitle}
-                onBackClick={onBackClick}
-                success={attachedPipettes && attachedPipettes[mount].model === model}
-                direction='attach'
-                mount={mount}
-                exit={props.close}
-                exitUrl={exitUrl}
-                confirm={confirm}
-                {...pipette}
-              />
-            )} />
-            <Route render={() => (
-              <TitledModal
-                title={TITLE}
-                subtitle={subtitle}
-                onBackClick={onBackClick}
-              >
-                <AttachPipetteTitle name={pipette.name} />
-                <AttachPipetteInstructions
-                  mount={mount}
-                  channels={pipette.channels}
-                />
-                <CheckPipettesButton onClick={confirm} />
-              </TitledModal>
-            )} />
-          </Switch>
-        )
-      }} />
+      <Route path={exitUrl} render={() => (
+        <ExitAlertModal {...props} />
+      )} />
+      <Route path={confirmUrl} render={() => (
+        <ConfirmPipette {...props} />
+      )} />
     </Switch>
   )
 }
@@ -157,20 +128,17 @@ function makeMapStateToProps () {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {closeUrl, baseUrl, robot, mount} = ownProps
+  const {confirmUrl, parentUrl, baseUrl, robot, mount} = ownProps
+
   return {
-    close: () => dispatch(push(closeUrl)),
-    back: () => dispatch(push(baseUrl)),
-    onPipetteSelect: (event: SyntheticInputEvent<>) => {
+    exit: () => dispatch(push(parentUrl)),
+    back: () => dispatch(goBack()),
+    onPipetteSelect: (event) => {
       dispatch(push(`${baseUrl}/${event.target.value}`))
     },
-    moveToFront: () => {
-      console.log('move to front')
-      dispatch(moveToChangePipette(robot, mount))
-    },
-    confirmPipette: (confirmUrl) => () => {
-      dispatch(fetchPipettes(robot))
-        .then(() => dispatch(push(confirmUrl)))
-    }
+    moveToFront: () => dispatch(moveToChangePipette(robot, mount)),
+    checkPipette: () => dispatch(fetchPipettes(robot)),
+    confirmPipette: () => dispatch(fetchPipettes(robot))
+      .then(() => dispatch(push(confirmUrl)))
   }
 }
