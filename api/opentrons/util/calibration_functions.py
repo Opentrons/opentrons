@@ -37,8 +37,6 @@ def calibrate_container_with_delta(
         delta_y, delta_z, save, new_container_name=None
 ):
 
-    if ff.split_labware_definitions():
-        delta_z = delta_z - container[0].properties['height']
     delta = Point(delta_x, delta_y, delta_z)
 
     new_coordinates = change_base(

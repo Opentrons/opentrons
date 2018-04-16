@@ -77,6 +77,7 @@ def test_aspirate_move_to():
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
         mount='left', tip_racks=[tip_rack])
+    p300.pick_up_tip()
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', '1')
@@ -87,7 +88,6 @@ def test_aspirate_move_to():
     robot.poses = p300._move(robot.poses, x=x, y=y, z=z)
     robot.calibrate_container_with_instrument(plate, p300, False)
 
-    p300.pick_up_tip()
     p300.aspirate(100, location)
     current_pos = pose_tracker.absolute(
         robot.poses,
