@@ -123,14 +123,21 @@ def test_smoothie_gpio():
     gpio.set_high(gpio.OUTPUT_PINS['HALT'])
     sleep(0.25)
 
-    d._connection.readline()
-    r = d._connection.readline().decode()
-    if 'ALARM' in r:
-        print(RESULT_SPACE.format(PASS))
-        serial_communication.write_and_return(
-            'M999', d._connection, timeout=1)
-    else:
-        print(RESULT_SPACE.format(FAIL))
+    old_timeout = int(d._connection.timeout)
+    d._connection.timeout = 1  # 1 second
+    cycles = 5
+    for i in range(cycles):
+        r = d._connection.readline().decode()
+        if 'ALARM' in r:
+            print(RESULT_SPACE.format(PASS))
+            serial_communication.write_and_return(
+                'M999', d._connection, timeout=1)
+            break
+        elif i >= cycles - 1:
+            print(RESULT_SPACE.format(FAIL))
+
+    d._reset_from_error()
+    d._connection.timeout = old_timeout
 
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
