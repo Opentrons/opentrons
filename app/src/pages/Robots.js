@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import {withRouter, Route, Redirect, type ContextRouter} from 'react-router'
 
 import type {State, Dispatch} from '../types'
-import type {Robot, Mount} from '../robot'
+import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
 
 import {TitleBar, Splash} from '@opentrons/components'
@@ -33,7 +33,7 @@ function RobotSettingsPage (props: Props) {
     robot,
     showConnectAlert,
     closeConnectAlert,
-    match: {url, params: {name}}
+    match: {path, url, params: {name}}
   } = props
 
   if (name && !robot) {
@@ -48,19 +48,9 @@ function RobotSettingsPage (props: Props) {
       <TitleBar title={robot.name} />
       <RobotSettings {...robot} />
 
-      <Route path={`${url}/pipettes/:mount`} render={(routeProps) => {
-        const routeMatch = routeProps.match
-        const mount: Mount = (routeMatch.params.mount: any)
-
-        return (
-          <ChangePipette
-            closeUrl={url}
-            baseUrl={routeMatch.url}
-            robot={robot}
-            mount={mount}
-          />
-        )
-      }} />
+      <Route path={`${path}/pipettes`} render={(props) => (
+        <ChangePipette {...props} robot={robot} parentUrl={url} />
+      )} />
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />

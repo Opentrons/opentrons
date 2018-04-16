@@ -2,14 +2,10 @@
 import * as React from 'react'
 
 import type {Mount} from '../../robot'
+import type {Channels, Direction} from './types'
 
 import screwdriverSrc from './images/screwdriver.svg'
 import styles from './styles.css'
-
-// TODO(mc, 2018-04-06): flow does not like numbers as object keys
-export type Channels = '1' | '8'
-
-export type Direction = 'attach' | 'detach'
 
 type Diagram = 'screws' | 'tab'
 

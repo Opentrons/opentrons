@@ -7,16 +7,21 @@ import {TitleBar, Overlay} from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = React.ElementProps<typeof TitleBar> & {
+type Props = {
+  titleBar: React.ElementProps<typeof TitleBar>,
   contentsClassName?: string,
   children?: React.Node
 }
 
 export default function TitledModal (props: Props) {
+  const {titleBar} = props
+
   return (
     <div className={styles.modal}>
       <Overlay />
-      <TitleBar {...props} className={styles.title_bar} />
+      {titleBar && (
+        <TitleBar {...titleBar} className={styles.title_bar} />
+      )}
       <div className={cx(styles.modal_contents, props.contentsClassName)}>
         {props.children}
       </div>
