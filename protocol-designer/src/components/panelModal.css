@@ -1,0 +1,8 @@
+@import '@opentrons/components';
+
+.panel_modal {
+  /* A modal that takes up the whole Main Panel */
+  @apply(--absolute-fill);
+
+  background-color: rgba(100, 100, 100, 0.8);
+}
