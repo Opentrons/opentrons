@@ -48,6 +48,11 @@ before_install:
 install:
   - make install
 
+before_script:
+  # Get all branches to allow comparison for mono-repo management tools
+  - git config --replace-all remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+  - git fetch
+
 script:
   - make test
   - if [[ $LINT = true ]]; then make lint; fi

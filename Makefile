@@ -9,6 +9,7 @@ PATH := $(shell yarn bin):$(PATH)
 API_DIR := api
 API_LIB_DIR := api-server-lib
 SHARED_DATA_DIR := shared-data
+UPDATE_SERVER_DIR := update-server
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -26,6 +27,7 @@ install:
 	pip install pipenv==11.6.8
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
+	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 	yarn
 	$(MAKE) -C $(SHARED_DATA_DIR) build
 
@@ -51,12 +53,21 @@ push-api:
 
 # all tests
 .PHONY: test
-test: test-api test-js
+test: test-py test-js
 
-.PHONY: test-api
-test-api:
-	$(MAKE) -C $(API_DIR) test
-	$(MAKE) -C $(API_LIB_DIR) test
+# Use lerna to run test only if anything in update-server has changed
+# `--scope @opentrons/update-server` tells lerna to use the package.json that
+#   uses this name (e.g.: the one in update-server/otupdate)
+# `--since` gives the name of the upstream branch to check against
+# `-- ` (with the space after) tells lerna to execute everything after this
+# `-C ..` is here because the scope causes the working directory to change to
+#   where it finds the package.json specified by --scope, and the Makefile is
+#   in the parent of that directory
+.PHONY: test-py
+test-py:
+#	lerna exec --scope @opentrons/update-server --since origin/edge -- $(MAKE) -C .. test
+	lerna exec --scope @opentrons/api-server --since origin/edge -- $(MAKE) -C .. test
+	lerna exec --scope @opentrons/ot2serverlib --since origin/edge -- $(MAKE) -C .. test
 
 .PHONY: test-js
 test-js:
@@ -74,6 +85,7 @@ lint: lint-py lint-js lint-css
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(API_LIB_DIR) lint
+	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
 .PHONY: lint-js
 lint-js:
