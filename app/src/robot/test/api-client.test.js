@@ -262,6 +262,16 @@ describe('api client', () => {
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
+
+    test('sends error if received malformed session from API', () => {
+      const expected = actions.sessionResponse(expect.anything())
+
+      session.commands = [{foo: 'bar'}]
+      session.command_log = null
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
   })
 
   describe('calibration', () => {
