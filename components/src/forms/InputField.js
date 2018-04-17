@@ -8,7 +8,7 @@ import styles from './forms.css'
 // TODO(mc, 2018-02-22): disabled prop
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => mixed,
+  onChange?: (event: SyntheticInputEvent<*>) => mixed,
   /** classes to apply */
   className?: string,
   /** inline label text */
@@ -28,7 +28,9 @@ type Props = {
   /** optional input type (default "text") */
   type?: 'text' | 'password',
   /** mouse click handler */
-  onClick?: (event: SyntheticMouseEvent<*>) => mixed
+  onClick?: (event: SyntheticMouseEvent<*>) => mixed,
+  /** makes input field read-only */
+  readOnly?: ?boolean
 }
 
 export default function InputField (props: Props) {
@@ -73,6 +75,7 @@ function Input (props: Props) {
           placeholder={props.placeholder}
           onChange={props.onChange}
           onClick={props.onClick}
+          readOnly={props.readOnly}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>

@@ -63,8 +63,8 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
   // TODO LATER Ian 2018-04-05 combine this with consolidate since args are similar
   // and clean up the parsing errors
   const pipette = formData['aspirate--pipette']
-  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
-  const destWells = formData['dispense--wells'] ? formData['dispense--wells'].split(',') : []
+  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'] : []
+  const destWells = formData['dispense--wells'] ? formData['dispense--wells'] : []
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 
@@ -157,8 +157,8 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
 
 function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<ConsolidateFormData> {
   const pipette = formData['aspirate--pipette']
-  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'].split(',') : []
-  const destWells = formData['dispense--wells'] ? formData['dispense--wells'].split(',') : []
+  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'] : []
+  const destWells = formData['dispense--wells'] ? formData['dispense--wells'] : []
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 

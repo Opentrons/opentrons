@@ -5,6 +5,7 @@ import {selectors} from './reducers'
 import {END_STEP} from './types'
 import type {StepType, StepIdType, FormSectionNames, FormModalFields, SubstepIdentifier} from './types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
+import type {Channels} from '@opentrons/components'
 
 type EndStepId = typeof END_STEP
 // Update Form input (onChange on inputs)
@@ -30,6 +31,18 @@ export type PopulateFormAction = {
   type: 'POPULATE_FORM',
   payload: {} // TODO use FormData keys type
 }
+
+// Open well selection modal
+export type OpenWellSelectionModalPayload = {
+  labwareType: string, // TODO Ian 2018-04-17 rename to `labwareModel`, once you change type -> model in type Labware
+  channels: Channels,
+  formFieldAccessor: string // eg 'aspirate--wells' or 'dispense--wells'
+}
+
+export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) => ({
+  type: 'OPEN_WELL_SELECTION_MODAL',
+  payload
+})
 
 // Create new step
 

@@ -11,6 +11,7 @@ import {
   type DropdownOption
 } from '@opentrons/components'
 
+import WellSelectionInput from '../containers/WellSelectionInput'
 import FormSection from './FormSection'
 import styles from './Form.css'
 import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
@@ -29,6 +30,7 @@ export type Props = {
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onToggleFormSection: (section: FormSectionNames) => mixed => mixed, // ???
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
+  openWellSelectionModal: (args: {labwareId: string, pipetteId: string}) => mixed,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean
   /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
@@ -79,11 +81,16 @@ export default function StepEditForm (props: Props) {
             <FormGroup label='Labware:'>
               <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
             </FormGroup>
+            {/* TODO IMMEDIATELY: 'disable' this FormGroup (label style) when no labware or no pipette selected */}
+            {/* TODO LATER: also 'disable' when selected labware is a trash */}
             <FormGroup label='Wells:'>
-              <InputField
-                {...formConnector('aspirate--wells')}
-                onClick={() => console.log('TODO source well selector modal', props.formData['aspirate--labware'], props.formData['aspirate--pipette'])}
+              <WellSelectionInput
+                labwareId={props.formData['aspirate--labware']}
+                pipetteId={props.formData['aspirate--pipette']}
+                initialSelectedWells={props.formData['aspirate--wells']}
+                formFieldAccessor={'aspirate--wells'}
               />
+              {/* ...formConnector('aspirate--wells') */}
             </FormGroup>
             <FormGroup label='Pipette:'>
               <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
@@ -149,10 +156,16 @@ export default function StepEditForm (props: Props) {
               <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />
             </FormGroup>
             <FormGroup label='Wells:'>
-              <InputField
+              <WellSelectionInput
+                labwareId={props.formData['dispense--labware']}
+                pipetteId={props.formData['aspirate--pipette']}
+                initialSelectedWells={props.formData['dispense--wells']}
+                formFieldAccessor={'dispense--wells'}
+              />
+              {/* <InputField
                 {...formConnector('dispense--wells')}
                 onClick={() => console.log('TODO open dest well modal here', props.formData['dispense--labware'], props.formData['aspirate--pipette'])}
-              />
+              /> */}
             </FormGroup>
             {props.formData.stepType === 'transfer' && <FormGroup label='Volume:'>
               <InputField units='μL' {...formConnector('dispense--volume')} />
