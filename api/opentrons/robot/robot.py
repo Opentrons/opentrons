@@ -4,6 +4,7 @@ from functools import lru_cache
 import opentrons.util.calibration_functions as calib
 from numpy import add, subtract
 from opentrons import commands, containers, drivers
+from opentrons.instruments import pipette_config
 from opentrons.broker import subscribe
 from opentrons.containers import Container
 from opentrons.data_storage import database, old_container_loading,\
@@ -920,11 +921,19 @@ class Robot(object):
                 'plunger_axis': 'b'
             }
         left_data.update(self._driver.read_pipette_model('left'))
+        left_model = left_data.get('model')
+        if left_model:
+            tip_length = pipette_config.configs[left_model].tip_length
+            left_data.update({'tip_length': tip_length})
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c'
             }
         right_data.update(self._driver.read_pipette_model('right'))
+        right_model = right_data.get('model')
+        if left_model:
+            tip_length = pipette_config.configs[right_model].tip_length
+            right_data.update({'tip_length': tip_length})
         return {
             'left': left_data,
             'right': right_data

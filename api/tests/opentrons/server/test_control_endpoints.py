@@ -43,14 +43,17 @@ async def test_get_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
+    model = list(configs.values())[0]
     expected = {
         'left': {
-            'model': list(configs.values())[0].name,
+            'model': model.name,
+            'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': list(configs.values())[0].name,
+            'model': model.name,
+            'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c'
         }
