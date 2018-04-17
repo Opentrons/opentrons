@@ -254,6 +254,7 @@ async def home(request):
             if mount in ['left', 'right']:
                 pipette = instruments.Pipette(mount=mount)
                 pipette.home()
+                robot.remove_instrument(mount)
 
                 status = 200
                 message = "Pipette on {} homed successfully.".format(mount)

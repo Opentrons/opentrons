@@ -423,6 +423,11 @@ class Robot(object):
             point=(_x, _y, _z)
         )
 
+    def remove_instrument(self, mount):
+        instrument = self._instruments.pop(mount, None)
+        if instrument:
+            self.poses = pose_tracker.remove(self.poses, instrument)
+
     def add_warning(self, warning_msg):
         """
         Internal. Add a runtime warning to the queue.
