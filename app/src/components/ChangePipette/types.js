@@ -10,13 +10,13 @@ import type {
 import type {PipetteSelectionProps} from './PipetteSelection'
 
 export type Model =
-  | 'p10_single'
-  | 'p50_single'
-  | 'p300_single'
-  | 'p1000_single'
-  | 'p10_multi'
-  | 'p50_multi'
-  | 'p300_multi'
+  | 'p10_single_v1'
+  | 'p50_single_v1'
+  | 'p300_single_v1'
+  | 'p1000_single_v1'
+  | 'p10_multi_v1'
+  | 'p50_multi_v1'
+  | 'p300_multi_v1'
 
 // TODO(mc, 2018-04-06): flow does not like numbers as object keys
 export type Channels = '1' | '8'
