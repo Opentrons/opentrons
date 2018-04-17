@@ -3,7 +3,7 @@
 .modal {
   @apply --modal;
 
-  padding: 6rem 4rem;
+  padding: 3rem 1.5rem;
 }
 
 .title_bar {
@@ -16,7 +16,7 @@
 .modal_contents {
   z-index: 1;
   width: 100%;
-  max-width: 32rem;
+  max-width: 48rem;
   margin: auto;
 }
 
@@ -29,19 +29,7 @@
 
 .position_diagram {
   padding: 1.5rem;
-  background-color: var(--c-bg-light);
-}
-
-.diagram_title {
-  @apply --font-header-dark;
-
-  margin: 0 1rem 0.5rem;
-}
-
-.diagram_instructions {
-  @apply --font-body-2-dark;
-
-  margin: 0 1rem;
+  background-color: white;
 }
 
 .diagram_image {
