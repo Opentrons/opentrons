@@ -8,9 +8,17 @@ import styles from './styles.css'
 
 // TODO (ka 2018-4-10): move this component to util/ or at least up a level for reuse for tip probe
 export default function RequestInProgressModal (props: ChangePipetteProps) {
-  const message = props.mount === 'right'
-    ? 'Right pipette carriage moving to front and left.'
-    : 'Left pipette carriage moving to front and right.'
+  let message = props.mount === 'right'
+    ? 'Right pipette carriage moving'
+    : 'Left pipette carriage moving'
+
+  if (props.moveRequest.inProgress) {
+    message += props.mount === 'right'
+      ? ' to front and left.'
+      : ' to front and right.'
+  } else if (props.homeRequest.inProgress) {
+    message += ' up.'
+  }
 
   return (
     <TitledModal

@@ -6,10 +6,23 @@ import {Switch, Route, withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
-import type {RobotMoveState, PipettesResponse} from '../../http-api-client'
 import type {Pipette, ChangePipetteProps} from './types'
 
-import {moveToChangePipette, fetchPipettes, makeGetRobotMove, makeGetRobotPipettes} from '../../http-api-client'
+import type {
+  RobotHome,
+  RobotMoveState,
+  PipettesResponse
+} from '../../http-api-client'
+
+import {
+  home,
+  moveToChangePipette,
+  fetchPipettes,
+  makeGetRobotMove,
+  makeGetRobotHome,
+  makeGetRobotPipettes
+} from '../../http-api-client'
+
 import PIPETTES from './pipettes'
 import ClearDeckAlertModal from './ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
@@ -77,6 +90,7 @@ type OP = {
 
 type SP = {
   moveRequest: RobotMoveState,
+  homeRequest: RobotHome,
   pipettes: ?PipettesResponse
 }
 
@@ -90,13 +104,13 @@ type DP = {
 }
 
 function ChangePipetteRouter (props: ChangePipetteProps) {
-  const {baseUrl, confirmUrl, exitUrl, moveRequest} = props
+  const {baseUrl, confirmUrl, exitUrl, moveRequest, homeRequest} = props
 
   if (!moveRequest.inProgress && !moveRequest.response) {
     return (<ClearDeckAlertModal {...props} />)
   }
 
-  if (moveRequest.inProgress) {
+  if (moveRequest.inProgress || homeRequest.inProgress) {
     return (<RequestInProgressModal {...props} />)
   }
 
@@ -117,11 +131,13 @@ function ChangePipetteRouter (props: ChangePipetteProps) {
 
 function makeMapStateToProps () {
   const getRobotMove = makeGetRobotMove()
+  const getRobotHome = makeGetRobotHome()
   const getRobotPipettes = makeGetRobotPipettes()
 
   return (state: State, ownProps: OP): SP => {
     return {
       moveRequest: getRobotMove(state, ownProps.robot),
+      homeRequest: getRobotHome(state, ownProps.robot),
       pipettes: getRobotPipettes(state, ownProps.robot).response
     }
   }
@@ -131,7 +147,8 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {confirmUrl, parentUrl, baseUrl, robot, mount} = ownProps
 
   return {
-    exit: () => dispatch(push(parentUrl)),
+    exit: () => dispatch(home(robot, mount))
+      .then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
     onPipetteSelect: (event) => {
       dispatch(push(`${baseUrl}/${event.target.value}`))
