@@ -24,12 +24,12 @@ export type JogControlsProps = Labware & {
 }
 
 const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
-  left: 'chevron-left',
-  right: 'chevron-right',
-  back: 'chevron-up',
-  forward: 'chevron-down',
-  up: 'chevron-up',
-  down: 'chevron-down'
+  left: 'ot-arrow-left',
+  right: 'ot-arrow-right',
+  back: 'ot-arrow-up',
+  forward: 'ot-arrow-down',
+  up: 'ot-arrow-up',
+  down: 'ot-arrow-down'
 }
 
 export default function JogControls (props: JogControlsProps) {

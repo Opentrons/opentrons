@@ -437,6 +437,86 @@ exports[`icons menu-down renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-arrow-down renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M4 12l8 8 8-8h-4V4H8v8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-arrow-left renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 4l-8 8 8 8v-4h8V8h-8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-arrow-right renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 20l8-8-8-8v4H4v8h8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-arrow-up renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M20 12l-8-8-8 8h4v8h8v-8z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-calibrate renders correctly 1`] = `
 <svg
   aria-hidden="true"
