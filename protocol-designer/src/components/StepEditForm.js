@@ -80,7 +80,10 @@ export default function StepEditForm (props: Props) {
               <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
             </FormGroup>
             <FormGroup label='Wells:'>
-              <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('aspirate--wells')} />
+              <InputField
+                {...formConnector('aspirate--wells')}
+                onClick={() => console.log('TODO source well selector modal', props.formData['aspirate--labware'], props.formData['aspirate--pipette'])}
+              />
             </FormGroup>
             <FormGroup label='Pipette:'>
               <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
@@ -146,7 +149,10 @@ export default function StepEditForm (props: Props) {
               <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />
             </FormGroup>
             <FormGroup label='Wells:'>
-              <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('dispense--wells')} />
+              <InputField
+                {...formConnector('dispense--wells')}
+                onClick={() => console.log('TODO open dest well modal here', props.formData['dispense--labware'], props.formData['aspirate--pipette'])}
+              />
             </FormGroup>
             {props.formData.stepType === 'transfer' && <FormGroup label='Volume:'>
               <InputField units='μL' {...formConnector('dispense--volume')} />

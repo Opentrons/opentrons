@@ -107,7 +107,7 @@ export type TransferForm = {|
 
   'aspirate--labware'?: string,
   'aspirate--wells'?: string,
-  'aspirate--pipette'?: string,
+  'aspirate--pipette'?: string, // TODO just call this pipette, there's only one
   'aspirate--pre-wet-tip'?: boolean,
   'aspirate--touch-tip'?: boolean,
   'aspirate--air-gap--checkbox'?: boolean,
@@ -140,7 +140,7 @@ export type ConsolidateForm = {|
   'aspirate--volume'?: string,
   'aspirate--labware'?: string,
   'aspirate--wells'?: string,
-  'aspirate--pipette'?: string,
+  'aspirate--pipette'?: string, // TODO just call this pipette, there's only one
   'aspirate--pre-wet-tip'?: boolean,
   'aspirate--touch-tip'?: boolean,
   'aspirate--air-gap--checkbox'?: boolean,
