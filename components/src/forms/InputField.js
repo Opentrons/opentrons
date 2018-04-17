@@ -26,7 +26,9 @@ type Props = {
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
   secondaryCaption?: string,
   /** optional input type (default "text") */
-  type?: 'text' | 'password'
+  type?: 'text' | 'password',
+  /** mouse click handler */
+  onClick?: (event: SyntheticMouseEvent<*>) => mixed
 }
 
 export default function InputField (props: Props) {
@@ -70,6 +72,7 @@ function Input (props: Props) {
           value={props.value || ''}
           placeholder={props.placeholder}
           onChange={props.onChange}
+          onClick={props.onClick}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>
