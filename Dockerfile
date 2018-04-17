@@ -57,7 +57,11 @@ RUN apk add --update \
 # site-packages and cleaning up the one created by python3 package.
 RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
-RUN pip install pipenv==9.0.3 jupyter
+RUN pip install --force-reinstall \
+    pipenv==9.0.3 \
+    jupyter==1.0.0 \
+    tornado==4.5.1 \
+    pyzmq==16.0.2
 
 # Copy server files and data into the container. Note: any directories that
 # you wish to copy into the container must be excluded from the .dockerignore
