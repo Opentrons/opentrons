@@ -11,7 +11,7 @@ type Props = {
   onCloseClick?: () => mixed,
   /** optional modal heading */
   heading?: React.Node,
-  /** optional array of `ButtonProps` for `FlatButton`s at bottom of modal */
+  /** optional array of `ButtonProps` for `OutlineButton`s at bottom of modal */
   buttons?: Array<?ButtonProps>,
   /** modal contents */
   children: React.Node,
