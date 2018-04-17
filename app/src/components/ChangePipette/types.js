@@ -1,6 +1,12 @@
 // @flow
 import type {Mount} from '../../robot'
-import type {RobotMoveState, PipettesResponse} from '../../http-api-client'
+
+import type {
+  RobotMoveState,
+  RobotHome,
+  PipettesResponse
+} from '../../http-api-client'
+
 import type {PipetteSelectionProps} from './PipetteSelection'
 
 export type Model =
@@ -34,6 +40,7 @@ export type ChangePipetteProps = {
   confirmUrl: string,
   exitUrl: string,
   moveRequest: RobotMoveState,
+  homeRequest: RobotHome,
   pipettes: ?PipettesResponse,
   back: () => mixed,
   exit: () => mixed,
