@@ -131,8 +131,10 @@ async def test_home_pipette(virtual_smoothie_env, loop, test_client):
         'mount': 'left'}
 
     res = await cli.post('/robot/home', json=test_data)
-
     assert res.status == 200
+
+    res2 = await cli.post('/robot/home', json=test_data)
+    assert res2.status == 200
 
 
 async def test_home_robot(virtual_smoothie_env, loop, test_client):
