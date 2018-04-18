@@ -365,6 +365,7 @@ def main():
         calibration_points = expected_dots
 
     robot.connect()
+    robot.turn_on_rail_lights()
 
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
@@ -386,5 +387,6 @@ if __name__ == "__main__":
     # Register hook to reboot the robot after exiting this tool (regardless of
     # whether this process exits normally or not)
     atexit.register(notify_and_restart)
+    atexit.register(robot.turn_off_rail_lights)
 
     main()
