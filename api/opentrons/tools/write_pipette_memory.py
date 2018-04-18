@@ -40,6 +40,25 @@ def write_identifiers(robot, mount, new_id, new_model):
     _assert_the_same(new_model, read_model['model'])
 
 
+def check_previous_data(robot, mount):
+    old_id = robot._driver.read_pipette_id(mount)
+    if old_id.get('pipette_id'):
+        old_id = old_id.get('pipette_id')
+    else:
+        old_id = None
+    old_model = robot._driver.read_pipette_model(mount)
+    if old_model.get('model'):
+        old_model = old_model.get('model')
+    else:
+        old_model = None
+    if old_id and old_model:
+        print(
+            'Overwriting old data: id={0}, model={1}'.format(
+                old_id, old_model))
+    else:
+        print('No old data on this pipette')
+
+
 def _assert_the_same(a, b):
     if a != b:
         raise Exception(WRITE_FAIL_MESSAGE)
@@ -71,6 +90,7 @@ def main(robot):
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
+        check_previous_data(robot, 'right')
         write_identifiers(robot, 'right', barcode, model)
         print('PASS: Saved -> {}'.format(barcode))
     except KeyboardInterrupt:
