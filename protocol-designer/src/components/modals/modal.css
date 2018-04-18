@@ -1,8 +1,3 @@
 .modal {
   z-index: 100;
 }
-
-.modal_contents {
-  /* HACK Ian 2018-02-27 -- there's not a nice way to give the modal a width! */
-  width: 60vw;
-}
