@@ -35,3 +35,4 @@ fi
 export ENABLE_NETWORKING_ENDPOINTS=true
 echo "Starting Opentrons API server"
 python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH opentrons.server.main:init
+while true; do sleep 1; done
