@@ -9,12 +9,13 @@ from opentrons.robot import robot_configs
 # ------------ Function tests (unit) ----------------------
 async def test_init_pipette(dc_session):
     robot.reset()
+    model = 'p10_single_v1'
     data = {
         'mount': 'left',
-        'model': 'p10_single'}
+        'model': model}
     await endpoints.init_pipette(data)
     actual = dc_session.pipettes.get('left').name
-    expected = pipette_config.p10_single.name
+    expected = pipette_config.configs[model].name
     assert actual == expected
 
 
@@ -97,7 +98,7 @@ async def test_save_z(dc_session):
     await endpoints.save_z({})
 
     new_z = dc_session.z_value
-    pipette_z_offset = pipette_config.p10_single.model_offset[-1]
+    pipette_z_offset = pipette_config.configs['p10_single_v1'].model_offset[-1]
     expected_z = z_target - pipette_z_offset
     assert new_z == expected_z
 
@@ -227,7 +228,7 @@ async def test_incorrect_token(async_client, monkeypatch):
             'token': 'FAKE TOKEN',
             'command': 'init pipette',
             'mount': 'left',
-            'model': 'p10_single'
+            'model': 'p10_single_v1'
         })
 
     assert resp.status == 403
@@ -258,12 +259,12 @@ async def test_init_pipette_integration(async_client, monkeypatch):
             'token': token,
             'command': 'init pipette',
             'mount': 'left',
-            'model': 'p10_single'
+            'model': 'p10_single_v1'
         })
 
     body = await resp.json()
 
-    assert body['pipettes']['left'] == 'p10_single'
+    assert body['pipettes']['left'] == 'p10_single_v1'
     assert endpoints.session.pipettes.get('right') is None
 
 
@@ -294,7 +295,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
             'token': token,
             'command': 'init pipette',
             'mount': 'left',
-            'model': 'p10_single'
+            'model': 'p10_single_v1'
         })
 
     await async_client.post(

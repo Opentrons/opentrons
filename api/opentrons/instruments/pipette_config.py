@@ -1,25 +1,64 @@
+import os
+import json
 from collections import namedtuple
 
 
-# multi-channel pipettes share the same dimensional offsets
-DISTANCE_BETWEEN_NOZZLES = 9
-NUM_MULTI_CHANNEL_NOZZLES = 8
-MULTI_LENGTH = (NUM_MULTI_CHANNEL_NOZZLES - 1) * DISTANCE_BETWEEN_NOZZLES
-Y_OFFSET_MULTI = MULTI_LENGTH / 2
-Z_OFFSET_MULTI = -25.8
+FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# single-channel pipettes have different lengths
-Z_OFFSET_P10 = -13  # longest single-channel pipette
-Z_OFFSET_P50 = 0
-Z_OFFSET_P300 = 0
-Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
-# Default number of seconds to aspirate/dispense a pipette's full volume,
-# and these times were chosen to mimic normal human-pipetting motions.
-# However, accurate speeds are dependent on environment (ex: liquid viscosity),
-# therefore a pipette's flow-rates (ul/sec) should be set by protocol writer
-DEFAULT_ASPIRATE_SECONDS = 2
-DEFAULT_DISPENSE_SECONDS = 1
+def config_dir():
+    return os.environ.get(
+        'OT_SETTINGS_DIR',
+        os.path.abspath(os.path.join(
+            FILE_DIR, '..', '..', '..', 'labware-definitions', 'robot-data')))
+
+
+pipette_config = namedtuple(
+    'pipette_config',
+    [
+        'plunger_positions',
+        'pick_up_current',
+        'aspirate_flow_rate',
+        'dispense_flow_rate',
+        'ul_per_mm',
+        'channels',
+        'name',
+        'model_offset',
+        'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
+    ]
+)
+
+
+def _load_config_from_file(pipette_model: str) -> pipette_config:
+    with open(os.path.join(config_dir(), 'pipette-config.json')) as conf:
+        all_configs = json.load(conf)
+        cfg = all_configs[pipette_model]
+        return pipette_config(
+            plunger_positions={
+                'top': cfg['plunger-positions']['top'],
+                'bottom': cfg['plunger-positions']['bottom'],
+                'blow_out': cfg['plunger-positions']['blow-out'],
+                'drop_tip': cfg['plunger-positions']['drop-tip']
+            },
+            pick_up_current=cfg['pick-up-current'],
+            aspirate_flow_rate=cfg['aspirate-flow-rate'],
+            dispense_flow_rate=cfg['dispense-flow-rate'],
+            ul_per_mm=cfg['ul-per-mm'],
+            channels=cfg['channels'],
+            name=pipette_model,
+            model_offset=cfg['model-offset'],
+            tip_length=cfg['tip-length']
+        )
+
+# Notes:
+# - multi-channel pipettes share the same dimensional offsets
+# - single-channel pipettes have different lengths
+# - Default number of seconds to aspirate/dispense a pipette's full volume,
+#     and these times were chosen to mimic normal human-pipetting motions.
+#     However, accurate speeds are dependent on environment (ex: liquid
+#     viscosity), therefore a pipette's flow-rates (ul/sec) should be set by
+#     protocol writer
+
 
 # model-specific ID's, saved with each Pipette's memory
 # used to identifiy what model pipette is currently connected to machine
@@ -37,151 +76,28 @@ PIPETTE_MODEL_IDENTIFIERS = {
     }
 }
 
-pipette_config = namedtuple(
-    'pipette_config',
-    [
-        'plunger_positions',
-        'pick_up_current',
-        'aspirate_flow_rate',
-        'dispense_flow_rate',
-        'ul_per_mm',
-        'channels',
-        'name',
-        'model_offset',
-        'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
-    ]
-)
-
-p10_single = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -5
-    },
-    pick_up_current=0.1,
-    aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.617,
-    channels=1,
-    name='p10_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P10),
-    tip_length=40  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p10_multi = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -5
-    },
-    pick_up_current=0.2,
-    aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.617,
-    channels=8,
-    name='p10_multi',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=40  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p50_single = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 4,
-        'blow_out': 2,
-        'drop_tip': -2.5
-    },
-    pick_up_current=0.1,
-    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.08,
-    channels=1,
-    name='p50_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P50),
-    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p50_multi = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 4,
-        'blow_out': 2,
-        'drop_tip': -4
-    },
-    pick_up_current=0.3,
-    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.08,
-    channels=8,
-    name='p50_multi',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p300_single = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -2.5
-    },
-    pick_up_current=0.1,
-    aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=18.51,
-    channels=1,
-    name='p300_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P300),
-    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p300_multi = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -4
-    },
-    pick_up_current=0.3,
-    aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=18.51,
-    channels=8,
-    name='p300_multi',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
-)
-
-p1000_single = pipette_config(
-    plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -2.5
-    },
-    pick_up_current=0.1,
-    aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
-    dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=61.69,
-    channels=1,
-    name='p1000_single',
-    model_offset=(0.0, 0.0, Z_OFFSET_P1000),
-    tip_length=60  # TODO (andy): remove from pipette, move to tip-rack
-)
-
 
 configs = {
-    'p10_single': p10_single,
-    'p10_multi': p10_multi,
-    'p50_single': p50_single,
-    'p50_multi': p50_multi,
-    'p300_single': p300_single,
-    'p300_multi': p300_multi,
-    'p1000_single': p1000_single
-}
+    model: _load_config_from_file(model)
+    for model in [
+        'p10_single_v1',
+        'p10_multi_v1',
+        'p50_single_v1',
+        'p50_multi_v1',
+        'p300_single_v1',
+        'p300_multi_v1',
+        'p1000_single_v1']}
 
 
-def load(pipette_model: str):
-    return configs[pipette_model]
+def load(pipette_model: str) -> pipette_config:
+    """
+    Lazily loads pipette config data from disk. This means that changes to the
+    configuration data should be picked up on newly instantiated objects
+    without requiring a restart. If :param pipette_model is not in the top-
+    level keys of the "pipette-config.json" file, this function will raise a
+    KeyError
+    :param pipette_model: a pipette model string corresponding to a top-level
+        key in the "pipette-config.json" file
+    :return: a `pipette_config` instance
+    """
+    return _load_config_from_file(pipette_model)
