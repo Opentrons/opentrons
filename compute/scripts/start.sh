@@ -30,7 +30,6 @@ config_path=`python -c "from opentrons.util import environment; print(environmen
 
 if [ ! -e "$config_path" ]; then
     echo "Config file not found. Please perform factory calibration and then restart robot"
-    while true; do sleep 1; done
 fi
 
 export ENABLE_NETWORKING_ENDPOINTS=true
