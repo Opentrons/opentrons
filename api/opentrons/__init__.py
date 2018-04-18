@@ -51,7 +51,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p10_single')
+        config = pipette_config.load('p10_single_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -69,7 +69,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p10_multi')
+        config = pipette_config.load('p10_multi_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -87,7 +87,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p50_single')
+        config = pipette_config.load('p50_single_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -105,7 +105,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p50_multi')
+        config = pipette_config.load('p50_multi_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -123,7 +123,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p300_single')
+        config = pipette_config.load('p300_single_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -141,7 +141,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p300_multi')
+        config = pipette_config.load('p300_multi_v1')
 
         return self._create_pipette_from_config(
             config=config,
@@ -159,7 +159,7 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p1000_single')
+        config = pipette_config.load('p1000_single_v1')
 
         return self._create_pipette_from_config(
             config=config,

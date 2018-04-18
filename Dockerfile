@@ -69,6 +69,9 @@ RUN pip install --force-reinstall \
 ENV LABWARE_DEF /etc/labware
 ENV AUDIO_FILES /etc/audio
 ENV USER_DEFN_ROOT /data/user_storage/opentrons_data/labware
+ENV OT_SETTINGS_DIR /etc/robot-data/
+RUN echo "export OT_SETTINGS_DIR=$OT_SETTINGS_DIR" >> /etc/profile
+COPY ./labware-definitions/robot-data /etc/robot-data
 COPY ./compute/conf/jupyter_notebook_config.py /root/.jupyter/
 COPY ./labware-definitions/definitions /etc/labware
 COPY ./audio/ /etc/audio

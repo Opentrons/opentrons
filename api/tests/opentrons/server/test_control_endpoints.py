@@ -252,7 +252,7 @@ async def test_move_pipette(virtual_smoothie_env, loop, test_client):
         'target': 'pipette',
         'point': [100, 200, 50],
         'mount': 'right',
-        'model': 'p300_single'
+        'model': 'p300_single_v1'
     }
     res = await cli.post('/robot/move', json=data)
     assert res.status == 200
