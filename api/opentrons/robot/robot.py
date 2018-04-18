@@ -413,9 +413,9 @@ class Robot(object):
         # if it's the left mount, apply the offset from right pipette
         if mount is 'left':
             _x, _y, _z = (
-               _x + self.config.left_mount_offset[0],
-               _y + self.config.left_mount_offset[1],
-               _z + self.config.left_mount_offset[2]
+               _x + self.config.mount_offset[0],
+               _y + self.config.mount_offset[1],
+               _z + self.config.mount_offset[2]
             )
         self.poses = pose_tracker.add(
             self.poses,
