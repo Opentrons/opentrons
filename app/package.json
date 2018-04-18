@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@opentrons/components": "3.0.0-beta.8",
+    "@opentrons/labware-definitions": "3.0.0-beta.8",
     "bonjour": "^3.5.0",
     "classnames": "^2.2.5",
     "electron": "1.8.3",

@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
 
+import type {PipetteChannels} from '@opentrons/labware-definitions'
 import type {Mount} from '../../robot'
-import type {Channels, Direction} from './types'
+import type {Direction} from './types'
 
 import screwdriverSrc from './images/screwdriver.svg'
 import styles from './styles.css'
@@ -12,7 +13,7 @@ type Diagram = 'screws' | 'tab'
 type DiagramProps = {
   direction: Direction,
   mount: Mount,
-  channels: Channels,
+  channels: PipetteChannels,
   diagram: Diagram,
 }
 
@@ -21,26 +22,28 @@ type Props = DiagramProps & {
   children: React.Node,
 }
 
+type Channels = 'single' | 'multi'
+
 // TODO(mc, 2018-04-06): there must be a better way...
 //   this object is way nicer than a giant if/else ladder though
 const DIAGRAMS: {[Direction]: {[Mount]: {[Channels]: {[Diagram]: string}}}} = {
   attach: {
     left: {
-      '1': {
+      'single': {
         screws: require('./images/attach-left-single-screws@3x.png'),
         tab: require('./images/attach-left-single-tab@3x.png')
       },
-      '8': {
+      'multi': {
         screws: require('./images/attach-left-multi-screws@3x.png'),
         tab: require('./images/attach-left-multi-tab@3x.png')
       }
     },
     right: {
-      '1': {
+      'single': {
         screws: require('./images/attach-right-single-screws@3x.png'),
         tab: require('./images/attach-right-single-tab@3x.png')
       },
-      '8': {
+      'multi': {
         screws: require('./images/attach-right-multi-screws@3x.png'),
         tab: require('./images/attach-right-multi-tab@3x.png')
       }
@@ -48,21 +51,21 @@ const DIAGRAMS: {[Direction]: {[Mount]: {[Channels]: {[Diagram]: string}}}} = {
   },
   detach: {
     left: {
-      '1': {
+      'single': {
         screws: require('./images/detach-left-single-screws@3x.png'),
         tab: require('./images/detach-left-single-tab@3x.png')
       },
-      '8': {
+      'multi': {
         screws: require('./images/detach-left-multi-screws@3x.png'),
         tab: require('./images/detach-left-multi-tab@3x.png')
       }
     },
     right: {
-      '1': {
+      'single': {
         screws: require('./images/detach-right-single-screws@3x.png'),
         tab: require('./images/detach-right-single-tab@3x.png')
       },
-      '8': {
+      'multi': {
         screws: require('./images/detach-right-multi-screws@3x.png'),
         tab: require('./images/detach-right-multi-tab@3x.png')
       }
@@ -79,9 +82,9 @@ export default function InstructionStep (props: Props) {
       <legend className={styles.step_legend}>
         Step {props.step}
       </legend>
-      <p>
+      <div>
         {props.children}
-      </p>
+      </div>
       {diagram === 'screws' && (
         <img src={screwdriverSrc} className={styles.screwdriver} />
       )}
@@ -92,6 +95,9 @@ export default function InstructionStep (props: Props) {
 
 export function getDiagramSrc (props: DiagramProps): string {
   const {direction, mount, channels, diagram} = props
+  const channelsKey = channels === 8
+    ? 'multi'
+    : 'single'
 
-  return DIAGRAMS[direction][mount][channels][diagram]
+  return DIAGRAMS[direction][mount][channelsKey][diagram]
 }

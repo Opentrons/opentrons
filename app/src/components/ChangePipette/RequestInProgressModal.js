@@ -2,8 +2,7 @@
 import * as React from 'react'
 
 import type {ChangePipetteProps} from './types'
-import {Icon} from '@opentrons/components'
-import TitledModal from './TitledModal'
+import {Icon, ModalPage} from '@opentrons/components'
 import styles from './styles.css'
 
 // TODO (ka 2018-4-10): move this component to util/ or at least up a level for reuse for tip probe
@@ -21,7 +20,7 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
   }
 
   return (
-    <TitledModal
+    <ModalPage
       contentsClassName={styles.in_progress_contents}
       titleBar={{
         title: props.title,
@@ -33,6 +32,6 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
       <p className={styles.progress_message}>
         {message}
       </p>
-    </TitledModal>
+    </ModalPage>
   )
 }
