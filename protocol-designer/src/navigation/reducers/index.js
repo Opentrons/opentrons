@@ -1,7 +1,7 @@
 // @flow
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
-import type { ActionType } from 'redux-actions'
+import {combineReducers} from 'redux'
+import {handleActions} from 'redux-actions'
+import type {ActionType} from 'redux-actions'
 
 import type {BaseState} from '../../types'
 import {navigateToPage, toggleNewProtocolModal} from '../actions'
@@ -16,14 +16,21 @@ const newProtocolModal = handleActions({
     action.payload
 }, false)
 
+const wellSelectionModal = handleActions({
+  OPEN_WELL_SELECTION_MODAL: () => true,
+  CLOSE_WELL_SELECTION_MODAL: () => false
+}, false)
+
 export const _allReducers = {
   page,
-  newProtocolModal
+  newProtocolModal,
+  wellSelectionModal
 }
 
 export type RootState = {
   page: Page,
-  newProtocolModal: boolean
+  newProtocolModal: boolean,
+  wellSelectionModal: boolean
 }
 
 const rootReducer = combineReducers(_allReducers)
