@@ -8,6 +8,7 @@ import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
+import ConnectedWellSelectionModal from '../containers/ConnectedWellSelectionModal'
 
 import styles from './ProtocolEditor.css'
 
@@ -27,9 +28,9 @@ export default function ProtocolEditor () {
           <ConnectedTitleBar />
 
           <div className={styles.main_page_content}>
-            {/* TODO Ian 2018-02-27 connect this modal IRL */}
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
+            <ConnectedWellSelectionModal />
             <ConnectedStepEditForm />
 
             <ConnectedMainPanel />

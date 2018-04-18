@@ -2,17 +2,25 @@
 import {createSelector} from 'reselect'
 
 import mapValues from 'lodash/mapValues'
-
+import min from 'lodash/min'
+import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
-import * as StepGeneration from '../step-generation'
-import {selectors as steplistSelectors} from '../steplist/reducers'
-import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {getAllWellsForLabware} from '../constants'
 
-import type {Selector} from '../types'
-import type {WellContents, AllWellContents} from '../labware-ingred/types'
-import type {NamedIngredsByLabwareAllSteps} from '../steplist/types'
+import * as StepGeneration from '../../step-generation'
+import {selectors as steplistSelectors} from '../../steplist/reducers'
+import {selectors as fileDataSelectors} from '../../file-data'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import wellSelectionSelectors from '../../well-selection/selectors'
+import {getAllWellsForLabware, getMaxVolumes} from '../../constants'
+
+import type {Selector} from '../../types'
+import type {WellContents, AllWellContents} from '../../labware-ingred/types'
+import type {NamedIngredsByLabwareAllSteps} from '../../steplist/types'
+
+// TODO IMMEDIATELY: factor out all these selectors to their own files,
+// and make this index.js just imports and exports.
+import wellContentsAllLabwareExport from './wellContentsAllLabware'
+export const wellContentsAllLabware = wellContentsAllLabwareExport
 
 type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
 
@@ -95,4 +103,24 @@ export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = cr
         })
       )
     )
+)
+
+export const selectedWellsMaxVolume: Selector<number> = createSelector(
+  wellSelectionSelectors.getSelectedWells,
+  labwareIngredSelectors.selectedContainerType,
+  (selectedWells, selectedContainerType) => {
+    const selectedWellNames = Object.keys(selectedWells.selected)
+    if (!selectedContainerType) {
+      console.warn('No container type selected, cannot get max volume')
+      return Infinity
+    }
+    const maxVolumesByWell = getMaxVolumes(selectedContainerType)
+    const maxVolumesList = (selectedWellNames.length > 0)
+      // when wells are selected, only look at vols of selected wells
+      ? Object.values(pick(maxVolumesByWell, selectedWellNames))
+      // when no wells selected (eg editing ingred group), look at all volumes.
+      // TODO LATER: look at filled wells, not all wells.
+      : Object.values(maxVolumesByWell)
+    return min(maxVolumesList.map(n => parseInt(n)))
+  }
 )

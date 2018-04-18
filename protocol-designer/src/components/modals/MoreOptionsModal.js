@@ -26,6 +26,7 @@ export default function (props: Props) {
   const formConnector = formConnectorFactory(props.handleChange, props.formData)
   return (
     !props.hideModal && <Modal onCloseClick={props.onCancel} className={modalStyles.modal}>
+      {/* TODO Ian 2018-04-18 should this be Modal component? */}
       <div className={modalStyles.modal_contents}>
         <FormGroup label='Step Name' className={styles.column_1_2}>
           <InputField {...formConnector('step-name')} />

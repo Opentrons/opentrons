@@ -36,13 +36,23 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {
-    throw new Error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    console.error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    return {
+      containerId: '',
+      wellContents: {},
+      containerType: '',
+      selectable: ownProps.selectable
+    }
   }
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
+  // TODO
+  const wellSelectionMode = true
+  const wellSelectionModeForContainer = wellSelectionMode && selectedContainerId === containerId
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
@@ -56,9 +66,9 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const highlightedWells = deckSetupMode ? {} : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
 
   let wellContents = {}
-  if (deckSetupMode) {
+  if (deckSetupMode || wellSelectionModeForContainer) {
     // selection for deck setup
-    wellContents = selectors.wellContentsAllLabware(state)[containerId]
+    wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
     // well contents for step, not deck setup mode
     const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])

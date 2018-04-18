@@ -2,13 +2,10 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
-import type {BaseState} from '../types'
 
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as fileDataSelectors} from '../file-data'
 import {openWellSelectionModal} from '../steplist/actions'
 
-import {InputField, type Channels} from '@opentrons/components'
+import {InputField} from '@opentrons/components'
 
 type OP = {
   formFieldAccessor: string,
@@ -17,20 +14,17 @@ type OP = {
   initialSelectedWells: ?Array<string>
 }
 
-type SP = {
-  channels: Channels,
-  labwareType: string,
-}
+type SP = {}
 
 type DP = {
   onClick: (e: SyntheticMouseEvent<*>) => mixed
 }
 
-type Props = OP & SP & DP
+type Props = OP & DP & SP
 
 function WellSelectorInput (props: Props) {
-  const {initialSelectedWells, channels, labwareType, onClick} = props
-  const enabled = (channels && labwareType)
+  const {initialSelectedWells, labwareId, onClick} = props
+  const enabled = !!(labwareId)
 
   return <InputField
     readOnly
@@ -39,21 +33,18 @@ function WellSelectorInput (props: Props) {
   />
 }
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {pipetteId, labwareId} = ownProps
-  return {
-    channels: fileDataSelectors.equippedPipettes(state)[pipetteId].channels,
-    labwareType: labwareIngredSelectors.getLabware(state)[labwareId].type
-  }
+function mapStateToProps (): SP {
+  // TODO remove this?
+  return {}
 }
 
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, ownProps: OP): Props {
   const {dispatch} = dispatchProps
   return {
     ...ownProps,
-    ...stateProps,
     onClick: () => dispatch(openWellSelectionModal({
-      ...stateProps,
+      pipetteId: ownProps.pipetteId,
+      labwareId: ownProps.labwareId,
       formFieldAccessor: ownProps.formFieldAccessor
     }))
   }
