@@ -7,6 +7,7 @@ import type {Labware, JogButtonName} from '../../robot'
 
 import {
   PrimaryButton,
+  RadioGroup,
   Icon,
   type IconName
 } from '@opentrons/components'
@@ -23,27 +24,43 @@ export type JogControlsProps = Labware & {
 }
 
 const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
-  left: 'chevron-left',
-  right: 'chevron-right',
-  back: 'chevron-up',
-  forward: 'chevron-down',
-  up: 'chevron-up',
-  down: 'chevron-down'
+  left: 'ot-arrow-left',
+  right: 'ot-arrow-right',
+  back: 'ot-arrow-up',
+  forward: 'ot-arrow-down',
+  up: 'ot-arrow-up',
+  down: 'ot-arrow-down'
 }
 
 export default function JogControls (props: JogControlsProps) {
   return (
     <div className={styles.jog_container}>
       <div className={styles.jog_controls}>
+        <span className={styles.jog_label_xy}>
+          Across Deck
+        </span>
+        <span className={styles.jog_label_z}>
+          Up & Down
+        </span>
         {props.jogButtons.map((button) => (
           <JogButton key={button.name} {...button} />
         ))}
-        <span className={styles.jog_label_xy}>
-          X-Y axis
+        <span className={styles.jog_increment}>
+          Jump Size
         </span>
-        <span className={styles.jog_label_z}>
-          Z axis
-        </span>
+        <span className={styles.increment_group}>
+        <RadioGroup
+          className={styles.increment_item}
+          disabled
+          value={'1'}
+          options={[
+            {name: '0.1 mm', value: '0.1'},
+            {name: '1 mm', value: '1'},
+            {name: '10 mm', value: '10'}
+          ]}
+          onChange={e => (console.log(e.target.value))}
+        />
+      </span>
       </div>
     </div>
   )

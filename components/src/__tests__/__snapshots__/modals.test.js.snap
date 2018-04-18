@@ -105,6 +105,71 @@ exports[`modals Modal renders correctly 1`] = `
 </div>
 `;
 
+exports[`modals ModalPage renders correctly 1`] = `
+<div
+  className="modal"
+>
+  <div
+    className="overlay"
+    onClick={undefined}
+  />
+  <header
+    className="title_bar title_bar"
+  >
+    <button
+      className="button_flat inverted"
+      disabled={undefined}
+      onClick={[Function]}
+      title="Back"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="icon"
+        fill="currentColor"
+        height={undefined}
+        style={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width={undefined}
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
+          fillRule="evenodd"
+        />
+      </svg>
+      back
+    </button>
+    <div
+      className="title_wrapper"
+    >
+      <h1
+        className="title"
+      >
+        Title
+      </h1>
+      <span
+        className="separator"
+      >
+        |
+      </span>
+      <h2
+        className="subtitle"
+      >
+        Subtitle
+      </h2>
+    </div>
+  </header>
+  <div
+    className="modal_contents"
+  >
+    children
+  </div>
+</div>
+`;
+
 exports[`modals Overlay renders correctly 1`] = `
 <div
   className="overlay clickable"

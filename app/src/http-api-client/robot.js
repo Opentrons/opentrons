@@ -9,10 +9,10 @@ import client, {type ApiRequestError} from './client'
 
 type Point = [number, number, number]
 
-type Target = 'mount' | 'pipette'
+type MoveTarget = 'mount' | 'pipette'
 
 type Position = {
-  target: Target,
+  target: MoveTarget,
   left: Point,
   right: Point,
 }
@@ -29,7 +29,7 @@ type RobotPositionsResponse = {
 }
 
 type RobotMoveRequest = {
-  target: Target,
+  target: MoveTarget,
   point: Point,
   mount: Mount,
   model?: string,
@@ -39,11 +39,19 @@ type RobotMoveResponse = {
   message: string
 }
 
-type RequestPath = 'move'
+type RobotHomeRequest =
+  | {target: 'robot'}
+  | {target: 'pipette', mount: Mount}
 
-type RobotRequest = RobotMoveRequest
+type RobotHomeResponse = {
+  message: string
+}
 
-type RobotResponse = RobotMoveResponse
+type RequestPath = 'move' | 'home'
+
+type RobotRequest = RobotMoveRequest | RobotHomeRequest
+
+type RobotResponse = RobotMoveResponse | RobotHomeResponse
 
 type RobotRequestAction = {|
   type: 'api:ROBOT_REQUEST',
@@ -96,9 +104,12 @@ export type RobotAction =
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
+export type RobotHome = ApiCall<RobotHomeRequest, RobotHomeResponse>
+
 type RobotByNameState = {
   movePosition?: PositionName,
   move?: RobotMove,
+  home?: RobotHome
 }
 
 type RobotState = {
@@ -106,6 +117,7 @@ type RobotState = {
 }
 
 const MOVE: RequestPath = 'move'
+const HOME: RequestPath = 'home'
 
 export function moveToChangePipette (
   robot: RobotService,
@@ -142,6 +154,23 @@ export function clearRobotMoveResponse (
   robot: RobotService
 ): ClearMoveResponseAction {
   return {type: 'api:CLEAR_ROBOT_MOVE_RESPONSE', payload: {robot}}
+}
+
+export function home (robot: RobotService, mount?: Mount): ThunkPromiseAction {
+  return (dispatch) => {
+    const body = mount
+      ? {target: 'pipette', mount}
+      : {target: 'robot'}
+
+    dispatch(robotRequest(robot, HOME, body))
+
+    return client(robot, 'POST', 'robot/home', body)
+      .then(
+        (response) => robotSuccess(robot, HOME, response),
+        (error) => robotFailure(robot, HOME, error)
+      )
+      .then(dispatch)
+  }
 }
 
 export function robotReducer (state: ?RobotState, action: Action): RobotState {
@@ -269,6 +298,20 @@ export const makeGetRobotMove = () => {
         response: null,
         position: null
       }
+  )
+
+  return selector
+}
+
+export const makeGetRobotHome = () => {
+  const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
+    selectRobotState,
+    (state) => (state && state.home) || {
+      inProgress: false,
+      error: null,
+      request: null,
+      response: null
+    }
   )
 
   return selector

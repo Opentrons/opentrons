@@ -23,11 +23,13 @@ async def get_attached_pipettes(request):
     {
       'left': {
         'model': 'p300_single',
+        'tip_length': 51.7,
         'mount_axis': 'z',
         'plunger_axis': 'b'
       },
       'right': {
         'model': 'p10_multi',
+        'tip_length': 40,
         'mount_axis': 'a',
         'plunger_axis': 'c'
       }
@@ -252,6 +254,7 @@ async def home(request):
             if mount in ['left', 'right']:
                 pipette = instruments.Pipette(mount=mount)
                 pipette.home()
+                robot.remove_instrument(mount)
 
                 status = 200
                 message = "Pipette on {} homed successfully.".format(mount)

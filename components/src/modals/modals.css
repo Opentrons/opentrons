@@ -13,15 +13,25 @@
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-.clickable {
-  @apply --clickable;
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .modal_contents {
   z-index: 1;
   width: 100%;
-  padding: 1rem;
+  max-width: 38rem;
+  margin: auto;
   background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
+
+.clickable {
+  @apply --clickable;
 }
 
 .alert_modal_contents {

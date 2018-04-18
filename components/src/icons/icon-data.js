@@ -165,6 +165,22 @@ const ICON_DATA_BY_NAME = {
   'close-circle': {
     viewBox: '0 0 24 24',
     path: 'M12 .33A11.67 11.67 0 1 0 23.67 12 11.66 11.66 0 0 0 12 .33zm5.83 15.86l-1.64 1.64L12 13.65l-4.19 4.18-1.64-1.64L10.35 12 6.17 7.81l1.64-1.64L12 10.35l4.19-4.19 1.64 1.64-4.18 4.2z'
+  },
+  'ot-arrow-up': {
+    viewBox: '0 0 24 24',
+    path: 'M20 12l-8-8-8 8h4v8h8v-8z'
+  },
+  'ot-arrow-down': {
+    viewBox: '0 0 24 24',
+    path: 'M4 12l8 8 8-8h-4V4H8v8z'
+  },
+  'ot-arrow-left': {
+    viewBox: '0 0 24 24',
+    path: 'M12 4l-8 8 8 8v-4h8V8h-8z'
+  },
+  'ot-arrow-right': {
+    viewBox: '0 0 24 24',
+    path: 'M12 20l8-8-8-8v4H4v8h8z'
   }
 }
 

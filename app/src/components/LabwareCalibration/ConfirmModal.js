@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import type {Labware} from '../../robot'
 
-import {TitleBar, Overlay} from '@opentrons/components'
+import {ModalPage} from '@opentrons/components'
 import ConfirmModalContents from './ConfirmModalContents'
 import styles from './styles.css'
 
@@ -22,21 +22,18 @@ export default function ConfirmModal (props: Props) {
     labware.calibration === 'picked-up'
   )
 
-  // TODO(mc, 2018-02-07): TitleBar is locked to <h1> and <h2>
-  //   this isn't quite semantic, so fix it up
+  const titleBar = {
+    title: 'Calibrate Deck',
+    subtitle: labware.type,
+    back: {onClick: onBackClick, disabled: backClickDisabled}
+  }
+
   return (
-    <div className={styles.modal}>
-      <Overlay />
-      <TitleBar
-        className={styles.title_bar}
-        title='Calibrate Deck'
-        subtitle={labware.type}
-        onBackClick={onBackClick}
-        backClickDisabled={backClickDisabled}
-      />
-      <div className={styles.modal_contents}>
-        <ConfirmModalContents {...labware} />
-      </div>
-    </div>
+    <ModalPage
+      titleBar={titleBar}
+      contentsClassName={styles.modal_contents}
+    >
+      <ConfirmModalContents {...labware} />
+    </ModalPage>
   )
 }
