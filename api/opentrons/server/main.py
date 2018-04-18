@@ -3,6 +3,7 @@
 import sys
 import logging
 import os
+import traceback
 from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
@@ -81,6 +82,21 @@ def log_init():
     dictConfig(logging_config)
 
 
+@web.middleware
+async def error_middleware(request, handler):
+    try:
+        response = await handler(request)
+    except Exception as e:
+        log.exception("Exception in handler for request {}".format(request))
+        data = {
+            'message': 'An unexpected error occured - {}'.format(e),
+            'traceback': traceback.format_exc()
+        }
+        response = web.json_response(data, status=500)
+
+    return response
+
+
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli  # NOQA
 def init(loop=None):
@@ -88,7 +104,7 @@ def init(loop=None):
     Builds an application including the RPC server, and also configures HTTP
     routes for methods defined in opentrons.server.endpoints
     """
-    server = Server(MainRouter(), loop=loop)
+    server = Server(MainRouter(), loop=loop, middlewares=[error_middleware])
 
     server.app.router.add_get(
         '/health', endp.health)

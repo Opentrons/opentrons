@@ -25,7 +25,7 @@ CALL_NACK_MESSAGE = 4
 
 
 class Server(object):
-    def __init__(self, root=None, loop=None):
+    def __init__(self, root=None, loop=None, middlewares=()):
         self.monitor_events_task = None
         self.loop = loop or asyncio.get_event_loop()
         self.objects = {}
@@ -39,7 +39,7 @@ class Server(object):
         self.clients = {}
         self.tasks = []
 
-        self.app = web.Application(loop=loop)
+        self.app = web.Application(loop=loop, middlewares=middlewares)
         self.app.router.add_get('/', self.handler)
         self.app.on_shutdown.append(self.on_shutdown)
 
