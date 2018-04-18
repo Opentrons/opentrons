@@ -4,14 +4,24 @@ import WellSelectionModal from '../components/WellSelectionModal'
 import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 import type {Dispatch} from 'redux'
-import {selectors as navigationSelectors} from '../navigation'
-import {closeWellSelectionModal} from '../steplist/actions'
-
-export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionModal)
+import wellSelectionSelectors from '../well-selection/selectors'
+import {selectors as fileDataSelectors} from '../file-data'
+import {
+  closeWellSelectionModal,
+  saveWellSelectionModal
+} from '../well-selection/actions'
 
 type Props = React.ElementProps<typeof WellSelectionModal>
+type HideModal = {hideModal: true}
 
-type OP = {} // TODO IMMED
+export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionModalWrapper)
+
+function WellSelectionModalWrapper (props: Props) {
+  if (props.hideModal) {
+    return null
+  }
+  return <WellSelectionModal {...props} />
+}
 
 type DP = {
   onSave: $PropertyType<Props, 'onSave'>,
@@ -20,17 +30,26 @@ type DP = {
 
 type SP = $Diff<Props, DP>
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
+function mapStateToProps (state: BaseState): SP | HideModal {
+  const wellSelectionModalData = wellSelectionSelectors.wellSelectionModalData(state)
+
+  if (wellSelectionModalData === null) {
+    return {
+      hideModal: true
+    }
+  }
+
+  const pipetteId = wellSelectionModalData.pipetteId
+  console.log({wellSelectionModalData, pipetteId})
+
   return {
-    // show them modal when there is a selected container
-    hideModal: !navigationSelectors.wellSelectionModal(state),
-    pipette: {channels: 8, mount: 'left', id: 'fakse pipette', maxVolume: 42}
+    pipette: fileDataSelectors.equippedPipettes(state)[pipetteId]
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mapDispatchToProps (dispatch: Dispatch<any>): DP { // TODO Ian 2018-04-18 properly type dispatch
   return {
-    onSave: () => console.log('TODO save wells'), // TODO dispatch for save etc
+    onSave: () => dispatch(saveWellSelectionModal()),
     onCloseClick: () => dispatch(closeWellSelectionModal())
   }
 }

@@ -13,17 +13,12 @@ import styles from './WellSelectionModal.css'
 import modalStyles from './modals/modal.css'
 
 type Props = {
-  hideModal: ?boolean,
   pipette: PipetteData,
   onCloseClick: (e: SyntheticEvent<*>) => mixed,
   onSave: () => mixed,
 }
 
 export default function WellSelectionModal (props: Props) {
-  if (props.hideModal) {
-    return null
-  }
-
   return (
     <Modal
       className={modalStyles.modal}
@@ -31,8 +26,8 @@ export default function WellSelectionModal (props: Props) {
       onCloseClick={props.onCloseClick}
     >
       <div className={styles.top_row}>
-        {/* TODO how do we get name in dropdown? Do that. */}
-        <LabeledValue label='Pipette' value={props.pipette.id} />
+        {/* TODO Ian 2018-04-18 once we have pipette model strings, use model to get name instead of parsing ID */}
+        <LabeledValue label='Pipette' value={props.pipette && props.pipette.id && props.pipette.id.split(':')[1]} />
         <OutlineButton onClick={props.onSave} inverted>
           SAVE SELECTION
         </OutlineButton>

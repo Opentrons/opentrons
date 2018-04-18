@@ -11,7 +11,7 @@ type EndStepId = typeof END_STEP
 
 type ChangeFormPayload = {
   accessor: string, // TODO use FormData keys type
-  value: string | boolean
+  value: string | boolean | Array<string>
 }
 
 type ChangeFormInputAction = {
@@ -30,23 +30,6 @@ export type PopulateFormAction = {
   type: 'POPULATE_FORM',
   payload: {} // TODO use FormData keys type
 }
-
-// Well selection modal
-export type OpenWellSelectionModalPayload = {
-  labwareId: string,
-  pipetteId: string,
-  formFieldAccessor: string // eg 'aspirate--wells' or 'dispense--wells'
-}
-
-export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload): * => ({
-  type: 'OPEN_WELL_SELECTION_MODAL',
-  payload
-})
-
-export const closeWellSelectionModal = (): * => ({
-  type: 'CLOSE_WELL_SELECTION_MODAL',
-  payload: null
-})
 
 // Create new step
 

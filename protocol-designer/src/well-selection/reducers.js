@@ -4,6 +4,8 @@ import {handleActions, type ActionType} from 'redux-actions'
 
 import type {Wells} from '../labware-ingred/types'
 import * as actions from '../labware-ingred/actions'
+import type {OpenWellSelectionModalPayload} from './actions'
+import typeof {openWellSelectionModal} from './actions'
 
 type SelectedWellsState = {|
   preselected: Wells,
@@ -35,14 +37,22 @@ const highlightedIngredients = handleActions({
   HOVER_WELL_END: (state, action: ActionType<typeof actions.hoverWellBegin>) => ({}) // clear highlighting
 }, {})
 
+type WellSelectionModalState = OpenWellSelectionModalPayload | null
+const wellSelectionModal = handleActions({
+  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>) => action.payload,
+  CLOSE_WELL_SELECTION_MODAL: () => null
+}, null)
+
 export type RootState = {|
   selectedWells: SelectedWellsState,
-  highlightedIngredients: HighlightedIngredientsState
+  highlightedIngredients: HighlightedIngredientsState,
+  wellSelectionModal: WellSelectionModalState
 |}
 
 const rootReducer = combineReducers({
   selectedWells,
-  highlightedIngredients
+  highlightedIngredients,
+  wellSelectionModal
 })
 
 export default rootReducer

@@ -32,7 +32,7 @@ import type {BaseState, Selector} from '../../types'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
 // external actions (for types)
-import typeof {openWellSelectionModal} from '../../steplist/actions'
+import typeof {openWellSelectionModal} from '../../well-selection/actions'
 
 // UTILS
 const nextEmptySlot = loadedContainersSubstate => {

@@ -16,15 +16,9 @@ const newProtocolModal = handleActions({
     action.payload
 }, false)
 
-const wellSelectionModal = handleActions({
-  OPEN_WELL_SELECTION_MODAL: () => true,
-  CLOSE_WELL_SELECTION_MODAL: () => false
-}, false)
-
 export const _allReducers = {
   page,
-  newProtocolModal,
-  wellSelectionModal
+  newProtocolModal
 }
 
 export type RootState = {

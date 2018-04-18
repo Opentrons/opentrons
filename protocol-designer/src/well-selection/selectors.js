@@ -18,9 +18,15 @@ const numWellsSelected: Selector<number> = createSelector(
 
 const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
 
+const wellSelectionModalData: Selector<*> = createSelector(
+  rootSelector,
+  s => s.wellSelectionModal
+)
+
 export default {
   selectedWellNames,
   numWellsSelected,
   getSelectedWells,
-  getHighlightedWells
+  getHighlightedWells,
+  wellSelectionModalData
 }

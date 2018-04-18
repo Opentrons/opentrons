@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 
-import {openWellSelectionModal} from '../steplist/actions'
+import {openWellSelectionModal} from '../well-selection/actions'
 
 import {InputField} from '@opentrons/components'
 
