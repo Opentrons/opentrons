@@ -10,6 +10,7 @@ import Pill from './Pill'
 
 // types
 export type {PageTabProps} from './PageTabs'
+export type {TitleBarProps} from './TitleBar'
 
 export {
   PageTabs,

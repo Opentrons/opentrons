@@ -4,11 +4,10 @@ import cx from 'classnames'
 import {Redirect} from 'react-router'
 import {Link} from 'react-router-dom'
 
-import {Icon, PrimaryButton} from '@opentrons/components'
+import {Icon, PrimaryButton, ModalPage} from '@opentrons/components'
 
 import type {ChangePipetteProps} from './types'
 import {getDiagramSrc} from './InstructionStep'
-import TitledModal from './TitledModal'
 import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
@@ -30,13 +29,12 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
     : {...exitButtonProps, Component: Link, to: props.exitUrl}
 
   return (
-    <TitledModal
+    <ModalPage
       titleBar={{
         title: props.title,
         subtitle: props.subtitle,
         back: {onClick: props.back, disabled: !!success}
       }}
-      contentsClassName={styles.confirm_pipette_contents}
     >
       <Status name={pipette.name} success={success} />
       {!success && (
@@ -45,7 +43,7 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
       <PrimaryButton {...exitButtonProps}>
         {EXIT_BUTTON_MESSAGE}
       </PrimaryButton>
-    </TitledModal>
+    </ModalPage>
   )
 }
 

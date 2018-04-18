@@ -5,8 +5,7 @@ import {Link} from 'react-router-dom'
 import type {Mount} from '../../robot'
 import type {ChangePipetteProps, Channels} from './types'
 import PIPETTES from './pipettes'
-import {PrimaryButton} from '@opentrons/components'
-import TitledModal from './TitledModal'
+import {PrimaryButton, ModalPage} from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
 import styles from './styles.css'
@@ -22,7 +21,7 @@ export default function AttachPipette (props: ChangePipetteProps) {
   }
 
   return (
-    <TitledModal titleBar={titleBar}>
+    <ModalPage titleBar={titleBar} contentsClassName={styles.modal_contents}>
       <AttachPipetteTitle name={pipette && pipette.name} />
 
       {!pipette && (
@@ -41,7 +40,7 @@ export default function AttachPipette (props: ChangePipetteProps) {
           <CheckPipettesButton onClick={confirmPipette} />
         </div>
       )}
-    </TitledModal>
+    </ModalPage>
   )
 }
 
