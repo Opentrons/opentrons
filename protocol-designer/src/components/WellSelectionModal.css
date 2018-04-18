@@ -1,0 +1,29 @@
+@import '@opentrons/components';
+
+:root {
+  --inverted_text: {
+    color: var(--c-white);
+  };
+}
+
+.top_row {
+  lost-utility: clearfix;
+  padding: 0 1rem;
+
+  & > * {
+    @apply --inverted_text;
+
+    lost-column: 1/3;
+
+    &:last-child {
+      lost-offset: 1/3;
+    }
+  }
+}
+
+.bottom_row {
+  @apply --inverted_text;
+
+  padding-top: 2rem;
+  text-align: center;
+}

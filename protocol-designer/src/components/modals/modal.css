@@ -1,3 +1,13 @@
 .modal {
   z-index: 100;
+  align-items: flex-start;
+}
+
+.modal_contents {
+  /* Aligns modal to top instead of centering vertically */
+  margin: 0 auto;
+}
+
+.transparent_content {
+  background-color: transparent;
 }
