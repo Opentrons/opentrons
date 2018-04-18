@@ -126,7 +126,7 @@ class CLITool:
         """
         Increase the jog resolution without overrunning the list of values
         """
-        if self._steps_index < len(self._steps):
+        if self._steps_index < len(self._steps) - 1:
             self._steps_index = self._steps_index + 1
         return 'step: {}'.format(self.current_step())
 
@@ -365,6 +365,10 @@ def main():
         calibration_points = expected_dots
 
     robot.connect()
+
+    # lights help the script user to see the points on the deck
+    robot.turn_on_rail_lights()
+    atexit.register(robot.turn_off_rail_lights)
 
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
