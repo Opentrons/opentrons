@@ -30,7 +30,7 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
       }}
     >
       <Icon name='ot-spinner' spin className={styles.in_progress_icon} />
-      <p>
+      <p className={styles.progress_message}>
         {message}
       </p>
     </TitledModal>

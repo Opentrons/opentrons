@@ -52,6 +52,7 @@
   flex-direction: column;
   font-style: italic;
   text-align: center;
+  z-index: 4;
 }
 
 .in_progress_icon {
