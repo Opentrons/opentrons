@@ -156,3 +156,16 @@
   min-width: 1.5rem;
   padding-right: 0.5rem;
 }
+
+.disabled {
+  cursor: not-allowed;
+
+  & * {
+    /* Disable mouse interaction. NOTE: User can still tab to focus a field */
+    pointer-events: none;
+  }
+
+  & .formgroup_label {
+    color: var(--c-light-gray);
+  }
+}
