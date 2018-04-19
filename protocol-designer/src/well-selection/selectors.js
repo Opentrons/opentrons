@@ -37,6 +37,7 @@ const selectedWellNames: Selector<Array<string>> = createSelector(
   })
 )
 
+// TODO Ian 2018-04-19 this is a confusing name, it gets {selected: Wells, preselected: Wells.}. Refactor.
 const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells
 
 const numWellsSelected: Selector<number> = createSelector(
