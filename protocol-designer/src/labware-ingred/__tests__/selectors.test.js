@@ -162,15 +162,6 @@ const ingredsByLabwareXXTwoIngred = {
   'FIXED_TRASH_ID': {}
 }
 
-const defaultWellContents = {
-  highlighted: false,
-  hovered: false,
-  preselected: false,
-  selected: false
-}
-
-const container1MaxVolume = 400
-
 // ==============================
 
 describe('allIngredientNamesIds selector', () => {
@@ -221,65 +212,5 @@ describe('ingredientsByLabware', () => {
         baseStateXXTwoIngred.ingredLocations
       )
     ).toEqual(ingredsByLabwareXXTwoIngred)
-  })
-})
-
-describe('wellContentsAllLabware', () => {
-  const singleIngredResult = selectors.wellContentsAllLabware.resultFunc(
-    containerState, // all labware
-    ingredsByLabwareXXSingleIngred,
-    {containerId: 'container1Id'}, // selected labware
-    {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
-    {A3: 'A3'} // highlighted (TODO: is this used?)
-  )
-
-  // TODO: 2nd test case
-  // const twoIngredResult = selectors.wellContentsAllLabware.resultFunc(
-  //   containerState, // all labware
-  //   ingredsByLabwareXXTwoIngred,
-  //   containerState.container2Id, // selected labware
-  //   {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
-  //   {A3: 'A3'} // highlighted (TODO: is this used?)
-  // )
-
-  test('container has expected number of wells', () => {
-    expect(Object.keys(singleIngredResult.container1Id).length).toEqual(96)
-  })
-
-  test('selects well contents of all labware (for Plate props)', () => {
-    expect(
-      singleIngredResult
-    ).toMatchObject({
-      'FIXED_TRASH_ID': {
-        A1: defaultWellContents
-      },
-      container2Id: {
-        A1: defaultWellContents
-      },
-      container3Id: {
-        A1: defaultWellContents
-      },
-
-      container1Id: {
-        A1: {
-          ...defaultWellContents,
-          selected: true,
-          maxVolume: container1MaxVolume
-        },
-        A2: {
-          ...defaultWellContents,
-          maxVolume: container1MaxVolume
-        },
-        B1: {
-          ...defaultWellContents,
-          selected: true,
-          maxVolume: container1MaxVolume
-        },
-        B2: {
-          ...defaultWellContents,
-          maxVolume: container1MaxVolume
-        }
-      }
-    })
   })
 })
