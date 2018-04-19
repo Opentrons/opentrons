@@ -931,13 +931,14 @@ class Robot(object):
         if left_model:
             tip_length = pipette_config.configs[left_model].tip_length
             left_data.update({'tip_length': tip_length})
+
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c'
             }
         right_data.update(self._driver.read_pipette_model('right'))
         right_model = right_data.get('model')
-        if left_model:
+        if right_model:
             tip_length = pipette_config.configs[right_model].tip_length
             right_data.update({'tip_length': tip_length})
         return {
