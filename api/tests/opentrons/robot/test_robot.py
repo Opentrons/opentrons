@@ -6,6 +6,39 @@ from numpy import isclose
 from unittest import mock
 
 
+def test_configurable_mount_offsets():
+    def _test_offset(x, y, z):
+        robot.reset()
+        robot.config = robot.config._replace(
+            mount_offset=(x, y, z))
+        left = instruments.P300_Single(mount='left')
+        right = instruments.P300_Single(mount='right')
+        robot.home()
+        left_pos = pose_tracker.absolute(robot.poses, left)
+        right_pos = pose_tracker.absolute(robot.poses, right)
+        assert left_pos[0] == right_pos[0] + x
+        assert left_pos[1] == right_pos[1] + y
+        assert left_pos[2] == right_pos[2] + z
+
+    robot.config = robot.config._replace(
+        instrument_offset={
+            'right': {
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
+            },
+            'left': {
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
+            }
+        }
+    )
+    old_config = robot.config
+    _test_offset(-34, 0, 0)
+    _test_offset(-32, 0, 0)
+    _test_offset(100, 3, 1.234)
+    robot.config = old_config
+
+
 def test_pos_tracker_persistance(virtual_smoothie_env):
     robot.reset()
     p300 = instruments.P300_Single(mount='left')
