@@ -17,7 +17,7 @@ import type {Selector} from '../../types'
 import type {WellContents, AllWellContents} from '../../labware-ingred/types'
 import type {NamedIngredsByLabwareAllSteps} from '../../steplist/types'
 
-// TODO IMMEDIATELY: factor out all these selectors to their own files,
+// TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import wellContentsAllLabwareExport from './wellContentsAllLabware'
 export const wellContentsAllLabware = wellContentsAllLabwareExport

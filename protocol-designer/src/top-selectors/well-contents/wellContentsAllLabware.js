@@ -70,7 +70,7 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
   labwareIngredSelectors.getSelectedContainer,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
-  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => { // TODO IMMEDIATELY _labware needs to be typed
+  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
     const allLabwareIds = Object.keys(_labware)
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
