@@ -40,7 +40,6 @@ function mapStateToProps (state: BaseState): SP | HideModal {
   }
 
   const pipetteId = wellSelectionModalData.pipetteId
-  console.log({wellSelectionModalData, pipetteId})
 
   return {
     pipette: fileDataSelectors.equippedPipettes(state)[pipetteId]

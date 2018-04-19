@@ -2,6 +2,10 @@
 import type {ThunkDispatch, GetState} from '../types'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
+import {selectors as steplistSelectors} from '../steplist/reducers'
+import type {Wells} from '../labware-ingred/types'
+
+// TODO Ian 2018-04-19 Move selectWells & preselectWells actions from labware-ingred into this file
 
 // Well selection modal
 export type OpenWellSelectionModalPayload = {
@@ -10,10 +14,39 @@ export type OpenWellSelectionModalPayload = {
   formFieldAccessor: string // eg 'aspirate--wells' or 'dispense--wells'
 }
 
-export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload): * => ({
-  type: 'OPEN_WELL_SELECTION_MODAL',
-  payload
-})
+function _wellArrayToObj (wells: ?Array<string>): Wells {
+  if (!wells) {
+    return {}
+  }
+  return wells.reduce((acc: Wells, well: string) => ({
+    ...acc,
+    [well]: well
+  }), {})
+}
+
+export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =>
+  (dispatch: ThunkDispatch<*>, getState: GetState) => {
+    const state = getState()
+    const accessor = payload.formFieldAccessor
+    const formData = steplistSelectors.formData(state)
+
+    const wells: Wells = (accessor && formData && formData[accessor] &&
+      _wellArrayToObj(formData[accessor])) || {}
+
+    // initially selected wells in form get selected in state before modal opens
+    dispatch({
+      type: 'SELECT_WELLS',
+      payload: {
+        wells,
+        append: false
+      }
+    })
+
+    dispatch({
+      type: 'OPEN_WELL_SELECTION_MODAL',
+      payload
+    })
+  }
 
 export const closeWellSelectionModal = (): * => ({
   type: 'CLOSE_WELL_SELECTION_MODAL',

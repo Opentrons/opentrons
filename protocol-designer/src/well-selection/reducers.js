@@ -25,10 +25,10 @@ const selectedWells = handleActions({
     }
   }),
   // Actions that cause "deselect everything" behavior:
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
-    selectedWellsInitialState,
+  EDIT_MODE_INGREDIENT_GROUP: () => selectedWellsInitialState,
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
-  EDIT_INGREDIENT: () => selectedWellsInitialState
+  EDIT_INGREDIENT: () => selectedWellsInitialState,
+  CLOSE_WELL_SELECTION_MODAL: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
 type HighlightedIngredientsState = {wells: Wells}
