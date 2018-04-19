@@ -158,8 +158,6 @@
 }
 
 .disabled {
-  cursor: not-allowed;
-
   & * {
     /* Disable mouse interaction. NOTE: User can still tab to focus a field */
     pointer-events: none;
