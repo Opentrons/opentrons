@@ -94,7 +94,8 @@ robot_config = namedtuple(
         'default_current',
         'low_current',
         'high_current',
-        'default_max_speed'
+        'default_max_speed',
+        'mount_offset'
     ]
 )
 
@@ -131,6 +132,7 @@ def _get_default():
         tip_length={
             'Pipette': 51.7 # TODO (andy): move to tip-rack
         },
+        mount_offset=(-34, 0, 0), # distance between the left/right mounts
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
         low_current=LOW_CURRENT,
