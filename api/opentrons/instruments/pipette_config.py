@@ -37,19 +37,19 @@ def _load_config_from_file(pipette_model: str) -> pipette_config:
             cfg = all_configs[pipette_model]
             res = pipette_config(
                 plunger_positions={
-                    'top': cfg['plunger-positions']['top'],
-                    'bottom': cfg['plunger-positions']['bottom'],
-                    'blow_out': cfg['plunger-positions']['blow-out'],
-                    'drop_tip': cfg['plunger-positions']['drop-tip']
+                    'top': cfg['plungerPositions']['top'],
+                    'bottom': cfg['plungerPositions']['bottom'],
+                    'blow_out': cfg['plungerPositions']['blowOut'],
+                    'drop_tip': cfg['plungerPositions']['dropTip']
                 },
-                pick_up_current=cfg['pick-up-current'],
-                aspirate_flow_rate=cfg['aspirate-flow-rate'],
-                dispense_flow_rate=cfg['dispense-flow-rate'],
-                ul_per_mm=cfg['ul-per-mm'],
+                pick_up_current=cfg['pickUpCurrent'],
+                aspirate_flow_rate=cfg['aspirateFlowRate'],
+                dispense_flow_rate=cfg['dispenseFlowRate'],
+                ul_per_mm=cfg['ulPerMm'],
                 channels=cfg['channels'],
                 name=pipette_model,
-                model_offset=cfg['model-offset'],
-                tip_length=cfg['tip-length']
+                model_offset=cfg['modelOffset'],
+                tip_length=cfg['tipLength']
             )
     else:
         res = None
