@@ -13,12 +13,11 @@ environment:
   OT_BUCKET_APP: opentrons-app
   OT_FOLDER_APP: builds
 
-  OT_BUILD: '%APPVEYOR_BUILD_NUMBER%'
-  OT_BRANCH: '%APPVEYOR_REPO_BRANCH%'
-
 init:
-  # set OT_TAG in a script because APPVEYOR_REPO_TAG_NAME may be undefined
-  - if %APPVEYOR_REPO_TAG% == true set OT_TAG=%APPVEYOR_REPO_TAG_NAME%
+  # set vars in ps scripts because cmd is terrible at undefined vars
+  - ps: $env:OT_TAG = $env:APPVEYOR_REPO_TAG_NAME
+  - ps: $env:OT_BUILD = $env:APPVEYOR_BUILD_NUMBER
+  - ps: $env:OT_BRANCH = $env:APPVEYOR_REPO_BRANCH
 
 platform: x64
 
