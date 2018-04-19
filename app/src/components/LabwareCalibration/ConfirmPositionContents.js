@@ -5,6 +5,7 @@ import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
 import {
+  selectors as robotSelectors,
   actions as robotActions,
   type Instrument,
   type Labware,
@@ -18,17 +19,22 @@ import {PrimaryButton} from '@opentrons/components'
 import ConfirmPositionDiagram from './ConfirmPositionDiagram'
 import JogControls, {type JogControlsProps} from './JogControls'
 
+type StateProps = {
+  currentJogDistance: number
+}
+
 type OwnProps = Labware & {
   calibrator: Instrument
 }
 
 type DispatchProps = JogControlsProps & {
-  onConfirmClick: () => void
+  onConfirmClick: () => void,
+  onIncrementSelect: (event: SyntheticInputEvent<>) => mixed,
 }
 
 type Props = OwnProps & DispatchProps
 
-export default connect(null, mapDispatchToProps)(ConfirmPositionContents)
+export default connect(mapStateToProps, mapDispatchToProps)(ConfirmPositionContents)
 
 function ConfirmPositionContents (props: Props) {
   const {isTiprack, onConfirmClick, calibrator: {channels}} = props
@@ -60,10 +66,16 @@ const JOG_BUTTONS: Array<{
   {name: 'down', axis: 'z', direction: -1}
 ]
 
+function mapStateToProps (state): StateProps {
+  return {
+    currentJogDistance: robotSelectors.getJogDistance(state)
+  }
+}
+
 function mapDispatchToProps (
   dispatch: Dispatch<*>,
   ownProps: OwnProps
-): Props {
+): any {
   const {slot, isTiprack, calibrator: {mount}} = ownProps
 
   const jogButtons = JOG_BUTTONS.map((button) => {
@@ -82,6 +94,10 @@ function mapDispatchToProps (
   return {
     ...ownProps,
     jogButtons,
+    onIncrementSelect: (event) => {
+      const step = Number(event.target.value)
+      dispatch(robotActions.setJogDistance(step))
+    },
     onConfirmClick: () => { dispatch(onConfirmAction) }
   }
 }

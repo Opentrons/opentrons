@@ -109,6 +109,7 @@ export type LabwareCalibrationAction = {|
     | 'robot:DROP_TIP_AND_HOME'
     | 'robot:CONFIRM_TIPRACK'
     | 'robot:UPDATE_OFFSET'
+    | 'robot:SET_JOG_DISTANCE'
   ),
   payload: {|
     mount: Mount,
@@ -170,7 +171,7 @@ export const actionTypes = {
 
   RETURN_TIP: makeRobotActionName('RETURN_TIP'),
   RETURN_TIP_RESPONSE: makeRobotActionName('RETURN_TIP_RESPONSE'),
-  TOGGLE_JOG_DISTANCE: makeRobotActionName('TOGGLE_JOG_DISTANCE'),
+  SET_JOG_DISTANCE: makeRobotActionName('SET_JOG_DISTANCE'),
   CONFIRM_LABWARE: makeRobotActionName('CONFIRM_LABWARE'),
 
   // protocol run controls
@@ -422,8 +423,8 @@ export const actions = {
     return {type: 'robot:MOVE_TO_SUCCESS', payload: {}}
   },
 
-  toggleJogDistance () {
-    return {type: actionTypes.TOGGLE_JOG_DISTANCE}
+  setJogDistance (step: number) {
+    return {type: 'robot:SET_JOG_DISTANCE', payload: step}
   },
 
   jog (

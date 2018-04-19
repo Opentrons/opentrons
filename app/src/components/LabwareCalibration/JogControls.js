@@ -16,11 +16,13 @@ import styles from './styles.css'
 
 type JogButtonProps = {
   name: JogButtonName,
-  onClick: () => void
+  onClick: () => void,
 }
 
 export type JogControlsProps = Labware & {
-  jogButtons: Array<JogButtonProps>
+  jogButtons: Array<JogButtonProps>,
+  currentJogDistance: number,
+  onIncrementSelect: (event: SyntheticInputEvent<*>) => mixed,
 }
 
 const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
@@ -33,6 +35,7 @@ const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
 }
 
 export default function JogControls (props: JogControlsProps) {
+  console.log(props.currentJogDistance)
   return (
     <div className={styles.jog_container}>
       <div className={styles.jog_controls}>
@@ -51,14 +54,13 @@ export default function JogControls (props: JogControlsProps) {
         <span className={styles.increment_group}>
         <RadioGroup
           className={styles.increment_item}
-          disabled
-          value={'1'}
+          value={`${props.currentJogDistance}`}
           options={[
             {name: '0.1 mm', value: '0.1'},
             {name: '1 mm', value: '1'},
             {name: '10 mm', value: '10'}
           ]}
-          onChange={e => (console.log(e.target.value))}
+          onChange={props.onIncrementSelect}
         />
       </span>
       </div>

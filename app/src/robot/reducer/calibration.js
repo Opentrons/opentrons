@@ -15,11 +15,6 @@ import type {
   CalibrationFailureAction
 } from '../actions'
 
-import {
-  JOG_DISTANCE_SLOW_MM,
-  JOG_DISTANCE_FAST_MM
-} from '../constants'
-
 // calibration request types
 // TODO(mc, 2018-01-10): these should match up with the request actions;
 //   explore how to link these concepts effectively
@@ -62,13 +57,12 @@ const {
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
   PROBE_TIP_RESPONSE,
-  TOGGLE_JOG_DISTANCE,
   CONFIRM_LABWARE
 } = actionTypes
 
 const INITIAL_STATE: State = {
   deckPopulated: true,
-  jogDistance: JOG_DISTANCE_SLOW_MM,
+  jogDistance: 0.1,
 
   // TODO(mc, 2018-01-22): combine these into subreducer
   probedByMount: {},
@@ -144,6 +138,9 @@ export default function calibrationReducer (
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
 
+    case 'robot:SET_JOG_DISTANCE':
+      return handleSetJogDistance(state, action)
+
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
@@ -151,7 +148,6 @@ export default function calibrationReducer (
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
     case PROBE_TIP: return handleProbeTip(state, action)
     case PROBE_TIP_RESPONSE: return handleProbeTipResponse(state, action)
-    case TOGGLE_JOG_DISTANCE: return handleToggleJog(state, action)
     case CONFIRM_LABWARE: return handleConfirmLabware(state, action)
   }
 
@@ -485,12 +481,10 @@ function handleConfirmTiprackFailure (
   }
 }
 
-function handleToggleJog (state: State, action: any) {
+function handleSetJogDistance (state: State, action: any) {
   return {
     ...state,
-    jogDistance: state.jogDistance === JOG_DISTANCE_SLOW_MM
-      ? JOG_DISTANCE_FAST_MM
-      : JOG_DISTANCE_SLOW_MM
+    jogDistance: Number(action.payload)
   }
 }
 
