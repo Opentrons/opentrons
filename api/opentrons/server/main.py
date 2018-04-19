@@ -144,6 +144,8 @@ def init(loop=None):
         '/robot/home', control.home)
     server.app.router.add_get(
         '/settings', update.get_feature_flag)
+    server.app.router.add_get(
+        '/settings/environment', update.environment)
     server.app.router.add_post(
         '/settings/set', update.set_feature_flag)
 

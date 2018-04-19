@@ -13,6 +13,8 @@ import logging
 
 log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')
+if not fflags.split_labware_definitions():
+    log.debug("Database path: {}".format(database_path))
 
 # ======================== Private Functions ======================== #
 
@@ -68,16 +70,20 @@ def _load_container_object_from_db(db, container_name: str):
     container = Container()
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)
+    log.debug("Loading {} with coords {}".format(rel_coords, container_type))
     for well in wells:
         container.add(*_load_well_object_from_db(db, well))
     return container
 
 
 def _update_container_object_in_db(db, container: Container):
+    coords = _parse_container_obj(container)
+    log.debug("Updating {} with coordinates {}".format(
+        container.get_type(), coords))
     db_queries.update_container(
         db,
         container.get_type(),
-        **_parse_container_obj(container)
+        **coords
     )
 
 
@@ -190,6 +196,8 @@ def overwrite_container(container: Container) -> bool:
         # warnings.warn('overwrite_container is deprecated, please use save_labware_offset')  # noqa
         res = save_labware_offset(container)
     else:
+        log.debug("Overwriting container definition: {}".format(
+            container.get_type()))
         db_conn = sqlite3.connect(database_path)
         _update_container_object_in_db(db_conn, container)
         res = True  # old overwrite fn does not return anything
@@ -200,6 +208,7 @@ def save_labware_offset(labware: Container, labware_name: str=None) -> bool:
     if labware_name is None:
         labware_name = labware.get_name()
     offset = _calculate_offset(labware)
+    log.debug("Saving offset {} for {}".format(offset, labware_name))
     return ldef.save_labware_offset(labware_name, offset)
 
 

@@ -156,3 +156,11 @@ async def get_feature_flag(request):
     """
     res = ff.get_all_feature_flags()
     return web.json_response(res)
+
+
+async def environment(request):
+    res = dict(os.environ)
+    api_keys = filter(lambda x: "KEY" in x, list(res.keys()))
+    for key in api_keys:
+        res.pop(key)
+    return web.json_response(res)
