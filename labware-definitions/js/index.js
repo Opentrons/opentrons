@@ -8,6 +8,10 @@ import labwareDefinitions from '../build/labware.json'
 // Sorted list of all labware
 const labwareList: Array<string> = Object.keys(labwareDefinitions).sort()
 
+export * from './types'
+
+export * from './pipettes'
+
 export {
   computeWellAccess,
   getLabware,
