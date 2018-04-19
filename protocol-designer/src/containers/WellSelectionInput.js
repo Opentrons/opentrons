@@ -14,13 +14,11 @@ type OP = {
   initialSelectedWells: ?Array<string>
 }
 
-type SP = {}
-
 type DP = {
   onClick?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
-type Props = OP & DP & SP
+type Props = OP & DP
 
 function WellSelectorInput (props: Props) {
   const {initialSelectedWells, labwareId, pipetteId, onClick} = props
@@ -37,13 +35,7 @@ function WellSelectorInput (props: Props) {
   )
 }
 
-function mapStateToProps (): SP {
-  // TODO remove this?
-  return {}
-}
-
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, ownProps: OP): Props {
-  const {dispatch} = dispatchProps
+function mapDispatchToProps (dispatch: Dispatch<*>, ownProps: OP): Props {
   const {pipetteId, labwareId, formFieldAccessor} = ownProps
 
   if (pipetteId && labwareId) {
@@ -60,6 +52,6 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
   return {...ownProps}
 }
 
-const ConnectedWellSelectorInput = connect(mapStateToProps, null, mergeProps)(WellSelectorInput)
+const ConnectedWellSelectorInput = connect(null, mapDispatchToProps)(WellSelectorInput)
 
 export default ConnectedWellSelectorInput

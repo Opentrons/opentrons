@@ -51,7 +51,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
-  // TODO
+
   const wellSelectionMode = true
   const wellSelectionModeForContainer = wellSelectionMode && selectedContainerId === containerId
 
