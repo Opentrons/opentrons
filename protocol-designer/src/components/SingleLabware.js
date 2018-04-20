@@ -13,7 +13,7 @@ type Props = {
 export default function SingleLabware (props: Props) {
   return (
     <div className={cx(styles.single_labware, props.className)}>
-      <svg width='100%' height='100%' viewBox={`0 0 ${SLOT_WIDTH} ${SLOT_HEIGHT}`}>
+      <svg viewBox={`0 0 ${SLOT_WIDTH} ${SLOT_HEIGHT}`}>
         {props.children}
       </svg>
     </div>

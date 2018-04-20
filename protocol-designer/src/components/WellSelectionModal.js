@@ -27,7 +27,11 @@ export default function WellSelectionModal (props: Props) {
     >
       <div className={styles.top_row}>
         {/* TODO Ian 2018-04-18 once we have pipette model strings, use model to get name instead of parsing ID */}
-        <LabeledValue label='Pipette' value={props.pipette && props.pipette.id && props.pipette.id.split(':')[1]} />
+        <LabeledValue
+          label='Pipette'
+          value={props.pipette && props.pipette.id && props.pipette.id.split(':')[1]}
+          className={styles.inverted_text}
+        />
         <OutlineButton onClick={props.onSave} inverted>
           SAVE SELECTION
         </OutlineButton>

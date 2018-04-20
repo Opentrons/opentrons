@@ -35,12 +35,11 @@ function WellSelectorInput (props: Props) {
   )
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>, ownProps: OP): Props {
+function mapDispatchToProps (dispatch: Dispatch<*>, ownProps: OP): DP {
   const {pipetteId, labwareId, formFieldAccessor} = ownProps
 
   if (pipetteId && labwareId) {
     return {
-      ...ownProps,
       onClick: () => dispatch(openWellSelectionModal({
         pipetteId: pipetteId,
         labwareId: labwareId,

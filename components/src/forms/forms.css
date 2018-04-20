@@ -158,10 +158,8 @@
 }
 
 .disabled {
-  & * {
-    /* Disable mouse interaction. NOTE: User can still tab to focus a field */
-    pointer-events: none;
-  }
+  /* Disable mouse interaction. NOTE: User can still tab to focus a field */
+  pointer-events: none;
 
   & .formgroup_label {
     color: var(--c-light-gray);
