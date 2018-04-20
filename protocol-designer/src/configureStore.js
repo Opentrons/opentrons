@@ -5,6 +5,7 @@ import labwareIngredRootReducer from './labware-ingred/reducers'
 import steplistRootReducer from './steplist/reducers'
 import {rootReducer as navigationRootReducer} from './navigation'
 import {rootReducer as fileDataRootReducer} from './file-data'
+import wellSelectionRootReducer from './well-selection/reducers'
 
 // TODO: Ian 2018-01-15 how to make this more DRY with hot reloading?
 function getRootReducer () {
@@ -12,7 +13,8 @@ function getRootReducer () {
     labwareIngred: require('./labware-ingred/reducers'),
     steplist: require('./steplist/reducers'),
     navigation: require('./navigation').rootReducer,
-    fileData: require('./file-data').rootReducer
+    fileData: require('./file-data').rootReducer,
+    wellSelection: require('./well-selection/reducers')
   })
 }
 
@@ -21,7 +23,8 @@ export default function configureStore () {
     labwareIngred: labwareIngredRootReducer,
     steplist: steplistRootReducer,
     navigation: navigationRootReducer,
-    fileData: fileDataRootReducer
+    fileData: fileDataRootReducer,
+    wellSelection: wellSelectionRootReducer
   })
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
@@ -42,6 +45,7 @@ export default function configureStore () {
     module.hot.accept('./steplist/reducers', replaceReducers)
     module.hot.accept('./navigation/reducers', replaceReducers)
     module.hot.accept('./file-data/reducers', replaceReducers)
+    module.hot.accept('./well-selection/reducers', replaceReducers)
   }
 
   return store

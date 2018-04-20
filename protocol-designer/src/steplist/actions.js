@@ -11,7 +11,7 @@ type EndStepId = typeof END_STEP
 
 type ChangeFormPayload = {
   accessor: string, // TODO use FormData keys type
-  value: string | boolean
+  value: string | boolean | Array<string>
 }
 
 type ChangeFormInputAction = {

@@ -6,6 +6,7 @@ import max from 'lodash/max'
 import { SELECTABLE_WELL_CLASS } from '../constants'
 import {uuid, getCollidingWells} from '../utils'
 import {selectors} from './reducers'
+import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
 import {editableIngredFields} from './types'
@@ -214,7 +215,7 @@ export const editIngredient = (payload: {|
         ...inputFields,
         groupId: groupId,
         containerId: container.containerId,
-        wells: selectors.selectedWellNames(state),
+        wells: wellSelectionSelectors.selectedWellNames(state),
         isUnchangedClone: true
       }
     })
@@ -245,7 +246,7 @@ export const editIngredient = (payload: {|
       name,
       containerId: container && container.containerId,
       groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
-      wells: selectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
+      wells: wellSelectionSelectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
       isUnchangedClone
     }
   })

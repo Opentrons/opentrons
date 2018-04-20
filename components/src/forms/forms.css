@@ -66,6 +66,7 @@
     border: none;
     flex: 1 1 auto;
     color: var(--c-dark-gray);
+    width: 100%;
 
     /* add 1px padding that is present in chrome but not ff */
     padding: 1px;
@@ -158,4 +159,13 @@
   width: 1.5rem;
   min-width: 1.5rem;
   padding-right: 0.5rem;
+}
+
+.disabled {
+  /* Disable mouse interaction. NOTE: User can still tab to focus a field */
+  pointer-events: none;
+
+  & .formgroup_label {
+    color: var(--c-light-gray);
+  }
 }

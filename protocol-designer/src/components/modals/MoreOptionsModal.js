@@ -24,9 +24,18 @@ type Props = {
 
 export default function (props: Props) {
   const formConnector = formConnectorFactory(props.handleChange, props.formData)
+
+  if (props.hideModal) {
+    return null
+  }
+
   return (
-    !props.hideModal && <Modal onCloseClick={props.onCancel} className={modalStyles.modal}>
-      <div className={modalStyles.modal_contents}>
+    <Modal
+      onCloseClick={props.onCancel}
+      className={modalStyles.modal}
+      contentsClassName={modalStyles.modal_contents}
+    >
+      <div>
         <FormGroup label='Step Name' className={styles.column_1_2}>
           <InputField {...formConnector('step-name')} />
         </FormGroup>

@@ -3,6 +3,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../labware-ingred/actions'
 import { selectors } from '../labware-ingred/reducers'
+import {selectedWellsMaxVolume} from '../top-selectors/well-contents'
+import wellSelectionSelectors from '../well-selection/selectors'
 import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
 import type {BaseState} from '../types'
 
@@ -20,8 +22,8 @@ function mapStateToProps (state: BaseState): StateProps {
   const selectedIngredGroup = selectors.selectedIngredientGroup(state)
   return {
     editingIngredGroupId: selectedIngredGroup && selectedIngredGroup.groupId,
-    numWellsSelected: selectors.numWellsSelected(state),
-    selectedWellsMaxVolume: selectors.selectedWellsMaxVolume(state),
+    numWellsSelected: wellSelectionSelectors.numWellsSelected(state),
+    selectedWellsMaxVolume: selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),
     allIngredientGroupFields: selectors.allIngredientGroupFields(state)
   }

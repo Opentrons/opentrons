@@ -9,6 +9,7 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import {preselectWells, selectWells} from '../labware-ingred/actions'
+import wellSelectionSelectors from '../well-selection/selectors'
 
 import {END_STEP} from '../steplist/types'
 
@@ -36,13 +37,23 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {
-    throw new Error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    console.error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    return {
+      containerId: '',
+      wellContents: {},
+      containerType: '',
+      selectable: ownProps.selectable
+    }
   }
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
+
+  const wellSelectionMode = true
+  const wellSelectionModeForContainer = wellSelectionMode && selectedContainerId === containerId
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
@@ -53,24 +64,33 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     prevStepId = Math.max(stepId - 1, 0)
   }
 
-  const highlightedWells = deckSetupMode ? {} : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
-
   let wellContents = {}
   if (deckSetupMode) {
     // selection for deck setup
-    wellContents = selectors.wellContentsAllLabware(state)[containerId]
+    wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
     // well contents for step, not deck setup mode
     const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])
       ? allWellContentsForSteps[prevStepId][containerId]
       : {}
     // TODO Ian 2018-04-11 separate out selected/highlighted state from wellContents props of Plate,
-    // so you don't have to do this merge
+    // so you don't have to do this merge. This well selected state & data really needs cleanup!
+
+    let selectedWells = {}
+
+    if (wellSelectionModeForContainer) {
+      const wellSelectionState = wellSelectionSelectors.getSelectedWells(state)
+      selectedWells = wellSelectionState.selected
+    } else {
+      const highlightedWells = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
+      selectedWells = (highlightedWells && highlightedWells[containerId]) || {}
+    }
+
     wellContents = mapValues(
       wellContentsWithoutHighlight,
       (wellContents: WellContents, well: string) => ({
         ...wellContents,
-        selected: highlightedWells && highlightedWells[containerId] && highlightedWells[containerId][well]
+        selected: selectedWells[well]
       })
     )
   }

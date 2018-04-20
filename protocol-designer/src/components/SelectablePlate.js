@@ -18,7 +18,7 @@ export type Props = {
   containerType: string,
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
-  containerId: string,
+  containerId: string, // used by container
   selectable?: boolean
 }
 
@@ -57,7 +57,6 @@ export default function SelectablePlate (props: Props) {
     containerType,
     onSelectionMove,
     onSelectionDone,
-    containerId,
     selectable
   } = props
 
@@ -65,7 +64,6 @@ export default function SelectablePlate (props: Props) {
     selectable={selectable}
     wellContents={wellContentsGroupIdsToColor(wellContents)}
     containerType={containerType}
-    containerId={containerId}
     showLabels={selectable}
   />
 

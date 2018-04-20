@@ -11,6 +11,7 @@ import {
   type DropdownOption
 } from '@opentrons/components'
 
+import WellSelectionInput from '../containers/WellSelectionInput'
 import FormSection from './FormSection'
 import styles from './Form.css'
 import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
@@ -29,6 +30,7 @@ export type Props = {
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onToggleFormSection: (section: FormSectionNames) => mixed => mixed, // ???
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
+  openWellSelectionModal: (args: {labwareId: string, pipetteId: string}) => mixed,
   formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
   canSave: boolean
   /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
@@ -36,7 +38,8 @@ export type Props = {
 }
 
 export default function StepEditForm (props: Props) {
-  const formConnector = formConnectorFactory(props.handleChange, props.formData)
+  const {formData} = props
+  const formConnector = formConnectorFactory(props.handleChange, formData)
 
   const buttonRow = <div className={styles.button_row}>
     <FlatButton onClick={props.onClickMoreOptions}>MORE OPTIONS</FlatButton>
@@ -44,7 +47,7 @@ export default function StepEditForm (props: Props) {
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>
 
-  if (props.formData.stepType === 'pause') {
+  if (formData.stepType === 'pause') {
     return (
       <div className={styles.form}>
         <div className={styles.row_wrapper}>
@@ -68,7 +71,7 @@ export default function StepEditForm (props: Props) {
     )
   }
 
-  if (props.formData.stepType === 'transfer' || props.formData.stepType === 'consolidate') {
+  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate') {
     return (
       <div className={styles.form}>
         <FormSection title='Aspirate'
@@ -79,13 +82,17 @@ export default function StepEditForm (props: Props) {
             <FormGroup label='Labware:'>
               <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
             </FormGroup>
-            <FormGroup label='Wells:'>
-              <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('aspirate--wells')} />
-            </FormGroup>
+            {/* TODO LATER: also 'disable' when selected labware is a trash */}
+            <WellSelectionInput
+              labwareId={formData['aspirate--labware']}
+              pipetteId={formData['aspirate--pipette']}
+              initialSelectedWells={formData['aspirate--wells']}
+              formFieldAccessor={'aspirate--wells'}
+            />
             <FormGroup label='Pipette:'>
               <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
             </FormGroup>
-            {props.formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
+            {formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
               <InputField units='μL' {...formConnector('aspirate--volume')} />
             </FormGroup>}
           </div>
@@ -145,10 +152,13 @@ export default function StepEditForm (props: Props) {
             <FormGroup label='Labware:'>
               <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />
             </FormGroup>
-            <FormGroup label='Wells:'>
-              <InputField placeholder='eg "A1,A2,B1,B2"' {...formConnector('dispense--wells')} />
-            </FormGroup>
-            {props.formData.stepType === 'transfer' && <FormGroup label='Volume:'>
+            <WellSelectionInput
+              labwareId={formData['dispense--labware']}
+              pipetteId={formData['aspirate--pipette']}
+              initialSelectedWells={formData['dispense--wells']}
+              formFieldAccessor={'dispense--wells'}
+            />
+            {formData.stepType === 'transfer' && <FormGroup label='Volume:'>
               <InputField units='μL' {...formConnector('dispense--volume')} />
             </FormGroup>}
           </div>
@@ -177,7 +187,7 @@ export default function StepEditForm (props: Props) {
             </div>
 
             <div className={styles.column_1_2}>
-              {props.formData.stepType === 'transfer' && <FormGroup label='WELL ORDER'>
+              {formData.stepType === 'transfer' && <FormGroup label='WELL ORDER'>
                 (WellSelectionWidget here)
               </FormGroup>}
 
@@ -196,7 +206,7 @@ export default function StepEditForm (props: Props) {
 
   return (
     <div className={styles.form}>
-      <div>Todo: support {props.formData.stepType} step</div>
+      <div>Todo: support {formData.stepType} step</div>
     </div>
   )
 }
