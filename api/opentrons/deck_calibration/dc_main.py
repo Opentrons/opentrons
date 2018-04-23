@@ -92,7 +92,18 @@ class CLITool:
             'corner8': (190.65, 227.57, self._tip_length),
             'corner9': (330.14, 222.78, self._tip_length)}
 
-        self._left_mount_point = self._expected_points[1]
+        lx, ly, lz = self._expected_points[1]
+        mx, my, mz = robot.config.mount_offset
+        self._left_mount_point = (
+            lx - mx,
+            ly - my,
+            lz - mz
+        )
+        self._left_mount_test_point = (
+            self._left_mount_point[0],
+            self._left_mount_point[1],
+            self._left_mount_point[2] + 5  # add 5mm to avoid collisions
+        )
 
         self.key_map = {
             '-': lambda: self.decrease_step(),
@@ -111,7 +122,7 @@ class CLITool:
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
-            'l': lambda: self.validate(self._left_mount_point, 0, left),
+            'l': lambda: self.validate(self._left_mount_test_point, 0, left),
             '1': lambda: self.validate(self._expected_points[1], 1, right),
             '2': lambda: self.validate(self._expected_points[2], 2, right),
             '3': lambda: self.validate(self._expected_points[3], 3, right),
@@ -197,7 +208,8 @@ class CLITool:
         ex, ey, ez = self._left_mount_point
         dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         mx, my, mz = robot.config.mount_offset
-        robot.config._replace(mount_offset=(mx + dx, my + dy, mz + dz))
+        robot.config = robot.config._replace(
+            mount_offset=(mx + dx, my + dy, mz + dz))
         msg = 'saved mount-offset: {}'.format(
             robot.config.mount_offset)
         return msg
@@ -246,20 +258,27 @@ class CLITool:
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
 
+        _, _, cz = self._driver_to_deck_coords(self._position())
+        if self._current_pipette != pipette and cz < SAFE_HEIGHT:
+            self.move_to_safe_height()
+
         self._current_pipette = pipette
         self._current_point = point_num
 
-        cx, cy, cz = self._driver_to_deck_coords(self._position())
-
+        _, _, cz = self._driver_to_deck_coords(self._position())
         if cz < SAFE_HEIGHT:
-            _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
-            robot._driver.move({self._current_pipette: sz})
+            self.move_to_safe_height()
 
         tx, ty, tz = self._deck_to_driver_coords(point)
         robot._driver.move({'X': tx, 'Y': ty})
         robot._driver.move({self._current_pipette: tz})
 
         return 'moved to point {}'.format(point)
+
+    def move_to_safe_height(self):
+        cx, cy, _ = self._driver_to_deck_coords(self._position())
+        _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
+        robot._driver.move({self._current_pipette: sz})
 
     def exit(self):
         raise urwid.ExitMainLoop
