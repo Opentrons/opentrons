@@ -11,7 +11,7 @@ const CANCEL_TEXT = 'cancel'
 const CONTINUE_TEXT = 'move pipette to front'
 
 export default function ClearDeckAlertModal (props: ChangePipetteProps) {
-  const {moveToFront, parentUrl} = props
+  const {actualPipette, moveToFront, parentUrl} = props
 
   return (
     <AlertModal
@@ -29,6 +29,16 @@ export default function ClearDeckAlertModal (props: ChangePipetteProps) {
         <li>All tipracks</li>
         <li>All labware</li>
       </ul>
+      {actualPipette && (
+        <div>
+          <p className={styles.alert_note_heading}>
+            Note:
+          </p>
+          <p className={styles.alert_note}>
+            Detaching a pipette will also clear its related calibration data
+          </p>
+        </div>
+      )}
     </AlertModal>
   )
 }

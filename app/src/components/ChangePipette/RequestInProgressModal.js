@@ -3,7 +3,6 @@ import * as React from 'react'
 
 import type {ChangePipetteProps} from './types'
 import {SpinnerModalPage} from '@opentrons/components'
-
 // TODO (ka 2018-4-10): move this component to util/ or at least up a level for reuse for tip probe
 export default function RequestInProgressModal (props: ChangePipetteProps) {
   let message = props.mount === 'right'
@@ -27,6 +26,7 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
           disabled: true
         }
       }}
+
       message={message}
     />
   )

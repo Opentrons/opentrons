@@ -3,16 +3,14 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push, goBack} from 'react-router-redux'
 import {Switch, Route, withRouter, type Match} from 'react-router'
+import {getPipette, getPipetteModels} from '@opentrons/labware-definitions'
 
+import type {PipetteConfig} from '@opentrons/labware-definitions'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
-import type {Pipette, ChangePipetteProps} from './types'
+import type {Direction, ChangePipetteProps} from './types'
 
-import type {
-  RobotHome,
-  RobotMoveState,
-  PipettesResponse
-} from '../../http-api-client'
+import type {RobotHome, RobotMoveState} from '../../http-api-client'
 
 import {
   home,
@@ -23,11 +21,10 @@ import {
   makeGetRobotPipettes
 } from '../../http-api-client'
 
-import PIPETTES from './pipettes'
 import ClearDeckAlertModal from './ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
 import type {PipetteSelectionProps} from './PipetteSelection'
-import AttachPipette from './AttachPipette'
+import Instructions from './Instructions'
 import ConfirmPipette from './ConfirmPipette'
 import RequestInProgressModal from './RequestInProgressModal'
 
@@ -41,7 +38,7 @@ const TITLE = 'Pipette Setup'
 // used to guarentee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
 // used to guarentee model param in route is a pipettes model
-const RE_MODEL = `(${PIPETTES.map(p => p.model).join('|')})`
+const RE_MODEL = `(${getPipetteModels().join('|')})`
 
 const ConnectedChangePipetteRouter = withRouter(
   connect(makeMapStateToProps, mapDispatchToProps)(ChangePipetteRouter)
@@ -56,7 +53,7 @@ export default function ChangePipette (props: Props) {
       render={(propsWithMount) => {
         const {match: {params, url: baseUrl}} = propsWithMount
         const mount: Mount = (params.mount: any)
-        const pipette = PIPETTES.find(p => p.model === params.model)
+        const wantedPipette = params.model ? getPipette(params.model) : null
 
         return (
           <ConnectedChangePipetteRouter
@@ -64,8 +61,7 @@ export default function ChangePipette (props: Props) {
             title={TITLE}
             subtitle={`${mount} carriage`}
             mount={mount}
-            pipette={pipette}
-            direction='attach'
+            wantedPipette={wantedPipette}
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             confirmUrl={`${baseUrl}/confirm`}
@@ -78,10 +74,11 @@ export default function ChangePipette (props: Props) {
 }
 
 type OP = {
+  title: string,
   subtitle: string,
   mount: Mount,
   robot: Robot,
-  pipette: ?Pipette,
+  wantedPipette: ?PipetteConfig,
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
@@ -91,7 +88,10 @@ type OP = {
 type SP = {
   moveRequest: RobotMoveState,
   homeRequest: RobotHome,
-  pipettes: ?PipettesResponse
+  actualPipette: ?PipetteConfig,
+  displayName: string,
+  direction: Direction,
+  success: boolean,
 }
 
 type DP = {
@@ -117,7 +117,7 @@ function ChangePipetteRouter (props: ChangePipetteProps) {
   return (
     <Switch>
       <Route exact path={baseUrl} render={() => (
-        <AttachPipette {...props} />
+        <Instructions {...props} />
       )} />
       <Route path={exitUrl} render={() => (
         <ExitAlertModal {...props} />
@@ -135,10 +135,30 @@ function makeMapStateToProps () {
   const getRobotPipettes = makeGetRobotPipettes()
 
   return (state: State, ownProps: OP): SP => {
+    const {mount, wantedPipette} = ownProps
+    const pipettes = getRobotPipettes(state, ownProps.robot).response
+    const model = pipettes && pipettes[mount] && pipettes[mount].model
+    const actualPipette = model ? getPipette(model) : null
+    const direction = actualPipette ? 'detach' : 'attach'
+
+    const success = (
+      (wantedPipette && wantedPipette.model) ===
+      (actualPipette && actualPipette.model)
+    )
+
+    const displayName = (
+      (actualPipette && actualPipette.displayName) ||
+      (wantedPipette && wantedPipette.displayName) ||
+      ''
+    )
+
     return {
+      actualPipette,
+      direction,
+      success,
+      displayName,
       moveRequest: getRobotMove(state, ownProps.robot),
-      homeRequest: getRobotHome(state, ownProps.robot),
-      pipettes: getRobotPipettes(state, ownProps.robot).response
+      homeRequest: getRobotHome(state, ownProps.robot)
     }
   }
 }
@@ -150,9 +170,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     exit: () => dispatch(home(robot, mount))
       .then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
-    onPipetteSelect: (event) => {
-      dispatch(push(`${baseUrl}/${event.target.value}`))
-    },
+    onPipetteSelect: (evt) => dispatch(push(`${baseUrl}/${evt.target.value}`)),
     moveToFront: () => dispatch(moveToChangePipette(robot, mount)),
     checkPipette: () => dispatch(fetchPipettes(robot)),
     confirmPipette: () => dispatch(fetchPipettes(robot))

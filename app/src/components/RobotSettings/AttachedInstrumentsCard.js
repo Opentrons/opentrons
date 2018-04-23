@@ -37,7 +37,7 @@ function AttachedInstrumentsCard (props: Props) {
   return (
     <RefreshCard
       title={TITLE}
-      name={props.name}
+      watch={props.name}
       refresh={props.fetchPipettes}
       refreshing={props.inProgress}
     >

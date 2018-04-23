@@ -1,12 +1,20 @@
 // @flow
 import * as React from 'react'
 
+import {getPipette, getPipetteModels} from '@opentrons/labware-definitions'
 import {DropdownField} from '@opentrons/components'
 import styles from './styles.css'
 
 const LABEL = 'Select the pipette you wish to attach:'
 
-export type PipetteSelectionProps = React.ElementProps<typeof DropdownField>
+export type PipetteSelectionProps = {
+  onChange: $PropertyType<React.ElementProps<typeof DropdownField>, 'onChange'>
+}
+
+const OPTIONS = getPipetteModels().map(m => {
+  const pipette = getPipette(m) || {model: '', displayName: ''}
+  return {value: pipette.model, name: pipette.displayName}
+})
 
 export default function PipetteSelection (props: PipetteSelectionProps) {
   return (
@@ -14,7 +22,7 @@ export default function PipetteSelection (props: PipetteSelectionProps) {
       <span className={styles.pipette_selection_label}>
         {LABEL}
       </span>
-      <DropdownField {...props} />
+      <DropdownField {...props} options={OPTIONS} />
     </label>
   )
 }
