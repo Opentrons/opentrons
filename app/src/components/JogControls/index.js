@@ -19,6 +19,10 @@ type JogButtonProps = {
   onClick: () => void,
 }
 
+/* TODO: (ka 2018-4-23):
+  This currentJogDistance is using the selector and reducer get/setJogDistance
+  we might want to think about having a get/setCalibrationJogDistance and a get/setLabwareJogDistance
+  if we track it in 2 different areas of state */
 export type JogControlsProps = Labware & {
   jogButtons: Array<JogButtonProps>,
   currentJogDistance: number,
