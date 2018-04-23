@@ -304,8 +304,14 @@ async def take_picture(request):
     res = await proc.stdout.read()
     res = res.decode().strip()
     await proc.wait()
+
+    # TODO (andy - 2018-04-23) find better way of ensuring picture was taken
+    # TODO              and properly saved by ffmpeg
     if 'video:' in res and 'audio:' in res and 'subtitle:' in res:
         return web.json_response({'message': res}, status=500)
+    if not os.path.exists(filename):
+        return web.json_response({'message': 'picture not saved'}, status=500)
+
     return web.FileResponse(filename)
 
 
