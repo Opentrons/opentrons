@@ -298,12 +298,14 @@ async def take_picture(request):
     cmd = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1'  # NOQA
     proc = await asyncio.create_subprocess_shell(
         '{} {}'.format(cmd, filename),
-        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
         loop=request.loop)
 
-    rd = await proc.stdout.read()
-    rd.decode().strip()
+    rd = await proc.stderr.read()
+    error_msg = rd.decode().strip()
     await proc.wait()
+    if error_msg:
+        return web.json_response({"message": error_msg}, status=500)
 
     return web.FileResponse(filename)
 
