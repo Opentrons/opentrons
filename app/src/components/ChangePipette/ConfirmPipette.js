@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Redirect} from 'react-router'
 import {Link} from 'react-router-dom'
 
 import {Icon, PrimaryButton, ModalPage} from '@opentrons/components'
@@ -12,16 +11,10 @@ import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 
+// note: direction prop is not valid inside this component
+// display messages based on presence of wantedPipette and actualPipette
 export default function ConfirmPipette (props: ChangePipetteProps) {
-  const {pipette, pipettes: attachedPipettes, mount} = props
-
-  if (!pipette) return (<Redirect to={props.baseUrl} />)
-
-  const success = (
-    attachedPipettes &&
-    attachedPipettes[mount].model === pipette.model
-  )
-
+  const {success, wantedPipette, actualPipette} = props
   let exitButtonProps = {className: styles.confirm_button}
 
   exitButtonProps = success
@@ -36,9 +29,15 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
         back: {onClick: props.back, disabled: !!success}
       }}
     >
-      <Status name={pipette.name} success={success} />
-      {!success && (
+      <Status {...props} />
+      {!success && wantedPipette && (
         <FailureToDetect {...props} />
+      )}
+      {!success && (
+        <CheckAgainButton {...props} />
+      )}
+      {success && !actualPipette && (
+        <AttachAnotherButton {...props} />
       )}
       <PrimaryButton {...exitButtonProps}>
         {EXIT_BUTTON_MESSAGE}
@@ -47,17 +46,25 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
   )
 }
 
-function Status (props: {name: string, success: ?boolean}) {
-  const {name, success} = props
+function Status (props: ChangePipetteProps) {
+  const {displayName, wantedPipette, success} = props
   const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: success,
     [styles.failure]: !success
   })
 
-  const message = success
-    ? `${name} succesfully attached.`
-    : `Unable to detect ${name}.`
+  let message
+
+  if (wantedPipette) {
+    message = success
+     ? `${displayName} successfully attached.`
+     : `Unable to detect ${wantedPipette.displayName || ''}.`
+  } else {
+    message = success
+      ? 'Pipette is detached'
+      : `${displayName} is still attached`
+  }
 
   return (
     <div className={styles.confirm_status}>
@@ -72,17 +79,39 @@ function FailureToDetect (props: ChangePipetteProps) {
     <div>
       <img
         className={styles.confirm_diagram}
-        src={getDiagramSrc({...props, ...props.pipette, diagram: 'tab'})}
+        src={getDiagramSrc({
+          ...props,
+          ...props.wantedPipette,
+          diagram: 'tab',
+          direction: 'attach'
+        })}
       />
       <p className={styles.confirm_failure_instructions}>
         Check again to ensure that white connector tab is plugged into pipette.
       </p>
-      <PrimaryButton
-        className={styles.confirm_button}
-        onClick={props.checkPipette}
-      >
-        have robot check connection again
-      </PrimaryButton>
     </div>
+  )
+}
+
+function AttachAnotherButton (props: ChangePipetteProps) {
+  return (
+    <PrimaryButton
+      className={styles.confirm_button}
+      Component={Link}
+      to={props.baseUrl}
+    >
+      attach another pipette
+    </PrimaryButton>
+  )
+}
+
+function CheckAgainButton (props: ChangePipetteProps) {
+  return (
+    <PrimaryButton
+      className={styles.confirm_button}
+      onClick={props.checkPipette}
+    >
+      have robot check connection again
+    </PrimaryButton>
   )
 }
