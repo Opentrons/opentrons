@@ -120,6 +120,8 @@ def init(loop=None):
         '/lights/on', control.turn_on_rail_lights)
     server.app.router.add_post(
         '/lights/off', control.turn_off_rail_lights)
+    server.app.router.add_get(
+        '/camera/picture', control.take_picture)
     server.app.router.add_post(
         '/server/update', update.install_api)
     server.app.router.add_post(

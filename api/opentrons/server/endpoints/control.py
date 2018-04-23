@@ -1,3 +1,4 @@
+import asyncio
 import os
 import json
 import logging
@@ -284,6 +285,27 @@ async def turn_on_rail_lights(request):
 async def turn_off_rail_lights(request):
     robot.turn_off_rail_lights()
     return web.json_response({"lights": "off"})
+
+
+async def take_picture(request):
+    filename = './picture.jpg'
+    if os.path.exists(filename):
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
+
+    cmd = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1'  # NOQA
+    proc = await asyncio.create_subprocess_shell(
+        '{} {}'.format(cmd, filename),
+        stdout=asyncio.subprocess.PIPE,
+        loop=request.loop)
+
+    rd = await proc.stdout.read()
+    rd.decode().strip()
+    await proc.wait()
+
+    return web.FileResponse(filename)
 
 
 async def restart(request):
