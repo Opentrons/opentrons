@@ -123,7 +123,7 @@ def init(loop=None):
     server.app.router.add_post(
         '/server/update', update.install_api)
     server.app.router.add_post(
-        '/server/update_firmware', update.update_firmware)
+        '/server/update/firmware', update.update_firmware)
     server.app.router.add_post(
         '/server/restart', control.restart)
     server.app.router.add_post(

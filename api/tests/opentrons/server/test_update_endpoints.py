@@ -1,9 +1,11 @@
 import os
 import json
 import tempfile
+import zipfile
 from aiohttp import web
 from opentrons.server.main import init, log_init
 from opentrons.server.endpoints import (control, update)
+from opentrons import config
 from opentrons.config import feature_flags as ff
 
 
@@ -57,7 +59,7 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 async def test_feature_flags(
         virtual_smoothie_env, monkeypatch, loop, test_client):
-    tmpd = tempfile.TemporaryDirectory()
+    tmpd = tempfile.mkdtemp()
     monkeypatch.setattr(
         ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
 
@@ -80,3 +82,32 @@ async def test_feature_flags(
     r2body = await r2.text()
     expected = {flag_name: flag_value}
     assert json.loads(r2body) == expected
+
+
+async def test_post_data(virtual_smoothie_env, monkeypatch, loop, test_client):
+    tmpd = tempfile.mkdtemp()
+    monkeypatch.setattr(config, 'OVERRIDE_SETTINGS_DIR', tmpd.name)
+
+    log_init()
+
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    tmpd2 = tempfile.mkdtemp()
+    zip_dir = os.path.join(tmpd2, 'stuff')
+    os.makedirs(zip_dir)
+
+    # Create test data in /tmpdir/stuff/test_file.json
+    test_file_relpath = os.path.join('stuff', 'test_file.json')
+    test_file_path = os.path.join(tmpd2, test_file_relpath)
+    with open(test_file_path, 'w') as test_f:
+        json.dump({'test': 'Call me Ishmael...'}, test_f)
+
+    # Create a zip file /tmpdir/test.zip with the
+    zip_f = os.path.join(zip_dir, 'test.zip')
+    with zipfile.ZipFile(zip_f, 'x') as zf:
+        zf.write(test_file_path, test_file_relpath)
+
+    data = {
+        'data': open(zip_f)
+    }

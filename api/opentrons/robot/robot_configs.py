@@ -161,7 +161,7 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
-
+    # TODO: modify this to get the path via `opentrons.config.get_config_index`
     filename = filename or environment.get_path('OT_CONFIG_FILE')
     if tag:
         root, ext = os.path.splitext(filename)
