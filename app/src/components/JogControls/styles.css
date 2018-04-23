@@ -1,0 +1,80 @@
+@import '@opentrons/components';
+
+.jog_container {
+  padding: 1rem 0;
+}
+
+.jog_controls {
+  display: grid;
+  grid-gap: 0.25rem;
+  grid-template-rows: repeat(3, [row] 3rem);
+  grid-template-columns: repeat(3, [col] 3rem) auto repeat(3, [col] 3rem) auto repeat(3, [col] 3rem);
+}
+
+.jog_button {
+  width: 2.5rem;
+  height: 2.5rem;
+  align-self: center;
+  justify-self: center;
+
+  &.back {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  &.forward {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  &.left {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  &.right {
+    grid-column: 3;
+    grid-row: 3;
+  }
+
+  &.up {
+    grid-column: 6;
+    grid-row: 2;
+  }
+
+  &.down {
+    grid-column: 6;
+    grid-row: 3;
+  }
+}
+
+.jog_increment {
+  grid-row: 1;
+  grid-column: 9/11;
+}
+
+.increment_group {
+  grid-row: 2;
+  grid-column: 9/11;
+}
+
+.increment_item {
+  padding: 0.375rem;
+}
+
+.jog_label_xy,
+.jog_label_z,
+.jog_increment {
+  @apply --font-header-dark;
+}
+
+.jog_label_xy {
+  grid-column: 1 / 4;
+  grid-row: 1;
+}
+
+.jog_label_z {
+  grid-column: 5/8;
+  grid-row: 1;
+  text-align: center;
+}

@@ -35,7 +35,6 @@ const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
 }
 
 export default function JogControls (props: JogControlsProps) {
-  console.log(props.currentJogDistance)
   return (
     <div className={styles.jog_container}>
       <div className={styles.jog_controls}>

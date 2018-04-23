@@ -17,7 +17,7 @@ import {
 import {PrimaryButton} from '@opentrons/components'
 
 import ConfirmPositionDiagram from './ConfirmPositionDiagram'
-import JogControls, {type JogControlsProps} from './JogControls'
+import JogControls, {type JogControlsProps} from '../JogControls'
 
 type StateProps = {
   currentJogDistance: number
