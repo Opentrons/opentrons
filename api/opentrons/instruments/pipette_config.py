@@ -270,4 +270,4 @@ def load(pipette_model: str) -> pipette_config:
         key in the "pipette-config.json" file
     :return: a `pipette_config` instance
     """
-    return _load_config_from_file(pipette_model)
+    return select_config(pipette_model)
