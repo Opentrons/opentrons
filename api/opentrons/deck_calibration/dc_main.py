@@ -109,13 +109,14 @@ class CLITool:
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
-            '1': lambda: self.validate(self._expected_points[1], 1),
-            '2': lambda: self.validate(self._expected_points[2], 2),
-            '3': lambda: self.validate(self._expected_points[3], 3),
-            '4': lambda: self.validate(self._test_points['slot5'], 4),
-            '5': lambda: self.validate(self._test_points['corner3'], 5),
-            '6': lambda: self.validate(self._test_points['corner8'], 6),
-            '7': lambda: self.validate(self._test_points['corner9'], 7)
+            'm': lambda: self.validate_mount_offset(),
+            '1': lambda: self.validate(self._expected_points[1], 1, right),
+            '2': lambda: self.validate(self._expected_points[2], 2, right),
+            '3': lambda: self.validate(self._expected_points[3], 3, right),
+            '4': lambda: self.validate(self._test_points['slot5'], 4, right),
+            '5': lambda: self.validate(self._test_points['corner3'], 5, right),
+            '6': lambda: self.validate(self._test_points['corner8'], 6, right),
+            '7': lambda: self.validate(self._test_points['corner9'], 7, right)
         }
 
     def current_step(self):
@@ -137,6 +138,20 @@ class CLITool:
         if self._steps_index > 0:
             self._steps_index = self._steps_index - 1
         return 'step: {}'.format(self.current_step())
+
+    def _deck_to_driver_coords(self, point):
+        # TODO (ben 20180201): create a function in linal module so we don't
+        # TODO                 have to do dot product & etc here
+        point = array(list(point) + [1])
+        x, y, z, _ = dot(robot.config.gantry_calibration, point)
+        return (x, y, z)
+
+    def _driver_to_deck_coords(self, point):
+        # TODO (ben 20180201): create a function in linal module so we don't
+        # TODO                 have to do dot product & etc here
+        point = array(list(point) + [1])
+        x, y, z, _ = dot(inv(robot.config.gantry_calibration), point)
+        return (x, y, z)
 
     def _position(self):
         """
@@ -171,11 +186,23 @@ class CLITool:
         current position once the 'Enter' key is pressed to the 'actual points'
         vector.
         """
-        self._actual_points[self._current_point] = self._position()[:-1]
+        if self._current_pipette is left:
+            msg = self.save_mount_offset()
+        else:
+            self._actual_points[self._current_point] = self._position()[:-1]
+            msg = 'saved #{}: {}'.format(
+                self._current_point, self._actual_points[self._current_point])
+        return msg
 
-        msg = 'saved #{}: {}'.format(
-            self._current_point, self._actual_points[self._current_point])
-
+    def save_mount_offset(self) -> str:
+        cx, cy, cz = self._driver_to_deck_coords(self._position())
+        ex, ey, ez = apply_mount_offset(self._expected_points[1])
+        dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+        mx, my, mz = robot.config.mount_offset
+        robot.config = robot.config._replace(
+            mount_offset=(mx - dx, my - dy, mz - dz))
+        msg = 'saved mount-offset: {}'.format(
+            robot.config.mount_offset)
         return msg
 
     def save_transform(self) -> str:
@@ -208,31 +235,49 @@ class CLITool:
         self._calibration_matrix[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
-    def validate(self, point: (float, float, float), point_num: int) -> str:
+    def _left_mount_offset(self):
+        lx, ly, lz = self._expected_points[1]
+        mx, my, mz = robot.config.mount_offset
+        return (lx - mx, ly - my, lz - mz)
+
+    def validate_mount_offset(self):
+        # move the RIGHT pipette to expected point, then immediately after
+        # move the LEFT pipette to that same point
+        self.validate(self._expected_points[1], 1, right)
+        self.validate(apply_mount_offset(self._expected_points[1]), 0, left)
+
+    def validate(
+            self,
+            point: (float, float, float),
+            point_num: int,
+            pipette: str) -> str:
         """
         :param point: Expected values from mechanical drawings
         :param point_num: The current position attempting to be validated
 
-
         :return:
         """
-        # TODO (ben 20180201): create a function in linal module so we don't
-        # TODO                 have to do dot product & etc here
-        v = array(list(point) + [1])
-        x, y, z, _ = dot(
-            inv(self._calibration_matrix), list(self._position()) + [1])
+        _, _, cz = self._driver_to_deck_coords(self._position())
+        if self._current_pipette != pipette and cz < SAFE_HEIGHT:
+            self.move_to_safe_height()
 
-        if z < SAFE_HEIGHT:
-            _, _, z, _ = dot(self._calibration_matrix, [x, y, SAFE_HEIGHT, 1])
-            robot._driver.move({self._current_pipette: z})
-
-        x, y, z, _ = dot(self._calibration_matrix, v)
-        robot._driver.move({'X': x, 'Y': y})
-        robot._driver.move({self._current_pipette: z})
-
+        self._current_pipette = pipette
         self._current_point = point_num
 
-        return 'moving to point {}'.format(point)
+        _, _, cz = self._driver_to_deck_coords(self._position())
+        if cz < SAFE_HEIGHT:
+            self.move_to_safe_height()
+
+        tx, ty, tz = self._deck_to_driver_coords(point)
+        robot._driver.move({'X': tx, 'Y': ty})
+        robot._driver.move({self._current_pipette: tz})
+
+        return 'moved to point {}'.format(point)
+
+    def move_to_safe_height(self):
+        cx, cy, _ = self._driver_to_deck_coords(self._position())
+        _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
+        robot._driver.move({self._current_pipette: sz})
 
     def exit(self):
         raise urwid.ExitMainLoop
