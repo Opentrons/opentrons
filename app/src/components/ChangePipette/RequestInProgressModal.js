@@ -2,9 +2,7 @@
 import * as React from 'react'
 
 import type {ChangePipetteProps} from './types'
-import {Icon, ModalPage} from '@opentrons/components'
-import styles from './styles.css'
-
+import {SpinnerModalPage} from '@opentrons/components'
 // TODO (ka 2018-4-10): move this component to util/ or at least up a level for reuse for tip probe
 export default function RequestInProgressModal (props: ChangePipetteProps) {
   let message = props.mount === 'right'
@@ -20,18 +18,16 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
   }
 
   return (
-    <ModalPage
-      contentsClassName={styles.in_progress_contents}
+    <SpinnerModalPage
       titleBar={{
         title: props.title,
         subtitle: props.subtitle,
-        button: {disabled: true}
+        back: {
+          disabled: true
+        }
       }}
-    >
-      <Icon name='ot-spinner' spin className={styles.in_progress_icon} />
-      <p className={styles.progress_message}>
-        {message}
-      </p>
-    </ModalPage>
+
+      message={message}
+    />
   )
 }

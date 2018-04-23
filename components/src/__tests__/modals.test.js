@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Modal, AlertModal, ContinueModal, ModalPage, Overlay} from '..'
+import {Modal, AlertModal, ContinueModal, ModalPage, SpinnerModalPage, Overlay} from '..'
 
 describe('modals', () => {
   test('Modal has a clickable overlay', () => {
@@ -122,6 +122,24 @@ describe('modals', () => {
       >
         children
       </ModalPage>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('SpinnerModalPage renders correctly', () => {
+    const tree = Renderer.create(
+      <SpinnerModalPage
+        titleBar={{
+          title: 'Title',
+          subtitle: 'Subtitle',
+          back: {
+            disabled: true
+          }
+        }}
+      >
+        children
+      </SpinnerModalPage>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
