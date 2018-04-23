@@ -15,6 +15,10 @@
   justify-content: space-between;
   text-transform: uppercase;
   background-color: var(--c-dark-gray);
+
+  & :disabled {
+    opacity: 0;
+  }
 }
 
 .title_bar,

@@ -1,6 +1,17 @@
 /* common styling for modals */
 @import '..';
 
+:root {
+  --modal-contents: {
+    z-index: 1;
+    width: 100%;
+    max-width: 38rem;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 0.5rem;
+  }
+}
+
 .modal {
   @apply --modal;
 
@@ -21,13 +32,27 @@
 }
 
 .modal_contents {
-  z-index: 1;
-  width: 100%;
-  max-width: 38rem;
-  margin: auto;
+  @apply --modal-contents;
+
   background-color: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
+}
+
+.spinner_modal_contents {
+  @apply --modal-contents;
+  @apply --font-body-2-light;
+  @apply center-content;
+
+  max-width: 30rem;
+  padding-top: 3rem;
+  background-color: transparent;
+  flex-direction: column;
+  font-style: italic;
+  text-align: center;
+  z-index: 4;
+}
+
+.spinner_modal_icon {
+  width: 5rem;
 }
 
 .clickable {

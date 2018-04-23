@@ -176,3 +176,85 @@ exports[`modals Overlay renders correctly 1`] = `
   onClick={[Function]}
 />
 `;
+
+exports[`modals SpinnerModalPage renders correctly 1`] = `
+<div
+  className="modal"
+>
+  <div
+    className="overlay"
+    onClick={undefined}
+  />
+  <header
+    className="title_bar title_bar"
+  >
+    <button
+      className="button_flat inverted"
+      disabled={true}
+      onClick={undefined}
+      title="Back"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="icon"
+        fill="currentColor"
+        height={undefined}
+        style={undefined}
+        version="1.1"
+        viewBox="0 0 24 24"
+        width={undefined}
+        x={undefined}
+        y={undefined}
+      >
+        <path
+          d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
+          fillRule="evenodd"
+        />
+      </svg>
+      back
+    </button>
+    <div
+      className="title_wrapper"
+    >
+      <h1
+        className="title"
+      >
+        Title
+      </h1>
+      <span
+        className="separator"
+      >
+        |
+      </span>
+      <h2
+        className="subtitle"
+      >
+        Subtitle
+      </h2>
+    </div>
+  </header>
+  <div
+    className="spinner_modal_contents"
+  >
+    <svg
+      aria-hidden="true"
+      className="spinner_modal_icon spin"
+      fill="currentColor"
+      height={undefined}
+      style={undefined}
+      version="1.1"
+      viewBox="0 0 512 512"
+      width={undefined}
+      x={undefined}
+      y={undefined}
+    >
+      <path
+        d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
+        fillRule="evenodd"
+      />
+    </svg>
+    <p />
+  </div>
+</div>
+`;
