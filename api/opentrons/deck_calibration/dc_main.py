@@ -109,7 +109,7 @@ class CLITool:
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
-            'l': lambda: self.validate(self._left_mount_offset(), 0, left),
+            'm': lambda: self.validate_mount_offset(),
             '1': lambda: self.validate(self._expected_points[1], 1, right),
             '2': lambda: self.validate(self._expected_points[2], 2, right),
             '3': lambda: self.validate(self._expected_points[3], 3, right),
@@ -143,14 +143,14 @@ class CLITool:
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(self._calibration_matrix, point)
+        x, y, z, _ = dot(robot.config.gantry_calibration, point)
         return (x, y, z)
 
     def _driver_to_deck_coords(self, point):
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(inv(self._calibration_matrix), point)
+        x, y, z, _ = dot(inv(robot.config.gantry_calibration), point)
         return (x, y, z)
 
     def _position(self):
@@ -196,7 +196,7 @@ class CLITool:
 
     def save_mount_offset(self) -> str:
         cx, cy, cz = self._driver_to_deck_coords(self._position())
-        ex, ey, ez = self._left_mount_offset()
+        ex, ey, ez = apply_mount_offset(self._expected_points[1])
         dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         mx, my, mz = robot.config.mount_offset
         robot.config = robot.config._replace(
@@ -239,6 +239,12 @@ class CLITool:
         lx, ly, lz = self._expected_points[1]
         mx, my, mz = robot.config.mount_offset
         return (lx - mx, ly - my, lz - mz)
+
+    def validate_mount_offset(self):
+        # move the RIGHT pipette to expected point, then immediately after
+        # move the LEFT pipette to that same point
+        self.validate(self._expected_points[1], 1, right)
+        self.validate(apply_mount_offset(self._expected_points[1]), 0, left)
 
     def validate(
             self,
