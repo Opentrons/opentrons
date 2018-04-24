@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/labware-definitions",
-  "version": "3.0.0-beta.8",
+  "version": "3.0.0-beta.9",
   "description": "Default labware definitions for Opentrons robots",
   "repository": {
     "type": "git",
