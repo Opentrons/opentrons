@@ -16,6 +16,7 @@ import {
   home,
   moveToChangePipette,
   fetchPipettes,
+  disengagePipetteMotors,
   makeGetRobotMove,
   makeGetRobotHome,
   makeGetRobotPipettes
@@ -165,15 +166,18 @@ function makeMapStateToProps () {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {confirmUrl, parentUrl, baseUrl, robot, mount} = ownProps
+  const disengage = () => dispatch(disengagePipetteMotors(robot, mount))
+  const checkPipette = () => disengage()
+    .then(() => dispatch(fetchPipettes(robot)))
 
   return {
+    checkPipette,
     exit: () => dispatch(home(robot, mount))
       .then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
     onPipetteSelect: (evt) => dispatch(push(`${baseUrl}/${evt.target.value}`)),
-    moveToFront: () => dispatch(moveToChangePipette(robot, mount)),
-    checkPipette: () => dispatch(fetchPipettes(robot)),
-    confirmPipette: () => dispatch(fetchPipettes(robot))
-      .then(() => dispatch(push(confirmUrl)))
+    moveToFront: () => dispatch(moveToChangePipette(robot, mount))
+      .then(disengage),
+    confirmPipette: () => checkPipette().then(() => dispatch(push(confirmUrl)))
   }
 }
