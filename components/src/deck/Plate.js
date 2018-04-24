@@ -16,7 +16,11 @@ import type {LabwareLocations} from '../labware-types'
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
+<<<<<<< d04d868a69088a8252d6cea59b4b98b9deba3285
 type WellDims = {
+=======
+type WellDims = { // TODO similar to type in Well.js. DRY it up
+>>>>>>> cleanup well props & styling to match design reqs
   ...WellLocation,
   maxVolume: number
 }
@@ -84,7 +88,11 @@ export default class Plate extends React.Component<PlateProps> {
 
     const wellLocation = containerLocations[wellName]
 
+<<<<<<< d04d868a69088a8252d6cea59b4b98b9deba3285
     const {highlighted, selected, error, fillColor} = singleWellContents
+=======
+    const { highlighted = false, selected = false, error = false, fillColor = '' } = (singleWellContents || {}) // ignored/removed: highlighed, hovered
+>>>>>>> cleanup well props & styling to match design reqs
 
     return <Well
       key={wellName}
