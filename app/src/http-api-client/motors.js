@@ -59,7 +59,7 @@ const DISENGAGE: RequestPath = 'disengage'
 
 export function disengagePipetteMotors (
   robot: RobotService,
-  mounts: Array<Mount>
+  ...mounts: Array<Mount>
 ): ThunkPromiseAction {
   return (dispatch, getState) => {
     const pipettesState = getState().api.pipettes[robot.name]

@@ -45,7 +45,7 @@ describe('/motors/**', () => {
       client.__setMockResponse(mockPipettesResponse, response)
 
       // use mock.calls to verify call order
-      return store.dispatch(disengagePipetteMotors(robot, ['right']))
+      return store.dispatch(disengagePipetteMotors(robot, 'right'))
         .then(() => expect(client.mock.calls).toEqual([
           [robot, 'GET', 'pipettes'],
           [robot, 'POST', 'motors/disengage', expected]
@@ -59,7 +59,7 @@ describe('/motors/**', () => {
       client.__setMockResponse(response)
 
       // use mock.calls to verify call order
-      return store.dispatch(disengagePipetteMotors(robot, ['left']))
+      return store.dispatch(disengagePipetteMotors(robot, 'left'))
         .then(() => expect(client.mock.calls).toEqual([
           [robot, 'POST', 'motors/disengage', expected]
         ]))
@@ -74,7 +74,7 @@ describe('/motors/**', () => {
 
       client.__setMockResponse(mockPipettesResponse, response)
 
-      return store.dispatch(disengagePipetteMotors(robot, ['left', 'right']))
+      return store.dispatch(disengagePipetteMotors(robot, 'left', 'right'))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
@@ -88,7 +88,7 @@ describe('/motors/**', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(disengagePipetteMotors(robot, ['left', 'right']))
+      return store.dispatch(disengagePipetteMotors(robot, 'left', 'right'))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
