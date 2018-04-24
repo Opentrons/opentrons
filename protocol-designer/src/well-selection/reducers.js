@@ -5,20 +5,19 @@ import {handleActions, type ActionType} from 'redux-actions'
 import type {Wells} from '../labware-ingred/types'
 import * as actions from '../labware-ingred/actions'
 import type {OpenWellSelectionModalPayload} from './actions'
-import typeof {openWellSelectionModal} from './actions'
 
 type SelectedWellsState = {|
-  preselected: Wells,
+  highlighted: Wells,
   selected: Wells
 |}
-const selectedWellsInitialState: SelectedWellsState = {preselected: {}, selected: {}}
+const selectedWellsInitialState: SelectedWellsState = {highlighted: {}, selected: {}}
 const selectedWells = handleActions({
-  PRESELECT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) => action.payload.append
-    ? {...state, preselected: action.payload.wells}
-    : {selected: {}, preselected: action.payload.wells},
+  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) => action.payload.append
+    ? {...state, highlighted: action.payload.wells}
+    : {selected: {}, highlighted: action.payload.wells},
 
   SELECT_WELLS: (state, action: ActionType<typeof actions.selectWells>) => ({
-    preselected: {},
+    highlighted: {},
     selected: {
       ...(action.payload.append ? state.selected : {}),
       ...action.payload.wells
@@ -39,7 +38,7 @@ const highlightedIngredients = handleActions({
 
 type WellSelectionModalState = OpenWellSelectionModalPayload | null
 const wellSelectionModal = handleActions({
-  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>) => action.payload,
+  OPEN_WELL_SELECTION_MODAL: (state, action: {payload: OpenWellSelectionModalPayload}) => action.payload,
   CLOSE_WELL_SELECTION_MODAL: () => null
 }, null)
 

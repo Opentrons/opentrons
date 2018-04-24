@@ -94,7 +94,7 @@ type WellSelectionPayload = {|
 |}
 
 export const preselectWells = createAction(
-  'PRESELECT_WELLS',
+  'HIGHLIGHT_WELLS',
   (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
     wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
     append: e.shiftKey

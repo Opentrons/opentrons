@@ -37,7 +37,7 @@ const selectedWellNames: Selector<Array<string>> = createSelector(
   })
 )
 
-// TODO Ian 2018-04-19 this is a confusing name, it gets {selected: Wells, preselected: Wells.}. Refactor.
+// TODO Ian 2018-04-19 this is a confusing name, it gets {selected: Wells, highlighted: Wells.}. Refactor.
 const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells
 
 const numWellsSelected: Selector<number> = createSelector(
@@ -45,7 +45,11 @@ const numWellsSelected: Selector<number> = createSelector(
   selectedWells => Object.keys(selectedWells.selected).length
 )
 
-const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
+// TODO Ian 2018-04-24 is 'highlightedIngredients' useful?
+// Should HOVER_WELL_BEGIN / HOVER_WELL_END be removed in favor of HIGHLIGHT_WELLS?
+// or the other way around?
+
+// const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
 
 const wellSelectionModalData: Selector<*> = createSelector(
   rootSelector,
@@ -56,6 +60,6 @@ export default {
   selectedWellNames,
   numWellsSelected,
   getSelectedWells,
-  getHighlightedWells,
+  // getHighlightedWells,
   wellSelectionModalData
 }

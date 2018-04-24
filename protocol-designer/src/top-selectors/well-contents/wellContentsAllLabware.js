@@ -14,11 +14,8 @@ import {defaultContainers} from '../../constants.js'
 const _getWellContents = (
   containerType: ?string,
   __ingredientsForContainer: IngredsForLabware,
-  selectedWells: {
-    preselected: Wells,
-    selected: Wells
-  } | null,
-  highlightedWells: Wells | null
+  selectedWells: ?Wells,
+  highlightedWells: ?Wells
 ): AllWellContents | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
@@ -47,16 +44,11 @@ const _getWellContents = (
   return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
     const groupIds = groupIdsForWell(wellName)
 
-    const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
-
     return {
       ...acc,
       [wellName]: {
-        preselected: selectedWells ? wellName in selectedWells.preselected : false,
-        selected: selectedWells ? wellName in selectedWells.selected : false,
-        highlighted: isHighlighted, // TODO remove 'highlighted' state?
-        hovered: !!(highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1),
-
+        highlighted: highlightedWells ? (wellName in highlightedWells) : false,
+        selected: selectedWells ? wellName in selectedWells : false,
         maxVolume: location['total-liquid-volume'] || Infinity,
         groupIds
       }
@@ -69,8 +61,7 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
   labwareIngredSelectors.ingredientsByLabware,
   labwareIngredSelectors.getSelectedContainer,
   wellSelectionSelectors.getSelectedWells,
-  wellSelectionSelectors.getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
-  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
+  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells) => {
     const allLabwareIds = Object.keys(_labware)
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
@@ -84,8 +75,8 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
           _labware[labwareId].type,
           ingredsForLabware,
           // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? _selectedWells : null,
-          isSelectedLabware ? _highlightedWells : null
+          isSelectedLabware ? _selectedWells.selected : null,
+          isSelectedLabware ? _selectedWells.highlighted : null
         )
         : null
       }
