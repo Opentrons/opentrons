@@ -13,17 +13,21 @@ import SelectionRect from '../components/SelectionRect.js'
 import type {AllWellContents, WellContents} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
-export type Props = {
-  wellContents: AllWellContents,
-  containerType: string,
-  onSelectionMove: RectEvent,
-  onSelectionDone: RectEvent,
-  containerId: string, // used by container
-  selectable?: boolean
-}
-
 type PlateProps = React.ElementProps<typeof Plate>
 type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
+
+export type Props = {
+  wellContents: AllWellContents,
+  containerType: $PropertyType<PlateProps, 'containerType'>,
+
+  selectable?: $PropertyType<PlateProps, 'selectable'>,
+  handleMouseOverWell?: $PropertyType<PlateProps, 'handleMouseOverWell'>,
+
+  onSelectionMove: RectEvent,
+  onSelectionDone: RectEvent,
+  containerId: string // used by container
+}
+
 function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
   return mapValues(
     wc,
@@ -58,7 +62,8 @@ export default function SelectablePlate (props: Props) {
     containerType,
     onSelectionMove,
     onSelectionDone,
-    selectable
+    selectable,
+    handleMouseOverWell
   } = props
 
   const plate = <Plate
@@ -66,6 +71,7 @@ export default function SelectablePlate (props: Props) {
     wellContents={wellContentsGroupIdsToColor(wellContents)}
     containerType={containerType}
     showLabels={selectable}
+    handleMouseOverWell={handleMouseOverWell}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect

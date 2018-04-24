@@ -3,15 +3,20 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
+
 import SelectablePlate from '../components/SelectablePlate.js'
+
+import {getCollidingWells} from '../utils'
+import {SELECTABLE_WELL_CLASS} from '../constants'
+import {END_STEP} from '../steplist/types'
+
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
+
 import {preselectWells, selectWells} from '../labware-ingred/actions'
 import wellSelectionSelectors from '../well-selection/selectors'
-
-import {END_STEP} from '../steplist/types'
 
 import type {WellContents} from '../labware-ingred/types'
 import type {BaseState} from '../types'
@@ -26,7 +31,8 @@ type Props = React.ElementProps<typeof SelectablePlate>
 
 type DispatchProps = {
   onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
-  onSelectionDone: $PropertyType<Props, 'onSelectionDone'>
+  onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
+  handleMouseOverWell: $PropertyType<Props, 'handleMouseOverWell'>
 }
 
 type StateProps = $Diff<Props, DispatchProps>
@@ -107,8 +113,17 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
   return {
-    onSelectionMove: (e, rect) => dispatch(preselectWells(e, rect)),
-    onSelectionDone: (e, rect) => dispatch(selectWells(e, rect))
+    onSelectionMove: (e, rect) => dispatch(preselectWells(
+      e,
+      getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+    )),
+    onSelectionDone: (e, rect) => dispatch(selectWells(
+      e,
+      getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+    )),
+    handleMouseOverWell: (well: string) => (e) => {
+      console.log('TODO well:', well)
+    }
   }
 }
 

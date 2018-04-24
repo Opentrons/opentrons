@@ -3,8 +3,7 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
 
-import { SELECTABLE_WELL_CLASS } from '../constants'
-import {uuid, getCollidingWells} from '../utils'
+import {uuid} from '../utils'
 import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
@@ -95,16 +94,16 @@ type WellSelectionPayload = {|
 
 export const preselectWells = createAction(
   'HIGHLIGHT_WELLS',
-  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
-    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+  (e: MouseEvent, wells: Wells): WellSelectionPayload => ({
+    wells,
     append: e.shiftKey
   })
 )
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
-    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+  (e: MouseEvent, wells: Wells): WellSelectionPayload => ({
+    wells,
     append: e.shiftKey
   })
 )
