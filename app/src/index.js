@@ -11,7 +11,11 @@ import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 import {checkForShellUpdates} from './shell'
 import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
-import {middleware as analyticsMiddleware} from './analytics'
+import {
+  initialize as initializeAnalytics,
+  middleware as analyticsMiddleware
+} from './analytics'
+
 import reducer from './reducer'
 
 // components
@@ -62,3 +66,7 @@ if (process.env.NODE_ENV === 'development') {
 store.dispatch(checkForShellUpdates())
 
 renderApp()
+
+initializeAnalytics({
+  intercom: process.env.DISABLE_INTERCOM !== '1'
+})
