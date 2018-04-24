@@ -49,8 +49,6 @@ const ingredsByLabwareXXSingleIngred = {
 
 const defaultWellContents = {
   highlighted: false,
-  hovered: false,
-  preselected: false,
   selected: false
 }
 
@@ -61,7 +59,7 @@ describe('wellContentsAllLabware', () => {
     containerState, // all labware
     ingredsByLabwareXXSingleIngred,
     {containerId: 'container1Id'}, // selected labware
-    {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
+    {highlighted: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
     {A3: 'A3'} // highlighted (TODO: is this used?)
   )
 
@@ -70,7 +68,7 @@ describe('wellContentsAllLabware', () => {
   //   containerState, // all labware
   //   ingredsByLabwareXXTwoIngred,
   //   containerState.container2Id, // selected labware
-  //   {preselected: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
+  //   {highlighted: {}, selected: {A1: 'A1', B1: 'B1'}}, // selected
   //   {A3: 'A3'} // highlighted (TODO: is this used?)
   // )
 
