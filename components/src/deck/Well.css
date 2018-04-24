@@ -1,10 +1,31 @@
-.well {
+@import '@opentrons/components';
+
+/* Well fill contents, the "bottom layer" */
+
+.well_fill {
+  fill: currentColor;
+}
+
+/* Styles for border + overlay, the "top layer" */
+
+.well_border {
   stroke-width: 0.4;
   stroke: black;
-  fill: var(--fill-color);
+  fill: transparent;
 }
 
 .selected {
   stroke-width: 1;
-  stroke: blue;
+  stroke: var(--c-blue);
+  fill: color(gray(180) alpha(50%));
+}
+
+.highlighted {
+  stroke-width: 1;
+  stroke: var(--c-blue);
+}
+
+.error {
+  stroke-width: 1;
+  stroke: var(--c-red);
 }

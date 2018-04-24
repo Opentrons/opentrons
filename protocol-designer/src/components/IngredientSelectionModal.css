@@ -5,18 +5,3 @@
 
   background-color: rgba(100, 100, 100, 0.8);
 }
-
-/* TODO Ian 2018-02-21 REMOVE this: */
-
-/* .ingredient_panel_sidebar {
-  float: left;
-  display: inline-block;
-  position: relative;
-  height: 100%;
-  width: var(--ingredient_panel_sidebar_width);
-  border-right: 3px solid gray;
-} */
-
-.container_detail {
-  margin: 1rem 2rem;
-}
