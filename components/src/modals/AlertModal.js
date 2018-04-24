@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import {OutlineButton, type ButtonProps} from '../buttons'
+import {Icon} from '../icons'
 import Modal from './Modal'
 import styles from './modals.css'
 
@@ -26,13 +27,14 @@ export default function AlertModal (props: Props) {
   const {heading, buttons, className, onCloseClick} = props
 
   return (
-    <Modal className={className} onCloseClick={onCloseClick}>
+    <Modal className={className} contentsClassName={styles.alert_modal_wrapper} onCloseClick={onCloseClick}>
+      {heading && (
+        <div className={styles.alert_modal_heading}>
+          <Icon name='warning' className={styles.alert_modal_icon} />
+          {heading}
+        </div>
+      )}
       <div className={styles.alert_modal_contents}>
-        {heading && (
-          <div className={styles.alert_modal_heading}>
-            {heading}
-          </div>
-        )}
         {props.children}
       </div>
       {buttons && (

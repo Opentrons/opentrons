@@ -917,6 +917,26 @@ exports[`icons usb renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons warning renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons wifi renders correctly 1`] = `
 <svg
   aria-hidden="true"
