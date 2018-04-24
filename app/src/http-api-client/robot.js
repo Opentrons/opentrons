@@ -1,5 +1,5 @@
 // @flow
-//  HTTP API client module for /robot/**
+// HTTP API client module for /robot/**
 import {createSelector, type Selector} from 'reselect'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'

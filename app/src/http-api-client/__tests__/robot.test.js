@@ -32,6 +32,7 @@ describe('robot/*', () => {
   })
 
   describe('moveToChangePipette action creator', () => {
+    const path = 'move'
     const mockPositionsResponse = {
       positions: {
         change_pipette: {
@@ -41,33 +42,56 @@ describe('robot/*', () => {
         }
       }
     }
+    const response = {message: 'we did it'}
 
-    test('calls GET /robot/positions', () => {
-      client.__setMockResponse(mockPositionsResponse)
-
-      return store.dispatch(moveToChangePipette(robot, 'left'))
-        .then(() => expect(client)
-          .toHaveBeenCalledWith(robot, 'GET', 'robot/positions'))
-    })
-
-    test('calls POST /robot/move with positions response', () => {
+    test('calls GET /robot/positions then POST /robot/move', () => {
       const expected = {
         target: 'mount',
         mount: 'left',
         point: [1, 2, 3]
       }
 
-      client.__setMockResponse(mockPositionsResponse)
+      client.__setMockResponse(mockPositionsResponse, response)
 
       return store.dispatch(moveToChangePipette(robot, 'left'))
-        .then(() => expect(client)
-          .toHaveBeenCalledWith(robot, 'POST', 'robot/move', expected))
+        .then(() => expect(client.mock.calls).toEqual([
+          [robot, 'GET', 'robot/positions'],
+          [robot, 'POST', 'robot/move', expected]
+        ]))
     })
 
-    // TODO(mc, 2018-04-10): need to improve client mock to handle successive
-    //   mock responses in order to test these
-    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS')
-    test('dispatches ROBOT_REQUEST and ROBOT_FAILURE')
+    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_SUCCESS', () => {
+      const request = {target: 'mount', mount: 'right', point: [4, 5, 6]}
+      const expectedActions = [
+        {
+          type: 'api:SET_ROBOT_MOVE_POSITION',
+          payload: {robot, position: 'change_pipette'}
+        },
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(mockPositionsResponse, response)
+
+      return store.dispatch(moveToChangePipette(robot, 'right'))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const expectedActions = [
+        {
+          type: 'api:SET_ROBOT_MOVE_POSITION',
+          payload: {robot, position: 'change_pipette'}
+        },
+        {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(moveToChangePipette(robot, 'left'))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
   })
 
   describe('home action creator', () => {
