@@ -14,6 +14,7 @@ from opentrons import robot, instruments
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.deck_calibration.linal import solve, add_z, apply_transform
 from opentrons.deck_calibration import *
+from opentrons.config import feature_flags as ff
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
@@ -349,13 +350,11 @@ def backup_configuration_and_reload(tag=None):
     clear_configuration_and_reload()
 
 
-slot_1_lower_left = (12.13, 6.0)
-slot_3_lower_right = (380.87, 6.0)
-slot_10_upper_left = (12.13, 351.5)
+expected_loc = dots_set(ff.dots_deck_type())
 expected_dots = {
-    1: slot_1_lower_left,
-    2: slot_3_lower_right,
-    3: slot_10_upper_left
+    1: expected_loc[0],
+    2: expected_loc[1],
+    3: expected_loc[2]
 }
 
 # for machines that cannot reach the calibration dots, use the screw holes

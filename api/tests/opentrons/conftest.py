@@ -168,6 +168,17 @@ def split_labware_def():
     yield
     ff.set_feature_flag('split-labware-def', False)
 
+
+@pytest.fixture
+def dots_deck_type(monkeypatch):
+    tmpd = tempfile.TemporaryDirectory()
+    monkeypatch.setattr(
+        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
+
+    ff.set_feature_flag('dots-deck-type', True)
+    yield
+    ff.set_feature_flag('dots-deck-type', False)
+
 # -----end feature flag fixtures-----------
 
 

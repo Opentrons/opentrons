@@ -3,8 +3,10 @@ from uuid import uuid1
 from opentrons.instruments import pipette_config
 from opentrons import instruments, robot
 from opentrons.robot import robot_configs
-from opentrons.deck_calibration import jog, position
+from opentrons.deck_calibration import jog, position, dots_set
 from opentrons.deck_calibration.linal import add_z, solve
+from opentrons.config import feature_flags as ff
+
 
 import logging
 import json
@@ -12,10 +14,9 @@ import json
 session = None
 log = logging.getLogger(__name__)
 
-slot_1_lower_left = (12.13, 6.0)
-slot_3_lower_right = (380.87, 6.0)
-slot_10_upper_left = (12.13, 351.5)
-
+slot_1_lower_left,\
+    slot_3_lower_right,\
+    slot_10_upper_left = dots_set(ff.dots_deck_type())
 # Safe points are defined as 5mm toward the center of the deck in x and y, and
 # 10mm above the deck. User is expect to jog to the critical point from the
 # corresponding safe point, to avoid collision depending on direction of
