@@ -2,8 +2,8 @@
 import Deck from './Deck'
 import LabwareContainer from './LabwareContainer'
 import Plate from './Plate'
-import type {SingleWell} from './Plate'
 import Well from './Well'
+import type {SingleWell} from './Well'
 
 import {ContainerNameOverlay} from './ContainerNameOverlay'
 import {EmptyDeckSlot} from './EmptyDeckSlot'

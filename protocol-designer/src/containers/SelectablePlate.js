@@ -76,20 +76,22 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     // TODO Ian 2018-04-11 separate out selected/highlighted state from wellContents props of Plate,
     // so you don't have to do this merge. This well selected state & data really needs cleanup!
 
+    let highlightedWells = {}
     let selectedWells = {}
 
     if (wellSelectionModeForContainer) {
       const wellSelectionState = wellSelectionSelectors.getSelectedWells(state)
       selectedWells = wellSelectionState.selected
     } else {
-      const highlightedWells = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
-      selectedWells = (highlightedWells && highlightedWells[containerId]) || {}
+      const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
+      highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
     }
 
     wellContents = mapValues(
       wellContentsWithoutHighlight,
       (wellContents: WellContents, well: string) => ({
         ...wellContents,
+        highlighted: highlightedWells[well],
         selected: selectedWells[well]
       })
     )

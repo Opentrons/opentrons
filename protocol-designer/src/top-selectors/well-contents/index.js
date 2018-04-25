@@ -35,9 +35,9 @@ function _wellContentsForWell (
     )
 
   return {
-    preselected: false,
-    selected: false,
     highlighted: false,
+    selected: false,
+    error: false,
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
     groupIds: ingredGroupIdsWithContent

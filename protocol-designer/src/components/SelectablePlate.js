@@ -29,9 +29,10 @@ function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
     wc,
     (well: WellContents): SingleWell => ({
       wellName: well.wellName,
-      selected: well.selected,
-      preselected: well.preselected,
+
       highlighted: well.highlighted,
+      selected: well.selected,
+      error: well.error,
       maxVolume: well.maxVolume,
 
       fillColor: getFillColor(well.groupIds)
