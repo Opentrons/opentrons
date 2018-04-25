@@ -45,8 +45,10 @@ export default function AlertItem (props: AlertProps) {
   const className = cx(
     styles.alert,
     alertProps.className,
-    {[styles.alert_body]: props.children}
+    {[styles.alert_body]: props.children},
+    props.className
   )
+
   return (
     <div className={className}>
       <div className={styles.title_bar}>
