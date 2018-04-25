@@ -16,11 +16,6 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 // display messages based on presence of wantedPipette and actualPipette
 export default function ConfirmPipette (props: ChangePipetteProps) {
   const {success, attachedWrong, actualPipette} = props
-  let exitButtonProps = {className: styles.confirm_button}
-
-  exitButtonProps = success
-    ? {...exitButtonProps, onClick: props.exit}
-    : {...exitButtonProps, Component: Link, to: props.exitUrl}
 
   return (
     <ModalPage
