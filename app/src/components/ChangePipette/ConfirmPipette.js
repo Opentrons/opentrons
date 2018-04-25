@@ -10,6 +10,7 @@ import {getDiagramSrc} from './InstructionStep'
 import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
+const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 
 // note: direction prop is not valid inside this component
 // display messages based on presence of wantedPipette and actualPipette
@@ -40,9 +41,7 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
       {success && !actualPipette && (
         <AttachAnotherButton {...props} />
       )}
-      <PrimaryButton {...exitButtonProps}>
-        {EXIT_BUTTON_MESSAGE}
-      </PrimaryButton>
+      <ExitButton {...props} />
     </ModalPage>
   )
 }
@@ -163,5 +162,22 @@ function TryAgainButton (props: ChangePipetteProps) {
 
   return (
     <PrimaryButton {...buttonProps} className={styles.confirm_button} />
+  )
+}
+
+function ExitButton (props: ChangePipetteProps) {
+  const {exit, exitUrl, success, attachedWrong} = props
+  const children = attachedWrong
+    ? EXIT_BUTTON_MESSAGE_WRONG
+    : EXIT_BUTTON_MESSAGE
+
+  let exitButtonProps = {children, className: styles.confirm_button}
+
+  exitButtonProps = success
+    ? {...exitButtonProps, onClick: exit}
+    : {...exitButtonProps, Component: Link, to: exitUrl}
+
+  return (
+    <PrimaryButton {...exitButtonProps} />
   )
 }
