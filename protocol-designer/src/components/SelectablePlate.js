@@ -22,6 +22,7 @@ export type Props = {
 
   selectable?: $PropertyType<PlateProps, 'selectable'>,
   handleMouseOverWell?: $PropertyType<PlateProps, 'handleMouseOverWell'>,
+  handleMouseExitWell?: $PropertyType<PlateProps, 'handleMouseExitWell'>,
 
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
@@ -63,15 +64,19 @@ export default function SelectablePlate (props: Props) {
     onSelectionMove,
     onSelectionDone,
     selectable,
-    handleMouseOverWell
+    handleMouseOverWell,
+    handleMouseExitWell
   } = props
 
   const plate = <Plate
-    selectable={selectable}
-    wellContents={wellContentsGroupIdsToColor(wellContents)}
-    containerType={containerType}
+    {...{
+      selectable,
+      containerType,
+      handleMouseOverWell,
+      handleMouseExitWell
+    }}
     showLabels={selectable}
-    handleMouseOverWell={handleMouseOverWell}
+    wellContents={wellContentsGroupIdsToColor(wellContents)}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect

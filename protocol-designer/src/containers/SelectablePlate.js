@@ -15,7 +15,7 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 
-import {preselectWells, selectWells} from '../labware-ingred/actions'
+import {highlightWells, selectWells, deselectWells} from '../labware-ingred/actions'
 import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {WellContents} from '../labware-ingred/types'
@@ -32,7 +32,8 @@ type Props = React.ElementProps<typeof SelectablePlate>
 type DispatchProps = {
   onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
   onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
-  handleMouseOverWell: $PropertyType<Props, 'handleMouseOverWell'>
+  handleMouseOverWell: $PropertyType<Props, 'handleMouseOverWell'>,
+  handleMouseExitWell: $PropertyType<Props, 'handleMouseExitWell'>
 }
 
 type StateProps = $Diff<Props, DispatchProps>
@@ -112,24 +113,30 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 }
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
+  const labwareType = 'TODO NEXT PR' // TODO Ian 2018-04-25
+  const pipetteChannels = 1 // TODO Ian 2018-04-25
+
   return {
-    onSelectionMove: (e, rect) => dispatch(
-      preselectWells(
-        e,
-        getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-      )
+    onSelectionMove: (e, rect) => dispatch(highlightWells({
+      wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+      labwareType,
+      pipetteChannels
+    })),
+
+    onSelectionDone: (e, rect) => {
+      const wells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+      if (e.shiftKey) {
+        dispatch(deselectWells({wells, labwareType, pipetteChannels}))
+      } else {
+        dispatch(selectWells({wells, labwareType, pipetteChannels}))
+      }
+    },
+
+    handleMouseOverWell: (well: string) => () => dispatch(
+      highlightWells({wells: {[well]: well}, labwareType, pipetteChannels})
     ),
-    onSelectionDone: (e, rect) => dispatch(
-      selectWells(
-        e,
-        getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-      )
-    ),
-    handleMouseOverWell: (well: string) => (e) => dispatch(
-      preselectWells(
-        e,
-        {[well]: well}
-      )
+    handleMouseExitWell: () => dispatch(
+      highlightWells({wells: {}, labwareType, pipetteChannels})
     )
   }
 }

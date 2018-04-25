@@ -26,7 +26,8 @@ export type PlateProps = {
   wellContents: {[string]: SingleWell}, // Keyed by wellName, eg 'A1'
   showLabels?: boolean,
   selectable?: boolean,
-  handleMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed
+  handleMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
+  handleMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
 const plateOutline = <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
@@ -74,7 +75,7 @@ export default class Plate extends React.Component<PlateProps> {
   }
 
   createWell = (wellName: string) => {
-    const { selectable, wellContents } = this.props
+    const { selectable, wellContents, handleMouseExitWell } = this.props
     const { originOffset, firstWell, containerLocations } = this.getContainerData()
     const singleWellContents: SingleWell = wellContents[wellName]
 
@@ -107,7 +108,8 @@ export default class Plate extends React.Component<PlateProps> {
         wellLocation,
         svgOffset,
 
-        onMouseOver: this.handleMouseOverWell(wellName)
+        onMouseOver: this.handleMouseOverWell(wellName),
+        onMouseLeave: handleMouseExitWell
       }
     } />
   }

@@ -31,7 +31,8 @@ type Props = {
     x: number,
     y: number
   },
-  onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed
+  onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
 export default function Well (props: Props) {
@@ -43,7 +44,8 @@ export default function Well (props: Props) {
     error,
     wellLocation,
     svgOffset,
-    onMouseOver
+    onMouseOver,
+    onMouseLeave
   } = props
 
   const fillColor = props.fillColor || 'transparent'
@@ -61,7 +63,8 @@ export default function Well (props: Props) {
 
   const selectionProps = {
     'data-wellname': wellName,
-    onMouseOver
+    onMouseOver,
+    onMouseLeave
   }
 
   const isRect = typeof wellLocation.length === 'number' && typeof wellLocation.width === 'number'

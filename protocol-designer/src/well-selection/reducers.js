@@ -1,4 +1,5 @@
 // @flow
+import omit from 'lodash/omit'
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
@@ -10,17 +11,25 @@ type SelectedWellsState = {|
   highlighted: Wells,
   selected: Wells
 |}
+
+function deleteWells (initialWells: Wells, wellsToRemove: Wells): Wells {
+  // remove given wells from a set of wells
+  return omit(initialWells, Object.keys(wellsToRemove))
+}
+
 const selectedWellsInitialState: SelectedWellsState = {highlighted: {}, selected: {}}
 const selectedWells = handleActions({
-  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) =>
+  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.highlightWells>) =>
     ({...state, highlighted: action.payload.wells}),
 
   SELECT_WELLS: (state, action: ActionType<typeof actions.selectWells>) => ({
     highlighted: {},
-    selected: {
-      ...(action.payload.append ? state.selected : {}),
-      ...action.payload.wells
-    }
+    selected: {...state.selected, ...action.payload.wells}
+  }),
+
+  DESELECT_WELLS: (state, action: ActionType<typeof actions.deselectWells>) => ({
+    highlighted: {},
+    selected: deleteWells(state.selected, action.payload.wells)
   }),
   // Actions that cause "deselect everything" behavior:
   EDIT_MODE_INGREDIENT_GROUP: () => selectedWellsInitialState,

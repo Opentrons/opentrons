@@ -10,7 +10,7 @@ import wellSelectionSelectors from '../well-selection/selectors'
 import type {GetState} from '../types'
 import {editableIngredFields} from './types'
 import type {IngredInputFields, Wells} from './types'
-import type {DeckSlot} from '@opentrons/components'
+import type {DeckSlot, Channels} from '@opentrons/components'
 
 // Payload mappers
 const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
@@ -88,23 +88,27 @@ export const modifyContainer = createAction(
 
 type WellSelectionPayload = {|
   wells: Wells,
-  append: boolean // true if user is holding shift key
+  labwareType: string,
+  pipetteChannels: Channels
 |}
 
-export const preselectWells = createAction(
+const _wellSelectPayloadMapper = (
+  args: WellSelectionPayload
+): WellSelectionPayload => args
+
+export const highlightWells = createAction(
   'HIGHLIGHT_WELLS',
-  (e: MouseEvent | SyntheticMouseEvent<*>, wells: Wells): WellSelectionPayload => ({
-    wells,
-    append: e.shiftKey
-  })
+  _wellSelectPayloadMapper
 )
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  (e: MouseEvent | SyntheticMouseEvent<*>, wells: Wells): WellSelectionPayload => ({
-    wells,
-    append: e.shiftKey
-  })
+  _wellSelectPayloadMapper
+)
+
+export const deselectWells = createAction(
+  'DESELECT_WELLS',
+  _wellSelectPayloadMapper
 )
 
 // ===== well hovering =====
