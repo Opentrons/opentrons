@@ -16,13 +16,13 @@
 
 .selected {
   stroke-width: 1;
-  stroke: var(--c-blue);
-  fill: color(gray(180) alpha(50%));
+  stroke: var(--c-highlight);
+  fill: color(var(--c-highlight) alpha(20%));
 }
 
 .highlighted {
   stroke-width: 1;
-  stroke: var(--c-blue);
+  stroke: var(--c-highlight);
 }
 
 .error {
