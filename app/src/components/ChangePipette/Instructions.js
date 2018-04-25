@@ -17,7 +17,7 @@ export default function Instructions (props: ChangePipetteProps) {
     ...props,
     back: wantedPipette
       ? {onClick: props.back}
-      : {Component: Link, to: props.exitUrl}
+      : {Component: Link, to: props.exitUrl, children: 'exit'}
   }
 
   return (
