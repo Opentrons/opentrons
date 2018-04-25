@@ -37,12 +37,12 @@ const selectedWellNames: Selector<Array<string>> = createSelector(
   })
 )
 
-// TODO Ian 2018-04-19 this is a confusing name, it gets {selected: Wells, highlighted: Wells.}. Refactor.
-const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells
+const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells.selected
+const getHighlightedWells = (state: BaseState) => rootSelector(state).selectedWells.highlighted
 
 const numWellsSelected: Selector<number> = createSelector(
   getSelectedWells,
-  selectedWells => Object.keys(selectedWells.selected).length
+  selectedWells => Object.keys(selectedWells).length
 )
 
 // TODO Ian 2018-04-24 is 'highlightedIngredients' useful?
@@ -60,6 +60,6 @@ export default {
   selectedWellNames,
   numWellsSelected,
   getSelectedWells,
-  // getHighlightedWells,
+  getHighlightedWells,
   wellSelectionModalData
 }

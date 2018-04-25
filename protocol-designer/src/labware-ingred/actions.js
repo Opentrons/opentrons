@@ -11,7 +11,6 @@ import type {GetState} from '../types'
 import {editableIngredFields} from './types'
 import type {IngredInputFields, Wells} from './types'
 import type {DeckSlot} from '@opentrons/components'
-import type {GenericRect} from '../collision-types'
 
 // Payload mappers
 const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
@@ -94,7 +93,7 @@ type WellSelectionPayload = {|
 
 export const preselectWells = createAction(
   'HIGHLIGHT_WELLS',
-  (e: MouseEvent, wells: Wells): WellSelectionPayload => ({
+  (e: MouseEvent | SyntheticMouseEvent<*>, wells: Wells): WellSelectionPayload => ({
     wells,
     append: e.shiftKey
   })
@@ -102,7 +101,7 @@ export const preselectWells = createAction(
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  (e: MouseEvent, wells: Wells): WellSelectionPayload => ({
+  (e: MouseEvent | SyntheticMouseEvent<*>, wells: Wells): WellSelectionPayload => ({
     wells,
     append: e.shiftKey
   })

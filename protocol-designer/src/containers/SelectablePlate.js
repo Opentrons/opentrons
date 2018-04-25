@@ -59,7 +59,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
 
   const wellSelectionMode = true
-  const wellSelectionModeForContainer = wellSelectionMode && selectedContainerId === containerId
+  const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
@@ -72,31 +72,31 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
   let wellContents = {}
   if (deckSetupMode) {
-    // selection for deck setup
+    // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
-    // well contents for step, not deck setup mode
+    // well contents for step, not inital state.
+    // shows liquids the current step in timeline
     const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])
       ? allWellContentsForSteps[prevStepId][containerId]
       : {}
-    // TODO Ian 2018-04-11 separate out selected/highlighted state from wellContents props of Plate,
-    // so you don't have to do this merge. This well selected state & data really needs cleanup!
 
     let highlightedWells = {}
-    let selectedWells = {}
+    const selectedWells = wellSelectionSelectors.getSelectedWells(state)
 
-    if (wellSelectionModeForContainer) {
-      const wellSelectionState = wellSelectionSelectors.getSelectedWells(state)
-      selectedWells = wellSelectionState.selected
+    if (wellSelectionModeForLabware) {
+      // wells are highlighted for well selection hover
+      highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
     } else {
+      // wells are highlighted for steps / substep hover
       const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
       highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
     }
 
     wellContents = mapValues(
       wellContentsWithoutHighlight,
-      (wellContents: WellContents, well: string) => ({
-        ...wellContents,
+      (wellContentsForWell: WellContents, well: string) => ({
+        ...wellContentsForWell,
         highlighted: highlightedWells[well],
         selected: selectedWells[well]
       })
@@ -113,17 +113,24 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
   return {
-    onSelectionMove: (e, rect) => dispatch(preselectWells(
-      e,
-      getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-    )),
-    onSelectionDone: (e, rect) => dispatch(selectWells(
-      e,
-      getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-    )),
-    handleMouseOverWell: (well: string) => (e) => {
-      console.log('TODO well:', well)
-    }
+    onSelectionMove: (e, rect) => dispatch(
+      preselectWells(
+        e,
+        getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+      )
+    ),
+    onSelectionDone: (e, rect) => dispatch(
+      selectWells(
+        e,
+        getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+      )
+    ),
+    handleMouseOverWell: (well: string) => (e) => dispatch(
+      preselectWells(
+        e,
+        {[well]: well}
+      )
+    )
   }
 }
 

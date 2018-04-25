@@ -12,9 +12,8 @@ type SelectedWellsState = {|
 |}
 const selectedWellsInitialState: SelectedWellsState = {highlighted: {}, selected: {}}
 const selectedWells = handleActions({
-  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) => action.payload.append
-    ? {...state, highlighted: action.payload.wells}
-    : {selected: {}, highlighted: action.payload.wells},
+  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) =>
+    ({...state, highlighted: action.payload.wells}),
 
   SELECT_WELLS: (state, action: ActionType<typeof actions.selectWells>) => ({
     highlighted: {},

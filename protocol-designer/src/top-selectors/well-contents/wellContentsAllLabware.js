@@ -61,7 +61,8 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
   labwareIngredSelectors.ingredientsByLabware,
   labwareIngredSelectors.getSelectedContainer,
   wellSelectionSelectors.getSelectedWells,
-  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells) => {
+  wellSelectionSelectors.getHighlightedWells,
+  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
     const allLabwareIds = Object.keys(_labware)
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
@@ -75,8 +76,8 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
           _labware[labwareId].type,
           ingredsForLabware,
           // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? _selectedWells.selected : null,
-          isSelectedLabware ? _selectedWells.highlighted : null
+          isSelectedLabware ? _selectedWells : null,
+          isSelectedLabware ? _highlightedWells : null
         )
         : null
       }
