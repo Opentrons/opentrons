@@ -1,5 +1,6 @@
 // @flow
 import flatten from 'lodash/flatten'
+import memoize from 'lodash/memoize'
 import {computeWellAccess, getLabware} from '@opentrons/labware-definitions'
 
 type WellSetByWell = Array<Array<string>>
@@ -28,12 +29,27 @@ function _getAllWellSetsForLabware (labwareName: string): ?WellSetByWell {
   return allWellSets
 }
 
-export function getWellSetForMultichannel (labwareName: string, well: string): ?Array<string> {
-  // Eg given well C2 for a 96 plate, returns ['A2', 'B2', ... 'H2'] (or null)
-  const allWellSets = _getAllWellSetsForLabware(labwareName)
+/** Memoize _getAllWellSetsForLabware so well sets don't need to be computed
+  * for the same labware more than once.
+  * NOTE: This assumes labware definitions are static. Custom labware must
+  * somehow invalidate this cache.
+**/
+const _getAllWellSetsForLabwareMemoized = memoize(_getAllWellSetsForLabware)
+
+function _getWellSetForMultichannel (labwareName: string, well: string): ?Array<string> {
+  /** Given a well for a labware, returns the well set it belongs to (or null)
+    * for 8-channel access.
+    * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
+  **/
+  const allWellSets = _getAllWellSetsForLabwareMemoized(labwareName)
   if (!allWellSets) {
     return null
   }
 
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
 }
+
+export const getWellSetForMultichannel = memoize(
+  _getWellSetForMultichannel,
+  (labwareName: string, well: string) => `$LABWARE:${labwareName}--WELL:${well}`
+)

@@ -1,6 +1,6 @@
 import {getWellSetForMultichannel} from '../utils'
 
-describe('getWellSetForMultichannel', () => {
+describe('getWellSetForMultichannel (integration test)', () => {
   test('96-flat', () => {
     const labwareName = '96-flat'
     expect(
