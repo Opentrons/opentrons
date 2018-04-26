@@ -4,9 +4,8 @@
   margin: 0 auto;
   min-width: 40rem;
   max-width: 45rem;
-  padding: 0 1rem 2rem;
+  padding-bottom: 2rem;
   display: grid;
-  grid-column-gap: 0.25rem;
   grid-template-columns: 50% 50%;
   grid-template-areas: 'left right';
 }
