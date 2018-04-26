@@ -93,6 +93,7 @@ type SP = {
   displayName: string,
   direction: Direction,
   success: boolean,
+  attachedWrong: boolean,
 }
 
 type DP = {
@@ -147,6 +148,12 @@ function makeMapStateToProps () {
       (actualPipette && actualPipette.model)
     )
 
+    const attachedWrong = !!(
+      !success &&
+      wantedPipette &&
+      actualPipette
+    )
+
     const displayName = (
       (actualPipette && actualPipette.displayName) ||
       (wantedPipette && wantedPipette.displayName) ||
@@ -157,6 +164,7 @@ function makeMapStateToProps () {
       actualPipette,
       direction,
       success,
+      attachedWrong,
       displayName,
       moveRequest: getRobotMove(state, ownProps.robot),
       homeRequest: getRobotHome(state, ownProps.robot)

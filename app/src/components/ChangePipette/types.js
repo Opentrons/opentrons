@@ -26,6 +26,7 @@ export type ChangePipetteProps = {
   displayName: string,
   direction: Direction,
   success: boolean,
+  attachedWrong: boolean,
   parentUrl: string,
   baseUrl: string,
   confirmUrl: string,

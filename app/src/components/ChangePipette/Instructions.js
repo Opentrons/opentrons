@@ -10,6 +10,9 @@ import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
 import styles from './styles.css'
 
+const ATTACH_CONFIRM = 'have robot check connection'
+const DETACH_CONFIRM = 'confirm pipette is detached'
+
 export default function Instructions (props: ChangePipetteProps) {
   const {wantedPipette, actualPipette} = props
 
@@ -17,7 +20,7 @@ export default function Instructions (props: ChangePipetteProps) {
     ...props,
     back: wantedPipette
       ? {onClick: props.back}
-      : {Component: Link, to: props.exitUrl}
+      : {Component: Link, to: props.exitUrl, children: 'exit'}
   }
 
   return (
@@ -31,7 +34,9 @@ export default function Instructions (props: ChangePipetteProps) {
       {(actualPipette || wantedPipette) && (
         <div>
           <Steps {...props} />
-          <CheckButton onClick={props.confirmPipette} />
+          <CheckButton onClick={props.confirmPipette}>
+            {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
+          </CheckButton>
         </div>
       )}
     </ModalPage>
@@ -103,8 +108,6 @@ function CheckButton (props: ButtonProps) {
     <PrimaryButton
       {...props}
       className={styles.check_pipette_button}
-    >
-      have robot check connection
-    </PrimaryButton>
+    />
   )
 }
