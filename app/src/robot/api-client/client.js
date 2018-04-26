@@ -197,8 +197,8 @@ export default function client (dispatch) {
     // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
 
     remote.calibration_manager.return_tip(instrument)
-    .then(() => dispatch(actions.returnTipRepsonse()))
-    .catch((error) => dispatch(actions.returnTipRepsonse(error)))
+    .then(() => dispatch(actions.returnTipResponse()))
+    .catch((error) => dispatch(actions.returnTipResponse(error)))
   }
 
   function moveTo (state, action) {

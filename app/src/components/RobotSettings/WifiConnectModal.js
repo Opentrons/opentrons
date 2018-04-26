@@ -15,7 +15,7 @@ type Props = {
   response: ?WifiConfigureResponse
 }
 
-const SUCCESS_TITLE = 'Succsesfully connected to '
+const SUCCESS_TITLE = 'Successfully connected to '
 const FAILURE_TITLE = 'Could not join network'
 
 const SUCCESS_MESSAGE = 'Your robot has successfully connected to WiFi and should appear in the robot list shortly. If not, try refreshing the list manually or rebooting the robot.'
