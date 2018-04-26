@@ -1,11 +1,9 @@
 import os
 import logging
 import asyncio
-from zipfile import ZipFile
 from aiohttp import web
 
 from opentrons import robot
-from opentrons import config
 from opentrons.config import feature_flags as ff
 
 log = logging.getLogger(__name__)

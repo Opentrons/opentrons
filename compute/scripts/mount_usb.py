@@ -16,6 +16,7 @@ if not os.path.ismount(usb_mount_path):
         print("No USB drive detected--data may not be persisted")
     else:
         try:
+            print("Mounting {} to {}".format(sdn1_devices[0], usb_mount_path))
             subprocess.check_output(
                 'mount {0} {1} &> /dev/null'.format(
                     sdn1_devices[0], usb_mount_path),

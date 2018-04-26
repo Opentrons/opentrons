@@ -1,3 +1,4 @@
+# TODO (ben 2018-04-26): move relevant methods and data into `opentrons.config`
 import os
 import sys
 

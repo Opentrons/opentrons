@@ -7,7 +7,8 @@ FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def pipette_config_path():
-    return get_config_index()['pipetteConfigFile']
+    index = get_config_index()
+    return index.get('pipetteConfigFile', './settings.json')
 
 
 pipette_config = namedtuple(

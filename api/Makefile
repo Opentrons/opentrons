@@ -106,7 +106,3 @@ change-left:
 .PHONY: term
 term:
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(host)
-
-.PHONE: datazip
-datazip:
-    

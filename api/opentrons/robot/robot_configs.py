@@ -3,8 +3,7 @@
 # pylama:skip=1
 
 from collections import namedtuple
-from opentrons.util import environment
-from opentrons.config import merge, children, build
+from opentrons.config import get_config_index, merge, children, build
 from opentrons.config import feature_flags as fflags
 
 import json
@@ -144,7 +143,7 @@ def _get_default():
 
 
 def load(filename=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     result = _get_default()
 
     try:
@@ -161,8 +160,7 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
-    # TODO: modify this to get the path via `opentrons.config.get_config_index`
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
@@ -183,18 +181,19 @@ def backup_configuration(config, tag=None):
 
 
 def clear(filename=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)
 
 
 def _save_config_json(config_json, filename=None, tag=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
 
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as file:
         json.dump(config_json, file, sort_keys=True, indent=4)
         return config_json

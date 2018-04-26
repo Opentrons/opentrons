@@ -209,10 +209,7 @@ def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
 
 
 def test_calibrate_labware_new(
-        virtual_smoothie_env, monkeypatch, split_labware_def):
-    import tempfile
-    temp = tempfile.mkdtemp()
-    monkeypatch.setenv('USER_DEFN_ROOT', temp)
+        virtual_smoothie_env, split_labware_def):
     robot.reset()
 
     plate = labware.load('96-flat', '5')

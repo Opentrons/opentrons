@@ -24,6 +24,7 @@ from typing import List, Tuple
 
 log = logging.getLogger(__file__)
 
+override_settings_dir = os.environ.get('OVERRIDE_SETTINGS_DIR')
 usb_mount_point = '/mnt/usbdrive'
 usb_settings_dir = os.path.join(usb_mount_point, 'config')
 resin_settings_dir = '/data'
@@ -44,7 +45,9 @@ def settings_dir():
     """
     usb_index_file = os.path.join(usb_settings_dir, index_filename)
     resin_index_file = os.path.join(resin_settings_dir, index_filename)
-    if os.path.exists(usb_index_file):
+    if override_settings_dir:
+        res = override_settings_dir
+    elif os.path.exists(usb_index_file):
         res = usb_settings_dir
     elif os.path.exists(resin_index_file):
         res = resin_settings_dir
@@ -53,7 +56,6 @@ def settings_dir():
         write_base_config(new_path, new_cfg)
         res = new_path
 
-    log.debug("Using settings from {}".format(res))
     return res
 
 
@@ -72,16 +74,43 @@ def get_config_index() -> dict:
 
 def _move_settings_data(source_path_dict, dest_path_dict):
     for key, pth in source_path_dict.items():
-        if os.path.isdir(pth):
-            if os.listdir(pth) and not os.path.exists(dest_path_dict[key]):
+        tgt_dir = os.path.dirname(dest_path_dict[key])
+        os.makedirs(tgt_dir, exist_ok=True)
+        if key.endswith('Dir'):
+            log.debug("Copying directory contents onto USB drive")
+            # Source directory may not exist, or may be empty
+            # If target directory does exist, do not copy
+            if os.path.exists(pth) and os.listdir(pth) and not os.path.exists(dest_path_dict[key]):  # noqa
                 shutil.copytree(pth, dest_path_dict[key])
             else:
-                os.makedirs(dest_path_dict[key], exist_ok=True)
+                log.debug("Directory copy preconditions failed:")
+                log.debug("    Source path exists: {}".format(
+                    os.path.exists(pth)))
+                log.debug("    Number of source files: {}".format(
+                    len(os.listdir(pth))))
+                log.debug("    Target directory {} already exists: {}".format(
+                    tgt_dir, os.path.exists(tgt_dir)))
         else:
             if os.path.exists(pth):
                 shutil.copy2(pth, dest_path_dict[key])
-            else:
-                os.makedirs(os.path.dirname(pth), exist_ok=True)
+
+
+def _flatten_dict(input_dict: dict) -> dict:
+    """
+    Flattens a nested dictionary, keeping only keys with non-dict values. Note
+    that keys will be the underscore-delimited concatenation of the nested path
+    of keys from the original dict.
+    """
+    res = {}
+    for k, v in input_dict.items():
+        if type(v) is not dict:
+            res[k] = v
+        else:
+            nest = _flatten_dict(v)
+            for key, value in nest.items():
+                new_key = "{}_{}".format(k, key)
+                res[new_key] = value
+    return res
 
 
 def _generate_base_config() -> (str, dict):
@@ -118,14 +147,21 @@ def _generate_base_config() -> (str, dict):
         },
         'pipetteConfigFile': '/etc/robot-data/pipette-config.json',
         'featureFlagFile': os.path.join(resin_settings_dir, 'settings.json'),
-        'deckCalibrationFile': os.path.join(resin_settings_dir, 'config.json')
+        'deckCalibrationFile': os.path.join(
+            resin_settings_dir,
+            'user_storage',
+            'opentrons_data',
+            'config.json')
     }
     usb_mount_available = os.path.ismount(usb_mount_point)
     if usb_mount_available:
         os.makedirs(usb_settings_dir, exist_ok=True)
         base_data_dir = usb_settings_dir
         new_cfg = usb_config
-        _move_settings_data(resin_config, usb_config)
+
+        move_source = _flatten_dict(resin_config)
+        move_target = _flatten_dict(usb_config)
+        _move_settings_data(move_source, move_target)
     else:
         base_data_dir = resin_settings_dir
         new_cfg = resin_config
@@ -135,8 +171,8 @@ def _generate_base_config() -> (str, dict):
 
 def write_base_config(path: str, config_data: dict):
     os.makedirs(path, exist_ok=True)
-    with open(os.path.join(path, index_filename)) as base_f:
-        json.dump(config_data, base_f)
+    with open(os.path.join(path, index_filename), 'w') as base_f:
+        json.dump(config_data, base_f, indent=2)
 
 
 # ---- Utility functions ----

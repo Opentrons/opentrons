@@ -1,14 +1,10 @@
 import pytest
-from opentrons.util import environment
+from opentrons.config import get_config_index
 
 
 @pytest.fixture
-def config(monkeypatch, tmpdir):
+def mock_config():
     from opentrons.robot import robot_configs
-    from opentrons.util import environment
-
-    monkeypatch.setenv('APP_DATA_DIR', str(tmpdir))
-    environment.refresh()
 
     test_config = robot_configs.load()
     test_config = test_config._replace(name='new-value1')
@@ -17,7 +13,7 @@ def config(monkeypatch, tmpdir):
     return robot_configs
 
 
-def test_clear_config(config):
+def test_clear_config(mock_config):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
     from opentrons.deck_calibration import dc_main
@@ -29,7 +25,7 @@ def test_clear_config(config):
     assert robot.config == robot_configs._get_default()
 
 
-def test_save_and_clear_config(config):
+def test_save_and_clear_config(mock_config):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
     from opentrons.deck_calibration import dc_main
@@ -37,7 +33,7 @@ def test_save_and_clear_config(config):
     import os
 
     old_config = robot.config
-    base_filename = environment.get_path('OT_CONFIG_FILE')
+    base_filename = get_config_index().get('deckCalibrationFile')
 
     tag = "testing"
     root, ext = os.path.splitext(base_filename)

@@ -2,6 +2,7 @@
 import os
 import json
 from typing import List
+from opentrons.config import get_config_index
 
 """
 There will be 3 directories for json blobs to define labware:
@@ -111,17 +112,15 @@ FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def default_definition_dir():
-    return os.environ.get(
-        'LABWARE_DEF',
-        os.path.abspath(os.path.join(
-            FILE_DIR, '..', '..', '..', 'labware-definitions', 'definitions')))
+    return get_config_index().get('labware', {}).get('baseDefinitionDir')
 
 
-def user_defn_root():
-    return os.environ.get(
-        'USER_DEFN_ROOT',
-        os.path.abspath(os.path.join(
-            FILE_DIR, '..', '..', '..', 'labware-definitions', 'user')))
+def user_defn_dir():
+    return get_config_index().get('labware', {}).get('userDefinitionDir')
+
+
+def offset_dir():
+    return get_config_index().get('labware', {}).get('offsetDir')
 
 
 def _load_definition(path: str, labware_name: str) -> dict:
@@ -154,12 +153,12 @@ def _load_offset(path: str, labware_name: str) -> dict:
 def _load(default_defn_dir: str,
           user_defn_root_path: str,
           labware_name: str,
+          offset_dir_path: str,
           with_offset: bool) -> dict:
     """
-    Try to find definition file in <user_defn_root_path>/definitions first,
-    then fall back to <default_defn_dir>. If a definition is found in either
-    place, look for an offset file in <user_defn_root_path>/offsets and apply
-    it if found.
+    Try to find definition file in <user_defn_dir> first, then fall back to
+    <default_defn_dir>. If a definition is found in either place, look for an
+    offset file in <offset_dir> and apply it if found.
 
     If no definition file is found, raise a FileNotFoundException.
 
@@ -170,14 +169,12 @@ def _load(default_defn_dir: str,
         should also be loaded and applied, if one exists
     :return: a dict of the definition with offset applied to each well
     """
-    defn_dir = os.path.join(user_defn_root_path, 'definitions')
-    offset_dir = os.path.join(user_defn_root_path, 'offsets')
-    lw = _load_definition(defn_dir, labware_name)
+    lw = _load_definition(user_defn_root_path, labware_name)
     if not lw:
         lw = _load_definition(default_defn_dir, labware_name)
     if not lw:
         raise FileNotFoundError
-    offs = _load_offset(offset_dir, labware_name) if with_offset else None
+    offs = _load_offset(offset_dir_path, labware_name) if with_offset else None
 
     if offs:
         for well in lw['wells'].keys():
@@ -191,7 +188,11 @@ def _load(default_defn_dir: str,
 
 def load_json(labware_name: str, with_offset: bool=True) -> dict:
     return _load(
-        default_definition_dir(), user_defn_root(), labware_name, with_offset)
+        default_definition_dir(),
+        user_defn_dir(),
+        labware_name,
+        offset_dir(),
+        with_offset)
 
 
 def _list_labware(path: str) -> List[str]:
@@ -203,10 +204,8 @@ def _list_labware(path: str) -> List[str]:
 
 
 def list_all_labware() -> List[str]:
-    user_list = [] + _list_labware(
-        os.path.join(user_defn_root(), 'definitions'))
-    default_list = [] + _list_labware(
-        default_definition_dir())
+    user_list = [] + _list_labware(user_defn_dir())
+    default_list = [] + _list_labware(default_definition_dir())
     return sorted(list(set(user_list + default_list)))
 
 
@@ -234,7 +233,7 @@ def save_user_definition(defn: dict) -> bool:
         `opentrons.data_storage.serializers.labware_to_json`
     :return: success code
     """
-    defn_dir = os.path.join(user_defn_root(), 'definitions')
+    defn_dir = user_defn_dir()
     if not os.path.exists(defn_dir):
         os.makedirs(defn_dir, exist_ok=True)
     return _save_user_definition(defn_dir, defn)
@@ -249,7 +248,7 @@ def save_labware_offset(name: str, offset: dict) -> bool:
         definition file, as determined by calibration
     :return: success code
     """
-    offset_dir = os.path.join(user_defn_root(), 'offsets')
-    if not os.path.exists(offset_dir):
-        os.makedirs(offset_dir, exist_ok=True)
-    return _save_offset(offset_dir, name, offset)
+    offset_d = offset_dir()
+    if not os.path.exists(offset_d):
+        os.makedirs(offset_d, exist_ok=True)
+    return _save_offset(offset_d, name, offset)
