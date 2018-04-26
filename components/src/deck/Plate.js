@@ -23,7 +23,7 @@ type WellDims = {
 
 export type PlateProps = {
   containerType: string,
-  wellContents: {[string]: SingleWell}, // Keyed by wellName, eg 'A1'
+  wellContents?: {[string]: ?SingleWell}, // Keyed by wellName, eg 'A1'
   showLabels?: boolean,
   selectable?: boolean,
   handleMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
@@ -77,7 +77,7 @@ export default class Plate extends React.Component<PlateProps> {
   createWell = (wellName: string) => {
     const { selectable, wellContents, handleMouseExitWell } = this.props
     const { originOffset, firstWell, containerLocations } = this.getContainerData()
-    const singleWellContents: SingleWell = wellContents[wellName]
+    const singleWellContents = wellContents && wellContents[wellName]
 
     // rectangular wells are centered around x, y
     const svgOffset = (typeof firstWell.width === 'number' && typeof firstWell.length === 'number')
@@ -92,18 +92,12 @@ export default class Plate extends React.Component<PlateProps> {
 
     const wellLocation = containerLocations[wellName]
 
-    const {highlighted, selected, error, fillColor} = singleWellContents
-
     return <Well
       key={wellName}
       {...{
+        ...singleWellContents,
         wellName,
         selectable,
-
-        fillColor,
-        highlighted,
-        selected,
-        error,
 
         wellLocation,
         svgOffset,

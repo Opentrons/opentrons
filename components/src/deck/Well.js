@@ -7,10 +7,10 @@ import {SELECTABLE_WELL_CLASS} from '../constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
 export type SingleWell = {|
-  highlighted: boolean, // highlighted is the same as hovered
-  selected: boolean,
-  error: boolean,
   wellName: string,
+  highlighted?: ?boolean, // highlighted is the same as hovered
+  selected?: ?boolean,
+  error?: ?boolean,
   maxVolume?: number,
   fillColor?: ?string
 |}
