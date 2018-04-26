@@ -43,6 +43,10 @@
   padding-top: 4rem;
 }
 
+.no_alert_header {
+  padding-top: 1.5rem;
+}
+
 .spinner_modal_contents {
   @apply --modal-contents;
   @apply --font-body-2-light;

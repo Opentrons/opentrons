@@ -25,9 +25,12 @@ type Props = {
  */
 export default function AlertModal (props: Props) {
   const {heading, buttons, className, onCloseClick} = props
+  const wrapperStyle = heading
+    ? styles.alert_modal_wrapper
+    : cx(styles.alert_modal_wrapper, styles.no_alert_header)
 
   return (
-    <Modal className={className} contentsClassName={styles.alert_modal_wrapper} onCloseClick={onCloseClick}>
+    <Modal className={className} contentsClassName={wrapperStyle} onCloseClick={onCloseClick}>
       {heading && (
         <div className={styles.alert_modal_heading}>
           <Icon name='warning' className={styles.alert_modal_icon} />
