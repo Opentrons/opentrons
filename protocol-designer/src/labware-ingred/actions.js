@@ -3,16 +3,14 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
 
-import { SELECTABLE_WELL_CLASS } from '../constants'
-import {uuid, getCollidingWells} from '../utils'
+import {uuid} from '../utils'
 import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
 import {editableIngredFields} from './types'
 import type {IngredInputFields, Wells} from './types'
-import type {DeckSlot} from '@opentrons/components'
-import type {GenericRect} from '../collision-types'
+import type {DeckSlot, Channels} from '@opentrons/components'
 
 // Payload mappers
 const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
@@ -90,23 +88,27 @@ export const modifyContainer = createAction(
 
 type WellSelectionPayload = {|
   wells: Wells,
-  append: boolean // true if user is holding shift key
+  labwareType: string,
+  pipetteChannels: Channels
 |}
 
-export const preselectWells = createAction(
-  'PRESELECT_WELLS',
-  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
-    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
-    append: e.shiftKey
-  })
+const _wellSelectPayloadMapper = (
+  args: WellSelectionPayload
+): WellSelectionPayload => args
+
+export const highlightWells = createAction(
+  'HIGHLIGHT_WELLS',
+  _wellSelectPayloadMapper
 )
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  (e: MouseEvent, rect: GenericRect): WellSelectionPayload => ({
-    wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
-    append: e.shiftKey
-  })
+  _wellSelectPayloadMapper
+)
+
+export const deselectWells = createAction(
+  'DESELECT_WELLS',
+  _wellSelectPayloadMapper
 )
 
 // ===== well hovering =====

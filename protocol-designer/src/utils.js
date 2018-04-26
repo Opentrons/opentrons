@@ -1,7 +1,7 @@
 // @flow
 import * as componentLibrary from '@opentrons/components'
 import type {BoundingRect, GenericRect} from './collision-types'
-
+import type {Wells} from './labware-ingred/types'
 export const { humanize, wellNameSplit } = componentLibrary
 
 export type FormConnectorFactory<F> = (
@@ -69,7 +69,7 @@ export function clientRectToBoundingRect (rect: ClientRect): BoundingRect {
   }
 }
 
-export const getCollidingWells = (rectPositions: GenericRect, selectableClassname: string) => {
+export const getCollidingWells = (rectPositions: GenericRect, selectableClassname: string): Wells => {
   // Returns obj of selected wells under a collision rect
   // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
   const { x0, y0, x1, y1 } = rectPositions
@@ -90,7 +90,7 @@ export const getCollidingWells = (rectPositions: GenericRect, selectableClassnam
     )
   )
 
-  const collidedWellData = collidedElems.reduce((acc, elem) => {
+  const collidedWellData = collidedElems.reduce((acc: Wells, elem) => {
     if ('wellname' in elem.dataset) {
       const wellName = elem.dataset['wellname']
       return {...acc, [wellName]: wellName}

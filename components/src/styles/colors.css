@@ -16,6 +16,9 @@
   --c-bg-selected: #d1d1d1;
   --c-bg-selected-light: #f1f1f1;
 
+  /* general UI */
+  --c-highlight: #5fd8ee;
+
   /* Misc */
   --c-overlay: rgba(0, 0, 0, 0.7);
   --c-plate-bg: #ccc;

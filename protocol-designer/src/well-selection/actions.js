@@ -5,7 +5,7 @@ import {changeFormInput} from '../steplist/actions'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import type {Wells} from '../labware-ingred/types'
 
-// TODO Ian 2018-04-19 Move selectWells & preselectWells actions from labware-ingred into this file
+// TODO Ian 2018-04-19 Move selectWells & highlightWells actions from labware-ingred into this file
 
 // Well selection modal
 export type OpenWellSelectionModalPayload = {
