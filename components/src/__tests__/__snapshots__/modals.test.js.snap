@@ -73,7 +73,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
     onClick={[Function]}
   />
   <div
-    className="modal_contents alert_modal_wrapper"
+    className="modal_contents alert_modal_wrapper no_alert_header"
   >
     <div
       className="alert_modal_contents"
