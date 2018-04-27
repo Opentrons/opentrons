@@ -12,6 +12,7 @@ import {TitleBar, Splash} from '@opentrons/components'
 import Page from '../components/Page'
 import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
 import ChangePipette from '../components/ChangePipette'
+import CalibrateDeck from '../components/CalibrateDeck'
 
 type StateProps = {
   robot: ?Robot,
@@ -50,6 +51,10 @@ function RobotSettingsPage (props: Props) {
 
       <Route path={`${path}/pipettes`} render={(props) => (
         <ChangePipette {...props} robot={robot} parentUrl={url} />
+      )} />
+
+      <Route path={`${path}/deck-calibration`} render={(props) => (
+        <CalibrateDeck {...props} robot={robot} parentUrl={url} />
       )} />
 
       {showConnectAlert && (

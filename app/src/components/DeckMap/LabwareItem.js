@@ -52,7 +52,7 @@ export default function LabwareItem (props: LabwareItemProps) {
   const item = (
     <LabwareContainer width={width} height={height} highlighted={highlighted}>
       <g className={plateClass}>
-        <Plate containerType={type} />
+        <Plate containerType={type} wellContents={{}} />
 
         {!showSpinner && (
           <ContainerNameOverlay containerName={name} containerType={type} />

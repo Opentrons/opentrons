@@ -2,26 +2,31 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 
-import type {ChangePipetteProps} from './types'
+import type {PipetteConfig} from '@opentrons/labware-definitions'
 import {AlertModal} from '@opentrons/components'
 import styles from './styles.css'
 
+type Props = {
+  actualPipette?: ?PipetteConfig,
+  onContinueClick?: () => mixed,
+  parentUrl: string,
+  cancelText: string,
+  continueText: string
+}
 const HEADING = 'Before continuing, remove from deck:'
-const CANCEL_TEXT = 'cancel'
-const CONTINUE_TEXT = 'move pipette to front'
 
-export default function ClearDeckAlertModal (props: ChangePipetteProps) {
-  const {actualPipette, moveToFront, parentUrl} = props
+export default function ClearDeckAlertModal (props: Props) {
+  const {actualPipette, onContinueClick, parentUrl, cancelText, continueText} = props
 
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: CANCEL_TEXT, Component: Link, to: parentUrl},
+        {children: `${cancelText}`, Component: Link, to: parentUrl},
         {
-          children: CONTINUE_TEXT,
+          children: `${continueText}`,
           className: styles.alert_button,
-          onClick: moveToFront
+          onClick: onContinueClick
         }
       ]}
     >
