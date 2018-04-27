@@ -15,7 +15,7 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 
-import {highlightWells, selectWells, deselectWells} from '../labware-ingred/actions'
+import {highlightWells, selectWells, deselectWells} from '../well-selection/actions'
 import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {WellContents} from '../labware-ingred/types'

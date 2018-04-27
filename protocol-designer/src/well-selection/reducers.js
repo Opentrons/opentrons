@@ -1,11 +1,14 @@
 // @flow
 import omit from 'lodash/omit'
 import {combineReducers} from 'redux'
-import {handleActions, type ActionType} from 'redux-actions'
+import {handleActions} from 'redux-actions'
 
 import type {Wells} from '../labware-ingred/types'
-import * as actions from '../labware-ingred/actions'
-import type {OpenWellSelectionModalPayload} from './actions'
+import type {OpenWellSelectionModalPayload, WellSelectionPayload} from './actions'
+
+type WellSelectionAction = {
+  payload: WellSelectionPayload
+}
 
 type SelectedWellsState = {|
   highlighted: Wells,
@@ -19,15 +22,15 @@ function deleteWells (initialWells: Wells, wellsToRemove: Wells): Wells {
 
 const selectedWellsInitialState: SelectedWellsState = {highlighted: {}, selected: {}}
 const selectedWells = handleActions({
-  HIGHLIGHT_WELLS: (state, action: ActionType<typeof actions.highlightWells>) =>
+  HIGHLIGHT_WELLS: (state, action: WellSelectionAction) =>
     ({...state, highlighted: action.payload.wells}),
 
-  SELECT_WELLS: (state, action: ActionType<typeof actions.selectWells>) => ({
+  SELECT_WELLS: (state, action: WellSelectionAction) => ({
     highlighted: {},
     selected: {...state.selected, ...action.payload.wells}
   }),
 
-  DESELECT_WELLS: (state, action: ActionType<typeof actions.deselectWells>) => ({
+  DESELECT_WELLS: (state, action: WellSelectionAction) => ({
     highlighted: {},
     selected: deleteWells(state.selected, action.payload.wells)
   }),
@@ -38,12 +41,6 @@ const selectedWells = handleActions({
   CLOSE_WELL_SELECTION_MODAL: () => selectedWellsInitialState
 }, selectedWellsInitialState)
 
-type HighlightedIngredientsState = {wells: Wells}
-const highlightedIngredients = handleActions({
-  HOVER_WELL_BEGIN: (state, action: ActionType<typeof actions.hoverWellBegin>) => ({ wells: action.payload }),
-  HOVER_WELL_END: (state, action: ActionType<typeof actions.hoverWellBegin>) => ({}) // clear highlighting
-}, {})
-
 type WellSelectionModalState = OpenWellSelectionModalPayload | null
 const wellSelectionModal = handleActions({
   OPEN_WELL_SELECTION_MODAL: (state, action: {payload: OpenWellSelectionModalPayload}) => action.payload,
@@ -52,13 +49,11 @@ const wellSelectionModal = handleActions({
 
 export type RootState = {|
   selectedWells: SelectedWellsState,
-  highlightedIngredients: HighlightedIngredientsState,
   wellSelectionModal: WellSelectionModalState
 |}
 
 const rootReducer = combineReducers({
   selectedWells,
-  highlightedIngredients,
   wellSelectionModal
 })
 

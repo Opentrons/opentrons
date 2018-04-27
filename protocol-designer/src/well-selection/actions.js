@@ -1,11 +1,39 @@
 // @flow
-import type {ThunkDispatch, GetState} from '../types'
+import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 import {selectors as steplistSelectors} from '../steplist/reducers'
+
+import type {Channels} from '@opentrons/components'
+import type {ThunkDispatch, GetState} from '../types'
 import type {Wells} from '../labware-ingred/types'
 
-// TODO Ian 2018-04-19 Move selectWells & highlightWells actions from labware-ingred into this file
+// ===== Preselect / select wells in plate
+
+export type WellSelectionPayload = {|
+  wells: Wells,
+  labwareType: string,
+  pipetteChannels: Channels
+|}
+
+const _wellSelectPayloadMapper = (
+  args: WellSelectionPayload
+): WellSelectionPayload => args
+
+export const highlightWells = createAction(
+  'HIGHLIGHT_WELLS',
+  _wellSelectPayloadMapper
+)
+
+export const selectWells = createAction(
+  'SELECT_WELLS',
+  _wellSelectPayloadMapper
+)
+
+export const deselectWells = createAction(
+  'DESELECT_WELLS',
+  _wellSelectPayloadMapper
+)
 
 // Well selection modal
 export type OpenWellSelectionModalPayload = {
