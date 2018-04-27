@@ -10,10 +10,10 @@ from opentrons.robot import robot_configs
 async def test_init_pipette(dc_session):
     robot.reset()
     model = 'p10_single_v1'
-    data = {
-        'mount': 'left',
-        'model': model}
+
+    data = {}
     await endpoints.init_pipette(data)
+
     actual = dc_session.pipettes.get('left').name
     expected = pipette_config.configs[model].name
     assert actual == expected
@@ -258,13 +258,12 @@ async def test_init_pipette_integration(async_client, monkeypatch):
         data={
             'token': token,
             'command': 'init pipette',
-            'mount': 'left',
-            'model': 'p10_single_v1'
         })
 
     body = await resp.json()
 
-    assert body['pipettes']['left'] == 'p10_single_v1'
+    assert body['pipette']['model'] == 'p10_single_v1'
+    assert body['pipette']['mount'] == 'left'
     assert endpoints.session.pipettes.get('right') is None
 
 
@@ -278,6 +277,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     3. Select the current pipette
     Then jog requests will work as expected.
     """
+    robot.reset()
     dummy_token = 'Test Token'
 
     def uuid_mock():
@@ -293,17 +293,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
         '/calibration/deck',
         data={
             'token': token,
-            'command': 'init pipette',
-            'mount': 'left',
-            'model': 'p10_single_v1'
-        })
-
-    await async_client.post(
-        '/calibration/deck',
-        data={
-            'token': token,
-            'command': 'select pipette',
-            'mount': 'left'
+            'command': 'init pipette'
         })
 
     axis = 'Z'
