@@ -37,6 +37,16 @@
   background-color: white;
 }
 
+.alert_modal_wrapper {
+  border-radius: 0;
+  position: relative;
+  padding-top: 4rem;
+}
+
+.no_alert_header {
+  padding-top: 1.5rem;
+}
+
 .spinner_modal_contents {
   @apply --modal-contents;
   @apply --font-body-2-light;
@@ -63,13 +73,26 @@
 .alert_modal_contents {
   @apply --font-body-2-dark;
 
-  padding: 0.5rem 1rem;
+  padding: 1rem;
 }
 
 .alert_modal_heading {
   @apply --font-header-dark;
 
-  margin-bottom: 0.5rem;
+  font-weight: normal;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #e0e0e0;
+}
+
+.alert_modal_icon {
+  height: 1.125rem;
+  margin-right: 0.75rem;
 }
 
 .alert_modal_buttons {

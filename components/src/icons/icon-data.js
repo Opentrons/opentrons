@@ -5,6 +5,10 @@ const ICON_DATA_BY_NAME = {
     viewBox: '0 0 24 24',
     path: 'M13.2 13.2h-2.4V6h2.4v7.2zm0 4.8h-2.4v-2.4h2.4V18zM12 0C5.373 0 0 5.373 0 12A12 12 0 1 0 12 0z'
   },
+  'warning': {
+    viewBox: '0 0 24 24',
+    path: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'
+  },
   'arrow-left': {
     viewBox: '0 0 24 24',
     path: 'M18 11.242v1.516H8.91l4.166 4.166L12 18l-6-6 6-6 1.076 1.076-4.167 4.166z'
