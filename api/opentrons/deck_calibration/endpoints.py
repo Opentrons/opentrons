@@ -66,45 +66,44 @@ class SessionManager:
 # session protections are applied--should be called through the dispatch
 # endpoint
 # ------------------------------------------------------------------------
-async def init_pipette(data):
+def init_pipette():
     """
-    Finds pipettes attached to the robot currently.
+    Finds pipettes attached to the robot currently and chooses the correct one
+    to add to the session.
 
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
     pipette_info = set_current_mount(robot.get_attached_pipettes())
     pipette = pipette_info['pipette']
-    mount_res = {}
+    res = {}
     if pipette:
         session.pipettes[pipette.mount] = pipette
-        mount_res = {'mount': pipette.mount, 'model': pipette_info['model']}
+        res = {'mount': pipette.mount, 'model': pipette_info['model']}
 
     log.info("Pipette info {}".format(session.pipettes))
 
-    res = {'token': session.id, 'pipette': mount_res}
-    return web.json_response(res, status=pipette_info['status'])
+    return res
 
 
-def set_current_mount(params):
+def set_current_mount(attached_pipettes):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
 
-    :param params: Information obtained from the current pipettes attached
-    to the robot. This looks like the following:
+    :attached_pipettes attached_pipettes: Information obtained from the current
+    pipettes attached to the robot. This looks like the following:
     :dict with keys 'left' and 'right' and a model string for each
     mount, or 'uncommissioned' if no model string available
     :return: The selected pipette
     """
     global session
-    left = params.get('left')
-    right = params.get('right')
+    left = attached_pipettes.get('left')
+    right = attached_pipettes.get('right')
     left_pipette = None
     right_pipette = None
 
     pipette = None
-    status = 200
     model = None
 
     if left['model'] in pipette_config.configs.keys():
@@ -117,8 +116,6 @@ def set_current_mount(params):
         right_pipette = instruments._create_pipette_from_config(
             mount='right', config=pip_config)
 
-    if left_pipette is None and right_pipette is None:
-        status = 403
     if left_pipette and left_pipette.channels == 1:
         session.current_mount = 'Z'
         pipette = left_pipette
@@ -137,7 +134,7 @@ def set_current_mount(params):
             pipette = right_pipette
             model = right['model']
 
-    return {'status': status, 'pipette': pipette, 'model': model}
+    return {'pipette': pipette, 'model': model}
 
 
 async def attach_tip(data):
@@ -335,13 +332,14 @@ async def release(data):
     """
     global session
     session = None
+    robot.remove_instrument('left')
+    robot.remove_instrument('right')
     return web.json_response({"message": "calibration session released"})
 
 # ---------------------- End Route Fns -------------------------
 
 # Router must be defined after all route functions
 router = {'jog': run_jog,
-          'init pipette': init_pipette,
           'save xy': save_xy,
           'attach tip': attach_tip,
           'detach tip': detach_tip,
@@ -370,9 +368,16 @@ async def start(request):
         body = {}
 
     if not session or body.get('force'):
+        if body.get('force'):
+            robot.remove_instrument('left')
+            robot.remove_instrument('right')
         session = SessionManager()
-        data = {'token': session.id}
+        res = init_pipette()
+        data = {'token': session.id, 'pipette': res}
         status = 201
+        if not res:
+            status = 403
+            data = {'message': 'Error, pipette not recognized'}
     else:
         data = {'message': 'Error, session in progress. Use "force" key in'
                            ' request body to override'}
