@@ -189,8 +189,7 @@ async def test_jog(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_update_container_offset(
-        user_definition_dirs, main_router, model):
+async def test_update_container_offset(main_router, model):
     with mock.patch.object(
             model.robot,
             'calibrate_container_with_instrument') as call:
@@ -207,7 +206,6 @@ async def test_update_container_offset(
 
 async def test_jog_calibrate_bottom(
         dummy_db,
-        user_definition_dirs,
         main_router,
         model,
         calibrate_bottom_flag):
@@ -260,7 +258,6 @@ async def test_jog_calibrate_bottom(
 
 async def test_jog_calibrate_top(
         dummy_db,
-        user_definition_dirs,
         main_router,
         model,
         monkeypatch):
@@ -315,7 +312,6 @@ async def test_jog_calibrate_top(
 
 async def test_jog_calibrate_top_new(
         split_labware_def,
-        user_definition_dirs,
         main_router,
         model,
         monkeypatch):

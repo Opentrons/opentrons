@@ -2,17 +2,16 @@ import os
 import json
 import tempfile
 from opentrons.data_storage import labware_definitions as ldef
+from opentrons.config import get_config_index
 
 file_dir = os.path.abspath(os.path.dirname(__file__))
 
-test_defn_root = os.path.abspath(os.path.join(
-    file_dir, '..', '..', '..', '..', 'labware-definitions', 'definitions'))
-test_user_defn_root = os.path.abspath(os.path.join(
-    file_dir, '..', 'data', 'labware-def'))
-test_definition_dir = os.path.join(
-    test_user_defn_root, 'definitions')
-test_offset_dir = os.path.join(
-    test_user_defn_root, 'offsets')
+defn_dir = os.path.abspath(
+    get_config_index().get('labware', {}).get('baseDefinitionDir', ''))
+user_defn_dir = os.path.abspath(
+    get_config_index().get('labware', {}).get('userDefinitionDir', ''))
+offset_dir = os.path.abspath(
+    get_config_index().get('labware', {}).get('offsetDir', ''))
 
 test_lw_name = '4-well-plate'
 expected_x = 40
@@ -28,7 +27,7 @@ expected_final_z = expected_z + expected_z_offset
 
 
 def test_load_definition():
-    container_json = ldef._load_definition(test_definition_dir, test_lw_name)
+    container_json = ldef._load_definition(user_defn_dir, test_lw_name)
     print(type(container_json))
     wells = container_json['wells']
     assert len(wells) == 4
@@ -40,7 +39,7 @@ def test_load_definition():
 
 
 def test_load_offset():
-    offset_json = ldef._load_offset(test_offset_dir, test_lw_name)
+    offset_json = ldef._load_offset(offset_dir, test_lw_name)
     assert offset_json['x'] == expected_x_offset
     assert offset_json['y'] == expected_y_offset
     assert offset_json['z'] == expected_z_offset
@@ -49,7 +48,7 @@ def test_load_offset():
 def test_load_labware():
     # Tests for finding definition and offset file in user definition dir
     lw = ldef._load(
-        test_defn_root, test_user_defn_root, test_lw_name, with_offset=True)
+        defn_dir, user_defn_dir, test_lw_name, offset_dir, with_offset=True)
     assert lw['wells']['A1']['x'] == expected_final_x
     assert lw['wells']['A1']['y'] == expected_final_y
     assert lw['wells']['A1']['z'] == expected_final_z
@@ -57,14 +56,14 @@ def test_load_labware():
     # Tests for finding definition in default dir and no offset file
     real_lw_name = '6-well-plate'
     real_lw = ldef._load(
-        test_defn_root, test_user_defn_root, real_lw_name, with_offset=True)
+        defn_dir, user_defn_dir, real_lw_name, offset_dir, with_offset=True)
     assert real_lw['metadata']['name'] == real_lw_name
 
 
 def test_load_without_offset():
     # Tests for loading definition without offset, even if offset file exists
     lw = ldef._load(
-        test_defn_root, test_user_defn_root, test_lw_name, with_offset=False)
+        defn_dir, user_defn_dir, test_lw_name, offset_dir, with_offset=False)
     assert lw['wells']['A1']['x'] == expected_x
     assert lw['wells']['A1']['y'] == expected_y
     assert lw['wells']['A1']['z'] == expected_z
@@ -74,7 +73,7 @@ def test_list_labware():
     # Minor spot-checks, function is simple. Values will need to be updated if
     # labware is added to library
     lw = ldef.list_all_labware()
-    assert len(lw) == 43
+    assert len(lw) == 44
     assert lw[0] == '12-well-plate'
     assert lw[-1] == 'wheaton_vial_rack'
 
@@ -96,7 +95,7 @@ def test_save_offset():
 def test_save_user_definition():
     test_file_name = '4-well-plate.json'
     with open(os.path.join(
-            test_user_defn_root, 'definitions', test_file_name)) as test_def:
+            user_defn_dir, test_file_name)) as test_def:
         test_data = json.load(test_def)
     test_dir = tempfile.mkdtemp()
 

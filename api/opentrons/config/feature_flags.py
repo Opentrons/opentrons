@@ -1,20 +1,6 @@
 import os
 import json
-
-
-# In order to specify a location for the settings.json file, export the
-# OT_FLAG_DIR environment variable. For example,
-# `export OT_FLAG_DIR=$HOME` would cause the server to look in the user's
-# home directory for a file named 'settings.json'. Primarily used to override
-# feature flags during development.
-OVERRIDE_SETTINGS_DIR = os.environ.get('OT_FLAG_DIR')
-DEFAULT_SETTINGS_DIR = '/data'
-SETTINGS_FILE = 'settings.json'
-
-if OVERRIDE_SETTINGS_DIR:
-    SETTINGS_PATH = os.path.join(OVERRIDE_SETTINGS_DIR, SETTINGS_FILE)
-else:
-    SETTINGS_PATH = os.path.join(DEFAULT_SETTINGS_DIR, SETTINGS_FILE)
+from opentrons.config import get_config_index
 
 
 def get_feature_flag(name: str) -> bool:
@@ -23,26 +9,24 @@ def get_feature_flag(name: str) -> bool:
 
 
 def get_all_feature_flags() -> dict:
-    try:
-        if os.path.exists(SETTINGS_PATH):
-            with open(SETTINGS_PATH, 'r') as fd:
-                settings = json.load(fd)
-        else:
-            settings = {}
-    except Exception as e:
-        print("Error: {}".format(e))
+    settings_file = get_config_index().get('featureFlagFile')
+    if settings_file and os.path.exists(settings_file):
+        with open(settings_file, 'r') as fd:
+            settings = json.load(fd)
+    else:
         settings = {}
     return settings
 
 
 def set_feature_flag(name: str, value):
-    if os.path.exists(SETTINGS_PATH):
-        with open(SETTINGS_PATH, 'r') as fd:
+    settings_file = get_config_index().get('featureFlagFile')
+    if os.path.exists(settings_file):
+        with open(settings_file, 'r') as fd:
             settings = json.load(fd)
         settings[name] = value
     else:
         settings = {name: value}
-    with open(SETTINGS_PATH, 'w') as fd:
+    with open(settings_file, 'w') as fd:
         json.dump(settings, fd)
 
 

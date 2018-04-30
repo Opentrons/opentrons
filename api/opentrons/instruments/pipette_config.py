@@ -1,16 +1,14 @@
 import os
 import json
 from collections import namedtuple
-
+from opentrons.config import get_config_index
 
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-def config_dir():
-    return os.environ.get(
-        'OT_SETTINGS_DIR',
-        os.path.abspath(os.path.join(
-            FILE_DIR, '..', '..', '..', 'labware-definitions', 'robot-data')))
+def pipette_config_path():
+    index = get_config_index()
+    return index.get('pipetteConfigFile', './settings.json')
 
 
 pipette_config = namedtuple(
@@ -30,7 +28,7 @@ pipette_config = namedtuple(
 
 
 def _load_config_from_file(pipette_model: str) -> pipette_config:
-    config_file = os.path.join(config_dir(), 'pipette-config.json')
+    config_file = pipette_config_path()
     if os.path.exists(config_file):
         with open(config_file) as conf:
             all_configs = json.load(conf)

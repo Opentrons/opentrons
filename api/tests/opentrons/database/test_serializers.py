@@ -1,11 +1,9 @@
-import os
+from opentrons.config import get_config_index
 from opentrons.data_storage import serializers as ser
 from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import database as sqldb
 
-file_dir = os.path.abspath(os.path.dirname(__file__))
-test_defn_root = os.path.abspath(os.path.join(
-    file_dir, '..', '..', '..', '..', 'labware-definitions', 'definitions'))
+test_defn_root = get_config_index().get('labware').get('baseDefinitionDir')
 
 
 # ===================
@@ -28,13 +26,6 @@ def test_one_deserializer():
         wellname: [well._coordinates[i] for i in [0, 1, 2]]
         for wellname, well in new_container.children_by_name.items()}
 
-    # from pprint import pprint
-    # print("Old:")
-    # pprint(old_wells)
-    # print()
-    # print("New:")
-    # pprint(new_wells)
-
     assert old_wells == new_wells
 
 
@@ -55,7 +46,7 @@ def test_one_serializer():
 
 
 def test_seralizer_all_containers():
-    new_defs = ['GEB-tiprack-300ul', 'tube-rack-5ml-96']
+    new_defs = ['GEB-tiprack-300ul', 'tube-rack-5ml-96', '4-well-plate']
     plates = [item for item in ldef.list_all_labware() if item not in new_defs]
     for plate in plates:
         old_container = sqldb.load_container(plate)

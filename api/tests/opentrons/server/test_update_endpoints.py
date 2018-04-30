@@ -4,7 +4,6 @@ import tempfile
 from aiohttp import web
 from opentrons.server.main import init, log_init
 from opentrons.server.endpoints import (control, update)
-from opentrons.config import feature_flags as ff
 
 
 async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
@@ -56,11 +55,7 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 
 async def test_feature_flags(
-        virtual_smoothie_env, monkeypatch, loop, test_client):
-    tmpd = tempfile.TemporaryDirectory()
-    monkeypatch.setattr(
-        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
-
+        virtual_smoothie_env, loop, test_client):
     log_init()
 
     app = init(loop)

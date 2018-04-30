@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+python /usr/local/bin/mount_usb.py
 python /usr/local/bin/setup_gpio.py
 
 # Keep all IPv6 addresses on an interface down event. If set static
