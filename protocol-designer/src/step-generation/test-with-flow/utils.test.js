@@ -34,19 +34,18 @@ describe('reduceCommandCreators', () => {
   })
 
   const divideCreator: any = (num: number) => (prevState: CountState) => {
-    let errors = []
-
     if (num === 0) {
-      errors.push({
-        message: 'Cannot divide by zero',
-        type: 'DIVIDE_BY_ZERO'
-      })
+      return {
+        errors: [{
+          message: 'Cannot divide by zero',
+          type: 'DIVIDE_BY_ZERO'
+        }]
+      }
     }
 
     return {
       commands: [`command: divide by ${num}`],
-      robotState: {count: prevState.count / num},
-      errors
+      robotState: {count: prevState.count / num}
     }
   }
 
