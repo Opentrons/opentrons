@@ -69,7 +69,8 @@ GCODES = {'HOME': 'G28.2',
           'WRITE_INSTRUMENT_MODEL': 'M372',
           'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907',
-          'DISENGAGE_MOTOR': 'M18'}
+          'DISENGAGE_MOTOR': 'M18',
+          'HOMING_STATUS': 'G28.6'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -149,6 +150,29 @@ def _parse_switch_values(raw_switch_values):
             s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
             for s in parsed_values
             if any([n in s for n in ['max', 'Probe']])
+        }
+    except Exception as e:
+        log.error("Thoroughly unexpected! {}".format(e))
+        raise e
+    return res
+
+
+def _parse_homing_status_values(raw_homing_status_values):
+    '''
+        Parse the Smoothieware response to a G28.6 command (homing-status)
+        A "1" means it has been homed, and "0" means it has not been homed
+
+        Example response after homing just X axis:
+        "X:1 Y:0 Z:0 A:0 B:0 C:0"
+
+        returns: dict
+            Key is axis, value is True if the axis needs to be homed
+    '''
+    try:
+        parsed_values = raw_homing_status_values.strip().split(' ')
+        res = {
+            s.split(':')[0]: bool(1 - int(s.split(':')[1]))
+            for s in parsed_values
         }
     except Exception as e:
         log.error("Thoroughly unexpected! {}".format(e))
@@ -361,6 +385,11 @@ class SmoothieDriver_3_0_0:
         '''Returns the state of all SmoothieBoard limit switches'''
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
+
+    @property
+    def homing_status(self):
+        res = self._send_command(GCODES['HOMING_STATUS'])
+        return _parse_homing_status_values(res)
 
     @property
     def current(self):
@@ -733,6 +762,7 @@ class SmoothieDriver_3_0_0:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
+                self._home_if_needed(''.join(list(target.keys())))
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
@@ -910,6 +940,20 @@ class SmoothieDriver_3_0_0:
         self._smoothie_hard_halt()
         self._reset_from_error()
         self._setup()
+
+    def _home_if_needed(self, axes_string):
+        current_status = [
+            axis
+            for axis, needs_homing in self.homing_status.items()
+            if needs_homing
+        ]
+        axes_to_home = [
+            ax
+            for ax in axes_string
+            if ax in current_status
+        ]
+        self.home(''.join(axes_to_home))
+
 
     def _smoothie_reset(self):
         log.debug('Resetting Smoothie (simulating: {})'.format(
