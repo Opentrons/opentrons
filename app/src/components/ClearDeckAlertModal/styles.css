@@ -1,9 +1,17 @@
+@import '@opentrons/components';
+
 .alert_list {
   list-style-type: none;
   padding-left: 3rem;
 
   & > li {
     line-height: 2;
+  }
+
+  & > p {
+    @apply --font-body-2-dark;
+
+    margin: 0;
   }
 }
 
@@ -14,12 +22,6 @@
   margin-bottom: 0.25rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
-}
-
-.alert_note {
-  @apply --font-body-2-dark;
-
-  margin: 0;
 }
 
 .alert_button {
