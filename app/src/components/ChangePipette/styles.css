@@ -9,36 +9,6 @@
   };
 }
 
-.alert_list {
-  list-style-type: none;
-  padding-left: 3rem;
-
-  & > li {
-    line-height: 2;
-  }
-}
-
-.alert_note_heading {
-  @apply --font-body-2-dark;
-
-  margin-top: 1.5rem;
-  margin-bottom: 0.25rem;
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-}
-
-.alert_note {
-  @apply --font-body-2-dark;
-
-  margin: 0;
-}
-
-.alert_button {
-  width: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
 .modal {
   @apply --modal;
 

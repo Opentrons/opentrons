@@ -33,7 +33,7 @@ export default function AlertModal (props: Props) {
     <Modal className={className} contentsClassName={wrapperStyle} onCloseClick={onCloseClick}>
       {heading && (
         <div className={styles.alert_modal_heading}>
-          <Icon name='warning' className={styles.alert_modal_icon} />
+          <Icon name='alert' className={styles.alert_modal_icon} />
           {heading}
         </div>
       )}

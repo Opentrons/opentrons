@@ -2,26 +2,30 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 
-import type {ChangePipetteProps} from './types'
 import {AlertModal} from '@opentrons/components'
 import styles from './styles.css'
 
+type Props = {
+  onContinueClick?: () => mixed,
+  parentUrl: string,
+  cancelText: string,
+  continueText: string,
+  children?: React.Node
+}
 const HEADING = 'Before continuing, remove from deck:'
-const CANCEL_TEXT = 'cancel'
-const CONTINUE_TEXT = 'move pipette to front'
 
-export default function ClearDeckAlertModal (props: ChangePipetteProps) {
-  const {actualPipette, moveToFront, parentUrl} = props
+export default function ClearDeckAlertModal (props: Props) {
+  const {onContinueClick, parentUrl, cancelText, continueText} = props
 
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: CANCEL_TEXT, Component: Link, to: parentUrl},
+        {children: `${cancelText}`, Component: Link, to: parentUrl},
         {
-          children: CONTINUE_TEXT,
+          children: `${continueText}`,
           className: styles.alert_button,
-          onClick: moveToFront
+          onClick: onContinueClick
         }
       ]}
     >
@@ -29,16 +33,15 @@ export default function ClearDeckAlertModal (props: ChangePipetteProps) {
         <li>All tipracks</li>
         <li>All labware</li>
       </ul>
-      {actualPipette && (
+      {props.children && (
         <div>
           <p className={styles.alert_note_heading}>
             Note:
           </p>
-          <p className={styles.alert_note}>
-            Detaching a pipette will also clear its related calibration data
-          </p>
+          {props.children}
         </div>
-      )}
+        )
+      }
     </AlertModal>
   )
 }

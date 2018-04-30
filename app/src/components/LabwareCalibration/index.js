@@ -10,7 +10,7 @@ import {
   type Labware
 } from '../../robot'
 
-import CalibrateDeck from '../CalibrateDeck'
+import DeckMap from '../DeckMap'
 import InfoBox from './InfoBox'
 import ConfirmModal from './ConfirmModal'
 
@@ -29,7 +29,7 @@ function LabwareCalibration (props: Props) {
   return (
     <div>
       <InfoBox {...props} />
-      <CalibrateDeck />
+      <DeckMap />
       <Route path={`${url}/confirm`} render={() => {
         if (!labware || labware.calibration === 'confirmed') {
           return (

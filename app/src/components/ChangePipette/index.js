@@ -22,7 +22,7 @@ import {
   makeGetRobotPipettes
 } from '../../http-api-client'
 
-import ClearDeckAlertModal from './ClearDeckAlertModal'
+import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
 import type {PipetteSelectionProps} from './PipetteSelection'
 import Instructions from './Instructions'
@@ -107,9 +107,22 @@ type DP = {
 
 function ChangePipetteRouter (props: ChangePipetteProps) {
   const {baseUrl, confirmUrl, exitUrl, moveRequest, homeRequest} = props
-
+  const clearDeckProps = {
+    cancelText: 'cancel',
+    continueText: 'move pipette to front',
+    parentUrl: props.parentUrl,
+    onContinueClick: props.moveToFront
+  }
   if (!moveRequest.inProgress && !moveRequest.response) {
-    return (<ClearDeckAlertModal {...props} />)
+    return (
+      <ClearDeckAlertModal {...clearDeckProps} >
+      {props.actualPipette && (
+        <p>
+          Detaching a pipette will also clear its related calibration data
+        </p>
+      )}
+      </ClearDeckAlertModal>
+    )
   }
 
   if (moveRequest.inProgress || homeRequest.inProgress) {
