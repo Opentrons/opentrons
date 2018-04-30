@@ -551,9 +551,15 @@ class Robot(object):
         for a in self._actuators.values():
             self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
-        # Then plungers
-        self.poses = self._actuators['left']['plunger'].home(self.poses)
-        self.poses = self._actuators['right']['plunger'].home(self.poses)
+        # Then plungers, only if there is a pipette currently attached
+        current_pipettes = {
+            mount: data['plunger_axis']
+            for mount, data in self.get_attached_pipettes().items()
+            if data['model']
+        }
+        for mount, plunger_axis in current_pipettes.items():
+            self._driver.unstick_axes(plunger_axis)
+            self.poses = self._actuators[mount]['plunger'].home(self.poses)
 
         # next move should not use any previously used instrument or labware
         # to prevent robot.move_to() from using risky path optimization

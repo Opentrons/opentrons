@@ -270,6 +270,7 @@ def test_set_current(model):
 def test_unstick_axes(model):
     import types
     driver = model.robot._driver
+    driver.simulating = True
 
     old_send_command = driver._send_command
 
