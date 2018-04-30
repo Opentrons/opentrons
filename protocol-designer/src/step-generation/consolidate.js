@@ -24,7 +24,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     // bail out before doing anything else
     return {
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
-    } // TODO test
+    }
   }
 
   // TODO error on negative data.disposalVolume?

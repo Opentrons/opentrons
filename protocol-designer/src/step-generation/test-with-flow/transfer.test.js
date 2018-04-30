@@ -178,6 +178,20 @@ test('transfer with multiple sets of wells', () => {
   // TODO Ian 2018-04-02 robotState, liquidState checks
 })
 
+test('invalid pipette ID should throw error', () => {
+  transferArgs = {
+    ...transferArgs,
+    pipette: 'no-such-pipette-id-here'
+  }
+
+  const result = transferWithErrors(transferArgs)(robotInitialState)
+
+  expect(result.errors).toHaveLength(1)
+  expect(result.errors[0]).toMatchObject({
+    type: 'PIPETTE_DOES_NOT_EXIST'
+  })
+})
+
 describe('single transfer exceeding pipette max', () => {
   beforeEach(() => {
     transferArgs = {

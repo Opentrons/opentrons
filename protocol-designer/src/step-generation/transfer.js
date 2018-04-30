@@ -31,7 +31,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     // bail out before doing anything else
     return {
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
-    } // TODO test
+    }
   }
 
   // TODO error on negative data.disposalVolume?
