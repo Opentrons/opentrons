@@ -1,6 +1,7 @@
 // @flow
 // robot HTTP API client module
 import {combineReducers} from 'redux'
+import {calibrationReducer, type CalibrationAction} from './calibration'
 import {healthReducer, type HealthAction} from './health'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
 import {motorsReducer, type MotorsAction} from './motors'
@@ -10,6 +11,7 @@ import {serverReducer, type ServerAction} from './server'
 import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
+  calibration: calibrationReducer,
   health: healthReducer,
   healthCheck: healthCheckReducer,
   motors: motorsReducer,
@@ -19,9 +21,7 @@ export const reducer = combineReducers({
   wifi: wifiReducer
 })
 
-export type {
-  ApiRequestError
-} from './client'
+export * from './types'
 
 export type {
   RobotHealth,
@@ -57,6 +57,7 @@ export type {
 export type State = $Call<typeof reducer>
 
 export type Action =
+  | CalibrationAction
   | HealthAction
   | HealthCheckAction
   | MotorsAction
@@ -64,6 +65,10 @@ export type Action =
   | RobotAction
   | ServerAction
   | WifiAction
+
+export {
+  startDeckCalibration
+} from './calibration'
 
 export {
   fetchHealth,

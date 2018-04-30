@@ -1,7 +1,13 @@
 // @flow
 // http api client types
 
-import type {ApiRequestError} from './client'
+import type {Error} from '../types'
+
+export type ApiRequestError = Error & {
+  url?: string,
+  status?: number,
+  statusText?: string,
+}
 
 export type ApiCall<T, U> = {
   /** request in progress flag */
