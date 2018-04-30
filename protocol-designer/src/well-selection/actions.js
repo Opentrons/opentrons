@@ -2,23 +2,19 @@
 import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
-import {selectors as steplistSelectors} from '../steplist/reducers'
 
-import type {Channels} from '@opentrons/components'
+import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+
 import type {ThunkDispatch, GetState} from '../types'
 import type {Wells} from '../labware-ingred/types'
+import type {Channels} from '@opentrons/components'
 
 // ===== Preselect / select wells in plate
 
-export type WellSelectionPayload = {|
-  wells: Wells,
-  labwareType: string,
-  pipetteChannels: Channels
-|}
-
-const _wellSelectPayloadMapper = (
-  args: WellSelectionPayload
-): WellSelectionPayload => args
+// these actions all use PRIMARY WELLS (see reducers for definition)
+const _wellSelectPayloadMapper = (args: Wells): Wells => args
 
 export const highlightWells = createAction(
   'HIGHLIGHT_WELLS',
@@ -27,7 +23,7 @@ export const highlightWells = createAction(
 
 export const selectWells = createAction(
   'SELECT_WELLS',
-  _wellSelectPayloadMapper
+  (wells: Wells) => wells
 )
 
 export const deselectWells = createAction(
@@ -39,7 +35,9 @@ export const deselectWells = createAction(
 export type OpenWellSelectionModalPayload = {
   labwareId: string,
   pipetteId: string,
-  formFieldAccessor: string // eg 'aspirate--wells' or 'dispense--wells'
+  formFieldAccessor: string, // eg 'aspirate--wells' or 'dispense--wells'
+  pipetteChannels?: ?Channels,
+  labwareName?: string
 }
 
 function _wellArrayToObj (wells: ?Array<string>): Wells {
@@ -62,17 +60,19 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       _wellArrayToObj(formData[accessor])) || {}
 
     // initially selected wells in form get selected in state before modal opens
-    dispatch({
-      type: 'SELECT_WELLS',
-      payload: {
-        wells,
-        append: false
-      }
-    })
+    dispatch(selectWells(wells))
+
+    const pipettes = fileDataSelectors.equippedPipettes(state)
+    const labware = labwareIngredSelectors.getLabware(state)
+    // TODO type this action, make an underline fn action creator
 
     dispatch({
       type: 'OPEN_WELL_SELECTION_MODAL',
-      payload
+      payload: {
+        ...payload,
+        pipetteChannels: pipettes && pipettes[payload.pipetteId] && pipettes[payload.pipetteId].channels,
+        labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type
+      }
     })
   }
 

@@ -40,6 +40,7 @@ export default function WellSelectionModal (props: Props) {
       <SingleLabwareWrapper>
         <SelectablePlate
           selectable
+          pipetteChannels={props.pipette && props.pipette.channels}
         />
       </SingleLabwareWrapper>
 

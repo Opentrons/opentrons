@@ -4,35 +4,38 @@ import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 
 import type {Wells} from '../labware-ingred/types'
-import type {OpenWellSelectionModalPayload, WellSelectionPayload} from './actions'
+import type {OpenWellSelectionModalPayload} from './actions'
 
 type WellSelectionAction = {
-  payload: WellSelectionPayload
+  payload: Wells // NOTE: primary wells.
 }
 
-type SelectedWellsState = {|
+type SelectedWellsState = {
   highlighted: Wells,
   selected: Wells
-|}
+}
 
 function deleteWells (initialWells: Wells, wellsToRemove: Wells): Wells {
   // remove given wells from a set of wells
   return omit(initialWells, Object.keys(wellsToRemove))
 }
 
+// NOTE: selected wells state holds PRIMARY WELLS.
+// The "primary well" is the well that the back-most tip of a multi-channel pipette goes into.
+// For example, in the column A1, B1, C1, ... H1 in a 96 plate, A1 is the primary well.
 const selectedWellsInitialState: SelectedWellsState = {highlighted: {}, selected: {}}
 const selectedWells = handleActions({
-  HIGHLIGHT_WELLS: (state, action: WellSelectionAction) =>
-    ({...state, highlighted: action.payload.wells}),
+  HIGHLIGHT_WELLS: (state, action: WellSelectionAction): SelectedWellsState =>
+    ({...state, highlighted: action.payload}),
 
-  SELECT_WELLS: (state, action: WellSelectionAction) => ({
+  SELECT_WELLS: (state, action: WellSelectionAction): SelectedWellsState => ({
     highlighted: {},
-    selected: {...state.selected, ...action.payload.wells}
+    selected: {...state.selected, ...action.payload}
   }),
 
-  DESELECT_WELLS: (state, action: WellSelectionAction) => ({
+  DESELECT_WELLS: (state, action: WellSelectionAction): SelectedWellsState => ({
     highlighted: {},
-    selected: deleteWells(state.selected, action.payload.wells)
+    selected: deleteWells(state.selected, action.payload)
   }),
   // Actions that cause "deselect everything" behavior:
   EDIT_MODE_INGREDIENT_GROUP: () => selectedWellsInitialState,

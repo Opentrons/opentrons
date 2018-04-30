@@ -2,6 +2,7 @@
 import flatten from 'lodash/flatten'
 import memoize from 'lodash/memoize'
 import {computeWellAccess, getLabware} from '@opentrons/labware-definitions'
+import type {Wells} from '../labware-ingred/types'
 
 type WellSetByWell = Array<Array<string>>
 
@@ -53,3 +54,9 @@ export const getWellSetForMultichannel = memoize(
   _getWellSetForMultichannel,
   (labwareName: string, well: string) => `$LABWARE:${labwareName}--WELL:${well}`
 )
+
+export function wellSetToWellObj (wellSet: ?Array<string>): Wells {
+  return wellSet
+    ? wellSet.reduce((acc: Wells, well: string) => ({...acc, [well]: well}), {})
+    : {}
+}
