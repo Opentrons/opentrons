@@ -267,6 +267,11 @@ class SmoothieDriver_3_0_0:
         else:
             res = self._read_from_pipette(
                 GCODES['READ_INSTRUMENT_MODEL'], mount)
+            if res and not res.endswith('_v1'):
+                # Backward compatibility for pipettes programmed with model
+                # strings that did not include the _v# designation
+                res = res + '_v1'
+
         return {'model': res}
 
     def write_pipette_id(self, mount, data_string):
@@ -684,8 +689,12 @@ class SmoothieDriver_3_0_0:
         if not mount:
             raise ValueError('Unexpected mount: {}'.format(mount))
         try:
-            self.disengage_axis('XYZABC')
+            # EMI interference from both plunger motors has been found to
+            # prevent the I2C lines from communicating between Smoothieware and
+            # pipette's onboard EEPROM. To avoid, turn off both plunger motors
+            self.disengage_axis('BC')
             self.delay(CURRENT_CHANGE_DELAY)
+            # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
             res = _parse_instrument_data(res)
             assert mount in res
@@ -717,6 +726,11 @@ class SmoothieDriver_3_0_0:
         if not isinstance(data_string, str):
             raise ValueError(
                 'Expected {0}, not {1}'.format(str, type(data_string)))
+        # EMI interference from both plunger motors has been found to
+        # prevent the I2C lines from communicating between Smoothieware and
+        # pipette's onboard EEPROM. To avoid, turn off both plunger motors
+        self.disengage_axis('BC')
+        self.delay(CURRENT_CHANGE_DELAY)
         # data is read/written as strings of HEX characters
         # to avoid firmware weirdness in how it parses GCode arguments
         byte_string = _byte_array_to_hex_string(

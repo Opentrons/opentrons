@@ -1,3 +1,4 @@
+# TODO (ben 20180426): unify this with the config in `opentrons.server.main`
 import logging
 from logging.config import dictConfig
 

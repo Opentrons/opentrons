@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {selectors as robotSelectors} from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
-import LabwareItem, {type LabwareItemProps} from '../CalibrateDeck/LabwareItem'
+import LabwareItem, {type LabwareItemProps} from '../DeckMap/LabwareItem'
 
 type OwnProps = LabwareComponentProps
 

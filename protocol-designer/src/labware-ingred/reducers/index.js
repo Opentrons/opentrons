@@ -3,13 +3,12 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
-import min from 'lodash/min'
 import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
-import {getMaxVolumes, defaultContainers, sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
+import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
@@ -24,14 +23,16 @@ import type {
   AllIngredGroupFields,
   Labware,
   Wells,
-  AllWellContents,
   IngredsForLabware,
   IngredsForAllLabware,
   IngredInstance
 } from '../types'
-import type {BaseState, Selector, JsonWellData, VolumeJson} from '../../types'
 import * as actions from '../actions'
+import type {BaseState, Selector} from '../../types'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
+
+// external actions (for types)
+import typeof {openWellSelectionModal} from '../../well-selection/actions'
 
 // UTILS
 const nextEmptySlot = loadedContainersSubstate => {
@@ -61,7 +62,10 @@ const copyLabwareMode = handleActions({
 
 const selectedContainer = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>) => action.payload,
-  CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>) => null
+  CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>) => null,
+
+  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>) => action.payload.labwareId,
+  CLOSE_WELL_SELECTION_MODAL: () => null
 }, null)
 
 type SelectedIngredientGroupState = {|
@@ -116,36 +120,6 @@ export const containers = handleActions({
   }
 },
 initialLabwareState)
-
-type SelectedWellsState = {|
-  preselected: Wells,
-  selected: Wells
-|}
-const selectedWellsInitialState: SelectedWellsState = {preselected: {}, selected: {}}
-const selectedWells = handleActions({
-  PRESELECT_WELLS: (state, action: ActionType<typeof actions.preselectWells>) => action.payload.append
-    ? {...state, preselected: action.payload.wells}
-    : {selected: {}, preselected: action.payload.wells},
-
-  SELECT_WELLS: (state, action: ActionType<typeof actions.selectWells>) => ({
-    preselected: {},
-    selected: {
-      ...(action.payload.append ? state.selected : {}),
-      ...action.payload.wells
-    }
-  }),
-  // Actions that cause "deselect everything" behavior:
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
-    selectedWellsInitialState,
-  CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
-  EDIT_INGREDIENT: () => selectedWellsInitialState
-}, selectedWellsInitialState)
-
-type HighlightedIngredientsState = {wells: Wells}
-const highlightedIngredients = handleActions({
-  HOVER_WELL_BEGIN: (state, action: ActionType<typeof actions.hoverWellBegin>) => ({ wells: action.payload }),
-  HOVER_WELL_END: (state, action: ActionType<typeof actions.hoverWellBegin>) => ({}) // clear highlighting
-}, {})
 
 type IngredientsState = {
   [ingredGroupId: string]: IngredInputFields
@@ -263,10 +237,8 @@ export type RootState = {|
   selectedContainer: string | null,
   selectedIngredientGroup: SelectedIngredientGroupState,
   containers: ContainersState,
-  selectedWells: SelectedWellsState,
   ingredients: IngredientsState,
-  ingredLocations: LocationsState,
-  highlightedIngredients: HighlightedIngredientsState
+  ingredLocations: LocationsState
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
@@ -276,17 +248,18 @@ const rootReducer = combineReducers({
   selectedContainer,
   selectedIngredientGroup,
   containers,
-  selectedWells,
   ingredients,
-  ingredLocations,
-  highlightedIngredients
+  ingredLocations
 })
 
 // SELECTORS
 const rootSelector = (state: BaseState): RootState => state.labwareIngred
 
 // TODO Ian 2018-03-02 when you do selector cleanup, use this one more widely instead of .containers
-const getLabware = (state: BaseState) => rootSelector(state).containers
+const getLabware: Selector<ContainersState> = createSelector(
+  rootSelector,
+  rootState => rootState.containers
+)
 
 // TODO Ian 2018-03-08 use these instead of direct access in other selectors
 const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
@@ -384,35 +357,6 @@ const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelect
     }), {})
 )
 
-const selectedWellNames: Selector<Array<string>> = createSelector(
-  (state: BaseState) => rootSelector(state).selectedWells.selected,
-  selectedWells => Object.keys(selectedWells)
-)
-
-const numWellsSelected = createSelector(
-  (state: BaseState) => rootSelector(state).selectedWells,
-  selectedWells => Object.keys(selectedWells.selected).length)
-
-const selectedWellsMaxVolume: Selector<number> = createSelector(
-  (state: BaseState) => rootSelector(state).selectedWells,
-  selectedContainerType,
-  (selectedWells, selectedContainerType) => {
-    const selectedWellNames = Object.keys(selectedWells.selected)
-    if (!selectedContainerType) {
-      console.warn('No container type selected, cannot get max volume')
-      return Infinity
-    }
-    const maxVolumesByWell = getMaxVolumes(selectedContainerType)
-    const maxVolumesList = (selectedWellNames.length > 0)
-      // when wells are selected, only look at vols of selected wells
-      ? Object.values(pick(maxVolumesByWell, selectedWellNames))
-      // when no wells selected (eg editing ingred group), look at all volumes.
-      // TODO LATER: look at filled wells, not all wells.
-      : Object.values(maxVolumesByWell)
-    return min(maxVolumesList.map(n => parseInt(n)))
-  }
-)
-
 const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
   getLabware,
   getIngredientGroups,
@@ -451,91 +395,6 @@ const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?st
       ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
 
-const _getWellContents = (
-  containerType: ?string,
-  __ingredientsForContainer: IngredsForLabware,
-  selectedWells: {
-    preselected: Wells,
-    selected: Wells
-  } | null,
-  highlightedWells: Wells | null
-): AllWellContents | null => {
-  // selectedWells and highlightedWells args may both be null,
-  // they're only relevant to the selected container.
-  if (!containerType) {
-    console.warn('_getWellContents called with no containerType, skipping')
-    return null
-  }
-
-  const containerData: VolumeJson = defaultContainers.containers[containerType]
-  if (!containerData) {
-    console.warn('No data for container type ' + containerType)
-    return null
-  }
-  const allLocations = containerData.locations
-
-  const allIngredGroupIds = Object.keys(__ingredientsForContainer)
-
-  function groupIdsForWell (wellName: string): Array<string> {
-    return allIngredGroupIds.filter((groupId: string) =>
-      __ingredientsForContainer[groupId] &&
-      __ingredientsForContainer[groupId].wells &&
-      __ingredientsForContainer[groupId].wells[wellName]
-    )
-  }
-
-  return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
-    const groupIds = groupIdsForWell(wellName)
-
-    const isHighlighted = highlightedWells ? (wellName in highlightedWells) : false
-
-    return {
-      ...acc,
-      [wellName]: {
-        preselected: selectedWells ? wellName in selectedWells.preselected : false,
-        selected: selectedWells ? wellName in selectedWells.selected : false,
-        highlighted: isHighlighted, // TODO remove 'highlighted' state?
-        hovered: !!(highlightedWells && isHighlighted && Object.keys(highlightedWells).length === 1),
-
-        maxVolume: location['total-liquid-volume'] || Infinity,
-        groupIds
-      }
-    }
-  }, {})
-}
-
-const getSelectedWells = (state: BaseState) => rootSelector(state).selectedWells // wells are selected only for the selected container.
-const getHighlightedWells = (state: BaseState) => rootSelector(state).highlightedIngredients.wells
-
-const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
-  getLabware,
-  ingredientsByLabware,
-  getSelectedContainer,
-  getSelectedWells,
-  getHighlightedWells, // TODO Ian 2018-03-08: is 'highlighted' used?
-  (_labware: ContainersState, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
-    const allLabwareIds = Object.keys(_labware)
-
-    return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
-      const ingredsForLabware = _ingredsByLabware[labwareId]
-      const isSelectedLabware = _selectedLabware && (_selectedLabware.containerId === labwareId)
-      // Skip labware ids with no ingreds
-      return {
-        ...acc,
-        [labwareId]: (ingredsForLabware)
-          ? _getWellContents(
-          _labware[labwareId].type,
-          ingredsForLabware,
-          // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? _selectedWells : null,
-          isSelectedLabware ? _highlightedWells : null
-        )
-        : null
-      }
-    }, {})
-  }
-)
-
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
 // -- so you'd have to refactor the props of the containers that use this selector too
 const activeModals = createSelector(
@@ -564,6 +423,7 @@ export const selectors = {
   getIngredientGroups,
   getIngredientLocations,
   getLabware,
+  getSelectedContainer,
 
   activeModals,
   allIngredientGroupFields,
@@ -572,15 +432,12 @@ export const selectors = {
   containersBySlot,
   labwareToCopy,
   canAdd,
-  numWellsSelected,
-  selectedWellsMaxVolume,
-  selectedWellNames,
+  selectedContainerType,
   selectedIngredientGroup: getSelectedIngredientGroup,
   selectedContainerSlot,
   selectedContainer: getSelectedContainer,
   ingredientsByLabware,
-  labwareOptions,
-  wellContentsAllLabware
+  labwareOptions
 }
 
 export default rootReducer

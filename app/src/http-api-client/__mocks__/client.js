@@ -1,33 +1,23 @@
 // mock http api client
 'use strict'
 
-let _mockResponse = null
-let _mockError = null
+const {
+  mockResolvedValueOnce,
+  mockRejectedValueOnce
+} = require('../../../__util__/mock-promise')
 
-const client = module.exports = jest.fn(() => {
-  if (_mockResponse) {
-    return new Promise((resolve) => process.nextTick(() => {
-      resolve(_mockResponse)
-    }))
-  }
+const client = module.exports = jest.fn()
 
-  return new Promise((resolve, reject) => process.nextTick(() => {
-    reject(_mockError || new Error('Mock values not seeded'))
-  }))
-})
-
-client.__setMockResponse = function setMockResponse (response) {
-  _mockError = null
-  _mockResponse = response
+client.__setMockResponse = function setMockResponse (...responses) {
+  client.mockReset()
+  responses.forEach((r) => mockResolvedValueOnce(client, r))
 }
 
-client.__setMockError = function setMockError (error) {
-  _mockResponse = null
-  _mockError = error
+client.__setMockError = function setMockError (...errors) {
+  client.mockReset()
+  errors.forEach((e) => mockRejectedValueOnce(client, e))
 }
 
 client.__clearMock = function clearMockResponses () {
-  _mockResponse = null
-  _mockError = null
-  client.mockClear()
+  client.mockReset()
 }

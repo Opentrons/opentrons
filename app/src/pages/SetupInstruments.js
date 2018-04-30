@@ -7,6 +7,7 @@ import {Route, Redirect, type ContextRouter} from 'react-router'
 import type {State} from '../types'
 import type {Instrument} from '../robot'
 import {selectors as robotSelectors} from '../robot'
+import {makeGetRobotPipettes} from '../http-api-client'
 
 import Page from '../components/Page'
 import TipProbe from '../components/TipProbe'
@@ -39,7 +40,7 @@ function SetupInstrumentsPage (props: Props) {
     <Page>
       <SessionHeader />
       <InstrumentTabs {...{instruments, currentInstrument}} />
-      <Instruments {...{instruments, currentInstrument}} />
+      <Instruments {...props} />
       {currentInstrument && (
         <TipProbe
           {...currentInstrument}
@@ -60,9 +61,17 @@ function SetupInstrumentsPage (props: Props) {
 
 function makeMapStateToProps (): (State, OwnProps) => StateProps {
   const getCurrentInstrument = robotSelectors.makeGetCurrentInstrument()
+  const getAttachedPipettes = makeGetRobotPipettes()
 
-  return (state, props) => ({
-    instruments: robotSelectors.getInstruments(state),
-    currentInstrument: getCurrentInstrument(state, props)
-  })
+  return (state, props) => {
+    const name = robotSelectors.getConnectedRobotName(state)
+    const pipettesResponse = getAttachedPipettes(state, {name})
+
+    return {
+      name,
+      instruments: robotSelectors.getInstruments(state),
+      currentInstrument: getCurrentInstrument(state, props),
+      actualPipettes: pipettesResponse.response
+    }
+  }
 }

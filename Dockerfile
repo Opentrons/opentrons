@@ -22,14 +22,6 @@ ENV ETHERNET_STATIC_IP=fd00:0000:cafe:fefe::1
 ENV ETHERNET_NETWORK_PREFIX=fd00:0000:cafe:fefe::
 ENV ETHERNET_NETWORK_PREFIX_LENGTH=64
 
-# Some shells are not inheriting environment variables from PID 1
-# so we are setting them explicitly
-RUN echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
-    echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
-    echo "export PATH=$PATH" >> /etc/profile && \
-    echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile && \
-    echo "export OT_SMOOTHIE_ID=$OT_SMOOTHIE_ID" >> /etc/profile
-
 # See compute/README.md for details. Make sure to keep them in sync
 RUN apk add --update \
       util-linux \
@@ -57,7 +49,11 @@ RUN apk add --update \
 # site-packages and cleaning up the one created by python3 package.
 RUN cp -r /usr/lib/python3.6/site-packages /usr/local/lib/python3.6/ && \
     rm -rf /usr/lib/python3.6
-RUN pip install pipenv==9.0.3 jupyter
+RUN pip install --force-reinstall \
+    pipenv==9.0.3 \
+    jupyter==1.0.0 \
+    tornado==4.5.1 \
+    pyzmq==16.0.2
 
 # Copy server files and data into the container. Note: any directories that
 # you wish to copy into the container must be excluded from the .dockerignore
@@ -65,6 +61,7 @@ RUN pip install pipenv==9.0.3 jupyter
 ENV LABWARE_DEF /etc/labware
 ENV AUDIO_FILES /etc/audio
 ENV USER_DEFN_ROOT /data/user_storage/opentrons_data/labware
+COPY ./labware-definitions/robot-data /etc/robot-data
 COPY ./compute/conf/jupyter_notebook_config.py /root/.jupyter/
 COPY ./labware-definitions/definitions /etc/labware
 COPY ./audio/ /etc/audio
@@ -107,14 +104,29 @@ RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.c
 
 # All newly installed packages will go to persistent storage
 ENV PIP_ROOT /data/packages
-RUN echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile
 
 # Generate keys for dropbear
 RUN ssh_key_gen.sh
 
 # Generate the id that we will later check to see if that's the
 # new container and that local Opentrons API package should be deleted
-RUN echo "export CONTAINER_ID=$(uuidgen)" >> /etc/profile
+# and persist all environment variables from the docker definition,
+# because they are sometimes not picked up from PID 1
+RUN echo "export CONTAINER_ID=$(uuidgen)" >> /etc/profile && \
+    echo "export ETHERNET_STATIC_IP=$ETHERNET_STATIC_IP" >> /etc/profile && \
+    echo "export OT_SETTINGS_DIR=$OT_SETTINGS_DIR" >> /etc/profile && \
+    echo "export OT_SERVER_PORT=$OT_SERVER_PORT" >> /etc/profile && \
+    echo "export OT_SERVER_UNIX_SOCKET_PATH=$OT_SERVER_UNIX_SOCKET_PATH" >> /etc/profile && \
+    echo "export PIP_ROOT=$PIP_ROOT" >> /etc/profile && \
+    echo "export LABWARE_DEF=$LABWARE_DEF" >> /etc/profile && \
+    echo "export USER_DEFN_ROOT=$USER_DEFN_ROOT" >> /etc/profile && \
+    echo "export AUDIO_FILES=$AUDIO_FILES" >> /etc/profile && \
+    echo "export PIPENV_VENV_IN_PROJECT=$PIPENV_VENV_IN_PROJECT" >> /etc/profile && \
+    echo "export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SYSTEM_BUS_ADDRESS" >> /etc/profile && \
+    echo "export PYTHONPATH=$PYTHONPATH" >> /etc/profile && \
+    echo "export PATH=$PATH" >> /etc/profile && \
+    echo "export RUNNING_ON_PI=$RUNNING_ON_PI" >> /etc/profile && \
+    echo "export OT_SMOOTHIE_ID=$OT_SMOOTHIE_ID" >> /etc/profile
 
 # Updates, HTTPS (for future use), API, SSH for link-local over USB
 EXPOSE 80 443 31950

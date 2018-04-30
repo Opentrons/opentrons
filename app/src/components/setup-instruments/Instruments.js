@@ -1,49 +1,92 @@
 // @flow
 import * as React from 'react'
-import capitalize from 'lodash/capitalize'
+import {Link} from 'react-router-dom'
+import cx from 'classnames'
 
+import type {PipettesResponse} from '../../http-api-client'
 import type {Instrument} from '../../robot'
 import {constants as robotConstants} from '../../robot'
 
-import {InstrumentGroup} from '@opentrons/components'
+import {getPipette} from '@opentrons/labware-definitions'
+import {InstrumentGroup, AlertItem} from '@opentrons/components'
+import styles from './styles.css'
 
 type Props = {
+  name: string,
   instruments: Array<Instrument>,
-  currentInstrument: ?Instrument
+  currentInstrument: ?Instrument,
+  actualPipettes: ?PipettesResponse
 }
 
+const {INSTRUMENT_MOUNTS} = robotConstants
+const ATTACH_ALERT = 'Pipette missing'
+const CHANGE_ALERT = 'Incorrect pipette attached'
+
 export default function Instruments (props: Props) {
-  const {currentInstrument, instruments: allInstruments} = props
-  const currentMount = currentInstrument
-    ? currentInstrument.mount
-    : null
+  const {name, currentInstrument, instruments, actualPipettes} = props
+  const currentMount = currentInstrument && currentInstrument.mount
 
-  // TODO(mc, 2018-03-07): refactor when InstrumentGroup switches to object
-  //   of instruments keyed by mount instead of array
-  const instruments = robotConstants.INSTRUMENT_MOUNTS.map((mount) => {
-    const inst = allInstruments.find((i) => i.mount === mount)
+  const infoByMount = INSTRUMENT_MOUNTS.reduce((result, mount) => {
+    const inst = instruments.find((i) => i.mount === mount)
+    // TODO(mc, 2018-04-25)
+    const pipetteConfig = inst
+      ? getPipette(inst.name)
+      : null
+
     const isDisabled = !inst || mount !== currentMount
+    const details = !pipetteConfig
+      ? {description: 'N/A', tipType: 'N/A'}
+      : {
+        description: pipetteConfig.displayName,
+        tipType: `${pipetteConfig.nominalMaxVolumeUl} ul`,
+        channels: pipetteConfig.channels
+      }
 
-    const description = inst
-      ? `${capitalize(`${inst.channels}`)}-channel (${inst.volume} ul)`
-      : 'N/A'
+    const actualModel = actualPipettes && actualPipettes[mount].model
+    let showAlert = false
+    let alertType = ''
 
-    const tipType = inst
-      ? `${inst.volume} ul`
-      : 'N/A'
+    // only show alert if a pipette is on this mount in the protocol
+    if (pipetteConfig) {
+      if (actualModel == null) {
+        showAlert = true
+        alertType = 'attach'
+      } else if (actualModel !== pipetteConfig.model) {
+        showAlert = true
+        alertType = 'change'
+      }
+    }
+
+    const children = showAlert && (
+      <div>
+        <AlertItem
+          type='warning'
+          title={alertType === 'attach' ? ATTACH_ALERT : CHANGE_ALERT}
+        />
+        <p className={styles.wrong_pipette_message}>
+          {'Go to the '}
+          <Link to={`/robots/${name}`}>
+            robot settings
+          </Link>
+          {` panel to ${alertType} pipette.`}
+        </p>
+      </div>
+    )
 
     return {
-      ...(inst || {mount}),
-      isDisabled,
-      description,
-      tipType
+      ...result,
+      [mount]: {
+        mount,
+        isDisabled,
+        children,
+        className: cx(styles.instrument, styles[mount]),
+        infoClassName: styles.instrument_info,
+        ...details
+      }
     }
-  })
-
-  const left = instruments.find(i => i.mount === 'left')
-  const right = instruments.find(i => i.mount === 'right')
+  }, {})
 
   return (
-    <InstrumentGroup {...{left, right}} />
+    <InstrumentGroup {...infoByMount} />
   )
 }

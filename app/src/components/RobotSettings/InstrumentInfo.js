@@ -32,9 +32,10 @@ export default function InstrumentInfo (props: Props) {
   const label = LABEL_BY_MOUNT[mount]
   const channelsMatch = model && model.match(RE_CHANNELS)
   const channels = channelsMatch && channelsMatch[1]
-  const buttonText = props.model
+  const direction = props.model
     ? 'change'
     : 'attach'
+
   const url = `/robots/${name}/pipettes/${mount}`
 
   const className = cx(styles.instrument_card, {
@@ -48,7 +49,7 @@ export default function InstrumentInfo (props: Props) {
         value={(model || 'None').split('_').join(' ')}
       />
       <OutlineButton Component={Link} to={url} onClick={onClick}>
-        {buttonText}
+        {direction}
       </OutlineButton>
       <div className={styles.image}>
         {channels && (

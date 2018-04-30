@@ -1,6 +1,17 @@
 /* common styling for modals */
 @import '..';
 
+:root {
+  --modal-contents: {
+    z-index: 1;
+    width: 100%;
+    max-width: 38rem;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 0.5rem;
+  }
+}
+
 .modal {
   @apply --modal;
 
@@ -13,27 +24,75 @@
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-.clickable {
-  @apply --clickable;
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .modal_contents {
-  z-index: 1;
-  width: 100%;
-  padding: 1rem;
+  @apply --modal-contents;
+
   background-color: white;
+}
+
+.alert_modal_wrapper {
+  border-radius: 0;
+  position: relative;
+  padding-top: 4rem;
+}
+
+.no_alert_header {
+  padding-top: 1.5rem;
+}
+
+.spinner_modal_contents {
+  @apply --modal-contents;
+  @apply --font-body-2-light;
+  @apply center-content;
+
+  max-width: 30rem;
+  padding-top: 3rem;
+  background-color: transparent;
+  flex-direction: column;
+  font-style: italic;
+  text-align: center;
+  z-index: 4;
+}
+
+.spinner_modal_icon {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}
+
+.clickable {
+  @apply --clickable;
 }
 
 .alert_modal_contents {
   @apply --font-body-2-dark;
 
-  padding: 0.5rem 1rem;
+  padding: 1rem;
 }
 
 .alert_modal_heading {
   @apply --font-header-dark;
 
-  margin-bottom: 0.5rem;
+  font-weight: normal;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #e0e0e0;
+}
+
+.alert_modal_icon {
+  height: 1.125rem;
+  margin-right: 0.75rem;
 }
 
 .alert_modal_buttons {

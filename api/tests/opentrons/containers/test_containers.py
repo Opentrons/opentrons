@@ -18,7 +18,7 @@ from opentrons.config import feature_flags as ff
 from tests.opentrons import generate_plate
 
 
-def test_containers_create(user_definition_dirs, robot):
+def test_containers_create(robot):
     container_name = 'plate_for_testing_containers_create'
     containers_create(
         name=container_name,

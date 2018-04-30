@@ -9,22 +9,6 @@
   };
 }
 
-.alert_list {
-  list-style-type: none;
-  padding-left: 3rem;
-  margin-top: 1rem;
-
-  & > li {
-    line-height: 2;
-  }
-}
-
-.alert_button {
-  width: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
 .modal {
   @apply --modal;
 
@@ -39,34 +23,9 @@
 }
 
 .modal_contents {
-  z-index: 1;
-  width: 100%;
   max-width: 48rem;
   min-height: 32rem;
   padding: 2rem 1.25rem;
-  margin: auto;
-  background-color: white;
-  border-radius: 0.5rem;
-}
-
-.in_progress_contents {
-  @apply --bg-modal-transparent;
-  @apply --font-body-2-light;
-  @apply --center-children;
-
-  flex-direction: column;
-  font-style: italic;
-  text-align: center;
-}
-
-.in_progress_icon {
-  width: 7.5rem;
-  margin-bottom: 3rem;
-}
-
-.confirm_pipette_contents {
-  @apply --font-header-light;
-  @apply --bg-modal-transparent;
 }
 
 .confirm_status {
@@ -101,7 +60,7 @@
 
 .confirm_failure_instructions {
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 3rem;
 }
 
 .confirm_button {
@@ -149,6 +108,11 @@
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
   }
+}
+
+.step_copy {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .step_legend {

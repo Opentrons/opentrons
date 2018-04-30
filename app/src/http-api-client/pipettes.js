@@ -6,13 +6,14 @@ import type {State, Action, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
 
 import type {ApiCall} from './types'
+import type {MotorAxis} from './motors'
 import client, {type ApiRequestError} from './client'
 
 // TODO(mc, 2018-03-30): mount, volume, and channels should come from the API
 export type Pipette = {
   model: ?string,
-  mount_axis: string,
-  plunger_axis: string,
+  mount_axis: MotorAxis,
+  plunger_axis: MotorAxis,
 }
 
 export type PipettesResponse = {

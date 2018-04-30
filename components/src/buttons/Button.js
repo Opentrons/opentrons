@@ -12,7 +12,7 @@ export type ButtonProps = {
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
-  disabled?: boolean,
+  disabled?: ?boolean,
   /** optional Icon name */
   iconName?: IconName,
   /** classes to apply */

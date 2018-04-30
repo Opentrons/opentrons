@@ -3,7 +3,7 @@
 const ICON_DATA_BY_NAME = {
   'alert': {
     viewBox: '0 0 24 24',
-    path: 'M13.2 13.2h-2.4V6h2.4v7.2zm0 4.8h-2.4v-2.4h2.4V18zM12 0C5.373 0 0 5.373 0 12A12 12 0 1 0 12 0z'
+    path: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'
   },
   'arrow-left': {
     viewBox: '0 0 24 24',
@@ -165,6 +165,22 @@ const ICON_DATA_BY_NAME = {
   'close-circle': {
     viewBox: '0 0 24 24',
     path: 'M12 .33A11.67 11.67 0 1 0 23.67 12 11.66 11.66 0 0 0 12 .33zm5.83 15.86l-1.64 1.64L12 13.65l-4.19 4.18-1.64-1.64L10.35 12 6.17 7.81l1.64-1.64L12 10.35l4.19-4.19 1.64 1.64-4.18 4.2z'
+  },
+  'ot-arrow-up': {
+    viewBox: '0 0 24 24',
+    path: 'M20 12l-8-8-8 8h4v8h8v-8z'
+  },
+  'ot-arrow-down': {
+    viewBox: '0 0 24 24',
+    path: 'M4 12l8 8 8-8h-4V4H8v8z'
+  },
+  'ot-arrow-left': {
+    viewBox: '0 0 24 24',
+    path: 'M12 4l-8 8 8 8v-4h8V8h-8z'
+  },
+  'ot-arrow-right': {
+    viewBox: '0 0 24 24',
+    path: 'M12 20l8-8-8-8v4H4v8h8z'
   }
 }
 

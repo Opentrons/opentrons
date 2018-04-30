@@ -3,8 +3,7 @@
 # pylama:skip=1
 
 from collections import namedtuple
-from opentrons.util import environment
-from opentrons.config import merge, children, build
+from opentrons.config import get_config_index, merge, children, build
 from opentrons.config import feature_flags as fflags
 
 import json
@@ -94,7 +93,8 @@ robot_config = namedtuple(
         'default_current',
         'low_current',
         'high_current',
-        'default_max_speed'
+        'default_max_speed',
+        'mount_offset'
     ]
 )
 
@@ -110,7 +110,7 @@ def _get_default():
         version=1,
         steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-        probe_center=(295.0, 300.0, probe_height),
+        probe_center=(293.03, 301.27, probe_height),
         probe_dimensions=(35.0, 40.0, probe_height + 5.0),
         gantry_calibration=[
             [ 1.00, 0.00, 0.00,  0.00],
@@ -131,6 +131,7 @@ def _get_default():
         tip_length={
             'Pipette': 51.7 # TODO (andy): move to tip-rack
         },
+        mount_offset=(-34, 0, 0), # distance between the left/right mounts
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
         low_current=LOW_CURRENT,
@@ -142,7 +143,7 @@ def _get_default():
 
 
 def load(filename=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     result = _get_default()
 
     try:
@@ -159,8 +160,7 @@ def load(filename=None):
 
 
 def save(config, filename=None, tag=None):
-
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
@@ -181,18 +181,19 @@ def backup_configuration(config, tag=None):
 
 
 def clear(filename=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     log.info('Deleting config file: {}'.format(filename))
     if os.path.exists(filename):
         os.remove(filename)
 
 
 def _save_config_json(config_json, filename=None, tag=None):
-    filename = filename or environment.get_path('OT_CONFIG_FILE')
+    filename = filename or get_config_index().get('deckCalibrationFile')
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
 
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as file:
         json.dump(config_json, file, sort_keys=True, indent=4)
         return config_json

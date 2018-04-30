@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import type {Mount} from '../robot-types'
@@ -20,7 +20,11 @@ export type InstrumentInfoProps = {
   /** usually 1 or 8 */
   channels?: number,
   /** classes to apply */
-  className?: string
+  className?: string,
+  /** classes to apply to the info group child */
+  infoClassName?: string,
+  /** children to display under the info */
+  children?: React.Node,
 }
 
 export default function InstrumentInfo (props: InstrumentInfoProps) {
@@ -33,11 +37,15 @@ export default function InstrumentInfo (props: InstrumentInfoProps) {
 
   return (
     <div className={className}>
-      <div className={styles.pipette_info}>
+      <div className={cx(styles.pipette_info, props.infoClassName)}>
         <InfoItem title={'pipette'} value={props.description} />
         <InfoItem title={'suggested tip type'} value={props.tipType} />
+        {props.children}
       </div>
-      <InstrumentDiagram channels={props.channels} className={styles.pipette_icon} />
+      <InstrumentDiagram
+        channels={props.channels}
+        className={styles.pipette_icon}
+      />
     </div>
   )
 }

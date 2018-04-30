@@ -73,7 +73,7 @@ flash:
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
 		-F "hex=@$(firmware)" \
-		http://$(host):31950/server/update_firmware
+		http://$(host):31950/server/update/firmware
 
 .PHONY: restart
 restart:
@@ -105,4 +105,4 @@ change-left:
 # TODO(mc, 2018-03-14): use $(host) var
 .PHONY: term
 term:
-	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@fd00:0:cafe:fefe::1
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(host)

@@ -234,7 +234,9 @@ exports[`InputField renders correctly 1`] = `
     >
       <input
         onChange={undefined}
+        onClick={undefined}
         placeholder="Placeholder Text"
+        readOnly={undefined}
         type="text"
         value=""
       />

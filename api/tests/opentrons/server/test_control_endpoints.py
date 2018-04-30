@@ -43,14 +43,17 @@ async def test_get_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
+    model = list(configs.values())[0]
     expected = {
         'left': {
-            'model': list(configs.values())[0].name,
+            'model': model.name,
+            'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': list(configs.values())[0].name,
+            'model': model.name,
+            'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c'
         }
@@ -128,8 +131,10 @@ async def test_home_pipette(virtual_smoothie_env, loop, test_client):
         'mount': 'left'}
 
     res = await cli.post('/robot/home', json=test_data)
-
     assert res.status == 200
+
+    res2 = await cli.post('/robot/home', json=test_data)
+    assert res2.status == 200
 
 
 async def test_home_robot(virtual_smoothie_env, loop, test_client):
@@ -247,7 +252,7 @@ async def test_move_pipette(virtual_smoothie_env, loop, test_client):
         'target': 'pipette',
         'point': [100, 200, 50],
         'mount': 'right',
-        'model': 'p300_single'
+        'model': 'p300_single_v1'
     }
     res = await cli.post('/robot/move', json=data)
     assert res.status == 200

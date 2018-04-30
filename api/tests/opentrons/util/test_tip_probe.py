@@ -1,24 +1,11 @@
 import pytest
 from opentrons.robot import robot_configs
-from opentrons.util import environment
-from opentrons.util.calibration_functions import (
-    # probe_instrument,
-    update_instrument_config,
-    # BOUNCE_DISTANCE_MM,
-    # X_SWITCH_OFFSET_MM,
-    # Y_SWITCH_OFFSET_MM,
-    # Z_SWITCH_OFFSET_MM,
-    # Z_CLEARANCE,
-    # Z_CROSSOVER_CLEARANCE,
-    # SWITCH_CLEARANCE
-)
+from opentrons.config import get_config_index
+from opentrons.util.calibration_functions import update_instrument_config
 
 
 @pytest.fixture
-def config(monkeypatch, tmpdir):
-    monkeypatch.setenv('APP_DATA_DIR', str(tmpdir))
-    environment.refresh()
-
+def config(monkeypatch):
     default = robot_configs._get_default()._replace(
             gantry_calibration=[
                 [1.0, 0.0, 0.0, 0.0],
@@ -130,7 +117,7 @@ def test_update_instrument_config(fixture, monkeypatch):
         dst=instrument.instrument_mover)) == (5.0, 5.0, 0), \
         "Expected instrument position to update relative to mover in pose tree"
 
-    filename = environment.get_path('OT_CONFIG_FILE')
+    filename = get_config_index().get('deckCalibrationFile')
     with open(filename, 'r') as file:
         assert json.load(file) == {
             'instrument_offset': {

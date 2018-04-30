@@ -10,34 +10,24 @@ import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
 
 import styles from './Plate.css'
 import Well from './Well'
+import type {SingleWell, WellLocation} from './Well'
 import type {LabwareLocations} from '../labware-types'
 
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
-export type SingleWell = {|
-  highlighted: boolean,
-  preselected: boolean,
-  selected: boolean,
-  wellName: string,
-  maxVolume: number,
-  fillColor?: ?string
-|}
-
-type wellDims = { // TODO similar to type in Well.js. DRY it up
-  x: number,
-  y: number,
-  length?: number,
-  width?: number,
-  diameter?: number,
+type WellDims = {
+  ...WellLocation,
   maxVolume: number
 }
 
 export type PlateProps = {
   containerType: string,
-  wellContents: {[string]: SingleWell}, // Keyed by wellName, eg 'A1'
+  wellContents?: {[string]: ?SingleWell}, // Keyed by wellName, eg 'A1'
   showLabels?: boolean,
-  selectable?: boolean
+  selectable?: boolean,
+  handleMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
+  handleMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
 const plateOutline = <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
@@ -55,7 +45,7 @@ function FallbackPlate () {
 
 type LabwareData = {
   originOffset: {x: number, y: number},
-  firstWell: wellDims,
+  firstWell: WellDims,
   containerLocations: LabwareLocations,
   allWellNames: Array<string>
 }
@@ -71,17 +61,23 @@ export default class Plate extends React.Component<PlateProps> {
     const infoForContainerType = defaultContainers.containers[containerType]
     const originOffset = infoForContainerType['origin-offset'] || {x: 0, y: 0}
     const containerLocations = infoForContainerType.locations
-    const firstWell: wellDims = containerLocations['A1']
+    const firstWell: WellDims = containerLocations['A1']
 
     const allWellNames = Object.keys(containerLocations)
 
     return { originOffset, firstWell, containerLocations, allWellNames }
   }
 
+  handleMouseOverWell = (well: string) => {
+    return this.props.handleMouseOverWell
+      ? this.props.handleMouseOverWell(well)
+      : undefined
+  }
+
   createWell = (wellName: string) => {
-    const { selectable, wellContents } = this.props
+    const { selectable, wellContents, handleMouseExitWell } = this.props
     const { originOffset, firstWell, containerLocations } = this.getContainerData()
-    const singleWellContents: SingleWell = wellContents[wellName]
+    const singleWellContents = wellContents && wellContents[wellName]
 
     // rectangular wells are centered around x, y
     const svgOffset = (typeof firstWell.width === 'number' && typeof firstWell.length === 'number')
@@ -96,18 +92,18 @@ export default class Plate extends React.Component<PlateProps> {
 
     const wellLocation = containerLocations[wellName]
 
-    const { preselected = false, selected = false, fillColor = '' } = (singleWellContents || {}) // ignored/removed: highlighed, hovered
-
     return <Well
       key={wellName}
       {...{
+        ...singleWellContents,
         wellName,
-        fillColor,
         selectable,
-        selected,
-        preselected,
+
         wellLocation,
-        svgOffset
+        svgOffset,
+
+        onMouseOver: this.handleMouseOverWell(wellName),
+        onMouseLeave: handleMouseExitWell
       }
     } />
   }

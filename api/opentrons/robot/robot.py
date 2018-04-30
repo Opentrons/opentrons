@@ -4,6 +4,7 @@ from functools import lru_cache
 import opentrons.util.calibration_functions as calib
 from numpy import add, subtract
 from opentrons import commands, containers, drivers
+from opentrons.instruments import pipette_config
 from opentrons.broker import subscribe
 from opentrons.containers import Container
 from opentrons.data_storage import database, old_container_loading,\
@@ -19,9 +20,6 @@ log = get_logger(__name__)
 
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
-
-# distance in millimeters between the left and right mounts (aka carriages)
-X_DISTANCE_BETWEEN_MOUNTS = 34
 
 
 class InstrumentMosfet(object):
@@ -406,21 +404,30 @@ class Robot(object):
         # by designed dimensions of that model (eg: p10-multi vs p300-single)
         mx, my, mz = instrument.model_offset
 
-        # X distance between gantry's left and right mounts (aka carriages)
-        mount_x_offset = {'left': -X_DISTANCE_BETWEEN_MOUNTS, 'right': 0}
-
         # combine each offset to get the pipette's position relative to gantry
         _x, _y, _z = (
-            mx + cx + mount_x_offset[mount],
+            mx + cx,
             my + cy,
             mz
         )
+        # if it's the left mount, apply the offset from right pipette
+        if mount is 'left':
+            _x, _y, _z = (
+               _x + self.config.mount_offset[0],
+               _y + self.config.mount_offset[1],
+               _z + self.config.mount_offset[2]
+            )
         self.poses = pose_tracker.add(
             self.poses,
             instrument,
             parent=mount,
             point=(_x, _y, _z)
         )
+
+    def remove_instrument(self, mount):
+        instrument = self._instruments.pop(mount, None)
+        if instrument:
+            self.poses = pose_tracker.remove(self.poses, instrument)
 
     def add_warning(self, warning_msg):
         """
@@ -921,11 +928,20 @@ class Robot(object):
                 'plunger_axis': 'b'
             }
         left_data.update(self._driver.read_pipette_model('left'))
+        left_model = left_data.get('model')
+        if left_model:
+            tip_length = pipette_config.configs[left_model].tip_length
+            left_data.update({'tip_length': tip_length})
+
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c'
             }
         right_data.update(self._driver.read_pipette_model('right'))
+        right_model = right_data.get('model')
+        if right_model:
+            tip_length = pipette_config.configs[right_model].tip_length
+            right_data.update({'tip_length': tip_length})
         return {
             'left': left_data,
             'right': right_data

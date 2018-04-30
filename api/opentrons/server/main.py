@@ -3,6 +3,7 @@
 import sys
 import logging
 import os
+import traceback
 from aiohttp import web
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
@@ -81,6 +82,21 @@ def log_init():
     dictConfig(logging_config)
 
 
+@web.middleware
+async def error_middleware(request, handler):
+    try:
+        response = await handler(request)
+    except Exception as e:
+        log.exception("Exception in handler for request {}".format(request))
+        data = {
+            'message': 'An unexpected error occured - {}'.format(e),
+            'traceback': traceback.format_exc()
+        }
+        response = web.json_response(data, status=500)
+
+    return response
+
+
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli  # NOQA
 def init(loop=None):
@@ -88,7 +104,7 @@ def init(loop=None):
     Builds an application including the RPC server, and also configures HTTP
     routes for methods defined in opentrons.server.endpoints
     """
-    server = Server(MainRouter(), loop=loop)
+    server = Server(MainRouter(), loop=loop, middlewares=[error_middleware])
 
     server.app.router.add_get(
         '/health', endp.health)
@@ -105,9 +121,11 @@ def init(loop=None):
     server.app.router.add_post(
         '/lights/off', control.turn_off_rail_lights)
     server.app.router.add_post(
+        '/camera/picture', control.take_picture)
+    server.app.router.add_post(
         '/server/update', update.install_api)
     server.app.router.add_post(
-        '/server/update_firmware', update.update_firmware)
+        '/server/update/firmware', update.update_firmware)
     server.app.router.add_post(
         '/server/restart', control.restart)
     server.app.router.add_post(
@@ -128,6 +146,8 @@ def init(loop=None):
         '/robot/home', control.home)
     server.app.router.add_get(
         '/settings', update.get_feature_flag)
+    server.app.router.add_get(
+        '/settings/environment', update.environment)
     server.app.router.add_post(
         '/settings/set', update.set_feature_flag)
 

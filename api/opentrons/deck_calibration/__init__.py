@@ -42,3 +42,9 @@ def set_calibration_value(rbt: Robot, axis: str, value: float):
     else:
         row = z_row
     rbt.config.gantry_calibration[row][xyz_column] = value
+
+
+def apply_mount_offset(point: tuple) -> tuple:
+    px, py, pz = point
+    mx, my, mz = robot.config.mount_offset
+    return (px - mx, py - my, pz - mz)

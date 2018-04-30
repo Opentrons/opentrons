@@ -11,3 +11,15 @@ export function mockRejectedValue (mock, value) {
     process.nextTick(() => reject(value))
   }))
 }
+
+export function mockResolvedValueOnce (mock, value) {
+  mock.mockImplementationOnce(() => new Promise((resolve) => {
+    process.nextTick(() => resolve(value))
+  }))
+}
+
+export function mockRejectedValueOnce (mock, value) {
+  mock.mockImplementationOnce(() => new Promise((resolve, reject) => {
+    process.nextTick(() => reject(value))
+  }))
+}

@@ -13,25 +13,31 @@ import SelectionRect from '../components/SelectionRect.js'
 import type {AllWellContents, WellContents} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
-export type Props = {
-  wellContents: AllWellContents,
-  containerType: string,
-  onSelectionMove: RectEvent,
-  onSelectionDone: RectEvent,
-  containerId: string,
-  selectable?: boolean
-}
-
 type PlateProps = React.ElementProps<typeof Plate>
 type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
+
+export type Props = {
+  wellContents: AllWellContents,
+  containerType: $PropertyType<PlateProps, 'containerType'>,
+
+  selectable?: $PropertyType<PlateProps, 'selectable'>,
+  handleMouseOverWell?: $PropertyType<PlateProps, 'handleMouseOverWell'>,
+  handleMouseExitWell?: $PropertyType<PlateProps, 'handleMouseExitWell'>,
+
+  onSelectionMove: RectEvent,
+  onSelectionDone: RectEvent,
+  containerId: string // used by container
+}
+
 function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
   return mapValues(
     wc,
     (well: WellContents): SingleWell => ({
       wellName: well.wellName,
-      selected: well.selected,
-      preselected: well.preselected,
+
       highlighted: well.highlighted,
+      selected: well.selected,
+      error: well.error,
       maxVolume: well.maxVolume,
 
       fillColor: getFillColor(well.groupIds)
@@ -57,16 +63,20 @@ export default function SelectablePlate (props: Props) {
     containerType,
     onSelectionMove,
     onSelectionDone,
-    containerId,
-    selectable
+    selectable,
+    handleMouseOverWell,
+    handleMouseExitWell
   } = props
 
   const plate = <Plate
-    selectable={selectable}
-    wellContents={wellContentsGroupIdsToColor(wellContents)}
-    containerType={containerType}
-    containerId={containerId}
+    {...{
+      selectable,
+      containerType,
+      handleMouseOverWell,
+      handleMouseExitWell
+    }}
     showLabels={selectable}
+    wellContents={wellContentsGroupIdsToColor(wellContents)}
   />
 
   if (!selectable) return plate // don't wrap plate with SelectionRect

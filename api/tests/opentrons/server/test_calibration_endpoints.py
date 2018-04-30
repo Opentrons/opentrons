@@ -7,17 +7,6 @@ from opentrons.robot import robot_configs
 
 
 # ------------ Function tests (unit) ----------------------
-async def test_init_pipette(dc_session):
-    robot.reset()
-    data = {
-        'mount': 'left',
-        'model': 'p10_single'}
-    await endpoints.init_pipette(data)
-    actual = dc_session.pipettes.get('left').name
-    expected = pipette_config.p10_single.name
-    assert actual == expected
-
-
 async def test_add_and_remove_tip(dc_session):
     robot.reset()
     mount = 'left'
@@ -97,7 +86,7 @@ async def test_save_z(dc_session):
     await endpoints.save_z({})
 
     new_z = dc_session.z_value
-    pipette_z_offset = pipette_config.p10_single.model_offset[-1]
+    pipette_z_offset = pipette_config.configs['p10_single_v1'].model_offset[-1]
     expected_z = z_target - pipette_z_offset
     assert new_z == expected_z
 
@@ -139,9 +128,12 @@ async def test_create_session(async_client, monkeypatch):
 
     monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
-    expected = {'token': dummy_token}
+    expected = {
+        'token': dummy_token,
+        'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
     resp = await async_client.post('/calibration/deck/start')
     text = await resp.text()
+    print(text)
     assert json.loads(text) == expected
     assert resp.status == 201
 
@@ -152,6 +144,8 @@ async def test_release(async_client):
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
+    robot.reset()
+
     resp = await async_client.post('/calibration/deck/start')
     assert resp.status == 201
     body = await resp.json()
@@ -180,6 +174,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
+    robot.reset()
     dummy_token = 'Test Token'
 
     def uuid_mock():
@@ -191,8 +186,10 @@ async def test_forcing_new_session(async_client, monkeypatch):
 
     resp = await async_client.post('/calibration/deck/start')
     text = await resp.json()
+
     assert resp.status == 201
-    expected = {'token': dummy_token}
+    expected = {'token': dummy_token,
+                'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
     assert text == expected
 
     resp1 = await async_client.post('/calibration/deck/start')
@@ -202,7 +199,8 @@ async def test_forcing_new_session(async_client, monkeypatch):
         '/calibration/deck/start', json={'force': 'true'})
     text2 = await resp2.json()
     assert resp2.status == 201
-    expected2 = {'token': dummy_token}
+    expected2 = {'token': dummy_token,
+                 'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
     assert text2 == expected2
 
 
@@ -227,18 +225,22 @@ async def test_incorrect_token(async_client, monkeypatch):
             'token': 'FAKE TOKEN',
             'command': 'init pipette',
             'mount': 'left',
-            'model': 'p10_single'
+            'model': 'p10_single_v1'
         })
 
     assert resp.status == 403
 
 
 # ------------ Router tests (integration) ----------------------
-async def test_init_pipette_integration(async_client, monkeypatch):
+async def test_set_and_jog_integration(async_client, monkeypatch):
     """
-    Test that initializing a pipette works as expected with a correctly formed
-    packet/ POST request.
-
+    Test that the select model function and jog function works.
+    Note that in order for the jog function to work, the following must
+    be done:
+    1. Create a session manager
+    2. Initialize a pipette
+    3. Select the current pipette
+    Then jog requests will work as expected.
     """
     robot.reset()
     dummy_token = 'Test Token'
@@ -251,59 +253,6 @@ async def test_init_pipette_integration(async_client, monkeypatch):
     token_res = await async_client.post('/calibration/deck/start')
     token_text = await token_res.json()
     token = token_text['token']
-
-    resp = await async_client.post(
-        '/calibration/deck',
-        data={
-            'token': token,
-            'command': 'init pipette',
-            'mount': 'left',
-            'model': 'p10_single'
-        })
-
-    body = await resp.json()
-
-    assert body['pipettes']['left'] == 'p10_single'
-    assert endpoints.session.pipettes.get('right') is None
-
-
-async def test_set_and_jog_integration(async_client, monkeypatch):
-    """
-    Test that the select model function and jog function works.
-    Note that in order for the jog function to work, the following must
-    be done:
-    1. Create a session manager
-    2. Initialize a pipette
-    3. Select the current pipette
-    Then jog requests will work as expected.
-    """
-    dummy_token = 'Test Token'
-
-    def uuid_mock():
-        return dummy_token
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    token_res = await async_client.post('/calibration/deck/start')
-    token_text = await token_res.json()
-    token = token_text['token']
-
-    await async_client.post(
-        '/calibration/deck',
-        data={
-            'token': token,
-            'command': 'init pipette',
-            'mount': 'left',
-            'model': 'p10_single'
-        })
-
-    await async_client.post(
-        '/calibration/deck',
-        data={
-            'token': token,
-            'command': 'select pipette',
-            'mount': 'left'
-        })
 
     axis = 'Z'
     direction = '1'

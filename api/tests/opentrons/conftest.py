@@ -6,7 +6,7 @@ import asyncio
 import os
 import re
 import shutil
-import tempfile
+import json
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
@@ -15,6 +15,7 @@ import pytest
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
+from opentrons import config
 from opentrons.config import feature_flags as ff
 from opentrons.server.main import init
 from opentrons.deck_calibration import endpoints
@@ -93,6 +94,48 @@ def print_db_path(db):
     print("Database: ", db_info[2])
 
 
+@pytest.fixture(autouse=True)
+def clear_feature_flags():
+    ff_file = config.get_config_index().get('featureFlagFile')
+    if os.path.exists(ff_file):
+        os.remove(ff_file)
+
+
+@pytest.fixture(autouse=True)
+def labware_test_data():
+    index = config.get_config_index()
+    user_def_dir = index.get('labware', {}).get('userDefinitionDir', '')
+    offset_dir = index.get('labware', {}).get('offsetDir', '')
+    deck_calibration_dir = os.path.dirname(index.get('deckCalibrationFile'))
+    dummy_lw_name = '4-well-plate'
+    filename = '{}.json'.format(dummy_lw_name)
+    dummy_lw_defn = {
+      "metadata": {"name": dummy_lw_name},
+      "wells": {
+        "A1": {"x": 40, "y": 40, "z": 30,
+               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
+        "A2": {"x": 40, "y": 80, "z": 30,
+               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
+        "B1": {"x": 80, "y": 40, "z": 30,
+               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
+        "B2": {"x": 80, "y": 80, "z": 30,
+               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6}},
+      "ordering": [["A1", "B1"],
+                   ["A2", "B2"]]}
+    dummy_lw_offset = {"x": 10, "y": -10, "z": 100}
+    os.makedirs(user_def_dir, exist_ok=True)
+    with open(os.path.join(user_def_dir, filename), 'w') as usr_def:
+        json.dump(dummy_lw_defn, usr_def)
+    os.makedirs(offset_dir, exist_ok=True)
+    with open(os.path.join(offset_dir, filename), 'w') as offs:
+        json.dump(dummy_lw_offset, offs)
+    os.makedirs(deck_calibration_dir, exist_ok=True)
+    yield
+    shutil.rmtree(os.path.dirname(user_def_dir), ignore_errors=True)
+    shutil.rmtree(os.path.dirname(offset_dir), ignore_errors=True)
+    shutil.rmtree(deck_calibration_dir, ignore_errors=True)
+
+
 # Builds a temp db to allow mutations during testing
 @pytest.fixture
 def dummy_db(tmpdir):
@@ -106,33 +149,21 @@ def dummy_db(tmpdir):
 
 # -------feature flag fixtures-------------
 @pytest.fixture
-def calibrate_bottom_flag(monkeypatch):
-    tmpd = tempfile.TemporaryDirectory()
-    monkeypatch.setattr(
-        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
-
+def calibrate_bottom_flag():
     ff.set_feature_flag('calibrate-to-bottom', True)
     yield
     ff.set_feature_flag('calibrate-to-bottom', False)
 
 
 @pytest.fixture
-def short_trash_flag(monkeypatch):
-    tmpd = tempfile.TemporaryDirectory()
-    monkeypatch.setattr(
-        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
-
+def short_trash_flag():
     ff.set_feature_flag('short-fixed-trash', True)
     yield
     ff.set_feature_flag('short-fixed-trash', False)
 
 
 @pytest.fixture
-def split_labware_def(monkeypatch):
-    tmpd = tempfile.TemporaryDirectory()
-    monkeypatch.setattr(
-        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
-
+def split_labware_def():
     ff.set_feature_flag('split-labware-def', True)
     yield
     ff.set_feature_flag('split-labware-def', False)
@@ -246,19 +277,10 @@ def setup_testing_env():
 
 @pytest.fixture
 def virtual_smoothie_env(monkeypatch):
+    # TODO (ben 20180426): move this to the .env file
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     yield
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
-
-
-@pytest.fixture
-def user_definition_dirs(monkeypatch):
-    tmp_usr_root = tempfile.mkdtemp()
-    os.mkdir(os.path.join(tmp_usr_root, 'definitions'))
-    os.mkdir(os.path.join(tmp_usr_root, 'offsets'))
-    monkeypatch.setenv("USER_DEFN_ROOT", tmp_usr_root)
-    yield
-    monkeypatch.setenv("USER_DEFN_ROOT", '')
 
 
 @pytest.fixture

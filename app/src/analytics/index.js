@@ -1,16 +1,34 @@
 // analytics module
-// pushes events to GTM's data layer
+import noop from 'lodash/noop'
+import {LOCATION_CHANGE} from 'react-router-redux'
+
+import {version} from '../../package.json'
 import gtmConfig from './gtm-config'
+import intercomConfig from './intercom-config'
 import makeEvent from './make-event'
 
 // grab the data layer (and create it if it doesn't exist)
 const {DATA_LAYER_NAME} = gtmConfig
 const dataLayer = global[DATA_LAYER_NAME] = global[DATA_LAYER_NAME] || []
 
+let intercom = noop
+
 export const NAME = 'analytics'
 
 const CUSTOM_EVENT_NAME = 'OT_EVENT'
 const INITIAL_STATE = {}
+
+export function initialize (features) {
+  if (features.intercom) {
+    const data = {
+      app_id: intercomConfig.id,
+      'App Version': version
+    }
+
+    intercom = global.Intercom || intercom
+    intercom('boot', data)
+  }
+}
 
 export function reducer (state = INITIAL_STATE, action) {
   return state
@@ -40,6 +58,9 @@ export const middleware = (store) => (next) => (action) => {
       // TODO(mc, 2017-11-20): use a proper logger rather than console
       console.warn(`Warning: no analytics mapper found for action ${type}`)
     }
+  } else if (action.type === LOCATION_CHANGE) {
+    // update intercom on page change
+    intercom('update')
   }
 
   return next(action)

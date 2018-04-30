@@ -107,7 +107,7 @@ export default function client (dispatch) {
           // TODO(mc, 2017-10-09): This seems like an API responsibility
           remote.session_manager.session = apiSession
           // TODO(mc, 2017-10-12) batch these updates and don't hardcode URL
-          handleApiSession(apiSession, true)
+          handleApiSession(apiSession)
         })
         .catch((error) => dispatch(actions.sessionResponse(error)))
     }
@@ -197,8 +197,8 @@ export default function client (dispatch) {
     // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
 
     remote.calibration_manager.return_tip(instrument)
-    .then(() => dispatch(actions.returnTipRepsonse()))
-    .catch((error) => dispatch(actions.returnTipRepsonse(error)))
+    .then(() => dispatch(actions.returnTipResponse()))
+    .catch((error) => dispatch(actions.returnTipResponse(error)))
   }
 
   function moveTo (state, action) {
@@ -313,23 +313,27 @@ export default function client (dispatch) {
       clearRunTimerInterval()
     }
 
-    // TODO(mc, 2017-08-30): Use a reduce
-    ;(commands || []).forEach(makeHandleCommand())
-    ;(instruments || []).forEach(apiInstrumentToInstrument)
-    ;(containers || []).forEach(apiContainerToContainer)
+    try {
+      // TODO(mc, 2017-08-30): Use a reduce
+      ;(commands || []).forEach(makeHandleCommand())
+      ;(instruments || []).forEach(apiInstrumentToInstrument)
+      ;(containers || []).forEach(apiContainerToContainer)
 
-    const payload = {
-      name,
-      state,
-      errors: [],
-      protocolText: protocol_text,
-      protocolCommands,
-      protocolCommandsById,
-      instrumentsByMount,
-      labwareBySlot
+      const payload = {
+        name,
+        state,
+        errors: [],
+        protocolText: protocol_text,
+        protocolCommands,
+        protocolCommandsById,
+        instrumentsByMount,
+        labwareBySlot
+      }
+
+      dispatch(actions.sessionResponse(null, payload))
+    } catch (error) {
+      dispatch(actions.sessionResponse(error))
     }
-
-    dispatch(actions.sessionResponse(null, payload))
 
     function makeHandleCommand (depth = 0) {
       return function handleCommand (command) {

@@ -5,7 +5,10 @@ import thunk from 'redux-thunk'
 import client from '../client'
 import {
   moveToChangePipette,
-  reducer
+  home,
+  reducer,
+  makeGetRobotMove,
+  makeGetRobotHome
 } from '..'
 
 jest.mock('../client')
@@ -29,6 +32,7 @@ describe('robot/*', () => {
   })
 
   describe('moveToChangePipette action creator', () => {
+    const path = 'move'
     const mockPositionsResponse = {
       positions: {
         change_pipette: {
@@ -38,33 +42,108 @@ describe('robot/*', () => {
         }
       }
     }
+    const response = {message: 'we did it'}
 
-    test('calls GET /robot/positions', () => {
-      client.__setMockResponse(mockPositionsResponse)
-
-      return store.dispatch(moveToChangePipette(robot, 'left'))
-        .then(() => expect(client)
-          .toHaveBeenCalledWith(robot, 'GET', 'robot/positions'))
-    })
-
-    test('calls POST /robot/move with positions response', () => {
+    test('calls GET /robot/positions then POST /robot/move', () => {
       const expected = {
         target: 'mount',
         mount: 'left',
         point: [1, 2, 3]
       }
 
-      client.__setMockResponse(mockPositionsResponse)
+      client.__setMockResponse(mockPositionsResponse, response)
 
       return store.dispatch(moveToChangePipette(robot, 'left'))
-        .then(() => expect(client)
-          .toHaveBeenCalledWith(robot, 'POST', 'robot/move', expected))
+        .then(() => expect(client.mock.calls).toEqual([
+          [robot, 'GET', 'robot/positions'],
+          [robot, 'POST', 'robot/move', expected]
+        ]))
     })
 
-    // TODO(mc, 2018-04-10): need to improve client mock to handle successive
-    //   mock responses in order to test these
-    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS')
-    test('dispatches ROBOT_REQUEST and ROBOT_FAILURE')
+    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_SUCCESS', () => {
+      const request = {target: 'mount', mount: 'right', point: [4, 5, 6]}
+      const expectedActions = [
+        {
+          type: 'api:SET_ROBOT_MOVE_POSITION',
+          payload: {robot, position: 'change_pipette'}
+        },
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(mockPositionsResponse, response)
+
+      return store.dispatch(moveToChangePipette(robot, 'right'))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const expectedActions = [
+        {
+          type: 'api:SET_ROBOT_MOVE_POSITION',
+          payload: {robot, position: 'change_pipette'}
+        },
+        {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(moveToChangePipette(robot, 'left'))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('home action creator', () => {
+    const path = 'home'
+    const response = {message: 'success'}
+
+    test('calls POST /robot/home to home robot', () => {
+      const expectedBody = {target: 'robot'}
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(home(robot))
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'POST', 'robot/home', expectedBody))
+    })
+
+    test('calls POST /robot/home to home a pipette', () => {
+      const expectedBody = {target: 'pipette', mount: 'right'}
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(home(robot, 'right'))
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'POST', 'robot/home', expectedBody))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS', () => {
+      const request = {target: 'pipette', mount: 'left'}
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(home(robot, 'left'))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_FAILURE', () => {
+      const request = {target: 'robot'}
+      const error = {name: 'ResponseError', status: '400'}
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(home(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
   })
 
   test('reducer handles SET_ROBOT_MOVE_POSITION', () => {
@@ -81,85 +160,137 @@ describe('robot/*', () => {
     })
   })
 
-  describe('reducer with /robot/move', () => {
-    beforeEach(() => {
-      state = state.api
-    })
+  const REDUCER_REQUEST_RESPONSE_TESTS = [
+    {
+      path: 'move',
+      request: {target: 'mount', mount: 'left', point: [1, 2, 3]},
+      response: {message: 'we did it!'}
+    },
+    {
+      path: 'home',
+      request: {target: 'pipette', mount: 'left'},
+      response: {message: 'we did it!'}
+    }
+  ]
 
-    const path = 'move'
-    const request = {target: 'mount', mount: 'left', point: [1, 2, 3]}
-    const response = {message: 'we did it!'}
+  REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
+    const {path, request, response} = spec
 
-    test('handles ROBOT_REQUEST', () => {
-      const action = {
-        type: 'api:ROBOT_REQUEST',
-        payload: {path, robot, request}
-      }
+    describe(`reducer with /robot/${path}`, () => {
+      beforeEach(() => {
+        state = state.api
+      })
 
-      expect(reducer(state, action).robot).toEqual({
-        [NAME]: {
-          move: {
+      test('handles ROBOT_REQUEST', () => {
+        const action = {
+          type: 'api:ROBOT_REQUEST',
+          payload: {path, robot, request}
+        }
+
+        expect(reducer(state, action).robot).toEqual({
+          [NAME]: {
+            [path]: {
+              request,
+              inProgress: true,
+              error: null,
+              response: null
+            }
+          }
+        })
+      })
+
+      test('handles ROBOT_SUCCESS', () => {
+        const action = {
+          type: 'api:ROBOT_SUCCESS',
+          payload: {path, robot, response}
+        }
+
+        state.robot[NAME] = {
+          [path]: {
             request,
             inProgress: true,
             error: null,
             response: null
           }
         }
+
+        expect(reducer(state, action).robot).toEqual({
+          [NAME]: {
+            [path]: {
+              request,
+              response,
+              inProgress: false,
+              error: null
+            }
+          }
+        })
+      })
+
+      test('handles ROBOT_FAILURE', () => {
+        const error = {message: 'we did not do it!'}
+        const action = {
+          type: 'api:ROBOT_FAILURE',
+          payload: {path, robot, error}
+        }
+
+        state.robot[NAME] = {
+          [path]: {
+            request,
+            inProgress: true,
+            error: null,
+            response: null
+          }
+        }
+
+        expect(reducer(state, action).robot).toEqual({
+          [NAME]: {
+            [path]: {
+              request,
+              error,
+              response: null,
+              inProgress: false
+            }
+          }
+        })
+      })
+    })
+  })
+
+  describe('selectors', () => {
+    beforeEach(() => {
+      state.api.robot[NAME] = {
+        home: {inProgress: true},
+        move: {inProgress: true},
+        movePosition: 'change_pipette'
+      }
+    })
+
+    test('makeGetRobotMove', () => {
+      const getMove = makeGetRobotMove()
+
+      expect(getMove(state, robot)).toEqual({
+        ...state.api.robot[NAME].move,
+        position: 'change_pipette'
+      })
+
+      expect(getMove(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null,
+        position: null
       })
     })
 
-    test('handles ROBOT_SUCCESS', () => {
-      const action = {
-        type: 'api:ROBOT_SUCCESS',
-        payload: {path, robot, response}
-      }
+    test('makeGetRobotHome', () => {
+      const getHome = makeGetRobotHome()
 
-      state.robot[NAME] = {
-        move: {
-          request,
-          inProgress: true,
-          error: null,
-          response: null
-        }
-      }
-
-      expect(reducer(state, action).robot).toEqual({
-        [NAME]: {
-          move: {
-            request,
-            response,
-            inProgress: false,
-            error: null
-          }
-        }
-      })
-    })
-
-    test('handles ROBOT_FAILURE', () => {
-      const error = {message: 'we did not do it!'}
-      const action = {
-        type: 'api:ROBOT_FAILURE',
-        payload: {path, robot, error}
-      }
-
-      state.robot[NAME] = {
-        move: {
-          request,
-          inProgress: true,
-          error: null,
-          response: null
-        }
-      }
-
-      expect(reducer(state, action).robot).toEqual({
-        [NAME]: {
-          move: {
-            request,
-            error,
-            response: null,
-            inProgress: false
-          }
-        }
+      expect(getHome(state, robot)).toEqual(state.api.robot[NAME].home)
+      expect(getHome(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null
       })
     })
   })

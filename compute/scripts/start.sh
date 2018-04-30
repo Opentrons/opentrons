@@ -11,10 +11,6 @@ nginx
 # enable SSH over ethernet
 inetd -e /etc/inetd.conf
 
-# Home robot
-echo "Homing Robot... this may take a few seconds."
-python -c "from opentrons import robot; robot.connect(); robot.home()"
-
 # If user boot script exists, run it
 mkdir -p /data/boot.d
 run-parts /data/boot.d
@@ -30,9 +26,10 @@ config_path=`python -c "from opentrons.util import environment; print(environmen
 
 if [ ! -e "$config_path" ]; then
     echo "Config file not found. Please perform factory calibration and then restart robot"
-    while true; do sleep 1; done
 fi
 
 export ENABLE_NETWORKING_ENDPOINTS=true
 echo "Starting Opentrons API server"
 python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH opentrons.server.main:init
+echo "Server exited unexpectedly. Please power-cycle the machine, and contact Opentrons support."
+while true; do sleep 1; done

@@ -7,27 +7,14 @@ export const MIXED_WELL_COLOR = '#9b9b9b' // NOTE: matches `--c-med-gray` in col
 // TODO factor into CSS or constants or elsewhere
 export const swatchColors = (n: number) => {
   const colors = [
-    '#e6194b',
-    '#3cb44b',
-    '#ffe119',
-    '#0082c8',
-    '#f58231',
-    '#911eb4',
-    '#46f0f0',
-    '#f032e6',
-    '#d2f53c',
-    '#fabebe',
-    '#008080',
-    '#e6beff',
-    '#aa6e28',
-    '#fffac8',
-    '#800000',
-    '#aaffc3',
-    '#808000',
-    '#ffd8b1',
-    '#000080',
-    '#808080',
-    '#000000'
+    '#0076ff',
+    '#ff4888',
+    '#00d781',
+    '#7b21d6',
+    '#ff6161',
+    '#065596',
+    '#2a97dc',
+    '#d24193'
   ]
   return colors[n % colors.length]
 }

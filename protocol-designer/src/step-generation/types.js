@@ -100,7 +100,7 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
 |}
 
 export type LabwareData = {
-  type: string, // TODO LATER keys from JSON
+  type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
   name: ?string, // user-defined nickname
   slot: DeckSlot
 }

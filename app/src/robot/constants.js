@@ -81,5 +81,3 @@ export const MULTI_CHANNEL = 'multi'
 // jogging
 export const JOG_DIRECTION_NEG = -1
 export const JOG_DIRECTION_POS = 1
-export const JOG_DISTANCE_SLOW_MM = 0.25
-export const JOG_DISTANCE_FAST_MM = 4

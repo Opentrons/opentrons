@@ -1,22 +1,53 @@
 from opentrons.containers import load as containers_load
-from opentrons import robot, instruments
+from opentrons import robot, instruments, labware
 from opentrons.trackers import pose_tracker
 from opentrons.util import vector
 from numpy import isclose
 from unittest import mock
 
 
+def test_configurable_mount_offsets():
+    def _test_offset(x, y, z):
+        robot.reset()
+        robot.config = robot.config._replace(
+            mount_offset=(x, y, z))
+        left = instruments.P300_Single(mount='left')
+        right = instruments.P300_Single(mount='right')
+        robot.home()
+        left_pos = pose_tracker.absolute(robot.poses, left)
+        right_pos = pose_tracker.absolute(robot.poses, right)
+        assert left_pos[0] == right_pos[0] + x
+        assert left_pos[1] == right_pos[1] + y
+        assert left_pos[2] == right_pos[2] + z
+
+    robot.config = robot.config._replace(
+        instrument_offset={
+            'right': {
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
+            },
+            'left': {
+                'single': (0.0, 0.0, 0.0),
+                'multi': (0.0, 0.0, 0.0)
+            }
+        }
+    )
+    old_config = robot.config
+    _test_offset(-34, 0, 0)
+    _test_offset(-32, 0, 0)
+    _test_offset(100, 3, 1.234)
+    robot.config = old_config
+
+
 def test_pos_tracker_persistance(virtual_smoothie_env):
     robot.reset()
     p300 = instruments.P300_Single(mount='left')
     plate = containers_load(robot, 'trough-12row', '5')
-    # TODO(artyom, 20171030): re-visit once z-value is back into container data
     assert robot.max_placeable_height_on_deck(plate) == 40.0
 
     robot.poses = p300._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p300, save=False)
 
-    # TODO(artyom, 20171030): re-visit once z-value is back into container data
     assert robot.max_placeable_height_on_deck(plate) == 10.0
 
 
@@ -154,3 +185,48 @@ def test_drop_tip_default_trash(virtual_smoothie_env):
             (robot.fixed_trash[0], trash_loc),
             instrument=pip,
             strategy='arc')
+
+
+def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
+    import tempfile
+    temp = tempfile.mkdtemp()
+    monkeypatch.setenv('USER_DEFN_ROOT', temp)
+    robot.reset()
+
+    plate = labware.load('96-flat', '1')
+    pip = instruments.P300_Single(mount='right')
+
+    old_x, old_y, old_z = pose_tracker.absolute(robot.poses, plate[0])
+
+    pip.move_to(plate[0])
+    robot.poses = pip._jog(robot.poses, 'x', 1)
+    robot.poses = pip._jog(robot.poses, 'y', 2)
+    robot.poses = pip._jog(robot.poses, 'z', -3)
+    robot.calibrate_container_with_instrument(plate, pip, save=False)
+    new_pose = pose_tracker.absolute(robot.poses, plate[0])
+
+    assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
+
+
+def test_calibrate_labware_new(
+        virtual_smoothie_env, split_labware_def):
+    robot.reset()
+
+    plate = labware.load('96-flat', '5')
+    pip = instruments.P300_Single(mount='right')
+
+    old_x, old_y, old_z = pose_tracker.absolute(robot.poses, plate[0])
+
+    pip.move_to(plate[0])
+    robot.poses = pip._jog(robot.poses, 'x', 1)
+    robot.poses = pip._jog(robot.poses, 'y', 2)
+    robot.poses = pip._jog(robot.poses, 'z', -3)
+    robot.calibrate_container_with_instrument(plate, pip, save=True)
+    new_pose = pose_tracker.absolute(robot.poses, plate[0])
+
+    assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
+
+    # Ensure that slot offset is removed and new offset file is picked up
+    plate2 = labware.load('96-flat', '1')
+    new_pose2 = pose_tracker.absolute(robot.poses, plate2[0])
+    assert isclose(new_pose2, (15.34, 76.24, 7.5)).all()

@@ -1,3 +1,4 @@
+# pylama:ignore=E252
 import sqlite3
 # import warnings
 from typing import List
@@ -8,15 +9,18 @@ from opentrons.util.vector import Vector
 from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
+import logging
 
+log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')
+if not fflags.split_labware_definitions():
+    log.debug("Database path: {}".format(database_path))
 
 # ======================== Private Functions ======================== #
 
 
 def _parse_container_obj(container: Container):
-    # TODO: figure out how the output of this fn is used--what needs to change
-    # TODO: since all container._coordinates are now (0, 0, 0)
+    # Note: in the new labware system, container coordinates are always (0,0,0)
     return dict(zip('xyz', container._coordinates))
 
 
@@ -66,16 +70,20 @@ def _load_container_object_from_db(db, container_name: str):
     container = Container()
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)
+    log.debug("Loading {} with coords {}".format(rel_coords, container_type))
     for well in wells:
         container.add(*_load_well_object_from_db(db, well))
     return container
 
 
 def _update_container_object_in_db(db, container: Container):
+    coords = _parse_container_obj(container)
+    log.debug("Updating {} with coordinates {}".format(
+        container.get_type(), coords))
     db_queries.update_container(
         db,
         container.get_type(),
-        **_parse_container_obj(container)
+        **coords
     )
 
 
@@ -91,8 +99,6 @@ def _create_well_obj_in_db(db, container_name: str, well: Well):
     )
 
 
-# FIXME: This has ugly output because of the way that
-# wells are added to containers. fix this by fixing placeables....
 def _load_well_object_from_db(db, well_data):
     container_name, location, x, y, z, \
         depth, volume, diameter, length, width = well_data
@@ -135,16 +141,20 @@ def _get_db_version(db):
 
 def _calculate_offset(labware: Container) -> dict:
     new_definition = serializers.labware_to_json(labware)
-    base_definition = ldef.load_json(new_definition['metadata']['name'])
-
+    base_definition = ldef.load_json(
+        new_definition['metadata']['name'], with_offset=False)
     first_well = list(base_definition['wells'].keys())[0]
     base_well = base_definition['wells'][first_well]
     new_well = new_definition['wells'][first_well]
 
+    slot_coords = labware.parent.coordinates()
+
     x, y, z = [
-        new_well[axis] - base_well[axis]
+        new_well[axis] - base_well[axis] - slot_coords[axis]
         for axis in 'xyz'
     ]
+    log.debug("Calculated offset for {} in {}: {}".format(
+        labware.get_name(), labware.get_parent(), (x, y, z)))
     return {'x': x, 'y': y, 'z': z}
 # ======================== END Private Functions ======================== #
 
@@ -186,6 +196,8 @@ def overwrite_container(container: Container) -> bool:
         # warnings.warn('overwrite_container is deprecated, please use save_labware_offset')  # noqa
         res = save_labware_offset(container)
     else:
+        log.debug("Overwriting container definition: {}".format(
+            container.get_type()))
         db_conn = sqlite3.connect(database_path)
         _update_container_object_in_db(db_conn, container)
         res = True  # old overwrite fn does not return anything
@@ -196,6 +208,7 @@ def save_labware_offset(labware: Container, labware_name: str=None) -> bool:
     if labware_name is None:
         labware_name = labware.get_name()
     offset = _calculate_offset(labware)
+    log.debug("Saving offset {} for {}".format(offset, labware_name))
     return ldef.save_labware_offset(labware_name, offset)
 
 

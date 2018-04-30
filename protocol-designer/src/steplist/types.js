@@ -106,8 +106,8 @@ export type TransferForm = {|
   id: StepIdType,
 
   'aspirate--labware'?: string,
-  'aspirate--wells'?: string,
-  'aspirate--pipette'?: string,
+  'aspirate--wells'?: Array<string>,
+  'aspirate--pipette'?: string, // TODO just call this pipette, there's only one
   'aspirate--pre-wet-tip'?: boolean,
   'aspirate--touch-tip'?: boolean,
   'aspirate--air-gap--checkbox'?: boolean,
@@ -121,7 +121,7 @@ export type TransferForm = {|
 
   'dispense--volume'?: string,
   'dispense--labware'?: string,
-  'dispense--wells'?: string,
+  'dispense--wells'?: Array<string>,
   'dispense--mix--checkbox'?: boolean,
   'dispense--mix--volume'?: string,
   'dispense--mix--times'?: string,
@@ -139,8 +139,8 @@ export type ConsolidateForm = {|
 
   'aspirate--volume'?: string,
   'aspirate--labware'?: string,
-  'aspirate--wells'?: string,
-  'aspirate--pipette'?: string,
+  'aspirate--wells'?: Array<string>,
+  'aspirate--pipette'?: string, // TODO just call this pipette, there's only one
   'aspirate--pre-wet-tip'?: boolean,
   'aspirate--touch-tip'?: boolean,
   'aspirate--air-gap--checkbox'?: boolean,
@@ -153,7 +153,7 @@ export type ConsolidateForm = {|
   'aspirate--change-tip'?: 'once' | 'never' | 'always',
 
   'dispense--labware'?: string,
-  'dispense--wells'?: string, // only one well
+  'dispense--wells'?: Array<string>, // only one well
   'dispense--mix--checkbox'?: boolean,
   'dispense--mix--volume'?: string,
   'dispense--mix--times'?: string,

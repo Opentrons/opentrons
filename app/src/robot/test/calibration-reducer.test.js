@@ -1,5 +1,5 @@
 // calibration reducer tests
-import {reducer, actionTypes, constants} from '../'
+import {reducer, actionTypes} from '../'
 
 describe('robot reducer - calibration', () => {
   test('initial state', () => {
@@ -7,7 +7,7 @@ describe('robot reducer - calibration', () => {
 
     expect(state).toEqual({
       deckPopulated: true,
-      jogDistance: constants.JOG_DISTANCE_SLOW_MM,
+      jogDistance: 0.1,
 
       // intrument probed + basic tip-tracking flags
       // TODO(mc, 2018-01-22): combine these into subreducer
@@ -509,16 +509,16 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles TOGGLE_JOG_DISTANCE action', () => {
-    const slow = {calibration: {jogDistance: constants.JOG_DISTANCE_SLOW_MM}}
-    const fast = {calibration: {jogDistance: constants.JOG_DISTANCE_FAST_MM}}
-    const action = {type: actionTypes.TOGGLE_JOG_DISTANCE}
+  test('handles SET_JOG_DISTANCE action', () => {
+    const state = {
+      calibration: {
+        jogDistance: 10
+      }
+    }
 
-    expect(reducer(slow, action).calibration).toEqual({
-      jogDistance: constants.JOG_DISTANCE_FAST_MM
-    })
-    expect(reducer(fast, action).calibration).toEqual({
-      jogDistance: constants.JOG_DISTANCE_SLOW_MM
+    const action = {type: 'robot:SET_JOG_DISTANCE', payload: 1}
+    expect(reducer(state, action).calibration).toEqual({
+      jogDistance: 1
     })
   })
 

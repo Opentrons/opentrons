@@ -3,14 +3,20 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
+
 import SelectablePlate from '../components/SelectablePlate.js'
+
+import {getCollidingWells} from '../utils'
+import {SELECTABLE_WELL_CLASS} from '../constants'
+import {END_STEP} from '../steplist/types'
+
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
-import {preselectWells, selectWells} from '../labware-ingred/actions'
 
-import {END_STEP} from '../steplist/types'
+import {highlightWells, selectWells, deselectWells} from '../labware-ingred/actions'
+import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {WellContents} from '../labware-ingred/types'
 import type {BaseState} from '../types'
@@ -25,7 +31,9 @@ type Props = React.ElementProps<typeof SelectablePlate>
 
 type DispatchProps = {
   onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
-  onSelectionDone: $PropertyType<Props, 'onSelectionDone'>
+  onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
+  handleMouseOverWell: $PropertyType<Props, 'handleMouseOverWell'>,
+  handleMouseExitWell: $PropertyType<Props, 'handleMouseExitWell'>
 }
 
 type StateProps = $Diff<Props, DispatchProps>
@@ -36,13 +44,23 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {
-    throw new Error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    console.error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    return {
+      containerId: '',
+      wellContents: {},
+      containerType: '',
+      selectable: ownProps.selectable
+    }
   }
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
+
+  const wellSelectionMode = true
+  const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
@@ -53,24 +71,35 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     prevStepId = Math.max(stepId - 1, 0)
   }
 
-  const highlightedWells = deckSetupMode ? {} : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
-
   let wellContents = {}
   if (deckSetupMode) {
-    // selection for deck setup
-    wellContents = selectors.wellContentsAllLabware(state)[containerId]
+    // selection for deck setup: shows initial state of liquids
+    wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
-    // well contents for step, not deck setup mode
+    // well contents for step, not inital state.
+    // shows liquids the current step in timeline
     const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])
       ? allWellContentsForSteps[prevStepId][containerId]
       : {}
-    // TODO Ian 2018-04-11 separate out selected/highlighted state from wellContents props of Plate,
-    // so you don't have to do this merge
+
+    let highlightedWells = {}
+    const selectedWells = wellSelectionSelectors.getSelectedWells(state)
+
+    if (wellSelectionModeForLabware) {
+      // wells are highlighted for well selection hover
+      highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
+    } else {
+      // wells are highlighted for steps / substep hover
+      const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
+      highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
+    }
+
     wellContents = mapValues(
       wellContentsWithoutHighlight,
-      (wellContents: WellContents, well: string) => ({
-        ...wellContents,
-        selected: highlightedWells && highlightedWells[containerId] && highlightedWells[containerId][well]
+      (wellContentsForWell: WellContents, well: string) => ({
+        ...wellContentsForWell,
+        highlighted: highlightedWells[well],
+        selected: selectedWells[well]
       })
     )
   }
@@ -84,9 +113,31 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
 }
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
+  const labwareType = 'TODO NEXT PR' // TODO Ian 2018-04-25
+  const pipetteChannels = 1 // TODO Ian 2018-04-25
+
   return {
-    onSelectionMove: (e, rect) => dispatch(preselectWells(e, rect)),
-    onSelectionDone: (e, rect) => dispatch(selectWells(e, rect))
+    onSelectionMove: (e, rect) => dispatch(highlightWells({
+      wells: getCollidingWells(rect, SELECTABLE_WELL_CLASS),
+      labwareType,
+      pipetteChannels
+    })),
+
+    onSelectionDone: (e, rect) => {
+      const wells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+      if (e.shiftKey) {
+        dispatch(deselectWells({wells, labwareType, pipetteChannels}))
+      } else {
+        dispatch(selectWells({wells, labwareType, pipetteChannels}))
+      }
+    },
+
+    handleMouseOverWell: (well: string) => () => dispatch(
+      highlightWells({wells: {[well]: well}, labwareType, pipetteChannels})
+    ),
+    handleMouseExitWell: () => dispatch(
+      highlightWells({wells: {}, labwareType, pipetteChannels})
+    )
   }
 }
 

@@ -1,10 +1,11 @@
 // @flow
 // labware calibration controls modal
 import * as React from 'react'
+import cx from 'classnames'
 
 import type {Labware} from '../../robot'
 
-import {TitleBar, Overlay} from '@opentrons/components'
+import {ModalPage} from '@opentrons/components'
 import ConfirmModalContents from './ConfirmModalContents'
 import styles from './styles.css'
 
@@ -22,21 +23,23 @@ export default function ConfirmModal (props: Props) {
     labware.calibration === 'picked-up'
   )
 
-  // TODO(mc, 2018-02-07): TitleBar is locked to <h1> and <h2>
-  //   this isn't quite semantic, so fix it up
+  // TODO (ka 2018-4-18): this is a temporary workaround for a stlye over ride for in progress screens with transparate bg
+  const contentsStyle = labware.calibration.match(/^(moving-to-slot|picking-up|dropping-tip|confirming)$/)
+    ? cx(styles.modal_contents, styles.in_progress_contents)
+    : styles.modal_contents
+
+  const titleBar = {
+    title: 'Calibrate Deck',
+    subtitle: labware.type,
+    back: {onClick: onBackClick, disabled: backClickDisabled}
+  }
+
   return (
-    <div className={styles.modal}>
-      <Overlay />
-      <TitleBar
-        className={styles.title_bar}
-        title='Calibrate Deck'
-        subtitle={labware.type}
-        onBackClick={onBackClick}
-        backClickDisabled={backClickDisabled}
-      />
-      <div className={styles.modal_contents}>
-        <ConfirmModalContents {...labware} />
-      </div>
-    </div>
+    <ModalPage
+      titleBar={titleBar}
+      contentsClassName={contentsStyle}
+    >
+      <ConfirmModalContents {...labware} />
+    </ModalPage>
   )
 }
