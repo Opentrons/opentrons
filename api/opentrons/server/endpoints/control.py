@@ -1,3 +1,4 @@
+import asyncio
 import os
 import json
 import logging
@@ -284,6 +285,34 @@ async def turn_on_rail_lights(request):
 async def turn_off_rail_lights(request):
     robot.turn_off_rail_lights()
     return web.json_response({"lights": "off"})
+
+
+async def take_picture(request):
+    filename = './picture.jpg'
+    if os.path.exists(filename):
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
+
+    cmd = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1'  # NOQA
+    proc = await asyncio.create_subprocess_shell(
+        '{} {}'.format(cmd, filename),
+        stdout=asyncio.subprocess.PIPE,
+        loop=request.loop)
+
+    res = await proc.stdout.read()
+    res = res.decode().strip()
+    await proc.wait()
+
+    # TODO (andy - 2018-04-23) find better way of ensuring picture was taken
+    # TODO              and properly saved by ffmpeg
+    if 'video:' in res and 'audio:' in res and 'subtitle:' in res:
+        return web.json_response({'message': res}, status=500)
+    if not os.path.exists(filename):
+        return web.json_response({'message': 'picture not saved'}, status=500)
+
+    return web.FileResponse(filename)
 
 
 async def restart(request):
