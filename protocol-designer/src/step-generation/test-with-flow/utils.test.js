@@ -21,18 +21,38 @@ describe('repeatArray', () => {
 })
 
 describe('reduceCommandCreators', () => {
+  // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
+  type CountState = {count: number}
+  const addCreator: any = (num: number) => (prevState: CountState) => ({
+    commands: [`command: add ${num}`],
+    robotState: {count: prevState.count + num},
+    errors: null
+  })
+
+  const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
+    commands: [`command: multiply by ${num}`],
+    robotState: {count: prevState.count * num},
+    errors: null
+  })
+
+  const divideCreator: any = (num: number) => (prevState: CountState) => {
+    let errors = []
+
+    if (num === 0) {
+      errors.push({
+        message: 'Cannot divide by zero',
+        type: 'DIVIDE_BY_ZERO'
+      })
+    }
+
+    return {
+      commands: [`command: divide by ${num}`],
+      robotState: {count: prevState.count / num},
+      errors
+    }
+  }
+
   test('basic command creators', () => {
-    // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
-    const addCreator: any = (num: number) => (prevState: {count: number}) => ({
-      commands: [`command: add ${num}`],
-      robotState: {count: prevState.count + num}
-    })
-
-    const multiplyCreator: any = (num: number) => (prevState: {count: number}) => ({
-      commands: [`command: multiply by ${num}`],
-      robotState: {count: prevState.count * num}
-    })
-
     const initialState: any = {count: 0}
     const result: any = reduceCommandCreators([addCreator(1), multiplyCreator(2)])(initialState)
 
@@ -42,6 +62,26 @@ describe('reduceCommandCreators', () => {
       'command: add 1',
       'command: multiply by 2'
     ])
+  })
+
+  test('error in a command short-circuits the command creation pipeline', () => {
+    const initialState: any = {count: 5}
+    const result = reduceCommandCreators([
+      addCreator(4),
+      divideCreator(0),
+      multiplyCreator(3)
+    ])(initialState)
+
+    expect(result.errors).toEqual([{
+      message: 'Cannot divide by zero',
+      type: 'DIVIDE_BY_ZERO'
+    }])
+
+    expect(result.errorStep).toEqual(1) // divide step passed the error
+
+    expect(result.commands).toEqual(['command: add 4'])
+
+    expect(result.robotState).toEqual({count: 9}) // state after prev adding step
   })
 })
 

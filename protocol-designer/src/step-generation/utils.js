@@ -19,14 +19,30 @@ export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
 export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): CommandCreator =>
   (prevRobotState: RobotState) => (
     commandCreators.reduce(
-      (prev, reducerFn) => {
+      (prev, reducerFn, stepIdx) => {
+        if (prev.errors) {
+          // if there are errors, short-circuit the reduce
+          return prev
+        }
+
         const next = reducerFn(prev.robotState)
+
+        if (next.errors) {
+          return {
+            robotState: prev.robotState,
+            commands: prev.commands,
+            errors: next.errors,
+            errorStep: stepIdx
+          }
+        }
+
         return {
           robotState: next.robotState,
-          commands: [...prev.commands, ...next.commands]
+          commands: [...prev.commands, ...next.commands],
+          errors: null
         }
       },
-      {robotState: cloneDeep(prevRobotState), commands: []}
+      {robotState: cloneDeep(prevRobotState), commands: [], errors: null}
       // TODO: should I clone here (for safety) or is it safe enough?
       // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
     )
