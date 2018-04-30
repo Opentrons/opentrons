@@ -388,6 +388,12 @@ class SmoothieDriver_3_0_0:
 
     @property
     def homing_status(self):
+        if not self.is_connected():
+            print('FUCK fuck FUCK')
+            return {
+                ax: False
+                for ax in AXES
+            }
         res = self._send_command(GCODES['HOMING_STATUS'])
         return _parse_homing_status_values(res)
 
@@ -942,7 +948,11 @@ class SmoothieDriver_3_0_0:
         self._setup()
 
     def _home_if_needed(self, axes_string):
-        current_status = [
+        '''
+        Given a list of axes to check, this method will home each axis if
+        Smoothieware's internal flag sets it as needing to be homed
+        '''
+        current_homing_status = [
             axis
             for axis, needs_homing in self.homing_status.items()
             if needs_homing
@@ -950,10 +960,10 @@ class SmoothieDriver_3_0_0:
         axes_to_home = [
             ax
             for ax in axes_string
-            if ax in current_status
+            if ax in current_homing_status
         ]
-        self.home(''.join(axes_to_home))
-
+        if axes_to_home:
+            self.home(''.join(axes_to_home))
 
     def _smoothie_reset(self):
         log.debug('Resetting Smoothie (simulating: {})'.format(
