@@ -38,11 +38,10 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
 
         return {
           robotState: next.robotState,
-          commands: [...prev.commands, ...next.commands],
-          errors: null
+          commands: [...prev.commands, ...next.commands]
         }
       },
-      {robotState: cloneDeep(prevRobotState), commands: [], errors: null}
+      {robotState: cloneDeep(prevRobotState), commands: []}
       // TODO: should I clone here (for safety) or is it safe enough?
       // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
     )

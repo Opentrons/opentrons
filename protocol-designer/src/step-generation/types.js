@@ -174,17 +174,26 @@ export type Command = {|
   volume: number
 |}
 
-export type ErrorType = 'INSUFFICIENT_TIPS' // TODO Ian 2018-04-30 add in gradually: 'MISMATCHED_SOURCE_DEST_WELLS' | 'LABWARE_DOES_NOT_EXIST'
+export type ErrorType =
+  | 'INSUFFICIENT_TIPS'
+  | 'MISMATCHED_SOURCE_DEST_WELLS'
+  | 'LABWARE_DOES_NOT_EXIST'
+  | 'PIPETTE_DOES_NOT_EXIST'
+  | 'NO_TIP_ON_PIPETTE'
+  | 'PIPETTE_VOLUME_EXCEEDED'
 
 export type CommandCreatorError = {|
   message: string,
   type: ErrorType
 |}
 
-export type CommandCreator = (prevRobotState: RobotState) => {|
+export type CommandsAndRobotState = {|
   commands: Array<Command>,
-  robotState: RobotState,
-  // truthy `errors` key indicates errors while creating commands
-  errors: ?Array<CommandCreatorError>,
-  errorStep?: number,
+  robotState: RobotState
 |}
+
+export type CommandCreatorErrorResponse = {
+  errors: Array<CommandCreatorError>
+}
+
+export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse

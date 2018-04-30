@@ -1,8 +1,11 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState} from './fixtures' // getTipColumn, getTiprackTipstate, createEmptyLiquidState
-import transfer from '../transfer'
+import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures' // getTipColumn, getTiprackTipstate, createEmptyLiquidState
+import _transfer from '../transfer'
 import {FIXED_TRASH_ID} from '../../constants'
+
+const transfer = commandCreatorNoErrors(_transfer)
+const transferWithErrors = commandCreatorHasErrors(_transfer)
 
 let transferArgs
 let robotInitialState
@@ -78,10 +81,12 @@ describe('pick up tip if no tip on pipette', () => {
       changeTip: 'never'
     }
 
-    expect(
-      // $FlowFixMe // TODO Ian 2018-04-02: here, flow doesn't like transferArgs fields
-      () => transfer(transferArgs)(robotInitialState)
-    ).toThrow(/Attempted to aspirate with no tip.*/)
+    const result = transferWithErrors(transferArgs)(robotInitialState)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'NO_TIP_ON_PIPETTE'
+    })
   })
 })
 

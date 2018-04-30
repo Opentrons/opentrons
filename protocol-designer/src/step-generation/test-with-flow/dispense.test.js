@@ -1,10 +1,17 @@
 // @flow
-import {createRobotState} from './fixtures'
-import dispense from '../dispense'
+import {
+  createRobotState,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors
+} from './fixtures'
+import _dispense from '../dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
+
+const dispense = commandCreatorNoErrors(_dispense)
+const dispenseWithErrors = commandCreatorHasErrors(_dispense)
 
 describe('dispense', () => {
   let initialRobotState
@@ -54,12 +61,17 @@ describe('dispense', () => {
     })
 
     test('dispensing without tip should throw error', () => {
-      expect(() => dispense({
+      const result = dispenseWithErrors({
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
         well: 'A1'
-      })(initialRobotState)).toThrow(/Attempted to dispense with no tip on pipette/)
+      })(initialRobotState)
+
+      expect(result.errors).toHaveLength(1)
+      expect(result.errors[0]).toMatchObject({
+        type: 'NO_TIP_ON_PIPETTE'
+      })
     })
 
     // TODO Ian 2018-02-12... what is excessive volume?

@@ -25,14 +25,12 @@ describe('reduceCommandCreators', () => {
   type CountState = {count: number}
   const addCreator: any = (num: number) => (prevState: CountState) => ({
     commands: [`command: add ${num}`],
-    robotState: {count: prevState.count + num},
-    errors: null
+    robotState: {count: prevState.count + num}
   })
 
   const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
     commands: [`command: multiply by ${num}`],
-    robotState: {count: prevState.count * num},
-    errors: null
+    robotState: {count: prevState.count * num}
   })
 
   const divideCreator: any = (num: number) => (prevState: CountState) => {
@@ -72,16 +70,15 @@ describe('reduceCommandCreators', () => {
       multiplyCreator(3)
     ])(initialState)
 
-    expect(result.errors).toEqual([{
-      message: 'Cannot divide by zero',
-      type: 'DIVIDE_BY_ZERO'
-    }])
-
-    expect(result.errorStep).toEqual(1) // divide step passed the error
-
-    expect(result.commands).toEqual(['command: add 4'])
-
-    expect(result.robotState).toEqual({count: 9}) // state after prev adding step
+    expect(result).toEqual({
+      robotState: {count: 9}, // last valid state before division error
+      commands: ['command: add 4'], // last valid set of commands before division error
+      errors: [{
+        message: 'Cannot divide by zero',
+        type: 'DIVIDE_BY_ZERO'
+      }],
+      errorStep: 1 // divide step passed the error
+    })
   })
 })
 

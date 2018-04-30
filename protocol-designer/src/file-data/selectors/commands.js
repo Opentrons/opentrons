@@ -108,23 +108,27 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
 
 type RobotStateTimelineAcc = {
   formErrors: {[string]: string},
-  timeline: Array<{|
-    commands: Array<StepGeneration.Command>,
-    robotState: StepGeneration.RobotState
-  |}>,
-  robotState: StepGeneration.RobotState
+  timeline: Array<StepGeneration.CommandsAndRobotState>,
+  robotState: StepGeneration.RobotState,
+  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>
 }
 
-export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.CommandCreator, *>> = createSelector(
+export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRobotState> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId) => {
+    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
       if (!isEmpty(acc.formErrors)) {
-        // stop reducing if there are errors
+        // stop reducing if there are errors with validating / processing the form
         return acc
       }
+
+      if (acc.timelineErrors) {
+        // stop reducing if there were timeline errors
+        return acc
+      }
+
       const form = forms[stepId]
 
       if (stepId === 0) {
@@ -150,6 +154,13 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
 
       if (form.validatedForm.stepType === 'consolidate') {
         const nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
+        // TODO: DRY
+        if (nextCommandsAndState.errors) {
+          return {
+            ...acc,
+            timelineErrors: nextCommandsAndState.errors
+          }
+        }
         return {
           ...acc,
           timeline: [...acc.timeline, nextCommandsAndState],
@@ -159,6 +170,13 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
 
       if (form.validatedForm.stepType === 'transfer') {
         const nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+        // TODO: DRY
+        if (nextCommandsAndState.errors) {
+          return {
+            ...acc,
+            timelineErrors: nextCommandsAndState.errors
+          }
+        }
         return {
           ...acc,
           timeline: [...acc.timeline, nextCommandsAndState],
@@ -171,7 +189,7 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         ...acc,
         formErrors: {...acc.formErrors, 'STEP NOT IMPLEMENTED': form.validatedForm.stepType}
       }
-    }, {formErrors: {}, timeline: [], robotState: initialRobotState})
+    }, {formErrors: {}, timeline: [], robotState: initialRobotState, timelineErrors: null})
     // TODO Ian 2018-03-01 pass along name and description of steps for command annotations in file
 
     if (!isEmpty(result.formErrors)) {

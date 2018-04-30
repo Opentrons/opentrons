@@ -6,8 +6,8 @@ import aspirate from './aspirate'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import {reduceCommandCreators} from './utils'
-// blowout, repeatArray
 import touchTip from './touchTip'
+import * as errorCreators from './errorCreators'
 import type {TransferFormData, RobotState, CommandCreator} from './'
 
 const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -24,9 +24,14 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
   */
 
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
+  const actionName = 'transfer'
+
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
-    throw new Error('Consolidate called with pipette that does not exist in robotState, pipette id: ' + data.pipette) // TODO test
+    // bail out before doing anything else
+    return {
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
+    } // TODO test
   }
 
   // TODO error on negative data.disposalVolume?

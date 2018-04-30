@@ -1,7 +1,15 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotStateFixture, createEmptyLiquidState, getTipColumn, getTiprackTipstate} from './fixtures'
-import {consolidate} from '../'
+import {
+  createRobotStateFixture,
+  createEmptyLiquidState,
+  getTipColumn,
+  getTiprackTipstate,
+  commandCreatorNoErrors
+} from './fixtures'
+import _consolidate from '../consolidate'
+
+const consolidate = commandCreatorNoErrors(_consolidate)
 
 const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
@@ -127,6 +135,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -397,6 +406,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -473,6 +483,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -624,6 +635,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -788,6 +800,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
