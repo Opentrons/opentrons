@@ -3,14 +3,12 @@
 
 import type {Error} from '../types'
 import type {RobotService} from '../robot'
+import type {ApiRequestError} from './client'
 
 type Method = 'GET' | 'POST'
 
-export type ApiRequestError = Error & {
-  url?: string,
-  status?: number,
-  statusText?: string,
-}
+// TODO(mc, 2018-04-30): deprecate importing this type from client
+export type {ApiRequestError}
 
 // not a real Error or Response so it can be copied across worker boundries
 function ResponseError (
