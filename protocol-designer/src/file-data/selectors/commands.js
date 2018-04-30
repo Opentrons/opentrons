@@ -194,7 +194,12 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
 
     if (!isEmpty(result.formErrors)) {
       // TODO 2018-03-01 remove later
-      console.warn('Got form errors while constructing timeline', result)
+      console.log('Got form errors while constructing timeline', result)
+    }
+
+    if (result.timelineErrors) {
+      // TODO 2018-04-30 remove later
+      console.log('Got timeline errors', result)
     }
 
     return result.timeline
