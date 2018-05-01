@@ -5,7 +5,7 @@ import type {CommandCreatorError} from './types'
 export function insufficientTips (): CommandCreatorError {
   return {
     type: 'INSUFFICIENT_TIPS',
-    message: 'No more tips for pipette, cannot replace tip'
+    message: 'Not enough tips to complete action'
   }
 }
 

@@ -2,17 +2,15 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-
+import {selectors} from '../file-data'
 import {AlertItem} from '@opentrons/components'
 import styles from './Alert.css'
 import type {BaseState} from '../types'
-
-type ErrorType = string // TODO IMMEDIATELY import enum type
+import type {ErrorType, CommandCreatorError} from '../step-generation'
 
 type SP = {
   alerts: Array<{
-    type: ErrorType,
-    message: string,
+    ...CommandCreatorError,
     dismissId?: string // presence of dismissId allows alert to be dismissed
   }>
 }
@@ -24,7 +22,7 @@ type DP = {
 type Props = SP & DP
 
 const captions: {[ErrorType]: string} = {
-  'TIP': 'Add another tip rack to an empty slot in Deck Setup'
+  'INSUFFICIENT_TIPS': 'Add another tip rack to an empty slot in Deck Setup'
 }
 
 function Alerts (props: Props) {
@@ -49,14 +47,19 @@ function Alerts (props: Props) {
 }
 
 function mapStateToProps (state: BaseState): SP {
-  // TODO IMMEDIATELY: use selector
+  const timelineFull = selectors.robotStateTimelineFull(state)
+  const errors = timelineFull.timelineErrors
+
+  if (!errors || errors.length === 0) {
+    return {
+      alerts: []
+    }
+  }
+
   return {
-    alerts: [
-      {type: 'TEST', message: 'TEST Message is here', dismissId: '123'},
-      {type: 'TIP', message: 'TIP Message is here'},
-      {type: 'TEST', message: 'TEST Message is here', dismissId: '123'},
-      {type: 'TEST', message: 'TEST Message is here', dismissId: '123'}
-    ]
+    alerts: errors.map(err => ({...err})) // NOTE Flow complains about exact obj types if you don't map & unpack here
+
+    // TODO LATER Ian 2018-05-01 generate warnings somewhere, and merge in here with dismissId's
   }
 }
 
