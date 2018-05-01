@@ -73,6 +73,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const wellSelectionMode = true
   const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
+  // TODO Ian 2018-05-01: selector for prevStepId. If steps are deleted, IDs aren't sequential.
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
     // last liquid state
@@ -89,9 +90,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   } else {
     // well contents for step, not inital state.
     // shows liquids the current step in timeline
-    const wellContentsWithoutHighlight = (allWellContentsForSteps[prevStepId])
-      ? allWellContentsForSteps[prevStepId][containerId]
-      : {}
+    const wellContentsWithoutHighlight = allWellContentsForSteps[prevStepId] &&
+      allWellContentsForSteps[prevStepId][containerId]
+
+    if (!wellContentsWithoutHighlight) {
+      // TODO Ian 2018-05-01 fix in PR 1334
+      console.error('TODO: use robotStateTimeline\'s last valid well contents state as a fallback, when there are upstream invalid steps')
+    }
 
     let highlightedWells = {}
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)
