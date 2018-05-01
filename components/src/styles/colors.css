@@ -18,6 +18,7 @@
 
   /* general UI */
   --c-highlight: #5fd8ee;
+  --c-warning: #e28200;
 
   /* Misc */
   --c-overlay: rgba(0, 0, 0, 0.7);
