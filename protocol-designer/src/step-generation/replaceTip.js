@@ -1,6 +1,7 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
+import {insufficientTips} from './errorCreators'
 import type {RobotState, CommandCreator} from './types'
 
 const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
@@ -11,18 +12,22 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   */
   const pipetteData = prevRobotState.instruments[pipetteId]
 
-  // TODO IMMEDIATELY: more elegant way to avoid this mutation-driven state update?
   let robotState = cloneDeep(prevRobotState)
 
   // get next full tiprack in slot order
   const nextTiprack = getNextTiprack(pipetteData.channels, robotState)
 
   if (!nextTiprack) {
-    throw new Error('TODO IMMEDIATELY/SOON! Need to figure out how to handle running out of tips') // TODO: test
+    return {
+      errors: [insufficientTips()]
+    }
   }
 
   // drop tip if you have one
   const dropTipResult = dropTip(pipetteData.id)(robotState)
+  if (dropTipResult.errors) {
+    return dropTipResult
+  }
   robotState = dropTipResult.robotState
 
   const commands = [
@@ -46,6 +51,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   if (pipetteData.channels === 8) {
     const allWells = tiprackWellNamesByCol.find(col => col[0] === nextTiprack.well)
     if (!allWells) {
+      // TODO Ian 2018-04-30 return {errors}, don't throw
       throw new Error('Invalid well: ' + nextTiprack.well) // TODO: test
     }
     allWells.forEach(function (well) {

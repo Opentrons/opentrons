@@ -108,27 +108,32 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
 
 type RobotStateTimelineAcc = {
   formErrors: {[string]: string},
-  timeline: Array<{|
-    commands: Array<StepGeneration.Command>,
-    robotState: StepGeneration.RobotState
-  |}>,
-  robotState: StepGeneration.RobotState
+  timeline: Array<StepGeneration.CommandsAndRobotState>,
+  robotState: StepGeneration.RobotState,
+  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>
 }
 
-export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.CommandCreator, *>> = createSelector(
+export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRobotState> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId) => {
+    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
       if (!isEmpty(acc.formErrors)) {
-        // stop reducing if there are errors
+        // short-circut the reduce if there were errors with validating / processing the form
         return acc
       }
+
+      if (acc.timelineErrors) {
+        // short-circut the reduce if there were timeline errors
+        return acc
+      }
+
       const form = forms[stepId]
 
       if (stepId === 0) {
-        // first stepId is initial deck setup.
+        // The first stepId is the "initial deck setup" step.
+        // It doesn't have a form, it just sets up initialRobotState
         return {
           ...acc,
           timeline: [
@@ -141,6 +146,7 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         }
       }
 
+      // put form errors into accumulator
       if (!form.validatedForm) {
         return {
           ...acc,
@@ -148,35 +154,50 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         }
       }
 
+      // finally, deal with valid step forms
+      let nextCommandsAndState
+
       if (form.validatedForm.stepType === 'consolidate') {
-        const nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
-        return {
-          ...acc,
-          timeline: [...acc.timeline, nextCommandsAndState],
-          robotState: nextCommandsAndState.robotState
-        }
+        nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
       }
-
       if (form.validatedForm.stepType === 'transfer') {
-        const nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+        nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+      }
+
+      if (!nextCommandsAndState) {
+        // TODO implement the remaining steps
         return {
           ...acc,
-          timeline: [...acc.timeline, nextCommandsAndState],
-          robotState: nextCommandsAndState.robotState
+          formErrors: {
+            ...acc.formErrors,
+            'STEP NOT IMPLEMENTED': form.validatedForm.stepType
+          }
         }
       }
 
-      // TODO don't ignore everything that's not consolidate/transfer
+      // for supported steps
+      if (nextCommandsAndState.errors) {
+        return {
+          ...acc,
+          timelineErrors: nextCommandsAndState.errors
+        }
+      }
       return {
         ...acc,
-        formErrors: {...acc.formErrors, 'STEP NOT IMPLEMENTED': form.validatedForm.stepType}
+        timeline: [...acc.timeline, nextCommandsAndState],
+        robotState: nextCommandsAndState.robotState
       }
-    }, {formErrors: {}, timeline: [], robotState: initialRobotState})
+    }, {formErrors: {}, timeline: [], robotState: initialRobotState, timelineErrors: null})
     // TODO Ian 2018-03-01 pass along name and description of steps for command annotations in file
 
     if (!isEmpty(result.formErrors)) {
-      // TODO 2018-03-01 remove later
-      console.warn('Got form errors while constructing timeline', result)
+      // TODO Ian 2018-03-01 remove log later
+      console.log('Got form errors while constructing timeline', result)
+    }
+
+    if (result.timelineErrors) {
+      // TODO Ian 2018-04-30 remove log later
+      console.log('Got timeline errors', result)
     }
 
     return result.timeline

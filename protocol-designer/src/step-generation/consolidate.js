@@ -4,6 +4,7 @@ import flatMap from 'lodash/flatMap'
 import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
 import mix from './mix'
+import * as errorCreators from './errorCreators'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
 const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -16,9 +17,14 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
 
     A single uniform volume will be aspirated from every source well.
   */
+  const actionName = 'consolidate'
+
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
-    throw new Error('Consolidate called with pipette that does not exist in robotState, pipette id: ' + data.pipette) // TODO test
+    // bail out before doing anything else
+    return {
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
+    }
   }
 
   // TODO error on negative data.disposalVolume?

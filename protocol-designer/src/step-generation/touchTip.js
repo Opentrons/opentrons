@@ -1,19 +1,27 @@
 // @flow
 // import cloneDeep from 'lodash/cloneDeep'
-import type {RobotState, CommandCreator, PipetteLabwareFields} from './'
+import {noTipOnPipette, pipetteDoesNotExist} from './errorCreators'
+import type {RobotState, CommandCreator, CommandCreatorError, PipetteLabwareFields} from './'
 
 const touchTip = (args: PipetteLabwareFields): CommandCreator => (prevRobotState: RobotState) => {
   /** touchTip with given args. Requires tip. */
+  const actionName = 'touchTip'
   const {pipette, labware, well} = args
 
   const pipetteData = prevRobotState.instruments[pipette]
 
+  let errors: Array<CommandCreatorError> = []
+
   if (!pipetteData) {
-    throw new Error(`Attempted to touchTip with pipette id "${pipette}", this pipette was not found under "instruments"`)
+    errors.push(pipetteDoesNotExist({actionName, pipette}))
   }
 
   if (prevRobotState.tipState.pipettes[pipette] === false) {
-    throw new Error(`Attempted to touchTip with no tip on pipette: ${pipette} from ${labware}'s well ${well}`)
+    errors.push(noTipOnPipette({actionName, pipette, labware, well}))
+  }
+
+  if (errors.length > 0) {
+    return {errors}
   }
 
   const commands = [{
@@ -25,7 +33,7 @@ const touchTip = (args: PipetteLabwareFields): CommandCreator => (prevRobotState
 
   return {
     commands,
-    robotState: prevRobotState // TODO LATER deep clone robotState and manipulate it for liquid tracking here?
+    robotState: prevRobotState
   }
 }
 

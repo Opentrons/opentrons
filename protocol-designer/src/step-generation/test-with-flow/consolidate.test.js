@@ -1,7 +1,17 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotStateFixture, createEmptyLiquidState, getTipColumn, getTiprackTipstate} from './fixtures'
-import {consolidate} from '../'
+import {
+  createRobotStateFixture,
+  createEmptyLiquidState,
+  getTipColumn,
+  getTiprackTipstate,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors
+} from './fixtures'
+import _consolidate from '../consolidate'
+
+const consolidate = commandCreatorNoErrors(_consolidate)
+const consolidateWithErrors = commandCreatorHasErrors(_consolidate)
 
 const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
@@ -127,6 +137,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -397,6 +408,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -473,6 +485,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -624,6 +637,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -788,6 +802,7 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(robotInitialState)
+
     expect(result.commands).toEqual([
       {
         command: 'pick-up-tip',
@@ -1515,6 +1530,21 @@ describe('consolidate single-channel', () => {
       }
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
+  })
+
+  test('invalid pipette ID should return error', () => {
+    const data = {
+      ...baseData,
+      sourceWells: ['A1', 'A2'],
+      volume: 150,
+      changeTip: 'once',
+      pipette: 'no-such-pipette-id-here'
+    }
+
+    const result = consolidateWithErrors(data)(robotInitialState)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
   test('delay after dispense') // TODO Ian 2018-04-05 support delay in consolidate

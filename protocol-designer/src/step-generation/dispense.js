@@ -1,13 +1,21 @@
 // @flow
-import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
+import * as errorCreators from './errorCreators'
 import updateLiquidState from './dispenseUpdateLiquidState'
+import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from './'
 
 /** Dispense with given args. Requires tip. */
 const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
   const {pipette, volume, labware, well} = args
 
+  const actionName = 'dispense'
+  let errors: Array<CommandCreatorError> = []
+
   if (prevRobotState.tipState.pipettes[pipette] === false) {
-    throw new Error(`Attempted to dispense with no tip on pipette: ${volume} uL with ${pipette} from ${labware}'s well ${well}`)
+    errors.push(errorCreators.noTipOnPipette({actionName, pipette, labware, well}))
+  }
+
+  if (errors.length > 0) {
+    return {errors}
   }
 
   const commands = [{

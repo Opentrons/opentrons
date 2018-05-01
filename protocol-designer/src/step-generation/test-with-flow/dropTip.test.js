@@ -1,9 +1,11 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState} from './fixtures'
-import dropTip from '../dropTip'
+import {createRobotState, commandCreatorNoErrors} from './fixtures'
+import _dropTip from '../dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
+
+const dropTip = commandCreatorNoErrors(_dropTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 
@@ -60,7 +62,9 @@ describe('dropTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('drop tip if there is a tip', () => {
-      const result = dropTip('p300SingleId')(makeRobotState({singleHasTips: true, multiHasTips: true}))
+      const result = dropTip('p300SingleId')(makeRobotState({singleHasTips: true, multiHasTips: true})
+      )
+
       expect(result.commands).toEqual([{
         command: 'drop-tip',
         pipette: 'p300SingleId',
