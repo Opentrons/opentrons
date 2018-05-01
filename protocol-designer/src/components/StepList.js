@@ -14,6 +14,7 @@ import StepCreationButton from '../containers/StepCreationButton'
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
 type StepListProps = {
+  errorStepId: ?StepIdType, // this is the first step with an error
   selectedStepId: StepIdTypeWithEnd | null,
   hoveredSubstep: SubstepIdentifier,
   steps: Array<StepItemData & {substeps: StepSubItemData}>,
@@ -61,6 +62,10 @@ export default function StepList (props: StepListProps) {
     >
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
+          error={(props.errorStepId && step.id)
+            ? (step.id >= props.errorStepId)
+            : false
+          }
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
           onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(step.id)}
           onCollapseToggle={

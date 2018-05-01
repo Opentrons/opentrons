@@ -110,7 +110,8 @@ export type RobotStateTimelineAcc = {
   formErrors: {[string]: string},
   timeline: Array<StepGeneration.CommandsAndRobotState>,
   robotState: StepGeneration.RobotState,
-  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>
+  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>,
+  errorStepId?: number
 }
 
 // exposes errors and last valid robotState
@@ -180,7 +181,8 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       if (nextCommandsAndState.errors) {
         return {
           ...acc,
-          timelineErrors: nextCommandsAndState.errors
+          timelineErrors: nextCommandsAndState.errors,
+          errorStepId: stepId
         }
       }
       return {
