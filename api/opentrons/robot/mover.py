@@ -23,14 +23,19 @@ class Mover:
 
         target[axis] += distance
 
-        return self.move(pose_tree, **target)
+        return self.move(pose_tree, home_flagged_axes=False, **target)
 
-    def move(self, pose_tree, x=None, y=None, z=None):
+    def move(self, pose_tree, x=None, y=None, z=None, home_flagged_axes=True):
         """
         Dispatch move command to the driver changing base of
         x, y and z from source coordinate system to destination.
 
         Value must be set for each axis that is mapped.
+
+        home_flagged_axes: (default=True)
+            This kwarg is passed to the driver. This ensures that any axes
+            within this Mover's axis_mapping is homed before moving, if it has
+            not yet done so. See driver docstring for details
         """
         def defaults(_x, _y, _z):
             _x = _x if x is not None else 0
@@ -56,7 +61,7 @@ class Mover:
         if 'z' in self._axis_mapping:
             assert z is not None, "Value must be set for each axis mapped"
             driver_target[self._axis_mapping['z']] = dst_z
-        self._driver.move(driver_target)
+        self._driver.move(driver_target, home_flagged_axes=home_flagged_axes)
 
         # Update pose with the new value. Since stepper motors are open loop
         # there is no need to to query diver for position

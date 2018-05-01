@@ -733,7 +733,24 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target):
+    def move(self, target, home_flagged_axes=False):
+        '''
+        Move to the `target` Smoothieware coordinate, along any of the size
+        axes, XYZABC.
+
+        target: dict
+            dict setting the coordinate that Smoothieware will be at when
+            `move()` returns. `target` keys are the axis in upper-case, and the
+            values are the coordinate in millimeters (float)
+
+        home_flagged_axes: boolean (default=False)
+            If set to `True`, each axis included within the target coordinate
+            may be homed before moving, determined by Smoothieware's internal
+            homing-status flags (`True` means it has already homed). All axes'
+            flags are set to `False` by Smoothieware under three conditions:
+            1) Smoothieware boots or resets, 2) if a HALT gcode or signal
+            is sent, or 3) a homing/limitswitch error occured.
+        '''
         from numpy import isclose
 
         self.run_flag.wait()
@@ -768,7 +785,8 @@ class SmoothieDriver_3_0_0:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
-                self._home_if_needed(''.join(list(target.keys())))
+                if home_flagged_axes:
+                    self.home_flagged_axes(''.join(list(target.keys())))
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
@@ -947,7 +965,7 @@ class SmoothieDriver_3_0_0:
         self._reset_from_error()
         self._setup()
 
-    def _home_if_needed(self, axes_string):
+    def home_flagged_axes(self, axes_string):
         '''
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
