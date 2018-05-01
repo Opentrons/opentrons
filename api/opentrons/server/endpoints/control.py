@@ -177,16 +177,30 @@ async def move(request):
         if target == 'mount':
             message = _move_mount(mount, point)
         elif target == 'pipette':
-            config = pipette_config.load(model)
-            pipette = instruments._create_pipette_from_config(
-                config=config,
-                mount=mount)
+            pipette = _fetch_or_create_pipette(mount, model)
             pipette.move_to((robot.deck, point))
             new_position = tuple(
                 pose_tracker.absolute(pipette.robot.poses, pipette))
             message = "Move complete. New position: {}".format(new_position)
 
     return web.json_response({"message": message}, status=status)
+
+
+def _fetch_or_create_pipette(mount, model=None):
+    existing_pipettes = robot.get_instruments()
+    pipette = None
+    for existing_mount, existing_pipette in existing_pipettes:
+        if existing_mount == mount:
+            pipette = existing_pipette
+    if pipette is None:
+        if model is None:
+            pipette = instruments.Pipette(mount=mount)
+        else:
+            config = pipette_config.load(model)
+            pipette = instruments._create_pipette_from_config(
+                config=config,
+                mount=mount)
+    return pipette
 
 
 def _move_mount(mount, point):
@@ -253,7 +267,7 @@ async def home(request):
         else:
             mount = data.get('mount')
             if mount in ['left', 'right']:
-                pipette = instruments.Pipette(mount=mount)
+                pipette = _fetch_or_create_pipette(mount)
                 pipette.home()
                 robot.remove_instrument(mount)
 
