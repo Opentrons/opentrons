@@ -15,6 +15,7 @@ type StepItemProps = {
   description?: string,
   collapsed?: boolean,
   selected?: boolean,
+  error?: ?boolean,
   sourceLabwareName?: string,
   destLabwareName?: string,
   onClick?: (event: SyntheticEvent<>) => void,
@@ -33,6 +34,7 @@ export default function StepItem (props: StepItemProps) {
     destLabwareName,
     collapsed,
     selected,
+    error,
     onClick,
     onMouseEnter,
     onMouseLeave,
@@ -51,7 +53,9 @@ export default function StepItem (props: StepItemProps) {
     <TitledList
       className={styles.step_item}
       description={Description}
-      {...{iconName, title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
+      iconName={error ? 'alert' : iconName} // TODO change 'alert' to 'warning' when icon names are switched
+      iconProps={{className: error ? styles.error_icon : ''}}
+      {...{title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
     >
       {showLabwareHeader && <li className={styles.aspirate_dispense}>
           <span>ASPIRATE</span>

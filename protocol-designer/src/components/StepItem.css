@@ -123,3 +123,7 @@
   /* TODO Ian 2018-04-09 this border for highlight is also in lists.css in complib. Export from complib as class? */
   border: 2px solid var(--c-blue);
 }
+
+.error_icon {
+  fill: var(--c-warning);
+}
