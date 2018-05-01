@@ -60,7 +60,6 @@ def calibrate_container_with_delta(
 
 
 def probe_instrument(instrument, robot, tip_length=None) -> Point:
-    robot.home()
 
     if tip_length is None:
         tip_length = robot.config.tip_length[instrument.name]
