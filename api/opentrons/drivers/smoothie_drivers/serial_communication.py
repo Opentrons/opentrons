@@ -66,7 +66,7 @@ def _write_to_device_and_return(cmd, ack, device_connection):
     response = device_connection.read_until(ack.encode())
 
     clean_response = _parse_smoothie_response(
-        response, ack.encode(), cmd.encode())
+        response, cmd.encode(), ack.encode())
     if clean_response:
         return clean_response.decode()
     return ''
@@ -107,13 +107,14 @@ def write_and_return(
     return response
 
 
-def connect(device_name, baudrate=115200):
+def connect(device_name=None, port=None, baudrate=115200):
     '''
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'
     :param baudrate: integer frequency for serial communication
     :return: serial.Serial connection
     '''
-    smoothie_port = get_ports_by_name(device_name=device_name)[0]
-    log.debug("Device name: {}, Port: {}".format(device_name, smoothie_port))
-    return _connect(port_name=smoothie_port, baudrate=baudrate)
+    if not port:
+        port = get_ports_by_name(device_name=device_name)[0]
+    log.debug("Device name: {}, Port: {}".format(device_name, port))
+    return _connect(port_name=port, baudrate=baudrate)

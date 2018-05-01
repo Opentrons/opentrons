@@ -310,15 +310,15 @@ class SmoothieDriver_3_0_0:
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
-    def connect(self):
+    def connect(self, port=None):
         self.simulating = False
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-
         smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
         self._connection = serial_communication.connect(
             device_name=smoothie_id,
+            port=port,
             baudrate=self._config.serial_speed
         )
         self._setup()
@@ -342,8 +342,8 @@ class SmoothieDriver_3_0_0:
     def get_fw_version(self):
         version = 'Virtual Smoothie'
         if not self.simulating:
-            version = serial_communication.write_and_return(
-                "version\n", self._connection).split('\r')[0]
+            version = self._send_command('version')
+            version = version.split('\r')[0].strip()
         return version
 
     @property
