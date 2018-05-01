@@ -1,6 +1,6 @@
 from opentrons import robot
 from opentrons.robot.robot import Robot
-
+from opentrons.config import feature_flags as ff
 
 # Application constants
 SAFE_HEIGHT = 130
@@ -13,7 +13,7 @@ holes = 'holes'
 crosses = 'crosses'
 
 
-def dots_set(dot_flag):
+def dots_set():
     """
 
     :param dot_flag: a boolean represented whether the feature flag is set
@@ -21,7 +21,27 @@ def dots_set(dot_flag):
     then it will utilize old calibration points)
     :return:  List of calibration coordinates
     """
-    if dot_flag:
+    if ff.dots_deck_type():
+        slot_1_lower_left = (12.13, 6.0)
+        slot_3_lower_right = (380.87, 6.0)
+        slot_7_upper_left = (12.13, 261.0)
+    else:
+        slot_1_lower_left = (12.13, 9.0)
+        slot_3_lower_right = (380.87, 9.0)
+        slot_7_upper_left = (12.13, 258.0)
+
+    return [slot_1_lower_left, slot_3_lower_right, slot_7_upper_left]
+
+
+def cli_dots_set():
+    """
+
+    :param dot_flag: a boolean represented whether the feature flag is set
+    or not (if dots_deck_type is set to True
+    then it will utilize old calibration points)
+    :return:  List of calibration coordinates
+    """
+    if ff.dots_deck_type():
         slot_1_lower_left = (12.13, 6.0)
         slot_3_lower_right = (380.87, 6.0)
         slot_10_upper_left = (12.13, 351.5)

@@ -5,8 +5,6 @@ from opentrons import instruments, robot
 from opentrons.robot import robot_configs
 from opentrons.deck_calibration import jog, position, dots_set
 from opentrons.deck_calibration.linal import add_z, solve
-from opentrons.config import feature_flags as ff
-
 
 import logging
 import json
@@ -14,27 +12,37 @@ import json
 session = None
 log = logging.getLogger(__name__)
 
-slot_1_lower_left,\
-    slot_3_lower_right,\
-    slot_10_upper_left = dots_set(ff.dots_deck_type())
-# Safe points are defined as 5mm toward the center of the deck in x and y, and
-# 10mm above the deck. User is expect to jog to the critical point from the
-# corresponding safe point, to avoid collision depending on direction of
-# misalignment between the deck and the gantry.
-slot_1_safe_point = (slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
-slot_3_safe_point = (slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
-slot_10_safe_point = (slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
 
-expected_points = {
-    '1': slot_1_lower_left,
-    '2': slot_3_lower_right,
-    '3': slot_10_upper_left}
+def expected_points():
+    slot_1_lower_left,\
+        slot_3_lower_right,\
+        slot_7_upper_left = dots_set()
+
+    return {
+        '1': slot_1_lower_left,
+        '2': slot_3_lower_right,
+        '3': slot_7_upper_left}
 
 
-safe_points = {
-    '1': slot_1_safe_point,
-    '2': slot_3_safe_point,
-    '3': slot_10_safe_point}
+def safe_points():
+    # Safe points are defined as 5mm toward the center of the deck in x, y and
+    # 10mm above the deck. User is expect to jog to the critical point from the
+    # corresponding safe point, to avoid collision depending on direction of
+    # misalignment between the deck and the gantry.
+    slot_1_lower_left, \
+        slot_3_lower_right, \
+        slot_10_upper_left = expected_points().values()
+    slot_1_safe_point = (
+        slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
+    slot_3_safe_point = (
+        slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
+    slot_10_safe_point = (
+        slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+
+    return {
+        '1': slot_1_safe_point,
+        '2': slot_3_safe_point,
+        '3': slot_10_safe_point}
 
 
 def _get_uuid() -> str:
@@ -55,7 +63,7 @@ class SessionManager:
         self.pipettes = {}
         self.current_mount = None
         self.tip_length = None
-        self.points = {k: None for k in expected_points.keys()}
+        self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
         default = robot_configs._get_default().gantry_calibration
@@ -300,7 +308,9 @@ def save_transform(data):
         status = 400
     else:
         # expected values based on mechanical drawings of the robot
-        expected = [expected_points[p] for p in sorted(expected_points.keys())]
+        expected_pos = expected_points()
+        expected = [
+            expected_pos[p] for p in expected_pos.keys()]
         # measured data
         actual = [session.points[p] for p in sorted(session.points.keys())]
         # Generate a 2 dimensional transform matrix from the two matricies
@@ -334,6 +344,7 @@ async def release(data):
     global session
     session = None
     robot.remove_instrument('left')
+
     robot.remove_instrument('right')
     return web.json_response({"message": "calibration session released"})
 

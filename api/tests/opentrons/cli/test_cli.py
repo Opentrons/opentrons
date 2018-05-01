@@ -1,5 +1,6 @@
 import pytest
 from opentrons.config import get_config_index
+from opentrons.config import feature_flags as ff
 
 
 @pytest.fixture
@@ -49,37 +50,31 @@ def test_save_and_clear_config(mock_config):
     assert saved_config == old_config
 
 
-@pytest.fixture
-def deck_setup_flag(monkeypatch):
-    tmpd = tempfile.TemporaryDirectory()
-    monkeypatch.setattr(
-        ff, 'SETTINGS_PATH', os.path.join(tmpd.name, 'settings.json'))
-
-    print(tmpd)
-    print(os.path.abspath(os.path.join(tmpd.name, 'settings.json')))
-    ff.set_feature_flag('dots-deck-type', True)
-
-    print(ff.dots_deck_type())
-    yield
-
-    print(ff.dots_deck_type())
-
-
-async def test_new_deck_points(deck_setup_flag):
+async def test_new_deck_points():
     # Checks that the correct deck calibration points are being used
     # if feature_flag is set (or not)
-    from opentrons.deck_calibration import dots_set
+    from opentrons.deck_calibration.dc_main import get_calibration_points
+    from opentrons.deck_calibration.endpoints import expected_points
+    ff.set_feature_flag('dots-deck-type', True)
+    calibration_points = get_calibration_points()
+    expected_points1 = expected_points()
+    # Check that old calibration points are used in cli
+    assert calibration_points[1] == (12.13, 6.0)
+    assert calibration_points[2] == (380.87, 6.0)
+    assert calibration_points[3] == (12.13, 351.5)
+    # Check that endpoints are now using slot 7 for dots
+    assert expected_points1['1'] == (12.13, 6.0)
+    assert expected_points1['2'] == (380.87, 6.0)
+    assert expected_points1['3'] == (12.13, 261.0)
 
-    slot_1_lower_left,\
-        slot_3_lower_right,\
-        slot_10_upper_left = dots_set(ff.dots_deck_type())
-    # Check when feature_flag is set
-    assert slot_1_lower_left == (12.13, 6.0)
-    assert slot_3_lower_right == (380.87, 6.0)
-    assert slot_10_upper_left == (12.13, 351.5)
-
-    yield
-    # Check when feature_flag not set (default should be cross positions)
-    assert slot_1_lower_left == (12.13, 9.0)
-    assert slot_3_lower_right == (380.87, 9.0)
-    assert slot_10_upper_left == (12.13, 348.5)
+    ff.set_feature_flag('dots-deck-type', False)
+    calibration_points2 = get_calibration_points()
+    expected_points2 = expected_points()
+    # Check that new calibration points are used
+    assert calibration_points2[1] == (12.13, 9.0)
+    assert calibration_points2[2] == (380.87, 9.0)
+    assert calibration_points2[3] == (12.13, 348.5)
+    # Check that endpoints are now using slot 7 for crosses
+    assert expected_points2['1'] == (12.13, 9.0)
+    assert expected_points2['2'] == (380.87, 9.0)
+    assert expected_points2['3'] == (12.13, 258.0)
