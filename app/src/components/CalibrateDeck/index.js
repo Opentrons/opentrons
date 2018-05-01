@@ -18,6 +18,7 @@ import {
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import RequestInProgressModal from './RequestInProgressModal'
 import AttachTipModal from './AttachTipModal'
+import InUseModal from './InUseModal'
 
 type Props = {
   match: Match,
@@ -72,7 +73,7 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
 
     // conflict: token already issued
     if (status === 409) {
-      return 'TODO: deck calibration force control modal'
+      return (<InUseModal {...props} />)
     }
 
     // forbidden: no pipette attached
