@@ -28,7 +28,7 @@ function WellSelectorInput (props: Props) {
     <FormGroup label='Wells:' disabled={disabled}>
       <InputField
         readOnly
-        value={initialSelectedWells && `${initialSelectedWells.length}`}
+        value={initialSelectedWells && `${initialSelectedWells.length}`} // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
         onClick={onClick}
       />
     </FormGroup>
