@@ -53,7 +53,7 @@ export default function StepItem (props: StepItemProps) {
     <TitledList
       className={styles.step_item}
       description={Description}
-      iconName={error ? 'alert' : iconName} // TODO change 'alert' to 'warning' when icon names are switched
+      iconName={error ? 'alert' : iconName}
       iconProps={{className: error ? styles.error_icon : ''}}
       {...{title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
     >
