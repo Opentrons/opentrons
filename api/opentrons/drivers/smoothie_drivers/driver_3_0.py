@@ -75,6 +75,9 @@ GCODES = {'HOME': 'G28.2',
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
+SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
+SMOOTHIE_ACK = 'ok\r\nok\r\n'
+
 
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
@@ -548,9 +551,9 @@ class SmoothieDriver_3_0_0:
             pass
         else:
 
-            command_line = command + ' M400'
+            command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
             ret_code = serial_communication.write_and_return(
-                command_line, self._connection, timeout)
+                command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
             if (ERROR_KEYWORD in ret_code.lower()) or \
