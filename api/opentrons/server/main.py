@@ -5,6 +5,7 @@ import logging
 import os
 import traceback
 from aiohttp import web
+from opentrons import robot
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
@@ -189,6 +190,8 @@ def main():
     else:
         log.debug("Starting Opentrons server application on {}:{}".format(
             args.hostname, args.port))
+    robot.connect()
+    robot.home()
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
 
