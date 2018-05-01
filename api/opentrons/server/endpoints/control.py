@@ -87,6 +87,7 @@ async def position_info(request):
     can easily access the pipette mount screws with a screwdriver. Attach tip
     position places either pipette roughly in the front-center of the deck area
     """
+    safe_pos1, safe_pos2, safe_pos3 = safe_points().values()
     return web.json_response({
         'positions': {
             'change_pipette': {
@@ -100,15 +101,15 @@ async def position_info(request):
             },
             'initial_calibration_1': {
                 'target': 'pipette',
-                'point': safe_points['1']
+                'point': safe_pos1
             },
             'initial_calibration_2': {
                 'target': 'pipette',
-                'point': safe_points['2']
+                'point': safe_pos2
             },
             'initial_calibration_3': {
                 'target': 'pipette',
-                'point': safe_points['3']
+                'point': safe_pos3
             }
         }
     })

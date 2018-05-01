@@ -349,25 +349,14 @@ def backup_configuration_and_reload(tag=None):
     clear_configuration_and_reload()
 
 
-slot_1_lower_left = (12.13, 6.0)
-slot_3_lower_right = (380.87, 6.0)
-slot_10_upper_left = (12.13, 351.5)
-expected_dots = {
-    1: slot_1_lower_left,
-    2: slot_3_lower_right,
-    3: slot_10_upper_left
-}
+def get_calibration_points():
 
-# for machines that cannot reach the calibration dots, use the screw holes
-# TODO (ben 20180131): remove this once all robots can reach engraved points
-slot_4_screw_hole = (108.75, 92.8)
-slot_6_screw_hole = (373.75, 92.8)
-slot_11_screw_hole = (241.25, 273.80)
-expected_holes = {
-    1: slot_4_screw_hole,
-    2: slot_6_screw_hole,
-    3: slot_11_screw_hole
-}
+    expected_loc = cli_dots_set()
+    return {
+        1: expected_loc[0],
+        2: expected_loc[1],
+        3: expected_loc[2]
+    }
 
 
 def main():
@@ -402,13 +391,6 @@ def main():
         sys.exit()
     backup_configuration_and_reload()
 
-    # older machines cannot reach deck points, use the screw holes instead
-    res = input('Are you calibrating to the screw holes (y/[n])? ')
-    if res in ['y', 'Y', 'yes']:
-        calibration_points = expected_holes
-    else:
-        calibration_points = expected_dots
-
     robot.connect()
 
     # lights help the script user to see the points on the deck
@@ -419,7 +401,7 @@ def main():
     #  - 200ul tip is 51.7mm long when attached to a pipette
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
     cli = CLITool(
-        point_set=calibration_points,
+        point_set=get_calibration_points(),
         tip_length=51.7)
     cli.ui_loop.run()
 

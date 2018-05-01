@@ -93,9 +93,10 @@ async def test_save_z(dc_session):
 
 async def test_save_calibration_file(dc_session, monkeypatch):
     robot.reset()
+    expected_pos = endpoints.expected_points()
     dc_session.points = {
         k: (v[0], v[1] + 0.3)
-        for k, v in endpoints.expected_points.items()}
+        for k, v in expected_pos.items()}
     dc_session.z_value = 0.2
 
     persisted_data = []

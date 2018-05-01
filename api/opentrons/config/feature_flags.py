@@ -49,3 +49,9 @@ def split_labware_definitions(): return get_feature_flag('split-labware-def')
 # - False: Otherwise the default
 # will be that you calibrate to the top
 def calibrate_to_bottom(): return get_feature_flag('calibrate-to-bottom')
+
+
+# dots_deck_type
+# - True: The deck layout has etched "dots"
+# - False: The deck layout has etched "crosses"
+def dots_deck_type(): return get_feature_flag('dots-deck-type')
