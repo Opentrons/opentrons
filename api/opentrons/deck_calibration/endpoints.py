@@ -31,18 +31,18 @@ def safe_points():
     # misalignment between the deck and the gantry.
     slot_1_lower_left, \
         slot_3_lower_right, \
-        slot_10_upper_left = expected_points().values()
+        slot_7_upper_left = expected_points().values()
     slot_1_safe_point = (
         slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
     slot_3_safe_point = (
         slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
-    slot_10_safe_point = (
-        slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+    slot_7_safe_point = (
+        slot_7_upper_left[0] + 5, slot_7_upper_left[1] - 5, 10)
 
     return {
         '1': slot_1_safe_point,
         '2': slot_3_safe_point,
-        '3': slot_10_safe_point}
+        '3': slot_7_safe_point}
 
 
 def _get_uuid() -> str:
