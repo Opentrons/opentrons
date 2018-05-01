@@ -340,10 +340,25 @@ class SmoothieDriver_3_0_0:
         return self._connection.port
 
     def get_fw_version(self):
+        '''
+        Queries Smoothieware for it's build version, and returns
+        the parsed response.
+
+        returns: str
+            Current version of attached Smoothi-driver. Versions are derived
+            from git branch-hash (eg: edge-66ec883NOMSD)
+
+        Example Smoothieware response:
+
+        Build version: edge-66ec883NOMSD, Build date: Jan 28 2018 15:26:57, MCU: LPC1769, System Clock: 120MHz  # NOQA
+          CNC Build   NOMSD Build
+        6 axis
+        '''
         version = 'Virtual Smoothie'
         if not self.simulating:
             version = self._send_command('version')
-            version = version.split('\r')[0].strip()
+            version = version.split(',')[0].split(':')[-1].strip()
+            version = version.replace('NOMSD', '')
         return version
 
     @property
