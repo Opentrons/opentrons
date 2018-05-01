@@ -37,6 +37,14 @@
   background-color: white;
 }
 
+.modal_page_heading {
+  @apply --font-header-dark;
+
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
 .alert_modal_wrapper {
   border-radius: 0;
   position: relative;
