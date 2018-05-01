@@ -6,13 +6,14 @@ import {Switch, Route, withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {CalibrateDeckProps} from './types'
+import type {OP, SP, DP, CalibrateDeckProps} from './types'
+
+import {getPipette} from '@opentrons/labware-definitions'
 
 import {
-  makeGetRobotMove
+  makeGetRobotMove,
+  makeGetDeckCalibrationStartState
 } from '../../http-api-client'
-
-import type {RobotMoveState} from '../../http-api-client'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import RequestInProgressModal from './RequestInProgressModal'
@@ -32,6 +33,7 @@ const ConnectedCalibrateDeckRouter = withRouter(
 
 export default function CalibrateDeck (props: Props) {
   const {robot, parentUrl, match: {path}} = props
+
   return (
     <Route
       path={`${path}/:step?`}
@@ -41,6 +43,7 @@ export default function CalibrateDeck (props: Props) {
         const NUM_STEP = step.replace(/^\D+/g, '')
         const subtitle = `Step ${NUM_STEP} of 6`
         const baseUrl = path
+
         return (
           <ConnectedCalibrateDeckRouter
             robot={robot}
@@ -56,38 +59,40 @@ export default function CalibrateDeck (props: Props) {
   )
 }
 
-type OP = {
-  title: string,
-  subtitle: string,
-  robot: Robot,
-  parentUrl: string,
-  baseUrl: string,
-  exitUrl: string,
-}
-
-type SP = {
-  moveRequest: RobotMoveState
-}
-
-type DP = {
-  back: () => mixed,
-}
-
 function CalibrateDeckRouter (props: CalibrateDeckProps) {
-  const {moveRequest, baseUrl} = props
+  const {startRequest, moveRequest, baseUrl} = props
   const clearDeckProps = {
     cancelText: 'cancel',
     continueText: 'move pipette to front',
     parentUrl: props.parentUrl
   }
+
+  if (startRequest.error) {
+    const {status} = startRequest.error
+
+    // conflict: token already issued
+    if (status === 409) {
+      return 'TODO: deck calibration force control modal'
+    }
+
+    // forbidden: no pipette attached
+    if (status === 403) {
+      return 'TODO: no pipettes attached modal'
+    }
+
+    return 'TODO: unexpected error starting calibration'
+  }
+
   if (!moveRequest.inProgress && !moveRequest.response) {
     return (
       <ClearDeckAlertModal {...clearDeckProps} />
     )
   }
+
   if (moveRequest.inProgress) {
     return (<RequestInProgressModal {...props} />)
   }
+
   return (
     <Switch>
       <Route path={`${baseUrl}/step-1`} render={() => (
@@ -97,15 +102,23 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
   )
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    back: () => dispatch(goBack())
+function makeMapStateToProps () {
+  const getRobotMove = makeGetRobotMove()
+  const getDeckCalStartState = makeGetDeckCalibrationStartState()
+
+  return (state: State, ownProps: OP): SP => {
+    const moveRequest = getRobotMove(state, ownProps.robot)
+    const startRequest = getDeckCalStartState(state, ownProps.robot)
+    const pipette = startRequest.response
+      ? getPipette(startRequest.response.pipette.model)
+      : null
+
+    return {moveRequest, startRequest, pipette}
   }
 }
 
-function makeMapStateToProps (state: State, ownProps: OP): SP {
-  const getRobotMove = makeGetRobotMove()
+function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
-    moveRequest: getRobotMove(state, ownProps.robot)
+    back: () => dispatch(goBack())
   }
 }

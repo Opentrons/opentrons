@@ -1,7 +1,8 @@
 // @flow
 // http api client module for /calibration/**
-import type {Action, ThunkPromiseAction} from '../types'
-import type {RobotService, Mount} from '../robot'
+import {createSelector, type Selector} from 'reselect'
+import type {State, Action, ThunkPromiseAction} from '../types'
+import type {BaseRobot, RobotService, Mount} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
 
 import client from './client'
@@ -56,8 +57,10 @@ export type CalibrationAction =
   | CalSuccessAction
   | CalFailureAction
 
+export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
+
 type RobotCalState = {
-  'deck/start': ?ApiCall<DeckStartRequest, DeckStartResponse>
+  'deck/start'?: DeckCalStartState
 }
 
 type CalState = {
@@ -66,9 +69,6 @@ type CalState = {
 
 // const DECK: RequestPath = 'deck'
 const DECK_START: RequestPath = 'deck/start'
-
-// DEBUG(mc, 2018-04-30): remove when UI is wired
-global.startDeckCalibration = startDeckCalibration
 
 export function startDeckCalibration (
   robot: RobotService,
@@ -147,6 +147,19 @@ export function calibrationReducer (
   }
 
   return state
+}
+
+export function makeGetDeckCalibrationStartState () {
+  const sel: Selector<State, BaseRobot, DeckCalStartState> = createSelector(
+    selectRobotCalState,
+    (state) => state[DECK_START] || {inProgress: false}
+  )
+
+  return sel
+}
+
+function selectRobotCalState (state: State, props: BaseRobot): RobotCalState {
+  return state.api.calibration[props.name] || {}
 }
 
 function calRequest (
