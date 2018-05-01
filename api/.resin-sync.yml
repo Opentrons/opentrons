@@ -1,0 +1,6 @@
+local_resinos: {}
+uuid: 9c36460c8f5f608e28eff528c765c497
+destination: /test_script
+ignore:
+  - .git
+  - node_modules/

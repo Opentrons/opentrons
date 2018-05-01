@@ -22,10 +22,10 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     '''
     from opentrons import robot, containers, instruments
 
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+    plate = containers.load('96-flat', '4', 'my-plate')
+    tiprack = containers.load('GEB-tiprack-300ul', '1', 'my-rack')
 
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+    pipette = instruments.P300_Single(mount='right')
 
 Head Speed
 ==========
@@ -34,11 +34,13 @@ The maximum speed of the robot's head can be set using ``robot.head_speed()``. T
 
 .. testcode:: robot
 
-    robot.head_speed(5000)
+    robot.head_speed(500)
+    robot.head_speed(combined_speed=400)
+    robot.head_speed(x=400, y=200)
 
 .. note::
 
-    Setting the head speed to above ``6000 mm/sec`` may cause your robot to "skip", which means the motors will lose their grip and make a loud vibrating noise. We recommend you try out different speed values on your robot, and see what works and what doesn't.
+    Setting the head speed to above ``600 mm/sec`` may cause your robot to "skip", which means the motors will lose their grip and make a loud vibrating noise. We recommend you try out different speed values on your robot, and see what works and what doesn't.
 
 Homing
 ======
@@ -140,8 +142,9 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    my-rack tiprack-200ul
+    my-rack GEB-tiprack-300ul
     my-plate 96-flat
+    tall-fixed-trash tall-fixed-trash
 
 Get Instruments
 ===============
@@ -160,7 +163,7 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    my-pipette B
+    my-pipette left
 
 Reset
 =====
@@ -179,6 +182,6 @@ will print out...
 .. testoutput:: robot
     :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    []
+    [<Deck><Slot 12><Container tall-fixed-trash>]
     []
     []
