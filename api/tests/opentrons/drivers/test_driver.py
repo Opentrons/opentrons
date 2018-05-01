@@ -338,7 +338,7 @@ def test_fast_home(model):
     assert driver.position['X'] == driver.homed_position['X']
 
 
-def test_homing_status(model):
+def test_homing_flags(model):
     import types
     driver = model.robot._driver
 
@@ -354,14 +354,14 @@ def test_homing_status(model):
     driver._send_command = types.MethodType(send_mock, driver)
 
     expected = {
-        'X': True,
-        'Y': False,
-        'Z': True,
-        'A': False,
-        'B': True,
-        'C': False
+        'X': False,
+        'Y': True,
+        'Z': False,
+        'A': True,
+        'B': False,
+        'C': True
     }
-    assert driver.homing_status == expected
+    assert driver.homed_flags == expected
 
 
 def test_switch_state(model):

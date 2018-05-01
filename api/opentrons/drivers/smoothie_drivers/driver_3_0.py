@@ -171,7 +171,7 @@ def _parse_homing_status_values(raw_homing_status_values):
     try:
         parsed_values = raw_homing_status_values.strip().split(' ')
         res = {
-            s.split(':')[0]: bool(1 - int(s.split(':')[1]))
+            s.split(':')[0]: bool(int(s.split(':')[1]))
             for s in parsed_values
         }
     except Exception as e:
@@ -387,11 +387,27 @@ class SmoothieDriver_3_0_0:
         return _parse_switch_values(res)
 
     @property
-    def homing_status(self):
+    def homed_flags(self):
+        '''
+        Returns Smoothieware's current homing-status, which is a dictionary
+        of boolean values for each axis (XYZABC). If an axis is False, then it
+        still needs to be homed, and it's coordinate cannot be trusted.
+        Smoothieware sets it's internal homing flags for all axes to False when
+        it has yet to home since booting/restarting, or an endstop/homing error
+
+        returns: dict
+            {
+                'X': False,
+                'Y': True,
+                'Z': False,
+                'A': True,
+                'B': False,
+                'C': True
+            }
+        '''
         if not self.is_connected():
-            print('FUCK fuck FUCK')
             return {
-                ax: False
+                ax: True
                 for ax in AXES
             }
         res = self._send_command(GCODES['HOMING_STATUS'])
@@ -970,18 +986,14 @@ class SmoothieDriver_3_0_0:
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
         '''
-        current_homing_status = [
+        axes_that_need_to_home = [
             axis
-            for axis, needs_homing in self.homing_status.items()
-            if needs_homing
+            for axis, already_homed in self.homed_flags.items()
+            if (not already_homed) and (axis in axes_string)
         ]
-        axes_to_home = [
-            ax
-            for ax in axes_string
-            if ax in current_homing_status
-        ]
-        if axes_to_home:
-            self.home(''.join(axes_to_home))
+        if axes_that_need_to_home:
+            axes_string = ''.join(axes_that_need_to_home)
+            self.home(axes_string)
 
     def _smoothie_reset(self):
         log.debug('Resetting Smoothie (simulating: {})'.format(
