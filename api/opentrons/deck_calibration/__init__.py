@@ -12,6 +12,8 @@ dots = 'dots'
 holes = 'holes'
 crosses = 'crosses'
 
+z_pos = (170.5, 129.0, 5.0)
+
 
 def dots_set():
     """

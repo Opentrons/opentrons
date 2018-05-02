@@ -9,6 +9,7 @@ from opentrons import robot, instruments
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.deck_calibration.endpoints import safe_points
+from opentrons.deck_calibration import z_pos
 
 log = logging.getLogger(__name__)
 
@@ -110,6 +111,11 @@ async def position_info(request):
             'initial_calibration_3': {
                 'target': 'pipette',
                 'point': safe_pos3
+            },
+            'z_calibration': {
+                'target': 'pipette',
+                'point': z_pos
+
             }
         }
     })
