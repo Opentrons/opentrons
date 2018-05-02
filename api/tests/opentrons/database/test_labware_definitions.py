@@ -2,6 +2,7 @@ import os
 import json
 import tempfile
 from opentrons.data_storage import labware_definitions as ldef
+from opentrons.data_storage import database
 from opentrons.config import get_config_index
 
 file_dir = os.path.abspath(os.path.dirname(__file__))
@@ -107,3 +108,64 @@ def test_save_user_definition():
     with open(os.path.join(test_dir, test_file_name)) as test_file:
         actual = json.load(test_file)
         assert actual == test_data
+
+
+def test_labware_create(dummy_db):
+    from opentrons import containers
+    lw_name = '15-well-plate'
+    if lw_name in containers.list():
+        database.delete_container(lw_name)
+    n_cols = 5
+    n_rows = 3
+    col_space = 12
+    row_space = 18
+    diameter = 5
+    height = 20
+    volume = 3.14 * (diameter / 2.0)**2
+    res = containers.create(
+        lw_name,
+        (n_cols, n_rows),
+        (col_space, row_space),
+        diameter,
+        height,
+        volume)
+    lw = database.load_container(lw_name)
+    database.delete_container(lw_name)
+
+    assert len(lw.wells()) is n_cols * n_rows
+    for well in lw.wells():
+        name = well.get_name()
+        assert res[name].coordinates() == well.coordinates()
+        for prop in ['height', 'diameter']:
+            assert res[name].properties[prop] == well.properties[prop]
+    assert lw.well("C5").coordinates() == (
+        (n_cols - 1) * col_space, (n_rows - 1) * row_space, 0)
+
+
+def test_new_labware_create(split_labware_def):
+    from opentrons import containers
+    lw_name = '15-well-plate'
+    n_cols = 5
+    n_rows = 3
+    col_space = 12
+    row_space = 18
+    diameter = 5
+    height = 20
+    volume = 3.14 * (diameter / 2.0)**2
+    res = containers.create(
+        lw_name,
+        (n_cols, n_rows),
+        (col_space, row_space),
+        diameter,
+        height,
+        volume)
+    lw = database.load_container(lw_name)
+
+    assert len(lw.wells()) is n_cols * n_rows
+    for well in lw.wells():
+        name = well.get_name()
+        assert res[name].coordinates() == well.coordinates()
+        for prop in ['height', 'diameter']:
+            assert res[name].properties[prop] == well.properties[prop]
+    assert lw.well("C5").coordinates() == (
+        (n_cols - 1) * col_space, (n_rows - 1) * row_space, 0)
