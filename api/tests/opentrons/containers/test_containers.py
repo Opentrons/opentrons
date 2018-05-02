@@ -1,9 +1,7 @@
 import math
 import unittest
 
-from opentrons.data_storage import database
 from opentrons.containers import (
-    create as containers_create,
     load as containers_load,
     list as containers_list
 )
@@ -14,35 +12,7 @@ from opentrons.containers.placeable import (
     Well,
     Deck,
     Slot)
-from opentrons.config import feature_flags as ff
 from tests.opentrons import generate_plate
-
-
-def test_containers_create(robot):
-    container_name = 'plate_for_testing_containers_create'
-    containers_create(
-        name=container_name,
-        grid=(8, 12),
-        spacing=(9, 9),
-        diameter=4,
-        depth=8,
-        volume=1000)
-
-    p = containers_load(robot, container_name, '1')
-    assert len(p) == 96
-    assert len(p.cols) == 12
-    assert len(p.rows) == 8
-    assert p.get_parent() == robot.deck['1']
-    assert p['C3'] == p[18]
-    assert p['C3'].max_volume() == 1000
-    for i, w in enumerate(p):
-        assert w == p[i]
-
-    assert container_name in containers_list()
-
-    if not ff.split_labware_definitions():
-        database.delete_container(container_name)
-        assert container_name not in containers_list()
 
 
 class ContainerTestCase(unittest.TestCase):
