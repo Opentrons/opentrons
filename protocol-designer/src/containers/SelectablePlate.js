@@ -10,7 +10,7 @@ import {getCollidingWells} from '../utils'
 import {getWellSetForMultichannel} from '../well-selection/utils'
 import {END_STEP} from '../steplist/types'
 import {selectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors, utils as steplistUtils} from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 
@@ -66,6 +66,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const labware = selectors.getLabware(state)[containerId]
   const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
+  const orderedSteps = steplistSelectors.orderedSteps(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
@@ -73,15 +74,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const wellSelectionMode = true
   const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
-  // TODO Ian 2018-05-01: selector for prevStepId. If steps are deleted, IDs aren't sequential.
-  let prevStepId: number = 0 // initial liquid state if stepId is null
-  if (stepId === END_STEP) {
-    // last liquid state
-    prevStepId = allWellContentsForSteps.length - 1 // TODO IMMEDIATELY not a good way to get prev step
-  }
-  if (typeof stepId === 'number') {
-    prevStepId = Math.max(stepId - 1, 0) // TODO IMMEDIATELY not a good way to get prev step
-  }
+  const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
 
   let wellContents = {}
   if (deckSetupMode) {
@@ -90,13 +83,11 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   } else {
     // well contents for step, not inital state.
     // shows liquids the current step in timeline
-    const wellContentsWithoutHighlight = allWellContentsForSteps[prevStepId] &&
-      allWellContentsForSteps[prevStepId][containerId]
-
-    if (!wellContentsWithoutHighlight) {
-      // TODO Ian 2018-05-01 fix in PR 1334
-      console.error('TODO: use robotStateTimeline\'s last valid well contents state as a fallback, when there are upstream invalid steps')
-    }
+    const wellContentsWithoutHighlight = (stepId === END_STEP || !allWellContentsForSteps[prevStepId])
+      // End step, or erroring step: show last valid well contents in timeline
+      ? wellContentsSelectors.lastValidWellContents(state)[containerId]
+      // Valid non-end step
+      : allWellContentsForSteps[prevStepId][containerId]
 
     let highlightedWells = {}
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)
@@ -106,6 +97,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
     } else {
       // wells are highlighted for steps / substep hover
+
+      // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
+      // even when prev step isn't processed (due to encountering an upstream error
+      // in the timeline reduce op)
       const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
       highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
     }

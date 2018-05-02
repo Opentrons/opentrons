@@ -44,7 +44,7 @@ function _wellContentsForWell (
   }
 }
 
-function _wellContentsForLabware (
+export function _wellContentsForLabware (
   labwareLiquids: SingleLabwareLiquidState,
   labwareId: string,
   labwareType: string
@@ -81,6 +81,24 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
           )
         }
       )
+    )
+  }
+)
+
+// const timelineFull = fileDataSelectors.robotStateTimelineFull(state)
+
+export const lastValidWellContents: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
+  fileDataSelectors.robotStateTimelineFull,
+  (timelineFull) => {
+    return mapValues(
+      timelineFull.robotState.labware,
+      (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
+        return _wellContentsForLabware(
+          timelineFull.robotState.liquidState.labware[labwareId],
+          labwareId,
+          timelineFull.robotState.labware[labwareId].type
+        )
+      }
     )
   }
 )
