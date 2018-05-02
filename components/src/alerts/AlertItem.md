@@ -33,3 +33,16 @@ initialState = {alert: 'warning'}
   )}
 </div>
 ```
+
+Stackable:
+```js
+<div>
+  <AlertItem type='warning' onCloseClick={() => console.log('dismiss warning 1')} title={'Warning 1 with longer text longer text longer text longer text longer text longer text has X'} />
+  <AlertItem type='warning' title={'Warning 1 with longer text longer text longer text longer text longer text longer text no X'} />
+  <AlertItem type='warning' title={'Warning'} />
+  <AlertItem type='warning' onCloseClick={() => console.log('dismiss warning 3')} title={'Warning 3'} >
+    <p>Some additional info</p>
+  </AlertItem>
+  <AlertItem type='warning' onCloseClick={() => console.log('dismiss warning 4')} title={'Warning 4'} />
+</div>
+```

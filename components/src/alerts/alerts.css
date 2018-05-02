@@ -1,10 +1,12 @@
 @import '..';
 
 .alert {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-regular);
+}
+
+.alert:not(:first-of-type) {
+  border-top: none;
 }
 
 .title_bar {
@@ -16,10 +18,12 @@
 }
 
 .title {
-  width: calc(100% - 3.5rem);
+  width: 100%;
 }
 
 .success {
+  border: 1px solid #60b120;
+
   & > .title_bar {
     background-color: #b6febc;
     color: #60b120;
@@ -31,6 +35,8 @@
 }
 
 .warning {
+  border: 1px solid var(--c-warning);
+
   & > .title_bar {
     background-color: #ffd58f;
     color: #7c4d00;
@@ -39,14 +45,6 @@
       fill: var(--c-warning);
     }
   }
-}
-
-.alert_body.success {
-  border: 1px solid #60b120;
-}
-
-.alert_body.warning {
-  border: 1px solid var(--c-warning);
 }
 
 .message {
