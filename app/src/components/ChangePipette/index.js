@@ -10,11 +10,11 @@ import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
 import type {Direction, ChangePipetteProps} from './types'
 
-import type {RobotHome, RobotMoveState} from '../../http-api-client'
+import type {RobotHome, RobotMove} from '../../http-api-client'
 
 import {
   home,
-  moveToChangePipette,
+  moveRobotTo,
   fetchPipettes,
   disengagePipetteMotors,
   makeGetRobotMove,
@@ -87,7 +87,7 @@ type OP = {
 }
 
 type SP = {
-  moveRequest: RobotMoveState,
+  moveRequest: RobotMove,
   homeRequest: RobotHome,
   actualPipette: ?PipetteConfig,
   displayName: string,
@@ -197,8 +197,10 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
       .then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
     onPipetteSelect: (evt) => dispatch(push(`${baseUrl}/${evt.target.value}`)),
-    moveToFront: () => dispatch(moveToChangePipette(robot, mount))
-      .then(disengage),
+    moveToFront: () => dispatch(moveRobotTo(robot, {
+      mount,
+      position: 'change_pipette'
+    })).then(disengage),
     confirmPipette: () => checkPipette().then(() => dispatch(push(confirmUrl)))
   }
 }
