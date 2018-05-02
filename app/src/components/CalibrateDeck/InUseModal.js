@@ -37,7 +37,7 @@ export default class InUseModal extends React.Component <Props, State> {
         {children: 'continue', disabled: !canContinue}
       ]}
     >
-      <p>Robot is currently in use</p>
+      <p>Are you sure you want to interrupt this robot?</p>
       <div>
         <CheckboxField
           label="It can’t be undone"
