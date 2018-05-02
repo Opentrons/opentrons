@@ -2,7 +2,7 @@
 import type {PipetteConfig} from '@opentrons/labware-definitions'
 import type {Mount} from '../../robot'
 
-import type {RobotMoveState, RobotHome} from '../../http-api-client'
+import type {RobotMove, RobotHome} from '../../http-api-client'
 
 import type {PipetteSelectionProps} from './PipetteSelection'
 
@@ -31,7 +31,7 @@ export type ChangePipetteProps = {
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
-  moveRequest: RobotMoveState,
+  moveRequest: RobotMove,
   homeRequest: RobotHome,
   back: () => mixed,
   exit: () => mixed,

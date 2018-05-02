@@ -1,42 +1,52 @@
 // @flow
 // HTTP API client module for /robot/**
 import {createSelector, type Selector} from 'reselect'
+
+import type {PipetteConfig} from '@opentrons/labware-definitions'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
-
-import type {ApiCall} from './types'
-import client, {type ApiRequestError} from './client'
+import type {ApiCall, ApiRequestError} from './types'
+import client from './client'
 
 type Point = [number, number, number]
 
 type MoveTarget = 'mount' | 'pipette'
 
-type Position = {
+type MountPosition = {|
   target: MoveTarget,
   left: Point,
   right: Point,
-}
+|}
 
-// TODO(mc, 2018-04-10): add other positions as necessary
-type Positions = {
-  change_pipette: Position
-}
-
-type PositionName = $Keys<Positions>
-
-type RobotPositionsResponse = {
-  positions: Positions
-}
-
-type RobotMoveRequest = {
+type Position = {|
   target: MoveTarget,
   point: Point,
-  mount: Mount,
-  model?: string,
+|}
+
+type Positions = {|
+  change_pipette: MountPosition,
+  attach_tip: Position,
+  z_calibration: Position,
+  initial_calibration_1: Position,
+  initial_calibration_2: Position,
+  initial_calibration_3: Position,
+|}
+
+type RobotPositionsResponse = {
+  positions: Positions,
 }
 
+// note: not the actual request body because moveTo is two requests
+type RobotMoveRequest =
+  | {| position: 'change_pipette', mount: Mount |}
+  | {| position: 'attach_tip', mount: Mount, pipette: PipetteConfig |}
+  | {| position: 'z_calibration', mount: Mount, pipette: PipetteConfig |}
+  | {| position: 'initial_calibration_1', mount: Mount, pipette: PipetteConfig |}
+  | {| position: 'initial_calibration_2', mount: Mount, pipette: PipetteConfig |}
+  | {| position: 'initial_calibration_3', mount: Mount, pipette: PipetteConfig |}
+
 type RobotMoveResponse = {
-  message: string
+  message: string,
 }
 
 type RobotHomeRequest =
@@ -44,7 +54,7 @@ type RobotHomeRequest =
   | {target: 'pipette', mount: Mount}
 
 type RobotHomeResponse = {
-  message: string
+  message: string,
 }
 
 type RequestPath = 'move' | 'home'
@@ -83,15 +93,7 @@ type RobotFailureAction = {|
 type ClearMoveResponseAction = {|
   type: 'api:CLEAR_ROBOT_MOVE_RESPONSE',
   payload: {|
-    robot: BaseRobot
-  |}
-|}
-
-type SetMovePositionAction = {|
-  type: 'api:SET_ROBOT_MOVE_POSITION',
-  payload: {|
     robot: BaseRobot,
-    position: PositionName,
   |}
 |}
 
@@ -99,7 +101,6 @@ export type RobotAction =
   | RobotRequestAction
   | RobotSuccessAction
   | RobotFailureAction
-  | SetMovePositionAction
   | ClearMoveResponseAction
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
@@ -107,47 +108,44 @@ export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 export type RobotHome = ApiCall<RobotHomeRequest, RobotHomeResponse>
 
 type RobotByNameState = {
-  movePosition?: PositionName,
   move?: RobotMove,
-  home?: RobotHome
+  home?: RobotHome,
 }
 
 type RobotState = {
-  [robotName: string]: ?RobotByNameState
+  [robotName: string]: ?RobotByNameState,
 }
 
 const MOVE: RequestPath = 'move'
 const HOME: RequestPath = 'home'
 
-export function moveToChangePipette (
+export function moveRobotTo (
   robot: RobotService,
-  mount: Mount
+  request: RobotMoveRequest
 ): ThunkPromiseAction {
-  return (dispatch) => {
-    const position = 'change_pipette'
+  const {position, mount} = request
 
-    dispatch(setRobotMovePosition(robot, position))
+  return (dispatch) => {
+    dispatch(robotRequest(robot, MOVE, request))
 
     return client(robot, 'GET', `robot/positions`)
       .then((response: RobotPositionsResponse) => {
-        const {target, [mount]: point} = response.positions[position]
-        const request = {target, point, mount}
+        const positionInfo = response.positions
+        const {target} = positionInfo[position]
+        const point = position === 'change_pipette'
+          ? positionInfo[position][mount]
+          : positionInfo[position].point
 
-        dispatch(robotRequest(robot, MOVE, request))
-        return client(robot, 'POST', 'robot/move', request)
+        let body = {target, point, mount}
+        if (request.pipette) body = {...body, model: request.pipette.model}
+
+        return client(robot, 'POST', 'robot/move', body)
       })
       .then(
         (r: RobotMoveResponse) => dispatch(robotSuccess(robot, MOVE, r)),
         (e: ApiRequestError) => dispatch(robotFailure(robot, MOVE, e))
       )
   }
-}
-
-function setRobotMovePosition (
-  robot: BaseRobot,
-  position: PositionName
-): SetMovePositionAction {
-  return {type: 'api:SET_ROBOT_MOVE_POSITION', payload: {robot, position}}
 }
 
 export function clearRobotMoveResponse (
@@ -229,16 +227,6 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         }
       }
 
-    case 'api:SET_ROBOT_MOVE_POSITION':
-      ({robot: {name}} = action.payload)
-
-      return {
-        ...state,
-        [name]: {
-          ...state[name],
-          movePosition: action.payload.position
-        }
-      }
     case 'api:CLEAR_ROBOT_MOVE_RESPONSE':
       ({robot: {name}} = action.payload)
       stateByName = state[name] || {}
@@ -282,22 +270,10 @@ function robotFailure (
   return {type: 'api:ROBOT_FAILURE', payload: {robot, path, error}}
 }
 
-export type RobotMoveState = RobotMove & {
-  position: ?PositionName,
-}
-
 export const makeGetRobotMove = () => {
-  const selector: Selector<State, BaseRobot, RobotMoveState> = createSelector(
+  const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
     selectRobotState,
-    (state) => state && state.move
-      ? {...state.move, position: state.movePosition || null}
-      : {
-        inProgress: false,
-        error: null,
-        request: null,
-        response: null,
-        position: null
-      }
+    (state) => state.move || {inProgress: false}
   )
 
   return selector
@@ -306,17 +282,12 @@ export const makeGetRobotMove = () => {
 export const makeGetRobotHome = () => {
   const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
     selectRobotState,
-    (state) => (state && state.home) || {
-      inProgress: false,
-      error: null,
-      request: null,
-      response: null
-    }
+    (state) => state.home || {inProgress: false}
   )
 
   return selector
 }
 
-function selectRobotState (state: State, props: BaseRobot): ?RobotByNameState {
-  return state.api.robot[props.name]
+function selectRobotState (state: State, props: BaseRobot): RobotByNameState {
+  return state.api.robot[props.name] || {}
 }
