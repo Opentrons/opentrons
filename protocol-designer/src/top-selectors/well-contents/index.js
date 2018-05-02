@@ -85,8 +85,6 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
   }
 )
 
-// const timelineFull = fileDataSelectors.robotStateTimelineFull(state)
-
 export const lastValidWellContents: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
   fileDataSelectors.robotStateTimelineFull,
   (timelineFull) => {

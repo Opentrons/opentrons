@@ -224,7 +224,7 @@ export function generateSubsteps (
       const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
 
       if (!namedIngredsByLabware) {
-        // TODO IMMEDIATELY
+        // TODO Ian 2018-05-02 another assert candidate here
         console.warn(`No namedIngredsByLabware for previous step id ${prevStepId}`)
         return null
       }
