@@ -385,9 +385,11 @@ async def start(request):
             robot.remove_instrument('right')
         session = SessionManager()
         res = init_pipette()
-        data = {'token': session.id, 'pipette': res}
-        status = 201
-        if not res:
+        if res:
+            status = 201
+            data = {'token': session.id, 'pipette': res}
+        else:
+            session = None
             status = 403
             data = {'message': 'Error, pipette not recognized'}
     else:
@@ -403,7 +405,7 @@ async def dispatch(request):
     """
     if session:
         message = ''
-        data = await request.post()
+        data = await request.json()
         try:
             log.info("Dispatching {}".format(data))
             _id = data.get('token')
