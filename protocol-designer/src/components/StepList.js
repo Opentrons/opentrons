@@ -5,7 +5,7 @@ import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
 import {END_STEP} from '../steplist/types'
-import type {StepItemData, StepSubItemData, StepIdType, SubstepIdentifier} from '../steplist/types'
+import type {StepItemsWithSubsteps, StepIdType, SubstepIdentifier} from '../steplist/types'
 
 import StepItem from '../components/StepItem'
 import TransferishSubstep from '../components/TransferishSubstep'
@@ -17,7 +17,7 @@ type StepListProps = {
   errorStepId: ?StepIdType, // this is the first step with an error
   selectedStepId: StepIdTypeWithEnd | null,
   hoveredSubstep: SubstepIdentifier,
-  steps: Array<StepItemData & {substeps: StepSubItemData}>,
+  steps: Array<StepItemsWithSubsteps>,
   handleSubstepHover: SubstepIdentifier => mixed,
   handleStepItemClickById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
   handleStepItemCollapseToggleById?: (StepIdType) => (event?: SyntheticEvent<>) => mixed,

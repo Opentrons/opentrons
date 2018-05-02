@@ -406,8 +406,7 @@ const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   s => s.formSectionCollapse
 )
 
-/** All Step data EXCEPT substeps */
-export const allSteps: Selector<Array<any>> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
+export const allSteps: Selector<Array<StepItemData>> = createSelector(
   getSteps,
   orderedStepsSelector,
   getCollapsedSteps,

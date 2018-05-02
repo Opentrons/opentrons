@@ -15,7 +15,9 @@ import type {Selector} from '../types'
 import type {LabwareData} from '../step-generation/types'
 import type {
   StepIdType,
-  StepSubItemData
+  StepSubItemData,
+  StepItemsWithSubsteps,
+  StepItemData
 } from '../steplist/types'
 
 export const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSelector(
@@ -30,11 +32,11 @@ export const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = cre
 )
 
 /** Mix-in substeps for each step. */
-export const allStepsWithSubsteps: * = createSelector(
+export const allStepsWithSubsteps: Selector<Array<StepItemsWithSubsteps>> = createSelector(
   steplistSelectors.allSteps,
   allSubsteps,
   (_allSteps, _allSubsteps) => {
-    return _allSteps.map((step: *, stepId: number) => ({
+    return _allSteps.map((step: StepItemData, stepId: StepIdType) => ({
       ...step,
       substeps: _allSubsteps[stepId]
     }))

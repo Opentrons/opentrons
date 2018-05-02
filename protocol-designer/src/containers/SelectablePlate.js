@@ -77,10 +77,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   let prevStepId: number = 0 // initial liquid state if stepId is null
   if (stepId === END_STEP) {
     // last liquid state
-    prevStepId = allWellContentsForSteps.length - 1
+    prevStepId = allWellContentsForSteps.length - 1 // TODO IMMEDIATELY not a good way to get prev step
   }
   if (typeof stepId === 'number') {
-    prevStepId = Math.max(stepId - 1, 0)
+    prevStepId = Math.max(stepId - 1, 0) // TODO IMMEDIATELY not a good way to get prev step
   }
 
   let wellContents = {}

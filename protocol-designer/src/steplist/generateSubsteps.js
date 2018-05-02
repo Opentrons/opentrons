@@ -217,7 +217,7 @@ export function generateSubsteps (
       valForm.validatedForm.stepType === 'transfer' ||
       valForm.validatedForm.stepType === 'consolidate'
     ) {
-      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[stepId - 1]
+      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[stepId - 1] // TODO IMMEDIATELY not a good way to get prev step
 
       const {
         pipette: pipetteId,
