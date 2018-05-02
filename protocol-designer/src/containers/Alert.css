@@ -1,0 +1,9 @@
+@import '@opentrons/components';
+
+.alert {
+  position: relative;
+  border: 1px solid var(--c-warning);
+
+  /* NOTE Ian 2018-05-01: borders for AlertItem depend on contents, PD doesn't match App?
+  Also, missing X moves message to the right */
+}

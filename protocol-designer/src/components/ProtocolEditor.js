@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 
+import Alerts from '../containers/Alerts'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
@@ -26,6 +27,7 @@ export default function ProtocolEditor () {
         <ConnectedSidebar />
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
+          <Alerts />
 
           <div className={styles.main_page_content}>
             <ConnectedNewFileModal />

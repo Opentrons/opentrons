@@ -1,3 +1,5 @@
+@import '..';
+
 .alert {
   position: absolute;
   top: 0;
@@ -34,7 +36,7 @@
     color: #7c4d00;
 
     & svg {
-      fill: #e28200;
+      fill: var(--c-warning);
     }
   }
 }
@@ -44,7 +46,7 @@
 }
 
 .alert_body.warning {
-  border: 1px solid #e28200;
+  border: 1px solid var(--c-warning);
 }
 
 .message {

@@ -84,14 +84,18 @@ export type StepSubItemData = TransferLikeSubstepItem | {|
   message: string
 |}
 
-export type StepItemData = {|
+export type StepItemData = {
   id: StepIdType,
   title: string,
   stepType: StepType,
-  description?: string,
-  sourceLabwareName?: string,
-  destLabwareName?: string
-|}
+  description?: ?string,
+  sourceLabwareName?: ?string,
+  destLabwareName?: ?string
+}
+
+export type StepItemsWithSubsteps = StepItemData & {
+  substeps: StepSubItemData | null
+}
 
 export type SubSteps = {[StepIdType]: StepSubItemData | null}
 
