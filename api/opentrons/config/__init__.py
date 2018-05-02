@@ -80,7 +80,8 @@ def _move_settings_data(source_path_dict, dest_path_dict):
             log.debug("Copying directory contents onto USB drive")
             # Source directory may not exist, or may be empty
             # If target directory does exist, do not copy
-            if os.path.exists(pth) and os.listdir(pth) and not os.path.exists(dest_path_dict[key]):  # noqa
+            os.makedirs(pth, exist_ok=True)
+            if os.listdir(pth) and not os.path.exists(dest_path_dict[key]):
                 shutil.copytree(pth, dest_path_dict[key])
             else:
                 log.debug("Directory copy preconditions failed:")

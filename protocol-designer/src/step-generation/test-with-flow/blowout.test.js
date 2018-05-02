@@ -1,8 +1,11 @@
 // @flow
-import blowout from '../blowout'
-import {createRobotState} from './fixtures'
+import _blowout from '../blowout'
+import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
+
+const blowout = commandCreatorNoErrors(_blowout)
+const blowoutWithErrors = commandCreatorHasErrors(_blowout)
 
 jest.mock('../dispenseUpdateLiquidState')
 
@@ -54,19 +57,29 @@ describe('blowout', () => {
   })
 
   test('blowout with invalid pipette ID should throw error', () => {
-    expect(() => blowout({
+    const result = blowoutWithErrors({
       pipette: 'badPipette',
       labware: 'sourcePlateId',
       well: 'A1'
-    })(robotStateWithTip)).toThrow(/Attempted to blowout with pipette id .* this pipette was not found/)
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'PIPETTE_DOES_NOT_EXIST'
+    })
   })
 
   test('blowout with no tip should throw error', () => {
-    expect(() => blowout({
+    const result = blowoutWithErrors({
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1'
-    })(initialRobotState)).toThrow(/Attempted to blowout with no tip on pipette/)
+    })(initialRobotState)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'NO_TIP_ON_PIPETTE'
+    })
   })
 
   describe('liquid tracking', () => {

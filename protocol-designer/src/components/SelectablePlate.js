@@ -6,7 +6,8 @@ import {
   swatchColors,
   Plate,
   MIXED_WELL_COLOR,
-  type SingleWell
+  type SingleWell,
+  type Channels
 } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
@@ -26,7 +27,10 @@ export type Props = {
 
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
-  containerId: string // used by container
+
+  // used by container
+  containerId: string,
+  pipetteChannels?: Channels
 }
 
 function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {

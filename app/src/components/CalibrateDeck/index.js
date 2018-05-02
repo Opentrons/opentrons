@@ -2,12 +2,25 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {goBack} from 'react-router-redux'
-import {Route, withRouter, type Match} from 'react-router'
+import {Switch, Route, withRouter, type Match} from 'react-router'
 
-import type {Dispatch} from '../../types'
+import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
+import type {OP, SP, DP, CalibrateDeckProps} from './types'
+
+import {getPipette} from '@opentrons/labware-definitions'
+
+import {
+  makeGetRobotMove,
+  makeGetDeckCalibrationStartState
+} from '../../http-api-client'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
+import RequestInProgressModal from './RequestInProgressModal'
+import AttachTipModal from './AttachTipModal'
+import InUseModal from './InUseModal'
+import NoPipetteModal from './NoPipetteModal'
+import ErrorModal from './ErrorModal'
 
 type Props = {
   match: Match,
@@ -18,23 +31,27 @@ type Props = {
 const TITLE = 'Deck Calibration'
 
 const ConnectedCalibrateDeckRouter = withRouter(
-  connect(null, mapDispatchToProps)(CalibrateDeckRouter)
+  connect(makeMapStateToProps, mapDispatchToProps)(CalibrateDeckRouter)
 )
 
 export default function CalibrateDeck (props: Props) {
   const {robot, parentUrl, match: {path}} = props
+
   return (
     <Route
-      path={`${path}/:step`}
-      render={(propsWithMount) => {
-        const {match: {params, url: baseUrl}} = propsWithMount
+      path={`${path}/:step?`}
+      render={(propsWithStep) => {
+        const {match: {params}} = propsWithStep
         const step: string = (params.step: any)
-        console.log(step)
+        const NUM_STEP = step.replace(/^\D+/g, '')
+        const subtitle = `Step ${NUM_STEP} of 6`
+        const baseUrl = path
+
         return (
           <ConnectedCalibrateDeckRouter
             robot={robot}
             title={TITLE}
-            subtitle={`${step}`}
+            subtitle={subtitle}
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             exitUrl={`${baseUrl}/exit`}
@@ -45,30 +62,62 @@ export default function CalibrateDeck (props: Props) {
   )
 }
 
-type OP = {
-  title: string,
-  subtitle: string,
-  robot: Robot,
-  step: string,
-  parentUrl: string,
-  baseUrl: string,
-  exitUrl: string,
-}
-
-type DP = {
-  back: () => mixed,
-}
-
-function CalibrateDeckRouter (props: Props) {
+function CalibrateDeckRouter (props: CalibrateDeckProps) {
+  const {startRequest, moveRequest, baseUrl, parentUrl} = props
   const clearDeckProps = {
     cancelText: 'cancel',
     continueText: 'move pipette to front',
     parentUrl: props.parentUrl
   }
-  // TODO: (ka 4/27/2018): defaulting to clear deck alert for initial PR
+
+  if (startRequest.error) {
+    const {status} = startRequest.error
+
+    // conflict: token already issued
+    if (status === 409) {
+      return (<InUseModal {...props} />)
+    }
+
+    // forbidden: no pipette attached
+    if (status === 403) {
+      return (<NoPipetteModal {...props}/>)
+    }
+    // TODO: (ka 2018-5-2) kept props generic in case we decide to reuse
+    return (<ErrorModal closeUrl={parentUrl} error={startRequest.error}/>)
+  }
+
+  if (!moveRequest.inProgress && !moveRequest.response) {
+    return (
+      <ClearDeckAlertModal {...clearDeckProps} />
+    )
+  }
+
+  if (moveRequest.inProgress) {
+    return (<RequestInProgressModal {...props} />)
+  }
+
   return (
-    <ClearDeckAlertModal {...clearDeckProps} />
+    <Switch>
+      <Route path={`${baseUrl}/step-1`} render={() => (
+        <AttachTipModal {...props}/>
+      )} />
+    </Switch>
   )
+}
+
+function makeMapStateToProps () {
+  const getRobotMove = makeGetRobotMove()
+  const getDeckCalStartState = makeGetDeckCalibrationStartState()
+
+  return (state: State, ownProps: OP): SP => {
+    const moveRequest = getRobotMove(state, ownProps.robot)
+    const startRequest = getDeckCalStartState(state, ownProps.robot)
+    const pipette = startRequest.response
+      ? getPipette(startRequest.response.pipette.model)
+      : null
+
+    return {moveRequest, startRequest, pipette}
+  }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {

@@ -6,6 +6,26 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import {tiprackWellNamesFlat} from '../'
 import type {RobotState, PipetteData, LabwareData} from '../'
+import type {CommandsAndRobotState, CommandCreatorErrorResponse} from '../types'
+
+/** Used to wrap command creators in tests, effectively casting their results
+ **  to normal response or error response
+ **/
+export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandsAndRobotState => {
+  const result = command(commandArgs)(state)
+  if (result.errors) {
+    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
+  }
+  return result
+}
+
+export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandCreatorErrorResponse => {
+  const result = command(commandArgs)(state)
+  if (!result.errors) {
+    throw new Error('expected errors')
+  }
+  return result
+}
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = {[wellName: string]: boolean}

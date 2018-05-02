@@ -24,6 +24,10 @@ export const reducer = combineReducers({
 export * from './types'
 
 export type {
+  DeckCalStartState
+} from './calibration'
+
+export type {
   RobotHealth,
   HealthSuccessAction,
   HealthFailureAction
@@ -36,7 +40,7 @@ export type {
 } from './pipettes'
 
 export type {
-  RobotMoveState,
+  RobotMove,
   RobotHome
 } from './robot'
 
@@ -67,7 +71,8 @@ export type Action =
   | WifiAction
 
 export {
-  startDeckCalibration
+  startDeckCalibration,
+  makeGetDeckCalibrationStartState
 } from './calibration'
 
 export {
@@ -96,7 +101,7 @@ export {
 
 export {
   home,
-  moveToChangePipette,
+  moveRobotTo,
   clearRobotMoveResponse,
   makeGetRobotMove,
   makeGetRobotHome

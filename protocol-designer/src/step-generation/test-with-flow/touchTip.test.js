@@ -1,6 +1,13 @@
 // @flow
-import touchTip from '../touchTip'
-import {createRobotState} from './fixtures'
+import _touchTip from '../touchTip'
+import {
+  createRobotState,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors
+} from './fixtures'
+
+const touchTip = commandCreatorNoErrors(_touchTip)
+const touchTipWithErrors = commandCreatorHasErrors(_touchTip)
 
 describe('touchTip', () => {
   const _robotFixtureArgs = {
@@ -31,18 +38,28 @@ describe('touchTip', () => {
   })
 
   test('touchTip with invalid pipette ID should throw error', () => {
-    expect(() => touchTip({
+    const result = touchTipWithErrors({
       pipette: 'badPipette',
       labware: 'sourcePlateId',
       well: 'A1'
-    })(robotStateWithTip)).toThrow(/Attempted to touchTip with pipette id .* this pipette was not found/)
+    })(robotStateWithTip)
+
+    expect(result.errors).toEqual([{
+      message: 'Attempted to touchTip with pipette id "badPipette", this pipette was not found under "instruments"',
+      type: 'PIPETTE_DOES_NOT_EXIST'
+    }])
   })
 
   test('touchTip with no tip should throw error', () => {
-    expect(() => touchTip({
+    const result = touchTipWithErrors({
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1'
-    })(initialRobotState)).toThrow(/Attempted to touchTip with no tip on pipette/)
+    })(initialRobotState)
+
+    expect(result.errors).toEqual([{
+      message: 'Attempted to touchTip with no tip on pipette: p300SingleId from sourcePlateId\'s well A1',
+      type: 'NO_TIP_ON_PIPETTE'
+    }])
   })
 })

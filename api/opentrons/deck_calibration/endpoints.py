@@ -3,7 +3,7 @@ from uuid import uuid1
 from opentrons.instruments import pipette_config
 from opentrons import instruments, robot
 from opentrons.robot import robot_configs
-from opentrons.deck_calibration import jog, position
+from opentrons.deck_calibration import jog, position, dots_set
 from opentrons.deck_calibration.linal import add_z, solve
 
 import logging
@@ -12,28 +12,37 @@ import json
 session = None
 log = logging.getLogger(__name__)
 
-slot_1_lower_left = (12.13, 6.0)
-slot_3_lower_right = (380.87, 6.0)
-slot_10_upper_left = (12.13, 351.5)
 
-# Safe points are defined as 5mm toward the center of the deck in x and y, and
-# 10mm above the deck. User is expect to jog to the critical point from the
-# corresponding safe point, to avoid collision depending on direction of
-# misalignment between the deck and the gantry.
-slot_1_safe_point = (slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
-slot_3_safe_point = (slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
-slot_10_safe_point = (slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+def expected_points():
+    slot_1_lower_left,\
+        slot_3_lower_right,\
+        slot_7_upper_left = dots_set()
 
-expected_points = {
-    '1': slot_1_lower_left,
-    '2': slot_3_lower_right,
-    '3': slot_10_upper_left}
+    return {
+        '1': slot_1_lower_left,
+        '2': slot_3_lower_right,
+        '3': slot_7_upper_left}
 
 
-safe_points = {
-    '1': slot_1_safe_point,
-    '2': slot_3_safe_point,
-    '3': slot_10_safe_point}
+def safe_points():
+    # Safe points are defined as 5mm toward the center of the deck in x, y and
+    # 10mm above the deck. User is expect to jog to the critical point from the
+    # corresponding safe point, to avoid collision depending on direction of
+    # misalignment between the deck and the gantry.
+    slot_1_lower_left, \
+        slot_3_lower_right, \
+        slot_7_upper_left = expected_points().values()
+    slot_1_safe_point = (
+        slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
+    slot_3_safe_point = (
+        slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
+    slot_7_safe_point = (
+        slot_7_upper_left[0] + 5, slot_7_upper_left[1] - 5, 10)
+
+    return {
+        '1': slot_1_safe_point,
+        '2': slot_3_safe_point,
+        '3': slot_7_safe_point}
 
 
 def _get_uuid() -> str:
@@ -54,7 +63,7 @@ class SessionManager:
         self.pipettes = {}
         self.current_mount = None
         self.tip_length = None
-        self.points = {k: None for k in expected_points.keys()}
+        self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
         default = robot_configs._get_default().gantry_calibration
@@ -299,7 +308,9 @@ def save_transform(data):
         status = 400
     else:
         # expected values based on mechanical drawings of the robot
-        expected = [expected_points[p] for p in sorted(expected_points.keys())]
+        expected_pos = expected_points()
+        expected = [
+            expected_pos[p] for p in expected_pos.keys()]
         # measured data
         actual = [session.points[p] for p in sorted(session.points.keys())]
         # Generate a 2 dimensional transform matrix from the two matricies
@@ -333,6 +344,7 @@ async def release(data):
     global session
     session = None
     robot.remove_instrument('left')
+
     robot.remove_instrument('right')
     return web.json_response({"message": "calibration session released"})
 
@@ -373,9 +385,11 @@ async def start(request):
             robot.remove_instrument('right')
         session = SessionManager()
         res = init_pipette()
-        data = {'token': session.id, 'pipette': res}
-        status = 201
-        if not res:
+        if res:
+            status = 201
+            data = {'token': session.id, 'pipette': res}
+        else:
+            session = None
             status = 403
             data = {'message': 'Error, pipette not recognized'}
     else:
@@ -391,7 +405,7 @@ async def dispatch(request):
     """
     if session:
         message = ''
-        data = await request.post()
+        data = await request.json()
         try:
             log.info("Dispatching {}".format(data))
             _id = data.get('token')

@@ -93,9 +93,10 @@ async def test_save_z(dc_session):
 
 async def test_save_calibration_file(dc_session, monkeypatch):
     robot.reset()
+    expected_pos = endpoints.expected_points()
     dc_session.points = {
         k: (v[0], v[1] + 0.3)
-        for k, v in endpoints.expected_points.items()}
+        for k, v in expected_pos.items()}
     dc_session.z_value = 0.2
 
     persisted_data = []
@@ -138,6 +139,43 @@ async def test_create_session(async_client, monkeypatch):
     assert resp.status == 201
 
 
+async def test_create_session_fail(async_client, monkeypatch):
+    """
+    Tests that the GET request to initiate a session manager for factory
+    calibration returns a good token.
+    """
+    from opentrons.robot.robot import Robot
+    dummy_token = 'Test Token'
+
+    def uuid_mock():
+        return dummy_token
+
+    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
+
+    def dummy_get_pipettes(self):
+        return {
+            'left': {
+                'mount_axis': 'z',
+                'plunger_axis': 'b',
+                'model': None
+            },
+            'right': {
+                'mount_axis': 'a',
+                'plunger_axis': 'c',
+                'model': None
+            }
+        }
+
+    monkeypatch.setattr(Robot, 'get_attached_pipettes', dummy_get_pipettes)
+
+    resp = await async_client.post('/calibration/deck/start')
+    text = await resp.text()
+    print(text)
+    assert json.loads(text) == {'message': 'Error, pipette not recognized'}
+    assert resp.status == 403
+    assert endpoints.session is None
+
+
 async def test_release(async_client):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -157,7 +195,7 @@ async def test_release(async_client):
     # Release
     resp2 = await async_client.post(
         '/calibration/deck',
-        data={
+        json={
             'token': token,
             'command': 'release'
         })
@@ -221,7 +259,7 @@ async def test_incorrect_token(async_client, monkeypatch):
 
     resp = await async_client.post(
         '/calibration/deck',
-        data={
+        json={
             'token': 'FAKE TOKEN',
             'command': 'init pipette',
             'mount': 'left',
@@ -262,7 +300,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     prior_x, prior_y, prior_z = dc.position('Z')
     resp = await async_client.post(
         '/calibration/deck',
-        data={
+        json={
             'token': token,
             'command': 'jog',
             'mount': 'left',

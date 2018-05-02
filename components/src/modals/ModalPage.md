@@ -11,8 +11,8 @@ Basic usage:
         onClick: () => alert('back button clicked')
       }
     }}
+    heading ='Optional styled heading'
     >
-    <h3>Some content in a Modal Page</h3>
     <p>Click the back button for an back action.</p>
   </ModalPage>
 </div>
