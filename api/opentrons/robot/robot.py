@@ -505,7 +505,7 @@ class Robot(object):
         ``True`` for success, ``False`` for failure.
         """
 
-        self._driver.connect()
+        self._driver.connect(port=port)
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
