@@ -82,6 +82,10 @@
   @apply --font-body-2-dark;
 
   padding: 1rem;
+
+  & > p {
+    padding-bottom: 1rem;
+  }
 }
 
 .alert_modal_heading {
