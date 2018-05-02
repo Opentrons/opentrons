@@ -6,7 +6,7 @@ import {Switch, Route, withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {OP, SP, DP, CalibrateDeckProps} from './types'
+import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
 import {getPipette} from '@opentrons/labware-definitions'
 
@@ -21,6 +21,7 @@ import AttachTipModal from './AttachTipModal'
 import InUseModal from './InUseModal'
 import NoPipetteModal from './NoPipetteModal'
 import ErrorModal from './ErrorModal'
+import CalibrateDeckModal from './CalibrateDeckModal'
 
 type Props = {
   match: Match,
@@ -42,7 +43,7 @@ export default function CalibrateDeck (props: Props) {
       path={`${path}/:step?`}
       render={(propsWithStep) => {
         const {match: {params}} = propsWithStep
-        const step: string = (params.step: any)
+        const step: CalibrationStep = (params.step: any)
         const NUM_STEP = step.replace(/^\D+/g, '')
         const subtitle = `Step ${NUM_STEP} of 6`
         const baseUrl = path
@@ -55,6 +56,7 @@ export default function CalibrateDeck (props: Props) {
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             exitUrl={`${baseUrl}/exit`}
+            calibrationStep={step}
           />
         )
       }}
@@ -100,6 +102,18 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
     <Switch>
       <Route path={`${baseUrl}/step-1`} render={() => (
         <AttachTipModal {...props}/>
+      )} />
+      <Route path={`${baseUrl}/step-2`} render={() => (
+        <CalibrateDeckModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-3`} render={() => (
+        <CalibrateDeckModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-4`} render={() => (
+        <CalibrateDeckModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-5`} render={() => (
+        <CalibrateDeckModal {...props} />
       )} />
     </Switch>
   )
