@@ -21,6 +21,13 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
 
     A single uniform volume will be aspirated from every source well and dispensed into every dest well.
     In other words, all the sub-transfers will use the same uniform volume.
+
+    =====
+
+    For transfer, changeTip means:
+    * 'always': before each aspirate, get a fresh tip
+    * 'once': get a new tip at the beginning of the transfer step, and use it throughout
+    * 'never': reuse the tip from the last step
   */
 
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
@@ -52,7 +59,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     .concat(lastSubTransferVol)
 
   const sourceDestPairs = zip(data.sourceWells, data.destWells)
-  const CommandCreators = flatMap(
+  const commandCreators = flatMap(
     sourceDestPairs,
     (wellPair: [string, string], pairIdx: number): Array<CommandCreator> => {
       const [sourceWell, destWell] = wellPair
@@ -132,7 +139,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     }
   )
 
-  return reduceCommandCreators(CommandCreators)(prevRobotState)
+  return reduceCommandCreators(commandCreators)(prevRobotState)
 }
 
 export default transfer

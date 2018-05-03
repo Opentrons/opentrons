@@ -14,7 +14,8 @@ import {
 import WellSelectionInput from '../containers/WellSelectionInput'
 import FormSection from './FormSection'
 import styles from './Form.css'
-import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
+import type {FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
+import type {FormData} from '../form-types'
 
 import {formConnectorFactory} from '../utils'
 
@@ -85,15 +86,15 @@ export default function StepEditForm (props: Props) {
             {/* TODO LATER: also 'disable' when selected labware is a trash */}
             <WellSelectionInput
               labwareId={formData['aspirate--labware']}
-              pipetteId={formData['aspirate--pipette']}
+              pipetteId={formData['pipette']}
               initialSelectedWells={formData['aspirate--wells']}
               formFieldAccessor={'aspirate--wells'}
             />
             <FormGroup label='Pipette:'>
-              <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
+              <DropdownField options={props.pipetteOptions} {...formConnector('pipette')} />
             </FormGroup>
             {formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('aspirate--volume')} />
+              <InputField units='μL' {...formConnector('volume')} />
             </FormGroup>}
           </div>
 
@@ -154,12 +155,12 @@ export default function StepEditForm (props: Props) {
             </FormGroup>
             <WellSelectionInput
               labwareId={formData['dispense--labware']}
-              pipetteId={formData['aspirate--pipette']}
+              pipetteId={formData['pipette']}
               initialSelectedWells={formData['dispense--wells']}
               formFieldAccessor={'dispense--wells'}
             />
             {formData.stepType === 'transfer' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('dispense--volume')} />
+              <InputField units='μL' {...formConnector('volume')} />
             </FormGroup>}
           </div>
 

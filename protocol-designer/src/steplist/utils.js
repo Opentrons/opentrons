@@ -1,5 +1,6 @@
 // @flow
-import {END_STEP, type StepIdType} from './types'
+import {END_STEP} from './types'
+import type {StepIdType} from '../form-types'
 
 export function getPrevStepId (
   orderedSteps: Array<StepIdType>,
