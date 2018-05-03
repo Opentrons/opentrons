@@ -1,10 +1,12 @@
 // @flow
-import chunk from 'lodash/chunk'
-import flatMap from 'lodash/flatMap'
-import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
-import mix from './mix'
-import * as errorCreators from './errorCreators'
+// TODO Ian 2018-05-03
+// import chunk from 'lodash/chunk'
+// import flatMap from 'lodash/flatMap'
+// import {FIXED_TRASH_ID} from '../constants'
+// import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {reduceCommandCreators} from './'
+// import mix from './mix'
+// import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
 
 const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState: RobotState) => {

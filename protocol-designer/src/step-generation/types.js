@@ -56,6 +56,17 @@ export type TransferFormData = {
   mixBeforeAspirate: ?MixArgs,
 }
 
+export type DistributeFormData = {
+  ...TransferLikeFormDataFields,
+  stepType: 'distribute',
+
+  sourceWell: string,
+  destWell: Array<string>,
+
+  /** Mix in first well in chunk */
+  mixBeforeAspirate: ?MixArgs
+}
+
 export type PauseFormData = {|
   ...SharedFormDataFields,
   stepType: 'pause',
