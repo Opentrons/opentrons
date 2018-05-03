@@ -22,9 +22,10 @@ jupyter notebook --allow-root &
 
 # Check if config exists, and alert if not found
 echo "Checking for deck calibration data..."
-config_path=`python -c "from opentrons.util import environment; print(environment.get_path('OT_CONFIG_FILE'))"`
+config_path=`python -c "from opentrons import config; print(config.get_config_index().get('deckCalibrationFile'))"`
 
 if [ ! -e "$config_path" ]; then
+    echo $config_path
     echo "Config file not found. Please perform factory calibration and then restart robot"
 fi
 

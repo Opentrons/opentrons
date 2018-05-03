@@ -1,11 +1,9 @@
 import time
+import logging
 
 from serial import SerialException
 
-from opentrons.util.log import get_logger
-
-
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Connection(object):

@@ -229,6 +229,7 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
         ._replace(instrument_offset=instrument_offset) \
         ._replace(tip_length=tip_length)
     robot.config = config
+    log.debug("Updating config for {} instrument".format(instrument.mount))
     robot_configs.save(config)
 
     new_coordinates = change_base(
