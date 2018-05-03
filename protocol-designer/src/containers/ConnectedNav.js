@@ -17,12 +17,14 @@ function Nav (props: Props) {
     <VerticalNavBar className={styles.nav_bar}>
       <NavButton
         iconName='ot-file'
+        title='FILE'
         disabled={props.currentPage === 'file-splash'}
         isCurrent={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
         onClick={props.handleClick('file-detail')} />
 
       <NavButton
-        iconName='settings'
+        iconName='ot-design'
+        title='DESIGN'
         disabled={props.currentPage === 'file-splash'}
         isCurrent={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
         onClick={props.handleClick('steplist')} />
