@@ -14,7 +14,8 @@ import {
 import WellSelectionInput from '../containers/WellSelectionInput'
 import FormSection from './FormSection'
 import styles from './Form.css'
-import type {FormData, FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
+import type {FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
+import type {FormData} from '../form-types'
 
 import {formConnectorFactory} from '../utils'
 

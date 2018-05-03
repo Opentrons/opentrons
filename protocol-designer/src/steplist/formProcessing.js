@@ -8,7 +8,7 @@ import type {
   ProcessedFormData,
   TransferLikeForm,
   PauseForm
-} from './types'
+} from '../form-types'
 
 import type {ConsolidateFormData, PauseFormData, TransferFormData} from '../step-generation'
 

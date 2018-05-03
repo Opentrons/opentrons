@@ -6,8 +6,7 @@ import {Icon, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import styles from './StepItem.css'
 
-import {stepIconsByType} from '../steplist/types'
-import type {StepType} from '../steplist/types'
+import {stepIconsByType, type StepType} from '../form-types'
 
 type StepItemProps = {
   stepType: StepType,

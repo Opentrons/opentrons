@@ -13,15 +13,19 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'
+
+import type {
+  StepItemData,
+  FormSectionState,
+  SubstepIdentifier
+} from './types'
+
 import type {
   FormData,
   BlankForm,
-  StepItemData,
   StepIdType,
-  FormSectionState,
-  FormModalFields,
-  SubstepIdentifier
-} from './types'
+  FormModalFields
+} from '../form-types'
 
 import {
   type ValidFormAndErrors,

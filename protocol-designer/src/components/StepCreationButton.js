@@ -3,8 +3,7 @@ import * as React from 'react'
 import styles from './StepCreationButton.css'
 
 import {PrimaryButton} from '@opentrons/components'
-import {stepIconsByType} from '../steplist/types'
-import type {StepType} from '../steplist/types'
+import {stepIconsByType, type StepType} from '../form-types'
 
 type StepCreationButtonProps = {
   onStepClick?: StepType => (event?: SyntheticEvent<*>) => mixed,

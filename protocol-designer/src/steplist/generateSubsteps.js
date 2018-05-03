@@ -12,10 +12,11 @@ import {
 
 import type {
   NamedIngredsByLabwareAllSteps,
-  StepIdType,
   SubSteps,
   TransferLikeSubstepItem
 } from './types'
+
+import type {StepIdType} from '../form-types'
 
 import type {
   PipetteData,

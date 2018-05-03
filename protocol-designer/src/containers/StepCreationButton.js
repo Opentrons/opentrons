@@ -5,7 +5,7 @@ import StepCreationButton from '../components/StepCreationButton'
 
 import {addStep, expandAddStepButton} from '../steplist/actions'
 import {selectors} from '../steplist/reducers'
-import type {StepType} from '../steplist/types'
+import type {StepType} from '../form-types'
 import type {BaseState, ThunkDispatch} from '../types'
 
 type Props = React.ElementProps<typeof StepCreationButton>

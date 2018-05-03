@@ -1,6 +1,23 @@
 // @flow
 import type {DeckSlot, Mount, Channels} from '@opentrons/components'
-import type {MixArgs, SharedFormDataFields, ChangeTipOptions} from '../form-types'
+
+// ===== MIX-IN TYPES =====
+
+export type ChangeTipOptions = 'always' | 'once' | 'never'
+
+export type MixArgs = {|
+  volume: number,
+  times: number
+|}
+
+export type SharedFormDataFields = {|
+  /** Optional user-readable name for this step */
+  name: ?string,
+  /** Optional user-readable description/notes for this step */
+  description: ?string,
+|}
+
+// ===== Processed form types. Used as args to call command creator fns =====
 
 export type TransferLikeFormDataFields = {|
   ...SharedFormDataFields,

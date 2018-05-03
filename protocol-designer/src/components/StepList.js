@@ -5,7 +5,8 @@ import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
 import {END_STEP} from '../steplist/types'
-import type {StepItemsWithSubsteps, StepIdType, SubstepIdentifier} from '../steplist/types'
+import type {StepItemsWithSubsteps, SubstepIdentifier} from '../steplist/types'
+import type {StepIdType} from '../form-types'
 
 import StepItem from '../components/StepItem'
 import TransferLikeSubstep from '../components/TransferLikeSubstep'
