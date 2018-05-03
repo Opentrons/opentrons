@@ -197,7 +197,7 @@ async def detach_tip(data):
     mount = 'left' if session.current_mount == 'Z' else 'right'
     pipette = session.pipettes[mount]
 
-    if not session.pipettes[mount].tip_attached:
+    if not pipette.tip_attached:
         log.warning('detach tip called with no tip')
 
     pipette._remove_tip(session.tip_length)
