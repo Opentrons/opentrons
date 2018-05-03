@@ -5,7 +5,7 @@ import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, reduceCommandCreators} from './' // blowout, replaceTip, touchTip,
 // import mix from './mix'
-// import * as errorCreators from './errorCreators'
+import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
 
 const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -24,7 +24,27 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
     * 'once': get a new tip at the beginning of the distribute step, and use it throughout
     * 'never': reuse the tip from the last step
   */
-  const maxWellsPerChunk = 2 // TODO
+
+  // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
+  const actionName = 'distribute'
+
+  const pipetteData = prevRobotState.instruments[data.pipette]
+  if (!pipetteData) {
+    // bail out before doing anything else
+    return {
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
+    }
+  }
+
+  // TODO error on negative data.disposalVolume?
+  const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
+    ? data.disposalVolume
+    : 0
+
+  const maxWellsPerChunk = Math.floor(
+    (pipetteData.maxVolume - disposalVolume) / data.volume
+  )
+
   const {pipette} = data
 
   const commandCreators = flatMap(
@@ -36,7 +56,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
           return [
             dispense({
               pipette,
-              volume: data.volume / destWellChunk.length,
+              volume: data.volume,
               labware: data.destLabware,
               well: destWell
             })
@@ -46,7 +66,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
       return [
         aspirate({
           pipette,
-          volume: data.volume,
+          volume: data.volume * destWellChunk.length,
           labware: data.sourceLabware,
           well: data.sourceWell
         }),
