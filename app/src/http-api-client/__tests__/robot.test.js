@@ -239,18 +239,14 @@ describe('robot/*', () => {
     beforeEach(() => {
       state.api.robot[NAME] = {
         home: {inProgress: true},
-        move: {inProgress: true},
-        movePosition: 'change_pipette'
+        move: {inProgress: true}
       }
     })
 
     test('makeGetRobotMove', () => {
       const getMove = makeGetRobotMove()
 
-      expect(getMove(state, robot)).toEqual({
-        ...state.api.robot[NAME].move
-      })
-
+      expect(getMove(state, robot)).toEqual(state.api.robot[NAME].move)
       expect(getMove(state, {name: 'foo'})).toEqual({inProgress: false})
     })
 

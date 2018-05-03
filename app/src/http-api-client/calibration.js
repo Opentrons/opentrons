@@ -26,8 +26,8 @@ type DeckStartResponse = {
 }
 
 type DeckCalRequest =
-  | {| command: 'attach_tip', tipLength: number |}
-  | {| command: 'detach_tip' |}
+  | {| command: 'attach tip', tipLength: number |}
+  | {| command: 'detach tip' |}
   | {| command: 'jog', axis: JogAxis, direction: JogDirection, step: number |}
   | {| command: 'save xy', point: DeckCalPoint |}
   | {| command: 'save z' |}
