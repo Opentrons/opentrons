@@ -148,8 +148,11 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
         }
       }
 
+      // un-nest to make flow happy
+      const validatedForm = form.validatedForm
+
       // put form errors into accumulator
-      if (!form.validatedForm) {
+      if (!validatedForm) {
         return {
           ...acc,
           formErrors: form.errors
@@ -159,11 +162,14 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       // finally, deal with valid step forms
       let nextCommandsAndState
 
-      if (form.validatedForm.stepType === 'consolidate') {
-        nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
+      if (validatedForm.stepType === 'consolidate') {
+        nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
       }
-      if (form.validatedForm.stepType === 'transfer') {
-        nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+      if (validatedForm.stepType === 'transfer') {
+        nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
+      }
+      if (validatedForm.stepType === 'pause') {
+        nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
 
       if (!nextCommandsAndState) {
@@ -172,7 +178,7 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
           ...acc,
           formErrors: {
             ...acc.formErrors,
-            'STEP NOT IMPLEMENTED': form.validatedForm.stepType
+            'STEP NOT IMPLEMENTED': validatedForm.stepType
           }
         }
       }

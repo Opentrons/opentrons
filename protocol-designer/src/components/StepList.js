@@ -43,11 +43,15 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
   }
 
   if (substeps.stepType === 'pause') {
-    // TODO: style pause stuff
-    if (substeps.waitForUserInput) {
+    if (substeps.wait === true) {
+      // Show message if waiting indefinitely
       return <li>{substeps.message}</li>
     }
-    const {hours, minutes, seconds} = substeps
+    if (!substeps.meta) {
+      // No message or time, show nothing
+      return null
+    }
+    const {hours, minutes, seconds} = substeps.meta
     return <li>{hours} hr {minutes} m {seconds} s</li>
   }
 
