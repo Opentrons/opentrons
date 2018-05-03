@@ -573,6 +573,7 @@ class SmoothieDriver_3_0_0:
             # Smoothieware returns error state if a switch was hit while moving
             if (ERROR_KEYWORD in ret_code.lower()) or \
                     (ALARM_KEYWORD in ret_code.lower()):
+                self._set_button_light(red=True)
                 self._reset_from_error()
                 error_axis = ret_code.strip()[-1]
                 if GCODES['HOME'] not in command and error_axis in 'XYZABC':
@@ -751,11 +752,13 @@ class SmoothieDriver_3_0_0:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
+                self._set_button_light(green=True)
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
                 log.debug("move: {}".format(command))
                 self._send_command(command)
+                self._set_button_light(blue=True)
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
@@ -793,6 +796,7 @@ class SmoothieDriver_3_0_0:
                 for group in HOME_SEQUENCE
             ]))
 
+        self._set_button_light(green=True)
         for axes in home_sequence:
             if 'X' in axes:
                 self._home_x()
@@ -808,6 +812,8 @@ class SmoothieDriver_3_0_0:
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
+
+        self._set_button_light(blue=True)
 
         # Only update axes that have been selected for homing
         homed = {
