@@ -59,7 +59,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     .concat(lastSubTransferVol)
 
   const sourceDestPairs = zip(data.sourceWells, data.destWells)
-  const CommandCreators = flatMap(
+  const commandCreators = flatMap(
     sourceDestPairs,
     (wellPair: [string, string], pairIdx: number): Array<CommandCreator> => {
       const [sourceWell, destWell] = wellPair
@@ -139,7 +139,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     }
   )
 
-  return reduceCommandCreators(CommandCreators)(prevRobotState)
+  return reduceCommandCreators(commandCreators)(prevRobotState)
 }
 
 export default transfer
