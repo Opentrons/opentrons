@@ -92,6 +92,18 @@ export type TransferFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
+export type PauseFormData = {|
+  ...SharedFormDataFields,
+  stepType: 'pause',
+  message?: string,
+  wait: number | true,
+  meta: ?{
+    hours?: number,
+    minutes?: number,
+    seconds?: number
+  }
+|}
+
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,

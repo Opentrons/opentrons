@@ -8,10 +8,10 @@ import type {
   ProcessedFormData,
   TransferForm,
   ConsolidateForm,
-  TransferFormData
+  PauseForm
 } from './types'
 
-import type {ConsolidateFormData} from '../step-generation'
+import type {ConsolidateFormData, PauseFormData, TransferFormData} from '../step-generation'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -249,6 +249,47 @@ function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<Consol
   }
 }
 
+function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
+  const hours = parseFloat(formData['pause-hour']) || 0
+  const minutes = parseFloat(formData['pause-minute']) || 0
+  const seconds = parseFloat(formData['pause-second']) || 0
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds
+
+  const message = formData['pause-message'] || ''
+
+  const errors = {
+    ...(!formData['pause-for-amount-of-time']
+      ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
+      : {}
+    ),
+    ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
+      ? {'_pause-times': 'Must include hours, minutes, or seconds'}
+      : {}
+    )
+  }
+
+  return {
+    errors,
+    validatedForm: formHasErrors({errors})
+      ? null
+      : {
+        stepType: formData.stepType,
+        name: `Pause ${formData.id}`, // TODO real name for steps
+        description: 'description would be here 2018-03-01', // TODO get from form
+        // stepType: formData.stepType,
+        wait: (formData['pause-for-amount-of-time'] === 'false')
+          ? true
+          : totalSeconds,
+        message,
+        meta: {
+          hours,
+          minutes,
+          seconds
+        }
+      }
+  }
+}
+
 export function validateAndProcessForm (formData: FormData): * { // ValidFormAndErrors
   if (formData.stepType === 'transfer') {
     return _vapTransfer(formData)
@@ -259,38 +300,7 @@ export function validateAndProcessForm (formData: FormData): * { // ValidFormAnd
   }
 
   if (formData.stepType === 'pause') {
-    const hours = parseFloat(formData['pause-hour']) || 0
-    const minutes = parseFloat(formData['pause-minute']) || 0
-    const seconds = parseFloat(formData['pause-second']) || 0
-    const totalSeconds = hours * 360 + minutes * 60 + seconds
-
-    const message = formData['pause-message'] || ''
-
-    const errors = {
-      ...(!formData['pause-for-amount-of-time']
-        ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
-        : {}
-      ),
-      ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
-        ? {'_pause-times': 'Must include hours, minutes, or seconds'}
-        : {}
-      )
-    }
-
-    return {
-      errors,
-      validatedForm: formHasErrors({errors})
-        ? null
-        : {
-          stepType: formData.stepType,
-          waitForUserInput: formData['pause-for-amount-of-time'] === 'false',
-          totalSeconds,
-          hours,
-          minutes,
-          seconds,
-          message
-        }
-    }
+    return _vapPause(formData)
   }
 
   // Fallback for unsupported step type. Should be unreachable (...right?)
