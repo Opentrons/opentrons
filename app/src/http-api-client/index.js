@@ -40,7 +40,7 @@ export type {
 } from './pipettes'
 
 export type {
-  RobotMoveState,
+  RobotMove,
   RobotHome
 } from './robot'
 
@@ -101,7 +101,7 @@ export {
 
 export {
   home,
-  moveToChangePipette,
+  moveRobotTo,
   clearRobotMoveResponse,
   makeGetRobotMove,
   makeGetRobotHome

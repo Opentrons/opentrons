@@ -129,7 +129,8 @@ const savedStepForms = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
     [action.payload.id]: action.payload
-  })
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
 }, {})
 
 type CollapsedStepsState = {
@@ -265,7 +266,7 @@ const getCollapsedSteps = createSelector(
   (state: RootState) => state.collapsedSteps
 )
 
-const orderedStepsSelector = createSelector(
+const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
   rootSelector,
   (state: RootState) => state.orderedSteps
 )
@@ -406,8 +407,7 @@ const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   s => s.formSectionCollapse
 )
 
-/** All Step data EXCEPT substeps */
-export const allSteps: Selector<Array<any>> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
+export const allSteps: Selector<Array<StepItemData>> = createSelector(
   getSteps,
   orderedStepsSelector,
   getCollapsedSteps,

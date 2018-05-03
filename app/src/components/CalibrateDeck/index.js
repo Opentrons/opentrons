@@ -11,6 +11,7 @@ import type {OP, SP, DP, CalibrateDeckProps} from './types'
 import {getPipette} from '@opentrons/labware-definitions'
 
 import {
+  startDeckCalibration,
   makeGetRobotMove,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
@@ -18,6 +19,9 @@ import {
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import RequestInProgressModal from './RequestInProgressModal'
 import AttachTipModal from './AttachTipModal'
+import InUseModal from './InUseModal'
+import NoPipetteModal from './NoPipetteModal'
+import ErrorModal from './ErrorModal'
 
 type Props = {
   match: Match,
@@ -60,7 +64,7 @@ export default function CalibrateDeck (props: Props) {
 }
 
 function CalibrateDeckRouter (props: CalibrateDeckProps) {
-  const {startRequest, moveRequest, baseUrl} = props
+  const {startRequest, moveRequest, baseUrl, parentUrl} = props
   const clearDeckProps = {
     cancelText: 'cancel',
     continueText: 'move pipette to front',
@@ -72,15 +76,15 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
 
     // conflict: token already issued
     if (status === 409) {
-      return 'TODO: deck calibration force control modal'
+      return (<InUseModal {...props} />)
     }
 
     // forbidden: no pipette attached
     if (status === 403) {
-      return 'TODO: no pipettes attached modal'
+      return (<NoPipetteModal {...props}/>)
     }
-
-    return 'TODO: unexpected error starting calibration'
+    // TODO: (ka 2018-5-2) kept props generic in case we decide to reuse
+    return (<ErrorModal closeUrl={parentUrl} error={startRequest.error}/>)
   }
 
   if (!moveRequest.inProgress && !moveRequest.response) {
@@ -119,6 +123,7 @@ function makeMapStateToProps () {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
-    back: () => dispatch(goBack())
+    back: () => dispatch(goBack()),
+    forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
   }
 }

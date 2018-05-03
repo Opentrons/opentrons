@@ -120,6 +120,14 @@ async def test_robot_info(virtual_smoothie_env, loop, test_client):
     assert len(body['positions']['change_pipette']['right']) == 3
     assert body['positions']['attach_tip']['target'] == 'pipette'
     assert len(body['positions']['attach_tip']['point']) == 3
+    assert body['positions']['initial_calibration_1']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_1']['point']) == 3
+    assert body['positions']['initial_calibration_2']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_2']['point']) == 3
+    assert body['positions']['initial_calibration_3']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_3']['point']) == 3
+    assert body['positions']['z_calibration']['target'] == 'pipette'
+    assert len(body['positions']['z_calibration']['point']) == 3
 
 
 async def test_home_pipette(virtual_smoothie_env, loop, test_client):

@@ -5,7 +5,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-DRIVER_ACK = b'ok\r\nok\r\n'
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
@@ -38,9 +37,9 @@ def serial_with_temp_timeout(serial_connection, timeout):
     serial_connection.timeout = saved_timeout
 
 
-def _parse_smoothie_response(response, command):
-    if DRIVER_ACK in response:
-        parsed_response = response.split(DRIVER_ACK)[0]
+def _parse_smoothie_response(response, command, ack):
+    if ack in response:
+        parsed_response = response.split(ack)[0]
         # smoothieware can enter a weird state, where it repeats back
         # the sent command at the beginning of its response
         # This checks for this echo, and strips the command from the response
@@ -57,17 +56,17 @@ def clear_buffer(serial_connection):
     serial_connection.reset_input_buffer()
 
 
-def _write_to_device_and_return(cmd, device_connection):
+def _write_to_device_and_return(cmd, ack, device_connection):
     '''Writes to a serial device.
     - Formats command
     - Wait for ack return
     - return parsed response'''
-    command = cmd + '\r\n\r\n'
-    device_connection.write(command.encode())
+    device_connection.write(cmd.encode())
 
-    response = device_connection.read_until(DRIVER_ACK)
+    response = device_connection.read_until(ack.encode())
 
-    clean_response = _parse_smoothie_response(response, cmd.encode())
+    clean_response = _parse_smoothie_response(
+        response, cmd.encode(), ack.encode())
     if clean_response:
         return clean_response.decode()
     return ''
@@ -83,37 +82,39 @@ def _connect(port_name, baudrate):
     return ser
 
 
-def _attempt_command_recovery(command, serial_conn):
+def _attempt_command_recovery(command, ack, serial_conn):
     '''Recovery after following a failed write_and_return() atempt'''
     with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
-        response = _write_to_device_and_return(command, device)
+        response = _write_to_device_and_return(command, ack, device)
     if response is None:
         log.debug("No valid response during _attempt_command_recovery")
         raise RuntimeError(
             "Recovery attempted - no valid smoothie response "
-            "for command: {} in {} seconds".format(command, RECOVERY_TIMEOUT))
+            "for command: {} in {} seconds".format(
+                command.encode(), RECOVERY_TIMEOUT))
     return response
 
 
 def write_and_return(
-        command, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
+        command, ack, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
     '''Write a command and return the response'''
-    log.debug('Write -> {}'.format(command))
+    log.debug('Write -> {}'.format(command.encode()))
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
-        response = _write_to_device_and_return(command, device_connection)
-    log.debug('Read <- {}'.format(response))
+        response = _write_to_device_and_return(command, ack, device_connection)
+    log.debug('Read <- {}'.format(response.encode()))
     return response
 
 
-def connect(device_name, baudrate=115200):
+def connect(device_name=None, port=None, baudrate=115200):
     '''
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'
     :param baudrate: integer frequency for serial communication
     :return: serial.Serial connection
     '''
-    smoothie_port = get_ports_by_name(device_name=device_name)[0]
-    log.debug("Device name: {}, Port: {}".format(device_name, smoothie_port))
-    return _connect(port_name=smoothie_port, baudrate=baudrate)
+    if not port:
+        port = get_ports_by_name(device_name=device_name)[0]
+    log.debug("Device name: {}, Port: {}".format(device_name, port))
+    return _connect(port_name=port, baudrate=baudrate)

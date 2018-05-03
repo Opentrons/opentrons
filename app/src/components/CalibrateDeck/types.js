@@ -1,7 +1,7 @@
 // @flow
 import type {PipetteConfig} from '@opentrons/labware-definitions'
 import type {RobotService} from '../../robot'
-import type {RobotMoveState, DeckCalStartState} from '../../http-api-client'
+import type {RobotMove, DeckCalStartState} from '../../http-api-client'
 
 export type OP = {
   title: string,
@@ -15,11 +15,12 @@ export type OP = {
 export type SP = {
   pipette: ?PipetteConfig,
   startRequest: DeckCalStartState,
-  moveRequest: RobotMoveState,
+  moveRequest: RobotMove,
 }
 
 export type DP = {
   back: () => mixed,
+  forceStart: () => mixed,
 }
 
 export type CalibrateDeckProps = OP & SP & DP

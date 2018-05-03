@@ -13,16 +13,18 @@ def test_remove_serial_echo(smoothie, monkeypatch):
         _parse_smoothie_response
     smoothie_response = b'ok\r\nok\r\n'
     command = b'G28.2B'
-    res = _parse_smoothie_response(smoothie_response, command)
+    ack = b'ok\r\nok\r\n'
+    res = _parse_smoothie_response(smoothie_response, command, ack)
     assert res == b''
-    res = _parse_smoothie_response(command + smoothie_response, command)
+    res = _parse_smoothie_response(command + smoothie_response, command, ack)
     assert res == b''
     res = _parse_smoothie_response(
-        b'\r\n' + command + b'\r\n\r\n' + smoothie_response, command)
+        b'\r\n' + command + b'\r\n\r\n' + smoothie_response, command, ack)
     assert res == b''
     res = _parse_smoothie_response(
         b'\r\n' + command + b'\r\n\r\nsome-data\r\nok\r\n' + smoothie_response,
-        command)
+        command,
+        ack)
     assert res == b'some-data'
 
 
@@ -51,9 +53,9 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     smoothie._setup()
     smoothie.simulating = False
 
-    def write_with_log(command, connection, timeout):
-        command_log.append(command)
-        return serial_communication.DRIVER_ACK.decode()
+    def write_with_log(command, ack, connection, timeout):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
 
     def _parse_axis_values(arg):
         return smoothie.position
@@ -86,9 +88,9 @@ def test_disable_motor(smoothie, monkeypatch):
     command_log = []
     smoothie.simulating = False
 
-    def write_with_log(command, connection, timeout):
-        command_log.append(command)
-        return serial_communication.DRIVER_ACK.decode()
+    def write_with_log(command, ack, connection, timeout):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
 
     def _parse_axis_values(arg):
         return smoothie.position
@@ -118,9 +120,9 @@ def test_plunger_commands(smoothie, monkeypatch):
     smoothie.home()
     smoothie.simulating = False
 
-    def write_with_log(command, connection, timeout):
-        command_log.append(command)
-        return serial_communication.DRIVER_ACK.decode()
+    def write_with_log(command, ack, connection, timeout):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
 
     def _parse_axis_values(arg):
         return smoothie.position
@@ -398,7 +400,7 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
     model.robot.home()
     cmd_list = []
 
-    def write_mock(command, serial_connection, timeout):
+    def write_mock(command, ack, serial_connection, timeout):
         nonlocal cmd_list
         cmd_list.append(command)
         if GCODES['MOVE'] in command:
@@ -477,12 +479,13 @@ def test_speed_change(model, monkeypatch):
     robot._driver.simulating = False
 
     from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
-    def write_with_log(command, connection, timeout):
+    def write_with_log(command, ack, connection, timeout):
         if 'G0F' in command:
-            command_log.append(command)
-        return serial_communication.DRIVER_ACK.decode()
+            command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
@@ -507,12 +510,13 @@ def test_max_speed_change(model, monkeypatch):
     robot._driver.simulating = False
 
     from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
-    def write_with_log(command, connection, timeout):
+    def write_with_log(command, ack, connection, timeout):
         if 'M203.1' in command or 'G0F' in command:
-            command_log.append(command)
-        return serial_communication.DRIVER_ACK.decode()
+            command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)

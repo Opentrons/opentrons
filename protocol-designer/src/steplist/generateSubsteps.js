@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
 import {getWellsForTips} from '../step-generation/utils'
+import {utils as steplistUtils} from '../steplist'
 
 import {
   formHasErrors,
@@ -193,9 +194,12 @@ export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
   allPipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps
+  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
+  orderedSteps: Array<StepIdType>
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
+    const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
+
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
     if (valForm.validatedForm === null || formHasErrors(valForm)) {
       return null
@@ -217,7 +221,13 @@ export function generateSubsteps (
       valForm.validatedForm.stepType === 'transfer' ||
       valForm.validatedForm.stepType === 'consolidate'
     ) {
-      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[stepId - 1]
+      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
+
+      if (!namedIngredsByLabware) {
+        // TODO Ian 2018-05-02 another assert candidate here
+        console.warn(`No namedIngredsByLabware for previous step id ${prevStepId}`)
+        return null
+      }
 
       const {
         pipette: pipetteId,
