@@ -423,7 +423,7 @@ export const allSteps: Selector<Array<StepItemData>> = createSelector(
           : null
       }
 
-      // optional form fields for "transferish" steps
+      // optional form fields for "TransferLike" steps
       const additionalFormFields = (
         savedForm.stepType === 'transfer' ||
         savedForm.stepType === 'distribute' ||
