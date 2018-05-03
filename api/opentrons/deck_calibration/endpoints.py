@@ -226,15 +226,26 @@ async def run_jog(data):
     :return: The position you are moving to based on axis, direction, step
     given by the user.
     """
-    if session.current_mount:
-        message = jog(
-            data['axis'],
-            float(data['direction']),
-            float(data['step']))
-        status = 200
-    else:
-        message = "Current mount must be set before jogging"
+    axis = data.get('axis')
+    direction = data.get('direction')
+    step = data.get('step')
+
+    if axis not in ('x', 'y', 'z'):
+        message = '"axis" must be "x", "y", or "z"'
         status = 400
+    elif direction not in (-1, 1):
+        message = '"direction" must be -1 or 1'
+        status = 400
+    elif step is None:
+        message = '"step" must be specified'
+        status = 400
+    else:
+        if axis == 'z':
+            axis = session.current_mount
+        position = jog(axis.upper(), direction, step)
+        message = 'Jogged to {}'.format(position)
+        status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
