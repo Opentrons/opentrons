@@ -156,27 +156,28 @@ async def attach_tip(data):
     {
       'token': UUID token from current session start
       'command': 'attach tip'
-      'tip-length': a float representing how much the length of a pipette
+      'tipLength': a float representing how much the length of a pipette
         increases when a tip is added
     }
     """
     global session
-    tip_length = data.get('tip-length')
+    tip_length = data.get('tipLength')
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not tip_length:
-        message = 'Error: "tip-length" must be specified in request'
-        status = 400
-    elif session.pipettes[mount].tip_attached:
-        message = "Error: tip already attached"
+    pipette = session.pipettes[mount]
+
+    if not tip_length:
+        message = 'Error: "tipLength" must be specified in request'
         status = 400
     else:
+        if pipette.tip_attached:
+            log.warning('attach tip called while tip already attached')
+            pipette._remove_tip(pipette._tip_length)
+
         session.tip_length = tip_length
-        session.pipettes[mount]._add_tip(tip_length)
-        message = "Tip length set: {}".format(session.tip_length)
+        pipette._add_tip(tip_length)
+        message = "Tip length set: {}".format(tip_length)
         status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
@@ -194,19 +195,15 @@ async def detach_tip(data):
     """
     global session
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not session.pipettes[mount].tip_attached:
-        message = "Error: no tip attached"
-        status = 400
-    else:
-        pip = session.pipettes[mount]
-        pip._remove_tip(session.tip_length)
-        session.tip_length = None
-        message = "Tip removed"
-        status = 200
-    return web.json_response({'message': message}, status=status)
+    pipette = session.pipettes[mount]
+
+    if not session.pipettes[mount].tip_attached:
+        log.warning('detach tip called with no tip')
+
+    pipette._remove_tip(session.tip_length)
+    session.tip_length = None
+
+    return web.json_response({'message': "Tip removed"}, status=200)
 
 
 async def run_jog(data):
