@@ -1,3 +1,5 @@
 // @flow
 
-// TODO Ian 2018-05-03
+test('TODO', () => {
+  // TODO Ian 2018-05-03
+})
