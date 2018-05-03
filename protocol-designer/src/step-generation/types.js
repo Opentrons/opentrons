@@ -33,7 +33,7 @@ export type TransferLikeFormDataFields = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type ConsolidateFormData = {|
+export type ConsolidateFormData = {
   ...TransferLikeFormDataFields,
 
   stepType: 'consolidate',
@@ -43,9 +43,9 @@ export type ConsolidateFormData = {|
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
-|}
+}
 
-export type TransferFormData = {|
+export type TransferFormData = {
   ...TransferLikeFormDataFields,
   stepType: 'transfer',
 
@@ -54,7 +54,7 @@ export type TransferFormData = {|
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
-|}
+}
 
 export type PauseFormData = {|
   ...SharedFormDataFields,

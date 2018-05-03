@@ -85,15 +85,15 @@ export default function StepEditForm (props: Props) {
             {/* TODO LATER: also 'disable' when selected labware is a trash */}
             <WellSelectionInput
               labwareId={formData['aspirate--labware']}
-              pipetteId={formData['aspirate--pipette']}
+              pipetteId={formData['pipette']}
               initialSelectedWells={formData['aspirate--wells']}
               formFieldAccessor={'aspirate--wells'}
             />
             <FormGroup label='Pipette:'>
-              <DropdownField options={props.pipetteOptions} {...formConnector('aspirate--pipette')} />
+              <DropdownField options={props.pipetteOptions} {...formConnector('pipette')} />
             </FormGroup>
             {formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('aspirate--volume')} />
+              <InputField units='μL' {...formConnector('volume')} />
             </FormGroup>}
           </div>
 
@@ -154,12 +154,12 @@ export default function StepEditForm (props: Props) {
             </FormGroup>
             <WellSelectionInput
               labwareId={formData['dispense--labware']}
-              pipetteId={formData['aspirate--pipette']}
+              pipetteId={formData['pipette']}
               initialSelectedWells={formData['dispense--wells']}
               formFieldAccessor={'dispense--wells'}
             />
             {formData.stepType === 'transfer' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('dispense--volume')} />
+              <InputField units='μL' {...formConnector('volume')} />
             </FormGroup>}
           </div>
 
