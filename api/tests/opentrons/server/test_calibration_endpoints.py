@@ -117,7 +117,7 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
 
 # ------------ Session and token tests ----------------------
-# TODO(mc, 2018-05-02): this does not adequetly pipette selection logic
+# TODO(mc, 2018-05-02): this does not adequately pipette selection logic
 async def test_create_session(async_client, monkeypatch):
     """
     Tests that the POST request to initiate a session manager for factory
@@ -271,7 +271,7 @@ async def test_incorrect_token(async_client, monkeypatch):
 
 
 # ------------ Router tests (integration) ----------------------
-# TODO(mc, 2018-05-02): this does not adequetly test z to smoothie axis logic
+# TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
 async def test_set_and_jog_integration(async_client, monkeypatch):
     """
     Test that the jog function works.

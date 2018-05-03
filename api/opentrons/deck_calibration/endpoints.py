@@ -226,7 +226,6 @@ async def run_jog(data):
     :return: The position you are moving to based on axis, direction, step
     given by the user.
     """
-    global session
     axis = data.get('axis')
     direction = data.get('direction')
     step = data.get('step')
