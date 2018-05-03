@@ -1,10 +1,9 @@
 // @flow
 // TODO Ian 2018-05-03
-// import chunk from 'lodash/chunk'
-// import flatMap from 'lodash/flatMap'
+import chunk from 'lodash/chunk'
+import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
-// import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
-import {reduceCommandCreators} from './'
+import {aspirate, dispense, reduceCommandCreators} from './' // blowout, replaceTip, touchTip,
 // import mix from './mix'
 // import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
@@ -25,8 +24,37 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
     * 'once': get a new tip at the beginning of the distribute step, and use it throughout
     * 'never': reuse the tip from the last step
   */
+  const maxWellsPerChunk = 2 // TODO
+  const {pipette} = data
 
-  const commandCreators: Array<CommandCreator> = [] // TODO
+  const commandCreators = flatMap(
+    chunk(data.destWells, maxWellsPerChunk),
+    (destWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
+      const dispenseCommands = flatMap(
+        destWellChunk,
+        (destWell: string, wellIndex: number): Array<CommandCreator> => {
+          return [
+            dispense({
+              pipette,
+              volume: data.volume / destWellChunk.length,
+              labware: data.destLabware,
+              well: destWell
+            })
+          ]
+        })
+
+      return [
+        aspirate({
+          pipette,
+          volume: data.volume,
+          labware: data.sourceLabware,
+          well: data.sourceWell
+        }),
+        ...dispenseCommands
+      ]
+    }
+  )
+
   return reduceCommandCreators(commandCreators)(prevRobotState)
 }
 
