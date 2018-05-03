@@ -20,6 +20,7 @@ export type SP = {
 
 export type DP = {
   back: () => mixed,
+  forceStart: () => mixed,
 }
 
 export type CalibrateDeckProps = OP & SP & DP

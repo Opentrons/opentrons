@@ -11,6 +11,7 @@ import type {OP, SP, DP, CalibrateDeckProps} from './types'
 import {getPipette} from '@opentrons/labware-definitions'
 
 import {
+  startDeckCalibration,
   makeGetRobotMove,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
@@ -122,6 +123,7 @@ function makeMapStateToProps () {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
-    back: () => dispatch(goBack())
+    back: () => dispatch(goBack()),
+    forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
   }
 }
