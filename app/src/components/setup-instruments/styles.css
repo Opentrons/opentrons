@@ -13,3 +13,9 @@
 
   margin-top: 1.5rem;
 }
+
+.alert {
+  @apply --absolute-fill;
+
+  bottom: auto;
+}

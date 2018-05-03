@@ -7,7 +7,7 @@ import styles from './alerts.css'
 
 export type AlertProps = {
   /** name constant of the icon to display */
-  type: 'success' | 'warning' | 'error',
+  type: 'success' | 'warning',
   /** title/main message of colored alert bar */
   title: string,
   /** Alert message body contents */
@@ -31,10 +31,6 @@ const ALERT_PROPS_BY_TYPE = {
   warning: {
     iconName: 'alert-circle',
     className: styles.warning
-  },
-  error: {
-    iconName: 'close-circle',
-    className: styles.error
   }
 }
 
@@ -45,7 +41,6 @@ export default function AlertItem (props: AlertProps) {
   const className = cx(
     styles.alert,
     alertProps.className,
-    {[styles.alert_body]: props.children},
     props.className
   )
 

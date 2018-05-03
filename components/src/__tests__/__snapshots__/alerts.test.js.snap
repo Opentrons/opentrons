@@ -126,7 +126,7 @@ exports[`alerts warning alert renders correctly 1`] = `
 
 exports[`alerts warning alert with message body renders correctly 1`] = `
 <div
-  className="alert warning alert_body"
+  className="alert warning"
 >
   <div
     className="title_bar"

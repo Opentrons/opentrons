@@ -4,7 +4,6 @@ import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {selectors} from '../file-data'
 import {AlertItem} from '@opentrons/components'
-import styles from './Alert.css'
 import type {BaseState} from '../types'
 import type {ErrorType, CommandCreatorError} from '../step-generation'
 
@@ -30,7 +29,6 @@ function Alerts (props: Props) {
     <div>
       {props.alerts.map((alert, key) =>
         <AlertItem
-          className={styles.alert}
           type='warning'
           key={key}
           title={alert.message}
