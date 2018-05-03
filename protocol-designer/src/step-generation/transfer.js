@@ -21,6 +21,13 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
 
     A single uniform volume will be aspirated from every source well and dispensed into every dest well.
     In other words, all the sub-transfers will use the same uniform volume.
+
+    =====
+
+    For transfer, changeTip means:
+    * 'always': before each aspirate, get a fresh tip
+    * 'once': get a new tip at the beginning of the transfer step, and use it throughout
+    * 'never': reuse the tip from the last step
   */
 
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...

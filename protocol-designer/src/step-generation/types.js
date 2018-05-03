@@ -2,21 +2,14 @@
 import type {DeckSlot, Mount, Channels} from '@opentrons/components'
 import type {MixArgs, SharedFormDataFields, ChangeTipOptions} from '../form-types'
 
-export type ConsolidateFormData = {|
+export type TransferLikeFormDataFields = {|
   ...SharedFormDataFields,
 
-  stepType: 'consolidate',
-
-  pipette: string, // PipetteId. TODO IMMEDIATELY/SOON make this match in the form
-
-  sourceWells: Array<string>,
-  destWell: string,
+  pipette: string, // PipetteId
 
   sourceLabware: string,
   destLabware: string,
-  /** Volume to aspirate from each source well. Different volumes across the
-    source wells isn't currently supported
-  */
+  /** volume is interpreted differently by different Step types */
   volume: number,
 
   // ===== ASPIRATE SETTINGS =====
@@ -24,15 +17,8 @@ export type ConsolidateFormData = {|
   preWetTip: boolean,
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean,
-  /**
-    For consolidate, changeTip means:
-    'always': before the first aspirate in a single asp-asp-disp cycle, get a fresh tip
-    'once': get a new tip at the beginning of the consolidate step, and use it throughout
-    'never': reuse the tip from the last step
-  */
+  /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
-  /** Mix in first well in chunk */
-  mixFirstAspirate: ?MixArgs,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: ?number,
 
@@ -47,49 +33,27 @@ export type ConsolidateFormData = {|
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
-export type TransferFormData = {|
-  // TODO IMMEDIATELY use "mixin types" for shared fields across FormData types.
-  ...SharedFormDataFields,
-  stepType: 'transfer',
+export type ConsolidateFormData = {|
+  ...TransferLikeFormDataFields,
 
-  pipette: string, // PipetteId. TODO IMMEDIATELY/SOON make this match in the form
+  stepType: 'consolidate',
+
+  sourceWells: Array<string>,
+  destWell: string,
+
+  /** Mix in first well in chunk */
+  mixFirstAspirate: ?MixArgs,
+|}
+
+export type TransferFormData = {|
+  ...TransferLikeFormDataFields,
+  stepType: 'transfer',
 
   sourceWells: Array<string>,
   destWells: Array<string>,
 
-  sourceLabware: string,
-  destLabware: string,
-  /** Volume to aspirate from each source well. Different volumes across the
-    source wells isn't currently supported
-  */
-  volume: number,
-
-  // ===== ASPIRATE SETTINGS =====
-  /** Pre-wet tip with ??? uL liquid from the first source well. */
-  preWetTip: boolean,
-  /** Touch tip after every aspirate */
-  touchTipAfterAspirate: boolean,
-  /**
-    For transfer, changeTip means:
-    'always': before each aspirate, get a fresh tip
-    'once': get a new tip at the beginning of the transfer step, and use it throughout
-    'never': reuse the tip from the last step
-  */
-  changeTip: ChangeTipOptions,
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
-  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: ?number,
-
-  // ===== DISPENSE SETTINGS =====
-  /** Mix in destination well after dispense */
-  mixInDestination: ?MixArgs,
-  /** Touch tip in destination well after dispense */
-  touchTipAfterDispense: boolean,
-  /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
-  delayAfterDispense: ?number,
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string // TODO LATER LabwareId export type here instead of string?
 |}
 
 export type PauseFormData = {|
