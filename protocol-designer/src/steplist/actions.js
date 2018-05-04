@@ -4,32 +4,119 @@ import type {Dispatch} from 'redux'
 import {selectors} from './reducers'
 import {END_STEP} from './types'
 import type {SubstepIdentifier, FormSectionNames} from './types'
-import type {StepType, StepIdType, FormModalFields} from '../form-types'
+import type {StepType, StepIdType, FormModalFields, FormData} from '../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
+import {getWellSetForMultichannel} from '../well-selection/utils'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 type EndStepId = typeof END_STEP
-// Update Form input (onChange on inputs)
 
+// Update Form input (onChange on inputs)
 type ChangeFormPayload = {
-  accessor: string, // TODO use FormData keys type
-  value: string | boolean | Array<string>
+  // TODO Ian 2018-05-04 use StepType + FormData type to properly type this payload.
+  // Accessor strings and values depend on StepType
+  stepType?: string,
+  update: {
+    [accessor: string]: string | boolean | Array<string>,
+  }
 }
 
-type ChangeFormInputAction = {
+export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
   payload: ChangeFormPayload
 }
 
-export const changeFormInput = (payload: ChangeFormPayload): ChangeFormInputAction => ({
-  type: 'CHANGE_FORM_INPUT',
-  payload
-})
+function _getAllWells (
+  primaryWells: ?Array<string>,
+  labwareType: ?string
+): Array<string> {
+  if (!labwareType || !primaryWells) {
+    return []
+  }
+
+  const _labwareType = labwareType // TODO Ian 2018-05-04 remove this weird flow workaround
+
+  const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
+    const nextWellSet = getWellSetForMultichannel(_labwareType, well)
+    // filter out any nulls (but you shouldn't get any)
+    return (nextWellSet) ? [...acc, ...nextWellSet] : acc
+  }, [])
+
+  return allWells
+}
+
+function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
+  const baseState = getState()
+  const unsavedForm = selectors.formData(baseState)
+
+  // Changing pipette from multi-channel to single-channel (and visa versa) modifies well selection
+  if (
+    unsavedForm !== null &&
+    unsavedForm.pipette &&
+    'pipette' in payload.update
+  ) {
+    const prevPipette = unsavedForm.pipette
+    const nextPipette = payload.update.pipette
+
+    const getChannels = (pipetteId: string): 1 | 8 => {
+      // TODO HACK Ian 2018-05-04 use pipette definitions for this;
+      // you'd also need a way to grab pipette model from a given pipetteId here
+      return pipetteId.endsWith('8-Channel') ? 8 : 1
+    }
+
+    if (nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
+      getChannels(nextPipette) === 8 &&
+      getChannels(prevPipette) === 1
+    ) {
+      // multi-channel to single-channel: clear all selected wells
+      // to avoid carrying over inaccessible wells
+      return {
+        update: {
+          pipette: nextPipette,
+          'aspirate--wells': [],
+          'dispense--wells': []
+        }
+      }
+    }
+
+    if (typeof nextPipette === 'string' &&
+      getChannels(nextPipette) === 1 &&
+      getChannels(prevPipette) === 8
+    ) {
+      // single-channel to multi-channel: convert primary wells to all wells
+      const sourceLabwareId = unsavedForm['aspirate--labware']
+      const destLabwareId = unsavedForm['dispense--labware']
+
+      const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
+      const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
+
+      return {
+        update: {
+          pipette: nextPipette,
+          'aspirate--wells': _getAllWells(unsavedForm['aspirate--wells'], sourceLabwareType),
+          'dispense--wells': _getAllWells(unsavedForm['dispense--wells'], destLabwareType)
+        }
+      }
+    }
+  }
+
+  // fallback, untransformed
+  return payload
+}
+
+export const changeFormInput = (payload: ChangeFormPayload) =>
+  (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
+    dispatch({
+      type: 'CHANGE_FORM_INPUT',
+      payload: handleFormChange(payload, getState)
+    })
+  }
 
 // Populate form with selected action (only used in thunks)
 
 export type PopulateFormAction = {
   type: 'POPULATE_FORM',
-  payload: {} // TODO use FormData keys type
+  payload: FormData
 }
 
 // Create new step
