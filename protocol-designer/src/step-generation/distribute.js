@@ -3,7 +3,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, reduceCommandCreators} from './' // blowout, replaceTip, touchTip,
+import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
 // import mix from './mix'
 import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
@@ -53,24 +53,64 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
       const dispenseCommands = flatMap(
         destWellChunk,
         (destWell: string, wellIndex: number): Array<CommandCreator> => {
+          const touchTipAfterDispenseCommand = data.touchTipAfterDispense
+            ? [
+              touchTip({
+                pipette,
+                labware: data.destLabware,
+                well: destWell
+              })
+            ]
+            : []
+
           return [
             dispense({
               pipette,
               volume: data.volume,
               labware: data.destLabware,
               well: destWell
-            })
+            }),
+            ...touchTipAfterDispenseCommand
           ]
         })
 
+      // NOTE: identical to consolidate
+      let tipCommands: Array<CommandCreator> = []
+
+      if (
+        data.changeTip === 'always' ||
+        (data.changeTip === 'once' && chunkIndex === 0)
+      ) {
+        tipCommands = [replaceTip(data.pipette)]
+      }
+
+      const blowoutCommands = data.blowout ? [blowout({
+        pipette: data.pipette,
+        labware: data.blowout,
+        well: 'A1'
+      })] : []
+
+      const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
+        ? [
+          touchTip({
+            pipette: data.pipette,
+            labware: data.sourceLabware,
+            well: data.sourceWell
+          })
+        ]
+        : []
+
       return [
+        ...tipCommands,
         aspirate({
           pipette,
-          volume: data.volume * destWellChunk.length,
+          volume: data.volume * destWellChunk.length + disposalVolume,
           labware: data.sourceLabware,
           well: data.sourceWell
         }),
-        ...dispenseCommands
+        ...touchTipAfterAspirateCommand,
+        ...dispenseCommands,
+        ...blowoutCommands
       ]
     }
   )
