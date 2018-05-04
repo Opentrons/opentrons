@@ -14,18 +14,18 @@ def config(monkeypatch):
                 [0.0, 0.0, 0.0, 1.0]
             ],
             # probe top center
-            probe_center=(5.0, 5.0, 100.0),
+            probe_center=[5.0, 5.0, 100.0],
             # Bounding box relative to top center
-            probe_dimensions=(50.0, 50.0, 100.0),
+            probe_dimensions=[50.0, 50.0, 100.0],
             # left relative to right
             instrument_offset={
                 'right': {
-                    'single': (0.0, 0.0, 0.0),
-                    'multi': (0.0, 0.0, 0.0)
+                    'single': [0.0, 0.0, 0.0],
+                    'multi': [0.0, 0.0, 0.0]
                 },
                 'left': {
-                    'single': (0.0, 0.0, 0.0),
-                    'multi': (0.0, 0.0, 0.0)
+                    'single': [0.0, 0.0, 0.0],
+                    'multi': [0.0, 0.0, 0.0]
                 }
             },
             tip_length={
@@ -118,14 +118,10 @@ def test_update_instrument_config(fixture, monkeypatch):
         "Expected instrument position to update relative to mover in pose tree"
 
     filename = get_config_index().get('deckCalibrationFile')
+    expected = dict(robot_configs._get_default()._asdict())
+    expected['instrument_offset']['right']['single'] = [5.0, 5.0, 0.0]
+    expected['tip_length']['Pipette'] = 55.0
+
     with open(filename, 'r') as file:
-        assert json.load(file) == {
-            'instrument_offset': {
-                'right': {
-                    'single': [5.0, 5.0, 0.0]
-                }
-            },
-            'tip_length': {
-                'Pipette': 55.0
-            }
-        }
+        actual = json.load(file)
+    assert actual == expected

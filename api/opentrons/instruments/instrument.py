@@ -2,9 +2,9 @@ import copy
 import json
 import os
 import sys
+import logging
 
 from opentrons.util import environment
-from opentrons.util.log import get_logger
 from opentrons.util.vector import Vector, VectorEncoder
 
 
@@ -15,7 +15,7 @@ else:
     JSON_ERROR = json.decoder.JSONDecodeError
 
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Instrument(object):
