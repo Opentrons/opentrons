@@ -7,8 +7,10 @@ import {
   reducer,
   startDeckCalibration,
   deckCalibrationCommand,
+  setCalibrationJogStep,
   makeGetDeckCalibrationStartState,
-  makeGetDeckCalibrationCommandState
+  makeGetDeckCalibrationCommandState,
+  getCalibrationJogStep
 } from '..'
 
 jest.mock('../client')
@@ -142,6 +144,15 @@ describe('/calibration/**', () => {
     })
   })
 
+  describe('non-API-call action creators', () => {
+    test('setCalibrationJogStep', () => {
+      const step = 4
+      const expected = {type: 'api:SET_CAL_JOG_STEP', payload: {step}}
+
+      expect(setCalibrationJogStep(step)).toEqual(expected)
+    })
+  })
+
   const REDUCER_REQUEST_RESPONSE_TESTS = [
     {
       path: 'deck/start',
@@ -236,6 +247,21 @@ describe('/calibration/**', () => {
     })
   })
 
+  describe('reducer with non-API-call actions', () => {
+    beforeEach(() => {
+      state = state.api
+    })
+
+    test('handles SET_CAL_JOG_STEP', () => {
+      const action = setCalibrationJogStep(5)
+
+      expect(reducer(state, action).calibration).toEqual({
+        ...state.calibration,
+        jogStep: 5
+      })
+    })
+  })
+
   describe('selectors', () => {
     beforeEach(() => {
       state.api.calibration[NAME] = {
@@ -270,6 +296,11 @@ describe('/calibration/**', () => {
         request: null,
         response: null
       })
+    })
+
+    test('getCalibrationJogStep', () => {
+      state.api.calibration.jogStep = 42
+      expect(getCalibrationJogStep(state)).toBe(42)
     })
   })
 })
