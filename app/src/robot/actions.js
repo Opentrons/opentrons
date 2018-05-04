@@ -102,6 +102,11 @@ export type PipetteCalibrationAction = {|
   |}
 |}
 
+export type SetJogDistanceAction = {|
+  type: 'robot:SET_JOG_DISTANCE',
+  payload: number,
+|}
+
 export type LabwareCalibrationAction = {|
   type: (
     | 'robot:MOVE_TO'
@@ -171,7 +176,6 @@ export const actionTypes = {
 
   RETURN_TIP: makeRobotActionName('RETURN_TIP'),
   RETURN_TIP_RESPONSE: makeRobotActionName('RETURN_TIP_RESPONSE'),
-  SET_JOG_DISTANCE: makeRobotActionName('SET_JOG_DISTANCE'),
   CONFIRM_LABWARE: makeRobotActionName('CONFIRM_LABWARE'),
 
   // protocol run controls
@@ -204,6 +208,7 @@ export type Action =
   | CalibrationResponseAction
   | CalibrationFailureAction
   | ReturnTipResponseAction
+  | SetJogDistanceAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -423,7 +428,7 @@ export const actions = {
     return {type: 'robot:MOVE_TO_SUCCESS', payload: {}}
   },
 
-  setJogDistance (step: number) {
+  setJogDistance (step: number): SetJogDistanceAction {
     return {type: 'robot:SET_JOG_DISTANCE', payload: step}
   },
 
