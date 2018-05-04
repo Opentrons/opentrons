@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {goBack} from 'react-router-redux'
 import {Switch, Route, withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {OP, SP, DP, CalibrateDeckProps} from './types'
+import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
 import {getPipette} from '@opentrons/labware-definitions'
 
@@ -22,6 +21,7 @@ import AttachTipModal from './AttachTipModal'
 import InUseModal from './InUseModal'
 import NoPipetteModal from './NoPipetteModal'
 import ErrorModal from './ErrorModal'
+import InstructionsModal from './InstructionsModal'
 
 type Props = {
   match: Match,
@@ -40,12 +40,12 @@ export default function CalibrateDeck (props: Props) {
 
   return (
     <Route
-      path={`${path}/:step?`}
+      path={`${path}/step-:step`}
       render={(propsWithStep) => {
         const {match: {params}} = propsWithStep
-        const step: string = (params.step: any)
-        const NUM_STEP = step.replace(/^\D+/g, '')
-        const subtitle = `Step ${NUM_STEP} of 6`
+        const step: CalibrationStep = (params.step: any)
+        const subtitle = `Step ${step} of 6`
+        // const calibrationStep = `step-${step}`
         const baseUrl = path
 
         return (
@@ -56,6 +56,7 @@ export default function CalibrateDeck (props: Props) {
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             exitUrl={`${baseUrl}/exit`}
+            calibrationStep={step}
           />
         )
       }}
@@ -102,6 +103,18 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
       <Route path={`${baseUrl}/step-1`} render={() => (
         <AttachTipModal {...props}/>
       )} />
+      <Route path={`${baseUrl}/step-2`} render={() => (
+        <InstructionsModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-3`} render={() => (
+        <InstructionsModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-4`} render={() => (
+        <InstructionsModal {...props} />
+      )} />
+      <Route path={`${baseUrl}/step-5`} render={() => (
+        <InstructionsModal {...props} />
+      )} />
     </Switch>
   )
 }
@@ -116,14 +129,24 @@ function makeMapStateToProps () {
     const pipette = startRequest.response
       ? getPipette(startRequest.response.pipette.model)
       : null
-
-    return {moveRequest, startRequest, pipette}
+    // TODO (ka 2018-5-4): Swap for DeckCalibrationState reducer in JogControls PR
+    // increment selet will not update UI at this time, will console.log clicked increment
+    const currentJogDistance = 0.1
+    return {moveRequest, startRequest, pipette, currentJogDistance}
   }
 }
 
+// TODO (ka 2018-5-4): Wire up HTTP jog actions in JogControls PR
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+  const makeJog = (axis, direction) => () => {
+    console.log(axis, direction)
+  }
   return {
-    back: () => dispatch(goBack()),
+    makeJog,
+    onIncrementSelect: (event) => {
+      const step = Number(event.target.value)
+      console.log(step)
+    },
     forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
   }
 }

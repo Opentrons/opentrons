@@ -14,7 +14,6 @@ export default function AttachTipModal (props: CalibrateDeckProps) {
         title: props.title,
         subtitle: props.subtitle,
         back: {
-          onClick: props.back,
           disabled: true
         }
       }}

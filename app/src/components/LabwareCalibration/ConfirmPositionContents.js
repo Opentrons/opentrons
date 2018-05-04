@@ -8,10 +8,7 @@ import {
   selectors as robotSelectors,
   actions as robotActions,
   type Instrument,
-  type Labware,
-  type Axis,
-  type Direction,
-  type JogButtonName
+  type Labware
 } from '../../robot'
 
 import {PrimaryButton} from '@opentrons/components'
@@ -53,19 +50,6 @@ function ConfirmPositionContents (props: Props) {
   )
 }
 
-const JOG_BUTTONS: Array<{
-  name: JogButtonName,
-  axis: Axis,
-  direction: Direction
-}> = [
-  {name: 'left', axis: 'x', direction: -1},
-  {name: 'right', axis: 'x', direction: 1},
-  {name: 'back', axis: 'y', direction: 1},
-  {name: 'forward', axis: 'y', direction: -1},
-  {name: 'up', axis: 'z', direction: 1},
-  {name: 'down', axis: 'z', direction: -1}
-]
-
 function mapStateToProps (state): StateProps {
   return {
     currentJogDistance: robotSelectors.getJogDistance(state)
@@ -78,14 +62,9 @@ function mapDispatchToProps (
 ): any {
   const {slot, isTiprack, calibrator: {mount}} = ownProps
 
-  const jogButtons = JOG_BUTTONS.map((button) => {
-    const {name, axis, direction} = button
-    const onClick = () => {
-      dispatch(robotActions.jog(mount, axis, direction))
-    }
-
-    return {name, onClick}
-  })
+  const makeJog = (axis, direction) => () => {
+    dispatch(robotActions.jog(mount, axis, direction))
+  }
 
   const onConfirmAction = isTiprack
     ? robotActions.pickupAndHome(mount, slot)
@@ -93,7 +72,7 @@ function mapDispatchToProps (
 
   return {
     ...ownProps,
-    jogButtons,
+    makeJog,
     onIncrementSelect: (event) => {
       const step = Number(event.target.value)
       dispatch(robotActions.setJogDistance(step))
