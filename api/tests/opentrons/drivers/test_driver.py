@@ -161,7 +161,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G91 G0Y-3 G90 M400'],                      # retract Y
         ['G28.2Y M400'],                        # home Y
         ['G91 G0Y-3 G90 M400'],                      # retract Y
-        ['M203.1 A100 B50 C50 X600 Y400 Z100 M400'],  # return to norm speed
+        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],  # return to norm speed
         ['M907 Y0.3 M400'],                    # end of HOME dwells X axis
         ['G4P0.05 M400'],
         ['M114.2 M400']                       # Get position
