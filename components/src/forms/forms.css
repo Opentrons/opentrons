@@ -82,7 +82,8 @@
   }
 
   &:focus-within {
-    background-color: var(--c-light-blue);
+    background-color: var(--c-white);
+    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
   }
 
   & .suffix {
