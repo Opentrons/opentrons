@@ -545,19 +545,26 @@ class Robot(object):
         # and to make sure tips are not in the liquid while
         # homing plungers. Z/A axis will automatically home before X/Y
         self.poses = self.gantry.home(self.poses)
-        # Then plungers
-        self.poses = self._actuators['left']['plunger'].home(self.poses)
-        self.poses = self._actuators['right']['plunger'].home(self.poses)
+
+        # explicitly update carriage Mover positions (axes ZA) in pose tree
+        # because their Mover.home() commands aren't used here
+        for a in self._actuators.values():
+            self.poses = a['carriage'].update_pose_from_driver(self.poses)
+
+        # Then plungers, only if there is a pipette currently attached
+        current_pipettes = {
+            mount: data['plunger_axis']
+            for mount, data in self.get_attached_pipettes().items()
+            if data['model']
+        }
+        for mount, plunger_axis in current_pipettes.items():
+            self._driver.unstick_axes(plunger_axis)
+            self.poses = self._actuators[mount]['plunger'].home(self.poses)
 
         # next move should not use any previously used instrument or labware
         # to prevent robot.move_to() from using risky path optimization
         self._previous_instrument = None
         self._prev_container = None
-
-        # explicitly update carriage Mover positions in pose tree
-        # because their Mover.home() commands aren't used here
-        for a in self._actuators.values():
-            self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)

@@ -377,6 +377,10 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
+        if self.simulating:
+            sim_switches = {ax: False for ax in AXES}
+            sim_switches.update({'Probe': False})
+            return sim_switches
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
@@ -517,6 +521,42 @@ class SmoothieDriver_3_0_0:
         if active_currents:
             self.set_current(active_currents, axes_active=True)
 
+    def unstick_axes(self, axes):
+        '''
+        Some axes (specifically plunger axis in OT2) build up static friction
+        over time. To get over this, the robot can move that plunger at normal
+        current and a very slow speed to increase the torque, removing the
+        static friction
+
+        axes:
+            String containing each axis to be moved. Ex: 'BC' or 'ZABC'
+        '''
+        for ax in axes:
+            if ax not in AXES:
+                raise ValueError('Unknown axes: {}'.format(axes))
+
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({ax: 1 for ax in axes})
+
+        # only need to request switch state once
+        state_of_switches = self.switch_state
+
+        # incase axes is pressing endstop, home it slowly instead of moving
+        homing_axes = ''.join([ax for ax in axes if state_of_switches[ax]])
+        moving_axes = {
+            ax: self.position[ax] - 3  # move away (-) from switch
+            for ax in axes
+            if (not state_of_switches[ax]) and (ax not in homing_axes)
+        }
+
+        try:
+            if moving_axes:
+                self.move(moving_axes)
+            if homing_axes:
+                self.home(homing_axes)
+        finally:
+            self.pop_axis_max_speed()
+
     # ----------- Private functions --------------- #
 
     def _wait_for_ack(self):
@@ -571,11 +611,12 @@ class SmoothieDriver_3_0_0:
                 command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
+            # OR if it tried to home an axis, then timed out
             if (ERROR_KEYWORD in ret_code.lower()) or \
                     (ALARM_KEYWORD in ret_code.lower()):
                 self._reset_from_error()
                 error_axis = ret_code.strip()[-1]
-                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                if GCODES['HOME'] not in command:
                     self.home(error_axis)
                 raise SmoothieError(ret_code)
 

@@ -269,6 +269,52 @@ def test_set_current(model):
     assert current_log == expected
 
 
+def test_unstick_axes(model):
+    import types
+    driver = model.robot._driver
+    driver.simulating = True
+
+    old_send_command = driver._send_command
+
+    current_log = []
+
+    def send_command_mock(self, command, timeout=None):
+        nonlocal current_log
+        current_log.append(command)
+        old_send_command(command, timeout=None)
+
+    driver._send_command = types.MethodType(send_command_mock, driver)
+
+    driver.unstick_axes('BC')
+
+    expected = [
+        'M203.1 B1 C1',                         # slow them down
+        'M907 B0.5 C0.5',                       # set plunger current
+        'G4P0.05',
+        'G0B-3C-3',                             # move away from endstop
+        'M907 B0.1 C0.1',                       # set plunger current
+        'G4P0.05',
+        'M203.1 A100 B50 C50 X600 Y400 Z100'    # return to normal speed
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    current_log = []
+    driver.unstick_axes('XYZA')
+
+    expected = [
+        'M203.1 A1 X1 Y1 Z1',                   # slow them down
+        'M907 A1.0 X1.5 Y1.75 Z1.0',            # get out of dwelling current
+        'G4P0.05',
+        'G0A-3X-3Y-3Z-3',                       # move away from endstop
+        'M203.1 A100 B50 C50 X600 Y400 Z100'    # return to normal speed
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+
 def test_parse_pipette_data():
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
         _parse_instrument_data, _byte_array_to_hex_string
@@ -343,6 +389,7 @@ def test_fast_home(model):
 def test_switch_state(model):
     import types
     driver = model.robot._driver
+    driver.simulating = False
 
     def send_mock(self, target):
         smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'
