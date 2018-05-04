@@ -22,6 +22,8 @@ pipette_config = namedtuple(
         'channels',
         'name',
         'model_offset',
+        'plunger_current',
+        'drop_tip_current',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
@@ -47,6 +49,8 @@ def _load_config_from_file(pipette_model: str) -> pipette_config:
                 channels=cfg['channels'],
                 name=pipette_model,
                 model_offset=cfg['modelOffset'],
+                plunger_current=cfg['plungerCurrent'],
+                drop_tip_current=cfg['dropTipCurrent'],
                 tip_length=cfg['tipLength']
             )
     else:
@@ -94,6 +98,8 @@ p10_single = pipette_config(
     channels=1,
     name='p10_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=40
 )
 
@@ -111,6 +117,8 @@ p10_multi = pipette_config(
     channels=8,
     name='p10_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=40
 )
 
@@ -128,6 +136,8 @@ p50_single = pipette_config(
     channels=1,
     name='p50_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -145,6 +155,8 @@ p50_multi = pipette_config(
     channels=8,
     name='p50_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -162,6 +174,8 @@ p300_single = pipette_config(
     channels=1,
     name='p300_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -179,6 +193,8 @@ p300_multi = pipette_config(
     channels=8,
     name='p300_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -196,6 +212,8 @@ p1000_single = pipette_config(
     channels=1,
     name='p1000_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
