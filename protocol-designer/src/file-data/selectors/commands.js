@@ -168,6 +168,9 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       if (validatedForm.stepType === 'transfer') {
         nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
       }
+      if (validatedForm.stepType === 'distribute') {
+        nextCommandsAndState = StepGeneration.distribute(validatedForm)(acc.robotState)
+      }
       if (validatedForm.stepType === 'pause') {
         nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
