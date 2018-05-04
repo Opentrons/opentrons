@@ -3,7 +3,7 @@ import type {PipetteConfig} from '@opentrons/labware-definitions'
 import type {RobotService} from '../../robot'
 import type {RobotMoveState, DeckCalStartState} from '../../http-api-client'
 
-export type CalibrationStep = 'step-2' | 'step-3' | 'step-4' | 'step-5'
+export type CalibrationStep = 2 | 3 | 4 | 5
 
 export type OP = {
   title: string,
@@ -12,16 +12,19 @@ export type OP = {
   parentUrl: string,
   baseUrl: string,
   exitUrl: string,
+  calibrationStep: CalibrationStep
 }
 
 export type SP = {
   pipette: ?PipetteConfig,
   startRequest: DeckCalStartState,
   moveRequest: RobotMoveState,
+  currentJogDistance: number
 }
 
 export type DP = {
-  back: () => mixed,
+  makeJog: (axis: any, direction: any) => () => mixed,
+  onIncrementSelect: (event: SyntheticInputEvent<>) => mixed,
 }
 
 export type CalibrateDeckProps = OP & SP & DP

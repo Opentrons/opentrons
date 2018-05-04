@@ -17,34 +17,27 @@ import styles from './styles.css'
 type JogButtonProps = {
   name: JogButtonName,
   onClick: () => mixed,
+  icon: IconName,
 }
 
 const JOG_BUTTONS: Array<{
   name: JogButtonName,
   axis: Axis,
-  direction: Direction
+  direction: Direction,
+  icon: IconName
 }> = [
-  {name: 'left', axis: 'x', direction: -1},
-  {name: 'right', axis: 'x', direction: 1},
-  {name: 'back', axis: 'y', direction: 1},
-  {name: 'forward', axis: 'y', direction: -1},
-  {name: 'up', axis: 'z', direction: 1},
-  {name: 'down', axis: 'z', direction: -1}
+  {name: 'left', axis: 'x', direction: -1, icon: 'ot-arrow-left'},
+  {name: 'right', axis: 'x', direction: 1, icon: 'ot-arrow-right'},
+  {name: 'back', axis: 'y', direction: 1, icon: 'ot-arrow-up'},
+  {name: 'forward', axis: 'y', direction: -1, icon: 'ot-arrow-down'},
+  {name: 'up', axis: 'z', direction: 1, icon: 'ot-arrow-up'},
+  {name: 'down', axis: 'z', direction: -1, icon: 'ot-arrow-down'}
 ]
 
 export type JogControlsProps = {
   makeJog: (axis: Axis, direction: Direction) => () => mixed,
   currentJogDistance: number,
   onIncrementSelect: (event: SyntheticInputEvent<*>) => mixed,
-}
-
-const ARROW_ICONS_BY_NAME: {[JogButtonName]: IconName} = {
-  left: 'ot-arrow-left',
-  right: 'ot-arrow-right',
-  back: 'ot-arrow-up',
-  forward: 'ot-arrow-down',
-  up: 'ot-arrow-up',
-  down: 'ot-arrow-down'
 }
 
 export default function JogControls (props: JogControlsProps) {
@@ -82,7 +75,7 @@ export default function JogControls (props: JogControlsProps) {
 }
 
 function JogButton (props: JogButtonProps) {
-  const {name, onClick} = props
+  const {name, onClick, icon} = props
   const className = cx(styles.jog_button, styles[name])
 
   return (
@@ -91,7 +84,7 @@ function JogButton (props: JogButtonProps) {
       title={name}
       onClick={onClick}
     >
-      <Icon name={ARROW_ICONS_BY_NAME[name]} />
+      <Icon name={icon} />
     </PrimaryButton>
   )
 }
