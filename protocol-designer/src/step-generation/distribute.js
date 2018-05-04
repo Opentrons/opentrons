@@ -4,7 +4,7 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
-// import mix from './mix'
+import mix from './mix'
 import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
 
@@ -100,8 +100,19 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         ]
         : []
 
+      const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
+        ? mix(
+          data.pipette,
+          data.sourceLabware,
+          data.sourceWell,
+          data.mixBeforeAspirate.volume,
+          data.mixBeforeAspirate.times
+        )
+        : []
+
       return [
         ...tipCommands,
+        ...mixBeforeAspirateCommands,
         aspirate({
           pipette,
           volume: data.volume * destWellChunk.length + disposalVolume,
@@ -109,6 +120,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
           well: data.sourceWell
         }),
         ...touchTipAfterAspirateCommand,
+
         ...dispenseCommands,
         ...blowoutCommands
       ]

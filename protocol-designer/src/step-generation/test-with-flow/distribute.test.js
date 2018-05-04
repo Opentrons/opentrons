@@ -624,7 +624,127 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
     ])
   })
 
-  test('mix before aspirate') // TODO IMMEDIATELY
+  test('mix before aspirate w/ disposal vol', () => {
+    const volume = 130
+    const disposalVolume = 20
+    const aspirateVol = (volume * 2) + disposalVolume
+    const distributeArgs: DistributeFormData = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume,
+      mixBeforeAspirate: {
+        volume: 250,
+        times: 2
+      },
+      disposalVolume
+    }
+
+    const result = distribute(distributeArgs)(robotInitialState)
+
+    const mixCommands = [
+      // mix 1
+      {
+        command: 'aspirate',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: 250,
+        well: 'A1'
+      },
+      {
+        command: 'dispense',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: 250,
+        well: 'A1'
+      },
+      // mix 2
+      {
+        command: 'aspirate',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: 250,
+        well: 'A1'
+      },
+      {
+        command: 'dispense',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: 250,
+        well: 'A1'
+      }
+    ]
+
+    expect(result.commands).toEqual([
+      ...mixCommands,
+      {
+        command: 'aspirate',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: aspirateVol,
+        well: 'A1'
+      },
+      {
+        command: 'dispense',
+        labware: 'destPlateId',
+        pipette: 'p300SingleId',
+        volume,
+        well: 'A2'
+      },
+      {
+        command: 'dispense',
+        labware: 'destPlateId',
+        pipette: 'p300SingleId',
+        volume,
+        well: 'A3'
+      },
+      blowoutSingleToDestPlateA1,
+      ...mixCommands,
+      {
+        command: 'aspirate',
+        labware: 'sourcePlateId',
+        pipette: 'p300SingleId',
+        volume: aspirateVol,
+        well: 'A1'
+      },
+      {
+        command: 'dispense',
+        labware: 'destPlateId',
+        pipette: 'p300SingleId',
+        volume,
+        well: 'A4'
+      },
+      {
+        command: 'dispense',
+        labware: 'destPlateId',
+        pipette: 'p300SingleId',
+        volume,
+        well: 'A5'
+      },
+      blowoutSingleToDestPlateA1
+    ])
+  })
+})
+
+describe('invalid input + state errors', () => {
+  test('invalid pipette ID should throw error', () => {
+    const distributeArgs: DistributeFormData = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3'],
+      changeTip: 'never',
+      volume: 100,
+      pipette: 'no-such-pipette-id-here'
+    }
+
+    const result = distributeWithErrors(distributeArgs)(robotInitialState)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'PIPETTE_DOES_NOT_EXIST'
+    })
+  })
 })
 
 describe('weirdos TBD', () => {
