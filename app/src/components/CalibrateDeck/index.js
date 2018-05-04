@@ -11,6 +11,9 @@ import {getPipette} from '@opentrons/labware-definitions'
 
 import {
   startDeckCalibration,
+  deckCalibrationCommand,
+  setCalibrationJogStep,
+  getCalibrationJogStep,
   makeGetRobotMove,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
@@ -84,14 +87,13 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
     if (status === 403) {
       return (<NoPipetteModal {...props}/>)
     }
-    // TODO: (ka 2018-5-2) kept props generic in case we decide to reuse
-    return (<ErrorModal closeUrl={parentUrl} error={startRequest.error}/>)
+
+    // props are generic in case we decide to reuse
+    return (<ErrorModal closeUrl={parentUrl} error={startRequest.error} />)
   }
 
   if (!moveRequest.inProgress && !moveRequest.response) {
-    return (
-      <ClearDeckAlertModal {...clearDeckProps} />
-    )
+    return (<ClearDeckAlertModal {...clearDeckProps} />)
   }
 
   if (moveRequest.inProgress) {
@@ -124,29 +126,31 @@ function makeMapStateToProps () {
   const getDeckCalStartState = makeGetDeckCalibrationStartState()
 
   return (state: State, ownProps: OP): SP => {
-    const moveRequest = getRobotMove(state, ownProps.robot)
     const startRequest = getDeckCalStartState(state, ownProps.robot)
     const pipette = startRequest.response
       ? getPipette(startRequest.response.pipette.model)
       : null
-    // TODO (ka 2018-5-4): Swap for DeckCalibrationState reducer in JogControls PR
-    // increment selet will not update UI at this time, will console.log clicked increment
-    const currentJogDistance = 0.1
-    return {moveRequest, startRequest, pipette, currentJogDistance}
+
+    return {
+      pipette,
+      startRequest,
+      moveRequest: getRobotMove(state, ownProps.robot),
+      step: getCalibrationJogStep(state)
+    }
   }
 }
 
-// TODO (ka 2018-5-4): Wire up HTTP jog actions in JogControls PR
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const makeJog = (axis, direction) => () => {
-    console.log(axis, direction)
-  }
+  const {robot} = ownProps
+
   return {
-    makeJog,
-    onIncrementSelect: (event) => {
+    jog: (axis, direction, step) => dispatch(
+      deckCalibrationCommand(robot, {command: 'jog', axis, direction, step})
+    ),
+    onStepSelect: (event) => {
       const step = Number(event.target.value)
-      console.log(step)
+      dispatch(setCalibrationJogStep(step))
     },
-    forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
+    forceStart: () => dispatch(startDeckCalibration(robot, true))
   }
 }

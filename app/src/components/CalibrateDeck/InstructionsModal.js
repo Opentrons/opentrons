@@ -9,6 +9,7 @@ export default function InstructionsModal (props: CalibrateDeckProps) {
   const HEADING = props.calibrationStep === 'step-2'
    ? 'Calibrate the z-axis'
    : 'Calibrate the X-Y axis'
+
   return (
     <ModalPage
       titleBar={{
