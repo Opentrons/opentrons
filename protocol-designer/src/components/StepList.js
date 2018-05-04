@@ -5,18 +5,20 @@ import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
 import {END_STEP} from '../steplist/types'
-import type {StepItemData, StepSubItemData, StepIdType, SubstepIdentifier} from '../steplist/types'
+import type {StepItemsWithSubsteps, SubstepIdentifier} from '../steplist/types'
+import type {StepIdType} from '../form-types'
 
 import StepItem from '../components/StepItem'
-import TransferishSubstep from '../components/TransferishSubstep'
+import TransferLikeSubstep from '../components/TransferLikeSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
 
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
 type StepListProps = {
+  errorStepId: ?StepIdType, // this is the first step with an error
   selectedStepId: StepIdTypeWithEnd | null,
   hoveredSubstep: SubstepIdentifier,
-  steps: Array<StepItemData & {substeps: StepSubItemData}>,
+  steps: Array<StepItemsWithSubsteps>,
   handleSubstepHover: SubstepIdentifier => mixed,
   handleStepItemClickById?: (StepIdTypeWithEnd) => (event?: SyntheticEvent<>) => mixed,
   handleStepItemCollapseToggleById?: (StepIdType) => (event?: SyntheticEvent<>) => mixed,
@@ -34,7 +36,7 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
     substeps.stepType === 'distribute'
   ) {
     // all these step types share the same substep display
-    return <TransferishSubstep
+    return <TransferLikeSubstep
       substeps={substeps}
       hoveredSubstep={hoveredSubstep}
       onSelectSubstep={onSelectSubstep} // TODO use action
@@ -42,11 +44,15 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
   }
 
   if (substeps.stepType === 'pause') {
-    // TODO: style pause stuff
-    if (substeps.waitForUserInput) {
+    if (substeps.wait === true) {
+      // Show message if waiting indefinitely
       return <li>{substeps.message}</li>
     }
-    const {hours, minutes, seconds} = substeps
+    if (!substeps.meta) {
+      // No message or time, show nothing
+      return null
+    }
+    const {hours, minutes, seconds} = substeps.meta
     return <li>{hours} hr {minutes} m {seconds} s</li>
   }
 
@@ -61,6 +67,10 @@ export default function StepList (props: StepListProps) {
     >
       {props.steps && props.steps.map((step, key) => (
         <StepItem key={key}
+          error={(props.errorStepId && step.id)
+            ? (step.id >= props.errorStepId)
+            : false
+          }
           onClick={props.handleStepItemClickById && props.handleStepItemClickById(step.id)}
           onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(step.id)}
           onCollapseToggle={

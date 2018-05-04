@@ -10,6 +10,7 @@ import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 import {getPipette} from '@opentrons/labware-definitions'
 
 import {
+  startDeckCalibration,
   makeGetRobotMove,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
@@ -141,10 +142,10 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     console.log(axis, direction)
   }
   return {
-    makeJog,
     onIncrementSelect: (event) => {
       const step = Number(event.target.value)
       console.log(step)
     }
+    forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
   }
 }

@@ -6,8 +6,7 @@ import {Icon, TitledList} from '@opentrons/components'
 import StepDescription from './StepDescription'
 import styles from './StepItem.css'
 
-import {stepIconsByType} from '../steplist/types'
-import type {StepType} from '../steplist/types'
+import {stepIconsByType, type StepType} from '../form-types'
 
 type StepItemProps = {
   stepType: StepType,
@@ -15,6 +14,7 @@ type StepItemProps = {
   description?: string,
   collapsed?: boolean,
   selected?: boolean,
+  error?: ?boolean,
   sourceLabwareName?: string,
   destLabwareName?: string,
   onClick?: (event: SyntheticEvent<>) => void,
@@ -33,6 +33,7 @@ export default function StepItem (props: StepItemProps) {
     destLabwareName,
     collapsed,
     selected,
+    error,
     onClick,
     onMouseEnter,
     onMouseLeave,
@@ -51,7 +52,9 @@ export default function StepItem (props: StepItemProps) {
     <TitledList
       className={styles.step_item}
       description={Description}
-      {...{iconName, title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
+      iconName={error ? 'alert-circle' : iconName}
+      iconProps={{className: error ? styles.error_icon : ''}}
+      {...{title, selected, onClick, onMouseEnter, onMouseLeave, onCollapseToggle: onCollapseToggle, collapsed}}
     >
       {showLabwareHeader && <li className={styles.aspirate_dispense}>
           <span>ASPIRATE</span>

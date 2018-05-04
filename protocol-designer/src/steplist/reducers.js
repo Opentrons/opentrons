@@ -13,15 +13,19 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'
+
+import type {
+  StepItemData,
+  FormSectionState,
+  SubstepIdentifier
+} from './types'
+
 import type {
   FormData,
   BlankForm,
-  StepItemData,
   StepIdType,
-  FormSectionState,
-  FormModalFields,
-  SubstepIdentifier
-} from './types'
+  FormModalFields
+} from '../form-types'
 
 import {
   type ValidFormAndErrors,
@@ -129,7 +133,8 @@ const savedStepForms = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
     [action.payload.id]: action.payload
-  })
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
 }, {})
 
 type CollapsedStepsState = {
@@ -265,7 +270,7 @@ const getCollapsedSteps = createSelector(
   (state: RootState) => state.collapsedSteps
 )
 
-const orderedStepsSelector = createSelector(
+const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
   rootSelector,
   (state: RootState) => state.orderedSteps
 )
@@ -406,8 +411,7 @@ const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   s => s.formSectionCollapse
 )
 
-/** All Step data EXCEPT substeps */
-export const allSteps: Selector<Array<any>> = createSelector( // TODO Ian 2018-04-09 type this selector, no `any`
+export const allSteps: Selector<Array<StepItemData>> = createSelector(
   getSteps,
   orderedStepsSelector,
   getCollapsedSteps,
@@ -423,7 +427,7 @@ export const allSteps: Selector<Array<any>> = createSelector( // TODO Ian 2018-0
           : null
       }
 
-      // optional form fields for "transferish" steps
+      // optional form fields for "TransferLike" steps
       const additionalFormFields = (
         savedForm.stepType === 'transfer' ||
         savedForm.stepType === 'distribute' ||

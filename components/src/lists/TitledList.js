@@ -68,11 +68,13 @@ export default function TitledList (props: ListProps) {
     [styles.clickable]: props.onClick
   })
 
+  const iconClass = cx(styles.title_bar_icon, iconProps && iconProps.className)
+
   return (
     <div className={className} {...{onMouseEnter, onMouseLeave}}>
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
-          <Icon {...iconProps} className={styles.title_bar_icon} name={iconName} />
+          <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
         <h3 className={styles.title}>
           {props.title}

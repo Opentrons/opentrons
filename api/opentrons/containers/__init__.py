@@ -89,11 +89,11 @@ def create(name, grid, spacing, diameter, depth, volume=0):
     for r in range(rows):
         for c in range(columns):
             well = Well(properties=properties)
-            well_name = chr(c + ord('A')) + str(1 + r)
+            well_name = chr(r + ord('A')) + str(1 + c)
             coordinates = (c * col_spacing, r * row_spacing, 0)
             custom_container.add(well, well_name, coordinates)
     database.save_new_container(custom_container, name)
-    return custom_container
+    return database.load_container(name)
 
 
 # FIXME: [Jared - 8/31/17] This is not clean

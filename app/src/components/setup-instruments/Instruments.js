@@ -61,6 +61,7 @@ export default function Instruments (props: Props) {
       <div>
         <AlertItem
           type='warning'
+          className={styles.alert}
           title={alertType === 'attach' ? ATTACH_ALERT : CHANGE_ALERT}
         />
         <p className={styles.wrong_pipette_message}>

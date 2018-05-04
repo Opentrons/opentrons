@@ -184,14 +184,14 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
   }
 }
 
-type TransferishSubstepProps = {|
+type TransferLikeSubstepProps = {|
   ...StepSubItemProps,
   onSelectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: SubstepIdentifier
 |}
 
-// This "transferish" substep component is for transfer/distribute/consolidate
-export default function TransferishSubstep (props: TransferishSubstepProps) {
+// This "TransferLike" substep component is for transfer/distribute/consolidate
+export default function TransferLikeSubstep (props: TransferLikeSubstepProps) {
   const {substeps, onSelectSubstep, hoveredSubstep} = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)

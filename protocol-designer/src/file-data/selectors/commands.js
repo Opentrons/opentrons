@@ -106,19 +106,21 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-type RobotStateTimelineAcc = {
+export type RobotStateTimelineAcc = {
   formErrors: {[string]: string},
   timeline: Array<StepGeneration.CommandsAndRobotState>,
   robotState: StepGeneration.RobotState,
-  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>
+  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>,
+  errorStepId?: number
 }
 
-export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRobotState> = createSelector(
+// exposes errors and last valid robotState
+export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
+    const result: RobotStateTimelineAcc = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
       if (!isEmpty(acc.formErrors)) {
         // short-circut the reduce if there were errors with validating / processing the form
         return acc
@@ -146,8 +148,11 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
         }
       }
 
+      // un-nest to make flow happy
+      const validatedForm = form.validatedForm
+
       // put form errors into accumulator
-      if (!form.validatedForm) {
+      if (!validatedForm) {
         return {
           ...acc,
           formErrors: form.errors
@@ -157,11 +162,14 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
       // finally, deal with valid step forms
       let nextCommandsAndState
 
-      if (form.validatedForm.stepType === 'consolidate') {
-        nextCommandsAndState = StepGeneration.consolidate(form.validatedForm)(acc.robotState)
+      if (validatedForm.stepType === 'consolidate') {
+        nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
       }
-      if (form.validatedForm.stepType === 'transfer') {
-        nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+      if (validatedForm.stepType === 'transfer') {
+        nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
+      }
+      if (validatedForm.stepType === 'pause') {
+        nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
 
       if (!nextCommandsAndState) {
@@ -170,7 +178,7 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
           ...acc,
           formErrors: {
             ...acc.formErrors,
-            'STEP NOT IMPLEMENTED': form.validatedForm.stepType
+            'STEP NOT IMPLEMENTED': validatedForm.stepType
           }
         }
       }
@@ -179,7 +187,8 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
       if (nextCommandsAndState.errors) {
         return {
           ...acc,
-          timelineErrors: nextCommandsAndState.errors
+          timelineErrors: nextCommandsAndState.errors,
+          errorStepId: stepId
         }
       }
       return {
@@ -200,6 +209,12 @@ export const robotStateTimeline: BaseState => Array<StepGeneration.CommandsAndRo
       console.log('Got timeline errors', result)
     }
 
-    return result.timeline
+    return result
   }
+)
+
+// TODO look at who uses this and see if they can use robotStateTimelineFull instead (or not)
+export const robotStateTimeline: Selector<Array<StepGeneration.CommandsAndRobotState>> = createSelector(
+  robotStateTimelineFull,
+  full => full.timeline
 )

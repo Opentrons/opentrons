@@ -22,15 +22,15 @@ async def test_add_and_remove_tip(dc_session):
 
     # Check correct attach command
     tip_length = 50
-    res1 = await endpoints.attach_tip({'tip-length': tip_length})
+    res1 = await endpoints.attach_tip({'tipLength': tip_length})
     assert res1.status == 200
     assert dc_session.tip_length == tip_length
     assert pip.tip_attached
 
-    # Check command in wrong state (tip already attached)
-    res2 = await endpoints.attach_tip({'tip-length': tip_length + 5})
-    assert res2.status == 400
-    assert dc_session.tip_length == tip_length
+    # Check command with tip already attached
+    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5})
+    assert res2.status == 200
+    assert dc_session.tip_length == tip_length + 5
     assert pip.tip_attached
 
     # Check correct detach command
@@ -39,9 +39,11 @@ async def test_add_and_remove_tip(dc_session):
     assert dc_session.tip_length is None
     assert not pip.tip_attached
 
-    # Check command in wrong state (no tip)
+    # Check command with no tip
     res4 = await endpoints.detach_tip({})
-    assert res4.status == 400
+    assert res4.status == 200
+    assert dc_session.tip_length is None
+    assert not pip.tip_attached
 
 
 async def test_save_xy(dc_session):
@@ -117,9 +119,10 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
 
 # ------------ Session and token tests ----------------------
+# TODO(mc, 2018-05-02): this does not adequately pipette selection logic
 async def test_create_session(async_client, monkeypatch):
     """
-    Tests that the GET request to initiate a session manager for factory
+    Tests that the POST request to initiate a session manager for factory
     calibration returns a good token.
     """
     dummy_token = 'Test Token'
@@ -134,7 +137,7 @@ async def test_create_session(async_client, monkeypatch):
         'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
     resp = await async_client.post('/calibration/deck/start')
     text = await resp.text()
-    print(text)
+
     assert json.loads(text) == expected
     assert resp.status == 201
 
@@ -270,14 +273,14 @@ async def test_incorrect_token(async_client, monkeypatch):
 
 
 # ------------ Router tests (integration) ----------------------
+# TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
 async def test_set_and_jog_integration(async_client, monkeypatch):
     """
-    Test that the select model function and jog function works.
+    Test that the jog function works.
     Note that in order for the jog function to work, the following must
     be done:
     1. Create a session manager
-    2. Initialize a pipette
-    3. Select the current pipette
+
     Then jog requests will work as expected.
     """
     robot.reset()
@@ -292,23 +295,25 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     token_text = await token_res.json()
     token = token_text['token']
 
-    axis = 'Z'
-    direction = '1'
-    step = '3'
+    axis = 'z'
+    direction = 1
+    step = 3
+    # left pipette z carriage motor is smoothie axis "Z"
+    smoothie_axis = 'Z'
 
     robot.reset()
-    prior_x, prior_y, prior_z = dc.position('Z')
+    prior_x, prior_y, prior_z = dc.position(smoothie_axis)
     resp = await async_client.post(
         '/calibration/deck',
         json={
             'token': token,
             'command': 'jog',
-            'mount': 'left',
             'axis': axis,
             'direction': direction,
             'step': step
         })
 
     body = await resp.json()
+    msg = body.get('message')
 
-    assert body.get('message') == [prior_x, prior_y, prior_z + float(step)]
+    assert '{}'.format((prior_x, prior_y, prior_z + float(step))) in msg

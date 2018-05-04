@@ -4,7 +4,7 @@ import thunk from 'redux-thunk'
 
 import client from '../client'
 import {
-  moveToChangePipette,
+  moveRobotTo,
   home,
   reducer,
   makeGetRobotMove,
@@ -31,8 +31,9 @@ describe('robot/*', () => {
     store = mockStore(state)
   })
 
-  describe('moveToChangePipette action creator', () => {
+  describe('moveRobotTo action creator', () => {
     const path = 'move'
+    const request = {position: 'change_pipette', mount: 'left'}
     const mockPositionsResponse = {
       positions: {
         change_pipette: {
@@ -53,43 +54,35 @@ describe('robot/*', () => {
 
       client.__setMockResponse(mockPositionsResponse, response)
 
-      return store.dispatch(moveToChangePipette(robot, 'left'))
-        .then(() => expect(client.mock.calls).toEqual([
-          [robot, 'GET', 'robot/positions'],
-          [robot, 'POST', 'robot/move', expected]
-        ]))
+      return store.dispatch(moveRobotTo(robot, request))
+      .then(() => expect(client.mock.calls).toEqual([
+        [robot, 'GET', 'robot/positions'],
+        [robot, 'POST', 'robot/move', expected]
+      ]))
     })
 
-    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_SUCCESS', () => {
-      const request = {target: 'mount', mount: 'right', point: [4, 5, 6]}
+    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS', () => {
       const expectedActions = [
-        {
-          type: 'api:SET_ROBOT_MOVE_POSITION',
-          payload: {robot, position: 'change_pipette'}
-        },
         {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
         {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
       ]
 
       client.__setMockResponse(mockPositionsResponse, response)
 
-      return store.dispatch(moveToChangePipette(robot, 'right'))
+      return store.dispatch(moveRobotTo(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
-    test('dispatches SET_ROBOT_MOVE_POSITION, ROBOT_REQUEST, ROBOT_FAILURE', () => {
+    test('dispatches ROBOT_REQUEST amd ROBOT_FAILURE', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
-        {
-          type: 'api:SET_ROBOT_MOVE_POSITION',
-          payload: {robot, position: 'change_pipette'}
-        },
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
         {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
       ]
 
       client.__setMockError(error)
 
-      return store.dispatch(moveToChangePipette(robot, 'left'))
+      return store.dispatch(moveRobotTo(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -143,20 +136,6 @@ describe('robot/*', () => {
 
       return store.dispatch(home(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-  })
-
-  test('reducer handles SET_ROBOT_MOVE_POSITION', () => {
-    state = state.api
-    const action = {
-      type: 'api:SET_ROBOT_MOVE_POSITION',
-      payload: {robot, position: 'change_pipette'}
-    }
-
-    expect(reducer(state, action).robot).toEqual({
-      [NAME]: {
-        movePosition: 'change_pipette'
-      }
     })
   })
 
@@ -260,38 +239,22 @@ describe('robot/*', () => {
     beforeEach(() => {
       state.api.robot[NAME] = {
         home: {inProgress: true},
-        move: {inProgress: true},
-        movePosition: 'change_pipette'
+        move: {inProgress: true}
       }
     })
 
     test('makeGetRobotMove', () => {
       const getMove = makeGetRobotMove()
 
-      expect(getMove(state, robot)).toEqual({
-        ...state.api.robot[NAME].move,
-        position: 'change_pipette'
-      })
-
-      expect(getMove(state, {name: 'foo'})).toEqual({
-        inProgress: false,
-        error: null,
-        request: null,
-        response: null,
-        position: null
-      })
+      expect(getMove(state, robot)).toEqual(state.api.robot[NAME].move)
+      expect(getMove(state, {name: 'foo'})).toEqual({inProgress: false})
     })
 
     test('makeGetRobotHome', () => {
       const getHome = makeGetRobotHome()
 
       expect(getHome(state, robot)).toEqual(state.api.robot[NAME].home)
-      expect(getHome(state, {name: 'foo'})).toEqual({
-        inProgress: false,
-        error: null,
-        request: null,
-        response: null
-      })
+      expect(getHome(state, {name: 'foo'})).toEqual({inProgress: false})
     })
   })
 })
