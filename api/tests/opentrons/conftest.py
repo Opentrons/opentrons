@@ -99,6 +99,9 @@ def clear_feature_flags():
     ff_file = config.get_config_index().get('featureFlagFile')
     if os.path.exists(ff_file):
         os.remove(ff_file)
+    yield
+    if os.path.exists(ff_file):
+        os.remove(ff_file)
 
 
 @pytest.fixture(autouse=True)
@@ -167,6 +170,7 @@ def split_labware_def():
     ff.set_feature_flag('split-labware-def', True)
     yield
     ff.set_feature_flag('split-labware-def', False)
+
 
 # -----end feature flag fixtures-----------
 

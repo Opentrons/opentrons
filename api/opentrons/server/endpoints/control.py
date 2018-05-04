@@ -9,6 +9,7 @@ from opentrons import robot, instruments
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.deck_calibration.endpoints import safe_points
+from opentrons.deck_calibration import z_pos
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +88,7 @@ async def position_info(request):
     can easily access the pipette mount screws with a screwdriver. Attach tip
     position places either pipette roughly in the front-center of the deck area
     """
+    safe_pos1, safe_pos2, safe_pos3 = safe_points().values()
     return web.json_response({
         'positions': {
             'change_pipette': {
@@ -100,15 +102,20 @@ async def position_info(request):
             },
             'initial_calibration_1': {
                 'target': 'pipette',
-                'point': safe_points['1']
+                'point': safe_pos1
             },
             'initial_calibration_2': {
                 'target': 'pipette',
-                'point': safe_points['2']
+                'point': safe_pos2
             },
             'initial_calibration_3': {
                 'target': 'pipette',
-                'point': safe_points['3']
+                'point': safe_pos3
+            },
+            'z_calibration': {
+                'target': 'pipette',
+                'point': z_pos
+
             }
         }
     })
@@ -177,16 +184,30 @@ async def move(request):
         if target == 'mount':
             message = _move_mount(mount, point)
         elif target == 'pipette':
-            config = pipette_config.load(model)
-            pipette = instruments._create_pipette_from_config(
-                config=config,
-                mount=mount)
+            pipette = _fetch_or_create_pipette(mount, model)
             pipette.move_to((robot.deck, point))
             new_position = tuple(
                 pose_tracker.absolute(pipette.robot.poses, pipette))
             message = "Move complete. New position: {}".format(new_position)
 
     return web.json_response({"message": message}, status=status)
+
+
+def _fetch_or_create_pipette(mount, model=None):
+    existing_pipettes = robot.get_instruments()
+    pipette = None
+    for existing_mount, existing_pipette in existing_pipettes:
+        if existing_mount == mount:
+            pipette = existing_pipette
+    if pipette is None:
+        if model is None:
+            pipette = instruments.Pipette(mount=mount)
+        else:
+            config = pipette_config.load(model)
+            pipette = instruments._create_pipette_from_config(
+                config=config,
+                mount=mount)
+    return pipette
 
 
 def _move_mount(mount, point):
@@ -253,7 +274,7 @@ async def home(request):
         else:
             mount = data.get('mount')
             if mount in ['left', 'right']:
-                pipette = instruments.Pipette(mount=mount)
+                pipette = _fetch_or_create_pipette(mount)
                 pipette.home()
                 robot.remove_instrument(mount)
 

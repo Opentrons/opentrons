@@ -1,4 +1,5 @@
 import os
+import logging
 from functools import lru_cache
 
 import opentrons.util.calibration_functions as calib
@@ -13,10 +14,9 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
-from opentrons.util.log import get_logger
 from opentrons.config import feature_flags as fflags
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
@@ -505,7 +505,7 @@ class Robot(object):
         ``True`` for success, ``False`` for failure.
         """
 
-        self._driver.connect()
+        self._driver.connect(port=port)
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()

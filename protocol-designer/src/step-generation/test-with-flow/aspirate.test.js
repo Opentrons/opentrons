@@ -1,10 +1,17 @@
 // @flow
-import aspirate from '../aspirate'
-import {createRobotStateFixture, createRobotState} from './fixtures'
-
+import _aspirate from '../aspirate'
+import {
+  createRobotStateFixture,
+  createRobotState,
+  commandCreatorHasErrors,
+  commandCreatorNoErrors
+} from './fixtures'
 import updateLiquidState from '../aspirateUpdateLiquidState'
 
 jest.mock('../aspirateUpdateLiquidState')
+
+const aspirate = commandCreatorNoErrors(_aspirate)
+const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
 
 describe('aspirate', () => {
   let initialRobotState
@@ -56,30 +63,45 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > pipette max vol should throw error', () => {
-    expect(() => aspirate({
+    const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 10000,
       labware: 'sourcePlateId',
       well: 'A1'
-    })(robotStateWithTip)).toThrow(/Attempted to aspirate volume greater than pipette max volume/)
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'PIPETTE_VOLUME_EXCEEDED'
+    })
   })
 
   test('aspirate with invalid pipette ID should throw error', () => {
-    expect(() => aspirate({
+    const result = aspirateWithErrors({
       pipette: 'badPipette',
       volume: 50,
       labware: 'sourcePlateId',
       well: 'A1'
-    })(robotStateWithTip)).toThrow(/Attempted to aspirate with pipette id .* this pipette was not found/)
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'PIPETTE_DOES_NOT_EXIST'
+    })
   })
 
-  test('aspirate with no tip should throw error', () => {
-    expect(() => aspirate({
+  test('aspirate with no tip should return error', () => {
+    const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 50,
       labware: 'sourcePlateId',
       well: 'A1'
-    })(initialRobotState)).toThrow(/Attempted to aspirate with no tip on pipette/)
+    })(initialRobotState)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'NO_TIP_ON_PIPETTE'
+    })
   })
 
   describe('liquid tracking', () => {

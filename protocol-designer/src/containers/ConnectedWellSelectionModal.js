@@ -33,7 +33,7 @@ type SP = $Diff<Props, DP>
 function mapStateToProps (state: BaseState): SP | HideModal {
   const wellSelectionModalData = wellSelectionSelectors.wellSelectionModalData(state)
 
-  if (wellSelectionModalData === null) {
+  if (!wellSelectionModalData) {
     return {
       hideModal: true
     }

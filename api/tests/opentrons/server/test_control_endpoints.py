@@ -120,6 +120,14 @@ async def test_robot_info(virtual_smoothie_env, loop, test_client):
     assert len(body['positions']['change_pipette']['right']) == 3
     assert body['positions']['attach_tip']['target'] == 'pipette'
     assert len(body['positions']['attach_tip']['point']) == 3
+    assert body['positions']['initial_calibration_1']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_1']['point']) == 3
+    assert body['positions']['initial_calibration_2']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_2']['point']) == 3
+    assert body['positions']['initial_calibration_3']['target'] == 'pipette'
+    assert len(body['positions']['initial_calibration_3']['point']) == 3
+    assert body['positions']['z_calibration']['target'] == 'pipette'
+    assert len(body['positions']['z_calibration']['point']) == 3
 
 
 async def test_home_pipette(virtual_smoothie_env, loop, test_client):
@@ -244,10 +252,6 @@ async def test_move_pipette(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
     robot.home()
-    # from opentrons.trackers import pose_tracker
-    # print("Before: {}".format(tuple(
-    #             pose_tracker.absolute(
-    #                 robot.poses, robot._actuators['right']['carriage']))))
     data = {
         'target': 'pipette',
         'point': [100, 200, 50],
@@ -256,8 +260,28 @@ async def test_move_pipette(virtual_smoothie_env, loop, test_client):
     }
     res = await cli.post('/robot/move', json=data)
     assert res.status == 200
-    # text = await res.text()
-    # print("Final: {}".format(tuple(
-    #             pose_tracker.absolute(
-    #                 robot.poses, robot._actuators['right']['carriage']))))
-    # print("=-> Result: {}".format(text))
+
+
+async def test_move_and_home_existing_pipette(
+        virtual_smoothie_env, loop, test_client):
+    from opentrons import instruments
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    robot.reset()
+    robot.home()
+    instruments.P300_Single(mount='right')
+    move_data = {
+        'target': 'pipette',
+        'point': [100, 200, 50],
+        'mount': 'right',
+        'model': 'p300_single_v1'
+    }
+    res = await cli.post('/robot/move', json=move_data)
+    assert res.status == 200
+
+    move_data = {
+        'target': 'pipette',
+        'mount': 'right'
+    }
+    res1 = await cli.post('/robot/home', json=move_data)
+    assert res1.status == 200

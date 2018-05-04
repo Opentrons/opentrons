@@ -1,8 +1,6 @@
-from os import environ
 from time import sleep
 
 from opentrons.drivers.rpi_drivers import gpio
-from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons import robot
 
 # set the direction of each gpio (in or out)

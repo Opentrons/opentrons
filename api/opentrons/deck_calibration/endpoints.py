@@ -3,7 +3,7 @@ from uuid import uuid1
 from opentrons.instruments import pipette_config
 from opentrons import instruments, robot
 from opentrons.robot import robot_configs
-from opentrons.deck_calibration import jog, position
+from opentrons.deck_calibration import jog, position, dots_set
 from opentrons.deck_calibration.linal import add_z, solve
 
 import logging
@@ -12,28 +12,37 @@ import json
 session = None
 log = logging.getLogger(__name__)
 
-slot_1_lower_left = (12.13, 6.0)
-slot_3_lower_right = (380.87, 6.0)
-slot_10_upper_left = (12.13, 351.5)
 
-# Safe points are defined as 5mm toward the center of the deck in x and y, and
-# 10mm above the deck. User is expect to jog to the critical point from the
-# corresponding safe point, to avoid collision depending on direction of
-# misalignment between the deck and the gantry.
-slot_1_safe_point = (slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
-slot_3_safe_point = (slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
-slot_10_safe_point = (slot_10_upper_left[0] + 5, slot_10_upper_left[1] - 5, 10)
+def expected_points():
+    slot_1_lower_left,\
+        slot_3_lower_right,\
+        slot_7_upper_left = dots_set()
 
-expected_points = {
-    '1': slot_1_lower_left,
-    '2': slot_3_lower_right,
-    '3': slot_10_upper_left}
+    return {
+        '1': slot_1_lower_left,
+        '2': slot_3_lower_right,
+        '3': slot_7_upper_left}
 
 
-safe_points = {
-    '1': slot_1_safe_point,
-    '2': slot_3_safe_point,
-    '3': slot_10_safe_point}
+def safe_points():
+    # Safe points are defined as 5mm toward the center of the deck in x, y and
+    # 10mm above the deck. User is expect to jog to the critical point from the
+    # corresponding safe point, to avoid collision depending on direction of
+    # misalignment between the deck and the gantry.
+    slot_1_lower_left, \
+        slot_3_lower_right, \
+        slot_7_upper_left = expected_points().values()
+    slot_1_safe_point = (
+        slot_1_lower_left[0] + 5, slot_1_lower_left[1] + 5, 10)
+    slot_3_safe_point = (
+        slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
+    slot_7_safe_point = (
+        slot_7_upper_left[0] + 5, slot_7_upper_left[1] - 5, 10)
+
+    return {
+        '1': slot_1_safe_point,
+        '2': slot_3_safe_point,
+        '3': slot_7_safe_point}
 
 
 def _get_uuid() -> str:
@@ -54,7 +63,7 @@ class SessionManager:
         self.pipettes = {}
         self.current_mount = None
         self.tip_length = None
-        self.points = {k: None for k in expected_points.keys()}
+        self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
         default = robot_configs._get_default().gantry_calibration
@@ -147,27 +156,28 @@ async def attach_tip(data):
     {
       'token': UUID token from current session start
       'command': 'attach tip'
-      'tip-length': a float representing how much the length of a pipette
+      'tipLength': a float representing how much the length of a pipette
         increases when a tip is added
     }
     """
     global session
-    tip_length = data.get('tip-length')
+    tip_length = data.get('tipLength')
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not tip_length:
-        message = 'Error: "tip-length" must be specified in request'
-        status = 400
-    elif session.pipettes[mount].tip_attached:
-        message = "Error: tip already attached"
+    pipette = session.pipettes[mount]
+
+    if not tip_length:
+        message = 'Error: "tipLength" must be specified in request'
         status = 400
     else:
+        if pipette.tip_attached:
+            log.warning('attach tip called while tip already attached')
+            pipette._remove_tip(pipette._tip_length)
+
         session.tip_length = tip_length
-        session.pipettes[mount]._add_tip(tip_length)
-        message = "Tip length set: {}".format(session.tip_length)
+        pipette._add_tip(tip_length)
+        message = "Tip length set: {}".format(tip_length)
         status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
@@ -185,19 +195,15 @@ async def detach_tip(data):
     """
     global session
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not session.pipettes[mount].tip_attached:
-        message = "Error: no tip attached"
-        status = 400
-    else:
-        pip = session.pipettes[mount]
-        pip._remove_tip(session.tip_length)
-        session.tip_length = None
-        message = "Tip removed"
-        status = 200
-    return web.json_response({'message': message}, status=status)
+    pipette = session.pipettes[mount]
+
+    if not pipette.tip_attached:
+        log.warning('detach tip called with no tip')
+
+    pipette._remove_tip(session.tip_length)
+    session.tip_length = None
+
+    return web.json_response({'message': "Tip removed"}, status=200)
 
 
 async def run_jog(data):
@@ -217,15 +223,26 @@ async def run_jog(data):
     :return: The position you are moving to based on axis, direction, step
     given by the user.
     """
-    if session.current_mount:
-        message = jog(
-            data['axis'],
-            float(data['direction']),
-            float(data['step']))
-        status = 200
-    else:
-        message = "Current mount must be set before jogging"
+    axis = data.get('axis')
+    direction = data.get('direction')
+    step = data.get('step')
+
+    if axis not in ('x', 'y', 'z'):
+        message = '"axis" must be "x", "y", or "z"'
         status = 400
+    elif direction not in (-1, 1):
+        message = '"direction" must be -1 or 1'
+        status = 400
+    elif step is None:
+        message = '"step" must be specified'
+        status = 400
+    else:
+        if axis == 'z':
+            axis = session.current_mount
+        position = jog(axis.upper(), direction, step)
+        message = 'Jogged to {}'.format(position)
+        status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
@@ -299,7 +316,9 @@ def save_transform(data):
         status = 400
     else:
         # expected values based on mechanical drawings of the robot
-        expected = [expected_points[p] for p in sorted(expected_points.keys())]
+        expected_pos = expected_points()
+        expected = [
+            expected_pos[p] for p in expected_pos.keys()]
         # measured data
         actual = [session.points[p] for p in sorted(session.points.keys())]
         # Generate a 2 dimensional transform matrix from the two matricies
@@ -333,6 +352,7 @@ async def release(data):
     global session
     session = None
     robot.remove_instrument('left')
+
     robot.remove_instrument('right')
     return web.json_response({"message": "calibration session released"})
 
@@ -373,9 +393,11 @@ async def start(request):
             robot.remove_instrument('right')
         session = SessionManager()
         res = init_pipette()
-        data = {'token': session.id, 'pipette': res}
-        status = 201
-        if not res:
+        if res:
+            status = 201
+            data = {'token': session.id, 'pipette': res}
+        else:
+            session = None
             status = 403
             data = {'message': 'Error, pipette not recognized'}
     else:
@@ -391,7 +413,7 @@ async def dispatch(request):
     """
     if session:
         message = ''
-        data = await request.post()
+        data = await request.json()
         try:
             log.info("Dispatching {}".format(data))
             _id = data.get('token')

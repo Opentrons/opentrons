@@ -154,3 +154,29 @@ def test_delay_calls(monkeypatch):
     assert 'pause' in cmd
     assert 'sleep 64.0' in cmd
     assert 'resume' in cmd
+
+
+def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
+    from opentrons import robot, labware
+    from opentrons.instruments.pipette import Pipette
+    robot.reset()
+    robot.home()
+    tiprack = labware.load('tiprack-200ul', '1')
+    p300 = instruments.P300_Multi(mount='left', tip_racks=[tiprack])
+    p300.pick_up_tip()
+
+    movelog = []
+    move_fn = Pipette.move_to
+
+    def log_move(self, location, strategy=None):
+        movelog.append(location)
+        move_fn(self, location, strategy)
+
+    monkeypatch.setattr(Pipette, "move_to", log_move)
+
+    p300.drop_tip()
+
+    base_obj = movelog[0][0]
+    y_offset = movelog[0][1][1]
+    assert base_obj == robot.fixed_trash[0]
+    assert y_offset == 108

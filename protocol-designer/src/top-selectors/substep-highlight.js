@@ -10,7 +10,8 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
 
 import type {Selector} from '../types'
-import type {ProcessedFormData, StepSubItemData} from '../steplist/types'
+import type {StepSubItemData} from '../steplist/types'
+import type {ProcessedFormData} from '../form-types'
 
 type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
 

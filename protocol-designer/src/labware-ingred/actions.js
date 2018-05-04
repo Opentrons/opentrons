@@ -9,11 +9,8 @@ import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
 import {editableIngredFields} from './types'
-import type {IngredInputFields, Wells} from './types'
-import type {DeckSlot, Channels} from '@opentrons/components'
-
-// Payload mappers
-const xyToSingleWellObj = (x: string, y: string): Wells => ({ [(x + ',' + y)]: [x, y] })
+import type {IngredInputFields} from './types'
+import type {DeckSlot} from '@opentrons/components'
 
 // ===== Labware selector actions =====
 
@@ -82,44 +79,6 @@ export const modifyContainer = createAction(
       [field: string]: mixed // eg modify = {name: 'newName'}
     }
   |}) => args
-)
-
-// ===== Preselect / select wells in plate
-
-type WellSelectionPayload = {|
-  wells: Wells,
-  labwareType: string,
-  pipetteChannels: Channels
-|}
-
-const _wellSelectPayloadMapper = (
-  args: WellSelectionPayload
-): WellSelectionPayload => args
-
-export const highlightWells = createAction(
-  'HIGHLIGHT_WELLS',
-  _wellSelectPayloadMapper
-)
-
-export const selectWells = createAction(
-  'SELECT_WELLS',
-  _wellSelectPayloadMapper
-)
-
-export const deselectWells = createAction(
-  'DESELECT_WELLS',
-  _wellSelectPayloadMapper
-)
-
-// ===== well hovering =====
-export const hoverWellBegin = createAction(
-  'HOVER_WELL_BEGIN',
-  xyToSingleWellObj
-)
-
-export const hoverWellEnd = createAction(
-  'HOVER_WELL_END',
-  xyToSingleWellObj
 )
 
 // ===========

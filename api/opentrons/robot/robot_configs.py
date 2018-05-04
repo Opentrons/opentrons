@@ -3,13 +3,12 @@
 # pylama:skip=1
 
 from collections import namedtuple
-from opentrons.config import get_config_index, merge, children, build
+from opentrons.config import get_config_index, merge
 from opentrons.config import feature_flags as fflags
 
 import json
 import os
 import logging
-import time
 
 log = logging.getLogger(__name__)
 
@@ -55,8 +54,8 @@ DEFAULT_CURRENT = {
 
 X_MAX_SPEED = 600
 Y_MAX_SPEED = 400
-Z_MAX_SPEED = 100
-A_MAX_SPEED = 100
+Z_MAX_SPEED = 125
+A_MAX_SPEED = 125
 B_MAX_SPEED = 50
 C_MAX_SPEED = 50
 
@@ -110,8 +109,8 @@ def _get_default():
         version=1,
         steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
-        probe_center=(293.03, 301.27, probe_height),
-        probe_dimensions=(35.0, 40.0, probe_height + 5.0),
+        probe_center=[293.03, 301.27, probe_height],
+        probe_dimensions=[35.0, 40.0, probe_height + 5.0],
         gantry_calibration=[
             [ 1.00, 0.00, 0.00,  0.00],
             [ 0.00, 1.00, 0.00,  0.00],
@@ -120,18 +119,18 @@ def _get_default():
         ],
         instrument_offset={
             'right': {
-                'single': (0.0, 0.0, 0.0),
-                'multi': (0.0, 0.0, 0.0)
+                'single': [0.0, 0.0, 0.0],
+                'multi': [0.0, 0.0, 0.0]
             },
             'left': {
-                'single': (0.0, 0.0, 0.0),
-                'multi': (0.0, 0.0, 0.0)
+                'single': [0.0, 0.0, 0.0],
+                'multi': [0.0, 0.0, 0.0]
             }
         },
         tip_length={
             'Pipette': 51.7 # TODO (andy): move to tip-rack
         },
-        mount_offset=(-34, 0, 0), # distance between the left/right mounts
+        mount_offset=[-34, 0, 0], # distance between the left/right mounts
         serial_speed=115200,
         default_current=DEFAULT_CURRENT,
         low_current=LOW_CURRENT,
@@ -145,11 +144,10 @@ def _get_default():
 def load(filename=None):
     filename = filename or get_config_index().get('deckCalibrationFile')
     result = _get_default()
-
+    log.debug("Loading {}".format(filename))
     try:
         with open(filename, 'r') as file:
             local = json.load(file)
-            local = _check_version_and_update(local)
             result = robot_config(**merge([result._asdict(), local]))
     except FileNotFoundError:
         log.warning('Config {0} not found. Loading defaults'.format(filename))
@@ -164,13 +162,8 @@ def save(config, filename=None, tag=None):
     if tag:
         root, ext = os.path.splitext(filename)
         filename = "{}-{}{}".format(root, tag, ext)
-    _default = children(_get_default()._asdict())
 
-    diff = build([
-        item for item in children(config._asdict())
-        if item not in _default
-    ])
-    return _save_config_json(diff, filename=filename, tag=tag)
+    return _save_config_json(config._asdict(), filename=filename)
 
 
 def backup_configuration(config, tag=None):
@@ -187,47 +180,8 @@ def clear(filename=None):
         os.remove(filename)
 
 
-def _save_config_json(config_json, filename=None, tag=None):
-    filename = filename or get_config_index().get('deckCalibrationFile')
-    if tag:
-        root, ext = os.path.splitext(filename)
-        filename = "{}-{}{}".format(root, tag, ext)
-
+def _save_config_json(config_json, filename=None):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as file:
         json.dump(config_json, file, sort_keys=True, indent=4)
-        return config_json
-
-
-def _check_version_and_update(config_json):
-    migration_functions = {
-        0: _migrate_zero_to_one
-    }
-
-    version = config_json.get('version', 0)
-
-    if version in migration_functions:
-        # backup the loaded configuration json file
-        tag = '{}-v{}'.format(
-            int(time.time() * 1000),
-            version)
-        _save_config_json(config_json, tag=tag)
-        # migrate the configuration file
-        migrate_func = migration_functions[version]
-        config_json = migrate_func(config_json)
-        # recursively update the config
-        # until there are no more migration methods for its version
-        config_json = _check_version_and_update(config_json)
-
     return config_json
-
-
-def _migrate_zero_to_one(config_json):
-    # add a version number to the config, and set to 1
-    config_json['version'] = 1
-    # overwrite instrument_offset to the default
-    _default = _get_default()
-    config_json['instrument_offset'] = _default.instrument_offset.copy()
-    config_json['tip_length'] = _default.tip_length.copy()
-    return config_json
-

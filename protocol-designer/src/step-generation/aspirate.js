@@ -1,23 +1,31 @@
 // @flow
-import type {RobotState, CommandCreator, AspirateDispenseArgs} from './'
 import updateLiquidState from './aspirateUpdateLiquidState'
+import * as errorCreators from './errorCreators'
+import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from './'
 
 /** Aspirate with given args. Requires tip. */
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
   const {pipette, volume, labware, well} = args
 
-  const pipetteData = prevRobotState.instruments[pipette]
+  const actionName = 'aspirate'
+  let errors: Array<CommandCreatorError> = []
+
+  const pipetteData: ?* = prevRobotState.instruments[pipette]
 
   if (!pipetteData) {
-    throw new Error(`Attempted to aspirate with pipette id "${pipette}", this pipette was not found under "instruments"`)
+    errors.push(errorCreators.pipetteDoesNotExist({actionName, pipette}))
   }
 
   if (prevRobotState.tipState.pipettes[pipette] === false) {
-    throw new Error(`Attempted to aspirate with no tip on pipette: ${volume} uL with ${pipette} from ${labware}'s well ${well}`)
+    errors.push(errorCreators.noTipOnPipette({actionName, pipette, volume, labware, well}))
   }
 
-  if (pipetteData.maxVolume < volume) {
-    throw new Error(`Attempted to aspirate volume greater than pipette max volume (${volume} > ${pipetteData.maxVolume})`)
+  if (pipetteData && pipetteData.maxVolume < volume) {
+    errors.push(errorCreators.pipetteVolumeExceeded({actionName, volume, maxVolume: pipetteData.maxVolume}))
+  }
+
+  if (errors.length > 0) {
+    return {errors}
   }
 
   const commands = [{

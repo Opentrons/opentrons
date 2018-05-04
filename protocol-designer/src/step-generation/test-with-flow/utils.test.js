@@ -21,18 +21,35 @@ describe('repeatArray', () => {
 })
 
 describe('reduceCommandCreators', () => {
+  // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
+  type CountState = {count: number}
+  const addCreator: any = (num: number) => (prevState: CountState) => ({
+    commands: [`command: add ${num}`],
+    robotState: {count: prevState.count + num}
+  })
+
+  const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
+    commands: [`command: multiply by ${num}`],
+    robotState: {count: prevState.count * num}
+  })
+
+  const divideCreator: any = (num: number) => (prevState: CountState) => {
+    if (num === 0) {
+      return {
+        errors: [{
+          message: 'Cannot divide by zero',
+          type: 'DIVIDE_BY_ZERO'
+        }]
+      }
+    }
+
+    return {
+      commands: [`command: divide by ${num}`],
+      robotState: {count: prevState.count / num}
+    }
+  }
+
   test('basic command creators', () => {
-    // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
-    const addCreator: any = (num: number) => (prevState: {count: number}) => ({
-      commands: [`command: add ${num}`],
-      robotState: {count: prevState.count + num}
-    })
-
-    const multiplyCreator: any = (num: number) => (prevState: {count: number}) => ({
-      commands: [`command: multiply by ${num}`],
-      robotState: {count: prevState.count * num}
-    })
-
     const initialState: any = {count: 0}
     const result: any = reduceCommandCreators([addCreator(1), multiplyCreator(2)])(initialState)
 
@@ -42,6 +59,25 @@ describe('reduceCommandCreators', () => {
       'command: add 1',
       'command: multiply by 2'
     ])
+  })
+
+  test('error in a command short-circuits the command creation pipeline', () => {
+    const initialState: any = {count: 5}
+    const result = reduceCommandCreators([
+      addCreator(4),
+      divideCreator(0),
+      multiplyCreator(3)
+    ])(initialState)
+
+    expect(result).toEqual({
+      robotState: {count: 9}, // last valid state before division error
+      commands: ['command: add 4'], // last valid set of commands before division error
+      errors: [{
+        message: 'Cannot divide by zero',
+        type: 'DIVIDE_BY_ZERO'
+      }],
+      errorStep: 1 // divide step passed the error
+    })
   })
 })
 

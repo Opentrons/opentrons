@@ -1,7 +1,8 @@
 @import '@opentrons/components';
 
 .jog_container {
-  padding: 1rem 0;
+  padding: 2rem;
+  padding-bottom: 2.5rem;
 }
 
 .jog_controls {

@@ -46,7 +46,8 @@ def log_init():
         handlers={
             'debug': {
                 'class': 'logging.StreamHandler',
-                'formatter': 'basic'
+                'formatter': 'basic',
+                'level': level_value
             },
             'serial': {
                 'class': 'logging.handlers.RotatingFileHandler',
@@ -60,13 +61,17 @@ def log_init():
         loggers={
             '__main__': {
                 'handlers': ['debug'],
-                'level': level_value
+                'level': logging.INFO
             },
             'opentrons.server': {
                 'handlers': ['debug'],
                 'level': level_value
             },
             'opentrons.api': {
+                'handlers': ['debug'],
+                'level': level_value
+            },
+            'opentrons.robot.robot_configs': {
                 'handlers': ['debug'],
                 'level': level_value
             },

@@ -76,6 +76,9 @@ GCODES = {'HOME': 'G28.2',
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
+SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
+SMOOTHIE_ACK = 'ok\r\nok\r\n'
+
 
 def _parse_axis_values(raw_axis_values):
     parsed_values = raw_axis_values.strip().split(' ')
@@ -331,15 +334,15 @@ class SmoothieDriver_3_0_0:
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
-    def connect(self):
+    def connect(self, port=None):
         self.simulating = False
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-
         smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
         self._connection = serial_communication.connect(
             device_name=smoothie_id,
+            port=port,
             baudrate=self._config.serial_speed
         )
         self._setup()
@@ -361,10 +364,25 @@ class SmoothieDriver_3_0_0:
         return self._connection.port
 
     def get_fw_version(self):
+        '''
+        Queries Smoothieware for it's build version, and returns
+        the parsed response.
+
+        returns: str
+            Current version of attached Smoothi-driver. Versions are derived
+            from git branch-hash (eg: edge-66ec883NOMSD)
+
+        Example Smoothieware response:
+
+        Build version: edge-66ec883NOMSD, Build date: Jan 28 2018 15:26:57, MCU: LPC1769, System Clock: 120MHz  # NOQA
+          CNC Build   NOMSD Build
+        6 axis
+        '''
         version = 'Virtual Smoothie'
         if not self.simulating:
-            version = serial_communication.write_and_return(
-                "version\n", self._connection).split('\r')[0]
+            version = self._send_command('version')
+            version = version.split(',')[0].split(':')[-1].strip()
+            version = version.replace('NOMSD', '')
         return version
 
     @property
@@ -599,9 +617,9 @@ class SmoothieDriver_3_0_0:
             pass
         else:
 
-            command_line = command + ' M400'
+            command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
             ret_code = serial_communication.write_and_return(
-                command_line, self._connection, timeout)
+                command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
 
             # Smoothieware returns error state if a switch was hit while moving
             if (ERROR_KEYWORD in ret_code.lower()) or \

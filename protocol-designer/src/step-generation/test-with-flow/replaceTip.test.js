@@ -1,9 +1,11 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {replaceTip} from '../'
+import {createRobotState, getTiprackTipstate, getTipColumn, commandCreatorNoErrors} from './fixtures'
+import _replaceTip from '../replaceTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
+
+const replaceTip = commandCreatorNoErrors(_replaceTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 

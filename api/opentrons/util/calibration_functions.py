@@ -84,6 +84,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
 
     safe_height = _calculate_safeheight(robot, Z_CROSSOVER_CLEARANCE)
 
+    log.info("Moving to safe z: {}".format(safe_height))
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
     for axis, x, y, z, distance in hot_spots:
@@ -96,6 +97,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
             x = x + center.x
             y = y + center.y
 
+        log.info("Moving to {}".format((x, y, z)))
         robot.poses = instrument._move(robot.poses, x=x, y=y)
         robot.poses = instrument._move(robot.poses, z=z)
 
@@ -226,6 +228,7 @@ def update_instrument_config(instrument, measured_center) -> (Point, float):
         ._replace(instrument_offset=instrument_offset) \
         ._replace(tip_length=tip_length)
     robot.config = config
+    log.debug("Updating config for {} instrument".format(instrument.mount))
     robot_configs.save(config)
 
     new_coordinates = change_base(
