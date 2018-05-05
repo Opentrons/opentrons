@@ -346,6 +346,8 @@ class SmoothieDriver_3_0_0:
                 port=port,
                 baudrate=self._config.serial_speed
             )
+            self._setup()
+            gpio.set_light_indicator_status('idle')
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
@@ -353,9 +355,6 @@ class SmoothieDriver_3_0_0:
             error_msg += 'because another process is currently using it, or '
             error_msg += 'the UART port is disabled on this device (OS)'
             raise SerialException(error_msg)
-        try:
-            self._setup()
-            gpio.set_light_indicator_status('idle')
         except Exception as e:
             gpio.set_light_indicator_status('error')
             raise e
