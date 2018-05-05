@@ -1,9 +1,12 @@
+import logging
 import os
 import json
 from collections import namedtuple
 from opentrons.config import get_config_index
 
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+log = logging.getLogger(__name__)
 
 
 def pipette_config_path():
@@ -31,30 +34,32 @@ pipette_config = namedtuple(
 
 def _load_config_from_file(pipette_model: str) -> pipette_config:
     config_file = pipette_config_path()
+    res = None
     if os.path.exists(config_file):
         with open(config_file) as conf:
-            all_configs = json.load(conf)
-            cfg = all_configs[pipette_model]
-            res = pipette_config(
-                plunger_positions={
-                    'top': cfg['plungerPositions']['top'],
-                    'bottom': cfg['plungerPositions']['bottom'],
-                    'blow_out': cfg['plungerPositions']['blowOut'],
-                    'drop_tip': cfg['plungerPositions']['dropTip']
-                },
-                pick_up_current=cfg['pickUpCurrent'],
-                aspirate_flow_rate=cfg['aspirateFlowRate'],
-                dispense_flow_rate=cfg['dispenseFlowRate'],
-                ul_per_mm=cfg['ulPerMm'],
-                channels=cfg['channels'],
-                name=pipette_model,
-                model_offset=cfg['modelOffset'],
-                plunger_current=cfg['plungerCurrent'],
-                drop_tip_current=cfg['dropTipCurrent'],
-                tip_length=cfg['tipLength']
-            )
-    else:
-        res = None
+            try:
+                all_configs = json.load(conf)
+                cfg = all_configs[pipette_model]
+                res = pipette_config(
+                    plunger_positions={
+                        'top': cfg['plungerPositions']['top'],
+                        'bottom': cfg['plungerPositions']['bottom'],
+                        'blow_out': cfg['plungerPositions']['blowOut'],
+                        'drop_tip': cfg['plungerPositions']['dropTip']
+                    },
+                    pick_up_current=cfg['pickUpCurrent'],
+                    aspirate_flow_rate=cfg['aspirateFlowRate'],
+                    dispense_flow_rate=cfg['dispenseFlowRate'],
+                    ul_per_mm=cfg['ulPerMm'],
+                    channels=cfg['channels'],
+                    name=pipette_model,
+                    model_offset=cfg['modelOffset'],
+                    plunger_current=cfg['plungerCurrent'],
+                    drop_tip_current=cfg['dropTipCurrent'],
+                    tip_length=cfg['tipLength']
+                )
+            except (KeyError, json.decoder.JSONDecodeError) as e:
+                log.error(e)
     return res
 
 
