@@ -244,6 +244,7 @@ def test_set_current(model):
 
     def set_current_mock(self, target, axes_active=True):
         nonlocal current_log
+        print('Current: ', target)
         current_log.append(target)
         set_current(target, axes_active)
 

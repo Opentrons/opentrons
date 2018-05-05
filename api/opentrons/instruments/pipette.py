@@ -940,7 +940,7 @@ class Pipette:
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
             )
-            self.instrument_actuator.pop_current()
+            self.instrument_actuator.pop_current()   # here
             self.current_volume = 0
             self.move_to(self.current_tip().top(0))
 
