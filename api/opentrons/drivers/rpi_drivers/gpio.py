@@ -160,18 +160,6 @@ def initialize():
         _enable_pin(pin, IN)
 
 
-def turn_on_blue_button_light():
-    set_button_color(blue=True)
-
-
-def turn_on_red_button_light():
-    set_button_color(red=True)
-
-
-def turn_off_button_light():
-    set_button_color(red=False, green=False, blue=False)
-
-
 def set_button_color(red=False, green=False, blue=False):
     color_pins = {
         OUTPUT_PINS['RED_BUTTON']: red,
