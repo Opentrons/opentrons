@@ -10,13 +10,7 @@ gpio.initialize()
 # from the amplifier, then we can set to LOW to disable the amplifier
 gpio.set_high(gpio.OUTPUT_PINS['AUDIO_ENABLE'])
 
-# smoothieware programming pins, must be in a known state (HIGH)
+# smoothieware programming pins, put in a HIGH state to not interrupt operation
 gpio.set_high(gpio.OUTPUT_PINS['HALT'])
 gpio.set_high(gpio.OUTPUT_PINS['ISP'])
-gpio.set_low(gpio.OUTPUT_PINS['RESET'])
-sleep(0.25)
 gpio.set_high(gpio.OUTPUT_PINS['RESET'])
-sleep(0.25)
-
-# turn light to blue
-robot.turn_on_button_light()
