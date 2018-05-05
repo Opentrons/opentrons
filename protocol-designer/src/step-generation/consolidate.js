@@ -16,6 +16,13 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     then consolidate will be broken up into multiple asp-asp-disp, asp-asp-disp cycles.
 
     A single uniform volume will be aspirated from every source well.
+
+    =====
+
+    For consolidate, changeTip means:
+    * 'always': before the first aspirate in a single asp-asp-disp cycle, get a fresh tip
+    * 'once': get a new tip at the beginning of the consolidate step, and use it throughout
+    * 'never': reuse the tip from the last step
   */
   const actionName = 'consolidate'
 
@@ -36,7 +43,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     (pipetteData.maxVolume - disposalVolume) / data.volume
   )
 
-  const CommandCreators = flatMap(
+  const commandCreators = flatMap(
     chunk(data.sourceWells, maxWellsPerChunk),
     (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       // Aspirate commands for all source wells in the chunk
@@ -149,7 +156,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     }
   )
 
-  return reduceCommandCreators(CommandCreators)(prevRobotState)
+  return reduceCommandCreators(commandCreators)(prevRobotState)
 }
 
 export default consolidate

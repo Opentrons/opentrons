@@ -8,7 +8,7 @@ import {
   Modal
 } from '@opentrons/components'
 
-import type {FormModalFields} from '../../steplist/types'
+import type {FormModalFields} from '../../form-types'
 import {formConnectorFactory} from '../../utils'
 import styles from './MoreOptionsModal.css'
 import modalStyles from './modal.css'

@@ -5,10 +5,11 @@ import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
 import {END_STEP} from '../steplist/types'
-import type {StepItemsWithSubsteps, StepIdType, SubstepIdentifier} from '../steplist/types'
+import type {StepItemsWithSubsteps, SubstepIdentifier} from '../steplist/types'
+import type {StepIdType} from '../form-types'
 
 import StepItem from '../components/StepItem'
-import TransferishSubstep from '../components/TransferishSubstep'
+import TransferLikeSubstep from '../components/TransferLikeSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
 
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
@@ -35,7 +36,7 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
     substeps.stepType === 'distribute'
   ) {
     // all these step types share the same substep display
-    return <TransferishSubstep
+    return <TransferLikeSubstep
       substeps={substeps}
       hoveredSubstep={hoveredSubstep}
       onSelectSubstep={onSelectSubstep} // TODO use action

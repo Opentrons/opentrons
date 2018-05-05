@@ -170,7 +170,7 @@ class Server(object):
                 .format(traceback.format_exc()), e)
         finally:
             log.info('Closing WebSocket {0}'.format(id(client)))
-            client.close()
+            await client.close()
             del self.clients[client]
 
         return client
@@ -190,10 +190,6 @@ class Server(object):
         # legitimate dictionary as kwargs, but we consider it very low.
         if (len(args) > 0) and (isinstance(args[-1], dict)):
             kwargs = args.pop()
-
-        log.debug(
-            '{0}.{1}({2})'
-            .format(obj, name, ', '.join([str(a) for a in args])))
 
         if not function:
             raise ValueError(
@@ -288,7 +284,6 @@ class Server(object):
             call_result = '{0} [line {1}]: {2}'.format(
                 e.__class__.__name__, line_no, str(e))
         finally:
-            log.debug('Call result: {0}'.format(call_result))
             response['data'] = call_result
         return response
 
@@ -312,7 +307,6 @@ class Server(object):
     def send(self, payload):
         for socket, value in self.clients.items():
             task, queue = value
-            log.debug('Enqueuing {0} for {1}'.format(id(payload), id(socket)))
             asyncio.run_coroutine_threadsafe(queue.put(payload), self.loop)
 
 
