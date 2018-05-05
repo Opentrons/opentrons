@@ -55,6 +55,7 @@ SEC_PER_MIN = 60
 
 DEFAULT_SMOOTHIE_TIMEOUT = 1
 DEFAULT_MOVEMENT_TIMEOUT = 30
+SMOOTHIE_BOOT_TIMEOUT = 3
 
 GCODES = {'HOME': 'G28.2',
           'MOVE': 'G0',
@@ -564,7 +565,7 @@ class SmoothieDriver_3_0_0:
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         '''
         try:
-            self._send_command('\r\n', timeout=3)
+            self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
         except SmoothieError:
             # because a bunch of junk is printed out after boot/reset that we
             # ignore, don't worry if there is an error or alarm message inside
