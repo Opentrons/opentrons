@@ -224,25 +224,6 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-    def _update_position_after_homing(self, axes_homed):
-        # Only update axes that have been selected for homing
-        homed = {
-            ax: self.homed_position.get(ax)
-            for ax in ''.join(axes_homed)
-        }
-        self.update_position(default=homed)
-        for axis in ''.join(axes_homed):
-            self.engaged_axes[axis] = True
-
-        # coordinate after homing might not synce with default in API
-        # so update this driver's homed position using current coordinates
-        new = {
-            ax: self.position[ax]
-            for ax in self.homed_position.keys()
-            if ax in axis
-        }
-        self._homed_position.update(new)
-
     def update_position(self, default=None, is_retry=False):
         if default is None:
             default = self._position
@@ -857,7 +838,23 @@ class SmoothieDriver_3_0_0:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
 
-        self._update_position_after_homing(home_sequence)
+        # Only update axes that have been selected for homing
+        homed = {
+            ax: self.homed_position.get(ax)
+            for ax in ''.join(home_sequence)
+        }
+        self.update_position(default=homed)
+        for axis in ''.join(home_sequence):
+            self.engaged_axes[axis] = True
+
+        # coordinate after homing might not synce with default in API
+        # so update this driver's homed position using current coordinates
+        new = {
+            ax: self.position[ax]
+            for ax in self.homed_position.keys()
+            if ax in axis
+        }
+        self._homed_position.update(new)
 
         return self.position
 
