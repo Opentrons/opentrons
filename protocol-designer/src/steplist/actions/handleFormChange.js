@@ -1,4 +1,5 @@
 // @flow
+import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
 import {selectors} from '../reducers'
@@ -23,13 +24,40 @@ function _getAllWells (
     return (nextWellSet) ? [...acc, ...nextWellSet] : acc
   }, [])
 
-  return allWells
+  // remove duplicates (eg trough: [A1, A1, A1, A1, A1, A1, A1, A1] -> [A1])
+  return uniq(allWells)
 }
 
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
   const unsavedForm = selectors.formData(baseState)
+
+  // Changing labware clears wells selection: source labware
+  if (
+    unsavedForm !== null &&
+    'aspirate--labware' in payload.update
+  ) {
+    return {
+      update: {
+        ...payload.update,
+        'aspirate--wells': null
+      }
+    }
+  }
+
+  // Changing labware clears wells selection: dest labware
+  if (
+    unsavedForm !== null &&
+    'dispense--labware' in payload.update
+  ) {
+    return {
+      update: {
+        ...payload.update,
+        'dispense--wells': null
+      }
+    }
+  }
 
   // Changing pipette from multi-channel to single-channel (and visa versa) modifies well selection
   if (
@@ -54,9 +82,9 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       // to avoid carrying over inaccessible wells
       return {
         update: {
-          pipette: nextPipette,
-          'aspirate--wells': [],
-          'dispense--wells': []
+          ...payload.update,
+          'aspirate--wells': null,
+          'dispense--wells': null
         }
       }
     }
@@ -74,7 +102,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
 
       return {
         update: {
-          pipette: nextPipette,
+          ...payload.update,
           'aspirate--wells': _getAllWells(unsavedForm['aspirate--wells'], sourceLabwareType),
           'dispense--wells': _getAllWells(unsavedForm['dispense--wells'], destLabwareType)
         }
