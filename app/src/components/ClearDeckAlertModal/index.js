@@ -7,6 +7,7 @@ import styles from './styles.css'
 
 type Props = {
   onContinueClick?: () => mixed,
+  onCancelClick?: () => mixed,
   parentUrl: string,
   cancelText: string,
   continueText: string,
@@ -15,13 +16,13 @@ type Props = {
 const HEADING = 'Before continuing, remove from deck:'
 
 export default function ClearDeckAlertModal (props: Props) {
-  const {onContinueClick, parentUrl, cancelText, continueText} = props
+  const {onContinueClick, onCancelClick, parentUrl, cancelText, continueText} = props
 
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: `${cancelText}`, Component: Link, to: parentUrl},
+        {children: `${cancelText}`, Component: Link, to: parentUrl, onClick: onCancelClick},
         {
           children: `${continueText}`,
           className: styles.alert_button,
