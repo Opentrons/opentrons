@@ -180,7 +180,9 @@ class SmoothieDriver_3_0_0:
         self._config = config
 
         # motor current settings
-        self._saved_current_settings = config.low_current.copy()
+        self._active_current_settings = config.high_current.copy()
+        self._dwelling_current_settings = config.low_current.copy()
+        self._saved_current_settings = self._dwelling_current_settings.copy()
         self._current_settings = self._saved_current_settings.copy()
 
         # Active axes are axes that are in use. An axis might be disabled if
@@ -426,6 +428,28 @@ class SmoothieDriver_3_0_0:
     def pop_axis_max_speed(self):
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
+    def set_active_current(self, settings):
+        self._active_current_settings.update(settings)
+
+        active_axes_to_update = {
+            axis: amperage
+            for axis, amperage in self._active_current_settings.items()
+            if self._active_axes.get(axis) is True
+        }
+        if active_axes_to_update:
+            self.set_current(active_axes_to_update)
+
+    def set_dwelling_current(self, settings):
+        self._dwelling_current_settings.update(settings)
+
+        dwelling_axes_to_update = {
+            axis: amperage
+            for axis, amperage in self._dwelling_current_settings.items()
+            if self._active_axes.get(axis) is False
+        }
+        if dwelling_axes_to_update:
+            self.set_current(dwelling_axes_to_update)
+
     def set_current(self, settings, axes_active=True):
         '''
         Sets the current in mA by axis.
@@ -491,7 +515,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
-            ax: self._config.low_current[ax]
+            ax: self._dwelling_current_settings[ax]
             for ax in axes
             if self._active_axes[ax] is True
         }
@@ -510,7 +534,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
-            ax: self._config.high_current[ax]
+            ax: self._active_current_settings[ax]
             for ax in axes
             if self._active_axes[ax] is False
         }
@@ -640,7 +664,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.set_current(self._config.low_current, axes_active=False)
+        self.set_current(self._dwelling_current_settings, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()

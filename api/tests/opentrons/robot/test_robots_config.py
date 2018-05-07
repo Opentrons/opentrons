@@ -22,5 +22,5 @@ def test_load_corrupt_json():
     with open(filename, 'w') as file:
         file.write('')  # empty config file
     c = robot_configs.load(filename)
-    assert c.version == 1
+    assert c.version == 2
     os.remove(filename)

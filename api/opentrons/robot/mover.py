@@ -88,6 +88,18 @@ class Mover:
                 for axis in self._axis_mapping.values()
             })
 
+    def set_active_current(self, power):
+        self._driver.set_active_current({
+                axis.upper(): power
+                for axis in self._axis_mapping.values()
+            })
+
+    def set_dwelling_current(self, power):
+        self._driver.set_dwelling_current({
+                axis.upper(): power
+                for axis in self._axis_mapping.values()
+            })
+
     def push_current(self):
         self._driver.push_current()
 

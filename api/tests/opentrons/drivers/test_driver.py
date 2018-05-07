@@ -73,8 +73,8 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
         ['M907 X1.5 M400'], ['G4P0.05 M400'],
         ['M907 X0.3 M400'], ['G4P0.05 M400'],
         ['M907 B0.5 C0.5 X1.5 Y1.75'], ['G4P0.05 M400'],
-        ['M907 C0.1 X0.3 M400'], ['G4P0.05 M400'],
-        ['M907 B0.1 Y0.3 M400'], ['G4P0.05 M400'],
+        ['M907 C0.05 X0.3 M400'], ['G4P0.05 M400'],
+        ['M907 B0.05 Y0.3 M400'], ['G4P0.05 M400'],
     ]
     # from pprint import pprint
     # for i in range(len(expected)):
@@ -136,7 +136,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A1.0 B0.5 C0.5 Z1.0 M400'],     # Set axes motors high
         ['G4P0.05 M400'],                      # Dwell
         ['G28.2[ABCZ]+ M400'],                 # Home
-        ['M907 A0.1 B0.1 C0.1 Z0.1 M400'],     # Set axes motors low
+        ['M907 A0.1 B0.05 C0.05 Z0.1 M400'],     # Set axes motors low
         ['G4P0.05 M400'],                      # Dwell
 
         ['M907 Y0.8 M400'],                    # set Y motor to low current
@@ -187,7 +187,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 B0.5 M400'],
         ['G4P0.05 M400'],
         ['G0B2 M400'],
-        ['M907 B0.1 M400'],
+        ['M907 B0.05 M400'],
         ['G4P0.05 M400']
     ]
     # from pprint import pprint
@@ -206,7 +206,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 B0.5 C0.5 M400'],               # Set plunger current high
         ['G4P0.05 M400'],                      # Dwell
         ['G0.+[BC].+ M400'],                   # Move (including BC)
-        ['M907 B0.1 C0.1 M400'],               # Set plunger current low
+        ['M907 B0.05 C0.05 M400'],               # Set plunger current low
         ['G4P0.05 M400']                       # Dwell
     ]
     # from pprint import pprint
@@ -244,7 +244,6 @@ def test_set_current(model):
 
     def set_current_mock(self, target, axes_active=True):
         nonlocal current_log
-        print('Current: ', target)
         current_log.append(target)
         set_current(target, axes_active)
 
@@ -258,7 +257,7 @@ def test_set_current(model):
     # on the Smoothie (see `Robot._actuators`)
     expected = [
         {'C': 0.5},
-        {'C': 0.1},
+        {'C': 0.05},
         {'A': 1.0},
         {'X': 1.5, 'Y': 1.75},
         {'A': 0.1},
