@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {Link} from 'react-router-dom'
 import type {CalibrateDeckProps} from './types'
 import {ModalPage, PrimaryButton} from '@opentrons/components'
 
@@ -13,9 +14,7 @@ export default function AttachTipModal (props: CalibrateDeckProps) {
       titleBar={{
         title: props.title,
         subtitle: props.subtitle,
-        back: {
-          disabled: true
-        }
+        back: {Component: Link, to: props.exitUrl, children: 'exit'}
       }}
       heading= 'Place a tip on left pipette'
       >

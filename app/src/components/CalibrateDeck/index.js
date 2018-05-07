@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {push, goBack} from 'react-router-redux'
 import {Switch, Route, withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
@@ -10,6 +11,7 @@ import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 import {getPipette} from '@opentrons/labware-definitions'
 
 import {
+  home,
   startDeckCalibration,
   deckCalibrationCommand,
   setCalibrationJogStep,
@@ -25,6 +27,7 @@ import InUseModal from './InUseModal'
 import NoPipetteModal from './NoPipetteModal'
 import ErrorModal from './ErrorModal'
 import InstructionsModal from './InstructionsModal'
+import ExitAlertModal from './ExitAlertModal'
 
 type Props = {
   match: Match,
@@ -45,20 +48,19 @@ export default function CalibrateDeck (props: Props) {
     <Route
       path={`${path}/step-:step`}
       render={(propsWithStep) => {
-        const {match: {params}} = propsWithStep
+        const {match: {url, params}} = propsWithStep
         const step: CalibrationStep = (params.step: any)
         const subtitle = `Step ${step} of 6`
         // const calibrationStep = `step-${step}`
-        const baseUrl = path
-
+        // const baseUrl = url
         return (
           <ConnectedCalibrateDeckRouter
             robot={robot}
             title={TITLE}
             subtitle={subtitle}
             parentUrl={parentUrl}
-            baseUrl={baseUrl}
-            exitUrl={`${baseUrl}/exit`}
+            baseUrl={path}
+            exitUrl={`${url}/exit`}
             calibrationStep={step}
           />
         )
@@ -68,11 +70,12 @@ export default function CalibrateDeck (props: Props) {
 }
 
 function CalibrateDeckRouter (props: CalibrateDeckProps) {
-  const {startRequest, moveRequest, baseUrl, parentUrl} = props
+  const {startRequest, moveRequest, baseUrl, parentUrl, calibrationStep} = props
   const clearDeckProps = {
     cancelText: 'cancel',
     continueText: 'move pipette to front',
-    parentUrl: props.parentUrl
+    parentUrl: props.parentUrl,
+    onCancelClick: props.onCancelClick
   }
 
   if (startRequest.error) {
@@ -102,6 +105,9 @@ function CalibrateDeckRouter (props: CalibrateDeckProps) {
 
   return (
     <Switch>
+      <Route path={`${baseUrl}/step-${calibrationStep}/exit`} render={() => (
+        <ExitAlertModal {...props} />
+      )} />
       <Route path={`${baseUrl}/step-1`} render={() => (
         <AttachTipModal {...props}/>
       )} />
@@ -141,7 +147,7 @@ function makeMapStateToProps () {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot} = ownProps
+  const {robot, parentUrl} = ownProps
 
   return {
     jog: (axis, direction, step) => dispatch(
@@ -151,6 +157,14 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
       const step = Number(event.target.value)
       dispatch(setCalibrationJogStep(step))
     },
-    forceStart: () => dispatch(startDeckCalibration(robot, true))
+    forceStart: () => dispatch(startDeckCalibration(robot, true)),
+    // cancel button click in clear deck alert modal
+    onCancelClick: () => dispatch(deckCalibrationCommand(robot, {command: 'release'})),
+    // exit button click in title bar, opens exit alert modal, confirm exit click
+    exit: () => dispatch(home(robot))
+      .then(() => dispatch(deckCalibrationCommand(robot, {command: 'release'})))
+      .then(() => dispatch(push(parentUrl))),
+    // cancel button click in exit alert modal
+    back: () => dispatch(goBack())
   }
 }

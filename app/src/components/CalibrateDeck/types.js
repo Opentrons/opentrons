@@ -27,6 +27,9 @@ export type DP = {
   forceStart: () => mixed,
   jog: $PropertyType<JogControlsProps, 'jog'>,
   onStepSelect: $PropertyType<JogControlsProps, 'onStepSelect'>,
+  onCancelClick: () => mixed,
+  exit: () => mixed,
+  back: () => mixed
 }
 
 export type CalibrateDeckProps = OP & SP & DP
