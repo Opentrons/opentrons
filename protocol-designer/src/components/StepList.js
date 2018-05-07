@@ -11,6 +11,7 @@ import type {StepIdType} from '../form-types'
 import StepItem from '../components/StepItem'
 import TransferLikeSubstep from '../components/TransferLikeSubstep'
 import StepCreationButton from '../containers/StepCreationButton'
+import styles from './StepItem.css'
 
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
@@ -99,6 +100,7 @@ export default function StepList (props: StepListProps) {
 
       <StepCreationButton />
       <TitledList title='END' iconName='check'
+        className={styles.step_item}
         onClick={props.handleStepItemClickById && props.handleStepItemClickById(END_STEP)}
         onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(END_STEP)}
         selected={props.selectedStepId === END_STEP}
