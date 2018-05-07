@@ -13,7 +13,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-PLUNGER_CURRENT_LOW = 0.1
+PLUNGER_CURRENT_LOW = 0.05
 PLUNGER_CURRENT_HIGH = 0.5
 
 MOUNT_CURRENT_LOW = 0.1
@@ -86,8 +86,6 @@ robot_config = namedtuple(
         'probe_center',
         'probe_dimensions',
         'serial_speed',
-        'plunger_current_low',
-        'plunger_current_high',
         'tip_length',
         'default_current',
         'low_current',
@@ -106,7 +104,7 @@ def _get_default():
 
     return robot_config(
         name='Ada Lovelace',
-        version=1,
+        version=2,
         steps_per_mm='M92 X80.00 Y80.00 Z400 A400 B768 C768',
         acceleration='M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000',
         probe_center=[293.03, 301.27, probe_height],
@@ -135,9 +133,7 @@ def _get_default():
         default_current=DEFAULT_CURRENT,
         low_current=LOW_CURRENT,
         high_current=HIGH_CURRENT,
-        default_max_speed=DEFAULT_MAX_SPEEDS,
-        plunger_current_low=PLUNGER_CURRENT_LOW,
-        plunger_current_high=PLUNGER_CURRENT_HIGH
+        default_max_speed=DEFAULT_MAX_SPEEDS
     )
 
 
