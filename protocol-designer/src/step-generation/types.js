@@ -19,7 +19,7 @@ export type SharedFormDataFields = {|
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
-export type TransferLikeFormDataFields = {|
+export type TransferLikeFormDataFields = {
   ...SharedFormDataFields,
 
   pipette: string, // PipetteId
@@ -40,19 +40,15 @@ export type TransferLikeFormDataFields = {|
   disposalVolume: ?number,
 
   // ===== DISPENSE SETTINGS =====
-  /** Mix in destination well after dispense */
-  mixInDestination: ?MixArgs,
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
   /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
   blowout: ?string // TODO LATER LabwareId export type here instead of string?
-|}
+}
 
 export type ConsolidateFormData = {
-  ...TransferLikeFormDataFields,
-
   stepType: 'consolidate',
 
   sourceWells: Array<string>,
@@ -60,10 +56,11 @@ export type ConsolidateFormData = {
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
-}
+  /** Mix in destination well after dispense */
+  mixInDestination: ?MixArgs
+} & TransferLikeFormDataFields
 
 export type TransferFormData = {
-  ...TransferLikeFormDataFields,
   stepType: 'transfer',
 
   sourceWells: Array<string>,
@@ -71,18 +68,19 @@ export type TransferFormData = {
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
-}
+  /** Mix in destination well after dispense */
+  mixInDestination: ?MixArgs
+} & TransferLikeFormDataFields
 
 export type DistributeFormData = {
-  ...TransferLikeFormDataFields,
   stepType: 'distribute',
 
   sourceWell: string,
-  destWell: Array<string>,
+  destWells: Array<string>,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs
-}
+} & TransferLikeFormDataFields
 
 export type PauseFormData = {|
   ...SharedFormDataFields,

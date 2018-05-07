@@ -2,6 +2,7 @@
 import aspirate from './aspirate'
 import blowout from './blowout'
 import consolidate from './consolidate'
+import distribute from './distribute'
 import delay from './delay'
 import dispense from './dispense'
 import dropTip from './dropTip'
@@ -17,6 +18,7 @@ export {
   aspirate,
   blowout,
   consolidate,
+  distribute,
   delay,
   dispense,
   dropTip,

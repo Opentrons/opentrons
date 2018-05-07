@@ -10,7 +10,14 @@ import type {
   PauseForm
 } from '../form-types'
 
-import type {ConsolidateFormData, PauseFormData, TransferFormData} from '../step-generation'
+import type {
+  ConsolidateFormData,
+  DistributeFormData,
+  PauseFormData,
+  TransferFormData
+} from '../step-generation'
+
+import {FIXED_TRASH_ID} from '../constants'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -48,6 +55,15 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
       'aspirate--change-tip': 'once'
     }
   }
+
+  if (stepType === 'distribute') {
+    return {
+      ...baseForm,
+      'dispense--blowout--checkbox': true,
+      'dispense--blowout--labware': FIXED_TRASH_ID
+    }
+  }
+
   if (stepType !== 'pause') {
     console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO. Got ' + stepType)
   }
@@ -58,9 +74,14 @@ export function formHasErrors (form: {errors: {[string]: string}}): boolean {
   return Object.values(form.errors).length > 0
 }
 
+type TransferLikeValidationAndErrors =
+  | ValidationAndErrors<ConsolidateFormData>
+  | ValidationAndErrors<DistributeFormData>
+  | ValidationAndErrors<TransferFormData>
+
 function _vapTransferLike (
   formData: TransferLikeForm
-): ValidationAndErrors<ConsolidateFormData> | ValidationAndErrors<TransferFormData> {
+): TransferLikeValidationAndErrors {
   const stepType = formData.stepType
   const pipette = formData['pipette']
   const volume = Number(formData['volume'])
@@ -138,10 +159,10 @@ function _vapTransferLike (
   }
 
   if (!formHasErrors({errors})) {
-    if (stepType === 'transfer') {
-      const sourceWells = formData['aspirate--wells'] || []
-      const destWells = formData['dispense--wells'] || []
+    const sourceWells = formData['aspirate--wells'] || []
+    const destWells = formData['dispense--wells'] || []
 
+    if (stepType === 'transfer') {
       if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
         errors._mismatchedWells = 'Numbers of wells must match'
       }
@@ -159,20 +180,34 @@ function _vapTransferLike (
     }
 
     if (stepType === 'consolidate') {
-      const sourceWells = formData['aspirate--wells'] || []
-      const destWells = formData['dispense--wells'] || []
-
       if (sourceWells.length <= 1 || destWells.length !== 1) {
-        errors._mismatchedWells = 'Multiple sources well and exactly one destination well is required.'
+        errors._mismatchedWells = 'Multiple source wells and exactly one destination well is required.'
       }
 
       const validatedForm: ConsolidateFormData = {
         ...commonFields,
+        mixFirstAspirate,
         sourceWells,
         destWell: destWells[0],
         stepType: 'consolidate',
-        mixFirstAspirate,
         name: `Consolidate ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+      }
+
+      return {errors, validatedForm}
+    }
+
+    if (stepType === 'distribute') {
+      if (sourceWells.length !== 1 || destWells.length <= 1) {
+        errors._mismatchedWells = 'Single source well and multiple destination wells is required.'
+      }
+
+      const validatedForm: DistributeFormData = {
+        ...commonFields,
+        mixBeforeAspirate,
+        sourceWell: sourceWells[0],
+        destWells,
+        stepType: 'distribute',
+        name: `Distribute ${formData.id}` // TODO Ian 2018-04-03 real name for steps
       }
 
       return {errors, validatedForm}
@@ -227,7 +262,7 @@ function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
 }
 
 export function validateAndProcessForm (formData: FormData): * { // ValidFormAndErrors
-  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate') {
+  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate' || formData.stepType === 'distribute') {
     return _vapTransferLike(formData)
   }
 
