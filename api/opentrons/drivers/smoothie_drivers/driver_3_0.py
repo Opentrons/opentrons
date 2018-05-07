@@ -429,8 +429,22 @@ class SmoothieDriver_3_0_0:
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
     def set_active_current(self, settings):
+        '''
+        Sets the amperage of each motor for when it is activated by driver.
+        Values are initialized from the `robot_config.high_current` values,
+        and can then be changed through this method by other parts of the API.
+
+        For example, `Pipette` setting the active-current of it's pipette,
+        depending on what model pipette it is, and what action it is performing
+
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for current (generally between 0.1 and 2)
+        '''
         self._active_current_settings.update(settings)
 
+        # if an axis specified in the `settings` is currently active,
+        # reset it's current to the new active-current value
         active_axes_to_update = {
             axis: amperage
             for axis, amperage in self._active_current_settings.items()
@@ -440,8 +454,22 @@ class SmoothieDriver_3_0_0:
             self.set_current(active_axes_to_update)
 
     def set_dwelling_current(self, settings):
+        '''
+        Sets the amperage of each motor for when it is dwelling.
+        Values are initialized from the `robot_config.log_current` values,
+        and can then be changed through this method by other parts of the API.
+
+        For example, `Pipette` setting the dwelling-current of it's pipette,
+        depending on what model pipette it is.
+
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for current (generally between 0.1 and 2)
+        '''
         self._dwelling_current_settings.update(settings)
 
+        # if an axis specified in the `settings` is currently dwelling,
+        # reset it's current to the new dwelling-current value
         dwelling_axes_to_update = {
             axis: amperage
             for axis, amperage in self._dwelling_current_settings.items()

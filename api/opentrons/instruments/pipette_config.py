@@ -59,7 +59,7 @@ def _load_config_from_file(pipette_model: str) -> pipette_config:
                     tip_length=cfg['tipLength']
                 )
             except (KeyError, json.decoder.JSONDecodeError) as e:
-                log.error(e)
+                log.error('Error when loading pipette config: {}'.format(e))
     return res
 
 

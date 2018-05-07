@@ -188,6 +188,8 @@ class Pipette:
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
 
+        # TODO (andy) these values maybe should persist between sessions,
+        # by saving within `robot_config`
         self._plunger_current = plunger_current
         self._drop_tip_current = drop_tip_current
 
