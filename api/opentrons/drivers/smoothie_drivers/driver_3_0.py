@@ -449,9 +449,10 @@ class SmoothieDriver_3_0_0:
             axis: amperage
             for axis, amperage in self._active_current_settings.items()
             if self._active_axes.get(axis) is True
+            if self.current[axis] != amperage
         }
         if active_axes_to_update:
-            self.set_current(active_axes_to_update)
+            self.set_current(active_axes_to_update, axes_active=True)
 
     def set_dwelling_current(self, settings):
         '''
@@ -474,9 +475,10 @@ class SmoothieDriver_3_0_0:
             axis: amperage
             for axis, amperage in self._dwelling_current_settings.items()
             if self._active_axes.get(axis) is False
+            if self.current[axis] != amperage
         }
         if dwelling_axes_to_update:
-            self.set_current(dwelling_axes_to_update)
+            self.set_current(dwelling_axes_to_update, axes_active=False)
 
     def set_current(self, settings, axes_active=True):
         '''
