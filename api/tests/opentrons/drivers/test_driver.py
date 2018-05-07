@@ -184,6 +184,8 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
+        ['M907 A0.1 X0.3 Y0.3 Z0.1 M400'],
+        ['G4P0.05 M400'],
         ['M907 B0.5 M400'],
         ['G4P0.05 M400'],
         ['G0B2 M400'],
@@ -203,7 +205,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         'B': 4,
         'C': 5})
     expected = [
-        ['M907 B0.5 C0.5 M400'],               # Set plunger current high
+        ['M907 A1.0 B0.5 C0.5 X1.5 Y1.75 Z1.0 M400'],  # Set active axes high
         ['G4P0.05 M400'],                      # Dwell
         ['G0.+[BC].+ M400'],                   # Move (including BC)
         ['M907 B0.1 C0.1 M400'],               # Set plunger current low
@@ -259,7 +261,10 @@ def test_set_current(model):
         {'C': 0.5},
         {'C': 0.1},
         {'A': 1.0},
+        {'A': 0.1},
         {'X': 1.5, 'Y': 1.75},
+        {'X': 0.3, 'Y': 0.3},
+        {'A': 1.0},
         {'A': 0.1},
         {'A': 1.0},
         {'A': 0.1}
