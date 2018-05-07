@@ -46,11 +46,11 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       return pipetteId.endsWith('8-Channel') ? 8 : 1
     }
 
-    if (nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
-      getChannels(nextPipette) === 8 &&
-      getChannels(prevPipette) === 1
+    if (typeof nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
+      getChannels(prevPipette) === 1 &&
+      getChannels(nextPipette) === 8
     ) {
-      // multi-channel to single-channel: clear all selected wells
+      // single-channel to multi-channel: clear all selected wells
       // to avoid carrying over inaccessible wells
       return {
         update: {
@@ -62,10 +62,10 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     }
 
     if (typeof nextPipette === 'string' &&
-      getChannels(nextPipette) === 1 &&
-      getChannels(prevPipette) === 8
+      getChannels(prevPipette) === 8 &&
+      getChannels(nextPipette) === 1
     ) {
-      // single-channel to multi-channel: convert primary wells to all wells
+      // multi-channel to single-channel: convert primary wells to all wells
       const sourceLabwareId = unsavedForm['aspirate--labware']
       const destLabwareId = unsavedForm['dispense--labware']
 
