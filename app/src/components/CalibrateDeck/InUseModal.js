@@ -35,7 +35,7 @@ export default class InUseModal extends React.Component<
         heading={HEADING}
         buttons={[
           {children: 'cancel', Component: Link, to: parentUrl},
-          {children: 'continue', onClick: forceStart, disabled: !canContinue}
+          {children: 'interrupt', onClick: forceStart, disabled: !canContinue}
         ]}
       >
         <p>Are you sure you want to interrupt this robot?</p>
