@@ -897,14 +897,15 @@ class SmoothieDriver_3_0_0:
             seconds=seconds
         )
         log.debug("delay: {}".format(command))
-        self._send_command(command)
+        self._send_command(command, timeout=int(seconds) + 1)
 
     def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
             self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             log.debug("probe_axis: {}".format(command))
-            self._send_command(command=command, timeout=30)
+            self._send_command(
+                command=command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.update_position(self.position)
             return self.position
         else:
