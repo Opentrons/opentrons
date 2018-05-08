@@ -180,9 +180,7 @@ class SmoothieDriver_3_0_0:
         self._config = config
 
         # motor current settings
-        self._active_current_settings = config.high_current.copy()
-        self._dwelling_current_settings = config.low_current.copy()
-        self._saved_current_settings = self._dwelling_current_settings.copy()
+        self._saved_current_settings = config.low_current.copy()
         self._current_settings = self._saved_current_settings.copy()
 
         # Active axes are axes that are in use. An axis might be disabled if
@@ -428,58 +426,6 @@ class SmoothieDriver_3_0_0:
     def pop_axis_max_speed(self):
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
-    def set_active_current(self, settings):
-        '''
-        Sets the amperage of each motor for when it is activated by driver.
-        Values are initialized from the `robot_config.high_current` values,
-        and can then be changed through this method by other parts of the API.
-
-        For example, `Pipette` setting the active-current of it's pipette,
-        depending on what model pipette it is, and what action it is performing
-
-        settings
-            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
-            and floating point number for current (generally between 0.1 and 2)
-        '''
-        self._active_current_settings.update(settings)
-
-        # if an axis specified in the `settings` is currently active,
-        # reset it's current to the new active-current value
-        active_axes_to_update = {
-            axis: amperage
-            for axis, amperage in self._active_current_settings.items()
-            if self._active_axes.get(axis) is True
-            if self.current[axis] != amperage
-        }
-        if active_axes_to_update:
-            self.set_current(active_axes_to_update, axes_active=True)
-
-    def set_dwelling_current(self, settings):
-        '''
-        Sets the amperage of each motor for when it is dwelling.
-        Values are initialized from the `robot_config.log_current` values,
-        and can then be changed through this method by other parts of the API.
-
-        For example, `Pipette` setting the dwelling-current of it's pipette,
-        depending on what model pipette it is.
-
-        settings
-            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
-            and floating point number for current (generally between 0.1 and 2)
-        '''
-        self._dwelling_current_settings.update(settings)
-
-        # if an axis specified in the `settings` is currently dwelling,
-        # reset it's current to the new dwelling-current value
-        dwelling_axes_to_update = {
-            axis: amperage
-            for axis, amperage in self._dwelling_current_settings.items()
-            if self._active_axes.get(axis) is False
-            if self.current[axis] != amperage
-        }
-        if dwelling_axes_to_update:
-            self.set_current(dwelling_axes_to_update, axes_active=False)
-
     def set_current(self, settings, axes_active=True):
         '''
         Sets the current in mA by axis.
@@ -545,7 +491,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
-            ax: self._dwelling_current_settings[ax]
+            ax: self._config.low_current[ax]
             for ax in axes
             if self._active_axes[ax] is True
         }
@@ -564,7 +510,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
-            ax: self._active_current_settings[ax]
+            ax: self._config.high_current[ax]
             for ax in axes
             if self._active_axes[ax] is False
         }
@@ -694,7 +640,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.set_current(self._dwelling_current_settings, axes_active=False)
+        self.set_current(self._config.low_current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
