@@ -33,6 +33,10 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   const baseState = getState()
   const unsavedForm = selectors.formData(baseState)
 
+  // TODO Ian 2018-05-08 all these transformations should probably be put under
+  // `if (unsavedForm.stepType === 'mix') { handleFormChange_mix(payload, unsavedForm, getState)}
+  // so they don't get jumbled together
+
   // Changing labware clears wells selection: source labware
   if (
     unsavedForm !== null &&
@@ -59,6 +63,19 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     }
   }
 
+  // Changing labware clears wells selection: labware (eg, mix)
+  if (
+    unsavedForm !== null &&
+    'labware' in payload.update
+  ) {
+    return {
+      update: {
+        ...payload.update,
+        'wells': null
+      }
+    }
+  }
+
   // Changing pipette from multi-channel to single-channel (and visa versa) modifies well selection
   if (
     unsavedForm !== null &&
@@ -80,6 +97,18 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     ) {
       // single-channel to multi-channel: clear all selected wells
       // to avoid carrying over inaccessible wells
+
+      // steptypes with single set of wells (not source + dest)
+      if (unsavedForm.stepType === 'mix') {
+        return {
+          update: {
+            ...payload.update,
+            wells: null
+          }
+        }
+      }
+
+      // source + dest well steptypes
       return {
         update: {
           ...payload.update,
@@ -94,6 +123,21 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       getChannels(nextPipette) === 1
     ) {
       // multi-channel to single-channel: convert primary wells to all wells
+
+      // steptypes with single set of wells (not source + dest)
+      if (unsavedForm.stepType === 'mix') {
+        const labwareId = unsavedForm.labware
+        const labwareType = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId].type
+
+        return {
+          update: {
+            ...payload.update,
+            wells: _getAllWells(unsavedForm.wells, labwareType)
+          }
+        }
+      }
+
+      // source + dest well steptypes
       const sourceLabwareId = unsavedForm['aspirate--labware']
       const destLabwareId = unsavedForm['dispense--labware']
 
