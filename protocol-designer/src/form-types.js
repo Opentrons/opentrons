@@ -28,9 +28,11 @@ export type FormModalFields = {|
   'step-details': string
 |}
 
+export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
+
 export type TransferLikeForm = {|
   ...FormModalFields,
-  stepType: 'transfer' | 'consolidate', // TODO add distribute
+  stepType: TransferLikeStepType,
   id: StepIdType,
 
   'aspirate--labware'?: string,

@@ -49,7 +49,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
     onToggleFormSection: (section) => () => dispatch(collapseFormSection(section)),
     handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
       // TODO Ian 2018-01-26 factor this nasty type handling out
-      const dispatchEvent = value => dispatch(changeFormInput({accessor, value}))
+      const dispatchEvent = value => dispatch(changeFormInput({update: {[accessor]: value}}))
 
       if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
         dispatchEvent(e.target.checked)

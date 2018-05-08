@@ -1,6 +1,6 @@
 // @flow
 import type {PauseFormData} from '../step-generation'
-import type {StepIdType, StepType} from '../form-types'
+import type {StepIdType, StepType, TransferLikeStepType} from '../form-types'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -37,7 +37,7 @@ export type StepItemSourceDestRowMulti = {|
 
 export type TransferLikeSubstepItemSingleChannel = {|
   multichannel: false,
-  stepType: 'transfer' | 'consolidate' | 'distribute',
+  stepType: TransferLikeStepType,
   parentStepId: StepIdType,
   rows: Array<{|
     ...StepItemSourceDestRow,

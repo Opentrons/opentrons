@@ -36,6 +36,7 @@ import {
 
 import type {
   AddStepAction,
+  ChangeFormInputAction,
   DeleteStepAction,
   SaveStepFormAction,
   SelectStepAction,
@@ -52,7 +53,6 @@ import {
   cancelStepForm, // TODO try collapsing them all into a single Action type
   saveStepForm,
   hoverOnSubstep,
-  changeFormInput,
   expandAddStepButton,
   hoverOnStep,
   toggleStepCollapsed
@@ -60,13 +60,15 @@ import {
 
 type FormState = FormData | null
 
-// the `form` state holds temporary form info that is saved or thrown away with "cancel".
-// TODO: rename to make that more clear. 'unsavedForm'?
+// the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 const unsavedForm = handleActions({
-  CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
-    ...state,
-    [action.payload.accessor]: action.payload.value
-  }),
+  CHANGE_FORM_INPUT: (state: FormState, action: ChangeFormInputAction) => {
+    // $FlowFixMe TODO IMMEDIATELY
+    return {
+      ...state,
+      ...action.payload.update
+    }
+  },
   POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
   SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
@@ -101,7 +103,7 @@ function createDefaultStep (action: AddStepAction) {
 const unsavedFormModal = handleActions({
   OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModal) => action.payload,
   CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
-    ({...state, [action.payload.accessor]: action.payload.value}),
+    ({...state, ...action.payload.update}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,
   SAVE_MORE_OPTIONS_MODAL: () => null,
   DELETE_STEP: () => null

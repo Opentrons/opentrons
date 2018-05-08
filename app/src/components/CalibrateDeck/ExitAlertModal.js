@@ -8,13 +8,12 @@ type Props = {
   exit: () => mixed,
 }
 
-const HEADING = 'Are you sure you want to go back?'
+const HEADING = 'Are you sure you want to exit initial robot calibration?'
 const CANCEL_TEXT = 'cancel'
-const EXIT_TEXT = 'exit'
+const EXIT_TEXT = 'exit calibration'
 
 export default function ExitAlertModal (props: Props) {
   const {back, exit} = props
-
   return (
     <AlertModal
       heading={HEADING}
@@ -23,7 +22,7 @@ export default function ExitAlertModal (props: Props) {
         {children: EXIT_TEXT, onClick: exit}
       ]}
     >
-      <p>Doing so will exit pipette setup and home your robot.</p>
+      <p>Doing so will home the robot and revert to using previously saved calibration settings.</p>
     </AlertModal>
   )
 }
