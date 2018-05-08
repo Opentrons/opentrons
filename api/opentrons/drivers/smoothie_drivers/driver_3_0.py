@@ -745,12 +745,20 @@ class SmoothieDriver_3_0_0:
         target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
+        non_moving_axes = ''.join([
+            ax
+            for ax in AXES
+            if ax not in target.keys()
+        ])
+
         if target_coords:
             command = ''
             if backlash_coords != target_coords:
                 command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
             command += GCODES['MOVE'] + ''.join(target_coords)
             try:
+                if non_moving_axes:
+                    self.dwell_axes(non_moving_axes)
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
@@ -792,6 +800,14 @@ class SmoothieDriver_3_0_0:
                 ''.join(set(group) & set(axis) - set(disabled))
                 for group in HOME_SEQUENCE
             ]))
+
+        non_moving_axes = ''.join([
+            ax
+            for ax in AXES
+            if ax not in home_sequence
+        ])
+        if non_moving_axes:
+            self.dwell_axes(non_moving_axes)
 
         for axes in home_sequence:
             if 'X' in axes:
