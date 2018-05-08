@@ -44,6 +44,7 @@ function RobotSettingsPage (props: Props) {
 
   if (!robot) return (<Page><Splash /></Page>)
 
+  // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
     <Page>
       <TitleBar title={robot.name} />
@@ -53,8 +54,8 @@ function RobotSettingsPage (props: Props) {
         <ChangePipette {...props} robot={robot} parentUrl={url} />
       )} />
 
-      <Route path={`${path}/deck-calibration`} render={(props) => (
-        <CalibrateDeck {...props} robot={robot} parentUrl={url} />
+      <Route path={`${path}/calibrate-deck`} render={(props) => (
+        <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
       )} />
 
       {showConnectAlert && (
