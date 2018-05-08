@@ -72,7 +72,10 @@ export default function StepEditForm (props: Props) {
     )
   }
 
-  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate') {
+  if (formData.stepType === 'transfer' ||
+    formData.stepType === 'consolidate' ||
+    formData.stepType === 'distribute'
+  ) {
     return (
       <div className={styles.form}>
         <FormSection title='Aspirate'
@@ -159,9 +162,10 @@ export default function StepEditForm (props: Props) {
               initialSelectedWells={formData['dispense--wells']}
               formFieldAccessor={'dispense--wells'}
             />
-            {formData.stepType === 'transfer' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('volume')} />
-            </FormGroup>}
+            {(formData.stepType === 'transfer' || formData.stepType === 'distribute') &&
+              <FormGroup label='Volume:'>
+                <InputField units='μL' {...formConnector('volume')} />
+              </FormGroup>}
           </div>
 
           <div className={styles.row_wrapper}>

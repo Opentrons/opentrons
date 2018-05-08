@@ -21,6 +21,7 @@ import type {StepIdType} from '../form-types'
 import type {
   PipetteData,
   ConsolidateFormData,
+  DistributeFormData,
   PauseFormData,
   TransferFormData
 } from '../step-generation/types'
@@ -190,6 +191,14 @@ function _consolidateSubsteps (
   }
 }
 
+function _distributeSubsteps (
+  form: DistributeFormData,
+  transferLikeFields: *
+): ?TransferLikeSubstepItem { // <-- TODO remove '?' type
+  console.log('Distribute substeps not yet implemented') // TODO Ian 2018-05-04
+  return null
+}
+
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
@@ -221,7 +230,8 @@ export function generateSubsteps (
     // Handle all TransferLike substeps
     if (
       validatedForm.stepType === 'transfer' ||
-      validatedForm.stepType === 'consolidate'
+      validatedForm.stepType === 'consolidate' ||
+      validatedForm.stepType === 'distribute'
     ) {
       const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
 
@@ -277,10 +287,17 @@ export function generateSubsteps (
         )
       }
 
+      if (validatedForm.stepType === 'distribute') {
+        return _distributeSubsteps(
+          validatedForm,
+          transferLikeFields
+        )
+      }
+
       // unreachable here
     }
 
-    console.warn('allSubsteps doesnt support step type: ', validatedForm.stepType, stepId)
+    console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
     return null
   })
 }

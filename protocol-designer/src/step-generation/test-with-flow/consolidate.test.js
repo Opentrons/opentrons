@@ -130,6 +130,7 @@ describe('consolidate single-channel', () => {
   })
 
   test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
+    // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
     const data = {
       ...baseData,
       volume: 150,

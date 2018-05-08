@@ -30,7 +30,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
 
     handleChange: (accessor: string) => (e: SyntheticInputEvent<*>) => {
       // NOTE this is similar to ConnectedStepEdit form, is it possible to make a more general reusable fn?
-      dispatch(changeMoreOptionsModalInput({accessor, value: e.target.value}))
+      dispatch(changeMoreOptionsModalInput({update: {[accessor]: e.target.value}}))
     },
 
     onClickAway: () => dispatch(cancelMoreOptionsModal())

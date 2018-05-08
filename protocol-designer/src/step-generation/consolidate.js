@@ -131,7 +131,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         ? [
           blowout({
             pipette: data.pipette,
-            labware: data.blowout,
+            labware: data.blowout, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
             well: 'A1' // TODO LATER: should user be able to specify the blowout well?
           })
         ]
