@@ -214,6 +214,51 @@ def test_plunger_commands(smoothie, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+def test_set_active_current(smoothie, monkeypatch):
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    command_log = []
+    smoothie._setup()
+    smoothie.home()
+    smoothie.simulating = False
+
+    def write_with_log(command, ack, connection, timeout):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
+
+    def _parse_axis_values(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+
+    smoothie.set_active_current(
+        {'X': 2, 'Y': 2, 'Z': 2, 'A': 2, 'B': 2, 'C': 2})
+    smoothie.set_dwelling_current(
+        {'X': 0, 'Y': 0, 'Z': 0, 'A': 0, 'B': 0, 'C': 0})
+
+    smoothie.move({'X': 0, 'Y': 0, 'Z': 0, 'A': 0, 'B': 0, 'C': 0})
+    smoothie.move({'B': 1, 'C': 1})
+    expected = [
+        ['M907 A0 B0 C0 X0 Y0 Z0 M400'],       # from call set_dwelling_current
+        ['G4P0.05 M400'],                      # Dwell
+        ['M907 A2 B2 C2 X2 Y2 Z2 M400'],       # Set all axes to high current
+        ['G4P0.05 M400'],                      # Dwell
+        ['G0.+[ABCXYZ].+ M400'],               # Move (including BC)
+        ['M907 B0 C0 M400'],                   # Set plunger current low
+        ['G4P0.05 M400'],                      # Dwell
+        ['M907 B2 C2 M400'],                   # Set plunger motors active
+        ['G4P0.05 M400'],                      # Dwell
+        ['G0.+[BC].+ M400'],                   # Move (including BC)
+        ['M907 B0 C0 M400'],                   # Set plunger current low
+        ['G4P0.05 M400']                       # Dwell
+    ]
+    from pprint import pprint
+    pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_functional(smoothie):
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
