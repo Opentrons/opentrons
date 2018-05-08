@@ -236,8 +236,7 @@ class SmoothieDriver_3_0_0:
                 if is_retry:
                     raise e
                 else:
-                    self.update_position(default=default, is_retry=True)
-                    return  # avoid calling `_update_position` after recursion
+                    return self.update_position(default=default, is_retry=True)
 
         self._update_position(updated_position)
 
