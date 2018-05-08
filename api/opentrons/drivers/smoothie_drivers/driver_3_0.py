@@ -4,6 +4,8 @@ from time import sleep
 from threading import Event
 from typing import Dict
 
+from serial.serialutil import SerialException
+
 from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.instruments.pipette_config import configs
@@ -50,6 +52,10 @@ DISABLE_AXES = ''
 
 MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
 SEC_PER_MIN = 60
+
+DEFAULT_SMOOTHIE_TIMEOUT = 1
+DEFAULT_MOVEMENT_TIMEOUT = 30
+SMOOTHIE_BOOT_TIMEOUT = 3
 
 GCODES = {'HOME': 'G28.2',
           'MOVE': 'G0',
@@ -316,12 +322,20 @@ class SmoothieDriver_3_0_0:
             self.simulating = True
             return
         smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
-        self._connection = serial_communication.connect(
-            device_name=smoothie_id,
-            port=port,
-            baudrate=self._config.serial_speed
-        )
-        self._setup()
+        try:
+            self._connection = serial_communication.connect(
+                device_name=smoothie_id,
+                port=port,
+                baudrate=self._config.serial_speed
+            )
+            self._setup()
+        except SerialException:
+            # if another process is using the port, pyserial raises an
+            # exception that describes a "readiness to read" which is confusing
+            error_msg = 'Unable to access UART port to Smoothie. This is '
+            error_msg += 'because another process is currently using it, or '
+            error_msg += 'the UART port is disabled on this device (OS)'
+            raise SerialException(error_msg)
 
     def disconnect(self):
         if self._connection:
@@ -527,22 +541,18 @@ class SmoothieDriver_3_0_0:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         '''
-        try:
-            self._send_command('\r\n', timeout=3)
-        except SmoothieError:
-            # because a bunch of junk is printed out after boot/reset that we
-            # ignore, don't worry if there is an error or alarm message inside
-            pass
+        self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     def _reset_from_error(self):
         # smoothieware will ignore new messages for a short time
         # after it has entered an error state, so sleep for some milliseconds
-        sleep(0.1)
+        if not self.simulating:
+            sleep(0.1)
         log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(self, command, timeout=None):
+    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -570,6 +580,12 @@ class SmoothieDriver_3_0_0:
             ret_code = serial_communication.write_and_return(
                 command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
 
+            # smoothieware can enter a weird state, where it repeats back
+            # the sent command at the beginning of its response.
+            # Check for this echo, and strips the command from the response
+            if command_line.strip() in ret_code.strip():
+                ret_code = ret_code.replace(command_line, '')
+
             # Smoothieware returns error state if a switch was hit while moving
             if (ERROR_KEYWORD in ret_code.lower()) or \
                     (ALARM_KEYWORD in ret_code.lower()):
@@ -596,7 +612,8 @@ class SmoothieDriver_3_0_0:
             str(-Y_SWITCH_BACK_OFF_MM),
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
-        self._send_command(relative_retract_command)
+        self._send_command(
+            relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
         self.pop_current()
         self.pop_speed()
         self.dwell_axes('Y')
@@ -604,7 +621,8 @@ class SmoothieDriver_3_0_0:
         # now it is safe to home the X axis
         try:
             self.activate_axes('X')
-            self._send_command(GCODES['HOME'] + 'X')
+            self._send_command(
+                GCODES['HOME'] + 'X', timeout=DEFAULT_MOVEMENT_TIMEOUT)
         finally:
             self.dwell_axes('X')
 
@@ -612,7 +630,8 @@ class SmoothieDriver_3_0_0:
         log.debug("_home_y")
         self.activate_axes('Y')
         # home the Y at normal speed (fast)
-        self._send_command(GCODES['HOME'] + 'Y')
+        self._send_command(
+            GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
 
         # slow the maximum allowed speed on Y axis
         self.push_axis_max_speed()
@@ -626,16 +645,24 @@ class SmoothieDriver_3_0_0:
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
         try:
-            self._send_command(relative_retract_command)
-            self._send_command(GCODES['HOME'] + 'Y')
-            self._send_command(relative_retract_command)
+            self._send_command(
+                relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self._send_command(
+                GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self._send_command(
+                relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.pop_axis_max_speed()  # bring max speeds back to normal
         finally:
             self.dwell_axes('Y')
 
     def _setup(self):
         log.debug("_setup")
-        self._wait_for_ack()
+        try:
+            self._wait_for_ack()
+        except serial_communication.SerialNoResponse:
+            # incase motor-driver is stuck in bootloader and unresponsive,
+            # use gpio to reset into a known state
+            self._smoothie_reset()
         self._reset_from_error()
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
@@ -763,7 +790,10 @@ class SmoothieDriver_3_0_0:
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
                 log.debug("move: {}".format(command))
-                self._send_command(command)
+                # TODO (andy) a movement's timeout should be calculated by
+                # how long the movement is expected to take. A default timeout
+                # of 30 seconds prevents any movements that take longer
+                self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
@@ -820,7 +850,8 @@ class SmoothieDriver_3_0_0:
                 try:
                     self.activate_axes(axes)
                     log.debug("home: {}".format(command))
-                    self._send_command(command, timeout=30)
+                    self._send_command(
+                        command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
@@ -884,14 +915,15 @@ class SmoothieDriver_3_0_0:
             seconds=seconds
         )
         log.debug("delay: {}".format(command))
-        self._send_command(command)
+        self._send_command(command, timeout=int(seconds) + 1)
 
     def probe_axis(self, axis, probing_distance) -> Dict[str, float]:
         if axis.upper() in AXES:
             self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             log.debug("probe_axis: {}".format(command))
-            self._send_command(command=command, timeout=30)
+            self._send_command(
+                command=command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.update_position(self.position)
             return self.position
         else:
