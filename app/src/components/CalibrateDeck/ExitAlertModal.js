@@ -21,6 +21,7 @@ export default function ExitAlertModal (props: Props) {
         {children: CANCEL_TEXT, onClick: back},
         {children: EXIT_TEXT, onClick: exit}
       ]}
+      alertOverlay
     >
       <p>Doing so will home the robot and revert to using previously saved calibration settings.</p>
     </AlertModal>

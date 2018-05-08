@@ -32,9 +32,9 @@ function AttachTipPanel (props: OwnProps & DispatchProps) {
   const leftChildren = (
     <div>
       <p>
-        Place a previously used or otherwise discarded
+        Place a spare
         <em>{` ${volume} μL `}</em>
-        tip on the pipette before continuing
+        tip on pipette before continuing
       </p>
       <PrimaryButton onClick={onProbeTipClick}>
         Confirm Tip Attached
