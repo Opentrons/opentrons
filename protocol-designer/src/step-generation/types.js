@@ -82,6 +82,30 @@ export type DistributeFormData = {
   mixBeforeAspirate: ?MixArgs
 } & TransferLikeFormDataFields
 
+export type MixFormData = {
+  ...SharedFormDataFields,
+  stepType: 'mix',
+  labware: string,
+  pipette: string,
+  wells: Array<string>,
+  /** Mix volume (should not exceed pipette max) */
+  volume: number,
+  /** Times to mix (should be integer) */
+  times: number,
+  /** Touch tip after mixing */
+  touchTip: boolean,
+  /** Delay in seconds */
+  delay: ?number,
+  /** change tip:
+    * 'never' keeps tip from prev step
+    * 'once' gets fresh tip for the mix step and uses it across all wells
+    * 'always' uses fresh tip for each mix well
+   **/
+  changeTip: ChangeTipOptions,
+  /** If given, blow out in the specified labware after mixing each well */
+  blowout?: string
+}
+
 export type PauseFormData = {|
   ...SharedFormDataFields,
   stepType: 'pause',

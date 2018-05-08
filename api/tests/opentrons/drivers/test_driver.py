@@ -8,6 +8,56 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
+def test_update_position(model):
+    import types
+    driver = model.robot._driver
+    driver.simulating = False
+    _old_send_command = driver._send_command
+
+    def _new_send_message(self, command, timeout=None):
+        return 'ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+    count = 0
+
+    def _new_send_message(self, command, timeout=None):
+        nonlocal count
+        # first attempt to read, we get bad data
+        msg = 'ok MCS: X:0.0000 Y:MISTAKE Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+        if count > 0:
+            # any following attempts to read, we get good data
+            msg = msg.replace('Y:MISTAKE', 'Y:0.0000')
+        count += 1
+        return msg
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+    driver._send_command = types.MethodType(_old_send_command, driver)
+
+
 def test_remove_serial_echo(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers.serial_communication import \
         _parse_smoothie_response
@@ -184,6 +234,8 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
+        ['M907 A0.1 X0.3 Y0.3 Z0.1 M400'],
+        ['G4P0.05 M400'],
         ['M907 B0.5 M400'],
         ['G4P0.05 M400'],
         ['G0B2 M400'],
@@ -203,7 +255,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         'B': 4,
         'C': 5})
     expected = [
-        ['M907 B0.5 C0.5 M400'],               # Set plunger current high
+        ['M907 A1.0 B0.5 C0.5 X1.5 Y1.75 Z1.0 M400'],  # Set active axes high
         ['G4P0.05 M400'],                      # Dwell
         ['G0.+[BC].+ M400'],                   # Move (including BC)
         ['M907 B0.05 C0.05 M400'],               # Set plunger current low
@@ -304,7 +356,10 @@ def test_set_current(model):
         {'C': 0.5},
         {'C': 0.05},
         {'A': 1.0},
+        {'A': 0.1},
         {'X': 1.5, 'Y': 1.75},
+        {'X': 0.3, 'Y': 0.3},
+        {'A': 1.0},
         {'A': 0.1},
         {'A': 1.0},
         {'A': 0.1}

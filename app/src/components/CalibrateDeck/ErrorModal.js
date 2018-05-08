@@ -2,16 +2,17 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 import {AlertModal} from '@opentrons/components'
-import {type ApiRequestError} from '../../http-api-client'
+import type {Error} from '../../types'
 
 type Props = {
   closeUrl: string,
-  error: ApiRequestError
+  error: Error
 }
 
 const HEADING = 'Error'
 export default function ErrorModal (props: Props) {
   const {error, closeUrl} = props
+
   return (
     <AlertModal
       heading={HEADING}

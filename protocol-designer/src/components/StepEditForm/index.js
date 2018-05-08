@@ -11,13 +11,13 @@ import {
   type DropdownOption
 } from '@opentrons/components'
 
-import WellSelectionInput from '../containers/WellSelectionInput'
+import WellSelectionInput from '../../containers/WellSelectionInput'
 import FormSection from './FormSection'
-import styles from './Form.css'
-import type {FormSectionNames, FormSectionState} from '../steplist/types' // TODO import from index.js
-import type {FormData} from '../form-types'
+import styles from '../Form.css'
+import type {FormSectionNames, FormSectionState} from '../../steplist/types' // TODO import from index.js
+import type {FormData} from '../../form-types'
 
-import {formConnectorFactory} from '../utils'
+import {formConnectorFactory} from '../../utils'
 
 type Options = Array<DropdownOption>
 
@@ -47,6 +47,79 @@ export default function StepEditForm (props: Props) {
     <PrimaryButton onClick={props.onCancel}>CANCEL</PrimaryButton>
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>
+
+  const formColumnRight = <div className={styles.column_1_2}>
+    <FormGroup label='WELL ORDER'>
+      (WellSelectionWidget here)
+    </FormGroup>
+
+    <FormGroup label='CHANGE TIP'>
+      <RadioGroup
+        inline
+        {...formConnector('aspirate--change-tip')}
+        options={[
+          {name: 'Always', value: 'always'},
+          {name: 'Once', value: 'once'},
+          {name: 'Never', value: 'never'}
+        ]}
+      />
+    </FormGroup>
+
+    <FormGroup label='FLOW RATE'>
+      (Flow rate SliderInput here)
+    </FormGroup>
+  </div>
+
+  // TODO Ian 2018-05-08 break these forms out into own components, put it all in a folder.
+  // Especially, make components for the re-used form parts instead of repeating them
+  if (formData.stepType === 'mix') {
+    return (
+      <div className={styles.form}>
+        <div className={styles.row_wrapper}>
+          <div className={styles.top_row}>
+            {/* TODO Ian 2018-05-08 this labware/wells/pipette could be a component,
+              it's common across most forms */}
+            <FormGroup label='Labware:'>
+              <DropdownField options={props.labwareOptions} {...formConnector('labware')} />
+            </FormGroup>
+            {/* TODO LATER: also 'disable' when selected labware is a trash */}
+            <WellSelectionInput
+              labwareId={formData['labware']}
+              pipetteId={formData['pipette']}
+              initialSelectedWells={formData['wells']}
+              formFieldAccessor={'wells'}
+            />
+            <FormGroup label='Pipette:'>
+              <DropdownField options={props.pipetteOptions} {...formConnector('pipette')} />
+            </FormGroup>
+          </div>
+          <div className={styles.row_wrapper}>
+            <div className={styles.column_1_2}>
+              <FormGroup label='Repetitions' className={styles.field_row}>
+                <InputField units='uL' {...formConnector('volume')} />
+                <InputField units='Times' {...formConnector('times')} />
+              </FormGroup>
+              <div className={styles.field_row}>
+                <CheckboxField label='Delay' {...formConnector('dispense--delay--checkbox')} />
+                <InputField units='m' {...formConnector('dispense--delay-minutes')} />
+                <InputField units='s' {...formConnector('dispense--delay-seconds')} />
+              </div>
+              <div className={styles.field_row}>
+                <CheckboxField label='Blow out' {...formConnector('dispense--blowout--checkbox')} />
+                <DropdownField className={styles.column_2_3}
+                  options={props.labwareOptions}
+                  {...formConnector('dispense--blowout--labware')}
+                />
+              </div>
+              <CheckboxField label='Touch tip' {...formConnector('touch-tip')} />
+            </div>
+            {formColumnRight}
+          </div>
+        </div>
+        {buttonRow}
+      </div>
+    )
+  }
 
   if (formData.stepType === 'pause') {
     return (
@@ -122,28 +195,7 @@ export default function StepEditForm (props: Props) {
                 </div>
               </FormGroup>
             </div>
-
-            <div className={styles.column_1_2}>
-              <FormGroup label='WELL ORDER'>
-                (WellSelectionWidget here)
-              </FormGroup>
-
-              <FormGroup label='CHANGE TIP'>
-                <RadioGroup
-                  inline
-                  {...formConnector('aspirate--change-tip')}
-                  options={[
-                    {name: 'Always', value: 'always'},
-                    {name: 'Once', value: 'once'},
-                    {name: 'Never', value: 'never'}
-                  ]}
-                />
-              </FormGroup>
-
-              <FormGroup label='FLOW RATE'>
-                (Flow rate SliderInput here)
-              </FormGroup>
-            </div>
+            {formColumnRight}
           </div>
 
         </FormSection>
