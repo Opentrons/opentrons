@@ -7,17 +7,21 @@ import type {
   BlankForm,
   ProcessedFormData,
   TransferLikeForm,
+  MixForm,
   PauseForm
 } from '../form-types'
 
 import type {
   ConsolidateFormData,
   DistributeFormData,
+  MixFormData,
   PauseFormData,
   TransferFormData
 } from '../step-generation'
 
 import {FIXED_TRASH_ID} from '../constants'
+
+const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -49,7 +53,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
     'step-details': ''
   }
 
-  if (stepType === 'transfer' || stepType === 'consolidate') {
+  if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
       'aspirate--change-tip': 'once'
@@ -136,9 +140,7 @@ function _vapTransferLike (
     ? Number('aspirate--disposal-vol--volume') // TODO handle unparseable
     : null
 
-  const changeTip = formData['aspirate--change-tip'] || 'always'
-  // It's radiobutton, so one should always be selected.
-  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
     pipette,
@@ -261,6 +263,68 @@ function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
   }
 }
 
+function _vapMix (formData: MixForm): ValidationAndErrors<MixFormData> {
+  const requiredFields = ['pipette', 'labware', 'volume', 'times']
+
+  let errors = {}
+
+  requiredFields.forEach(field => {
+    if (formData[field] == null) {
+      errors[field] = 'This field is required'
+    }
+  })
+
+  const {labware, pipette} = formData
+  const touchTip = !!formData['touch-tip']
+
+  const wells = formData.wells || []
+  const volume = Number(formData.volume) || 0
+  const times = Number(formData.times) || 0
+
+  // It's radiobutton, so one should always be selected.
+  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
+
+  const blowout = formData['dispense--blowout--labware']
+
+  const delay = formData['dispense--delay--checkbox']
+    ? ((Number(formData['dispense--delay-minutes']) || 0) * 60) +
+      (Number(formData['dispense--delay-seconds'] || 0))
+    : null
+  // TODO Ian 2018-05-08 delay number parsing errors
+
+  if (wells.length <= 0) {
+    errors.wells = '1 or more wells is required'
+  }
+
+  if (volume <= 0) {
+    errors.volume = 'Volume must be a number greater than 0'
+  }
+
+  if (times <= 0 || !Number.isInteger(times)) {
+    errors.times = 'Number of repetitions must be an integer greater than 0'
+  }
+
+  return {
+    errors,
+    validatedForm: (!formHasErrors({errors}) && labware && pipette)
+      ? {
+        stepType: formData.stepType,
+        name: `Mix ${formData.id}`, // TODO real name for steps
+        description: 'description would be here 2018-03-01', // TODO get from form
+        labware,
+        wells,
+        volume,
+        times,
+        touchTip,
+        delay,
+        changeTip,
+        blowout,
+        pipette
+      }
+      : null
+  }
+}
+
 export function validateAndProcessForm (formData: FormData): * { // ValidFormAndErrors
   if (formData.stepType === 'transfer' || formData.stepType === 'consolidate' || formData.stepType === 'distribute') {
     return _vapTransferLike(formData)
@@ -268,6 +332,10 @@ export function validateAndProcessForm (formData: FormData): * { // ValidFormAnd
 
   if (formData.stepType === 'pause') {
     return _vapPause(formData)
+  }
+
+  if (formData.stepType === 'mix') {
+    return _vapMix(formData)
   }
 
   // Fallback for unsupported step type. Should be unreachable (...right?)
