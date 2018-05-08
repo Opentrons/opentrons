@@ -232,11 +232,11 @@ class SmoothieDriver_3_0_0:
                 updated_position = \
                     _parse_axis_values(position_response)
                 # TODO jmg 10/27: log warning rather than an exception
-            except (TypeError, ParseError) as e:
+            except (TypeError, ParseError, ValueError) as e:
                 if is_retry:
                     raise e
                 else:
-                    self.update_position(default=default, is_retry=True)
+                    return self.update_position(default=default, is_retry=True)
 
         self._update_position(updated_position)
 

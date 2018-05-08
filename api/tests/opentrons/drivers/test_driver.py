@@ -8,6 +8,56 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
+def test_update_position(model):
+    import types
+    driver = model.robot._driver
+    driver.simulating = False
+    _old_send_command = driver._send_command
+
+    def _new_send_message(self, command, timeout=None):
+        return 'ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+    count = 0
+
+    def _new_send_message(self, command, timeout=None):
+        nonlocal count
+        # first attempt to read, we get bad data
+        msg = 'ok MCS: X:0.0000 Y:MISTAKE Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+        if count > 0:
+            # any following attempts to read, we get good data
+            msg = msg.replace('Y:MISTAKE', 'Y:0.0000')
+        count += 1
+        return msg
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+    driver._send_command = types.MethodType(_old_send_command, driver)
+
+
 def test_remove_serial_echo(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers.serial_communication import \
         _parse_smoothie_response
