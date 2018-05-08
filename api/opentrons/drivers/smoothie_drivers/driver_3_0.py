@@ -336,8 +336,6 @@ class SmoothieDriver_3_0_0:
             error_msg += 'because another process is currently using it, or '
             error_msg += 'the UART port is disabled on this device (OS)'
             raise SerialException(error_msg)
-        except Exception as e:
-            raise e
 
     def disconnect(self):
         if self._connection:
