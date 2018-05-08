@@ -3,6 +3,7 @@ import type {IconName} from '@opentrons/components'
 import type {
   ChangeTipOptions,
   ConsolidateFormData,
+  DistributeFormData,
   TransferFormData,
   MixFormData,
   PauseFormData
@@ -123,6 +124,7 @@ export type BlankForm = {
 // TODO gradually create & use definitions from step-generation/types.js
 export type ProcessedFormData =
   | ConsolidateFormData
+  | DistributeFormData
   | MixFormData
   | PauseFormData
   | TransferFormData
