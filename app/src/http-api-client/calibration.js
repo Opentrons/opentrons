@@ -11,7 +11,9 @@ export type JogAxis = 'x' | 'y' | 'z'
 
 export type JogDirection = -1 | 1
 
-export type DeckCalPoint = 1 | 2 | 3
+export type JogStep = number
+
+export type DeckCalPoint = '1' | '2' | '3'
 
 type DeckStartRequest = {
   force?: boolean
@@ -28,7 +30,7 @@ type DeckStartResponse = {
 type DeckCalRequest =
   | {| command: 'attach tip', tipLength: number |}
   | {| command: 'detach tip' |}
-  | {| command: 'jog', axis: JogAxis, direction: JogDirection, step: number |}
+  | {| command: 'jog', axis: JogAxis, direction: JogDirection, step: JogStep |}
   | {| command: 'save xy', point: DeckCalPoint |}
   | {| command: 'save z' |}
   | {| command: 'save transform' |}
@@ -52,7 +54,7 @@ type CalRequestAction = {|
     robot: RobotService,
     path: RequestPath,
     request: CalRequest,
-  |}
+  |},
 |}
 
 type CalSuccessAction = {|
@@ -61,7 +63,7 @@ type CalSuccessAction = {|
     robot: RobotService,
     path: RequestPath,
     response: CalResponse,
-  |}
+  |},
 |}
 
 type CalFailureAction = {|
@@ -70,13 +72,21 @@ type CalFailureAction = {|
     robot: RobotService,
     path: RequestPath,
     error: ApiRequestError,
-  |}
+  |},
+|}
+
+type SetCalJogStepAction = {|
+  type: 'api:SET_CAL_JOG_STEP',
+  payload: {|
+    step: JogStep,
+  |},
 |}
 
 export type CalibrationAction =
   | CalRequestAction
   | CalSuccessAction
   | CalFailureAction
+  | SetCalJogStepAction
 
 export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
 
@@ -88,11 +98,14 @@ type RobotCalState = {
 }
 
 type CalState = {
-  [robotName: string]: ?RobotCalState
+  jogStep: JogStep,
+  [robotName: string]: ?RobotCalState,
 }
 
 const DECK: 'deck' = 'deck'
 const DECK_START: 'deck/start' = 'deck/start'
+
+const DEFAULT_JOG_STEP = 0.1
 
 export function startDeckCalibration (
   robot: RobotService,
@@ -128,11 +141,15 @@ export function deckCalibrationCommand (
   }
 }
 
+export function setCalibrationJogStep (step: JogStep): SetCalJogStepAction {
+  return {type: 'api:SET_CAL_JOG_STEP', payload: {step}}
+}
+
 export function calibrationReducer (
   state: ?CalState,
   action: Action
 ): CalState {
-  if (!state) return {}
+  if (!state) return {jogStep: DEFAULT_JOG_STEP}
 
   let name
   let path
@@ -186,6 +203,9 @@ export function calibrationReducer (
           }
         }
       }
+
+    case 'api:SET_CAL_JOG_STEP':
+      return {...state, jogStep: action.payload.step}
   }
 
   return state
@@ -207,6 +227,10 @@ export function makeGetDeckCalibrationCommandState () {
   )
 
   return sel
+}
+
+export function getCalibrationJogStep (state: State): JogStep {
+  return state.api.calibration.jogStep
 }
 
 function getRobotCalState (state: State, props: BaseRobot): RobotCalState {

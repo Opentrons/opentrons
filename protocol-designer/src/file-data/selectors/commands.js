@@ -168,12 +168,17 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       if (validatedForm.stepType === 'transfer') {
         nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
       }
+      if (validatedForm.stepType === 'distribute') {
+        nextCommandsAndState = StepGeneration.distribute(validatedForm)(acc.robotState)
+      }
       if (validatedForm.stepType === 'pause') {
         nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
+      if (validatedForm.stepType === 'mix') {
+        console.warn('Mix step not yet implemented') // TODO Ian 2018-05-08 next PR!
+      }
 
       if (!nextCommandsAndState) {
-        // TODO implement the remaining steps
         return {
           ...acc,
           formErrors: {

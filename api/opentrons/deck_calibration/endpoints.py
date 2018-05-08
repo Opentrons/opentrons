@@ -256,7 +256,7 @@ async def save_xy(data):
     {
       'token': UUID token from current session start
       'command': 'save xy'
-      'point': an integer [1, 2, or 3] of the calibration point to save
+      'point': a string ID ['1', '2', or '3'] of the calibration point to save
     }
     """
     global session

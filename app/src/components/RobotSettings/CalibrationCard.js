@@ -39,10 +39,11 @@ function CalibrationCard (props: Props) {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const stepOneUrl = `/robots/${ownProps.name}/deck-calibration/step-1`
+  // TODO(mc, 2018-05-08): pass this in as a prop
+  const deckCalUrl = `/robots/${ownProps.name}/calibrate-deck`
 
   return {
     start: () => dispatch(startDeckCalibration(ownProps))
-      .then(() => dispatch(push(stepOneUrl)))
+      .then(() => dispatch(push(deckCalUrl)))
   }
 }

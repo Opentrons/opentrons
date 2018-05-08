@@ -1,9 +1,9 @@
 // @flow
-// jog controls component for ConfirmPositionContents
+// jog controls component
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {JogButtonName, Axis, Direction} from '../../robot'
+import type {JogAxis, JogDirection, JogStep} from '../../http-api-client'
 
 import {
   PrimaryButton,
@@ -14,16 +14,27 @@ import {
 
 import styles from './styles.css'
 
+type Jog = (axis: JogAxis, direction: JogDirection, step: JogStep) => mixed
+
 type JogButtonProps = {
-  name: JogButtonName,
-  onClick: () => mixed,
+  name: string,
   icon: IconName,
+  jog: Jog,
+  axis: JogAxis,
+  direction: JogDirection,
+  step: JogStep,
+}
+
+export type JogControlsProps = {
+  jog: Jog,
+  step: JogStep,
+  onStepSelect: (event: SyntheticInputEvent<*>) => mixed,
 }
 
 const JOG_BUTTONS: Array<{
-  name: JogButtonName,
-  axis: Axis,
-  direction: Direction,
+  name: string,
+  axis: JogAxis,
+  direction: JogDirection,
   icon: IconName
 }> = [
   {name: 'left', axis: 'x', direction: -1, icon: 'ot-arrow-left'},
@@ -34,14 +45,9 @@ const JOG_BUTTONS: Array<{
   {name: 'down', axis: 'z', direction: -1, icon: 'ot-arrow-down'}
 ]
 
-export type JogControlsProps = {
-  makeJog: (axis: Axis, direction: Direction) => () => mixed,
-  currentJogDistance: number,
-  onIncrementSelect: (event: SyntheticInputEvent<*>) => mixed,
-}
-
 export default function JogControls (props: JogControlsProps) {
-  const {makeJog} = props
+  const {jog, step, onStepSelect} = props
+
   return (
     <div className={styles.jog_container}>
       <div className={styles.jog_controls}>
@@ -52,7 +58,7 @@ export default function JogControls (props: JogControlsProps) {
           Up & Down
         </span>
         {JOG_BUTTONS.map((button) => (
-          <JogButton key={button.name} {...button} onClick={makeJog(button.axis, button.direction)} />
+          <JogButton key={button.name} {...button} jog={jog} step={step} />
         ))}
         <span className={styles.jog_increment}>
           Jump Size
@@ -60,13 +66,13 @@ export default function JogControls (props: JogControlsProps) {
         <span className={styles.increment_group}>
         <RadioGroup
           className={styles.increment_item}
-          value={`${props.currentJogDistance}`}
+          value={`${step}`}
           options={[
             {name: '0.1 mm', value: '0.1'},
             {name: '1 mm', value: '1'},
             {name: '10 mm', value: '10'}
           ]}
-          onChange={props.onIncrementSelect}
+          onChange={onStepSelect}
         />
       </span>
       </div>
@@ -75,14 +81,20 @@ export default function JogControls (props: JogControlsProps) {
 }
 
 function JogButton (props: JogButtonProps) {
-  const {name, onClick, icon} = props
+  const {name, icon, jog, axis, direction, step} = props
   const className = cx(styles.jog_button, styles[name])
+
+  // TODO(mc, 2018-05-07): I tried to make this a class based component to
+  //  have handleClick be a class method, but props ended up out-of-date in the
+  //  handler but not in render. No idea why this was happening but figure it
+  //  out because it's concerning
+  const handleClick = () => jog(axis, direction, step)
 
   return (
     <PrimaryButton
       className={className}
       title={name}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <Icon name={icon} />
     </PrimaryButton>

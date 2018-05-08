@@ -85,6 +85,14 @@
   @apply --clickable;
 }
 
+.alert_modal {
+  z-index: 10;
+}
+
+.alert_modal_overlay {
+  background-color: rgba(115, 115, 115, 0.9);
+}
+
 .alert_modal_contents {
   @apply --font-body-2-dark;
 
