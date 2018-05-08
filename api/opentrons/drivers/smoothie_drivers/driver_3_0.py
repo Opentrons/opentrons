@@ -541,12 +541,7 @@ class SmoothieDriver_3_0_0:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         '''
-        try:
-            self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
-        except SmoothieError:
-            # because a bunch of junk is printed out after boot/reset that we
-            # ignore, don't worry if there is an error or alarm message inside
-            pass
+        self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     def _reset_from_error(self):
         # smoothieware will ignore new messages for a short time
@@ -584,6 +579,12 @@ class SmoothieDriver_3_0_0:
             command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
             ret_code = serial_communication.write_and_return(
                 command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
+
+            # smoothieware can enter a weird state, where it repeats back
+            # the sent command at the beginning of its response.
+            # Check for this echo, and strips the command from the response
+            if command_line.strip() in ret_code.strip():
+                ret_code = ret_code.replace(command_line, '')
 
             # Smoothieware returns error state if a switch was hit while moving
             if (ERROR_KEYWORD in ret_code.lower()) or \
@@ -658,7 +659,7 @@ class SmoothieDriver_3_0_0:
         log.debug("_setup")
         try:
             self._wait_for_ack()
-        except Exception:
+        except serial_communication.SerialNoResponse:
             # incase motor-driver is stuck in bootloader and unresponsive,
             # use gpio to reset into a known state
             self._smoothie_reset()
