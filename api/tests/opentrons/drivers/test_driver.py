@@ -8,6 +8,44 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
+def test_update_position(model):
+    import types
+    driver = model.robot._driver
+    _old_send_command = driver._send_command
+
+    def _new_send_message(self, command, timeout=None):
+        return 'ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+    def _new_send_message(self, command, timeout=None):
+        return 'ok MCS: X:0.0000 Y:MISTAKE Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    driver.update_position()
+    expected = {
+        'X': 0,
+        'Y': 0,
+        'Z': 0,
+        'A': 0,
+        'B': 0,
+        'C': 0
+    }
+    assert driver.position == expected
+
+
 def test_remove_serial_echo(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers.serial_communication import \
         _parse_smoothie_response
@@ -30,8 +68,8 @@ def test_remove_serial_echo(smoothie, monkeypatch):
 
 def test_parse_axis_values(smoothie):
     from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
-    good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
-    bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
+    good_data = 'ok MCS: X:10 Y:20: Z:30 A:40 B:50 C:60'
+    bad_data = 'ok MCS: X:10 Y:20: Z:30A:40 B:50 C:60'
     res = drv._parse_axis_values(good_data)
     expected = {
         'X': 10,
@@ -406,7 +444,7 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
         if GCODES['MOVE'] in command:
             return "ALARM: Hard limit +C"
         elif GCODES['CURRENT_POSITION'] in command:
-            return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+            return 'ok MCS: X:10 Y:20: Z:30 A:40 B:50 C:60'
         else:
             return "ok"
 
