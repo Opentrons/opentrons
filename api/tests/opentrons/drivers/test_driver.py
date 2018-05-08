@@ -9,23 +9,30 @@ def position(x, y, z, a, b, c):
 
 
 def test_remove_serial_echo(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers.serial_communication import \
-        _parse_smoothie_response
-    smoothie_response = b'ok\r\nok\r\n'
-    command = b'G28.2B'
-    ack = b'ok\r\nok\r\n'
-    res = _parse_smoothie_response(smoothie_response, command, ack)
-    assert res == b''
-    res = _parse_smoothie_response(command + smoothie_response, command, ack)
-    assert res == b''
-    res = _parse_smoothie_response(
-        b'\r\n' + command + b'\r\n\r\n' + smoothie_response, command, ack)
-    assert res == b''
-    res = _parse_smoothie_response(
-        b'\r\n' + command + b'\r\n\r\nsome-data\r\nok\r\n' + smoothie_response,
-        command,
-        ack)
-    assert res == b'some-data'
+    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    smoothie.simulating = False
+
+    def return_echo_response(command, ack, connection, timeout):
+        if 'some-data' in command:
+            return command + 'TESTS-RULE'
+        return command
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        return_echo_response)
+
+    cmd = 'G28.2B'
+    res = smoothie._send_command(
+        cmd, driver_3_0.SMOOTHIE_ACK)
+    assert res == ''
+    res = smoothie._send_command(
+        '\r\n' + cmd + '\r\n\r\n',
+        driver_3_0.SMOOTHIE_ACK)
+    assert res == ''
+    res = smoothie._send_command(
+        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
+        driver_3_0.SMOOTHIE_ACK)
+    assert res == 'TESTS-RULE'
 
 
 def test_parse_axis_values(smoothie):
