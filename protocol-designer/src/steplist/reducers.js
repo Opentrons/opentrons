@@ -348,18 +348,34 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
 
     const stepForm = _forms[_hoveredStep].validatedForm
 
-    if (
-      !stepForm ||
-      stepForm === null ||
-      stepForm.stepType === 'pause' // no labware involved
-    ) {
+    if (!stepForm) {
       return blank
     }
 
-    const src = stepForm.sourceLabware
-    const dest = stepForm.destLabware
+    if (
+      stepForm.stepType === 'consolidate' ||
+      stepForm.stepType === 'distribute' ||
+      stepForm.stepType === 'transfer'
+    ) {
+      // source and dest labware
+      const src = stepForm.sourceLabware
+      const dest = stepForm.destLabware
 
-    return [src, dest]
+      return [src, dest]
+    }
+
+    if (stepForm.stepType === 'mix') {
+      // only 1 labware
+      return [stepForm.labware]
+    }
+
+    // step types that have no labware that gets highlighted
+    if (!(stepForm.stepType === 'pause')) {
+      // TODO Ian 2018-05-08 use assert here
+      console.warn(`hoveredStepLabware does not support step type "${stepForm.stepType}"`)
+    }
+
+    return blank
   }
 )
 
