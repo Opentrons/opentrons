@@ -783,6 +783,9 @@ class SmoothieDriver_3_0_0:
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
                 log.debug("move: {}".format(command))
+                # TODO (andy) a movement's timeout should be calculated by
+                # how long the movement is expected to take. A default timeout
+                # of 30 seconds prevents any movements that take longer
                 self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             finally:
                 # dwell pipette motors because they get hot

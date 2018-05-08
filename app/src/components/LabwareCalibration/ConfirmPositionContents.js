@@ -1,35 +1,31 @@
 // @flow
 // container for position confirmation logic in ConfirmationModal
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-  type Instrument,
-  type Labware
-} from '../../robot'
+import type {State, Dispatch} from '../../types'
+import type {Instrument, Labware} from '../../robot'
 
+import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 import {PrimaryButton} from '@opentrons/components'
-
 import ConfirmPositionDiagram from './ConfirmPositionDiagram'
 import JogControls, {type JogControlsProps} from '../JogControls'
 
-type StateProps = {
-  currentJogDistance: number
+type SP = {
+  step: $PropertyType<JogControlsProps, 'step'>,
 }
 
-type OwnProps = Labware & {
+type DP = {
+  onConfirmClick: () => void,
+  jog: $PropertyType<JogControlsProps, 'jog'>,
+  onStepSelect: $PropertyType<JogControlsProps, 'onStepSelect'>,
+}
+
+type OP = Labware & {
   calibrator: Instrument
 }
 
-type DispatchProps = JogControlsProps & {
-  onConfirmClick: () => void,
-  onIncrementSelect: (event: SyntheticInputEvent<>) => mixed,
-}
-
-type Props = OwnProps & DispatchProps
+type Props = SP & DP & OP
 
 export default connect(mapStateToProps, mapDispatchToProps)(ConfirmPositionContents)
 
@@ -50,30 +46,23 @@ function ConfirmPositionContents (props: Props) {
   )
 }
 
-function mapStateToProps (state): StateProps {
+function mapStateToProps (state: State): SP {
   return {
-    currentJogDistance: robotSelectors.getJogDistance(state)
+    step: robotSelectors.getJogDistance(state)
   }
 }
 
-function mapDispatchToProps (
-  dispatch: Dispatch<*>,
-  ownProps: OwnProps
-): any {
+function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {slot, isTiprack, calibrator: {mount}} = ownProps
-
-  const makeJog = (axis, direction) => () => {
-    dispatch(robotActions.jog(mount, axis, direction))
-  }
-
   const onConfirmAction = isTiprack
     ? robotActions.pickupAndHome(mount, slot)
     : robotActions.updateOffset(mount, slot)
 
   return {
-    ...ownProps,
-    makeJog,
-    onIncrementSelect: (event) => {
+    jog: (axis, direction) => {
+      dispatch(robotActions.jog(mount, axis, direction))
+    },
+    onStepSelect: (event) => {
       const step = Number(event.target.value)
       dispatch(robotActions.setJogDistance(step))
     },
