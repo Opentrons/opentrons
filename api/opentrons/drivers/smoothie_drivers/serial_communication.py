@@ -10,6 +10,10 @@ DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
 
 
+class SerialNoResponse(Exception):
+    pass
+
+
 def get_ports_by_name(device_name):
     '''Returns all serial devices with a given name'''
     filtered_devices = filter(
@@ -37,16 +41,9 @@ def serial_with_temp_timeout(serial_connection, timeout):
     serial_connection.timeout = saved_timeout
 
 
-def _parse_smoothie_response(response, command, ack):
+def _parse_serial_response(response, ack):
     if ack in response:
         parsed_response = response.split(ack)[0]
-        # smoothieware can enter a weird state, where it repeats back
-        # the sent command at the beginning of its response
-        # This checks for this echo, and strips the command from the response
-        if isinstance(command, str):
-            command = command.encode()
-        if command in parsed_response:
-            parsed_response = parsed_response.replace(command, b'')
         return parsed_response.strip()
     else:
         return None
@@ -62,11 +59,12 @@ def _write_to_device_and_return(cmd, ack, device_connection):
     - Wait for ack return
     - return parsed response'''
     device_connection.write(cmd.encode())
-
     response = device_connection.read_until(ack.encode())
-
-    clean_response = _parse_smoothie_response(
-        response, cmd.encode(), ack.encode())
+    if not response:
+        raise SerialNoResponse(
+            'No response from serial port after {} second(s)'.format(
+                device_connection.timeout))
+    clean_response = _parse_serial_response(response, ack.encode())
     if clean_response:
         return clean_response.decode()
     return ''
@@ -89,7 +87,7 @@ def _attempt_command_recovery(command, ack, serial_conn):
     if response is None:
         log.debug("No valid response during _attempt_command_recovery")
         raise RuntimeError(
-            "Recovery attempted - no valid smoothie response "
+            "Recovery attempted - no valid serial response "
             "for command: {} in {} seconds".format(
                 command.encode(), RECOVERY_TIMEOUT))
     return response

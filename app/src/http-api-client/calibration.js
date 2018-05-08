@@ -13,7 +13,7 @@ export type JogDirection = -1 | 1
 
 export type JogStep = number
 
-export type DeckCalPoint = 1 | 2 | 3
+export type DeckCalPoint = '1' | '2' | '3'
 
 type DeckStartRequest = {
   force?: boolean
