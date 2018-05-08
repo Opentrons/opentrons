@@ -12,7 +12,9 @@ type ModalProps = {
   /** classes to apply */
   className?: string,
   /** classes to apply to the contents box */
-  contentsClassName?: string
+  contentsClassName?: string,
+  /** lightens overlay (alert modal over existing modal)**/
+  alertOverlay?: boolean
 }
 
 /**
@@ -20,10 +22,11 @@ type ModalProps = {
  * with a dark overlay and displays `children` as its contents in a white box
  */
 export default function Modal (props: ModalProps) {
+  const {contentsClassName, alertOverlay, onCloseClick} = props
   return (
-    <div className={cx(styles.modal, props.className)}>
-      <Overlay onClick={props.onCloseClick} />
-      <div className={cx(styles.modal_contents, props.contentsClassName)}>
+    <div className={cx(styles.modal, props.className, {[styles.alert_modal]: alertOverlay})} >
+      <Overlay onClick={onCloseClick} alertOverlay={alertOverlay}/>
+       <div className={cx(styles.modal_contents, contentsClassName)}>
         {props.children}
       </div>
     </div>
