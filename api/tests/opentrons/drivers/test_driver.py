@@ -122,15 +122,15 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.activate_axes('X')
-    smoothie.write_current()
+    smoothie._set_saved_current()
     smoothie.dwell_axes('X')
-    smoothie.write_current()
+    smoothie._set_saved_current()
     smoothie.activate_axes('XYBC')
-    smoothie.write_current()
+    smoothie._set_saved_current()
     smoothie.dwell_axes('XC')
-    smoothie.write_current()
+    smoothie._set_saved_current()
     smoothie.dwell_axes('BCY')
-    smoothie.write_current()
+    smoothie._set_saved_current()
     expected = [
         ['M907 A0.1 B0.1 C0.1 X1.5 Y0.3 Z0.1 G4P0.005 M400'],
         ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
@@ -334,7 +334,7 @@ def test_set_current(model):
     import types
     driver = model.robot._driver
 
-    set_current = driver.set_current
+    set_current = driver._save_current
     current_log = []
 
     def set_current_mock(self, target, axes_active=True):
@@ -342,7 +342,7 @@ def test_set_current(model):
         current_log.append(target)
         set_current(target, axes_active)
 
-    driver.set_current = types.MethodType(set_current_mock, driver)
+    driver._save_current = types.MethodType(set_current_mock, driver)
 
     rack = model.robot.add_container('tiprack-200ul', '10')
     pipette = model.instrument._instrument
@@ -367,7 +367,7 @@ def test_set_current(model):
     # pprint(current_log)
     assert current_log == expected
 
-    driver.set_current = set_current
+    driver._save_current = set_current
 
 
 def test_parse_pipette_data():

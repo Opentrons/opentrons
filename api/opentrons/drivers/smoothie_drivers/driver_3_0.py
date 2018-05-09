@@ -529,7 +529,7 @@ class SmoothieDriver_3_0_0:
             if self.current[axis] != amperage
         }
         if active_axes_to_update:
-            self.set_current(active_axes_to_update, axes_active=True)
+            self._save_current(active_axes_to_update, axes_active=True)
 
     def push_active_current(self):
         self._active_current_settings['saved'].update(
@@ -562,7 +562,7 @@ class SmoothieDriver_3_0_0:
             if self.current[axis] != amps
         }
         if dwelling_axes_to_update:
-            self.set_current(dwelling_axes_to_update, axes_active=False)
+            self._save_current(dwelling_axes_to_update, axes_active=False)
 
     def push_dwelling_current(self):
         self._dwelling_current_settings['saved'].update(
@@ -571,7 +571,7 @@ class SmoothieDriver_3_0_0:
     def pop_dwelling_current(self):
         self.set_dwelling_current(self._dwelling_current_settings['saved'])
 
-    def set_current(self, settings, axes_active=True):
+    def _save_current(self, settings, axes_active=True):
         '''
         Sets the current in Amperes (A) by axis. Currents are limited to be
         between 0.0-2.0 amps per axis motor.
@@ -589,9 +589,9 @@ class SmoothieDriver_3_0_0:
             for ax in settings.keys()
         })
         self._current_settings['now'].update(settings)
-        log.debug("set_current: {}".format(self.current))
+        log.debug("_save_current: {}".format(self.current))
 
-    def write_current(self):
+    def _set_saved_current(self):
         '''
         Sends the driver's current settings to the serial port as gcode. Call
         this method to set the axis-current state on the actual Smoothie
@@ -636,19 +636,6 @@ class SmoothieDriver_3_0_0:
             for axis in axes:
                 self.engaged_axes[axis] = False
 
-    def push_current(self):
-        self._current_settings['saved'].update(self._current_settings['now'])
-
-    def pop_current(self):
-        # only update axes that change their amperage
-        # this prevents non-active axes from incidentally being activated
-        diff_current = {
-            ax: self._current_settings['saved'][ax]
-            for ax in AXES
-            if self._current_settings['saved'][ax] != self.current[ax]
-        }
-        self.set_current(diff_current)
-
     def dwell_axes(self, axes):
         '''
         Sets motors to low current, for when they are not moving.
@@ -666,7 +653,7 @@ class SmoothieDriver_3_0_0:
             if self._active_axes[ax] is True
         }
         if dwelling_currents:
-            self.set_current(dwelling_currents, axes_active=False)
+            self._save_current(dwelling_currents, axes_active=False)
 
     def activate_axes(self, axes):
         '''
@@ -685,7 +672,7 @@ class SmoothieDriver_3_0_0:
             if self._active_axes[ax] is False
         }
         if active_currents:
-            self.set_current(active_currents, axes_active=True)
+            self._save_current(active_currents, axes_active=True)
 
     # ----------- Private functions --------------- #
 
@@ -756,7 +743,7 @@ class SmoothieDriver_3_0_0:
     def _home_x(self):
         log.debug("_home_x")
         # move the gantry forward on Y axis with low power
-        self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
+        self._save_current({'Y': Y_BACKOFF_LOW_CURRENT})
         self.push_speed()
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
@@ -784,7 +771,7 @@ class SmoothieDriver_3_0_0:
             self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
         finally:
             self.dwell_axes('X')
-            self.write_current()
+            self._set_saved_current()
 
     def _home_y(self):
         log.debug("_home_y")
@@ -817,7 +804,7 @@ class SmoothieDriver_3_0_0:
             self.pop_axis_max_speed()  # bring max speeds back to normal
         finally:
             self.dwell_axes('Y')
-            self.write_current()
+            self._set_saved_current()
 
     def _setup(self):
         log.debug("_setup")
@@ -831,7 +818,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.set_current(self.current, axes_active=False)
+        self._save_current(self.current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
@@ -985,7 +972,7 @@ class SmoothieDriver_3_0_0:
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
                 if plunger_axis_moved:
                     self.dwell_axes(plunger_axis_moved)
-                    self.write_current()
+                    self._set_saved_current()
 
             self._update_position(target)
 
@@ -1046,7 +1033,7 @@ class SmoothieDriver_3_0_0:
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
-                    self.write_current()
+                    self._set_saved_current()
 
         # Only update axes that have been selected for homing
         homed = {
