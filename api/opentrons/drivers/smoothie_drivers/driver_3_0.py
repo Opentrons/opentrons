@@ -75,7 +75,8 @@ GCODES = {'HOME': 'G28.2',
           'WRITE_INSTRUMENT_MODEL': 'M372',
           'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907',
-          'DISENGAGE_MOTOR': 'M18'}
+          'DISENGAGE_MOTOR': 'M18',
+          'HOMING_STATUS': 'G28.6'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -158,6 +159,29 @@ def _parse_switch_values(raw_switch_values):
             s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
             for s in parsed_values
             if any([n in s for n in ['max', 'Probe']])
+        }
+    except Exception as e:
+        log.error("Thoroughly unexpected! {}".format(e))
+        raise e
+    return res
+
+
+def _parse_homing_status_values(raw_homing_status_values):
+    '''
+        Parse the Smoothieware response to a G28.6 command (homing-status)
+        A "1" means it has been homed, and "0" means it has not been homed
+
+        Example response after homing just X axis:
+        "X:1 Y:0 Z:0 A:0 B:0 C:0"
+
+        returns: dict
+            Key is axis, value is True if the axis needs to be homed
+    '''
+    try:
+        parsed_values = raw_homing_status_values.strip().split(' ')
+        res = {
+            s.split(':')[0]: bool(int(s.split(':')[1]))
+            for s in parsed_values
         }
     except Exception as e:
         log.error("Thoroughly unexpected! {}".format(e))
@@ -407,6 +431,33 @@ class SmoothieDriver_3_0_0:
         '''Returns the state of all SmoothieBoard limit switches'''
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
+
+    @property
+    def homed_flags(self):
+        '''
+        Returns Smoothieware's current homing-status, which is a dictionary
+        of boolean values for each axis (XYZABC). If an axis is False, then it
+        still needs to be homed, and it's coordinate cannot be trusted.
+        Smoothieware sets it's internal homing flags for all axes to False when
+        it has yet to home since booting/restarting, or an endstop/homing error
+
+        returns: dict
+            {
+                'X': False,
+                'Y': True,
+                'Z': False,
+                'A': True,
+                'B': False,
+                'C': True
+            }
+        '''
+        if not self.is_connected():
+            return {
+                ax: True
+                for ax in AXES
+            }
+        res = self._send_command(GCODES['HOMING_STATUS'])
+        return _parse_homing_status_values(res)
 
     @property
     def current(self):
@@ -823,7 +874,24 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target):
+    def move(self, target, home_flagged_axes=False):
+        '''
+        Move to the `target` Smoothieware coordinate, along any of the size
+        axes, XYZABC.
+
+        target: dict
+            dict setting the coordinate that Smoothieware will be at when
+            `move()` returns. `target` keys are the axis in upper-case, and the
+            values are the coordinate in millimeters (float)
+
+        home_flagged_axes: boolean (default=False)
+            If set to `True`, each axis included within the target coordinate
+            may be homed before moving, determined by Smoothieware's internal
+            homing-status flags (`True` means it has already homed). All axes'
+            flags are set to `False` by Smoothieware under three conditions:
+            1) Smoothieware boots or resets, 2) if a HALT gcode or signal
+            is sent, or 3) a homing/limitswitch error occured.
+        '''
         from numpy import isclose
 
         self.run_flag.wait()
@@ -866,6 +934,8 @@ class SmoothieDriver_3_0_0:
             try:
                 if non_moving_axes:
                     self.dwell_axes(non_moving_axes)
+                if home_flagged_axes:
+                    self.home_flagged_axes(''.join(list(target.keys())))
                 self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
@@ -1056,6 +1126,20 @@ class SmoothieDriver_3_0_0:
         self._smoothie_hard_halt()
         self._reset_from_error()
         self._setup()
+
+    def home_flagged_axes(self, axes_string):
+        '''
+        Given a list of axes to check, this method will home each axis if
+        Smoothieware's internal flag sets it as needing to be homed
+        '''
+        axes_that_need_to_home = [
+            axis
+            for axis, already_homed in self.homed_flags.items()
+            if (not already_homed) and (axis in axes_string)
+        ]
+        if axes_that_need_to_home:
+            axes_string = ''.join(axes_that_need_to_home)
+            self.home(axes_string)
 
     def _smoothie_reset(self):
         log.debug('Resetting Smoothie (simulating: {})'.format(

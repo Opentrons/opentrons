@@ -465,6 +465,32 @@ def test_fast_home(model):
     assert driver.position['X'] == driver.homed_position['X']
 
 
+def test_homing_flags(model):
+    import types
+    driver = model.robot._driver
+
+    def is_connected_mock(self):
+        return True
+
+    driver.is_connected = types.MethodType(is_connected_mock, driver)
+
+    def send_mock(self, target):
+        smoothie_homing_res = 'X:0 Y:1 Z:0 A:1 B:0 C:1\r\n'
+        return smoothie_homing_res
+
+    driver._send_command = types.MethodType(send_mock, driver)
+
+    expected = {
+        'X': False,
+        'Y': True,
+        'Z': False,
+        'A': True,
+        'B': False,
+        'C': True
+    }
+    assert driver.homed_flags == expected
+
+
 def test_switch_state(model):
     import types
     driver = model.robot._driver
