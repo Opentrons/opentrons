@@ -175,10 +175,12 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
         nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
       if (validatedForm.stepType === 'mix') {
-        console.warn('Mix step not yet implemented') // TODO Ian 2018-05-08 next PR!
+        nextCommandsAndState = StepGeneration.mix(validatedForm)(acc.robotState)
       }
 
       if (!nextCommandsAndState) {
+        // TODO Ian 2018-05-08 use assert
+        console.warn(`StepType "${validatedForm.stepType}" not yet implemented`)
         return {
           ...acc,
           formErrors: {

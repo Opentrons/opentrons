@@ -96,11 +96,7 @@ export type MixFormData = {
   touchTip: boolean,
   /** Delay in seconds */
   delay: ?number,
-  /** change tip:
-    * 'never' keeps tip from prev step
-    * 'once' gets fresh tip for the mix step and uses it across all wells
-    * 'always' uses fresh tip for each mix well
-   **/
+  /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
   /** If given, blow out in the specified labware after mixing each well */
   blowout?: string

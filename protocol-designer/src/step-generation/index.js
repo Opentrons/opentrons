@@ -6,6 +6,7 @@ import distribute from './distribute'
 import delay from './delay'
 import dispense from './dispense'
 import dropTip from './dropTip'
+import mix from './mix'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
 import transfer from './transfer'
@@ -22,6 +23,7 @@ export {
   delay,
   dispense,
   dropTip,
+  mix,
   replaceTip,
   touchTip,
   transfer
