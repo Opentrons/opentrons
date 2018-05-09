@@ -185,16 +185,23 @@ class SmoothieDriver_3_0_0:
         self._connection = None
         self._config = config
 
-        # motor current settings
-        self._active_current_settings = config.high_current.copy()
-        self._dwelling_current_settings = config.low_current.copy()
-
-        self._saved_active_current_settings = \
-            self._active_current_settings.copy()
-        self._saved_dwelling_current_settings = \
-            self._dwelling_current_settings.copy()
-        self._saved_current_settings = self._dwelling_current_settings.copy()
-        self._current_settings = self._saved_current_settings.copy()
+        # Current settings:
+        # The amperage of each axis, has been organized into three states:
+        # Current-Settings is the amperage each axis was last set to
+        # Active-Current-Settings is set when an axis is moving/homing
+        # Dwelling-Current-Settings is set when an axis is NOT moving/homing
+        self._current_settings = {
+            'now': config.low_current.copy(),
+            'saved': config.low_current.copy()  # used in push/pop methods
+        }
+        self._active_current_settings = {
+            'now': config.high_current.copy(),
+            'saved': config.high_current.copy()  # used in push/pop methods
+        }
+        self._dwelling_current_settings = {
+            'now': config.low_current.copy(),
+            'saved': config.low_current.copy()  # used in push/pop methods
+        }
 
         # Active axes are axes that are in use. An axis might be disabled if
         # a motor has had a failure and the robot is operating without that
@@ -403,7 +410,7 @@ class SmoothieDriver_3_0_0:
 
     @property
     def current(self):
-        return self._current_settings
+        return self._current_settings['now']
 
     @property
     def speed(self):
@@ -460,13 +467,13 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._active_current_settings.update(settings)
+        self._active_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently active,
         # reset it's current to the new active-current value
         active_axes_to_update = {
             axis: amperage
-            for axis, amperage in self._active_current_settings.items()
+            for axis, amperage in self._active_current_settings['now'].items()
             if self._active_axes.get(axis) is True
             if self.current[axis] != amperage
         }
@@ -474,11 +481,11 @@ class SmoothieDriver_3_0_0:
             self.set_current(active_axes_to_update, axes_active=True)
 
     def push_active_current(self):
-        self._saved_active_current_settings.update(
-            self._active_current_settings)
+        self._active_current_settings['saved'].update(
+            self._active_current_settings['now'])
 
     def pop_active_current(self):
-        self.set_active_current(self._saved_active_current_settings)
+        self.set_active_current(self._active_current_settings['saved'])
 
     def set_dwelling_current(self, settings):
         '''
@@ -493,25 +500,25 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._dwelling_current_settings.update(settings)
+        self._dwelling_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently dwelling,
         # reset it's current to the new dwelling-current value
         dwelling_axes_to_update = {
-            axis: amperage
-            for axis, amperage in self._dwelling_current_settings.items()
+            axis: amps
+            for axis, amps in self._dwelling_current_settings['now'].items()
             if self._active_axes.get(axis) is False
-            if self.current[axis] != amperage
+            if self.current[axis] != amps
         }
         if dwelling_axes_to_update:
             self.set_current(dwelling_axes_to_update, axes_active=False)
 
     def push_dwelling_current(self):
-        self._saved_dwelling_current_settings.update(
-            self._dwelling_current_settings)
+        self._dwelling_current_settings['saved'].update(
+            self._dwelling_current_settings['now'])
 
     def pop_dwelling_current(self):
-        self.set_dwelling_current(self._dwelling_current_settings)
+        self.set_dwelling_current(self._dwelling_current_settings['saved'])
 
     def set_current(self, settings, axes_active=True):
         '''
@@ -525,7 +532,7 @@ class SmoothieDriver_3_0_0:
             ax: axes_active
             for ax in settings.keys()
         })
-        self._current_settings.update(settings)
+        self._current_settings['now'].update(settings)
         values = ['{}{}'.format(axis, value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
@@ -554,15 +561,15 @@ class SmoothieDriver_3_0_0:
                 self.engaged_axes[axis] = False
 
     def push_current(self):
-        self._saved_current_settings.update(self._current_settings)
+        self._current_settings['saved'].update(self._current_settings['now'])
 
     def pop_current(self):
         # only update axes that change their amperage
         # this prevents non-active axes from incidentally being activated
         diff_current = {
-            ax: self._saved_current_settings[ax]
+            ax: self._current_settings['saved'][ax]
             for ax in AXES
-            if self._saved_current_settings[ax] != self._current_settings[ax]
+            if self._current_settings['saved'][ax] != self.current[ax]
         }
         self.set_current(diff_current)
 
@@ -578,7 +585,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
-            ax: self._dwelling_current_settings[ax]
+            ax: self._dwelling_current_settings['now'][ax]
             for ax in axes
             if self._active_axes[ax] is True
         }
@@ -597,7 +604,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
-            ax: self._active_current_settings[ax]
+            ax: self._active_current_settings['now'][ax]
             for ax in axes
             if self._active_axes[ax] is False
         }
@@ -740,7 +747,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
-        self.set_current(self._dwelling_current_settings, axes_active=False)
+        self.set_current(self.current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
