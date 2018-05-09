@@ -30,6 +30,14 @@ export function pipetteDoesNotExist (args: {actionName: string, pipette: string}
   }
 }
 
+export function labwareDoesNotExist (args: {actionName: string, labware: string}): CommandCreatorError {
+  const {actionName, labware} = args
+  return {
+    message: `Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`,
+    type: 'LABWARE_DOES_NOT_EXIST'
+  }
+}
+
 export function pipetteVolumeExceeded (args: {
   actionName: string,
   volume: string | number,

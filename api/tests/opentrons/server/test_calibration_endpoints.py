@@ -107,7 +107,7 @@ async def test_save_calibration_file(dc_session, monkeypatch):
         nonlocal persisted_data
         persisted_data.append((config, filename, tag))
 
-    monkeypatch.setattr(robot_configs, 'save', dummy_save)
+    monkeypatch.setattr(robot_configs, 'save_deck_calibration', dummy_save)
 
     endpoints.save_transform({})
 

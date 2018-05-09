@@ -4,7 +4,7 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
-import mix from './mix'
+import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
 
@@ -101,7 +101,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         : []
 
       const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
-        ? mix(
+        ? mixUtil(
           data.pipette,
           data.sourceLabware,
           data.sourceWell,
