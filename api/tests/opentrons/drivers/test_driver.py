@@ -315,8 +315,8 @@ def test_set_active_current(smoothie, monkeypatch):
         ['M907 B0 C0 M400'],                   # Set plunger current low
         ['G4P0.05 M400']                       # Dwell
     ]
-    from pprint import pprint
-    pprint(command_log)
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
