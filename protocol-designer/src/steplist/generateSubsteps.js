@@ -229,7 +229,6 @@ function _mixSubsteps (
       multichannel: true,
       multiRows: wells.map((well: string, i: number) => {
         const wellsForTips = getWellsForTips(channels, labwareType, well).wellsForTips
-        console.log({wellsForTips, channels, labwareType, well})
 
         return range(channels).map(channel => ({
           substepId: i,
