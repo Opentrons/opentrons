@@ -10,14 +10,14 @@ import IngredPill from '../IngredPill'
 import styles from './StepItem.css'
 
 import type {
-  TransferLikeSubstepItem,
+  SourceDestSubstepItem,
   StepItemSourceDestRowMulti,
   SubstepIdentifier,
   NamedIngred
 } from '../../steplist/types'
 
 export type StepSubItemProps = {|
-  substeps: TransferLikeSubstepItem
+  substeps: SourceDestSubstepItem
 |}
 
 const DEFAULT_COLLAPSED_STATE = true
@@ -184,14 +184,13 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
   }
 }
 
-type TransferLikeSubstepProps = {|
+type SourceDestSubstepProps = {|
   ...StepSubItemProps,
   onSelectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: SubstepIdentifier
 |}
 
-// This "TransferLike" substep component is for transfer/distribute/consolidate
-export default function TransferLikeSubstep (props: TransferLikeSubstepProps) {
+export default function SourceDestSubstep (props: SourceDestSubstepProps) {
   const {substeps, onSelectSubstep, hoveredSubstep} = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)

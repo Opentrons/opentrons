@@ -9,7 +9,7 @@ import type {StepItemsWithSubsteps, SubstepIdentifier} from '../../steplist/type
 import type {StepIdType} from '../../form-types'
 
 import StepItem from './StepItem'
-import TransferLikeSubstep from './TransferLikeSubstep'
+import SourceDestSubstep from './SourceDestSubstep'
 import StepCreationButton from '../../containers/StepCreationButton'
 import styles from './StepItem.css'
 
@@ -34,10 +34,11 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
 
   if (substeps.stepType === 'transfer' ||
     substeps.stepType === 'consolidate' ||
-    substeps.stepType === 'distribute'
+    substeps.stepType === 'distribute' ||
+    substeps.stepType === 'mix'
   ) {
     // all these step types share the same substep display
-    return <TransferLikeSubstep
+    return <SourceDestSubstep
       substeps={substeps}
       hoveredSubstep={hoveredSubstep}
       onSelectSubstep={onSelectSubstep} // TODO use action

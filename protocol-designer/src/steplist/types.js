@@ -35,30 +35,29 @@ export type StepItemSourceDestRowMulti = {|
   channelId: number
 |}
 
-export type TransferLikeSubstepItemSingleChannel = {|
+export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,
-  stepType: TransferLikeStepType,
+  stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
   rows: Array<{|
     ...StepItemSourceDestRow,
-    substepId: number,
     volume?: number
   |}>
 |}
 
-export type TransferLikeSubstepItemMultiChannel = {|
+export type SourceDestSubstepItemMultiChannel = {|
   multichannel: true,
-  stepType: 'transfer' | 'consolidate' | 'distribute',
+  stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
   volume?: number, // uniform volume for all steps
   multiRows: Array<Array<StepItemSourceDestRowMulti>> // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
-export type TransferLikeSubstepItem = TransferLikeSubstepItemSingleChannel | TransferLikeSubstepItemMultiChannel
+export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
 
 export type StepSubItemData =
-  | TransferLikeSubstepItem
+  | SourceDestSubstepItem
   | PauseFormData // Pause substep uses same data as processed form
 
 export type StepItemData = {

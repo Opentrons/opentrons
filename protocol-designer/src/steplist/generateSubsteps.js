@@ -13,7 +13,7 @@ import {
 import type {
   NamedIngredsByLabwareAllSteps,
   SubSteps,
-  TransferLikeSubstepItem
+  SourceDestSubstepItem
 } from './types'
 
 import type {StepIdType} from '../form-types'
@@ -22,6 +22,7 @@ import type {
   PipetteData,
   ConsolidateFormData,
   DistributeFormData,
+  MixFormData,
   PauseFormData,
   TransferFormData
 } from '../step-generation/types'
@@ -32,7 +33,7 @@ type AllLabwareTypes = {[labwareId: string]: string}
 function _transferSubsteps (
   form: TransferFormData,
   transferLikeFields: *
-): TransferLikeSubstepItem {
+): SourceDestSubstepItem {
   const {
     sourceWells,
     destWells
@@ -110,7 +111,7 @@ function _transferSubsteps (
 function _consolidateSubsteps (
   form: ConsolidateFormData,
   transferLikeFields: *
-): TransferLikeSubstepItem {
+): SourceDestSubstepItem {
   const {
     sourceWells,
     destWell
@@ -194,9 +195,45 @@ function _consolidateSubsteps (
 function _distributeSubsteps (
   form: DistributeFormData,
   transferLikeFields: *
-): ?TransferLikeSubstepItem { // <-- TODO remove '?' type
+): ?SourceDestSubstepItem { // <-- TODO remove '?' type
   console.log('Distribute substeps not yet implemented') // TODO Ian 2018-05-04
   return null
+}
+
+function _mixSubsteps (
+  form: MixFormData,
+  standardFields: *
+): SourceDestSubstepItem {
+  const {
+    stepType,
+    wells
+    // times // TODO used here??
+  } = form
+
+  const {
+    stepId,
+    // pipette,
+    volume,
+    // labwareType, // TODO use with multi-ch
+    wellIngreds
+  } = standardFields
+
+  const commonFields = {
+    stepType,
+    parentStepId: stepId
+  }
+
+  // const multichannel = pipette.channels > 1
+
+  return {
+    ...commonFields,
+    multichannel: false, // TODO
+    rows: wells.map((well: string, idx: number) => ({
+      substepId: idx,
+      sourceIngredients: wellIngreds[well],
+      volume
+    }))
+  }
 }
 
 // NOTE: This is the fn used by the `allSubsteps` selector
@@ -227,11 +264,12 @@ export function generateSubsteps (
       return formData
     }
 
-    // Handle all TransferLike substeps
+    // Handle all TransferLike substeps + mix
     if (
       validatedForm.stepType === 'transfer' ||
       validatedForm.stepType === 'consolidate' ||
-      validatedForm.stepType === 'distribute'
+      validatedForm.stepType === 'distribute' ||
+      validatedForm.stepType === 'mix'
     ) {
       const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
 
@@ -243,15 +281,42 @@ export function generateSubsteps (
 
       const {
         pipette: pipetteId,
-        sourceLabware,
-        destLabware,
         volume
       } = validatedForm
 
+      const pipette = allPipetteData[pipetteId]
+
       // TODO Ian 2018-04-06 use assert here
-      if (!allPipetteData[pipetteId]) {
+      if (!pipette) {
         console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
       }
+
+      // NOTE: other one-labware step types go here
+      if (validatedForm.stepType === 'mix') {
+        const {labware} = validatedForm
+
+        const wellIngreds = namedIngredsByLabware[labware]
+        const labwareType = allLabwareTypes[labware]
+
+        // fields common to all one-labware step types
+        const standardFields = {
+          stepId,
+          pipette,
+          volume,
+          labwareType,
+          wellIngreds
+        }
+
+        return _mixSubsteps(
+          validatedForm,
+          standardFields
+        )
+      }
+
+      const {
+        sourceLabware,
+        destLabware
+      } = validatedForm
 
       const sourceWellIngreds = namedIngredsByLabware[sourceLabware]
       const destWellIngreds = namedIngredsByLabware[destLabware]
@@ -263,7 +328,7 @@ export function generateSubsteps (
       const transferLikeFields = {
         stepId,
 
-        pipette: allPipetteData[pipetteId],
+        pipette,
         volume,
 
         sourceLabwareType,
