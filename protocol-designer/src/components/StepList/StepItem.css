@@ -8,6 +8,7 @@
     padding: 0.5rem;
     border-top: 2px solid var(--c-light-gray);
     text-align: center;
+    font-size: var(--fs-body-1);
   };
 
   --subitem_cell: {
@@ -35,9 +36,7 @@
   }
 
   & .volume_cell {
-    color: var(--c-med-gray);
     overflow: visible;
-    text-align: right;
   }
 }
 
@@ -84,9 +83,9 @@
 /* Aspirate / dispense headers */
 .aspirate_dispense {
   display: flex;
-  padding: 0.5rem;
-  font-size: var(--fs-body-1);
+  margin: 0.5rem;
   text-align: left;
+  font-size: var(--fs-body-1);
 
   & .spacer {
     flex: 1;

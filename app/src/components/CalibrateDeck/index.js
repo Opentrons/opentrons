@@ -19,7 +19,7 @@ import {
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
 
-import ClearDeckAlertModal from '../ClearDeckAlertModal'
+import ClearDeckAlert from './ClearDeckAlert'
 import InUseModal from './InUseModal'
 import NoPipetteModal from './NoPipetteModal'
 import ErrorModal from './ErrorModal'
@@ -34,21 +34,24 @@ export default withRouter(
 )
 
 function CalibrateDeck (props: CalibrateDeckProps) {
-  const {startRequest, parentUrl, match: {path}} = props
+  const {startRequest, pipetteProps, parentUrl, match: {path}} = props
 
-  const clearDeckProps = {
-    cancelText: 'cancel',
-    continueText: 'move pipette to front',
-    parentUrl: props.parentUrl,
-    onContinueClick: props.onContinueClick,
-    onCancelClick: props.onCancelClick
+  if (pipetteProps && !pipetteProps.pipette) {
+    return (
+      <ErrorModal
+        closeUrl={parentUrl}
+        error={{name: 'BadData', message: BAD_PIPETTE_ERROR}}
+      />
+    )
   }
 
   return (
     <Switch>
       <Route path={path} exact render={() => {
-        if (startRequest.error) {
-          const {status} = startRequest.error
+        const {error} = startRequest
+
+        if (error) {
+          const {status} = error
 
           // conflict: token already issued
           if (status === 409) {
@@ -61,30 +64,21 @@ function CalibrateDeck (props: CalibrateDeckProps) {
           }
 
           // props are generic in case we decide to reuse
-          return (<ErrorModal closeUrl={parentUrl} error={startRequest.error} />)
+          return (<ErrorModal closeUrl={parentUrl} error={error} />)
         }
 
-        if (startRequest.response) {
-          return (<ClearDeckAlertModal {...clearDeckProps} />)
+        if (pipetteProps && pipetteProps.pipette) {
+          return (<ClearDeckAlert {...props} {...pipetteProps} />)
         }
 
         return null
       }} />
       <Route path={`${path}/step-:step${RE_STEP}`} render={(stepProps) => {
-        const {pipetteProps} = props
+        if (!pipetteProps || !pipetteProps.pipette) return null
+
         const {match: {params, url: stepUrl}} = stepProps
         const step: CalibrationStep = (params.step: any)
         const exitUrl = `${stepUrl}/exit`
-
-        if (!pipetteProps || !pipetteProps.pipette) {
-          console.error('Cannot calibrate deck without a pipette or mount')
-
-          return (
-            <ErrorModal
-              closeUrl={exitUrl}
-              error={{name: 'BadData', message: BAD_PIPETTE_ERROR}}
-            />)
-        }
 
         const startedProps = {
           ...props,
@@ -119,31 +113,31 @@ function makeMapStateToProps () {
       ? {mount: pipetteInfo.mount, pipette: getPipette(pipetteInfo.model)}
       : null
 
+    if (pipetteProps && !pipetteProps.pipette) {
+      console.error('Invalid pipette received from API', pipetteInfo)
+    }
+
     return {
       startRequest,
       pipetteProps,
       moveRequest: getRobotMove(state, robot),
-      step: getCalibrationJogStep(state)
+      jogStep: getCalibrationJogStep(state)
     }
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot, parentUrl, match: {url}} = ownProps
+  const {robot, parentUrl} = ownProps
 
   return {
     jog: (axis, direction, step) => dispatch(
       deckCalibrationCommand(robot, {command: 'jog', axis, direction, step})
     ),
-    onStepSelect: (event) => {
+    onJogStepSelect: (event) => {
       const step = Number(event.target.value)
       dispatch(setCalibrationJogStep(step))
     },
     forceStart: () => dispatch(startDeckCalibration(robot, true)),
-    // continue button click in clear modal
-    onContinueClick: () => dispatch(push(`${url}/step-1`)),
-    // cancel button click in clear deck alert modal
-    onCancelClick: () => dispatch(deckCalibrationCommand(robot, {command: 'release'})),
     // exit button click in title bar, opens exit alert modal, confirm exit click
     exit: () => dispatch(home(robot))
       .then(() => dispatch(deckCalibrationCommand(robot, {command: 'release'})))

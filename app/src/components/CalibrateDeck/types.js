@@ -16,7 +16,7 @@ export type OP = {
 export type SP = {
   startRequest: DeckCalStartState,
   moveRequest: RobotMove,
-  step: $PropertyType<JogControlsProps, 'step'>,
+  jogStep: $PropertyType<JogControlsProps, 'step'>,
   pipetteProps: ?{
     mount: Mount,
     pipette: ?PipetteConfig,
@@ -26,9 +26,7 @@ export type SP = {
 export type DP = {
   forceStart: () => mixed,
   jog: $PropertyType<JogControlsProps, 'jog'>,
-  onStepSelect: $PropertyType<JogControlsProps, 'onStepSelect'>,
-  onContinueClick: () => mixed,
-  onCancelClick: () => mixed,
+  onJogStepSelect: $PropertyType<JogControlsProps, 'onStepSelect'>,
   exit: () => mixed,
   back: () => mixed
 }

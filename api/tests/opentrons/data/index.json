@@ -6,5 +6,6 @@
     },
     "pipetteConfigFile": "../labware-definitions/robot-data/pipette-config.json",
     "featureFlagFile": "../labware-definitions/settings.json",
-    "deckCalibrationFile": "tests/opentrons/data/configs/config.json"
+    "deckCalibrationFile": "tests/opentrons/data/configs/deckCalibration.json",
+    "robotSettingsFile": "tests/opentrons/data/configs/robotSettings.json"
 }

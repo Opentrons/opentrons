@@ -936,16 +936,17 @@ class Pipette:
             for i in range(int(presses)):
                 # move nozzle down into the tip
                 self.instrument_mover.push_speed()
+
+                self.instrument_mover.push_active_current()
+                self.instrument_mover.set_active_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
-                self.instrument_mover.push_current()
-                self.instrument_mover.set_current(self._pick_up_current)
                 dist = plunge_depth + (-1 * increment * i)
                 self.move_to(
                     self.current_tip().top(dist),
                     strategy='direct')
                 # move nozzle back up
+                self.instrument_mover.pop_active_current()
                 self.instrument_mover.pop_speed()
-                self.instrument_mover.pop_current()
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')

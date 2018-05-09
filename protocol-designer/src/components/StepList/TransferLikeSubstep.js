@@ -5,7 +5,7 @@ import last from 'lodash/last'
 import uniqBy from 'lodash/uniqBy'
 
 import {Icon} from '@opentrons/components'
-import IngredPill from './IngredPill'
+import IngredPill from '../IngredPill'
 
 import styles from './StepItem.css'
 
@@ -14,7 +14,7 @@ import type {
   StepItemSourceDestRowMulti,
   SubstepIdentifier,
   NamedIngred
-} from '../steplist/types'
+} from '../../steplist/types'
 
 export type StepSubItemProps = {|
   substeps: TransferLikeSubstepItem
