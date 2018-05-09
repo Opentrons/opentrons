@@ -35,7 +35,7 @@ HOMED_POSITION = {
 
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
-CURRENT_CHANGE_DELAY = 0.05
+CURRENT_CHANGE_DELAY = 0.005
 
 Y_SWITCH_BACK_OFF_MM = 20
 Y_BACKOFF_LOW_CURRENT = 0.8
@@ -522,7 +522,12 @@ class SmoothieDriver_3_0_0:
 
     def set_current(self, settings, axes_active=True):
         '''
-        Sets the current in mA by axis.
+        Sets the current in Amperes (A) by axis. Currents are limited to be
+        between 0.0-2.0 amps per axis motor.
+
+        Note: this method does not send gcode commands, but instead stores the
+        desired current setting. A seperate call to _generate_current_command()
+        will return a gcode command that can be used to set Smoothie's current
 
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
@@ -533,15 +538,35 @@ class SmoothieDriver_3_0_0:
             for ax in settings.keys()
         })
         self._current_settings['now'].update(settings)
+        log.debug("set_current: {}".format(self.current))
+
+    def write_current(self):
+        '''
+        Sends the driver's current settings to the serial port as gcode. Call
+        this method to set the axis-current state on the actual Smoothie
+        motor-driver.
+        '''
+        self._send_command(self._generate_current_command())
+
+    def _generate_current_command(self):
+        '''
+        Returns a constructed GCode string that contains this driver's
+        axis-current settings, plus a small delay to wait for those settings
+        to take effect.
+        '''
         values = ['{}{}'.format(axis, value)
-                  for axis, value in sorted(settings.items())]
-        command = '{} {}'.format(
+                  for axis, value in sorted(self.current.items())]
+        current_cmd = '{} {}'.format(
             GCODES['SET_CURRENT'],
             ' '.join(values)
         )
-        log.debug("set_current: {}".format(command))
-        self._send_command(command)
-        self.delay(CURRENT_CHANGE_DELAY)
+        command = '{currents} {code}P{seconds}'.format(
+            currents=current_cmd,
+            code=GCODES['DWELL'],
+            seconds=CURRENT_CHANGE_DELAY
+        )
+        log.debug("_generate_current_command: {}".format(command))
+        return command
 
     def disengage_axis(self, axes):
         '''
@@ -680,9 +705,8 @@ class SmoothieDriver_3_0_0:
     def _home_x(self):
         log.debug("_home_x")
         # move the gantry forward on Y axis with low power
-        self.push_current()
-        self.push_speed()
         self.set_current({'Y': Y_BACKOFF_LOW_CURRENT})
+        self.push_speed()
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
         # move away from the Y endstop switch
@@ -692,26 +716,34 @@ class SmoothieDriver_3_0_0:
             str(-Y_SWITCH_BACK_OFF_MM),
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
-        self._send_command(
-            relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-        self.pop_current()
+
+        command = '{0} {1}'.format(
+            self._generate_current_command(), relative_retract_command)
+        self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
         self.pop_speed()
         self.dwell_axes('Y')
 
         # now it is safe to home the X axis
         try:
             self.activate_axes('X')
-            self._send_command(
-                GCODES['HOME'] + 'X', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            command = '{0} {1}'.format(
+                self._generate_current_command(),
+                GCODES['HOME'] + 'X'
+            )
+            self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
         finally:
             self.dwell_axes('X')
+            self.write_current()
 
     def _home_y(self):
         log.debug("_home_y")
         self.activate_axes('Y')
         # home the Y at normal speed (fast)
-        self._send_command(
-            GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+        command = '{0} {1}'.format(
+            self._generate_current_command(),
+            GCODES['HOME'] + 'Y'
+        )
+        self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
 
         # slow the maximum allowed speed on Y axis
         self.push_axis_max_speed()
@@ -734,6 +766,7 @@ class SmoothieDriver_3_0_0:
             self.pop_axis_max_speed()  # bring max speeds back to normal
         finally:
             self.dwell_axes('Y')
+            self.write_current()
 
     def _setup(self):
         log.debug("_setup")
@@ -852,21 +885,24 @@ class SmoothieDriver_3_0_0:
         target_coords = create_coords_list(target)
         backlash_coords = create_coords_list(backlash_target)
 
-        non_moving_axes = ''.join([
-            ax
-            for ax in AXES
-            if ax not in target.keys()
-        ])
-
         if target_coords:
-            command = ''
+            non_moving_axes = ''.join([
+                ax
+                for ax in AXES
+                if ax not in target.keys()
+            ])
+            self.dwell_axes(non_moving_axes)
+            self.activate_axes(target.keys())
+
+            # include the current-setting gcodes within the moving gcode string
+            # to reduce latency, since we're setting current so much
+            command = self._generate_current_command()
+
             if backlash_coords != target_coords:
-                command += GCODES['MOVE'] + ''.join(backlash_coords) + ' '
-            command += GCODES['MOVE'] + ''.join(target_coords)
+                command += ' ' + GCODES['MOVE'] + ''.join(backlash_coords)
+            command += ' ' + GCODES['MOVE'] + ''.join(target_coords)
+
             try:
-                if non_moving_axes:
-                    self.dwell_axes(non_moving_axes)
-                self.activate_axes(target.keys())
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
                 log.debug("move: {}".format(command))
@@ -879,6 +915,8 @@ class SmoothieDriver_3_0_0:
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
                 if plunger_axis_moved:
                     self.dwell_axes(plunger_axis_moved)
+                    self.write_current()
+
             self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
@@ -916,8 +954,7 @@ class SmoothieDriver_3_0_0:
             for ax in AXES
             if ax not in home_sequence
         ])
-        if non_moving_axes:
-            self.dwell_axes(non_moving_axes)
+        self.dwell_axes(non_moving_axes)
 
         for axes in home_sequence:
             if 'X' in axes:
@@ -926,15 +963,20 @@ class SmoothieDriver_3_0_0:
                 self._home_y()
             else:
                 # if we are homing neither the X nor Y axes, simple home
-                command = GCODES['HOME'] + axes
+                self.activate_axes(axes)
+
+                # include the current-setting gcodes within the moving gcode
+                # string to reduce latency, since we're setting current so much
+                command = self._generate_current_command()
+                command += ' ' + GCODES['HOME'] + ''.join(sorted(axes))
                 try:
-                    self.activate_axes(axes)
                     log.debug("home: {}".format(command))
                     self._send_command(
                         command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
+                    self.write_current()
 
         # Only update axes that have been selected for homing
         homed = {
