@@ -54,8 +54,7 @@ function InstructionsModal (props: Props) {
   } else if (['2', '3', '4', '5'].indexOf(calibrationStep) > -1) {
     StepInstructions = ConfirmPosition
   } else {
-    // TODO(mc, 2018-05-08): RemoveTip
-    StepInstructions = 'div'
+    StepInstructions = AttachTip
   }
 
   return (
