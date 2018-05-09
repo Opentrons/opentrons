@@ -189,7 +189,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {confirmUrl, parentUrl, baseUrl, robot, mount} = ownProps
   const disengage = () => dispatch(disengagePipetteMotors(robot, mount))
   const checkPipette = () => disengage()
-    .then(() => dispatch(fetchPipettes(robot)))
+    .then(() => dispatch(fetchPipettes(robot, true)))
 
   return {
     checkPipette,
