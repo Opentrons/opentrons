@@ -9,7 +9,7 @@ def mock_config():
 
     test_config = robot_configs.load()
     test_config = test_config._replace(name='new-value1')
-    robot_configs.save(test_config)
+    robot_configs.save_robot_settings(test_config)
 
     return robot_configs
 
@@ -23,7 +23,7 @@ def test_clear_config(mock_config):
     from opentrons import robot
     from opentrons.robot import robot_configs
 
-    assert robot.config == robot_configs._get_default()
+    assert robot.config == robot_configs._build_config({}, {})
 
 
 def test_save_and_clear_config(mock_config):
@@ -44,7 +44,7 @@ def test_save_and_clear_config(mock_config):
     from opentrons import robot
     from opentrons.robot import robot_configs
 
-    assert robot.config == robot_configs._get_default()
+    assert robot.config == robot_configs._build_config({}, {})
 
     saved_config = robot_configs.load(filename)
     assert saved_config == old_config

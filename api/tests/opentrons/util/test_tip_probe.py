@@ -6,7 +6,7 @@ from opentrons.util.calibration_functions import update_instrument_config
 
 @pytest.fixture
 def config(monkeypatch):
-    default = robot_configs._get_default()._replace(
+    default = robot_configs._build_config({}, {})._replace(
             gantry_calibration=[
                 [1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
@@ -32,7 +32,11 @@ def config(monkeypatch):
                 'Pipette': 50
             }
         )
-    monkeypatch.setattr(robot_configs, '_get_default', lambda: default)
+
+    def dummy_default(a, b):
+        return default
+
+    monkeypatch.setattr(robot_configs, '_build_config', dummy_default)
     return default
 
 
@@ -86,42 +90,47 @@ def fixture(config, monkeypatch):
         )
 
 
-def test_update_instrument_config(fixture, monkeypatch):
+def test_update_instrument_config(fixture):
     from opentrons.trackers.pose_tracker import change_base
     from numpy import array
     import json
 
     robot = fixture.robot
-    instrument = fixture.instrument
+    inst = fixture.instrument
 
-    # tip_length = robot.config. \
-    #     tip_length[instrument.mount][instrument.type]
-    instrument_offset = robot.config. \
-        instrument_offset[instrument.mount][instrument.type]
+    inst_offset = robot.config.instrument_offset[inst.mount][inst.type]
 
-    config = update_instrument_config(
-        instrument=instrument,
+    cfg = update_instrument_config(
+        instrument=inst,
         measured_center=(0.0, 0.0, 105.0)
     )
 
-    new_tip_length = config.tip_length[instrument.name]
-    new_instrument_offset = config \
-        .instrument_offset[instrument.mount][instrument.type]
+    new_tip_length = cfg.tip_length[inst.name]
+    new_instrument_offset = cfg.instrument_offset[inst.mount][inst.type]
 
     assert new_tip_length == 55.0
-    assert new_instrument_offset == \
-        tuple(array(instrument_offset) + (5.0, 5.0, 0.0))
+    assert new_instrument_offset == tuple(array(inst_offset) + (5.0, 5.0, 0.0))
     assert tuple(change_base(
         robot.poses,
-        src=instrument,
-        dst=instrument.instrument_mover)) == (5.0, 5.0, 0), \
+        src=inst,
+        dst=inst.instrument_mover)) == (5.0, 5.0, 0), \
         "Expected instrument position to update relative to mover in pose tree"
 
-    filename = get_config_index().get('deckCalibrationFile')
-    expected = dict(robot_configs._get_default()._asdict())
+    filename = get_config_index().get('robotSettingsFile')
+    expected = dict(robot_configs._build_config({}, {})._asdict())
+    expected.pop('gantry_calibration')
     expected['instrument_offset']['right']['single'] = [5.0, 5.0, 0.0]
     expected['tip_length']['Pipette'] = 55.0
 
     with open(filename, 'r') as file:
         actual = json.load(file)
+
+    # from pprint import pprint
+    # print('=------> <------=')
+    # print("Expected:")
+    # pprint(expected)
+    # print()
+    # print("Actual:")
+    # pprint(actual)
+    # print()
     assert actual == expected
