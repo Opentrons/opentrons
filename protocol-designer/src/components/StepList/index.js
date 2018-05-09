@@ -4,13 +4,13 @@ import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
-import {END_STEP} from '../steplist/types'
-import type {StepItemsWithSubsteps, SubstepIdentifier} from '../steplist/types'
-import type {StepIdType} from '../form-types'
+import {END_STEP} from '../../steplist/types'
+import type {StepItemsWithSubsteps, SubstepIdentifier} from '../../steplist/types'
+import type {StepIdType} from '../../form-types'
 
-import StepItem from '../components/StepItem'
-import TransferLikeSubstep from '../components/TransferLikeSubstep'
-import StepCreationButton from '../containers/StepCreationButton'
+import StepItem from './StepItem'
+import TransferLikeSubstep from './TransferLikeSubstep'
+import StepCreationButton from '../../containers/StepCreationButton'
 import styles from './StepItem.css'
 
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
