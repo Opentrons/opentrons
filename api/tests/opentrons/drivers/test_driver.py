@@ -320,6 +320,22 @@ def test_set_active_current(smoothie, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+def test_active_dwelling_current_push_pop(smoothie):
+    assert smoothie._active_current_settings != \
+        smoothie._dwelling_current_settings
+
+    from copy import deepcopy
+    old_active_currents = deepcopy(smoothie._active_current_settings)
+    old_dwelling_currents = deepcopy(smoothie._dwelling_current_settings)
+
+    smoothie.push_active_current()
+    smoothie.set_active_current({'X': 2.0, 'Y': 2.0, 'Z': 2.0, 'A': 2.0})
+    smoothie.pop_active_current()
+
+    assert smoothie._active_current_settings == old_active_currents
+    assert smoothie._dwelling_current_settings == old_dwelling_currents
+
+
 def test_functional(smoothie):
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
