@@ -211,8 +211,8 @@ function _mixSubsteps (
 
   const {
     stepId,
-    // pipette,
-    // labwareType, // TODO IMMEDIATELY use with multi-ch
+    pipette,
+    labwareType,
     wellIngreds
   } = standardFields
 
@@ -221,11 +221,29 @@ function _mixSubsteps (
     parentStepId: stepId
   }
 
-  // const multichannel = pipette.channels > 1
+  const channels = pipette.channels
+
+  if (channels > 1) {
+    return {
+      ...commonFields,
+      multichannel: true,
+      multiRows: wells.map((well: string, i: number) => {
+        const wellsForTips = getWellsForTips(channels, labwareType, well).wellsForTips
+        console.log({wellsForTips, channels, labwareType, well})
+
+        return range(channels).map(channel => ({
+          substepId: i,
+          channelId: channel,
+          sourceIngredients: wellIngreds[wellsForTips[channel]],
+          sourceWell: wellsForTips[channel]
+        }))
+      })
+    }
+  }
 
   return {
     ...commonFields,
-    multichannel: false, // TODO
+    multichannel: false,
     rows: wells.map((well: string, idx: number) => ({
       substepId: idx,
       sourceIngredients: wellIngreds[well],
