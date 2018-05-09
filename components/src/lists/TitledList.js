@@ -27,7 +27,7 @@ type ListProps = {
   /** optional mouseLeave action */
   onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => void,
+  onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
   /** highlights the whole TitledList if true */

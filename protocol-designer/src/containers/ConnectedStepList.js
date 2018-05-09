@@ -9,6 +9,7 @@ import type {StepIdType} from '../form-types'
 import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepList from '../components/StepList'
 
 type StepIdTypeWithEnd = StepIdType | '__end__' // TODO import this; also used in StepList
@@ -20,6 +21,7 @@ type StateProps = {
   selectedStepId: $PropertyType<Props, 'selectedStepId'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   errorStepId: $PropertyType<Props, 'errorStepId'>,
+  labware: $PropertyType<Props, 'labware'>
 }
 
 type DispatchProps = $Diff<Props, StateProps>
@@ -29,7 +31,8 @@ function mapStateToProps (state: BaseState): StateProps {
     steps: substepSelectors.allStepsWithSubsteps(state),
     selectedStepId: selectors.hoveredOrSelectedStepId(state),
     hoveredSubstep: selectors.getHoveredSubstep(state),
-    errorStepId: fileDataSelectors.robotStateTimelineFull(state).errorStepId // TODO make mini selector
+    errorStepId: fileDataSelectors.robotStateTimelineFull(state).errorStepId, // TODO make mini selector
+    labware: labwareIngredSelectors.getLabware(state)
   }
 }
 

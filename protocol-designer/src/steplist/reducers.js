@@ -278,7 +278,7 @@ const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
 )
 
 /** This is just a simple selector, but has some debugging logic. TODO Ian 2018-03-20: use assert here */
-const getSavedForms = createSelector(
+const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   getSteps,
   orderedStepsSelector,
   (state: BaseState) => rootSelector(state).savedStepForms,
@@ -287,7 +287,7 @@ const getSavedForms = createSelector(
       // No steps -- since initial Deck Setup step exists in default Redux state,
       // this probably should never happen
       console.warn('validatedForms called with no steps in "orderedSteps"')
-      return []
+      return {}
     }
 
     if (_steps[0].stepType !== 'deck-setup') {
@@ -437,31 +437,13 @@ export const allSteps: Selector<Array<StepItemData>> = createSelector(
   labwareIngredSelectors.getLabware,
   (steps, orderedSteps, collapsedSteps, _savedForms, _labware) => {
     return orderedSteps.map(id => {
-      const savedForm = (_savedForms && _savedForms[id]) || {}
-
-      function getLabwareName (labwareId: ?string) {
-        return (labwareId)
-          ? _labware[labwareId] && _labware[labwareId].name
-          : null
-      }
-
-      // optional form fields for "TransferLike" steps
-      const additionalFormFields = (
-        savedForm.stepType === 'transfer' ||
-        savedForm.stepType === 'distribute' ||
-        savedForm.stepType === 'consolidate'
-      )
-        ? {
-          sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
-          destLabwareName: getLabwareName(savedForm['dispense--labware'])
-        }
-        : {}
+      const savedForm = (_savedForms && _savedForms[id]) || null
 
       return {
         ...steps[id],
 
-        ...additionalFormFields,
-        description: savedForm['step-details'],
+        formData: savedForm,
+        description: savedForm ? savedForm['step-details'] : null,
 
         collapsed: collapsedSteps[id]
         // substeps: _allSubsteps[id] // TODO Add back in in higher-order selector

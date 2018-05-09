@@ -1,6 +1,6 @@
 // @flow
 import type {PauseFormData} from '../step-generation'
-import type {StepIdType, StepType, TransferLikeStepType} from '../form-types'
+import type {FormData, StepIdType, StepType, TransferLikeStepType} from '../form-types'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -65,8 +65,7 @@ export type StepItemData = {
   title: string,
   stepType: StepType,
   description?: ?string,
-  sourceLabwareName?: ?string,
-  destLabwareName?: ?string
+  formData: ?FormData
 }
 
 export type StepItemsWithSubsteps = StepItemData & {

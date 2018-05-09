@@ -207,14 +207,12 @@ function _mixSubsteps (
   const {
     stepType,
     wells
-    // times // TODO used here??
   } = form
 
   const {
     stepId,
     // pipette,
-    volume,
-    // labwareType, // TODO use with multi-ch
+    // labwareType, // TODO IMMEDIATELY use with multi-ch
     wellIngreds
   } = standardFields
 
@@ -231,7 +229,7 @@ function _mixSubsteps (
     rows: wells.map((well: string, idx: number) => ({
       substepId: idx,
       sourceIngredients: wellIngreds[well],
-      volume
+      sourceWell: well
     }))
   }
 }
