@@ -146,15 +146,11 @@ def test_smoothie_gpio():
 
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
-    gpio.set_low(gpio.OUTPUT_PINS['ISP'])
-    sleep(0.25)
-    gpio.set_high(gpio.OUTPUT_PINS['ISP'])
-    sleep(0.25)
-
-    r = _write_and_return('M999')
-    if len(r):
+    d._smoothie_programming_mode()
+    try:
+        _write_and_return('M999')
         print(RESULT_SPACE.format(FAIL))
-    else:
+    except Exception:
         print(RESULT_SPACE.format(PASS))
 
     print('RESET')
