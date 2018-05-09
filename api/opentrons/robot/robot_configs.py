@@ -7,6 +7,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+ROBOT_CONFIG_VERSION = 2
 
 PLUNGER_CURRENT_LOW = 0.05
 PLUNGER_CURRENT_HIGH = 0.5
@@ -127,7 +128,7 @@ def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
             inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
-        version=int(robot_settings.get('version', 1)),
+        version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
         steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
         acceleration=robot_settings.get('acceleration', DEFAULT_ACCELERATION),
         probe_center=robot_settings.get(
