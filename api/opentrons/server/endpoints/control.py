@@ -17,7 +17,11 @@ log = logging.getLogger(__name__)
 async def get_attached_pipettes(request):
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
-    dict with the results keyed by mount
+    dict with the results keyed by mount. By default, this endpoint provides
+    cached values, which will not interrupt a running session. WARNING: if the
+    caller supplies the "refresh=true" query parameter, this method will
+    interrupt a sequence of Smoothie operations that are in progress, such as a
+    protocol run.
 
     Example:
 
@@ -42,6 +46,8 @@ async def get_attached_pipettes(request):
     written to on-board memory), or if no pipette is present, the corresponding
     mount will report `'model': null`
     """
+    if request.url.query.get('refresh') == 'true':
+        robot.cache_instrument_models()
     return web.json_response(robot.get_attached_pipettes())
 
 

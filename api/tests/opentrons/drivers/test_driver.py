@@ -440,7 +440,7 @@ def test_read_and_write_pipettes(model):
     driver.simulating = False
     read_model = driver.read_pipette_model('left')
     driver.simulating = True
-    assert read_model == {'model': test_model + '_v1'}
+    assert read_model == test_model + '_v1'
 
     driver._send_command = types.MethodType(_old_send_command, driver)
 

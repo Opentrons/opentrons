@@ -200,6 +200,7 @@ def main():
     # a request (eg: a request to move, or a request to update firmware)
     try:
         robot.connect()
+        robot.cache_instrument_models()
     except Exception as e:
         log.exception("Error while connecting to motor-driver: {}".format(e))
 
