@@ -1,4 +1,4 @@
-def test_old_probe_height(monkeypatch, short_trash_flag):
+def test_old_probe_height(short_trash_flag):
     from opentrons.robot import robot_configs
 
     cfg = robot_configs.load()
