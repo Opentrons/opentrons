@@ -130,7 +130,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save xy', point: '3'})
     ).then(() => dispatch(
-      dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength})
+      moveRobotTo(robot, {position: 'attach_tip', mount, pipette})
     )).then(goToNext)
   } else {
     proceed = () => dispatch(
