@@ -1,9 +1,12 @@
+import logging
 import os
 import json
 from collections import namedtuple
 from opentrons.config import get_config_index
 
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+log = logging.getLogger(__name__)
 
 
 def pipette_config_path():
@@ -22,6 +25,8 @@ pipette_config = namedtuple(
         'channels',
         'name',
         'model_offset',
+        'plunger_current',
+        'drop_tip_current',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
@@ -29,28 +34,32 @@ pipette_config = namedtuple(
 
 def _load_config_from_file(pipette_model: str) -> pipette_config:
     config_file = pipette_config_path()
+    res = None
     if os.path.exists(config_file):
         with open(config_file) as conf:
-            all_configs = json.load(conf)
-            cfg = all_configs[pipette_model]
-            res = pipette_config(
-                plunger_positions={
-                    'top': cfg['plungerPositions']['top'],
-                    'bottom': cfg['plungerPositions']['bottom'],
-                    'blow_out': cfg['plungerPositions']['blowOut'],
-                    'drop_tip': cfg['plungerPositions']['dropTip']
-                },
-                pick_up_current=cfg['pickUpCurrent'],
-                aspirate_flow_rate=cfg['aspirateFlowRate'],
-                dispense_flow_rate=cfg['dispenseFlowRate'],
-                ul_per_mm=cfg['ulPerMm'],
-                channels=cfg['channels'],
-                name=pipette_model,
-                model_offset=cfg['modelOffset'],
-                tip_length=cfg['tipLength']
-            )
-    else:
-        res = None
+            try:
+                all_configs = json.load(conf)
+                cfg = all_configs[pipette_model]
+                res = pipette_config(
+                    plunger_positions={
+                        'top': cfg['plungerPositions']['top'],
+                        'bottom': cfg['plungerPositions']['bottom'],
+                        'blow_out': cfg['plungerPositions']['blowOut'],
+                        'drop_tip': cfg['plungerPositions']['dropTip']
+                    },
+                    pick_up_current=cfg['pickUpCurrent'],
+                    aspirate_flow_rate=cfg['aspirateFlowRate'],
+                    dispense_flow_rate=cfg['dispenseFlowRate'],
+                    ul_per_mm=cfg['ulPerMm'],
+                    channels=cfg['channels'],
+                    name=pipette_model,
+                    model_offset=cfg['modelOffset'],
+                    plunger_current=cfg['plungerCurrent'],
+                    drop_tip_current=cfg['dropTipCurrent'],
+                    tip_length=cfg['tipLength']
+                )
+            except (KeyError, json.decoder.JSONDecodeError) as e:
+                log.error('Error when loading pipette config: {}'.format(e))
     return res
 
 
@@ -94,6 +103,8 @@ p10_single = pipette_config(
     channels=1,
     name='p10_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=40
 )
 
@@ -111,6 +122,8 @@ p10_multi = pipette_config(
     channels=8,
     name='p10_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=40
 )
 
@@ -128,6 +141,8 @@ p50_single = pipette_config(
     channels=1,
     name='p50_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -145,6 +160,8 @@ p50_multi = pipette_config(
     channels=8,
     name='p50_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -162,6 +179,8 @@ p300_single = pipette_config(
     channels=1,
     name='p300_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
+    plunger_current=0.3,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -179,6 +198,8 @@ p300_multi = pipette_config(
     channels=8,
     name='p300_multi_v1',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
@@ -196,6 +217,8 @@ p1000_single = pipette_config(
     channels=1,
     name='p1000_single_v1',
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
+    plunger_current=0.5,
+    drop_tip_current=0.5,
     tip_length=60
 )
 
