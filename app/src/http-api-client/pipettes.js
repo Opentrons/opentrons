@@ -55,11 +55,17 @@ type PipettesState = {
   [robotName: string]: ?RobotPipettes
 }
 
-export function fetchPipettes (robot: RobotService): ThunkPromiseAction {
+export function fetchPipettes (
+  robot: RobotService,
+  refresh: boolean = false
+): ThunkPromiseAction {
+  let path = 'pipettes'
+  if (refresh) path += '?refresh=true'
+
   return (dispatch) => {
     dispatch({type: 'api:PIPETTES_REQUEST', payload: {robot}})
 
-    return client(robot, 'GET', 'pipettes')
+    return client(robot, 'GET', path)
       .then((pipettes) => (
         {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}}
       )).catch((error) => (
