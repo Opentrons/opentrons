@@ -3,7 +3,7 @@
     "displayName": "P10 Single-Channel",
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 3,
       "blowOut": 1,
       "dropTip": -5
@@ -11,7 +11,7 @@
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
-    "ulPerMm": 0.617,
+    "ulPerMm": 0.77,
     "channels": 1,
     "modelOffset": [0.0, 0.0, -13],
     "tipLength": 40
@@ -20,7 +20,7 @@
     "displayName": "P10 8-Channel",
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 3,
       "blowOut": 1,
       "dropTip": -5
@@ -28,7 +28,7 @@
     "pickUpCurrent": 0.2,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
-    "ulPerMm": 0.617,
+    "ulPerMm": 0.77,
     "channels": 8,
     "modelOffset": [0.0, 28.0, -25.8],
     "tipLength": 40
@@ -37,7 +37,7 @@
     "displayName": "P50 Single-Channel",
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 4,
       "blowOut": 2,
       "dropTip": -2.5
@@ -45,7 +45,7 @@
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
-    "ulPerMm": 3.08,
+    "ulPerMm": 3.35,
     "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "tipLength": 60
@@ -54,7 +54,7 @@
     "displayName": "P50 8-Channel",
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 4,
       "blowOut": 2,
       "dropTip": -4
@@ -62,7 +62,7 @@
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
-    "ulPerMm": 3.08,
+    "ulPerMm": 3.35,
     "channels": 8,
     "modelOffset": [0.0, 28.0, -25.8],
     "tipLength": 60
@@ -71,15 +71,15 @@
     "displayName": "P300 Single-Channel",
     "nominalMaxVolumeUl": 300,
     "plungerPositions": {
-      "top": 18,
-      "bottom": 3,
+      "top": 19,
+      "bottom": 2.5,
       "blowOut": 1,
       "dropTip": -2.5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
-    "ulPerMm": 18.51,
+    "ulPerMm": 18.7,
     "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "tipLength": 60
@@ -88,7 +88,7 @@
     "displayName": "P300 8-Channel",
     "nominalMaxVolumeUl": 300,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 3,
       "blowOut": 1,
       "dropTip": -4
@@ -96,7 +96,7 @@
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
-    "ulPerMm": 18.51,
+    "ulPerMm": 19,
     "channels": 8,
     "modelOffset": [0.0, 28.0, -25.8],
     "tipLength": 60
@@ -105,7 +105,7 @@
     "displayName": "P1000 Single-channel",
     "nominalMaxVolumeUl": 1000,
     "plungerPositions": {
-      "top": 18,
+      "top": 19,
       "bottom": 3,
       "blowOut": 1,
       "dropTip": -2.5
@@ -113,7 +113,7 @@
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 500,
     "dispenseFlowRate": 1000,
-    "ulPerMm": 61.69,
+    "ulPerMm": 65,
     "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "tipLength": 60

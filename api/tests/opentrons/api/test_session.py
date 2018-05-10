@@ -54,7 +54,7 @@ async def test_load_from_text(session_manager, protocol):
             traverse(command['children'])
     traverse(session.commands)
     # Less commands now that trash is built in
-    assert len(acc) == 69
+    assert len(acc) == 75
 
 
 async def test_async_notifications(main_router):
