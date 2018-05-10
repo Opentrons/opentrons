@@ -122,20 +122,24 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
 
     smoothie.activate_axes('X')
+    smoothie._set_saved_current()
     smoothie.dwell_axes('X')
+    smoothie._set_saved_current()
     smoothie.activate_axes('XYBC')
+    smoothie._set_saved_current()
     smoothie.dwell_axes('XC')
+    smoothie._set_saved_current()
     smoothie.dwell_axes('BCY')
+    smoothie._set_saved_current()
     expected = [
-        ['M907 X1.5 M400'], ['G4P0.05 M400'],
-        ['M907 X0.3 M400'], ['G4P0.05 M400'],
-        ['M907 B0.5 C0.5 X1.5 Y1.75'], ['G4P0.05 M400'],
-        ['M907 C0.05 X0.3 M400'], ['G4P0.05 M400'],
-        ['M907 B0.05 Y0.3 M400'], ['G4P0.05 M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.5 C0.5 X1.5 Y1.75 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.75 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
     ]
     # from pprint import pprint
-    # for i in range(len(expected)):
-    #     pprint(expected[i][0] == command_log[i], expected[i], command_log[i])
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -190,49 +194,30 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A1.0 B0.5 C0.5 Z1.0 M400'],     # Set axes motors high
-        ['G4P0.05 M400'],                      # Dwell
-        ['G28.2[ABCZ]+ M400'],                 # Home
-        ['M907 A0.1 B0.05 C0.05 Z0.1 M400'],     # Set axes motors low
-        ['G4P0.05 M400'],                      # Dwell
-
-        ['M907 Y0.8 M400'],                    # set Y motor to low current
-        ['G4P0.05 M400'],                      # delay for current
-        ['G0F3000 M400'],                      # set Y motor to low speed
-        ['G91 G0Y-20 G90 M400'],               # move Y motor away from switch
-        ['M907 Y0.3 M400'],  # set current back
-        ['G4P0.05 M400'],                      # delay for current
-        ['G0F24000 M400'],                      # set back to default speed
-        ['M907 Y0.3 M400'],                    # activate X motor for HOME
-        ['G4P0.05 M400'],
-        ['M907 X1.5 M400'],                    # activate X motor for HOME
-        ['G4P0.05 M400'],
-        ['G28.2X M400'],                       # home X
-        ['M907 X0.3 M400'],                    # end of HOME dwells X axis
-        ['G4P0.05 M400'],
-
-        ['M907 Y1.75 M400'],
-        ['G4P0.05 M400'],
-        ['G28.2Y M400'],                        # home Y
-        ['M203.1 Y8 M400'],                     # lower speed on Y for retract
-        ['G91 G0Y-3 G90 M400'],                      # retract Y
-        ['G28.2Y M400'],                        # home Y
-        ['G91 G0Y-3 G90 M400'],                      # retract Y
-        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],  # return to norm speed
-        ['M907 Y0.3 M400'],                    # end of HOME dwells X axis
-        ['G4P0.05 M400'],
-        ['M114.2 M400']                       # Get position
+        ['M907 A1.0 B0.5 C0.5 X0.3 Y0.3 Z1.0 G4P0.005 G28.2.+[ABCZ].+ M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['G0F3000 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-20 G90 M400'],
+        ['G0F24000 M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.75 Z0.1 G4P0.005 G28.2Y M400'],
+        ['M203.1 Y8 M400'],
+        ['G91 G0Y-3 G90 M400'],
+        ['G28.2Y M400'],
+        ['G91 G0Y-3 G90 M400'],
+        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M114.2 M400']
     ]
-    # for i in range(len(expected)):
-    #     print(expected[i][0] == command_log[i], expected[i], command_log[i])
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A1.0 X1.5 Y1.75 Z1.0 M400'],
-        ['G4P0.05 M400'],
-        ['G0.+ M400']                         # Move (non-plunger)
+        ['M907 A1.0 B0.05 C0.05 X1.5 Y1.75 Z1.0 G4P0.005 G0.+ M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -241,13 +226,8 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 X0.3 Y0.3 Z0.1 M400'],
-        ['G4P0.05 M400'],
-        ['M907 B0.5 M400'],
-        ['G4P0.05 M400'],
-        ['G0B2 M400'],
-        ['M907 B0.05 M400'],
-        ['G4P0.05 M400']
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -262,11 +242,10 @@ def test_plunger_commands(smoothie, monkeypatch):
         'B': 4,
         'C': 5})
     expected = [
-        ['M907 A1.0 B0.5 C0.5 X1.5 Y1.75 Z1.0 M400'],  # Set active axes high
-        ['G4P0.05 M400'],                      # Dwell
-        ['G0.+[BC].+ M400'],                   # Move (including BC)
-        ['M907 B0.05 C0.05 M400'],               # Set plunger current low
-        ['G4P0.05 M400']                       # Dwell
+        # Set active axes high
+        ['M907 A1.0 B0.5 C0.5 X1.5 Y1.75 Z1.0 G4P0.005 G0.+[BC].+ M400'],
+        # Set plunger current low
+        ['M907 A1.0 B0.05 C0.05 X1.5 Y1.75 Z1.0 G4P0.005 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -299,21 +278,16 @@ def test_set_active_current(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 0, 'Z': 0, 'A': 0, 'B': 0, 'C': 0})
     smoothie.move({'B': 1, 'C': 1})
+    smoothie.set_active_current({'B': 0.42, 'C': 0.42})
+    smoothie.home('BC')
     expected = [
-        ['M907 A0 B0 C0 X0 Y0 Z0 M400'],       # from call set_dwelling_current
-        ['G4P0.05 M400'],                      # Dwell
-        ['M907 A2 B2 C2 X2 Y2 Z2 M400'],       # Set all axes to high current
-        ['G4P0.05 M400'],                      # Dwell
-        ['G0.+[ABCXYZ].+ M400'],               # Move (including BC)
-        ['M907 B0 C0 M400'],                   # Set plunger current low
-        ['G4P0.05 M400'],                      # Dwell
-        ['M907 A0 X0 Y0 Z0 M400'],             # dwell the inactive axes
-        ['G4P0.05 M400'],                      # Dwell
-        ['M907 B2 C2 M400'],                   # Set plunger motors active
-        ['G4P0.05 M400'],                      # Dwell
-        ['G0.+[BC].+ M400'],                   # Move (including BC)
-        ['M907 B0 C0 M400'],                   # Set plunger current low
-        ['G4P0.05 M400']                       # Dwell
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0 M400'],  # move all
+        ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005 M400'],  # disable BC axes
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1 M400'],  # move BC
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005 M400'],  # disable BC axes
+        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4P0.005 G28.2BC M400'],  # home BC
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005 M400'],  # dwell all axes after home
+        ['M114.2 M400']  # update the position
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -360,8 +334,7 @@ def test_set_current(model):
     import types
     driver = model.robot._driver
 
-    set_current = driver.set_current
-
+    set_current = driver._save_current
     current_log = []
 
     def set_current_mock(self, target, axes_active=True):
@@ -369,10 +342,11 @@ def test_set_current(model):
         current_log.append(target)
         set_current(target, axes_active)
 
-    driver.set_current = types.MethodType(set_current_mock, driver)
+    driver._save_current = types.MethodType(set_current_mock, driver)
 
     rack = model.robot.add_container('tiprack-200ul', '10')
     pipette = model.instrument._instrument
+    pipette.set_pick_up_current(0.42)
     pipette.pick_up_tip(rack[0], presses=1)
 
     # Instrument in `model` is configured to right mount, which is the A axis
@@ -385,13 +359,15 @@ def test_set_current(model):
         {'X': 1.5, 'Y': 1.75},
         {'X': 0.3, 'Y': 0.3},
         {'A': 1.0},
-        {'A': 0.1},
+        {'A': 0.42},
         {'A': 1.0},
         {'A': 0.1}
     ]
     # from pprint import pprint
     # pprint(current_log)
     assert current_log == expected
+
+    driver._save_current = set_current
 
 
 def test_parse_pipette_data():
@@ -568,15 +544,21 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
     with pytest.raises(SmoothieError):
         driver.move({'C': 100})
 
-    assert [c.split(' ')[0] for c in cmd_list] == [
-        'M907',        # set current up
-        'G4P0.05',     # dwell
-        'G0C100.3',    # move C (with backlash compensation)
-        'M999',        # reset from error
-        'G28.2C',      # home
-        'M907',        # set current
-        'G4P0.05',     # dwell
-        'M114.2'       # get current position
+    # from pprint import pprint
+    # pprint([c.strip() for c in cmd_list])
+
+    assert [c.strip() for c in cmd_list] == [
+        # attempt to move and fail
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100 M400',
+        # recover from failure
+        'M999 M400',
+        # set current for homing the failed axis (C)
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C M400',
+        # set current back to idling after home
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400',
+        # update position
+        'M114.2 M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'
     ]
 
 
