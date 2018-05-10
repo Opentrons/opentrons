@@ -125,6 +125,7 @@ class Pipette:
             dispense_flow_rate=None,
             plunger_current=0.5,
             drop_tip_current=0.5,
+            plunger_positions=PLUNGER_POSITIONS,
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
         self.robot = robot
@@ -172,18 +173,17 @@ class Pipette:
         self.previous_placeable = None
         self.current_volume = 0
 
-        self.plunger_positions = PLUNGER_POSITIONS.copy()
+        self.plunger_positions = plunger_positions
 
         if max_volume:
             warnings.warn(
                 "'max_volume' is deprecated, use `ul_per_mm` in constructor"
             )
 
-        self.ul_per_mm = ul_per_mm
+        self.max_volume = None
         self.min_volume = min_volume
-        t = self._get_plunger_position('top')
-        b = self._get_plunger_position('bottom')
-        self.max_volume = (t - b) * self.ul_per_mm
+        self.ul_per_mm = None
+        self.set_ul_per_mm(ul_per_mm)
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
@@ -1442,6 +1442,12 @@ class Pipette:
         )
 
         return self
+
+    def set_ul_per_mm(self, ul_per_mm):
+        self.ul_per_mm = ul_per_mm
+        t = self._get_plunger_position('top')
+        b = self._get_plunger_position('bottom')
+        self.max_volume = (t - b) * self.ul_per_mm
 
     def _get_plunger_position(self, position):
         """
