@@ -9,7 +9,7 @@ import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import StepItem from '../components/steplist/StepItem' // TODO IMMEDIATELY use index.js
+import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
 
@@ -34,18 +34,22 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const allSteps = steplistSelectors.allSteps(state)
   const allLabware = labwareIngredSelectors.getLabware(state)
 
+  // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
+  // Also if you can, use END_STEP const instead of hard-coded '__end__',
+  // but flow doesn't like that :(
+
   return {
-    step: (stepId === '__end__') // TODO IMMEDIATELY can't use END_STEP, flow :(
+    step: (stepId === '__end__')
       ? null
       : allSteps[stepId],
 
-    substeps: (stepId === '__end__' || stepId === 0) // TODO IMMEDIATELY can't use END_STEP, flow :(
+    substeps: (stepId === '__end__' || stepId === 0)
       ? null
       : substepSelectors.allSubsteps(state)[stepId],
 
     hoveredSubstep: steplistSelectors.getHoveredSubstep(state),
 
-    collapsed: (stepId === '__end__' || stepId === 0) // TODO IMMEDIATELY can't use END_STEP, flow :(
+    collapsed: (stepId === '__end__' || stepId === 0)
       ? undefined
       : steplistSelectors.getCollapsedSteps(state)[stepId],
 
@@ -65,7 +69,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     handleSubstepHover: (payload: SubstepIdentifier) => dispatch(hoverOnSubstep(payload)),
 
     onStepClick: () => dispatch(selectStep(stepId)),
-    onStepItemCollapseToggle: (stepId === '__end__' || stepId === 0) // TODO IMMEDIATELY can't use END_STEP, flow :(
+    onStepItemCollapseToggle: (stepId === '__end__' || stepId === 0)
       ? undefined
       : () => dispatch(toggleStepCollapsed(stepId)),
     onStepHover: () => dispatch(hoverOnStep(stepId)),

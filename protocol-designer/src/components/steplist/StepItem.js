@@ -73,12 +73,12 @@ export default function StepItem (props: StepItemProps) {
       onCollapseToggle={onStepItemCollapseToggle}
       {...{selected, collapsed}}
     >
-      {hackSubstepItemThing(props)}
+      {getStepItemContents(props)}
     </TitledList>
   )
 }
 
-function hackSubstepItemThing (stepItemProps: StepItemProps) { // TODO just pass props
+function getStepItemContents (stepItemProps: StepItemProps) {
   const {
     step,
     substeps,

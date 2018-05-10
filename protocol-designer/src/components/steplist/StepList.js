@@ -5,7 +5,7 @@ import {SidePanel} from '@opentrons/components'
 import {END_STEP, type StepIdTypeWithEnd} from '../../steplist/types'
 import type {StepIdType} from '../../form-types'
 
-import StepItem from '../../containers/ConnectedStepItem' // TODO IMMEDIATELY move into StepList/ dir
+import StepItem from '../../containers/ConnectedStepItem'
 import StepCreationButton from '../../containers/StepCreationButton'
 
 type StepListProps = {
@@ -25,13 +25,6 @@ export default function StepList (props: StepListProps) {
 
       <StepCreationButton />
       <StepItem stepId={END_STEP} />
-      {/* TODO IMMEDIATELY remove this */}
-      {/* <TitledList title='END' iconName='check'
-        className={styles.step_item}
-        onClick={props.handleStepItemClickById && props.handleStepItemClickById(END_STEP)}
-        onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(END_STEP)}
-        selected={props.selectedStepId === END_STEP}
-      /> */}
     </SidePanel>
   )
 }
