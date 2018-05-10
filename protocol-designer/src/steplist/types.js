@@ -68,8 +68,6 @@ export type StepItemData = {
   formData: ?FormData
 }
 
-export type StepItemsWithSubsteps = StepItemData & {
-  substeps: StepSubItemData | null
-}
-
 export type SubSteps = {[StepIdType]: StepSubItemData | null}
+
+export type StepIdTypeWithEnd = StepIdType | typeof END_STEP

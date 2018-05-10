@@ -14,11 +14,7 @@ import {
 import type {Selector} from '../types'
 import type {LabwareData} from '../step-generation/types'
 import type {StepIdType} from '../form-types'
-import type {
-  StepSubItemData
-  // StepItemsWithSubsteps, // <-- TODO delete this type
-  // StepItemData
-} from '../steplist/types'
+import type {StepSubItemData} from '../steplist/types'
 
 export const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = createSelector(
   steplistSelectors.validatedForms,

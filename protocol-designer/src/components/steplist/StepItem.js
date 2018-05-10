@@ -10,9 +10,15 @@ import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
 import {stepIconsByType} from '../../form-types'
 
-import type {SubstepIdentifier, StepItemData, StepSubItemData} from '../../steplist/types'
+import type {
+  SubstepIdentifier,
+  StepItemData,
+  StepSubItemData,
+  StepIdTypeWithEnd
+} from '../../steplist/types'
 
 type StepItemProps = {
+  stepId: StepIdTypeWithEnd,
   step: ?StepItemData,
   substeps: ?StepSubItemData,
 
@@ -31,22 +37,26 @@ type StepItemProps = {
 
 export default function StepItem (props: StepItemProps) {
   const {
+    stepId,
     step,
-    // substeps,
 
     collapsed,
     error,
     selected,
-    // hoveredSubstep,
 
-    // handleSubstepHover,
     onStepMouseLeave,
     onStepClick,
     onStepItemCollapseToggle,
     onStepHover
   } = props
 
-  const iconName = step && stepIconsByType[step.stepType]
+  const iconName = stepId === '__end__'
+    ? 'check'
+    : (step && stepIconsByType[step.stepType])
+
+  const title = stepId === '__end__'
+    ? 'END'
+    : (step && step.title)
 
   const Description = <StepDescription description={step && step.description} />
 
@@ -56,7 +66,7 @@ export default function StepItem (props: StepItemProps) {
       description={Description}
       iconName={error ? 'alert-circle' : iconName}
       iconProps={{className: error ? styles.error_icon : ''}}
-      title={(step && step.title) || '???'} // TODO IMMEDIATELY do we ever not have a step?
+      title={title || ''}
       onClick={onStepClick}
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}

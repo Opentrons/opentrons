@@ -3,9 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {BaseState, ThunkDispatch} from '../types'
 
-import {END_STEP} from '../steplist/types'
 import type {SubstepIdentifier} from '../steplist/types'
-import type {StepIdType} from '../form-types'
 import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as steplistSelectors} from '../steplist/reducers'
@@ -13,15 +11,13 @@ import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepItem from '../components/steplist/StepItem' // TODO IMMEDIATELY use index.js
 
-type StepIdTypeWithEnd = StepIdType | typeof END_STEP // TODO import this; also used in StepList
-
-type OP = {
-  stepId: StepIdTypeWithEnd
-}
-
 type Props = React.ElementProps<typeof StepItem>
 
-type StateProps = {
+type OP = {
+  stepId: $PropertyType<Props, 'stepId'>
+}
+
+type SP = {
   step: $PropertyType<Props, 'step'>,
   substeps: $PropertyType<Props, 'substeps'>,
   collapsed: $PropertyType<Props, 'collapsed'>,
@@ -31,11 +27,11 @@ type StateProps = {
   getLabwareName: $PropertyType<Props, 'getLabwareName'>
 }
 
-type DispatchProps = $Diff<Props, StateProps>
+type DP = $Diff<$Diff<Props, SP>, OP>
 
-function mapStateToProps (state: BaseState, ownProps: OP): StateProps {
+function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
-  const allSteps = steplistSelectors.allSteps(state) // TODO IMMEDIATELY allSteps should return object not array
+  const allSteps = steplistSelectors.allSteps(state)
   const allLabware = labwareIngredSelectors.getLabware(state)
 
   return {
@@ -62,7 +58,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): StateProps {
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DispatchProps {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   const {stepId} = ownProps
 
   return {

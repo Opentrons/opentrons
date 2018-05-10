@@ -6,7 +6,7 @@ type Props = {
   substeps: PauseFormData
 }
 
-export default function PauseStepItems (props: Props) { // TODO IMMEDIATELY type this; factor out as component
+export default function PauseStepItems (props: Props) {
   const {substeps} = props
   if (substeps.wait === true) {
     // Show message if waiting indefinitely

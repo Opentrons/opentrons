@@ -2,19 +2,15 @@
 import * as React from 'react'
 import {SidePanel} from '@opentrons/components'
 
-import {END_STEP} from '../../steplist/types'
+import {END_STEP, type StepIdTypeWithEnd} from '../../steplist/types'
 import type {StepIdType} from '../../form-types'
 
 import StepItem from '../../containers/ConnectedStepItem' // TODO IMMEDIATELY move into StepList/ dir
 import StepCreationButton from '../../containers/StepCreationButton'
-// import {SubstepItems, generateHeaders} from './substeps'
-// import styles from './StepItem.css'
-
-type StepIdTypeWithEnd = StepIdType | typeof END_STEP // TODO IMMEDIATELY import this
 
 type StepListProps = {
   orderedSteps: Array<StepIdType>,
-  handleStepHoverById?: (StepIdTypeWithEnd | null) => (event?: SyntheticEvent<>) => mixed
+  handleStepHoverById?: ?StepIdTypeWithEnd => (event?: SyntheticEvent<>) => mixed
 }
 
 export default function StepList (props: StepListProps) {
