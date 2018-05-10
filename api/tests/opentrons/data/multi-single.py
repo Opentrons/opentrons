@@ -9,18 +9,8 @@ tiprack = containers.load('tiprack-200ul', '8')
 trough = containers.load('trough-12row', '9')
 plate = containers.load('96-flat', '5')
 
-single = instruments.Pipette(
-    mount='right',
-    min_volume=10,
-    name="p200",
-    tip_racks=[tiprack])
-
-multi = instruments.Pipette(
-    mount='left',
-    min_volume=10,
-    name="p200S",
-    tip_racks=[tiprack],
-    channels=8)
+single = instruments.P300_Single(mount='right', tip_racks=[tiprack])
+multi = instruments.P300_Multi(mount='left', tip_racks=[tiprack])
 
 
 for tip in [tiprack[0], tiprack[-1]]:
