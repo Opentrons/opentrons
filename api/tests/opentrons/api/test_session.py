@@ -54,7 +54,7 @@ async def test_load_from_text(session_manager, protocol):
             traverse(command['children'])
     traverse(session.commands)
     # Less commands now that trash is built in
-    assert len(acc) == 69
+    assert len(acc) == 75
 
 
 async def test_async_notifications(main_router):
@@ -246,7 +246,8 @@ async def test_session_model_functional(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate', 'tall-fixed-trash']
-    assert [instrument.name for instrument in session.instruments] == ['p200']
+    names = [instrument.name for instrument in session.instruments]
+    assert names == ['p300_single_v1']
 
 
 # TODO(artyom 20171018): design a small protocol specifically for the test

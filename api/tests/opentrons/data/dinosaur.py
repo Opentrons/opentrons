@@ -9,12 +9,7 @@ plate = containers.load('96-PCR-flat', '1', 'plate')
 p200rack = containers.load('tiprack-200ul', '2', 'tiprack')
 
 # create a p200 pipette on robot axis B
-p200 = instruments.Pipette(
-    name="p200",
-    mount="left",
-    min_volume=20,
-    tip_racks=[p200rack]
-)
+p200 = instruments.P300_Single(mount="left", tip_racks=[p200rack])
 
 # simple, atomic commands to control fine details
 p200.pick_up_tip()

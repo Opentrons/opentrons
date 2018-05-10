@@ -199,9 +199,9 @@ class InstrumentsWrapper(object):
             ul_per_mm=config.ul_per_mm,
             aspirate_flow_rate=config.aspirate_flow_rate,
             dispense_flow_rate=config.dispense_flow_rate,
+            plunger_positions=config.plunger_positions.copy(),
             fallback_tip_length=config.tip_length)  # TODO move to labware
 
-        p.plunger_positions = config.plunger_positions.copy()
         p.set_pick_up_current(config.pick_up_current)
         return p
 
