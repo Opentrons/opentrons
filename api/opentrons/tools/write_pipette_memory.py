@@ -37,7 +37,7 @@ def write_identifiers(robot, mount, new_id, new_model):
 
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
-    _assert_the_same(new_model, read_model['model'])
+    _assert_the_same(new_model, read_model)
 
 
 def check_previous_data(robot, mount):
@@ -47,10 +47,6 @@ def check_previous_data(robot, mount):
     else:
         old_id = None
     old_model = robot._driver.read_pipette_model(mount)
-    if old_model.get('model'):
-        old_model = old_model.get('model')
-    else:
-        old_model = None
     if old_id and old_model:
         print(
             'Overwriting old data: id={0}, model={1}'.format(
