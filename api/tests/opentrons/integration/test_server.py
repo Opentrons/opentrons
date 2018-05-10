@@ -55,12 +55,6 @@ async def test_notifications(session, session_manager, protocol, root, connect):
     res = await socket.receive_json()
 
     assert len(res['data']['v']['command_log']['v']) == 76
-    responses = [
-        res for res in responses
-        if res['data']['v']['name'] == 'state']
-    # TODO (artyom 20171030): travis breaks with off by one len == 107
-    # passes locally.
-    # assert len(responses) == 106
 
     states = [
         response['data']['v']['payload']['v']['state']
