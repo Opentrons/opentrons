@@ -246,7 +246,8 @@ async def test_session_model_functional(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate', 'tall-fixed-trash']
-    assert [instrument.name for instrument in session.instruments] == ['p200']
+    names = [instrument.name for instrument in session.instruments]
+    assert names == ['p300_single_v1']
 
 
 # TODO(artyom 20171018): design a small protocol specifically for the test
