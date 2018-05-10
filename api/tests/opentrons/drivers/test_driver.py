@@ -206,7 +206,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G91 G0Y-3 G90 M400'],
         ['G28.2Y M400'],
         ['G91 G0Y-3 G90 M400'],
-        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
+        ['M203.1 A125 B50 C50 X500 Y300 Z125 M400'],
         ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['M114.2 M400']
     ]
