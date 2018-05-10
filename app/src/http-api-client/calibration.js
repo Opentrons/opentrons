@@ -175,6 +175,22 @@ export function calibrationReducer (
       ({path, response, robot: {name}} = action.payload)
       stateByName = state[name] || {}
 
+      // TODO(mc, 2018-05-07): this has a race condition if a new /deck request
+      //  is fired w/ one already in flight; disallow this
+      if (
+        path === DECK && stateByName[DECK] && stateByName[DECK].request &&
+        stateByName[DECK].request.command === 'release'
+      ) {
+        stateByName = {
+          ...stateByName,
+          [DECK_START]: {
+            ...stateByName[DECK_START],
+            error: null,
+            response: null
+          }
+        }
+      }
+
       return {
         ...state,
         [name]: {

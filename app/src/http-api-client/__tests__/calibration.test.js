@@ -153,33 +153,56 @@ describe('/calibration/**', () => {
     })
   })
 
-  const REDUCER_REQUEST_RESPONSE_TESTS = [
-    {
-      path: 'deck/start',
-      request: {},
-      response: {
-        token: 'token',
-        pipette: {mount: 'left', model: 'p300_single_v1'}
-      }
-    }
-  ]
+  describe('reducer with api-call actions', () => {
+    beforeEach(() => {
+      state = state.api
+    })
 
-  REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
-    const {path, request, response} = spec
-
-    describe(`reducer with /calibration/${path}`, () => {
-      beforeEach(() => {
-        state = state.api
-      })
-
-      test('handles CAL_REQUEST', () => {
-        const action = {
-          type: 'api:CAL_REQUEST',
-          payload: {path, robot, request}
+    const REDUCER_REQUEST_RESPONSE_TESTS = [
+      {
+        path: 'deck/start',
+        request: {},
+        response: {
+          token: 'token',
+          pipette: {mount: 'left', model: 'p300_single_v1'}
         }
+      },
+      {
+        path: 'deck',
+        request: {command: 'save transform'},
+        response: {message: 'saved'}
+      }
+    ]
 
-        expect(reducer(state, action).calibration).toEqual({
-          [NAME]: {
+    REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
+      const {path, request, response} = spec
+
+      describe(`reducer with /calibration/${path}`, () => {
+        test('handles CAL_REQUEST', () => {
+          const action = {
+            type: 'api:CAL_REQUEST',
+            payload: {path, robot, request}
+          }
+
+          expect(reducer(state, action).calibration).toEqual({
+            [NAME]: {
+              [path]: {
+                request,
+                inProgress: true,
+                error: null,
+                response: null
+              }
+            }
+          })
+        })
+
+        test('handles CAL_SUCCESS', () => {
+          const action = {
+            type: 'api:CAL_SUCCESS',
+            payload: {path, robot, response}
+          }
+
+          state.calibration[NAME] = {
             [path]: {
               request,
               inProgress: true,
@@ -187,63 +210,64 @@ describe('/calibration/**', () => {
               response: null
             }
           }
+
+          expect(reducer(state, action).calibration).toEqual({
+            [NAME]: {
+              [path]: {
+                request,
+                response,
+                inProgress: false,
+                error: null
+              }
+            }
+          })
         })
-      })
 
-      test('handles CAL_SUCCESS', () => {
-        const action = {
-          type: 'api:CAL_SUCCESS',
-          payload: {path, robot, response}
-        }
-
-        state.calibration[NAME] = {
-          [path]: {
-            request,
-            inProgress: true,
-            error: null,
-            response: null
+        test('handles CAL_FAILURE', () => {
+          const error = {message: 'we did not do it!'}
+          const action = {
+            type: 'api:CAL_FAILURE',
+            payload: {path, robot, error}
           }
-        }
 
-        expect(reducer(state, action).calibration).toEqual({
-          [NAME]: {
+          state.calibration[NAME] = {
             [path]: {
               request,
-              response,
-              inProgress: false,
-              error: null
+              inProgress: true,
+              error: null,
+              response: null
             }
           }
-        })
-      })
 
-      test('handles CAL_FAILURE', () => {
-        const error = {message: 'we did not do it!'}
-        const action = {
-          type: 'api:CAL_FAILURE',
-          payload: {path, robot, error}
-        }
-
-        state.calibration[NAME] = {
-          [path]: {
-            request,
-            inProgress: true,
-            error: null,
-            response: null
-          }
-        }
-
-        expect(reducer(state, action).calibration).toEqual({
-          [NAME]: {
-            [path]: {
-              request,
-              error,
-              response: null,
-              inProgress: false
+          expect(reducer(state, action).calibration).toEqual({
+            [NAME]: {
+              [path]: {
+                request,
+                error,
+                response: null,
+                inProgress: false
+              }
             }
-          }
+          })
         })
       })
+    })
+
+    // TODO(mc, 2018-05-07): refactor this test according to the TODO in the
+    //  CAL_SUCCESS handler in the reducer
+    test('CAL_RESPONSE with command: "release" clears token', () => {
+      state.calibration[NAME] = {
+        deck: {request: {command: 'release'}},
+        'deck/start': {response: {token: 'token'}}
+      }
+
+      const action = {
+        type: 'api:CAL_SUCCESS',
+        payload: {robot, path: 'deck', response: {message: 'released'}}
+      }
+
+      expect(reducer(state, action).calibration[NAME]['deck/start'].response)
+        .toBe(null)
     })
   })
 
