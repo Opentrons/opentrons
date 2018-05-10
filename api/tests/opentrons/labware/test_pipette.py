@@ -10,31 +10,31 @@ def test_pipette_models():
     robot.reset()
     p = instruments.P10_Single(mount='left')
     assert p.channels == 1
-    assert p.max_volume > 10
+    assert round(p.max_volume, 2) == 12.71
     p = instruments.P10_Multi(mount='right')
     assert p.channels == 8
-    assert p.max_volume > 10
+    assert round(p.max_volume, 2) == 11.55
 
     robot.reset()
     p = instruments.P50_Single(mount='left')
     assert p.channels == 1
-    assert p.max_volume > 50
+    assert round(p.max_volume, 2) == 42         # too low b/c of hardware
     p = instruments.P50_Multi(mount='right')
     assert p.channels == 8
-    assert p.max_volume > 50
+    assert round(p.max_volume, 2) == 42         # too low b/c of hardware
 
     robot.reset()
     p = instruments.P300_Single(mount='left')
     assert p.channels == 1
-    assert p.max_volume > 300
+    assert round(p.max_volume, 2) == 280.5      # too low b/c of hardware
     p = instruments.P300_Multi(mount='right')
     assert p.channels == 8
-    assert p.max_volume > 300
+    assert round(p.max_volume, 2) == 285        # too low b/c of hardware
 
     robot.reset()
     p = instruments.P1000_Single(mount='left')
     assert p.channels == 1
-    assert p.max_volume > 1000
+    assert round(p.max_volume, 2) == 925.35      # too low b/c of hardware
 
 
 def test_pipette_max_deck_height():
@@ -92,7 +92,7 @@ def test_aspirate_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (8.402, 0.0, 0.0)).all()
+    assert (current_pos == (9.348, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
@@ -120,7 +120,7 @@ def test_dispense_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (3.0, 0.0, 0.0)).all()
+    assert (current_pos == (4.0, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
