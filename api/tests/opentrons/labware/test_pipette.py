@@ -126,6 +126,22 @@ def test_dispense_move_to():
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
 
 
+def test_trough_move_to():
+    from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
+    robot.reset()
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
+    p300 = instruments.P300_Single(
+                   mount='left',
+                   tip_racks=[tip_rack])
+
+    trough = containers_load(robot, 'trough-12row', '1')
+    p300.pick_up_tip()
+    p300.move_to(trough)
+    current_pos = pose_tracker.absolute(robot.poses, p300)
+
+    assert isclose(current_pos, (14.34, 7.75 + 35 + Y_OFFSET_MULTI, 40)).all()
+
+
 def test_delay_calls(monkeypatch):
     from opentrons import robot
     from opentrons.instruments import pipette

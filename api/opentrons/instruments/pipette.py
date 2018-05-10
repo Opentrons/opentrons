@@ -317,6 +317,7 @@ class Pipette:
                 strategy = 'direct'
 
         self._associate_placeable(placeable)
+
         self.robot.move_to(
             location,
             instrument=self,
