@@ -46,7 +46,8 @@ def log_init():
         handlers={
             'debug': {
                 'class': 'logging.StreamHandler',
-                'formatter': 'basic'
+                'formatter': 'basic',
+                'level': level_value
             },
             'serial': {
                 'class': 'logging.handlers.RotatingFileHandler',
@@ -67,6 +68,10 @@ def log_init():
                 'level': level_value
             },
             'opentrons.api': {
+                'handlers': ['debug'],
+                'level': level_value
+            },
+            'opentrons.robot.robot_configs': {
                 'handlers': ['debug'],
                 'level': level_value
             },
@@ -190,8 +195,15 @@ def main():
     else:
         log.debug("Starting Opentrons server application on {}:{}".format(
             args.hostname, args.port))
-    robot.connect()
-    robot.home()
+
+    # TODO (andy) server should only connect to motor-driver when required by
+    # a request (eg: a request to move, or a request to update firmware)
+    try:
+        robot.connect()
+        robot.cache_instrument_models()
+    except Exception as e:
+        log.exception("Error while connecting to motor-driver: {}".format(e))
+
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
 

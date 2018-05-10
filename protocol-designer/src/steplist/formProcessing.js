@@ -6,12 +6,22 @@ import type {
   FormData,
   BlankForm,
   ProcessedFormData,
-  TransferForm,
-  ConsolidateForm,
-  TransferFormData
-} from './types'
+  TransferLikeForm,
+  MixForm,
+  PauseForm
+} from '../form-types'
 
-import type {ConsolidateFormData} from '../step-generation'
+import type {
+  ConsolidateFormData,
+  DistributeFormData,
+  MixFormData,
+  PauseFormData,
+  TransferFormData
+} from '../step-generation'
+
+import {FIXED_TRASH_ID} from '../constants'
+
+const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -43,12 +53,21 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
     'step-details': ''
   }
 
-  if (stepType === 'transfer' || stepType === 'consolidate') {
+  if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
       'aspirate--change-tip': 'once'
     }
   }
+
+  if (stepType === 'distribute') {
+    return {
+      ...baseForm,
+      'dispense--blowout--checkbox': true,
+      'dispense--blowout--labware': FIXED_TRASH_ID
+    }
+  }
+
   if (stepType !== 'pause') {
     console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO. Got ' + stepType)
   }
@@ -59,113 +78,22 @@ export function formHasErrors (form: {errors: {[string]: string}}): boolean {
   return Object.values(form.errors).length > 0
 }
 
-function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferFormData> {
-  // TODO LATER Ian 2018-04-05 combine this with consolidate since args are similar
-  // and clean up the parsing errors
-  const pipette = formData['aspirate--pipette']
-  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'] : []
-  const destWells = formData['dispense--wells'] ? formData['dispense--wells'] : []
+type TransferLikeValidationAndErrors =
+  | ValidationAndErrors<ConsolidateFormData>
+  | ValidationAndErrors<DistributeFormData>
+  | ValidationAndErrors<TransferFormData>
+
+function _vapTransferLike (
+  formData: TransferLikeForm
+): TransferLikeValidationAndErrors {
+  const stepType = formData.stepType
+  const pipette = formData['pipette']
+  const volume = Number(formData['volume'])
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 
-  const blowout = formData['dispense--blowout--labware']
-
-  const delayAfterDispense = formData['dispense--delay--checkbox']
-    ? ((parseFloat(formData['dispense--delay-minutes']) || 0) * 60) +
-      (parseFloat(formData['dispense--delay-seconds'] || 0))
-    : null
-
-  const changeTip = formData['aspirate--change-tip'] || 'always'
-  // It's radiobutton, so one should always be selected.
-  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
-
-  const volume = parseFloat(formData['dispense--volume'])
-
-  const disposalVolume = formData['aspirate--disposal-vol--checkbox']
-    ? (parseFloat(formData['aspirate--disposal-vol--volume']) || null)
-    : null
-
   const requiredFieldErrors = [
-    'aspirate--pipette',
-    'aspirate--labware',
-    'dispense--labware'
-  ].reduce((acc: {}, fieldName: string) => (!formData[fieldName])
-    ? {...acc, [fieldName]: 'This field is required'}
-    : acc,
-  {})
-
-  // Conditionally add error fields
-  let errors = {...requiredFieldErrors}
-
-  if (!(volume > 0)) {
-    const field = formData.stepType === 'transfer' ? 'dispense--volume' : 'aspirate--volume'
-    errors[field] = 'Volume must be a positive number'
-  }
-
-  if (formData.stepType === 'transfer') {
-    if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
-      errors._mismatchedWells = 'Numbers of wells must match'
-    }
-  }
-
-  return {
-    errors,
-    validatedForm: (
-      !formHasErrors({errors}) &&
-      // extra explicit for flow
-      pipette &&
-      sourceLabware &&
-      destLabware
-    )
-      ? {
-        stepType: formData.stepType,
-        pipette,
-        sourceWells,
-        destWells,
-        sourceLabware,
-        destLabware,
-        volume,
-        changeTip,
-        blowout,
-        delayAfterDispense,
-
-        mixBeforeAspirate: getMixData(
-          formData,
-          'aspirate--mix--checkbox',
-          'aspirate--mix--volume',
-          'aspirate--mix--times'
-        ),
-
-        mixInDestination: getMixData(
-          formData,
-          'dispense--mix--checkbox',
-          'dispense--mix--volume',
-          'dispense--mix--times'
-        ),
-
-        disposalVolume,
-        preWetTip: !!(formData['aspirate--pre-wet-tip']),
-        touchTipAfterAspirate: !!(formData['aspirate--touch-tip']),
-        touchTipAfterDispense: false, // TODO Ian 2018-04-03 field not in form
-
-        description: 'description would be here TODO', // TODO Ian 2018-03-01 get from form
-        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
-      }
-      : null
-  }
-}
-
-function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<ConsolidateFormData> {
-  const pipette = formData['aspirate--pipette']
-  const sourceWells = formData['aspirate--wells'] ? formData['aspirate--wells'] : []
-  const destWells = formData['dispense--wells'] ? formData['dispense--wells'] : []
-  const sourceLabware = formData['aspirate--labware']
-  const destLabware = formData['dispense--labware']
-
-  const volume = parseFloat(formData['aspirate--volume'])
-
-  const requiredFieldErrors = [
-    'aspirate--pipette',
+    'pipette',
     'aspirate--labware',
     'dispense--labware'
   ].reduce((acc, fieldName) => (!formData[fieldName])
@@ -176,121 +104,238 @@ function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<Consol
   // Conditionally add error fields
   let errors = {...requiredFieldErrors}
 
-  if (!(volume > 0)) {
-    errors['aspirate--volume'] = 'Volume must be a positive number'
-  }
-
-  if (sourceWells.length <= 1 || destWells.length !== 1) {
-    errors._mismatchedWells = 'Multiple sources well and exactly one destination well is required.'
+  if (isNaN(volume) || !(volume > 0)) {
+    errors['volume'] = 'Volume must be a positive number'
   }
 
   const blowout = formData['dispense--blowout--labware']
 
   const delayAfterDispense = formData['dispense--delay--checkbox']
-    ? ((parseFloat(formData['dispense--delay-minutes']) || 0) * 60) +
-      (parseFloat(formData['dispense--delay-seconds'] || 0))
+    ? ((Number(formData['dispense--delay-minutes']) || 0) * 60) +
+      (Number(formData['dispense--delay-seconds'] || 0))
     : null
-
-  // const disposalVolume =
 
   const mixFirstAspirate = formData['aspirate--mix--checkbox']
     ? {
-      volume: parseFloat(formData['aspirate--mix--volume']),
+      volume: Number(formData['aspirate--mix--volume']),
       times: parseInt(formData['aspirate--mix--times']) // TODO handle unparseable
     }
     : null
 
-  // TODO general mix args creator
-  const mixInDestination = formData['dispense--mix--checkbox']
-    ? {
-      volume: parseFloat(formData['dispense--mix--volume']),
-      times: parseInt(formData['dispense--mix--times'])
-    }
-    : null
+  const mixBeforeAspirate = getMixData(
+    formData,
+    'aspirate--mix--checkbox',
+    'aspirate--mix--volume',
+    'aspirate--mix--times'
+  )
+
+  const mixInDestination = getMixData(
+    formData,
+    'dispense--mix--checkbox',
+    'dispense--mix--volume',
+    'dispense--mix--times'
+  )
 
   const disposalVolume = formData['aspirate--disposal-vol--checkbox']
-    ? parseFloat('aspirate--disposal-vol--volume') // TODO handle unparseable
+    ? Number('aspirate--disposal-vol--volume') // TODO handle unparseable
     : null
 
-  const changeTip = formData['aspirate--change-tip'] || 'always'
-  // It's radiobutton, so one should always be selected.
-  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
+
+  const commonFields = {
+    pipette,
+    volume,
+
+    sourceLabware,
+    destLabware,
+
+    blowout, // TODO allow user to blowout
+    changeTip,
+    delayAfterDispense,
+    disposalVolume,
+    mixInDestination,
+    preWetTip: formData['aspirate--pre-wet-tip'] || false,
+    touchTipAfterAspirate: formData['aspirate--touch-tip'] || false,
+    touchTipAfterDispense: false, // TODO Ian 2018-03-01 Not in form
+    description: 'description would be here 2018-03-01' // TODO get from form
+  }
+
+  if (!formHasErrors({errors})) {
+    const sourceWells = formData['aspirate--wells'] || []
+    const destWells = formData['dispense--wells'] || []
+
+    if (stepType === 'transfer') {
+      if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
+        errors._mismatchedWells = 'Numbers of wells must match'
+      }
+
+      const validatedForm: TransferFormData = {
+        ...commonFields,
+        stepType: 'transfer',
+        sourceWells,
+        destWells,
+        mixBeforeAspirate,
+        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+      }
+
+      return {errors, validatedForm}
+    }
+
+    if (stepType === 'consolidate') {
+      if (sourceWells.length <= 1 || destWells.length !== 1) {
+        errors._mismatchedWells = 'Multiple source wells and exactly one destination well is required.'
+      }
+
+      const validatedForm: ConsolidateFormData = {
+        ...commonFields,
+        mixFirstAspirate,
+        sourceWells,
+        destWell: destWells[0],
+        stepType: 'consolidate',
+        name: `Consolidate ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+      }
+
+      return {errors, validatedForm}
+    }
+
+    if (stepType === 'distribute') {
+      if (sourceWells.length !== 1 || destWells.length <= 1) {
+        errors._mismatchedWells = 'Single source well and multiple destination wells is required.'
+      }
+
+      const validatedForm: DistributeFormData = {
+        ...commonFields,
+        mixBeforeAspirate,
+        sourceWell: sourceWells[0],
+        destWells,
+        stepType: 'distribute',
+        name: `Distribute ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+      }
+
+      return {errors, validatedForm}
+    }
+  }
 
   return {
     errors,
-    validatedForm: (
-      !formHasErrors({errors}) &&
-      // extra explicit for flow
-      pipette &&
-      sourceLabware &&
-      destLabware
+    validatedForm: null
+  }
+}
+
+function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
+  const hours = parseFloat(formData['pause-hour']) || 0
+  const minutes = parseFloat(formData['pause-minute']) || 0
+  const seconds = parseFloat(formData['pause-second']) || 0
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds
+
+  const message = formData['pause-message'] || ''
+
+  const errors = {
+    ...(!formData['pause-for-amount-of-time']
+      ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
+      : {}
+    ),
+    ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
+      ? {'_pause-times': 'Must include hours, minutes, or seconds'}
+      : {}
     )
+  }
+
+  return {
+    errors,
+    validatedForm: formHasErrors({errors})
+      ? null
+      : {
+        stepType: formData.stepType,
+        name: `Pause ${formData.id}`, // TODO real name for steps
+        description: 'description would be here 2018-03-01', // TODO get from form
+        // stepType: formData.stepType,
+        wait: (formData['pause-for-amount-of-time'] === 'false')
+          ? true
+          : totalSeconds,
+        message,
+        meta: {
+          hours,
+          minutes,
+          seconds
+        }
+      }
+  }
+}
+
+function _vapMix (formData: MixForm): ValidationAndErrors<MixFormData> {
+  const requiredFields = ['pipette', 'labware', 'volume', 'times']
+
+  let errors = {}
+
+  requiredFields.forEach(field => {
+    if (formData[field] == null) {
+      errors[field] = 'This field is required'
+    }
+  })
+
+  const {labware, pipette} = formData
+  const touchTip = !!formData['touch-tip']
+
+  const wells = formData.wells || []
+  const volume = Number(formData.volume) || 0
+  const times = Number(formData.times) || 0
+
+  // It's radiobutton, so one should always be selected.
+  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
+
+  const blowout = formData['dispense--blowout--labware']
+
+  const delay = formData['dispense--delay--checkbox']
+    ? ((Number(formData['dispense--delay-minutes']) || 0) * 60) +
+      (Number(formData['dispense--delay-seconds'] || 0))
+    : null
+  // TODO Ian 2018-05-08 delay number parsing errors
+
+  if (wells.length <= 0) {
+    errors.wells = '1 or more wells is required'
+  }
+
+  if (volume <= 0) {
+    errors.volume = 'Volume must be a number greater than 0'
+  }
+
+  if (times <= 0 || !Number.isInteger(times)) {
+    errors.times = 'Number of repetitions must be an integer greater than 0'
+  }
+
+  return {
+    errors,
+    validatedForm: (!formHasErrors({errors}) && labware && pipette)
       ? {
         stepType: formData.stepType,
-        pipette,
-        sourceWells,
-        destWell: destWells[0],
-        sourceLabware,
-        destLabware,
-        volume,
-        blowout, // TODO allow user to blowout
-        changeTip,
-        delayAfterDispense,
+        name: `Mix ${formData.id}`, // TODO real name for steps
         description: 'description would be here 2018-03-01', // TODO get from form
-        mixFirstAspirate,
-        disposalVolume,
-        mixInDestination,
-        preWetTip: formData['aspirate--pre-wet-tip'] || false,
-        touchTipAfterAspirate: formData['aspirate--touch-tip'] || false,
-        touchTipAfterDispense: false, // TODO Ian 2018-03-01 Not in form
-        name: `Consolidate ${formData.id}` // TODO real name for steps
+        labware,
+        wells,
+        volume,
+        times,
+        touchTip,
+        delay,
+        changeTip,
+        blowout,
+        pipette
       }
       : null
   }
 }
 
 export function validateAndProcessForm (formData: FormData): * { // ValidFormAndErrors
-  if (formData.stepType === 'transfer') {
-    return _vapTransfer(formData)
-  }
-
-  if (formData.stepType === 'consolidate') {
-    return _vapConsolidate(formData)
+  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate' || formData.stepType === 'distribute') {
+    return _vapTransferLike(formData)
   }
 
   if (formData.stepType === 'pause') {
-    const hours = parseFloat(formData['pause-hour']) || 0
-    const minutes = parseFloat(formData['pause-minute']) || 0
-    const seconds = parseFloat(formData['pause-second']) || 0
-    const totalSeconds = hours * 360 + minutes * 60 + seconds
+    return _vapPause(formData)
+  }
 
-    const message = formData['pause-message'] || ''
-
-    const errors = {
-      ...(!formData['pause-for-amount-of-time']
-        ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
-        : {}
-      ),
-      ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
-        ? {'_pause-times': 'Must include hours, minutes, or seconds'}
-        : {}
-      )
-    }
-
-    return {
-      errors,
-      validatedForm: formHasErrors({errors})
-        ? null
-        : {
-          stepType: formData.stepType,
-          waitForUserInput: formData['pause-for-amount-of-time'] === 'false',
-          totalSeconds,
-          hours,
-          minutes,
-          seconds,
-          message
-        }
-    }
+  if (formData.stepType === 'mix') {
+    return _vapMix(formData)
   }
 
   // Fallback for unsupported step type. Should be unreachable (...right?)

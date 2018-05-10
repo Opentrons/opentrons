@@ -1,4 +1,5 @@
 import os
+import logging
 from functools import lru_cache
 
 import opentrons.util.calibration_functions as calib
@@ -13,10 +14,9 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
-from opentrons.util.log import get_logger
 from opentrons.config import feature_flags as fflags
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
@@ -208,6 +208,7 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
+        self.model_by_mount = {'left': None, 'right': None}
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -297,6 +298,10 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         return self
+
+    def cache_instrument_models(self):
+        for mount in self.model_by_mount.keys():
+            self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -390,6 +395,7 @@ class Robot(object):
             raise RuntimeError('Instrument {0} already on {1} mount'.format(
                 prev_instr.name, mount))
         self._instruments[mount] = instrument
+        self.cache_instrument_models()
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
 
@@ -428,6 +434,7 @@ class Robot(object):
         instrument = self._instruments.pop(mount, None)
         if instrument:
             self.poses = pose_tracker.remove(self.poses, instrument)
+        self.cache_instrument_models()
 
     def add_warning(self, warning_msg):
         """
@@ -924,9 +931,9 @@ class Robot(object):
         """
         left_data = {
                 'mount_axis': 'z',
-                'plunger_axis': 'b'
+                'plunger_axis': 'b',
+                'model': self.model_by_mount['left'],
             }
-        left_data.update(self._driver.read_pipette_model('left'))
         left_model = left_data.get('model')
         if left_model:
             tip_length = pipette_config.configs[left_model].tip_length
@@ -934,9 +941,9 @@ class Robot(object):
 
         right_data = {
                 'mount_axis': 'a',
-                'plunger_axis': 'c'
+                'plunger_axis': 'c',
+                'model': self.model_by_mount['right']
             }
-        right_data.update(self._driver.read_pipette_model('right'))
         right_model = right_data.get('model')
         if right_model:
             tip_length = pipette_config.configs[right_model].tip_length

@@ -4,12 +4,14 @@ import isNil from 'lodash/isNil'
 import pick from 'lodash/pick'
 import {SidePanel, TitledList} from '@opentrons/components'
 
-import {END_STEP} from '../steplist/types'
-import type {StepItemsWithSubsteps, StepIdType, SubstepIdentifier} from '../steplist/types'
+import {END_STEP} from '../../steplist/types'
+import type {StepItemsWithSubsteps, SubstepIdentifier} from '../../steplist/types'
+import type {StepIdType} from '../../form-types'
 
-import StepItem from '../components/StepItem'
-import TransferishSubstep from '../components/TransferishSubstep'
-import StepCreationButton from '../containers/StepCreationButton'
+import StepItem from './StepItem'
+import TransferLikeSubstep from './TransferLikeSubstep'
+import StepCreationButton from '../../containers/StepCreationButton'
+import styles from './StepItem.css'
 
 type StepIdTypeWithEnd = StepIdType | typeof END_STEP
 
@@ -35,7 +37,7 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
     substeps.stepType === 'distribute'
   ) {
     // all these step types share the same substep display
-    return <TransferishSubstep
+    return <TransferLikeSubstep
       substeps={substeps}
       hoveredSubstep={hoveredSubstep}
       onSelectSubstep={onSelectSubstep} // TODO use action
@@ -43,11 +45,15 @@ function generateSubstepItems (substeps, onSelectSubstep, hoveredSubstep) {
   }
 
   if (substeps.stepType === 'pause') {
-    // TODO: style pause stuff
-    if (substeps.waitForUserInput) {
+    if (substeps.wait === true) {
+      // Show message if waiting indefinitely
       return <li>{substeps.message}</li>
     }
-    const {hours, minutes, seconds} = substeps
+    if (!substeps.meta) {
+      // No message or time, show nothing
+      return null
+    }
+    const {hours, minutes, seconds} = substeps.meta
     return <li>{hours} hr {minutes} m {seconds} s</li>
   }
 
@@ -94,6 +100,7 @@ export default function StepList (props: StepListProps) {
 
       <StepCreationButton />
       <TitledList title='END' iconName='check'
+        className={styles.step_item}
         onClick={props.handleStepItemClickById && props.handleStepItemClickById(END_STEP)}
         onMouseEnter={props.handleStepHoverById && props.handleStepHoverById(END_STEP)}
         selected={props.selectedStepId === END_STEP}

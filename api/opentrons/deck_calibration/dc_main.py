@@ -328,7 +328,9 @@ def probe(tip_length: float) -> str:
 
 def save_config() -> str:
     try:
-        result = robot_configs.save(robot.config)
+        robot_configs.save_robot_settings(robot.config)
+        robot_configs.save_deck_calibration(robot.config)
+        result = robot_configs.load()
     except Exception as e:
         result = repr(e)
     return result

@@ -24,7 +24,12 @@ export const reducer = combineReducers({
 export * from './types'
 
 export type {
-  DeckCalStartState
+  DeckCalStartState,
+  DeckCalCommandState,
+  JogAxis,
+  JogDirection,
+  JogStep,
+  DeckCalPoint
 } from './calibration'
 
 export type {
@@ -72,7 +77,11 @@ export type Action =
 
 export {
   startDeckCalibration,
-  makeGetDeckCalibrationStartState
+  deckCalibrationCommand,
+  setCalibrationJogStep,
+  makeGetDeckCalibrationStartState,
+  makeGetDeckCalibrationCommandState,
+  getCalibrationJogStep
 } from './calibration'
 
 export {

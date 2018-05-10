@@ -13,15 +13,19 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'
+
+import type {
+  StepItemData,
+  FormSectionState,
+  SubstepIdentifier
+} from './types'
+
 import type {
   FormData,
   BlankForm,
-  StepItemData,
   StepIdType,
-  FormSectionState,
-  FormModalFields,
-  SubstepIdentifier
-} from './types'
+  FormModalFields
+} from '../form-types'
 
 import {
   type ValidFormAndErrors,
@@ -32,6 +36,7 @@ import {
 
 import type {
   AddStepAction,
+  ChangeFormInputAction,
   DeleteStepAction,
   SaveStepFormAction,
   SelectStepAction,
@@ -48,7 +53,6 @@ import {
   cancelStepForm, // TODO try collapsing them all into a single Action type
   saveStepForm,
   hoverOnSubstep,
-  changeFormInput,
   expandAddStepButton,
   hoverOnStep,
   toggleStepCollapsed
@@ -56,13 +60,15 @@ import {
 
 type FormState = FormData | null
 
-// the `form` state holds temporary form info that is saved or thrown away with "cancel".
-// TODO: rename to make that more clear. 'unsavedForm'?
+// the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 const unsavedForm = handleActions({
-  CHANGE_FORM_INPUT: (state, action: ActionType<typeof changeFormInput>) => ({
-    ...state,
-    [action.payload.accessor]: action.payload.value
-  }),
+  CHANGE_FORM_INPUT: (state: FormState, action: ChangeFormInputAction) => {
+    // $FlowFixMe TODO IMMEDIATELY
+    return {
+      ...state,
+      ...action.payload.update
+    }
+  },
   POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
   SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
@@ -97,7 +103,7 @@ function createDefaultStep (action: AddStepAction) {
 const unsavedFormModal = handleActions({
   OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModal) => action.payload,
   CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
-    ({...state, [action.payload.accessor]: action.payload.value}),
+    ({...state, ...action.payload.update}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,
   SAVE_MORE_OPTIONS_MODAL: () => null,
   DELETE_STEP: () => null
@@ -342,18 +348,34 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
 
     const stepForm = _forms[_hoveredStep].validatedForm
 
-    if (
-      !stepForm ||
-      stepForm === null ||
-      stepForm.stepType === 'pause' // no labware involved
-    ) {
+    if (!stepForm) {
       return blank
     }
 
-    const src = stepForm.sourceLabware
-    const dest = stepForm.destLabware
+    if (
+      stepForm.stepType === 'consolidate' ||
+      stepForm.stepType === 'distribute' ||
+      stepForm.stepType === 'transfer'
+    ) {
+      // source and dest labware
+      const src = stepForm.sourceLabware
+      const dest = stepForm.destLabware
 
-    return [src, dest]
+      return [src, dest]
+    }
+
+    if (stepForm.stepType === 'mix') {
+      // only 1 labware
+      return [stepForm.labware]
+    }
+
+    // step types that have no labware that gets highlighted
+    if (!(stepForm.stepType === 'pause')) {
+      // TODO Ian 2018-05-08 use assert here
+      console.warn(`hoveredStepLabware does not support step type "${stepForm.stepType}"`)
+    }
+
+    return blank
   }
 )
 
@@ -423,7 +445,7 @@ export const allSteps: Selector<Array<StepItemData>> = createSelector(
           : null
       }
 
-      // optional form fields for "transferish" steps
+      // optional form fields for "TransferLike" steps
       const additionalFormFields = (
         savedForm.stepType === 'transfer' ||
         savedForm.stepType === 'distribute' ||

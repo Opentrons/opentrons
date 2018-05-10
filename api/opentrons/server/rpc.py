@@ -153,24 +153,21 @@ class Server(object):
                 'type': self.call_and_serialize(lambda: type(self.root))
             })
             log.debug('Root info sent to {0}'.format(client_id))
-        except Exception as e:
-            log.error('While sending root info to {0}: '.format(client_id), e)
+        except Exception:
+            log.exception('While sending root info to {0}'.format(client_id))
 
         try:
             self.clients[client] = self.send_worker(client)
             # Async receive client data until websocket is closed
             async for msg in client:
-                # log.debug('Received: {0}'.format(msg))
                 task = self.loop.create_task(self.process(msg))
                 task.add_done_callback(task_done)
                 self.tasks += [task]
-        except Exception as e:
-            log.error(
-                'While reading from socket: {0}'
-                .format(traceback.format_exc()), e)
+        except Exception:
+            log.exception('While reading from socket:')
         finally:
             log.info('Closing WebSocket {0}'.format(id(client)))
-            client.close()
+            await client.close()
             del self.clients[client]
 
         return client
@@ -191,10 +188,6 @@ class Server(object):
         if (len(args) > 0) and (isinstance(args[-1], dict)):
             kwargs = args.pop()
 
-        log.debug(
-            '{0}.{1}({2})'
-            .format(obj, name, ', '.join([str(a) for a in args])))
-
         if not function:
             raise ValueError(
                 'Function {0} not found in {1}'.format(name, type(obj)))
@@ -213,12 +206,12 @@ class Server(object):
         """
         def resolve(a):
             if isinstance(a, dict):
-                id = a.get('i', None)
+                _id = a.get('i', None)
                 # If it's a compound type (including dict)
                 # Check if it has id (i) to determine that it has
                 # a reference in object storage. If it's None, then it's
                 # a dict originated at the remote
-                return self.objects[id] if id else a['v']
+                return self.objects[_id] if _id else a['v']
             # if array, resolve it's elements
             if isinstance(a, (list, tuple)):
                 return [resolve(i) for i in a]
@@ -254,8 +247,8 @@ class Server(object):
                         message))
             else:
                 log.warning('Unhanled WSMsgType: {0}'.format(message.type))
-        except Exception as e:
-            log.error('While processing request: {0}'.format(str(e)))
+        except Exception:
+            log.exception('Error while processing request')
 
     def call_and_serialize(self, func, max_depth=0):
         call_result = func()
@@ -272,23 +265,20 @@ class Server(object):
             response['$']['status'] = 'success'
         except Exception as e:
             trace = traceback.format_exc()
-            log.warning(
-                'Exception while dispatching a method call: {0}'
-                .format(trace))
+            log.exception('Exception while dispatching a method call:')
             try:
                 line_no = [
                     l.split(',')[0].strip()
                     for l in trace.split('line')
                     if '<module>' in l][0]
-            except Exception as exc:
-                log.debug(
-                    "Exception while getting line no: {}".format(type(exc)))
+            except Exception:
+                log.exception("Exception while getting line number:")
                 line_no = 'unknown'
-            response['$']['status'] = 'error'
-            call_result = '{0} [line {1}]: {2}'.format(
-                e.__class__.__name__, line_no, str(e))
+            finally:
+                response['$']['status'] = 'error'
+                call_result = '{0} [line {1}]: {2}'.format(
+                    e.__class__.__name__, line_no, str(e))
         finally:
-            log.debug('Call result: {0}'.format(call_result))
             response['data'] = call_result
         return response
 
@@ -312,7 +302,6 @@ class Server(object):
     def send(self, payload):
         for socket, value in self.clients.items():
             task, queue = value
-            log.debug('Enqueuing {0} for {1}'.format(id(payload), id(socket)))
             asyncio.run_coroutine_threadsafe(queue.put(payload), self.loop)
 
 

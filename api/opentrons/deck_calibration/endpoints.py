@@ -66,7 +66,7 @@ class SessionManager:
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
-        default = robot_configs._get_default().gantry_calibration
+        default = robot_configs._build_config({}, {}).gantry_calibration
         robot.config = robot.config._replace(gantry_calibration=default)
 
 
@@ -156,27 +156,28 @@ async def attach_tip(data):
     {
       'token': UUID token from current session start
       'command': 'attach tip'
-      'tip-length': a float representing how much the length of a pipette
+      'tipLength': a float representing how much the length of a pipette
         increases when a tip is added
     }
     """
     global session
-    tip_length = data.get('tip-length')
+    tip_length = data.get('tipLength')
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not tip_length:
-        message = 'Error: "tip-length" must be specified in request'
-        status = 400
-    elif session.pipettes[mount].tip_attached:
-        message = "Error: tip already attached"
+    pipette = session.pipettes[mount]
+
+    if not tip_length:
+        message = 'Error: "tipLength" must be specified in request'
         status = 400
     else:
+        if pipette.tip_attached:
+            log.warning('attach tip called while tip already attached')
+            pipette._remove_tip(pipette._tip_length)
+
         session.tip_length = tip_length
-        session.pipettes[mount]._add_tip(tip_length)
-        message = "Tip length set: {}".format(session.tip_length)
+        pipette._add_tip(tip_length)
+        message = "Tip length set: {}".format(tip_length)
         status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
@@ -194,19 +195,15 @@ async def detach_tip(data):
     """
     global session
     mount = 'left' if session.current_mount == 'Z' else 'right'
-    if not session.current_mount:
-        message = "Error: current mount must be set before attaching tip"
-        status = 400
-    elif not session.pipettes[mount].tip_attached:
-        message = "Error: no tip attached"
-        status = 400
-    else:
-        pip = session.pipettes[mount]
-        pip._remove_tip(session.tip_length)
-        session.tip_length = None
-        message = "Tip removed"
-        status = 200
-    return web.json_response({'message': message}, status=status)
+    pipette = session.pipettes[mount]
+
+    if not pipette.tip_attached:
+        log.warning('detach tip called with no tip')
+
+    pipette._remove_tip(session.tip_length)
+    session.tip_length = None
+
+    return web.json_response({'message': "Tip removed"}, status=200)
 
 
 async def run_jog(data):
@@ -226,15 +223,26 @@ async def run_jog(data):
     :return: The position you are moving to based on axis, direction, step
     given by the user.
     """
-    if session.current_mount:
-        message = jog(
-            data['axis'],
-            float(data['direction']),
-            float(data['step']))
-        status = 200
-    else:
-        message = "Current mount must be set before jogging"
+    axis = data.get('axis')
+    direction = data.get('direction')
+    step = data.get('step')
+
+    if axis not in ('x', 'y', 'z'):
+        message = '"axis" must be "x", "y", or "z"'
         status = 400
+    elif direction not in (-1, 1):
+        message = '"direction" must be -1 or 1'
+        status = 400
+    elif step is None:
+        message = '"step" must be specified'
+        status = 400
+    else:
+        if axis == 'z':
+            axis = session.current_mount
+        position = jog(axis.upper(), direction, step)
+        message = 'Jogged to {}'.format(position)
+        status = 200
+
     return web.json_response({'message': message}, status=status)
 
 
@@ -248,7 +256,7 @@ async def save_xy(data):
     {
       'token': UUID token from current session start
       'command': 'save xy'
-      'point': an integer [1, 2, or 3] of the calibration point to save
+      'point': a string ID ['1', '2', or '3'] of the calibration point to save
     }
     """
     global session
@@ -322,7 +330,7 @@ def save_transform(data):
             gantry_calibration=list(
                 map(lambda i: list(i), calibration_matrix)))
 
-        robot_configs.save(robot.config)
+        robot_configs.save_deck_calibration(robot.config)
         robot_configs.backup_configuration(robot.config)
         message = "Config file saved and backed up"
         status = 200

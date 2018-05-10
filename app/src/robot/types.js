@@ -25,15 +25,9 @@ export type Slot =
   | '11'
 
 // jog axes and directions
+// TODO(mc, 2018-05-04): deprecate in favor of types in HTTP API module
 export type Axis = 'x' | 'y' | 'z'
 export type Direction = -1 | 1
-export type JogButtonName =
-  | 'left'
-  | 'right'
-  | 'back'
-  | 'forward'
-  | 'up'
-  | 'down'
 
 // minimum robot for actions/reducers/middleware to work
 export type BaseRobot = {

@@ -11,17 +11,19 @@ import {
 } from './formProcessing'
 
 import type {
-  StepIdType,
+  NamedIngredsByLabwareAllSteps,
   SubSteps,
-  PauseFormData,
-  TransferFormData,
-  TransferLikeSubstepItem,
-  NamedIngredsByLabwareAllSteps
+  TransferLikeSubstepItem
 } from './types'
+
+import type {StepIdType} from '../form-types'
 
 import type {
   PipetteData,
-  ConsolidateFormData
+  ConsolidateFormData,
+  DistributeFormData,
+  PauseFormData,
+  TransferFormData
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
@@ -189,6 +191,14 @@ function _consolidateSubsteps (
   }
 }
 
+function _distributeSubsteps (
+  form: DistributeFormData,
+  transferLikeFields: *
+): ?TransferLikeSubstepItem { // <-- TODO remove '?' type
+  console.log('Distribute substeps not yet implemented') // TODO Ian 2018-05-04
+  return null
+}
+
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
@@ -198,28 +208,30 @@ export function generateSubsteps (
   orderedSteps: Array<StepIdType>
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
+    const validatedForm = valForm.validatedForm
     const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
 
     // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (valForm.validatedForm === null || formHasErrors(valForm)) {
+    if (validatedForm === null || formHasErrors(valForm)) {
       return null
     }
 
-    if (valForm.validatedForm.stepType === 'deck-setup') {
+    if (validatedForm.stepType === 'deck-setup') {
       // No substeps for Deck Setup
       return null
     }
 
-    if (valForm.validatedForm.stepType === 'pause') {
+    if (validatedForm.stepType === 'pause') {
       // just returns formData
-      const formData: PauseFormData = valForm.validatedForm
+      const formData: PauseFormData = validatedForm
       return formData
     }
 
     // Handle all TransferLike substeps
     if (
-      valForm.validatedForm.stepType === 'transfer' ||
-      valForm.validatedForm.stepType === 'consolidate'
+      validatedForm.stepType === 'transfer' ||
+      validatedForm.stepType === 'consolidate' ||
+      validatedForm.stepType === 'distribute'
     ) {
       const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
 
@@ -234,7 +246,7 @@ export function generateSubsteps (
         sourceLabware,
         destLabware,
         volume
-      } = valForm.validatedForm
+      } = validatedForm
 
       // TODO Ian 2018-04-06 use assert here
       if (!allPipetteData[pipetteId]) {
@@ -261,16 +273,23 @@ export function generateSubsteps (
         destWellIngreds
       }
 
-      if (valForm.validatedForm.stepType === 'transfer') {
+      if (validatedForm.stepType === 'transfer') {
         return _transferSubsteps(
-          valForm.validatedForm,
+          validatedForm,
           transferLikeFields
         )
       }
 
-      if (valForm.validatedForm.stepType === 'consolidate') {
+      if (validatedForm.stepType === 'consolidate') {
         return _consolidateSubsteps(
-          valForm.validatedForm,
+          validatedForm,
+          transferLikeFields
+        )
+      }
+
+      if (validatedForm.stepType === 'distribute') {
+        return _distributeSubsteps(
+          validatedForm,
           transferLikeFields
         )
       }
@@ -278,7 +297,7 @@ export function generateSubsteps (
       // unreachable here
     }
 
-    console.warn('allSubsteps doesnt support step type: ', valForm.validatedForm.stepType, stepId)
+    console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
     return null
   })
 }

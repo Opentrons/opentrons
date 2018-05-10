@@ -7,7 +7,7 @@
     width: 100%;
     max-width: 38rem;
     margin: auto;
-    padding: 2rem;
+    padding: 1rem;
     border-radius: 0.5rem;
   }
 }
@@ -37,11 +37,18 @@
   background-color: white;
 }
 
+.modal_page_contents {
+  @apply --modal-contents;
+
+  background-color: white;
+  min-width: 38rem;
+}
+
 .modal_page_heading {
   @apply --font-header-dark;
 
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   text-transform: uppercase;
 }
 
@@ -76,6 +83,14 @@
 
 .clickable {
   @apply --clickable;
+}
+
+.alert_modal {
+  z-index: 10;
+}
+
+.alert_modal_overlay {
+  background-color: rgba(115, 115, 115, 0.9);
 }
 
 .alert_modal_contents {

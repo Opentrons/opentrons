@@ -89,8 +89,9 @@ export const saveWellSelectionModal = () =>
     // this if-else is mostly for Flow
     if (wellSelectionModalData) {
       dispatch(changeFormInput({
-        accessor: wellSelectionModalData.formFieldAccessor,
-        value: selectors.selectedWellNames(state)
+        update: {
+          [wellSelectionModalData.formFieldAccessor]: selectors.selectedWellNames(state)
+        }
       }))
     } else {
       console.warn('No well selection modal data in state')

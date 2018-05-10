@@ -1,34 +1,34 @@
 // @flow
 import type {Dispatch} from 'redux'
 
-import {selectors} from './reducers'
-import {END_STEP} from './types'
-import type {StepType, StepIdType, FormSectionNames, FormModalFields, SubstepIdentifier} from './types'
-import type {GetState, ThunkAction, ThunkDispatch} from '../types'
+import {selectors} from '../reducers'
+import {END_STEP} from '../types'
+import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
+import type {ChangeFormPayload} from './types'
+import type {SubstepIdentifier, FormSectionNames} from '../types'
+import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
+import handleFormChange from './handleFormChange'
 
 type EndStepId = typeof END_STEP
-// Update Form input (onChange on inputs)
 
-type ChangeFormPayload = {
-  accessor: string, // TODO use FormData keys type
-  value: string | boolean | Array<string>
-}
-
-type ChangeFormInputAction = {
+export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
   payload: ChangeFormPayload
 }
 
-export const changeFormInput = (payload: ChangeFormPayload): ChangeFormInputAction => ({
-  type: 'CHANGE_FORM_INPUT',
-  payload
-})
+export const changeFormInput = (payload: ChangeFormPayload) =>
+  (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
+    dispatch({
+      type: 'CHANGE_FORM_INPUT',
+      payload: handleFormChange(payload, getState)
+    })
+  }
 
 // Populate form with selected action (only used in thunks)
 
 export type PopulateFormAction = {
   type: 'POPULATE_FORM',
-  payload: {} // TODO use FormData keys type
+  payload: FormData
 }
 
 // Create new step

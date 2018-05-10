@@ -5,7 +5,12 @@ import thunk from 'redux-thunk'
 import client from '../client'
 import {
   reducer,
-  startDeckCalibration
+  startDeckCalibration,
+  deckCalibrationCommand,
+  setCalibrationJogStep,
+  makeGetDeckCalibrationStartState,
+  makeGetDeckCalibrationCommandState,
+  getCalibrationJogStep
 } from '..'
 
 jest.mock('../client')
@@ -88,6 +93,63 @@ describe('/calibration/**', () => {
 
       return store.dispatch(startDeckCalibration(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('deckCalibrationCommand action creator', () => {
+    const path = 'deck'
+    const token = 'mock-token'
+    const request = {command: 'release'}
+    const response = {message: 'mock-response'}
+
+    beforeEach(() => {
+      state.api.calibration[NAME] = {'deck/start': {response: {token}}}
+    })
+
+    test('calls POST /calibration/deck and adds token to request', () => {
+      client.__setMockResponse(response)
+
+      return store.dispatch(deckCalibrationCommand(robot, request))
+        .then(() => expect(client).toHaveBeenCalledWith(
+          robot,
+          'POST',
+          'calibration/deck',
+          {...request, token}
+        ))
+    })
+
+    test('dispatches CAL_REQUEST and CAL_SUCCESS', () => {
+      const expectedActions = [
+        {type: 'api:CAL_REQUEST', payload: {robot, request, path}},
+        {type: 'api:CAL_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(deckCalibrationCommand(robot, request))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches CAL_REQUEST and CAL_FAILURE', () => {
+      const error = {name: 'ResponseError', message: 'AH'}
+      const expectedActions = [
+        {type: 'api:CAL_REQUEST', payload: {robot, request, path}},
+        {type: 'api:CAL_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(deckCalibrationCommand(robot, request))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('non-API-call action creators', () => {
+    test('setCalibrationJogStep', () => {
+      const step = 4
+      const expected = {type: 'api:SET_CAL_JOG_STEP', payload: {step}}
+
+      expect(setCalibrationJogStep(step)).toEqual(expected)
     })
   })
 
@@ -182,6 +244,63 @@ describe('/calibration/**', () => {
           }
         })
       })
+    })
+  })
+
+  describe('reducer with non-API-call actions', () => {
+    beforeEach(() => {
+      state = state.api
+    })
+
+    test('handles SET_CAL_JOG_STEP', () => {
+      const action = setCalibrationJogStep(5)
+
+      expect(reducer(state, action).calibration).toEqual({
+        ...state.calibration,
+        jogStep: 5
+      })
+    })
+  })
+
+  describe('selectors', () => {
+    beforeEach(() => {
+      state.api.calibration[NAME] = {
+        deck: {inProgress: true},
+        'deck/start': {inProgress: true}
+      }
+    })
+
+    test('makeGetDeckCalibrationStartState', () => {
+      const getStartState = makeGetDeckCalibrationStartState()
+
+      expect(getStartState(state, robot))
+        .toEqual(state.api.calibration[NAME]['deck/start'])
+
+      expect(getStartState(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null
+      })
+    })
+
+    test('makeGetDeckCalibrationCommandState', () => {
+      const getCommandState = makeGetDeckCalibrationCommandState()
+
+      expect(getCommandState(state, robot))
+        .toEqual(state.api.calibration[NAME].deck)
+
+      expect(getCommandState(state, {name: 'foo'})).toEqual({
+        inProgress: false,
+        error: null,
+        request: null,
+        response: null
+      })
+    })
+
+    test('getCalibrationJogStep', () => {
+      state.api.calibration.jogStep = 42
+      expect(getCalibrationJogStep(state)).toBe(42)
     })
   })
 })

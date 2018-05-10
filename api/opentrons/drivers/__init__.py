@@ -3,10 +3,10 @@ import glob
 import os
 import pkg_resources
 import sys
+import logging
 
 import serial
 
-from opentrons.util.log import get_logger
 from opentrons.drivers import connection
 
 __all__ = [
@@ -24,7 +24,7 @@ SMOOTHIE_DEFAULTS = configparser.ConfigParser()
 SMOOTHIE_DEFAULTS.read(SMOOTHIE_DEFAULTS_FILE)
 
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def get_serial_ports_list():

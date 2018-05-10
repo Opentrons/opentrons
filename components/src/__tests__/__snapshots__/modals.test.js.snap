@@ -180,7 +180,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     </div>
   </header>
   <div
-    className="modal_contents"
+    className="modal_page_contents"
   >
     children
   </div>

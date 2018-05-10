@@ -2,7 +2,7 @@ import os
 import json
 import tempfile
 from aiohttp import web
-from opentrons.server.main import init, log_init
+from opentrons.server.main import init
 from opentrons.server.endpoints import (control, update)
 
 
@@ -24,8 +24,6 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 
 async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
-    log_init()
-
     msg = "success"
     filename = "testy.whl"
     tmpdir = tempfile.mkdtemp("files")
@@ -56,8 +54,6 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 async def test_feature_flags(
         virtual_smoothie_env, loop, test_client):
-    log_init()
-
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 

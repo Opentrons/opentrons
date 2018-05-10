@@ -12,7 +12,7 @@ const HEADING = 'Are you sure you want to go back?'
 const CANCEL_TEXT = 'cancel'
 const EXIT_TEXT = 'exit'
 
-export default function ChangePipette (props: Props) {
+export default function ExitAlertModal (props: Props) {
   const {back, exit} = props
 
   return (
@@ -22,6 +22,7 @@ export default function ChangePipette (props: Props) {
         {children: CANCEL_TEXT, onClick: back},
         {children: EXIT_TEXT, onClick: exit}
       ]}
+      alertOverlay
     >
       <p>Doing so will exit pipette setup and home your robot.</p>
     </AlertModal>

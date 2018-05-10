@@ -13,8 +13,8 @@ import {
 
 import type {Selector} from '../types'
 import type {LabwareData} from '../step-generation/types'
+import type {StepIdType} from '../form-types'
 import type {
-  StepIdType,
   StepSubItemData,
   StepItemsWithSubsteps,
   StepItemData

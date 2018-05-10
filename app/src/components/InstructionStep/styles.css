@@ -1,0 +1,52 @@
+@import '@opentrons/components';
+
+.instructions {
+  display: flex;
+  align-content: stretch;
+  width: 100%;
+}
+
+.step {
+  @apply --font-body-2-dark;
+
+  width: 50%;
+  padding: 0 1.25rem;
+  vertical-align: top;
+  border: 2px solid var(--c-light-gray);
+
+  &:not(:last-child) {
+    margin-right: 1.25rem;
+  }
+
+  & > * {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.step_copy {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.step_legend {
+  display: inline;
+  margin: 0;
+  padding: 0 0.75rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
+.screwdriver {
+  overflow: visible;
+  display: block;
+  width: 8rem;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  max-height: 11rem;
+  margin-left: auto;
+  margin-right: auto;
+}

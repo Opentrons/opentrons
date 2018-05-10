@@ -7,6 +7,14 @@ import type {ApiCall, ApiRequestError} from './types'
 
 import client from './client'
 
+export type JogAxis = 'x' | 'y' | 'z'
+
+export type JogDirection = -1 | 1
+
+export type JogStep = number
+
+export type DeckCalPoint = '1' | '2' | '3'
+
 type DeckStartRequest = {
   force?: boolean
 }
@@ -15,15 +23,30 @@ type DeckStartResponse = {
   token: string,
   pipette: {
     mount: Mount,
-    model: string
+    model: string,
   },
 }
 
-type CalRequest = DeckStartRequest
+type DeckCalRequest =
+  | {| command: 'attach tip', tipLength: number |}
+  | {| command: 'detach tip' |}
+  | {| command: 'jog', axis: JogAxis, direction: JogDirection, step: JogStep |}
+  | {| command: 'save xy', point: DeckCalPoint |}
+  | {| command: 'save z' |}
+  | {| command: 'save transform' |}
+  | {| command: 'release' |}
 
-type CalResponse = DeckStartResponse
+type DeckCalResponse = {
+  message: string,
+}
 
-type RequestPath = 'deck/start'
+type CalRequest = DeckStartRequest | DeckCalRequest
+
+type CalResponse = DeckStartResponse | DeckCalResponse
+
+type RequestPath =
+  | 'deck/start'
+  | 'deck'
 
 type CalRequestAction = {|
   type: 'api:CAL_REQUEST',
@@ -31,7 +54,7 @@ type CalRequestAction = {|
     robot: RobotService,
     path: RequestPath,
     request: CalRequest,
-  |}
+  |},
 |}
 
 type CalSuccessAction = {|
@@ -40,7 +63,7 @@ type CalSuccessAction = {|
     robot: RobotService,
     path: RequestPath,
     response: CalResponse,
-  |}
+  |},
 |}
 
 type CalFailureAction = {|
@@ -49,26 +72,40 @@ type CalFailureAction = {|
     robot: RobotService,
     path: RequestPath,
     error: ApiRequestError,
-  |}
+  |},
+|}
+
+type SetCalJogStepAction = {|
+  type: 'api:SET_CAL_JOG_STEP',
+  payload: {|
+    step: JogStep,
+  |},
 |}
 
 export type CalibrationAction =
   | CalRequestAction
   | CalSuccessAction
   | CalFailureAction
+  | SetCalJogStepAction
 
 export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
 
+export type DeckCalCommandState = ApiCall<DeckCalRequest, DeckCalResponse>
+
 type RobotCalState = {
-  'deck/start'?: DeckCalStartState
+  'deck/start'?: DeckCalStartState,
+  deck?: DeckCalCommandState,
 }
 
 type CalState = {
-  [robotName: string]: ?RobotCalState
+  jogStep: JogStep,
+  [robotName: string]: ?RobotCalState,
 }
 
-// const DECK: RequestPath = 'deck'
-const DECK_START: RequestPath = 'deck/start'
+const DECK: 'deck' = 'deck'
+const DECK_START: 'deck/start' = 'deck/start'
+
+const DEFAULT_JOG_STEP = 0.1
 
 export function startDeckCalibration (
   robot: RobotService,
@@ -86,11 +123,33 @@ export function startDeckCalibration (
   }
 }
 
+export function deckCalibrationCommand (
+  robot: RobotService,
+  request: DeckCalRequest
+): ThunkPromiseAction {
+  return (dispatch, getState) => {
+    const state = getRobotCalState(getState(), robot)
+    const startState = getStartStateFromCalState(state)
+    const token = startState.response && startState.response.token
+
+    dispatch(calRequest(robot, DECK, request))
+
+    return client(robot, 'POST', `calibration/${DECK}`, {...request, token})
+      .then((res: DeckCalResponse) => calSuccess(robot, DECK, res))
+      .catch((err: ApiRequestError) => calFailure(robot, DECK, err))
+      .then(dispatch)
+  }
+}
+
+export function setCalibrationJogStep (step: JogStep): SetCalJogStepAction {
+  return {type: 'api:SET_CAL_JOG_STEP', payload: {step}}
+}
+
 export function calibrationReducer (
   state: ?CalState,
   action: Action
 ): CalState {
-  if (!state) return {}
+  if (!state) return {jogStep: DEFAULT_JOG_STEP}
 
   let name
   let path
@@ -144,6 +203,9 @@ export function calibrationReducer (
           }
         }
       }
+
+    case 'api:SET_CAL_JOG_STEP':
+      return {...state, jogStep: action.payload.step}
   }
 
   return state
@@ -151,15 +213,46 @@ export function calibrationReducer (
 
 export function makeGetDeckCalibrationStartState () {
   const sel: Selector<State, BaseRobot, DeckCalStartState> = createSelector(
-    selectRobotCalState,
-    (state) => state[DECK_START] || {inProgress: false}
+    getRobotCalState,
+    getStartStateFromCalState
   )
 
   return sel
 }
 
-function selectRobotCalState (state: State, props: BaseRobot): RobotCalState {
+export function makeGetDeckCalibrationCommandState () {
+  const sel: Selector<State, BaseRobot, DeckCalCommandState> = createSelector(
+    getRobotCalState,
+    getDeckStateFromCalState
+  )
+
+  return sel
+}
+
+export function getCalibrationJogStep (state: State): JogStep {
+  return state.api.calibration.jogStep
+}
+
+function getRobotCalState (state: State, props: BaseRobot): RobotCalState {
   return state.api.calibration[props.name] || {}
+}
+
+function getStartStateFromCalState (state: RobotCalState): DeckCalStartState {
+  return state[DECK_START] || {
+    inProgress: false,
+    error: null,
+    request: null,
+    response: null
+  }
+}
+
+function getDeckStateFromCalState (state: RobotCalState): DeckCalCommandState {
+  return state[DECK] || {
+    inProgress: false,
+    error: null,
+    request: null,
+    response: null
+  }
 }
 
 function calRequest (

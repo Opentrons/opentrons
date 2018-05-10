@@ -91,31 +91,29 @@ def run_quiet_process(command):
 
 
 def test_smoothie_gpio():
-    from time import sleep
-    from opentrons.drivers.rpi_drivers import gpio
     from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import SMOOTHIE_ACK
+
+    def _write_and_return(msg):
+        return serial_communication.write_and_return(
+            msg + '\r\n\r\n',
+            SMOOTHIE_ACK,
+            robot._driver._connection,
+            timeout=1)
 
     print('CONNECT')
     robot.connect()
     d = robot._driver
     # make sure the driver is currently working as expected
-    version_response = serial_communication.write_and_return(
-        'version\r\n', d._connection, timeout=1)
+    version_response = _write_and_return('version')
     if 'version' in version_response:
         print(RESULT_SPACE.format(PASS))
     else:
         print(RESULT_SPACE.format(FAIL))
 
     print('DATA LOSS')
-    for i in range(10):
-        serial_communication.write_and_return(
-            'version\r\n',
-            d._connection,
-            timeout=1)
-    data = [
-        serial_communication.write_and_return('version\r\n', d._connection, timeout=1)  #NOQA
-        for i in range(100)
-    ]
+    [_write_and_return('version') for i in range(10)]
+    data = [_write_and_return('version') for i in range(100)]
     if len(set(data)) == 1:
         print(RESULT_SPACE.format(PASS))
     else:
@@ -124,44 +122,32 @@ def test_smoothie_gpio():
     print('HALT')
     d._connection.reset_input_buffer()
     # drop the HALT line LOW, and make sure there is an error state
-    gpio.set_low(gpio.OUTPUT_PINS['HALT'])
-    sleep(0.25)
-    gpio.set_high(gpio.OUTPUT_PINS['HALT'])
-    sleep(0.25)
+    d._smoothie_hard_halt()
 
     old_timeout = int(d._connection.timeout)
     d._connection.timeout = 1  # 1 second
-    cycles = 5
-    for i in range(cycles):
-        r = d._connection.readline().decode()
-        if 'ALARM' in r:
-            print(RESULT_SPACE.format(PASS))
-            serial_communication.write_and_return(
-                'M999', d._connection, timeout=1)
-            break
-        elif i >= cycles - 1:
-            print(RESULT_SPACE.format(FAIL))
+    r = d._connection.readline().decode()
+    if 'ALARM' in r:
+        print(RESULT_SPACE.format(PASS))
+    else:
+        print(RESULT_SPACE.format(FAIL))
 
     d._reset_from_error()
     d._connection.timeout = old_timeout
 
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
-    gpio.set_low(gpio.OUTPUT_PINS['ISP'])
-    sleep(0.25)
-    gpio.set_high(gpio.OUTPUT_PINS['ISP'])
-    sleep(0.25)
-
-    r = serial_communication.write_and_return('M999', d._connection, timeout=1)
-    if len(r):
-        print(RESULT_SPACE.format(FAIL))
-    else:
-        print(RESULT_SPACE.format(PASS))
+    d._smoothie_programming_mode()
+    try:                                        # NOQA
+        _write_and_return('M999')               # NOQA
+        print(RESULT_SPACE.format(FAIL))        # NOQA
+    except Exception:                           # NOQA
+        print(RESULT_SPACE.format(PASS))        # NOQA
 
     print('RESET')
     # toggle the RESET line to LOW, and make sure it is NOT dead
     d._smoothie_reset()
-    r = serial_communication.write_and_return('M119', d._connection, timeout=1)
+    r = _write_and_return('M119')
     if 'X_max' in r:
         print(RESULT_SPACE.format(PASS))
     else:
