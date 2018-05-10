@@ -54,8 +54,7 @@ function InstructionsModal (props: Props) {
   } else if (['2', '3', '4', '5'].indexOf(calibrationStep) > -1) {
     StepInstructions = ConfirmPosition
   } else {
-    // TODO(mc, 2018-05-08): RemoveTip
-    StepInstructions = 'div'
+    StepInstructions = AttachTip
   }
 
   return (
@@ -130,7 +129,9 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   } else if (step === '5') {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save xy', point: '3'})
-    ).then(goToNext)
+    ).then(() => dispatch(
+      moveRobotTo(robot, {position: 'attach_tip', mount, pipette})
+    )).then(goToNext)
   } else {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save transform'})
