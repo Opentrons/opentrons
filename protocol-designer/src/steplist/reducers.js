@@ -92,8 +92,7 @@ const formSectionCollapse = handleActions({
 }, initialFormSectionState)
 
 // Add default title (and later, other default values) to newly-created Step
-// TODO: Ian 2018-01-26 don't add any default values, selector should generate title if missing,
-// title is all pristine Steps need added into the selector.
+// TODO: Ian 2018-01-26 don't add any default values, the allSteps selector generates the title
 function createDefaultStep (action: AddStepAction) {
   const {stepType} = action.payload
   return {...action.payload, title: stepType}
@@ -442,10 +441,21 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
       (step: StepItemData, id: StepIdType): StepItemData => {
         const savedForm = (_savedForms && _savedForms[id]) || null
 
+        // Assign the step title
+        let title
+
+        if (savedForm && savedForm['step-name']) {
+          title = savedForm['step-name']
+        } else if (step.stepType === 'deck-setup') {
+          title = 'Deck Setup'
+        } else {
+          title = `${step.stepType} ${id}`
+        }
+
         return {
           ...steps[id],
           formData: savedForm,
-          title: savedForm ? savedForm['step-name'] : '--', // TODO IMMEDIATELY when does it not have a title?
+          title,
           description: savedForm ? savedForm['step-details'] : null
         }
       }
