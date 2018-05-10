@@ -163,7 +163,8 @@ const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
-    state.filter(stepId => stepId !== action.payload)
+    // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
+    state.filter(stepId => !(stepId === action.payload && `${stepId}` === action.payload))
 }, [INITIAL_DECK_SETUP_ID])
 
 type SelectedStepState = null | StepIdType | typeof END_STEP
