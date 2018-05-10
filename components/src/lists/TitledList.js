@@ -10,7 +10,7 @@ type ListProps = {
   /** text of title */
   title: string,
   /** optional icon left of the title */
-  iconName?: IconName,
+  iconName?: ?IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
   iconProps?: $Diff<React.ElementProps<typeof Icon>, {name: *}>,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow

@@ -1,9 +1,10 @@
 // @flow
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
-import type { ActionType } from 'redux-actions'
-import { createSelector } from 'reselect'
+import {combineReducers} from 'redux'
+import {handleActions} from 'redux-actions'
+import type {ActionType} from 'redux-actions'
+import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
+import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import omit from 'lodash/omit'
 
@@ -429,26 +430,25 @@ const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   s => s.formSectionCollapse
 )
 
-export const allSteps: Selector<Array<StepItemData>> = createSelector(
+export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
   getSteps,
-  orderedStepsSelector,
   getCollapsedSteps,
   getSavedForms,
   labwareIngredSelectors.getLabware,
-  (steps, orderedSteps, collapsedSteps, _savedForms, _labware) => {
-    return orderedSteps.map(id => {
-      const savedForm = (_savedForms && _savedForms[id]) || null
+  (steps, collapsedSteps, _savedForms, _labware) => {
+    return mapValues(
+      steps,
+      (step: StepItemData, id: StepIdType): StepItemData => {
+        const savedForm = (_savedForms && _savedForms[id]) || null
 
-      return {
-        ...steps[id],
-
-        formData: savedForm,
-        description: savedForm ? savedForm['step-details'] : null,
-
-        collapsed: collapsedSteps[id]
-        // substeps: _allSubsteps[id] // TODO Add back in in higher-order selector
+        return {
+          ...steps[id],
+          formData: savedForm,
+          title: savedForm ? savedForm['step-name'] : '--', // TODO IMMEDIATELY when does it not have a title?
+          description: savedForm ? savedForm['step-details'] : null
+        }
       }
-    })
+    )
   }
 )
 

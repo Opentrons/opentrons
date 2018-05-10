@@ -187,7 +187,7 @@ class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, {col
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
   onSelectSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: SubstepIdentifier
+  hoveredSubstep: ?SubstepIdentifier
 |}
 
 export default function SourceDestSubstep (props: SourceDestSubstepProps) {
