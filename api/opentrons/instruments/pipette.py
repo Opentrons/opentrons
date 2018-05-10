@@ -1052,8 +1052,6 @@ class Pipette:
                 x=pos_drop_tip
             )
 
-            self._shake_off_tips(location)
-
             if home_after:
                 self._home_after_drop_tip()
 
@@ -1099,9 +1097,9 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         d = self._get_plunger_position('drop_tip')
         safety_margin = abs(b - d)
+        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.fast_home(
             self.robot.poses, safety_margin)
-        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=self._get_plunger_position('bottom')

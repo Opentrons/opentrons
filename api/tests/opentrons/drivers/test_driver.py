@@ -330,7 +330,7 @@ def test_functional(smoothie):
     assert smoothie.position == smoothie.homed_position
 
 
-def test_set_current(model):
+def test_set_pick_upcurrent(model):
     import types
     driver = model.robot._driver
 
@@ -368,6 +368,48 @@ def test_set_current(model):
     assert current_log == expected
 
     driver._save_current = set_current
+
+
+def test_drop_tip_current(model):
+    import types
+    driver = model.robot._driver
+
+    old_save_current = driver._save_current
+    current_log = []
+
+    def mock_save_current(self, settings, axes_active=True):
+        nonlocal current_log
+        if 'C' in settings:
+            current_log.append(settings)
+        old_save_current(settings, axes_active)
+
+    driver._save_current = types.MethodType(mock_save_current, driver)
+
+    rack = model.robot.add_container('tiprack-200ul', '10')
+    pipette = model.instrument._instrument
+    pipette._plunger_current = 0.123
+    pipette._drop_tip_current = 0.456
+    pipette.drop_tip(rack[0])
+
+    # Instrument in `model` is configured to right mount, which is the A axis
+    # on the Smoothie (see `Robot._actuators`)
+    expected = [
+        {'C': 0.456},   # make to 'drop_tip' position
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # move to 'bottom' position
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # fast-home move upwards
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # fast-home home command
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # move back to 'bottom' position
+        {'C': 0.05}     # dwell
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    driver._save_current = old_save_current
 
 
 def test_parse_pipette_data():
