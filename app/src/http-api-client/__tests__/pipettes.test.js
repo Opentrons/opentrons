@@ -40,6 +40,14 @@ describe('pipettes', () => {
           .toHaveBeenCalledWith(robot, 'GET', 'pipettes'))
     })
 
+    test('fetchPipettes with refresh calls GET /pipettes?refresh=true', () => {
+      client.__setMockResponse(pipettes)
+
+      return store.dispatch(fetchPipettes(robot, true))
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'GET', 'pipettes?refresh=true'))
+    })
+
     test('fetchPipettes dispatches PIPETTES_REQUEST + SUCCESS', () => {
       const expectedActions = [
         {type: 'api:PIPETTES_REQUEST', payload: {robot}},

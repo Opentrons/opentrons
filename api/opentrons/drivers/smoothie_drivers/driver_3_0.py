@@ -319,7 +319,7 @@ class SmoothieDriver_3_0_0:
                 # strings that did not include the _v# designation
                 res = res + '_v1'
 
-        return {'model': res}
+        return res
 
     def write_pipette_id(self, mount, data_string):
         '''

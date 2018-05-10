@@ -109,7 +109,7 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
     monkeypatch.setattr(robot_configs, 'save_deck_calibration', dummy_save)
 
-    endpoints.save_transform({})
+    await endpoints.save_transform({})
 
     expected = robot.config.gantry_calibration
     assert len(persisted_data) == 2

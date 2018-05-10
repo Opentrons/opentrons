@@ -300,7 +300,7 @@ async def save_z(data):
     return web.json_response({'message': message}, status=status)
 
 
-def save_transform(data):
+async def save_transform(data):
     """
     Calculate the transormation matrix that calibrates the gantry to the deck
     :param data: Information obtained from a POST request.

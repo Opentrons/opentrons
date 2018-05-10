@@ -31,7 +31,7 @@ async def test_get_pipettes_uncommissioned(
     }
 
     robot._driver.simulating = False
-    resp = await cli.get('/pipettes')
+    resp = await cli.get('/pipettes?refresh=true')
     robot._driver.simulating = True
     text = await resp.text()
     assert resp.status == 200
@@ -59,10 +59,69 @@ async def test_get_pipettes(
         }
     }
 
+    resp = await cli.get('/pipettes?refresh=true')
+    text = await resp.text()
+    assert resp.status == 200
+    assert json.loads(text) == expected
+
+
+async def test_get_cached_pipettes(
+        virtual_smoothie_env, loop, test_client, monkeypatch):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    model = list(configs.values())[0]
+    expected = {
+        'left': {
+            'model': model.name,
+            'tip_length': model.tip_length,
+            'mount_axis': 'z',
+            'plunger_axis': 'b'
+        },
+        'right': {
+            'model': model.name,
+            'tip_length': model.tip_length,
+            'mount_axis': 'a',
+            'plunger_axis': 'c'
+        }
+    }
+
     resp = await cli.get('/pipettes')
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
+
+    model1 = list(configs.values())[1]
+
+    def dummy_model(mount):
+        return model1.name
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_model)
+
+    resp1 = await cli.get('/pipettes')
+    text1 = await resp1.text()
+    assert resp1.status == 200
+    assert json.loads(text1) == expected
+
+    expected2 = {
+        'left': {
+            'model': model1.name,
+            'tip_length': model1.tip_length,
+            'mount_axis': 'z',
+            'plunger_axis': 'b'
+        },
+        'right': {
+            'model': model1.name,
+            'tip_length': model1.tip_length,
+            'mount_axis': 'a',
+            'plunger_axis': 'c'
+        }
+    }
+
+    resp2 = await cli.get('/pipettes?refresh=true')
+    text2 = await resp2.text()
+    assert resp2.status == 200
+    assert json.loads(text2) == expected2
 
 
 async def test_disengage_axes(
