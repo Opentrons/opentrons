@@ -30,9 +30,11 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState:
 
   const commands = [{
     command: 'blowout',
-    pipette,
-    labware,
-    well
+    params: {
+      pipette,
+      labware,
+      well
+    }
   }]
 
   return {

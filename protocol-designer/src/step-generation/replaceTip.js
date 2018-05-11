@@ -35,9 +35,11 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     // pick up tip command
     {
       command: 'pick-up-tip',
-      pipette: pipetteData.id,
-      labware: nextTiprack.tiprackId,
-      well: nextTiprack.well
+      params: {
+        pipette: pipetteData.id,
+        labware: nextTiprack.tiprackId,
+        well: nextTiprack.well
+      }
     }
   ]
 

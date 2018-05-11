@@ -20,9 +20,11 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
   const commands = [
     {
       command: 'drop-tip',
-      pipette: pipetteId,
-      labware: FIXED_TRASH_ID,
-      well: 'A1' // TODO: Is 'A1' of the trash always the right place to drop tips?
+      params: {
+        pipette: pipetteId,
+        labware: FIXED_TRASH_ID,
+        well: 'A1' // TODO: Is 'A1' of the trash always the right place to drop tips?
+      }
     }
   ]
 

@@ -180,20 +180,24 @@ export type AspirateDispenseArgs = {|
 
 export type Command = {|
   command: 'aspirate' | 'dispense',
-  ...AspirateDispenseArgs
+  params: AspirateDispenseArgs
 |} | {|
   command: 'pick-up-tip' | 'drop-tip' | 'blowout' | 'touch-tip',
-  ...PipetteLabwareFields
+  params: PipetteLabwareFields
 |} | {|
   command: 'delay',
   /** number of seconds to delay (fractional values OK),
     or `true` for delay until user input */
-  wait: number | true,
-  message: ?string
+  params: {|
+    wait: number | true,
+    message: ?string
+  |}
 |} | {|
   command: 'air-gap',
-  pipette: string,
-  volume: number
+  params: {|
+    pipette: string,
+    volume: number
+  |},
 |}
 
 export type ErrorType =
