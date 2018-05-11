@@ -9,7 +9,7 @@ import type {
   PauseFormData
 } from './step-generation'
 
-export type StepIdType = number
+export type StepIdType = number // TODO Ian 2018-05-10 change to string
 
 // TODO Ian 2018-01-16 factor out to some constants.js ?
 export const stepIconsByType: {[string]: IconName} = {
