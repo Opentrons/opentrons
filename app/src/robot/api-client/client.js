@@ -9,7 +9,7 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
-const RUN_TIME_TICK_INTERVAL_MS = 500
+const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
