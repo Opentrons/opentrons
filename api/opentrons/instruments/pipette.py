@@ -1685,10 +1685,10 @@ class Pipette:
         """
         if aspirate:
             self.set_speed(
-                aspirate=round(self._ul_to_mm(aspirate), 3))
+                aspirate=round(self._ul_to_mm(aspirate), 6))
         if dispense:
             self.set_speed(
-                dispense=round(self._ul_to_mm(dispense), 3))
+                dispense=round(self._ul_to_mm(dispense), 6))
         return self
 
     def set_pick_up_current(self, amperes):
