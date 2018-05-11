@@ -80,7 +80,19 @@ describe('api client', () => {
   }
 
   const sendConnect = () => sendToClient(STATE, actions.connect(ROBOT_NAME))
+
   const sendDisconnect = () => sendToClient(STATE, actions.disconnect())
+
+  const sendNotification = (notification) => {
+    expect(rpcClient.on)
+      .toHaveBeenCalledWith('notification', expect.any(Function))
+
+    const handler = rpcClient.on.mock.calls.find((args) => {
+      return args[0] === 'notification'
+    })[1]
+
+    handler(notification)
+  }
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
@@ -150,20 +162,32 @@ describe('api client', () => {
   })
 
   describe('session responses', () => {
-    test('dispatches sessionResponse on connect', () => {
-      const expected = actions.sessionResponse(null, {
+    let expectedInitial
+
+    beforeEach(() => {
+      expectedInitial = actions.sessionResponse(null, {
         name: session.name,
         state: session.state,
-        errors: [],
         protocolText: session.protocol_text,
         protocolCommands: [],
         protocolCommandsById: {},
         instrumentsByMount: {},
         labwareBySlot: {}
       })
+    })
 
+    test('dispatches sessionResponse on connect', () => {
       return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    test('dispatches sessionResponse on full session notification', () => {
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification({topic: 'session', payload: session})
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
     })
 
     test('handles connnect without session', () => {
@@ -205,9 +229,9 @@ describe('api client', () => {
         {id: 4, description: 'e', children: []}
       ]
       session.command_log = {
-        0: {timestamp: 0},
-        1: {timestamp: 1},
-        2: {timestamp: 2}
+        0: 0,
+        1: 1,
+        2: 2
       }
 
       return sendConnect()
@@ -270,6 +294,15 @@ describe('api client', () => {
       session.command_log = null
 
       return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('sends SESSION_UPDATE if session notification has lastCommand', () => {
+      const update = {state: 'running', startTime: 1, lastCommand: null}
+      const expected = actions.sessionUpdate(update)
+
+      return sendConnect()
+        .then(() => sendNotification({topic: 'session', payload: update}))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })

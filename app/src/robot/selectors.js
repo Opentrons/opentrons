@@ -196,12 +196,9 @@ export const getRunProgress = createSelector(
 
 // TODO(mc, 2018-01-04): inferring start time from handledAt of first command
 // is inadequate; robot starts moving before this timestamp is set
-export const getStartTime = createSelector(
-  getCommands,
-  (commands): ?number => commands.length
-    ? commands[0].handledAt
-    : null
-)
+export function getStartTime (state: State) {
+  return session(state).startTime
+}
 
 export const getRunTime = createSelector(
   getStartTime,

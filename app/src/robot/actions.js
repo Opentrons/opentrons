@@ -10,7 +10,8 @@ import type {
   Direction,
   BaseRobot,
   RobotService,
-  ProtocolFile
+  ProtocolFile,
+  SessionUpdate
 } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
@@ -155,6 +156,11 @@ export type CalibrationFailureAction = {|
   payload: Error
 |}
 
+export type SessionUpdateAction = {|
+  type: 'robot:SESSION_UPDATE',
+  payload: SessionUpdate,
+|}
+
 export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
@@ -209,6 +215,7 @@ export type Action =
   | CalibrationFailureAction
   | ReturnTipResponseAction
   | SetJogDistanceAction
+  | SessionUpdateAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -273,6 +280,13 @@ export const actions = {
       payload: !didError
         ? session
         : error
+    }
+  },
+
+  sessionUpdate (update: SessionUpdate): SessionUpdateAction {
+    return {
+      type: 'robot:SESSION_UPDATE',
+      payload: update
     }
   },
 

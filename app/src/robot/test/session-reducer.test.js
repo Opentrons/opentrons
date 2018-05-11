@@ -31,6 +31,7 @@ describe('robot reducer - session', () => {
       pauseRequest: {inProgress: false, error: null},
       resumeRequest: {inProgress: false, error: null},
       cancelRequest: {inProgress: false, error: null},
+      startTime: null,
       runTime: 0
     })
   })
@@ -77,7 +78,6 @@ describe('robot reducer - session', () => {
         sessionRequest: {inProgress: true, error: null},
         name: '/path/to/foo.py'
       }
-
     }
     const action = {
       type: actionTypes.SESSION_RESPONSE,
@@ -118,6 +118,37 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual({
       sessionRequest: {inProgress: false, error: new Error('AH')},
       name: '/path/to/foo.py'
+    })
+  })
+
+  test('handles SESSION_UPDATE action', () => {
+    const state = {
+      session: {
+        state: 'loaded',
+        startTime: null,
+        protocolCommands: [0, 1, 2],
+        protocolCommandsById: {
+          0: {id: 0, handledAt: 2}
+        }
+      }
+    }
+    const action = {
+      type: 'robot:SESSION_UPDATE',
+      payload: {
+        state: 'running',
+        startTime: 1,
+        lastCommand: {id: 1, handledAt: 3}
+      }
+    }
+
+    expect(reducer(state, action).session).toEqual({
+      state: 'running',
+      startTime: 1,
+      protocolCommands: [0, 1, 2],
+      protocolCommandsById: {
+        0: {id: 0, handledAt: 2},
+        1: {id: 1, handledAt: 3}
+      }
     })
   })
 

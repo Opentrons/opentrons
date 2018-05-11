@@ -203,6 +203,48 @@ describe('robot selectors', () => {
     })
   })
 
+  test('getStartTime', () => {
+    const state = makeState({session: {startTime: 42}})
+    expect(getStartTime(state)).toBe(42)
+  })
+
+  test('getRunTime with no startTime', () => {
+    const state = {
+      [NAME]: {
+        session: {
+          startTime: null,
+          runTime: 42
+        }
+      }
+    }
+
+    expect(getRunTime(state)).toEqual('00:00:00')
+  })
+
+  test('getRunTime', () => {
+    const testGetRunTime = (seconds, expected) => {
+      const stateWithRunTime = {
+        [NAME]: {
+          session: {
+            startTime: 42,
+            runTime: 42 + (1000 * seconds)
+          }
+        }
+      }
+
+      expect(getRunTime(stateWithRunTime)).toEqual(expected)
+    }
+
+    testGetRunTime(0, '00:00:00')
+    testGetRunTime(1, '00:00:01')
+    testGetRunTime(59, '00:00:59')
+    testGetRunTime(60, '00:01:00')
+    testGetRunTime(61, '00:01:01')
+    testGetRunTime(3599, '00:59:59')
+    testGetRunTime(3600, '01:00:00')
+    testGetRunTime(3601, '01:00:01')
+  })
+
   describe('command based', () => {
     const state = makeState({
       session: {
@@ -253,44 +295,6 @@ describe('robot selectors', () => {
       })
 
       expect(getRunProgress(state)).toEqual(0)
-    })
-
-    test('getStartTime', () => {
-      expect(getStartTime(state)).toEqual(42)
-    })
-
-    test('getStartTime without commands', () => {
-      expect(getStartTime(makeState({session: {protocolCommands: []}})))
-        .toEqual(null)
-    })
-
-    test('getRunTime', () => {
-      const testGetRunTime = (seconds, expected) => {
-        const stateWithRunTime = {
-          [NAME]: {
-            session: {
-              ...state[NAME].session,
-              runTime: 42 + (1000 * seconds)
-            }
-          }
-        }
-
-        expect(getRunTime(stateWithRunTime)).toEqual(expected)
-      }
-
-      testGetRunTime(0, '00:00:00')
-      testGetRunTime(1, '00:00:01')
-      testGetRunTime(59, '00:00:59')
-      testGetRunTime(60, '00:01:00')
-      testGetRunTime(61, '00:01:01')
-      testGetRunTime(3599, '00:59:59')
-      testGetRunTime(3600, '01:00:00')
-      testGetRunTime(3601, '01:00:01')
-    })
-
-    test('getRunTime without commands', () => {
-      expect(getRunTime(makeState({session: {protocolCommands: []}})))
-        .toEqual('00:00:00')
     })
 
     test('getCommands', () => {
