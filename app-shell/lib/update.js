@@ -8,14 +8,10 @@ updater.logger = log
 updater.autoDownload = false
 
 module.exports = {
-  getCurrentVersion,
+  CURRENT_VERSION: updater.currentVersion,
   checkForUpdates,
   downloadUpdate,
   quitAndInstall
-}
-
-function getCurrentVersion () {
-  return updater.currentVersion
 }
 
 function checkForUpdates () {

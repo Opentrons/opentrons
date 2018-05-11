@@ -269,11 +269,12 @@ describe('app shell module', () => {
   })
 
   describe('shell selectors', () => {
+    // TODO(mc, 2018-05-11): mockUpdate.CURRENT_VERSION is undefined so this
+    //  test isn't really doing anything anymore
     test('getShellUpdate selector', () => {
-      mockUpdate.getCurrentVersion.mockReturnValue('42.0.0')
       expect(getShellUpdate(state)).toEqual({
         ...state.shell.update,
-        current: '42.0.0'
+        current: mockUpdate.CURRENT_VERSION
       })
     })
   })

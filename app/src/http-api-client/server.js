@@ -10,7 +10,7 @@ import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
 
 // remote module paths relative to app-shell/lib/main.js
-const {getAvailableUpdate, getUpdateFile} = remote.require('./api-update')
+const {AVAILABLE_UPDATE, getUpdateFile} = remote.require('./api-update')
 
 type RequestPath = 'update' | 'restart'
 
@@ -164,8 +164,10 @@ export function serverReducer (
       ({robot: {name}} = action.payload)
       let stateByName = state[name]
       const previousUpdate = stateByName && stateByName.availableUpdate
-      const availableUpdate =
-        getAvailableUpdate(action.payload.health.api_version)
+      const currentVersion = action.payload.health.api_version
+      const availableUpdate = currentVersion !== AVAILABLE_UPDATE
+        ? AVAILABLE_UPDATE
+        : null
 
       if (availableUpdate !== previousUpdate) {
         stateByName = {...stateByName, update: null, restart: null}

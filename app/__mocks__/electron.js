@@ -11,8 +11,9 @@ const __clearMock = () => {
   Object.keys(__mockRemotes).forEach((remoteName) => {
     const remote = __mockRemotes[remoteName]
 
-    Object.keys(remote).forEach((methodName) => {
-      remote[methodName].mockClear()
+    Object.keys(remote).forEach((property) => {
+      const value = remote[property]
+      value && value.mockClear && value.mockClear()
     })
   })
 }
