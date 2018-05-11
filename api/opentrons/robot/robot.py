@@ -922,7 +922,7 @@ class Robot(object):
         self.reset()
         self.home()
 
-    def get_attached_pipettes(self):
+    def get_attached_pipettes(self, default=None):
         """
         Gets model names of attached pipettes
 
@@ -948,6 +948,20 @@ class Robot(object):
         if right_model:
             tip_length = pipette_config.configs[right_model].tip_length
             right_data.update({'tip_length': tip_length})
+
+        if self.is_simulating():
+            from opentrons.instruments.pipette_config import configs
+            default_version = list(configs.values())[0].name
+            if not isinstance(default, dict):
+                default = {
+                    'left': {'model': default_version},
+                    'right': {'model': default_version}
+                }
+            if 'left' in default:
+                left_data.update(default['left'])
+            if 'right' in default:
+                right_data.update(default['right'])
+
         return {
             'left': left_data,
             'right': right_data

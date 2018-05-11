@@ -51,7 +51,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p10_single_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p10_single')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -69,7 +71,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p10_multi_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p10_multi')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -87,7 +91,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p50_single_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p50_single')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -105,7 +111,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p50_multi_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p50_multi')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -123,7 +131,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p300_single_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p300_single')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -141,7 +151,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p300_multi_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p300_multi')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -159,7 +171,9 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        config = pipette_config.load('p1000_single_v1')
+        pipette_model_version = self._retrieve_version_number(
+            mount, 'p1000_single')
+        config = pipette_config.load(pipette_model_version)
 
         return self._create_pipette_from_config(
             config=config,
@@ -206,6 +220,22 @@ class InstrumentsWrapper(object):
 
         p.set_pick_up_current(config.pick_up_current)
         return p
+
+    def _retrieve_version_number(self, mount, expected_model):
+        # pass a default state incase the driver is simulating
+        default_version = expected_model + '_v2'
+        pipettes_attached = robot.get_attached_pipettes(
+            default={mount:{'model': default_version}})
+        found_version = pipettes_attached[mount]['model']
+        if not found_version:
+            found_version = default_version
+
+        # check that the model string is a substring of the version
+        # eg: check that 'p10_single' is inside the found 'p10_single_v2'
+        if expected_model not in found_version:
+            raise RuntimeError(
+                'Found unexpected Pipette attached: {}'.format(found_version))
+        return found_version
 
 
 instruments = InstrumentsWrapper(robot)

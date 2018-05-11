@@ -310,11 +310,12 @@ class SmoothieDriver_3_0_0:
         :return :dict with key 'model' and model string as value, or None
         '''
         if self.simulating:
-            res = list(configs.values())[0].name
+            # res = list(configs.values())[0].name
+            return None
         else:
             res = self._read_from_pipette(
                 GCODES['READ_INSTRUMENT_MODEL'], mount)
-            if res and not res.endswith('_v1'):
+            if '_v' not in res:
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the _v# designation
                 res = res + '_v1'
