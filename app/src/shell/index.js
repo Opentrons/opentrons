@@ -6,9 +6,9 @@ import {createSelector, type Selector} from 'reselect'
 import type {State, Action, ThunkPromiseAction, Error} from '../types'
 
 const {
+  CURRENT_VERSION,
   checkForUpdates,
   downloadUpdate,
-  getCurrentVersion,
   quitAndInstall
 } = remote.require('./update')
 
@@ -135,15 +135,9 @@ export type ShellUpdate = $PropertyType<ShellState, 'update'> & {
 export const getShellUpdate: Selector<State, void, ShellUpdate> =
   createSelector(
     selectShellUpdateState,
-    getCurrentVersion,
-    (updateState, current) => ({...updateState, current})
+    (updateState) => ({...updateState, current: CURRENT_VERSION})
   )
 
 function selectShellUpdateState (state: State) {
   return state.shell.update
 }
-
-// DEBUG(mc, 2018-03-28): code review helpers, remove once UI is in place
-global.checkForShellUpdates = checkForShellUpdates
-global.downloadShellUpdate = downloadShellUpdate
-global.getShellUpdate = getShellUpdate

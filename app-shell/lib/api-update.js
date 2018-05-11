@@ -6,9 +6,8 @@
 const fs = require('fs')
 const path = require('path')
 const {promisify} = require('util')
-const semver = require('semver')
 
-const {version: LATEST_VERSION} = require('../package.json')
+const {version: AVAILABLE_UPDATE} = require('../package.json')
 
 const readDir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
@@ -23,8 +22,8 @@ const UPDATE_DIR = path.join(__dirname, '../../api/dist')
 let updateFile
 
 module.exports = {
+  AVAILABLE_UPDATE,
   initialize,
-  getAvailableUpdate,
   getUpdateFile
 }
 
@@ -41,12 +40,6 @@ function initialize () /*: Promise<void> */ {
 
       updateFile = wheels[0]
     })
-}
-
-function getAvailableUpdate (robotVersion /*: string */) /*: ?string */ {
-  return semver.gt(LATEST_VERSION, robotVersion)
-    ? LATEST_VERSION
-    : null
 }
 
 function getUpdateFile () /*: Promise<string> */ {
