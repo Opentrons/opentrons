@@ -19,19 +19,20 @@ def test_get_temp_deck_temperature(monkeypatch):
         current_temp = 24
         target_temp = 'none'
 
-        if command == 'M105':
+        if 'M105' in command:
             return 'T:' + str(target_temp) \
                 + ' C:' + str(current_temp) \
-                + '\r\nok\r\nok\r\n'
+                + '\r\n'
 
     monkeypatch.setattr(
         serial_communication,
         'write_and_return',
         write_with_log)
 
-    res = serial_communication.write_and_return('M105', 'ok\r\nok\r\n', None)
+    res = serial_communication.write_and_return(
+        'M105\r\n', 'ok\r\nok\r\n', None)
 
-    expected = 'T:none C:24\r\nok\r\nok\r\n'
+    expected = 'T:none C:24\r\n'
     assert res == expected
     # fuzzy_assert(result=res, expected=expected)
 
@@ -42,7 +43,7 @@ def test_set_temp_deck_temperature(monkeypatch):
 
     def write_with_log(command, ack, connection, timeout=None):
         if 'M104' in command:
-            return 'ok\r\nok\r\n'
+            return ''
 
     monkeypatch.setattr(
         serial_communication,
@@ -50,9 +51,9 @@ def test_set_temp_deck_temperature(monkeypatch):
         write_with_log)
 
     res = serial_communication.write_and_return(
-        'M104 S55', 'ok\r\nok\r\n', None)
+        'M104 S55\r\n', 'ok\r\nok\r\n', None)
 
-    expected = 'ok\r\nok\r\n'
+    expected = ''
     assert res == expected
     # fuzzy_assert(result=res, expected=expected)
 
@@ -65,7 +66,7 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     def write_with_log(command, ack, connection, timeout=None):
 
         if 'M104' in command and current_temp_deck_status == 'ERROR':
-            return 'ERROR\r\nok\r\nok\r\n'
+            return 'ERROR\r\n'
 
     monkeypatch.setattr(
         serial_communication,
@@ -73,9 +74,9 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
         write_with_log)
 
     res = serial_communication.write_and_return(
-        'M104 S55', 'ok\r\nok\r\n', None)
+        'M104 S55\r\n', 'ok\r\nok\r\n', None)
 
-    expected = 'ERROR\r\nok\r\nok\r\n'
+    expected = 'ERROR\r\n'
     assert res == expected
     # fuzzy_assert(result=res, expected=expected)
 
@@ -84,17 +85,18 @@ def test_turn_off_temp_deck(monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
 
     def write_with_log(command, ack, connection, timeout=None):
-        if command == 'M18':
-            return 'ok\r\nok\r\n'
+        if 'M18' in command:
+            return ''
 
     monkeypatch.setattr(
         serial_communication,
         'write_and_return',
         write_with_log)
 
-    res = serial_communication.write_and_return('M18', 'ok\r\nok\r\n', None)
+    res = serial_communication.write_and_return(
+        'M18\r\n', 'ok\r\nok\r\n', None)
 
-    expected = 'ok\r\nok\r\n'
+    expected = ''
     assert res == expected
     # fuzzy_assert(result=res, expected=expected)
 
@@ -108,22 +110,23 @@ def test_get_device_info(monkeypatch):
     serial = 'td20180102A01'
 
     def write_with_log(command, ack, connection, timeout=None):
-        if command == 'M115':
+        if 'M115' in command:
             return 'model:' + model \
                 + ' version:' + firmware_version \
                 + ' serial:' + serial \
-                + '\r\nok\r\nok\r\n'
+                + '\r\n'
 
     monkeypatch.setattr(
         serial_communication,
         'write_and_return',
         write_with_log)
-    res = serial_communication.write_and_return('M115', 'ok\r\nok\r\n', None)
+    res = serial_communication.write_and_return(
+        'M115\r\n', 'ok\r\nok\r\n', None)
 
     expected = ('model:temp-v1 '
                 'version:edge-1a2b345 '
                 'serial:td20180102A01'
-                '\r\nok\r\nok\r\n')
+                '\r\n')
     assert res == expected
 
 
@@ -131,16 +134,17 @@ def test_dfu_command(monkeypatch):
     from opentrons.drivers.smoothie_drivers import serial_communication
 
     def write_with_log(command, ack, connection, timeout=None):
-        if command == 'dfu':
-            return 'Entering Bootloader\r\nok\r\nok\r\n'
+        if 'dfu' in command:
+            return 'Entering Bootloader\r\n'
 
     monkeypatch.setattr(
         serial_communication,
         'write_and_return',
         write_with_log)
 
-    res = serial_communication.write_and_return('dfu', 'ok\r\nok\r\n', None)
+    res = serial_communication.write_and_return(
+        'dfu\r\n', 'ok\r\nok\r\n', None)
 
-    expected = 'Entering Bootloader\r\nok\r\nok\r\n'
+    expected = 'Entering Bootloader\r\n'
     assert res == expected
     # fuzzy_assert(result=res, expected=expected)
