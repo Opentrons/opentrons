@@ -325,8 +325,18 @@ describe('api client', () => {
             },
             labwareBySlot: {
               1: {_id: 'lab-1', type: '96-flat'},
-              5: {_id: 'lab-2', type: 'tiprack-200ul', isTiprack: true},
-              9: {_id: 'lab-3', type: 'tiprack-200ul', isTiprack: true}
+              5: {
+                _id: 'lab-2',
+                type: 'tiprack-200ul',
+                isTiprack: true,
+                calibratorMount: 'left'
+              },
+              9: {
+                _id: 'lab-3',
+                type: 'tiprack-200ul',
+                isTiprack: true,
+                calibratorMount: 'right'
+              }
             }
           }
         }

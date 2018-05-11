@@ -315,14 +315,15 @@ export function getLabwareBySlot (state: State) {
 }
 
 export const getLabware = createSelector(
+  getInstrumentsByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
   getCalibrationRequest,
-  (labwareBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
-    return Object.keys(labwareBySlot)
+  (instByMount, lwBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
+    return Object.keys(lwBySlot)
       .filter(isSlot)
       .map((slot) => {
-        const labware = labwareBySlot[slot]
+        const labware = lwBySlot[slot]
         const confirmed = confirmedBySlot[slot] || false
         let calibration: LabwareCalibrationStatus = 'unconfirmed'
         let isMoving = false
@@ -358,6 +359,16 @@ export const getLabware = createSelector(
         }
 
         return {...labware, calibration, confirmed, isMoving}
+      })
+      .sort((a, b) => {
+        if (a.isTiprack && !b.isTiprack) return -1
+        if (!a.isTiprack && b.isTiprack) return 1
+        if (!a.isTiprack && !b.isTiprack) return 0
+
+        // both a and b are tipracks, sort multi-channel calibrators first
+        const aChannels = instByMount[a.calibratorMount].channels
+        const bChannels = instByMount[b.calibratorMount].channels
+        return bChannels - aChannels
       })
   }
 )
