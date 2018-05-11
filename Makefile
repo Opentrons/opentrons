@@ -10,7 +10,7 @@ API_DIR := api
 COMPONENTS_DIR := components
 APP_DIR := app
 APP_SHELL_DIR := app-shell
-LABWARE_DEFINITIONS_DIR := labware-definitions
+LABWARE_DEFINITIONS_DIR := shared-data
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
 # watch, coverage, and update snapshot variables for tests

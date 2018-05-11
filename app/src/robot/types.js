@@ -1,6 +1,6 @@
 // @flow
 // common robot types
-import type {PipetteChannels} from '@opentrons/labware-definitions'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {Mount} from '@opentrons/components'
 import typeof reducer from './reducer'
 

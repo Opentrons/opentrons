@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import {getPipette, getPipetteModels} from '@opentrons/labware-definitions'
+import {getPipette, getPipetteModels} from '@opentrons/shared-data'
 import {DropdownField} from '@opentrons/components'
 import styles from './styles.css'
 
