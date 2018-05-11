@@ -123,6 +123,8 @@ class Pipette:
             dispense_speed=DEFAULT_DISPENSE_SPEED,
             aspirate_flow_rate=None,
             dispense_flow_rate=None,
+            plunger_current=0.5,
+            drop_tip_current=0.5,
             plunger_positions=PLUNGER_POSITIONS,
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
@@ -185,6 +187,11 @@ class Pipette:
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
+
+        # TODO (andy) these values maybe should persist between sessions,
+        # by saving within `robot_config`
+        self._plunger_current = plunger_current
+        self._drop_tip_current = drop_tip_current
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
@@ -408,6 +415,7 @@ class Pipette:
 
         self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
+        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=mm_position
@@ -505,6 +513,7 @@ class Pipette:
 
         self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
+        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=mm_position
@@ -537,6 +546,8 @@ class Pipette:
                 # move to top of well to avoid touching liquid
                 if placeable:
                     self.move_to(placeable.top())
+                self.instrument_actuator.set_active_current(
+                    self._plunger_current)
                 self.robot.poses = self.instrument_actuator.move(
                     self.robot.poses,
                     x=self._get_plunger_position('bottom')
@@ -677,6 +688,7 @@ class Pipette:
             log.warning("Cannot 'blow out' without a tip attached.")
 
         self.move_to(location)
+        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=self._get_plunger_position('blow_out')
@@ -919,6 +931,7 @@ class Pipette:
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(
                 self, location, presses, plunge_depth, increment):
+            self.instrument_actuator.set_active_current(self._plunger_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=self._get_plunger_position('bottom')
@@ -929,6 +942,7 @@ class Pipette:
             for i in range(int(presses)):
                 # move nozzle down into the tip
                 self.instrument_mover.push_speed()
+
                 self.instrument_mover.push_active_current()
                 self.instrument_mover.set_active_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
@@ -1027,16 +1041,16 @@ class Pipette:
             pos_bottom = self._get_plunger_position('bottom')
             pos_drop_tip = self._get_plunger_position('drop_tip')
 
+            self.instrument_actuator.set_active_current(self._drop_tip_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_bottom
             )
+            self.instrument_actuator.set_active_current(self._plunger_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_drop_tip
             )
-
-            self._shake_off_tips(location)
 
             if home_after:
                 self._home_after_drop_tip()
@@ -1083,6 +1097,7 @@ class Pipette:
         b = self._get_plunger_position('bottom')
         d = self._get_plunger_position('drop_tip')
         safety_margin = abs(b - d)
+        self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.fast_home(
             self.robot.poses, safety_margin)
         self.robot.poses = self.instrument_actuator.move(
@@ -1113,6 +1128,7 @@ class Pipette:
         @commands.publish.both(command=commands.home)
         def _home(mount):
             self.current_volume = 0
+            self.instrument_actuator.set_active_current(self._plunger_current)
             self.robot.poses = self.instrument_actuator.home(
                 self.robot.poses)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)

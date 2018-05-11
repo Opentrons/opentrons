@@ -7,8 +7,9 @@ import logging
 
 log = logging.getLogger(__name__)
 
+ROBOT_CONFIG_VERSION = 2
 
-PLUNGER_CURRENT_LOW = 0.1
+PLUNGER_CURRENT_LOW = 0.05
 PLUNGER_CURRENT_HIGH = 0.5
 
 MOUNT_CURRENT_LOW = 0.1
@@ -92,8 +93,6 @@ robot_config = namedtuple(
         'probe_center',
         'probe_dimensions',
         'serial_speed',
-        'plunger_current_low',
-        'plunger_current_high',
         'tip_length',
         'default_current',
         'low_current',
@@ -129,7 +128,7 @@ def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
             inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
-        version=int(robot_settings.get('version', 1)),
+        version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
         steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
         acceleration=robot_settings.get('acceleration', DEFAULT_ACCELERATION),
         probe_center=robot_settings.get(
@@ -145,11 +144,7 @@ def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
         low_current=robot_settings.get('low_current', LOW_CURRENT),
         high_current=robot_settings.get('high_current', HIGH_CURRENT),
         default_max_speed=robot_settings.get(
-            'default_max_speed', DEFAULT_MAX_SPEEDS),
-        plunger_current_low=robot_settings.get(
-            'plunger_current_low', PLUNGER_CURRENT_LOW),
-        plunger_current_high=robot_settings.get(
-            'plunger_current_high', PLUNGER_CURRENT_HIGH)
+            'default_max_speed', DEFAULT_MAX_SPEEDS)
     )
     return cfg
 

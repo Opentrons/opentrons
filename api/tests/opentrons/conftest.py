@@ -68,7 +68,6 @@ MAIN_TESTER_DB = str(os.path.join(
 def state(topic, state):
     def _match(item):
         return \
-            item['name'] == 'state' and \
             item['topic'] == topic and \
             item['payload'].state == state
 

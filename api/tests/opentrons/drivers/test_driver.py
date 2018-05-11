@@ -132,11 +132,11 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     smoothie.dwell_axes('BCY')
     smoothie._set_saved_current()
     expected = [
-        ['M907 A0.1 B0.1 C0.1 X1.25 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['M907 A0.1 B0.5 C0.5 X1.25 Y1.5 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.5 C0.1 X0.3 Y1.5 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400']
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.5 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -195,19 +195,19 @@ def test_plunger_commands(smoothie, monkeypatch):
     smoothie.home()
     expected = [
         ['M907 A1.0 B0.5 C0.5 X0.3 Y0.3 Z1.0 G4P0.005 G28.2.+[ABCZ].+ M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['G0F3000 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-20 G90 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-20 G90 M400'],
         ['G0F24000 M400'],
-        ['M907 A0.1 B0.1 C0.1 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y1.5 Z0.1 G4P0.005 G28.2Y M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.5 Z0.1 G4P0.005 G28.2Y M400'],
         ['M203.1 Y8 M400'],
         ['G91 G0Y-3 G90 M400'],
         ['G28.2Y M400'],
         ['G91 G0Y-3 G90 M400'],
         ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['M114.2 M400']
     ]
     # from pprint import pprint
@@ -217,7 +217,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A1.0 B0.1 C0.1 X1.25 Y1.5 Z1.0 G4P0.005 G0.+ M400']
+        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.5 Z1.0 G4P0.005 G0.+ M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -226,8 +226,8 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.5 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 G0B2 M400'],
-        ['M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400']
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -245,7 +245,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         # Set active axes high
         ['M907 A1.0 B0.5 C0.5 X1.25 Y1.5 Z1.0 G4P0.005 G0.+[BC].+ M400'],
         # Set plunger current low
-        ['M907 A1.0 B0.1 C0.1 X1.25 Y1.5 Z1.0 G4P0.005 M400'],
+        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.5 Z1.0 G4P0.005 M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -330,7 +330,7 @@ def test_functional(smoothie):
     assert smoothie.position == smoothie.homed_position
 
 
-def test_set_current(model):
+def test_set_pick_upcurrent(model):
     import types
     driver = model.robot._driver
 
@@ -353,7 +353,7 @@ def test_set_current(model):
     # on the Smoothie (see `Robot._actuators`)
     expected = [
         {'C': 0.5},
-        {'C': 0.1},
+        {'C': 0.05},
         {'A': 1.0},
         {'A': 0.1},
         {'X': 1.25, 'Y': 1.5},
@@ -368,6 +368,48 @@ def test_set_current(model):
     assert current_log == expected
 
     driver._save_current = set_current
+
+
+def test_drop_tip_current(model):
+    import types
+    driver = model.robot._driver
+
+    old_save_current = driver._save_current
+    current_log = []
+
+    def mock_save_current(self, settings, axes_active=True):
+        nonlocal current_log
+        if 'C' in settings:
+            current_log.append(settings)
+        old_save_current(settings, axes_active)
+
+    driver._save_current = types.MethodType(mock_save_current, driver)
+
+    rack = model.robot.add_container('tiprack-200ul', '10')
+    pipette = model.instrument._instrument
+    pipette._plunger_current = 0.123
+    pipette._drop_tip_current = 0.456
+    pipette.drop_tip(rack[0])
+
+    # Instrument in `model` is configured to right mount, which is the A axis
+    # on the Smoothie (see `Robot._actuators`)
+    expected = [
+        {'C': 0.456},   # make to 'drop_tip' position
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # move to 'bottom' position
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # fast-home move upwards
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # fast-home home command
+        {'C': 0.05},    # dwell
+        {'C': 0.123},   # move back to 'bottom' position
+        {'C': 0.05}     # dwell
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    driver._save_current = old_save_current
 
 
 def test_parse_pipette_data():
@@ -549,16 +591,16 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.1 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100 M400',
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100 M400',
         # recover from failure
         'M999 M400',
         # set current for homing the failed axis (C)
-        'M907 A0.1 B0.1 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C M400',
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C M400',
         # set current back to idling after home
-        'M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400',
         # update position
         'M114.2 M400',
-        'M907 A0.1 B0.1 C0.1 X0.3 Y0.3 Z0.1 G4P0.005 M400'
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'
     ]
 
 

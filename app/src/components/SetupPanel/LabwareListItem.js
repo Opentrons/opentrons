@@ -35,6 +35,7 @@ export default function LabwareListItem (props: Props) {
       url={url}
       onClick={onClick}
       iconName={iconName}
+      activeClassName={styles.active}
     >
       <div className={styles.item_info}>
         <span>Slot {slot}</span>

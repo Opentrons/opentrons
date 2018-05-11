@@ -47,6 +47,8 @@ class Session(object):
         self.instruments = None
         self.containers = None
 
+        self.startTime = None
+
         self.refresh()
 
     def get_instruments(self):
@@ -174,6 +176,7 @@ class Session(object):
         self._reset()
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
+        self.startTime = now()
         self.set_state('running')
 
         try:
@@ -209,37 +212,41 @@ class Session(object):
 
     def log_append(self):
         self.command_log.update({
-            len(self.command_log): {
-                'timestamp': int(time() * 1000)
-            }
-        })
+            len(self.command_log): now()})
         self._on_state_changed()
 
     def error_append(self, error):
         self.errors.append(
             {
-                'timestamp': int(time() * 1000),
+                'timestamp': now(),
                 'error': error
             }
         )
-        self._on_state_changed()
+        # self._on_state_changed()
 
     def _reset(self):
         robot.reset()
         self.clear_logs()
 
-    # TODO (artyom, 20171003): along with calibration, consider extracting this
-    # into abstract base class or find any other way to keep notifications
-    # consistent across all managers
     def _snapshot(self):
+        if self.state is 'loaded':
+            payload = copy(self)
+        else:
+            if self.command_log.keys():
+                idx = sorted(self.command_log.keys())[-1]
+                timestamp = self.command_log[idx]
+                last_command = {'id': idx, 'handledAt': timestamp}
+            else:
+                last_command = None
+
+            payload = {
+                'state': self.state,
+                'startTime': self.startTime,
+                'lastCommand': last_command
+            }
         return {
             'topic': Session.TOPIC,
-            'name': 'state',
-            # we are making a copy to avoid the scenario
-            # when object state is updated elsewhere before
-            # it is serialized and transferred
-            'payload': copy(self)
-
+            'payload': payload
         }
 
     def _on_state_changed(self):
@@ -260,6 +267,10 @@ def _dedupe(iterable):
         if item not in acc:
             acc.add(item)
             yield item
+
+
+def now():
+    return int(time() * 1000)
 
 
 def _get_labware(command):
