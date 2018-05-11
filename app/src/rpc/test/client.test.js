@@ -311,7 +311,8 @@ describe('rpc client', () => {
     Client(url)
       .then((client) => {
         addListener(client, 'notification', (message) => {
-          expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE)
+          expect(RemoteObject)
+            .toHaveBeenCalledWith(client, INSTANCE, {methods: false})
           expect(message).toEqual(mockRemote)
           done()
         })

@@ -62,6 +62,16 @@ describe('rpc remote object factory', () => {
       })
   })
 
+  test('deserializes an object without methods if methods: false', () => {
+    const source = {i: 1, t: 2, v: {foo: 'bar'}}
+
+    return RemoteObject(context, source, {methods: false})
+      .then((remote) => {
+        expect(context.resolveTypeValues).not.toHaveBeenCalledWith(source)
+        expect(remote).toEqual({_id: 1, foo: 'bar'})
+      })
+  })
+
   test('deserializes object props as remote objects', () => {
     const child = {i: 2, t: 100, v: {baz: 'qux'}}
     const source = {i: 1, t: 100, v: {foo: 'bar', bar: child}}
