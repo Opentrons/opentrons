@@ -1,15 +1,23 @@
 // @flow
 import _distribute from '../distribute'
 // import merge from 'lodash/merge'
-import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
+import {
+  createRobotState,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors,
+  commandFixtures as cmd
+} from './fixtures'
 import type {DistributeFormData} from '../types'
 const distribute = commandCreatorNoErrors(_distribute)
 const distributeWithErrors = commandCreatorHasErrors(_distribute)
 
+// shorthand
+const dispense = (well, volume) =>
+  cmd.dispense(well, volume, {labware: 'destPlateId'})
+
 let mixinArgs
 let robotInitialState
 let robotInitialStatePipettesLackTips
-let dropTipSingleChannel
 let blowoutSingleToDestPlateA1
 
 beforeEach(() => {
@@ -50,19 +58,7 @@ beforeEach(() => {
     fillTiprackTips: false
   })
 
-  dropTipSingleChannel = {
-    command: 'drop-tip',
-    pipette: 'p300SingleId',
-    labware: 'trashId',
-    well: 'A1'
-  }
-
-  blowoutSingleToDestPlateA1 = {
-    command: 'blowout',
-    pipette: 'p300SingleId',
-    labware: mixinArgs.blowout,
-    well: 'A1'
-  }
+  blowoutSingleToDestPlateA1 = cmd.blowout(mixinArgs.blowout)
 })
 
 describe('distribute: minimal example', () => {
@@ -79,27 +75,9 @@ describe('distribute: minimal example', () => {
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 60,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 60,
-        well: 'A3'
-      },
+      cmd.aspirate('A1', 120),
+      dispense('A2', 60),
+      dispense('A3', 60),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -118,57 +96,17 @@ describe('tip handling for multiple distribute chunks', () => {
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      dropTipSingleChannel,
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A3'
-      },
+      cmd.dropTip('A1'),
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 300),
+      dispense('A2', 150),
+      dispense('A3', 150),
       blowoutSingleToDestPlateA1,
 
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A5'
-      },
+      cmd.aspirate('A1', 300),
+      dispense('A4', 150),
+      dispense('A5', 150),
+
       blowoutSingleToDestPlateA1
     ])
   })
@@ -185,65 +123,19 @@ describe('tip handling for multiple distribute chunks', () => {
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      dropTipSingleChannel,
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A3'
-      },
+      cmd.dropTip('A1'),
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 300),
+      dispense('A2', 150),
+      dispense('A3', 150),
       blowoutSingleToDestPlateA1,
 
       // next chunk, change tip
-      dropTipSingleChannel,
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A5'
-      },
+      cmd.dropTip('A1'),
+      cmd.pickUpTip('B1'),
+      cmd.aspirate('A1', 300),
+      dispense('A4', 150),
+      dispense('A5', 150),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -260,49 +152,13 @@ describe('tip handling for multiple distribute chunks', () => {
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A3'
-      },
+      cmd.aspirate('A1', 300),
+      dispense('A2', 150),
+      dispense('A3', 150),
       blowoutSingleToDestPlateA1,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A5'
-      },
+      cmd.aspirate('A1', 300),
+      dispense('A4', 150),
+      dispense('A5', 150),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -343,64 +199,18 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
     const aspirateVol = (120 * 2) + 12
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: aspirateVol,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A3'
-      },
+      cmd.aspirate('A1', aspirateVol),
+      dispense('A2', 120),
+      dispense('A3', 120),
       blowoutSingleToDestPlateA1,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: aspirateVol,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A5'
-      },
+
+      cmd.aspirate('A1', aspirateVol),
+      dispense('A4', 120),
+      dispense('A5', 120),
       blowoutSingleToDestPlateA1,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 120 + 12,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 120,
-        well: 'A6'
-      },
+
+      cmd.aspirate('A1', 120 + 12),
+      dispense('A6', 120),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -495,59 +305,18 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
       touchTipAfterAspirate: true
     }
     const result = distribute(distributeArgs)(robotInitialState)
-    const touchTipCommand = {
-      command: 'touch-tip',
-      labware: 'sourcePlateId',
-      pipette: 'p300SingleId',
-      well: 'A1'
-    }
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      touchTipCommand,
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A3'
-      },
+      cmd.aspirate('A1', 300),
+      cmd.touchTip('A1'),
+      dispense('A2', 150),
+      dispense('A3', 150),
       blowoutSingleToDestPlateA1,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      touchTipCommand,
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A5'
-      },
+
+      cmd.aspirate('A1', 300),
+      cmd.touchTip('A1'),
+      dispense('A4', 150),
+      dispense('A5', 150),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -563,63 +332,23 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
-    function makeTouchTip (well: string) {
-      return {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'destPlateId',
-        well
-      }
+    function touchTip (well: string) {
+      return cmd.touchTip(well, {labware: 'destPlateId'})
     }
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A2'
-      },
-      makeTouchTip('A2'),
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A3'
-      },
-      makeTouchTip('A3'),
+      cmd.aspirate('A1', 300),
+      dispense('A2', 150),
+      touchTip('A2'),
+      dispense('A3', 150),
+      touchTip('A3'),
       blowoutSingleToDestPlateA1,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 300,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A4'
-      },
-      makeTouchTip('A4'),
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume: 150,
-        well: 'A5'
-      },
-      makeTouchTip('A5'),
+
+      cmd.aspirate('A1', 300),
+      dispense('A4', 150),
+      touchTip('A4'),
+      dispense('A5', 150),
+      touchTip('A5'),
       blowoutSingleToDestPlateA1
     ])
   })
@@ -645,83 +374,24 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
 
     const mixCommands = [
       // mix 1
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 250,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 250,
-        well: 'A1'
-      },
+      cmd.aspirate('A1', 250),
+      cmd.dispense('A1', 250), // dispense to sourcePlateId
       // mix 2
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 250,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: 250,
-        well: 'A1'
-      }
+      cmd.aspirate('A1', 250),
+      cmd.dispense('A1', 250) // dispense to sourcePlateId
     ]
 
     expect(result.commands).toEqual([
       ...mixCommands,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: aspirateVol,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume,
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume,
-        well: 'A3'
-      },
+      cmd.aspirate('A1', aspirateVol),
+      dispense('A2', volume),
+      dispense('A3', volume),
       blowoutSingleToDestPlateA1,
+
       ...mixCommands,
-      {
-        command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
-        volume: aspirateVol,
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume,
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
-        volume,
-        well: 'A5'
-      },
+      cmd.aspirate('A1', aspirateVol),
+      dispense('A4', volume),
+      dispense('A5', volume),
       blowoutSingleToDestPlateA1
     ])
   })

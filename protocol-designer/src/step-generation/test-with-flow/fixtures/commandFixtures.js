@@ -3,14 +3,7 @@ import {tiprackWellNamesFlat} from '../../data'
 import type {Command} from '../../types'
 
 export const replaceTipCommands = (tip: number | string): Array<Command> => [
-  {
-    command: 'drop-tip',
-    params: {
-      pipette: 'p300SingleId',
-      labware: 'trashId',
-      well: 'A1'
-    }
-  },
+  dropTip('A1'),
   pickUpTip(tip)
 ]
 
