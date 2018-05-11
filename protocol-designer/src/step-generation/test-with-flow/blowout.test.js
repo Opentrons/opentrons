@@ -48,9 +48,11 @@ describe('blowout', () => {
 
     expect(result.commands).toEqual([{
       command: 'blowout',
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
-      well: 'A1'
+      params: {
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A1'
+      }
     }])
 
     expect(result.robotState).toEqual(robotStateWithTip)
