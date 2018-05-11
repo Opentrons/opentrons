@@ -1,60 +1,17 @@
 // @flow
 import _mix from '../mix'
-import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
-import {tiprackWellNamesFlat} from '../data'
+import {
+  createRobotState,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors,
+  commandFixtures as cmd
+} from './fixtures'
 import type {MixFormData} from '../types'
 const mix = commandCreatorNoErrors(_mix)
 const mixWithErrors = commandCreatorHasErrors(_mix)
 
 let robotInitialState
 let mixinArgs
-
-// TODO Ian 2018-05-08 move these to fixtures, use to make other tests less verbose too.
-// You also need a factory to use different pipette id, etc
-const cmd = {
-  // NOTE: 'Commands' name in these fixture creators indicates
-  // it's an array & not a single command obj
-  replaceTipCommands: (tiprackTipIdx: number) => [
-    {
-      command: 'drop-tip',
-      pipette: 'p300SingleId',
-      labware: 'trashId',
-      well: 'A1'
-    },
-    {
-      command: 'pick-up-tip',
-      pipette: 'p300SingleId',
-      labware: 'tiprack1Id',
-      well: tiprackWellNamesFlat[tiprackTipIdx]
-    }
-  ],
-  touchTip: (well: string) => ({
-    command: 'touch-tip',
-    labware: 'sourcePlateId',
-    pipette: 'p300SingleId',
-    well
-  }),
-  aspirate: (well: string, volume: number) => ({
-    command: 'aspirate',
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
-    volume,
-    well
-  }),
-  dispense: (well: string, volume: number) => ({
-    command: 'dispense',
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
-    volume,
-    well
-  }),
-  blowout: (labware: string) => ({
-    command: 'blowout',
-    pipette: 'p300SingleId',
-    well: 'A1',
-    labware
-  })
-}
 
 beforeEach(() => {
   robotInitialState = createRobotState({
