@@ -53,10 +53,12 @@ describe('aspirate', () => {
 
     expect(result.commands).toEqual([{
       command: 'aspirate',
-      pipette: 'p300SingleId',
-      volume: 50,
-      labware: 'sourcePlateId',
-      well: 'A1'
+      params: {
+        pipette: 'p300SingleId',
+        volume: 50,
+        labware: 'sourcePlateId',
+        well: 'A1'
+      }
     }])
 
     expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
