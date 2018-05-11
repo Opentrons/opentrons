@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../../types'
-import type {ProtocolFile} from '../types'
+import type {ProtocolFile, FilePipette} from '../types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 import {fileFormValues} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
@@ -26,11 +26,10 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
 
     const instruments = mapValues(
       initialRobotState.instruments,
-      (pipette: PipetteData) => ({
-        type: 'pipette',
+      (pipette: PipetteData): FilePipette => ({
         mount: pipette.mount,
-        channels: pipette.channels,
-        model: pipette.maxVolume
+        // TODO HACK Ian 2018-05-11 use pipette definitions in labware-definitions
+        model: `p${pipette.maxVolume}_${pipette.channels === 1 ? 'single' : 'multi'}_v1` // eg p10_single_v1
       })
     )
 
@@ -38,8 +37,8 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
       initialRobotState.labware,
       (l: LabwareData) => ({
         slot: l.slot,
-        name: l.name || l.type, // TODO "humanize" it, or force naming of labware
-        type: l.type
+        displayName: l.name || l.type, // TODO Ian 2018-05-11 "humanize" type when no name?
+        model: l.type
       })
     )
 
@@ -67,15 +66,15 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
         model: 'OT-2 Standard'
       },
 
-      instruments,
+      pipettes: instruments,
       labware,
 
-      commands: timeline.map((timelineItem, i) => ({
+      procedure: timeline.map((timelineItem, i) => ({
         annotation: {
           name: `TODO Name ${i}`,
           description: 'todo description'
         },
-        commands: timelineItem.commands.reduce((acc, c) => [...acc, c], [])
+        subprocedure: timelineItem.commands.reduce((acc, c) => [...acc, c], [])
       }))
     }
   }
