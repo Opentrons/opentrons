@@ -27,8 +27,10 @@ describe('delay indefinitely', () => {
     expect(result.commands).toEqual([
       {
         command: 'delay',
-        wait: true,
-        message
+        params: {
+          wait: true,
+          message
+        }
       }
     ])
   })
@@ -52,8 +54,10 @@ describe('delay for a given time', () => {
     expect(result.commands).toEqual([
       {
         command: 'delay',
-        wait: 95.5,
-        message
+        params: {
+          wait: 95.5,
+          message
+        }
       }
     ])
   })

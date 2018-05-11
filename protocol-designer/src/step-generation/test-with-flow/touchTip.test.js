@@ -29,9 +29,11 @@ describe('touchTip', () => {
 
     expect(result.commands).toEqual([{
       command: 'touch-tip',
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
-      well: 'A1'
+      params: {
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A1'
+      }
     }])
 
     expect(result.robotState).toEqual(robotStateWithTip)

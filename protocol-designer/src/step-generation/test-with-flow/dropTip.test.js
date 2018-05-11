@@ -67,9 +67,11 @@ describe('dropTip', () => {
 
       expect(result.commands).toEqual([{
         command: 'drop-tip',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
+        params: {
+          pipette: 'p300SingleId',
+          labware: 'trashId',
+          well: 'A1'
+        }
       }])
       expect(result.robotState).toEqual(
         makeRobotState({singleHasTips: false, multiHasTips: true})
@@ -89,9 +91,11 @@ describe('dropTip', () => {
       const result = dropTip('p300MultiId')(makeRobotState({singleHasTips: true, multiHasTips: true}))
       expect(result.commands).toEqual([{
         command: 'drop-tip',
-        pipette: 'p300MultiId',
-        labware: 'trashId',
-        well: 'A1'
+        params: {
+          pipette: 'p300MultiId',
+          labware: 'trashId',
+          well: 'A1'
+        }
       }])
       expect(result.robotState).toEqual(
         makeRobotState({singleHasTips: true, multiHasTips: false})
