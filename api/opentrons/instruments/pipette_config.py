@@ -120,7 +120,7 @@ p10_single_v2 = pipette_config(
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=0.77,
     channels=1,
-    name='p10_single_v1',
+    name='p10_single_v2',
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -158,7 +158,7 @@ p10_multi_v2 = pipette_config(
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=0.77,
     channels=8,
-    name='p10_multi_v1',
+    name='p10_multi_v2',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -196,7 +196,7 @@ p50_single_v2 = pipette_config(
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=3.35,
     channels=1,
-    name='p50_single_v1',
+    name='p50_single_v2',
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -234,7 +234,7 @@ p50_multi_v2 = pipette_config(
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=3.35,
     channels=8,
-    name='p50_multi_v1',
+    name='p50_multi_v2',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -272,7 +272,7 @@ p300_single_v2 = pipette_config(
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=18.7,
     channels=1,
-    name='p300_single_v1',
+    name='p300_single_v2',
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -310,7 +310,7 @@ p300_multi_v2 = pipette_config(
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=19,
     channels=8,
-    name='p300_multi_v1',
+    name='p300_multi_v2',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -348,7 +348,7 @@ p1000_single_v2 = pipette_config(
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=65,
     channels=1,
-    name='p1000_single_v1',
+    name='p1000_single_v2',
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -410,14 +410,7 @@ PIPETTE_MODEL_IDENTIFIERS = {
 
 configs = {
     model: select_config(model)
-    for model in [
-        'p10_single_v1',
-        'p10_multi_v1',
-        'p50_single_v1',
-        'p50_multi_v1',
-        'p300_single_v1',
-        'p300_multi_v1',
-        'p1000_single_v1']}
+    for model in fallback_configs.keys()}
 
 
 def load(pipette_model: str) -> pipette_config:

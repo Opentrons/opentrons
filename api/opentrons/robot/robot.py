@@ -929,30 +929,20 @@ class Robot(object):
         :return: :dict with keys 'left' and 'right' and a model string for each
             mount, or 'uncommissioned' if no model string available
         """
+        # get the cached pipette model numbers
         left_data = {
                 'mount_axis': 'z',
                 'plunger_axis': 'b',
                 'model': self.model_by_mount['left'],
             }
-        left_model = left_data.get('model')
-        if left_model:
-            tip_length = pipette_config.configs[left_model].tip_length
-            left_data.update({'tip_length': tip_length})
-
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c',
                 'model': self.model_by_mount['right']
             }
-        right_model = right_data.get('model')
-        if right_model:
-            tip_length = pipette_config.configs[right_model].tip_length
-            right_data.update({'tip_length': tip_length})
-
         if self.is_simulating():
-            from opentrons.instruments.pipette_config import configs
-            default_version = list(configs.values())[0].name
-            if not isinstance(default, dict):
+            default_version = list(pipette_config.configs.values())[0].name
+            if not default:
                 default = {
                     'left': {'model': default_version},
                     'right': {'model': default_version}
@@ -962,6 +952,20 @@ class Robot(object):
             if 'right' in default:
                 right_data.update(default['right'])
 
+        # add tip-length
+        left_model = left_data.get('model')
+        if left_model:
+            tip_length = pipette_config.configs[left_model].tip_length
+            left_data.update({'tip_length': tip_length})
+        right_model = right_data.get('model')
+        if right_model:
+            tip_length = pipette_config.configs[right_model].tip_length
+            right_data.update({'tip_length': tip_length})
+
+        print({
+            'left': left_data,
+            'right': right_data
+        })
         return {
             'left': left_data,
             'right': right_data

@@ -225,7 +225,7 @@ class InstrumentsWrapper(object):
         # pass a default state incase the driver is simulating
         default_version = expected_model + '_v2'
         pipettes_attached = robot.get_attached_pipettes(
-            default={mount:{'model': default_version}})
+            default={mount: {'model': default_version}})
         found_version = pipettes_attached[mount]['model']
         if not found_version:
             found_version = default_version

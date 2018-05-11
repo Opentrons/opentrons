@@ -70,7 +70,17 @@ async def test_get_cached_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
+    monkeypatch.setattr(robot, 'is_simulating', lambda: False)
+
     model = list(configs.values())[0]
+
+    def dummy_model(mount):
+        return model.name
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_model)
+
+    robot.cache_instrument_models()  # do an initial caching
+
     expected = {
         'left': {
             'model': model.name,
@@ -101,7 +111,7 @@ async def test_get_cached_pipettes(
     resp1 = await cli.get('/pipettes')
     text1 = await resp1.text()
     assert resp1.status == 200
-    assert json.loads(text1) == expected
+    assert json.loads(text1) == expected  # models aren't cached, so no change
 
     expected2 = {
         'left': {
