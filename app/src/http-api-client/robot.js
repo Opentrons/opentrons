@@ -2,7 +2,7 @@
 // HTTP API client module for /robot/**
 import {createSelector, type Selector} from 'reselect'
 
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'

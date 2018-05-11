@@ -1,5 +1,5 @@
 // @flow
-import {getLabware} from '@opentrons/labware-definitions'
+import {getLabware} from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'

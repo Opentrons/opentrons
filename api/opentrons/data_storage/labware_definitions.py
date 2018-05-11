@@ -6,7 +6,7 @@ from opentrons.config import get_config_index
 
 """
 There will be 3 directories for json blobs to define labware:
-- `labware_data`: Definitions live in the `labware-definitions` project in the
+- `labware_data`: Definitions live in the `shared-data` project in the
         root of the Opentrons/opentrons GitHub repo. These are copied into the
         Docker container to "/etc/labware".
 - `custom_definitions`: Same format as definitions in `labware_data`, but lives

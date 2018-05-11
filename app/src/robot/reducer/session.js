@@ -11,7 +11,11 @@ import type {
 
 import {actionTypes} from '../actions'
 
-import type {Action, DisconnectResponseAction} from '../actions'
+import type {
+  Action,
+  DisconnectResponseAction,
+  SessionUpdateAction
+} from '../actions'
 
 type Request = {
   inProgress: boolean,
@@ -39,6 +43,7 @@ export type State = {
   pauseRequest: Request,
   resumeRequest: Request,
   cancelRequest: Request,
+  startTime: ?number,
   runTime: number,
 }
 
@@ -76,6 +81,7 @@ const INITIAL_STATE: State = {
   pauseRequest: {inProgress: false, error: null},
   resumeRequest: {inProgress: false, error: null},
   cancelRequest: {inProgress: false, error: null},
+  startTime: null,
   runTime: 0
 }
 
@@ -86,6 +92,9 @@ export default function sessionReducer (
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
+
+    case 'robot:SESSION_UPDATE':
+      return handleSessionUpdate(state, action)
 
     case SESSION: return handleSession(state, action)
     case SESSION_RESPONSE: return handleSessionResponse(state, action)
@@ -109,6 +118,28 @@ function handleDisconnectResponse (
 ): State {
   if (action.payload.error) return state
   return INITIAL_STATE
+}
+
+function handleSessionUpdate (
+  state: State,
+  action: SessionUpdateAction
+): State {
+  const {payload: {state: sessionState, startTime, lastCommand}} = action
+  let {protocolCommandsById} = state
+
+  if (lastCommand) {
+    const command = {
+      ...protocolCommandsById[lastCommand.id],
+      ...lastCommand
+    }
+
+    protocolCommandsById = {
+      ...protocolCommandsById,
+      [lastCommand.id]: command
+    }
+  }
+
+  return {...state, state: sessionState, startTime, protocolCommandsById}
 }
 
 function handleSession (state: State, action: any): State {

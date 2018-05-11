@@ -97,13 +97,15 @@ async def test_load_and_run(
     res = []
     index = 0
     async for notification in main_router.notifications:
-        name, payload = notification['name'], notification['payload']
-        if name == 'state':
-            index += 1  # Command log in sync with add-command events emitted
+        payload = notification['payload']
+        index += 1  # Command log in sync with add-command events emitted
+        if type(payload) is dict:
+            state = payload.get('state')
+        else:
             state = payload.state
-            res.append(state)
-            if payload.state == 'finished':
-                break
+        res.append(state)
+        if state == 'finished':
+            break
 
     assert [key for key, _ in itertools.groupby(res)] == \
         ['loaded', 'probing', 'ready', 'running', 'finished']
@@ -131,20 +133,6 @@ def test_set_state(run_session):
 
     with pytest.raises(ValueError):
         run_session.set_state('impossible-state')
-
-
-def test_log_append(run_session):
-    run_session.log_append()
-    run_session.log_append()
-    run_session.log_append()
-
-    run_log = {
-        _id: value
-        for _id, value in run_session.command_log.items()
-        if isinstance(value.pop('timestamp'), int)
-    }
-
-    assert run_log == {0: {}, 1: {}, 2: {}}
 
 
 def test_error_append(run_session):

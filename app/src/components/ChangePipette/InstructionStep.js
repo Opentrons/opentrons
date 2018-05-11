@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import type {PipetteChannels} from '@opentrons/labware-definitions'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {Mount} from '../../robot'
 import type {Direction} from './types'
 

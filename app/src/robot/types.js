@@ -1,6 +1,6 @@
 // @flow
 // common robot types
-import type {PipetteChannels} from '@opentrons/labware-definitions'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {Mount} from '@opentrons/components'
 import typeof reducer from './reducer'
 
@@ -140,3 +140,12 @@ export type SessionStatus =
   | 'error'
   | 'finished'
   | 'stopped'
+
+export type SessionUpdate = {
+  state: SessionStatus,
+  startTime: ?number,
+  lastCommand: ?{
+    id: number,
+    handledAt: number,
+  },
+}

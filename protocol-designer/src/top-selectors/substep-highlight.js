@@ -1,6 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
-import {computeWellAccess} from '@opentrons/labware-definitions'
+import {computeWellAccess} from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 

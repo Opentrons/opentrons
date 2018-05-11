@@ -1,6 +1,6 @@
 // @flow
 import type {Match} from 'react-router'
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {RobotService, Mount} from '../../robot'
 import type {RobotMove, DeckCalStartState} from '../../http-api-client'
 import type {JogControlsProps} from '../JogControls'
