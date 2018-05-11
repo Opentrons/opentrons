@@ -39,9 +39,17 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
+  const connectedRobotName = robotSelectors.getConnectedRobotName(state)
   const robotNotification = getAnyRobotUpdateAvailable(state)
   const moreNotification = getShellUpdate(state).available != null
 
+  // TODO(ka 2018-5-11): quick workaround to show connected robot on return to robot setting page
+  let robotUrl
+  if (connectedRobotName) {
+    robotUrl = `/robots/${connectedRobotName}`
+  } else {
+    robotUrl = '/robots'
+  }
   // TODO(mc, 2018-03-08): move this logic to the Calibrate page
   let calibrateUrl
   if (isSessionLoaded) {
@@ -60,7 +68,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
     connect: {
       iconName: 'ot-connect',
       title: 'robot',
-      url: '/robots',
+      url: robotUrl,
       notification: robotNotification
     },
     upload: {
