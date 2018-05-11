@@ -940,6 +940,7 @@ class Robot(object):
                 'plunger_axis': 'c',
                 'model': self.model_by_mount['right']
             }
+
         if self.is_simulating():
             default_version = list(pipette_config.configs.values())[0].name
             if not default:
@@ -962,10 +963,6 @@ class Robot(object):
             tip_length = pipette_config.configs[right_model].tip_length
             right_data.update({'tip_length': tip_length})
 
-        print({
-            'left': left_data,
-            'right': right_data
-        })
         return {
             'left': left_data,
             'right': right_data
