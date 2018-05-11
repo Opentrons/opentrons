@@ -1,6 +1,6 @@
 // @flow
 
-// TODO LATER Ian 2018-02-09 use labware-definitions data instead?
+// TODO LATER Ian 2018-02-09 use shared-data data instead?
 export const tiprackWellNamesByCol = [
   ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'],
   ['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2'],

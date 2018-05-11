@@ -1,7 +1,7 @@
 // @flow
 import flatten from 'lodash/flatten'
 import memoize from 'lodash/memoize'
-import {computeWellAccess, getLabware} from '@opentrons/labware-definitions'
+import {computeWellAccess, getLabware} from '@opentrons/shared-data'
 import type {Wells} from '../labware-ingred/types'
 
 type WellSetByWell = Array<Array<string>>

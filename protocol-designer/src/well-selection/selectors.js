@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
 import {wellSetToWellObj} from './utils'
-import {computeWellAccess} from '@opentrons/labware-definitions'
+import {computeWellAccess} from '@opentrons/shared-data'
 import type {BaseState, Selector} from '../types'
 import type {Wells} from '../labware-ingred/types'
 import type {OpenWellSelectionModalPayload} from './actions'

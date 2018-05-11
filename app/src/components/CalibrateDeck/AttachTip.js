@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {CalibrateDeckStartedProps, CalibrationStep} from './types'
 import {PrimaryButton} from '@opentrons/components'
 

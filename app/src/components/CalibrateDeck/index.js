@@ -7,7 +7,7 @@ import {Switch, Route, withRouter} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
-import {getPipette} from '@opentrons/labware-definitions'
+import {getPipette} from '@opentrons/shared-data'
 
 import {
   home,

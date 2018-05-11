@@ -4,7 +4,7 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import {computeWellAccess} from '@opentrons/labware-definitions'
+import {computeWellAccess} from '@opentrons/shared-data'
 import type {CommandCreator, RobotState} from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {

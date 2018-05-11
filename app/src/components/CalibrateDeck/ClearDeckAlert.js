@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {Mount} from '../../robot'
 import type {CalibrateDeckProps} from './types'
 
