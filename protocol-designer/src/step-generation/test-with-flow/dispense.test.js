@@ -53,10 +53,12 @@ describe('dispense', () => {
 
       expect(result.commands).toEqual([{
         command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
+        params: {
+          pipette: 'p300SingleId',
+          volume: 50,
+          labware: 'sourcePlateId',
+          well: 'A1'
+        }
       }])
     })
 
