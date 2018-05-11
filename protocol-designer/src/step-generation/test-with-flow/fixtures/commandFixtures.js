@@ -8,7 +8,7 @@ export const replaceTipCommands = (tip: number | string): Array<Command> => [
 ]
 
 export const dropTip = (
-  tip: number | string,
+  tip: number | string, // TODO IMMEDIATELY should this be well?: string & default to A1?
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
   command: 'drop-tip',
@@ -83,14 +83,14 @@ export const dispense = (
 })
 
 export const blowout = (
-  labware: string,
+  labware?: string,
   params?: {| pipette?: string |}
 ): Command => ({
   command: 'blowout',
   params: {
     pipette: 'p300SingleId',
     well: 'A1',
-    ...params,
-    labware
+    labware: labware || 'trashId',
+    ...params
   }
 })
