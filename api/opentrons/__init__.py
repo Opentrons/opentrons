@@ -222,7 +222,9 @@ class InstrumentsWrapper(object):
         return p
 
     def _retrieve_version_number(self, mount, expected_model):
-        # pass a default state incase the driver is simulating
+        # pass a default pipette model-version, for when robot is simulating
+        # this allows any pipette to be simulated, regardless of what is
+        # actually attached/cached on the robot's mounts
         default_version = expected_model + '_v1'
         pipettes_attached = robot.get_attached_pipettes(
             default={mount: {'model': default_version}})
@@ -233,7 +235,7 @@ class InstrumentsWrapper(object):
         # check that the model string is a substring of the version
         # eg: check that 'p10_single' is inside the found 'p10_single_v2'
         if expected_model not in found_version:
-            raise RuntimeError(
+            raise TypeError(
                 'Found unexpected Pipette attached: {}'.format(found_version))
         return found_version
 
