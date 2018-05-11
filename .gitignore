@@ -74,6 +74,7 @@ target/
 /Pipfile
 
 # Testing
+api/tests/opentrons/data/configs/
 sample_protocol.py
 
 # Local Calibration Data
