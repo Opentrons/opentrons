@@ -35,45 +35,69 @@ export const pickUpTip = (
   params: {
     pipette: 'p300SingleId',
     labware: 'tiprack1Id',
-    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip],
-    ...params
+    ...params,
+    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip]
   }
 })
 
-export const touchTip = (well: string): Command => ({
+export const touchTip = (
+  well: string,
+  params?: {| labware?: string |}
+): Command => ({
   command: 'touch-tip',
   params: {
     labware: 'sourcePlateId',
     pipette: 'p300SingleId',
+    ...params,
     well
   }
 })
 
-export const aspirate = (well: string, volume: number): Command => ({
+export const aspirate = (
+  well: string,
+  volume: number,
+  params?: {|
+    pipette?: string,
+    labware?: string
+  |}
+): Command => ({
   command: 'aspirate',
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
+    ...params,
     volume,
     well
   }
 })
 
-export const dispense = (well: string, volume: number): Command => ({
+export const dispense = (
+  well: string,
+  volume: number,
+  params?: {|
+    pipette?: string,
+    labware?: string
+  |}
+): Command => ({
   command: 'dispense',
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
+    ...params,
     volume,
     well
   }
 })
 
-export const blowout = (labware: string): Command => ({
+export const blowout = (
+  labware: string,
+  params?: {| pipette?: string |}
+): Command => ({
   command: 'blowout',
   params: {
     pipette: 'p300SingleId',
     well: 'A1',
+    ...params,
     labware
   }
 })
