@@ -89,6 +89,11 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 DEFAULT_ASPIRATE_SECONDS = 2
 DEFAULT_DISPENSE_SECONDS = 1
 
+# TODO (ben 20180511): should we read these values from
+# TODO                 /shared-data/robot-data/pipette-config.json ? Unclear,
+# TODO                 because this is the backup in case that behavior fails,
+# TODO                 but we could make it more reliable if we start bundling
+# TODO                 config data into the wheel file perhaps. Needs research.
 p10_single_v1 = pipette_config(
     plunger_positions={
         'top': 19,
@@ -105,7 +110,7 @@ p10_single_v1 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=40
+    tip_length=33
 )
 
 p10_single_v2 = pipette_config(
@@ -124,7 +129,7 @@ p10_single_v2 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=40
+    tip_length=33
 )
 
 p10_multi_v1 = pipette_config(
@@ -143,7 +148,7 @@ p10_multi_v1 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=40
+    tip_length=33
 )
 
 p10_multi_v2 = pipette_config(
@@ -162,7 +167,7 @@ p10_multi_v2 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=40
+    tip_length=33
 )
 
 p50_single_v1 = pipette_config(
@@ -181,7 +186,7 @@ p50_single_v1 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p50_single_v2 = pipette_config(
@@ -200,7 +205,7 @@ p50_single_v2 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p50_multi_v1 = pipette_config(
@@ -219,7 +224,7 @@ p50_multi_v1 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p50_multi_v2 = pipette_config(
@@ -238,7 +243,7 @@ p50_multi_v2 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p300_single_v1 = pipette_config(
@@ -257,7 +262,7 @@ p300_single_v1 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p300_single_v2 = pipette_config(
@@ -276,7 +281,7 @@ p300_single_v2 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
     plunger_current=0.3,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p300_multi_v1 = pipette_config(
@@ -295,7 +300,7 @@ p300_multi_v1 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p300_multi_v2 = pipette_config(
@@ -314,7 +319,7 @@ p300_multi_v2 = pipette_config(
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=51.7
 )
 
 p1000_single_v1 = pipette_config(
@@ -333,7 +338,7 @@ p1000_single_v1 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=76.7
 )
 
 p1000_single_v2 = pipette_config(
@@ -352,7 +357,7 @@ p1000_single_v2 = pipette_config(
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
     plunger_current=0.5,
     drop_tip_current=0.5,
-    tip_length=60
+    tip_length=76.7
 )
 
 fallback_configs = {

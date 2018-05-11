@@ -191,7 +191,7 @@ async def move(request):
             message = _move_mount(mount, point)
         elif target == 'pipette':
             pipette = _fetch_or_create_pipette(mount, model)
-            pipette.move_to((robot.deck, point))
+            pipette.move_to((robot.deck, point), strategy='arc')
             new_position = tuple(
                 pose_tracker.absolute(pipette.robot.poses, pipette))
             message = "Move complete. New position: {}".format(new_position)

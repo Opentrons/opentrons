@@ -16,7 +16,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 40
+    "tipLength": 33
   },
   "p10_single_v2": {
     "displayName": "P10 Single-Channel",
@@ -35,7 +35,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 40
+    "tipLength": 33
   },
   "p10_multi_v1": {
     "displayName": "P10 8-Channel",
@@ -54,7 +54,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 40
+    "tipLength": 33
   },
   "p10_multi_v2": {
     "displayName": "P10 8-Channel",
@@ -73,7 +73,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 40
+    "tipLength": 33
   },
   "p50_single_v1": {
     "displayName": "P50 Single-Channel",
@@ -92,7 +92,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p50_single_v2": {
     "displayName": "P50 Single-Channel",
@@ -111,7 +111,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p50_multi_v1": {
     "displayName": "P50 8-Channel",
@@ -130,7 +130,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p50_multi_v2": {
     "displayName": "P50 8-Channel",
@@ -149,7 +149,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p300_single_v1": {
     "displayName": "P300 Single-Channel",
@@ -168,7 +168,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p300_single_v2": {
     "displayName": "P300 Single-Channel",
@@ -187,7 +187,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p300_multi_v1": {
     "displayName": "P300 8-Channel",
@@ -206,7 +206,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p300_multi_v2": {
     "displayName": "P300 8-Channel",
@@ -225,7 +225,7 @@
     "modelOffset": [0.0, 28.0, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 51.7
   },
   "p1000_single_v1": {
     "displayName": "P1000 Single-channel",
@@ -244,7 +244,7 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 76.7
   },
   "p1000_single_v2": {
     "displayName": "P1000 Single-channel",
@@ -263,6 +263,6 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "tipLength": 60
+    "tipLength": 76.7
   }
 }
