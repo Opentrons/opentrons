@@ -199,7 +199,8 @@ def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
 
 
 def test_fallback_config_file(monkeypatch):
-    from opentrons.instruments.pipette_config import _create_config_from_dict
+    from opentrons.instruments.pipette_config import \
+        _create_config_from_dict, fallback_configs
 
     pipette_dict = {
         'ulPerMm': 123,
@@ -207,9 +208,11 @@ def test_fallback_config_file(monkeypatch):
         'channels': 4
     }
 
-    config = _create_config_from_dict(pipette_dict, 'p300_single_v1')
-    assert config.ul_per_mm == 123
-    assert config.tip_length == 321
-    assert config.channels == 4
-    assert config.name == 'p300_single_v1'  # loaded from fallback
-    assert config.pick_up_current == 0.1    # loaded from fallback
+    for model, config in fallback_configs.items():
+        new_config = _create_config_from_dict(pipette_dict, model)
+        assert new_config.ul_per_mm == 123
+        assert new_config.tip_length == 321
+        assert new_config.channels == 4
+        assert new_config.name == config.name
+        assert new_config.pick_up_current == config.pick_up_current
+        assert new_config.plunger_positions == config.plunger_positions
