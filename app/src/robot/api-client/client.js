@@ -272,7 +272,10 @@ export default function client (dispatch) {
   }
 
   function cancel (state, action) {
-    remote.session_manager.session.stop()
+    // ensure session is unpaused before canceling to work around RPC API's
+    // inablity to cancel a paused protocol
+    remote.session_manager.session.resume()
+      .then(() => remote.session_manager.session.stop())
       .then(() => dispatch(actions.cancelResponse()))
       .catch((error) => dispatch(actions.cancelResponse(error)))
   }
