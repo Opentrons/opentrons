@@ -99,3 +99,8 @@
     order: 3;
   }
 }
+
+/* TODO (ka 2018-5-14): temporariliy hide last calibrated labeled value without affecting card layout */
+.hidden_value {
+  visibility: hidden;
+}
