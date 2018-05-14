@@ -9,7 +9,7 @@ from opentrons import robot
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
-from opentrons.server.endpoints import (wifi, control, update)
+from opentrons.server.endpoints import (wifi, control, update, protocols)
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
@@ -156,6 +156,8 @@ def init(loop=None):
         '/settings/environment', update.environment)
     server.app.router.add_post(
         '/settings/set', update.set_feature_flag)
+    server.app.router.add_post(
+        '/protocol/execute_json', protocols.execute_json)
 
     return server.app
 
