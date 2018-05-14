@@ -1,17 +1,28 @@
-from opentrons.instruments.pipette_config import PIPETTE_MODEL_IDENTIFIERS
+from opentrons.instruments.pipette_config import configs
 
 
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
 MODELS = {
-    'P10S': PIPETTE_MODEL_IDENTIFIERS['single']['10'],
-    'P10M': PIPETTE_MODEL_IDENTIFIERS['multi']['10'],
-    'P50S': PIPETTE_MODEL_IDENTIFIERS['single']['50'],
-    'P50M': PIPETTE_MODEL_IDENTIFIERS['multi']['50'],
-    'P300S': PIPETTE_MODEL_IDENTIFIERS['single']['300'],
-    'P300M': PIPETTE_MODEL_IDENTIFIERS['multi']['300'],
-    'P1000S': PIPETTE_MODEL_IDENTIFIERS['single']['1000']
+    'v1': {
+        'P10S': configs['p10_single_v1'],
+        'P10M': configs['p10_multi_v1'],
+        'P50S': configs['p50_single_v1'],
+        'P50M': configs['p50_multi_v1'],
+        'P300S': configs['p300_single_v1'],
+        'P300M': configs['p300_multi_v1'],
+        'P1000S': configs['p1000_single_v1']
+    },
+    'v2': {
+        'P10SV13': configs['p10_single_v2'],
+        'P10MV13': configs['p10_multi_v2'],
+        'P50SV13': configs['p50_single_v2'],
+        'P50MV13': configs['p50_multi_v2'],
+        'P3HSV13': configs['p300_single_v2'],
+        'P3HMV13': configs['p300_multi_v2'],
+        'P1KSV13': configs['p1000_single_v2']
+    }
 }
 
 
@@ -73,10 +84,13 @@ def _user_submitted_barcode(max_length):
 
 def _parse_model_from_barcode(barcode):
     model = None
-    for key in MODELS.keys():
-        if key in barcode:
-            model = MODELS[key]
-            break
+    # MUST iterate through v2 first, because v1 barcodes did not have
+    # characters to specify the version number
+    for version in ['v2', 'v1']:
+        for key in MODELS[version].keys():
+            if key in barcode:
+                model = MODELS[version][key]
+                break
     if not model:
         raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
     return model
