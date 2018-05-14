@@ -10,6 +10,9 @@ export default function MockSession () {
     instruments: [],
     containers: [],
 
-    run: jest.fn()
+    run: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    stop: jest.fn()
   }
 }
