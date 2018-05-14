@@ -228,7 +228,7 @@ p50_single_v2 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
-        'blow_out': 0.5,
+        'blow_out': 1,
         'drop_tip': -4.5
     },
     pick_up_current=0.1,

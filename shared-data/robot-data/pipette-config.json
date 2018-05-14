@@ -100,7 +100,7 @@
     "plungerPositions": {
       "top": 19,
       "bottom": 2.5,
-      "blowOut": 0.5,
+      "blowOut": 1,
       "dropTip": -4.5
     },
     "pickUpCurrent": 0.1,
