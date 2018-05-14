@@ -60,7 +60,6 @@ def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
 
     try:
         plunger_pos = _load_config_value(cfg, 'plungerPositions')
-        print(plunger_pos)
         res = pipette_config(
             plunger_positions={
                 'top': plunger_pos['top'],
@@ -84,7 +83,6 @@ def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
             tip_length=_load_config_value(cfg, 'tipLength')
         )
     except (KeyError, json.decoder.JSONDecodeError) as e:
-        print('fuck')
         log.error('Error when loading pipette config: {}'.format(e))
 
     return res
