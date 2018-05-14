@@ -196,3 +196,20 @@ def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     y_offset = movelog[0][1][1]
     assert base_obj == robot.fixed_trash[0]
     assert y_offset == 108
+
+
+def test_fallback_config_file(monkeypatch):
+    from opentrons.instruments.pipette_config import _create_config_from_dict
+
+    pipette_dict = {
+        'ulPerMm': 123,
+        'tipLength': 321,
+        'channels': 4
+    }
+
+    config = _create_config_from_dict(pipette_dict, 'p300_single_v1')
+    assert config.ul_per_mm == 123
+    assert config.tip_length == 321
+    assert config.channels == 4
+    assert config.name == 'p300_single_v1'  # loaded from fallback
+    assert config.pick_up_current == 0.1    # loaded from fallback
