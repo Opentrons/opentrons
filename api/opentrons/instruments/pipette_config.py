@@ -32,7 +32,20 @@ pipette_config = namedtuple(
 )
 
 
-def _load_config_from_file(pipette_model: str) -> pipette_config:
+def _load_config_from_file(pipette_model: str, fallback) -> pipette_config:
+
+    def _json_key_to_config_attribute(key) -> str:
+        return ''.join([
+                '_{}'.format(c.lower()) if c.isupper() else c
+                for c in key
+            ])
+
+    def _load_config_value(config, key) -> pipette_config:
+        nonlocal fallback
+        fallback_key = _json_key_to_config_attribute(key)
+        fallback_value = getattr(fallback, fallback_key)
+        return config.get(key, fallback_value)
+
     config_file = pipette_config_path()
     res = None
     if os.path.exists(config_file):
@@ -40,23 +53,26 @@ def _load_config_from_file(pipette_model: str) -> pipette_config:
             try:
                 all_configs = json.load(conf)
                 cfg = all_configs[pipette_model]
+                plunger_pos = _load_config_value(cfg, 'plungerPositions')
                 res = pipette_config(
                     plunger_positions={
-                        'top': cfg['plungerPositions']['top'],
-                        'bottom': cfg['plungerPositions']['bottom'],
-                        'blow_out': cfg['plungerPositions']['blowOut'],
-                        'drop_tip': cfg['plungerPositions']['dropTip']
+                        'top': plunger_pos['top'],
+                        'bottom': plunger_pos['bottom'],
+                        'blow_out': plunger_pos['blowOut'],
+                        'drop_tip': plunger_pos['dropTip']
                     },
-                    pick_up_current=cfg['pickUpCurrent'],
-                    aspirate_flow_rate=cfg['aspirateFlowRate'],
-                    dispense_flow_rate=cfg['dispenseFlowRate'],
-                    ul_per_mm=cfg['ulPerMm'],
-                    channels=cfg['channels'],
+                    pick_up_current=_load_config_value(cfg, 'pickUpCurrent'),
+                    aspirate_flow_rate=_load_config_value(
+                        cfg, 'aspirateFlowRate'),
+                    dispense_flow_rate=_load_config_value(
+                        cfg, 'dispenseFlowRate'),
+                    ul_per_mm=_load_config_value(cfg, 'ulPerMm'),
+                    channels=_load_config_value(cfg, 'channels'),
                     name=pipette_model,
-                    model_offset=cfg['modelOffset'],
-                    plunger_current=cfg['plungerCurrent'],
-                    drop_tip_current=cfg['dropTipCurrent'],
-                    tip_length=cfg['tipLength']
+                    model_offset=_load_config_value(cfg, 'modelOffset'),
+                    plunger_current=_load_config_value(cfg, 'plungerCurrent'),
+                    drop_tip_current=_load_config_value(cfg, 'dropTipCurrent'),
+                    tip_length=_load_config_value(cfg, 'tipLength')
                 )
             except (KeyError, json.decoder.JSONDecodeError) as e:
                 log.error('Error when loading pipette config: {}'.format(e))
@@ -239,10 +255,12 @@ fallback_configs = {
 
 
 def select_config(model: str):
-    cfg = _load_config_from_file(model)
+    fallback_cfg = fallback_configs.get(model)
+    cfg = _load_config_from_file(model, fallback_cfg)
     if not cfg:
-        cfg = fallback_configs.get(model)
-    return cfg
+        return fallback_cfg
+    else:
+        return cfg
 # ----------------------- end deprecated data -------------------------
 
 
