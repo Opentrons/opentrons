@@ -110,7 +110,9 @@ class CalibrationManager:
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
+
         inst.move_to(target)
+
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):

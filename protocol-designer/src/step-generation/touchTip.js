@@ -26,9 +26,11 @@ const touchTip = (args: PipetteLabwareFields): CommandCreator => (prevRobotState
 
   const commands = [{
     command: 'touch-tip',
-    pipette,
-    labware,
-    well
+    params: {
+      pipette,
+      labware,
+      well
+    }
   }]
 
   return {

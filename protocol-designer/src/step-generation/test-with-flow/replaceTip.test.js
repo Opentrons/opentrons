@@ -1,6 +1,12 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState, getTiprackTipstate, getTipColumn, commandCreatorNoErrors} from './fixtures'
+import {
+  createRobotState,
+  getTiprackTipstate,
+  getTipColumn,
+  commandCreatorNoErrors,
+  commandFixtures as cmd
+} from './fixtures'
 import _replaceTip from '../replaceTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -38,12 +44,9 @@ describe('replaceTip', () => {
     test('Single-channel: first tip', () => {
       const result = replaceTip('p300SingleId')(robotInitialState)
 
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: tiprack1Id,
-        well: 'A1'
-      }])
+      expect(result.commands).toEqual([
+        cmd.pickUpTip(0)
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -81,12 +84,9 @@ describe('replaceTip', () => {
         }
       ))
 
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: tiprack1Id,
-        well: 'B1'
-      }])
+      expect(result.commands).toEqual([
+        cmd.pickUpTip(1)
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -125,12 +125,9 @@ describe('replaceTip', () => {
 
       const result = replaceTip('p300SingleId')(initialTestRobotState)
 
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: tiprack1Id,
-        well: 'A2'
-      }])
+      expect(result.commands).toEqual([
+        cmd.pickUpTip('A2')
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -171,18 +168,8 @@ describe('replaceTip', () => {
       const result = replaceTip('p300SingleId')(initialTestRobotState)
 
       expect(result.commands).toEqual([
-        {
-          command: 'drop-tip',
-          pipette: 'p300SingleId',
-          labware: 'trashId',
-          well: 'A1'
-        },
-        {
-          command: 'pick-up-tip',
-          pipette: 'p300SingleId',
-          labware: tiprack1Id,
-          well: 'B1'
-        }
+        cmd.dropTip('A1'),
+        cmd.pickUpTip('B1')
       ])
 
       expect(result.robotState).toEqual(
@@ -220,12 +207,9 @@ describe('replaceTip', () => {
 
       const result = replaceTip('p300SingleId')(initialTestRobotState)
 
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: tiprack2Id,
-        well: 'A1'
-      }])
+      expect(result.commands).toEqual([
+        cmd.pickUpTip('A1', {labware: tiprack2Id})
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -247,15 +231,13 @@ describe('replaceTip', () => {
   })
 
   describe('replaceTip: multi-channel', () => {
+    const p300MultiId = 'p300MultiId'
     test('multi-channel, all tipracks have tips', () => {
-      const result = replaceTip('p300MultiId')(robotInitialState)
+      const result = replaceTip(p300MultiId)(robotInitialState)
 
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300MultiId',
-        labware: tiprack1Id,
-        well: 'A1'
-      }])
+      expect(result.commands).toEqual([
+        cmd.pickUpTip('A1', {pipette: p300MultiId})
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -285,13 +267,11 @@ describe('replaceTip', () => {
         }
       }
 
-      const result = replaceTip('p300MultiId')(robotStateWithTipA1Missing)
-      expect(result.commands).toEqual([{
-        command: 'pick-up-tip',
-        pipette: 'p300MultiId',
-        labware: tiprack1Id,
-        well: 'A2' // get from next row
-      }])
+      const result = replaceTip(p300MultiId)(robotStateWithTipA1Missing)
+
+      expect(result.commands).toEqual([
+        cmd.pickUpTip('A2', {pipette: p300MultiId})
+      ])
 
       expect(result.robotState).toEqual(merge(
         {},
@@ -330,20 +310,10 @@ describe('replaceTip', () => {
           }
         }
       }
-      const result = replaceTip('p300MultiId')(robotStateWithTipsOnMulti)
+      const result = replaceTip(p300MultiId)(robotStateWithTipsOnMulti)
       expect(result.commands).toEqual([
-        {
-          command: 'drop-tip',
-          pipette: 'p300MultiId',
-          labware: 'trashId',
-          well: 'A1'
-        },
-        {
-          command: 'pick-up-tip',
-          pipette: 'p300MultiId',
-          labware: tiprack1Id,
-          well: 'A1' // get from next row
-        }
+        cmd.dropTip('A1', {pipette: p300MultiId}),
+        cmd.pickUpTip('A1', {pipette: p300MultiId})
       ])
 
       expect(result.robotState).toEqual(merge(

@@ -4,9 +4,9 @@ import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import {tiprackWellNamesFlat} from '../'
-import type {RobotState, PipetteData, LabwareData} from '../'
-import type {CommandsAndRobotState, CommandCreatorErrorResponse} from '../types'
+import {tiprackWellNamesFlat} from '../../'
+import type {RobotState, PipetteData, LabwareData} from '../../'
+import type {CommandsAndRobotState, CommandCreatorErrorResponse} from '../../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response

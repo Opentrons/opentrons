@@ -49,7 +49,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   const baseForm = {
     id: stepId,
     stepType: stepType,
-    'step-name': humanize(stepType) + ' ' + (stepId + 1),
+    'step-name': humanize(stepType) + ' ' + stepId,
     'step-details': ''
   }
 

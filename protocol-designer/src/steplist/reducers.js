@@ -1,9 +1,10 @@
 // @flow
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
-import type { ActionType } from 'redux-actions'
-import { createSelector } from 'reselect'
+import {combineReducers} from 'redux'
+import {handleActions} from 'redux-actions'
+import type {ActionType} from 'redux-actions'
+import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
+import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import omit from 'lodash/omit'
 
@@ -91,8 +92,7 @@ const formSectionCollapse = handleActions({
 }, initialFormSectionState)
 
 // Add default title (and later, other default values) to newly-created Step
-// TODO: Ian 2018-01-26 don't add any default values, selector should generate title if missing,
-// title is all pristine Steps need added into the selector.
+// TODO: Ian 2018-01-26 don't add any default values, the allSteps selector generates the title
 function createDefaultStep (action: AddStepAction) {
   const {stepType} = action.payload
   return {...action.payload, title: stepType}
@@ -162,7 +162,8 @@ const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
-    state.filter(stepId => stepId !== action.payload)
+    // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
+    state.filter(stepId => !(stepId === action.payload && `${stepId}` === action.payload))
 }, [INITIAL_DECK_SETUP_ID])
 
 type SelectedStepState = null | StepIdType | typeof END_STEP
@@ -278,7 +279,7 @@ const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
 )
 
 /** This is just a simple selector, but has some debugging logic. TODO Ian 2018-03-20: use assert here */
-const getSavedForms = createSelector(
+const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   getSteps,
   orderedStepsSelector,
   (state: BaseState) => rootSelector(state).savedStepForms,
@@ -287,7 +288,7 @@ const getSavedForms = createSelector(
       // No steps -- since initial Deck Setup step exists in default Redux state,
       // this probably should never happen
       console.warn('validatedForms called with no steps in "orderedSteps"')
-      return []
+      return {}
     }
 
     if (_steps[0].stepType !== 'deck-setup') {
@@ -429,44 +430,36 @@ const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   s => s.formSectionCollapse
 )
 
-export const allSteps: Selector<Array<StepItemData>> = createSelector(
+export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
   getSteps,
-  orderedStepsSelector,
   getCollapsedSteps,
   getSavedForms,
   labwareIngredSelectors.getLabware,
-  (steps, orderedSteps, collapsedSteps, _savedForms, _labware) => {
-    return orderedSteps.map(id => {
-      const savedForm = (_savedForms && _savedForms[id]) || {}
+  (steps, collapsedSteps, _savedForms, _labware) => {
+    return mapValues(
+      steps,
+      (step: StepItemData, id: StepIdType): StepItemData => {
+        const savedForm = (_savedForms && _savedForms[id]) || null
 
-      function getLabwareName (labwareId: ?string) {
-        return (labwareId)
-          ? _labware[labwareId] && _labware[labwareId].name
-          : null
-      }
+        // Assign the step title
+        let title
 
-      // optional form fields for "TransferLike" steps
-      const additionalFormFields = (
-        savedForm.stepType === 'transfer' ||
-        savedForm.stepType === 'distribute' ||
-        savedForm.stepType === 'consolidate'
-      )
-        ? {
-          sourceLabwareName: getLabwareName(savedForm['aspirate--labware']),
-          destLabwareName: getLabwareName(savedForm['dispense--labware'])
+        if (savedForm && savedForm['step-name']) {
+          title = savedForm['step-name']
+        } else if (step.stepType === 'deck-setup') {
+          title = 'Deck Setup'
+        } else {
+          title = `${step.stepType} ${id}`
         }
-        : {}
 
-      return {
-        ...steps[id],
-
-        ...additionalFormFields,
-        description: savedForm['step-details'],
-
-        collapsed: collapsedSteps[id]
-        // substeps: _allSubsteps[id] // TODO Add back in in higher-order selector
+        return {
+          ...steps[id],
+          formData: savedForm,
+          title,
+          description: savedForm ? savedForm['step-details'] : null
+        }
       }
-    })
+    )
   }
 )
 

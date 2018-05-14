@@ -339,6 +339,24 @@ def model(robot):
 
 
 @pytest.fixture
+def model_with_trough(robot):
+    from opentrons.containers import load
+    from opentrons.instruments.pipette import Pipette
+
+    pipette = Pipette(robot, mount='right')
+    plate = load(robot, 'trough-12row', '1')
+
+    instrument = models.Instrument(pipette)
+    container = models.Container(plate)
+
+    return namedtuple('model', 'robot instrument container')(
+            robot=robot,
+            instrument=instrument,
+            container=container
+        )
+
+
+@pytest.fixture
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
          SmoothieDriver_3_0_0 as SmoothieDriver
