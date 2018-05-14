@@ -82,8 +82,9 @@ class Server(object):
         def task_done(future):
             exception = future.result()
             if exception:
-                log.debug('Send task for socket {0}'.format(_id))
-            log.debug('Send task for {0} finished'.format(_id))
+                log.debug('Send task for socket {} result: {}'.format(
+                    _id, exception))
+            log.debug('Send task for {} finished'.format(_id))
 
         async def send_task(socket, queue):
             while True:
@@ -115,10 +116,8 @@ class Server(object):
                         '$': {'type': NOTIFICATION_MESSAGE},
                         'data': data
                     })
-            except Exception as e:
-                log.warning(
-                    'While processing event {0}: {1}'.format(
-                        event, e))
+            except Exception:
+                log.exception('While processing event {0}:'.format(event))
 
     async def handler(self, request):
         """
@@ -236,6 +235,7 @@ class Server(object):
                     func = self.build_call(_id, **data)
                     self.send_ack(token)
                 except Exception as e:
+                    log.exception("Excption during rpc.Server.process:")
                     error = '{0}: {1}'.format(e.__class__.__name__, e)
                     self.send_error(error, token)
                 else:
