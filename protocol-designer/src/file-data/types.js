@@ -18,6 +18,12 @@ export type FilePipette = {
   model: string // TODO Ian 2018-05-11 use pipette-definitions model types
 }
 
+export type FileLabware = {
+  slot: DeckSlot,
+  model: string,
+  'display-name': string
+}
+
 // A JSON protocol
 export type ProtocolFile = {
   'protocol-schema': VersionString,
@@ -51,11 +57,7 @@ export type ProtocolFile = {
   },
 
   labware: {
-    [labwareId: string]: {
-      slot: DeckSlot,
-      model: string,
-      displayName: string
-    }
+    [labwareId: string]: FileLabware
   },
 
   procedure: Array<{
