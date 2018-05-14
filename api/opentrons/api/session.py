@@ -7,6 +7,7 @@ from functools import reduce
 from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
 from opentrons.commands import tree, types
+from opentrons.protocols import execute_json
 from opentrons import robot
 
 from .models import Container, Instrument
@@ -118,7 +119,10 @@ class Session(object):
             # TODO (artyom, 20171005): this will go away
             # once robot / driver simulation flow is fixed
             robot._driver.disconnect()
-            exec(self._protocol, {})
+            if self._is_json_protocol:
+                execute_json(self.protocol_text)
+            else:
+                exec(self._protocol, {})
         finally:
             robot._driver.connect()
             unsubscribe()
@@ -135,9 +139,13 @@ class Session(object):
 
     def refresh(self):
         self._reset()
+        self._is_json_protocol = self.name.endswith('.json')
 
-        parsed = ast.parse(self.protocol_text)
-        self._protocol = compile(parsed, filename=self.name, mode='exec')
+        if self._is_json_protocol:
+            self._protocol = None
+        else:
+            parsed = ast.parse(self.protocol_text)
+            self._protocol = compile(parsed, filename=self.name, mode='exec')
         commands = self._simulate()
         self.commands = tree.from_list(commands)
 
@@ -182,7 +190,10 @@ class Session(object):
         try:
             self.resume()
             robot.home()
-            exec(self._protocol, {})
+            if self._is_json_protocol:
+                execute_json(self.protocol_text)
+            else:
+                exec(self._protocol, {})
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
