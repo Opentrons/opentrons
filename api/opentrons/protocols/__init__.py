@@ -1,7 +1,12 @@
 import json
 import time
+from itertools import chain
 from opentrons import instruments, labware, robot
 from opentrons.instruments import pipette_config
+
+
+def _sleep(seconds):
+    time.sleep(seconds)
 
 
 def load_pipettes(protocol_data):
@@ -31,71 +36,64 @@ def load_labware(protocol_data):
                 loaded_labware[labware_id] = labware.load(
                     props['model'],
                     props['slot'],
-                    props['display-name'],
+                    props.get('display-name'),
                     share=True
                 )
         else:
             loaded_labware[labware_id] = labware.load(
                 props['model'],
                 props['slot'],
-                props['display-name']
+                props.get('display-name')
             )
 
     return loaded_labware
 
 
 def get_location(command_params, loaded_labware):
-    labwareId = command_params['labware']
-    well = command_params['well']
-    return loaded_labware[labwareId][well]
+    labwareId = command_params.get('labware')
+    well = command_params.get('well')
+    return loaded_labware.get(labwareId, {}).get(well)
 
 
 def get_pipette(command_params, loaded_pipettes):
     pipetteId = command_params.get('pipette')
-    return loaded_pipettes[pipetteId]
+    return loaded_pipettes.get(pipetteId)
 
 
 def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
-    for procedure in protocol_data['procedure']:
-        subprocedure = procedure['subprocedure']
+    subprocedures = [p['subprocedure'] for p in protocol_data['procedure']]
+    flat_subs = chain.from_iterable(subprocedures)
 
-        for command_item in subprocedure:
-            command_type = command_item['command']
-            params = command_item['params']
+    for command_item in flat_subs:
+        command_type = command_item['command']
+        params = command_item['params']
 
-            if command_type == 'delay':
-                wait = params.get('wait', 0)
-                if type(wait) is str:
-                    # TODO Ian 2018-05-14 pass message
-                    robot.pause()
-                else:
-                    time.sleep(wait)
+        pipette = get_pipette(params, loaded_pipettes)
+        location = get_location(params, loaded_labware)
+        volume = params.get('volume')
 
+        if command_type == 'delay':
+            wait = params.get('wait', 0)
+            if type(wait) is str:
+                # TODO Ian 2018-05-14 pass message
+                robot.pause()
             else:
-                pipette = get_pipette(params, loaded_pipettes)
-                location = get_location(params, loaded_labware)
-                volume = params.get('volume', None)
+                _sleep(wait)
 
-                if command_type == 'blowout':
-                    pipette.blow_out(location)
+        elif command_type == 'blowout':
+            pipette.blow_out(location)
 
-                elif command_type == 'pick-up-tip':
-                    pipette.pick_up_tip(location)
+        elif command_type == 'pick-up-tip':
+            pipette.pick_up_tip(location)
 
-                elif command_type == 'drop-tip':
-                    pipette.drop_tip(location)
+        elif command_type == 'drop-tip':
+            pipette.drop_tip(location)
 
-                elif command_type == 'aspirate':
-                    pipette.aspirate(
-                        volume,
-                        location
-                    )
+        elif command_type == 'aspirate':
+            pipette.aspirate(volume, location)
 
-                elif command_type == 'dispense':
-                    pipette.dispense(
-                        volume,
-                        location
-                    )
+        elif command_type == 'dispense':
+            pipette.dispense(volume, location)
 
 
 def execute_json(json_string):
