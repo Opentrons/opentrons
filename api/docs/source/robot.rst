@@ -27,6 +27,16 @@ The robot module can be thought of as the parent for all aspects of the Opentron
 
     pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
+
+User-Specified Pause
+==========
+
+This will pause your protocol at a specific step. You can resume by pressing 'resume' in your OT App.
+
+.. testcode:: robot
+
+robot.pause()
+
 Head Speed
 ==========
 
