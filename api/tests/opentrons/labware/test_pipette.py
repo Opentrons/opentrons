@@ -92,7 +92,8 @@ def test_aspirate_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (7.848, 0.0, 0.0)).all()
+
+    assert (current_pos == (7.847594, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()

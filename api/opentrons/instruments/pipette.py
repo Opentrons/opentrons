@@ -1474,7 +1474,7 @@ class Pipette:
         """
 
         millimeters = ul / self.ul_per_mm
-        return round(millimeters, 3)
+        return millimeters
 
     def _ul_to_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
@@ -1487,7 +1487,7 @@ class Pipette:
 
         millimeters = self._ul_to_mm(ul)
         destination_mm = self._get_plunger_position('bottom') + millimeters
-        return round(destination_mm, 3)
+        return round(destination_mm, 6)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1702,10 +1702,10 @@ class Pipette:
         """
         if aspirate:
             self.set_speed(
-                aspirate=self._ul_to_mm(aspirate))
+                aspirate=round(self._ul_to_mm(aspirate), 6))
         if dispense:
             self.set_speed(
-                dispense=self._ul_to_mm(dispense))
+                dispense=round(self._ul_to_mm(dispense), 6))
         return self
 
     def set_pick_up_current(self, amperes):
