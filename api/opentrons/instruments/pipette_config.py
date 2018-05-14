@@ -35,16 +35,25 @@ pipette_config = namedtuple(
 def _load_config_from_file(pipette_model: str, fallback) -> pipette_config:
 
     def _json_key_to_config_attribute(key) -> str:
+        '''
+        Converts the JSON key syntax (eg: "plungerPositions"), to the format
+        used in the namedtuple `plunger_config` (eg: "plunger_positions")
+        '''
         return ''.join([
                 '_{}'.format(c.lower()) if c.isupper() else c
                 for c in key
             ])
 
-    def _load_config_value(config, key) -> pipette_config:
+    def _load_config_value(config_json, key) -> pipette_config:
+        '''
+        Retrieves a given key from the loaded JSON config dict. If that key is
+        not present in the dictionary, it falls back to the value from
+        the namedtuple `plunger_config`, named "fallback"
+        '''
         nonlocal fallback
         fallback_key = _json_key_to_config_attribute(key)
         fallback_value = getattr(fallback, fallback_key)
-        return config.get(key, fallback_value)
+        return config_json.get(key, fallback_value)
 
     config_file = pipette_config_path()
     res = None
