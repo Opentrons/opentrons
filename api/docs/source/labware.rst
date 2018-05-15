@@ -25,7 +25,7 @@ __ https://andysigler.github.io/ot-api-containerviz/
 
 Below are a list of some of the most commonly used containers in the API, as well as images for how they look.
 
-If you are interested in using your own container that is not included in the API, please take a look at how to create custom containers using ``containers.create()``, or contact Opentrons Support.
+If you are interested in using your own container that is not included in the API, please take a look at how to create custom containers using ``labware.create()``, or contact Opentrons Support.
 
 .. note::
 
@@ -337,12 +337,11 @@ Through the API's call containers.create(), you can create simple grid container
 
     custom_plate = containers.create(
         '3x6_plate',                    # name of you container
-        grid=(3, 6),                    # specify amount of (columns, rows)
-        spacing=(12, 12),               # distances (mm) between each (column, row)
+        grid=(3, 6),                    # specify amount of (rows, columns)
+        spacing=(12, 12),               # distances (mm) between each (row, column)
         diameter=5,                     # diameter (mm) of each well on the plate
         depth=10,                       # depth (mm) of each well on the plate
-        volume=200,                     # optional: volume capacity of each well (uL)
-        save=False)
+        volume=200)
 
 When you create your custom container it will return the custom plate. If you would like to save this container to the robot's containers library you can pass save=True and it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 
