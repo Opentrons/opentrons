@@ -57,16 +57,9 @@ __ https://www.sublimetext.com/3
 Jupyter Notebook
 ================
 
-For a more interactive environment to write and debug using some of our API tools, we recommend using Jupyter Notebook. To begin, just install `Anaconda`__, which comes with Jupyter Notebook.
+For a more interactive environment to write and debug using some of our API tools, we recommend using Jupyter Notebook.
 
-__ https://www.continuum.io/downloads
+You can access Jupyter Notebook using the following:
 
-Once installed, launch Jupyter Notebook, and install the Opentrons API by doing the following:
-
-1) Create a new Python notebook
-2) Run the command ``!pip install --upgrade opentrons`` in a cell
-3) Restart your notebook's Kernel, and API will be installed
-
-.. note::
-
-    Be sure to download the **Python 3.6 version** if Anaconda, and Python 2.7 will not work with the Opentrons API.
+1. Open your Opentrons App and look for the IP address of your robot on the robot information page.
+2. Type in ``(Your Robot's IP Address):48888`` into any browser on your computer.
