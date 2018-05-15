@@ -695,7 +695,8 @@ class SmoothieDriver_3_0_0:
         self._send_command(GCODES['RESET_FROM_ERROR'])
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
+    def _send_command(
+            self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT, is_retry=False):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -720,8 +721,22 @@ class SmoothieDriver_3_0_0:
         else:
 
             command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-            ret_code = serial_communication.write_and_return(
-                command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
+            try:
+                ret_code = serial_communication.write_and_return(
+                    command_line,
+                    SMOOTHIE_ACK,
+                    self._connection,
+                    timeout=timeout)
+            except serial_communication.SerialNoResponse as e:
+                if not is_retry:
+                    # try again, falling back to a shorter timeout so
+                    # an error doesn't cause a very long hangup
+                    return self._send_command(
+                        command,
+                        timeout=DEFAULT_SMOOTHIE_TIMEOUT,
+                        is_retry=True)
+                else:
+                    raise e
 
             # smoothieware can enter a weird state, where it repeats back
             # the sent command at the beginning of its response.
