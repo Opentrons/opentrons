@@ -60,7 +60,7 @@ export default function ChangePipette (props: Props) {
           <ConnectedChangePipetteRouter
             robot={robot}
             title={TITLE}
-            subtitle={`${mount} carriage`}
+            subtitle={`${mount} mount`}
             mount={mount}
             wantedPipette={wantedPipette}
             parentUrl={parentUrl}
