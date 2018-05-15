@@ -27,7 +27,8 @@ export type StepItemSourceDestRow = {|
   sourceIngredients?: Array<NamedIngred>,
   destIngredients?: Array<NamedIngred>,
   sourceWell?: ?string,
-  destWell?: ?string
+  destWell?: ?string,
+  volume?: ?number // TODO IMMEDIATELY use this?!??
 |}
 
 export type StepItemSourceDestRowMulti = {|

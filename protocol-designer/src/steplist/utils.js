@@ -14,3 +14,27 @@ export function getPrevStepId (
 
   return prevStepId
 }
+
+/** Split an array into nested arrays when predicate fn is true */
+export function splitWhen<T> (
+  array: Array<T>,
+  predicate: (prev: T, current: T) => mixed
+): Array<Array<T>> {
+  const splitIdx = array.slice(1).reduce((acc: number, val: *, prevIdx: number): number => {
+    if (acc !== -1) return acc // short-circuit this reduce
+
+    return predicate(array[prevIdx], val)
+      ? prevIdx + 1
+      : acc
+  }, -1)
+
+  if (splitIdx === -1) {
+    // no split needed
+    return [array]
+  }
+
+  return [
+    array.slice(0, splitIdx),
+    ...splitWhen(array.slice(splitIdx), predicate)
+  ]
+}
