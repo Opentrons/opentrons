@@ -220,8 +220,9 @@ def test_fallback_config_file(monkeypatch):
 
 
 def test_json_and_fallback_configs_match(monkeypatch):
-    from opentrons.instruments.pipette_config import select_config, configs
+    from opentrons.instruments.pipette_config import \
+        select_config, fallback_configs
 
-    for model, config_fallback in configs.items():
+    for model, config_fallback in fallback_configs.items():
         config_from_json = select_config(model)
         assert config_from_json == config_fallback
