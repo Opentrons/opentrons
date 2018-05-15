@@ -95,6 +95,9 @@ def _load_config_dict_from_file(pipette_model: str) -> dict:
         with open(config_file) as conf:
             all_configs = json.load(conf)
             cfg = all_configs[pipette_model]
+            # convert the JSON's array for modelOfset
+            # into a tuple for model_offset
+            cfg['modelOffset'] = tuple(cfg['modelOffset'])
     return cfg
 
 
