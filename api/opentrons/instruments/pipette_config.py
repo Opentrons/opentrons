@@ -132,9 +132,9 @@ DEFAULT_DISPENSE_SECONDS = 1
 p10_single = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -5
+        'bottom': 2.5,
+        'blow_out': -0.5,
+        'drop_tip': -4
     },
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -151,9 +151,9 @@ p10_single = pipette_config(
 p10_multi = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 3,
+        'bottom': 4,
         'blow_out': 1,
-        'drop_tip': -5
+        'drop_tip': -4.5
     },
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -170,9 +170,9 @@ p10_multi = pipette_config(
 p50_single = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 4,
+        'bottom': 2.5,
         'blow_out': 2,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
@@ -189,7 +189,7 @@ p50_single = pipette_config(
 p50_multi = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 4,
+        'bottom': 2.5,
         'blow_out': 2,
         'drop_tip': -4
     },
@@ -210,7 +210,7 @@ p300_single = pipette_config(
         'top': 19,
         'bottom': 2.5,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -229,7 +229,7 @@ p300_multi = pipette_config(
         'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -4
+        'drop_tip': -3.5
     },
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -248,7 +248,7 @@ p1000_single = pipette_config(
         'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
