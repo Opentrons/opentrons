@@ -728,15 +728,10 @@ class SmoothieDriver_3_0_0:
                     self._connection,
                     timeout=timeout)
             except serial_communication.SerialNoResponse as e:
-                if not is_retry:
-                    # try again, falling back to a shorter timeout so
-                    # an error doesn't cause a very long hangup
-                    return self._send_command(
-                        command,
-                        timeout=DEFAULT_SMOOTHIE_TIMEOUT,
-                        is_retry=True)
-                else:
+                if is_retry:
                     raise e
+                return self._send_command(
+                    command, timeout=timeout, is_retry=True)
 
             # smoothieware can enter a weird state, where it repeats back
             # the sent command at the beginning of its response.
