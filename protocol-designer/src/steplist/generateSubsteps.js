@@ -13,22 +13,26 @@ import {
 import type {
   NamedIngredsByLabwareAllSteps,
   SubSteps,
-  SourceDestSubstepItem
+  SourceDestSubstepItem,
+  SourceDestSubstepItemSingleChannel
 } from './types'
 
 import type {StepIdType} from '../form-types'
+import type {RobotStateTimelineAcc} from '../file-data/selectors'
+import {distribute} from '../step-generation'
 
 import type {
   PipetteData,
   ConsolidateFormData,
-  DistributeFormData,
+  // DistributeFormData,
   MixFormData,
   PauseFormData,
   TransferFormData
 } from '../step-generation/types'
 
-type AllPipetteData = {[pipetteId: string]: PipetteData} // TODO make general type, key by ID not mount?
+type AllPipetteData = {[pipetteId: string]: PipetteData}
 type AllLabwareTypes = {[labwareId: string]: string}
+type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
 
 function _transferSubsteps (
   form: TransferFormData,
@@ -192,13 +196,13 @@ function _consolidateSubsteps (
   }
 }
 
-function _distributeSubsteps (
-  form: DistributeFormData,
-  transferLikeFields: *
-): ?SourceDestSubstepItem { // <-- TODO remove '?' type
-  console.log('Distribute substeps not yet implemented') // TODO Ian 2018-05-04
-  return null
-}
+// function _distributeSubsteps (
+//   form: DistributeFormData,
+//   transferLikeFields: *
+// ): ?SourceDestSubstepItem { // <-- TODO remove '?' type
+//   console.log('Distribute substeps not yet implemented') // TODO Ian 2018-05-04
+//   return null
+// }
 
 function _mixSubsteps (
   form: MixFormData,
@@ -257,7 +261,8 @@ export function generateSubsteps (
   allPipetteData: AllPipetteData,
   allLabwareTypes: AllLabwareTypes,
   namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  orderedSteps: Array<StepIdType>
+  orderedSteps: Array<StepIdType>,
+  robotStateTimeline: RobotStateTimelineAcc
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
@@ -279,11 +284,65 @@ export function generateSubsteps (
       return formData
     }
 
-    // Handle all TransferLike substeps + mix
+    if (validatedForm.stepType === 'distribute') {
+      const robotState = (
+        robotStateTimeline.timeline[prevStepId] &&
+        robotStateTimeline.timeline[prevStepId].robotState
+      ) || robotStateTimeline.robotState
+
+      const result = distribute(validatedForm)(robotState) // TODO IMMEDIATELY disable any mix args
+      if (result.errors) {
+        return null
+      }
+      const commands = result.commands
+      // TODO multi-channel
+
+      const rows = commands.reduce((
+        acc: SourceDestSubstepItemRows,
+        command: *,
+        commandIdx: number
+      ): SourceDestSubstepItemRows => {
+        if (command.command === 'aspirate') {
+          const {well, volume, labware} = command.params
+          return [
+            ...acc,
+            {
+              substepId: acc.length,
+              sourceIngredients: namedIngredsByLabwareAllSteps[prevStepId][labware][well] || [], // TODO needs &&s
+              sourceWell: well,
+              volume: volume
+            }
+          ]
+        }
+
+        if (command.command === 'dispense') {
+          return [
+            ...acc,
+            {
+              substepId: acc.length,
+              destIngredients: [], // TODO
+              destWell: command.params.well,
+              volume: command.params.volume
+            }
+          ]
+        }
+
+        return acc
+      }, [])
+      console.log({commands, rows})
+      const returnThisThing: SourceDestSubstepItem = { // TODO
+        stepType: validatedForm.stepType,
+        parentStepId: stepId,
+        multichannel: false,
+        rows
+      }
+      return returnThisThing
+    }
+
+    // TODO REPLACE: Handle all TransferLike substeps + mix
     if (
-      validatedForm.stepType === 'transfer' ||
       validatedForm.stepType === 'consolidate' ||
-      validatedForm.stepType === 'distribute' ||
+      validatedForm.stepType === 'transfer' ||
       validatedForm.stepType === 'mix'
     ) {
       const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
@@ -362,13 +421,6 @@ export function generateSubsteps (
 
       if (validatedForm.stepType === 'consolidate') {
         return _consolidateSubsteps(
-          validatedForm,
-          transferLikeFields
-        )
-      }
-
-      if (validatedForm.stepType === 'distribute') {
-        return _distributeSubsteps(
           validatedForm,
           transferLikeFields
         )
