@@ -183,8 +183,16 @@ def _parse_homing_status_values(raw_homing_status_values):
             s.split(':')[0]: bool(int(s.split(':')[1]))
             for s in parsed_values
         }
+    except (ValueError, IndexError) as e:
+        log.error(
+            "Data format error in _parse_homing_status_values: {}".format(e))
+        log.error("Received from Smoothie: {}".format(
+            raw_homing_status_values))
+        raise e
     except Exception as e:
-        log.error("Thoroughly unexpected! {}".format(e))
+        log.error("Unexpected! {}".format(e))
+        log.error("Received from Smoothie: {}".format(
+            raw_homing_status_values))
         raise e
     return res
 
@@ -432,8 +440,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    @property
-    def homed_flags(self):
+    def get_homed_flags(self, is_retry=False):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -456,8 +463,17 @@ class SmoothieDriver_3_0_0:
                 ax: True
                 for ax in AXES
             }
-        res = self._send_command(GCODES['HOMING_STATUS'])
-        return _parse_homing_status_values(res)
+        res = {}
+        try {
+            res = self._send_command(GCODES['HOMING_STATUS'])
+            res = _parse_homing_status_values(res)
+        }
+        except (ValueError, IndexError) as e:
+            if is_retry:
+                raise e
+            else:
+                res = self.get_homed_flags(is_retry=True)
+        return res
 
     @property
     def current(self):
@@ -1161,9 +1177,10 @@ class SmoothieDriver_3_0_0:
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
         '''
+        flags = self.get_homed_flags()
         axes_that_need_to_home = [
             axis
-            for axis, already_homed in self.homed_flags.items()
+            for axis, already_homed in flags.items()
             if (not already_homed) and (axis in axes_string)
         ]
         if axes_that_need_to_home:
