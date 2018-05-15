@@ -3,14 +3,10 @@
 // api updater
 'use strict'
 
-const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
-const {promisify} = require('util')
 
 const {version: AVAILABLE_UPDATE} = require('../package.json')
-
-const readDir = promisify(fs.readdir)
-const readFile = promisify(fs.readFile)
 
 /*::
 import type {RobotService} from '../../app/src/robot'
@@ -28,7 +24,7 @@ module.exports = {
 }
 
 function initialize () /*: Promise<void> */ {
-  return readDir(UPDATE_DIR)
+  return fse.readdir(UPDATE_DIR)
     .then((files) => {
       const wheels = files.filter((file) => file.endsWith(UPDATE_EXT))
 
@@ -45,6 +41,6 @@ function initialize () /*: Promise<void> */ {
 function getUpdateFile () /*: Promise<string> */ {
   if (!updateFile) return Promise.reject(new Error('No update file available'))
 
-  return readFile(path.join(UPDATE_DIR, updateFile))
+  return fse.readFile(path.join(UPDATE_DIR, updateFile))
     .then((contents) => ({name: updateFile, contents}))
 }

@@ -132,9 +132,9 @@ DEFAULT_DISPENSE_SECONDS = 1
 p10_single = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -5
+        'bottom': 2.5,
+        'blow_out': -0.5,
+        'drop_tip': -4
     },
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -142,7 +142,7 @@ p10_single = pipette_config(
     ul_per_mm=0.77,
     channels=1,
     name='p10_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P10),
+    model_offset=[0.0, 0.0, Z_OFFSET_P10],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=33
@@ -151,9 +151,9 @@ p10_single = pipette_config(
 p10_multi = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 3,
+        'bottom': 4,
         'blow_out': 1,
-        'drop_tip': -5
+        'drop_tip': -4.5
     },
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -161,7 +161,7 @@ p10_multi = pipette_config(
     ul_per_mm=0.77,
     channels=8,
     name='p10_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=33
@@ -170,9 +170,9 @@ p10_multi = pipette_config(
 p50_single = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 4,
+        'bottom': 2.5,
         'blow_out': 2,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
@@ -180,7 +180,7 @@ p50_single = pipette_config(
     ul_per_mm=3.35,
     channels=1,
     name='p50_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P50),
+    model_offset=[0.0, 0.0, Z_OFFSET_P50],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -189,7 +189,7 @@ p50_single = pipette_config(
 p50_multi = pipette_config(
     plunger_positions={
         'top': 19,
-        'bottom': 4,
+        'bottom': 2.5,
         'blow_out': 2,
         'drop_tip': -4
     },
@@ -199,7 +199,7 @@ p50_multi = pipette_config(
     ul_per_mm=3.35,
     channels=8,
     name='p50_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -210,7 +210,7 @@ p300_single = pipette_config(
         'top': 19,
         'bottom': 2.5,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -218,7 +218,7 @@ p300_single = pipette_config(
     ul_per_mm=18.7,
     channels=1,
     name='p300_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P300),
+    model_offset=[0.0, 0.0, Z_OFFSET_P300],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -229,7 +229,7 @@ p300_multi = pipette_config(
         'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -4
+        'drop_tip': -3.5
     },
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -237,7 +237,7 @@ p300_multi = pipette_config(
     ul_per_mm=19,
     channels=8,
     name='p300_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -248,7 +248,7 @@ p1000_single = pipette_config(
         'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
@@ -256,7 +256,7 @@ p1000_single = pipette_config(
     ul_per_mm=65,
     channels=1,
     name='p1000_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P1000),
+    model_offset=[0.0, 0.0, Z_OFFSET_P1000],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=76.7

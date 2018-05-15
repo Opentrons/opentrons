@@ -4,9 +4,9 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19,
-      "bottom": 3,
-      "blowOut": 1,
-      "dropTip": -5
+      "bottom": 2.5,
+      "blowOut": -0.5,
+      "dropTip": -4
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 5,
@@ -23,16 +23,16 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19,
-      "bottom": 3,
+      "bottom": 4,
       "blowOut": 1,
-      "dropTip": -5
+      "dropTip": -4.5
     },
     "pickUpCurrent": 0.2,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
     "ulPerMm": 0.77,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 33
@@ -42,9 +42,9 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19,
-      "bottom": 4,
+      "bottom": 2.5,
       "blowOut": 2,
-      "dropTip": -2.5
+      "dropTip": -5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 25,
@@ -61,7 +61,7 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19,
-      "bottom": 4,
+      "bottom": 2.5,
       "blowOut": 2,
       "dropTip": -4
     },
@@ -70,7 +70,7 @@
     "dispenseFlowRate": 50,
     "ulPerMm": 3.35,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 51.7
@@ -82,7 +82,7 @@
       "top": 19,
       "bottom": 2.5,
       "blowOut": 1,
-      "dropTip": -2.5
+      "dropTip": -5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 150,
@@ -101,14 +101,14 @@
       "top": 19,
       "bottom": 3,
       "blowOut": 1,
-      "dropTip": -4
+      "dropTip": -3.5
     },
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
     "ulPerMm": 19,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 51.7
@@ -120,7 +120,7 @@
       "top": 19,
       "bottom": 3,
       "blowOut": 1,
-      "dropTip": -2.5
+      "dropTip": -5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 500,

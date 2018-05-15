@@ -80,6 +80,7 @@ DEFAULT_MOUNT_OFFSET = [-34, 0, 0]
 DEFAULT_INST_OFFSET = [0.0, 0.0, 0.0]
 SERIAL_SPEED = 115200
 DEFAULT_TIP_LENGTH_DICT = {'Pipette': 51.7}
+DEFAULT_LOG_LEVEL = 'INFO'
 
 robot_config = namedtuple(
     'robot_config',
@@ -98,7 +99,8 @@ robot_config = namedtuple(
         'low_current',
         'high_current',
         'default_max_speed',
-        'mount_offset'
+        'mount_offset',
+        'log_level'
     ]
 )
 
@@ -144,7 +146,8 @@ def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
         low_current=robot_settings.get('low_current', LOW_CURRENT),
         high_current=robot_settings.get('high_current', HIGH_CURRENT),
         default_max_speed=robot_settings.get(
-            'default_max_speed', DEFAULT_MAX_SPEEDS)
+            'default_max_speed', DEFAULT_MAX_SPEEDS),
+        log_level=robot_settings.get('log_level', DEFAULT_LOG_LEVEL)
     )
     return cfg
 
