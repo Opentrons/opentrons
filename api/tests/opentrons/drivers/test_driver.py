@@ -347,6 +347,7 @@ def test_set_pick_upcurrent(model):
         set_current(target, axes_active)
 
     driver._save_current = types.MethodType(set_current_mock, driver)
+    driver.update_homed_flags({ax: True for ax in 'XYZABC'})
 
     rack = model.robot.add_container('tiprack-200ul', '10')
     pipette = model.instrument._instrument
@@ -367,8 +368,8 @@ def test_set_pick_upcurrent(model):
         {'A': 1.0},
         {'A': 0.1}
     ]
-    # from pprint import pprint
-    # pprint(current_log)
+    from pprint import pprint
+    pprint(current_log)
     assert current_log == expected
 
     driver._save_current = set_current
@@ -495,6 +496,7 @@ def test_homing_flags(model):
         return True
 
     driver.is_connected = types.MethodType(is_connected_mock, driver)
+    driver.simulating = False
 
     def send_mock(self, target):
         smoothie_homing_res = 'X:0 Y:1 Z:0 A:1 B:0 C:1\r\n'
