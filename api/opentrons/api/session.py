@@ -184,6 +184,7 @@ class Session(object):
             robot.home()
             exec(self._protocol, {})
         except Exception as e:
+            log.exception("Exception during run:")
             self.error_append(e)
             raise e
         finally:
