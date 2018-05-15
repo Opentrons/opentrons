@@ -4,26 +4,20 @@
 Examples
 ########
 
-.. testsetup:: *
-
-  from opentrons import robot
-  robot.reset()
-
 All examples on this page assume the following containers and pipette:
 
 .. testcode:: examples
 
-  from opentrons import robot, containers, instruments
+  from opentrons import robot, labware, instruments
 
-  plate = containers.load('96-flat', 'B1')
-  trough = containers.load('trough-12row', 'C1')
+  plate = labware.load('96-flat', '1')
+  trough = labware.load('trough-12row', '2')
 
-  tiprack_1 = containers.load('tiprack-200ul', 'A1')
-  tiprack_2 = containers.load('tiprack-200ul', 'A2')
+  tiprack_1 = labware.load('tiprack-200ul', '3')
+  tiprack_2 = labware.load('tiprack-200ul', '4')
 
-  p200 = instruments.Pipette(
-      axis="b",
-      max_volume=200,
+  p300 = instruments.P300_Single(
+      mount='left',
       tip_racks=[tiprack_2])
 
 ******************************

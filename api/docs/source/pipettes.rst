@@ -240,6 +240,7 @@ Liquid Control
 ****************
 
 This is the fun section, where we get to move things around and pipette! This section describes the ``Pipette`` object's many liquid-handling commands, as well as how to move the ``robot``.
+Please note that the default now for pipette aspirate and dispense location is a 1mm offset from the **bottom** of the well now.
 
 **********************
 
