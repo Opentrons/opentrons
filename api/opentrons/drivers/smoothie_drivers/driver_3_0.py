@@ -86,27 +86,57 @@ SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 
-def _parse_axis_values(raw_axis_values):
-    parsed_values = raw_axis_values.strip().split(' ')
-    parsed_values = parsed_values[2:]
-    if len(parsed_values) != 6:
-        log.warning("Unexpected response in _parse_axis_values: {}".format(
-            raw_axis_values))
-        raise ParseError('Unexpected response from Smoothieware: {}'.format(
-            raw_axis_values))
+class SmoothieError(Exception):
+    pass
+
+
+class ParseError(Exception):
+    pass
+
+
+def _parse_number_from_substring(smoothie_substring):
+    '''
+    Returns the number in the expected string "N:12.3", where "N" is the
+    axis, and "12.3" is a floating point value for the axis' position
+    '''
     try:
-        data = {
-            s.split(':')[0].upper(): round(
-                float(s.split(':')[1]),
-                GCODE_ROUNDING_PRECISION)
-            for s in parsed_values
-        }
-    except (ValueError, IndexError) as e:
-        log.error("Data format error in _parse_axis_values: {}".format(e))
-        raise e
-    except Exception as e:
-        log.error("Unexpected! {}".format(e))
-        raise e
+        return round(
+            float(smoothie_substring.split(':')[1]),
+            GCODE_ROUNDING_PRECISION
+        )
+    except (ValueError, IndexError, TypeError, AttributeError) as e:
+        log.exception('Unexpected argument to _parse_number_from_substring:')
+        raise ParseError(
+            'Unexpected argument to _parse_number_from_substring: {}'.format(
+                smoothie_substring))
+
+
+def _parse_axis_from_substring(smoothie_substring):
+    '''
+    Returns the axis in the expected string "N:12.3", where "N" is the
+    axis, and "12.3" is a floating point value for the axis' position
+    '''
+    try:
+        return smoothie_substring.split(':')[0].title()  # upper 1st letter
+    except (ValueError, IndexError, TypeError, AttributeError) as e:
+        log.exception('Unexpected argument to _parse_axis_from_substring:')
+        raise ParseError(
+            'Unexpected argument to _parse_axis_from_substring: {}'.format(
+                smoothie_substring))
+
+
+def _parse_position_response(raw_axis_values):
+    parsed_values = raw_axis_values.strip().split(' ')
+    if len(parsed_values) < 8:
+        msg = 'Unexpected response in _parse_position_response: {}'.format(
+            raw_axis_values)
+        log.error(msg)
+        raise ParseError(msg)
+
+    data = {
+        _parse_axis_from_substring(s): _parse_number_from_substring(s)
+        for s in parsed_values[2:]  # remove first two items ('ok', 'MCS:')
+    }
     return data
 
 
@@ -117,11 +147,11 @@ def _parse_instrument_data(smoothie_response):
         # data received from Smoothieware is stringified HEX values
         # because of how Smoothieware handles GCODE messages
         data = bytearray.fromhex(items[1])
-    except (ValueError, IndexError):
-        log.error("Unexpected response in _parse_instrument_data: {}".format(
-            smoothie_response))
-        raise ParseError('Unexpected response from Smoothieware: {}'.format(
-            smoothie_response))
+    except (ValueError, IndexError, TypeError, AttributeError) as e:
+        log.exception('Unexpected argument to _parse_instrument_data:')
+        raise ParseError(
+            'Unexpected argument to _parse_instrument_data: {}'.format(
+                smoothie_response))
     return {mount: data}
 
 
@@ -132,9 +162,11 @@ def _byte_array_to_ascii_string(byte_array):
             if c in byte_array:
                 byte_array = byte_array[:byte_array.index(c)]
         res = byte_array.decode()
-    except Exception as e:
-        log.error("Totally unexpected! {}".format(e))
-        raise e
+    except (ValueError, TypeError, AttributeError) as e:
+        log.exception('Unexpected argument to _byte_array_to_ascii_string:')
+        raise ParseError(
+            'Unexpected argument to _byte_array_to_ascii_string: {}'.format(
+                byte_array))
     return res
 
 
@@ -143,26 +175,39 @@ def _byte_array_to_hex_string(byte_array):
     # because of how Smoothieware parses GCODE messages
     try:
         res = ''.join('%02x' % b for b in byte_array)
-    except Exception as e:
-        log.error("Even more unexpected! {}".format(e))
-        raise e
+    except TypeError as e:
+        log.exception('Unexpected argument to _byte_array_to_hex_string:')
+        raise ParseError(
+            'Unexpected argument to _byte_array_to_hex_string: {}'.format(
+                byte_array))
     return res
 
 
 def _parse_switch_values(raw_switch_values):
-    try:
-        # probe has a space after it's ":" for some reason
-        if 'Probe: ' in raw_switch_values:
-            raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
-        parsed_values = raw_switch_values.strip().split(' ')
-        res = {
-            s.split(':')[0].split('_')[0]: bool(int(s.split(':')[1]))
-            for s in parsed_values
-            if any([n in s for n in ['max', 'Probe']])
-        }
-    except Exception as e:
-        log.error("Thoroughly unexpected! {}".format(e))
-        raise e
+    if not raw_switch_values or not isinstance(raw_switch_values, str):
+        raise ParseError(
+            'Unexpected argument to _parse_switch_values: {}'.format(
+                raw_switch_values))
+
+    # probe has a space after it's ":" for some reason
+    if 'Probe: ' in raw_switch_values:
+        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
+
+    parsed_values = raw_switch_values.strip().split(' ')
+    res = {
+        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
+        for s in parsed_values
+        if any([n in s for n in ['max', 'Probe']])
+    }
+    # remove the extra "_max" character from each axis key in the dict
+    res = {
+        key.split('_')[0]: val
+        for key, val in res.items()
+    }
+    if len((list(AXES) + ['Probe']) & res.keys()) != 7:
+        raise ParseError(
+            'Unexpected argument to _parse_switch_values: {}'.format(
+                raw_switch_values))
     return res
 
 
@@ -177,24 +222,21 @@ def _parse_homing_status_values(raw_homing_status_values):
         returns: dict
             Key is axis, value is True if the axis needs to be homed
     '''
-    try:
-        parsed_values = raw_homing_status_values.strip().split(' ')
-        res = {
-            s.split(':')[0]: bool(int(s.split(':')[1]))
-            for s in parsed_values
-        }
-    except Exception as e:
-        log.error("Thoroughly unexpected! {}".format(e))
-        raise e
+    if not raw_homing_status_values or \
+            not isinstance(raw_homing_status_values, str):
+        raise ParseError(
+            'Unexpected argument to _parse_homing_status_values: {}'.format(
+                raw_homing_status_values))
+    parsed_values = raw_homing_status_values.strip().split(' ')
+    res = {
+        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
+        for s in parsed_values
+    }
+    if len(list(AXES) & res.keys()) != 6:
+        raise ParseError(
+            'Unexpected argument to _parse_homing_status_values: {}'.format(
+                raw_homing_status_values))
     return res
-
-
-class SmoothieError(Exception):
-    pass
-
-
-class ParseError(Exception):
-    pass
 
 
 class SmoothieDriver_3_0_0:
@@ -249,6 +291,15 @@ class SmoothieDriver_3_0_0:
 
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
+        self.homed_flags = {}
+        self.update_homed_flags(flags={
+            'X': False,
+            'Y': False,
+            'Z': False,
+            'A': False,
+            'B': False,
+            'C': False
+        })
 
     @property
     def homed_position(self):
@@ -274,13 +325,11 @@ class SmoothieDriver_3_0_0:
                 position_response = \
                     self._send_command(GCODES['CURRENT_POSITION'])
                 updated_position = \
-                    _parse_axis_values(position_response)
-                # TODO jmg 10/27: log warning rather than an exception
-            except (TypeError, ParseError, ValueError) as e:
+                    _parse_position_response(position_response)
+            except ParseError as e:
                 if is_retry:
                     raise e
-                else:
-                    return self.update_position(default=default, is_retry=True)
+                return self.update_position(default=default, is_retry=True)
 
         self._update_position(updated_position)
 
@@ -432,8 +481,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    @property
-    def homed_flags(self):
+    def update_homed_flags(self, flags=None, is_retry=False):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -451,13 +499,19 @@ class SmoothieDriver_3_0_0:
                 'C': True
             }
         '''
-        if not self.is_connected():
-            return {
-                ax: True
-                for ax in AXES
-            }
-        res = self._send_command(GCODES['HOMING_STATUS'])
-        return _parse_homing_status_values(res)
+        if flags and isinstance(flags, dict):
+            self.homed_flags.update(flags)
+        elif self.simulating:
+            self.homed_flags.update({ax: False for ax in AXES})
+        elif self.is_connected():
+            try:
+                res = self._send_command(GCODES['HOMING_STATUS'])
+                flags = _parse_homing_status_values(res)
+                self.homed_flags.update(flags)
+            except ParseError as e:
+                if is_retry:
+                    raise e
+                return self.update_homed_flags(is_retry=True)
 
     @property
     def current(self):
@@ -693,6 +747,7 @@ class SmoothieDriver_3_0_0:
             sleep(0.1)
         log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
+        self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
@@ -779,6 +834,7 @@ class SmoothieDriver_3_0_0:
                 GCODES['HOME'] + 'X'
             )
             self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self.update_homed_flags(flags={'X': True})
         finally:
             self.dwell_axes('X')
             self._set_saved_current()
@@ -809,6 +865,7 @@ class SmoothieDriver_3_0_0:
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self._send_command(
                 GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self.update_homed_flags(flags={'Y': True})
             self._send_command(
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.pop_axis_max_speed()  # bring max speeds back to normal
@@ -1040,6 +1097,7 @@ class SmoothieDriver_3_0_0:
                     log.debug("home: {}".format(command))
                     self._send_command(
                         command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                    self.update_homed_flags(flags={ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
@@ -1192,6 +1250,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['RESET'])
             sleep(0.25)
             self._wait_for_ack()
+            self._reset_from_error()
 
     def _smoothie_programming_mode(self):
         log.debug('Setting Smoothie to ISP mode (simulating: {})'.format(
