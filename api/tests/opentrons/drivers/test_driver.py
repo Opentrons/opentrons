@@ -368,8 +368,8 @@ def test_set_pick_upcurrent(model):
         {'A': 1.0},
         {'A': 0.1}
     ]
-    from pprint import pprint
-    pprint(current_log)
+    # from pprint import pprint
+    # pprint(current_log)
     assert current_log == expected
 
     driver._save_current = set_current
