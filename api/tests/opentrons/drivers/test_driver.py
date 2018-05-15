@@ -721,3 +721,32 @@ def test_pause_in_protocol(model):
     model.robot.pause()
 
     assert model.robot._driver.run_flag.is_set()
+
+
+def test_send_command_with_retry(model, monkeypatch):
+    from opentrons.drivers.smoothie_drivers import serial_communication
+
+    robot = model.robot
+    robot._driver.simulating = False
+
+    count = 0
+
+    def _no_response(command, ack, connection, timeout):
+        nonlocal count
+        count += 1
+        if count < 2:
+            raise serial_communication.SerialNoResponse('No response')
+        else:
+            return 'ok'
+
+    monkeypatch.setattr(serial_communication, 'write_and_return', _no_response)
+
+    # force `write_and_return` to raise exception just once
+    count = 0
+    res = robot._driver._send_command('test')
+    assert res == 'ok'
+
+    # force `write_and_return` to raise exception twice
+    count = -1
+    with pytest.raises(serial_communication.SerialNoResponse):
+        robot._driver._send_command('test')
