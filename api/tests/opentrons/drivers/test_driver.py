@@ -506,7 +506,8 @@ def test_homing_flags(model):
         'B': False,
         'C': True
     }
-    assert driver.get_homed_flags() == expected
+    driver.update_homed_flags()
+    assert driver.homed_flags == expected
 
 
 def test_switch_state(model):

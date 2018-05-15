@@ -257,6 +257,8 @@ class SmoothieDriver_3_0_0:
 
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
+        self.homed_flags = {}
+        self.update_homed_flags()  # starts off as simulating, so all are True
 
     @property
     def homed_position(self):
@@ -440,7 +442,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    def get_homed_flags(self, is_retry=False):
+    def update_homed_flags(self, is_retry=False):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -463,17 +465,14 @@ class SmoothieDriver_3_0_0:
                 ax: True
                 for ax in AXES
             }
-        res = {}
-        try {
+        try:
             res = self._send_command(GCODES['HOMING_STATUS'])
-            res = _parse_homing_status_values(res)
-        }
+            self.homed_flags = _parse_homing_status_values(res)
         except (ValueError, IndexError) as e:
             if is_retry:
                 raise e
             else:
-                res = self.get_homed_flags(is_retry=True)
-        return res
+                self.update_homed_flags(is_retry=True)
 
     @property
     def current(self):
@@ -709,6 +708,7 @@ class SmoothieDriver_3_0_0:
             sleep(0.1)
         log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
+        self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
@@ -1177,10 +1177,9 @@ class SmoothieDriver_3_0_0:
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
         '''
-        flags = self.get_homed_flags()
         axes_that_need_to_home = [
             axis
-            for axis, already_homed in flags.items()
+            for axis, already_homed in self.homed_flags.items()
             if (not already_homed) and (axis in axes_string)
         ]
         if axes_that_need_to_home:
@@ -1199,6 +1198,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['RESET'])
             sleep(0.25)
             self._wait_for_ack()
+            self._reset_from_error()
 
     def _smoothie_programming_mode(self):
         log.debug('Setting Smoothie to ISP mode (simulating: {})'.format(
