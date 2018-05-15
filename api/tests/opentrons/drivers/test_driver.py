@@ -85,11 +85,11 @@ def test_remove_serial_echo(smoothie, monkeypatch):
     assert res == 'TESTS-RULE'
 
 
-def test_parse_axis_values(smoothie):
+def test_parse_position_response(smoothie):
     from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
     good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
     bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
-    res = drv._parse_axis_values(good_data)
+    res = drv._parse_position_response(good_data)
     expected = {
         'X': 10,
         'Y': 20,
@@ -100,7 +100,7 @@ def test_parse_axis_values(smoothie):
     }
     assert res == expected
     with pytest.raises(drv.ParseError):
-        drv._parse_axis_values(bad_data)
+        drv._parse_position_response(bad_data)
 
 
 def test_dwell_and_activate_axes(smoothie, monkeypatch):
@@ -114,12 +114,13 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
-    def _parse_axis_values(arg):
+    def _parse_position_response(arg):
         return smoothie.position
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
-    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
 
     smoothie.activate_axes('X')
     smoothie._set_saved_current()
@@ -153,12 +154,13 @@ def test_disable_motor(smoothie, monkeypatch):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
-    def _parse_axis_values(arg):
+    def _parse_position_response(arg):
         return smoothie.position
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
-    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
 
     smoothie.disengage_axis('X')
     smoothie.disengage_axis('XYZ')
@@ -185,12 +187,13 @@ def test_plunger_commands(smoothie, monkeypatch):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
-    def _parse_axis_values(arg):
+    def _parse_position_response(arg):
         return smoothie.position
 
-    monkeypatch.setattr(serial_communication, 'write_and_return',
-                        write_with_log)
-    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+    monkeypatch.setattr(
+        serial_communication, 'write_and_return', write_with_log)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
 
     smoothie.home()
     expected = [
@@ -264,12 +267,13 @@ def test_set_active_current(smoothie, monkeypatch):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
-    def _parse_axis_values(arg):
+    def _parse_position_response(arg):
         return smoothie.position
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
-    monkeypatch.setattr(driver_3_0, '_parse_axis_values', _parse_axis_values)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
 
     smoothie.set_active_current(
         {'X': 2, 'Y': 2, 'Z': 2, 'A': 2, 'B': 2, 'C': 2})
@@ -661,6 +665,8 @@ def test_speed_change(model, monkeypatch):
     def write_with_log(command, ack, connection, timeout):
         if 'G0F' in command:
             command_log.append(command.strip())
+        elif 'M114' in command:
+            return 'ok MCS: X:0.00 Y:0.00 Z:0.00 A:0.00 B:0.00 C:0.00'
         return driver_3_0.SMOOTHIE_ACK
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
@@ -668,7 +674,8 @@ def test_speed_change(model, monkeypatch):
 
     pipette.tip_attached = True
     pipette.set_speed(aspirate=20, dispense=40)
-    pipette.aspirate().dispense()
+    pipette.aspirate()
+    pipette.dispense()
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
         ['G0F24000 M400'],
