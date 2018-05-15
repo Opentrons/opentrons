@@ -810,7 +810,7 @@ class SmoothieDriver_3_0_0:
                 GCODES['HOME'] + 'X'
             )
             self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-            self.update_homed_flags({'X': True})
+            self.update_homed_flags(default={'X': True})
         finally:
             self.dwell_axes('X')
             self._set_saved_current()
@@ -841,7 +841,7 @@ class SmoothieDriver_3_0_0:
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self._send_command(
                 GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
-            self.update_homed_flags({'Y': True})
+            self.update_homed_flags(default={'Y': True})
             self._send_command(
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.pop_axis_max_speed()  # bring max speeds back to normal
@@ -1073,7 +1073,7 @@ class SmoothieDriver_3_0_0:
                     log.debug("home: {}".format(command))
                     self._send_command(
                         command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-                    self.update_homed_flags({ax: True for ax in axes})
+                    self.update_homed_flags(default={ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
