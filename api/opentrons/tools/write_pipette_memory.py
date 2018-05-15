@@ -15,13 +15,13 @@ MODELS = {
         'P1000S': configs['p1000_single_v1']
     },
     'v2': {
-        'P10SV13': configs['p10_single_v2'],
-        'P10MV13': configs['p10_multi_v2'],
-        'P50SV13': configs['p50_single_v2'],
-        'P50MV13': configs['p50_multi_v2'],
-        'P3HSV13': configs['p300_single_v2'],
-        'P3HMV13': configs['p300_multi_v2'],
-        'P1KSV13': configs['p1000_single_v2']
+        'P10SV13': configs['p10_single_v13'],
+        'P10MV13': configs['p10_multi_v13'],
+        'P50SV13': configs['p50_single_v13'],
+        'P50MV13': configs['p50_multi_v13'],
+        'P3HSV13': configs['p300_single_v13'],
+        'P3HMV13': configs['p300_multi_v13'],
+        'P1KSV13': configs['p1000_single_v13']
     }
 }
 

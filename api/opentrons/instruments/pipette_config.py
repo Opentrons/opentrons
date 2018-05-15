@@ -148,7 +148,7 @@ p10_single_v1 = pipette_config(
     tip_length=33
 )
 
-p10_single_v2 = pipette_config(
+p10_single_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 0,
@@ -160,7 +160,7 @@ p10_single_v2 = pipette_config(
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=0.77,
     channels=1,
-    name='p10_single_v2',
+    name='p10_single_v13',
     model_offset=(0.0, 0.0, Z_OFFSET_P10),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -186,7 +186,7 @@ p10_multi_v1 = pipette_config(
     tip_length=33
 )
 
-p10_multi_v2 = pipette_config(
+p10_multi_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -198,7 +198,7 @@ p10_multi_v2 = pipette_config(
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=0.77,
     channels=8,
-    name='p10_multi_v2',
+    name='p10_multi_v13',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -224,7 +224,7 @@ p50_single_v1 = pipette_config(
     tip_length=51.7
 )
 
-p50_single_v2 = pipette_config(
+p50_single_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -236,7 +236,7 @@ p50_single_v2 = pipette_config(
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=3.35,
     channels=1,
-    name='p50_single_v2',
+    name='p50_single_v13',
     model_offset=(0.0, 0.0, Z_OFFSET_P50),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -262,7 +262,7 @@ p50_multi_v1 = pipette_config(
     tip_length=51.7
 )
 
-p50_multi_v2 = pipette_config(
+p50_multi_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -274,7 +274,7 @@ p50_multi_v2 = pipette_config(
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=3.35,
     channels=8,
-    name='p50_multi_v2',
+    name='p50_multi_v13',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -300,7 +300,7 @@ p300_single_v1 = pipette_config(
     tip_length=51.7
 )
 
-p300_single_v2 = pipette_config(
+p300_single_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -312,7 +312,7 @@ p300_single_v2 = pipette_config(
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=18.7,
     channels=1,
-    name='p300_single_v2',
+    name='p300_single_v13',
     model_offset=(0.0, 0.0, Z_OFFSET_P300),
     plunger_current=0.3,
     drop_tip_current=0.5,
@@ -338,7 +338,7 @@ p300_multi_v1 = pipette_config(
     tip_length=51.7
 )
 
-p300_multi_v2 = pipette_config(
+p300_multi_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -350,7 +350,7 @@ p300_multi_v2 = pipette_config(
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=19,
     channels=8,
-    name='p300_multi_v2',
+    name='p300_multi_v13',
     model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -376,7 +376,7 @@ p1000_single_v1 = pipette_config(
     tip_length=76.7
 )
 
-p1000_single_v2 = pipette_config(
+p1000_single_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
@@ -388,7 +388,7 @@ p1000_single_v2 = pipette_config(
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
     ul_per_mm=65,
     channels=1,
-    name='p1000_single_v2',
+    name='p1000_single_v13',
     model_offset=(0.0, 0.0, Z_OFFSET_P1000),
     plunger_current=0.5,
     drop_tip_current=0.5,
@@ -397,19 +397,19 @@ p1000_single_v2 = pipette_config(
 
 fallback_configs = {
     'p10_single_v1': p10_single_v1,
-    'p10_single_v2': p10_single_v2,
+    'p10_single_v13': p10_single_v13,
     'p10_multi_v1': p10_multi_v1,
-    'p10_multi_v2': p10_multi_v2,
+    'p10_multi_v13': p10_multi_v13,
     'p50_single_v1': p50_single_v1,
-    'p50_single_v2': p50_single_v2,
+    'p50_single_v13': p50_single_v13,
     'p50_multi_v1': p50_multi_v1,
-    'p50_multi_v2': p50_multi_v2,
+    'p50_multi_v13': p50_multi_v13,
     'p300_single_v1': p300_single_v1,
-    'p300_single_v2': p300_single_v2,
+    'p300_single_v13': p300_single_v13,
     'p300_multi_v1': p300_multi_v1,
-    'p300_multi_v2': p300_multi_v2,
+    'p300_multi_v13': p300_multi_v13,
     'p1000_single_v1': p1000_single_v1,
-    'p1000_single_v2': p1000_single_v2,
+    'p1000_single_v13': p1000_single_v13,
 }
 
 

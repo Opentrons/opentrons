@@ -235,7 +235,7 @@ class InstrumentsWrapper(object):
             found_version = default_version
 
         # check that the model string is a substring of the version
-        # eg: check that 'p10_single' is inside the found 'p10_single_v2'
+        # eg: check that 'p10_single' is inside the found 'p10_single_v13'
         if expected_model not in found_version:
             raise TypeError(
                 'Found unexpected Pipette attached: {}'.format(found_version))
