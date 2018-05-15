@@ -107,5 +107,8 @@ module.exports = {
   target,
   plugins,
   devtool,
-  devServer
+  devServer,
+  node: {
+    __filename: true
+  }
 }

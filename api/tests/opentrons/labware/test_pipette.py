@@ -196,10 +196,10 @@ def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     base_obj = movelog[0][0]
     y_offset = movelog[0][1][1]
     assert base_obj == robot.fixed_trash[0]
-    assert y_offset == 108
+    assert y_offset == 111.5
 
 
-def test_fallback_config_file(monkeypatch):
+def test_fallback_config_file():
     from opentrons.instruments.pipette_config import \
         _create_config_from_dict, fallback_configs
 
@@ -217,3 +217,12 @@ def test_fallback_config_file(monkeypatch):
         assert new_config.name == config.name
         assert new_config.pick_up_current == config.pick_up_current
         assert new_config.plunger_positions == config.plunger_positions
+
+
+def test_json_and_fallback_configs_match():
+    from opentrons.instruments.pipette_config import \
+        select_config, fallback_configs
+
+    for model, config_fallback in fallback_configs.items():
+        config_from_json = select_config(model)
+        assert config_from_json == config_fallback

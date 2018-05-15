@@ -1,8 +1,8 @@
 // app updater
 'use strict'
 
-const log = require('electron-log')
 const {autoUpdater: updater} = require('electron-updater')
+const log = require('./log')(__filename)
 
 updater.logger = log
 updater.autoDownload = false

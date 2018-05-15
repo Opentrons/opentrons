@@ -8,6 +8,7 @@ import thunk from 'redux-thunk'
 import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
+import createLogger from './logger'
 import {checkForShellUpdates} from './shell'
 import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
@@ -20,6 +21,8 @@ import reducer from './reducer'
 
 // components
 import App from './components/App'
+
+const log = createLogger(__filename)
 
 const history = createHistory()
 
@@ -65,6 +68,7 @@ if (process.env.NODE_ENV === 'development') {
 // kickoff an initial update check at launch
 store.dispatch(checkForShellUpdates())
 
+log.info('Rendering app UI')
 renderApp()
 
 initializeAnalytics({
