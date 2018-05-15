@@ -14,7 +14,7 @@ MODELS = {
         'P300M': configs['p300_multi_v1'],
         'P1000S': configs['p1000_single_v1']
     },
-    'v2': {
+    'v13': {
         'P10SV13': configs['p10_single_v13'],
         'P10MV13': configs['p10_multi_v13'],
         'P50SV13': configs['p50_single_v13'],
@@ -84,12 +84,12 @@ def _user_submitted_barcode(max_length):
 
 def _parse_model_from_barcode(barcode):
     model = None
-    # MUST iterate through v2 first, because v1 barcodes did not have
+    # MUST iterate through v13 first, because v1 barcodes did not have
     # characters to specify the version number
-    for version in ['v2', 'v1']:
-        for key in MODELS[version].keys():
-            if key in barcode:
-                model = MODELS[version][key]
+    for version in ['v13', 'v1']:
+        for barcode_substring in MODELS[version].keys():
+            if barcode.startswith(barcode_substring):
+                model = MODELS[version][barcode_substring]
                 break
     if not model:
         raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
