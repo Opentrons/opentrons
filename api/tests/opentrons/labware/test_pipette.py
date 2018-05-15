@@ -217,3 +217,11 @@ def test_fallback_config_file(monkeypatch):
         assert new_config.name == config.name
         assert new_config.pick_up_current == config.pick_up_current
         assert new_config.plunger_positions == config.plunger_positions
+
+
+def test_json_and_fallback_configs_match(monkeypatch):
+    from opentrons.instruments.pipette_config import select_config, configs
+
+    for model, config_fallback in configs.items():
+        config_from_json = select_config(model)
+        assert config_from_json == config_fallback
