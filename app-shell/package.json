@@ -28,10 +28,12 @@
     "shx": "^0.2.2"
   },
   "dependencies": {
+    "dateformat": "^3.0.3",
     "electron-debug": "^1.1.0",
     "electron-devtools-installer": "^2.2.0",
-    "electron-log": "^2.2.9",
     "electron-updater": "2.21.3",
-    "semver": "^5.5.0"
+    "fs-extra": "^6.0.1",
+    "semver": "^5.5.0",
+    "winston": "^3.0.0-rc5"
   }
 }
