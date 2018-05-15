@@ -258,7 +258,14 @@ class SmoothieDriver_3_0_0:
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
         self.homed_flags = {}
-        self.update_homed_flags()  # starts off as simulating, so all are True
+        self.update_homed_flags(default={
+            'X': False,
+            'Y': False,
+            'Z': False,
+            'A': False,
+            'B': False,
+            'C': False
+        })
 
     @property
     def homed_position(self):
@@ -442,7 +449,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    def update_homed_flags(self, is_retry=False):
+    def update_homed_flags(self, default=None, is_retry=False):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -465,14 +472,17 @@ class SmoothieDriver_3_0_0:
                 ax: True
                 for ax in AXES
             }
-        try:
-            res = self._send_command(GCODES['HOMING_STATUS'])
-            self.homed_flags = _parse_homing_status_values(res)
-        except (ValueError, IndexError) as e:
-            if is_retry:
-                raise e
-            else:
-                self.update_homed_flags(is_retry=True)
+        if default:
+            self.homed_flags.update(default)
+        else:
+            try:
+                res = self._send_command(GCODES['HOMING_STATUS'])
+                self.homed_flags = _parse_homing_status_values(res)
+            except (ValueError, IndexError) as e:
+                if is_retry:
+                    raise e
+                else:
+                    self.update_homed_flags(is_retry=True)
 
     @property
     def current(self):
@@ -711,7 +721,8 @@ class SmoothieDriver_3_0_0:
         self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
+    def _send_command(
+            self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT, is_retry=False):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -736,8 +747,22 @@ class SmoothieDriver_3_0_0:
         else:
 
             command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-            ret_code = serial_communication.write_and_return(
-                command_line, SMOOTHIE_ACK, self._connection, timeout=timeout)
+            try:
+                ret_code = serial_communication.write_and_return(
+                    command_line,
+                    SMOOTHIE_ACK,
+                    self._connection,
+                    timeout=timeout)
+            except serial_communication.SerialNoResponse as e:
+                if not is_retry:
+                    # try again, falling back to a shorter timeout so
+                    # an error doesn't cause a very long hangup
+                    return self._send_command(
+                        command,
+                        timeout=DEFAULT_SMOOTHIE_TIMEOUT,
+                        is_retry=True)
+                else:
+                    raise e
 
             # smoothieware can enter a weird state, where it repeats back
             # the sent command at the beginning of its response.
@@ -785,6 +810,7 @@ class SmoothieDriver_3_0_0:
                 GCODES['HOME'] + 'X'
             )
             self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self.update_homed_flags({'X': True})
         finally:
             self.dwell_axes('X')
             self._set_saved_current()
@@ -815,6 +841,7 @@ class SmoothieDriver_3_0_0:
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self._send_command(
                 GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            self.update_homed_flags({'Y': True})
             self._send_command(
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.pop_axis_max_speed()  # bring max speeds back to normal
@@ -1046,6 +1073,7 @@ class SmoothieDriver_3_0_0:
                     log.debug("home: {}".format(command))
                     self._send_command(
                         command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                    self.update_homed_flags({ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
