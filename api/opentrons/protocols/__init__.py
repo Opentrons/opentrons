@@ -10,40 +10,44 @@ def _sleep(seconds):
 
 
 def load_pipettes(protocol_data):
-    pipettes = protocol_data['pipettes']
+    pipettes = protocol_data.get('pipettes', {})
     pipettes_by_id = {}
 
     for pipette_id, props in pipettes.items():
-        model = props['model']
+        model = props.get('model')
         config = pipette_config.load(model)
         pipettes_by_id[pipette_id] = instruments._create_pipette_from_config(
             config=config,
-            mount=props['mount'])
+            mount=props.get('mount'))
 
     return pipettes_by_id
 
 
 def load_labware(protocol_data):
-    data = protocol_data['labware']
+    data = protocol_data.get('labware', {})
     loaded_labware = {}
     for labware_id, props in data.items():
-        if props['slot'] == '12':
-            if props['model'] == 'fixed-trash':
+        slot = props.get('slot')
+        model = props.get('model')
+        display_name = props.get('display-name')
+
+        if slot == '12':
+            if model == 'fixed-trash':
                 # pass in the pre-existing fixed-trash
                 loaded_labware[labware_id] = robot.fixed_trash
             else:
                 # share the slot with the fixed-trash
                 loaded_labware[labware_id] = labware.load(
-                    props['model'],
-                    props['slot'],
-                    props.get('display-name'),
+                    model,
+                    slot,
+                    display_name,
                     share=True
                 )
         else:
             loaded_labware[labware_id] = labware.load(
-                props['model'],
-                props['slot'],
-                props.get('display-name')
+                model,
+                slot,
+                display_name
             )
 
     return loaded_labware
@@ -61,12 +65,15 @@ def get_pipette(command_params, loaded_pipettes):
 
 
 def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
-    subprocedures = [p['subprocedure'] for p in protocol_data['procedure']]
+    subprocedures = [
+        p.get('subprocedure', [])
+        for p in protocol_data.get('procedure', [])]
+
     flat_subs = chain.from_iterable(subprocedures)
 
     for command_item in flat_subs:
-        command_type = command_item['command']
-        params = command_item['params']
+        command_type = command_item.get('command')
+        params = command_item.get('params', {})
 
         pipette = get_pipette(params, loaded_pipettes)
         location = get_location(params, loaded_labware)

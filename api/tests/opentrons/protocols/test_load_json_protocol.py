@@ -59,6 +59,14 @@ def test_load_labware_trash():
     assert result['someTrashId'] == robot.fixed_trash
 
 
+def test_blank_protocol():
+    result = protocols.execute_json("""{}""")
+    assert result == {
+        'pipettes': {},
+        'labware': {}
+    }
+
+
 def test_dispatch_commands(monkeypatch):
     robot.reset()
     cmd = []
