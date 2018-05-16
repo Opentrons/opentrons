@@ -134,7 +134,7 @@ def _build_fallback_instrument_offset(robot_settings: dict) -> dict:
     return inst_offs
 
 
-def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
+def _build_config(deck_cal: list, robot_settings: dict) -> robot_config:
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
