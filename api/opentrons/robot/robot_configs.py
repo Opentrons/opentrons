@@ -124,9 +124,10 @@ def _default_probe_dimensions():
 def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
     inst_offs = {'right': {}, 'left': {}}
     pip_types = ['single', 'multi']
+    prev_instrument_offset = robot_settings.get('instrument_offset', {})
     for mount in inst_offs.keys():
+        mount_dict = prev_instrument_offset.get(mount, {})
         for typ in pip_types:
-            mount_dict = robot_settings.get(mount, {})
             inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
