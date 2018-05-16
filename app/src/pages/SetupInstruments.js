@@ -14,7 +14,7 @@ import TipProbe from '../components/TipProbe'
 import ConfirmTipProbeModal from '../components/ConfirmTipProbeModal'
 import {InstrumentTabs, Instruments} from '../components/setup-instruments'
 
-import SessionHeader from '../containers/SessionHeader'
+import SessionHeader from '../components/SessionHeader'
 
 type StateProps = {
   instruments: Array<Instrument>,

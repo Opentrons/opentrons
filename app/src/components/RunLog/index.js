@@ -1,9 +1,9 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-import {selectors as robotSelectors} from '../robot'
+import {selectors as robotSelectors} from '../../robot'
 
-import RunLog from '../components/RunLog'
+import CommandList from './CommandList'
 
 const mapStateToProps = (state) => ({
   commands: robotSelectors.getCommands(state)
@@ -11,7 +11,7 @@ const mapStateToProps = (state) => ({
 
 function ConnectedRunLog (props) {
   return (
-    <RunLog {...props} />
+    <CommandList {...props} />
   )
 }
 

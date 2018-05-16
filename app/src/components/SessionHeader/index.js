@@ -5,7 +5,7 @@ import {TitleBar} from '@opentrons/components'
 
 import {
   selectors as robotSelectors
-} from '../robot'
+} from '../../robot'
 
 export default connect(mapStateToProps)(SessionHeader)
 

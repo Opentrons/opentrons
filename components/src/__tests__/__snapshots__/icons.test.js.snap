@@ -417,6 +417,26 @@ exports[`icons flask-outline renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons info-circle renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons menu-down renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -792,6 +812,26 @@ exports[`icons pause renders correctly 1`] = `
 >
   <path
     d="M9.2 2v19.8H2V2zm13 0v19.8H15V2z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons pause-circle renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M15 16h-2V8h2m-4 8H9V8h2m1-6A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
     fillRule="evenodd"
   />
 </svg>
