@@ -244,7 +244,7 @@ class Session(object):
         self.clear_logs()
 
     def _snapshot(self):
-        if self.state is 'loaded':
+        if self.state == 'loaded':
             payload = copy(self)
         else:
             if self.command_log.keys():

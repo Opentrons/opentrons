@@ -40,7 +40,7 @@ def break_down_travel(p1, target, increment=5, mode='absolute'):
     vector_remainder = vector_step * (length_remainder / increment)
 
     res = []
-    if mode is 'absolute':
+    if mode == 'absolute':
         for i in range(int(length_steps)):
             p1 = p1 + vector_step
             res.append(p1)

@@ -145,7 +145,7 @@ def _validate_move_data(data):
     if point is not None and len(point) is not 3:
         message = "Point must have 3 values--got {}".format(point)
         error = True
-    if target is 'mount' and float(point[2]) < 30:
+    if target == 'mount' and float(point[2]) < 30:
         message = "Sending a mount to a z position lower than 30 can cause " \
                   "a collision with the deck or reach the end of the Z axis " \
                   "movement screw. Z values for mount movement must be >= 30"
