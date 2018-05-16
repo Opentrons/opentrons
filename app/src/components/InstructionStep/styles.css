@@ -10,7 +10,7 @@
   @apply --font-body-2-dark;
 
   width: 50%;
-  padding: 0 1.25rem;
+  padding: 1.25rem 1.25rem 0;
   vertical-align: top;
   border: 2px solid var(--c-light-gray);
 
@@ -19,7 +19,6 @@
   }
 
   & > * {
-    margin-top: 1.25rem;
     margin-bottom: 1.25rem;
   }
 }
@@ -45,8 +44,8 @@
 
 .diagram {
   display: block;
-  width: 100%;
-  max-height: 11rem;
+  max-width: 100%;
+  max-height: 13rem;
   margin-left: auto;
   margin-right: auto;
 }
