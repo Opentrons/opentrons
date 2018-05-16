@@ -14,10 +14,11 @@ def load_pipettes(protocol_data):
 
     for pipette_id, props in pipettes.items():
         model = props.get('model')
+        mount = props.get('mount')
         config = pipette_config.load(model)
         pipettes_by_id[pipette_id] = instruments._create_pipette_from_config(
             config=config,
-            mount=props.get('mount'))
+            mount=mount)
 
     return pipettes_by_id
 
