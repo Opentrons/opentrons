@@ -1,17 +1,15 @@
 // app configuration and settings
-// TODO(mc, 2018-05-15): implement this module properly
 'use strict'
 
-const path = require('path')
-const url = require('url')
+const Store = require('electron-store')
+const dotProp = require('dot-prop')
+const mergeOptions = require('merge-options')
+const yargsParser = require('yargs-parser')
 
-// TODO(mc, 2018-05-15): "properly" means features, not DEV_MODE / DEBUG
-const DEV_MODE = process.env.NODE_ENV === 'development'
-const DEBUG_MODE = process.env.DEBUG
+const ENV_PREFIX = 'OT_APP'
 
-module.exports = {
-  DEV_MODE,
-  DEBUG_MODE,
+const DEFAULTS = {
+  devtools: false,
 
   // logging config
   log: {
@@ -21,12 +19,50 @@ module.exports = {
     }
   },
 
-  // ui config
+  // ui and browser config
   ui: {
     width: 1024,
     height: 768,
-    url: DEV_MODE
-      ? `http://localhost:${process.env.PORT}`
-      : url.resolve('file://', path.join(__dirname, '../ui/index.html'))
+    url: {
+      protocol: 'file:',
+      path: 'ui/index.html'
+    },
+    webPreferences: {
+      webSecurity: true
+    }
   }
+}
+
+const overrides = yargsParser(process.argv.slice(2), {
+  envPrefix: ENV_PREFIX,
+  configuration: {
+    'negation-prefix': 'disable_'
+  }
+})
+
+const store = new Store({defaults: DEFAULTS})
+
+module.exports = {get, getStore, getOverrides}
+
+function get (path) {
+  const result = store.get(path)
+  const over = dotProp.get(overrides, path)
+
+  if (over != null) {
+    if (typeof result === 'object' && result != null) {
+      return mergeOptions(result, over)
+    }
+
+    return over
+  }
+
+  return result
+}
+
+function getStore () {
+  return store.store
+}
+
+function getOverrides () {
+  return overrides
 }
