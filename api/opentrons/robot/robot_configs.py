@@ -121,13 +121,20 @@ def _default_probe_dimensions():
     return [35.0, 40.0, probe_height + 5.0]
 
 
-def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
+def _build_fallback_instrument_offset(robot_settings: dict) -> dict:
+    # because `instrument_offset` is a dict of dicts, we must loop through it
+    # and replace empty values with the default offset
     inst_offs = {'right': {}, 'left': {}}
     pip_types = ['single', 'multi']
+    prev_instrument_offset = robot_settings.get('instrument_offset', {})
     for mount in inst_offs.keys():
+        mount_dict = prev_instrument_offset.get(mount, {})
         for typ in pip_types:
-            mount_dict = robot_settings.get(mount, {})
             inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
+    return inst_offs
+
+
+def _build_config(deck_cal: list, robot_settings: dict) -> robot_config:
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
@@ -138,7 +145,7 @@ def _build_config(deck_cal: dict, robot_settings: dict) -> robot_config:
         probe_dimensions=robot_settings.get(
             'probe_dimensions', _default_probe_dimensions()),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
-        instrument_offset=inst_offs,
+        instrument_offset=_build_fallback_instrument_offset(robot_settings),
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),
         mount_offset=robot_settings.get('mount_offset', DEFAULT_MOUNT_OFFSET),
         serial_speed=robot_settings.get('serial_speed', SERIAL_SPEED),
