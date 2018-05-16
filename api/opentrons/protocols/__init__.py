@@ -1,4 +1,3 @@
-import json
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
@@ -103,15 +102,11 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
             pipette.dispense(volume, location)
 
 
-def execute_json(json_string):
-    # TODO Ian 2018-05-11 use protocol-schema.json + jsonschema
-    # to validate input before parsing & executing
-    protocol_data = json.loads(json_string)
+def execute_protocol(protocol):
+    loaded_pipettes = load_pipettes(protocol)
+    loaded_labware = load_labware(protocol)
 
-    loaded_pipettes = load_pipettes(protocol_data)
-    loaded_labware = load_labware(protocol_data)
-
-    dispatch_commands(protocol_data, loaded_pipettes, loaded_labware)
+    dispatch_commands(protocol, loaded_pipettes, loaded_labware)
 
     return {
         'pipettes': loaded_pipettes,

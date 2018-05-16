@@ -60,7 +60,7 @@ def test_load_labware_trash():
 
 
 def test_blank_protocol():
-    result = protocols.execute_json("""{}""")
+    result = protocols.execute_protocol({})
     assert result == {
         'pipettes': {},
         'labware': {}
