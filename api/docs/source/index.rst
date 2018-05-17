@@ -6,12 +6,7 @@
 .. testsetup:: *
 
   from opentrons import robot, containers, instruments
-  robot.reset()
 
-.. testcleanup:: *
-
-  from opentrons import robot, containers, instruments
-  robot.reset()
 
 ===============
 Opentrons API
@@ -134,7 +129,8 @@ Table of Contents
   writing
   labware
   pipettes
-  transfer
+  atomic commands
+  complex commands
   robot
   modules
   examples
