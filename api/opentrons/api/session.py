@@ -121,6 +121,7 @@ class Session(object):
             exec(self._protocol, {})
         finally:
             robot._driver.connect()
+            robot.cache_instrument_models()
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands

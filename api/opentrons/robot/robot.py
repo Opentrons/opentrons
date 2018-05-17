@@ -956,7 +956,7 @@ class Robot(object):
             }
 
         # to allow any model of pipette to be simulated on a robot, pipette
-        # models below are updated when simulating, so regardless of what is
+        # models below are overwritten while simulating, so regardless of what is
         # currently attached/cached, any pipette model can be simulated
         if self.is_simulating():
             default_version = list(pipette_config.configs.values())[0].name
