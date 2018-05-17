@@ -103,4 +103,9 @@ _dist-collect-artifacts:
 
 .PHONY: dev
 dev:
-	$(env)=development PORT=$(port) electron .
+	$(env)=development electron . \
+		--devtools \
+		--log.level.console="debug" \
+		--disable_ui.webPreferences.webSecurity \
+		--ui.url.protocol="http:" \
+		--ui.url.path="localhost:$(port)"
