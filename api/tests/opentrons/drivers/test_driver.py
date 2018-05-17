@@ -760,7 +760,3 @@ def test_send_command_with_retry(model, monkeypatch):
     count = -1
     with pytest.raises(serial_communication.SerialNoResponse):
         robot._driver._send_command('test')
-
-    count = -1
-    res = robot._driver._send_command('test', retries=4)
-    assert res == 'ok'

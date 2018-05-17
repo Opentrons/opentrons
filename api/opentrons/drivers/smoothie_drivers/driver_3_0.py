@@ -316,7 +316,7 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-    def update_position(self, default=None, retries=DEFAULT_COMMAND_RETRIES):
+    def update_position(self, default=None):
         if default is None:
             default = self._position
 
@@ -324,15 +324,21 @@ class SmoothieDriver_3_0_0:
             updated_position = self._position.copy()
             updated_position.update(**default)
         else:
-            try:
-                position_response = \
-                    self._send_command(GCODES['CURRENT_POSITION'])
-                updated_position = \
-                    _parse_position_response(position_response)
-            except ParseError as e:
-                retries = self._update_retries_counter(retries, e)
-                return self.update_position(
-                    default=default, retries=retries)
+            def _recursive_update_position(retries):
+                try:
+                    position_response = self._send_command(
+                        GCODES['CURRENT_POSITION'])
+                    return _parse_position_response(position_response)
+                except ParseError as e:
+                    retries -= 1
+                    if retries <= 0:
+                        raise e
+                    if not self.simulating:
+                        sleep(DEFAULT_STABILIZE_DELAY)
+                    return _recursive_update_position(retries)
+
+            updated_position = _recursive_update_position(
+                DEFAULT_COMMAND_RETRIES)
 
         self._update_position(updated_position)
 
@@ -484,7 +490,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    def update_homed_flags(self, flags=None, retries=DEFAULT_COMMAND_RETRIES):
+    def update_homed_flags(self, flags=None):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -504,16 +510,26 @@ class SmoothieDriver_3_0_0:
         '''
         if flags and isinstance(flags, dict):
             self.homed_flags.update(flags)
+
         elif self.simulating:
             self.homed_flags.update({ax: False for ax in AXES})
+
         elif self.is_connected():
-            try:
-                res = self._send_command(GCODES['HOMING_STATUS'])
-                flags = _parse_homing_status_values(res)
-                self.homed_flags.update(flags)
-            except ParseError as e:
-                retries = self._update_retries_counter(retries, e)
-                return self.update_homed_flags(retries=retries)
+
+            def _recursive_update_homed_flags(retries):
+                try:
+                    res = self._send_command(GCODES['HOMING_STATUS'])
+                    flags = _parse_homing_status_values(res)
+                    self.homed_flags.update(flags)
+                except ParseError as e:
+                    retries -= 1
+                    if retries <= 0:
+                        raise e
+                    if not self.simulating:
+                        sleep(DEFAULT_STABILIZE_DELAY)
+                    return _recursive_update_homed_flags(retries)
+
+            _recursive_update_homed_flags(DEFAULT_COMMAND_RETRIES)
 
     @property
     def current(self):
@@ -732,14 +748,6 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Private functions --------------- #
 
-    def _update_retries_counter(self, retries, exception_raised):
-        retries -= 1
-        if retries <= 0:
-            raise exception_raised
-        if not self.simulating:
-            sleep(DEFAULT_STABILIZE_DELAY)
-        return retries
-
     def _wait_for_ack(self):
         '''
         In the case where smoothieware has just been reset, we want to
@@ -760,11 +768,7 @@ class SmoothieDriver_3_0_0:
         self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(
-            self,
-            command,
-            timeout=DEFAULT_SMOOTHIE_TIMEOUT,
-            retries=DEFAULT_COMMAND_RETRIES):
+    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -785,37 +789,44 @@ class SmoothieDriver_3_0_0:
             this is set to none
         """
         if self.simulating:
-            pass
-        else:
+            return
 
-            command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-            try:
-                ret_code = serial_communication.write_and_return(
-                    command_line,
-                    SMOOTHIE_ACK,
-                    self._connection,
-                    timeout=timeout)
-            except serial_communication.SerialNoResponse as e:
-                retries = self._update_retries_counter(retries, e)
-                return self._send_command(
-                    command, timeout=timeout, retries=retries)
+        command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
+        ret_code = self._recursive_write_and_return(
+            command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-            # smoothieware can enter a weird state, where it repeats back
-            # the sent command at the beginning of its response.
-            # Check for this echo, and strips the command from the response
-            if command_line.strip() in ret_code.strip():
-                ret_code = ret_code.replace(command_line, '')
+        # smoothieware can enter a weird state, where it repeats back
+        # the sent command at the beginning of its response.
+        # Check for this echo, and strips the command from the response
+        if command_line.strip() in ret_code.strip():
+            ret_code = ret_code.replace(command_line, '')
 
-            # Smoothieware returns error state if a switch was hit while moving
-            if (ERROR_KEYWORD in ret_code.lower()) or \
-                    (ALARM_KEYWORD in ret_code.lower()):
-                self._reset_from_error()
-                error_axis = ret_code.strip()[-1]
-                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
-                    self.home(error_axis)
-                raise SmoothieError(ret_code)
+        # Smoothieware returns error state if a switch was hit while moving
+        if (ERROR_KEYWORD in ret_code.lower()) or \
+                (ALARM_KEYWORD in ret_code.lower()):
+            self._reset_from_error()
+            error_axis = ret_code.strip()[-1]
+            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                self.home(error_axis)
+            raise SmoothieError(ret_code)
 
-            return ret_code
+        return ret_code
+
+    def _recursive_write_and_return(self, cmd, timeout, retries):
+        try:
+            return serial_communication.write_and_return(
+                cmd,
+                SMOOTHIE_ACK,
+                self._connection,
+                timeout=timeout)
+        except serial_communication.SerialNoResponse as e:
+            retries -= 1
+            if retries <= 0:
+                raise e
+            if not self.simulating:
+                sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_write_and_return(
+                cmd, timeout, retries)
 
     def _home_x(self):
         log.debug("_home_x")
