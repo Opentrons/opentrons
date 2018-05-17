@@ -6,6 +6,11 @@ const dotProp = require('dot-prop')
 const mergeOptions = require('merge-options')
 const yargsParser = require('yargs-parser')
 
+// make sure all arguments are included in production
+const argv = process.defaultApp
+  ? process.argv.slice(2)
+  : process.argv.slice(1)
+
 const ENV_PREFIX = 'OT_APP'
 
 const DEFAULTS = {
@@ -33,7 +38,7 @@ const DEFAULTS = {
   }
 }
 
-const overrides = yargsParser(process.argv.slice(2), {
+const overrides = yargsParser(argv, {
   envPrefix: ENV_PREFIX,
   configuration: {
     'negation-prefix': 'disable_'
