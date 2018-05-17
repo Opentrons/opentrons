@@ -17,7 +17,6 @@ import type {
   StepItemSourceDestRow,
   StepItemSourceDestRowMulti,
   SourceDestSubstepItemSingleChannel,
-  SourceDestSubstepItemMultiChannel,
   NamedIngred
 } from './types'
 
@@ -44,6 +43,117 @@ type GetLabwareType = (labwareId: string) => ?string
 type AspDispCommandType = {
   command: 'aspirate' | 'dispense',
   params: AspirateDispenseArgs
+}
+
+function _transferLikeSubsteps (args: {
+  validatedForm: *, // TODO SOON type this
+  allPipetteData: AllPipetteData,
+  stepId: StepIdType,
+  prevStepId: StepIdType,
+  getIngreds: GetIngreds,
+  getLabwareType: GetLabwareType,
+  robotStateTimeline: RobotStateTimelineAcc
+}): ?SourceDestSubstepItem {
+  const {
+    validatedForm,
+    allPipetteData,
+    stepId,
+    prevStepId,
+    getIngreds,
+    getLabwareType,
+    robotStateTimeline
+  } = args
+
+  const {
+    pipette: pipetteId
+  } = validatedForm
+
+  const pipette = allPipetteData[pipetteId]
+
+  // TODO Ian 2018-04-06 use assert here
+  if (!pipette) {
+    console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
+  }
+
+  const robotState = (
+    robotStateTimeline.timeline[prevStepId] &&
+    robotStateTimeline.timeline[prevStepId].robotState
+  ) || robotStateTimeline.robotState
+
+  const commandCallArgs = {
+    ...validatedForm,
+    // Disable any mix args so those aspirate/dispenses don't show up in substeps
+    mixBeforeAspirate: null
+  }
+
+  // TODO SOON next PR, use command based on stepType
+  const result = distribute(commandCallArgs)(robotState)
+  if (result.errors) {
+    return null
+  }
+
+  // Multichannel substeps
+  if (pipette.channels > 1) {
+    const aspDispMultiRows: SourceDestSubstepItemMultiRows = result.commands.reduce((acc, c, commandIdx) => {
+      if (c.command === 'aspirate' || c.command === 'dispense') {
+        const rows = commandToMultiRows(c, getIngreds, getLabwareType, pipette.channels)
+        return rows ? [...acc, rows] : acc
+      }
+      return acc
+    }, [])
+
+    const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
+      aspDispMultiRows,
+      (currentMultiRow, nextMultiRow) =>
+        // aspirate then dispense multirows adjacent
+        // (inferring from first channel row in each multirow)
+        currentMultiRow[0] && currentMultiRow[0].sourceWell &&
+        nextMultiRow[0] && nextMultiRow[0].destWell,
+      // Merge each channel row together when predicate true
+      (currentMultiRow, nextMultiRow) => range(pipette.channels).map(channel =>
+        ({
+          ...currentMultiRow[channel],
+          ...nextMultiRow[channel]
+        })
+      )
+    )
+
+    return {
+      multichannel: true,
+      stepType: validatedForm.stepType,
+      parentStepId: stepId,
+      multiRows: mergedMultiRows,
+      volume: validatedForm.volume // TODO Ian 2018-05-17 multi-channel independent volume
+    }
+  }
+
+  // Single-channel rows
+  const aspDispRows: SourceDestSubstepItemRows = result.commands.reduce((acc, c, commandIdx) => {
+    if (c.command === 'aspirate' || c.command === 'dispense') {
+      const row = commandToRows(c, getIngreds)
+      return row ? [...acc, row] : acc
+    }
+    return acc
+  }, [])
+
+  const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
+    aspDispRows,
+    (currentRow, nextRow) =>
+      // aspirate then dispense rows adjacent
+      currentRow.sourceWell && nextRow.destWell,
+    (currentRow, nextRow) => ({
+      ...nextRow,
+      ...currentRow,
+      volume: currentRow.volume // show aspirate volume, not dispense volume
+    })
+  )
+
+  return {
+    multichannel: false,
+    stepType: validatedForm.stepType,
+    parentStepId: stepId,
+    rows: mergedRows
+  }
 }
 
 function _transferSubsteps (
@@ -284,9 +394,9 @@ function commandToRows (command: AspDispCommandType, getIngreds: GetIngreds): ?S
 function commandToMultiRows (
   command: AspDispCommandType,
   getIngreds: GetIngreds,
-  getLabwareType: GetLabwareType
+  getLabwareType: GetLabwareType,
+  channels: *
 ): ?Array<StepItemSourceDestRowMulti> {
-  const channels = 8 // TODO pass this in
   const labwareId = command.params.labware
   const labwareType = getLabwareType(labwareId)
 
@@ -364,100 +474,18 @@ export function generateSubsteps (
     }
 
     if (validatedForm.stepType === 'distribute') {
-      // TODO IMMEDIATELY factor out the below stuff into a fn
-      const {
-        pipette: pipetteId
-      } = validatedForm
-
-      const pipette = allPipetteData[pipetteId]
-
-      // TODO Ian 2018-04-06 use assert here
-      if (!pipette) {
-        console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
-      }
-
       const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
       const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-
-      const robotState = (
-        robotStateTimeline.timeline[prevStepId] &&
-        robotStateTimeline.timeline[prevStepId].robotState
-      ) || robotStateTimeline.robotState
-
-      const commandCallArgs = {
-        ...validatedForm,
-        // Disable any mix args so those aspirate/dispenses don't show up in substeps
-        mixBeforeAspirate: null
-      }
-      const result = distribute(commandCallArgs)(robotState)
-      if (result.errors) {
-        return null
-      }
-
-      const aspDispRows: SourceDestSubstepItemRows = result.commands.reduce((acc, c, commandIdx) => {
-        if (c.command === 'aspirate' || c.command === 'dispense') {
-          const row = commandToRows(c, getIngreds)
-          return row ? [...acc, row] : acc
-        }
-        return acc
-      }, [])
-
-      // Multichannel substeps
-      if (pipette.channels > 1) {
-        const aspDispMultiRows: SourceDestSubstepItemMultiRows = result.commands.reduce((acc, c, commandIdx) => {
-          if (c.command === 'aspirate' || c.command === 'dispense') {
-            const rows = commandToMultiRows(c, getIngreds, getLabwareType)
-            return rows ? [...acc, rows] : acc
-          }
-          return acc
-        }, [])
-
-        const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
-          aspDispMultiRows,
-          (currentMultiRow, nextMultiRow) =>
-            // aspirate then dispense multirows adjacent
-            // (inferring from first channel row in each multirow)
-            currentMultiRow[0] && currentMultiRow[0].sourceWell &&
-            nextMultiRow[0] && nextMultiRow[0].destWell,
-          // Merge each channel row together when predicate true
-          (currentMultiRow, nextMultiRow) => range(pipette.channels).map(channel =>
-            ({
-              ...currentMultiRow[channel],
-              ...nextMultiRow[channel]
-            })
-          )
-        )
-
-        const returnThisThing: SourceDestSubstepItemMultiChannel = {
-          multichannel: true,
-          stepType: validatedForm.stepType,
-          parentStepId: stepId,
-          multiRows: mergedMultiRows,
-          volume: validatedForm.volume // TODO Ian 2018-05-17 multi-channel independent volume
-        }
-
-        return returnThisThing
-      }
-
-      const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
-        aspDispRows,
-        (currentRow, nextRow) =>
-          // aspirate then dispense rows adjacent
-          currentRow.sourceWell && nextRow.destWell,
-        (currentRow, nextRow) => ({
-          ...nextRow,
-          ...currentRow,
-          volume: currentRow.volume // show aspirate volume, not dispense volume
-        })
-      )
-
-      const returnThisThing: SourceDestSubstepItem = { // TODO
-        multichannel: false,
-        stepType: validatedForm.stepType,
-        parentStepId: stepId,
-        rows: mergedRows
-      }
-      return returnThisThing
+      // TODO SOON Ian 2018-05-17 all transferlikes will use this fn in next PR
+      return _transferLikeSubsteps({
+        validatedForm,
+        allPipetteData,
+        stepId,
+        prevStepId,
+        getIngreds,
+        getLabwareType,
+        robotStateTimeline
+      })
     }
 
     // TODO REPLACE: Handle all TransferLike substeps + mix
