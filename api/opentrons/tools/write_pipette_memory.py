@@ -1,6 +1,3 @@
-from opentrons.instruments.pipette_config import configs
-
-
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
@@ -83,7 +80,6 @@ def _user_submitted_barcode(max_length):
 
 
 def _parse_model_from_barcode(barcode):
-    model = None
     # MUST iterate through v13 first, because v1 barcodes did not have
     # characters to specify the version number
     for version in ['v13', 'v1']:

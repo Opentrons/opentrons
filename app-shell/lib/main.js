@@ -3,14 +3,22 @@
 
 const {app, dialog, ipcMain, Menu} = require('electron')
 
-const {DEV_MODE, DEBUG_MODE} = require('./config')
 const createUi = require('./ui')
 const initializeMenu = require('./menu')
 const {initialize: initializeApiUpdate} = require('./api-update')
 const createLogger = require('./log')
+const {get: getConfig, getStore, getOverrides} = require('./config')
+
+const config = getConfig()
 const log = createLogger(__filename)
 
-if (DEV_MODE || DEBUG_MODE) {
+log.debug('App config', {
+  config,
+  store: getStore(),
+  overrides: getOverrides()
+})
+
+if (config.devtools) {
   require('electron-debug')({showDevTools: true})
 }
 
@@ -31,7 +39,7 @@ function startUp () {
   initializeApiUpdate()
     .catch((error) => log.error('Initialize API update module error', error))
 
-  if (DEV_MODE || DEBUG_MODE) {
+  if (config.devtools) {
     installAndOpenExtensions()
       .catch((error) => dialog.showErrorBox('Error opening dev tools', error))
   }
