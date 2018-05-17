@@ -38,6 +38,7 @@ export default function ConfirmModal (props: Props) {
     <ModalPage
       titleBar={titleBar}
       contentsClassName={contentsStyle}
+      heading={`Calibrate pipette to ${labware.type}`}
     >
       <ConfirmModalContents {...labware} />
     </ModalPage>

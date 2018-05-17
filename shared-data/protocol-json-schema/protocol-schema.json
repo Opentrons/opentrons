@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "mm-offset": {
+      "description": "Millimeters for pipette location offsets",
+      "type": "number"
+    },
+
+    "well-position-params": {
+      "description": "Optional params for well position offsets",
+      "properties": {
+        "position": {
+          "required": ["anchor"],
+          "additionalProperties": false,
+          "properties": {
+            "anchor": {
+              "description": "The anchor, or origin point at which the offsets are applied. (It's always in the X/Y center of the well, but varies the Z)",
+              "type": "string",
+              "enum": ["top", "bottom", "center"]
+            },
+            "offset": {
+              "description": "Optional x, y, and z offsets from the anchor point in millimeters. Negative values are allowed",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "x": {"$ref": "#/definitions/mm-offset"},
+                "y": {"$ref": "#/definitions/mm-offset"},
+                "z": {"$ref": "#/definitions/mm-offset"}
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "pipette-access-params": {
+      "required": ["pipette", "labware", "well"],
+      "properties": {
+        "pipette": {
+          "type": "string"
+        },
+        "labware": {
+          "type": "string"
+        },
+        "well": {
+          "type": "string"
+        }
+      }
+    },
+
+    "volume-params": {
+      "required": ["volume"],
+      "volume": {
+        "type": "number"
+      }
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol-schema",
+    "metadata",
+    "robot",
+    "pipettes",
+    "labware",
+    "procedure"
+  ],
+  "properties": {
+    "protocol-schema": {
+      "description": "A version string for the Opentrons JSON Protocol schema being used. \"<major>.<minor>.<patch>\"",
+      "type": "string"
+    },
+
+    "metadata": {
+      "description": "Optional metadata about the protocol",
+      "type": "object",
+
+      "properties": {
+        "protocol-name": {
+          "description": "A short, human-readable name for the protocol",
+          "type": "string"
+        },
+        "author": {
+          "description": "The author or organization who created the protocol",
+          "type": "string"
+        },
+        "description": {
+          "description": "A text description of the protocol. For guidelines about how to write a good description, see (TODO WRITE DOCS & LINK HERE)",
+          "type": ["string", "null"]
+        },
+
+        "created": {
+          "description": "UNIX timestamp when this file was created",
+          "type": "number"
+        },
+        "last-modified": {
+          "description": "UNIX timestamp when this file was last modified",
+          "type": ["number", "null"]
+        },
+
+        "category": {
+          "description": "Category of protocol (eg, \"Basic Pipetting\")",
+          "type": ["string", "null"]
+        },
+        "subcategory": {
+          "description": "Subcategory of protocol (eg, \"Cell Plating\")",
+          "type": ["string", "null"]
+        },
+        "tags": {
+          "description": "Tags to be used in searching for this protocol",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "designer-application": {
+      "description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
+      "type": "object",
+      "properties": {
+        "application-name": {
+          "description": "Name of the application that created the protocol. Should be namespaced under the organization or individual who owns the organization, and be kebab-cased, eg \"opentrons/protocol-designer\"",
+          "type": "string"
+        },
+        "application-version": {
+          "description": "Version of the application that created the protocol",
+          "type": "string"
+        },
+        "data": {
+          "description": "Any data used by the application that created this protocol)",
+          "type": "object"
+        }
+      }
+    },
+
+    "robot": {
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot this (currently only OT-2 Standard is supported)",
+          "type": "string",
+          "enum": ["OT-2 Standard"]
+        }
+      }
+    },
+
+    "pipettes": {
+      "description": "The pipettes used in this protocol, keyed by an arbitrary unique ID",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing an individual pipette",
+          "type": "object",
+          "required": ["mount", "model"],
+          "properties": {
+            "mount": {
+              "description": "Where the pipette is mounted",
+              "type": "string",
+              "enum": ["left", "right"]
+            },
+            "model": {
+              "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
+              "type": "string",
+              "enum": [
+                "p10_single_v1",
+                "p10_multi_v1",
+                "p50_single_v1",
+                "p50_multi_v1",
+                "p300_single_v1",
+                "p300_multi_v1",
+                "p1000_single_v1",
+                "p1000_multi_v1"
+              ]
+            }
+          }
+        }
+      }
+    },
+
+    "labware": {
+      "description": "The labware used in this protocol, keyed by an arbitrary unique ID",
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing a single labware on the deck",
+          "type": "object",
+          "required": ["slot", "model"],
+          "properties": {
+            "slot": {
+              "description": "Which slot on the deck of an OT-2 robot the labware is placed into",
+              "type": "string",
+              "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+            },
+            "model": {
+              "description": "Labware type, eg \"96-flat\". See http://docs.opentrons.com/containers.html for a full list of supported labware. TODO support custom labware in JSON",
+              "type": "string"
+            },
+
+            "display-name": {
+              "description": "An optional human-readable nickname for this labware. Eg \"Buffer Trough\"",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "procedure": {
+      "description": "An array of \"subprocedure\" objects representing the steps to be executed on the robot",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subprocedure"],
+        "properties": {
+          "annotation": {
+            "description": "Optional info annotating the subprocedure",
+            "type": "object",
+            "required": ["name", "description"],
+            "properties": {
+              "name": {
+                "type": ["string", "null"]
+              },
+              "description": {
+                "type": ["string", "null"]
+              }
+            }
+          },
+
+          "subprocedure": {
+            "type": "array",
+            "items": {
+              "anyOf": [{
+                  "description": "Aspirate / dispense / air gap commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["aspirate", "dispense", "air-gap"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/pipette-access-params"},
+                        {"$ref": "#/definitions/volume-params"},
+                        {"$ref": "#/definitions/well-position-params"}
+                      ]
+                    }
+                  }
+                },
+
+                {
+                  "description": "Pick up tip / drop tip / touch tip / blowout commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["pick-up-tip", "drop-tip", "touch-tip", "blowout"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/pipette-access-params"},
+                        {"$ref": "#/definitions/well-position-params"}
+                      ]
+                    }
+                  }
+                },
+
+                {
+                  "description": "Delay command",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["delay"]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["wait"],
+                      "properties": {
+                        "wait": {
+                          "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
+                          "anyOf": [
+                            {"type": "number"},
+                            {"enum": [true]}
+                          ]
+                        },
+                        "message": {
+                          "description": "optional message describing the delay"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

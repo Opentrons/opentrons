@@ -1,15 +1,14 @@
 // @flow
 // list of robots
 import * as React from 'react'
-import cx from 'classnames'
 
 import {
   ListItem,
-  IconButton,
   NotificationIcon
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
+import ToggleButton from '../ToggleButton'
 import styles from './connect-panel.css'
 
 type ListProps = {
@@ -36,19 +35,6 @@ export function RobotListItem (props: ItemProps) {
     ? disconnect
     : connect
 
-  const connectButtonClassName = cx(styles.robot_item_icon, {
-    [styles.connected]: isConnected,
-    [styles.disconnected]: !isConnected
-  })
-
-  /* TODO (ka 2018-2-13):
-  Toggle Button Class based on connectivity,
-  NavLink gets ActiveClassName in ListItem
-  */
-  const toggleIcon = isConnected
-    ? 'ot-toggle-switch-on'
-    : 'ot-toggle-switch-off'
-
   return (
     <ListItem
       url={`/robots/${name}`}
@@ -66,10 +52,10 @@ export function RobotListItem (props: ItemProps) {
         {name}
       </p>
 
-      <IconButton
-        name={toggleIcon}
-        className={connectButtonClassName}
+      <ToggleButton
+        toggledOn={isConnected}
         onClick={onClick}
+        className={styles.robot_item_icon}
       />
     </ListItem>
   )

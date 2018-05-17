@@ -18,7 +18,7 @@ type DP = {
 
 type Props = OP & DP
 
-const TITLE = 'Initial robot calibration'
+const TITLE = 'Deck Calibration'
 const LAST_RUN_LABEL = 'Last Run'
 const CALIBRATION_MESSAGE = 'Calibrate your robot to initial factory settings to ensure accuracy.'
 

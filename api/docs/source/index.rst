@@ -132,15 +132,13 @@ Table of Contents
   :maxdepth: 3
 
   writing
-  containers
+  labware
   pipettes
   transfer
   robot
   modules
   examples
   api
-  calibration
-  firmware
 
 .. |br| raw:: html
 
