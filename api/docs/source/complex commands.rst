@@ -1,28 +1,23 @@
-.. _transfer:
+.. _complex commands:
 
 .. testsetup:: *
 
-    from opentrons import robot, containers, instruments
+    from opentrons import robot, labware, instruments
 
-    robot.reset()
     robot.clear_commands()
 
-    plate = containers.load('96-flat', 'B1')
+    plate = labware.load('96-flat', '1')
 
-    tiprack = containers.load('tiprack-200ul', 'A1')
-    trash = containers.load('point', 'D2')
+    tiprack = labware.load('tiprack-200ul', '2')
 
-    pipette = instruments.Pipette(
-        axis='b',
-        max_volume=200,
-        tip_racks=[tiprack],
-        trash_container=trash)
+    pipette = instruments.P300_Single(
+        mount='left',
+        tip_racks=[tiprack])
 
 #######################
-Transfer Shortcuts
+Complex Liquid Handling
 #######################
 
-The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write ``loop`` and ``if`` statements, we can simply use the ``transfer()`` command, making Python protocol both easier to write and read!
 
 **********************
 
@@ -34,29 +29,14 @@ Most of time, a protocol is really just looping over some wells, aspirating, and
 Basic
 -----
 
-The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then dropping it when finished.
+The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then disposing it when finished.
 
 .. testcode:: transfer
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
-Transfer commands will automatically create entire series of ``aspirate()``, ``dispense()``, and other ``Pipette`` commands. We can print out all commands to see what it did in the previous example:
+Transfer commands will automatically create entire series of ``aspirate()``, ``dispense()``, and other ``Pipette`` commands.
 
-.. testcode:: transfer
-
-    for c in robot.commands():
-        print(c)
-
-will print out...
-
-.. testoutput:: transfer
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    Transferring 100 from <Well A1> to <Well B1>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Dropping tip <Well A1>
 
 Large Volumes
 -------------
@@ -94,7 +74,7 @@ Transfer commands are most useful when moving liquid between multiple wells.
 
 .. testcode:: transfer_2
 
-    pipette.transfer(100, plate.cols('A'), plate.cols('B'))
+    pipette.transfer(100, plate.cols('1'), plate.cols('2'))
 
     for c in robot.commands():
         print(c)

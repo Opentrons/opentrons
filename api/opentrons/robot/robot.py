@@ -182,9 +182,8 @@ class Robot(object):
 
     Examples
     --------
-    >>> from opentrons import robot, instruments, containers
-    >>> robot.reset() # doctest: +ELLIPSIS
-    <opentrons.robot.robot.Robot object at ...>
+    >>> from opentrons import robot, instruments, labware
+    >>> robot.reset()
     >>> plate = containers.load('96-flat', 'A1', 'plate')
     >>> p200 = instruments.Pipette(axis='b')
     >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
