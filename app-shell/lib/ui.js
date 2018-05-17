@@ -1,29 +1,32 @@
 // sets up the main window ui
 'use strict'
 
-const {BrowserWindow} = require('electron')
-const {DEV_MODE, DEBUG_MODE, ui: config} = require('./config')
+const {app, BrowserWindow} = require('electron')
+const path = require('path')
+const config = require('./config').get('ui')
 const log = require('./log')(__filename)
+
+const urlPath = config.url.protocol === 'file:'
+  ? path.join(app.getAppPath(), config.url.path)
+  : config.url.path
+
+const url = `${config.url.protocol}//${urlPath}`
 
 const WINDOW_OPTS = {
   show: false,
   useContentSize: true,
   width: config.width,
   height: config.height,
-  webPreferences: {
+  // allow webPreferences to be set at launchtime from config
+  webPreferences: Object.assign({
     // TODO(mc, 2018-05-15): turn off experimentalFeatures?
     experimentalFeatures: true,
-    devTools: DEV_MODE || DEBUG_MODE,
 
     // TODO(mc, 2018-05-15): disable nodeIntegration in renderer thread
     nodeIntegration: true,
     // node integration needed for mdns robot discovery in webworker
-    nodeIntegrationInWorker: true,
-
-    // TODO(mc, 2018-02-12): this works around CORS restrictions
-    //   while in dev mode; evaluate whether this is acceptable
-    webSecurity: !DEV_MODE
-  }
+    nodeIntegrationInWorker: true
+  }, config.webPreferences)
 }
 
 module.exports = function createUi () {
@@ -35,8 +38,8 @@ module.exports = function createUi () {
       mainWindow.show()
     })
 
-  log.info(`Loading ${config.url}`)
-  mainWindow.loadURL(config.url, {'extraHeaders': 'pragma: no-cache\n'})
+  log.info(`Loading ${url}`)
+  mainWindow.loadURL(url, {'extraHeaders': 'pragma: no-cache\n'})
 
   return mainWindow
 }
