@@ -56,6 +56,9 @@ SEC_PER_MIN = 60
 DEFAULT_SMOOTHIE_TIMEOUT = 1
 DEFAULT_MOVEMENT_TIMEOUT = 30
 SMOOTHIE_BOOT_TIMEOUT = 3
+DEFAULT_STABILIZE_DELAY = 0.1
+
+DEFAULT_COMMAND_RETRIES = 3
 
 GCODES = {'HOME': 'G28.2',
           'MOVE': 'G0',
@@ -313,7 +316,7 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-    def update_position(self, default=None, is_retry=False):
+    def update_position(self, default=None):
         if default is None:
             default = self._position
 
@@ -321,15 +324,21 @@ class SmoothieDriver_3_0_0:
             updated_position = self._position.copy()
             updated_position.update(**default)
         else:
-            try:
-                position_response = \
-                    self._send_command(GCODES['CURRENT_POSITION'])
-                updated_position = \
-                    _parse_position_response(position_response)
-            except ParseError as e:
-                if is_retry:
-                    raise e
-                return self.update_position(default=default, is_retry=True)
+            def _recursive_update_position(retries):
+                try:
+                    position_response = self._send_command(
+                        GCODES['CURRENT_POSITION'])
+                    return _parse_position_response(position_response)
+                except ParseError as e:
+                    retries -= 1
+                    if retries <= 0:
+                        raise e
+                    if not self.simulating:
+                        sleep(DEFAULT_STABILIZE_DELAY)
+                    return _recursive_update_position(retries)
+
+            updated_position = _recursive_update_position(
+                DEFAULT_COMMAND_RETRIES)
 
         self._update_position(updated_position)
 
@@ -481,7 +490,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    def update_homed_flags(self, flags=None, is_retry=False):
+    def update_homed_flags(self, flags=None):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -501,17 +510,26 @@ class SmoothieDriver_3_0_0:
         '''
         if flags and isinstance(flags, dict):
             self.homed_flags.update(flags)
+
         elif self.simulating:
             self.homed_flags.update({ax: False for ax in AXES})
+
         elif self.is_connected():
-            try:
-                res = self._send_command(GCODES['HOMING_STATUS'])
-                flags = _parse_homing_status_values(res)
-                self.homed_flags.update(flags)
-            except ParseError as e:
-                if is_retry:
-                    raise e
-                return self.update_homed_flags(is_retry=True)
+
+            def _recursive_update_homed_flags(retries):
+                try:
+                    res = self._send_command(GCODES['HOMING_STATUS'])
+                    flags = _parse_homing_status_values(res)
+                    self.homed_flags.update(flags)
+                except ParseError as e:
+                    retries -= 1
+                    if retries <= 0:
+                        raise e
+                    if not self.simulating:
+                        sleep(DEFAULT_STABILIZE_DELAY)
+                    return _recursive_update_homed_flags(retries)
+
+            _recursive_update_homed_flags(DEFAULT_COMMAND_RETRIES)
 
     @property
     def current(self):
@@ -744,14 +762,13 @@ class SmoothieDriver_3_0_0:
         # smoothieware will ignore new messages for a short time
         # after it has entered an error state, so sleep for some milliseconds
         if not self.simulating:
-            sleep(0.1)
+            sleep(DEFAULT_STABILIZE_DELAY)
         log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
         self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(
-            self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT, is_retry=False):
+    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -772,38 +789,44 @@ class SmoothieDriver_3_0_0:
             this is set to none
         """
         if self.simulating:
-            pass
-        else:
+            return
 
-            command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-            try:
-                ret_code = serial_communication.write_and_return(
-                    command_line,
-                    SMOOTHIE_ACK,
-                    self._connection,
-                    timeout=timeout)
-            except serial_communication.SerialNoResponse as e:
-                if is_retry:
-                    raise e
-                return self._send_command(
-                    command, timeout=timeout, is_retry=True)
+        command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
+        ret_code = self._recursive_write_and_return(
+            command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-            # smoothieware can enter a weird state, where it repeats back
-            # the sent command at the beginning of its response.
-            # Check for this echo, and strips the command from the response
-            if command_line.strip() in ret_code.strip():
-                ret_code = ret_code.replace(command_line, '')
+        # smoothieware can enter a weird state, where it repeats back
+        # the sent command at the beginning of its response.
+        # Check for this echo, and strips the command from the response
+        if command_line.strip() in ret_code.strip():
+            ret_code = ret_code.replace(command_line, '')
 
-            # Smoothieware returns error state if a switch was hit while moving
-            if (ERROR_KEYWORD in ret_code.lower()) or \
-                    (ALARM_KEYWORD in ret_code.lower()):
-                self._reset_from_error()
-                error_axis = ret_code.strip()[-1]
-                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
-                    self.home(error_axis)
-                raise SmoothieError(ret_code)
+        # Smoothieware returns error state if a switch was hit while moving
+        if (ERROR_KEYWORD in ret_code.lower()) or \
+                (ALARM_KEYWORD in ret_code.lower()):
+            self._reset_from_error()
+            error_axis = ret_code.strip()[-1]
+            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                self.home(error_axis)
+            raise SmoothieError(ret_code)
 
-            return ret_code
+        return ret_code
+
+    def _recursive_write_and_return(self, cmd, timeout, retries):
+        try:
+            return serial_communication.write_and_return(
+                cmd,
+                SMOOTHIE_ACK,
+                self._connection,
+                timeout=timeout)
+        except serial_communication.SerialNoResponse as e:
+            retries -= 1
+            if retries <= 0:
+                raise e
+            if not self.simulating:
+                sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_write_and_return(
+                cmd, timeout, retries)
 
     def _home_x(self):
         log.debug("_home_x")
@@ -915,11 +938,12 @@ class SmoothieDriver_3_0_0:
             self.delay(CURRENT_CHANGE_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
-            res = _parse_instrument_data(res)
-            assert mount in res
-            # data is read/written as strings of HEX characters
-            # to avoid firmware weirdness in how it parses GCode arguments
-            return _byte_array_to_ascii_string(res[mount])
+            if res:
+                res = _parse_instrument_data(res)
+                assert mount in res
+                # data is read/written as strings of HEX characters
+                # to avoid firmware weirdness in how it parses GCode arguments
+                return _byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
 

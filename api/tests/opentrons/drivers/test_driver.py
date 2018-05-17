@@ -744,7 +744,7 @@ def test_send_command_with_retry(model, monkeypatch):
     def _no_response(command, ack, connection, timeout):
         nonlocal count
         count += 1
-        if count < 2:
+        if count < 3:
             raise serial_communication.SerialNoResponse('No response')
         else:
             return 'ok'
