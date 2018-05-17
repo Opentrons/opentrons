@@ -927,11 +927,12 @@ class SmoothieDriver_3_0_0:
             self.delay(CURRENT_CHANGE_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
-            res = _parse_instrument_data(res)
-            assert mount in res
-            # data is read/written as strings of HEX characters
-            # to avoid firmware weirdness in how it parses GCode arguments
-            return _byte_array_to_ascii_string(res[mount])
+            if res:
+                res = _parse_instrument_data(res)
+                assert mount in res
+                # data is read/written as strings of HEX characters
+                # to avoid firmware weirdness in how it parses GCode arguments
+                return _byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
 
