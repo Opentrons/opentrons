@@ -6,7 +6,7 @@ Examples
 
 All examples on this page assume the following labware and pipette:
 
-.. testcode:: examples
+.. code-block:: python
 
   from opentrons import robot, labware, instruments
 
@@ -28,13 +28,13 @@ Basic Transfer
 
 Moving 100uL from one well to another:
 
-.. testcode:: examples
+.. code-block:: python
 
   p300.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
 If you prefer to not use the ``.transfer()`` command, the following pipette commands will create the some results:
 
-.. testcode:: examples
+.. code-block:: python
 
   p300.pick_up_tip()
   p300.aspirate(100, plate.wells('A1'))
@@ -49,7 +49,7 @@ Loops
 
 Loops in Python allows your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``11``, and uses that loop's current value to transfer from all wells in a trough to each row of a plate:
 
-.. testcode:: examples
+.. code-block:: python
 
   # distribute 20uL from trough:A1 -> plate:row:1
   # distribute 20uL from trough:A2 -> plate:row:2
@@ -67,7 +67,7 @@ Multiple Air Gaps
 
 The Opentrons liquid handler can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating a air gap between each sample.
 
-.. testcode:: examples
+.. code-block:: python
 
   p300.pick_up_tip()
 
@@ -86,7 +86,7 @@ Dilution
 
 This example first spreads a dilutent to all wells of a plate. It then dilutes 8 samples from the trough across the 8 columns of the plate.
 
-.. testcode:: examples
+.. code-block:: python
 
   p300.distribute(50, trough.wells('A12'), plate.wells())  # dilutent
 
@@ -113,7 +113,7 @@ Plate Mapping
 
 Deposit various volumes of liquids into the same plate of wells, and automatically refill the tip volume when it runs out.
 
-.. testcode:: examples
+.. code-block:: python
 
   # these uL values were created randomly for this example
   water_volumes = [
@@ -179,7 +179,7 @@ Precision Pipetting
 
 This example shows how to deposit liquid around the edge of a well.
 
-.. testcode:: examples
+.. code-block:: python
 
   p300.pick_up_tip()
   p300.aspirate(200, trough.wells('A1'))

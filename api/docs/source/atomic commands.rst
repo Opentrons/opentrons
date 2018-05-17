@@ -15,7 +15,7 @@ When we handle liquids with a pipette, we are constantly exchanging old, used ti
 
 This section demonstrates the options available for controlling tips
 
-.. testcode:: tips
+.. code-block:: python
 
     '''
     Examples in this section expect the following
@@ -32,7 +32,7 @@ Pick Up Tip
 
 Before any liquid handling can be done, your pipette must have a tip on it. The command ``pick_up_tip()`` will move the pipette over to the specified tip, the press down into it to create a vacuum seal. The below example picks up the tip at location ``'A1'``.
 
-.. testcode:: tips
+.. code-block:: python
 
     pipette.pick_up_tip(tiprack.wells('A1'))
 
@@ -41,13 +41,13 @@ Drop Tip
 
 Once finished with a tip, the pipette will autonomously remove the tip when we call ``drop_tip()``. We can specify where to drop the tip by passing in a location. The below example drops the tip back at its originating location on the tip rack.
 If no location is specified, it will go to the fixed trash location on the deck.
-.. testcode:: tips
+.. code-block:: python
 
     pipette.drop_tip(tiprack.wells('A1'))
 
 Instead of returning a tip to the tip rack, we can also drop it in an alternative trash container besides the fixed trash on the deck.
 
-.. testcode:: tips
+.. code-block:: python
 
     trash = labware.load('trash-box', '1')
     pipette.pick_up_tip(tiprack.wells('A2'))
@@ -58,16 +58,10 @@ Return Tip
 
 When we need to return the tip to its originating location on the tip rack, we can simply call ``return_tip()``. The example below will automatically return the tip to ``'A3'`` on the tip rack.
 
-.. testcode:: tips
+.. code-block:: python
 
     pipette.pick_up_tip(tiprack.wells('A3'))
     pipette.return_tip()
-
-.. testcleanup:: tips
-
-    from opentrons import robot
-
-    robot.reset()
 
 
 **********************
@@ -78,7 +72,7 @@ Tips Iterating
 Automatically iterate through tips and drop tip in trash by attaching containers to a pipette.
 If no location is specified, the pipette will move to the next available tip by iterating through the tiprack that is associated with it.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     '''
     Examples in this section expect the following
@@ -98,7 +92,7 @@ Trash containers can be attached with the option ``trash_container=TRASH_CONTAIN
 
 Multiple tip racks are can be attached with the option ``tip_racks=[RACK_1, RACK_2, etc... ]``.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     pipette = instruments.P300_Single(mount='left',
                                       tip_racks=[tip_rack_1, tip_rack_2],
@@ -116,7 +110,7 @@ Iterating Through Tips
 
 Now that we have two tip racks attached to the pipette, we can automatically step through each tip whenever we call ``pick_up_tip()``. We then have the option to either ``return_tip()`` to the tip rack, or we can ``drop_tip()`` to remove the tip in the attached trash container.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     pipette.pick_up_tip()  # picks up tip_rack_1:A1
     pipette.return_tip()
@@ -135,7 +129,7 @@ If we try to ``pick_up_tip()`` again when all the tips have been used, the Opent
 
     If you run the cell above, and then uncomment and run the cell below, you will get an error because the pipette is out of tips.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     # this will raise an exception if run after the previous code block
     # pipette.pick_up_tip()
@@ -144,7 +138,7 @@ Reseting Tip Tracking
 ---------------------
 If you plan to change out tipracks during the protocol run, you must reset tip tracking to prevent any errors. This is done through ``pipette.reset()`` which resets the tipracks and sets the current volume back to 0 ul.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     pipette.reset()
 
@@ -154,7 +148,7 @@ Select Starting Tip
 
 Calls to ``pick_up_tip()`` will by default start at the attached tip rack's ``'A1'`` location in order of tipracks listed. If you however want to start automatic tip iterating at a different tip, you can use ``start_at_tip()``.
 
-.. testcode:: tipsiterating
+.. code-block:: python
 
     pipette.start_at_tip(tip_rack_1['C3'])
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
@@ -165,7 +159,7 @@ Get Current Tip
 
 Get the source location of the pipette's current tip by calling ``current_tip()``. If the tip was from the ``'A1'`` position on our tip rack, ``current_tip()`` will return that position.
 
-.. testoutput:: tipsinterating
+.. code-block:: python
 
     print(pipette.current_tip())  # is holding no tip
 
@@ -178,9 +172,6 @@ Get the source location of the pipette's current tip by calling ``current_tip()`
 will print out...
 
 
-.. testcleanup:: tipsinterating
-    robot.reset()
-
 **********************
 
 ****************
@@ -192,7 +183,7 @@ Please note that the default now for pipette aspirate and dispense location is a
 
 **********************
 
-.. testcode:: liquid
+.. code-block:: python
 
     from opentrons import labware, instruments, robot
 
@@ -209,7 +200,7 @@ Aspirate
 
 To aspirate is to pull liquid up into the pipette's tip. When calling aspirate on a pipette, we can specify how many micoliters, and at which location, to draw liquid from:
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.aspirate(50, plate.wells('A1'))  # aspirate 50uL from plate:A1
 
@@ -217,7 +208,7 @@ Now our pipette's tip is holding 50uL.
 
 We can also simply specify how many microliters to aspirate, and not mention a location. The pipette in this circumstance will aspirate from it's current location (which we previously set as ``plate.wells('A1'))``.
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.aspirate(50)                     # aspirate 50uL from current position
 
@@ -225,7 +216,7 @@ Now our pipette's tip is holding 100uL.
 
 We can also specify only the location to aspirate from. If we do not tell the pipette how many micoliters to aspirate, it will by default fill up the remaining volume in it's tip. In this example, since we already have 100uL in the tip, the pipette will aspirate another 200uL
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.aspirate(plate.wells('A2'))      # aspirate until pipette fills from plate:A2
 
@@ -235,7 +226,7 @@ Dispense
 
 To dispense is to push out liquid from the pipette's tip. It's usage in the Opentrons API is nearly identical to ``aspirate()``, in that you can specify microliters and location, only microliters, or only a location:
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.dispense(50, plate.wells('B1')) # dispense 50uL to plate:B1
     pipette.dispense(50)                    # dispense 50uL to current position
@@ -250,7 +241,7 @@ To blow out is to push an extra amount of air through the pipette's tip, so as t
 
 When calling ``blow_out()`` on a pipette, we have the option to specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from it's current position.
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.blow_out()                  # blow out in current location
     pipette.blow_out(plate.wells('B3')) # blow out in current plate:B3
@@ -263,7 +254,7 @@ To touch tip is to move the pipette's currently attached tip to four opposite ed
 
 When calling ``touch_tip()`` on a pipette, we have the option to specify a location where the tip will touch the inner walls. If no location is specified, the pipette will touch tip inside it's current location.
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.touch_tip()                  # touch tip within current location
     pipette.touch_tip(-2)                # touch tip 2mm below the top of the current location
@@ -277,7 +268,7 @@ Mixing is simply performing a series of ``aspirate()`` and ``dispense()`` comman
 
 The mix command takes three arguments: ``mix(repetitions, volume, location)``
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.mix(4, 100, plate.wells('A2'))   # mix 4 times, 100uL, in plate:A2
     pipette.mix(3, 50)                       # mix 3 times, 50uL, in current location
@@ -289,18 +280,16 @@ Air Gap
 
 Some liquids need an extra amount of air in the pipette's tip to prevent it from sliding out. A call to ``air_gap()`` with a microliter amount will aspirate that much air into the tip.
 
-.. testcode:: liquid
+.. code-block:: python
 
     pipette.aspirate(100, plate.wells('B4'))
     pipette.air_gap(20)
     pipette.drop_tip()
 
-.. testcleanup:: liquid
-    robot.reset()
 
 **********************
 
-.. testcode:: moving
+.. code-block:: python
 
     from opentrons import labware, instruments, robot
 
@@ -323,13 +312,13 @@ Pipette's are able to ``move_to()`` any location on the deck.
 
 For example, we can move to the first tip in our tip rack:
 
-.. testcode:: moving
+.. code-block:: python
 
     pipette.move_to(tiprack.wells('A1'))
 
 You can also specify at what height you would like the robot to move to inside of a location using ``top()`` and ``bottom()`` methods on that location.
 
-.. testcode:: moving
+.. code-block:: python
 
     pipette.move_to(plate.wells('A1').bottom())  # move to the bottom of well A1
     pipette.move_to(plate.wells('A1').top())     # move to the top of well A1
@@ -338,7 +327,7 @@ You can also specify at what height you would like the robot to move to inside o
 
 The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to mive in a straight line to the target location, you can set the movement strategy to ``'direct'``.
 
-.. testcode:: moving
+.. code-block:: python
 
     pipette.move_to(plate.wells('A1'), strategy='direct')
 
@@ -348,7 +337,7 @@ The above commands will cause the robot's head to first move upwards, then over 
 
 Usually the ``strategy='direct'`` option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use 'direct' movements inside that well, then finally move on to a different well.
 
-.. testcode:: moving
+.. code-block:: python
 
     pipette.move_to(plate.wells('A1'))
     pipette.move_to(plate.wells('A1').bottom(1), strategy='direct')
@@ -360,11 +349,9 @@ Delay
 
 To have your protocol pause for any given number of minutes or seconds, simply call ``delay()`` on your pipette. The value passed into ``delay()`` is the number of minutes or seconds the robot will wait until moving on to the next commands.
 
-.. testcode:: moving
+.. code-block:: python
 
     pipette.delay(seconds=2)             # pause for 2 seconds
     pipette.delay(minutes=5)             # pause for 5 minutes
     pipette.delay(minutes=5, seconds=2)  # pause for 5 minutes and 2 seconds
 
-.. testcleanup:: moving
-    robot.reset()

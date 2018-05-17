@@ -1,9 +1,5 @@
 .. _containers:
 
-.. testsetup:: *
-
-    from opentrons import containers, robot
-    robot.reset()
 
 ######################
 Containers
@@ -279,7 +275,7 @@ The containers module allows you to load common labware into your protocol. `Go 
 
 __ https://andysigler.github.io/ot-api-containerviz/
 
-.. testcode:: containers
+.. code-block:: python
 
     '''
     Examples in this section require the following
@@ -291,7 +287,7 @@ List
 
 Once the container module is loaded, you can see a list of all containers currently inside the API by calling ``containers.list()``
 
-.. testcode:: containers
+.. code-block:: python
 
     containers.list()
 
@@ -300,13 +296,13 @@ Load
 
 Labware is loaded with two arguments: 1) the container type, and 2) the deck slot it will be placed in on the robot.
 
-.. testcode:: containers
+.. code-block:: python
 
     p = containers.load('96-flat', 'B1')
 
 A third optional argument can be used to give a container a unique name.
 
-.. testcode:: containers_2
+.. code-block:: python
 
     p = containers.load('96-flat', 'B1', 'any-name-you-want')
 
@@ -320,7 +316,7 @@ __ https://opentrons.com/getting-started/calibrate-deck
 
 Names can also be used to place multiple containers in the same slot all at once, using the `share=True` argument. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
 
-.. testcode:: containers
+.. code-block:: python
 
     fa = containers.load('T25-flask', 'D1', 'flask_a')
     fb = containers.load('T25-flask', 'D1', 'flask_b', share=True)
@@ -333,7 +329,7 @@ In addition to the default containers that come with the Opentrons API, you can 
 
 Through the API's call containers.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.
 
-.. testcode:: containers_custom
+.. code-block:: python
 
     custom_plate = containers.create(
         '3x6_plate',                    # name of you container
@@ -345,15 +341,14 @@ Through the API's call containers.create(), you can create simple grid container
 
 When you create your custom container it will return the custom plate. If you would like to save this container to the robot's containers library you can pass save=True and it will be saved for later use under the name you've given it. This means you can use containers.load() to use the custom container you've created in this and any future protocol.
 
-.. testcode:: containers_custom
+.. code-block:: python
 
     for well in custom_plate.wells():
         print(well)
 
 will print out...
 
-.. testoutput:: containers_custom
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well B1>
@@ -374,18 +369,13 @@ will print out...
     <Well B6>
     <Well C6>
 
-.. testsetup:: pipettes
-
-    from opentrons import instruments, robot
-    robot.reset()
 
 **********************
 
-.. testsetup:: individualwells
+.. code-block:: python
 
     from opentrons import containers, robot
 
-    robot.reset()
     plate = containers.load('96-flat', 'A1')
 
 ******************
@@ -401,7 +391,7 @@ The OT-One deck and containers are all set up with the same coordinate system - 
 
 .. image:: img/well_iteration/Well_Iteration.png
 
-.. testcode:: individualwells
+.. code-block:: python
 
     '''
     Examples in this section expect the following
@@ -415,7 +405,7 @@ Wells by Name
 
 Once a container is loaded into your protocol, you can easily access the many wells within it using ``wells()`` method. ``wells()`` takes the name of the well as an argument, and will return the well at that location.
 
-.. testcode:: individualwells
+.. code-block:: python
 
     plate.wells('A1')
     plate.wells('H12')
@@ -425,7 +415,7 @@ Wells by Index
 
 Wells can be referenced by their "string" name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a container being at position 0.
 
-.. testcode:: individualwells
+.. code-block:: python
 
     plate.wells(0)   # well A1
     plate.wells(95)  # well H12
@@ -437,7 +427,7 @@ Columns and Rows
 A container's wells are organized within a series of columns and rows, which are also labelled on standard labware. In the API, columns are given letter names (``'A'`` through ``'H'`` for example) and go left to right, while rows are given numbered names (``'1'`` through ``'8'`` for example) and go from front to back.
 You can access a specific row or column by using the ``rows()`` and ``cols()`` methods on a container. These will return all wells within that row or column.
 
-.. testcode:: individualwells
+.. code-block:: python
 
     column = plate.cols('A')
     row = plate.rows('1')
@@ -447,26 +437,24 @@ You can access a specific row or column by using the ``rows()`` and ``cols()`` m
 
 will print out...
 
-.. testoutput:: individualwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     Column "A" has 12 wells
     Row "1" has 8 wells
 
 The ``rows()`` or ``cols()`` methods can be used in combination with the ``wells()`` method to access wells within that row or column. In the example below, both lines refer to well ``'A1'``.
 
-.. testcode:: individualwells
+.. code-block:: python
 
     plate.cols('A').wells('1')
     plate.rows('1').wells('A')
 
 **********************
 
-.. testsetup:: multiwells
+.. code-block:: python
 
     from opentrons import containers, robot
 
-    robot.reset()
     plate = containers.load('96-flat', 'A1')
 
 
@@ -477,7 +465,7 @@ If we had to reference each well one at a time, our protocols could get very ver
 
 When describing a liquid transfer, we can point to groups of wells for the liquid's source and/or destination. Or, we can get a group of wells that we want to loop through.
 
-.. testcode:: multiwells
+.. code-block:: python
 
     '''
     Examples in this section expect the following
@@ -493,7 +481,7 @@ The ``wells()`` method can return a single well, or it can return a list of well
 
 Here is an example or accessing a list of wells, each specified by name:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     w = plate.wells('A1', 'B2', 'C3', 'H12')
 
@@ -501,22 +489,20 @@ Here is an example or accessing a list of wells, each specified by name:
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <WellSeries: <Well A1><Well B2><Well C3><Well H12>>
 
 Multiple wells can be treated just like a normal Python list, and can be iterated through:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('A1', 'B2', 'C3', 'H12'):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well B2>
@@ -528,15 +514,14 @@ Wells To
 
 Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the ``to=`` argument is the last well.
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('A1', to='H1'):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well B1>
@@ -549,15 +534,14 @@ will print out...
 
 Not only can we get every well between the start and end positions, but we can also set the ``step=`` size. The example below will access every 2nd well between ``'A1'`` and ``'H'``:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('A1', to='H1', step=2):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well C1>
@@ -566,15 +550,14 @@ will print out...
 
 These lists of wells can also move in the reverse direction along your container. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('H1', to='A1', step=2):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well H1>
     <Well F1>
@@ -586,15 +569,14 @@ Wells Length
 
 Another way you can create a list of wells is by specifying the length= of the well list you need, in addition to the starting point. The example below will return eight wells, starting at well ``'A1'``:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('A1', length=8):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well B1>
@@ -607,15 +589,14 @@ will print out...
 
 And just like before, we can also set the ``step=`` argument. Except this time the example will be accessing every 3rd well, until a total of eight wells have been found:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('A1', length=8, step=3):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well D1>
@@ -628,15 +609,14 @@ will print out...
 
 You can set the step= value to a negative number to move in the reverse direction along the container:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.wells('H11', length=8, step=-1):
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well H11>
     <Well G11>
@@ -655,15 +635,14 @@ The same arguments described above can be used with ``rows()`` and ``cols()`` to
 
 Here is an example of iterating through rows:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for r in plate.rows('2', length=3, step=-2):
         print(r)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
     <WellSeries: <Well A12><Well B12><Well C12><Well D12><Well E12><Well F12><Well G12><Well H12>>
@@ -671,15 +650,14 @@ will print out...
 
 And here is an example of iterating through columns:
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for c in plate.cols('B', to='F', step=2):
         print(c)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6><Well B7><Well B8><Well B9><Well B10><Well B11><Well B12>>
     <WellSeries: <Well D1><Well D2><Well D3><Well D4><Well D5><Well D6><Well D7><Well D8><Well D9><Well D10><Well D11><Well D12>>
@@ -691,15 +669,14 @@ Slices
 
 Containers can also be treating similarly to Python lists, and can therefore handle slices.
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate[0:8:2]:
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well C1>
@@ -708,30 +685,28 @@ will print out...
 
 The API's containers are also prepared to take string values for the slice's ``start`` and ``stop`` positions.
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate['A1':'A2':2]:
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well A1>
     <Well C1>
     <Well E1>
     <Well G1>
 
-.. testcode:: multiwells
+.. code-block:: python
 
     for w in plate.cols['B']['1'::2]:
         print(w)
 
 will print out...
 
-.. testoutput:: multiwells
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     <Well B1>
     <Well B3>

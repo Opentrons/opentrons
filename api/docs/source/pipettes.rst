@@ -8,7 +8,7 @@ The ``instruments`` module gives your protocol access to the ``Pipette``, which 
 Creating a Pipette
 ******************
 
-.. testcode:: pipettes
+.. code-block:: python
 
     '''
     Examples in this section require the following:
@@ -19,6 +19,8 @@ Creating a Pipette
 Pipette Model(s)
 ===================
 Currently in our API there are 7 pipette models to correspond with the offered pipette models on our website.
+
+.. note::
 
 They are as follows:
 ``P10_Single`` (1 - 10 ul)
@@ -38,7 +40,7 @@ Mount
 To create a ``Pipette``, you must give it a mount. The mount can be either ``'left'`` or ``'right'``.
 In this example, we are using a Single-Channel 300uL pipette.
 
-.. testcode:: pipettes
+.. code-block:: python
 
     pipette = instruments.P300_Single(mount='left')
 
@@ -49,15 +51,11 @@ Plunger Flow Rates
 The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed`` and ``dispense_speed``.
 The values are in microliters/seconds, and have varying defaults depending on the model.
 
-default to ``aspirate_flow_rate=300`` and ``dispense_flow_rate=500``.
 
-.. testcode:: pipettes
+.. code-block:: python
 
     pipette = instruments.P300_Single(
         mount='right',
         aspirate_flow_rate=200,
         dispense_flow_rate=600)
 
-.. testcleanup:: pipettes
-
-    robot.reset()
