@@ -15,6 +15,8 @@ export type JogStep = number
 
 export type DeckCalPoint = '1' | '2' | '3'
 
+export type DeckCalMovePoint = 'attachTip' | 'safeZ' | DeckCalPoint
+
 type DeckStartRequest = {
   force?: boolean
 }
@@ -35,6 +37,7 @@ type DeckCalRequest =
   | {| command: 'save z' |}
   | {| command: 'save transform' |}
   | {| command: 'release' |}
+  | {| command: 'move', point: DeckCalMovePoint |}
 
 type DeckCalResponse = {
   message: string,

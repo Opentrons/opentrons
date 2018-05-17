@@ -249,7 +249,10 @@ class SmoothieDriver_3_0_0:
 
         self._position = HOMED_POSITION.copy()
         self.log = []
+
+        # why do we do this after copying the HOMED_POSITION?
         self._update_position({axis: 0 for axis in AXES})
+
         self.simulating = True
         self._connection = None
         self._config = config

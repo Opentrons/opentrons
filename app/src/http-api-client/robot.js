@@ -26,10 +26,6 @@ type Position = {|
 type Positions = {|
   change_pipette: MountPosition,
   attach_tip: Position,
-  z_calibration: Position,
-  initial_calibration_1: Position,
-  initial_calibration_2: Position,
-  initial_calibration_3: Position,
 |}
 
 type RobotPositionsResponse = {
@@ -40,10 +36,6 @@ type RobotPositionsResponse = {
 type RobotMoveRequest =
   | {| position: 'change_pipette', mount: Mount |}
   | {| position: 'attach_tip', mount: Mount, pipette: PipetteConfig |}
-  | {| position: 'z_calibration', mount: Mount, pipette: PipetteConfig |}
-  | {| position: 'initial_calibration_1', mount: Mount, pipette: PipetteConfig |}
-  | {| position: 'initial_calibration_2', mount: Mount, pipette: PipetteConfig |}
-  | {| position: 'initial_calibration_3', mount: Mount, pipette: PipetteConfig |}
 
 type RobotMoveResponse = {
   message: string,
