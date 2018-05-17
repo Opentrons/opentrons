@@ -56,6 +56,9 @@ SEC_PER_MIN = 60
 DEFAULT_SMOOTHIE_TIMEOUT = 1
 DEFAULT_MOVEMENT_TIMEOUT = 30
 SMOOTHIE_BOOT_TIMEOUT = 3
+DEFAULT_STABILIZE_DELAY = 0.1
+
+DEFAULT_COMMAND_RETRIES = 3
 
 GCODES = {'HOME': 'G28.2',
           'MOVE': 'G0',
@@ -313,7 +316,7 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-    def update_position(self, default=None, is_retry=False):
+    def update_position(self, default=None, retries=DEFAULT_COMMAND_RETRIES):
         if default is None:
             default = self._position
 
@@ -327,9 +330,9 @@ class SmoothieDriver_3_0_0:
                 updated_position = \
                     _parse_position_response(position_response)
             except ParseError as e:
-                if is_retry:
-                    raise e
-                return self.update_position(default=default, is_retry=True)
+                retries = self._update_retries_counter(retries, e)
+                return self.update_position(
+                    default=default, retries=retries)
 
         self._update_position(updated_position)
 
@@ -481,7 +484,7 @@ class SmoothieDriver_3_0_0:
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
-    def update_homed_flags(self, flags=None, is_retry=False):
+    def update_homed_flags(self, flags=None, retries=DEFAULT_COMMAND_RETRIES):
         '''
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -509,9 +512,8 @@ class SmoothieDriver_3_0_0:
                 flags = _parse_homing_status_values(res)
                 self.homed_flags.update(flags)
             except ParseError as e:
-                if is_retry:
-                    raise e
-                return self.update_homed_flags(is_retry=True)
+                retries = self._update_retries_counter(retries, e)
+                return self.update_homed_flags(retries=retries)
 
     @property
     def current(self):
@@ -730,6 +732,14 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Private functions --------------- #
 
+    def _update_retries_counter(self, retries, exception_raised):
+        retries -= 1
+        if retries <= 0:
+            raise exception_raised
+        if not self.simulating:
+            sleep(DEFAULT_STABILIZE_DELAY)
+        return retries
+
     def _wait_for_ack(self):
         '''
         In the case where smoothieware has just been reset, we want to
@@ -744,14 +754,17 @@ class SmoothieDriver_3_0_0:
         # smoothieware will ignore new messages for a short time
         # after it has entered an error state, so sleep for some milliseconds
         if not self.simulating:
-            sleep(0.1)
+            sleep(DEFAULT_STABILIZE_DELAY)
         log.debug("reset_from_error")
         self._send_command(GCODES['RESET_FROM_ERROR'])
         self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
-            self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT, is_retry=False):
+            self,
+            command,
+            timeout=DEFAULT_SMOOTHIE_TIMEOUT,
+            retries=DEFAULT_COMMAND_RETRIES):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -783,10 +796,9 @@ class SmoothieDriver_3_0_0:
                     self._connection,
                     timeout=timeout)
             except serial_communication.SerialNoResponse as e:
-                if is_retry:
-                    raise e
+                retries = self._update_retries_counter(retries, e)
                 return self._send_command(
-                    command, timeout=timeout, is_retry=True)
+                    command, timeout=timeout, retries=retries)
 
             # smoothieware can enter a weird state, where it repeats back
             # the sent command at the beginning of its response.

@@ -744,7 +744,7 @@ def test_send_command_with_retry(model, monkeypatch):
     def _no_response(command, ack, connection, timeout):
         nonlocal count
         count += 1
-        if count < 2:
+        if count < 3:
             raise serial_communication.SerialNoResponse('No response')
         else:
             return 'ok'
@@ -760,3 +760,7 @@ def test_send_command_with_retry(model, monkeypatch):
     count = -1
     with pytest.raises(serial_communication.SerialNoResponse):
         robot._driver._send_command('test')
+
+    count = -1
+    res = robot._driver._send_command('test', retries=4)
+    assert res == 'ok'
