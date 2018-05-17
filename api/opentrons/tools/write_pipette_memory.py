@@ -6,22 +6,22 @@ WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
 MODELS = {
     'v1': {
-        'P10S': configs['p10_single_v1'],
-        'P10M': configs['p10_multi_v1'],
-        'P50S': configs['p50_single_v1'],
-        'P50M': configs['p50_multi_v1'],
-        'P300S': configs['p300_single_v1'],
-        'P300M': configs['p300_multi_v1'],
-        'P1000S': configs['p1000_single_v1']
+        'P10S': 'p10_single_v1',
+        'P10M': 'p10_multi_v1',
+        'P50S': 'p50_single_v1',
+        'P50M': 'p50_multi_v1',
+        'P300S': 'p300_single_v1',
+        'P300M': 'p300_multi_v1',
+        'P1000S': 'p1000_single_v1'
     },
     'v13': {
-        'P10SV13': configs['p10_single_v13'],
-        'P10MV13': configs['p10_multi_v13'],
-        'P50SV13': configs['p50_single_v13'],
-        'P50MV13': configs['p50_multi_v13'],
-        'P3HSV13': configs['p300_single_v13'],
-        'P3HMV13': configs['p300_multi_v13'],
-        'P1KSV13': configs['p1000_single_v13']
+        'P10SV13': 'p10_single_v13',
+        'P10MV13': 'p10_multi_v13',
+        'P50SV13': 'p50_single_v13',
+        'P50MV13': 'p50_multi_v13',
+        'P3HSV13': 'p300_single_v13',
+        'P3HMV13': 'p300_multi_v13',
+        'P1KSV13': 'p1000_single_v13'
     }
 }
 
