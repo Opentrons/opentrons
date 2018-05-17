@@ -89,11 +89,8 @@ def _parse_model_from_barcode(barcode):
     for version in ['v13', 'v1']:
         for barcode_substring in MODELS[version].keys():
             if barcode.startswith(barcode_substring):
-                model = MODELS[version][barcode_substring]
-                break
-    if not model:
-        raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
-    return model
+                return MODELS[version][barcode_substring]
+    raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
 def main(robot):
@@ -102,7 +99,7 @@ def main(robot):
         model = _parse_model_from_barcode(barcode)
         check_previous_data(robot, 'right')
         write_identifiers(robot, 'right', barcode, model)
-        print('PASS: Saved -> {}'.format(barcode))
+        print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
     except Exception as e:
