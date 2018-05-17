@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import styles from './RunLog.css'
+import styles from './styles.css'
 
-export default class RunLog extends Component {
+export default class CommandList extends Component {
   componentDidUpdate () {
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true)
   }
@@ -54,7 +54,7 @@ export default class RunLog extends Component {
   }
 }
 
-RunLog.propTypes = {
+CommandList.propTypes = {
   // TODO(mc, 2017-08-23): use PropTypes.shape instead of object
   commands: PropTypes.arrayOf(PropTypes.object).isRequired
 }

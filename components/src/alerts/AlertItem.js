@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '../icons'
+import {Icon, type IconProps} from '../icons'
 import {IconButton} from '../buttons'
 import styles from './alerts.css'
 
 export type AlertProps = {
   /** name constant of the icon to display */
-  type: 'success' | 'warning',
+  type: 'success' | 'warning' | 'info',
   /** title/main message of colored alert bar */
   title: string,
   /** Alert message body contents */
@@ -16,6 +16,8 @@ export type AlertProps = {
   className?: string,
   /** optional handler to show close button/clear alert  */
   onCloseClick?: () => mixed,
+  /** Override the default Alert Icon */
+  icon?: IconProps
 }
 
 /**
@@ -25,12 +27,16 @@ export type AlertProps = {
 
 const ALERT_PROPS_BY_TYPE = {
   success: {
-    iconName: 'check-circle',
+    icon: {name: 'check-circle'},
     className: styles.success
   },
   warning: {
-    iconName: 'alert-circle',
+    icon: {name: 'alert-circle'},
     className: styles.warning
+  },
+  info: {
+    icon: {name: 'info-circle'},
+    className: styles.info
   }
 }
 
@@ -38,16 +44,24 @@ export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
 
 export default function AlertItem (props: AlertProps) {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
+  const icon = props.icon
+    ? props.icon
+    : alertProps.icon
   const className = cx(
     styles.alert,
     alertProps.className,
     props.className
   )
 
+  const iconProps = {
+    ...icon,
+    className: styles.icon
+  }
+
   return (
     <div className={className}>
       <div className={styles.title_bar}>
-        <Icon name={alertProps.iconName} className={styles.icon}/>
+        <Icon {...iconProps} />
         <span className={styles.title}>
           {props.title}
         </span>

@@ -34,6 +34,19 @@
   }
 }
 
+.info {
+  border: 1px solid #0ec9eb;
+
+  & > .title_bar {
+    background-color: #f0f3ff;
+    color: #0ec9eb;
+
+    & svg {
+      fill: #0ec9eb;
+    }
+  }
+}
+
 .warning {
   border: 1px solid var(--c-warning);
 

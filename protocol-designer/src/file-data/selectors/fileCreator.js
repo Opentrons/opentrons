@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../../types'
-import type {ProtocolFile, FilePipette} from '../types'
+import type {ProtocolFile, FilePipette, FileLabware} from '../types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 import {fileFormValues} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
@@ -35,9 +35,9 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
 
     const labware = mapValues(
       initialRobotState.labware,
-      (l: LabwareData) => ({
+      (l: LabwareData): FileLabware => ({
         slot: l.slot,
-        displayName: l.name || l.type, // TODO Ian 2018-05-11 "humanize" type when no name?
+        'display-name': l.name || l.type, // TODO Ian 2018-05-11 "humanize" type when no name?
         model: l.type
       })
     )

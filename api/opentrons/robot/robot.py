@@ -418,7 +418,7 @@ class Robot(object):
             mz
         )
         # if it's the left mount, apply the offset from right pipette
-        if mount is 'left':
+        if mount == 'left':
             _x, _y, _z = (
                _x + self.config.mount_offset[0],
                _y + self.config.mount_offset[1],

@@ -80,9 +80,9 @@ def jog(axis, direction, step):
 
 
 def set_calibration_value(rbt: Robot, axis: str, value: float):
-    if axis is 'x':
+    if axis == 'x':
         row = x_row
-    elif axis is 'y':
+    elif axis == 'y':
         row = y_row
     else:
         row = z_row
