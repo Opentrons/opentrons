@@ -94,7 +94,7 @@ def _load_config_dict_from_file(pipette_model: str) -> dict:
     if os.path.exists(config_file):
         with open(config_file) as conf:
             all_configs = json.load(conf)
-            cfg = all_configs[pipette_model]
+            cfg = all_configs.get(pipette_model, cfg)
     return cfg
 
 
@@ -161,7 +161,7 @@ p10_single_v13 = pipette_config(
     ul_per_mm=0.77,
     channels=1,
     name='p10_single_v13',
-    model_offset=(0.0, 0.0, Z_OFFSET_P10),
+    model_offset=[0.0, 0.0, Z_OFFSET_P10],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=33
@@ -199,7 +199,7 @@ p10_multi_v13 = pipette_config(
     ul_per_mm=0.77,
     channels=8,
     name='p10_multi_v13',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=33
@@ -237,7 +237,7 @@ p50_single_v13 = pipette_config(
     ul_per_mm=3.35,
     channels=1,
     name='p50_single_v13',
-    model_offset=(0.0, 0.0, Z_OFFSET_P50),
+    model_offset=[0.0, 0.0, Z_OFFSET_P50],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -275,7 +275,7 @@ p50_multi_v13 = pipette_config(
     ul_per_mm=3.35,
     channels=8,
     name='p50_multi_v13',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -313,7 +313,7 @@ p300_single_v13 = pipette_config(
     ul_per_mm=18.7,
     channels=1,
     name='p300_single_v13',
-    model_offset=(0.0, 0.0, Z_OFFSET_P300),
+    model_offset=[0.0, 0.0, Z_OFFSET_P300],
     plunger_current=0.3,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -351,7 +351,7 @@ p300_multi_v13 = pipette_config(
     ul_per_mm=19,
     channels=8,
     name='p300_multi_v13',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=51.7
@@ -380,7 +380,7 @@ p1000_single_v13 = pipette_config(
     plunger_positions={
         'top': 19,
         'bottom': 2.5,
-        'blow_out': 0.5,
+        'blow_out': -0.5,
         'drop_tip': -4
     },
     pick_up_current=0.1,
@@ -389,7 +389,7 @@ p1000_single_v13 = pipette_config(
     ul_per_mm=65,
     channels=1,
     name='p1000_single_v13',
-    model_offset=(0.0, 0.0, Z_OFFSET_P1000),
+    model_offset=[0.0, 0.0, Z_OFFSET_P1000],
     plunger_current=0.5,
     drop_tip_current=0.5,
     tip_length=76.7

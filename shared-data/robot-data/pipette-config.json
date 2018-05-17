@@ -70,7 +70,7 @@
     "dispenseFlowRate": 10,
     "ulPerMm": 0.77,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 33
@@ -146,7 +146,7 @@
     "dispenseFlowRate": 50,
     "ulPerMm": 3.35,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 51.7
@@ -222,7 +222,7 @@
     "dispenseFlowRate": 300,
     "ulPerMm": 19,
     "channels": 8,
-    "modelOffset": [0.0, 28.0, -25.8],
+    "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "tipLength": 51.7
