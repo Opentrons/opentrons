@@ -23,18 +23,18 @@ export type NamedIngredsByLabware = {[labwareId: string]: {[well: string]: Array
 export type NamedIngredsByLabwareAllSteps = Array<NamedIngredsByLabware>
 
 export type StepItemSourceDestRow = {|
-  substepId: number, // TODO should this be a string or is this ID properly a number?
+  substepId?: number, // TODO should this be a string or is this ID properly a number?
   sourceIngredients?: Array<NamedIngred>,
   destIngredients?: Array<NamedIngred>,
   sourceWell?: ?string,
   destWell?: ?string,
-  volume?: ?number // TODO IMMEDIATELY use this?!??
+  volume?: ?number
 |}
 
-export type StepItemSourceDestRowMulti = {|
+export type StepItemSourceDestRowMulti = {
   ...StepItemSourceDestRow,
   channelId: number
-|}
+}
 
 export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,

@@ -15,26 +15,38 @@ export function getPrevStepId (
   return prevStepId
 }
 
-/** Split an array into nested arrays when predicate fn is true */
-export function splitWhen<T> (
+/** Merge 2 adjacent elements of an array when predicate fn is true */
+export function mergeWhen<T> (
   array: Array<T>,
-  predicate: (prev: T, current: T) => mixed
-): Array<Array<T>> {
-  const splitIdx = array.slice(1).reduce((acc: number, val: *, prevIdx: number): number => {
-    if (acc !== -1) return acc // short-circuit this reduce
-
-    return predicate(array[prevIdx], val)
-      ? prevIdx + 1
-      : acc
-  }, -1)
-
-  if (splitIdx === -1) {
-    // no split needed
-    return [array]
+  predicate: (current: T, next: T) => mixed,
+  merge: (current: T, next: T) => T
+): Array<T> {
+  if (array.length <= 1) {
+    return array
   }
 
-  return [
-    array.slice(0, splitIdx),
-    ...splitWhen(array.slice(splitIdx), predicate)
-  ]
+  const result = []
+  let canMerge = true
+
+  for (let i = 0; i + 1 < array.length; i++) {
+    let current = array[i]
+    let next = array[i + 1]
+
+    if (canMerge) {
+      if (predicate(current, next)) {
+        result.push(merge(current, next))
+        canMerge = false
+      } else {
+        result.push(current)
+      }
+    } else {
+      canMerge = true
+    }
+  }
+
+  if (canMerge) {
+    result.push(array[array.length - 1])
+  }
+
+  return result
 }
