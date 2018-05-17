@@ -7,7 +7,7 @@ import {withRouter, type ContextRouter} from 'react-router'
 import {selectors as robotSelectors} from '../robot'
 import Page from '../components/Page'
 import LabwareCalibration from '../components/LabwareCalibration'
-import SessionHeader from '../containers/SessionHeader'
+import SessionHeader from '../components/SessionHeader'
 import ReviewDeckModal from '../components/ReviewDeckModal'
 
 type StateProps = {
