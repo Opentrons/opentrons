@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. testsetup:: *
+.. code-block:: python
 
   from opentrons import robot, containers, instruments
 
@@ -40,7 +40,7 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
 If we were to rewrite this with the Opentrons API, it would look like the following:
 
-.. testcode:: helloworld
+.. code-block:: python
 
     # imports
     from opentrons import containers, instruments
@@ -74,7 +74,7 @@ When writing in Python, you must always include the Opentrons API within your fi
 
 From the example above, the "imports" section looked like:
 
-.. testcode:: imports
+.. code-block:: python
 
     from opentrons import containers, instruments
 
@@ -88,7 +88,7 @@ Each container is given a type (ex: ``'96-flat'``), and the slot on the robot it
 
 From the example above, the "containers" section looked like:
 
-.. testcode:: imports
+.. code-block:: python
 
     plate = containers.load('96-flat', 'B1')
     tiprack = containers.load('tiprack-200ul', 'A1')
@@ -102,7 +102,7 @@ There are other parameters for pipettes, but the most important are the ``max_vo
 
 From the example above, the "pipettes" section looked like:
 
-.. testcode:: imports
+.. code-block:: python
 
     pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
@@ -115,7 +115,7 @@ This section can tend to get long, relative to the complexity of your protocol. 
 
 From the example above, the "commands" section looked like:
 
-.. testcode:: imports
+.. code-block:: python
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
