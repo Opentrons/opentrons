@@ -1290,7 +1290,6 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            self.disconnect()
             gpio.set_low(gpio.OUTPUT_PINS['RESET'])
             gpio.set_low(gpio.OUTPUT_PINS['ISP'])
             sleep(0.25)
