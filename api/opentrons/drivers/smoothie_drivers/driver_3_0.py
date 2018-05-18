@@ -800,14 +800,7 @@ class SmoothieDriver_3_0_0:
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        # smoothieware can enter a weird state, where it repeats back
-        # the sent command at the beginning of its response.
-        # Check for this echo, and strips the command from the response
-        remove_from_response = [
-            c.strip() for c in command_line.strip().split(' ') if c.strip()]
-        remove_from_response += ['\r', '\n']
-        for cmd in remove_from_response:
-            ret_code = ret_code.replace(cmd, '')
+        ret_code = self._remove_unwanted_characters(command_line, ret_code)
 
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
@@ -819,6 +812,29 @@ class SmoothieDriver_3_0_0:
             raise SmoothieError(ret_code)
 
         return ret_code.strip()
+
+    def _remove_unwanted_characters(self, command, response):
+        # smoothieware can enter a weird state, where it repeats back
+        # the sent command at the beginning of its response.
+        # Check for this echo, and strips the command from the response
+        remove_from_response = [
+            c.strip() for c in command.strip().split(' ') if c.strip()]
+
+        # also removing any inadvertant newline/return characters
+        # this is ok because all data we need from Smoothie is returned on
+        # the first line in the response
+        remove_from_response += ['\r', '\n']
+        modified_response = str(response)
+
+        for cmd in remove_from_response:
+            modified_response = modified_response.replace(cmd, '')
+
+        if modified_response != response:
+            log.debug('Removed characters from response: {}'.format(
+                response))
+            log.debug('Newly formatted response: {}'.format(modified_response))
+
+        return modified_response
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:
