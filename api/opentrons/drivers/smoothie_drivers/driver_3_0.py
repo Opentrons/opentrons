@@ -372,7 +372,7 @@ class SmoothieDriver_3_0_0:
         else:
             res = self._read_from_pipette(
                 GCODES['READ_INSTRUMENT_MODEL'], mount)
-            if res and not res.endswith('_v1'):
+            if res and '_v' not in res:
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the _v# designation
                 res = res + '_v1'
