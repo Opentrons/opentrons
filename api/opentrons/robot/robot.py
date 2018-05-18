@@ -931,13 +931,9 @@ class Robot(object):
         self.reset()
         self.home()
 
-    def get_attached_pipettes(self, default=None):
+    def get_attached_pipettes(self):
         """
         Gets model names of attached pipettes
-
-        default: dict
-            keys are 'left' and 'right', with each value being a dict of
-            pipette properties to overwrite while in simulating mode
 
         :return: :dict with keys 'left' and 'right' and a model string for each
             mount, or 'uncommissioned' if no model string available
@@ -959,15 +955,10 @@ class Robot(object):
         # is currently attached/cached, any pipette model can be simulated
         if self.is_simulating():
             default_version = list(pipette_config.configs.values())[0].name
-            if not default:
-                default = {
-                    'left': {'model': default_version},
-                    'right': {'model': default_version}
-                }
-            if 'left' in default:
-                left_data.update(default['left'])
-            if 'right' in default:
-                right_data.update(default['right'])
+            if not left_data['model']:
+                left_data['model'] = default_version
+            if not right_data['model']:
+                right_data['model'] = default_version
 
         # add tip-length
         left_model = left_data.get('model')

@@ -223,23 +223,19 @@ class InstrumentsWrapper(object):
         p.set_pick_up_current(config.pick_up_current)
         return p
 
-    def _retrieve_version_number(self, mount, expected_model):
+    def _retrieve_version_number(self, mount, expected_model_substring):
         # pass a default pipette model-version, for when robot is simulating
         # this allows any pipette to be simulated, regardless of what is
         # actually attached/cached on the robot's mounts
-        default_version = expected_model + '_v1'
-        pipettes_attached = robot.get_attached_pipettes(
-            default={mount: {'model': default_version}})
-        found_version = pipettes_attached[mount]['model']
-        if not found_version:
-            found_version = default_version
+        default_model = expected_model_substring + '_v1'  # default to v1
+        if robot.is_simulating():
+            return default_model
 
-        # check that the model string is a substring of the version
-        # eg: check that 'p10_single' is inside the found 'p10_single_v13'
-        if expected_model not in found_version:
-            raise TypeError(
-                'Found unexpected Pipette attached: {}'.format(found_version))
-        return found_version
+        attached_model = robot.get_attached_pipettes()[mount]['model']
+        if expected_model_substring in attached_model:
+            return attached_model
+        else:
+            return default_model
 
 
 instruments = InstrumentsWrapper(robot)
