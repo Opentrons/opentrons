@@ -222,9 +222,3 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
     return result
   }
 )
-
-// TODO look at who uses this and see if they can use robotStateTimelineFull instead (or not)
-export const robotStateTimeline: Selector<Array<StepGeneration.CommandsAndRobotState>> = createSelector(
-  robotStateTimelineFull,
-  full => full.timeline
-)
