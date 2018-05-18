@@ -1276,14 +1276,11 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            old_port = self.port
-            self.disconnect()
             gpio.set_low(gpio.OUTPUT_PINS['RESET'])
             gpio.set_high(gpio.OUTPUT_PINS['ISP'])
             sleep(0.25)
             gpio.set_high(gpio.OUTPUT_PINS['RESET'])
             sleep(0.25)
-            self._connect_to_port(old_port)
             self._wait_for_ack()
             self._reset_from_error()
 
