@@ -232,7 +232,7 @@ class InstrumentsWrapper(object):
             return default_model
 
         attached_model = robot.get_attached_pipettes()[mount]['model']
-        if expected_model_substring in attached_model:
+        if attached_model and expected_model_substring in attached_model:
             return attached_model
         else:
             return default_model
