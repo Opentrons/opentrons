@@ -4,7 +4,7 @@ import {PrimaryButton, OutlineButton, SidePanel} from '@opentrons/components'
 import styles from './FileSidebar.css'
 
 type Props = {
-  onUploadClick?: () => mixed,
+  onUpload: (SyntheticInputEvent<HTMLInputElement>) => mixed,
   onCreateNew?: () => mixed,
   downloadData: ?{
     fileContents: string,
@@ -27,7 +27,10 @@ export default function FileSidebar (props: Props) {
       }
 
       <div className={styles.bottom_buttons}>
-        <OutlineButton onClick={props.onUploadClick}>Upload</OutlineButton>
+        <div className={styles.upload_button}>
+          <input type='file' onChange={props.onUpload} />
+          <OutlineButton type='submit'>UPLOAD</OutlineButton>
+        </div>
         <OutlineButton onClick={props.onCreateNew}>Create New</OutlineButton>
       </div>
     </SidePanel>

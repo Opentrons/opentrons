@@ -7,17 +7,6 @@
   }
 }
 
-.download_button {
-  margin: 0 1rem;
-}
-
-.divider {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background-color: var(--c-light-gray);
-}
-
 .bottom_buttons {
   margin: 1rem 2rem;
 
@@ -25,4 +14,36 @@
     /* Unlike PrimaryButton, OutlineButton isn't 100% width */
     width: 100%;
   }
+}
+
+.download_button {
+  margin: 2rem 1rem;
+}
+
+.upload_button {
+  /* File input is transparent and laid over the button */
+  position: relative;
+  height: 4.25rem;
+
+  & > * {
+    @apply --absolute-fill;
+  }
+
+  & input {
+    z-index: 5;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &:hover button {
+    cursor: text;
+    background-color: color(var(--c-bg-light) shade(5%));
+  }
+}
+
+.divider {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--c-light-gray);
 }
