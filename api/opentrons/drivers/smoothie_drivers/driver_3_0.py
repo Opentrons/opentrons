@@ -831,12 +831,12 @@ class SmoothieDriver_3_0_0:
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
                 (ALARM_KEYWORD in ret_code.lower()):
-            if not self.simulating:
-                gpio.set_light_indicator_status('error')
             self._reset_from_error()
             error_axis = ret_code.strip()[-1]
             if GCODES['HOME'] not in command and error_axis in 'XYZABC':
                 self.home(error_axis)
+            if not self.simulating:
+                gpio.set_light_indicator_status('error')
             raise SmoothieError(ret_code)
 
         return ret_code.strip()
