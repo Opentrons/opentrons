@@ -90,7 +90,8 @@ class Pipette:
     --------
     >>> from opentrons import instruments, labware, robot # doctest: +SKIP
     >>> robot.reset() # doctest: +SKIP
-    >>> tip_rack_300ul = labware.load('GEB-tiprack-300ul', '1') # doctest: +SKIP
+    >>> tip_rack_300ul = labware.load(
+    ...     'GEB-tiprack-300ul', '1') # doctest: +SKIP
     >>> p300 = instruments.P300_Single(mount='left',
     ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """

@@ -448,7 +448,6 @@ class Robot(object):
         """
         return list(self._runtime_warnings)
 
-
     def get_motor(self, axis):
         """
         Get robot's head motor.
