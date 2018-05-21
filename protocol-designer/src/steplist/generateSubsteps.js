@@ -90,6 +90,9 @@ function transferLikeSubsteps (args: {
     robotStateTimeline.timeline[prevStepId].robotState
   ) || robotStateTimeline.robotState
 
+  // if false, show aspirate vol instead
+  const showDispenseVol = validatedForm.stepType === 'distribute'
+
   let result
 
   // Call appropriate command creator with the validateForm fields.
@@ -140,26 +143,29 @@ function transferLikeSubsteps (args: {
 
     const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
       aspDispMultiRows,
-      (currentMultiRow, nextMultiRow) =>
+      (currentMultiRow, nextMultiRow) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
-        currentMultiRow[0] && currentMultiRow[0].sourceWell &&
-        nextMultiRow[0] && nextMultiRow[0].destWell,
+        return currentMultiRow[0] && currentMultiRow[0].sourceWell &&
+        nextMultiRow[0] && nextMultiRow[0].destWell
+      },
       // Merge each channel row together when predicate true
-      (currentMultiRow, nextMultiRow) => range(pipette.channels).map(channel =>
-        ({
+      (currentMultiRow, nextMultiRow) => {
+        return range(pipette.channels).map(channel => ({
           ...currentMultiRow[channel],
-          ...nextMultiRow[channel]
-        })
-      )
+          ...nextMultiRow[channel],
+          volume: showDispenseVol
+            ? nextMultiRow[channel].volume
+            : currentMultiRow[channel].volume
+        }))
+      }
     )
 
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: mergedMultiRows,
-      volume: validatedForm.volume // TODO Ian 2018-05-17 multi-channel independent volume
+      multiRows: mergedMultiRows
     }
   }
 
@@ -180,7 +186,9 @@ function transferLikeSubsteps (args: {
     (currentRow, nextRow) => ({
       ...nextRow,
       ...currentRow,
-      volume: currentRow.volume // show aspirate volume, not dispense volume
+      volume: showDispenseVol
+        ? nextRow.volume
+        : currentRow.volume
     })
   )
 
@@ -232,12 +240,14 @@ function commandToMultiRows (
   return range(channels).map(channel => {
     const well = wellsForTips[channel]
     const ingreds = getIngreds(labwareId, command.params.well)
+    const volume = command.params.volume
 
     if (command.command === 'aspirate') {
       return {
         channelId: channel,
         sourceIngredients: ingreds,
-        sourceWell: well
+        sourceWell: well,
+        volume
       }
     }
     if (command.command !== 'dispense') {
@@ -248,7 +258,8 @@ function commandToMultiRows (
     return {
       channelId: channel,
       destIngredients: ingreds,
-      destWell: well
+      destWell: well,
+      volume
     }
   })
 }

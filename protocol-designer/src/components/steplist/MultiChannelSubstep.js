@@ -11,7 +11,6 @@ import type {StepItemSourceDestRowMulti} from '../../steplist/types'
 const DEFAULT_COLLAPSED_STATE = true
 
 type MultiChannelSubstepProps = {|
-  volume: ?string | ?number,
   rowGroup: Array<StepItemSourceDestRowMulti>,
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
@@ -39,7 +38,6 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
 
   render () {
     const {
-      volume,
       rowGroup,
       highlighted
     } = this.props
@@ -64,7 +62,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           )}
           sourceWells={rowGroup.map(row => row.sourceWell)}
           destWells={rowGroup.map(row => row.destWell)}
-          volume={volume}
+          volume={rowGroup && rowGroup[0] && rowGroup[0].volume}
           collapsible
           collapsed={collapsed}
           toggleCollapsed={this.handleToggleCollapsed}
@@ -75,7 +73,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           <SubstepRow
             key={rowKey}
             className={styles.step_subitem_channel_row}
-            volume={volume}
+            volume={row.volume}
             hideVolumeUnits
             sourceIngredients={row.sourceIngredients}
             sourceWells={row.sourceWell}

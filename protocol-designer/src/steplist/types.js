@@ -50,7 +50,7 @@ export type SourceDestSubstepItemMultiChannel = {|
   multichannel: true,
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
-  volume?: number, // uniform volume for all steps
+  volume?: ?number, // uniform volume for all steps
   multiRows: Array<Array<StepItemSourceDestRowMulti>> // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
