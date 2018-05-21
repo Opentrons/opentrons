@@ -14,3 +14,6 @@ gpio.set_high(gpio.OUTPUT_PINS['AUDIO_ENABLE'])
 gpio.set_high(gpio.OUTPUT_PINS['HALT'])
 gpio.set_high(gpio.OUTPUT_PINS['ISP'])
 gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+
+# start everything off with the LED showing an WAITING status as we boot up
+gpio.set_light_indicator_status('waiting')

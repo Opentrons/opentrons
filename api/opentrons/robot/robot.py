@@ -299,7 +299,7 @@ class Robot(object):
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
 
     def turn_on_button_light(self):
-        gpio.set_light_indicator_status('idle')
+        gpio.set_light_indicator_status('ready')
 
     def turn_off_button_light(self):
         gpio.set_light_indicator_status('off')

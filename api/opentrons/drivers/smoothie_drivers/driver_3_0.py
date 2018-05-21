@@ -5,6 +5,7 @@ from threading import Event
 from typing import Dict
 
 from serial.serialutil import SerialException
+from numpy import isclose
 
 from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
@@ -316,7 +317,6 @@ class SmoothieDriver_3_0_0:
 
         self.log += [self._position.copy()]
 
-<<<<<<< HEAD
     def _update_position_after_homing(self, axes_homed):
         # Only update axes that have been selected for homing
         homed = {
@@ -436,11 +436,15 @@ class SmoothieDriver_3_0_0:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-        gpio.set_light_indicator_status('idle')
-        self.disconnect()
-        self._connect_to_port(port)
-        self._setup()
-        gpio.set_light_indicator_status('error')
+        gpio.set_light_indicator_status('waiting')
+        try:
+            self.disconnect()
+            self._connect_to_port(port)
+            self._setup()
+            gpio.set_light_indicator_status('ready')
+        except Exception as e:
+            gpio.set_light_indicator_status('error')
+            raise e
 
     def disconnect(self):
         if self.is_connected():
@@ -1030,9 +1034,34 @@ class SmoothieDriver_3_0_0:
         log.debug("_write_to_pipette: {}".format(command))
         self._send_command(command)
 
+    def _create_coords_list(self, coords_dict):
+
+        def valid_movement(coords, axis):
+            return not (
+                (axis in DISABLE_AXES) or
+                (coords is None) or
+                isclose(coords, self.position[axis])
+            )
+
+        return [
+            axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+            for axis, coords in sorted(coords_dict.items())
+            if valid_movement(coords, axis)
+        ]
+
+    def _create_backlash_coords_list(self, coords_dict):
+        backlash_target = coords_dict.copy()
+        backlash_target.update({
+            axis: value + PLUNGER_BACKLASH_MM
+            for axis, value in sorted(coords_dict.items())
+            if axis in 'BC' and self.position[axis] < value
+        })
+        return self._create_coords_list(backlash_target)
+
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
+
     def move(self, target, home_flagged_axes=False):
         '''
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1051,33 +1080,11 @@ class SmoothieDriver_3_0_0:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
         '''
-        from numpy import isclose
 
         self.run_flag.wait()
 
-        def valid_movement(coords, axis):
-            return not (
-                (axis in DISABLE_AXES) or
-                (coords is None) or
-                isclose(coords, self.position[axis])
-            )
-
-        def create_coords_list(coords_dict):
-            return [
-                axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                for axis, coords in sorted(coords_dict.items())
-                if valid_movement(coords, axis)
-            ]
-
-        backlash_target = target.copy()
-        backlash_target.update({
-            axis: value + PLUNGER_BACKLASH_MM
-            for axis, value in sorted(target.items())
-            if axis in 'BC' and self.position[axis] < value
-        })
-
-        target_coords = create_coords_list(target)
-        backlash_coords = create_coords_list(backlash_target)
+        target_coords = self._create_coords_list(target)
+        backlash_coords = self._create_backlash_coords_list(target)
 
         if target_coords:
             non_moving_axes = ''.join([
@@ -1109,7 +1116,7 @@ class SmoothieDriver_3_0_0:
                 # of 30 seconds prevents any movements that take longer
                 self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
                 if not self.simulating:
-                    gpio.set_light_indicator_status('idle')
+                    gpio.set_light_indicator_status('ready')
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
@@ -1183,7 +1190,7 @@ class SmoothieDriver_3_0_0:
                     self._set_saved_current()
 
         if not self.simulating:
-            gpio.set_light_indicator_status('idle')
+            gpio.set_light_indicator_status('ready')
 
         self._update_position_after_homing(home_sequence)
 
@@ -1215,12 +1222,12 @@ class SmoothieDriver_3_0_0:
     def pause(self):
         if not self.simulating:
             self.run_flag.clear()
-            gpio.set_light_indicator_status('paused')
+            gpio.set_light_indicator_status('waiting')
 
     def resume(self):
         if not self.simulating:
             self.run_flag.set()
-            gpio.set_light_indicator_status('idle')
+            gpio.set_light_indicator_status('ready')
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:

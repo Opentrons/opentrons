@@ -51,9 +51,9 @@ INPUT_PINS = {
 _path_prefix = "/sys/class/gpio"
 
 LIGHT_INDICATOR_STATES = {
-    'idle': {'red': False, 'green': False, 'blue': True},
+    'ready': {'red': False, 'green': False, 'blue': True},
     'moving': {'red': False, 'green': True, 'blue': False},
-    'paused': {'red': True, 'green': True, 'blue': False},
+    'waiting': {'red': True, 'green': True, 'blue': False},
     'error': {'red': True, 'green': False, 'blue': False},
     'off': {'red': False, 'green': False, 'blue': False}
 }
