@@ -44,8 +44,9 @@ export function pipetteVolumeExceeded (args: {
   maxVolume: string | number
 }): CommandCreatorError {
   const {actionName, volume, maxVolume} = args
+  console.warn(`Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`)
   return {
-    message: `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`,
+    message: 'This step involves labware that has been deleted',
     type: 'PIPETTE_VOLUME_EXCEEDED'
   }
 }
