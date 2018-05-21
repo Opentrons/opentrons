@@ -32,8 +32,9 @@ export function pipetteDoesNotExist (args: {actionName: string, pipette: string}
 
 export function labwareDoesNotExist (args: {actionName: string, labware: string}): CommandCreatorError {
   const {actionName, labware} = args
+  console.warn(`Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`)
   return {
-    message: `Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`,
+    message: 'This step involves labware that has been deleted',
     type: 'LABWARE_DOES_NOT_EXIST'
   }
 }
@@ -44,9 +45,8 @@ export function pipetteVolumeExceeded (args: {
   maxVolume: string | number
 }): CommandCreatorError {
   const {actionName, volume, maxVolume} = args
-  console.warn(`Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`)
   return {
-    message: 'This step involves labware that has been deleted',
+    message: `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`,
     type: 'PIPETTE_VOLUME_EXCEEDED'
   }
 }
