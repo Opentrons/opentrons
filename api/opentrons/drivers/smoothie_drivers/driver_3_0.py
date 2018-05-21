@@ -412,18 +412,33 @@ class SmoothieDriver_3_0_0:
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     def connect(self, port=None):
-        self.simulating = False
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-        smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
+        self.disconnect()
+        self._connect_to_port(port)
+        self._setup()
+
+    def disconnect(self):
+        if self.is_connected():
+            self._connection.close()
+        self._connection = None
+        self.simulating = True
+
+    def is_connected(self):
+        if not self._connection:
+            return False
+        return self._connection.is_open
+
+    def _connect_to_port(self, port=None):
         try:
+            smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
             self._connection = serial_communication.connect(
                 device_name=smoothie_id,
                 port=port,
                 baudrate=self._config.serial_speed
             )
-            self._setup()
+            self.simulating = False
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
@@ -431,16 +446,6 @@ class SmoothieDriver_3_0_0:
             error_msg += 'because another process is currently using it, or '
             error_msg += 'the UART port is disabled on this device (OS)'
             raise SerialException(error_msg)
-
-    def disconnect(self):
-        if self._connection:
-            self._connection.close()
-        self.simulating = True
-
-    def is_connected(self):
-        if not self._connection:
-            return False
-        return self._connection.is_open
 
     @property
     def port(self):
@@ -794,11 +799,7 @@ class SmoothieDriver_3_0_0:
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        # smoothieware can enter a weird state, where it repeats back
-        # the sent command at the beginning of its response.
-        # Check for this echo, and strips the command from the response
-        if command_line.strip() in ret_code.strip():
-            ret_code = ret_code.replace(command_line, '')
+        ret_code = self._remove_unwanted_characters(command_line, ret_code)
 
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
@@ -809,7 +810,30 @@ class SmoothieDriver_3_0_0:
                 self.home(error_axis)
             raise SmoothieError(ret_code)
 
-        return ret_code
+        return ret_code.strip()
+
+    def _remove_unwanted_characters(self, command, response):
+        # smoothieware can enter a weird state, where it repeats back
+        # the sent command at the beginning of its response.
+        # Check for this echo, and strips the command from the response
+        remove_from_response = [
+            c.strip() for c in command.strip().split(' ') if c.strip()]
+
+        # also removing any inadvertant newline/return characters
+        # this is ok because all data we need from Smoothie is returned on
+        # the first line in the response
+        remove_from_response += ['\r', '\n']
+        modified_response = str(response)
+
+        for cmd in remove_from_response:
+            modified_response = modified_response.replace(cmd, '')
+
+        if modified_response != response:
+            log.debug('Removed characters from response: {}'.format(
+                response))
+            log.debug('Newly formatted response: {}'.format(modified_response))
+
+        return modified_response
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:

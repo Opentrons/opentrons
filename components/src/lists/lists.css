@@ -27,7 +27,7 @@
 }
 
 .titled_list_selected {
-  border-color: var(--c-blue);
+  border-color: var(--c-highlight);
 }
 
 .title_bar {

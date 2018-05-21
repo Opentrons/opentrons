@@ -1,3 +1,5 @@
+@import '@opentrons/components';
+
 /* TODO(mc, 2018-02-09): fix lint errors and remove this ignore */
 /* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
 .run_log_wrapper {
@@ -40,5 +42,5 @@ li.current {
 }
 
 li.last_current {
-  color: #006fff;
+  color: var(--c-highlight);
 }
