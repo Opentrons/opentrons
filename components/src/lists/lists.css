@@ -73,9 +73,12 @@
   margin: 0;
   padding: var(--list-padding-small);
 
-  &:hover,
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
+
   &.active {
-    background-color: var(--c-bg-selected-light);
+    background-color: var(--c-bg-selected);
   }
 }
 
