@@ -68,24 +68,18 @@ class Pipette:
     mount : str
         The axis of the pipette's actuator on the Opentrons robot
         ('left' or 'right')
-    name : str
-        Assigns the pipette a unique name for saving it's calibrations
-    channels : int
-        The number of channels on this pipette (Default: `1`)
-    min_volume : int
-        The smallest recommended uL volume for this pipette (Default: `0`)
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
         (Default: `fixed-trash`)
     tip_racks : list
         A list of Containers for this Pipette to track tips when calling
         :meth:`pick_up_tip` (Default: [])
-    aspirate_speed : int
-        The speed (in mm/minute) the plunger will move while aspirating
-        (Default: 300)
-    dispense_speed : int
-        The speed (in mm/minute) the plunger will move while dispensing
-        (Default: 500)
+    aspirate__flow_rate : int
+        The speed (in ul/sec) the plunger will move while aspirating
+        (Default: See Model Type)
+    dispense_flow_rate : int
+        The speed (in ul/sec) the plunger will move while dispensing
+        (Default: See Model Type)
 
     Returns
     -------
@@ -94,15 +88,11 @@ class Pipette:
 
     Examples
     --------
-    >>> from opentrons import instruments, containers, robot
-    >>> robot.reset() # doctest: +ELLIPSIS
-    <opentrons.robot.robot.Robot object at ...>
-    >>> p1000 = instruments.Pipette(name='p1000', mount='left')
-    >>> tip_rack_200ul = containers.load('tiprack-200ul', 'B1')
-    >>> p200 = instruments.Pipette(
-    ...     name='p200',
-    ...     mount='right',
-    ...     tip_racks=[tip_rack_200ul])
+    >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+    >>> robot.reset() # doctest: +SKIP
+    >>> tip_rack_300ul = labware.load('GEB-tiprack-300ul', '1') # doctest: +SKIP
+    >>> p300 = instruments.P300_Single(mount='left',
+    ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """
 
     def __init__(
@@ -364,27 +354,19 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'A1')
-        >>> p200 = instruments.Pipette(
-        ...     name='p200', mount='left')
-
-        >>> # aspirate 50uL from a Well
-        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # aspirate 50uL from the center of a well
-        >>> p200.aspirate(50, plate[1].bottom()) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '2') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
+        >>> p300.pick_up_tip() # doctest: +SKIP
+        # aspirate 50uL from a Well
+        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
+        # aspirate 50uL from the center of a well
+        >>> p300.aspirate(50, plate[1].bottom()) # doctest: +SKIP
         >>> # aspirate 20uL in place, twice as fast
-        >>> p200.aspirate(20, rate=2.0) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
+        >>> p300.aspirate(20, rate=2.0) # doctest: +SKIP
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
-        >>> p200.aspirate(plate[2]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot aspirate without a tip attached.")
@@ -466,28 +448,21 @@ class Pipette:
         Examples
         --------
         ..
-        >>> plate = containers.load('96-flat', 'C1')
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> # fill the pipette with liquid (200uL)
-        >>> p200.aspirate(plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # dispense 50uL to a Well
-        >>> p200.dispense(50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # dispense 50uL to the center of a well
-        >>> relative_vector = plate[1].center()
-        >>> p200.dispense(50, (plate[1], relative_vector)) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # dispense 20uL in place, at half the speed
-        >>> p200.dispense(20, rate=0.5) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # dispense the pipette's remaining volume (80uL) to a Well
-        >>> p200.dispense(plate[2]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        # fill the pipette with liquid (200uL)
+        >>> p300.aspirate(plate[0]) # doctest: +SKIP
+        # dispense 50uL to a Well
+        >>> p300.dispense(50, plate[0]) # doctest: +SKIP
+        # dispense 50uL to the center of a well
+        >>> relative_vector = plate[1].center() # doctest: +SKIP
+        >>> p300.dispense(50, (plate[1], relative_vector)) # doctest: +SKIP
+        # dispense 20uL in place, at half the speed
+        >>> p300.dispense(20, rate=0.5) # doctest: +SKIP
+        # dispense the pipette's remaining volume (80uL) to a Well
+        >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot dispense without a tip attached.")
@@ -626,17 +601,14 @@ class Pipette:
         Examples
         --------
         ..
-        >>> plate = containers.load('96-flat', 'D1')
-
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-
-        >>> # mix 50uL in a Well, three times
-        >>> p200.mix(3, 50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-
-        >>> # mix 3x with the pipette's max volume, from current position
-        >>> p200.mix(3) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '4') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        # mix 50uL in a Well, three times
+        >>> p300.mix(3, 50, plate[0]) # doctest: +SKIP
+        # mix 3x with the pipette's max volume, from current position
+        >>> p300.mix(3) # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot mix without a tip attached.")
@@ -681,9 +653,10 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.aspirate(50).dispense().blow_out() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot 'blow out' without a tip attached.")
@@ -731,13 +704,12 @@ class Pipette:
         Examples
         --------
         ..
-        >>> plate = containers.load('96-flat', 'B2')
-
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.dispense(plate[1]).touch_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '8') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
+        >>> p300.dispense(plate[1]).touch_tip() # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot touch tip without a tip attached.")
@@ -803,11 +775,11 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.air_gap(50) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
+        >>> p300.air_gap(50) # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot perform air_gap without a tip attached.")
@@ -844,19 +816,15 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'E1', share=True)
-        >>> p200 = instruments.Pipette(name='p200', mount='left',
-        ...     tip_racks=[tiprack])
-        >>> p200.pick_up_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.aspirate(50, plate[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.dispense(plate[1]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.return_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left',
+        ...     tip_racks=[tiprack, tiprack2]) # doctest: +SKIP
+        >>> p300.pick_up_tip() # doctest: +SKIP
+        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
+        >>> p300.dispense(plate[1]) # doctest: +SKIP
+        >>> p300.return_tip() # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot return tip without tip attached.")
@@ -902,20 +870,16 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'A2')
-        >>> p200 = instruments.Pipette(
-        ... name='p200', mount='left', tip_racks=[tiprack])
-        >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.return_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> # `pick_up_tip` will automatically go to tiprack[1]
-        >>> p200.pick_up_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.return_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left',
+        ...     tip_racks=[tiprack]) # doctest: +SKIP
+        >>> p300.pick_up_tip(tiprack[0]) # doctest: +SKIP
+        >>> p300.return_tip() # doctest: +SKIP
+        # `pick_up_tip` will automatically go to tiprack[1]
+        >>> p300.pick_up_tip() # doctest: +SKIP
+        >>> p300.return_tip() # doctest: +SKIP
         """
         if self.tip_attached:
             log.warning("There is already a tip attached to this pipette.")
@@ -997,22 +961,17 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> tiprack = containers.load('tiprack-200ul', 'C2')
-        >>> trash = containers.load('point', 'A3')
-        >>> p200 = instruments.Pipette(
-        ... name='p200', mount='left', trash_container=trash)
-        >>> p200.pick_up_tip(tiprack[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> # drops the tip in the trash
-        >>> p200.drop_tip() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> p200.pick_up_tip(tiprack[1]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        >>> # drops the tip back at its tip rack
-        >>> p200.drop_tip(tiprack[1]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> tiprack = labware.load('tiprack-200ul', 'C2') # doctest: +SKIP
+        >>> trash = labware.load('point', 'A3') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.pick_up_tip(tiprack[0]) # doctest: +SKIP
+        # drops the tip in the fixed trash
+        >>> p300.drop_tip() # doctest: +SKIP
+        >>> p300.pick_up_tip(tiprack[1]) # doctest: +SKIP
+        # drops the tip back at its tip rack
+        >>> p300.drop_tip(tiprack[1]) # doctest: +SKIP
         """
         if not self.tip_attached:
             log.warning("Cannot drop tip without a tip attached.")
@@ -1122,9 +1081,10 @@ class Pipette:
         Examples
         --------
         ..
-        >>> p200 = instruments.Pipette(name='p200', mount='right')
-        >>> p200.home() # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
+        >>> p300.home() # doctest: +SKIP
         """
         @commands.publish.both(command=commands.home)
         def _home(mount):
@@ -1153,12 +1113,11 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'B3')
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.distribute(50, plate[1], plate.cols[0]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.distribute(50, plate[1], plate.cols[0]) # doctest: +SKIP
         """
         # Note: currently it varies whether the pipette should have a tip on
         # or not depending on the parameters for this call, so we cannot
@@ -1186,12 +1145,11 @@ class Pipette:
         Examples
         --------
         ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'A3')
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.consolidate(50, plate.cols[0], plate[1]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', 'A3') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
+        >>> p300.consolidate(50, plate.cols[0], plate[1]) # doctest: +SKIP
         """
 
         kwargs['mode'] = 'consolidate'
@@ -1285,13 +1243,12 @@ class Pipette:
 
         Examples
         --------
-        ..
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> plate = containers.load('96-flat', 'D1')
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> p200.transfer(50, plate[0], plate[1]) # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
+        ...
+        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> plate = labware.load('96-flat', '5') # doctest: +SKIP
+        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
+        >>> p300.transfer(50, plate[0], plate[1]) # doctest: +SKIP
         """
         # Note: currently it varies whether the pipette should have a tip on
         # or not depending on the parameters for this call, so we cannot
@@ -1339,43 +1296,6 @@ class Pipette:
 
         return self
 
-    def calibrate(self, position):
-        """
-        Calibrate a saved plunger position to the robot's current position
-
-        Notes
-        -----
-        This will only work if the API is connected to a robot
-
-        Parameters
-        ----------
-
-        position : str
-            Either "top", "bottom", "blow_out", or "drop_tip"
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> robot = Robot()
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> robot.move_plunger(**{'a': 10})
-        >>> # save plunger 'top' to coordinate 10
-        >>> p200.calibrate('top') # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        """
-        current_position = self.robot._driver.get_plunger_positions()
-        current_position = current_position['target'][self.axis]
-        kwargs = {}
-        kwargs[position] = current_position
-        self.calibrate_plunger(**kwargs)
-
-        return self
-
     def calibrate_plunger(
             self,
             top=None,
@@ -1413,32 +1333,6 @@ class Pipette:
             self.plunger_positions['blow_out'] = blow_out
         if drop_tip is not None:
             self.plunger_positions['drop_tip'] = drop_tip
-
-        return self
-
-    def set_max_volume(self, max_volume):
-        """
-        Set this pipette's maximum volume, equal to the number of
-        microliters drawn when aspirating with the plunger's full range
-
-        Parameters
-        ----------
-        max_volume: int or float
-            The maximum number of microliters this :any:`Pipette` can hold.
-            Must be calculated and set after plunger calibrations to ensure
-            accuracy
-        """
-        # self.max_volume = max_volume
-
-        # if self.max_volume <= self.min_volume:
-        #     raise RuntimeError(
-        #         'Pipette max volume is less than '
-        #         'min volume ({0} < {1})'.format(
-        #             self.max_volume, self.min_volume))
-
-        warnings.warn(
-            "'max_volume' is deprecated, use `ul_per_mm` in constructor"
-        )
 
         return self
 
