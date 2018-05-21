@@ -75,7 +75,7 @@ function Steps (props: ChangePipetteProps) {
   } else {
     stepOne = (
       <p>
-        Attach pipette to carriage, <strong>starting with screw 1</strong>.
+        Attach pipette to mount, <strong>starting with screw 1</strong>.
       </p>
     )
     stepTwo = 'Connect the pipette to robot by pushing in the white connector tab.'

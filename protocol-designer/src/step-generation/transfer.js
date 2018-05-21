@@ -1,9 +1,9 @@
 // @flow
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
-import mix from './mix'
 import aspirate from './aspirate'
 import dispense from './dispense'
+import {mixUtil} from './mix'
 import replaceTip from './replaceTip'
 import {reduceCommandCreators} from './utils'
 import touchTip from './touchTip'
@@ -75,11 +75,11 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               : []
 
           const preWetTipCommands = (data.preWetTip && chunkIdx === 0)
-            ? mix(data.pipette, data.sourceLabware, sourceWell, Math.max(subTransferVol), 1)
+            ? mixUtil(data.pipette, data.sourceLabware, sourceWell, Math.max(subTransferVol), 1)
             : []
 
           const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
-            ? mix(
+            ? mixUtil(
               data.pipette,
               data.sourceLabware,
               sourceWell,
@@ -105,7 +105,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             : []
 
           const mixInDestinationCommands = (data.mixInDestination)
-            ? mix(
+            ? mixUtil(
               data.pipette,
               data.destLabware,
               destWell,

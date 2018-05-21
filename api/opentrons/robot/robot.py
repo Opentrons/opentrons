@@ -16,6 +16,7 @@ from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
+from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
 
 log = logging.getLogger(__name__)
 
@@ -179,18 +180,6 @@ class Robot(object):
         * :meth:`connect` to the robot and call :func:`run` it on a real robot.
 
     See :class:`Pipette` for the list of supported instructions.
-
-    Examples
-    --------
-    >>> from opentrons import robot, instruments, containers
-    >>> robot.reset() # doctest: +ELLIPSIS
-    <opentrons.robot.robot.Robot object at ...>
-    >>> plate = containers.load('96-flat', 'A1', 'plate')
-    >>> p200 = instruments.Pipette(axis='b')
-    >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
-    <opentrons.instruments.pipette.Pipette object at ...>
-    >>> robot.commands()
-    ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
     def __init__(self, config=None):
@@ -209,6 +198,7 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
+        self.model_by_mount = {'left': None, 'right': None}
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -243,6 +233,11 @@ class Robot(object):
             * Command queue
             * Runtime warnings
 
+        Examples
+        --------
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
         """
         self._actuators = {
             'left': {
@@ -298,6 +293,10 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         return self
+
+    def cache_instrument_models(self):
+        for mount in self.model_by_mount.keys():
+            self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
 
     def turn_on_button_light(self):
         gpio.set_light_indicator_status('idle')
@@ -380,8 +379,8 @@ class Robot(object):
 
         ::
 
-            from opentrons.instruments.pipette import Pipette
-            p200 = Pipette(mount='left')
+            from opentrons import instruments
+            m300 = instruments.P300_Multi(mount='left')
 
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
@@ -391,6 +390,7 @@ class Robot(object):
             raise RuntimeError('Instrument {0} already on {1} mount'.format(
                 prev_instr.name, mount))
         self._instruments[mount] = instrument
+        self.cache_instrument_models()
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
 
@@ -412,7 +412,7 @@ class Robot(object):
             mz
         )
         # if it's the left mount, apply the offset from right pipette
-        if mount is 'left':
+        if mount == 'left':
             _x, _y, _z = (
                _x + self.config.mount_offset[0],
                _y + self.config.mount_offset[1],
@@ -429,6 +429,7 @@ class Robot(object):
         instrument = self._instruments.pop(mount, None)
         if instrument:
             self.poses = pose_tracker.remove(self.poses, instrument)
+        self.cache_instrument_models()
 
     def add_warning(self, warning_msg):
         """
@@ -447,29 +448,6 @@ class Robot(object):
         or :func:`simulate`.
         """
         return list(self._runtime_warnings)
-
-    # TODO: remove because Magbead will be controlled by RPI
-    def get_mosfet(self, mosfet_index):
-        """
-        Get MOSFET for a MagBead (URL).
-
-        Parameters
-        ----------
-        mosfet_index : int
-            Number of a MOSFET on MagBead.
-
-        Returns
-        -------
-        Instance of :class:`InstrumentMosfet`.
-        """
-        instr_type = 'mosfet'
-        key = (instr_type, mosfet_index)
-
-        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
-        if not motor_obj:
-            motor_obj = InstrumentMosfet(self, mosfet_index)
-            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
-        return motor_obj
 
     def get_motor(self, axis):
         """
@@ -504,6 +482,17 @@ class Robot(object):
         Returns
         -------
         ``True`` for success, ``False`` for failure.
+
+        Note
+        ----
+        If you wish to connect to the robot without using the OT App, you will
+        need to use this function.
+
+        Examples
+        --------
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.connect() # doctest: +SKIP
         """
 
         self._driver.connect(port=port)
@@ -534,12 +523,6 @@ class Robot(object):
         a robot might accumulate precision
         error and it is recommended to home it. In this scenario, add
         ``robot.home('xyzab')`` into your script.
-
-        Examples
-        --------
-        >>> from opentrons import robot
-        >>> robot.connect()
-        >>> robot.home()
         """
 
         # Home gantry first to avoid colliding with labware
@@ -577,10 +560,15 @@ class Robot(object):
 
         Examples
         ---------
-        >>> from opentrons import robot
-        >>> robot.head_speed(300)  # default axes speed is 300 mm/sec
-        >>> robot.head_speed(combined_speed=400) # default speed is 400 mm/sec
-        >>> robot.head_speed(x=400, y=200) # sets max speeds of X and Y
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> robot.head_speed(300) # doctest: +SKIP
+        #  default axes speed is 300 mm/sec
+        >>> robot.head_speed(combined_speed=400) # doctest: +SKIP
+        #  default speed is 400 mm/sec
+        >>> robot.head_speed(x=400, y=200) # doctest: +SKIP
+        # sets max speeds of X and Y
         """
         user_set_speeds = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
         axis_max_speeds = {
@@ -622,17 +610,6 @@ class Robot(object):
             avoiding obstacles.
 
             ``direct`` : move to the point in a straight line.
-
-        Examples
-        --------
-        >>> from opentrons import robot
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> robot.connect('Virtual Smoothie')
-        >>> robot.home()
-        >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> robot.move_to(plate[0])
-        >>> robot.move_to(plate[0].top())
         """
 
         placeable, coordinates = containers.unpack_location(location)
@@ -640,6 +617,15 @@ class Robot(object):
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
+
+        if 'trough' in repr(placeable):
+            # Move the pipette so that a multi-channel pipette is centered in
+            # the trough well to prevent crashing into the side, which would
+            # happen if you send the "A1" tip to the center of the well. See
+            # `robot.calibrate_container_with_instrument` for corresponding
+            # offset and comment.
+            offset = offset + (0, Y_OFFSET_MULTI, 0)
+
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -925,9 +911,9 @@ class Robot(object):
         """
         left_data = {
                 'mount_axis': 'z',
-                'plunger_axis': 'b'
+                'plunger_axis': 'b',
+                'model': self.model_by_mount['left'],
             }
-        left_data.update(self._driver.read_pipette_model('left'))
         left_model = left_data.get('model')
         if left_model:
             tip_length = pipette_config.configs[left_model].tip_length
@@ -935,9 +921,9 @@ class Robot(object):
 
         right_data = {
                 'mount_axis': 'a',
-                'plunger_axis': 'c'
+                'plunger_axis': 'c',
+                'model': self.model_by_mount['right']
             }
-        right_data.update(self._driver.read_pipette_model('right'))
         right_model = right_data.get('model')
         if right_model:
             tip_length = pipette_config.configs[right_model].tip_length
@@ -1016,6 +1002,20 @@ class Robot(object):
             delta_x = delta[0]
             delta_y = delta[1]
             delta_z = delta[2]
+
+        if 'trough' in container.get_type():
+            # Rather than calibrating troughs to the center of the well, we
+            # calibrate such that a multi-channel would be centered in the
+            # well. We don't differentiate between single- and multi-channel
+            # pipettes here, and we track the tip of a multi-channel pipette
+            # that would go into well A1 of an 8xN plate rather than the axial
+            # center, but the axial center of a well is what we track for
+            # calibration, so we add Y_OFFSET_MULTI in the calibration `move`
+            # command, and then back that value off of the pipette position
+            # here (Y_OFFSET_MULTI is the y-distance from the axial center of
+            # the pipette to the A1 tip).
+            delta_y = delta_y - Y_OFFSET_MULTI
+
         self.poses = calib.calibrate_container_with_delta(
             self.poses,
             container,

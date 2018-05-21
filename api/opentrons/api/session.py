@@ -3,10 +3,12 @@ import logging
 from copy import copy
 from time import time
 from functools import reduce
+import json
 
 from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
 from opentrons.commands import tree, types
+from opentrons.protocols import execute_protocol
 from opentrons import robot
 
 from .models import Container, Instrument
@@ -46,6 +48,8 @@ class Session(object):
 
         self.instruments = None
         self.containers = None
+
+        self.startTime = None
 
         self.refresh()
 
@@ -116,7 +120,10 @@ class Session(object):
             # TODO (artyom, 20171005): this will go away
             # once robot / driver simulation flow is fixed
             robot._driver.disconnect()
-            exec(self._protocol, {})
+            if self._is_json_protocol:
+                execute_protocol(self._protocol)
+            else:
+                exec(self._protocol, {})
         finally:
             robot._driver.connect()
             unsubscribe()
@@ -133,9 +140,15 @@ class Session(object):
 
     def refresh(self):
         self._reset()
+        self._is_json_protocol = self.name.endswith('.json')
 
-        parsed = ast.parse(self.protocol_text)
-        self._protocol = compile(parsed, filename=self.name, mode='exec')
+        if self._is_json_protocol:
+            # TODO Ian 2018-05-16 use protocol JSON schema to raise
+            # warning/error here if the protocol_text doesn't follow the schema
+            self._protocol = json.loads(self.protocol_text)
+        else:
+            parsed = ast.parse(self.protocol_text)
+            self._protocol = compile(parsed, filename=self.name, mode='exec')
         commands = self._simulate()
         self.commands = tree.from_list(commands)
 
@@ -174,13 +187,18 @@ class Session(object):
         self._reset()
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
+        self.startTime = now()
         self.set_state('running')
 
         try:
             self.resume()
             robot.home()
-            exec(self._protocol, {})
+            if self._is_json_protocol:
+                execute_protocol(self._protocol)
+            else:
+                exec(self._protocol, {})
         except Exception as e:
+            log.exception("Exception during run:")
             self.error_append(e)
             raise e
         finally:
@@ -209,37 +227,41 @@ class Session(object):
 
     def log_append(self):
         self.command_log.update({
-            len(self.command_log): {
-                'timestamp': int(time() * 1000)
-            }
-        })
+            len(self.command_log): now()})
         self._on_state_changed()
 
     def error_append(self, error):
         self.errors.append(
             {
-                'timestamp': int(time() * 1000),
+                'timestamp': now(),
                 'error': error
             }
         )
-        self._on_state_changed()
+        # self._on_state_changed()
 
     def _reset(self):
         robot.reset()
         self.clear_logs()
 
-    # TODO (artyom, 20171003): along with calibration, consider extracting this
-    # into abstract base class or find any other way to keep notifications
-    # consistent across all managers
     def _snapshot(self):
+        if self.state == 'loaded':
+            payload = copy(self)
+        else:
+            if self.command_log.keys():
+                idx = sorted(self.command_log.keys())[-1]
+                timestamp = self.command_log[idx]
+                last_command = {'id': idx, 'handledAt': timestamp}
+            else:
+                last_command = None
+
+            payload = {
+                'state': self.state,
+                'startTime': self.startTime,
+                'lastCommand': last_command
+            }
         return {
             'topic': Session.TOPIC,
-            'name': 'state',
-            # we are making a copy to avoid the scenario
-            # when object state is updated elsewhere before
-            # it is serialized and transferred
-            'payload': copy(self)
-
+            'payload': payload
         }
 
     def _on_state_changed(self):
@@ -260,6 +282,10 @@ def _dedupe(iterable):
         if item not in acc:
             acc.add(item)
             yield item
+
+
+def now():
+    return int(time() * 1000)
 
 
 def _get_labware(command):

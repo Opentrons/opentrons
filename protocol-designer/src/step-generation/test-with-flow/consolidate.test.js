@@ -6,12 +6,29 @@ import {
   getTipColumn,
   getTiprackTipstate,
   commandCreatorNoErrors,
-  commandCreatorHasErrors
+  commandCreatorHasErrors,
+  commandFixtures as cmd
 } from './fixtures'
 import _consolidate from '../consolidate'
 
 const consolidate = commandCreatorNoErrors(_consolidate)
 const consolidateWithErrors = commandCreatorHasErrors(_consolidate)
+
+// shorthand
+const dispense = (well, volume) =>
+  cmd.dispense(well, volume, {labware: 'destPlateId'})
+
+function tripleMix (well: string, volume: number, labware: string) {
+  const params = {labware}
+  return [
+    cmd.aspirate(well, volume, params),
+    cmd.dispense(well, volume, params),
+    cmd.aspirate(well, volume, params),
+    cmd.dispense(well, volume, params),
+    cmd.aspirate(well, volume, params),
+    cmd.dispense(well, volume, params)
+  ]
+}
 
 const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
@@ -99,37 +116,15 @@ describe('consolidate single-channel', () => {
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTip)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 50),
+      cmd.aspirate('A2', 50),
+      dispense('B1', 100)
     ])
   })
 
   test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
+    // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
     const data = {
       ...baseData,
       volume: 150,
@@ -139,54 +134,14 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+      dispense('B1', 300),
+
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+      dispense('B1', 300)
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -202,66 +157,16 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'drop-tip',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+      dispense('B1', 300),
+      cmd.dropTip('A1'),
+
+      cmd.pickUpTip('B1'),
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+      dispense('B1', 300)
     ])
 
     expect(result.robotState).toMatchObject({
@@ -289,54 +194,14 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+      dispense('B1', 300),
+
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+      dispense('B1', 300)
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -352,48 +217,13 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotStatePickedUpOneTip)
 
     expect(result.commands).toEqual([
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+      dispense('B1', 300),
+
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+      dispense('B1', 300)
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -410,68 +240,16 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150, // disposalVolume included
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 200,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150, // disposalVolume included
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 200,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 150), // disposalVolume included
+      cmd.aspirate('A2', 100),
+      dispense('B1', 200),
+      cmd.blowout(), // Trash the disposal volume
+
+      cmd.aspirate('A3', 150), // disposalVolume included
+      cmd.aspirate('A4', 100),
+      dispense('B1', 200),
+      cmd.blowout() // Trash the disposal volume
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -487,142 +265,19 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      // done mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      // done mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+
+      ...tripleMix('A1', 50, 'sourcePlateId'),
+
+      cmd.aspirate('A1', 100),
+      cmd.aspirate('A2', 100),
+      cmd.aspirate('A3', 100),
+      dispense('B1', 300),
+
+      ...tripleMix('A4', 50, 'sourcePlateId'),
+
+      cmd.aspirate('A4', 100),
+      dispense('B1', 100)
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -639,156 +294,36 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
+      cmd.pickUpTip('A1'),
       // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
+      cmd.aspirate('A1', 50),
+      cmd.dispense('A1', 50), // sourceLabwareId
+      cmd.aspirate('A1', 50),
+      cmd.dispense('A1', 50), // sourceLabwareId
+      cmd.aspirate('A1', 50),
+      cmd.dispense('A1', 50), // sourceLabwareId
       // done mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 155, // with disposal vol
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 125,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 250,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
+      cmd.aspirate('A1', 155), // with disposal vol
+      cmd.aspirate('A2', 125),
+      dispense('B1', 250),
+
+      // Trash the disposal volume
+      cmd.blowout(),
+
       // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
+      cmd.aspirate('A3', 50),
+      cmd.dispense('A3', 50), // sourceLabwareId
+      cmd.aspirate('A3', 50),
+      cmd.dispense('A3', 50), // sourceLabwareId
+      cmd.aspirate('A3', 50),
+      cmd.dispense('A3', 50), // sourceLabwareId
       // done mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 155, // with disposal volume
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 125,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 250,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      }
+
+      cmd.aspirate('A3', 155), // with disposal volume
+      cmd.aspirate('A4', 125),
+      dispense('B1', 250),
+      // Trash the disposal volume
+      cmd.blowout()
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -804,142 +339,18 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // done mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // Start mix 2
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 53,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
-      // done mix 2
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 100),
+      cmd.aspirate('A2', 100),
+      cmd.aspirate('A3', 100),
+      dispense('B1', 300),
+
+      ...tripleMix('B1', 53, 'destPlateId'),
+
+      cmd.aspirate('A4', 100),
+      dispense('B1', 100),
+
+      ...tripleMix('B1', 53, 'destPlateId')
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -955,154 +366,21 @@ describe('consolidate single-channel', () => {
 
     const result = consolidate(data)(robotInitialState)
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // Start mix
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // done mix
-      {
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // Start mix 2
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 54,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // done mix 2
-      {
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 100),
+      cmd.aspirate('A2', 100),
+      cmd.aspirate('A3', 100),
+      dispense('B1', 300),
+
+      ...tripleMix('B1', 54, 'destPlateId'),
+
+      cmd.blowout(),
+      cmd.aspirate('A4', 100),
+      dispense('B1', 100),
+
+      ...tripleMix('B1', 54, 'destPlateId'),
+
+      cmd.blowout()
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -1119,155 +397,24 @@ describe('consolidate single-channel', () => {
 
     const result = consolidate(data)(robotInitialState)
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 130, // includes disposal volume
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 200,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
-      // Now, mix in the dest well
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      // done mixing
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 130, // includes disposal volume
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 100,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 200,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        // Trash the disposal volume
-        command: 'blowout',
-        pipette: 'p300SingleId',
-        labware: 'trashId',
-        well: 'A1'
-      },
-      // Now, mix in the dest well
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 52,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+      cmd.aspirate('A1', 130), // includes disposal volume
+      cmd.aspirate('A2', 100),
+      dispense('B1', 200),
+      // Trash the disposal volume
+      cmd.blowout(),
+
+      // Mix in the dest well
+      ...tripleMix('B1', 52, 'destPlateId'),
+
+      cmd.aspirate('A3', 130), // includes disposal volume
+      cmd.aspirate('A4', 100),
+      dispense('B1', 200),
+      // Trash the disposal volume
+      cmd.blowout(),
+
+      // Mix in the dest well
+      ...tripleMix('B1', 52, 'destPlateId')
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -1286,86 +433,25 @@ describe('consolidate single-channel', () => {
 
     const result = consolidate(data)(robotInitialState)
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
+      cmd.pickUpTip('A1'),
+
       // pre-wet tip
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: preWetVol,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: preWetVol,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
+      cmd.aspirate('A1', preWetVol),
+      cmd.dispense('A1', preWetVol),
       // done pre-wet
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
+
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+      dispense('B1', 300),
+
       // pre-wet tip, now with A3
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: preWetVol,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: preWetVol,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
+      cmd.aspirate('A3', preWetVol),
+      cmd.dispense('A3', preWetVol),
       // done pre-wet
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+      dispense('B1', 300)
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -1381,78 +467,23 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+
+      cmd.aspirate('A1', 150),
+      cmd.touchTip('A1'),
+
+      cmd.aspirate('A2', 150),
+      cmd.touchTip('A2'),
+
+      dispense('B1', 300),
+
+      cmd.aspirate('A3', 150),
+      cmd.touchTip('A3'),
+
+      cmd.aspirate('A4', 150),
+      cmd.touchTip('A4'),
+
+      dispense('B1', 300)
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -1468,66 +499,19 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300SingleId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300SingleId',
-        volume: 150,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300SingleId',
-        volume: 300,
-        labware: 'destPlateId',
-        well: 'B1'
-      },
-      {
-        command: 'touch-tip',
-        pipette: 'p300SingleId',
-        labware: 'destPlateId',
-        well: 'B1'
-      }
+      cmd.pickUpTip('A1'),
+
+      cmd.aspirate('A1', 150),
+      cmd.aspirate('A2', 150),
+
+      dispense('B1', 300),
+      cmd.touchTip('B1', {labware: 'destPlateId'}),
+
+      cmd.aspirate('A3', 150),
+      cmd.aspirate('A4', 150),
+
+      dispense('B1', 300),
+      cmd.touchTip('B1', {labware: 'destPlateId'})
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -1552,6 +536,14 @@ describe('consolidate single-channel', () => {
 })
 
 describe('consolidate multi-channel', () => {
+  const multiParams = {pipette: 'p300MultiId'}
+  const multiDispense = (well: string, volume: number) =>
+    cmd.dispense(
+      well,
+      volume,
+      {labware: 'destPlateId', pipette: 'p300MultiId'}
+    )
+
   const baseData = {
     stepType: 'consolidate',
     name: 'Consolidate Test',
@@ -1585,54 +577,14 @@ describe('consolidate multi-channel', () => {
     const result = consolidate(data)(robotInitialState)
 
     expect(result.commands).toEqual([
-      {
-        command: 'pick-up-tip',
-        pipette: 'p300MultiId',
-        labware: 'tiprack1Id',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300MultiId',
-        volume: 140,
-        labware: 'sourcePlateId',
-        well: 'A1'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300MultiId',
-        volume: 140,
-        labware: 'sourcePlateId',
-        well: 'A2'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300MultiId',
-        volume: 280,
-        labware: 'destPlateId',
-        well: 'A12'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300MultiId',
-        volume: 140,
-        labware: 'sourcePlateId',
-        well: 'A3'
-      },
-      {
-        command: 'aspirate',
-        pipette: 'p300MultiId',
-        volume: 140,
-        labware: 'sourcePlateId',
-        well: 'A4'
-      },
-      {
-        command: 'dispense',
-        pipette: 'p300MultiId',
-        volume: 280,
-        labware: 'destPlateId',
-        well: 'A12'
-      }
+      cmd.pickUpTip('A1', multiParams),
+      cmd.aspirate('A1', 140, multiParams),
+      cmd.aspirate('A2', 140, multiParams),
+      multiDispense('A12', 280),
+
+      cmd.aspirate('A3', 140, multiParams),
+      cmd.aspirate('A4', 140, multiParams),
+      multiDispense('A12', 280)
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpMultiTipsNoLiquidState)
   })

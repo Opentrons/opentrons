@@ -1,6 +1,9 @@
 // tests for the api client
+import functions from 'lodash/functions'
+import omit from 'lodash/omit'
 import {push} from 'react-router-redux'
 
+import {mockResolvedValue, mockRejectedValue} from '../../../__util__/mock-promise'
 import {delay} from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
@@ -53,7 +56,7 @@ describe('api client', () => {
     }
 
     dispatch = jest.fn()
-    RpcClient.mockReturnValue(Promise.resolve(rpcClient))
+    mockResolvedValue(RpcClient, rpcClient)
 
     const _receive = client(dispatch)
 
@@ -80,7 +83,20 @@ describe('api client', () => {
   }
 
   const sendConnect = () => sendToClient(STATE, actions.connect(ROBOT_NAME))
+
   const sendDisconnect = () => sendToClient(STATE, actions.disconnect())
+
+  const sendNotification = (topic, payload) => {
+    expect(rpcClient.on)
+      .toHaveBeenCalledWith('notification', expect.any(Function))
+
+    const handler = rpcClient.on.mock.calls.find((args) => {
+      return args[0] === 'notification'
+    })[1]
+
+    // only send properties, not methods
+    handler({topic, payload: omit(payload, functions(payload))})
+  }
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
@@ -99,7 +115,7 @@ describe('api client', () => {
       const error = new Error('AHH get_root')
       const expectedResponse = actions.connectResponse(error)
 
-      RpcClient.mockReturnValueOnce(Promise.reject(error))
+      mockRejectedValue(RpcClient, error)
 
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
@@ -140,8 +156,103 @@ describe('api client', () => {
   })
 
   describe('running', () => {
+    test('calls session.run and dispatches RUN_RESPONSE success', () => {
+      const expected = actions.runResponse()
+
+      mockResolvedValue(session.run)
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.run()))
+        .then(() => {
+          expect(session.run).toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expected)
+        })
+    })
+
+    test('calls session.run and dispatches RUN_RESPONSE failure', () => {
+      const expected = actions.runResponse(new Error('AH'))
+
+      mockRejectedValue(session.run, new Error('AH'))
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.run()))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('calls session.pause and dispatches PAUSE_RESPONSE success', () => {
+      const expected = actions.pauseResponse()
+
+      mockResolvedValue(session.pause)
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.pause()))
+        .then(() => {
+          expect(session.pause).toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expected)
+        })
+    })
+
+    test('calls session.stop and dispatches PAUSE_RESPONSE failure', () => {
+      const expected = actions.pauseResponse(new Error('AH'))
+
+      mockRejectedValue(session.pause, new Error('AH'))
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.pause()))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('calls session.resume and dispatches RESUME_RESPONSE success', () => {
+      const expected = actions.resumeResponse()
+
+      mockResolvedValue(session.resume)
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.resume()))
+        .then(() => {
+          expect(session.resume).toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expected)
+        })
+    })
+
+    test('calls session.resume and dispatches RESUME_RESPONSE failure', () => {
+      const expected = actions.resumeResponse(new Error('AH'))
+
+      mockRejectedValue(session.resume, new Error('AH'))
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.resume()))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('calls session.resume + stop and dispatches CANCEL_RESPONSE', () => {
+      const expected = actions.cancelResponse()
+
+      mockResolvedValue(session.resume)
+      mockResolvedValue(session.stop)
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.cancel()))
+        .then(() => {
+          expect(session.resume).toHaveBeenCalled()
+          expect(session.stop).toHaveBeenCalled()
+          expect(dispatch).toHaveBeenCalledWith(expected)
+        })
+    })
+
+    test('calls session.stop and dispatches CANCEL_RESPONSE failure', () => {
+      const expected = actions.cancelResponse(new Error('AH'))
+
+      mockResolvedValue(session.resume)
+      mockRejectedValue(session.stop, new Error('AH'))
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.cancel()))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
     test('start a timer when the run starts', () => {
-      session.run.mockReturnValue(Promise.resolve())
+      mockResolvedValue(session.run)
 
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
@@ -150,20 +261,32 @@ describe('api client', () => {
   })
 
   describe('session responses', () => {
-    test('dispatches sessionResponse on connect', () => {
-      const expected = actions.sessionResponse(null, {
+    let expectedInitial
+
+    beforeEach(() => {
+      expectedInitial = actions.sessionResponse(null, {
         name: session.name,
         state: session.state,
-        errors: [],
         protocolText: session.protocol_text,
         protocolCommands: [],
         protocolCommandsById: {},
         instrumentsByMount: {},
         labwareBySlot: {}
       })
+    })
 
+    test('dispatches sessionResponse on connect', () => {
       return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    test('dispatches sessionResponse on full session notification', () => {
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
     })
 
     test('handles connnect without session', () => {
@@ -205,9 +328,9 @@ describe('api client', () => {
         {id: 4, description: 'e', children: []}
       ]
       session.command_log = {
-        0: {timestamp: 0},
-        1: {timestamp: 1},
-        2: {timestamp: 2}
+        0: 0,
+        1: 1,
+        2: 2
       }
 
       return sendConnect()
@@ -272,6 +395,15 @@ describe('api client', () => {
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
+
+    test('sends SESSION_UPDATE if session notification has lastCommand', () => {
+      const update = {state: 'running', startTime: 1, lastCommand: null}
+      const expected = actions.sessionUpdate(update)
+
+      return sendConnect()
+        .then(() => sendNotification('session', update))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
   })
 
   describe('calibration', () => {
@@ -292,8 +424,18 @@ describe('api client', () => {
             },
             labwareBySlot: {
               1: {_id: 'lab-1', type: '96-flat'},
-              5: {_id: 'lab-2', type: 'tiprack-200ul', isTiprack: true},
-              9: {_id: 'lab-3', type: 'tiprack-200ul', isTiprack: true}
+              5: {
+                _id: 'lab-2',
+                type: 'tiprack-200ul',
+                isTiprack: true,
+                calibratorMount: 'left'
+              },
+              9: {
+                _id: 'lab-3',
+                type: 'tiprack-200ul',
+                isTiprack: true,
+                calibratorMount: 'right'
+              }
             }
           }
         }
@@ -304,7 +446,7 @@ describe('api client', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse()
 
-      calibrationManager.move_to_front.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.move_to_front)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -319,8 +461,7 @@ describe('api client', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse(new Error('AH'))
 
-      calibrationManager.move_to_front
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.move_to_front, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -331,7 +472,7 @@ describe('api client', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse()
 
-      calibrationManager.tip_probe.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.tip_probe)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -346,8 +487,7 @@ describe('api client', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse(new Error('AH'))
 
-      calibrationManager.tip_probe
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.tip_probe, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -358,7 +498,7 @@ describe('api client', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse()
 
-      calibrationManager.move_to.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.move_to)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -373,8 +513,7 @@ describe('api client', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse(new Error('AH'))
 
-      calibrationManager.move_to
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.move_to, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -385,10 +524,9 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse()
 
-      calibrationManager.update_container_offset
-        .mockReturnValue(Promise.resolve())
-      calibrationManager.pick_up_tip.mockReturnValue(Promise.resolve())
-      calibrationManager.home.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.update_container_offset)
+      mockResolvedValue(calibrationManager.pick_up_tip)
+      mockResolvedValue(calibrationManager.home)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -403,8 +541,10 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
-      calibrationManager.update_container_offset
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(
+        calibrationManager.update_container_offset,
+        new Error('AH')
+      )
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -415,10 +555,8 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
-      calibrationManager.update_container_offset
-        .mockReturnValue(Promise.resolve())
-      calibrationManager.pick_up_tip
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockResolvedValue(calibrationManager.update_container_offset)
+      mockRejectedValue(calibrationManager.pick_up_tip, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -429,9 +567,9 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse()
 
-      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
-      calibrationManager.home.mockReturnValue(Promise.resolve())
-      calibrationManager.move_to.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.drop_tip)
+      mockResolvedValue(calibrationManager.home)
+      mockResolvedValue(calibrationManager.move_to)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -449,8 +587,7 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      calibrationManager.drop_tip
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.drop_tip, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -461,8 +598,8 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
-      calibrationManager.home.mockReturnValue(Promise.reject(new Error('AH')))
+      mockResolvedValue(calibrationManager.drop_tip)
+      mockRejectedValue(calibrationManager.home, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -473,10 +610,9 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
-      calibrationManager.home.mockReturnValue(Promise.resolve())
-      calibrationManager.move_to
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockResolvedValue(calibrationManager.drop_tip)
+      mockResolvedValue(calibrationManager.home)
+      mockRejectedValue(calibrationManager.move_to, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -487,7 +623,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse()
 
-      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.drop_tip)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -504,7 +640,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(null, true)
 
-      calibrationManager.drop_tip.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.drop_tip)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -518,8 +654,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
 
-      calibrationManager.drop_tip
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.drop_tip, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -530,7 +665,7 @@ describe('api client', () => {
       const action = actions.jog('left', 'y', -1)
       const expectedResponse = actions.jogResponse()
 
-      calibrationManager.jog.mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.jog)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -548,7 +683,7 @@ describe('api client', () => {
       const action = actions.jog('left', 'x', 1)
       const expectedResponse = actions.jogResponse(new Error('AH'))
 
-      calibrationManager.jog.mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(calibrationManager.jog, new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -559,8 +694,7 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 1)
       const expectedResponse = actions.updateOffsetResponse(null, false)
 
-      calibrationManager.update_container_offset
-        .mockReturnValue(Promise.resolve())
+      mockResolvedValue(calibrationManager.update_container_offset)
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -575,8 +709,10 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 9)
       const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
 
-      calibrationManager.update_container_offset
-        .mockReturnValue(Promise.reject(new Error('AH')))
+      mockRejectedValue(
+        calibrationManager.update_container_offset,
+        new Error('AH')
+      )
 
       return sendConnect()
         .then(() => sendToClient(state, action))

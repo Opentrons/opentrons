@@ -1,5 +1,5 @@
 // @flow
-import type {DeckSlot, Mount, Channels} from '@opentrons/components'
+import type {DeckSlot, Mount} from '@opentrons/components'
 import type {Command} from '../step-generation/types'
 
 export type FilePageFields = {
@@ -12,6 +12,17 @@ export type FilePageFieldAccessors = $Keys<FilePageFields>
 
 type MsSinceEpoch = number
 type VersionString = string // eg '1.0.0'
+
+export type FilePipette = {
+  mount: Mount,
+  model: string // TODO Ian 2018-05-11 use pipette-definitions model types
+}
+
+export type FileLabware = {
+  slot: DeckSlot,
+  model: string,
+  'display-name': string
+}
 
 // A JSON protocol
 export type ProtocolFile = {
@@ -41,28 +52,19 @@ export type ProtocolFile = {
     model: 'OT-2 Standard' // TODO LATER support additional models
   },
 
-  instruments: {
-    [instrumentId: string]: {
-      type: 'pipette',
-      mount: Mount,
-      model: string, // Eg '10' for p10
-      channels: Channels
-    }
+  pipettes: {
+    [instrumentId: string]: FilePipette
   },
 
   labware: {
-    [labwareId: string]: {
-      slot: DeckSlot,
-      type: string,
-      name: string
-    }
+    [labwareId: string]: FileLabware
   },
 
-  commands: Array<{
+  procedure: Array<{
     annotation: {
       name: string,
       description: string
     },
-    commands: Array<Command>
+    subprocedure: Array<Command>
   }>
 }

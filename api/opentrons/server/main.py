@@ -2,7 +2,7 @@
 
 import sys
 import logging
-import os
+# import os
 import traceback
 from aiohttp import web
 from opentrons import robot
@@ -24,12 +24,12 @@ def log_init():
     Function that sets log levels and format strings. Checks for the
     OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
     """
-    default_log_level = 'INFO'
-    ot_log_level = os.environ.get('OT_LOG_LEVEL', default_log_level)
+    fallback_log_level = 'INFO'
+    ot_log_level = robot.config.log_level
     if ot_log_level not in logging._nameToLevel:
         log.info("OT Log Level {} not found. Defaulting to {}".format(
-            ot_log_level, default_log_level))
-        ot_log_level = default_log_level
+            ot_log_level, fallback_log_level))
+        ot_log_level = fallback_log_level
 
     level_value = logging._nameToLevel[ot_log_level]
 
@@ -195,8 +195,15 @@ def main():
     else:
         log.debug("Starting Opentrons server application on {}:{}".format(
             args.hostname, args.port))
-    robot.connect()
-    robot.home()
+
+    # TODO (andy) server should only connect to motor-driver when required by
+    # a request (eg: a request to move, or a request to update firmware)
+    try:
+        robot.connect()
+        robot.cache_instrument_models()
+    except Exception as e:
+        log.exception("Error while connecting to motor-driver: {}".format(e))
+
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
 

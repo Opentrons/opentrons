@@ -224,7 +224,7 @@ class RpcContext extends EventEmitter {
       case NOTIFICATION:
         this._cacheCallResultMetadata(data)
 
-        RemoteObject(this, data)
+        RemoteObject(this, data, {methods: false})
           .then((remote) => this.emit('notification', remote))
           // .catch((e) => log.error('Error creating notification remote', e))
 

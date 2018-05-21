@@ -65,10 +65,18 @@ def get_config_index() -> dict:
     function should guarantee that this file exists.
     :return: the contents of the the base config file
     """
+    rewrite_needed = False
     base_path = settings_dir()
     file_path = os.path.join(base_path, index_filename)
     with open(file_path) as base_config_file:
         res = json.load(base_config_file)
+    defaults = _generate_base_config()[1]
+    for key, default_val in defaults.items():
+        if key not in res.keys():
+            res[key] = default_val
+            rewrite_needed = True
+    if rewrite_needed:
+        write_base_config(base_path, res)
     return res
 
 
@@ -136,6 +144,8 @@ def _generate_base_config() -> (str, dict):
             usb_settings_dir, 'flags', 'settings.json'),
         'deckCalibrationFile': os.path.join(
             usb_settings_dir, 'deckCalibration.json'),
+        'robotSettingsFile': os.path.join(
+            usb_settings_dir, 'robotSettings.json')
     }
 
     resin_config = {
@@ -152,7 +162,12 @@ def _generate_base_config() -> (str, dict):
             resin_settings_dir,
             'user_storage',
             'opentrons_data',
-            'config.json')
+            'config.json'),
+        'robotSettingsFile': os.path.join(
+            resin_settings_dir,
+            'user_storage',
+            'opentrons_data',
+            'robotSettings.json')
     }
     usb_mount_available = os.path.ismount(usb_mount_point)
     if usb_mount_available:

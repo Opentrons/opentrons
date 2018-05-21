@@ -120,6 +120,13 @@ describe('robot actions', () => {
     expect(actions.sessionResponse(error)).toEqual(failure)
   })
 
+  test('SESSION_UPDATE action', () => {
+    const update = {state: 'running', startTime: 1}
+    const expected = {type: 'robot:SESSION_UPDATE', payload: update}
+
+    expect(actions.sessionUpdate(update)).toEqual(expected)
+  })
+
   test('set deck populated action', () => {
     expect(actions.setDeckPopulated(false)).toEqual({
       type: actionTypes.SET_DECK_POPULATED,

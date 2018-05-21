@@ -1,6 +1,6 @@
 // @flow
 // common robot types
-import type {PipetteChannels} from '@opentrons/labware-definitions'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {Mount} from '@opentrons/components'
 import typeof reducer from './reducer'
 
@@ -25,15 +25,9 @@ export type Slot =
   | '11'
 
 // jog axes and directions
+// TODO(mc, 2018-05-04): deprecate in favor of types in HTTP API module
 export type Axis = 'x' | 'y' | 'z'
 export type Direction = -1 | 1
-export type JogButtonName =
-  | 'left'
-  | 'right'
-  | 'back'
-  | 'forward'
-  | 'up'
-  | 'down'
 
 // minimum robot for actions/reducers/middleware to work
 export type BaseRobot = {
@@ -146,3 +140,12 @@ export type SessionStatus =
   | 'error'
   | 'finished'
   | 'stopped'
+
+export type SessionUpdate = {
+  state: SessionStatus,
+  startTime: ?number,
+  lastCommand: ?{
+    id: number,
+    handledAt: number,
+  },
+}

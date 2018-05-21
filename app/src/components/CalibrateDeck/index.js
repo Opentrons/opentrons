@@ -1,120 +1,102 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {Switch, Route, withRouter, type Match} from 'react-router'
+import {push, goBack} from 'react-router-redux'
+import {Switch, Route, withRouter} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
 import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
-import {getPipette} from '@opentrons/labware-definitions'
+import {getPipette} from '@opentrons/shared-data'
 
 import {
+  home,
   startDeckCalibration,
+  deckCalibrationCommand,
+  setCalibrationJogStep,
+  getCalibrationJogStep,
   makeGetRobotMove,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
 
-import ClearDeckAlertModal from '../ClearDeckAlertModal'
-import RequestInProgressModal from './RequestInProgressModal'
-import AttachTipModal from './AttachTipModal'
+import ClearDeckAlert from './ClearDeckAlert'
 import InUseModal from './InUseModal'
 import NoPipetteModal from './NoPipetteModal'
 import ErrorModal from './ErrorModal'
 import InstructionsModal from './InstructionsModal'
+import ExitAlertModal from './ExitAlertModal'
 
-type Props = {
-  match: Match,
-  robot: Robot,
-  parentUrl: string,
-}
+const RE_STEP = '(1|2|3|4|5|6)'
+const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot; please contact support'
 
-const TITLE = 'Deck Calibration'
-
-const ConnectedCalibrateDeckRouter = withRouter(
-  connect(makeMapStateToProps, mapDispatchToProps)(CalibrateDeckRouter)
+export default withRouter(
+  connect(makeMapStateToProps, mapDispatchToProps)(CalibrateDeck)
 )
 
-export default function CalibrateDeck (props: Props) {
-  const {robot, parentUrl, match: {path}} = props
+function CalibrateDeck (props: CalibrateDeckProps) {
+  const {startRequest, pipetteProps, parentUrl, match: {path}} = props
 
-  return (
-    <Route
-      path={`${path}/step-:step`}
-      render={(propsWithStep) => {
-        const {match: {params}} = propsWithStep
-        const step: CalibrationStep = (params.step: any)
-        const subtitle = `Step ${step} of 6`
-        // const calibrationStep = `step-${step}`
-        const baseUrl = path
-
-        return (
-          <ConnectedCalibrateDeckRouter
-            robot={robot}
-            title={TITLE}
-            subtitle={subtitle}
-            parentUrl={parentUrl}
-            baseUrl={baseUrl}
-            exitUrl={`${baseUrl}/exit`}
-            calibrationStep={step}
-          />
-        )
-      }}
-    />
-  )
-}
-
-function CalibrateDeckRouter (props: CalibrateDeckProps) {
-  const {startRequest, moveRequest, baseUrl, parentUrl} = props
-  const clearDeckProps = {
-    cancelText: 'cancel',
-    continueText: 'move pipette to front',
-    parentUrl: props.parentUrl
-  }
-
-  if (startRequest.error) {
-    const {status} = startRequest.error
-
-    // conflict: token already issued
-    if (status === 409) {
-      return (<InUseModal {...props} />)
-    }
-
-    // forbidden: no pipette attached
-    if (status === 403) {
-      return (<NoPipetteModal {...props}/>)
-    }
-    // TODO: (ka 2018-5-2) kept props generic in case we decide to reuse
-    return (<ErrorModal closeUrl={parentUrl} error={startRequest.error}/>)
-  }
-
-  if (!moveRequest.inProgress && !moveRequest.response) {
+  if (pipetteProps && !pipetteProps.pipette) {
     return (
-      <ClearDeckAlertModal {...clearDeckProps} />
+      <ErrorModal
+        closeUrl={parentUrl}
+        error={{name: 'BadData', message: BAD_PIPETTE_ERROR}}
+      />
     )
-  }
-
-  if (moveRequest.inProgress) {
-    return (<RequestInProgressModal {...props} />)
   }
 
   return (
     <Switch>
-      <Route path={`${baseUrl}/step-1`} render={() => (
-        <AttachTipModal {...props}/>
-      )} />
-      <Route path={`${baseUrl}/step-2`} render={() => (
-        <InstructionsModal {...props} />
-      )} />
-      <Route path={`${baseUrl}/step-3`} render={() => (
-        <InstructionsModal {...props} />
-      )} />
-      <Route path={`${baseUrl}/step-4`} render={() => (
-        <InstructionsModal {...props} />
-      )} />
-      <Route path={`${baseUrl}/step-5`} render={() => (
-        <InstructionsModal {...props} />
-      )} />
+      <Route path={path} exact render={() => {
+        const {error} = startRequest
+
+        if (error) {
+          const {status} = error
+
+          // conflict: token already issued
+          if (status === 409) {
+            return (<InUseModal {...props} />)
+          }
+
+          // forbidden: no pipette attached
+          if (status === 403) {
+            return (<NoPipetteModal {...props}/>)
+          }
+
+          // props are generic in case we decide to reuse
+          return (<ErrorModal closeUrl={parentUrl} error={error} />)
+        }
+
+        if (pipetteProps && pipetteProps.pipette) {
+          return (<ClearDeckAlert {...props} {...pipetteProps} />)
+        }
+
+        return null
+      }} />
+      <Route path={`${path}/step-:step${RE_STEP}`} render={(stepProps) => {
+        if (!pipetteProps || !pipetteProps.pipette) return null
+
+        const {match: {params, url: stepUrl}} = stepProps
+        const step: CalibrationStep = (params.step: any)
+        const exitUrl = `${stepUrl}/exit`
+
+        const startedProps = {
+          ...props,
+          exitUrl,
+          pipette: pipetteProps.pipette,
+          mount: pipetteProps.mount,
+          calibrationStep: step
+        }
+
+        return (
+          <div>
+            <InstructionsModal {...startedProps} />
+            <Route path={exitUrl} render={() => (
+              <ExitAlertModal {...props} />
+            )} />
+          </div>
+        )
+      }} />
     </Switch>
   )
 }
@@ -124,29 +106,43 @@ function makeMapStateToProps () {
   const getDeckCalStartState = makeGetDeckCalibrationStartState()
 
   return (state: State, ownProps: OP): SP => {
-    const moveRequest = getRobotMove(state, ownProps.robot)
-    const startRequest = getDeckCalStartState(state, ownProps.robot)
-    const pipette = startRequest.response
-      ? getPipette(startRequest.response.pipette.model)
+    const {robot} = ownProps
+    const startRequest = getDeckCalStartState(state, robot)
+    const pipetteInfo = startRequest.response && startRequest.response.pipette
+    const pipetteProps = pipetteInfo
+      ? {mount: pipetteInfo.mount, pipette: getPipette(pipetteInfo.model)}
       : null
-    // TODO (ka 2018-5-4): Swap for DeckCalibrationState reducer in JogControls PR
-    // increment selet will not update UI at this time, will console.log clicked increment
-    const currentJogDistance = 0.1
-    return {moveRequest, startRequest, pipette, currentJogDistance}
+
+    if (pipetteProps && !pipetteProps.pipette) {
+      console.error('Invalid pipette received from API', pipetteInfo)
+    }
+
+    return {
+      startRequest,
+      pipetteProps,
+      moveRequest: getRobotMove(state, robot),
+      jogStep: getCalibrationJogStep(state)
+    }
   }
 }
 
-// TODO (ka 2018-5-4): Wire up HTTP jog actions in JogControls PR
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const makeJog = (axis, direction) => () => {
-    console.log(axis, direction)
-  }
+  const {robot, parentUrl} = ownProps
+
   return {
-    makeJog,
-    onIncrementSelect: (event) => {
+    jog: (axis, direction, step) => dispatch(
+      deckCalibrationCommand(robot, {command: 'jog', axis, direction, step})
+    ),
+    onJogStepSelect: (event) => {
       const step = Number(event.target.value)
-      console.log(step)
+      dispatch(setCalibrationJogStep(step))
     },
-    forceStart: () => dispatch(startDeckCalibration(ownProps.robot, true))
+    forceStart: () => dispatch(startDeckCalibration(robot, true)),
+    // exit button click in title bar, opens exit alert modal, confirm exit click
+    exit: () => dispatch(home(robot))
+      .then(() => dispatch(deckCalibrationCommand(robot, {command: 'release'})))
+      .then(() => dispatch(push(parentUrl))),
+    // cancel button click in exit alert modal
+    back: () => dispatch(goBack())
   }
 }

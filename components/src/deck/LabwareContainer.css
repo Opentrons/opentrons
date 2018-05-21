@@ -19,7 +19,7 @@ NOTE: available defs are:
 
 .highlighted {
   fill: none;
-  stroke: var(--c-blue);
+  stroke: var(--c-highlight);
   stroke-width: 2.5;
 }
 

@@ -6,8 +6,10 @@ const pause = (data: PauseFormData): CommandCreator => (prevRobotState: RobotSta
     robotState: prevRobotState,
     commands: [{
       command: 'delay',
-      message: data.message,
-      wait: data.wait
+      params: {
+        message: data.message,
+        wait: data.wait
+      }
     }]
   }
 }

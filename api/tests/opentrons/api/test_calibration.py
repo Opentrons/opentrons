@@ -159,8 +159,8 @@ async def test_move_to_top(main_router, model):
         main_router.calibration_manager.move_to(
             model.instrument,
             model.container)
-
-        move_to.assert_called_with(model.container._container[0])
+        target = model.container._container[0]
+        move_to.assert_called_with(target)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))

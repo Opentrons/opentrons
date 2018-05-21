@@ -30,10 +30,12 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
 
   const commands = [{
     command: 'aspirate',
-    pipette,
-    volume,
-    labware,
-    well
+    params: {
+      pipette,
+      volume,
+      labware,
+      well
+    }
   }]
 
   const robotState = {

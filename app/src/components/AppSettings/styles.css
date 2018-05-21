@@ -1,6 +1,48 @@
 /* stylesheet for AppSettings components */
 @import '@opentrons/components';
 
+:root {
+  --app_settings_card_spacing: 0.75rem;
+}
+
 .app_settings {
   padding: 1.5rem;
+}
+
+.row {
+  width: 100%;
+  margin-bottom: var(--app_settings_card_spacing);
+}
+
+.analytics_toggle {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.analytics_label {
+  @apply --font-body-1-dark;
+
+  font-weight: 600;
+  line-height: 2rem;
+}
+
+.analytics_icon {
+  width: 4rem;
+  flex: 0 0 auto;
+  padding: 0 2rem 0 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.analytics_info {
+  max-width: 25rem;
+
+  & > p {
+    @apply --font-body-1-dark;
+
+    margin: 1rem 0;
+  }
 }

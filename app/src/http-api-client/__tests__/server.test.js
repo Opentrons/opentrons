@@ -150,42 +150,22 @@ describe('server API client', () => {
     }))
 
     test('sets availableUpdate on HEALTH_SUCCESS', () => {
-      const health = {name, api_version: '4.5.6', fw_version: '7.8.9'}
+      const health = {name, api_version: 'foobar', fw_version: '7.8.9'}
       const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
 
       // test update available
       state.server[robot.name].availableUpdate = null
-      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce('42.0.0')
-
       expect(reducer(state, action).server).toEqual({
-        [robot.name]: {availableUpdate: '42.0.0', update: null, restart: null}
+        [robot.name]: {
+          availableUpdate: mockApiUpdate.AVAILABLE_UPDATE,
+          update: null,
+          restart: null
+        }
       })
-      expect(mockApiUpdate.getAvailableUpdate)
-        .toHaveBeenCalledWith(health.api_version)
 
       // test no update available
-      electron.__clearMock()
-      state.server[robot.name].availableUpdate = '42.0.0'
-      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce(null)
-
-      expect(reducer(state, action).server).toEqual({
-        [robot.name]: {availableUpdate: null, update: null, restart: null}
-      })
-      expect(mockApiUpdate.getAvailableUpdate)
-        .toHaveBeenCalledWith(health.api_version)
-    })
-
-    test('clears update and restart if availableUpdate changes', () => {
-      const health = {name, api_version: '4.5.6', fw_version: '7.8.9'}
-      const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
-
-      state.server[robot.name] = {
-        availableUpdate: '4.5.6',
-        update: {},
-        restart: {}
-      }
-      mockApiUpdate.getAvailableUpdate.mockReturnValueOnce(null)
-
+      action.payload.health.api_version = mockApiUpdate.AVAILABLE_UPDATE
+      state.server[robot.name].availableUpdate = mockApiUpdate.AVAILABLE_UPDATE
       expect(reducer(state, action).server).toEqual({
         [robot.name]: {availableUpdate: null, update: null, restart: null}
       })

@@ -1,21 +1,17 @@
 // app updater
 'use strict'
 
-const log = require('electron-log')
 const {autoUpdater: updater} = require('electron-updater')
+const log = require('./log')(__filename)
 
 updater.logger = log
 updater.autoDownload = false
 
 module.exports = {
-  getCurrentVersion,
+  CURRENT_VERSION: updater.currentVersion,
   checkForUpdates,
   downloadUpdate,
   quitAndInstall
-}
-
-function getCurrentVersion () {
-  return updater.currentVersion
 }
 
 function checkForUpdates () {

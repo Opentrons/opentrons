@@ -16,3 +16,9 @@
   display: flex;
   justify-content: space-between;
 }
+
+.active {
+  color: #0ec9eb;
+  background-color: #f0f3ff;
+  fill: #0ec9eb;
+}

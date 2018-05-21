@@ -1,17 +1,25 @@
-from opentrons.instruments.pipette_config import PIPETTE_MODEL_IDENTIFIERS
-
-
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
 MODELS = {
-    'P10S': PIPETTE_MODEL_IDENTIFIERS['single']['10'],
-    'P10M': PIPETTE_MODEL_IDENTIFIERS['multi']['10'],
-    'P50S': PIPETTE_MODEL_IDENTIFIERS['single']['50'],
-    'P50M': PIPETTE_MODEL_IDENTIFIERS['multi']['50'],
-    'P300S': PIPETTE_MODEL_IDENTIFIERS['single']['300'],
-    'P300M': PIPETTE_MODEL_IDENTIFIERS['multi']['300'],
-    'P1000S': PIPETTE_MODEL_IDENTIFIERS['single']['1000']
+    'v1': {
+        'P10S': 'p10_single_v1',
+        'P10M': 'p10_multi_v1',
+        'P50S': 'p50_single_v1',
+        'P50M': 'p50_multi_v1',
+        'P300S': 'p300_single_v1',
+        'P300M': 'p300_multi_v1',
+        'P1000S': 'p1000_single_v1'
+    },
+    'v13': {
+        'P10SV13': 'p10_single_v13',
+        'P10MV13': 'p10_multi_v13',
+        'P50SV13': 'p50_single_v13',
+        'P50MV13': 'p50_multi_v13',
+        'P3HSV13': 'p300_single_v13',
+        'P3HMV13': 'p300_multi_v13',
+        'P1KSV13': 'p1000_single_v13'
+    }
 }
 
 
@@ -37,7 +45,7 @@ def write_identifiers(robot, mount, new_id, new_model):
 
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
-    _assert_the_same(new_model, read_model['model'])
+    _assert_the_same(new_model, read_model)
 
 
 def check_previous_data(robot, mount):
@@ -47,10 +55,6 @@ def check_previous_data(robot, mount):
     else:
         old_id = None
     old_model = robot._driver.read_pipette_model(mount)
-    if old_model.get('model'):
-        old_model = old_model.get('model')
-    else:
-        old_model = None
     if old_id and old_model:
         print(
             'Overwriting old data: id={0}, model={1}'.format(
@@ -76,14 +80,13 @@ def _user_submitted_barcode(max_length):
 
 
 def _parse_model_from_barcode(barcode):
-    model = None
-    for key in MODELS.keys():
-        if key in barcode:
-            model = MODELS[key]
-            break
-    if not model:
-        raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
-    return model
+    # MUST iterate through v13 first, because v1 barcodes did not have
+    # characters to specify the version number
+    for version in ['v13', 'v1']:
+        for barcode_substring in MODELS[version].keys():
+            if barcode.startswith(barcode_substring):
+                return MODELS[version][barcode_substring]
+    raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
 def main(robot):
@@ -92,7 +95,7 @@ def main(robot):
         model = _parse_model_from_barcode(barcode)
         check_previous_data(robot, 'right')
         write_identifiers(robot, 'right', barcode, model)
-        print('PASS: Saved -> {}'.format(barcode))
+        print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
     except Exception as e:

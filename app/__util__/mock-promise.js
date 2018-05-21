@@ -1,5 +1,6 @@
 // test utility functions
 
+// TODO(mc, 2018-05-12): upgrade jest to get builtin mock resolve and reject
 export function mockResolvedValue (mock, value) {
   mock.mockImplementation(() => new Promise((resolve) => {
     process.nextTick(() => resolve(value))

@@ -42,6 +42,7 @@ function LostConnectionAlert (props: Props) {
       buttons={[
         {onClick: disconnect, children: 'close'}
       ]}
+      alertOverlay
     >
       <ModalCopy />
     </AlertModal>

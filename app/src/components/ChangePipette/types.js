@@ -1,5 +1,5 @@
 // @flow
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {Mount} from '../../robot'
 
 import type {RobotMove, RobotHome} from '../../http-api-client'

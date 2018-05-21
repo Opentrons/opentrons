@@ -203,6 +203,48 @@ describe('robot selectors', () => {
     })
   })
 
+  test('getStartTime', () => {
+    const state = makeState({session: {startTime: 42}})
+    expect(getStartTime(state)).toBe(42)
+  })
+
+  test('getRunTime with no startTime', () => {
+    const state = {
+      [NAME]: {
+        session: {
+          startTime: null,
+          runTime: 42
+        }
+      }
+    }
+
+    expect(getRunTime(state)).toEqual('00:00:00')
+  })
+
+  test('getRunTime', () => {
+    const testGetRunTime = (seconds, expected) => {
+      const stateWithRunTime = {
+        [NAME]: {
+          session: {
+            startTime: 42,
+            runTime: 42 + (1000 * seconds)
+          }
+        }
+      }
+
+      expect(getRunTime(stateWithRunTime)).toEqual(expected)
+    }
+
+    testGetRunTime(0, '00:00:00')
+    testGetRunTime(1, '00:00:01')
+    testGetRunTime(59, '00:00:59')
+    testGetRunTime(60, '00:01:00')
+    testGetRunTime(61, '00:01:01')
+    testGetRunTime(3599, '00:59:59')
+    testGetRunTime(3600, '01:00:00')
+    testGetRunTime(3601, '01:00:01')
+  })
+
   describe('command based', () => {
     const state = makeState({
       session: {
@@ -253,44 +295,6 @@ describe('robot selectors', () => {
       })
 
       expect(getRunProgress(state)).toEqual(0)
-    })
-
-    test('getStartTime', () => {
-      expect(getStartTime(state)).toEqual(42)
-    })
-
-    test('getStartTime without commands', () => {
-      expect(getStartTime(makeState({session: {protocolCommands: []}})))
-        .toEqual(null)
-    })
-
-    test('getRunTime', () => {
-      const testGetRunTime = (seconds, expected) => {
-        const stateWithRunTime = {
-          [NAME]: {
-            session: {
-              ...state[NAME].session,
-              runTime: 42 + (1000 * seconds)
-            }
-          }
-        }
-
-        expect(getRunTime(stateWithRunTime)).toEqual(expected)
-      }
-
-      testGetRunTime(0, '00:00:00')
-      testGetRunTime(1, '00:00:01')
-      testGetRunTime(59, '00:00:59')
-      testGetRunTime(60, '00:01:00')
-      testGetRunTime(61, '00:01:01')
-      testGetRunTime(3599, '00:59:59')
-      testGetRunTime(3600, '01:00:00')
-      testGetRunTime(3601, '01:00:01')
-    })
-
-    test('getRunTime without commands', () => {
-      expect(getRunTime(makeState({session: {protocolCommands: []}})))
-        .toEqual('00:00:00')
     })
 
     test('getCommands', () => {
@@ -520,13 +524,22 @@ describe('robot selectors', () => {
           labwareBySlot: {
             1: {
               slot: '1',
-              name: 'a1',
-              type: 'a',
+              type: 's',
+              isTiprack: true,
+              calibratorMount: 'right'
+            },
+            2: {
+              slot: '2',
+              type: 'm',
               isTiprack: true,
               calibratorMount: 'left'
             },
-            5: {slot: '5', name: 'b2', type: 'b', isTiprack: false},
-            9: {slot: '9', name: 'c3', type: 'c', isTiprack: false}
+            5: {slot: '5', type: 'a', isTiprack: false},
+            9: {slot: '9', type: 'b', isTiprack: false}
+          },
+          instrumentsByMount: {
+            left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
+            right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
           }
         },
         calibration: {
@@ -537,10 +550,6 @@ describe('robot selectors', () => {
           confirmedBySlot: {
             1: false,
             5: true
-          },
-          instrumentsByMount: {
-            left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-            right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
           },
           calibrationRequest: {
             type: 'MOVE_TO',
@@ -556,20 +565,30 @@ describe('robot selectors', () => {
 
     test('get labware', () => {
       expect(getLabware(state)).toEqual([
+        // multi channel tiprack should be first
+        {
+          slot: '2',
+          type: 'm',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left'
+        },
+        // then single channel tiprack
         {
           slot: '1',
-          name: 'a1',
-          type: 'a',
+          type: 's',
           isTiprack: true,
           isMoving: true,
           calibration: 'moving-to-slot',
           confirmed: false,
-          calibratorMount: 'left'
+          calibratorMount: 'right'
         },
+        // then other labware by slot
         {
           slot: '5',
-          name: 'b2',
-          type: 'b',
+          type: 'a',
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
@@ -577,8 +596,7 @@ describe('robot selectors', () => {
         },
         {
           slot: '9',
-          name: 'c3',
-          type: 'c',
+          type: 'b',
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
@@ -590,14 +608,22 @@ describe('robot selectors', () => {
     test('get unconfirmed tipracks', () => {
       expect(getUnconfirmedTipracks(state)).toEqual([
         {
+          slot: '2',
+          type: 'm',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left'
+        },
+        {
           slot: '1',
-          name: 'a1',
-          type: 'a',
+          type: 's',
           isTiprack: true,
           isMoving: true,
           calibration: 'moving-to-slot',
           confirmed: false,
-          calibratorMount: 'left'
+          calibratorMount: 'right'
         }
       ])
     })
@@ -605,19 +631,26 @@ describe('robot selectors', () => {
     test('get unconfirmed labware', () => {
       expect(getUnconfirmedLabware(state)).toEqual([
         {
-          slot: '1',
-          name: 'a1',
-          type: 'a',
+          slot: '2',
+          type: 'm',
           isTiprack: true,
-          isMoving: true,
-          calibration: 'moving-to-slot',
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'left'
         },
         {
+          slot: '1',
+          type: 's',
+          isTiprack: true,
+          isMoving: true,
+          calibration: 'moving-to-slot',
+          confirmed: false,
+          calibratorMount: 'right'
+        },
+        {
           slot: '9',
-          name: 'c3',
-          type: 'c',
+          type: 'b',
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
@@ -628,12 +661,11 @@ describe('robot selectors', () => {
 
     test('get next labware', () => {
       expect(getNextLabware(state)).toEqual({
-        slot: '1',
-        name: 'a1',
-        type: 'a',
+        slot: '2',
+        type: 'm',
         isTiprack: true,
-        isMoving: true,
-        calibration: 'moving-to-slot',
+        isMoving: false,
+        calibration: 'unconfirmed',
         confirmed: false,
         calibratorMount: 'left'
       })
@@ -645,7 +677,8 @@ describe('robot selectors', () => {
             ...state[NAME].calibration,
             confirmedBySlot: {
               ...state[NAME].calibration.confirmedBySlot,
-              1: true
+              1: true,
+              2: true
             }
           }
         }
@@ -653,8 +686,7 @@ describe('robot selectors', () => {
 
       expect(getNextLabware(nextState)).toEqual({
         slot: '9',
-        name: 'c3',
-        type: 'c',
+        type: 'b',
         isTiprack: false,
         isMoving: false,
         calibration: 'unconfirmed',

@@ -7,7 +7,7 @@ import type {PipettesResponse} from '../../http-api-client'
 import type {Instrument} from '../../robot'
 import {constants as robotConstants} from '../../robot'
 
-import {getPipette} from '@opentrons/labware-definitions'
+import {getPipette} from '@opentrons/shared-data'
 import {InstrumentGroup, AlertItem} from '@opentrons/components'
 import styles from './styles.css'
 

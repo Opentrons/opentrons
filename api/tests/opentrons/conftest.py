@@ -68,7 +68,6 @@ MAIN_TESTER_DB = str(os.path.join(
 def state(topic, state):
     def _match(item):
         return \
-            item['name'] == 'state' and \
             item['topic'] == topic and \
             item['payload'].state == state
 
@@ -328,6 +327,24 @@ def model(robot):
 
     pipette = Pipette(robot, mount='right')
     plate = load(robot, '96-flat', '1')
+
+    instrument = models.Instrument(pipette)
+    container = models.Container(plate)
+
+    return namedtuple('model', 'robot instrument container')(
+            robot=robot,
+            instrument=instrument,
+            container=container
+        )
+
+
+@pytest.fixture
+def model_with_trough(robot):
+    from opentrons.containers import load
+    from opentrons.instruments.pipette import Pipette
+
+    pipette = Pipette(robot, mount='right')
+    plate = load(robot, 'trough-12row', '1')
 
     instrument = models.Instrument(pipette)
     container = models.Container(plate)

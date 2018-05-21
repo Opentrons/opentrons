@@ -1,76 +1,59 @@
 // electron main entry point
 'use strict'
 
-const path = require('path')
-const url = require('url')
-const {app, dialog, Menu, BrowserWindow} = require('electron')
-const log = require('electron-log')
+const {app, dialog, ipcMain, Menu} = require('electron')
 
+const createUi = require('./ui')
 const initializeMenu = require('./menu')
 const {initialize: initializeApiUpdate} = require('./api-update')
+const createLogger = require('./log')
+const {get: getConfig, getStore, getOverrides} = require('./config')
 
-// TODO(mc, 2018-01-06): replace dev and debug vars with feature vars
-const DEV_MODE = process.env.NODE_ENV === 'development'
-const DEBUG_MODE = process.env.DEBUG
+const config = getConfig()
+const log = createLogger(__filename)
 
-if (DEV_MODE || DEBUG_MODE) {
+log.debug('App config', {
+  config,
+  store: getStore(),
+  overrides: getOverrides()
+})
+
+if (config.devtools) {
   require('electron-debug')({showDevTools: true})
 }
 
-const appUrl = DEV_MODE
-  ? `http://localhost:${process.env.PORT}`
-  : url.resolve('file://', path.join(__dirname, '../ui/index.html'))
-
-// hold on to a reference to ensure mainWindow isn't GC'd
+// hold on to references so they don't get garbage collected
 let mainWindow
+let rendererLogger
 
 app.on('ready', startUp)
 
 function startUp () {
   log.info('Starting App')
-  process.on('uncaughtException', (error) => log.info('Uncaught: ', error))
+  process.on('uncaughtException', (error) => log.error('Uncaught: ', {error}))
 
-  createWindow()
+  mainWindow = createUi()
+  rendererLogger = createRendererLogger()
+
   initializeMenu()
   initializeApiUpdate()
-    .catch((e) => console.error('Initialze API update module error', e))
+    .catch((error) => log.error('Initialize API update module error', error))
 
-  load()
-
-  if (DEV_MODE || DEBUG_MODE) {
+  if (config.devtools) {
     installAndOpenExtensions()
       .catch((error) => dialog.showErrorBox('Error opening dev tools', error))
   }
+
+  log.silly('Global references', {mainWindow, rendererLogger})
 }
 
-function createWindow () {
-  mainWindow = new BrowserWindow({
-    show: false,
-    useContentSize: true,
-    width: 1024,
-    height: 768,
-    webPreferences: {
-      experimentalFeatures: true,
-      devTools: DEV_MODE || DEBUG_MODE,
+function createRendererLogger () {
+  log.info('Creating renderer logger')
 
-      // node integration needed for mdns robot discovery in webworker
-      nodeIntegrationInWorker: true,
+  const logger = createLogger()
+  ipcMain.on('log', (_, info) => logger.log(info))
 
-      // TODO(mc, 2018-02-12): this works around CORS restrictions
-      //   while in dev mode; evaluate whether this is acceptable
-      webSecurity: !DEV_MODE
-    }
-  })
-
-  mainWindow.once('ready-to-show', () => mainWindow.show())
-
-  return mainWindow
-}
-
-function load () {
-  log.info('Loading App UI at ' + appUrl)
-  mainWindow.loadURL(appUrl, {'extraHeaders': 'pragma: no-cache\n'})
-  log.info('App UI loaded')
+  return logger
 }
 
 function installAndOpenExtensions () {

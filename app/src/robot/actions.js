@@ -10,7 +10,8 @@ import type {
   Direction,
   BaseRobot,
   RobotService,
-  ProtocolFile
+  ProtocolFile,
+  SessionUpdate
 } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
@@ -102,6 +103,11 @@ export type PipetteCalibrationAction = {|
   |}
 |}
 
+export type SetJogDistanceAction = {|
+  type: 'robot:SET_JOG_DISTANCE',
+  payload: number,
+|}
+
 export type LabwareCalibrationAction = {|
   type: (
     | 'robot:MOVE_TO'
@@ -150,6 +156,11 @@ export type CalibrationFailureAction = {|
   payload: Error
 |}
 
+export type SessionUpdateAction = {|
+  type: 'robot:SESSION_UPDATE',
+  payload: SessionUpdate,
+|}
+
 export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
@@ -171,7 +182,6 @@ export const actionTypes = {
 
   RETURN_TIP: makeRobotActionName('RETURN_TIP'),
   RETURN_TIP_RESPONSE: makeRobotActionName('RETURN_TIP_RESPONSE'),
-  SET_JOG_DISTANCE: makeRobotActionName('SET_JOG_DISTANCE'),
   CONFIRM_LABWARE: makeRobotActionName('CONFIRM_LABWARE'),
 
   // protocol run controls
@@ -204,6 +214,8 @@ export type Action =
   | CalibrationResponseAction
   | CalibrationFailureAction
   | ReturnTipResponseAction
+  | SetJogDistanceAction
+  | SessionUpdateAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -268,6 +280,13 @@ export const actions = {
       payload: !didError
         ? session
         : error
+    }
+  },
+
+  sessionUpdate (update: SessionUpdate): SessionUpdateAction {
+    return {
+      type: 'robot:SESSION_UPDATE',
+      payload: update
     }
   },
 
@@ -423,7 +442,7 @@ export const actions = {
     return {type: 'robot:MOVE_TO_SUCCESS', payload: {}}
   },
 
-  setJogDistance (step: number) {
+  setJogDistance (step: number): SetJogDistanceAction {
     return {type: 'robot:SET_JOG_DISTANCE', payload: step}
   },
 

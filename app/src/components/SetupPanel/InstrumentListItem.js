@@ -42,6 +42,7 @@ export default function InstrumentListItem (props: Props) {
       url={url}
       confirmed={confirmed}
       iconName={iconName}
+      activeClassName={styles.active}
     >
       <div className={styles.item_info}>
         <span>{capitalize(mount)}</span>

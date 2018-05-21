@@ -10,7 +10,7 @@ type ListProps = {
   /** text of title */
   title: string,
   /** optional icon left of the title */
-  iconName?: IconName,
+  iconName?: ?IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
   iconProps?: $Diff<React.ElementProps<typeof Icon>, {name: *}>,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
@@ -27,7 +27,7 @@ type ListProps = {
   /** optional mouseLeave action */
   onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => void,
+  onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
   /** highlights the whole TitledList if true */

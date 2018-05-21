@@ -2,6 +2,8 @@
 'use strict'
 
 const path = require('path')
+const fs = require('fs')
+const os = require('os')
 
 jest.mock('electron-updater', () => ({autoUpdater: {}}))
 
@@ -11,11 +13,14 @@ const __clearMock = () => {
   Object.keys(__mockRemotes).forEach((remoteName) => {
     const remote = __mockRemotes[remoteName]
 
-    Object.keys(remote).forEach((methodName) => {
-      remote[methodName].mockClear()
+    Object.keys(remote).forEach((property) => {
+      const value = remote[property]
+      value && value.mockClear && value.mockClear()
     })
   })
 }
+
+const __tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ot-'))
 
 module.exports = {
   __mockRemotes,
@@ -32,5 +37,9 @@ module.exports = {
       __mockRemotes[name] = remote
       return remote
     })
+  },
+
+  app: {
+    getPath: () => __tempDir
   }
 }

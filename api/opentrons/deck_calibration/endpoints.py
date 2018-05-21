@@ -66,7 +66,7 @@ class SessionManager:
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
-        default = robot_configs._get_default().gantry_calibration
+        default = robot_configs._build_config({}, {}).gantry_calibration
         robot.config = robot.config._replace(gantry_calibration=default)
 
 
@@ -256,7 +256,7 @@ async def save_xy(data):
     {
       'token': UUID token from current session start
       'command': 'save xy'
-      'point': an integer [1, 2, or 3] of the calibration point to save
+      'point': a string ID ['1', '2', or '3'] of the calibration point to save
     }
     """
     global session
@@ -300,7 +300,7 @@ async def save_z(data):
     return web.json_response({'message': message}, status=status)
 
 
-def save_transform(data):
+async def save_transform(data):
     """
     Calculate the transormation matrix that calibrates the gantry to the deck
     :param data: Information obtained from a POST request.
@@ -330,7 +330,7 @@ def save_transform(data):
             gantry_calibration=list(
                 map(lambda i: list(i), calibration_matrix)))
 
-        robot_configs.save(robot.config)
+        robot_configs.save_deck_calibration(robot.config)
         robot_configs.backup_configuration(robot.config)
         message = "Config file saved and backed up"
         status = 200

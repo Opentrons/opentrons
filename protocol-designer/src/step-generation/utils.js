@@ -4,14 +4,13 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import {computeWellAccess} from '@opentrons/labware-definitions'
+import {computeWellAccess} from '@opentrons/shared-data'
 import type {CommandCreator, RobotState} from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
 }
 
-// TODO Ian 2018-02-13: how should errors that happen in CommandCreators (eg, invalid previous state: no more tips) be handled?
 /**
  * Take an array of CommandCreators, streaming robotState through them in order,
  * and adding each CommandCreator's commands to a single commands array.

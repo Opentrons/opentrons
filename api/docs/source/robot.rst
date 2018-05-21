@@ -1,6 +1,6 @@
 .. _robot:
 
-.. testsetup:: robot
+.. code-block:: python
 
     from opentrons import robot
     robot.reset()
@@ -15,7 +15,7 @@ Advanced Control
 
 The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.
 
-.. testcode:: robot
+.. code-block:: python
 
     '''
     Examples in this section require the following
@@ -27,12 +27,22 @@ The robot module can be thought of as the parent for all aspects of the Opentron
 
     pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
 
+
+User-Specified Pause
+==========
+
+This will pause your protocol at a specific step. You can resume by pressing 'resume' in your OT App.
+
+.. code-block:: python
+
+robot.pause()
+
 Head Speed
 ==========
 
 The maximum speed of the robot's head can be set using ``robot.head_speed()``. The value we set the speed to is in millimeters-per-second (mm/sec).
 
-.. testcode:: robot
+.. code-block:: python
 
     robot.head_speed(5000)
 
@@ -45,7 +55,7 @@ Homing
 
 You can `home` the robot by calling ``home()``. You can also specify axes. The robot will home immdediately when this call is made.
 
-.. testcode:: robot
+.. code-block:: python
 
     robot.home()           # home the robot on all axis
     robot.home('z')        # home the Z axis only
@@ -57,7 +67,7 @@ When commands are called on a pipette, they are recorded on the ``robot`` in the
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
-.. testcode:: robot
+.. code-block:: python
 
     pipette.pick_up_tip(tiprack.wells('A1'))
     pipette.drop_tip(tiprack.wells('A1'))
@@ -67,8 +77,7 @@ __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     Picking up tip <Well A1>
     Dropping tip <Well A1>
@@ -78,7 +87,7 @@ Clear Commands
 
 We can erase the robot command history by calling ``robot.clear_commands()``. Any previously created instruments and containers will still be inside robot, but the commands history is erased.
 
-.. testcode:: robot
+.. code-block:: python
 
     robot.clear_commands()
     pipette.pick_up_tip(tiprack['A1'])
@@ -89,8 +98,7 @@ We can erase the robot command history by calling ``robot.clear_commands()``. An
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     There is 1 command
     There are now 0 commands
@@ -100,7 +108,7 @@ Comment
 
 You can add a custom message to the list of command descriptions you see when running ``robot.commands()``. This command is ``robot.comment()``, and it allows you to print out any information you want at the point in your protocol
 
-.. testcode:: robot
+.. code-block:: python
 
     robot.clear_commands()
 
@@ -115,8 +123,7 @@ You can add a custom message to the list of command descriptions you see when ru
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     Picking up tip <Well A1>
     Hello, just picked up tip A1
@@ -130,15 +137,14 @@ When containers are loaded, they are automatically added to the ``robot``. You c
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
-.. testcode:: robot
+.. code-block:: python
 
     for container in robot.get_containers():
         print(container.get_name(), container.get_type())
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     my-rack tiprack-200ul
     my-plate 96-flat
@@ -150,15 +156,14 @@ When instruments are created, they are automatically added to the ``robot``. You
 
 __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
-.. testcode:: robot
+.. code-block:: python
 
     for axis, pipette in robot.get_instruments():
         print(pipette.name, axis)
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     my-pipette B
 
@@ -167,7 +172,7 @@ Reset
 
 Calling ``robot.reset()`` will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.
 
-.. testcode:: robot
+.. code-block:: python
 
     robot.reset()
     print(robot.get_containers())
@@ -176,8 +181,7 @@ Calling ``robot.reset()`` will remove everything from the robot. Any previously 
 
 will print out...
 
-.. testoutput:: robot
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
+.. code-block:: python
 
     []
     []

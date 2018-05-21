@@ -1,9 +1,12 @@
+import logging
 import os
 import json
 from collections import namedtuple
 from opentrons.config import get_config_index
 
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+log = logging.getLogger(__name__)
 
 
 def pipette_config_path():
@@ -22,36 +25,77 @@ pipette_config = namedtuple(
         'channels',
         'name',
         'model_offset',
+        'plunger_current',
+        'drop_tip_current',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
 
 
-def _load_config_from_file(pipette_model: str) -> pipette_config:
+def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
+
+    def _dict_key_to_config_attribute(key: str) -> str:
+        '''
+        Converts the JSON key syntax (eg: "plungerPositions"), to the format
+        used in the namedtuple `plunger_config` (eg: "plunger_positions")
+        '''
+        return ''.join([
+                '_{}'.format(c.lower()) if c.isupper() else c
+                for c in key
+            ])
+
+    def _load_config_value(config_dict: dict, key: str):
+        '''
+        Retrieves a given key from the loaded JSON config dict. If that key is
+        not present in the dictionary, it falls back to the value from
+        the namedtuple `plunger_config`, named "fallback"
+        '''
+        nonlocal model
+        fallback_cfg = fallback_configs.get(model)
+        fallback_key = _dict_key_to_config_attribute(key)
+        fallback_value = getattr(fallback_cfg, fallback_key)
+        return config_dict.get(key, fallback_value)
+
+    res = None
+
+    try:
+        plunger_pos = _load_config_value(cfg, 'plungerPositions')
+        res = pipette_config(
+            plunger_positions={
+                'top': plunger_pos['top'],
+                'bottom': plunger_pos['bottom'],
+                'blow_out': plunger_pos.get(
+                    'blowOut', plunger_pos.get('blow_out')),
+                'drop_tip': plunger_pos.get(
+                    'dropTip', plunger_pos.get('drop_tip')),
+            },
+            pick_up_current=_load_config_value(cfg, 'pickUpCurrent'),
+            aspirate_flow_rate=_load_config_value(
+                cfg, 'aspirateFlowRate'),
+            dispense_flow_rate=_load_config_value(
+                cfg, 'dispenseFlowRate'),
+            ul_per_mm=_load_config_value(cfg, 'ulPerMm'),
+            channels=_load_config_value(cfg, 'channels'),
+            name=model,
+            model_offset=_load_config_value(cfg, 'modelOffset'),
+            plunger_current=_load_config_value(cfg, 'plungerCurrent'),
+            drop_tip_current=_load_config_value(cfg, 'dropTipCurrent'),
+            tip_length=_load_config_value(cfg, 'tipLength')
+        )
+    except (KeyError, json.decoder.JSONDecodeError) as e:
+        log.error('Error when loading pipette config: {}'.format(e))
+
+    return res
+
+
+def _load_config_dict_from_file(pipette_model: str) -> dict:
     config_file = pipette_config_path()
+    cfg = {}
     if os.path.exists(config_file):
         with open(config_file) as conf:
             all_configs = json.load(conf)
             cfg = all_configs[pipette_model]
-            res = pipette_config(
-                plunger_positions={
-                    'top': cfg['plungerPositions']['top'],
-                    'bottom': cfg['plungerPositions']['bottom'],
-                    'blow_out': cfg['plungerPositions']['blowOut'],
-                    'drop_tip': cfg['plungerPositions']['dropTip']
-                },
-                pick_up_current=cfg['pickUpCurrent'],
-                aspirate_flow_rate=cfg['aspirateFlowRate'],
-                dispense_flow_rate=cfg['dispenseFlowRate'],
-                ul_per_mm=cfg['ulPerMm'],
-                channels=cfg['channels'],
-                name=pipette_model,
-                model_offset=cfg['modelOffset'],
-                tip_length=cfg['tipLength']
-            )
-    else:
-        res = None
-    return res
+    return cfg
 
 
 # ------------------------- deprecated data ---------------------------
@@ -80,123 +124,142 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 DEFAULT_ASPIRATE_SECONDS = 2
 DEFAULT_DISPENSE_SECONDS = 1
 
+# TODO (ben 20180511): should we read these values from
+# TODO                 /shared-data/robot-data/pipette-config.json ? Unclear,
+# TODO                 because this is the backup in case that behavior fails,
+# TODO                 but we could make it more reliable if we start bundling
+# TODO                 config data into the wheel file perhaps. Needs research.
 p10_single = pipette_config(
     plunger_positions={
-        'top': 18,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -5
+        'top': 19,
+        'bottom': 2.5,
+        'blow_out': -0.5,
+        'drop_tip': -4
     },
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.617,
+    ul_per_mm=0.77,
     channels=1,
     name='p10_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P10),
-    tip_length=40
+    model_offset=[0.0, 0.0, Z_OFFSET_P10],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    tip_length=33
 )
 
 p10_multi = pipette_config(
     plunger_positions={
-        'top': 18,
-        'bottom': 3,
+        'top': 19,
+        'bottom': 4,
         'blow_out': 1,
-        'drop_tip': -5
+        'drop_tip': -4.5
     },
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.617,
+    ul_per_mm=0.77,
     channels=8,
     name='p10_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=40
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    tip_length=33
 )
 
 p50_single = pipette_config(
     plunger_positions={
-        'top': 18,
-        'bottom': 4,
+        'top': 19,
+        'bottom': 2.5,
         'blow_out': 2,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.08,
+    ul_per_mm=3.35,
     channels=1,
     name='p50_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P50),
-    tip_length=60
+    model_offset=[0.0, 0.0, Z_OFFSET_P50],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    tip_length=51.7
 )
 
 p50_multi = pipette_config(
     plunger_positions={
-        'top': 18,
-        'bottom': 4,
+        'top': 19,
+        'bottom': 2.5,
         'blow_out': 2,
         'drop_tip': -4
     },
     pick_up_current=0.3,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.08,
+    ul_per_mm=3.35,
     channels=8,
     name='p50_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=60
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    tip_length=51.7
 )
 
 p300_single = pipette_config(
     plunger_positions={
-        'top': 18,
-        'bottom': 3,
+        'top': 19,
+        'bottom': 2.5,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=18.51,
+    ul_per_mm=18.7,
     channels=1,
     name='p300_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P300),
-    tip_length=60
+    model_offset=[0.0, 0.0, Z_OFFSET_P300],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    tip_length=51.7
 )
 
 p300_multi = pipette_config(
     plunger_positions={
-        'top': 18,
+        'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -4
+        'drop_tip': -3.5
     },
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=18.51,
+    ul_per_mm=19,
     channels=8,
     name='p300_multi_v1',
-    model_offset=(0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI),
-    tip_length=60
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    tip_length=51.7
 )
 
 p1000_single = pipette_config(
     plunger_positions={
-        'top': 18,
+        'top': 19,
         'bottom': 3,
         'blow_out': 1,
-        'drop_tip': -2.5
+        'drop_tip': -5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=61.69,
+    ul_per_mm=65,
     channels=1,
     name='p1000_single_v1',
-    model_offset=(0.0, 0.0, Z_OFFSET_P1000),
-    tip_length=60
+    model_offset=[0.0, 0.0, Z_OFFSET_P1000],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    tip_length=76.7
 )
 
 fallback_configs = {
@@ -211,7 +274,8 @@ fallback_configs = {
 
 
 def select_config(model: str):
-    cfg = _load_config_from_file(model)
+    cfg_dict = _load_config_dict_from_file(model)
+    cfg = _create_config_from_dict(cfg_dict, model)
     if not cfg:
         cfg = fallback_configs.get(model)
     return cfg

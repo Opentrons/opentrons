@@ -5,6 +5,7 @@ from opentrons.instruments import pipette_config
 from opentrons import instruments as inst, containers as cnt
 from opentrons.data_storage import database_migration
 from opentrons._version import __version__
+from opentrons.config import feature_flags as ff
 
 version = sys.version_info[0:2]
 if version < (3, 5):
@@ -12,7 +13,8 @@ if version < (3, 5):
         'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
             version[0], version[1]))
 
-database_migration.check_version_and_perform_necessary_migrations()
+if not ff.split_labware_definitions():
+    database_migration.check_version_and_perform_necessary_migrations()
 robot = Robot()
 
 
@@ -199,9 +201,11 @@ class InstrumentsWrapper(object):
             ul_per_mm=config.ul_per_mm,
             aspirate_flow_rate=config.aspirate_flow_rate,
             dispense_flow_rate=config.dispense_flow_rate,
+            plunger_current=config.plunger_current,
+            drop_tip_current=config.drop_tip_current,
+            plunger_positions=config.plunger_positions.copy(),
             fallback_tip_length=config.tip_length)  # TODO move to labware
 
-        p.plunger_positions = config.plunger_positions.copy()
         p.set_pick_up_current(config.pick_up_current)
         return p
 

@@ -168,12 +168,19 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       if (validatedForm.stepType === 'transfer') {
         nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
       }
+      if (validatedForm.stepType === 'distribute') {
+        nextCommandsAndState = StepGeneration.distribute(validatedForm)(acc.robotState)
+      }
       if (validatedForm.stepType === 'pause') {
         nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
       }
+      if (validatedForm.stepType === 'mix') {
+        nextCommandsAndState = StepGeneration.mix(validatedForm)(acc.robotState)
+      }
 
       if (!nextCommandsAndState) {
-        // TODO implement the remaining steps
+        // TODO Ian 2018-05-08 use assert
+        console.warn(`StepType "${validatedForm.stepType}" not yet implemented`)
         return {
           ...acc,
           formErrors: {

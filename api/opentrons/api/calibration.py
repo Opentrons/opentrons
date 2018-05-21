@@ -91,7 +91,6 @@ class CalibrationManager:
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        inst.robot.home()
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
         )
@@ -111,7 +110,9 @@ class CalibrationManager:
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
+
         inst.move_to(target)
+
         self._set_state('ready')
 
     def jog(self, instrument, distance, axis):

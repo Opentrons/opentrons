@@ -92,7 +92,8 @@ def test_aspirate_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (8.402, 0.0, 0.0)).all()
+
+    assert (current_pos == (7.847594, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
@@ -120,10 +121,26 @@ def test_dispense_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (3.0, 0.0, 0.0)).all()
+    assert (current_pos == (2.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
+
+
+def test_trough_move_to():
+    from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
+    robot.reset()
+    tip_rack = containers_load(robot, 'tiprack-200ul', '3')
+    p300 = instruments.P300_Single(
+                   mount='left',
+                   tip_racks=[tip_rack])
+
+    trough = containers_load(robot, 'trough-12row', '1')
+    p300.pick_up_tip()
+    p300.move_to(trough)
+    current_pos = pose_tracker.absolute(robot.poses, p300)
+
+    assert isclose(current_pos, (14.34, 7.75 + 35 + Y_OFFSET_MULTI, 40)).all()
 
 
 def test_delay_calls(monkeypatch):
@@ -179,4 +196,33 @@ def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     base_obj = movelog[0][0]
     y_offset = movelog[0][1][1]
     assert base_obj == robot.fixed_trash[0]
-    assert y_offset == 108
+    assert y_offset == 111.5
+
+
+def test_fallback_config_file():
+    from opentrons.instruments.pipette_config import \
+        _create_config_from_dict, fallback_configs
+
+    pipette_dict = {
+        'ulPerMm': 123,
+        'tipLength': 321,
+        'channels': 4
+    }
+
+    for model, config in fallback_configs.items():
+        new_config = _create_config_from_dict(pipette_dict, model)
+        assert new_config.ul_per_mm == 123
+        assert new_config.tip_length == 321
+        assert new_config.channels == 4
+        assert new_config.name == config.name
+        assert new_config.pick_up_current == config.pick_up_current
+        assert new_config.plunger_positions == config.plunger_positions
+
+
+def test_json_and_fallback_configs_match():
+    from opentrons.instruments.pipette_config import \
+        select_config, fallback_configs
+
+    for model, config_fallback in fallback_configs.items():
+        config_from_json = select_config(model)
+        assert config_from_json == config_fallback

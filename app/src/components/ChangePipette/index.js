@@ -3,9 +3,9 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push, goBack} from 'react-router-redux'
 import {Switch, Route, withRouter, type Match} from 'react-router'
-import {getPipette, getPipetteModels} from '@opentrons/labware-definitions'
+import {getPipette, getPipetteModels} from '@opentrons/shared-data'
 
-import type {PipetteConfig} from '@opentrons/labware-definitions'
+import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, Dispatch} from '../../types'
 import type {Robot, Mount} from '../../robot'
 import type {Direction, ChangePipetteProps} from './types'
@@ -60,7 +60,7 @@ export default function ChangePipette (props: Props) {
           <ConnectedChangePipetteRouter
             robot={robot}
             title={TITLE}
-            subtitle={`${mount} carriage`}
+            subtitle={`${mount} mount`}
             mount={mount}
             wantedPipette={wantedPipette}
             parentUrl={parentUrl}
@@ -189,7 +189,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {confirmUrl, parentUrl, baseUrl, robot, mount} = ownProps
   const disengage = () => dispatch(disengagePipetteMotors(robot, mount))
   const checkPipette = () => disengage()
-    .then(() => dispatch(fetchPipettes(robot)))
+    .then(() => dispatch(fetchPipettes(robot, true)))
 
   return {
     checkPipette,

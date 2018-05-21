@@ -28,6 +28,7 @@ export type {
   DeckCalCommandState,
   JogAxis,
   JogDirection,
+  JogStep,
   DeckCalPoint
 } from './calibration'
 
@@ -77,8 +78,10 @@ export type Action =
 export {
   startDeckCalibration,
   deckCalibrationCommand,
+  setCalibrationJogStep,
   makeGetDeckCalibrationStartState,
-  makeGetDeckCalibrationCommandState
+  makeGetDeckCalibrationCommandState,
+  getCalibrationJogStep
 } from './calibration'
 
 export {

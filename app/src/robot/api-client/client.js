@@ -9,7 +9,7 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 import {handleDiscover} from './discovery'
 
-const RUN_TIME_TICK_INTERVAL_MS = 500
+const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
@@ -197,8 +197,8 @@ export default function client (dispatch) {
     // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
 
     remote.calibration_manager.return_tip(instrument)
-    .then(() => dispatch(actions.returnTipResponse()))
-    .catch((error) => dispatch(actions.returnTipResponse(error)))
+      .then(() => dispatch(actions.returnTipResponse()))
+      .catch((error) => dispatch(actions.returnTipResponse(error)))
   }
 
   function moveTo (state, action) {
@@ -272,7 +272,10 @@ export default function client (dispatch) {
   }
 
   function cancel (state, action) {
-    remote.session_manager.session.stop()
+    // ensure session is unpaused before canceling to work around RPC API's
+    // inablity to cancel a paused protocol
+    remote.session_manager.session.resume()
+      .then(() => remote.session_manager.session.stop())
       .then(() => dispatch(actions.cancelResponse()))
       .catch((error) => dispatch(actions.cancelResponse(error)))
   }
@@ -292,45 +295,51 @@ export default function client (dispatch) {
   }
 
   function handleApiSession (apiSession) {
-    const {
-      name,
-      protocol_text,
-      commands,
-      command_log,
-      state,
-      instruments,
-      containers
-    } = apiSession
-    const protocolCommands = []
-    const protocolCommandsById = {}
-    const instrumentsByMount = {}
-    const labwareBySlot = {}
+    const update = {state: apiSession.state, startTime: apiSession.startTime}
 
     // ensure run timer is running or stopped
-    if (state === constants.RUNNING) {
+    if (update.state === constants.RUNNING) {
       setRunTimerInterval()
     } else {
       clearRunTimerInterval()
     }
 
-    try {
-      // TODO(mc, 2017-08-30): Use a reduce
-      ;(commands || []).forEach(makeHandleCommand())
-      ;(instruments || []).forEach(apiInstrumentToInstrument)
-      ;(containers || []).forEach(apiContainerToContainer)
-
-      const payload = {
-        name,
-        state,
-        errors: [],
-        protocolText: protocol_text,
-        protocolCommands,
-        protocolCommandsById,
-        instrumentsByMount,
-        labwareBySlot
+    // if lastCommand key is present, we're dealing with a light update
+    if ('lastCommand' in apiSession) {
+      const lastCommand = apiSession.lastCommand && {
+        id: apiSession.lastCommand.id,
+        handledAt: apiSession.lastCommand.handledAt
       }
 
-      dispatch(actions.sessionResponse(null, payload))
+      return dispatch(actions.sessionUpdate({...update, lastCommand}))
+    }
+
+    // else we're doing a heavy full session deserialization
+    try {
+      // TODO(mc, 2017-08-30): Use a reduce
+      if (apiSession.commands) {
+        update.protocolCommands = []
+        update.protocolCommandsById = {}
+        apiSession.commands.forEach(makeHandleCommand())
+      }
+
+      if (apiSession.instruments) {
+        update.instrumentsByMount = {}
+        apiSession.instruments.forEach(apiInstrumentToInstrument)
+      }
+
+      if (apiSession.containers) {
+        update.labwareBySlot = {}
+        apiSession.containers.forEach(apiContainerToContainer)
+      }
+
+      if (apiSession.protocol_text) {
+        update.protocolText = apiSession.protocol_text
+      }
+
+      if (apiSession.name) update.name = apiSession.name
+
+      dispatch(actions.sessionResponse(null, update))
     } catch (error) {
       dispatch(actions.sessionResponse(error))
     }
@@ -338,16 +347,16 @@ export default function client (dispatch) {
     function makeHandleCommand (depth = 0) {
       return function handleCommand (command) {
         const {id, description} = command
-        const logEntry = command_log[id]
+        const logEntry = apiSession.command_log[id]
         const children = Array.from(command.children)
         let handledAt = null
 
-        if (logEntry) handledAt = logEntry.timestamp
-        if (depth === 0) protocolCommands.push(id)
+        if (logEntry != null) handledAt = logEntry
+        if (depth === 0) update.protocolCommands.push(id)
 
         children.forEach(makeHandleCommand(depth + 1))
 
-        protocolCommandsById[id] = {
+        update.protocolCommandsById[id] = {
           id,
           description,
           handledAt,
@@ -362,7 +371,7 @@ export default function client (dispatch) {
       //  interacts with
       const volume = Number(name.match(RE_VOLUME)[1])
 
-      instrumentsByMount[mount] = {_id, mount, name, channels, volume}
+      update.instrumentsByMount[mount] = {_id, mount, name, channels, volume}
     }
 
     function apiContainerToContainer (apiContainer) {
@@ -374,20 +383,20 @@ export default function client (dispatch) {
         labware.calibratorMount = apiContainer.instruments[0].mount
       }
 
-      labwareBySlot[slot] = labware
+      update.labwareBySlot[slot] = labware
     }
   }
 
   function handleRobotNotification (message) {
     const {topic, payload} = message
 
-    console.log(message)
+    console.log(`"${topic}" message:`, payload)
 
     switch (topic) {
       case 'session': return handleApiSession(payload)
     }
 
-    console.log('Unhandled message!')
+    console.warn(`"${topic}" message was unhandled`)
   }
 
   function handleClientError (error) {

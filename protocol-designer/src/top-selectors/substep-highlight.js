@@ -1,6 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
-import {computeWellAccess} from '@opentrons/labware-definitions'
+import {computeWellAccess} from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -53,6 +53,9 @@ function _getSelectedWellsForStep (
 
   // If we're moving liquids within a single labware,
   // both the source and dest wells together need to be selected.
+  if (form.stepType === 'mix') {
+    wells = getWells(form.wells)
+  }
   if (form.stepType === 'transfer') {
     if (form.sourceLabware === labwareId) {
       wells.push(...getWells(form.sourceWells))
@@ -105,6 +108,14 @@ function _getSelectedWellsForSubstep (
   }
 
   let wells: Array<string> = []
+
+  // TODO Ian 2018-05-09 re-evaluate the steptype handling here
+  // single-labware steps
+  if (form.stepType === 'mix' && form.labware && form.labware === labwareId) {
+    return getWells('sourceWell')
+  }
+
+  // source + dest steps
   if (form.sourceLabware && form.sourceLabware === labwareId) {
     wells.push(...getWells('sourceWell'))
   }

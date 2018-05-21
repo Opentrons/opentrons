@@ -3,15 +3,10 @@
 // api updater
 'use strict'
 
-const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
-const {promisify} = require('util')
-const semver = require('semver')
 
-const {version: LATEST_VERSION} = require('../package.json')
-
-const readDir = promisify(fs.readdir)
-const readFile = promisify(fs.readFile)
+const {version: AVAILABLE_UPDATE} = require('../package.json')
 
 /*::
 import type {RobotService} from '../../app/src/robot'
@@ -23,13 +18,13 @@ const UPDATE_DIR = path.join(__dirname, '../../api/dist')
 let updateFile
 
 module.exports = {
+  AVAILABLE_UPDATE,
   initialize,
-  getAvailableUpdate,
   getUpdateFile
 }
 
 function initialize () /*: Promise<void> */ {
-  return readDir(UPDATE_DIR)
+  return fse.readdir(UPDATE_DIR)
     .then((files) => {
       const wheels = files.filter((file) => file.endsWith(UPDATE_EXT))
 
@@ -43,15 +38,9 @@ function initialize () /*: Promise<void> */ {
     })
 }
 
-function getAvailableUpdate (robotVersion /*: string */) /*: ?string */ {
-  return semver.gt(LATEST_VERSION, robotVersion)
-    ? LATEST_VERSION
-    : null
-}
-
 function getUpdateFile () /*: Promise<string> */ {
   if (!updateFile) return Promise.reject(new Error('No update file available'))
 
-  return readFile(path.join(UPDATE_DIR, updateFile))
+  return fse.readFile(path.join(UPDATE_DIR, updateFile))
     .then((contents) => ({name: updateFile, contents}))
 }
