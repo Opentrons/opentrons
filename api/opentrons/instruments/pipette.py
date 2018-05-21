@@ -1297,6 +1297,37 @@ class Pipette:
 
         return self
 
+    def calibrate(self, position):
+        """
+        Calibrate a saved plunger position to the robot's current position
+        Notes
+        -----
+        This will only work if the API is connected to a robot
+        Parameters
+        ----------
+        position : str
+            Either "top", "bottom", "blow_out", or "drop_tip"
+        Returns
+        -------
+        This instance of :class:`Pipette`.
+        Examples
+        --------
+        ..
+        >>> robot = Robot()
+        >>> p200 = instruments.Pipette(name='p200', mount='left')
+        >>> robot.move_plunger(**{'a': 10})
+        >>> # save plunger 'top' to coordinate 10
+        >>> p200.calibrate('top') # doctest: +ELLIPSIS
+        <opentrons.instruments.pipette.Pipette object at ...>
+        """
+        current_position = self.robot._driver.get_plunger_positions()
+        current_position = current_position['target'][self.axis]
+        kwargs = {}
+        kwargs[position] = current_position
+        self.calibrate_plunger(**kwargs)
+
+        return self
+
     def calibrate_plunger(
             self,
             top=None,
@@ -1334,6 +1365,31 @@ class Pipette:
             self.plunger_positions['blow_out'] = blow_out
         if drop_tip is not None:
             self.plunger_positions['drop_tip'] = drop_tip
+
+        return self
+
+    def set_max_volume(self, max_volume):
+        """
+        Set this pipette's maximum volume, equal to the number of
+        microliters drawn when aspirating with the plunger's full range
+        Parameters
+        ----------
+        max_volume: int or float
+            The maximum number of microliters this :any:`Pipette` can hold.
+            Must be calculated and set after plunger calibrations to ensure
+            accuracy
+        """
+        # self.max_volume = max_volume
+
+        # if self.max_volume <= self.min_volume:
+        #     raise RuntimeError(
+        #         'Pipette max volume is less than '
+        #         'min volume ({0} < {1})'.format(
+        #             self.max_volume, self.min_volume))
+
+        warnings.warn(
+            "'max_volume' is deprecated, use `ul_per_mm` in constructor"
+        )
 
         return self
 

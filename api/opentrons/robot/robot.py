@@ -611,8 +611,7 @@ class Robot(object):
             ``direct`` : move to the point in a straight line.
         """
 
-        placeable, coordinates = containers.\
-            unpack_location(location)
+        placeable, coordinates = containers.unpack_location(location)
 
         # because the top position is what is tracked,
         # this checks if coordinates doesn't equal top
