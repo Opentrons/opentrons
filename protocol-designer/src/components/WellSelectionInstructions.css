@@ -1,0 +1,10 @@
+@import '@opentrons/components';
+
+.instructional_text {
+  @apply --unselectable;
+
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: var(--fw-semibold);
+  color: var(--c-white);
+}
