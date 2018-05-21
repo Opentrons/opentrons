@@ -68,14 +68,6 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(
             RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
-    def test_set_max_volume(self):
-        import warnings
-        warnings.filterwarnings('error')
-        self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
-        self.assertRaises(
-            UserWarning, Pipette, self.robot, mount='right', max_volume=200)
-        warnings.filterwarnings('default')
-
     def test_deprecated_axis_call(self):
         import warnings
 

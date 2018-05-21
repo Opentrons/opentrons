@@ -84,6 +84,19 @@ def test_remove_serial_echo(smoothie, monkeypatch):
         driver_3_0.SMOOTHIE_ACK)
     assert res == 'TESTS-RULE'
 
+    def return_echo_response(command, ack, connection, timeout):
+        if 'some-data' in command:
+            return command.strip() + '\r\nT\r\nESTS-RULE'
+        return command
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        return_echo_response)
+
+    res = smoothie._send_command(
+        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
+        driver_3_0.SMOOTHIE_ACK)
+    assert res == 'TESTS-RULE'
+
 
 def test_parse_position_response(smoothie):
     from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
