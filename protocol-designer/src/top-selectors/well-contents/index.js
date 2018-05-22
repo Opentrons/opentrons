@@ -22,8 +22,6 @@ import type {NamedIngredsByLabwareAllSteps} from '../../steplist/types'
 import wellContentsAllLabwareExport from './wellContentsAllLabware'
 export const wellContentsAllLabware = wellContentsAllLabwareExport
 
-type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
-
 function _wellContentsForWell (
   liquidVolState: StepGeneration.LocationLiquidState,
   well: string
@@ -45,7 +43,7 @@ function _wellContentsForWell (
 }
 
 export function _wellContentsForLabware (
-  labwareLiquids: SingleLabwareLiquidState,
+  labwareLiquids: StepGeneration.SingleLabwareLiquidState,
   labwareId: string,
   labwareType: string
 ): AllWellContents {
@@ -70,7 +68,7 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
     return liquidStateTimeline.map(
       (liquidState, timelineIdx) => mapValues(
         liquidState,
-        (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
+        (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
           const robotState = _robotStateTimeline[timelineIdx].robotState
           const labwareType = robotState.labware[labwareId].type
 
@@ -90,7 +88,7 @@ export const lastValidWellContents: Selector<{[labwareId: string]: AllWellConten
   (timelineFull) => {
     return mapValues(
       timelineFull.robotState.labware,
-      (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
+      (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
         return _wellContentsForLabware(
           timelineFull.robotState.liquidState.labware[labwareId],
           labwareId,

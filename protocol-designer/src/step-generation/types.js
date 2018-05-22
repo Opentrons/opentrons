@@ -134,6 +134,8 @@ type TipId = string
 
 export type LocationLiquidState = {[ingredGroup: string]: {volume: number}}
 
+export type SingleLabwareLiquidState = {[well: string]: LocationLiquidState}
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
   instruments: {
