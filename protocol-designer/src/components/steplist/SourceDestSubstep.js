@@ -30,7 +30,6 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
         <MultiChannelSubstep
           key={groupKey}
           rowGroup={rowGroup}
-          volume={substeps.volume}
           onMouseEnter={() => onSelectSubstep({
             stepId: substeps.parentStepId,
             substepId: groupKey
