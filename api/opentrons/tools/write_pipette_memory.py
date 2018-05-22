@@ -76,6 +76,9 @@ def _user_submitted_barcode(max_length):
     barcode = input('BUTTON + SCAN: ').strip()
     if len(barcode) > max_length:
         raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
+    # remove all characters before the letter P
+    # for example, remove ASCII selector code "\x1b(B" on chinese keyboards
+    barcode = barcode[barcode.index('P'):]
     return barcode
 
 

@@ -417,7 +417,7 @@ exports[`icons flask-outline renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons info-circle renders correctly 1`] = `
+exports[`icons information renders correctly 1`] = `
 <svg
   aria-hidden="true"
   className="foo"

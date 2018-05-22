@@ -13,8 +13,6 @@ import type {Selector} from '../types'
 import type {StepSubItemData} from '../steplist/types'
 import type {ProcessedFormData} from '../form-types'
 
-type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
-
 type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
 
@@ -134,7 +132,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
   allSubsteps,
   (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
     function highlightedWellsForLabwareAtStep (
-      labwareLiquids: SingleLabwareLiquidState,
+      labwareLiquids: StepGeneration.SingleLabwareLiquidState,
       labwareId: string,
       robotState: StepGeneration.RobotState,
       form: ProcessedFormData,
@@ -169,7 +167,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       // replace value of each labware with highlighted wells info
       return mapValues(
         liquidState,
-        (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => (form)
+        (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => (form)
           ? highlightedWellsForLabwareAtStep(
             labwareLiquids,
             labwareId,

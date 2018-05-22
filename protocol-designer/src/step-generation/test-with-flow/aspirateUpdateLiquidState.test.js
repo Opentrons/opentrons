@@ -271,15 +271,18 @@ describe('...8-channel pipette', () => {
   test('aspirate from single-ingredient common well (trough-12row)', () => {
     let initialLiquidState = getBlankLiquidState('trough-12row')
 
+    const initialSourceVolume = 300
+    const aspirateVolume = 20
+
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
-      A1: {ingred1: {volume: 300}}
+      A1: {ingred1: {volume: initialSourceVolume}}
     }
 
     const args = {
       ...aspirate8Ch50FromA1Args,
       labwareType: 'trough-12row',
-      volume: 100
+      volume: aspirateVolume
     }
 
     const result = updateLiquidState(args, initialLiquidState)
@@ -288,12 +291,12 @@ describe('...8-channel pipette', () => {
       pipettes: {
         p300MultiId: {
           // aspirate volume divided among the 8 tips
-          ...createTipLiquidState(8, {ingred1: {volume: 100 / 8}})
+          ...createTipLiquidState(8, {ingred1: {volume: aspirateVolume}})
         }
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: 200}}
+          A1: {ingred1: {volume: initialSourceVolume - (aspirateVolume * 8)}}
         }
       }
     })
