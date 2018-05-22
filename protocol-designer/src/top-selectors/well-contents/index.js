@@ -70,7 +70,7 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
       (liquidState, timelineIdx) => mapValues(
         liquidState,
         (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
-          const robotState = _robotStateTimeline[timelineIdx].robotState
+          const robotState = timeline[timelineIdx].robotState
           const labwareType = robotState.labware[labwareId].type
 
           return _wellContentsForLabware(
