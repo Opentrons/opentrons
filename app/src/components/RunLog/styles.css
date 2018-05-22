@@ -11,7 +11,7 @@
   font-family: 'Open Sans';
   overflow-y: scroll;
   border: 1rem solid white;
-  max-height: 44rem;
+  max-height: calc(100vh - 3.5rem);
 }
 
 .alert_visible {

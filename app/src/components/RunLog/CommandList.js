@@ -1,8 +1,11 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import styles from './styles.css'
+
+import {SpinnerModal} from '@opentrons/components'
 import SessionAlert from './SessionAlert'
+
+import styles from './styles.css'
 
 export default class CommandList extends Component {
   componentDidUpdate () {
@@ -10,7 +13,7 @@ export default class CommandList extends Component {
   }
 
   render () {
-    const {commands, sessionStatus} = this.props
+    const {commands, sessionStatus, cancelInProgress} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
@@ -49,6 +52,9 @@ export default class CommandList extends Component {
     const showAlert = (sessionStatus !== 'running' && sessionStatus !== 'loaded' && sessionStatus !== 'error')
     return (
       <div className={styles.run_page}>
+      {cancelInProgress && (
+        <SpinnerModal />
+      )}
       <SessionAlert {...this.props} className={styles.alert}/>
       <section className={cx(styles.run_log_wrapper, {[styles.alert_visible]: showAlert})}>
         <ol className={styles.list}>

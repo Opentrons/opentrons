@@ -18,7 +18,8 @@ type Props = SP
 
 const mapStateToProps = (state: State): SP => ({
   commands: robotSelectors.getCommands(state),
-  sessionStatus: robotSelectors.getSessionStatus(state)
+  sessionStatus: robotSelectors.getSessionStatus(state),
+  cancelInProgress: robotSelectors.getCancelInProgress(state)
 })
 
 function RunLog (props: Props) {

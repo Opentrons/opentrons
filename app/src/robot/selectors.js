@@ -29,6 +29,7 @@ const calibration = (state: State) => state[_NAME].calibration
 const connection = (state: State) => state[_NAME].connection
 const session = (state: State) => state[_NAME].session
 const sessionRequest = (state: State) => session(state).sessionRequest
+const cancelRequest = (state: State) => session(state).cancelRequest
 
 export function isMount (target: ?string): boolean {
   return INSTRUMENT_MOUNTS.indexOf(target) > -1
@@ -131,6 +132,10 @@ export function getIsRunning (state: State): boolean {
 
 export function getIsPaused (state: State): boolean {
   return getSessionStatus(state) === ('paused': SessionStatus)
+}
+
+export function getCancelInProgress (state: State) {
+  return cancelRequest(state).inProgress
 }
 
 export function getIsDone (state: State): boolean {
