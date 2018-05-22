@@ -15,7 +15,7 @@ from .models import Container, Instrument
 
 log = logging.getLogger(__name__)
 
-VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused'}
+VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 class SessionManager(object):
@@ -197,13 +197,14 @@ class Session(object):
                 execute_protocol(self._protocol)
             else:
                 exec(self._protocol, {})
+            self.set_state('finished')
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
+            self.set_state('error')
             raise e
         finally:
             _unsubscribe()
-            self.set_state('finished')
 
         return self
 

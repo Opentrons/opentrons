@@ -22,27 +22,27 @@
 }
 
 .success {
-  border: 1px solid #60b120;
+  border: 1px solid var(--c-success);
 
   & > .title_bar {
-    background-color: #b6febc;
-    color: #60b120;
+    background-color: var(--c-bg-success);
+    color: var(--c-success);
 
     & svg {
-      fill: #60b120;
+      color: var(--c-success);
     }
   }
 }
 
 .info {
-  border: 1px solid #0ec9eb;
+  border: 1px solid var(--c-highlight);
 
   & > .title_bar {
-    background-color: #f0f3ff;
-    color: #0ec9eb;
+    background-color: var(--c-bg-selected);
+    color: var(--c-highlight);
 
     & svg {
-      fill: #0ec9eb;
+      color: var(--c-highlight);
     }
   }
 }
@@ -51,8 +51,8 @@
   border: 1px solid var(--c-warning);
 
   & > .title_bar {
-    background-color: #ffd58f;
-    color: #7c4d00;
+    background-color: var(--c-bg-warning);
+    color: var(--c-warning);
 
     & svg {
       fill: var(--c-warning);

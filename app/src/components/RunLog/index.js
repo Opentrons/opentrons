@@ -1,18 +1,30 @@
+// @flow
 import React from 'react'
 import {connect} from 'react-redux'
-
-import {selectors as robotSelectors} from '../../robot'
+import type {State} from '../../types'
+import {
+  selectors as robotSelectors,
+  type SessionStatus
+} from '../../robot'
 
 import CommandList from './CommandList'
 
-const mapStateToProps = (state) => ({
-  commands: robotSelectors.getCommands(state)
+type SP = {
+  commands: Array<any>,
+  sessionStatus: SessionStatus
+}
+
+type Props = SP
+
+const mapStateToProps = (state: State): SP => ({
+  commands: robotSelectors.getCommands(state),
+  sessionStatus: robotSelectors.getSessionStatus(state)
 })
 
-function ConnectedRunLog (props) {
+function RunLog (props: Props) {
   return (
     <CommandList {...props} />
   )
 }
 
-export default connect(mapStateToProps)(ConnectedRunLog)
+export default connect(mapStateToProps)(RunLog)

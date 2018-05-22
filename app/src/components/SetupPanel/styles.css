@@ -18,7 +18,6 @@
 }
 
 .active {
-  color: #0ec9eb;
-  background-color: #f0f3ff;
-  fill: #0ec9eb;
+  color: var(--c-highlight);
+  background-color: var(--c-bg-selected);
 }
