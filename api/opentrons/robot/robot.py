@@ -298,11 +298,14 @@ class Robot(object):
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
 
+    def set_light_indicator_status(self, status):
+        self._driver.set_light_indicator_status(status)
+
     def turn_on_button_light(self):
-        gpio.set_light_indicator_status('ready')
+        self.set_light_indicator_status('ready')
 
     def turn_off_button_light(self):
-        gpio.set_light_indicator_status('off')
+        self.set_light_indicator_status('off')
 
     def turn_on_rail_lights(self):
         gpio.turn_on_rail_lights()

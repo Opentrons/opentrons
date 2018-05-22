@@ -440,14 +440,14 @@ class SmoothieDriver_3_0_0:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-        gpio.set_light_indicator_status('waiting')
+        self.set_light_indicator_status('waiting')
         try:
             self.disconnect()
             self._connect_to_port(port)
             self._setup()
-            gpio.set_light_indicator_status('ready')
+            self.set_light_indicator_status('ready')
         except Exception as e:
-            gpio.set_light_indicator_status('error')
+            self.set_light_indicator_status('error')
             raise e
 
     def disconnect(self):
@@ -840,7 +840,8 @@ class SmoothieDriver_3_0_0:
             if GCODES['HOME'] not in command and error_axis in 'XYZABC':
                 self.home(error_axis)
             if not self.simulating:
-                gpio.set_light_indicator_status('error')
+                self.set_light_indicator_status(
+                    'error', delay=LIGHT_INDICATOR_DELAY)
             raise SmoothieError(ret_code)
 
         return ret_code.strip()
@@ -1001,7 +1002,8 @@ class SmoothieDriver_3_0_0:
                 # to avoid firmware weirdness in how it parses GCode arguments
                 return _byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
-            pass
+            self.set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
     def _write_to_pipette(self, gcode, mount, data_string):
         '''
@@ -1062,13 +1064,14 @@ class SmoothieDriver_3_0_0:
         })
         return self._create_coords_list(backlash_target)
 
-    def _set_light_indicator_status(self, status, delay=None):
+    def set_light_indicator_status(self, status, delay=None):
+        # cancel any previously made calls to set the indicator status
         if self.delayed_light_indicator_timer:
             self.delayed_light_indicator_timer.cancel()
         if not self.simulating:
             if delay:
                 self.delayed_light_indicator_timer = Timer(
-                    delay, gpio.set_light_indicator_status, status)
+                    delay, self.set_light_indicator_status, [status])
                 self.delayed_light_indicator_timer.start()
             else:
                 gpio.set_light_indicator_status(status)
@@ -1120,7 +1123,7 @@ class SmoothieDriver_3_0_0:
 
             try:
                 if not self.simulating:
-                    gpio.set_light_indicator_status('moving')
+                    self.set_light_indicator_status('moving')
                 for axis in target.keys():
                     self.engaged_axes[axis] = True
                 if home_flagged_axes:
@@ -1131,7 +1134,7 @@ class SmoothieDriver_3_0_0:
                 # of 30 seconds prevents any movements that take longer
                 self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
                 if not self.simulating:
-                    self._set_light_indicator_status(
+                    self.set_light_indicator_status(
                         'ready', delay=LIGHT_INDICATOR_DELAY)
             finally:
                 # dwell pipette motors because they get hot
@@ -1173,7 +1176,7 @@ class SmoothieDriver_3_0_0:
             ]))
 
         if not self.simulating:
-            gpio.set_light_indicator_status('moving')
+            self.set_light_indicator_status('moving')
 
         non_moving_axes = ''.join([
             ax
@@ -1206,7 +1209,7 @@ class SmoothieDriver_3_0_0:
                     self._set_saved_current()
 
         if not self.simulating:
-            self._set_light_indicator_status(
+            self.set_light_indicator_status(
                 'ready', delay=LIGHT_INDICATOR_DELAY)
 
         self._update_position_after_homing(home_sequence)
@@ -1239,12 +1242,12 @@ class SmoothieDriver_3_0_0:
     def pause(self):
         if not self.simulating:
             self.run_flag.clear()
-            gpio.set_light_indicator_status('waiting')
+            self.set_light_indicator_status('waiting')
 
     def resume(self):
         if not self.simulating:
             self.run_flag.set()
-            gpio.set_light_indicator_status('ready')
+            self.set_light_indicator_status('ready')
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:
