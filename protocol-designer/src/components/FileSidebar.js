@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
 import {PrimaryButton, OutlineButton, SidePanel} from '@opentrons/components'
+import cx from 'classnames'
 import styles from './FileSidebar.css'
 
 type Props = {
-  onUploadClick?: () => mixed,
+  onUpload: (SyntheticInputEvent<HTMLInputElement>) => mixed,
   onCreateNew?: () => mixed,
   downloadData: ?{
     fileContents: string,
@@ -25,11 +26,11 @@ export default function FileSidebar (props: Props) {
           <div className={styles.divider} />
         </div>
       }
-
-      <div className={styles.bottom_buttons}>
-        <OutlineButton onClick={props.onUploadClick}>Upload</OutlineButton>
-        <OutlineButton onClick={props.onCreateNew}>Create New</OutlineButton>
-      </div>
+      <OutlineButton Component='label' className={cx(styles.upload_button, styles.bottom_button)}>
+        UPLOAD
+        <input type='file' onChange={props.onUpload} />
+      </OutlineButton>
+      <OutlineButton onClick={props.onCreateNew} className={styles.bottom_button}>Create New</OutlineButton>
     </SidePanel>
   )
 }
