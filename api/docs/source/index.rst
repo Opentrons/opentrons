@@ -3,11 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. code-block:: python
-
-  from opentrons import robot, containers, instruments
-
-
 ===============
 Opentrons API
 ===============
@@ -18,7 +13,7 @@ We’ve designed it in a way we hope is accessible to anyone with basic computer
 
 `View source code on GitHub`__
 
-__ https://github.com/opentrons/opentrons-api
+__ https://github.com/Opentrons/opentrons
 
 **********************
 
