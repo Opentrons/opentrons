@@ -24,6 +24,10 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     errors.push(errorCreators.pipetteVolumeExceeded({actionName, volume, maxVolume: pipetteData.maxVolume}))
   }
 
+  if (!labware || !prevRobotState.labware[labware]) {
+    errors.push(errorCreators.labwareDoesNotExist({actionName, labware}))
+  }
+
   if (errors.length > 0) {
     return {errors}
   }

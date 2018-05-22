@@ -106,6 +106,20 @@ describe('aspirate', () => {
     })
   })
 
+  test('aspirate from nonexistent labware should return error', () => {
+    const result = aspirateWithErrors({
+      pipette: 'p300SingleId',
+      volume: 50,
+      labware: 'problematicLabwareId',
+      well: 'A1'
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'LABWARE_DOES_NOT_EXIST'
+    })
+  })
+
   describe('liquid tracking', () => {
     const mockLiquidReturnValue = 'expected liquid state'
     beforeEach(() => {
