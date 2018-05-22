@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import sys
 import logging
 # import os
@@ -7,6 +6,7 @@ import traceback
 from aiohttp import web
 from opentrons import robot
 from opentrons.api import MainRouter
+from opentrons.drivers.rpi_drivers import gpio
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
 from opentrons.server.endpoints import (wifi, control, update)
@@ -211,4 +211,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        gpio.set_light_indicator_status('error')
+        log.exception("Exiting server from an unexpected error:")

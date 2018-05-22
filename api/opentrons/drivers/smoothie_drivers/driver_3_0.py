@@ -1,7 +1,7 @@
 from os import environ
 import logging
 from time import sleep
-from threading import Event
+from threading import Event, Timer
 from typing import Dict
 
 from serial.serialutil import SerialException
@@ -88,6 +88,8 @@ GCODE_ROUNDING_PRECISION = 3
 
 SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
+
+LIGHT_INDICATOR_DELAY = 0.5
 
 
 class SmoothieError(Exception):
@@ -304,6 +306,8 @@ class SmoothieDriver_3_0_0:
             'B': False,
             'C': False
         })
+
+        self.delayed_light_indicator_timer = None
 
     @property
     def homed_position(self):
@@ -1058,6 +1062,17 @@ class SmoothieDriver_3_0_0:
         })
         return self._create_coords_list(backlash_target)
 
+    def _set_light_indicator_status(self, status, delay=None):
+        if self.delayed_light_indicator_timer:
+            self.delayed_light_indicator_timer.cancel()
+        if not self.simulating:
+            if delay:
+                self.delayed_light_indicator_timer = Timer(
+                    delay, gpio.set_light_indicator_status, status)
+                self.delayed_light_indicator_timer.start()
+            else:
+                gpio.set_light_indicator_status(status)
+
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
@@ -1116,7 +1131,8 @@ class SmoothieDriver_3_0_0:
                 # of 30 seconds prevents any movements that take longer
                 self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
                 if not self.simulating:
-                    gpio.set_light_indicator_status('ready')
+                    self._set_light_indicator_status(
+                        'ready', delay=LIGHT_INDICATOR_DELAY)
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
@@ -1190,7 +1206,8 @@ class SmoothieDriver_3_0_0:
                     self._set_saved_current()
 
         if not self.simulating:
-            gpio.set_light_indicator_status('ready')
+            self._set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
         self._update_position_after_homing(home_sequence)
 
