@@ -33,7 +33,5 @@ export ENABLE_NETWORKING_ENDPOINTS=true
 echo "Starting Opentrons API server"
 python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH opentrons.server.main:init
 
-# make sure that the status light is in an ERROR state
-python -c "from opentrons.drivers.rpi_drivers import gpio; gpio.set_light_indicator_status('error')"
 echo "Server exited unexpectedly. Please power-cycle the machine, and contact Opentrons support."
 while true; do sleep 1; done
