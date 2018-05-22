@@ -1,28 +1,16 @@
 @import '@opentrons/components';
 
-.download_button,
-.bottom_buttons {
-  & button {
-    margin: 1rem 0;
-  }
-}
-
-.bottom_buttons {
-  margin: 1rem 2rem;
-
-  & button {
-    /* Unlike PrimaryButton, OutlineButton isn't 100% width */
-    width: 100%;
-  }
+.bottom_button {
+  margin: 1.5rem 4rem 0;
+  width: calc(100% - 4rem * 2);
 }
 
 .download_button {
-  margin: 2rem 1rem;
+  margin: 1.5rem 2.5rem;
 }
 
 .upload_button {
   display: block;
-  width: 100%;
 
   & input {
     position: fixed;
