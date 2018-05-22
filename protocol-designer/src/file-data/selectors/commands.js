@@ -109,7 +109,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-export type RobotStateTimelineAcc = {
+export type RobotStateTimeline = {
   formErrors: {[string]: string},
   timeline: Array<StepGeneration.CommandsAndRobotState>,
   robotState: StepGeneration.RobotState,
@@ -118,12 +118,12 @@ export type RobotStateTimelineAcc = {
 }
 
 // exposes errors and last valid robotState
-export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSelector(
+export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result: RobotStateTimelineAcc = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
+    const result: RobotStateTimeline = orderedSteps.reduce((acc: RobotStateTimeline, stepId): RobotStateTimeline => {
       if (!isEmpty(acc.formErrors)) {
         // short-circut the reduce if there were errors with validating / processing the form
         return acc
@@ -221,10 +221,4 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
 
     return result
   }
-)
-
-// TODO look at who uses this and see if they can use robotStateTimelineFull instead (or not)
-export const robotStateTimeline: Selector<Array<StepGeneration.CommandsAndRobotState>> = createSelector(
-  robotStateTimelineFull,
-  full => full.timeline
 )

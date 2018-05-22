@@ -131,6 +131,8 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
   (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
+    const timeline = _robotStateTimeline.timeline
+
     function highlightedWellsForLabwareAtStep (
       labwareLiquids: StepGeneration.SingleLabwareLiquidState,
       labwareId: string,
@@ -160,7 +162,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
     }
 
     function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {
-      const robotState = _robotStateTimeline[timelineIdx].robotState
+      const robotState = timeline[timelineIdx].robotState
       const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
       const form = _forms[formIdx] && _forms[formIdx].validatedForm
 
@@ -179,7 +181,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       )
     }
 
-    const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
+    const liquidStateTimeline = timeline.map(t => t.robotState.liquidState.labware)
     return liquidStateTimeline.map(highlightedWellsForTimelineFrame)
   }
 )
