@@ -163,7 +163,7 @@ const orderedSteps = handleActions({
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
     // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
-    state.filter(stepId => !(stepId === action.payload && `${stepId}` === action.payload))
+    state.filter(stepId => !(stepId === action.payload || `${stepId}` === action.payload))
 }, [INITIAL_DECK_SETUP_ID])
 
 type SelectedStepState = null | StepIdType | typeof END_STEP
@@ -295,9 +295,13 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
       console.error('Error: expected deck-setup to be first step.', _orderedSteps)
     }
 
-    if (_orderedSteps.slice(1).some(stepId => _steps[stepId].stepType === 'deck-setup')) {
-      console.error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
-    }
+    _orderedSteps.slice(1).forEach(stepId => {
+      if (!_steps[stepId]) {
+        console.error(`Encountered an undefined step: ${stepId}`)
+      } else if (_steps[stepId].stepType === 'deck-setup') {
+        console.error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
+      }
+    })
 
     return _savedStepForms
   }
@@ -395,9 +399,14 @@ const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = c
       return false
     }
 
-    if (selectedStepId === '__end__' || steps[selectedStepId].stepType === 'deck-setup') {
+    if (
+      selectedStepId === '__end__' ||
+      !steps[selectedStepId] ||
+      steps[selectedStepId].stepType === 'deck-setup'
+    ) {
       // End step has no stepType
       // Deck Setup step has no form data
+      // Also skip undefined steps to avoid white-screening, though they shouldn't happen
       return false
     }
 
