@@ -21,23 +21,12 @@
 }
 
 .upload_button {
-  /* File input is transparent and laid over the button */
-  position: relative;
-  height: 4.25rem;
-
-  & > * {
-    @apply --absolute-fill;
-  }
+  display: block;
+  width: 100%;
 
   & input {
-    z-index: 5;
-    opacity: 0;
-    cursor: pointer;
-  }
-
-  &:hover button {
-    cursor: text;
-    background-color: color(var(--c-bg-light) shade(5%));
+    position: fixed;
+    clip: rect(1px 1px 1px 1px);
   }
 }
 

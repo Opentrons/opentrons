@@ -27,10 +27,10 @@ export default function FileSidebar (props: Props) {
       }
 
       <div className={styles.bottom_buttons}>
-        <div className={styles.upload_button}>
+        <OutlineButton Component='label' className={styles.upload_button}>
+          UPLOAD
           <input type='file' onChange={props.onUpload} />
-          <OutlineButton type='submit'>UPLOAD</OutlineButton>
-        </div>
+        </OutlineButton>
         <OutlineButton onClick={props.onCreateNew}>Create New</OutlineButton>
       </div>
     </SidePanel>
