@@ -62,7 +62,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           )}
           sourceWells={rowGroup.map(row => row.sourceWell)}
           destWells={rowGroup.map(row => row.destWell)}
-          volume={rowGroup && rowGroup[0] && rowGroup[0].volume}
+          volume={rowGroup[0] && rowGroup[0].volume}
           collapsible
           collapsed={collapsed}
           toggleCollapsed={this.handleToggleCollapsed}
