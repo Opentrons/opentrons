@@ -55,7 +55,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     selected: steplistSelectors.hoveredOrSelectedStepId(state) === stepId,
     hovered: steplistSelectors.getHoveredSubstep(state) === stepId,
-    error: fileDataSelectors.robotStateTimelineFull(state).errorStepId === stepId, // TODO make mini selector
+    error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
     getLabwareName: (labwareId: ?string): ?string =>
       labwareId && allLabware[labwareId] && allLabware[labwareId].name // TODO make mini selector

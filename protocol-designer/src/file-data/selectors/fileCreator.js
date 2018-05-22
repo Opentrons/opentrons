@@ -5,7 +5,7 @@ import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 import {fileFormValues} from './fileFields'
-import {getInitialRobotState, robotStateTimelineFull} from './commands'
+import {getInitialRobotState, robotStateTimeline} from './commands'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
@@ -14,8 +14,8 @@ const applicationVersion = '1.0.0'
 export const createFile: BaseState => ?ProtocolFile = createSelector(
   fileFormValues,
   getInitialRobotState,
-  robotStateTimelineFull,
-  (fileFormValues, initialRobotState, _robotStateTimelineFull) => {
+  robotStateTimeline,
+  (fileFormValues, initialRobotState, _robotStateTimeline) => {
     const {author, description} = fileFormValues
     const name = fileFormValues.name || 'untitled'
     const isValidFile = true // TODO Ian 2018-02-28 this will be its own selector
@@ -69,7 +69,7 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
       pipettes: instruments,
       labware,
 
-      procedure: _robotStateTimelineFull.timeline.map((timelineItem, i) => ({
+      procedure: _robotStateTimeline.timeline.map((timelineItem, i) => ({
         annotation: {
           name: `TODO Name ${i}`,
           description: 'todo description'

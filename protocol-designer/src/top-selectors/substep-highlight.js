@@ -125,13 +125,13 @@ function _getSelectedWellsForSubstep (
 }
 
 export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>> = createSelector(
-  fileDataSelectors.robotStateTimelineFull,
+  fileDataSelectors.robotStateTimeline,
   steplistSelectors.validatedForms,
   steplistSelectors.hoveredStepId,
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
-  (_robotStateTimelineFull, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
-    const timeline = _robotStateTimelineFull.timeline
+  (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
+    const timeline = _robotStateTimeline.timeline
 
     function highlightedWellsForLabwareAtStep (
       labwareLiquids: StepGeneration.SingleLabwareLiquidState,

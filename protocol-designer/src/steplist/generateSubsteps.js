@@ -21,7 +21,7 @@ import type {
 } from './types'
 
 import type {StepIdType} from '../form-types'
-import type {RobotStateTimelineAcc} from '../file-data/selectors'
+import type {RobotStateTimeline} from '../file-data/selectors'
 import {
   consolidate,
   distribute,
@@ -62,7 +62,7 @@ function transferLikeSubsteps (args: {
   prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: RobotStateTimelineAcc
+  robotStateTimeline: RobotStateTimeline
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
@@ -285,7 +285,7 @@ export function generateSubsteps (
   allLabwareTypes: AllLabwareTypes,
   namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
   orderedSteps: Array<StepIdType>,
-  robotStateTimeline: RobotStateTimelineAcc
+  robotStateTimeline: RobotStateTimeline
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
