@@ -61,10 +61,13 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        if (labwareData.type.startsWith('tiprack')) {
+        // TODO Ian 2018-05-18 have a more robust way of designating labware types
+        // as tiprack or not
+        if (labwareData.type && labwareData.type.startsWith('tiprack')) {
           return {
             ...acc,
-            [labwareId]: all96Tips
+            // TODO LATER Ian 2018-05-18 use shared-data wells instead of assuming 96 tips?
+            [labwareId]: {...all96Tips}
           }
         }
         return acc
