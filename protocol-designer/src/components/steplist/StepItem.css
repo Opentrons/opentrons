@@ -121,6 +121,7 @@
 
 .highlighted {
   border: 2px solid var(--c-highlight);
+  border-width: 2px 0;
 }
 
 .error_icon {
