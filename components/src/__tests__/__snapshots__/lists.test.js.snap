@@ -260,7 +260,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
         y={undefined}
       >
         <path
-          d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
+          d="M7.41 15.857L12 11.615l4.59 4.242L18 14.545 12 9l-6 5.545z"
           fillRule="evenodd"
         />
       </svg>
