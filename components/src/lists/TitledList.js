@@ -30,7 +30,7 @@ type ListProps = {
   onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
-  /** highlights the whole TitledList if true */
+  /** set to true when TitledList is selected (eg, user clicked it) */
   selected?: boolean,
   /** disables the whole TitledList if true */
   disabled?: boolean
@@ -68,7 +68,7 @@ export default function TitledList (props: ListProps) {
     [styles.clickable]: props.onClick
   })
 
-  const iconClass = cx(styles.title_bar_icon, iconProps && iconProps.className)
+  const iconClass = cx(styles.title_bar_icon, styles.icon_left_of_title, iconProps && iconProps.className)
 
   return (
     <div className={className} {...{onMouseEnter, onMouseLeave}}>
@@ -86,7 +86,9 @@ export default function TitledList (props: ListProps) {
           >
             <Icon
               className={styles.title_bar_icon}
-              name={props.collapsed ? 'chevron-down' : 'chevron-right'}
+              name={props.selected
+                  ? 'chevron-right'
+                  : (props.collapsed ? 'chevron-down' : 'chevron-up')}
             />
           </div>
         )}
