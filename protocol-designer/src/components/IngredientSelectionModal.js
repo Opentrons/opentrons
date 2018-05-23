@@ -7,6 +7,7 @@ import styles from './IngredientSelectionModal.css'
 import SelectablePlate from '../containers/SelectablePlate.js'
 // import IngredientsList from '../containers/IngredientsList.js'
 import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
+import WellSelectionInstructions from './WellSelectionInstructions'
 
 type Props = {
   visible: boolean
@@ -24,6 +25,8 @@ export default function IngredientSelectionModal (props: Props) {
       <SingleLabware>
         <SelectablePlate showLabels selectable />
       </SingleLabware>
+
+      <WellSelectionInstructions />
     </div>
   )
 }

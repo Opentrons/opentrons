@@ -4,6 +4,7 @@ import cx from 'classnames'
 
 import SelectablePlate from '../containers/SelectablePlate'
 import SingleLabwareWrapper from '../components/SingleLabware'
+import WellSelectionInstructions from './WellSelectionInstructions'
 
 import {Modal, OutlineButton, LabeledValue} from '@opentrons/components'
 
@@ -44,9 +45,7 @@ export default function WellSelectionModal (props: Props) {
         />
       </SingleLabwareWrapper>
 
-      <div className={styles.bottom_row}>
-        De-select: Shift + Click (NOT IMPLEMENTED TODO)
-      </div>
+      <WellSelectionInstructions />
     </Modal>
   )
 }
