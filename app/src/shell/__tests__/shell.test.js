@@ -13,20 +13,26 @@ import {
   downloadShellUpdate,
   quitAndInstallShellUpdate,
   shellReducer,
-  getShellUpdate
+  shellMiddleware,
+  getShellUpdate,
+  getShellConfig
 } from '..'
 
+jest.mock('../../logger')
 jest.mock('electron')
 
-const middlewares = [thunk]
+const middlewares = [thunk, shellMiddleware]
 const mockStore = configureMockStore(middlewares)
-const mockUpdate = electron.__mockRemotes['./update']
+const {
+  './update': mockUpdate,
+  './config': mockConfig
+} = electron.__mockRemotes
 
 describe('app shell module', () => {
   let state
 
   beforeEach(() => {
-    electron.__clearMock()
+    jest.clearAllMocks()
 
     state = {
       shell: {
@@ -268,6 +274,31 @@ describe('app shell module', () => {
     })
   })
 
+  describe('shell middleware', () => {
+    test('"dispatches" actions to the app shell if meta.shell', () => {
+      const store = mockStore({})
+      const action = {type: 'foo', meta: {shell: true}}
+
+      store.dispatch(action)
+      expect(electron.ipcRenderer.send).toHaveBeenCalledWith('dispatch', action)
+    })
+
+    test('catches actions from main and dispatches them to redux', () => {
+      const store = mockStore({})
+      const action = {type: 'foo'}
+
+      expect(electron.ipcRenderer.on)
+        .toHaveBeenCalledWith('dispatch', expect.any(Function))
+
+      const dispatchHandler = electron.ipcRenderer.on.mock.calls.find(call => {
+        return call[0] === 'dispatch' && typeof call[1] === 'function'
+      })[1]
+
+      dispatchHandler({}, action)
+      expect(store.getActions()).toEqual([action])
+    })
+  })
+
   describe('shell selectors', () => {
     // TODO(mc, 2018-05-11): mockUpdate.CURRENT_VERSION is undefined so this
     //  test isn't really doing anything anymore
@@ -276,6 +307,13 @@ describe('app shell module', () => {
         ...state.shell.update,
         current: mockUpdate.CURRENT_VERSION
       })
+    })
+  })
+
+  describe('config remote', () => {
+    test('getShellConfig', () => {
+      mockConfig.getConfig.mockReturnValue({isConfig: true})
+      expect(getShellConfig()).toEqual({isConfig: true})
     })
   })
 })

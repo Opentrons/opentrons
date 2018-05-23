@@ -9,7 +9,8 @@ import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
 import createLogger from './logger'
-import {checkForShellUpdates} from './shell'
+import {checkForShellUpdates, shellMiddleware} from './shell'
+
 import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {
@@ -29,6 +30,7 @@ const history = createHistory()
 const middleware = applyMiddleware(
   thunk,
   robotApiMiddleware(),
+  shellMiddleware,
   healthCheckMiddleware,
   analyticsMiddleware,
   routerMiddleware(history)

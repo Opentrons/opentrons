@@ -3,7 +3,7 @@
 
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
-const config = require('./config').get('ui')
+const config = require('./config').getConfig('ui')
 const log = require('./log')(__filename)
 
 const urlPath = config.url.protocol === 'file:'
