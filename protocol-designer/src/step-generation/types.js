@@ -138,7 +138,7 @@ export type SingleLabwareLiquidState = {[well: string]: LocationLiquidState}
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
-  instruments: {
+  instruments: { // TODO Ian 2018-05-23 rename this 'pipettes' to match tipState (& to disambiguate from future 'modules')
     [instrumentId: string]: PipetteData
   },
   labware: {

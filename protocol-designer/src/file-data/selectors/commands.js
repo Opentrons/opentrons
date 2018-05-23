@@ -1,6 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
+import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
@@ -123,6 +124,8 @@ export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
+    const finalStepId = last(orderedSteps)
+
     const result: RobotStateTimeline = orderedSteps.reduce((acc: RobotStateTimeline, stepId): RobotStateTimeline => {
       if (!isEmpty(acc.formErrors)) {
         // short-circut the reduce if there were errors with validating / processing the form
@@ -163,25 +166,23 @@ export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
       }
 
       // finally, deal with valid step forms
-      let nextCommandsAndState
+      let commandCreators = []
 
       if (validatedForm.stepType === 'consolidate') {
-        nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.consolidate(validatedForm))
+      } else
       if (validatedForm.stepType === 'transfer') {
-        nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.transfer(validatedForm))
+      } else
       if (validatedForm.stepType === 'distribute') {
-        nextCommandsAndState = StepGeneration.distribute(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.distribute(validatedForm))
+      } else
       if (validatedForm.stepType === 'pause') {
-        nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.delay(validatedForm))
+      } else
       if (validatedForm.stepType === 'mix') {
-        nextCommandsAndState = StepGeneration.mix(validatedForm)(acc.robotState)
-      }
-
-      if (!nextCommandsAndState) {
+        commandCreators.push(StepGeneration.mix(validatedForm))
+      } else {
         // TODO Ian 2018-05-08 use assert
         console.warn(`StepType "${validatedForm.stepType}" not yet implemented`)
         return {
@@ -193,6 +194,18 @@ export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
         }
       }
 
+      if (stepId === finalStepId) {
+        // Drop any tips at end of protocol
+        // (dropTip should do no-op when pipette has no tips)
+        const allPipettes = Object.keys(acc.robotState.instruments)
+
+        allPipettes.forEach(pipetteId =>
+          commandCreators.push(StepGeneration.dropTip(pipetteId))
+        )
+      }
+
+      const nextCommandsAndState = StepGeneration.reduceCommandCreators(commandCreators)(acc.robotState)
+
       // for supported steps
       if (nextCommandsAndState.errors) {
         return {
@@ -201,6 +214,7 @@ export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
           errorStepId: stepId
         }
       }
+
       return {
         ...acc,
         timeline: [...acc.timeline, nextCommandsAndState],
