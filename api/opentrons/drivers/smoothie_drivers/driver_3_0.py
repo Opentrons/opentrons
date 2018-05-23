@@ -859,11 +859,13 @@ class SmoothieDriver_3_0_0:
         self.push_speed()
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
-        # move away from the Y endstop switch
-        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+        # move away from the Y endstop switch, then backward half that distance
+        relative_retract_command = '{0} {1}Y{2} {3}Y{4} {5}'.format(
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
             GCODES['MOVE'],             # move towards front of machine
-            str(-Y_SWITCH_BACK_OFF_MM),
+            str(int(-Y_SWITCH_BACK_OFF_MM)),
+            GCODES['MOVE'],             # move towards back of machine
+            str(int(Y_SWITCH_BACK_OFF_MM / 2)),
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
 
