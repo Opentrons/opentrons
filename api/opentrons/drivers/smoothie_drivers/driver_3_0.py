@@ -81,7 +81,7 @@ GCODES = {'HOME': 'G28.2',
           'DISENGAGE_MOTOR': 'M18',
           'HOMING_STATUS': 'G28.6'}
 
-MOVING_COMMANDS = ['HOME', 'MOVE', 'DWELL', 'PROBE']
+MOVING_COMMANDS = ['HOME', 'MOVE', 'PROBE']
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -90,7 +90,7 @@ GCODE_ROUNDING_PRECISION = 3
 SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
-LIGHT_INDICATOR_DELAY = 0.5
+LIGHT_INDICATOR_DELAY = 0.2
 
 
 class SmoothieError(Exception):
@@ -853,7 +853,10 @@ class SmoothieDriver_3_0_0:
                     'error', delay=LIGHT_INDICATOR_DELAY)
             raise SmoothieError(ret_code)
 
-        if not self.simulating and is_moving:
+        # only set the LED to 'ready' mode if we have not just been paused
+        if not self.run_flag.is_set():
+            self.set_light_indicator_status('waiting')
+        elif not self.simulating and is_moving:
             self.set_light_indicator_status(
                 'ready', delay=LIGHT_INDICATOR_DELAY)
 
@@ -1159,8 +1162,6 @@ class SmoothieDriver_3_0_0:
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
 
-        self.run_flag.wait()
-
         axis = axis.upper()
 
         # If Y is requested make sure we home X first
@@ -1195,6 +1196,7 @@ class SmoothieDriver_3_0_0:
         self.dwell_axes(non_moving_axes)
 
         for axes in home_sequence:
+            self.run_flag.wait()  # wait for the driver to resume()
             if 'X' in axes:
                 self._home_x()
             elif 'Y' in axes:
@@ -1252,7 +1254,8 @@ class SmoothieDriver_3_0_0:
     def resume(self):
         if not self.simulating:
             self.run_flag.set()
-            self.set_light_indicator_status('ready')
+            self.set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:
