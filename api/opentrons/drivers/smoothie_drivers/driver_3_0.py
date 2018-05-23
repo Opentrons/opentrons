@@ -37,7 +37,8 @@ PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
 
-Y_SWITCH_BACK_OFF_MM = 20
+Y_SWITCH_BACK_OFF_MM = 28
+Y_SWITCH_REVERSE_BACK_OFF_MM = 10
 Y_BACKOFF_LOW_CURRENT = 0.8
 Y_BACKOFF_SLOW_SPEED = 50
 Y_RETRACT_SPEED = 8
@@ -865,7 +866,7 @@ class SmoothieDriver_3_0_0:
             GCODES['MOVE'],             # move towards front of machine
             str(int(-Y_SWITCH_BACK_OFF_MM)),
             GCODES['MOVE'],             # move towards back of machine
-            str(int(Y_SWITCH_BACK_OFF_MM / 2)),
+            str(int(Y_SWITCH_REVERSE_BACK_OFF_MM)),
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
 
