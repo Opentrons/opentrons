@@ -1,0 +1,610 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Opentrons API &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="https://opentrons.com/css/master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="#" />
+    <link rel="next" title="Design with Python" href="writing.html" />  
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+    app_id: "ukpodv2l"
+};
+</script>
+<script>
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments)
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args)
+        };
+        w.Intercom = i;
+
+        function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+        }
+        if (w.attachEvent) {
+            w.attachEvent('onload', l);
+        } else {
+            w.addEventListener('load', l, false);
+        }
+    }
+})()
+</script>
+
+  </head>
+  <body role="document">
+<header>
+    <a href="https://opentrons.com" class="brand">
+        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+    <div id="nav-collapse">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+    </div>
+    <nav>
+        <ul id="main">
+            <li>
+                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            </li>
+            <li>
+                <a href="https://shop.opentrons.com/">Buy</a>
+            </li>
+        </ul>
+        <section id="dropdown">
+            <ul class="products">
+                <li class="mobile">Products</li>
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+                <li>&nbsp;</li>
+            </ul>
+            <ul class="company">
+                <li class="mobile">Company</li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+            </ul>
+            <ul class="resources">
+                <li class="mobile">Resources</li>
+                <li><a href="https://support.opentrons.com/">Support</a></li>
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </section>
+    </nav>
+    <br style="clear:both">
+    <script type="text/javascript">
+    $(function() {
+
+        $('#dropdown').slideUp(0);
+
+        $('#nav-collapse').click(function(event) {
+            $(this).toggleClass('change');
+            $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
+        });
+
+        $('.menu-toggle').mouseenter(function(event) {
+            event.preventDefault();
+            var target = $(this).attr('data-dropdown');
+
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(300);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+
+
+        });
+        $('header').mouseleave(function(event) {
+            $('#dropdown').slideUp(300);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+        });
+    });
+    </script>
+</header>
+<div id="nav-spacer">&nbsp;</div>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <div class="section" id="opentrons-api">
+<h1>Opentrons API<a class="headerlink" href="#opentrons-api" title="Permalink to this headline">¶</a></h1>
+<p>The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.</p>
+<p>We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.</p>
+<p><a class="reference external" href="https://github.com/opentrons/opentrons-api">View source code on GitHub</a></p>
+<hr class="docutils" />
+<div class="section" id="how-it-looks">
+<h2>How it Looks<a class="headerlink" href="#how-it-looks" title="Permalink to this headline">¶</a></h2>
+<p>The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instruction to transfer from well <code class="docutils literal"><span class="pre">'A1'</span></code> to well <code class="docutils literal"><span class="pre">'B1'</span></code> that even a computer could understand:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Use the Opentrons API&#39;s containers and instruments
+
+Add a 96 well plate, and place it in slot &#39;B1&#39;
+Add a 200uL tip rack, and place it in slot &#39;A1&#39;
+
+Add a 200uL pipette to axis &#39;b&#39;, and tell it to use that tip rack
+
+Transfer 100uL from the plate&#39;s &#39;A1&#39; well to it&#39;s &#39;A2&#39; well
+</pre></div>
+</div>
+<p>If we were to rewrite this with the Opentrons API, it would look like the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="c1"># containers</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+
+<span class="c1"># pipettes</span>
+<span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">])</span>
+
+<span class="c1"># commands</span>
+<span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="how-it-s-organized">
+<h2>How it&#8217;s Organized<a class="headerlink" href="#how-it-s-organized" title="Permalink to this headline">¶</a></h2>
+<p>When writing protocols using the Opentrons API, there are generally three sections:</p>
+<ol class="arabic simple">
+<li>Imports</li>
+<li>Containers</li>
+<li>Pipettes</li>
+<li>Commands</li>
+</ol>
+<div class="section" id="imports">
+<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h3>
+<p>When writing in Python, you must always include the Opentrons API within your file. We most commonly use the <code class="docutils literal"><span class="pre">containers</span></code> and <code class="docutils literal"><span class="pre">instruments</span></code> sections of the API.</p>
+<p>From the example above, the &#8220;imports&#8221; section looked like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="containers">
+<h3>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h3>
+<p>While the imports section is usually the same across protocols, the containers section is different depending on the tip racks, well plates, troughs, or tubes you&#8217;re using on the robot.</p>
+<p>Each container is given a type (ex: <code class="docutils literal"><span class="pre">'96-flat'</span></code>), and the slot on the robot it will be placed (ex: <code class="docutils literal"><span class="pre">'B1'</span></code>).</p>
+<p>From the example above, the &#8220;containers&#8221; section looked like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pipettes">
+<h3>Pipettes<a class="headerlink" href="#pipettes" title="Permalink to this headline">¶</a></h3>
+<p>Next, pipettes are created and attached to a specific axis on the OT-One (<code class="docutils literal"><span class="pre">'a'</span></code> or <code class="docutils literal"><span class="pre">'b'</span></code>). Axis <code class="docutils literal"><span class="pre">'a'</span></code> is on the center of the head, while axis <code class="docutils literal"><span class="pre">'b'</span></code> is on the left.</p>
+<p>There are other parameters for pipettes, but the most important are the <code class="docutils literal"><span class="pre">max_volume</span></code> to set it&#8217;s size, and the tip rack(s) it will use during the protocol.</p>
+<p>From the example above, the &#8220;pipettes&#8221; section looked like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="commands">
+<h3>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h3>
+<p>And finally, the most fun section, the actual protocol commands! The most common commands are <code class="docutils literal"><span class="pre">transfer()</span></code>, <code class="docutils literal"><span class="pre">aspirate()</span></code>, <code class="docutils literal"><span class="pre">dispense()</span></code>, <code class="docutils literal"><span class="pre">pick_up_tip()</span></code>, <code class="docutils literal"><span class="pre">drop_tip()</span></code>, and much more.</p>
+<p>This section can tend to get long, relative to the complexity of your protocol. However, with a better understanding of Python you can learn to compress and simplify even the most complex-seeming protocols.</p>
+<p>From the example above, the &#8220;commands&#8221; section looked like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing.html#python-for-beginners">Python for Beginners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing.html#working-with-python">Working with Python</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="writing.html#text-editor">Text Editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing.html#jupyter-notebook">Jupyter Notebook</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="containers.html#labware-library">Labware Library</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#point">Point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#tipracks">Tipracks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#troughs">Troughs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#tube-racks">Tube Racks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#plates">Plates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="containers.html#id3">Containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#list">List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#load">Load</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#create">Create</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="containers.html#accessing-wells">Accessing Wells</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#individual-wells">Individual Wells</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html#multiple-wells">Multiple Wells</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipettes.html#creating-a-pipette">Creating a Pipette</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#axis-and-max-volume">Axis and Max Volume</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#minimum-volume">Minimum Volume</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#channels">Channels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#plunger-speeds">Plunger Speeds</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pipettes.html#tip-handling">Tip Handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#pick-up-tip">Pick Up Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#drop-tip">Drop Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#return-tip">Return Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#tips-iterating">Tips Iterating</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pipettes.html#liquid-control">Liquid Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#aspirate">Aspirate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#dispense">Dispense</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#blow-out">Blow Out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#touch-tip">Touch Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#mix">Mix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#air-gap">Air Gap</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pipettes.html#moving">Moving</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#move-to">Move To</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipettes.html#delay">Delay</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transfer.html#id1">Transfer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#basic">Basic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#large-volumes">Large Volumes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#multiple-wells">Multiple Wells</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#one-to-many">One to Many</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#few-to-many">Few to Many</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#list-of-volumes">List of Volumes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#volume-gradient">Volume Gradient</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transfer.html#distribute-and-consolidate">Distribute and Consolidate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#consolidate">Consolidate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#distribute">Distribute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#disposal-volume">Disposal Volume</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transfer.html#transfer-options">Transfer Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#always-get-a-new-tip">Always Get a New Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#never-get-a-new-tip">Never Get a New Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#trash-or-return-tip">Trash or Return Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#touch-tip">Touch Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#blow-out">Blow Out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#mix-before-after">Mix Before/After</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transfer.html#air-gap">Air Gap</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#head-speed">Head Speed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#homing">Homing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#clear-commands">Clear Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#comment">Comment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#get-containers">Get Containers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#get-instruments">Get Instruments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="robot.html#reset">Reset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#heat-deck">Heat Deck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#magbead">Magbead</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#setting-up-hardware">Setting up Hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#basic-transfer">Basic Transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#loops">Loops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-air-gaps">Multiple Air Gaps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#dilution">Dilution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#plate-mapping">Plate Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#precision-pipetting">Precision Pipetting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#robot">Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-opentrons.instruments">Pipette</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#download-app">Download App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#connect-to-robot">Connect to Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#upload-protocol">Upload Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#jogging">Jogging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#xyz">XYZ</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#slot-button">Slot Button</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#ab-plungers">AB Plungers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#move-to-slot">Move to Slot</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#calibrate">Calibrate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#tipracks">Tipracks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#containers">Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration.html#pipettes">Pipettes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="calibration.html#run-protocol">Run Protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="firmware.html#download-files">Download Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware.html#open-the-smoothie-s-microsd-card">Open the Smoothie&#8217;s MicroSD Card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware.html#select-your-model-s-config">Select Your Model&#8217;s Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware.html#copy-over-files">Copy Over Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware.html#restart">Restart</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="#">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="writing.html" title="next chapter">Design with Python</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+    <div class="get-in-touch">
+        <h1 class="title">Get In Touch</h1>
+        <p class="caption">
+            We'd love to hear from you!
+            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
+        </p>
+        <form class="footerForm">
+            <div class="input-wrapper">
+                <input type="text" name="name" value="" id="name" placeholder="Name">
+                <input type="email" name="email" value="" id="email" placeholder="Email">
+            </div>
+            <textarea name="message" id="message" placeholder="Message"></textarea>
+            <input type="hidden" name="type" value="message"></input>
+            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+        </form>
+    </div>
+    <div class="nav-link-group">
+        <div class="nav-link products">
+            <span class="link-title">PRODUCTS</span>
+            <ul class="products-list">
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link company">
+            <span class="link-title">COMPANY</span>
+            <ul class="company-list">
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
+                <!-- <li>Privacy Policy</li> -->
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link resources">
+            <span class="link-title">RESOURCES</span>
+            <ul class="resources-list">
+
+
+            <li><a href="https://support.opentrons.com/">Support</a></li>
+
+
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link buy-button">
+            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
+        </div>
+        <div class="social-group">
+            <p class="social-links">
+                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
+                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
+                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+            </p>
+            <p class="ot-newsletter">
+                Subscribe to our newsletter
+                <br>
+                <!-- <input type="email" name="email" placeholder="Email"></input>
+      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
+                <div id="mc_embed_signup">
+                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <div id="mc_embed_signup_scroll">
+                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
+                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
+                            </div>
+                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
+                        </div>
+                    </form>
+                </div>
+            </p>
+        </div>
+        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
+    </div>
+</footer>
+<script>
+$(document).ready(function() {
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
+    });
+
+    
+    return false;
+  });
+
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
+});
+</script>
+
+
+ 
+  </body>
+</html>

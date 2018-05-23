@@ -7,13 +7,12 @@ matrix:
       sudo: false
       language: python
       python: '3.6'
-      # TODO(mc, 2018-10-25): enable api docs on linux after BM's fixup work
       env:
         LINT=true
         BUILD_APP=true
         BUILD_PD=true
         BUILD_COMPONENTS=true
-        BUILD_API_DOCS=false
+        BUILD_API_DOCS=true
       addons:
         apt:
           sources: &common_sources
@@ -61,14 +60,15 @@ after_success:
   - make coverage
 
 deploy:
-  # TODO(mc, 2018-03-25): api docs deploy
-  - provider: script
+  - provider: pages
     skip_cleanup: true
-    script: echo "not implemented!"
+    github-token: $GITHUB_TOKEN
+    keep-history: false
+    local-dir: api/docs/dist
     on:
         condition: $BUILD_API_DOCS = true
         repo: Opentrons/opentrons
-        tags: true
+        branch: edge
 
   # app deploy
   - provider: s3
@@ -128,9 +128,8 @@ env:
     - OT_BUCKET_APP: opentrons-app
     - OT_FOLDER_APP: builds
 
-    # TODO(mc, 2018-03-25): delete/move these to GH pages deploy as appropriate
-    - ENCRYPTION_LABEL: c6cefc96bb2c
-    - COMMIT_AUTHOR_EMAIL: sphinx@opentrons.com
+    - secure: f/W7kN4gOvVpIanTQh9QtCwiXOk5UrRnUPo2ZU1Qk8zaFVbNj2za2A1xGKMqSyfZKw7guqIwTjWgc/aF9lxRtfU+5fkedJQdxDi5r7jZFxpqmpZOlhyXVY8WAWNqavEkefQInPlpHVAL8M2eV+Pi1cO9FsMhdyy/Wk7qA2nOiA8//9pFRB+0jgSbe1yqIF5DPyL0kbibd3EwmQvuQtnn25qqJXjneenhL6spflLCrnUjq1N/iOlcGd94eBUtk8RaBtMEjOb2D0Mb0DWKMsppoXg4/mZDus6s/PlmBwUJKNCuRtDiEUn5brE14q3OQh/FkDoXMRl69VND2mYp1LOeh5fgLSu6P+YToyHrh4lhXaRAul6l3JmXuoDC3k8hOAr8rPbtiwH7wGY2eRNv59vUejdXof4KHbAN6FTIH934tTe4uvBH79hRMoFY51pHRe6UiC39e/3hwl0pVKLjkV/40wfdEeYA7xhTZQVux+FAfk2krmggokxGEhbAQhWoyRX/wlH2XfEgassGskJ9SbuumNPNOLmEV9OOISFaXoYqVn+SPXy8mN1Pl2sLfaPFtnmmiY20t6yWsHsmfwi+41lv8n0vwCOGq521suDeNyiFhOH2AqG7xm6nHbIv+CiWt2ntKXgV233J17usvfr1zSK07PMDMlV2lvJx3CXj3hA4Yb4=
+
 
 notifications:
   email:

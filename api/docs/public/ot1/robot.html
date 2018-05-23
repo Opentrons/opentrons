@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Control &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="https://opentrons.com/css/master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Hardware Modules" href="modules.html" />
+    <link rel="prev" title="Transfer Shortcuts" href="transfer.html" />  
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+    app_id: "ukpodv2l"
+};
+</script>
+<script>
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments)
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args)
+        };
+        w.Intercom = i;
+
+        function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+        }
+        if (w.attachEvent) {
+            w.attachEvent('onload', l);
+        } else {
+            w.addEventListener('load', l, false);
+        }
+    }
+})()
+</script>
+
+  </head>
+  <body role="document">
+<header>
+    <a href="https://opentrons.com" class="brand">
+        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+    <div id="nav-collapse">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+    </div>
+    <nav>
+        <ul id="main">
+            <li>
+                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            </li>
+            <li>
+                <a href="https://shop.opentrons.com/">Buy</a>
+            </li>
+        </ul>
+        <section id="dropdown">
+            <ul class="products">
+                <li class="mobile">Products</li>
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+                <li>&nbsp;</li>
+            </ul>
+            <ul class="company">
+                <li class="mobile">Company</li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+            </ul>
+            <ul class="resources">
+                <li class="mobile">Resources</li>
+                <li><a href="https://support.opentrons.com/">Support</a></li>
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </section>
+    </nav>
+    <br style="clear:both">
+    <script type="text/javascript">
+    $(function() {
+
+        $('#dropdown').slideUp(0);
+
+        $('#nav-collapse').click(function(event) {
+            $(this).toggleClass('change');
+            $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
+        });
+
+        $('.menu-toggle').mouseenter(function(event) {
+            event.preventDefault();
+            var target = $(this).attr('data-dropdown');
+
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(300);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+
+
+        });
+        $('header').mouseleave(function(event) {
+            $('#dropdown').slideUp(300);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+        });
+    });
+    </script>
+</header>
+<div id="nav-spacer">&nbsp;</div>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <span class="target" id="robot"></span><div class="section" id="advanced-control">
+<h1>Advanced Control<a class="headerlink" href="#advanced-control" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The below features are designed for advanced users who wish to use the Opentrons API in their own Python environment (ie Jupyter). This page is not relevant for users only using the Opentrons App, because the features described below will not be accessible.</p>
+</div>
+<p>The robot module can be thought of as the parent for all aspects of the Opentrons API. All containers, instruments, and protocol commands are added to and controlled by robot.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section require the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">robot</span><span class="p">,</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;my-plate&#39;</span><span class="p">)</span>
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;my-rack&#39;</span><span class="p">)</span>
+
+<span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;my-pipette&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="head-speed">
+<h2>Head Speed<a class="headerlink" href="#head-speed" title="Permalink to this headline">¶</a></h2>
+<p>The maximum speed of the robot&#8217;s head can be set using <code class="docutils literal"><span class="pre">robot.head_speed()</span></code>. The value we set the speed to is in millimeters-per-second (mm/sec).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">.</span><span class="n">head_speed</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Setting the head speed to above <code class="docutils literal"><span class="pre">6000</span> <span class="pre">mm/sec</span></code> may cause your robot to &#8220;skip&#8221;, which means the motors will lose their grip and make a loud vibrating noise. We recommend you try out different speed values on your robot, and see what works and what doesn&#8217;t.</p>
+</div>
+</div>
+<div class="section" id="homing">
+<h2>Homing<a class="headerlink" href="#homing" title="Permalink to this headline">¶</a></h2>
+<p>You can <cite>home</cite> the robot by calling <code class="docutils literal"><span class="pre">home()</span></code>. You can also specify axes. The robot will home immdediately when this call is made.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>           <span class="c1"># home the robot on all axis</span>
+<span class="n">robot</span><span class="o">.</span><span class="n">home</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>        <span class="c1"># home the Z axis only</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<p>When commands are called on a pipette, they are recorded on the <code class="docutils literal"><span class="pre">robot</span></code> in the order they are called. You can see all past executed commands by calling <code class="docutils literal"><span class="pre">robot.commands()</span></code>, which returns a <a class="reference external" href="https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists">Python list</a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">))</span>
+<span class="n">pipette</span><span class="o">.</span><span class="n">drop_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container my-rack&gt;&lt;Well A1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container my-rack&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="clear-commands">
+<h2>Clear Commands<a class="headerlink" href="#clear-commands" title="Permalink to this headline">¶</a></h2>
+<p>We can erase the robot command history by calling <code class="docutils literal"><span class="pre">robot.clear_commands()</span></code>. Any previously created instruments and containers will still be inside robot, but the commands history is erased.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">.</span><span class="n">clear_commands</span><span class="p">()</span>
+<span class="n">pipette</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There is&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">()),</span> <span class="s1">&#39;command&#39;</span><span class="p">)</span>
+
+<span class="n">robot</span><span class="o">.</span><span class="n">clear_commands</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There are now&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">()),</span> <span class="s1">&#39;commands&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>There is 1 command
+There are now 0 commands
+</pre></div>
+</div>
+</div>
+<div class="section" id="comment">
+<h2>Comment<a class="headerlink" href="#comment" title="Permalink to this headline">¶</a></h2>
+<p>You can add a custom message to the list of command descriptions you see when running <code class="docutils literal"><span class="pre">robot.commands()</span></code>. This command is <code class="docutils literal"><span class="pre">robot.comment()</span></code>, and it allows you to print out any information you want at the point in your protocol</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">.</span><span class="n">clear_commands</span><span class="p">()</span>
+
+<span class="n">pipette</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">])</span>
+<span class="n">robot</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Hello, just picked up tip A1&quot;</span><span class="p">)</span>
+
+<span class="n">pipette</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">])</span>
+<span class="n">robot</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Goodbye, just dropped tip A1&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container my-rack&gt;&lt;Well A1&gt;
+Hello, just picked up tip A1
+Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container my-rack&gt;&lt;Well A1&gt;
+Goodbye, just dropped tip A1
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-containers">
+<h2>Get Containers<a class="headerlink" href="#get-containers" title="Permalink to this headline">¶</a></h2>
+<p>When containers are loaded, they are automatically added to the <code class="docutils literal"><span class="pre">robot</span></code>. You can see all currently held containers by calling <code class="docutils literal"><span class="pre">robot.get_containers()</span></code>, which returns a <a class="reference external" href="https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists">Python list</a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">get_containers</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">get_type</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>my-plate 96-flat
+my-rack tiprack-200ul
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-instruments">
+<h2>Get Instruments<a class="headerlink" href="#get-instruments" title="Permalink to this headline">¶</a></h2>
+<p>When instruments are created, they are automatically added to the <code class="docutils literal"><span class="pre">robot</span></code>. You can see all currently held instruments by calling <code class="docutils literal"><span class="pre">robot.get_instruments()</span></code>, which returns a <a class="reference external" href="https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists">Python list</a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">pipette</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">get_instruments</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pipette</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>my-pipette B
+</pre></div>
+</div>
+</div>
+<div class="section" id="reset">
+<h2>Reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h2>
+<p>Calling <code class="docutils literal"><span class="pre">robot.reset()</span></code> will remove everything from the robot. Any previously added containers, pipettes, or commands will be erased.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_containers</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_instruments</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[]
+[]
+[]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#head-speed">Head Speed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#homing">Homing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clear-commands">Clear Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comment">Comment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-containers">Get Containers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-instruments">Get Instruments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reset">Reset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="transfer.html" title="previous chapter">Transfer Shortcuts</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">Hardware Modules</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/robot.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+    <div class="get-in-touch">
+        <h1 class="title">Get In Touch</h1>
+        <p class="caption">
+            We'd love to hear from you!
+            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
+        </p>
+        <form class="footerForm">
+            <div class="input-wrapper">
+                <input type="text" name="name" value="" id="name" placeholder="Name">
+                <input type="email" name="email" value="" id="email" placeholder="Email">
+            </div>
+            <textarea name="message" id="message" placeholder="Message"></textarea>
+            <input type="hidden" name="type" value="message"></input>
+            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+        </form>
+    </div>
+    <div class="nav-link-group">
+        <div class="nav-link products">
+            <span class="link-title">PRODUCTS</span>
+            <ul class="products-list">
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link company">
+            <span class="link-title">COMPANY</span>
+            <ul class="company-list">
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
+                <!-- <li>Privacy Policy</li> -->
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link resources">
+            <span class="link-title">RESOURCES</span>
+            <ul class="resources-list">
+
+
+            <li><a href="https://support.opentrons.com/">Support</a></li>
+
+
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link buy-button">
+            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
+        </div>
+        <div class="social-group">
+            <p class="social-links">
+                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
+                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
+                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+            </p>
+            <p class="ot-newsletter">
+                Subscribe to our newsletter
+                <br>
+                <!-- <input type="email" name="email" placeholder="Email"></input>
+      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
+                <div id="mc_embed_signup">
+                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <div id="mc_embed_signup_scroll">
+                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
+                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
+                            </div>
+                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
+                        </div>
+                    </form>
+                </div>
+            </p>
+        </div>
+        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
+    </div>
+</footer>
+<script>
+$(document).ready(function() {
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
+    });
+
+    
+    return false;
+  });
+
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
+});
+</script>
+
+
+ 
+  </body>
+</html>
