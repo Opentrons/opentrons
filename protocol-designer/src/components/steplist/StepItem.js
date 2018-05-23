@@ -71,6 +71,7 @@ export default function StepItem (props: StepItemProps) {
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}
       onCollapseToggle={onStepItemCollapseToggle}
+      hoverable
       {...{selected, collapsed}}
     >
       {getStepItemContents(props)}

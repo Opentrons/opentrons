@@ -16,6 +16,15 @@
   @apply --clickable;
 }
 
+.disabled {
+  pointer-events: none;
+  background-color: transparent;
+
+  & * {
+    @apply --list-disabled;
+  }
+}
+
 .panel_group,
 .titled_list,
 .list_item {
@@ -24,11 +33,11 @@
 
 .titled_list {
   border: var(--bd-width-default) solid transparent;
+}
 
-  &:hover {
-    /* "highlighted" appearance */
-    border-color: var(--c-highlight);
-  }
+.hoverable_titled_list:hover {
+  /* "highlighted" appearance */
+  border-color: var(--c-highlight);
 }
 
 .title_bar {
@@ -122,13 +131,4 @@ a.list_item {
   flex: none;
   height: calc(1.25 * var(--fs-body-1));
   margin-right: 0.5rem;
-}
-
-.disabled {
-  pointer-events: none;
-  background-color: transparent;
-
-  & * {
-    @apply --list-disabled;
-  }
 }
