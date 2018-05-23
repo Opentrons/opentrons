@@ -517,7 +517,7 @@ export const selectors = {
 
   stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
   orderedSteps: orderedStepsSelector,
-  selectedStepId, // TODO replace with selectedStep: selectedStepSelector
+  selectedStepId, // TODO ??? replace with selectedStep: selectedStepSelector ???
   hoveredStepId,
   hoveredOrSelectedStepId,
   getHoveredSubstep,

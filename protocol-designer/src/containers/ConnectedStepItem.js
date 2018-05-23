@@ -53,7 +53,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       ? undefined
       : steplistSelectors.getCollapsedSteps(state)[stepId],
 
-    selected: steplistSelectors.hoveredOrSelectedStepId(state) === stepId,
+    selected: steplistSelectors.selectedStepId(state) === stepId,
     hovered: steplistSelectors.getHoveredSubstep(state) === stepId,
     error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
