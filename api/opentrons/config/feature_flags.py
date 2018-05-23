@@ -55,3 +55,9 @@ def calibrate_to_bottom(): return get_feature_flag('calibrate-to-bottom')
 # - True: The deck layout has etched "dots"
 # - False: The deck layout has etched "crosses"
 def dots_deck_type(): return get_feature_flag('dots-deck-type')
+
+
+# disable_home_on_boot
+# - True: The robot should not home the carriages on boot
+# - False: The robot should home the carriages on boot
+def disable_home_on_boot(): return get_feature_flag('disable-home-on-boot')
