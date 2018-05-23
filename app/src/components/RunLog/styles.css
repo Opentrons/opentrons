@@ -11,6 +11,7 @@
   font-family: 'Open Sans';
   overflow-y: scroll;
   border: 1rem solid white;
+  height: calc(100vh - 3.5rem);
   max-height: calc(100vh - 3.5rem);
 }
 
