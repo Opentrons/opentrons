@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import sys
 import logging
 # import os
@@ -199,9 +198,11 @@ def main():
     # TODO (andy) server should only connect to motor-driver when required by
     # a request (eg: a request to move, or a request to update firmware)
     try:
+        # if connect succeeds, the driver sets the status light to READY state
         robot.connect()
         robot.cache_instrument_models()
     except Exception as e:
+        # when connect fails, the driver sets the light state to ERROR
         log.exception("Error while connecting to motor-driver: {}".format(e))
 
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
@@ -209,4 +210,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        robot.set_light_indicator_status('error')
+        log.exception("Exiting server from an unexpected error:")

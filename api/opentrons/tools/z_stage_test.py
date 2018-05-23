@@ -139,18 +139,24 @@ def get_options():
 
 
 def run_z_stage():
+    failure_count = 0
     for cycle in range(options.cycles):
         pick_up_motion(options.distance, options.max_speed, 30)
         try:
             print("Testing Z")
             test_axis('Z', options.tolerance)
         except Exception as e:
+            failure_count += 1
             print("FAIL: {}".format(e))
         try:
             print("Testing A")
             test_axis('A', options.tolerance)
         except Exception as e:
+            failure_count += 1
             print("FAIL: {}".format(e))
+
+    if failure_count > 0:
+        raise Exception("Failed {} times".format(failure_count))
 
 
 if __name__ == '__main__':
@@ -162,10 +168,10 @@ if __name__ == '__main__':
         setup(options.high_current, options.max_speed)
         robot._driver.home("ZA")
         run_z_stage()
+        print("PASS")
     except KeyboardInterrupt:
         print("Test Cancelled")
         exit()
     except Exception as e:
         print("FAIL: {}".format(e))
         exit()
-    print("PASS")

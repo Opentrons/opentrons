@@ -11,6 +11,7 @@ from opentrons.containers import Container
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.rpi_drivers import gpio
 from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
@@ -297,17 +298,20 @@ class Robot(object):
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
 
+    def set_light_indicator_status(self, status):
+        self._driver.set_light_indicator_status(status)
+
     def turn_on_button_light(self):
-        self._driver.turn_on_blue_button_light()
+        self.set_light_indicator_status('ready')
 
     def turn_off_button_light(self):
-        self._driver.turn_off_button_light()
+        self.set_light_indicator_status('off')
 
     def turn_on_rail_lights(self):
-        self._driver.turn_on_rail_lights()
+        gpio.turn_on_rail_lights()
 
     def turn_off_rail_lights(self):
-        self._driver.turn_off_rail_lights()
+        gpio.turn_off_rail_lights()
 
     def identify(self, seconds):
         """

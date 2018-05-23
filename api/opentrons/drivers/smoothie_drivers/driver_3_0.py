@@ -1,10 +1,11 @@
 from os import environ
 import logging
 from time import sleep
-from threading import Event
+from threading import Event, Timer
 from typing import Dict
 
 from serial.serialutil import SerialException
+from numpy import isclose
 
 from opentrons.drivers.smoothie_drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
@@ -71,7 +72,6 @@ GCODES = {'HOME': 'G28.2',
           'RESET_FROM_ERROR': 'M999',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
-          'SET_SPEED': 'G0F',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
           'READ_INSTRUMENT_MODEL': 'M371',
@@ -81,12 +81,16 @@ GCODES = {'HOME': 'G28.2',
           'DISENGAGE_MOTOR': 'M18',
           'HOMING_STATUS': 'G28.6'}
 
+MOVING_COMMANDS = ['HOME', 'MOVE', 'PROBE']
+
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
 SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
+
+LIGHT_INDICATOR_DELAY = 0.2
 
 
 class SmoothieError(Exception):
@@ -304,6 +308,8 @@ class SmoothieDriver_3_0_0:
             'C': False
         })
 
+        self.delayed_light_indicator_timer = None
+
     @property
     def homed_position(self):
         return self._homed_position.copy()
@@ -315,6 +321,25 @@ class SmoothieDriver_3_0_0:
         })
 
         self.log += [self._position.copy()]
+
+    def _update_position_after_homing(self, axes_homed):
+        # Only update axes that have been selected for homing
+        homed = {
+            ax: self.homed_position.get(ax)
+            for ax in ''.join(axes_homed)
+        }
+        self.update_position(default=homed)
+        for axis in ''.join(axes_homed):
+            self.engaged_axes[axis] = True
+
+        # coordinate after homing might not synce with default in API
+        # so update this driver's homed position using current coordinates
+        new = {
+            ax: self.position[ax]
+            for ax in self.homed_position.keys()
+            if ax in axis
+        }
+        self._homed_position.update(new)
 
     def update_position(self, default=None):
         if default is None:
@@ -416,9 +441,15 @@ class SmoothieDriver_3_0_0:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-        self.disconnect()
-        self._connect_to_port(port)
-        self._setup()
+        self.set_light_indicator_status('waiting')
+        try:
+            self.disconnect()
+            self._connect_to_port(port)
+            self._setup()
+            self.set_light_indicator_status('ready')
+        except Exception as e:
+            self.set_light_indicator_status('error')
+            raise e
 
     def disconnect(self):
         if self.is_connected():
@@ -547,10 +578,8 @@ class SmoothieDriver_3_0_0:
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
         self._combined_speed = float(value)
-        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
-        command = GCODES['SET_SPEED'] + str(speed_per_min)
-        log.debug("set_speed: {}".format(command))
-        self._send_command(command)
+        log.debug("Setting Combined-Axes Speed: {}mm/sec".format(
+            self._combined_speed))
 
     def push_speed(self):
         self._saved_axes_speed = float(self._combined_speed)
@@ -696,6 +725,12 @@ class SmoothieDriver_3_0_0:
         log.debug("_generate_current_command: {}".format(command))
         return command
 
+    def _generate_combined_speed_command(self):
+        # F argument to G0 sets the combined-axes speed in mm/min
+        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
+        command = GCODES['MOVE'] + 'F' + str(speed_per_min)
+        return command
+
     def disengage_axis(self, axes):
         '''
         Disable the stepper-motor-driver's 36v output to motor
@@ -796,6 +831,10 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             return
 
+        is_moving = bool([c for c in MOVING_COMMANDS if GCODES[c] in command])
+        if not self.simulating and is_moving:
+            self.set_light_indicator_status('moving')
+
         command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
@@ -809,7 +848,17 @@ class SmoothieDriver_3_0_0:
             error_axis = ret_code.strip()[-1]
             if GCODES['HOME'] not in command and error_axis in 'XYZABC':
                 self.home(error_axis)
+            if not self.simulating:
+                self.set_light_indicator_status(
+                    'error', delay=LIGHT_INDICATOR_DELAY)
             raise SmoothieError(ret_code)
+
+        # only set the LED to 'ready' mode if we have not just been paused
+        if not self.run_flag.is_set():
+            self.set_light_indicator_status('waiting')
+        elif not self.simulating and is_moving:
+            self.set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
         return ret_code.strip()
 
@@ -860,7 +909,8 @@ class SmoothieDriver_3_0_0:
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
         # move away from the Y endstop switch
-        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+        relative_retract_command = '{0} {1} {2}Y{3} {4}'.format(
+            self._generate_combined_speed_command(),
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
             GCODES['MOVE'],             # move towards front of machine
             str(-Y_SWITCH_BACK_OFF_MM),
@@ -901,7 +951,8 @@ class SmoothieDriver_3_0_0:
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
 
         # retract, then home, then retract again
-        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+        relative_retract_command = '{0} {1} {2}Y{3} {4}'.format(
+            self._generate_combined_speed_command(),
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
             GCODES['MOVE'],             # move 3 millimeters away from switch
             str(-Y_RETRACT_DISTANCE),
@@ -969,7 +1020,9 @@ class SmoothieDriver_3_0_0:
                 # to avoid firmware weirdness in how it parses GCode arguments
                 return _byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
-            pass
+            # prevent expected error with no pipette from showing error
+            self.set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
     def _write_to_pipette(self, gcode, mount, data_string):
         '''
@@ -1006,9 +1059,46 @@ class SmoothieDriver_3_0_0:
         log.debug("_write_to_pipette: {}".format(command))
         self._send_command(command)
 
+    def _create_coords_list(self, coords_dict):
+
+        def valid_movement(coords, axis):
+            return not (
+                (axis in DISABLE_AXES) or
+                (coords is None) or
+                isclose(coords, self.position[axis])
+            )
+
+        return [
+            axis + str(round(coords, GCODE_ROUNDING_PRECISION))
+            for axis, coords in sorted(coords_dict.items())
+            if valid_movement(coords, axis)
+        ]
+
+    def _create_backlash_coords_list(self, coords_dict):
+        backlash_target = coords_dict.copy()
+        backlash_target.update({
+            axis: value + PLUNGER_BACKLASH_MM
+            for axis, value in sorted(coords_dict.items())
+            if axis in 'BC' and self.position[axis] < value
+        })
+        return self._create_coords_list(backlash_target)
+
+    def set_light_indicator_status(self, status, delay=None):
+        # cancel any previously made calls to set the indicator status
+        if self.delayed_light_indicator_timer:
+            self.delayed_light_indicator_timer.cancel()
+        if not self.simulating:
+            if delay:
+                self.delayed_light_indicator_timer = Timer(
+                    delay, self.set_light_indicator_status, [status])
+                self.delayed_light_indicator_timer.start()
+            else:
+                gpio.set_light_indicator_status(status)
+
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
+
     def move(self, target, home_flagged_axes=False):
         '''
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1027,33 +1117,11 @@ class SmoothieDriver_3_0_0:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
         '''
-        from numpy import isclose
 
         self.run_flag.wait()
 
-        def valid_movement(coords, axis):
-            return not (
-                (axis in DISABLE_AXES) or
-                (coords is None) or
-                isclose(coords, self.position[axis])
-            )
-
-        def create_coords_list(coords_dict):
-            return [
-                axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                for axis, coords in sorted(coords_dict.items())
-                if valid_movement(coords, axis)
-            ]
-
-        backlash_target = target.copy()
-        backlash_target.update({
-            axis: value + PLUNGER_BACKLASH_MM
-            for axis, value in sorted(target.items())
-            if axis in 'BC' and self.position[axis] < value
-        })
-
-        target_coords = create_coords_list(target)
-        backlash_coords = create_coords_list(backlash_target)
+        target_coords = self._create_coords_list(target)
+        backlash_coords = self._create_backlash_coords_list(target)
 
         if target_coords:
             non_moving_axes = ''.join([
@@ -1067,6 +1135,7 @@ class SmoothieDriver_3_0_0:
             # include the current-setting gcodes within the moving gcode string
             # to reduce latency, since we're setting current so much
             command = self._generate_current_command()
+            command += ' ' + self._generate_combined_speed_command()
 
             if backlash_coords != target_coords:
                 command += ' ' + GCODES['MOVE'] + ''.join(backlash_coords)
@@ -1092,8 +1161,6 @@ class SmoothieDriver_3_0_0:
             self._update_position(target)
 
     def home(self, axis=AXES, disabled=DISABLE_AXES):
-
-        self.run_flag.wait()
 
         axis = axis.upper()
 
@@ -1129,6 +1196,7 @@ class SmoothieDriver_3_0_0:
         self.dwell_axes(non_moving_axes)
 
         for axes in home_sequence:
+            self.run_flag.wait()  # wait for the driver to resume()
             if 'X' in axes:
                 self._home_x()
             elif 'Y' in axes:
@@ -1151,23 +1219,7 @@ class SmoothieDriver_3_0_0:
                     self.dwell_axes(axes)
                     self._set_saved_current()
 
-        # Only update axes that have been selected for homing
-        homed = {
-            ax: self.homed_position.get(ax)
-            for ax in ''.join(home_sequence)
-        }
-        self.update_position(default=homed)
-        for axis in ''.join(home_sequence):
-            self.engaged_axes[axis] = True
-
-        # coordinate after homing might not synce with default in API
-        # so update this driver's homed position using current coordinates
-        new = {
-            ax: self.position[ax]
-            for ax in self.homed_position.keys()
-            if ax in axis
-        }
-        self._homed_position.update(new)
+        self._update_position_after_homing(home_sequence)
 
         return self.position
 
@@ -1197,10 +1249,13 @@ class SmoothieDriver_3_0_0:
     def pause(self):
         if not self.simulating:
             self.run_flag.clear()
+            self.set_light_indicator_status('waiting')
 
     def resume(self):
         if not self.simulating:
             self.run_flag.set()
+            self.set_light_indicator_status(
+                'ready', delay=LIGHT_INDICATOR_DELAY)
 
     def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:
@@ -1223,41 +1278,6 @@ class SmoothieDriver_3_0_0:
             return self.position
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
-
-    # TODO (ben 20180320): we should probably move these to the gpio driver
-    def turn_on_blue_button_light(self):
-        self._set_button_light(blue=True)
-
-    def turn_on_red_button_light(self):
-        self._set_button_light(red=True)
-
-    def turn_off_button_light(self):
-        self._set_button_light(red=False, green=False, blue=False)
-
-    def _set_button_light(self, red=False, green=False, blue=False):
-        color_pins = {
-            gpio.OUTPUT_PINS['RED_BUTTON']: red,
-            gpio.OUTPUT_PINS['GREEN_BUTTON']: green,
-            gpio.OUTPUT_PINS['BLUE_BUTTON']: blue
-        }
-        for pin, state in color_pins.items():
-            if state:
-                gpio.set_high(pin)
-            else:
-                gpio.set_low(pin)
-
-    def turn_on_rail_lights(self):
-        gpio.set_high(gpio.OUTPUT_PINS['FRAME_LEDS'])
-
-    def turn_off_rail_lights(self):
-        gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
-
-    def read_button(self):
-        # button is normal-HIGH, so invert
-        return not bool(gpio.read(gpio.INPUT_PINS['BUTTON_INPUT']))
-
-    def read_window_switches(self):
-        return bool(gpio.read(gpio.INPUT_PINS['WINDOW_INPUT']))
 
     def kill(self):
         """

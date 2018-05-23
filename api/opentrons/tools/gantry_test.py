@@ -130,13 +130,9 @@ if __name__ == '__main__':
         robot.home()
         run_x_axis()
         run_y_axis()
+        print("PASS")
     except KeyboardInterrupt:
         print("Test Cancelled")
-        robot._driver.turn_on_blue_button_light()
         exit()
     except Exception as e:
-        robot._driver.turn_on_red_button_light()
         print("FAIL: {}".format(e))
-
-    robot._driver._set_button_light(red=False, green=True, blue=False)
-    print("PASS")
