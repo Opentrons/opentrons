@@ -6,7 +6,7 @@ const path = require('path')
 const dateFormat = require('dateformat')
 const winston = require('winston')
 
-const config = require('./config').get('log')
+const config = require('./config').getConfig('log')
 
 const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')

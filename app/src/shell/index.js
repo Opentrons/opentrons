@@ -1,9 +1,11 @@
 // @flow
 // desktop shell module
-import {remote} from 'electron'
+import {remote, ipcRenderer} from 'electron'
 import {createSelector, type Selector} from 'reselect'
 
-import type {State, Action, ThunkPromiseAction, Error} from '../types'
+import createLogger from '../logger'
+
+import type {State, Action, Middleware, ThunkPromiseAction, Error} from '../types'
 
 const {
   CURRENT_VERSION,
@@ -11,6 +13,12 @@ const {
   downloadUpdate,
   quitAndInstall
 } = remote.require('./update')
+
+const {
+  getConfig
+} = remote.require('./config')
+
+const log = createLogger(__filename)
 
 // TODO(mc, 2018-03-29): update sub reducer
 type ShellState = {
@@ -128,6 +136,21 @@ export function shellReducer (
   return state
 }
 
+export const shellMiddleware: Middleware = (store) => {
+  const {dispatch} = store
+
+  ipcRenderer.on('dispatch', (_, action) => {
+    log.debug('Received action from main via IPC', {action})
+    dispatch(action)
+  })
+
+  return (next) => (action) => {
+    if (action.meta && action.meta.shell) ipcRenderer.send('dispatch', action)
+
+    return next(action)
+  }
+}
+
 export type ShellUpdate = $PropertyType<ShellState, 'update'> & {
   current: string
 }
@@ -137,6 +160,11 @@ export const getShellUpdate: Selector<State, void, ShellUpdate> =
     selectShellUpdateState,
     (updateState) => ({...updateState, current: CURRENT_VERSION})
   )
+
+// getShellConfig makes a sync RPC call, so use sparingly
+export function getShellConfig () {
+  return getConfig()
+}
 
 function selectShellUpdateState (state: State) {
   return state.shell.update
