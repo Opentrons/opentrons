@@ -853,6 +853,9 @@ class SmoothieDriver_3_0_0:
                 raise e
             if not self.simulating:
                 sleep(DEFAULT_STABILIZE_DELAY)
+            if self._connection:
+                self._connection.close()
+                self._connection.open()
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
 
