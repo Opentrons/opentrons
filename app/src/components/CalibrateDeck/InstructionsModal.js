@@ -9,7 +9,6 @@ import type {CalibrateDeckStartedProps} from './types'
 
 import {
   restartRobotServer,
-  moveRobotTo,
   deckCalibrationCommand as dcCommand
 } from '../../http-api-client'
 
@@ -30,12 +29,16 @@ const TITLE = 'Deck Calibration'
 export default connect(null, mapDispatchToProps)(InstructionsModal)
 
 function InstructionsModal (props: Props) {
-  const {calibrationStep, exitUrl, moveRequest} = props
+  const {calibrationStep, exitUrl, commandRequest} = props
   const subtitle = `Step ${calibrationStep} of 6`
   const titleBarBase = {title: TITLE, subtitle}
   const backButtonBase = {children: 'exit'}
 
-  if (moveRequest.inProgress) {
+  if (
+    commandRequest.inProgress &&
+    commandRequest.request &&
+    commandRequest.request.command === 'move'
+  ) {
     return (
       <SpinnerModalPage
         titleBar={{
@@ -83,22 +86,26 @@ function getHeading (props: Props): string {
 }
 
 function getMovementDescription (props: Props): string {
-  const {moveRequest} = props
+  const {commandRequest} = props
   const mount = capitalize(props.mount)
 
-  switch (moveRequest.request && moveRequest.request.position) {
-    case 'attach_tip': return `${mount} pipette moving to the front and down.`
-    case 'z_calibration': return `${mount} pipette moving to slot 5.`
-    case 'initial_calibration_1': return `${mount} pipette moving to slot 1.`
-    case 'initial_calibration_2': return `${mount} pipette moving to slot 3.`
-    case 'initial_calibration_3': return `${mount} pipette moving to slot 7.`
+  switch (
+    commandRequest.request &&
+    commandRequest.request.command === 'move' &&
+    commandRequest.request.point
+  ) {
+    case 'attachTip': return `${mount} pipette moving to the front and down.`
+    case 'safeZ': return `${mount} pipette moving to slot 5.`
+    case '1': return `${mount} pipette moving to slot 1.`
+    case '2': return `${mount} pipette moving to slot 3.`
+    case '3': return `${mount} pipette moving to slot 7.`
   }
 
   return ''
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot, mount, pipette, calibrationStep: step, match: {url}} = ownProps
+  const {robot, pipette, calibrationStep: step, match: {url}} = ownProps
   const goToNext = () => dispatch(push(`${url}/step-${Number(step) + 1}`))
   let proceed
 
@@ -106,31 +113,31 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength})
     ).then(() => dispatch(
-      moveRobotTo(robot, {position: 'z_calibration', mount, pipette})
+      dcCommand(robot, {command: 'move', point: 'safeZ'})
     )).then(goToNext)
   } else if (step === '2') {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save z'})
     ).then(() => dispatch(
-      moveRobotTo(robot, {position: 'initial_calibration_1', mount, pipette})
+      dcCommand(robot, {command: 'move', point: '1'})
     )).then(goToNext)
   } else if (step === '3') {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save xy', point: '1'})
     ).then(() => dispatch(
-      moveRobotTo(robot, {position: 'initial_calibration_2', mount, pipette})
+      dcCommand(robot, {command: 'move', point: '2'})
     )).then(goToNext)
   } else if (step === '4') {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save xy', point: '2'})
     ).then(() => dispatch(
-      moveRobotTo(robot, {position: 'initial_calibration_3', mount, pipette})
+      dcCommand(robot, {command: 'move', point: '3'})
     )).then(goToNext)
   } else if (step === '5') {
     proceed = () => dispatch(
       dcCommand(robot, {command: 'save xy', point: '3'})
     ).then(() => dispatch(
-      moveRobotTo(robot, {position: 'attach_tip', mount, pipette})
+      dcCommand(robot, {command: 'move', point: 'attachTip'})
     )).then(goToNext)
   } else {
     proceed = () => dispatch(

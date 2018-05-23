@@ -7,10 +7,7 @@ import type {PipetteConfig} from '@opentrons/shared-data'
 import type {Mount} from '../../robot'
 import type {CalibrateDeckProps} from './types'
 
-import {
-  moveRobotTo,
-  deckCalibrationCommand as dcCommand
-} from '../../http-api-client'
+import {deckCalibrationCommand as dcCommand} from '../../http-api-client'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 
@@ -41,12 +38,12 @@ function ClearDeckAlert (props: Props) {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot, mount, pipette, match: {url}} = ownProps
+  const {robot, match: {url}} = ownProps
 
   return {
     onContinue: () => {
+      dispatch(dcCommand(robot, {command: 'move', point: 'attachTip'}))
       dispatch(push(`${url}/step-1`))
-      dispatch(moveRobotTo(robot, {position: 'attach_tip', mount, pipette}))
     },
     onCancel: () => dispatch(dcCommand(robot, {command: 'release'}))
   }
