@@ -14,7 +14,9 @@ import {
   CenteredTextSvg,
   LabwareContainer,
   ContainerNameOverlay,
-  EmptyDeckSlot
+  EmptyDeckSlot,
+  SLOT_WIDTH,
+  SLOT_HEIGHT
 } from '@opentrons/components'
 
 import {nonFillableContainers} from '../../constants'
@@ -54,6 +56,23 @@ function OccupiedDeckSlotOverlay ({
   )
 }
 
+// TODO HACK Ian 2018-05-23 this is a temporary workaround until we use SVG tip racks
+const IMG_TIP_RACK_10UL = require('../../images/labware/10 uL Tip Rack.png')
+const IMG_TIP_RACK_GENERIC = require('../../images/labware/Tip Rack.png')
+const IMG_TRASH = require('../../images/labware/Trash.png')
+const FALLBACK_IMG = IMG_TIP_RACK_GENERIC // TODO LATER OR NEVER Ian 2018-04-23 better fallback img?
+const labwareImages = {
+  'tiprack-10ul': IMG_TIP_RACK_10UL,
+
+  'tiprack-200ul': IMG_TIP_RACK_GENERIC,
+  'GEB-tiprack-300ul': IMG_TIP_RACK_GENERIC,
+
+  'tiprack-1000ul': IMG_TIP_RACK_GENERIC,
+  'tiprack-1000ul-chem': IMG_TIP_RACK_GENERIC,
+
+  'trash-box': IMG_TRASH
+}
+
 function SlotWithContainer ({containerType, containerName, containerId}) {
   // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
 
@@ -61,9 +80,8 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
     <g>
       {nonFillableContainers.includes(containerType)
         ? <image // TODO do real styles and maybe get SVG landscape images
-          href={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`}
-          width='120' height='120'
-          transform='translate(125 -15) rotate(90)'
+          href={labwareImages[containerType] || FALLBACK_IMG}
+          width={SLOT_WIDTH} height={SLOT_HEIGHT}
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
