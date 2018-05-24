@@ -25,8 +25,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
-  onResumeClick: () => dispatch(robotActions.resume()),
-  onCancelClick: () => dispatch(robotActions.cancel())
+  onResumeClick: () => dispatch(robotActions.resume())
 })
 
 function RunPanel (props) {

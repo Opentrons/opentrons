@@ -8,6 +8,7 @@ import {
 } from '../../robot'
 
 import CommandList from './CommandList'
+import ConfirmCancelModal from './ConfirmCancelModal'
 
 type SP = {
   commands: Array<any>,
@@ -29,3 +30,5 @@ function RunLog (props: Props) {
 }
 
 export default connect(mapStateToProps)(RunLog)
+
+export {ConfirmCancelModal}
