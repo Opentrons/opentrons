@@ -41,17 +41,17 @@ function OccupiedDeckSlotOverlay ({
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
         <ClickableText onClick={() => openIngredientSelector(containerId)}
-          iconName='plus' y='25%' text='Edit Ingredients' />
+          iconName='pen' y='25%' text='Edit Details' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
-        iconName='cursor-move' y='50%' text='Copy Labware' />
+        iconName='cursor-move' y='50%' text='Copy' />
       {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
       <ClickableText onClick={() =>
           window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
           deleteContainer({containerId, slot, containerType})
       }
-        iconName='close' y='75%' text='Delete Labware' />
+        iconName='close' y='75%' text='Delete' />
     </g>
   )
 }
@@ -73,8 +73,14 @@ const labwareImages = {
   'trash-box': IMG_TRASH
 }
 
-function SlotWithContainer ({containerType, containerName, containerId}) {
-  // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
+type SlotWithContainerProps = {
+  containerType: string,
+  displayName: string,
+  containerId: string
+}
+
+function SlotWithContainer (props: SlotWithContainerProps) {
+  const {containerType, displayName, containerId} = props
 
   return (
     <g>
@@ -85,7 +91,7 @@ function SlotWithContainer ({containerType, containerName, containerId}) {
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      {containerName && <ContainerNameOverlay {...{containerType, containerName}} />}
+      <ContainerNameOverlay displayName={displayName} />
     </g>
   )
 }
@@ -166,7 +172,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
-        ? <SlotWithContainer {...{containerType, containerName, containerId}} />
+        ? <SlotWithContainer displayName={containerName || containerType} {...{containerType, containerId}} />
         : <EmptyDeckSlot {...{height, width, slot}} />
       }
 

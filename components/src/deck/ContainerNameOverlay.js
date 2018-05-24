@@ -1,20 +1,18 @@
 // @flow
 import * as React from 'react'
-import {humanize} from '../utils'
 import {SLOT_HEIGHT} from './constants'
 import styles from './LabwareContainer.css'
 
 type Props = {
-  containerType: string,
-  containerName: string
+  displayName: string
 }
 
 export function ContainerNameOverlay (props: Props) {
-  const {containerType, containerName} = props
+  const {displayName} = props
 
   const paddingLeft = 4
-  const paddingTop = 0
-  const boxHeight = 25
+  const paddingTop = 5
+  const boxHeight = 18
 
   return (
     <g className={styles.name_overlay}>
@@ -23,12 +21,9 @@ export function ContainerNameOverlay (props: Props) {
         <text
           x={paddingLeft}
           y={0.4 * boxHeight + paddingTop}
-          className={styles.container_type}
+          className={styles.display_name}
         >
-          {humanize(containerType).toUpperCase()}
-        </text>
-        <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>
-          {containerName}
+          {displayName}
         </text>
       </g>
     </g>

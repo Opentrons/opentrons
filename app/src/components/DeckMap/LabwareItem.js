@@ -55,7 +55,7 @@ export default function LabwareItem (props: LabwareItemProps) {
         <Plate containerType={type} />
 
         {!showSpinner && (
-          <ContainerNameOverlay containerName={name} containerType={type} />
+          <ContainerNameOverlay displayName={name} />
         )}
 
         {showSpinner && (
