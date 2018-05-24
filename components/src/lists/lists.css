@@ -35,7 +35,7 @@
   outline: var(--bd-width-default) solid transparent;
 }
 
-.hoverable_titled_list:hover {
+.hovered {
   /* "highlighted" appearance */
   outline-color: var(--c-highlight);
 }
@@ -82,6 +82,7 @@
   bottom: 0;
   right: 0;
   padding: calc(var(--list-padding-small) - var(--bd-width-default));
+  padding-top: 1rem;
 
   &:hover {
     background-color: var(--c-bg-hover);

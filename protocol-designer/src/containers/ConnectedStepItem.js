@@ -17,15 +17,16 @@ type OP = {
   stepId: $PropertyType<Props, 'stepId'>
 }
 
-type SP = {
+type SP = {|
   step: $PropertyType<Props, 'step'>,
   substeps: $PropertyType<Props, 'substeps'>,
   collapsed: $PropertyType<Props, 'collapsed'>,
   error: $PropertyType<Props, 'error'>,
   selected: $PropertyType<Props, 'selected'>,
+  hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   getLabwareName: $PropertyType<Props, 'getLabwareName'>
-}
+|}
 
 type DP = $Diff<$Diff<Props, SP>, OP>
 
@@ -38,6 +39,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   // Also if you can, use END_STEP const instead of hard-coded '__end__',
   // but flow doesn't like that :(
 
+  const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
+  const hoveredStep = steplistSelectors.hoveredStepId(state)
+
   return {
     step: (stepId === '__end__')
       ? null
@@ -47,14 +51,18 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       ? null
       : substepSelectors.allSubsteps(state)[stepId],
 
-    hoveredSubstep: steplistSelectors.getHoveredSubstep(state),
+    hoveredSubstep,
 
     collapsed: (stepId === '__end__' || stepId === 0)
       ? undefined
       : steplistSelectors.getCollapsedSteps(state)[stepId],
 
     selected: steplistSelectors.selectedStepId(state) === stepId,
-    hovered: steplistSelectors.getHoveredSubstep(state) === stepId,
+
+    // no double-highlighting: whole step is only "hovered" when
+    // user is not hovering on substep.
+    hovered: hoveredStep === stepId && !hoveredSubstep,
+
     error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
     getLabwareName: (labwareId: ?string): ?string =>

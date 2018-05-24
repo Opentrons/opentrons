@@ -25,6 +25,7 @@ type StepItemProps = {
   collapsed?: boolean,
   error?: ?boolean,
   selected?: boolean,
+  hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
 
   getLabwareName: (labwareId: ?string) => ?string,
@@ -43,6 +44,7 @@ export default function StepItem (props: StepItemProps) {
     collapsed,
     error,
     selected,
+    hovered,
 
     onStepMouseLeave,
     onStepClick,
@@ -71,8 +73,7 @@ export default function StepItem (props: StepItemProps) {
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}
       onCollapseToggle={onStepItemCollapseToggle}
-      hoverable
-      {...{selected, collapsed}}
+      {...{selected, collapsed, hovered}}
     >
       {getStepItemContents(props)}
     </TitledList>

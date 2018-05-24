@@ -6,7 +6,6 @@
     flex-direction: row;
     align-items: center;
     padding: 0.5rem;
-    border-top: 2px solid var(--c-light-gray);
     text-align: center;
     font-size: var(--fs-body-1);
   };
@@ -21,6 +20,8 @@
 
 .step_subitem {
   @apply --step_subitem;
+
+  border-top: 2px solid var(--c-light-gray);
 
   & > * {
     @apply --subitem_cell;
@@ -63,8 +64,6 @@
 
 .step_subitem_column_header {
   @apply --step_subitem;
-
-  border: none;
 
   & svg {
     /* Source labware -> Dest Labware arrow icon */
@@ -114,14 +113,14 @@
   @apply --clickable;
 }
 
-.substep {
-  /* Invisible border for padding */
-  border: 2px solid transparent;
+.highlighted {
+  border-color: transparent;
+  outline: 2px solid var(--c-highlight);
+  outline-width: 2px 0;
 }
 
-.highlighted {
-  border: 2px solid var(--c-highlight);
-  border-width: 2px 0;
+.clear_border {
+  border-color: transparent;
 }
 
 .error_icon {

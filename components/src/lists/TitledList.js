@@ -32,8 +32,8 @@ type ListProps = {
   collapsed?: boolean,
   /** set to true when TitledList is selected (eg, user clicked it) */
   selected?: boolean,
-  /** enable :hover styling (show border on hover) */
-  hoverable?: boolean,
+  /** set to true when TitledList is hovered (but not when its contents are hovered) */
+  hovered?: boolean,
   /** disables the whole TitledList if true */
   disabled?: boolean
 }
@@ -64,7 +64,7 @@ export default function TitledList (props: ListProps) {
   const className = cx(styles.titled_list, props.className, {
     [styles.disabled]: disabled,
     [styles.titled_list_selected]: !disabled && props.selected,
-    [styles.hoverable_titled_list]: !disabled && props.hoverable
+    [styles.hovered]: !disabled && props.hovered
   })
 
   const titleBarClass = cx(styles.title_bar, {
