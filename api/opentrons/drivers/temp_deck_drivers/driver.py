@@ -77,7 +77,7 @@ def _parse_number_from_substring(substring):
         value = substring.split(':')[1]
         if value.strip().lower() == 'none':
             return None
-        return float(value)
+        return int(value)
     except (ValueError, IndexError, TypeError, AttributeError) as e:
         log.exception('Unexpected argument to _parse_number_from_substring:')
         raise ParseError(
@@ -299,7 +299,6 @@ class TempDeck:
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:
-            print(cmd, TEMP_DECK_ACK.encode(), self._connection, timeout)
             return serial_communication.write_and_return(
                 cmd,
                 TEMP_DECK_ACK,
