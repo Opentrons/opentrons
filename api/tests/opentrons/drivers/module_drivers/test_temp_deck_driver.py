@@ -9,142 +9,155 @@
 # expected ACK, then it'll eventually time out and return an error
 
 
-def test_get_temp_deck_temperature(monkeypatch):
+def test_get_temp_deck_temperature():
     # Get the curent and target temperatures
     # If no target temp has been previously set,
     # then the response will set 'T' to 'none'
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    import types
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
 
-    def write_with_log(command, ack, connection, timeout=None):
-        current_temp = 24
-        target_temp = 'none'
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    command_log = []
+    return_string = 'T:none C:90'
 
-        if 'M105' in command:
-            return 'T:' + str(target_temp) \
-                + ' C:' + str(current_temp) \
-                + '\r\n'
+    def _mock_send_command(self, command, timeout=None):
+        nonlocal command_log, return_string
+        command_log += [command]
+        return return_string
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    res = serial_communication.write_and_return(
-        'M105\r\n', 'ok\r\nok\r\n', None)
+    assert temp_deck.current_temperature == 25  # driver's initialized value
+    assert temp_deck.target_temperature is None
+    temp_deck.update_temperature()
+    assert command_log == ['M105']
+    assert temp_deck.current_temperature == 90
+    assert temp_deck.target_temperature is None
 
-    expected = 'T:none C:24\r\n'
-    assert res == expected
-    # fuzzy_assert(result=res, expected=expected)
+    command_log = []
+    return_string = 'T:99 C:90'
+    temp_deck.update_temperature()
+    assert command_log == ['M105']
+    assert temp_deck.current_temperature == 90
+    assert temp_deck.target_temperature == 99
 
 
 def test_set_temp_deck_temperature(monkeypatch):
     # Set target temperature
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    import types
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
 
-    def write_with_log(command, ack, connection, timeout=None):
-        if 'M104' in command:
-            return ''
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    command_log = []
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
+    def _mock_send_command(self, command, timeout=None):
+        nonlocal command_log
+        command_log += [command]
+        return ''
 
-    res = serial_communication.write_and_return(
-        'M104 S55\r\n', 'ok\r\nok\r\n', None)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    expected = ''
-    assert res == expected
-    # fuzzy_assert(result=res, expected=expected)
+    temp_deck.set_temperature(99)
+    assert command_log[-1] == 'M104 S99'
+
+    temp_deck.set_temperature(-9)
+    assert command_log[-1] == 'M104 S-9'
 
 
 def test_fail_set_temp_deck_temperature(monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    import types
+    from opentrons.drivers import serial_communication
 
-    current_temp_deck_status = 'ERROR'
+    def _raise_error(self, command, ack, serial_connection, timeout=None):
+        return 'ERROR: some error here'
 
-    def write_with_log(command, ack, connection, timeout=None):
+    serial_communication.write_and_return = types.MethodType(
+        _raise_error, serial_communication)
 
-        if 'M104' in command and current_temp_deck_status == 'ERROR':
-            return 'ERROR\r\n'
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeckError
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
+    import pytest
+    with pytest.raises(TempDeckError):
+        temp_deck.update_temperature()
 
-    res = serial_communication.write_and_return(
-        'M104 S55\r\n', 'ok\r\nok\r\n', None)
+    def _raise_error(self, command, ack, serial_connection, timeout=None):
+        return 'Alarm: something alarming happened here'
 
-    expected = 'ERROR\r\n'
-    assert res == expected
-    # fuzzy_assert(result=res, expected=expected)
+    serial_communication.write_and_return = types.MethodType(
+        _raise_error, serial_communication)
+
+    with pytest.raises(TempDeckError):
+        temp_deck.update_temperature()
 
 
 def test_turn_off_temp_deck(monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    import types
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
 
-    def write_with_log(command, ack, connection, timeout=None):
-        if 'M18' in command:
-            return ''
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    command_log = []
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
+    def _mock_send_command(self, command, timeout=None):
+        nonlocal command_log
+        command_log += [command]
+        return ''
 
-    res = serial_communication.write_and_return(
-        'M18\r\n', 'ok\r\nok\r\n', None)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    expected = ''
-    assert res == expected
-    # fuzzy_assert(result=res, expected=expected)
+    temp_deck.disengage()
+    assert command_log == ['M18']
 
 
 def test_get_device_info(monkeypatch):
-    # Get the device's Model, firmware version and Serial number
-    from opentrons.drivers.smoothie_drivers import serial_communication
+
+    import types
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    command_log = []
 
     model = 'temp-v1'
     firmware_version = 'edge-1a2b345'
     serial = 'td20180102A01'
 
-    def write_with_log(command, ack, connection, timeout=None):
-        if 'M115' in command:
-            return 'model:' + model \
-                + ' version:' + firmware_version \
-                + ' serial:' + serial \
-                + '\r\n'
+    def _mock_send_command(self, command, timeout=None):
+        nonlocal command_log
+        command_log += [command]
+        return 'model:' + model \
+            + ' version:' + firmware_version \
+            + ' serial:' + serial
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
-    res = serial_communication.write_and_return(
-        'M115\r\n', 'ok\r\nok\r\n', None)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    expected = ('model:temp-v1 '
-                'version:edge-1a2b345 '
-                'serial:td20180102A01'
-                '\r\n')
-    assert res == expected
+    res = temp_deck.get_device_info()
+    assert res == {
+        'model': model,
+        'version': firmware_version,
+        'serial': serial
+    }
 
 
 def test_dfu_command(monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    import types
+    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
 
-    def write_with_log(command, ack, connection, timeout=None):
-        if 'dfu' in command:
-            return 'Entering Bootloader\r\n'
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    command_log = []
 
-    monkeypatch.setattr(
-        serial_communication,
-        'write_and_return',
-        write_with_log)
+    def _mock_send_command(self, command, timeout=None):
+        nonlocal command_log
+        command_log += [command]
+        return ''
 
-    res = serial_communication.write_and_return(
-        'dfu\r\n', 'ok\r\nok\r\n', None)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    expected = 'Entering Bootloader\r\n'
-    assert res == expected
-    # fuzzy_assert(result=res, expected=expected)
+    temp_deck.enter_programming_mode()
+    assert command_log == ['dfu']

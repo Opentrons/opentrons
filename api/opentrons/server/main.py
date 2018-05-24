@@ -79,7 +79,7 @@ def log_init():
                 'handlers': ['debug'],
                 'level': level_value
             },
-            'opentrons.drivers.smoothie_drivers.serial_communication': {
+            'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG
             }
