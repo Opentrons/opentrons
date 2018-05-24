@@ -192,12 +192,12 @@ class Session(object):
 
         try:
             self.resume()
-            robot.home()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
                 exec(self._protocol, {})
             self.set_state('finished')
+            robot.home()
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)

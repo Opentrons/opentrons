@@ -10,6 +10,7 @@ from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
 from opentrons.server.endpoints import (wifi, control, update)
+from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
@@ -196,13 +197,15 @@ def main():
         log.debug("Starting Opentrons server application on {}:{}".format(
             args.hostname, args.port))
 
-    # TODO (andy) server should only connect to motor-driver when required by
-    # a request (eg: a request to move, or a request to update firmware)
     try:
         robot.connect()
         robot.cache_instrument_models()
     except Exception as e:
         log.exception("Error while connecting to motor-driver: {}".format(e))
+
+    if not ff.disable_home_on_boot():
+        log.info("Homing Z axes")
+        robot.home_z()
 
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
