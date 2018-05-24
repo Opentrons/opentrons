@@ -102,7 +102,6 @@ def _parse_key_from_substring(substring):
 def _parse_temperature_response(temperature_string):
     '''
     Example input: "T:none C:25"
-    Example input: "T:none C:25"
     '''
     if not temperature_string or \
             not isinstance(temperature_string, str):

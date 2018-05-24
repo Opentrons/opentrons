@@ -14,7 +14,7 @@ def test_get_temp_deck_temperature():
     # If no target temp has been previously set,
     # then the response will set 'T' to 'none'
     import types
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
@@ -46,7 +46,7 @@ def test_get_temp_deck_temperature():
 def test_set_temp_deck_temperature(monkeypatch):
     # Set target temperature
     import types
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
@@ -76,8 +76,8 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     serial_communication.write_and_return = types.MethodType(
         _raise_error, serial_communication)
 
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeckError
+    from opentrons.drivers.temp_deck import TempDeck
+    from opentrons.drivers.temp_deck.driver import TempDeckError
     temp_deck = TempDeck()
     temp_deck.simulating = False
 
@@ -97,7 +97,7 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
 
 def test_turn_off_temp_deck(monkeypatch):
     import types
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
@@ -117,7 +117,7 @@ def test_turn_off_temp_deck(monkeypatch):
 def test_get_device_info(monkeypatch):
 
     import types
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
@@ -146,7 +146,7 @@ def test_get_device_info(monkeypatch):
 
 def test_dfu_command(monkeypatch):
     import types
-    from opentrons.drivers.temp_deck_drivers.driver import TempDeck
+    from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
