@@ -54,7 +54,7 @@
     background-color: var(--c-bg-selected);
 
     & * {
-      color: var(--c-highlight);
+      color: var(--c-selected-dark);
       font-weight: var(--fw-semibold);
     }
   }
