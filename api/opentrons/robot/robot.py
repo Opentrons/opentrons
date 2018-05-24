@@ -294,8 +294,10 @@ class Robot(object):
         return self
 
     def cache_instrument_models(self):
+        log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
+            log.debug("{}: {}".format(mount, self.model_by_mount[mount]))
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -508,20 +510,6 @@ class Robot(object):
     def home(self, *args, **kwargs):
         """
         Home robot's head and plunger motors.
-
-        Parameters
-        ----------
-        *args :
-            A string with axes to home. For example ``'xyz'`` or ``'ab'``.
-
-            If no arguments provided home Z-axis then X, Y, B, A
-
-        Notes
-        -----
-        Sometimes while executing a long protocol,
-        a robot might accumulate precision
-        error and it is recommended to home it. In this scenario, add
-        ``robot.home('xyzab')`` into your script.
         """
 
         # Home gantry first to avoid colliding with labware
@@ -541,6 +529,10 @@ class Robot(object):
         # because their Mover.home() commands aren't used here
         for a in self._actuators.values():
             self.poses = a['carriage'].update_pose_from_driver(self.poses)
+
+    def home_z(self):
+        for mount in ['left', 'right']:
+            self.poses = self._actuators[mount]['carriage'].home(self.poses)
 
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)

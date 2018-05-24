@@ -59,15 +59,45 @@ If you're looking for something to work on, especially for a first contribution,
 
 ## Commit Guidelines
 
-Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. The following seven rules (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
+Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. These selected guidelines (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
 
 1.  Separate subject from body with a blank line
-2.  Limit the subject line to 50 characters
-3.  Capitalize the subject line
-4.  Do not end the subject line with a period
-5.  Use the imperative mood in the subject line
-6.  Wrap the body at 72 characters
-7.  Use the body to explain what and why vs. how
+2.  Capitalize the subject line
+3.  Do not end the subject line with a period
+4.  Use the imperative mood in the subject line
+5.  Use the body to explain what and why vs. how
+
+When committing, we use [commitizen][] to format our commit messages according to the [Conventional Commits][conventional-commits] specification. This allows us to automatically generate CHANGELOGs based on commit messages. To commit files, first install `commitizen`, then:
+
+```shell
+git add path/to/files
+git cz
+```
+
+This will launch the commitizen wizard, which will ask you to:
+
+1.  Select a commit type, which will be one of:
+    1.  `feat` - A new feature
+    2.  `fix` - A bug fix
+    3.  `docs` - Documentation only changes
+    4.  `style` - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc
+    5.  `refactor` - A code change that neither fixes a bug nor adds a feature
+    6.  `perf` - A code change that improves performance
+    7.  `test` - Adding missing tests or correcting existing tests
+    8.  `build` - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+    9.  `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+    10. `chore` - Other changes that don't modify src or test files
+2.  Select a scope
+    * For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
+    * For other commit types, use your best judgement or omit
+3.  Write a short commit title
+    * Written according to the guidelines above
+4.  Write a longer description if necessary
+    * Also written according to the guidelines above
+5.  Mention any tickets addressed by the commit
+    * e.g. `Closes #xyz`
+
+![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
 
 ## Project and Repository Structure
 
@@ -98,23 +128,23 @@ Your computer will need the following tools installed to be able to develop with
 *   macOS 10.11+, Linux, or Windows 10
 *   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux)
 
-    ``` shell
-    # pyenv on macOS: install with shared framework option
-    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.6.4
-
-    # pyenv on Linux: install with shared library option
-    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.6.4
+    ```shell
+    pyenv install 3.6.4
     ```
 
 *   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
 
     ```shell
-    # nvm on macOS and Linux
-    # installs version from .nvmrc ("8")
-    nvm install && nvm use
+    nvm install lts/carbon
     ```
 
 *   [yarn][yarn-install] - JavaScript package manager
+
+*   [commitizen][] - Commit message formatter
+
+    ```shell
+    yarn global add commitizen
+    ```
 
 *   GNU Make - we use [Makefiles][] to manage our builds
 
@@ -160,19 +190,13 @@ make lint-css
 Be sure to check out the [API `README`][api-readme] for additional instructions. To run the Opentrons API in development mode:
 
 ```shell
-# change into the API directory
-$ cd api
-
-# verify API is working by printing the version
-python -c 'import opentrons; print(opentrons.__version__)'
-
 # run API with virtual robot
-ENABLE_VIRTUAL_SMOOTHIE=true make dev
+make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
 # run API with robot's motor driver connected via USB to UART cable
-make dev
+make -C api dev
 
 # push the current contents of the api directory to robot for testing
-make push
+make -C api push
 ```
 
 ### Releasing (for Opentrons developers)
@@ -182,14 +206,17 @@ Our release process is still a work-in-progress. All projects are currently vers
 1.  Manually bump the `version` field in repo-level `package.json`
     *   The rest of these steps will refer to the bump as `${version}`
 2.  `python scripts/bump_version.py --sync && make install`
-3.  `git commit -am 'release: ${version}'`
-4.  Open a PR into `edge`
-5.  Merge the PR once approved
-6.  Verify that CI is green on `edge` and test the build artifacts
-7.  Pull latest `edge` to your machine
-8.  `git tag -a v${version} -m 'release: ${version}'`
-9.  `git push --tags`
-
+3.  `git add --all`
+4.  `git cz`
+    - Type: `chore`
+    - Scope: `release`
+    - Message: `${version}`
+5.  Open a PR into `edge`
+6.  Squash merge the PR once approved
+7.  Verify that CI is green on `edge` and test the build artifacts
+8.  Pull latest `edge` to your machine
+9.  `git tag -a v${version} -m 'chore(release): ${version}'`
+10. `git push --tags`
 
 ## Prior Art
 
@@ -201,7 +228,6 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 
 [repo]: https://github.com/Opentrons/opentrons
 [api-readme]: ./api/README.rst
-
 [easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
 [support]: https://support.opentrons.com/
 [fork-and-pull]: https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/
@@ -215,3 +241,5 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
 [yarn-install]: https://yarnpkg.com/en/docs/install
+[commitizen]: https://github.com/commitizen/cz-cli
+[conventional-commits]: https://conventionalcommits.org/
