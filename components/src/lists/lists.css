@@ -6,7 +6,7 @@
 
   --list-disabled: {
     color: var(--c-font-disabled);
-    border-color: #eee;
+    outline-color: #eee;
     fill: var(--c-font-disabled);
     background-color: transparent;
   }
@@ -32,12 +32,12 @@
 }
 
 .titled_list {
-  border: var(--bd-width-default) solid transparent;
+  outline: var(--bd-width-default) solid transparent;
 }
 
 .hoverable_titled_list:hover {
   /* "highlighted" appearance */
-  border-color: var(--c-highlight);
+  outline-color: var(--c-highlight);
 }
 
 .title_bar {
