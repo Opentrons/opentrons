@@ -3,14 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. code-block:: python
-
-  from opentrons import robot, containers, instruments
-
-
 ===============
 Opentrons API
 ===============
+
+For the OT 1 API, `please go to this link`__
+
+__ https://docs.opentrons.com/ot1/
 
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
 
@@ -18,7 +17,7 @@ We’ve designed it in a way we hope is accessible to anyone with basic computer
 
 `View source code on GitHub`__
 
-__ https://github.com/opentrons/opentrons-api
+__ https://github.com/Opentrons/opentrons
 
 **********************
 

@@ -84,6 +84,19 @@ def test_remove_serial_echo(smoothie, monkeypatch):
         driver_3_0.SMOOTHIE_ACK)
     assert res == 'TESTS-RULE'
 
+    def return_echo_response(command, ack, connection, timeout):
+        if 'some-data' in command:
+            return command.strip() + '\r\nT\r\nESTS-RULE'
+        return command
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        return_echo_response)
+
+    res = smoothie._send_command(
+        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
+        driver_3_0.SMOOTHIE_ACK)
+    assert res == 'TESTS-RULE'
+
 
 def test_parse_position_response(smoothie):
     from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
@@ -200,7 +213,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A1.0 B0.5 C0.5 X0.3 Y0.3 Z1.0 G4P0.005 G28.2.+[ABCZ].+ M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['G0F3000 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-20 G90 M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90 M400'],  # NOQA
         ['G0F24000 M400'],
         ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],

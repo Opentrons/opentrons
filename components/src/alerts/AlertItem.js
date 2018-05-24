@@ -35,7 +35,7 @@ const ALERT_PROPS_BY_TYPE = {
     className: styles.warning
   },
   info: {
-    icon: {name: 'info-circle'},
+    icon: {name: 'information'},
     className: styles.info
   }
 }

@@ -7,7 +7,7 @@ const createUi = require('./ui')
 const initializeMenu = require('./menu')
 const {initialize: initializeApiUpdate} = require('./api-update')
 const createLogger = require('./log')
-const {get: getConfig, getStore, getOverrides} = require('./config')
+const {getConfig, getStore, getOverrides, registerConfig} = require('./config')
 
 const config = getConfig()
 const log = createLogger(__filename)
@@ -36,8 +36,22 @@ function startUp () {
   rendererLogger = createRendererLogger()
 
   initializeMenu()
+
   initializeApiUpdate()
     .catch((error) => log.error('Initialize API update module error', error))
+
+  // wire modules to UI dispatches
+  const dispatch = (action) => {
+    log.debug('Sending action via IPC to renderer', {action})
+    mainWindow.webContents.send('dispatch', action)
+  }
+
+  const configHandler = registerConfig(dispatch)
+
+  ipcMain.on('dispatch', (_, action) => {
+    log.debug('Received action via IPC from renderer', {action})
+    configHandler(action)
+  })
 
   if (config.devtools) {
     installAndOpenExtensions()

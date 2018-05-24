@@ -20,12 +20,12 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     '''
     Examples in this section require the following
     '''
-    from opentrons import robot, containers, instruments
+    from opentrons import robot, labware, instruments
 
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+    plate = labware.load('96-flat', 'B1', 'my-plate')
+    tiprack = labware.load('tiprack-200ul', 'A1', 'my-rack')
 
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+    pipette = labware.P300_Single(mount='left', tip_racks=[tiprack])
 
 
 User-Specified Pause
@@ -35,7 +35,7 @@ This will pause your protocol at a specific step. You can resume by pressing 're
 
 .. code-block:: python
 
-robot.pause()
+    robot.pause()
 
 Head Speed
 ==========
@@ -149,23 +149,6 @@ will print out...
     my-rack tiprack-200ul
     my-plate 96-flat
 
-Get Instruments
-===============
-
-When instruments are created, they are automatically added to the ``robot``. You can see all currently held instruments by calling ``robot.get_instruments()``, which returns a `Python list`__.
-
-__ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
-
-.. code-block:: python
-
-    for axis, pipette in robot.get_instruments():
-        print(pipette.name, axis)
-
-will print out...
-
-.. code-block:: python
-
-    my-pipette B
 
 Reset
 =====
@@ -176,7 +159,6 @@ Calling ``robot.reset()`` will remove everything from the robot. Any previously 
 
     robot.reset()
     print(robot.get_containers())
-    print(robot.get_instruments())
     print(robot.commands())
 
 will print out...

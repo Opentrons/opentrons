@@ -58,8 +58,10 @@ def _write_to_device_and_return(cmd, ack, device_connection):
     - Formats command
     - Wait for ack return
     - return parsed response'''
+    log.debug('Write -> {}'.format(cmd.encode()))
     device_connection.write(cmd.encode())
     response = device_connection.read_until(ack.encode())
+    log.debug('Read <- {}'.format(response))
     if ack.encode() not in response:
         raise SerialNoResponse(
             'No response from serial port after {} second(s)'.format(
@@ -96,12 +98,10 @@ def _attempt_command_recovery(command, ack, serial_conn):
 def write_and_return(
         command, ack, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
     '''Write a command and return the response'''
-    log.debug('Write -> {}'.format(command.encode()))
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(command, ack, device_connection)
-    log.debug('Read <- {}'.format(response.encode()))
     return response
 
 

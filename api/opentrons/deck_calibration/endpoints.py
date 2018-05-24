@@ -3,8 +3,9 @@ from uuid import uuid1
 from opentrons.instruments import pipette_config
 from opentrons import instruments, robot
 from opentrons.robot import robot_configs
-from opentrons.deck_calibration import jog, position, dots_set
+from opentrons.deck_calibration import jog, position, dots_set, z_pos
 from opentrons.deck_calibration.linal import add_z, solve
+from typing import Dict, Tuple
 
 import logging
 import json
@@ -24,7 +25,7 @@ def expected_points():
         '3': slot_7_upper_left}
 
 
-def safe_points():
+def safe_points() -> Dict[str, Tuple[int, int, int]]:
     # Safe points are defined as 5mm toward the center of the deck in x, y and
     # 10mm above the deck. User is expect to jog to the critical point from the
     # corresponding safe point, to avoid collision depending on direction of
@@ -38,11 +39,15 @@ def safe_points():
         slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
     slot_7_safe_point = (
         slot_7_upper_left[0] + 5, slot_7_upper_left[1] - 5, 10)
+    attach_tip_point = (200, 90, 150)
 
     return {
         '1': slot_1_safe_point,
         '2': slot_3_safe_point,
-        '3': slot_7_safe_point}
+        '3': slot_7_safe_point,
+        'safeZ': z_pos,
+        'attachTip': attach_tip_point
+    }
 
 
 def _get_uuid() -> str:
@@ -62,6 +67,7 @@ class SessionManager:
         self.id = _get_uuid()
         self.pipettes = {}
         self.current_mount = None
+        self.current_model = None
         self.tip_length = None
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
@@ -87,6 +93,7 @@ def init_pipette():
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
+        session.current_model = pipette_info['model']
         session.pipettes[pipette.mount] = pipette
         res = {'mount': pipette.mount, 'model': pipette_info['model']}
 
@@ -125,24 +132,23 @@ def set_current_mount(attached_pipettes):
         right_pipette = instruments._create_pipette_from_config(
             mount='right', config=pip_config)
 
-    if left_pipette and left_pipette.channels == 1:
-        session.current_mount = 'Z'
-        pipette = left_pipette
-        model = left['model']
-    elif right_pipette and right_pipette.channels == 1:
+    if right_pipette and right_pipette.channels == 1:
         session.current_mount = 'A'
         pipette = right_pipette
         model = right['model']
+    elif left_pipette and left_pipette.channels == 1:
+        session.current_mount = 'Z'
+        pipette = left_pipette
+        model = left['model']
     else:
-        if left_pipette:
-            session.current_mount = 'Z'
-            pipette = left_pipette
-            model = left['model']
-        elif right_pipette:
+        if right_pipette:
             session.current_mount = 'A'
             pipette = right_pipette
             model = right['model']
-
+        elif left_pipette:
+            session.current_mount = 'Z'
+            pipette = left_pipette
+            model = left['model']
     return {'pipette': pipette, 'model': model}
 
 
@@ -239,9 +245,59 @@ async def run_jog(data):
     else:
         if axis == 'z':
             axis = session.current_mount
+        # print("=---> Jogging {} {}".format(axis, direction * step))
         position = jog(axis.upper(), direction, step)
         message = 'Jogged to {}'.format(position)
         status = 200
+
+    return web.json_response({'message': message}, status=status)
+
+
+async def move(data):
+    """
+    Allow the user to move the selected pipette to a specific point
+
+    :param data: Information obtained from a POST request.
+    The content type is application/json
+    The correct packet form should be as follows:
+    {
+      'token': UUID token from current session start
+      'command': 'move'
+      'point': The name of the point to move to. Must be one of
+               ["1", "2", "3", "safeZ", "attachTip"]
+    }
+    :return: The position you are moving to
+    """
+    point_name = data.get('point')
+    point = safe_points().get(point_name)
+
+    if point and len(point) == 3:
+        mount = 'left' if session.current_mount == 'Z' else 'right'
+        pipette = session.pipettes[mount]
+
+        # For multichannel pipettes, we use the tip closest to the front of the
+        # robot rather than the back (this is the tip that would go into well
+        # H1 of a plate when pipetting from the first row of a 96 well plate,
+        # for instance). Since moves are issued for the A1 tip, we have to
+        # adjust the target point by 2 * Y_OFFSET_MULTI (where the offset value
+        # is the distance from the axial center of the pipette to the A1 tip).
+        # By sending the A1 tip to to the adjusted target, the H1 tip should
+        # go to the desired point. Y_OFFSET_MULT must then be backed out of xy
+        # positions saved in the `save_xy` handler (not 2 * Y_OFFSET_MULTI,
+        # because the axial center of the pipette will only be off by
+        # 1* Y_OFFSET_MULTI).
+        if not pipette.channels == 1:
+            x = point[0]
+            y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
+            z = point[2]
+            point = (x, y, z)
+
+        pipette.move_to((robot.deck, point), strategy='arc')
+        message = 'Moved to {}'.format(point)
+        status = 200
+    else:
+        message = '"point" must be one of "1", "2", "3", "safeZ", "attachTip"'
+        status = 400
 
     return web.json_response({'message': message}, status=status)
 
@@ -269,7 +325,16 @@ async def save_xy(data):
         message = "Mount must be set before calibrating"
         status = 400
     else:
-        x, y, _ = position(session.current_mount)
+        x, y, z = position(session.current_mount)
+        mount = 'left' if session.current_mount == 'Z' else 'right'
+        if mount == 'left':
+            dx, dy, dz = robot.config.mount_offset
+            x = x + dx
+            y = y + dy
+            z = z + dz
+        if session.pipettes[mount].channels != 1:
+            # See note in `move`
+            y = y - pipette_config.Y_OFFSET_MULTI
         session.points[point] = (x, y)
         message = "Saved point {} value: {}".format(
             point, session.points[point])
@@ -294,7 +359,9 @@ async def save_z(data):
         status = 400
     else:
         actual_z = position(session.current_mount)[-1]
-        session.z_value = actual_z - session.tip_length
+        length_offset = pipette_config.load(
+            session.current_model).model_offset[-1]
+        session.z_value = actual_z - session.tip_length + length_offset
         message = "Saved z: {}".format(session.z_value)
         status = 200
     return web.json_response({'message': message}, status=status)
@@ -360,6 +427,7 @@ async def release(data):
 
 # Router must be defined after all route functions
 router = {'jog': run_jog,
+          'move': move,
           'save xy': save_xy,
           'attach tip': attach_tip,
           'detach tip': detach_tip,

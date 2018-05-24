@@ -179,17 +179,6 @@ class Robot(object):
         * :meth:`connect` to the robot and call :func:`run` it on a real robot.
 
     See :class:`Pipette` for the list of supported instructions.
-
-    Examples
-    --------
-    >>> from opentrons import robot, instruments, labware
-    >>> robot.reset()
-    >>> plate = containers.load('96-flat', 'A1', 'plate')
-    >>> p200 = instruments.Pipette(axis='b')
-    >>> p200.aspirate(200, plate[0]) # doctest: +ELLIPSIS
-    <opentrons.instruments.pipette.Pipette object at ...>
-    >>> robot.commands()
-    ['Aspirating 200 uL from <Well A1> at 1.0 speed']
     """
 
     def __init__(self, config=None):
@@ -243,6 +232,11 @@ class Robot(object):
             * Command queue
             * Runtime warnings
 
+        Examples
+        --------
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
         """
         self._actuators = {
             'left': {
@@ -384,8 +378,8 @@ class Robot(object):
 
         ::
 
-            from opentrons.instruments.pipette import Pipette
-            p200 = Pipette(mount='left')
+            from opentrons import instruments
+            m300 = instruments.P300_Multi(mount='left')
 
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
@@ -454,29 +448,6 @@ class Robot(object):
         """
         return list(self._runtime_warnings)
 
-    # TODO: remove because Magbead will be controlled by RPI
-    def get_mosfet(self, mosfet_index):
-        """
-        Get MOSFET for a MagBead (URL).
-
-        Parameters
-        ----------
-        mosfet_index : int
-            Number of a MOSFET on MagBead.
-
-        Returns
-        -------
-        Instance of :class:`InstrumentMosfet`.
-        """
-        instr_type = 'mosfet'
-        key = (instr_type, mosfet_index)
-
-        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
-        if not motor_obj:
-            motor_obj = InstrumentMosfet(self, mosfet_index)
-            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
-        return motor_obj
-
     def get_motor(self, axis):
         """
         Get robot's head motor.
@@ -510,6 +481,17 @@ class Robot(object):
         Returns
         -------
         ``True`` for success, ``False`` for failure.
+
+        Note
+        ----
+        If you wish to connect to the robot without using the OT App, you will
+        need to use this function.
+
+        Examples
+        --------
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.connect() # doctest: +SKIP
         """
 
         self._driver.connect(port=port)
@@ -540,12 +522,6 @@ class Robot(object):
         a robot might accumulate precision
         error and it is recommended to home it. In this scenario, add
         ``robot.home('xyzab')`` into your script.
-
-        Examples
-        --------
-        >>> from opentrons import robot
-        >>> robot.connect()
-        >>> robot.home()
         """
 
         # Home gantry first to avoid colliding with labware
@@ -583,10 +559,15 @@ class Robot(object):
 
         Examples
         ---------
-        >>> from opentrons import robot
-        >>> robot.head_speed(300)  # default axes speed is 300 mm/sec
-        >>> robot.head_speed(combined_speed=400) # default speed is 400 mm/sec
-        >>> robot.head_speed(x=400, y=200) # sets max speeds of X and Y
+
+        >>> from opentrons import robot # doctest: +SKIP
+        >>> robot.reset() # doctest: +SKIP
+        >>> robot.head_speed(300) # doctest: +SKIP
+        #  default axes speed is 300 mm/sec
+        >>> robot.head_speed(combined_speed=400) # doctest: +SKIP
+        #  default speed is 400 mm/sec
+        >>> robot.head_speed(x=400, y=200) # doctest: +SKIP
+        # sets max speeds of X and Y
         """
         user_set_speeds = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
         axis_max_speeds = {
@@ -628,17 +609,6 @@ class Robot(object):
             avoiding obstacles.
 
             ``direct`` : move to the point in a straight line.
-
-        Examples
-        --------
-        >>> from opentrons import robot
-        >>> robot.reset() # doctest: +ELLIPSIS
-        <opentrons.robot.robot.Robot object at ...>
-        >>> robot.connect('Virtual Smoothie')
-        >>> robot.home()
-        >>> plate = robot.add_container('96-flat', 'A1', 'plate')
-        >>> robot.move_to(plate[0])
-        >>> robot.move_to(plate[0].top())
         """
 
         placeable, coordinates = containers.unpack_location(location)

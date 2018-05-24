@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Design with Python &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="https://opentrons.com/css/master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Containers" href="containers.html" />
+    <link rel="prev" title="Opentrons API" href="index.html" />  
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+    app_id: "ukpodv2l"
+};
+</script>
+<script>
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments)
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args)
+        };
+        w.Intercom = i;
+
+        function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+        }
+        if (w.attachEvent) {
+            w.attachEvent('onload', l);
+        } else {
+            w.addEventListener('load', l, false);
+        }
+    }
+})()
+</script>
+
+  </head>
+  <body role="document">
+<header>
+    <a href="https://opentrons.com" class="brand">
+        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+    <div id="nav-collapse">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+    </div>
+    <nav>
+        <ul id="main">
+            <li>
+                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            </li>
+            <li>
+                <a href="https://shop.opentrons.com/">Buy</a>
+            </li>
+        </ul>
+        <section id="dropdown">
+            <ul class="products">
+                <li class="mobile">Products</li>
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+                <li>&nbsp;</li>
+            </ul>
+            <ul class="company">
+                <li class="mobile">Company</li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+            </ul>
+            <ul class="resources">
+                <li class="mobile">Resources</li>
+                <li><a href="https://support.opentrons.com/">Support</a></li>
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </section>
+    </nav>
+    <br style="clear:both">
+    <script type="text/javascript">
+    $(function() {
+
+        $('#dropdown').slideUp(0);
+
+        $('#nav-collapse').click(function(event) {
+            $(this).toggleClass('change');
+            $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
+        });
+
+        $('.menu-toggle').mouseenter(function(event) {
+            event.preventDefault();
+            var target = $(this).attr('data-dropdown');
+
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(300);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+
+
+        });
+        $('header').mouseleave(function(event) {
+            $('#dropdown').slideUp(300);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+        });
+    });
+    </script>
+</header>
+<div id="nav-spacer">&nbsp;</div>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <div class="section" id="design-with-python">
+<span id="writing"></span><h1>Design with Python<a class="headerlink" href="#design-with-python" title="Permalink to this headline">¶</a></h1>
+<p>Writing protocols in Python requires some up-front design before seeing your liquid handling automation in action. At a high-level, writing protocols with the Opentrons API looks like:</p>
+<ol class="arabic simple">
+<li>Write a Python protocol</li>
+<li>Test the code for errors</li>
+<li>Repeat steps 1 &amp; 2</li>
+<li>Calibrate labware on robot</li>
+<li>Run your protocol</li>
+</ol>
+<p>These sets of documents aim to help you get the most out of steps 1 &amp; 2, the &#8220;design&#8221; stage.</p>
+<hr class="docutils" />
+<div class="section" id="python-for-beginners">
+<h2>Python for Beginners<a class="headerlink" href="#python-for-beginners" title="Permalink to this headline">¶</a></h2>
+<p>If Python is new to you, we suggest going through a few simple tutorials to acquire a base understanding to build upon. The following tutorials are a great starting point for working with the Opentrons API (from <a class="reference external" href="http://www.learnpython.org/">learnpython.org</a>):</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://www.learnpython.org/en/Hello%2C_World%21">Hello World</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Variables_and_Types">Variables and Types</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Lists">Lists</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Basic_Operators">Basic Operators</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Conditions">Conditions</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Loops">Loops</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Functions">Functions</a></li>
+<li><a class="reference external" href="http://www.learnpython.org/en/Dictionaries">Dictionaries</a></li>
+</ol>
+<p>After going through the above tutorials, you should have enough of an understanding of Python to work with the Opentrons API and start designing your experiments!</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="working-with-python">
+<h2>Working with Python<a class="headerlink" href="#working-with-python" title="Permalink to this headline">¶</a></h2>
+<p>Currently, we recommend writing your protocols in one of two ways:</p>
+<div class="section" id="text-editor">
+<h3>Text Editor<a class="headerlink" href="#text-editor" title="Permalink to this headline">¶</a></h3>
+<p>Using a popular and free code editor, like <a class="reference external" href="https://www.sublimetext.com/3">Sublime Text 3</a>, is a common method for writing Python protocols. Download onto your computer, and you can now write and save Python scripts.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Make sure that when saving a protocol file, it ends with the <code class="docutils literal"><span class="pre">.py</span></code> file extension. This will ensure the App and other programs are able to properly read it.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">my_protocol_file.py</span></code></p>
+</div>
+</div>
+<div class="section" id="jupyter-notebook">
+<h3>Jupyter Notebook<a class="headerlink" href="#jupyter-notebook" title="Permalink to this headline">¶</a></h3>
+<p>For a more interactive environment to write and debug using some of our API tools, we recommend using Jupyter Notebook. To begin, just install <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>, which comes with Jupyter Notebook.</p>
+<p>Once installed, launch Jupyter Notebook, and install the Opentrons API by doing the following:</p>
+<ol class="arabic simple">
+<li>Create a new Python notebook</li>
+<li>Run the command <code class="docutils literal"><span class="pre">!pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">opentrons</span></code> in a cell</li>
+<li>Restart your notebook&#8217;s Kernel, and API will be installed</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Be sure to download the <strong>Python 3.6 version</strong> if Anaconda, and Python 2.7 will not work with the Opentrons API.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Design with Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#python-for-beginners">Python for Beginners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-python">Working with Python</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#text-editor">Text Editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jupyter-notebook">Jupyter Notebook</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Opentrons API</a></li>
+      <li>Next: <a href="containers.html" title="next chapter">Containers</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/writing.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+    <div class="get-in-touch">
+        <h1 class="title">Get In Touch</h1>
+        <p class="caption">
+            We'd love to hear from you!
+            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
+        </p>
+        <form class="footerForm">
+            <div class="input-wrapper">
+                <input type="text" name="name" value="" id="name" placeholder="Name">
+                <input type="email" name="email" value="" id="email" placeholder="Email">
+            </div>
+            <textarea name="message" id="message" placeholder="Message"></textarea>
+            <input type="hidden" name="type" value="message"></input>
+            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+        </form>
+    </div>
+    <div class="nav-link-group">
+        <div class="nav-link products">
+            <span class="link-title">PRODUCTS</span>
+            <ul class="products-list">
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link company">
+            <span class="link-title">COMPANY</span>
+            <ul class="company-list">
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
+                <!-- <li>Privacy Policy</li> -->
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link resources">
+            <span class="link-title">RESOURCES</span>
+            <ul class="resources-list">
+
+
+            <li><a href="https://support.opentrons.com/">Support</a></li>
+
+
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link buy-button">
+            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
+        </div>
+        <div class="social-group">
+            <p class="social-links">
+                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
+                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
+                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+            </p>
+            <p class="ot-newsletter">
+                Subscribe to our newsletter
+                <br>
+                <!-- <input type="email" name="email" placeholder="Email"></input>
+      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
+                <div id="mc_embed_signup">
+                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <div id="mc_embed_signup_scroll">
+                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
+                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
+                            </div>
+                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
+                        </div>
+                    </form>
+                </div>
+            </p>
+        </div>
+        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
+    </div>
+</footer>
+<script>
+$(document).ready(function() {
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
+    });
+
+    
+    return false;
+  });
+
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
+});
+</script>
+
+
+ 
+  </body>
+</html>

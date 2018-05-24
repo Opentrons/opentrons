@@ -15,7 +15,7 @@ import {
   deckCalibrationCommand,
   setCalibrationJogStep,
   getCalibrationJogStep,
-  makeGetRobotMove,
+  makeGetDeckCalibrationCommandState,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
 
@@ -102,7 +102,7 @@ function CalibrateDeck (props: CalibrateDeckProps) {
 }
 
 function makeMapStateToProps () {
-  const getRobotMove = makeGetRobotMove()
+  const getDeckCalCommand = makeGetDeckCalibrationCommandState()
   const getDeckCalStartState = makeGetDeckCalibrationStartState()
 
   return (state: State, ownProps: OP): SP => {
@@ -120,7 +120,7 @@ function makeMapStateToProps () {
     return {
       startRequest,
       pipetteProps,
-      moveRequest: getRobotMove(state, robot),
+      commandRequest: getDeckCalCommand(state, robot),
       jogStep: getCalibrationJogStep(state)
     }
   }

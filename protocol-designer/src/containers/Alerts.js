@@ -45,7 +45,7 @@ function Alerts (props: Props) {
 }
 
 function mapStateToProps (state: BaseState): SP {
-  const timelineFull = selectors.robotStateTimelineFull(state)
+  const timelineFull = selectors.robotStateTimeline(state)
   const errors = timelineFull.timelineErrors
 
   if (!errors || errors.length === 0) {

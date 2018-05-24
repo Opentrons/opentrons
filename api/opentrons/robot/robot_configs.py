@@ -231,7 +231,7 @@ def _load_json(filename) -> dict:
 
 
 def _save_json(data, filename):
-    print("Saving json file at {}".format(filename))
+    # print("Saving json file at {}".format(filename))
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as file:
         json.dump(data, file, sort_keys=True, indent=4)

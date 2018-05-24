@@ -1,0 +1,898 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Containers &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="https://opentrons.com/css/master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Liquid Handling" href="pipettes.html" />
+    <link rel="prev" title="Design with Python" href="writing.html" />  
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+    app_id: "ukpodv2l"
+};
+</script>
+<script>
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments)
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args)
+        };
+        w.Intercom = i;
+
+        function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+        }
+        if (w.attachEvent) {
+            w.attachEvent('onload', l);
+        } else {
+            w.addEventListener('load', l, false);
+        }
+    }
+})()
+</script>
+
+  </head>
+  <body role="document">
+<header>
+    <a href="https://opentrons.com" class="brand">
+        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+    <div id="nav-collapse">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+    </div>
+    <nav>
+        <ul id="main">
+            <li>
+                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            </li>
+            <li>
+                <a href="https://shop.opentrons.com/">Buy</a>
+            </li>
+        </ul>
+        <section id="dropdown">
+            <ul class="products">
+                <li class="mobile">Products</li>
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+                <li>&nbsp;</li>
+            </ul>
+            <ul class="company">
+                <li class="mobile">Company</li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+            </ul>
+            <ul class="resources">
+                <li class="mobile">Resources</li>
+                <li><a href="https://support.opentrons.com/">Support</a></li>
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </section>
+    </nav>
+    <br style="clear:both">
+    <script type="text/javascript">
+    $(function() {
+
+        $('#dropdown').slideUp(0);
+
+        $('#nav-collapse').click(function(event) {
+            $(this).toggleClass('change');
+            $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
+        });
+
+        $('.menu-toggle').mouseenter(function(event) {
+            event.preventDefault();
+            var target = $(this).attr('data-dropdown');
+
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(300);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+
+
+        });
+        $('header').mouseleave(function(event) {
+            $('#dropdown').slideUp(300);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+        });
+    });
+    </script>
+</header>
+<div id="nav-spacer">&nbsp;</div>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <div class="section" id="containers">
+<span id="id1"></span><h1>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h1>
+<p>We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the different ways we can access wells and groups of wells.</p>
+<hr class="docutils" />
+<div class="section" id="labware-library">
+<h2>Labware Library<a class="headerlink" href="#labware-library" title="Permalink to this headline">¶</a></h2>
+<p>The Opentrons API comes with many common labware containers built in. These containers can be loaded into you Python protocol using the <code class="docutils literal"><span class="pre">containers.load()</span></code> method, and the specific name of the labware you need.</p>
+<p><a class="reference external" href="https://andysigler.github.io/ot-api-containerviz/">Check out this webpage</a> to see a visualization of all the API&#8217;s current built-in containers.</p>
+<p>Below are a list of some of the most commonly used containers in the API, as well as images for how they look.</p>
+<p>If you are interested in using your own container that is not included in the API, please take a look at how to create custom containers using <code class="docutils literal"><span class="pre">containers.create()</span></code>, or contact Opentrons Support.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="point">
+<h3>Point<a class="headerlink" href="#point" title="Permalink to this headline">¶</a></h3>
+<p>Use <code class="docutils literal"><span class="pre">point</span></code> when there is only one position per container, such as the trash or a scale.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can access the point position as <code class="docutils literal"><span class="pre">container.wells('A1')</span></code> or <code class="docutils literal"><span class="pre">container.wells(0)</span></code>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="tipracks">
+<h3>Tipracks<a class="headerlink" href="#tipracks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="tiprack-10ul">
+<h4>tiprack-10ul<a class="headerlink" href="#tiprack-10ul" title="Permalink to this headline">¶</a></h4>
+<p>Tip rack for a 10 uL pipette (single or 8-channel)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-10ul&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tips:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/Tiprack-10ul.png" src="_images/Tiprack-10ul.png" />
+</div>
+<div class="section" id="tiprack-10ul-h">
+<h4>tiprack-10ul-H<a class="headerlink" href="#tiprack-10ul-h" title="Permalink to this headline">¶</a></h4>
+<p>Tip rack for a single channel 10 uL pipette when the pipette is in the center position.  Set initial position to H1, and the pipette will use all the tips on the right hand side (E-H, 1-12)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-10ul-H&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tips:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['E-H,</span> <span class="pre">1-12']</span></code></p>
+<img alt="_images/Tiprack-10ul-H.png" src="_images/Tiprack-10ul-H.png" />
+</div>
+<div class="section" id="tiprack-200ul">
+<h4>tiprack-200ul<a class="headerlink" href="#tiprack-200ul" title="Permalink to this headline">¶</a></h4>
+<p>Tip rack for a 200 or 300 uL pipette (single or 8-channel)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tips:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/Tiprack-200ul.png" src="_images/Tiprack-200ul.png" />
+</div>
+<div class="section" id="tiprack-1000ul">
+<h4>tiprack-1000ul<a class="headerlink" href="#tiprack-1000ul" title="Permalink to this headline">¶</a></h4>
+<p>Tip rack for a 1000 uL pipette (single or 8-channel)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-1000ul&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tips:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/Tiprack-1000.png" src="_images/Tiprack-1000.png" />
+</div>
+<div class="section" id="tiprack-1000ul-chem">
+<h4>tiprack-1000ul-chem<a class="headerlink" href="#tiprack-1000ul-chem" title="Permalink to this headline">¶</a></h4>
+<p>Tip rack for 1000ul chem (10x10)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-1000ul-chem&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tips:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">[0]-[99]</span></code></p>
+<img alt="_images/Tiprack-1000ul-chem.png" src="_images/Tiprack-1000ul-chem.png" />
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="troughs">
+<h3>Troughs<a class="headerlink" href="#troughs" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="trough-12row">
+<h4>trough-12row<a class="headerlink" href="#trough-12row" title="Permalink to this headline">¶</a></h4>
+<p>12 row reservoir</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;trough-12row&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Rows:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/Trough-12row.png" src="_images/Trough-12row.png" />
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tube-racks">
+<h3>Tube Racks<a class="headerlink" href="#tube-racks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="tube-rack-75ml">
+<h4>tube-rack-.75ml<a class="headerlink" href="#tube-rack-75ml" title="Permalink to this headline">¶</a></h4>
+<p>4x6 rack that holds .75 mL microcentrifuge tubes
+(A1, A1-D6)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tube-rack-.75ml&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tubes:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['D6']</span></code></p>
+<img alt="_images/Tuberack-075ml.png" src="_images/Tuberack-075ml.png" />
+</div>
+<div class="section" id="tube-rack-2ml">
+<h4>tube-rack-2ml<a class="headerlink" href="#tube-rack-2ml" title="Permalink to this headline">¶</a></h4>
+<p>4x6 rack that holds 1.5 mL microcentrifuge tubes and 2 mL microcentrifuge tubes</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tube-rack-2ml&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tubes:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['D6']</span></code></p>
+<img alt="_images/Tuberack-2ml.png" src="_images/Tuberack-2ml.png" />
+</div>
+<div class="section" id="tube-rack-15-50ml">
+<h4>tube-rack-15_50ml<a class="headerlink" href="#tube-rack-15-50ml" title="Permalink to this headline">¶</a></h4>
+<p>rack that holds 6 15 mL tubes and 4 50 mL tubes</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tube-rack-15_50ml&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Tubes:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['A3'],</span> <span class="pre">['B1']-['B3'],</span> <span class="pre">['C1']-['C2'],</span> <span class="pre">['D1']-['D2']</span></code></p>
+<img alt="_images/Tuberack-15-50ml.png" src="_images/Tuberack-15-50ml.png" />
+</div>
+</div>
+<div class="section" id="plates">
+<h3>Plates<a class="headerlink" href="#plates" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="deep-well">
+<h4>96-deep-well<a class="headerlink" href="#deep-well" title="Permalink to this headline">¶</a></h4>
+<p>See dimensions in diagram below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-deep-well&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Wells:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/96-Deep-Well.png" src="_images/96-Deep-Well.png" />
+</div>
+<div class="section" id="pcr-tall">
+<h4>96-PCR-tall<a class="headerlink" href="#pcr-tall" title="Permalink to this headline">¶</a></h4>
+<p>See dimensions in diagram below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-PCR-tall&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Wells:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/96-PCR-Tall.png" src="_images/96-PCR-Tall.png" />
+</div>
+<div class="section" id="pcr-flat">
+<h4>96-PCR-flat<a class="headerlink" href="#pcr-flat" title="Permalink to this headline">¶</a></h4>
+<p>See dimensions in diagram below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-PCR-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Wells:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['H12']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A12']</span></code></p>
+<img alt="_images/96-PCR-Flatt.png" src="_images/96-PCR-Flatt.png" />
+</div>
+<div class="section" id="pcr-strip-tall">
+<h4>PCR-strip-tall<a class="headerlink" href="#pcr-strip-tall" title="Permalink to this headline">¶</a></h4>
+<p>See dimensions in diagram below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;PCR-strip-tall&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Wells:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['A8']</span></code>, <em>8-channel</em> <code class="docutils literal"><span class="pre">['A1']</span></code></p>
+<img alt="_images/96-PCR-Strip.png" src="_images/96-PCR-Strip.png" />
+</div>
+<div class="section" id="plate">
+<h4>384-plate<a class="headerlink" href="#plate" title="Permalink to this headline">¶</a></h4>
+<p>See dimensions in diagram below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">container</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;384-plate&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Accessing Wells:</strong> <em>single channel</em> <code class="docutils literal"><span class="pre">['A1']-['P24']</span></code>, <em>multi-channel</em> <code class="docutils literal"><span class="pre">['A1']-['A24]</span></code></p>
+<img alt="_images/384-plate.png" src="_images/384-plate.png" />
+<hr class="docutils" />
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>Containers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>The containers module allows you to load common labware into your protocol. <a class="reference external" href="https://andysigler.github.io/ot-api-containerviz/">Go here</a> to see a visualization of all built-in containers.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section require the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span>
+</pre></div>
+</div>
+<div class="section" id="list">
+<h3>List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
+<p>Once the container module is loaded, you can see a list of all containers currently inside the API by calling <code class="docutils literal"><span class="pre">containers.list()</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">containers</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="load">
+<h3>Load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h3>
+<p>Labware is loaded with two arguments: 1) the container type, and 2) the deck slot it will be placed in on the robot.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A third optional argument can be used to give a container a unique name.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;any-name-you-want&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Unique names are useful in a few scenarios. First, they allow the container to have independant calibration data from other containers in the same slot. In the example above, the container named &#8216;any-name-you-want&#8217; will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Calibration data refers to the saved positions for each container on deck, and is a part of the <a class="reference external" href="https://opentrons.com/getting-started/calibrate-deck">Opentrons App calibration procedure</a>.</p>
+</div>
+<p>Names can also be used to place multiple containers in the same slot all at once. For example, the flasks below are all placed in slot D1. So in order for the Opentrons API to tell them apart, we have given them each a unique name.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fa</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;T25-flask&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">,</span> <span class="s1">&#39;flask_a&#39;</span><span class="p">)</span>
+<span class="n">fb</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;T25-flask&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">,</span> <span class="s1">&#39;flask_b&#39;</span><span class="p">)</span>
+<span class="n">fc</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;T25-flask&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">,</span> <span class="s1">&#39;flask_c&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create">
+<h3>Create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the default containers that come with the Opentrons API, you can create your own custom containers.</p>
+<p>Through the API&#8217;s call containers.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">containers</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="s1">&#39;3x6_plate&#39;</span><span class="p">,</span>                    <span class="c1"># name of you container</span>
+    <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>                    <span class="c1"># specify amount of (columns, rows)</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>               <span class="c1"># distances (mm) between each (column, row)</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                     <span class="c1"># diameter (mm) of each well on the plate</span>
+    <span class="n">depth</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>                       <span class="c1"># depth (mm) of each well on the plate</span>
+</pre></div>
+</div>
+<p>When you create your custom container, then it will be saved for later use under the name you&#8217;ve given it. This means you can use containers.load() to use the custom container you&#8217;ve created in this and any future protocol.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">custom_plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;3x6_plate&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">well</span> <span class="ow">in</span> <span class="n">custom_plate</span><span class="o">.</span><span class="n">wells</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">well</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well B1&gt;
+&lt;Well C1&gt;
+&lt;Well A2&gt;
+&lt;Well B2&gt;
+&lt;Well C2&gt;
+&lt;Well A3&gt;
+&lt;Well B3&gt;
+&lt;Well C3&gt;
+&lt;Well A4&gt;
+&lt;Well B4&gt;
+&lt;Well C4&gt;
+&lt;Well A5&gt;
+&lt;Well B5&gt;
+&lt;Well C5&gt;
+&lt;Well A6&gt;
+&lt;Well B6&gt;
+&lt;Well C6&gt;
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="accessing-wells">
+<h2>Accessing Wells<a class="headerlink" href="#accessing-wells" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<div class="section" id="individual-wells">
+<h3>Individual Wells<a class="headerlink" href="#individual-wells" title="Permalink to this headline">¶</a></h3>
+<p>When writing a protocol using the API, you will be spending most of your time selecting which wells to transfer liquids to and from.</p>
+<p>The OT-One deck and containers are all set up with the same coordinate system - numbered rows and lettered columns.</p>
+<img alt="_images/Well_Iteration.png" src="_images/Well_Iteration.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="wells-by-name">
+<h4>Wells by Name<a class="headerlink" href="#wells-by-name" title="Permalink to this headline">¶</a></h4>
+<p>Once a container is loaded into your protocol, you can easily access the many wells within it using <code class="docutils literal"><span class="pre">wells()</span></code> method. <code class="docutils literal"><span class="pre">wells()</span></code> takes the name of the well as an argument, and will return the well at that location.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;H12&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="wells-by-index">
+<h4>Wells by Index<a class="headerlink" href="#wells-by-index" title="Permalink to this headline">¶</a></h4>
+<p>Wells can be referenced by their &#8220;string&#8221; name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a container being at position 0.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># well A1</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="mi">95</span><span class="p">)</span>  <span class="c1"># well H12</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># well H12 (Python let&#39;s you do this)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-and-rows">
+<h4>Columns and Rows<a class="headerlink" href="#columns-and-rows" title="Permalink to this headline">¶</a></h4>
+<p>A container&#8217;s wells are organized within a series of columns and rows, which are also labelled on standard labware. In the API, columns are given letter names (<code class="docutils literal"><span class="pre">'A'</span></code> through <code class="docutils literal"><span class="pre">'H'</span></code> for example) and go left to right, while rows are given numbered names (<code class="docutils literal"><span class="pre">'1'</span></code> through <code class="docutils literal"><span class="pre">'8'</span></code> for example) and go from front to back.
+You can access a specific row or column by using the <code class="docutils literal"><span class="pre">rows()</span></code> and <code class="docutils literal"><span class="pre">cols()</span></code> methods on a container. These will return all wells within that row or column.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Column &quot;A&quot; has&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">),</span> <span class="s1">&#39;wells&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Row &quot;1&quot; has&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="s1">&#39;wells&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Column &quot;A&quot; has 12 wells
+Row &quot;1&quot; has 8 wells
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">rows()</span></code> or <code class="docutils literal"><span class="pre">cols()</span></code> methods can be used in combination with the <code class="docutils literal"><span class="pre">wells()</span></code> method to access wells within that row or column. In the example below, both lines refer to well <code class="docutils literal"><span class="pre">'A1'</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="multiple-wells">
+<h3>Multiple Wells<a class="headerlink" href="#multiple-wells" title="Permalink to this headline">¶</a></h3>
+<p>If we had to reference each well one at a time, our protocols could get very very long.</p>
+<p>When describing a liquid transfer, we can point to groups of wells for the liquid&#8217;s source and/or destination. Or, we can get a group of wells that we want to loop through.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="wells">
+<h4>Wells<a class="headerlink" href="#wells" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">wells()</span></code> method can return a single well, or it can return a list of wells when multiple arguments are passed.</p>
+<p>Here is an example or accessing a list of wells, each specified by name:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="s1">&#39;H12&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;WellSeries: &lt;Well A1&gt;&lt;Well B2&gt;&lt;Well C3&gt;&lt;Well H12&gt;&gt;
+</pre></div>
+</div>
+<p>Multiple wells can be treated just like a normal Python list, and can be iterated through:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="s1">&#39;H12&#39;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well B2&gt;
+&lt;Well C3&gt;
+&lt;Well H12&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="wells-to">
+<h4>Wells To<a class="headerlink" href="#wells-to" title="Permalink to this headline">¶</a></h4>
+<p>Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the <code class="docutils literal"><span class="pre">to=</span></code> argument is the last well.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;H1&#39;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well B1&gt;
+&lt;Well C1&gt;
+&lt;Well D1&gt;
+&lt;Well E1&gt;
+&lt;Well F1&gt;
+&lt;Well G1&gt;
+&lt;Well H1&gt;
+</pre></div>
+</div>
+<p>Not only can we get every well between the start and end positions, but we can also set the <code class="docutils literal"><span class="pre">step=</span></code> size. The example below will access every 2nd well between <code class="docutils literal"><span class="pre">'A1'</span></code> and <code class="docutils literal"><span class="pre">'H'</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;H1&#39;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well C1&gt;
+&lt;Well E1&gt;
+&lt;Well G1&gt;
+</pre></div>
+</div>
+<p>These lists of wells can also move in the reverse direction along your container. For example, setting the <code class="docutils literal"><span class="pre">to=</span></code> argument to a well that comes before the starting position is allowed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;H1&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well H1&gt;
+&lt;Well F1&gt;
+&lt;Well D1&gt;
+&lt;Well B1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="wells-length">
+<h4>Wells Length<a class="headerlink" href="#wells-length" title="Permalink to this headline">¶</a></h4>
+<p>Another way you can create a list of wells is by specifying the length= of the well list you need, in addition to the starting point. The example below will return eight wells, starting at well <code class="docutils literal"><span class="pre">'A1'</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well B1&gt;
+&lt;Well C1&gt;
+&lt;Well D1&gt;
+&lt;Well E1&gt;
+&lt;Well F1&gt;
+&lt;Well G1&gt;
+&lt;Well H1&gt;
+</pre></div>
+</div>
+<p>And just like before, we can also set the <code class="docutils literal"><span class="pre">step=</span></code> argument. Except this time the example will be accessing every 3rd well, until a total of eight wells have been found:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well D1&gt;
+&lt;Well G1&gt;
+&lt;Well B2&gt;
+&lt;Well E2&gt;
+&lt;Well H2&gt;
+&lt;Well C3&gt;
+&lt;Well F3&gt;
+</pre></div>
+</div>
+<p>You can set the step= value to a negative number to move in the reverse direction along the container:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;H11&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">step</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well H11&gt;
+&lt;Well G11&gt;
+&lt;Well F11&gt;
+&lt;Well E11&gt;
+&lt;Well D11&gt;
+&lt;Well C11&gt;
+&lt;Well B11&gt;
+&lt;Well A11&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h4>Columns and Rows<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>Columns and Rows
+The same arguments described above can be used with <code class="docutils literal"><span class="pre">rows()</span></code> and <code class="docutils literal"><span class="pre">cols()</span></code> to create lists of rows or columns.</p>
+<p>Here is an example of iterating through rows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">step</span><span class="o">=-</span><span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;WellSeries: &lt;Well A2&gt;&lt;Well B2&gt;&lt;Well C2&gt;&lt;Well D2&gt;&lt;Well E2&gt;&lt;Well F2&gt;&lt;Well G2&gt;&lt;Well H2&gt;&gt;
+&lt;WellSeries: &lt;Well A12&gt;&lt;Well B12&gt;&lt;Well C12&gt;&lt;Well D12&gt;&lt;Well E12&gt;&lt;Well F12&gt;&lt;Well G12&gt;&lt;Well H12&gt;&gt;
+&lt;WellSeries: &lt;Well A10&gt;&lt;Well B10&gt;&lt;Well C10&gt;&lt;Well D10&gt;&lt;Well E10&gt;&lt;Well F10&gt;&lt;Well G10&gt;&lt;Well H10&gt;&gt;
+</pre></div>
+</div>
+<p>And here is an example of iterating through columns:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;WellSeries: &lt;Well B1&gt;&lt;Well B2&gt;&lt;Well B3&gt;&lt;Well B4&gt;&lt;Well B5&gt;&lt;Well B6&gt;&lt;Well B7&gt;&lt;Well B8&gt;&lt;Well B9&gt;&lt;Well B10&gt;&lt;Well B11&gt;&lt;Well B12&gt;&gt;
+&lt;WellSeries: &lt;Well D1&gt;&lt;Well D2&gt;&lt;Well D3&gt;&lt;Well D4&gt;&lt;Well D5&gt;&lt;Well D6&gt;&lt;Well D7&gt;&lt;Well D8&gt;&lt;Well D9&gt;&lt;Well D10&gt;&lt;Well D11&gt;&lt;Well D12&gt;&gt;
+&lt;WellSeries: &lt;Well F1&gt;&lt;Well F2&gt;&lt;Well F3&gt;&lt;Well F4&gt;&lt;Well F5&gt;&lt;Well F6&gt;&lt;Well F7&gt;&lt;Well F8&gt;&lt;Well F9&gt;&lt;Well F10&gt;&lt;Well F11&gt;&lt;Well F12&gt;&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="slices">
+<h4>Slices<a class="headerlink" href="#slices" title="Permalink to this headline">¶</a></h4>
+<p>Containers can also be treating similarly to Python lists, and can therefore handle slices.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well C1&gt;
+&lt;Well E1&gt;
+&lt;Well G1&gt;
+</pre></div>
+</div>
+<p>The API&#8217;s containers are also prepared to take string values for the slice&#8217;s <code class="docutils literal"><span class="pre">start</span></code> and <code class="docutils literal"><span class="pre">stop</span></code> positions.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="p">[</span><span class="s1">&#39;A1&#39;</span><span class="p">:</span><span class="s1">&#39;A2&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well A1&gt;
+&lt;Well C1&gt;
+&lt;Well E1&gt;
+&lt;Well G1&gt;
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;1&#39;</span><span class="p">::</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>&lt;Well B1&gt;
+&lt;Well B3&gt;
+&lt;Well B5&gt;
+&lt;Well B7&gt;
+&lt;Well B9&gt;
+&lt;Well B11&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Containers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#labware-library">Labware Library</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#point">Point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tipracks">Tipracks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#troughs">Troughs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tube-racks">Tube Racks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plates">Plates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#list">List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load">Load</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create">Create</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-wells">Accessing Wells</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#individual-wells">Individual Wells</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-wells">Multiple Wells</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="writing.html" title="previous chapter">Design with Python</a></li>
+      <li>Next: <a href="pipettes.html" title="next chapter">Liquid Handling</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/containers.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+    <div class="get-in-touch">
+        <h1 class="title">Get In Touch</h1>
+        <p class="caption">
+            We'd love to hear from you!
+            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
+        </p>
+        <form class="footerForm">
+            <div class="input-wrapper">
+                <input type="text" name="name" value="" id="name" placeholder="Name">
+                <input type="email" name="email" value="" id="email" placeholder="Email">
+            </div>
+            <textarea name="message" id="message" placeholder="Message"></textarea>
+            <input type="hidden" name="type" value="message"></input>
+            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+        </form>
+    </div>
+    <div class="nav-link-group">
+        <div class="nav-link products">
+            <span class="link-title">PRODUCTS</span>
+            <ul class="products-list">
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link company">
+            <span class="link-title">COMPANY</span>
+            <ul class="company-list">
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
+                <!-- <li>Privacy Policy</li> -->
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link resources">
+            <span class="link-title">RESOURCES</span>
+            <ul class="resources-list">
+
+
+            <li><a href="https://support.opentrons.com/">Support</a></li>
+
+
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link buy-button">
+            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
+        </div>
+        <div class="social-group">
+            <p class="social-links">
+                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
+                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
+                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+            </p>
+            <p class="ot-newsletter">
+                Subscribe to our newsletter
+                <br>
+                <!-- <input type="email" name="email" placeholder="Email"></input>
+      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
+                <div id="mc_embed_signup">
+                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <div id="mc_embed_signup_scroll">
+                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
+                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
+                            </div>
+                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
+                        </div>
+                    </form>
+                </div>
+            </p>
+        </div>
+        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
+    </div>
+</footer>
+<script>
+$(document).ready(function() {
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
+    });
+
+    
+    return false;
+  });
+
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
+});
+</script>
+
+
+ 
+  </body>
+</html>

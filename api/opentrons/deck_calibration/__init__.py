@@ -24,10 +24,12 @@ def dots_set():
     :return:  List of calibration coordinates
     """
     if ff.dots_deck_type():
+        # Etched dots
         slot_1_lower_left = (12.13, 6.0)
         slot_3_lower_right = (380.87, 6.0)
         slot_7_upper_left = (12.13, 261.0)
     else:
+        # Etched crosses
         slot_1_lower_left = (12.13, 9.0)
         slot_3_lower_right = (380.87, 9.0)
         slot_7_upper_left = (12.13, 258.0)
@@ -72,7 +74,6 @@ def position(axis: str):
 
 
 def jog(axis, direction, step):
-
     robot._driver.move(
         {axis: robot._driver.position[axis] + direction * step})
 

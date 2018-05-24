@@ -215,7 +215,6 @@ function handleCancel (state: State, action: any): State {
 
 function handleCancelResponse (state: State, action: any): State {
   const {error, payload} = action
-
   if (error) {
     return {...state, cancelRequest: {inProgress: false, error: payload}}
   }

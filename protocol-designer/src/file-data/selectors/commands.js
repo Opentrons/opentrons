@@ -1,6 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
+import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
@@ -61,10 +62,13 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        if (labwareData.type.startsWith('tiprack')) {
+        // TODO Ian 2018-05-18 have a more robust way of designating labware types
+        // as tiprack or not
+        if (labwareData.type && labwareData.type.startsWith('tiprack')) {
           return {
             ...acc,
-            [labwareId]: all96Tips
+            // TODO LATER Ian 2018-05-18 use shared-data wells instead of assuming 96 tips?
+            [labwareId]: {...all96Tips}
           }
         }
         return acc
@@ -106,7 +110,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-export type RobotStateTimelineAcc = {
+export type RobotStateTimeline = {
   formErrors: {[string]: string},
   timeline: Array<StepGeneration.CommandsAndRobotState>,
   robotState: StepGeneration.RobotState,
@@ -115,12 +119,14 @@ export type RobotStateTimelineAcc = {
 }
 
 // exposes errors and last valid robotState
-export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSelector(
+export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (forms, orderedSteps, initialRobotState) => {
-    const result: RobotStateTimelineAcc = orderedSteps.reduce((acc: RobotStateTimelineAcc, stepId): RobotStateTimelineAcc => {
+    const finalStepId = last(orderedSteps)
+
+    const result: RobotStateTimeline = orderedSteps.reduce((acc: RobotStateTimeline, stepId): RobotStateTimeline => {
       if (!isEmpty(acc.formErrors)) {
         // short-circut the reduce if there were errors with validating / processing the form
         return acc
@@ -160,25 +166,23 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
       }
 
       // finally, deal with valid step forms
-      let nextCommandsAndState
+      let commandCreators = []
 
       if (validatedForm.stepType === 'consolidate') {
-        nextCommandsAndState = StepGeneration.consolidate(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.consolidate(validatedForm))
+      } else
       if (validatedForm.stepType === 'transfer') {
-        nextCommandsAndState = StepGeneration.transfer(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.transfer(validatedForm))
+      } else
       if (validatedForm.stepType === 'distribute') {
-        nextCommandsAndState = StepGeneration.distribute(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.distribute(validatedForm))
+      } else
       if (validatedForm.stepType === 'pause') {
-        nextCommandsAndState = StepGeneration.delay(validatedForm)(acc.robotState)
-      }
+        commandCreators.push(StepGeneration.delay(validatedForm))
+      } else
       if (validatedForm.stepType === 'mix') {
-        nextCommandsAndState = StepGeneration.mix(validatedForm)(acc.robotState)
-      }
-
-      if (!nextCommandsAndState) {
+        commandCreators.push(StepGeneration.mix(validatedForm))
+      } else {
         // TODO Ian 2018-05-08 use assert
         console.warn(`StepType "${validatedForm.stepType}" not yet implemented`)
         return {
@@ -190,6 +194,18 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
         }
       }
 
+      if (stepId === finalStepId) {
+        // Drop any tips at end of protocol
+        // (dropTip should do no-op when pipette has no tips)
+        const allPipettes = Object.keys(acc.robotState.instruments)
+
+        allPipettes.forEach(pipetteId =>
+          commandCreators.push(StepGeneration.dropTip(pipetteId))
+        )
+      }
+
+      const nextCommandsAndState = StepGeneration.reduceCommandCreators(commandCreators)(acc.robotState)
+
       // for supported steps
       if (nextCommandsAndState.errors) {
         return {
@@ -198,6 +214,7 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
           errorStepId: stepId
         }
       }
+
       return {
         ...acc,
         timeline: [...acc.timeline, nextCommandsAndState],
@@ -218,10 +235,4 @@ export const robotStateTimelineFull: Selector<RobotStateTimelineAcc> = createSel
 
     return result
   }
-)
-
-// TODO look at who uses this and see if they can use robotStateTimelineFull instead (or not)
-export const robotStateTimeline: Selector<Array<StepGeneration.CommandsAndRobotState>> = createSelector(
-  robotStateTimelineFull,
-  full => full.timeline
 )

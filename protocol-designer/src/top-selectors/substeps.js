@@ -23,7 +23,7 @@ export const allSubsteps: Selector<{[StepIdType]: StepSubItemData | null}> = cre
   labwareIngredSelectors.getLabware,
   namedIngredsByLabware,
   steplistSelectors.orderedSteps,
-  fileDataSelectors.robotStateTimelineFull,
+  fileDataSelectors.robotStateTimeline,
   (_validatedForms, _pipetteData, _allLabware, _namedIngredsByLabware, _orderedSteps, _robotStateTimeline) => {
     const allLabwareTypes: {[labwareId: string]: string} = mapValues(_allLabware, (l: LabwareData) => l.type)
     return generateSubsteps(_validatedForms, _pipetteData, allLabwareTypes, _namedIngredsByLabware, _orderedSteps, _robotStateTimeline)

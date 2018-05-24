@@ -8,8 +8,6 @@ from threading import Thread
 from opentrons import robot, instruments
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
-from opentrons.deck_calibration.endpoints import safe_points
-from opentrons.deck_calibration import z_pos
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +92,6 @@ async def position_info(request):
     can easily access the pipette mount screws with a screwdriver. Attach tip
     position places either pipette roughly in the front-center of the deck area
     """
-    safe_pos1, safe_pos2, safe_pos3 = safe_points().values()
     return web.json_response({
         'positions': {
             'change_pipette': {
@@ -105,23 +102,6 @@ async def position_info(request):
             'attach_tip': {
                 'target': 'pipette',
                 'point': (200, 90, 150)
-            },
-            'initial_calibration_1': {
-                'target': 'pipette',
-                'point': safe_pos1
-            },
-            'initial_calibration_2': {
-                'target': 'pipette',
-                'point': safe_pos2
-            },
-            'initial_calibration_3': {
-                'target': 'pipette',
-                'point': safe_pos3
-            },
-            'z_calibration': {
-                'target': 'pipette',
-                'point': z_pos
-
             }
         }
     })

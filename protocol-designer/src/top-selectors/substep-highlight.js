@@ -13,8 +13,6 @@ import type {Selector} from '../types'
 import type {StepSubItemData} from '../steplist/types'
 import type {ProcessedFormData} from '../form-types'
 
-type SingleLabwareLiquidState = {[well: string]: StepGeneration.LocationLiquidState}
-
 type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
 
@@ -133,8 +131,10 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
   (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {
+    const timeline = _robotStateTimeline.timeline
+
     function highlightedWellsForLabwareAtStep (
-      labwareLiquids: SingleLabwareLiquidState,
+      labwareLiquids: StepGeneration.SingleLabwareLiquidState,
       labwareId: string,
       robotState: StepGeneration.RobotState,
       form: ProcessedFormData,
@@ -162,14 +162,14 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
     }
 
     function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {
-      const robotState = _robotStateTimeline[timelineIdx].robotState
+      const robotState = timeline[timelineIdx].robotState
       const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
       const form = _forms[formIdx] && _forms[formIdx].validatedForm
 
       // replace value of each labware with highlighted wells info
       return mapValues(
         liquidState,
-        (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => (form)
+        (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => (form)
           ? highlightedWellsForLabwareAtStep(
             labwareLiquids,
             labwareId,
@@ -181,7 +181,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       )
     }
 
-    const liquidStateTimeline = _robotStateTimeline.map(t => t.robotState.liquidState.labware)
+    const liquidStateTimeline = timeline.map(t => t.robotState.liquidState.labware)
     return liquidStateTimeline.map(highlightedWellsForTimelineFrame)
   }
 )
