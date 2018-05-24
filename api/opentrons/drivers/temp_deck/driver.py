@@ -6,6 +6,7 @@ from time import sleep
 from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
+from opentrons.drivers.serial_communication import SerialNoResponse
 
 '''
 - Driver is responsible for providing an interface for the temp-deck
@@ -25,8 +26,6 @@ DEFAULT_TEMP_DECK_TIMEOUT = 1
 
 DEFAULT_STABILIZE_DELAY = 0.1
 DEFAULT_COMMAND_RETRIES = 3
-
-TEMP_DECK_BOOTLOADER_TIMEOUT = 3
 
 GCODES = {
     'GET_TEMP': 'M105',
@@ -50,7 +49,7 @@ class ParseError(Exception):
     pass
 
 
-def _parse_string_value_from_substring(substring):
+def _parse_string_value_from_substring(substring) -> str:
     '''
     Returns the ascii value in the expected string "N:aa11bb22", where "N" is
     the key, and "aa11bb22" is string value to be returned
@@ -65,7 +64,7 @@ def _parse_string_value_from_substring(substring):
                 substring))
 
 
-def _parse_number_from_substring(substring):
+def _parse_number_from_substring(substring) -> int:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -85,7 +84,7 @@ def _parse_number_from_substring(substring):
                 substring))
 
 
-def _parse_key_from_substring(substring):
+def _parse_key_from_substring(substring) -> str:
     '''
     Returns the axis in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -99,50 +98,55 @@ def _parse_key_from_substring(substring):
                 substring))
 
 
-def _parse_temperature_response(temperature_string):
+def _parse_temperature_response(temperature_string) -> dict:
     '''
     Example input: "T:none C:25"
     '''
+    err_msg = 'Unexpected argument to _parse_temperature_response: {}'.format(
+        temperature_string)
     if not temperature_string or \
             not isinstance(temperature_string, str):
-        raise ParseError(
-            'Unexpected argument to _parse_temperature_response: {}'.format(
-                temperature_string))
+        raise ParseError(err_msg)
     parsed_values = temperature_string.strip().split(' ')
     if len(parsed_values) < 2:
-        msg = 'Unexpected response in _parse_temperature_response: {}'.format(
-            temperature_string)
-        log.error(msg)
-        raise ParseError(msg)
+        log.error(err_msg)
+        raise ParseError(err_msg)
 
     data = {
         _parse_key_from_substring(s): _parse_number_from_substring(s)
         for s in parsed_values[:2]
     }
+    if 'C' not in data or 'T' not in data:
+        raise ParseError(err_msg)
+    data = {
+        'current': data['C'],
+        'target': data['T']
+    }
     return data
 
 
-def _parse_device_information(device_info_string):
+def _parse_device_information(device_info_string) -> dict:
     '''
         Parse the temp-deck's device information response.
 
         Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
     '''
+    error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
+        device_info_string)
     if not device_info_string or \
             not isinstance(device_info_string, str):
-        raise ParseError(
-            'Unexpected argument to _parse_device_information: {}'.format(
-                device_info_string))
+        raise ParseError(error_msg)
     parsed_values = device_info_string.strip().split(' ')
     if len(parsed_values) < 3:
-        msg = 'Unexpected response in _parse_device_information: {}'.format(
-            device_info_string)
-        log.error(msg)
-        raise ParseError(msg)
+        log.error(error_msg)
+        raise ParseError(error_msg)
     res = {
         _parse_key_from_substring(s): _parse_string_value_from_substring(s)
         for s in parsed_values[:3]
     }
+    for key in ['model', 'version', 'serial']:
+        if key not in res:
+            raise ParseError(error_msg)
     return res
 
 
@@ -157,13 +161,17 @@ class TempDeck:
 
         self._temperature = {'current': 25, 'target': None}
 
-    def connect(self, port=None):
+    def connect(self, port=None) -> str:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             self.simulating = True
             return
-        self.disconnect()
-        self._connect_to_port(port)
-        self._setup()
+        try:
+            self.disconnect()
+            self._connect_to_port(port)
+            self._wait_for_ack()  # verify the device is there
+        except (SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
     def disconnect(self):
         if self.is_connected():
@@ -171,47 +179,58 @@ class TempDeck:
         self._connection = None
         self.simulating = True
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         if not self._connection:
             return False
         return self._connection.is_open
 
     @property
-    def port(self):
+    def port(self) -> str:
         if not self._connection:
             return None
         return self._connection.port
 
-    def disengage(self):
+    def disengage(self) -> str:
         self.run_flag.wait()
-        self._send_command(GCODES['DISENGAGE'])
 
-    def set_temperature(self, celsius):
+        try:
+            self._send_command(GCODES['DISENGAGE'])
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
+
+    def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
-        self._send_command('{0} S{1}'.format(GCODES['SET_TEMP'], int(celsius)))
+        try:
+            self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], int(celsius)))
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
-    def update_temperature(self, default=None):
+    def update_temperature(self, default=None) -> str:
         if default is None:
             default = self._temperature.copy()
         updated_temperature = default
         if not self.simulating:
-            res = self._send_command(GCODES['GET_TEMP'])
-            res = _parse_temperature_response(res)
-            updated_temperature.update({
-                'current': res.get('C'),
-                'target': res.get('T')
-            })
+            try:
+                res = self._recursive_update_temperature(
+                    DEFAULT_COMMAND_RETRIES)
+                updated_temperature.update(res)
+            except (TempDeckError, SerialException, SerialNoResponse) as e:
+                return str(e)
         self._temperature.update(updated_temperature)
+        return ''
 
     @property
-    def target(self):
+    def target(self) -> int:
         return self._temperature.get('target')
 
     @property
-    def temperature(self):
+    def temperature(self) -> int:
         return self._temperature.get('current')
 
-    def get_device_info(self):
+    def get_device_info(self) -> dict:
         '''
         Queries Temp-Deck for it's build version, model, and serial number
 
@@ -234,9 +253,10 @@ class TempDeck:
                 'model': '1aa11bb22',
                 'version': '1aa11bb22'
             }
-        device_info = self._send_command(GCODES['DEVICE_INFO'])
-        device_info = _parse_device_information(device_info)
-        return device_info
+        try:
+            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return {'error': str(e)}
 
     def pause(self):
         if not self.simulating:
@@ -246,8 +266,12 @@ class TempDeck:
         if not self.simulating:
             self.run_flag.set()
 
-    def enter_programming_mode(self):
-        self._send_command(GCODES['PROGRAMMING_MODE'])
+    def enter_programming_mode(self) -> str:
+        try:
+            self._send_command(GCODES['PROGRAMMING_MODE'])
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
     def _connect_to_port(self, port=None):
         try:
@@ -265,10 +289,6 @@ class TempDeck:
             error_msg += 'because another process is currently using it, or '
             error_msg += 'the Serial port is disabled on this device (OS)'
             raise SerialException(error_msg)
-
-    def _setup(self):
-        log.debug("_setup")
-        self._wait_for_ack()
 
     def _wait_for_ack(self):
         '''
@@ -292,6 +312,8 @@ class TempDeck:
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
                 (ALARM_KEYWORD in ret_code.lower()):
+            log.error(
+                'Received error message from Temp-Deck: {}'.format(ret_code))
             raise TempDeckError(ret_code)
 
         return ret_code.strip()
@@ -303,7 +325,7 @@ class TempDeck:
                 TEMP_DECK_ACK,
                 self._connection,
                 timeout)
-        except serial_communication.SerialNoResponse as e:
+        except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:
                 raise e
@@ -314,3 +336,28 @@ class TempDeck:
                 self._connection.open()
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
+
+    def _recursive_update_temperature(self, retries) -> dict:
+        try:
+            res = self._send_command(GCODES['GET_TEMP'])
+            res = _parse_temperature_response(res)
+            return res
+        except ParseError as e:
+            retries -= 1
+            if retries <= 0:
+                raise TempDeckError(e)
+            if not self.simulating:
+                sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_update_temperature(retries)
+
+    def _recursive_get_info(self, retries) -> dict:
+        try:
+            device_info = self._send_command(GCODES['DEVICE_INFO'])
+            return _parse_device_information(device_info)
+        except ParseError as e:
+            retries -= 1
+            if retries <= 0:
+                raise TempDeckError(e)
+            if not self.simulating:
+                sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_get_info(retries)
