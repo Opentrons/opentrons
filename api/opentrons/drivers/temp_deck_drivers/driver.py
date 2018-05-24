@@ -184,9 +184,11 @@ class TempDeck:
         return self._connection.port
 
     def disengage(self):
+        self.run_flag.wait()
         self._send_command(GCODES['DISENGAGE'])
 
     def set_temperature(self, celsius):
+        self.run_flag.wait()
         self._send_command('{0} S{1}'.format(GCODES['SET_TEMP'], int(celsius)))
 
     def update_temperature(self, default=None):
@@ -203,16 +205,12 @@ class TempDeck:
         self._temperature.update(updated_temperature)
 
     @property
-    def target_temperature(self):
+    def target(self):
         return self._temperature.get('target')
 
     @property
-    def current_temperature(self):
-        return self._temperature.get('current')
-
-    @property
     def temperature(self):
-        return self._temperature.copy()
+        return self._temperature.get('current')
 
     def get_device_info(self):
         '''

@@ -28,19 +28,19 @@ def test_get_temp_deck_temperature():
 
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    assert temp_deck.current_temperature == 25  # driver's initialized value
-    assert temp_deck.target_temperature is None
+    assert temp_deck.temperature == 25  # driver's initialized value
+    assert temp_deck.target is None
     temp_deck.update_temperature()
     assert command_log == ['M105']
-    assert temp_deck.current_temperature == 90
-    assert temp_deck.target_temperature is None
+    assert temp_deck.temperature == 90
+    assert temp_deck.target is None
 
     command_log = []
     return_string = 'T:99 C:90'
     temp_deck.update_temperature()
     assert command_log == ['M105']
-    assert temp_deck.current_temperature == 90
-    assert temp_deck.target_temperature == 99
+    assert temp_deck.temperature == 90
+    assert temp_deck.target == 99
 
 
 def test_set_temp_deck_temperature(monkeypatch):
