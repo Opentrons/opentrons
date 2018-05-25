@@ -64,7 +64,7 @@ export default function TitledList (props: ListProps) {
   const className = cx(styles.titled_list, props.className, {
     [styles.disabled]: disabled,
     [styles.titled_list_selected]: !disabled && props.selected,
-    [styles.hovered]: !disabled && props.hovered
+    [styles.hover_border]: !disabled && props.hovered
   })
 
   const titleBarClass = cx(styles.title_bar, {

@@ -31,13 +31,8 @@
   background-color: white;
 }
 
-.titled_list {
-  outline: var(--bd-width-default) solid transparent;
-}
-
-.hovered {
-  /* "highlighted" appearance */
-  outline-color: var(--c-highlight);
+.hover_border {
+  outline: var(--bd-width-default) solid var(--c-highlight);
 }
 
 .title_bar {
