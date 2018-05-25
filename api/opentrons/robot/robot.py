@@ -291,6 +291,7 @@ class Robot(object):
         for mount in self._actuators.values():
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
+        self.cache_instrument_models()
         return self
 
     def cache_instrument_models(self):
@@ -500,6 +501,7 @@ class Robot(object):
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
+        self.cache_instrument_models()
 
     def _update_axis_homed(self, *args):
         for a in args:

@@ -31,7 +31,6 @@ async def test_transform_from_moves(async_client, monkeypatch):
         SmoothieDriver_3_0_0, 'read_pipette_model', dummy_read_model)
 
     robot.reset()
-    robot.cache_instrument_models()
     robot.home()
 
     # This is difficult to test without the `async_client` because it has to

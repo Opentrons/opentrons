@@ -199,7 +199,6 @@ def main():
 
     try:
         robot.connect()
-        robot.cache_instrument_models()
     except Exception as e:
         log.exception("Error while connecting to motor-driver: {}".format(e))
 
