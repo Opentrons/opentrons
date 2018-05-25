@@ -57,12 +57,12 @@ nav.main-menu a.brand img {
 }
 
 nav.main-menu:hover {
-    height: 160px;
+    height: 190px;
     overflow: hidden;
 }
 
 nav.main-menu:hover a.brand img {
-    margin-top: 52.8px;
+    margin-top: 77px;
 }
 
 nav.main-menu ul {
