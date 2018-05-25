@@ -59,7 +59,6 @@ async def test_add_and_remove_tip(dc_session):
 
 async def test_save_xy(dc_session):
     robot.reset()
-    robot.cache_instrument_models()
     mount = 'left'
     pip = instruments.P10_Single(mount=mount)
     dc_session.pipettes = {mount: pip}
@@ -88,7 +87,6 @@ async def test_save_xy(dc_session):
 
 async def test_save_z(dc_session):
     robot.reset()
-    robot.cache_instrument_models()
     mount = 'left'
     model = 'p10_single_v1'
     pip = instruments.P10_Single(mount=mount)
@@ -205,7 +203,6 @@ async def test_create_session(async_client, monkeypatch):
             SmoothieDriver_3_0_0, 'read_pipette_model', dummy_read_model)
 
         robot.reset()
-        robot.cache_instrument_models()
 
         resp = await async_client.post('/calibration/deck/start')
         start_result = await resp.json()
@@ -289,7 +286,6 @@ async def test_forcing_new_session(async_client, monkeypatch):
     overridden.
     """
     robot.reset()
-    robot.cache_instrument_models()
 
     dummy_token = 'Test Token'
 
@@ -359,7 +355,6 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     Then jog requests will work as expected.
     """
     robot.reset()
-    robot.cache_instrument_models()
     dummy_token = 'Test Token'
 
     def uuid_mock():
