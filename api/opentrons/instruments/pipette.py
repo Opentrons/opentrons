@@ -673,7 +673,7 @@ class Pipette:
         return self
 
     @commands.publish.both(command=commands.touch_tip)
-    def touch_tip(self, location=None, radius=1.0):
+    def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -691,11 +691,19 @@ class Pipette:
             second item relative :any:`Vector`
 
         radius : float
-            Radius is a floating point number between 0.0 and 1.0, describing
-            the percentage of a well's radius. When radius=1.0,
-            :any:`touch_tip()` will move to 100% of the wells radius. When
-            radius=0.5, :any:`touch_tip()` will move to 50% of the wells
-            radius.
+            Radius is a floating point describing the percentage of a well's
+            radius. When radius=1.0, :any:`touch_tip()` will move to 100% of
+            the wells radius. When radius=0.5, :any:`touch_tip()` will move to
+            50% of the wells radius.
+            Default: 1.0 (100%)
+
+        speed: float
+            The speed for touch tip motion, in mm/s.
+            Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+
+        v_offset: float
+            The offset in mm from the top of the well to touch tip.
+            Default: -1.0 mm
 
         Returns
         -------
@@ -714,11 +722,17 @@ class Pipette:
         """
         if not self.tip_attached:
             log.warning("Cannot touch tip without a tip attached.")
-
-        height_offset = 0
+        if speed > 80.0:
+            log.warning("Touch tip speeds greater than 80mm/s not allowed")
+            speed = 80.0
+        if speed < 20.0:
+            log.warning("Touch tip speeds greater than 80mm/s not allowed")
+            speed = 20.0
 
         if helpers.is_number(location):
-            height_offset = location
+            # Deprecated syntax
+            log.warning("Please use the `v_offset` named parameter")
+            v_offset = location
             location = None
 
         # if no location specified, use the previously
@@ -728,7 +742,7 @@ class Pipette:
         else:
             location = self.previous_placeable
 
-        v_offset = (0, 0, height_offset)
+        v_offset = (0, 0, v_offset)
 
         well_edges = [
             location.from_center(x=radius, y=0, z=1),       # right edge
@@ -741,7 +755,7 @@ class Pipette:
         well_edges = map(lambda x: x + v_offset, well_edges)
 
         self.robot.gantry.push_speed()
-        self.robot.gantry.set_speed(100)
+        self.robot.gantry.set_speed(speed)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
         self.robot.gantry.pop_speed()
 
