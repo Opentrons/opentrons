@@ -16,7 +16,8 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   SLOT_WIDTH,
-  SLOT_HEIGHT
+  SLOT_HEIGHT,
+  humanize
 } from '@opentrons/components'
 
 import {nonFillableContainers} from '../../constants'
@@ -91,7 +92,8 @@ function SlotWithContainer (props: SlotWithContainerProps) {
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      <ContainerNameOverlay displayName={displayName} />
+      <ContainerNameOverlay title={displayName || humanize(containerType)} />
+      {/* TODO NEXT Ian 2018-05-25 support disambiguation number '96 Flat (1)' */}
     </g>
   )
 }
