@@ -161,16 +161,12 @@ function TryAgainButton (props: ChangePipetteProps) {
 }
 
 function ExitButton (props: ChangePipetteProps) {
-  const {exit, exitUrl, success, attachedWrong} = props
+  const {exit, attachedWrong} = props
   const children = attachedWrong
     ? EXIT_BUTTON_MESSAGE_WRONG
     : EXIT_BUTTON_MESSAGE
 
-  let exitButtonProps = {children, className: styles.confirm_button}
-
-  exitButtonProps = success
-    ? {...exitButtonProps, onClick: exit}
-    : {...exitButtonProps, Component: Link, to: exitUrl}
+  let exitButtonProps = {children, className: styles.confirm_button, onClick: exit}
 
   return (
     <PrimaryButton {...exitButtonProps} />
