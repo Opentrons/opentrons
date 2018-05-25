@@ -1,8 +1,8 @@
 # Opentrons Platform
 
-[![Travis CI][travis-badge]][travis]
+<!-- [![Travis CI][travis-badge]][travis]
 [![AppVeyor][appveyor-badge]][appveyor]
-[![Codecov][codecov-badge]][codecov]
+[![Codecov][codecov-badge]][codecov] -->
 
 *   [Overview](#overview)
 *   [Opentrons API](#opentrons-api)
@@ -30,16 +30,16 @@ pipette.aspirate(tube_1).dispense(tube_2)
 That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
 
 *   [Documentation](http://docs.opentrons.com)
-*   [Source code](https://github.com/Opentrons/opentrons/tree/v3a/api)
+*   [Source code](https://github.com/Opentrons/opentrons/tree/edge/api)
 
 ## Opentrons App
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
 *   [Documentation](https://support.opentrons.com/)
-*   [Source code](https://github.com/Opentrons/opentrons/tree/v3a/app)
+*   [Source code](https://github.com/Opentrons/opentrons/tree/edge/app)
 
-![ot-app](https://lh3.googleusercontent.com/hz80NB3yiMB6r50aKg9DgSuqmwNAEKFz7aC3qQS56YregCGygg1oc3ldn9FAanqTt7REUXikkSuHDX69JODaLWgegDwO_JnDf30j3NuZ05mWOq16nMTxQBAFW6cZqqEsLaDU-uRW)
+![ot-app](https://s3.amazonaws.com/opentrons-images/standalone/ot-2-app.png)
 
 ## Contributing
 
@@ -54,9 +54,9 @@ For more information and development setup instructions, please read [the contri
 Enjoy!
 
 [travis]: https://travis-ci.org/Opentrons/opentrons/branches
-[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600&label=*nix%20build
+[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600&label=*nix%20build
 [appveyor]: https://ci.appveyor.com/project/Opentrons/opentrons
-[appveyor-badge]: https://img.shields.io/appveyor/ci/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600&label=windows%20build
+[appveyor-badge]: https://img.shields.io/appveyor/ci/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600&label=windows%20build
 [codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
-[codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/v3a.svg?style=flat-square&maxAge=3600
+[codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600
 [contributing]: ./CONTRIBUTING.md
