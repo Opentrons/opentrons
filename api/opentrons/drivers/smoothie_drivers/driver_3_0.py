@@ -6,7 +6,7 @@ from typing import Dict
 
 from serial.serialutil import SerialException
 
-from opentrons.drivers.smoothie_drivers import serial_communication
+from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.instruments.pipette_config import configs
 '''

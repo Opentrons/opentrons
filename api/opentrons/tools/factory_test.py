@@ -91,7 +91,7 @@ def run_quiet_process(command):
 
 
 def test_smoothie_gpio():
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers.driver_3_0 import SMOOTHIE_ACK
 
     def _write_and_return(msg):

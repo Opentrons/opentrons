@@ -59,7 +59,7 @@ def test_update_position(model):
 
 
 def test_remove_serial_echo(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     smoothie.simulating = False
 
@@ -117,7 +117,7 @@ def test_parse_position_response(smoothie):
 
 
 def test_dwell_and_activate_axes(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
@@ -158,7 +158,7 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
 
 
 def test_disable_motor(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie.simulating = False
@@ -189,7 +189,7 @@ def test_disable_motor(smoothie, monkeypatch):
 
 
 def test_plunger_commands(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
@@ -269,7 +269,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_set_active_current(smoothie, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
@@ -673,7 +673,7 @@ def test_speed_change(model, monkeypatch):
     robot = model.robot
     robot._driver.simulating = False
 
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
@@ -707,7 +707,7 @@ def test_max_speed_change(model, monkeypatch):
     robot = model.robot
     robot._driver.simulating = False
 
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
@@ -747,7 +747,7 @@ def test_pause_in_protocol(model):
 
 
 def test_send_command_with_retry(model, monkeypatch):
-    from opentrons.drivers.smoothie_drivers import serial_communication
+    from opentrons.drivers import serial_communication
 
     robot = model.robot
     robot._driver.simulating = False
