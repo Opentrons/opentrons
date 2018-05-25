@@ -205,7 +205,7 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
       className="title"
     />
     <div
-      className="title_bar_carat"
+      className="title_bar_carat hoverable_carat"
       onClick={[Function]}
     >
       <svg
@@ -244,7 +244,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
       className="title"
     />
     <div
-      className="title_bar_carat"
+      className="title_bar_carat hoverable_carat"
       onClick={[Function]}
     >
       <svg

@@ -148,16 +148,6 @@ const collapsedSteps = handleActions({
     ...state,
     [action.payload.id]: false
   }),
-  SELECT_STEP: (state: CollapsedStepsState, action: SelectStepAction) => {
-    if (action.payload === '__end__') {
-      return state
-    }
-
-    return {
-      ...state,
-      [action.payload]: false
-    }
-  },
   DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
     omit(state, action.payload.toString()),
   TOGGLE_STEP_COLLAPSED: (state: CollapsedStepsState, {payload}: ActionType<typeof toggleStepCollapsed>) => ({

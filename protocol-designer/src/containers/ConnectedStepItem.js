@@ -38,9 +38,20 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
   // Also if you can, use END_STEP const instead of hard-coded '__end__',
   // but flow doesn't like that :(
+  // Same issue with repeating `stepId === '__end__' || stepId === 0` 2x
 
   const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
   const hoveredStep = steplistSelectors.hoveredStepId(state)
+  const selected = steplistSelectors.selectedStepId(state) === stepId
+
+  let collapsed
+
+  if (!(stepId === '__end__' || stepId === 0)) {
+    // Leave collapsed undefined for special steps
+    collapsed = (selected)
+      ? false // selected steps never collapsed
+      : steplistSelectors.getCollapsedSteps(state)[stepId]
+  }
 
   return {
     step: (stepId === '__end__')
@@ -52,12 +63,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       : substepSelectors.allSubsteps(state)[stepId],
 
     hoveredSubstep,
-
-    collapsed: (stepId === '__end__' || stepId === 0)
-      ? undefined
-      : steplistSelectors.getCollapsedSteps(state)[stepId],
-
-    selected: steplistSelectors.selectedStepId(state) === stepId,
+    collapsed,
+    selected,
 
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.

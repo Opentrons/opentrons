@@ -84,7 +84,7 @@
   padding: calc(var(--list-padding-small) - var(--bd-width-default));
   padding-top: 1rem;
 
-  &:hover {
+  &.hoverable_carat:hover {
     background-color: var(--c-bg-hover);
   }
 }
