@@ -61,6 +61,15 @@ test-js:
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot)
 
+# This is the same as `make lint-css lint-js test-js`
+# but uses flow serve instead of flow check to save a few minutes
+# Intended for developers, not for CI
+.PHONY: precommit-js
+precommit-js: lint-css
+	eslint '**/*.js'
+	flow
+	jest --verbose
+
 # lints and typechecks
 .PHONY: lint
 lint: lint-py lint-js lint-css
