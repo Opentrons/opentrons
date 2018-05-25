@@ -48,7 +48,7 @@ docs:
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 	shx mkdir -p docs/dist
-	shx cp -R docs/build/html/* docs/public/* docs/dist
+	shx cp -R docs/build/html/. docs/public/. docs/dist
 
 .PHONY: publish
 publish:
