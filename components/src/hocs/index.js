@@ -1,6 +1,6 @@
 // @flow
-import ClickOutside from './ClickOutside'
+import clickOutside from './clickOutside'
 
 export {
-  ClickOutside
+  clickOutside
 }
