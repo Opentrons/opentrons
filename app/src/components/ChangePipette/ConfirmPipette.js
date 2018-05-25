@@ -166,9 +166,12 @@ function ExitButton (props: ChangePipetteProps) {
     ? EXIT_BUTTON_MESSAGE_WRONG
     : EXIT_BUTTON_MESSAGE
 
-  let exitButtonProps = {children, className: styles.confirm_button, onClick: exit}
-
   return (
-    <PrimaryButton {...exitButtonProps} />
+    <PrimaryButton
+      className={styles.confirm_button}
+      onClick={exit}
+    >
+      {children}
+    </PrimaryButton >
   )
 }
