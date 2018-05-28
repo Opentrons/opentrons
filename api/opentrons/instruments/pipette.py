@@ -186,7 +186,9 @@ class Pipette:
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
-
+        print("Hallo, in pipette constructor")
+        print(aspirate_flow_rate)
+        print(dispense_flow_rate)
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
@@ -393,10 +395,12 @@ class Pipette:
 
         self._position_for_aspirate(location)
 
-        mm_position = self._ul_to_plunger_position(
+        mm_position = self._aspirate_plunger_position(
             self.current_volume + volume)
+        print(mm_position)
         speed = self.speeds['aspirate'] * rate
-
+        print(self.speeds['aspirate'])
+        print(rate)
         self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
         self.instrument_actuator.set_active_current(self._plunger_current)
@@ -484,7 +488,7 @@ class Pipette:
 
         self._position_for_dispense(location)
 
-        mm_position = self._ul_to_plunger_position(
+        mm_position = self._dispense_plunger_position(
             self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
@@ -1385,7 +1389,7 @@ class Pipette:
         millimeters = ul / self.ul_per_mm
         return millimeters
 
-    def _ul_to_plunger_position(self, ul):
+    def _aspirate_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
 
         Translates the passed liquid volume to absolute coordinates
@@ -1393,10 +1397,143 @@ class Pipette:
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
+        aspirate_function_map = {
+            'p10 single': lambda: self._p10_single_piecewise(ul, 'aspirate'),
+            'p10 multi': lambda: self._p10_multi_piecewise(ul, 'aspirate'),
+            'p50 single': lambda: self._p50_single_piecewise(ul, 'aspirate'),
+            'p50 multi': lambda: self._p50_multi_piecewise(ul, 'aspirate'),
+            'p300 single': lambda: self._p300_single_piecewise(ul, 'aspirate'),
+            'p300 multi': lambda: self._p300_multi_piecewise(ul, 'aspirate'),
+            'p1000 single': 65}
+
+        full_model_name = self.name.split('_')
+        # Only grab the model name, not hardware version
+        model = ' '.join(full_model_name[0:2])
+        # Set the ul_per_mm for the pipette
+        ul_per_mm = aspirate_function_map.get(model)
+        if ul_per_mm is not None:
+            self.set_ul_per_mm(ul_per_mm())
+        millimeters = self._ul_to_mm(ul)
+        destination_mm = self._get_plunger_position('bottom') + millimeters
+        return round(destination_mm, 6)
+
+    def _dispense_plunger_position(self, ul):
+        """Calculate axis position for a given liquid volume.
+
+        Translates the passed liquid volume to absolute coordinates
+        on the axis associated with this pipette.
+
+        Calibration of the pipette motor's ul-to-mm conversion is required
+        """
+        dispense_function_map = {
+            'p10 single': lambda: self._p10_single_piecewise(ul, 'dispense'),
+            'p10 multi': lambda: self._p10_multi_piecewise(ul, 'dispense'),
+            'p50 single': lambda: self._p50_single_piecewise(ul, 'dispense'),
+            'p50 multi': lambda: self._p50_multi_piecewise(ul, 'dispense'),
+            'p300 single': lambda: self._p300_single_piecewise(ul, 'dispense'),
+            'p300 multi': lambda: self._p300_multi_piecewise(ul, 'dispense'),
+            'p1000 single': 65}
+
+        full_model_name = self.name.split('_')
+        # Only grab the model name, not hardware version
+        model = ' '.join(full_model_name[0:2])
+        # Set the ul_per_mm for the pipette
+        ul_per_mm = dispense_function_map.get(model)
+        # Change default of 1000 ul/mm if function returns a value
+        if ul_per_mm is not None:
+            # If ul_per_mm not None, it is a function so must make it callable
+            self.set_ul_per_mm(ul_per_mm())
 
         millimeters = self._ul_to_mm(ul)
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
+
+    def _p10_single_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p10 single
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 1.8263):
+                return -0.0958*ul + 1.088
+            elif (ul >= 1.8263) and (ul < 2.5222):
+                return -0.104*ul + 1.1031
+            elif (ul >= 2.5222) and (ul < 3.2354):
+                return -0.0447*ul + 0.9536
+            elif (ul >= 3.2354) and (ul < 3.9984):
+                return -0.012*ul + 0.8477
+            elif (ul >= 3.9984) and (ul <= 12.5135):
+                return -0.0021*ul + 0.8079
+        else:
+            # Constant function for dispense
+            return 0*ul + 0.7945
+
+    def _p10_multi_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p10 multi
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 1.893415617):
+                return -1.1069*ul + 3.042593193
+            elif (ul >= 1.893415617) and (ul < 2.497849452):
+                return -0.1888*ul + 1.30410391
+            elif (ul >= 2.497849452) and (ul < 5.649462387):
+                return -0.0081*ul + 0.8528667891
+            elif (ul >= 5.649462387) and (ul <= 12.74444519):
+                return -0.0018*ul + 0.8170558891
+        else:
+            # Constant function for dispense
+            return 0*ul + 0.8058688085
+
+    def _p50_single_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p50 single
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 11.79687499):
+                return -0.0098*ul + 3.064988953
+            elif (ul >= 11.79687499) and (ul <= 50):
+                return -0.0004*ul + 2.954068131
+        else:
+            return 0*ul + 2.931601299
+
+    def _p50_multi_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p50 multi
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 12.29687531):
+                return -0.0049*ul + 3.134703694
+            elif (ul >= 12.29687531) and (ul <= 50):
+                return -0.0002*ul + 3.077116024
+        else:
+            # Constant function for dispense
+            return 0*ul + 3.06368702
+
+    def _p300_single_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p300 single
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 36.19844973):
+                return 0.043*ul + 16.548
+            elif (ul >= 36.19844973) and (ul < 54.98518519):
+                return 0.012*ul + 17.658
+            elif (ul >= 54.98518519) and (ul < 73.90077516):
+                return 0.008*ul + 17.902
+            elif (ul >= 73.90077516) and (ul < 111.8437953):
+                return 0.004*ul + 18.153
+            elif (ul >= 111.8437953) and (ul <= 302.3895337):
+                return 0.001*ul + 18.23
+        else:
+            # Constant function for dispense
+            return 0*ul + 18.83156277
+
+    def _p300_multi_piecewise(self, ul, func):
+        # Piecewise function that calculates ul_per_mm for a p300 multi
+        # pipette model given a particular ul value
+        if func == 'aspirate':
+            if (ul > 0) and (ul < 57.25698968):
+                return 0.017*ul + 18.132
+            elif (ul >= 57.25698968) and (ul <= 309.2612689):
+                return 0.001*ul + 19.03
+        else:
+            # Constant function for dispense
+            return 0*ul + 19.29389273
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1588,6 +1725,9 @@ class Pipette:
             The speed in millimeters-per-second, at which the plunger will
             move while performing an dispense
         """
+        print("Hallo, setting speed now")
+        print(aspirate)
+        print(dispense)
         if aspirate:
             self.speeds['aspirate'] = aspirate
         if dispense:

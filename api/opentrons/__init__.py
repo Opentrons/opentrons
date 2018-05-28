@@ -198,7 +198,6 @@ class InstrumentsWrapper(object):
             trash_container=trash_container,
             tip_racks=tip_racks,
             channels=config.channels,
-            ul_per_mm=config.ul_per_mm,
             aspirate_flow_rate=config.aspirate_flow_rate,
             dispense_flow_rate=config.dispense_flow_rate,
             plunger_current=config.plunger_current,
