@@ -72,6 +72,10 @@ def log_init():
                 'handlers': ['debug'],
                 'level': level_value
             },
+            'opentrons.instruments': {
+                'handlers': ['debug'],
+                'level': level_value
+            },
             'opentrons.robot.robot_configs': {
                 'handlers': ['debug'],
                 'level': level_value
