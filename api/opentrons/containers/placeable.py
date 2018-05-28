@@ -745,8 +745,9 @@ class WellSeries(Container):
         return str(self)
 
     def __str__(self):
-        return '<{0}: {1}>'.format(
+        return '<{0} in {1}: {2}>'.format(
             self.__class__.__name__,
+            self.parent.parent,
             ''.join([str(well) for well in self.values]))
 
     def __getattr__(self, name):
