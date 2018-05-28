@@ -547,7 +547,6 @@ class Robot(object):
 
         Parameters
         ----------
-        speed : number setting the current combined-axes speed
         combined_speed : number specifying a combined-axes speed
         <axis> : key/value pair, specifying the maximum speed of that axis
 
@@ -556,10 +555,8 @@ class Robot(object):
 
         >>> from opentrons import robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
-        >>> robot.head_speed(300) # doctest: +SKIP
-        #  default axes speed is 300 mm/sec
         >>> robot.head_speed(combined_speed=400) # doctest: +SKIP
-        #  default speed is 400 mm/sec
+        #  sets the head speed to 400 mm/sec or the axis max per axis
         >>> robot.head_speed(x=400, y=200) # doctest: +SKIP
         # sets max speeds of X and Y
         """
