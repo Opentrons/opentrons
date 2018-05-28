@@ -45,7 +45,6 @@ class PipetteTip:
 
 class Pipette:
     """
-
     Through this class you can can:
         * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
           :meth:`mix`, and :meth:`blow_out`
@@ -74,7 +73,7 @@ class Pipette:
     tip_racks : list
         A list of Containers for this Pipette to track tips when calling
         :meth:`pick_up_tip` (Default: [])
-    aspirate__flow_rate : int
+    aspirate_flow_rate : int
         The speed (in ul/sec) the plunger will move while aspirating
         (Default: See Model Type)
     dispense_flow_rate : int
