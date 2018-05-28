@@ -9,9 +9,16 @@ environment:
   PATH: 'C:\Python36;C:\Python36\Scripts;%PATH%'
   # GNU make
   MAKE: C:\MinGW\bin\mingw32-make.exe
+
   # publish configuration
   OT_BUCKET_APP: opentrons-app
   OT_FOLDER_APP: builds
+
+  OT_APP_MIXPANEL_ID:
+    secure: W9ZdkT5jR5zZwQm1PMRzDNSZ1qFizfqGMIYv5hyGXPhpbzOPtyAlbJYfQMJ1Y+H+
+
+  OT_APP_INTERCOM_ID:
+    secure: BF0x/zKj1kHOnoHWLeCQXA==
 
 init:
   # set vars in ps scripts because cmd is terrible at undefined vars

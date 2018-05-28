@@ -15,108 +15,27 @@
 
 declare module 'react-router-redux' {
   declare module.exports: any;
-}
 
-/**
- * We include stubs for each file inside this npm package in case you need to
- * require those files directly. Feel free to delete any files that aren't
- * needed.
- */
-declare module 'react-router-redux/actions' {
-  declare module.exports: any;
-}
+  // action types
+  declare type LocationChangeAction = {|
+    type: '@@router/LOCATION_CHANGE',
+    // TODO(mc, 2018-05-28): this type has changed since @beta.6
+    payload: {|
+      pathname: string,
+      search: string,
+      hash: string,
+    |}
+  |}
 
-declare module 'react-router-redux/ConnectedRouter' {
-  declare module.exports: any;
-}
+  declare type CallHistoryMethodAction = {|
+    type: '@@router/CALL_HISTORY_METHOD',
+    payload: {|
+      method: 'push' | 'replace' | 'go' | 'goBack' | 'goForward',
+      args: Array<any>
+    |}
+  |}
 
-declare module 'react-router-redux/es/actions' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/es/ConnectedRouter' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/es/index' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/es/middleware' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/es/reducer' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/es/selectors' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/middleware' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/reducer' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/selectors' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/umd/react-router-redux' {
-  declare module.exports: any;
-}
-
-declare module 'react-router-redux/umd/react-router-redux.min' {
-  declare module.exports: any;
-}
-
-// Filename aliases
-declare module 'react-router-redux/actions.js' {
-  declare module.exports: $Exports<'react-router-redux/actions'>;
-}
-declare module 'react-router-redux/ConnectedRouter.js' {
-  declare module.exports: $Exports<'react-router-redux/ConnectedRouter'>;
-}
-declare module 'react-router-redux/es/actions.js' {
-  declare module.exports: $Exports<'react-router-redux/es/actions'>;
-}
-declare module 'react-router-redux/es/ConnectedRouter.js' {
-  declare module.exports: $Exports<'react-router-redux/es/ConnectedRouter'>;
-}
-declare module 'react-router-redux/es/index.js' {
-  declare module.exports: $Exports<'react-router-redux/es/index'>;
-}
-declare module 'react-router-redux/es/middleware.js' {
-  declare module.exports: $Exports<'react-router-redux/es/middleware'>;
-}
-declare module 'react-router-redux/es/reducer.js' {
-  declare module.exports: $Exports<'react-router-redux/es/reducer'>;
-}
-declare module 'react-router-redux/es/selectors.js' {
-  declare module.exports: $Exports<'react-router-redux/es/selectors'>;
-}
-declare module 'react-router-redux/index' {
-  declare module.exports: $Exports<'react-router-redux'>;
-}
-declare module 'react-router-redux/index.js' {
-  declare module.exports: $Exports<'react-router-redux'>;
-}
-declare module 'react-router-redux/middleware.js' {
-  declare module.exports: $Exports<'react-router-redux/middleware'>;
-}
-declare module 'react-router-redux/reducer.js' {
-  declare module.exports: $Exports<'react-router-redux/reducer'>;
-}
-declare module 'react-router-redux/selectors.js' {
-  declare module.exports: $Exports<'react-router-redux/selectors'>;
-}
-declare module 'react-router-redux/umd/react-router-redux.js' {
-  declare module.exports: $Exports<'react-router-redux/umd/react-router-redux'>;
-}
-declare module 'react-router-redux/umd/react-router-redux.min.js' {
-  declare module.exports: $Exports<'react-router-redux/umd/react-router-redux.min'>;
+  declare type RouterAction =
+    | LocationChangeAction
+    | CallHistoryMethodAction
 }

@@ -2,8 +2,9 @@
 'use strict'
 
 const Store = require('electron-store')
-const {getIn} = require('@thi.ng/paths')
 const mergeOptions = require('merge-options')
+const {getIn} = require('@thi.ng/paths')
+const uuid = require('uuid/v4')
 const yargsParser = require('yargs-parser')
 
 // make sure all arguments are included in production
@@ -18,6 +19,7 @@ const PARSE_ARGS_OPTS = {
   }
 }
 
+// TODO(mc, 2018-05-25): future config changes will require migration strategy
 const DEFAULTS = {
   devtools: false,
 
@@ -40,29 +42,38 @@ const DEFAULTS = {
     webPreferences: {
       webSecurity: true
     }
+  },
+
+  // analytics
+  analytics: {
+    appId: uuid(),
+    optedIn: false,
+    seenOptIn: false
   }
 }
 
-let store
-let overrides
-let log
+// lazy load store, overrides, and log because of config/log interdependency
+let _store
+let _overrides
+let _log
+const store = () => _store || new Store({defaults: DEFAULTS})
+const overrides = () => _overrides || yargsParser(argv, PARSE_ARGS_OPTS)
+const log = () => _log || require('./log')(__filename)
 
 module.exports = {
   // initialize and register the config module with dispatches from the UI
   registerConfig (dispatch) {
-    log = log || require('./log')(__filename)
-
     return function handleIncomingAction (action) {
       const {type, payload} = action
 
       if (type === 'config:UPDATE') {
-        log.debug('Handling config:UPDATE', payload)
+        log().debug('Handling config:UPDATE', payload)
 
         if (getIn(overrides, payload.path)) {
-          log.info(`${payload.path} in overrides; not updating`)
+          log().info(`${payload.path} in overrides; not updating`)
         } else {
-          log.info(`Updating "${payload.path}" to ${payload.value}`)
-          store.set(payload.path, payload.value)
+          log().info(`Updating "${payload.path}" to ${payload.value}`)
+          store().set(payload.path, payload.value)
           dispatch({type: 'config:SET', payload})
         }
       }
@@ -70,19 +81,16 @@ module.exports = {
   },
 
   getStore () {
-    return store.store
+    return store().store
   },
 
   getOverrides () {
-    return overrides
+    return overrides()
   },
 
   getConfig (path) {
-    store = store || new Store({defaults: DEFAULTS})
-    overrides = overrides || yargsParser(argv, PARSE_ARGS_OPTS)
-
-    const result = store.get(path)
-    const over = getIn(overrides, path)
+    const result = store().get(path)
+    const over = getIn(overrides(), path)
 
     if (over != null) {
       if (typeof result === 'object' && result != null) {

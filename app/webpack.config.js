@@ -13,8 +13,6 @@ const devServerConfig = require('./webpack/dev-server')
 
 const {productName} = require('@opentrons/app-shell/package.json')
 const {description, author} = require('./package.json')
-const gtmConfig = require('./src/analytics/gtm-config')
-const intercomConfig = require('./src/analytics/intercom-config')
 
 const DEV = process.env.NODE_ENV !== 'production'
 const ANALYZER = process.env.ANALYZER === 'true'
@@ -63,8 +61,7 @@ const plugins = [
     template: './src/index.hbs',
     description,
     author,
-    gtmConfig,
-    intercomConfig
+    intercomId: process.env.OT_APP_INTERCOM_ID
   }),
 
   new ScriptExtHtmlWebpackPlugin({

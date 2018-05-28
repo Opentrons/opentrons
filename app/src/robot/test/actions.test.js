@@ -53,13 +53,11 @@ describe('robot actions', () => {
   test('CONNECT_RESPONSE action', () => {
     const success = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {},
-      meta: {analytics: true}
+      payload: {}
     }
     const failure = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error: new Error('AH')},
-      meta: {analytics: true}
+      payload: {error: new Error('AH')}
     }
 
     expect(actions.connectResponse()).toEqual(success)
