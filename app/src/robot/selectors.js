@@ -199,24 +199,26 @@ export const getRunProgress = createSelector(
   }
 )
 
-// TODO(mc, 2018-01-04): inferring start time from handledAt of first command
-// is inadequate; robot starts moving before this timestamp is set
 export function getStartTime (state: State) {
   return session(state).startTime
 }
 
-export const getRunTime = createSelector(
+export const getRunSeconds = createSelector(
   getStartTime,
   (state: State) => session(state).runTime,
-  (startTime: ?number, runTime: ?number): string => {
-    // TODO(mc, 2018-01-04): gt check is required because of the TODO above
-    const runTimeSeconds = (runTime && startTime && runTime > startTime)
+  (startTime: ?number, runTime: ?number): number => {
+    return runTime && startTime && runTime > startTime
       ? Math.floor((runTime - startTime) / 1000)
       : 0
+  }
+)
 
-    const hours = padStart(`${Math.floor(runTimeSeconds / 3600)}`, 2, '0')
-    const minutes = padStart(`${Math.floor(runTimeSeconds / 60) % 60}`, 2, '0')
-    const seconds = padStart(`${runTimeSeconds % 60}`, 2, '0')
+export const getRunTime = createSelector(
+  getRunSeconds,
+  (runSeconds): string => {
+    const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
+    const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
+    const seconds = padStart(`${runSeconds % 60}`, 2, '0')
 
     return `${hours}:${minutes}:${seconds}`
   }

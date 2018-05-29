@@ -13,10 +13,7 @@ import {checkForShellUpdates, shellMiddleware} from './shell'
 
 import {healthCheckMiddleware} from './http-api-client'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
-import {
-  initialize as initializeAnalytics,
-  middleware as analyticsMiddleware
-} from './analytics'
+import {initializeAnalytics, analyticsMiddleware} from './analytics'
 
 import reducer from './reducer'
 
@@ -67,12 +64,11 @@ if (process.env.NODE_ENV === 'development') {
   global.store = store
 }
 
+// initialize analytics after first render
+store.dispatch(initializeAnalytics())
+
 // kickoff an initial update check at launch
 store.dispatch(checkForShellUpdates())
 
 log.info('Rendering app UI')
 renderApp()
-
-initializeAnalytics({
-  intercom: process.env.DISABLE_INTERCOM !== '1'
-})

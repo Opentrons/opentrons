@@ -15,8 +15,8 @@ export type Config = {
   log: {
     level: {
       file: LogLevel,
-      console: LogLevel
-    }
+      console: LogLevel,
+    },
   },
 
   // ui and browser config
@@ -25,12 +25,18 @@ export type Config = {
     height: number,
     url: {
       protocol: UrlProtocol,
-      path: string
+      path: string,
     },
     webPreferences: {
-      webSecurity: boolean
-    }
-  }
+      webSecurity: boolean,
+    },
+  },
+
+  analytics: {
+    appId: string,
+    optedIn: boolean,
+    seenOptIn: boolean,
+  },
 }
 
 type UpdateConfigAction = {|

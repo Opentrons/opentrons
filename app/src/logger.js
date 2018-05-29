@@ -12,7 +12,7 @@ export type LogLevel =
   | 'debug'
   | 'silly'
 
-type Logger = {[level: LogLevel]: (message: string, meta: {}) => void}
+type Logger = {[level: LogLevel]: (message: string, meta?: {}) => void}
 
 const LEVELS: Array<LogLevel> = [
   'error',
@@ -33,7 +33,7 @@ export default function createLogger (filename: string): Logger {
   }), {})
 }
 
-function log (level: LogLevel, message: string, label: string, meta: {}) {
+function log (level: LogLevel, message: string, label: string, meta?: {}) {
   const print = `[${label}] ${level}: ${message}`
 
   // log to web console, too

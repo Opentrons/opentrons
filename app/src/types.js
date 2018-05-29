@@ -6,6 +6,8 @@ import type {
   Dispatch as ReduxDispatch
 } from 'redux'
 
+import type {RouterAction} from 'react-router-redux'
+
 import typeof reducer from './reducer'
 import type {Action as RobotAction} from './robot'
 import type {Action as HttpApiAction} from './http-api-client'
@@ -19,6 +21,7 @@ export type Action =
   | RobotAction
   | HttpApiAction
   | ShellAction
+  | RouterAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 
