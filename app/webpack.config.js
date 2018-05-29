@@ -45,10 +45,11 @@ const rules = [
 const target = 'electron-renderer'
 
 const plugins = [
-  new webpack.EnvironmentPlugin({
-    NODE_ENV: 'development',
-    DEBUG: false
-  }),
+  new webpack.EnvironmentPlugin(
+    Object.keys(process.env).filter(v => v.startsWith('OT_APP')).concat([
+      'NODE_ENV'
+    ])
+  ),
 
   new ExtractTextPlugin({
     filename: CSS_OUTPUT_NAME,

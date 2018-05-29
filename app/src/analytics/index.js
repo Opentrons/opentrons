@@ -37,7 +37,7 @@ export function initializeAnalytics (): ThunkAction {
   return (_, getState) => {
     const config = getState().config.analytics
 
-    log.debug('Initializing analytics', {config})
+    log.debug('Analytics config', {config})
     initializeIntercom(config)
     initializeMixpanel(config)
   }
@@ -67,6 +67,8 @@ export const analyticsMiddleware: Middleware =
 
 function initializeIntercom (config: AnalyticsConfig) {
   if (INTERCOM_ID) {
+    log.debug('Initializing Intercom')
+
     const data = {app_id: INTERCOM_ID, 'App Version': version}
 
     intercom = global.Intercom || intercom
@@ -76,17 +78,19 @@ function initializeIntercom (config: AnalyticsConfig) {
 
 function initializeMixpanel (config: AnalyticsConfig) {
   if (MIXPANEL_ID) {
+    log.debug('Initializing Mixpanel')
+
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
 
     if (config.optedIn) {
-      log.debug('User has opted into analytics; enabling mixpanel')
+      log.debug('User has opted into analytics; tracking with Mixpanel')
 
       mixpanel.identify(config.appId)
       mixpanel.opt_in_tracking()
       mixpanel.register({appVersion: version, appId: config.appId})
 
       track = mixpanel.track.bind(mixpanel)
-      track('appOpened')
+      track('appOpen')
     }
   }
 }

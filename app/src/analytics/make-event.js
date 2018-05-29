@@ -30,14 +30,8 @@ export default function makeEvent (state: State, action: Action): ?Event {
         name: 'robotConnect',
         properties: {
           success: !action.payload.error,
-          method: (robot.wired
-            ? 'usb'
-            : 'wifi'
-          ),
-          error: (action.payload.error
-            ? action.payload.error.message
-            : ''
-          )
+          method: robot.wired ? 'usb' : 'wifi',
+          error: (action.payload.error && action.payload.error.message) || ''
         }
       }
 
