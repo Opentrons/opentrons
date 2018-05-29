@@ -122,9 +122,10 @@ export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = cr
 
 export const selectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
-  labwareIngredSelectors.selectedContainerType,
-  (selectedWells, selectedContainerType) => {
+  labwareIngredSelectors.getSelectedContainer,
+  (selectedWells, selectedContainer) => {
     const selectedWellNames = Object.keys(selectedWells)
+    const selectedContainerType = selectedContainer && selectedContainer.type
     if (!selectedContainerType) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
