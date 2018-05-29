@@ -6,7 +6,7 @@ describe('robot reducer - calibration', () => {
     const state = reducer(undefined, {}).calibration
 
     expect(state).toEqual({
-      deckPopulated: true,
+      deckPopulated: null,
       jogDistance: 0.1,
 
       // intrument probed + basic tip-tracking flags

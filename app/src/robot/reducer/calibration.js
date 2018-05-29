@@ -38,7 +38,7 @@ type CalibrationRequest = {
 }
 
 export type State = {
-  +deckPopulated: boolean,
+  +deckPopulated: ?boolean,
   +jogDistance: number,
 
   +probedByMount: {[Mount]: boolean},
@@ -61,7 +61,7 @@ const {
 } = actionTypes
 
 const INITIAL_STATE: State = {
-  deckPopulated: true,
+  deckPopulated: null,
   jogDistance: 0.1,
 
   // TODO(mc, 2018-01-22): combine these into subreducer
