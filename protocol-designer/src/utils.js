@@ -1,8 +1,7 @@
 // @flow
-import * as componentLibrary from '@opentrons/components'
+import {wellNameSplit} from '@opentrons/components'
 import type {BoundingRect, GenericRect} from './collision-types'
 import type {Wells} from './labware-ingred/types'
-export const { humanize, wellNameSplit } = componentLibrary
 
 export type FormConnectorFactory<F> = (
   handleChange: (accessor: F) => (e: SyntheticInputEvent<*>) => mixed,

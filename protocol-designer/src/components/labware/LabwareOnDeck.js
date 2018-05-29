@@ -17,7 +17,7 @@ import {
   EmptyDeckSlot,
   SLOT_WIDTH,
   SLOT_HEIGHT,
-  humanize
+  humanizeLabwareType
 } from '@opentrons/components'
 
 import {nonFillableContainers} from '../../constants'
@@ -92,7 +92,7 @@ function SlotWithContainer (props: SlotWithContainerProps) {
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      <ContainerNameOverlay title={displayName || humanize(containerType)} />
+      <ContainerNameOverlay title={displayName || humanizeLabwareType(containerType)} />
       {/* TODO NEXT Ian 2018-05-25 support disambiguation number '96 Flat (1)' */}
     </g>
   )

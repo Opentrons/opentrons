@@ -1,11 +1,7 @@
 // @flow
+import startCase from 'lodash/startCase'
 
-export const humanize = (s: string): string =>
-  s.toLowerCase().split(/-|_|\./)
-    .filter(s => s) // only truthy
-    .map(substring =>
-      substring[0].toUpperCase() + substring.slice(1)
-    ).join(' ')
+export const humanizeLabwareType = startCase
 
 export const wellNameSplit = (wellName: string): [string, string] => {
   // Eg B9 => ['B', '9']

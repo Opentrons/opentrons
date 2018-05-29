@@ -10,7 +10,7 @@ import {
   LabwareContainer,
   Plate,
   type LabwareComponentProps,
-  humanize
+  humanizeLabwareType
 } from '@opentrons/components'
 
 import type {Labware} from '../../robot'
@@ -56,7 +56,7 @@ export default function LabwareItem (props: LabwareItemProps) {
         <Plate containerType={type} />
 
         {!showSpinner && (
-          <ContainerNameOverlay title={humanize(type)} subtitle={name} />
+          <ContainerNameOverlay title={humanizeLabwareType(type)} subtitle={name} />
         )}
 
         {showSpinner && (
