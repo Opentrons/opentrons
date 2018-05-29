@@ -35,6 +35,9 @@
       }
     ]
   },
+  "deb": {
+    "fpm": ["--name=Opentrons"]
+  },
   "mac": {
     "target": [
       "zip"
