@@ -1,4 +1,5 @@
 .step_creation_button {
+  z-index: 5;
   position: relative;
   padding: 1rem 2rem 1.25rem 2rem;
 }

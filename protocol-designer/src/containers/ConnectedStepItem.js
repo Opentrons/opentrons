@@ -17,15 +17,16 @@ type OP = {
   stepId: $PropertyType<Props, 'stepId'>
 }
 
-type SP = {
+type SP = {|
   step: $PropertyType<Props, 'step'>,
   substeps: $PropertyType<Props, 'substeps'>,
   collapsed: $PropertyType<Props, 'collapsed'>,
   error: $PropertyType<Props, 'error'>,
   selected: $PropertyType<Props, 'selected'>,
+  hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   getLabwareName: $PropertyType<Props, 'getLabwareName'>
-}
+|}
 
 type DP = $Diff<$Diff<Props, SP>, OP>
 
@@ -37,6 +38,20 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
   // Also if you can, use END_STEP const instead of hard-coded '__end__',
   // but flow doesn't like that :(
+  // Same issue with repeating `stepId === '__end__' || stepId === 0` 2x
+
+  const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
+  const hoveredStep = steplistSelectors.hoveredStepId(state)
+  const selected = steplistSelectors.selectedStepId(state) === stepId
+
+  let collapsed
+
+  if (!(stepId === '__end__' || stepId === 0)) {
+    // Leave collapsed undefined for special steps
+    collapsed = (selected)
+      ? false // selected steps never collapsed
+      : steplistSelectors.getCollapsedSteps(state)[stepId]
+  }
 
   return {
     step: (stepId === '__end__')
@@ -47,14 +62,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       ? null
       : substepSelectors.allSubsteps(state)[stepId],
 
-    hoveredSubstep: steplistSelectors.getHoveredSubstep(state),
+    hoveredSubstep,
+    collapsed,
+    selected,
 
-    collapsed: (stepId === '__end__' || stepId === 0)
-      ? undefined
-      : steplistSelectors.getCollapsedSteps(state)[stepId],
+    // no double-highlighting: whole step is only "hovered" when
+    // user is not hovering on substep.
+    hovered: hoveredStep === stepId && !hoveredSubstep,
 
-    selected: steplistSelectors.hoveredOrSelectedStepId(state) === stepId,
-    hovered: steplistSelectors.getHoveredSubstep(state) === stepId,
     error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
     getLabwareName: (labwareId: ?string): ?string =>

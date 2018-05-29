@@ -48,11 +48,11 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
       <ol
         onMouseEnter={this.props.onMouseEnter}
         onMouseLeave={this.props.onMouseLeave}
-        className={cx(styles.substep, {[styles.highlighted]: highlighted})}
+        className={cx({[styles.highlighted]: highlighted})}
       >
         {/* Header row */}
         <SubstepRow
-          className={styles.step_subitem}
+          className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}
           sourceIngredients={uniqBy(
             rowGroup.reduce((acc, row) => (row.sourceIngredients)
               ? [...acc, ...row.sourceIngredients]
