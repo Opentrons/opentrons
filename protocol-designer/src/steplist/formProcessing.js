@@ -1,5 +1,6 @@
 // @flow
-import {humanize} from '../utils'
+import startCase from 'lodash/startCase'
+
 import type {
   StepType,
   StepIdType,
@@ -49,7 +50,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   const baseForm = {
     id: stepId,
     stepType: stepType,
-    'step-name': humanize(stepType) + ' ' + stepId,
+    'step-name': startCase(stepType) + ' ' + stepId,
     'step-details': ''
   }
 

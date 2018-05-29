@@ -58,6 +58,7 @@ NOTE: available defs are:
   opacity: 0.75;
 }
 
-.name_overlay .container_type {
+.name_overlay .display_name {
   font-weight: var(--fw-bold);
+  text-transform: uppercase;
 }
