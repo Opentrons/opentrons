@@ -58,7 +58,7 @@ function mapStateToProps (state: BaseState): StateProps {
   }
 
   if (_page === 'ingredient-detail') {
-    const labware = labwareIngredSelectors.selectedContainer(state)
+    const labware = labwareIngredSelectors.getSelectedContainer(state)
     return {
       _page,
       title: labware && labware.name,

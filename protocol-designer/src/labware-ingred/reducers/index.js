@@ -60,12 +60,13 @@ const copyLabwareMode = handleActions({
   COPY_LABWARE: (state, action: CopyLabware) => false // leave copy mode after performing a copy action
 }, false)
 
-const selectedContainer = handleActions({
-  OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>) => action.payload,
-  CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>) => null,
+type SelectedContainerId = string | null
+const selectedContainerId = handleActions({
+  OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>): SelectedContainerId => action.payload,
+  CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>): SelectedContainerId => null,
 
-  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>) => action.payload.labwareId,
-  CLOSE_WELL_SELECTION_MODAL: () => null
+  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId => action.payload.labwareId,
+  CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null
 }, null)
 
 type SelectedIngredientGroupState = {|
@@ -88,24 +89,37 @@ type ContainersState = {
   [id: string]: Labware
 }
 
-const initialLabwareState = {
+const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
     id: FIXED_TRASH_ID,
+    disambiguationNumber: 1,
     type: 'trash-box', // TODO Ian 2018-03-23 Change to 'fixed-trash' using new defs
     name: 'Trash',
     slot: '12'
   }
 }
 
+function getNextDisambiguationNumber (allContainers: ContainersState, labwareType: string): number {
+  const allIds = Object.keys(allContainers)
+  const sameTypeLabware = allIds.filter(containerId => allContainers[containerId].type === labwareType)
+  const disambigNumbers = sameTypeLabware.map(containerId => allContainers[containerId].disambiguationNumber)
+  return Math.max(...disambigNumbers)
+}
+
 export const containers = handleActions({
-  CREATE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.createContainer>) => ({
-    ...state,
-    [uuid() + ':' + action.payload.containerType]: {
-      slot: action.payload.slot || nextEmptySlot(_loadedContainersBySlot(state)),
-      type: action.payload.containerType,
-      name: null // create with null name, so we force explicit naming.
+  CREATE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.createContainer>) => {
+    const id = uuid() + ':' + action.payload.containerType
+    return {
+      ...state,
+      [id]: {
+        slot: action.payload.slot || nextEmptySlot(_loadedContainersBySlot(state)),
+        type: action.payload.containerType,
+        disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
+        id,
+        name: null // create with null name, so we force explicit naming.
+      }
     }
-  }),
+  },
   DELETE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.deleteContainer>) => pickBy(
     state,
     (value: Labware, key: string) => key !== action.payload.containerId
@@ -234,7 +248,7 @@ export const ingredLocations = handleActions({
 export type RootState = {|
   modeLabwareSelection: string | false, // TODO use null, not false
   copyLabwareMode: string | false,
-  selectedContainer: string | null,
+  selectedContainerId: SelectedContainerId,
   selectedIngredientGroup: SelectedIngredientGroupState,
   containers: ContainersState,
   ingredients: IngredientsState,
@@ -245,7 +259,7 @@ export type RootState = {|
 const rootReducer = combineReducers({
   modeLabwareSelection,
   copyLabwareMode,
-  selectedContainer,
+  selectedContainerId,
   selectedIngredientGroup,
   containers,
   ingredients,
@@ -255,13 +269,11 @@ const rootReducer = combineReducers({
 // SELECTORS
 const rootSelector = (state: BaseState): RootState => state.labwareIngred
 
-// TODO Ian 2018-03-02 when you do selector cleanup, use this one more widely instead of .containers
-const getLabware: Selector<ContainersState> = createSelector(
+const getLabware: Selector<{[labwareId: string]: Labware}> = createSelector(
   rootSelector,
   rootState => rootState.containers
 )
 
-// TODO Ian 2018-03-08 use these instead of direct access in other selectors
 const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
 const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
 
@@ -296,23 +308,15 @@ const labwareOptions: (state: BaseState) => Array<{value: string, name: string}>
 
 const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
 
-// TODO: containerId should be intrinsic to container reducer?
-// Or should this selector just return the ID?
-const getSelectedContainer = createSelector(
+const getSelectedContainerId: Selector<SelectedContainerId> = createSelector(
   rootSelector,
-  state => (state.selectedContainer === null)
-    ? null
-    : {
-      ...state.containers[state.selectedContainer],
-      containerId: state.selectedContainer
-    }
+  rootState => rootState.selectedContainerId
 )
 
-// Currently selected container's slot
-// TODO flow type container so this doesn't need its own selector
-const selectedContainerSlot = createSelector(
-  getSelectedContainer,
-  container => container && container.slot
+const getSelectedContainer: Selector<?Labware> = createSelector(
+  getSelectedContainerId,
+  getLabware,
+  (_selectedId, _labware) => (_selectedId && _labware[_selectedId]) || null
 )
 
 type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
@@ -327,13 +331,6 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
       [containerObj.slot]: {...containerObj, containerId}
     }),
     {})
-)
-
-// Uses selectedSlot to determine container type
-const selectedContainerType = createSelector(
-  selectedContainerSlot,
-  loadedContainersBySlot,
-  (slot, allContainers) => slot && allContainers[slot]
 )
 
 const ingredFields = [...editableIngredFields, 'groupId']
@@ -397,16 +394,25 @@ const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?st
 
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
 // -- so you'd have to refactor the props of the containers that use this selector too
-const activeModals = createSelector(
+type ActiveModals = {
+  labwareSelection: boolean,
+  ingredientSelection: ?{
+    slot: ?string,
+    containerName: ?string
+  }
+}
+
+const activeModals: Selector<ActiveModals> = createSelector(
   rootSelector,
-  selectedContainerSlot,
-  selectedContainerType,
-  (state, slot, containerType) => {
+  getLabware,
+  getSelectedContainerId,
+  (state, _allLabware, _selectedContainerId) => {
+    const selectedContainer = _selectedContainerId && _allLabware[_selectedContainerId]
     return ({
       labwareSelection: state.modeLabwareSelection !== false,
       ingredientSelection: {
-        slot,
-        containerName: containerType
+        slot: selectedContainer && selectedContainer.slot,
+        containerName: selectedContainer && selectedContainer.type
       }
     })
   }
@@ -424,6 +430,7 @@ export const selectors = {
   getIngredientLocations,
   getLabware,
   getSelectedContainer,
+  getSelectedContainerId,
 
   activeModals,
   allIngredientGroupFields,
@@ -432,10 +439,7 @@ export const selectors = {
   containersBySlot,
   labwareToCopy,
   canAdd,
-  selectedContainerType,
   selectedIngredientGroup: getSelectedIngredientGroup,
-  selectedContainerSlot,
-  selectedContainer: getSelectedContainer,
   ingredientsByLabware,
   labwareOptions
 }
