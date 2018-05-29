@@ -1,9 +1,11 @@
 // @flow
+import {humanizeLabwareType} from '@opentrons/components'
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
 import omit from 'lodash/omit'
+import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
@@ -103,7 +105,10 @@ function getNextDisambiguationNumber (allContainers: ContainersState, labwareTyp
   const allIds = Object.keys(allContainers)
   const sameTypeLabware = allIds.filter(containerId => allContainers[containerId].type === labwareType)
   const disambigNumbers = sameTypeLabware.map(containerId => allContainers[containerId].disambiguationNumber)
-  return Math.max(...disambigNumbers)
+
+  return disambigNumbers.length > 0
+    ? Math.max(...disambigNumbers) + 1
+    : 1
 }
 
 export const containers = handleActions({
@@ -134,6 +139,19 @@ export const containers = handleActions({
   }
 },
 initialLabwareState)
+
+type SavedLabwareState = {[labwareId: string]: boolean}
+/** Keeps track of which labware have saved nicknames */
+export const savedLabware = handleActions({
+  DELETE_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.deleteContainer>) => ({
+    ...state,
+    [action.payload.containerId]: false
+  }),
+  MODIFY_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.modifyContainer>) => ({
+    ...state,
+    [action.payload.containerId]: true
+  })
+}, {})
 
 type IngredientsState = {
   [ingredGroupId: string]: IngredInputFields
@@ -251,6 +269,7 @@ export type RootState = {|
   selectedContainerId: SelectedContainerId,
   selectedIngredientGroup: SelectedIngredientGroupState,
   containers: ContainersState,
+  savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
   ingredLocations: LocationsState
 |}
@@ -262,6 +281,7 @@ const rootReducer = combineReducers({
   selectedContainerId,
   selectedIngredientGroup,
   containers,
+  savedLabware,
   ingredients,
   ingredLocations
 })
@@ -272,6 +292,13 @@ const rootSelector = (state: BaseState): RootState => state.labwareIngred
 const getLabware: Selector<{[labwareId: string]: Labware}> = createSelector(
   rootSelector,
   rootState => rootState.containers
+)
+
+const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
+  getLabware,
+  (_labware) => mapValues(
+    _labware,
+    (l: Labware) => l.name || `${humanizeLabwareType(l.type)} (${l.disambiguationNumber})`)
 )
 
 const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
@@ -289,24 +316,28 @@ const loadedContainersBySlot = createSelector(
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
-const labwareOptions: (state: BaseState) => Array<{value: string, name: string}> = createSelector(
+type Options = Array<{value: string, name: string}>
+const labwareOptions: Selector<Options> = createSelector(
   getLabware,
-  containers => reduce(containers, (acc, containerFields: Labware, containerId) => {
+  getLabwareNames,
+  (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
     // TODO Ian 2018-02-16 more robust way to filter out tipracks?
-    if (!containerFields.type || containerFields.type.startsWith('tiprack')) {
+    if (!labware.type || labware.type.startsWith('tiprack')) {
       return acc
     }
     return [
       ...acc,
       {
-        name: containerFields.name || `${containerFields.slot}: ${containerFields.type}`,
-        value: containerId
+        name: names[labwareId],
+        value: labwareId
       }
     ]
   }, [])
 )
 
 const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
+
+const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
 
 const getSelectedContainerId: Selector<SelectedContainerId> = createSelector(
   rootSelector,
@@ -429,6 +460,8 @@ export const selectors = {
   getIngredientGroups,
   getIngredientLocations,
   getLabware,
+  getLabwareNames,
+  getSavedLabware,
   getSelectedContainer,
   getSelectedContainerId,
 

@@ -47,8 +47,9 @@ type StateProps = $Diff<Props, DispatchProps>
 function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const {slot} = ownProps
   const container = selectors.containersBySlot(state)[ownProps.slot]
+  const labwareNames = selectors.getLabwareNames(state)
   const containerInfo = (container)
-    ? {containerType: container.type, containerId: container.id, containerName: container.name}
+    ? {containerType: container.type, containerId: container.id, containerName: labwareNames[container.id]}
     : {}
 
   const selectedContainer = selectors.getSelectedContainer(state)
@@ -58,6 +59,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   return {
     ...containerInfo,
     slot,
+    showNameOverlay: (container && !selectors.getSavedLabware(state)[container.id]),
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
     labwareToCopy: selectors.labwareToCopy(state),

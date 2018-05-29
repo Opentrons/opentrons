@@ -104,6 +104,7 @@ type LabwareOnDeckProps = {
   containerId: string,
   containerType: string,
   containerName: ?string,
+  showNameOverlay: ?boolean,
 
   // canAdd: boolean,
 
@@ -141,6 +142,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     containerId,
     containerType,
     containerName,
+    showNameOverlay,
 
     // canAdd,
 
@@ -165,10 +167,9 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     deckSetupMode
   } = props
 
-  const hasName = containerName !== null
   const slotIsOccupied = !!containerType
 
-  const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
+  const canAddIngreds = !showNameOverlay && !nonFillableContainers.includes(containerType)
 
   return (
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
@@ -197,7 +198,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
         )
       }
 
-      {deckSetupMode && slotIsOccupied && hasName &&
+      {deckSetupMode && slotIsOccupied && !showNameOverlay &&
         <OccupiedDeckSlotOverlay {...{
           canAddIngreds,
           containerId,
@@ -209,7 +210,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           deleteContainer
         }} />}
 
-      {deckSetupMode && !hasName && <NameThisLabwareOverlay {...{
+      {deckSetupMode && showNameOverlay && <NameThisLabwareOverlay {...{
         containerType,
         containerId,
         slot,

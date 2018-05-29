@@ -3,7 +3,7 @@ import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
-import {TitleBar} from '@opentrons/components'
+import {TitleBar, humanizeLabwareType} from '@opentrons/components'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
@@ -59,10 +59,12 @@ function mapStateToProps (state: BaseState): StateProps {
 
   if (_page === 'ingredient-detail') {
     const labware = labwareIngredSelectors.getSelectedContainer(state)
+    const labwareNames = labwareIngredSelectors.getLabwareNames(state)
+    const labwareId = labware && labware.id
     return {
       _page,
-      title: labware && labware.name,
-      subtitle: labware && labware.type,
+      title: labwareId && labwareNames[labwareId],
+      subtitle: labware && humanizeLabwareType(labware.type),
       backButtonLabel: 'Deck'
     }
   }
