@@ -5,16 +5,25 @@ import ToggleButton from '../ToggleButton'
 import {Card} from '@opentrons/components'
 import styles from './styles.css'
 
+type Props = {
+  analyticsOptedIn: boolean,
+  toggleAnalyticsOptedIn: () => mixed,
+}
+
 const TITLE = 'Privacy Settings'
-export default function AnalyticsSettingsCard () {
+
+export default function AnalyticsSettingsCard (props: Props) {
+  const {analyticsOptedIn, toggleAnalyticsOptedIn} = props
+
   return (
     <Card title={TITLE} column>
       <div className={styles.analytics_toggle}>
         <p className={styles.analytics_label}>Share Robot & App analytics with Opentrons</p>
+
         <ToggleButton
           className={styles.analytics_icon}
-          toggledOn={false}
-          disabled
+          toggledOn={analyticsOptedIn}
+          onClick={toggleAnalyticsOptedIn}
         />
       </div>
       <div className={styles.analytics_info}>

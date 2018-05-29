@@ -4,7 +4,7 @@ import noop from 'lodash/noop'
 import {LOCATION_CHANGE} from 'react-router-redux'
 import mixpanel from 'mixpanel-browser'
 
-import type {ThunkAction, Middleware} from '../types'
+import type {State, ThunkAction, Middleware} from '../types'
 import type {Config} from '../config'
 
 import {version} from '../../package.json'
@@ -43,13 +43,16 @@ export function initializeAnalytics (): ThunkAction {
   }
 }
 
-export function optIntoAnalytics (): * {
-  return updateConfig('analytics.optedIn', true)
+export function toggleAnalyticsOptedIn (): ThunkAction {
+  return (dispatch, getState) => {
+    const optedIn = getAnalyticsOptedIn(getState())
+    return dispatch(updateConfig('analytics.optedIn', !optedIn))
+  }
 }
 
 export const analyticsMiddleware: Middleware =
   (store) => (next) => (action) => {
-    const {type} = action
+    const state = store.getState()
     const event = makeEvent(store.getState(), action)
 
     if (event) {
@@ -57,13 +60,31 @@ export const analyticsMiddleware: Middleware =
       track(event.name, event.properties)
     }
 
-    if (type === LOCATION_CHANGE) {
-      // update intercom on page change
+    // update intercom on page change
+    if (action.type === LOCATION_CHANGE) {
       intercom('update')
+    }
+
+    // enable mixpanel tracking if optedIn goes to true
+    if (
+      action.type === 'config:SET' &&
+      action.payload.path === 'analytics.optedIn'
+    ) {
+      const config = state.config.analytics
+
+      if (action.payload.value === true) {
+        enableMixpanelTracking(config)
+      } else {
+        disableMixpanelTracking(config)
+      }
     }
 
     return next(action)
   }
+
+export function getAnalyticsOptedIn (state: State) {
+  return state.config.analytics.optedIn
+}
 
 function initializeIntercom (config: AnalyticsConfig) {
   if (INTERCOM_ID) {
@@ -83,14 +104,27 @@ function initializeMixpanel (config: AnalyticsConfig) {
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
 
     if (config.optedIn) {
-      log.debug('User has opted into analytics; tracking with Mixpanel')
-
-      mixpanel.identify(config.appId)
-      mixpanel.opt_in_tracking()
-      mixpanel.register({appVersion: version, appId: config.appId})
-
-      track = mixpanel.track.bind(mixpanel)
+      enableMixpanelTracking(config)
       track('appOpen')
     }
   }
+}
+
+function enableMixpanelTracking (config: AnalyticsConfig) {
+  log.debug('User has opted into analytics; tracking with Mixpanel')
+
+  mixpanel.identify(config.appId)
+  mixpanel.opt_in_tracking()
+  mixpanel.register({appVersion: version, appId: config.appId})
+
+  track = mixpanel.track.bind(mixpanel)
+}
+
+function disableMixpanelTracking (config: AnalyticsConfig) {
+  log.debug('User has opted out of analytics; stopping tracking')
+
+  mixpanel.opt_out_tracking()
+  mixpanel.reset()
+
+  track = noop
 }
