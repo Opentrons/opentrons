@@ -1,5 +1,5 @@
 {
-  "version": "3.0.1-beta.0",
+  "version": "3.0.1-beta.1",
   "private": true,
   "workspaces": [
     "app",
@@ -7,7 +7,8 @@
     "components",
     "shared-data",
     "protocol-designer",
-    "webpack-config"
+    "webpack-config",
+    "api/opentrons"
   ],
   "config": {
     "commitizen": {

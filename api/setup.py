@@ -3,14 +3,15 @@
 import codecs
 import os
 from setuptools import setup, find_packages
-
+import json
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_version():
-    with open(os.path.join(HERE, 'version')) as version:
-        return version.readline().strip()
+    with open(os.path.join(HERE, 'opentrons', 'package.json')) as pkg:
+        package_json = json.load(pkg)
+        return package_json.get('version')
 
 
 VERSION = get_version()
@@ -52,19 +53,7 @@ def read(*parts):
         return f.read()
 
 
-def write_version_file(filename='opentrons/_version.py'):
-    contents = """
-# This file is generated during setup--do not edit manually
-
-__version__ = '{version}'
-"""
-    with open(filename, 'w') as version_file:
-        version_file.write(contents.format(version=VERSION))
-
-
 if __name__ == "__main__":
-    write_version_file()
-
     setup(
         python_requires='>=3.6',
         name=DISTNAME,
