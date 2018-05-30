@@ -9,8 +9,11 @@ import AppUpdateModal from './AppUpdateModal'
 
 import styles from './styles.css'
 
-type Props = ShellUpdate & {
-  checkForUpdates: () => mixed
+type Props = {
+  update: ShellUpdate,
+  analyticsOptedIn: boolean,
+  checkForUpdates: () => mixed,
+  toggleAnalyticsOptedIn: () => mixed,
 }
 
 export default function AppSettings (props: Props) {

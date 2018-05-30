@@ -5,7 +5,8 @@ import * as React from 'react'
 import type {ShellUpdate} from '../../shell'
 import {Icon, AlertModal, type ButtonProps} from '@opentrons/components'
 
-type Props = ShellUpdate & {
+type Props = {
+  update: ShellUpdate,
   downloadUpdate: () => mixed,
   quitAndInstall: () => mixed,
   close: () => mixed
@@ -15,7 +16,7 @@ type Props = ShellUpdate & {
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
 export default function AppUpdateModal (props: Props) {
-  const {close, downloadInProgress} = props
+  const {close, update: {downloadInProgress}} = props
   const {button, message} = mapPropsToButtonPropsAndMessage(props)
   const closeButtonChildren = props.error || downloadInProgress
     ? 'close'
@@ -23,7 +24,7 @@ export default function AppUpdateModal (props: Props) {
 
   return (
     <AlertModal
-      heading={`App Version ${props.available || ''} Available`}
+      heading={`App Version ${props.update.available || ''} Available`}
       onCloseClick={close}
       buttons={[
         {onClick: close, children: closeButtonChildren},
@@ -36,7 +37,7 @@ export default function AppUpdateModal (props: Props) {
 }
 
 function mapPropsToButtonPropsAndMessage (props: Props) {
-  const {error, downloaded, checkInProgress, downloadInProgress} = props
+  const {error, downloaded, checkInProgress, downloadInProgress} = props.update
 
   if (error) {
     return {

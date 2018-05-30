@@ -51,7 +51,7 @@ type UpdateConfigAction = {|
 |}
 
 type SetConfigAction = {|
-  type: 'config:UPDATE',
+  type: 'config:SET',
   payload: {|
     path: string,
     value: any
