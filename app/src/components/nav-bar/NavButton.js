@@ -36,7 +36,6 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
   const nextLabware = robotSelectors.getNextLabware(state)
   const isTipsProbed = robotSelectors.getInstrumentsCalibrated(state)
   const isRunning = robotSelectors.getIsRunning(state)
-  const isDone = robotSelectors.getIsDone(state)
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
@@ -85,7 +84,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
       url: calibrateUrl
     },
     run: {
-      disabled: !isTipsProbed && !(isRunning || isDone),
+      disabled: !isSessionLoaded,
       iconName: 'ot-run',
       title: 'run',
       url: '/run'

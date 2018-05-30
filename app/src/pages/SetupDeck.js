@@ -34,6 +34,6 @@ function SetupDeckPage (props: Props) {
 
 function mapStateToProps (state): StateProps {
   return {
-    deckPopulated: robotSelectors.getDeckPopulated(state)
+    deckPopulated: !!robotSelectors.getDeckPopulated(state)
   }
 }

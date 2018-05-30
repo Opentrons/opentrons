@@ -62,8 +62,10 @@ function UnprobedPanel (props: Props) {
 }
 
 function mapStateToProps (state, ownProps: OwnProps): StateProps {
+  const deckPopulated = robotSelectors.getDeckPopulated(state)
+
   return {
-    _showContinueModal: robotSelectors.getDeckPopulated(state)
+    _showContinueModal: deckPopulated || deckPopulated == null
   }
 }
 
