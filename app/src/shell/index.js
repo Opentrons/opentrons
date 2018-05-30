@@ -28,6 +28,7 @@ type ShellState = {
     available: ?string,
     downloaded: boolean,
     error: ?Error,
+    seen: boolean
   },
 }
 
@@ -37,7 +38,8 @@ const INITIAL_STATE: ShellState = {
     downloadInProgress: false,
     available: null,
     downloaded: false,
-    error: null
+    error: null,
+    seen: false
   }
 }
 
@@ -57,6 +59,10 @@ type StartDownloadAction = {|
   type: 'shell:START_DOWNLOAD'
 |}
 
+type SeenUpdateAction = {|
+  type: 'shell:SET_UPDATE_SEEN'
+|}
+
 type FinishDownloadAction = {|
   type: 'shell:FINISH_DOWNLOAD',
   payload: {|
@@ -69,6 +75,7 @@ export type ShellAction =
   | FinishUpdateCheckAction
   | StartDownloadAction
   | FinishDownloadAction
+  | SeenUpdateAction
 
 export function checkForShellUpdates (): ThunkPromiseAction {
   return (dispatch) => {
@@ -85,6 +92,10 @@ export function checkForShellUpdates (): ThunkPromiseAction {
         payload
       }))
   }
+}
+
+export function setUpdateSeen (): ShellAction {
+  return {type: 'shell:SET_UPDATE_SEEN'}
 }
 
 export function downloadShellUpdate (): ThunkPromiseAction {
@@ -119,7 +130,10 @@ export function shellReducer (
         update: {...state.update, ...action.payload, checkInProgress: false}}
 
     case 'shell:START_DOWNLOAD':
-      return {...state, update: {...state.update, downloadInProgress: true}}
+      return {...state, update: {...state.update, downloadInProgress: true, seen: true}}
+
+    case 'shell:SET_UPDATE_SEEN':
+      return {...state, update: {...state.update, seen: true}}
 
     case 'shell:FINISH_DOWNLOAD':
       return {

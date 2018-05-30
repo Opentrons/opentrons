@@ -30,6 +30,7 @@ export default function AppUpdateModal (props: Props) {
         {onClick: close, children: closeButtonChildren},
         button
       ]}
+      alertOverlay
     >
       {message}
     </AlertModal>
