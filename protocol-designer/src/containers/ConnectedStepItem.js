@@ -33,7 +33,6 @@ type DP = $Diff<$Diff<Props, SP>, OP>
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
   const allSteps = steplistSelectors.allSteps(state)
-  const allLabware = labwareIngredSelectors.getLabware(state)
 
   // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
   // Also if you can, use END_STEP const instead of hard-coded '__end__',
@@ -72,8 +71,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
-    getLabwareName: (labwareId: ?string): ?string =>
-      labwareId && allLabware[labwareId] && allLabware[labwareId].name // TODO make mini selector
+    getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId]
   }
 }
 

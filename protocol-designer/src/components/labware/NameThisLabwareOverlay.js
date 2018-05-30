@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import {humanizeLabwareType} from '@opentrons/components'
 import ForeignDiv from '../../components/ForeignDiv.js'
 import ClickableText from './ClickableText'
 import styles from './labware.css'
@@ -45,7 +44,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
 
   onSubmit = () => {
     const { containerId, modifyContainer } = this.props
-    const containerName = this.state.inputValue || humanizeLabwareType(this.props.containerType)
+    const containerName = this.state.inputValue || null
 
     modifyContainer({
       containerId,

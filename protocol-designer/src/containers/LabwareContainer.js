@@ -47,24 +47,28 @@ type StateProps = $Diff<Props, DispatchProps>
 function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const {slot} = ownProps
   const container = selectors.containersBySlot(state)[ownProps.slot]
+  const labwareNames = selectors.getLabwareNames(state)
   const containerInfo = (container)
-    ? { containerType: container.type, containerId: container.containerId, containerName: container.name }
+    ? {containerType: container.type, containerId: container.id, containerName: labwareNames[container.id]}
     : {}
+
+  const selectedContainer = selectors.getSelectedContainer(state)
+  const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
   return {
     ...containerInfo,
     slot,
+    showNameOverlay: (container && !selectors.getSavedLabware(state)[container.id]),
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
     labwareToCopy: selectors.labwareToCopy(state),
     highlighted: (deckSetupMode)
       // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
       // or when targeted by an open "Add Labware" modal
-      ? (selectors.selectedContainerSlot(state) === slot ||
-      selectors.canAdd(state) === slot)
+      ? (isSelectedSlot || selectors.canAdd(state) === slot)
       // outside of deckSetupMode, labware is highlighted when step/substep is hovered
-      : steplistSelectors.hoveredStepLabware(state).includes(container && container.containerId),
+      : steplistSelectors.hoveredStepLabware(state).includes(container && container.id),
     deckSetupMode
   }
 }

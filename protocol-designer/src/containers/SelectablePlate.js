@@ -50,8 +50,7 @@ type MP = {
 type SP = $Diff<Props, MP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const selectedContainer = selectors.selectedContainer(state)
-  const selectedContainerId = selectedContainer && selectedContainer.containerId
+  const selectedContainerId = selectors.getSelectedContainerId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {

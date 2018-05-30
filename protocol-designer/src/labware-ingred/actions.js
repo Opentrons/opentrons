@@ -125,8 +125,8 @@ export type DeleteIngredient = {|
 |}
 
 export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
-  const container = selectors.selectedContainer(getState())
-  if (!container || !container.containerId) {
+  const container = selectors.getSelectedContainer(getState())
+  if (!container || !container.id) {
     console.warn('Tried to delete ingredient with no selected container')
     return null
   }
@@ -135,7 +135,7 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
     type: 'DELETE_INGREDIENT',
     payload: {
       ...payload,
-      containerId: container.containerId
+      containerId: container.id
     }
   })
 }
@@ -159,7 +159,7 @@ export const editIngredient = (payload: {|
   copyGroupId: string | null
 |}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
-  const container = selectors.selectedContainer(state)
+  const container = selectors.getSelectedContainer(state)
   const allIngredients = selectors.getIngredientGroups(state)
 
   const {groupId, copyGroupId, ...inputFields} = payload
@@ -175,7 +175,7 @@ export const editIngredient = (payload: {|
       payload: {
         ...inputFields,
         groupId: groupId,
-        containerId: container.containerId,
+        containerId: container.id,
         wells: wellSelectionSelectors.selectedWellNames(state),
         isUnchangedClone: true
       }
@@ -205,7 +205,7 @@ export const editIngredient = (payload: {|
       ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
       name,
-      containerId: container && container.containerId,
+      containerId: container.id,
       groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
       wells: wellSelectionSelectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
       isUnchangedClone
