@@ -7,13 +7,15 @@ export type ClickOutsideInterface = {
   passRef: WrapperRefType => mixed
 }
 
+type HocProps = {
+  onClickOutside: ?(MouseEvent => mixed)
+}
+
 export default function clickOutside<
   WrappedProps: ClickOutsideInterface,
-  Props: $Diff<WrappedProps, ClickOutsideInterface>
-> (
-  WrappedComponent: React.ComponentType<WrappedProps>,
-  onClickOutside: ?(MouseEvent => mixed)
-): React.ComponentType<Props> {
+  InnerProps: $Diff<WrappedProps, ClickOutsideInterface>,
+  Props: InnerProps & HocProps
+> (WrappedComponent: React.ComponentType<WrappedProps>): React.ComponentType<Props> {
   return class ClickOutsideWrapper extends React.Component<Props> {
     wrapperRef: WrapperRefType
 
@@ -37,11 +39,11 @@ export default function clickOutside<
       }
 
       if (
-        onClickOutside &&
+        this.props.onClickOutside &&
         this.wrapperRef &&
         !this.wrapperRef.contains(clickedElem)
       ) {
-        onClickOutside(event)
+        this.props.onClickOutside(event)
       }
     }
 
@@ -54,7 +56,8 @@ export default function clickOutside<
     }
 
     render () {
-      return <WrappedComponent {...this.props} passRef={this.setWrapperRef} />
+      const {onClickOutside, ...passedProps} = this.props
+      return <WrappedComponent {...passedProps} passRef={this.setWrapperRef} />
     }
   }
 }

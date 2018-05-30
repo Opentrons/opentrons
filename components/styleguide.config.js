@@ -48,12 +48,12 @@ module.exports = {
       components: 'src/forms/[A-Z]*.js'
     },
     {
-      name: 'HOCs & Wrappers',
-      components: 'src/hocs/[A-Z]*.js'
-    },
-    {
       name: 'Icons',
       components: 'src/icons/[A-Z]*.js'
+    },
+    {
+      name: 'Interaction Enhancers',
+      components: 'src/interaction-enhancers/[A-Z]*.js'
     },
     {
       name: 'Lists',
