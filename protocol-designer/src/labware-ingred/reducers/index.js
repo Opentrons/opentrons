@@ -91,7 +91,7 @@ type ContainersState = {
 const initialLabwareState = {
   [FIXED_TRASH_ID]: {
     id: FIXED_TRASH_ID,
-    type: 'trash-box', // TODO Ian 2018-03-23 Change to 'fixed-trash' using new defs
+    type: 'fixed-trash',
     name: 'Trash',
     slot: '12'
   }
