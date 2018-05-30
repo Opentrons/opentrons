@@ -899,38 +899,25 @@ class Robot(object):
         :return: :dict with keys 'left' and 'right' and a model string for each
             mount, or 'uncommissioned' if no model string available
         """
-        # get the cached pipette model numbers
         left_data = {
                 'mount_axis': 'z',
                 'plunger_axis': 'b',
                 'model': self.model_by_mount['left'],
             }
+        left_model = left_data.get('model')
+        if left_model:
+            tip_length = pipette_config.configs[left_model].tip_length
+            left_data.update({'tip_length': tip_length})
+
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c',
                 'model': self.model_by_mount['right']
             }
-
-        # to allow any model of pipette to be simulated on a robot, pipette
-        # models below are overwritten while simulating, so regardless of what
-        # is currently attached/cached, any pipette model can be simulated
-        if self.is_simulating():
-            default_version = list(pipette_config.configs.values())[0].name
-            if not left_data['model']:
-                left_data['model'] = default_version
-            if not right_data['model']:
-                right_data['model'] = default_version
-
-        # add tip-length
-        left_model = left_data.get('model')
-        if left_model:
-            tip_length = pipette_config.configs[left_model].tip_length
-            left_data.update({'tip_length': tip_length})
         right_model = right_data.get('model')
         if right_model:
             tip_length = pipette_config.configs[right_model].tip_length
             right_data.update({'tip_length': tip_length})
-
         return {
             'left': left_data,
             'right': right_data
