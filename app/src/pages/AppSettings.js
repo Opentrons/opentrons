@@ -14,7 +14,6 @@ import {
   quitAndInstallShellUpdate,
   setUpdateSeen
 } from '../shell'
-import {toggleAnalyticsOptedIn, getAnalyticsOptedIn} from '../analytics'
 
 import Page from '../components/Page'
 import AppSettings, {AppUpdateModal} from '../components/AppSettings'
@@ -23,7 +22,6 @@ type OP = ContextRouter
 
 type SP = {
   update: ShellUpdate,
-  analyticsOptedIn: boolean,
 }
 
 type DP = {
@@ -31,7 +29,6 @@ type DP = {
   downloadUpdate: () => mixed,
   quitAndInstall: () => mixed,
   closeUpdateModal: () => mixed,
-  toggleAnalyticsOptedIn: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -62,8 +59,7 @@ function AppSettingsPage (props: Props) {
 
 function mapStateToProps (state: State): SP {
   return {
-    update: getShellUpdate(state),
-    analyticsOptedIn: getAnalyticsOptedIn(state)
+    update: getShellUpdate(state)
   }
 }
 
@@ -75,7 +71,6 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
     closeUpdateModal: () => {
       dispatch(setUpdateSeen())
       dispatch(push('/menu/app'))
-    },
-    toggleAnalyticsOptedIn: () => dispatch(toggleAnalyticsOptedIn())
+    }
   }
 }
