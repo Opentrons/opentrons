@@ -3,11 +3,9 @@ from opentrons import containers, instruments
 tiprack = containers.load('tiprack-200ul', '8')
 plate = containers.load('96-PCR-flat', '5')
 
-pipette = instruments.Pipette(
-    name="p200",
+pipette = instruments.P300_Single(
     tip_racks=[tiprack],
-    mount="right",
-    channels=1
+    mount="right"
 )
 
 pipette.pick_up_tip()

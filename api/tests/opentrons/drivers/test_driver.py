@@ -688,6 +688,7 @@ def test_speed_change(model, monkeypatch):
                         write_with_log)
 
     pipette.tip_attached = True
+    pipette.max_volume = 100
     pipette.set_speed(aspirate=20, dispense=40)
     pipette.aspirate()
     pipette.dispense()

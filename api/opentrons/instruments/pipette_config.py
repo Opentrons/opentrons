@@ -26,6 +26,7 @@ pipette_config = namedtuple(
         'model_offset',
         'plunger_current',
         'drop_tip_current',
+        'max_volume',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
@@ -78,6 +79,7 @@ def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
             model_offset=_load_config_value(cfg, 'modelOffset'),
             plunger_current=_load_config_value(cfg, 'plungerCurrent'),
             drop_tip_current=_load_config_value(cfg, 'dropTipCurrent'),
+            max_volume=_load_config_value(cfg, 'max_volume'),
             tip_length=_load_config_value(cfg, 'tipLength')
         )
     except (KeyError, json.decoder.JSONDecodeError) as e:
@@ -142,6 +144,7 @@ p10_single = pipette_config(
     model_offset=[0.0, 0.0, Z_OFFSET_P10],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=10,
     tip_length=33
 )
 
@@ -160,6 +163,7 @@ p10_multi = pipette_config(
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=10,
     tip_length=33
 )
 
@@ -178,6 +182,7 @@ p50_single = pipette_config(
     model_offset=[0.0, 0.0, Z_OFFSET_P50],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=50,
     tip_length=51.7
 )
 
@@ -196,6 +201,7 @@ p50_multi = pipette_config(
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=50,
     tip_length=51.7
 )
 
@@ -214,6 +220,7 @@ p300_single = pipette_config(
     model_offset=[0.0, 0.0, Z_OFFSET_P300],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=300,
     tip_length=51.7
 )
 
@@ -232,6 +239,7 @@ p300_multi = pipette_config(
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=300,
     tip_length=51.7
 )
 
@@ -250,6 +258,7 @@ p1000_single = pipette_config(
     model_offset=[0.0, 0.0, Z_OFFSET_P1000],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=1000,
     tip_length=76.7
 )
 

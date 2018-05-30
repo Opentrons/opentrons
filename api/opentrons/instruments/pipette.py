@@ -1,3 +1,5 @@
+# pylama:ignore=E731
+
 import itertools
 import warnings
 import logging
@@ -104,10 +106,10 @@ class Pipette:
             axis=None,
             mount_obj=None,
             name=None,
+            ul_per_mm=None,
             channels=1,
             min_volume=0,
-            max_volume=None,
-            ul_per_mm=1000.0,  # if none is specified, make it incredibily big
+            max_volume=None,  # Set 300ul as default
             trash_container='',
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
@@ -135,6 +137,7 @@ class Pipette:
 
         self.mount = mount
         self.channels = channels
+        self.ul_per_mm = ul_per_mm
 
         self.model_offset = model_offset
 
@@ -166,15 +169,8 @@ class Pipette:
 
         self.plunger_positions = plunger_positions
 
-        if max_volume:
-            warnings.warn(
-                "'max_volume' is deprecated, use `ul_per_mm` in constructor"
-            )
-
-        self.max_volume = None
+        self.max_volume = max_volume
         self.min_volume = min_volume
-        self.ul_per_mm = None
-        self.set_ul_per_mm(ul_per_mm)
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
@@ -186,9 +182,7 @@ class Pipette:
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
-        print("Hallo, in pipette constructor")
-        print(aspirate_flow_rate)
-        print(dispense_flow_rate)
+
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
@@ -397,10 +391,7 @@ class Pipette:
 
         mm_position = self._aspirate_plunger_position(
             self.current_volume + volume)
-        print(mm_position)
         speed = self.speeds['aspirate'] * rate
-        print(self.speeds['aspirate'])
-        print(rate)
         self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
         self.instrument_actuator.set_active_current(self._plunger_current)
@@ -1355,12 +1346,6 @@ class Pipette:
 
         return self
 
-    def set_ul_per_mm(self, ul_per_mm):
-        self.ul_per_mm = ul_per_mm
-        t = self._get_plunger_position('top')
-        b = self._get_plunger_position('bottom')
-        self.max_volume = (t - b) * self.ul_per_mm
-
     def _get_plunger_position(self, position):
         """
         Returns the calibrated coordinate of a given plunger position
@@ -1380,15 +1365,6 @@ class Pipette:
                 'Plunger position "{}" does not exist'.format(
                     position))
 
-    def _ul_to_mm(self, ul):
-        """Calculate distance in millimeters to move for a given liquid volume.
-
-        Calibration of the pipette motor's ul-to-mm conversion is required
-        """
-
-        millimeters = ul / self.ul_per_mm
-        return millimeters
-
     def _aspirate_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
 
@@ -1397,23 +1373,16 @@ class Pipette:
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
-        aspirate_function_map = {
-            'p10 single': lambda: self._p10_single_piecewise(ul, 'aspirate'),
-            'p10 multi': lambda: self._p10_multi_piecewise(ul, 'aspirate'),
-            'p50 single': lambda: self._p50_single_piecewise(ul, 'aspirate'),
-            'p50 multi': lambda: self._p50_multi_piecewise(ul, 'aspirate'),
-            'p300 single': lambda: self._p300_single_piecewise(ul, 'aspirate'),
-            'p300 multi': lambda: self._p300_multi_piecewise(ul, 'aspirate'),
-            'p1000 single': 65}
 
-        full_model_name = self.name.split('_')
-        # Only grab the model name, not hardware version
-        model = ' '.join(full_model_name[0:2])
+        model = self.name
         # Set the ul_per_mm for the pipette
-        ul_per_mm = aspirate_function_map.get(model)
+        if self.ul_per_mm:
+            ul_per_mm = lambda: self.ul_per_mm
+        else:
+            ul_per_mm = self._key_map_pipette_functions(model, ul, 'aspirate')
+        millimeters = 0.0
         if ul_per_mm is not None:
-            self.set_ul_per_mm(ul_per_mm())
-        millimeters = self._ul_to_mm(ul)
+            millimeters = ul / ul_per_mm()
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
@@ -1425,28 +1394,32 @@ class Pipette:
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
-        dispense_function_map = {
-            'p10 single': lambda: self._p10_single_piecewise(ul, 'dispense'),
-            'p10 multi': lambda: self._p10_multi_piecewise(ul, 'dispense'),
-            'p50 single': lambda: self._p50_single_piecewise(ul, 'dispense'),
-            'p50 multi': lambda: self._p50_multi_piecewise(ul, 'dispense'),
-            'p300 single': lambda: self._p300_single_piecewise(ul, 'dispense'),
-            'p300 multi': lambda: self._p300_multi_piecewise(ul, 'dispense'),
-            'p1000 single': 65}
 
-        full_model_name = self.name.split('_')
-        # Only grab the model name, not hardware version
-        model = ' '.join(full_model_name[0:2])
+        model = self.name
         # Set the ul_per_mm for the pipette
-        ul_per_mm = dispense_function_map.get(model)
+        if self.ul_per_mm:
+            ul_per_mm = lambda: self.ul_per_mm
+        else:
+            ul_per_mm = self._key_map_pipette_functions(model, ul, 'dispense')
         # Change default of 1000 ul/mm if function returns a value
+        millimeters = 0.0
         if ul_per_mm is not None:
             # If ul_per_mm not None, it is a function so must make it callable
-            self.set_ul_per_mm(ul_per_mm())
-
-        millimeters = self._ul_to_mm(ul)
+            millimeters = ul / ul_per_mm()
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
+
+    def _key_map_pipette_functions(self, model, ul, func):
+        function_map = {
+            'p10_single_v1': lambda: self._p10_single_piecewise(ul, func),
+            'p10_multi_v1': lambda: self._p10_multi_piecewise(ul, func),
+            'p50_single_v1': lambda: self._p50_single_piecewise(ul, func),
+            'p50_multi_v1': lambda: self._p50_multi_piecewise(ul, func),
+            'p300_single_v1': lambda: self._p300_single_piecewise(ul, func),
+            'p300_multi_v1': lambda: self._p300_multi_piecewise(ul, func),
+            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func)}
+
+        return function_map.get(model)
 
     def _p10_single_piecewise(self, ul, func):
         # Piecewise function that calculates ul_per_mm for a p10 single
@@ -1534,6 +1507,13 @@ class Pipette:
         else:
             # Constant function for dispense
             return 0*ul + 19.29389273
+
+    def _p1000_piecewise(self, ul, func):
+        if ul > 0:
+            if func == 'aspirate':
+                return 65
+            else:
+                return 65
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1725,9 +1705,6 @@ class Pipette:
             The speed in millimeters-per-second, at which the plunger will
             move while performing an dispense
         """
-        print("Hallo, setting speed now")
-        print(aspirate)
-        print(dispense)
         if aspirate:
             self.speeds['aspirate'] = aspirate
         if dispense:
@@ -1737,8 +1714,8 @@ class Pipette:
     def set_flow_rate(self, aspirate=None, dispense=None):
         """
         Set the speed (uL/second) the :any:`Pipette` plunger will move
-        during :meth:`aspirate` and :meth:`dispense`
-
+        during :meth:`aspirate` and :meth:`dispense`. The speed is set using
+        nominal max volumes for any given pipette model.
         Parameters
         ----------
         aspirate: int
@@ -1749,12 +1726,30 @@ class Pipette:
             The speed in microliters-per-second, at which the plunger will
             move while performing an dispense
         """
+        ul = self.max_volume
+        # Get model name
+        model = self.name
         if aspirate:
-            self.set_speed(
-                aspirate=round(self._ul_to_mm(aspirate), 6))
+            # Set the ul_per_mm for the pipette
+            if self.ul_per_mm:
+                ul_per_mm = lambda: self.ul_per_mm
+            else:
+                ul_per_mm = self._key_map_pipette_functions(
+                    model, ul, 'aspirate')
+
+            if ul_per_mm is not None:
+                self.set_speed(
+                    aspirate=round(aspirate / ul_per_mm(), 6))
         if dispense:
-            self.set_speed(
-                dispense=round(self._ul_to_mm(dispense), 6))
+            # Set the ul_per_mm for the pipette
+            if self.ul_per_mm:
+                ul_per_mm = lambda: self.ul_per_mm
+            else:
+                ul_per_mm = self._key_map_pipette_functions(
+                    model, ul, 'dispense')
+            if ul_per_mm is not None:
+                self.set_speed(
+                    dispense=round(dispense / ul_per_mm(), 6))
         return self
 
     def set_pick_up_current(self, amperes):
