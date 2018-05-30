@@ -8,8 +8,8 @@ import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
 import type {IngredGroupForLabware, IngredsForLabware} from '../labware-ingred/types'
 
-type DeleteIngredient = (args: {wellName: string, groupId: string}) => void // TODO get from action type?
-type EditModeIngredientGroup = (args: {groupId: string}) => void
+type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
+type EditModeIngredientGroup = (args: {|groupId: string, wellName: ?string|}) => mixed
 
 // Props used by both IngredientsList and IngredGroupCard // TODO
 type CommonProps = {|
@@ -49,7 +49,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}
         selected={selected}
-        onClick={() => editModeIngredientGroup({groupId})}
+        onClick={() => editModeIngredientGroup({groupId, wellName: null})}
         description={<StepDescription description={description} header='Description:' />}
       >
         <div className={styles.ingredient_row_header}>
@@ -117,10 +117,12 @@ function IngredIndividual (props: IndividProps) {
   )
 }
 
-export type Props = {
+type Props = {
+  ...CommonProps,
   ingredients: IngredsForLabware,
   selectedIngredientGroupId: string | null,
-  ...CommonProps
+  renameLabwareFormMode: boolean,
+  openRenameLabwareForm: () => mixed
 }
 
 export default function IngredientsList (props: Props) {
@@ -128,16 +130,20 @@ export default function IngredientsList (props: Props) {
     ingredients,
     editModeIngredientGroup,
     deleteIngredient,
-    selectedIngredientGroupId
+    selectedIngredientGroupId,
+    renameLabwareFormMode,
+    openRenameLabwareForm
   } = props
 
   return (
     <SidePanel title='Ingredients'>
+        {/* Labware Name "button" to open LabwareNameEditForm */}
         <TitledList
           className={stepItemStyles.step_item}
           title='labware name'
           iconName='flask-outline'
-          selected
+          selected={renameLabwareFormMode}
+          onClick={openRenameLabwareForm}
         />
 
         {ingredients && Object.keys(ingredients).map((i) =>

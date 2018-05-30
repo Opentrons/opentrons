@@ -4,37 +4,54 @@ import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import type {BaseState} from '../types'
 
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {closeRenameLabwareForm, modifyContainer} from '../labware-ingred/actions'
+
 import {FormGroup, InputField, PrimaryButton} from '@opentrons/components'
 import formStyles from '../components/Form.css'
 
 type Props = {
-  labwareName: string,
+  renameLabwareFormMode: boolean,
+  labwareName: ?string,
+
   onCancel: (event: SyntheticMouseEvent<*>) => mixed,
-  onSaveName: (name: string) => (event: SyntheticMouseEvent<*>) => mixed
+  onSaveName: (name: ?string) => (event: SyntheticMouseEvent<*>) => mixed
 }
 
 type SP = {
+  renameLabwareFormMode: $ElementType<Props, 'renameLabwareFormMode'>,
   labwareName: $ElementType<Props, 'labwareName'>
 }
 
-type DP = $Diff<Props, SP>
+type MP = {
+  _selectedLabwareId: ?string
+}
 
 type State = {
-  name: string
+  name: ?string
 }
 
 class LabwareNameEditForm extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = {name: props.labwareName}
+    this.state = {name: null}
   }
 
   handleChangeName = (e: SyntheticInputEvent<*>) => {
-    this.setState({name: e.currentTarget.value})
+    this.setState({name: e.target.value})
+  }
+
+  componentWillReceiveProps (nextProps: Props) {
+    this.setState({name: nextProps.labwareName})
   }
 
   render () {
-    const {onCancel, onSaveName} = this.props
+    const {onCancel, onSaveName, renameLabwareFormMode} = this.props
+
+    if (!renameLabwareFormMode) {
+      // Not in "rename labware form mode", don't show form
+      return null
+    }
 
     return (
       <div className={formStyles.form}>
@@ -53,17 +70,39 @@ class LabwareNameEditForm extends React.Component<Props, State> {
   }
 }
 
-function mapStateToProps (state: BaseState): SP {
+function mapStateToProps (state: BaseState): SP & MP {
+  const _selectedLabwareId = labwareIngredSelectors.getSelectedContainerId(state)
   return {
-    labwareName: 'todo name here'
+    labwareName: _selectedLabwareId && labwareIngredSelectors.getLabwareNames(state)[_selectedLabwareId],
+    renameLabwareFormMode: labwareIngredSelectors.getRenameLabwareFormMode(state),
+
+    _selectedLabwareId
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {_selectedLabwareId, ...props} = stateProps
+  const {dispatch} = dispatchProps
+
   return {
-    onCancel: () => console.log('cancel'),
-    onSaveName: (name) => () => console.log(name)
+    ...props,
+
+    onCancel: () => dispatch(closeRenameLabwareForm()),
+
+    onSaveName: (name) => () => {
+      if (_selectedLabwareId) {
+        dispatch(modifyContainer({
+          containerId: _selectedLabwareId,
+          modify: {name}
+        }))
+
+        dispatch(closeRenameLabwareForm())
+      } else {
+        // TODO Ian 2018-05-30 use assert
+        console.warn('Tried to save labware name with no selected labware')
+      }
+    }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LabwareNameEditForm)
+export default connect(mapStateToProps, null, mergeProps)(LabwareNameEditForm)

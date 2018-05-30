@@ -84,8 +84,18 @@ const selectedIngredientGroup = handleActions({
   OPEN_INGREDIENT_SELECTOR: () => null,
   EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
   DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
-  CLOSE_INGREDIENT_SELECTOR: () => null
+  CLOSE_INGREDIENT_SELECTOR: () => null,
+  OPEN_RENAME_LABWARE_FORM: () => null
 }, null)
+
+type RenameLabwareFormModeState = boolean
+const renameLabwareFormMode = handleActions({
+  OPEN_RENAME_LABWARE_FORM: () => true,
+
+  CLOSE_RENAME_LABWARE_FORM: () => false,
+  CLOSE_INGREDIENT_SELECTOR: () => false,
+  EDIT_MODE_INGREDIENT_GROUP: () => false
+}, false)
 
 type ContainersState = {
   [id: string]: Labware
@@ -271,7 +281,8 @@ export type RootState = {|
   containers: ContainersState,
   savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
-  ingredLocations: LocationsState
+  ingredLocations: LocationsState,
+  renameLabwareFormMode: RenameLabwareFormModeState
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
@@ -283,7 +294,8 @@ const rootReducer = combineReducers({
   containers,
   savedLabware,
   ingredients,
-  ingredLocations
+  ingredLocations,
+  renameLabwareFormMode
 })
 
 // SELECTORS
@@ -449,6 +461,8 @@ const activeModals: Selector<ActiveModals> = createSelector(
   }
 )
 
+const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renameLabwareFormMode
+
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
 const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).selectedIngredientGroup
@@ -466,11 +480,14 @@ export const selectors = {
   getSelectedContainerId,
 
   activeModals,
+  getRenameLabwareFormMode,
+
+  labwareToCopy,
+
   allIngredientGroupFields,
   allIngredientNamesIds,
   loadedContainersBySlot,
   containersBySlot,
-  labwareToCopy,
   canAdd,
   getSelectedIngredientGroup,
   ingredientsByLabware,

@@ -47,7 +47,7 @@ export const editModeIngredientGroup = createAction(
   'EDIT_MODE_INGREDIENT_GROUP',
   (args: (
     | null // null here means "deselect ingredient group"
-    | {| wellName: string, groupId: string |}
+    | {| wellName: ?string, groupId: string |}
   )) => args
 )
 
@@ -81,6 +81,16 @@ export const modifyContainer = createAction(
   |}) => args
 )
 
+export const openRenameLabwareForm = createAction(
+  'OPEN_RENAME_LABWARE_FORM',
+  () => {}
+)
+
+export const closeRenameLabwareForm = createAction(
+  'CLOSE_RENAME_LABWARE_FORM',
+  () => {}
+)
+
 // ===========
 
 export type CopyLabware = {
@@ -111,17 +121,16 @@ export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>,
   })
 }
 
-type DeleteIngredientPrepayload = {|
+type DeleteIngredientPrepayload = {
   wellName?: string,
   groupId: string
-|}
+}
 
 export type DeleteIngredient = {|
   type: 'DELETE_INGREDIENT',
   payload: {
-    ...DeleteIngredientPrepayload,
     containerId: string
-  }
+  } & DeleteIngredientPrepayload
 |}
 
 export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
