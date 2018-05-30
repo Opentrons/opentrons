@@ -1,13 +1,22 @@
-@import '@opentrons/components';
-
 /* TODO(mc, 2018-02-09): fix lint errors and remove this ignore */
 /* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
+@import '@opentrons/components';
+
+.run_page {
+  position: relative;
+}
+
 .run_log_wrapper {
   box-sizing: border-box;
   font-family: 'Open Sans';
   overflow-y: scroll;
   border: 1rem solid white;
-  max-height: 44rem;
+  height: calc(100vh - 3.5rem);
+  max-height: calc(100vh - 3.5rem);
+}
+
+.alert_visible {
+  border-top-width: 3rem;
 }
 
 .list {
@@ -38,9 +47,16 @@ li.executed {
 }
 
 li.current {
-  background-color: rgba(150, 150, 150, 0.1);
+  background-color: var(--c-bg-selected);
 }
 
 li.last_current {
   color: var(--c-highlight);
+}
+
+.alert {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }

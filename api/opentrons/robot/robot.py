@@ -291,11 +291,14 @@ class Robot(object):
         for mount in self._actuators.values():
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
+        self.cache_instrument_models()
         return self
 
     def cache_instrument_models(self):
+        log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
+            log.debug("{}: {}".format(mount, self.model_by_mount[mount]))
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -498,6 +501,7 @@ class Robot(object):
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
+        self.cache_instrument_models()
 
     def _update_axis_homed(self, *args):
         for a in args:
@@ -508,20 +512,6 @@ class Robot(object):
     def home(self, *args, **kwargs):
         """
         Home robot's head and plunger motors.
-
-        Parameters
-        ----------
-        *args :
-            A string with axes to home. For example ``'xyz'`` or ``'ab'``.
-
-            If no arguments provided home Z-axis then X, Y, B, A
-
-        Notes
-        -----
-        Sometimes while executing a long protocol,
-        a robot might accumulate precision
-        error and it is recommended to home it. In this scenario, add
-        ``robot.home('xyzab')`` into your script.
         """
 
         # Home gantry first to avoid colliding with labware
@@ -542,6 +532,10 @@ class Robot(object):
         for a in self._actuators.values():
             self.poses = a['carriage'].update_pose_from_driver(self.poses)
 
+    def home_z(self):
+        for mount in ['left', 'right']:
+            self.poses = self._actuators[mount]['carriage'].home(self.poses)
+
     def move_head(self, *args, **kwargs):
         self.poses = self.gantry.move(self.poses, **kwargs)
 
@@ -553,7 +547,6 @@ class Robot(object):
 
         Parameters
         ----------
-        speed : number setting the current combined-axes speed
         combined_speed : number specifying a combined-axes speed
         <axis> : key/value pair, specifying the maximum speed of that axis
 
@@ -562,10 +555,8 @@ class Robot(object):
 
         >>> from opentrons import robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
-        >>> robot.head_speed(300) # doctest: +SKIP
-        #  default axes speed is 300 mm/sec
         >>> robot.head_speed(combined_speed=400) # doctest: +SKIP
-        #  default speed is 400 mm/sec
+        #  sets the head speed to 400 mm/sec or the axis max per axis
         >>> robot.head_speed(x=400, y=200) # doctest: +SKIP
         # sets max speeds of X and Y
         """

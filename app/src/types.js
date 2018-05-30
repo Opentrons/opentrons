@@ -6,10 +6,13 @@ import type {
   Dispatch as ReduxDispatch
 } from 'redux'
 
+import type {RouterAction} from 'react-router-redux'
+
 import typeof reducer from './reducer'
 import type {Action as RobotAction} from './robot'
 import type {Action as HttpApiAction} from './http-api-client'
 import type {ShellAction} from './shell'
+import type {ConfigAction} from './config'
 
 export type State = $Call<reducer>
 
@@ -19,6 +22,8 @@ export type Action =
   | RobotAction
   | HttpApiAction
   | ShellAction
+  | ConfigAction
+  | RouterAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 

@@ -68,14 +68,6 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(
             RuntimeError, self.p200._get_plunger_position, 'roll_out')
 
-    def test_set_max_volume(self):
-        import warnings
-        warnings.filterwarnings('error')
-        self.assertRaises(UserWarning, self.p200.set_max_volume, 200)
-        self.assertRaises(
-            UserWarning, Pipette, self.robot, mount='right', max_volume=200)
-        warnings.filterwarnings('default')
-
     def test_deprecated_axis_call(self):
         import warnings
 
@@ -881,7 +873,7 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.robot.move_to = mock.Mock()
         self.p200.touch_tip(self.plate[0])
-        self.p200.touch_tip(-3)
+        self.p200.touch_tip(v_offset=-3)
         self.p200.touch_tip(self.plate[1], radius=0.5)
 
         expected = [
@@ -890,19 +882,19 @@ class PipetteTest(unittest.TestCase):
                       strategy='arc'),
 
             mock.call(
-                (self.plate[0], (6.40, 3.20, 10.50)),
+                (self.plate[0], (6.40, 3.20, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[0], (0.00, 3.20, 10.50)),
+                (self.plate[0], (0.00, 3.20, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 6.40, 10.50)),
+                (self.plate[0], (3.20, 6.40, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[0], (3.20, 0.00, 10.50)),
+                (self.plate[0], (3.20, 0.00, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
@@ -925,19 +917,19 @@ class PipetteTest(unittest.TestCase):
                       instrument=self.p200,
                       strategy='arc'),
             mock.call(
-                (self.plate[1], (4.80, 3.20, 10.50)),
+                (self.plate[1], (4.80, 3.20, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[1], (1.60, 3.20, 10.50)),
+                (self.plate[1], (1.60, 3.20, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[1], (3.20, 4.80, 10.50)),
+                (self.plate[1], (3.20, 4.80, 9.50)),
                 instrument=self.p200,
                 strategy='direct'),
             mock.call(
-                (self.plate[1], (3.20, 1.60, 10.50)),
+                (self.plate[1], (3.20, 1.60, 9.50)),
                 instrument=self.p200,
                 strategy='direct')
         ]

@@ -6,7 +6,7 @@ from typing import Dict
 
 from serial.serialutil import SerialException
 
-from opentrons.drivers.smoothie_drivers import serial_communication
+from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
 '''
 - Driver is responsible for providing an interface for motion control
@@ -36,7 +36,8 @@ PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
 
-Y_SWITCH_BACK_OFF_MM = 20
+Y_SWITCH_BACK_OFF_MM = 28
+Y_SWITCH_REVERSE_BACK_OFF_MM = 10
 Y_BACKOFF_LOW_CURRENT = 0.8
 Y_BACKOFF_SLOW_SPEED = 50
 Y_RETRACT_SPEED = 8
@@ -248,7 +249,10 @@ class SmoothieDriver_3_0_0:
 
         self._position = HOMED_POSITION.copy()
         self.log = []
+
+        # why do we do this after copying the HOMED_POSITION?
         self._update_position({axis: 0 for axis in AXES})
+
         self.simulating = True
         self._connection = None
         self._config = config
@@ -848,6 +852,9 @@ class SmoothieDriver_3_0_0:
                 raise e
             if not self.simulating:
                 sleep(DEFAULT_STABILIZE_DELAY)
+            if self._connection:
+                self._connection.close()
+                self._connection.open()
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
 
@@ -858,11 +865,13 @@ class SmoothieDriver_3_0_0:
         self.push_speed()
         self.set_speed(Y_BACKOFF_SLOW_SPEED)
 
-        # move away from the Y endstop switch
-        relative_retract_command = '{0} {1}Y{2} {3}'.format(
+        # move away from the Y endstop switch, then backward half that distance
+        relative_retract_command = '{0} {1}Y{2} {3}Y{4} {5}'.format(
             GCODES['RELATIVE_COORDS'],  # set to relative coordinate system
             GCODES['MOVE'],             # move towards front of machine
-            str(-Y_SWITCH_BACK_OFF_MM),
+            str(int(-Y_SWITCH_BACK_OFF_MM)),
+            GCODES['MOVE'],             # move towards back of machine
+            str(int(Y_SWITCH_REVERSE_BACK_OFF_MM)),
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
 

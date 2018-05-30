@@ -121,11 +121,11 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   channels: Channels
 |}
 
-export type LabwareData = {
+export type LabwareData = {|
   type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
   name: ?string, // user-defined nickname
   slot: DeckSlot
-}
+|}
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
   * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
@@ -134,9 +134,11 @@ type TipId = string
 
 export type LocationLiquidState = {[ingredGroup: string]: {volume: number}}
 
+export type SingleLabwareLiquidState = {[well: string]: LocationLiquidState}
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
-  instruments: {
+  instruments: { // TODO Ian 2018-05-23 rename this 'pipettes' to match tipState (& to disambiguate from future 'modules')
     [instrumentId: string]: PipetteData
   },
   labware: {

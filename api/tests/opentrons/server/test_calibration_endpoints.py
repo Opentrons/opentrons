@@ -1,10 +1,21 @@
 import json
+import numpy as np
 from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
-from opentrons.instruments import pipette_config
 from opentrons.robot import robot_configs
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
+
+# Note that several tests in this file have target/expected values that do not
+# accurately reflect robot operation, because of differences between return
+# values from the driver during simulating vs. non-simulating modes. In
+# particular, during simulating mode the driver's `position` method returns
+# the xyz position of the tip of the pipette, but during non-simulating mode
+# it returns a position that correponds roughly to the gantry (e.g.: where the
+# Smoothie board sees the position of itself--after a fashion). Simulating mode
+# should be replaced with something that accurately reflects actual robot
+# operation, and then these tests should be revised to match expected reality.
 
 # ------------ Function tests (unit) ----------------------
 async def test_add_and_remove_tip(dc_session):
@@ -67,16 +78,21 @@ async def test_save_xy(dc_session):
     await endpoints.save_xy(data)
 
     actual = dc_session.points[point]
-    expected = (robot._driver.position['X'], robot._driver.position['Y'])
+    expected = (
+        robot._driver.position['X'] + robot.config.mount_offset[0],
+        robot._driver.position['Y']
+    )
     assert actual == expected
 
 
 async def test_save_z(dc_session):
     robot.reset()
     mount = 'left'
+    model = 'p10_single_v1'
     pip = instruments.P10_Single(mount=mount)
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = 'Z'
+    dc_session.current_model = model
     dc_session.tip_length = 25
     dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
 
@@ -88,8 +104,7 @@ async def test_save_z(dc_session):
     await endpoints.save_z({})
 
     new_z = dc_session.z_value
-    pipette_z_offset = pipette_config.configs['p10_single_v1'].model_offset[-1]
-    expected_z = z_target - pipette_z_offset
+    expected_z = z_target
     assert new_z == expected_z
 
 
@@ -111,19 +126,54 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
     await endpoints.save_transform({})
 
-    expected = robot.config.gantry_calibration
+    in_memory = robot.config.gantry_calibration
     assert len(persisted_data) == 2
-    assert persisted_data[0][0].gantry_calibration == expected
-    assert persisted_data[1][0].gantry_calibration == expected
+    assert persisted_data[0][0].gantry_calibration == in_memory
+    assert persisted_data[1][0].gantry_calibration == in_memory
     assert persisted_data[1][-1] is not None
+
+    expected = [[1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.3],
+                [0.0, 0.0, 1.0, 0.2],
+                [0.0, 0.0, 0.0, 1.0]]
+    assert np.allclose(in_memory, expected)
+
+
+async def test_transform_calculation(dc_session):
+    # This transform represents a 5 degree rotation, with a shift in x, y, & z.
+    # Values for the points and expected transform come from a hand-crafted
+    # transformation matrix and the points that would generate that matrix.
+    cos_5deg_p = 0.99619469809
+    sin_5deg_p = 0.08715574274
+    sin_5deg_n = -sin_5deg_p
+    const_zero = 0.0
+    const_one_ = 1.0
+    delta_x___ = 0.3
+    delta_y___ = 0.4
+    delta_z___ = 0.5
+    expected_transform = [
+        [cos_5deg_p, sin_5deg_p, const_zero, delta_x___],
+        [sin_5deg_n, cos_5deg_p, const_zero, delta_y___],
+        [const_zero, const_zero, const_one_, delta_z___],
+        [const_zero, const_zero, const_zero, const_one_]]
+
+    dc_session.z_value = 0.5
+    dc_session.points = {
+        '1': [13.16824337, 8.30855312],
+        '2': [380.50507635, -23.82925545],
+        '3': [34.87002331, 256.36103295]
+    }
+
+    await endpoints.save_transform({})
+
+    assert np.allclose(robot.config.gantry_calibration, expected_transform)
 
 
 # ------------ Session and token tests ----------------------
-# TODO(mc, 2018-05-02): this does not adequately pipette selection logic
 async def test_create_session(async_client, monkeypatch):
     """
     Tests that the POST request to initiate a session manager for factory
-    calibration returns a good token.
+    calibration returns a good token, along with the correct preferred pipette
     """
     dummy_token = 'Test Token'
 
@@ -132,14 +182,35 @@ async def test_create_session(async_client, monkeypatch):
 
     monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
-    expected = {
-        'token': dummy_token,
-        'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
-    resp = await async_client.post('/calibration/deck/start')
-    text = await resp.text()
+    # each tuple in this list is (left-mount, right-mount, correct-choice)
+    pipette_combinations = [
+        ('p300_multi_v1', 'p10_single_v1', 'p10_single_v1'),
+        ('p300_single_v1', 'p10_single_v1', 'p10_single_v1'),
+        ('p10_multi_v1', 'p300_multi_v1', 'p300_multi_v1'),
+        (None, 'p10_single_v1', 'p10_single_v1'),
+        ('p300_multi_v1', None, 'p300_multi_v1'),
+        ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')]
 
-    assert json.loads(text) == expected
-    assert resp.status == 201
+    for left_model, right_model, preferred in pipette_combinations:
+        def dummy_read_model(self, mount):
+            if mount == 'left':
+                res = left_model
+            else:
+                res = right_model
+            return res
+
+        monkeypatch.setattr(
+            SmoothieDriver_3_0_0, 'read_pipette_model', dummy_read_model)
+
+        robot.reset()
+
+        resp = await async_client.post('/calibration/deck/start')
+        start_result = await resp.json()
+        endpoints.session = None
+
+        assert start_result.get('token') == dummy_token
+        assert start_result.get('pipette', {}).get('model') == preferred
+        assert resp.status == 201
 
 
 async def test_create_session_fail(async_client, monkeypatch):
@@ -173,7 +244,6 @@ async def test_create_session_fail(async_client, monkeypatch):
 
     resp = await async_client.post('/calibration/deck/start')
     text = await resp.text()
-    print(text)
     assert json.loads(text) == {'message': 'Error, pipette not recognized'}
     assert resp.status == 403
     assert endpoints.session is None
@@ -216,6 +286,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
     overridden.
     """
     robot.reset()
+
     dummy_token = 'Test Token'
 
     def uuid_mock():
@@ -230,7 +301,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
 
     assert resp.status == 201
     expected = {'token': dummy_token,
-                'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
+                'pipette': {'mount': 'right', 'model': 'p10_single_v1'}}
     assert text == expected
 
     resp1 = await async_client.post('/calibration/deck/start')
@@ -241,7 +312,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
     text2 = await resp2.json()
     assert resp2.status == 201
     expected2 = {'token': dummy_token,
-                 'pipette': {'mount': 'left', 'model': 'p10_single_v1'}}
+                 'pipette': {'mount': 'right', 'model': 'p10_single_v1'}}
     assert text2 == expected2
 
 
@@ -298,8 +369,9 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     axis = 'z'
     direction = 1
     step = 3
-    # left pipette z carriage motor is smoothie axis "Z"
-    smoothie_axis = 'Z'
+    # left pipette z carriage motor is smoothie axis "Z", right is "A"
+    sess = dc.endpoints.session
+    smoothie_axis = 'Z' if sess.current_mount == 'left' else 'A'
 
     robot.reset()
     prior_x, prior_y, prior_z = dc.position(smoothie_axis)
@@ -316,4 +388,4 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     body = await resp.json()
     msg = body.get('message')
 
-    assert '{}'.format((prior_x, prior_y, prior_z + float(step))) in msg
+    assert '{}'.format((prior_x, prior_y, prior_z + step)) in msg

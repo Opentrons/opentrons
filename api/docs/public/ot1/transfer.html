@@ -1,0 +1,1000 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Transfer Shortcuts &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="https://opentrons.com/css/master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Advanced Control" href="robot.html" />
+    <link rel="prev" title="Liquid Handling" href="pipettes.html" />  
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+    app_id: "ukpodv2l"
+};
+</script>
+<script>
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments)
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args)
+        };
+        w.Intercom = i;
+
+        function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+        }
+        if (w.attachEvent) {
+            w.attachEvent('onload', l);
+        } else {
+            w.addEventListener('load', l, false);
+        }
+    }
+})()
+</script>
+
+  </head>
+  <body role="document">
+<header>
+    <a href="https://opentrons.com" class="brand">
+        <img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+    <div id="nav-collapse">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+    </div>
+    <nav>
+        <ul id="main">
+            <li>
+                <a href="https://opentrons.com/robots" class="menu-toggle" data-dropdown=".products">Products</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/about" class="menu-toggle" data-dropdown=".company">Company</a>
+            </li>
+            <li>
+                <a href="https://opentrons.com/getting-started/" class="menu-toggle" data-dropdown=".resources">Resources</a>
+            </li>
+            <li>
+                <a href="https://shop.opentrons.com/">Buy</a>
+            </li>
+        </ul>
+        <section id="dropdown">
+            <ul class="products">
+                <li class="mobile">Products</li>
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+                <li>&nbsp;</li>
+            </ul>
+            <ul class="company">
+                <li class="mobile">Company</li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#006fff">We're Hiring</a></li>
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+            </ul>
+            <ul class="resources">
+                <li class="mobile">Resources</li>
+                <li><a href="https://support.opentrons.com/">Support</a></li>
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </section>
+    </nav>
+    <br style="clear:both">
+    <script type="text/javascript">
+    $(function() {
+
+        $('#dropdown').slideUp(0);
+
+        $('#nav-collapse').click(function(event) {
+            $(this).toggleClass('change');
+            $('#dropdown').slideToggle(500);
+        });
+
+        $('#dropdown ul').mouseenter(function(event) {
+            $('*').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#dropdown ul').mouseleave(function(event) {
+            $('*').removeClass('active');
+        });
+
+        $('.menu-toggle').mouseenter(function(event) {
+            event.preventDefault();
+            var target = $(this).attr('data-dropdown');
+
+            $('*').removeClass('active');
+            $(this).addClass('active');
+            $(target).addClass('active');
+
+            $('#dropdown').slideDown(300);
+
+            $('.brand').addClass('open');
+            $('#nav-spacer').addClass('nav-open');
+
+
+        });
+        $('header').mouseleave(function(event) {
+            $('#dropdown').slideUp(300);
+            $('.brand').removeClass('open');
+            $('#nav-spacer').removeClass('nav-open');
+        });
+    });
+    </script>
+</header>
+<div id="nav-spacer">&nbsp;</div>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <span class="target" id="transfer"></span><div class="section" id="transfer-shortcuts">
+<h1>Transfer Shortcuts<a class="headerlink" href="#transfer-shortcuts" title="Permalink to this headline">¶</a></h1>
+<p>The Transfer command is a nice way to wrap up the most common liquid-handling actions we take. Instead of having to write <code class="docutils literal"><span class="pre">loop</span></code> and <code class="docutils literal"><span class="pre">if</span></code> statements, we can simply use the <code class="docutils literal"><span class="pre">transfer()</span></code> command, making Python protocol both easier to write and read!</p>
+<hr class="docutils" />
+<div class="section" id="id1">
+<h2>Transfer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Most of time, a protocol is really just looping over some wells, aspirating, and then dispensing. Even though they are simple in nature, these loops take up a lot of space. The <code class="docutils literal"><span class="pre">pipette.transfer()</span></code> command takes care of those common loops. It will combine aspirates and dispenses automatically, making your protocol easier to read and edit.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+<span class="n">trash</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;D2&#39;</span><span class="p">)</span>
+
+<span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
+    <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">],</span>
+    <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="basic">
+<h3>Basic<a class="headerlink" href="#basic" title="Permalink to this headline">¶</a></h3>
+<p>The example below will transfer 100 uL from well <code class="docutils literal"><span class="pre">'A1'</span></code> to well <code class="docutils literal"><span class="pre">'B1'</span></code>, automatically picking up a new tip and then dropping it when finished.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Transfer commands will automatically create entire series of <code class="docutils literal"><span class="pre">aspirate()</span></code>, <code class="docutils literal"><span class="pre">dispense()</span></code>, and other <code class="docutils literal"><span class="pre">Pipette</span></code> commands. We can print out all commands to see what it did in the previous example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="large-volumes">
+<h3>Large Volumes<a class="headerlink" href="#large-volumes" title="Permalink to this headline">¶</a></h3>
+<p>Volumes larger than the pipette&#8217;s <code class="docutils literal"><span class="pre">max_volume</span></code> will automatically divide into smaller transfers.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 200.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 200.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 200.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 200.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 150.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 150.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 150.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 150.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="multiple-wells">
+<h3>Multiple Wells<a class="headerlink" href="#multiple-wells" title="Permalink to this headline">¶</a></h3>
+<p>Transfer commands are most useful when moving liquid between multiple wells.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A3&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B3&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A4&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B4&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A5&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B5&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A6&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B6&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A7&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B7&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A8&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B8&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A9&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B9&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A10&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B10&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A11&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B11&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A12&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B12&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="one-to-many">
+<h3>One to Many<a class="headerlink" href="#one-to-many" title="Permalink to this headline">¶</a></h3>
+<p>You can transfer from a single source to multiple destinations, and the other way around (many sources to one destination).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="few-to-many">
+<h3>Few to Many<a class="headerlink" href="#few-to-many" title="Permalink to this headline">¶</a></h3>
+<p>What happens if, for example, you tell your pipette to transfer from 4 source wells to 2 destination wells? The transfer command will attempt to divide the wells evenly, or raise an error if the number of wells aren&#8217;t divisible.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">,</span> <span class="s1">&#39;A3&#39;</span><span class="p">,</span> <span class="s1">&#39;A4&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A3&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A4&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-of-volumes">
+<h3>List of Volumes<a class="headerlink" href="#list-of-volumes" title="Permalink to this headline">¶</a></h3>
+<p>Instead of applying a single volume amount to all source/destination wells, you can instead pass a list of volumes.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="s1">&#39;B3&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 20.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 20.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Aspirating 40.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 40.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 60.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 60.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B3&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="volume-gradient">
+<h3>Volume Gradient<a class="headerlink" href="#volume-gradient" title="Permalink to this headline">¶</a></h3>
+<p>Create a linear gradient between a start and ending volume (uL). The start and ending volumes must be the first and second elements of a tuple.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Aspirating 90.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 90.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 80.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 80.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Aspirating 70.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 70.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Aspirating 60.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 60.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Aspirating 50.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 50.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Aspirating 40.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 40.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="distribute-and-consolidate">
+<h2>Distribute and Consolidate<a class="headerlink" href="#distribute-and-consolidate" title="Permalink to this headline">¶</a></h2>
+<p>Save time and tips with the <code class="docutils literal"><span class="pre">distribute()</span></code> and <code class="docutils literal"><span class="pre">consolidate()</span></code> commands. These are nearly identical to <code class="docutils literal"><span class="pre">transfer()</span></code>, except that they will combine multiple transfer&#8217;s into a single tip.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+<span class="n">trash</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;D2&#39;</span><span class="p">)</span>
+
+<span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
+    <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">],</span>
+    <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="consolidate">
+<h3>Consolidate<a class="headerlink" href="#consolidate" title="Permalink to this headline">¶</a></h3>
+<p>Volumes going to the same destination well are combined within the same tip, so that multiple aspirates can be combined to a single dispense.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">consolidate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Dispensing 180.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Dispensing 60.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+<p>If there are multiple destination wells, the pipette will never combine their volumes into the same tip.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">consolidate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Dispensing 120.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Aspirating 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Dispensing 120.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="distribute">
+<h3>Distribute<a class="headerlink" href="#distribute" title="Permalink to this headline">¶</a></h3>
+<p>Volumes from the same source well are combined within the same tip, so that one aspirate can provide for multiple dispenses.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">distribute</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 165.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Aspirating 165.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Aspirating 110.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Dispensing 55.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+<p>If there are multiple source wells, the pipette will never combine their volumes into the same tip.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">distribute</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">),</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 120.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Aspirating 120.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="disposal-volume">
+<h3>Disposal Volume<a class="headerlink" href="#disposal-volume" title="Permalink to this headline">¶</a></h3>
+<p>When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added <code class="docutils literal"><span class="pre">disposal_vol</span></code> can be set as an optional argument.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">distribute</span><span class="p">(</span>
+    <span class="mi">30</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">),</span>
+    <span class="n">disposal_vol</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>   <span class="c1"># include extra liquid to make dispenses more accurate</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 130.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Blowing out at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Aspirating 130.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Blowing out at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you do not specify a <code class="docutils literal"><span class="pre">disposal_vol</span></code>, the pipette will by default use a <code class="docutils literal"><span class="pre">disposal_vol</span></code> equal to it&#8217;s <code class="docutils literal"><span class="pre">min_volume</span></code>. This tutorial has not given the pipette any <code class="docutils literal"><span class="pre">min_volume</span></code>, so below is an example of allowing the pipette&#8217;s <code class="docutils literal"><span class="pre">min_volume</span></code> to be used as a default for <code class="docutils literal"><span class="pre">disposal_vol</span></code>.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">min_volume</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># `min_volume` is used as default to `disposal_vol`</span>
+
+<span class="n">pipette</span><span class="o">.</span><span class="n">distribute</span><span class="p">(</span>
+    <span class="mi">30</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 140.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well C2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well D2&gt;
+Blowing out at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Aspirating 140.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well E2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well F2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well G2&gt;
+Dispensing 30.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well H2&gt;
+Blowing out at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="transfer-options">
+<h2>Transfer Options<a class="headerlink" href="#transfer-options" title="Permalink to this headline">¶</a></h2>
+<p>There are other options for customizing your transfer command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+<span class="n">trash</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;D2&#39;</span><span class="p">)</span>
+
+<span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
+    <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">],</span>
+    <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="always-get-a-new-tip">
+<h3>Always Get a New Tip<a class="headerlink" href="#always-get-a-new-tip" title="Permalink to this headline">¶</a></h3>
+<p>Transfer commands will by default use the same one tip for each well, then finally drop it in the trash once finished.</p>
+<p>The pipette can optionally get a new tip at the beginning of each aspirate, to help avoid cross contamination.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">,</span> <span class="s1">&#39;A3&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="s1">&#39;B3&#39;</span><span class="p">),</span>
+    <span class="n">new_tip</span><span class="o">=</span><span class="s1">&#39;always&#39;</span><span class="p">)</span>    <span class="c1"># always pick up a new tip</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well B1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well C1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A3&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B3&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="never-get-a-new-tip">
+<h3>Never Get a New Tip<a class="headerlink" href="#never-get-a-new-tip" title="Permalink to this headline">¶</a></h3>
+<p>For scenarios where you instead are calling <code class="docutils literal"><span class="pre">pick_up_tip()</span></code> and <code class="docutils literal"><span class="pre">drop_tip()</span></code> elsewhere in your protocol, the transfer command can ignore picking up or dropping tips.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">,</span> <span class="s1">&#39;A3&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">,</span> <span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="s1">&#39;B3&#39;</span><span class="p">),</span>
+    <span class="n">new_tip</span><span class="o">=</span><span class="s1">&#39;never&#39;</span><span class="p">)</span>    <span class="c1"># never pick up or drop a tip</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B2&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A3&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B3&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="trash-or-return-tip">
+<h3>Trash or Return Tip<a class="headerlink" href="#trash-or-return-tip" title="Permalink to this headline">¶</a></h3>
+<p>By default, the transfer command will drop the pipette&#8217;s tips in the trash container. However, if you wish to instead return the tip to it&#8217;s tip rack, you can set <code class="docutils literal"><span class="pre">trash=False</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B1&#39;</span><span class="p">),</span>
+    <span class="n">trash</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>       <span class="c1"># do not trash tip</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well B1&gt;
+Returning tip
+Drop_tip at &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="touch-tip">
+<h3>Touch Tip<a class="headerlink" href="#touch-tip" title="Permalink to this headline">¶</a></h3>
+<p>A touch-tip can be performed after every aspirate and dispense by setting <code class="docutils literal"><span class="pre">touch_tip=True</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">touch_tip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>     <span class="c1"># touch tip to each well&#39;s edge</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Touching tip
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Touching tip
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="blow-out">
+<h3>Blow Out<a class="headerlink" href="#blow-out" title="Permalink to this headline">¶</a></h3>
+<p>A blow-out can be performed after every dispense that leaves the tip empty by setting <code class="docutils literal"><span class="pre">blow_out=True</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">blow_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>      <span class="c1"># blow out droplets when tip is empty</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Blowing out
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="mix-before-after">
+<h3>Mix Before/After<a class="headerlink" href="#mix-before-after" title="Permalink to this headline">¶</a></h3>
+<p>A mix can be performed before every aspirate by setting <code class="docutils literal"><span class="pre">mix_before=</span></code>. The value of <code class="docutils literal"><span class="pre">mix_before=</span></code> must be a tuple, the 1st value is the number of repetitions, the 2nd value is the amount of liquid to mix.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">mix_before</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="c1"># mix 2 times with 50uL before aspirating</span>
+    <span class="n">mix_after</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">75</span><span class="p">))</span>  <span class="c1"># mix 3 times with 75uL after dispensing</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Mixing 2 times with a volume of 50ul
+Aspirating 50 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 50
+Aspirating 50
+Dispensing 50
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Mixing 3 times with a volume of 75ul
+Aspirating 75 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 75.0
+Aspirating 75
+Dispensing 75.0
+Aspirating 75
+Dispensing 75.0
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="air-gap">
+<h3>Air Gap<a class="headerlink" href="#air-gap" title="Permalink to this headline">¶</a></h3>
+<p>An air gap can be performed after every aspirate by setting <code class="docutils literal"><span class="pre">air_gap=int</span></code>, where the value is the volume of air in microliters to aspirate after aspirating the liquid.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pipette</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span>
+    <span class="mi">100</span><span class="p">,</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span>
+    <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">),</span>
+    <span class="n">air_gap</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>         <span class="c1"># add 20uL of air after each aspirate</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">commands</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out...</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Picking up tip from &lt;Deck&gt;&lt;Slot A1&gt;&lt;Container tiprack-200ul&gt;&lt;Well A1&gt;
+Aspirating 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A1&gt;
+Air gap
+Aspirating 20
+Dispensing 20 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Dispensing 100.0 at &lt;Deck&gt;&lt;Slot B1&gt;&lt;Container 96-flat&gt;&lt;Well A2&gt;
+Drop_tip at &lt;Deck&gt;&lt;Slot D2&gt;&lt;Container point&gt;&lt;Well A1&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Liquid Handling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Transfer Shortcuts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Transfer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic">Basic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#large-volumes">Large Volumes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-wells">Multiple Wells</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#one-to-many">One to Many</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#few-to-many">Few to Many</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-of-volumes">List of Volumes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#volume-gradient">Volume Gradient</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#distribute-and-consolidate">Distribute and Consolidate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#consolidate">Consolidate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distribute">Distribute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#disposal-volume">Disposal Volume</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#transfer-options">Transfer Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#always-get-a-new-tip">Always Get a New Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#never-get-a-new-tip">Never Get a New Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trash-or-return-tip">Trash or Return Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#touch-tip">Touch Tip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#blow-out">Blow Out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mix-before-after">Mix Before/After</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#air-gap">Air Gap</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="pipettes.html" title="previous chapter">Liquid Handling</a></li>
+      <li>Next: <a href="robot.html" title="next chapter">Advanced Control</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/transfer.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+    <div class="get-in-touch">
+        <h1 class="title">Get In Touch</h1>
+        <p class="caption">
+            We'd love to hear from you!
+            <br> Reach us here or get in touch with us live via <span style="cursor:pointer" id="chat">chat</span>.
+        </p>
+        <form class="footerForm">
+            <div class="input-wrapper">
+                <input type="text" name="name" value="" id="name" placeholder="Name">
+                <input type="email" name="email" value="" id="email" placeholder="Email">
+            </div>
+            <textarea name="message" id="message" placeholder="Message"></textarea>
+            <input type="hidden" name="type" value="message"></input>
+            <button class="gray" type="submit" name="get-in-touch">Submit</button>
+        </form>
+    </div>
+    <div class="nav-link-group">
+        <div class="nav-link products">
+            <span class="link-title">PRODUCTS</span>
+            <ul class="products-list">
+                <li><a href="https://opentrons.com/robots">Robots</a></li>
+                <li><a href="https://opentrons.com/#/modules">Modules</a></li>
+                <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+                <li><a href="https://opentrons.com/protocol-library/">Protocol Library</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link company">
+            <span class="link-title">COMPANY</span>
+            <ul class="company-list">
+                <li><a href="https://opentrons.com/about">About</a></li>
+                <li><a href="https://opentrons.com/team">Team</a></li>
+                <li><a href="https://blog.opentrons.com" target="_blank">Blog</a></li>
+                <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+                <li><a href="https://opentrons.recruitee.com/" style="color:#05C1B3">WE'RE HIRING</a></li>
+                <!-- <li>Privacy Policy</li> -->
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link resources">
+            <span class="link-title">RESOURCES</span>
+            <ul class="resources-list">
+
+
+            <li><a href="https://support.opentrons.com/">Support</a></li>
+
+
+                <li><a href="https://support.opentrons.com/getting-started">Getting Started</a></li>
+                <li><a href="https://support.opentrons.com/frequently-asked-questions">FAQ</a></li>
+                <li><a href="https://github.com/OpenTrons/otone_docs/blob/master/Open_Source.md" target="_blank">Open Source</a></li>
+            </ul>
+        </div>
+        <div class="nav-link-divider"></div>
+        <div class="nav-link buy-button">
+            <a href="https://shop.opentrons.com/" target="_blank">BUY</a>
+        </div>
+        <div class="social-group">
+            <p class="social-links">
+                <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo" /></a>
+                <a href="https://twitter.com/OpenTrons_" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+                <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+                <!--     <a href="https://www.instagram.com/opentronslab/" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a> -->
+                <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+            </p>
+            <p class="ot-newsletter">
+                Subscribe to our newsletter
+                <br>
+                <!-- <input type="email" name="email" placeholder="Email"></input>
+      <button class="gray subscribe" type="button" name="button">Subscribe</button> -->
+                <div id="mc_embed_signup">
+                    <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <div id="mc_embed_signup_scroll">
+                            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required>
+                            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value="">
+                            </div>
+                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe">
+                        </div>
+                    </form>
+                </div>
+            </p>
+        </div>
+        <span class="ot-copyright">&#169;&nbsp;OPENTRONS 2016</span>
+    </div>
+</footer>
+<script>
+$(document).ready(function() {
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+
+  $(".footerForm").submit(function(event) {
+    event.preventDefault();
+    var data = {};
+    $(".footerForm").serializeArray().map(function(x){data[x.name] = x.value;});
+    ga('send', 'event', 'Contact - Email', 'Clicked Email Submit', window.location.href, { 'dimension1': data.email });
+    console.log(data)
+
+    $.ajax({
+      type: "POST",
+      url: "https://email.opentrons.com:3000",
+      dataType: "json",
+      contentType : "application/json",
+      data: JSON.stringify(data),
+      success: function(res) {
+        console.log(`success: ${res}`);
+        $(".footerForm").fadeOut("slow");
+        $(".caption")[0].innerHTML = "Thanks for contacting us! We'll get back to you as quick as we can.";
+      },
+      error: function(err) { console.log(`err: ${JSON.stringify(err)}`) },
+    });
+
+    
+    return false;
+  });
+
+  $("form.validate").submit(function(event) {
+    var data = {};
+    $("form.validate").serializeArray().map(function(x){data[x.name] = x.value;});
+    // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
+  });
+
+  $('#chat').on('click', () => {
+    Intercom('showNewMessage');
+  })
+});
+</script>
+
+
+ 
+  </body>
+</html>

@@ -21,13 +21,23 @@ import type {
 } from './types'
 
 import type {StepIdType} from '../form-types'
-import type {RobotStateTimelineAcc} from '../file-data/selectors'
-import {distribute, type AspirateDispenseArgs} from '../step-generation'
+import type {RobotStateTimeline} from '../file-data/selectors'
+import {
+  consolidate,
+  distribute,
+  transfer,
+  mix
+} from '../step-generation'
+
+import type {
+  AspirateDispenseArgs
+  // CommandCreator
+} from '../step-generation'
 
 import type {
   PipetteData,
   ConsolidateFormData,
-  // DistributeFormData,
+  DistributeFormData,
   MixFormData,
   PauseFormData,
   TransferFormData
@@ -45,14 +55,14 @@ type AspDispCommandType = {
   params: AspirateDispenseArgs
 }
 
-function _transferLikeSubsteps (args: {
-  validatedForm: *, // TODO SOON type this
+function transferLikeSubsteps (args: {
+  validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
   stepId: StepIdType,
   prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: RobotStateTimelineAcc
+  robotStateTimeline: RobotStateTimeline
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
@@ -80,14 +90,43 @@ function _transferLikeSubsteps (args: {
     robotStateTimeline.timeline[prevStepId].robotState
   ) || robotStateTimeline.robotState
 
-  const commandCallArgs = {
-    ...validatedForm,
-    // Disable any mix args so those aspirate/dispenses don't show up in substeps
-    mixBeforeAspirate: null
+  // if false, show aspirate vol instead
+  const showDispenseVol = validatedForm.stepType === 'distribute'
+
+  let result
+
+  // Call appropriate command creator with the validateForm fields.
+  // Disable any mix args so those aspirate/dispenses don't show up in substeps
+  if (validatedForm.stepType === 'transfer') {
+    const commandCallArgs = {
+      ...validatedForm,
+      mixBeforeAspirate: null,
+      mixInDestination: null
+    }
+
+    result = transfer(commandCallArgs)(robotState)
+  } else if (validatedForm.stepType === 'distribute') {
+    const commandCallArgs = {
+      ...validatedForm,
+      mixBeforeAspirate: null
+    }
+
+    result = distribute(commandCallArgs)(robotState)
+  } else if (validatedForm.stepType === 'consolidate') {
+    const commandCallArgs = {
+      ...validatedForm,
+      mixBeforeAspirate: null
+    }
+
+    result = consolidate(commandCallArgs)(robotState)
+  } else if (validatedForm.stepType === 'mix') {
+    result = mix(validatedForm)(robotState)
+  } else {
+    // TODO Ian 2018-05-21 Use assert here. Should be unreachable
+    console.warn(`transferLikeSubsteps got unsupported stepType "${validatedForm.stepType}"`)
+    return null
   }
 
-  // TODO SOON next PR, use command based on stepType
-  const result = distribute(commandCallArgs)(robotState)
   if (result.errors) {
     return null
   }
@@ -104,26 +143,29 @@ function _transferLikeSubsteps (args: {
 
     const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
       aspDispMultiRows,
-      (currentMultiRow, nextMultiRow) =>
+      (currentMultiRow, nextMultiRow) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
-        currentMultiRow[0] && currentMultiRow[0].sourceWell &&
-        nextMultiRow[0] && nextMultiRow[0].destWell,
+        return currentMultiRow[0] && currentMultiRow[0].sourceWell &&
+        nextMultiRow[0] && nextMultiRow[0].destWell
+      },
       // Merge each channel row together when predicate true
-      (currentMultiRow, nextMultiRow) => range(pipette.channels).map(channel =>
-        ({
+      (currentMultiRow, nextMultiRow) => {
+        return range(pipette.channels).map(channel => ({
           ...currentMultiRow[channel],
-          ...nextMultiRow[channel]
-        })
-      )
+          ...nextMultiRow[channel],
+          volume: showDispenseVol
+            ? nextMultiRow[channel].volume
+            : currentMultiRow[channel].volume
+        }))
+      }
     )
 
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: mergedMultiRows,
-      volume: validatedForm.volume // TODO Ian 2018-05-17 multi-channel independent volume
+      multiRows: mergedMultiRows
     }
   }
 
@@ -144,7 +186,9 @@ function _transferLikeSubsteps (args: {
     (currentRow, nextRow) => ({
       ...nextRow,
       ...currentRow,
-      volume: currentRow.volume // show aspirate volume, not dispense volume
+      volume: showDispenseVol
+        ? nextRow.volume
+        : currentRow.volume
     })
   )
 
@@ -153,219 +197,6 @@ function _transferLikeSubsteps (args: {
     stepType: validatedForm.stepType,
     parentStepId: stepId,
     rows: mergedRows
-  }
-}
-
-function _transferSubsteps (
-  form: TransferFormData,
-  transferLikeFields: *
-): SourceDestSubstepItem {
-  const {
-    sourceWells,
-    destWells
-  } = form
-
-  const {
-    stepId,
-    pipette,
-    volume,
-    sourceLabwareType,
-    destLabwareType,
-    sourceWellIngreds,
-    destWellIngreds
-  } = transferLikeFields
-
-  const commonFields = {
-    stepType: 'transfer',
-    parentStepId: stepId
-  }
-
-  const channels = pipette.channels
-
-  if (channels > 1) {
-    // multichannel
-
-    return {
-      ...commonFields,
-      multichannel: true,
-      volume,
-      multiRows: range(sourceWells.length).map(i => {
-        const sourceWellsForTips = getWellsForTips(channels, sourceLabwareType, sourceWells[i]).wellsForTips
-        const destWellsForTips = getWellsForTips(channels, destLabwareType, destWells[i]).wellsForTips
-
-        return range(channels).map(channel => {
-          const sourceWell = sourceWellsForTips[channel]
-          const destWell = destWellsForTips[channel]
-
-          const sourceIngredients = sourceWellIngreds[sourceWell]
-          const destIngredients = destWellIngreds
-            ? destWellIngreds[destWell]
-            : []
-
-          return {
-            substepId: i,
-            channelId: channel,
-            sourceIngredients,
-            destIngredients,
-            sourceWell,
-            destWell
-          }
-        })
-      })
-    }
-  }
-
-  return {
-    ...commonFields,
-    multichannel: false,
-    // TODO Ian 2018-03-02 break up steps when pipette too small
-    rows: range(sourceWells.length).map(i => {
-      const sourceWell = sourceWells[i]
-      const destWell = destWells[i]
-      return {
-        substepId: i,
-        sourceIngredients: sourceWellIngreds[sourceWell],
-        destIngredients: destWellIngreds ? destWellIngreds[destWell] : [],
-        sourceWell,
-        destWell,
-        volume
-      }
-    })
-  }
-}
-
-function _consolidateSubsteps (
-  form: ConsolidateFormData,
-  transferLikeFields: *
-): SourceDestSubstepItem {
-  const {
-    sourceWells,
-    destWell
-  } = form
-
-  const {
-    stepId,
-    pipette,
-    volume,
-    sourceLabwareType,
-    destLabwareType,
-    sourceWellIngreds,
-    destWellIngreds
-  } = transferLikeFields
-
-  const commonFields = {
-    stepType: 'consolidate',
-    parentStepId: stepId
-  }
-
-  const channels = pipette.channels
-
-  if (channels > 1) {
-    // multichannel
-
-    const destWellsForTips = getWellsForTips(channels, destLabwareType, destWell).wellsForTips
-
-    return {
-      ...commonFields,
-      multichannel: true,
-      volume,
-      multiRows: range(sourceWells.length).map(i => {
-        const isLastGroup = i + 1 === sourceWells.length
-        const sourceWellsForTips = getWellsForTips(channels, sourceLabwareType, sourceWells[i]).wellsForTips
-
-        return range(channels).map(channel => {
-          const sourceWell = sourceWellsForTips[channel]
-          const destWell = destWellsForTips[channel]
-
-          // only show dest ingreds on last group
-          const destIngredients = isLastGroup ? destWellIngreds[destWell] : []
-
-          return {
-            substepId: i,
-            channelId: channel,
-            sourceIngredients: sourceWellIngreds[sourceWell],
-            destIngredients,
-            sourceWell,
-            destWell: isLastGroup ? destWell : null // only show dest wells on last group
-            // volume
-          }
-        })
-      })
-    }
-  }
-
-  // dest well is only shown at the end, last substep
-  const destWellSubstep = {
-    destWell,
-    destIngredients: destWellIngreds[destWell],
-    volume: volume * sourceWells.length,
-    substepId: sourceWells.length
-  }
-
-  return {
-    ...commonFields,
-    multichannel: false,
-    // TODO Ian 2018-03-02 break up steps when pipette too small
-    rows: [
-      ...sourceWells.map((sourceWell, i) => ({
-        substepId: i,
-        sourceWell,
-        sourceIngredients: sourceWellIngreds[sourceWell],
-        volume
-      })),
-      destWellSubstep
-    ]
-  }
-}
-
-function _mixSubsteps (
-  form: MixFormData,
-  standardFields: *
-): SourceDestSubstepItem {
-  const {
-    stepType,
-    wells
-  } = form
-
-  const {
-    stepId,
-    pipette,
-    labwareType,
-    wellIngreds
-  } = standardFields
-
-  const commonFields = {
-    stepType,
-    parentStepId: stepId
-  }
-
-  const channels = pipette.channels
-
-  if (channels > 1) {
-    return {
-      ...commonFields,
-      multichannel: true,
-      multiRows: wells.map((well: string, i: number) => {
-        const wellsForTips = getWellsForTips(channels, labwareType, well).wellsForTips
-
-        return range(channels).map(channel => ({
-          substepId: i,
-          channelId: channel,
-          sourceIngredients: wellIngreds[wellsForTips[channel]],
-          sourceWell: wellsForTips[channel]
-        }))
-      })
-    }
-  }
-
-  return {
-    ...commonFields,
-    multichannel: false,
-    rows: wells.map((well: string, idx: number) => ({
-      substepId: idx,
-      sourceIngredients: wellIngreds[well],
-      sourceWell: well
-    }))
   }
 }
 
@@ -409,12 +240,14 @@ function commandToMultiRows (
   return range(channels).map(channel => {
     const well = wellsForTips[channel]
     const ingreds = getIngreds(labwareId, command.params.well)
+    const volume = command.params.volume
 
     if (command.command === 'aspirate') {
       return {
         channelId: channel,
         sourceIngredients: ingreds,
-        sourceWell: well
+        sourceWell: well,
+        volume
       }
     }
     if (command.command !== 'dispense') {
@@ -425,7 +258,8 @@ function commandToMultiRows (
     return {
       channelId: channel,
       destIngredients: ingreds,
-      destWell: well
+      destWell: well,
+      volume
     }
   })
 }
@@ -451,7 +285,7 @@ export function generateSubsteps (
   allLabwareTypes: AllLabwareTypes,
   namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
   orderedSteps: Array<StepIdType>,
-  robotStateTimeline: RobotStateTimelineAcc
+  robotStateTimeline: RobotStateTimeline
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
@@ -473,11 +307,16 @@ export function generateSubsteps (
       return formData
     }
 
-    if (validatedForm.stepType === 'distribute') {
+    if (
+      validatedForm.stepType === 'consolidate' ||
+      validatedForm.stepType === 'distribute' ||
+      validatedForm.stepType === 'transfer' ||
+      validatedForm.stepType === 'mix'
+    ) {
       const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
       const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
       // TODO SOON Ian 2018-05-17 all transferlikes will use this fn in next PR
-      return _transferLikeSubsteps({
+      return transferLikeSubsteps({
         validatedForm,
         allPipetteData,
         stepId,
@@ -486,96 +325,6 @@ export function generateSubsteps (
         getLabwareType,
         robotStateTimeline
       })
-    }
-
-    // TODO REPLACE: Handle all TransferLike substeps + mix
-    if (
-      validatedForm.stepType === 'consolidate' ||
-      validatedForm.stepType === 'transfer' ||
-      validatedForm.stepType === 'mix'
-    ) {
-      const namedIngredsByLabware = namedIngredsByLabwareAllSteps[prevStepId]
-
-      if (!namedIngredsByLabware) {
-        // TODO Ian 2018-05-02 another assert candidate here
-        console.warn(`No namedIngredsByLabware for previous step id ${prevStepId}`)
-        return null
-      }
-
-      const {
-        pipette: pipetteId,
-        volume
-      } = validatedForm
-
-      const pipette = allPipetteData[pipetteId]
-
-      // TODO Ian 2018-04-06 use assert here
-      if (!pipette) {
-        console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
-      }
-
-      // NOTE: other one-labware step types go here
-      if (validatedForm.stepType === 'mix') {
-        const {labware} = validatedForm
-
-        const wellIngreds = namedIngredsByLabware[labware]
-        const labwareType = allLabwareTypes[labware]
-
-        // fields common to all one-labware step types
-        const standardFields = {
-          stepId,
-          pipette,
-          volume,
-          labwareType,
-          wellIngreds
-        }
-
-        return _mixSubsteps(
-          validatedForm,
-          standardFields
-        )
-      }
-
-      const {
-        sourceLabware,
-        destLabware
-      } = validatedForm
-
-      const sourceWellIngreds = namedIngredsByLabware[sourceLabware]
-      const destWellIngreds = namedIngredsByLabware[destLabware]
-
-      const sourceLabwareType = allLabwareTypes[sourceLabware]
-      const destLabwareType = allLabwareTypes[destLabware]
-
-      // fields common to all transferlike substep generator fns
-      const transferLikeFields = {
-        stepId,
-
-        pipette,
-        volume,
-
-        sourceLabwareType,
-        destLabwareType,
-
-        sourceWellIngreds,
-        destWellIngreds
-      }
-
-      if (validatedForm.stepType === 'transfer') {
-        return _transferSubsteps(
-          validatedForm,
-          transferLikeFields
-        )
-      }
-
-      if (validatedForm.stepType === 'consolidate') {
-        return _consolidateSubsteps(
-          validatedForm,
-          transferLikeFields
-        )
-      }
-
-      // unreachable here
     }
 
     console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)

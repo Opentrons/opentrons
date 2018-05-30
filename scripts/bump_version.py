@@ -112,13 +112,6 @@ def main():
         project_pkg = update_js_pkg(project_pkg, new_version, js_pkgs)
         write_json_file(project_pkg_file, project_pkg)
 
-    # Python sub-projects
-    for project in ['api']:
-        print('Updating version file for {}'.format(project))
-        version_file = os.path.join(REPO_DIR, project, 'version')
-        with open(version_file, 'w') as version_data:
-            version_data.write(new_version + '\n')
-
 
 if __name__ == '__main__':
     main()

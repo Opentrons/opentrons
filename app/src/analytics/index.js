@@ -1,77 +1,130 @@
+// @flow
 // analytics module
 import noop from 'lodash/noop'
 import {LOCATION_CHANGE} from 'react-router-redux'
+import mixpanel from 'mixpanel-browser'
+
+import type {State, ThunkAction, Middleware} from '../types'
+import type {Config} from '../config'
 
 import {version} from '../../package.json'
-import gtmConfig from './gtm-config'
-import intercomConfig from './intercom-config'
+import {updateConfig} from '../config'
+import createLogger from '../logger'
 import makeEvent from './make-event'
 
-// grab the data layer (and create it if it doesn't exist)
-const {DATA_LAYER_NAME} = gtmConfig
-const dataLayer = global[DATA_LAYER_NAME] = global[DATA_LAYER_NAME] || []
+type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
+const log = createLogger(__filename)
+
+// pulled in from environment at build time
+const INTERCOM_ID = process.env.OT_APP_INTERCOM_ID
+const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID
+
+const MIXPANEL_OPTS = {
+  // opt out by default
+  opt_out_tracking_by_default: true,
+  // user details are persisted in our own config store
+  disable_persistence: true,
+  // pageviews tracked manually via react-router-redux events
+  track_pageview: false
+}
+
+// intercom and mixpanel.track handlers (noop)
 let intercom = noop
+let track = noop
 
-export const NAME = 'analytics'
+export function initializeAnalytics (): ThunkAction {
+  return (_, getState) => {
+    const config = getState().config.analytics
 
-const CUSTOM_EVENT_NAME = 'OT_EVENT'
-const INITIAL_STATE = {}
+    log.debug('Analytics config', {config})
+    initializeIntercom(config)
+    initializeMixpanel(config)
+  }
+}
 
-export function initialize (features) {
-  if (features.intercom) {
-    const data = {
-      app_id: intercomConfig.id,
-      'App Version': version
+export function toggleAnalyticsOptedIn (): ThunkAction {
+  return (dispatch, getState) => {
+    const optedIn = getAnalyticsOptedIn(getState())
+    return dispatch(updateConfig('analytics.optedIn', !optedIn))
+  }
+}
+
+export const analyticsMiddleware: Middleware =
+  (store) => (next) => (action) => {
+    const state = store.getState()
+    const event = makeEvent(store.getState(), action)
+
+    if (event) {
+      log.debug('Trackable event', {type: action.type, event})
+      track(event.name, event.properties)
     }
+
+    // update intercom on page change
+    if (action.type === LOCATION_CHANGE) {
+      intercom('update')
+    }
+
+    // enable mixpanel tracking if optedIn goes to true
+    if (
+      action.type === 'config:SET' &&
+      action.payload.path === 'analytics.optedIn'
+    ) {
+      const config = state.config.analytics
+
+      if (action.payload.value === true) {
+        enableMixpanelTracking(config)
+      } else {
+        disableMixpanelTracking(config)
+      }
+    }
+
+    return next(action)
+  }
+
+export function getAnalyticsOptedIn (state: State) {
+  return state.config.analytics.optedIn
+}
+
+function initializeIntercom (config: AnalyticsConfig) {
+  if (INTERCOM_ID) {
+    log.debug('Initializing Intercom')
+
+    const data = {app_id: INTERCOM_ID, 'App Version': version}
 
     intercom = global.Intercom || intercom
     intercom('boot', data)
   }
 }
 
-export function reducer (state = INITIAL_STATE, action) {
-  return state
-}
+function initializeMixpanel (config: AnalyticsConfig) {
+  if (MIXPANEL_ID) {
+    log.debug('Initializing Mixpanel')
 
-export function tagAction (action) {
-  const meta = action.meta || {}
+    mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
 
-  return {...action, meta: {...meta, [NAME]: true}}
-}
-
-export const middleware = (store) => (next) => (action) => {
-  const meta = action.meta && action.meta[NAME]
-
-  if (meta) {
-    const {type} = action
-    const event = makeEvent(store.getState(), action)
-
-    if (event) {
-      dataLayer.push({
-        event: CUSTOM_EVENT_NAME,
-        action: event.name,
-        category: event.category,
-        label: mapPayloadToLabel(event.payload)
-      })
-    } else {
-      // TODO(mc, 2017-11-20): use a proper logger rather than console
-      console.warn(`Warning: no analytics mapper found for action ${type}`)
+    if (config.optedIn) {
+      enableMixpanelTracking(config)
+      track('appOpen')
     }
-  } else if (action.type === LOCATION_CHANGE) {
-    // update intercom on page change
-    intercom('update')
   }
-
-  return next(action)
 }
 
-// maps a payload object to an analytics label string
-function mapPayloadToLabel (payload) {
-  if (payload == null) return ''
-  if (typeof payload !== 'object') return payload
+function enableMixpanelTracking (config: AnalyticsConfig) {
+  log.debug('User has opted into analytics; tracking with Mixpanel')
 
-  return Object.keys(payload).map((key) => {
-    return `${key}=${payload[key]}`
-  }).join(',')
+  mixpanel.identify(config.appId)
+  mixpanel.opt_in_tracking()
+  mixpanel.register({appVersion: version, appId: config.appId})
+
+  track = mixpanel.track.bind(mixpanel)
+}
+
+function disableMixpanelTracking (config: AnalyticsConfig) {
+  log.debug('User has opted out of analytics; stopping tracking')
+
+  mixpanel.opt_out_tracking()
+  mixpanel.reset()
+
+  track = noop
 }

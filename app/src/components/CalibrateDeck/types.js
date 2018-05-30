@@ -2,7 +2,7 @@
 import type {Match} from 'react-router'
 import type {PipetteConfig} from '@opentrons/shared-data'
 import type {RobotService, Mount} from '../../robot'
-import type {RobotMove, DeckCalStartState} from '../../http-api-client'
+import type {DeckCalCommandState, DeckCalStartState} from '../../http-api-client'
 import type {JogControlsProps} from '../JogControls'
 
 export type CalibrationStep = '1' | '2' | '3' | '4' | '5' | '6'
@@ -15,7 +15,7 @@ export type OP = {
 
 export type SP = {
   startRequest: DeckCalStartState,
-  moveRequest: RobotMove,
+  commandRequest: DeckCalCommandState,
   jogStep: $PropertyType<JogControlsProps, 'step'>,
   pipetteProps: ?{
     mount: Mount,

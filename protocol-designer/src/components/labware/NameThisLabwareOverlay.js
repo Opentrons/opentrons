@@ -1,7 +1,5 @@
 // @flow
 import * as React from 'react'
-
-import {humanize} from '../../utils.js'
 import ForeignDiv from '../../components/ForeignDiv.js'
 import ClickableText from './ClickableText'
 import styles from './labware.css'
@@ -20,11 +18,11 @@ type State = {
   inputValue: string
 }
 
+const NICKNAME_PROMPT = 'Add a nickname?'
+
 export default class NameThisLabwareOverlay extends React.Component<Props, State> {
-  defaultName: string
   constructor (props: Props) {
     super(props)
-    this.defaultName = humanize(this.props.containerType)
     this.state = {
       pristine: true,
       inputValue: ''
@@ -46,7 +44,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
 
   onSubmit = () => {
     const { containerId, modifyContainer } = this.props
-    const containerName = this.state.inputValue || this.defaultName
+    const containerName = this.state.inputValue || null
 
     modifyContainer({
       containerId,
@@ -72,7 +70,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
             <input
               onChange={this.handleChange}
               onKeyUp={this.handleKeyUp}
-              placeholder={this.defaultName}
+              placeholder={NICKNAME_PROMPT}
               value={this.state.inputValue}
             />
           </ForeignDiv>

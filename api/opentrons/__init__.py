@@ -1,11 +1,20 @@
+import os
 import sys
-
+import json
 from opentrons.robot.robot import Robot
 from opentrons.instruments import pipette_config
 from opentrons import instruments as inst, containers as cnt
 from opentrons.data_storage import database_migration
-from opentrons._version import __version__
 from opentrons.config import feature_flags as ff
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+try:
+    with open(os.path.join(HERE, 'package.json')) as pkg:
+        package_json = json.load(pkg)
+        __version__ = package_json.get('version')
+except (FileNotFoundError, OSError):
+    __version__ = 'unknown'
 
 version = sys.version_info[0:2]
 if version < (3, 5):

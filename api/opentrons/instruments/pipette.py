@@ -45,7 +45,6 @@ class PipetteTip:
 
 class Pipette:
     """
-
     Through this class you can can:
         * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
           :meth:`mix`, and :meth:`blow_out`
@@ -74,7 +73,7 @@ class Pipette:
     tip_racks : list
         A list of Containers for this Pipette to track tips when calling
         :meth:`pick_up_tip` (Default: [])
-    aspirate__flow_rate : int
+    aspirate_flow_rate : int
         The speed (in ul/sec) the plunger will move while aspirating
         (Default: See Model Type)
     dispense_flow_rate : int
@@ -673,7 +672,7 @@ class Pipette:
         return self
 
     @commands.publish.both(command=commands.touch_tip)
-    def touch_tip(self, location=None, radius=1.0):
+    def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -691,11 +690,19 @@ class Pipette:
             second item relative :any:`Vector`
 
         radius : float
-            Radius is a floating point number between 0.0 and 1.0, describing
-            the percentage of a well's radius. When radius=1.0,
-            :any:`touch_tip()` will move to 100% of the wells radius. When
-            radius=0.5, :any:`touch_tip()` will move to 50% of the wells
-            radius.
+            Radius is a floating point describing the percentage of a well's
+            radius. When radius=1.0, :any:`touch_tip()` will move to 100% of
+            the wells radius. When radius=0.5, :any:`touch_tip()` will move to
+            50% of the wells radius.
+            Default: 1.0 (100%)
+
+        speed: float
+            The speed for touch tip motion, in mm/s.
+            Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+
+        v_offset: float
+            The offset in mm from the top of the well to touch tip.
+            Default: -1.0 mm
 
         Returns
         -------
@@ -714,11 +721,17 @@ class Pipette:
         """
         if not self.tip_attached:
             log.warning("Cannot touch tip without a tip attached.")
-
-        height_offset = 0
+        if speed > 80.0:
+            log.warning("Touch tip speeds greater than 80mm/s not allowed")
+            speed = 80.0
+        if speed < 20.0:
+            log.warning("Touch tip speeds greater than 80mm/s not allowed")
+            speed = 20.0
 
         if helpers.is_number(location):
-            height_offset = location
+            # Deprecated syntax
+            log.warning("Please use the `v_offset` named parameter")
+            v_offset = location
             location = None
 
         # if no location specified, use the previously
@@ -728,7 +741,7 @@ class Pipette:
         else:
             location = self.previous_placeable
 
-        v_offset = (0, 0, height_offset)
+        v_offset = (0, 0, v_offset)
 
         well_edges = [
             location.from_center(x=radius, y=0, z=1),       # right edge
@@ -741,7 +754,7 @@ class Pipette:
         well_edges = map(lambda x: x + v_offset, well_edges)
 
         self.robot.gantry.push_speed()
-        self.robot.gantry.set_speed(100)
+        self.robot.gantry.set_speed(speed)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
         self.robot.gantry.pop_speed()
 
@@ -1297,37 +1310,6 @@ class Pipette:
 
         return self
 
-    def calibrate(self, position):
-        """
-        Calibrate a saved plunger position to the robot's current position
-        Notes
-        -----
-        This will only work if the API is connected to a robot
-        Parameters
-        ----------
-        position : str
-            Either "top", "bottom", "blow_out", or "drop_tip"
-        Returns
-        -------
-        This instance of :class:`Pipette`.
-        Examples
-        --------
-        ..
-        >>> robot = Robot()
-        >>> p200 = instruments.Pipette(name='p200', mount='left')
-        >>> robot.move_plunger(**{'a': 10})
-        >>> # save plunger 'top' to coordinate 10
-        >>> p200.calibrate('top') # doctest: +ELLIPSIS
-        <opentrons.instruments.pipette.Pipette object at ...>
-        """
-        current_position = self.robot._driver.get_plunger_positions()
-        current_position = current_position['target'][self.axis]
-        kwargs = {}
-        kwargs[position] = current_position
-        self.calibrate_plunger(**kwargs)
-
-        return self
-
     def calibrate_plunger(
             self,
             top=None,
@@ -1365,31 +1347,6 @@ class Pipette:
             self.plunger_positions['blow_out'] = blow_out
         if drop_tip is not None:
             self.plunger_positions['drop_tip'] = drop_tip
-
-        return self
-
-    def set_max_volume(self, max_volume):
-        """
-        Set this pipette's maximum volume, equal to the number of
-        microliters drawn when aspirating with the plunger's full range
-        Parameters
-        ----------
-        max_volume: int or float
-            The maximum number of microliters this :any:`Pipette` can hold.
-            Must be calculated and set after plunger calibrations to ensure
-            accuracy
-        """
-        # self.max_volume = max_volume
-
-        # if self.max_volume <= self.min_volume:
-        #     raise RuntimeError(
-        #         'Pipette max volume is less than '
-        #         'min volume ({0} < {1})'.format(
-        #             self.max_volume, self.min_volume))
-
-        warnings.warn(
-            "'max_volume' is deprecated, use `ul_per_mm` in constructor"
-        )
 
         return self
 

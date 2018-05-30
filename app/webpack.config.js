@@ -13,8 +13,6 @@ const devServerConfig = require('./webpack/dev-server')
 
 const {productName} = require('@opentrons/app-shell/package.json')
 const {description, author} = require('./package.json')
-const gtmConfig = require('./src/analytics/gtm-config')
-const intercomConfig = require('./src/analytics/intercom-config')
 
 const DEV = process.env.NODE_ENV !== 'production'
 const ANALYZER = process.env.ANALYZER === 'true'
@@ -47,10 +45,11 @@ const rules = [
 const target = 'electron-renderer'
 
 const plugins = [
-  new webpack.EnvironmentPlugin({
-    NODE_ENV: 'development',
-    DEBUG: false
-  }),
+  new webpack.EnvironmentPlugin(
+    Object.keys(process.env).filter(v => v.startsWith('OT_APP')).concat([
+      'NODE_ENV'
+    ])
+  ),
 
   new ExtractTextPlugin({
     filename: CSS_OUTPUT_NAME,
@@ -63,8 +62,7 @@ const plugins = [
     template: './src/index.hbs',
     description,
     author,
-    gtmConfig,
-    intercomConfig
+    intercomId: process.env.OT_APP_INTERCOM_ID
   }),
 
   new ScriptExtHtmlWebpackPlugin({

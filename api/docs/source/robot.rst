@@ -20,12 +20,12 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     '''
     Examples in this section require the following
     '''
-    from opentrons import robot, containers, instruments
+    from opentrons import robot, labware, instruments
 
-    plate = containers.load('96-flat', 'B1', 'my-plate')
-    tiprack = containers.load('tiprack-200ul', 'A1', 'my-rack')
+    plate = labware.load('96-flat', 'B1', 'my-plate')
+    tiprack = labware.load('tiprack-200ul', 'A1', 'my-rack')
 
-    pipette = instruments.Pipette(axis='b', max_volume=200, name='my-pipette')
+    pipette = labware.P300_Single(mount='left', tip_racks=[tiprack])
 
 
 User-Specified Pause
@@ -35,20 +35,27 @@ This will pause your protocol at a specific step. You can resume by pressing 're
 
 .. code-block:: python
 
-robot.pause()
+    robot.pause()
 
 Head Speed
 ==========
 
-The maximum speed of the robot's head can be set using ``robot.head_speed()``. The value we set the speed to is in millimeters-per-second (mm/sec).
+The speed of the robot's motors can be set using ``robot.head_speed()``. The units are all millimeters-per-second (mm/sec). The ``x``, ``y``, ``z``, ``a``, ``b``, ``c`` parameters set the maximum speed of the corresponding axis on Smoothie.
+
+'x': lateral motion, 'y': front to back motion, 'z': vertical motion of the left mount, 'a': vertical motion of the right mount, 'b': plunger motor for the left pipette, 'c': plunger motor for the right pipette.
+
+The ``combined_speed`` parameter sets the speed across all axes to either the specified value or the axis max, whichever is lower. Defaults are specified by ``DEFAULT_MAX_SPEEDS`` in `robot_configs.py`__.
+
+__ https://github.com/Opentrons/opentrons/blob/edge/api/opentrons/robot/robot_configs.py
 
 .. code-block:: python
 
-    robot.head_speed(5000)
+    max_speed_per_axis = {
+        'x': 600, 'y': 400, 'z': 125, 'a': 125, 'b': 50, 'c': 50}
+    robot.head_speed(
+        combined_speed=max(max_speed_per_axis.values()),
+        **max_speed_per_axis)
 
-.. note::
-
-    Setting the head speed to above ``6000 mm/sec`` may cause your robot to "skip", which means the motors will lose their grip and make a loud vibrating noise. We recommend you try out different speed values on your robot, and see what works and what doesn't.
 
 Homing
 ======
@@ -149,23 +156,6 @@ will print out...
     my-rack tiprack-200ul
     my-plate 96-flat
 
-Get Instruments
-===============
-
-When instruments are created, they are automatically added to the ``robot``. You can see all currently held instruments by calling ``robot.get_instruments()``, which returns a `Python list`__.
-
-__ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
-
-.. code-block:: python
-
-    for axis, pipette in robot.get_instruments():
-        print(pipette.name, axis)
-
-will print out...
-
-.. code-block:: python
-
-    my-pipette B
 
 Reset
 =====
@@ -176,7 +166,6 @@ Calling ``robot.reset()`` will remove everything from the robot. Any previously 
 
     robot.reset()
     print(robot.get_containers())
-    print(robot.get_instruments())
     print(robot.commands())
 
 will print out...

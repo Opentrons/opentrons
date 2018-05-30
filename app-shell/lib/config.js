@@ -2,8 +2,9 @@
 'use strict'
 
 const Store = require('electron-store')
-const dotProp = require('dot-prop')
 const mergeOptions = require('merge-options')
+const {getIn} = require('@thi.ng/paths')
+const uuid = require('uuid/v4')
 const yargsParser = require('yargs-parser')
 
 // make sure all arguments are included in production
@@ -11,8 +12,14 @@ const argv = process.defaultApp
   ? process.argv.slice(2)
   : process.argv.slice(1)
 
-const ENV_PREFIX = 'OT_APP'
+const PARSE_ARGS_OPTS = {
+  envPrefix: 'OT_APP',
+  configuration: {
+    'negation-prefix': 'disable_'
+  }
+}
 
+// TODO(mc, 2018-05-25): future config changes will require migration strategy
 const DEFAULTS = {
   devtools: false,
 
@@ -35,39 +42,64 @@ const DEFAULTS = {
     webPreferences: {
       webSecurity: true
     }
+  },
+
+  // analytics
+  analytics: {
+    appId: uuid(),
+    optedIn: false,
+    seenOptIn: false
   }
 }
 
-const overrides = yargsParser(argv, {
-  envPrefix: ENV_PREFIX,
-  configuration: {
-    'negation-prefix': 'disable_'
-  }
-})
+// lazy load store, overrides, and log because of config/log interdependency
+let _store
+let _overrides
+let _log
+const store = () => _store || new Store({defaults: DEFAULTS})
+const overrides = () => _overrides || yargsParser(argv, PARSE_ARGS_OPTS)
+const log = () => _log || require('./log')(__filename)
 
-const store = new Store({defaults: DEFAULTS})
+module.exports = {
+  // initialize and register the config module with dispatches from the UI
+  registerConfig (dispatch) {
+    return function handleIncomingAction (action) {
+      const {type, payload} = action
 
-module.exports = {get, getStore, getOverrides}
+      if (type === 'config:UPDATE') {
+        log().debug('Handling config:UPDATE', payload)
 
-function get (path) {
-  const result = store.get(path)
-  const over = dotProp.get(overrides, path)
+        if (getIn(overrides, payload.path)) {
+          log().info(`${payload.path} in overrides; not updating`)
+        } else {
+          log().info(`Updating "${payload.path}" to ${payload.value}`)
+          store().set(payload.path, payload.value)
+          dispatch({type: 'config:SET', payload})
+        }
+      }
+    }
+  },
 
-  if (over != null) {
-    if (typeof result === 'object' && result != null) {
-      return mergeOptions(result, over)
+  getStore () {
+    return store().store
+  },
+
+  getOverrides () {
+    return overrides()
+  },
+
+  getConfig (path) {
+    const result = store().get(path)
+    const over = getIn(overrides(), path)
+
+    if (over != null) {
+      if (typeof result === 'object' && result != null) {
+        return mergeOptions(result, over)
+      }
+
+      return over
     }
 
-    return over
+    return result
   }
-
-  return result
-}
-
-function getStore () {
-  return store.store
-}
-
-function getOverrides () {
-  return overrides
 }

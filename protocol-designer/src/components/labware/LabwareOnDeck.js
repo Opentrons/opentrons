@@ -14,7 +14,10 @@ import {
   CenteredTextSvg,
   LabwareContainer,
   ContainerNameOverlay,
-  EmptyDeckSlot
+  EmptyDeckSlot,
+  SLOT_WIDTH,
+  SLOT_HEIGHT,
+  humanizeLabwareType
 } from '@opentrons/components'
 
 import {nonFillableContainers} from '../../constants'
@@ -39,35 +42,58 @@ function OccupiedDeckSlotOverlay ({
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
         <ClickableText onClick={() => openIngredientSelector(containerId)}
-          iconName='plus' y='25%' text='Edit Ingredients' />
+          iconName='pen' y='25%' text='Edit Details' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
-        iconName='cursor-move' y='50%' text='Copy Labware' />
+        iconName='cursor-move' y='50%' text='Copy' />
       {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
       <ClickableText onClick={() =>
           window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
           deleteContainer({containerId, slot, containerType})
       }
-        iconName='close' y='75%' text='Delete Labware' />
+        iconName='close' y='75%' text='Delete' />
     </g>
   )
 }
 
-function SlotWithContainer ({containerType, containerName, containerId}) {
-  // NOTE: Ian 2017-12-06 is this a good or bad idea for SVG layouts?
+// TODO HACK Ian 2018-05-23 this is a temporary workaround until we use SVG tip racks
+const IMG_TIP_RACK_10UL = require('../../images/labware/10 uL Tip Rack.png')
+const IMG_TIP_RACK_GENERIC = require('../../images/labware/Tip Rack.png')
+const IMG_TRASH = require('../../images/labware/Trash.png')
+const FALLBACK_IMG = IMG_TIP_RACK_GENERIC // TODO LATER OR NEVER Ian 2018-04-23 better fallback img?
+const labwareImages = {
+  'tiprack-10ul': IMG_TIP_RACK_10UL,
+
+  'tiprack-200ul': IMG_TIP_RACK_GENERIC,
+  'GEB-tiprack-300ul': IMG_TIP_RACK_GENERIC,
+
+  'tiprack-1000ul': IMG_TIP_RACK_GENERIC,
+  'tiprack-1000ul-chem': IMG_TIP_RACK_GENERIC,
+
+  'trash-box': IMG_TRASH
+}
+
+type SlotWithContainerProps = {
+  containerType: string,
+  displayName: string,
+  containerId: string
+}
+
+function SlotWithContainer (props: SlotWithContainerProps) {
+  const {containerType, displayName, containerId} = props
 
   return (
     <g>
       {nonFillableContainers.includes(containerType)
         ? <image // TODO do real styles and maybe get SVG landscape images
-          href={`https://s3.amazonaws.com/opentrons-images/website/labware/${containerType}.png`}
-          width='120' height='120'
-          transform='translate(125 -15) rotate(90)'
+          href={labwareImages[containerType] || FALLBACK_IMG}
+          width={SLOT_WIDTH} height={SLOT_HEIGHT}
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
-      {containerName && <ContainerNameOverlay {...{containerType, containerName}} />}
+      <ContainerNameOverlay title={displayName || humanizeLabwareType(containerType)} />
+      {/* TODO NEXT Ian 2018-05-25 support disambiguation number '96 Flat (1)' */}
     </g>
   )
 }
@@ -78,6 +104,7 @@ type LabwareOnDeckProps = {
   containerId: string,
   containerType: string,
   containerName: ?string,
+  showNameOverlay: ?boolean,
 
   // canAdd: boolean,
 
@@ -115,6 +142,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     containerId,
     containerType,
     containerName,
+    showNameOverlay,
 
     // canAdd,
 
@@ -139,16 +167,15 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     deckSetupMode
   } = props
 
-  const hasName = containerName !== null
   const slotIsOccupied = !!containerType
 
-  const canAddIngreds = hasName && !nonFillableContainers.includes(containerType)
+  const canAddIngreds = !showNameOverlay && !nonFillableContainers.includes(containerType)
 
   return (
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
       {slotIsOccupied
-        ? <SlotWithContainer {...{containerType, containerName, containerId}} />
+        ? <SlotWithContainer displayName={containerName || containerType} {...{containerType, containerId}} />
         : <EmptyDeckSlot {...{height, width, slot}} />
       }
 
@@ -171,7 +198,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
         )
       }
 
-      {deckSetupMode && slotIsOccupied && hasName &&
+      {deckSetupMode && slotIsOccupied && !showNameOverlay &&
         <OccupiedDeckSlotOverlay {...{
           canAddIngreds,
           containerId,
@@ -183,7 +210,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           deleteContainer
         }} />}
 
-      {deckSetupMode && !hasName && <NameThisLabwareOverlay {...{
+      {deckSetupMode && showNameOverlay && <NameThisLabwareOverlay {...{
         containerType,
         containerId,
         slot,

@@ -17,9 +17,8 @@ type StateProps = {
 export default connect(mapStateToProps)(SidePanelGroup)
 
 function mapStateToProps (state): StateProps {
-  const instrumentsCalibrated = robotSelectors.getInstrumentsCalibrated(state)
   const isRunning = robotSelectors.getIsRunning(state)
-  const disabled = isRunning || !instrumentsCalibrated
+  const disabled = isRunning
 
   return {
     title: TITLE,

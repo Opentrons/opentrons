@@ -53,8 +53,16 @@ def settings_dir():
         res = resin_settings_dir
     else:
         new_path, new_cfg = _generate_base_config()
-        write_base_config(new_path, new_cfg)
-        res = new_path
+        try:
+            write_base_config(new_path, new_cfg)
+        except OSError:
+            # If a USB is mounted read-only:
+            log.error("Unable to write to {}. Is the mount read-only?".format(
+                new_path))
+            new_path, new_cfg = _generate_base_config(skip_usb=True)
+            write_base_config(new_path, new_cfg)
+        finally:
+            res = new_path
 
     return res
 
@@ -76,32 +84,38 @@ def get_config_index() -> dict:
             res[key] = default_val
             rewrite_needed = True
     if rewrite_needed:
-        write_base_config(base_path, res)
+        try:
+            write_base_config(base_path, res)
+        except OSError:
+            log.error("Unable to update base config. Is the mount read-only?")
     return res
 
 
 def _move_settings_data(source_path_dict, dest_path_dict):
-    for key, pth in source_path_dict.items():
-        tgt_dir = os.path.dirname(dest_path_dict[key])
-        os.makedirs(tgt_dir, exist_ok=True)
-        if key.endswith('Dir'):
-            log.debug("Copying directory contents onto USB drive")
-            # Source directory may not exist, or may be empty
-            # If target directory does exist, do not copy
-            os.makedirs(pth, exist_ok=True)
-            if os.listdir(pth) and not os.path.exists(dest_path_dict[key]):
-                shutil.copytree(pth, dest_path_dict[key])
+    try:
+        for key, pth in source_path_dict.items():
+            tgt_dir = os.path.dirname(dest_path_dict[key])
+            os.makedirs(tgt_dir, exist_ok=True)
+            if key.endswith('Dir'):
+                log.debug("Copying directory contents onto USB drive")
+                # Source directory may not exist, or may be empty
+                # If target directory does exist, do not copy
+                os.makedirs(pth, exist_ok=True)
+                if os.listdir(pth) and not os.path.exists(dest_path_dict[key]):
+                    shutil.copytree(pth, dest_path_dict[key])
+                else:
+                    log.debug("Directory copy preconditions failed:")
+                    log.debug("|- Source path exists: {}".format(
+                        os.path.exists(pth)))
+                    log.debug("|- Number of source files: {}".format(
+                        len(os.listdir(pth))))
+                    log.debug("|- Target path {} already exists: {}".format(
+                        tgt_dir, os.path.exists(tgt_dir)))
             else:
-                log.debug("Directory copy preconditions failed:")
-                log.debug("    Source path exists: {}".format(
-                    os.path.exists(pth)))
-                log.debug("    Number of source files: {}".format(
-                    len(os.listdir(pth))))
-                log.debug("    Target directory {} already exists: {}".format(
-                    tgt_dir, os.path.exists(tgt_dir)))
-        else:
-            if os.path.exists(pth):
-                shutil.copy2(pth, dest_path_dict[key])
+                if os.path.exists(pth):
+                    shutil.copy2(pth, dest_path_dict[key])
+    except OSError:
+        log.exception("Unable to move settings data due to:")
 
 
 def _flatten_dict(input_dict: dict) -> dict:
@@ -122,7 +136,7 @@ def _flatten_dict(input_dict: dict) -> dict:
     return res
 
 
-def _generate_base_config() -> (str, dict):
+def _generate_base_config(skip_usb=False) -> (str, dict):
     """
     Determines where existing info can be found in the system, and creates a
     corresponding data dict that can be written to index.json in the
@@ -170,7 +184,7 @@ def _generate_base_config() -> (str, dict):
             'robotSettings.json')
     }
     usb_mount_available = os.path.ismount(usb_mount_point)
-    if usb_mount_available:
+    if usb_mount_available and not skip_usb:
         os.makedirs(usb_settings_dir, exist_ok=True)
         base_data_dir = usb_settings_dir
         new_cfg = usb_config

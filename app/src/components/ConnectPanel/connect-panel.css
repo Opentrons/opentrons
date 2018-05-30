@@ -31,8 +31,8 @@
 }
 
 .active {
-  color: #0ec9eb;
-  background-color: #f0f3ff;
+  color: var(--c-highlight);
+  background-color: var(--c-bg-selected);
 }
 
 .scan_status {

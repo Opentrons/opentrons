@@ -15,7 +15,7 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
   fileFormValues,
   getInitialRobotState,
   robotStateTimeline,
-  (fileFormValues, initialRobotState, timeline) => {
+  (fileFormValues, initialRobotState, _robotStateTimeline) => {
     const {author, description} = fileFormValues
     const name = fileFormValues.name || 'untitled'
     const isValidFile = true // TODO Ian 2018-02-28 this will be its own selector
@@ -69,7 +69,7 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
       pipettes: instruments,
       labware,
 
-      procedure: timeline.map((timelineItem, i) => ({
+      procedure: _robotStateTimeline.timeline.map((timelineItem, i) => ({
         annotation: {
           name: `TODO Name ${i}`,
           description: 'todo description'

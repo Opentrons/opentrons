@@ -1,7 +1,7 @@
 // @flow
 import range from 'lodash/range'
 import {mergeLiquid, splitLiquid, getWellsForTips} from './utils'
-import type {RobotState, PipetteData} from './'
+import type {RobotState, PipetteData, SingleLabwareLiquidState} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
 
@@ -17,36 +17,39 @@ export default function updateLiquidState (
   prevLiquidState: LiquidState
 ) {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
-  const {wellsForTips, allWellsShared} = getWellsForTips(pipetteData.channels, labwareType, well)
+  const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
-  const pipetteLiquidState = range(pipetteData.channels).reduce((acc, tipIndex) => {
-    const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
-    const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
+  const pipetteLiquidState: SingleLabwareLiquidState = range(pipetteData.channels).reduce(
+    (acc: SingleLabwareLiquidState, tipIndex) => {
+      const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
+      const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
 
-    const newLiquidFromWell = splitLiquid(
-      allWellsShared ? volume / pipetteData.channels : volume, // divide source volume across shared tips
-      prevSourceLiquidState
-    ).dest
+      const newLiquidFromWell = splitLiquid(
+        volume,
+        prevSourceLiquidState
+      ).dest
 
-    return {
-      ...acc,
-      [tipIndex]: mergeLiquid(
-        prevTipLiquidState,
-        newLiquidFromWell
-      )
-    }
-  }, {})
+      return {
+        ...acc,
+        [tipIndex]: mergeLiquid(
+          prevTipLiquidState,
+          newLiquidFromWell
+        )
+      }
+    }, {})
 
   // Remove liquid from source well(s)
-  const labwareLiquidState = {
+  const labwareLiquidState: SingleLabwareLiquidState = {
     ...prevLiquidState.labware[labwareId],
-    ...wellsForTips.reduce((acc, well) => ({
+    ...wellsForTips.reduce((acc: SingleLabwareLiquidState, well) => ({
       ...acc,
       [well]: splitLiquid(
         volume,
-        prevLiquidState.labware[labwareId][well]
+        // When multiple tips aspirate from 1 well,
+        // that volume is sequentially removed, tip by tip
+        acc[well] || prevLiquidState.labware[labwareId][well]
       ).source
     }), {})
   }

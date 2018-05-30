@@ -1,6 +1,10 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import cx from 'classnames'
+
+import {SpinnerModal} from '@opentrons/components'
+import SessionAlert from './SessionAlert'
+
 import styles from './styles.css'
 
 export default class CommandList extends Component {
@@ -9,7 +13,7 @@ export default class CommandList extends Component {
   }
 
   render () {
-    const {commands} = this.props
+    const {commands, sessionStatus, cancelInProgress} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
@@ -25,7 +29,7 @@ export default class CommandList extends Component {
 
       const liProps = {
         key: id,
-        className: classnames(style, {
+        className: cx(style, {
           [styles.executed]: handledAt,
           [styles.current]: isCurrent,
           [styles.last_current]: isLast
@@ -43,13 +47,21 @@ export default class CommandList extends Component {
     }
 
     const commandItems = commands.map(makeCommandToTemplateMapper(0))
-
+    // TODO (ka 2018-5-21): Temporarily hiding error to avoid showing smoothie error on halt,
+    // error AlertItem would be useful for future errors
+    const showAlert = (sessionStatus !== 'running' && sessionStatus !== 'loaded' && sessionStatus !== 'error')
     return (
-      <section className={styles.run_log_wrapper}>
+      <div className={styles.run_page}>
+      {cancelInProgress && (
+        <SpinnerModal />
+      )}
+      <SessionAlert {...this.props} className={styles.alert}/>
+      <section className={cx(styles.run_log_wrapper, {[styles.alert_visible]: showAlert})}>
         <ol className={styles.list}>
           {commandItems}
         </ol>
       </section>
+      </div>
     )
   }
 }

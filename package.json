@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0",
+  "version": "3.0.1-beta.1",
   "private": true,
   "workspaces": [
     "app",
@@ -7,8 +7,14 @@
     "components",
     "shared-data",
     "protocol-designer",
-    "webpack-config"
+    "webpack-config",
+    "api/opentrons"
   ],
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "jest": {
     "moduleNameMapper": {
       "\\.(css)$": "identity-obj-proxy"
@@ -58,6 +64,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-react-optimize": "^1.0.1",
     "css-loader": "^0.28.4",
+    "cz-conventional-changelog": "2.1.0",
     "eslint": "3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.41.0",
@@ -88,10 +95,10 @@
     "react-test-renderer": "^16.2.0",
     "redux-mock-store": "^1.5.1",
     "script-ext-html-webpack-plugin": "^1.8.5",
-    "superagent": "^3.8.1",
     "style-loader": "^0.18.2",
     "stylelint": "^8.4.0",
     "stylelint-config-standard": "^18.0.0",
+    "superagent": "^3.8.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.1.0",
     "webpack-bundle-analyzer": "^2.8.2",

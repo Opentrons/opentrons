@@ -111,7 +111,7 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
     # [ 0  0  1  z ]
     # [ 0  0  0  1 ]
 
-    return xyz
+    return xyz.round(11)
 
 
 def apply_transform(

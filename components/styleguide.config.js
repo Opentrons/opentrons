@@ -52,6 +52,10 @@ module.exports = {
       components: 'src/icons/[A-Z]*.js'
     },
     {
+      name: 'Interaction Enhancers',
+      components: 'src/interaction-enhancers/[A-Z]*.js'
+    },
+    {
       name: 'Lists',
       components: 'src/lists/[A-Z]*.js'
     },

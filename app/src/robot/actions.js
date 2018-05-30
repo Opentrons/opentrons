@@ -56,9 +56,6 @@ export type ConnectResponseAction = {|
   payload: {|
     error: ?{message: string}
   |},
-  meta: {|
-    analytics: true
-  |},
 |}
 
 export type ReturnTipResponseAction = {|
@@ -237,8 +234,7 @@ export const actions = {
   connectResponse (error: ?Error): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error},
-      meta: {analytics: true}
+      payload: {error}
     }
   },
 
