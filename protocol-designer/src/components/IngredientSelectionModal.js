@@ -4,23 +4,19 @@ import * as React from 'react'
 import SingleLabware from './SingleLabware'
 import styles from './IngredientSelectionModal.css'
 
-import SelectablePlate from '../containers/SelectablePlate.js'
-// import IngredientsList from '../containers/IngredientsList.js'
-import IngredientPropertiesForm from '../containers/IngredientPropertiesForm.js'
+import SelectablePlate from '../containers/SelectablePlate'
+import IngredientPropertiesForm from '../containers/IngredientPropertiesForm'
+import LabwareNameEditForm from '../containers/LabwareNameEditForm'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
-type Props = {
-  visible: boolean
-}
+type Props = {}
 
 export default function IngredientSelectionModal (props: Props) {
-  const {visible} = props
-  if (!visible) return null
-
   return (
     <div className={styles.ingredient_modal}>
 
       <IngredientPropertiesForm />
+      <LabwareNameEditForm />
 
       <SingleLabware>
         <SelectablePlate showLabels selectable />

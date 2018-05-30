@@ -2,6 +2,7 @@
 import React from 'react'
 
 import {IconButton, SidePanel, TitledList} from '@opentrons/components'
+import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
@@ -132,6 +133,12 @@ export default function IngredientsList (props: Props) {
 
   return (
     <SidePanel title='Ingredients'>
+        <TitledList
+          className={stepItemStyles.step_item}
+          title='labware name'
+          iconName='flask-outline'
+          selected
+        />
 
         {ingredients && Object.keys(ingredients).map((i) =>
           <IngredGroupCard key={i}

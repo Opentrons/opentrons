@@ -54,6 +54,16 @@
   }
 }
 
+.simple_button_row {
+  lost-utility: clearfix;
+  lost-align: right flex;
+
+  & > * {
+    lost-column: 1/6;
+  }
+}
+
+/* TODO Ian 2018-05-30 clean up .button_row so it's more reusable, merge with .simple_button_row */
 .button_row {
   lost-utility: clearfix;
   margin-top: 2rem;

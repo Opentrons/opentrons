@@ -472,7 +472,7 @@ export const selectors = {
   containersBySlot,
   labwareToCopy,
   canAdd,
-  selectedIngredientGroup: getSelectedIngredientGroup,
+  getSelectedIngredientGroup,
   ingredientsByLabware,
   labwareOptions
 }
