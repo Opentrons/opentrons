@@ -58,7 +58,6 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
       containerType,
       containerId,
       slot,
-      // modifyContainer, // TODO do propTypes, include this
       deleteContainer
     } = this.props
 
@@ -66,27 +65,21 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
       <g className={styles.slot_overlay}>
         <rect className={styles.overlay_panel} />
         <g transform='translate(5, 0)'>
-          <text className={styles.clickable} x='0' y='0'>Name this labware:</text>
           <ForeignDiv x='0' y='15%' width='90%'>
             <input
+              className={styles.name_input}
               onChange={this.handleChange}
               onKeyUp={this.handleKeyUp}
               placeholder={NICKNAME_PROMPT}
               value={this.state.inputValue}
             />
           </ForeignDiv>
-          {/* <text className={styles.clickable} x='0' y='60%' onClick={this.onSubmit}>
-            Save
-          </text> */}
+
           <ClickableText onClick={this.onSubmit}
-            iconName='plus' y='60%' text='Save Labware' />
+            iconName='check' y='60%' text='Save' />
+
           <ClickableText onClick={() => deleteContainer({containerId, slot, containerType})}
             iconName='close' y='80%' text='Cancel' />
-          {/* <text className={styles.clickable} x='0' y='80%'
-            onClick={() => deleteContainer({containerId, slot, containerType})}
-          >
-              Delete
-          </text> */}
         </g>
       </g>
     )
