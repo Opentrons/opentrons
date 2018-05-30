@@ -2,8 +2,9 @@
 
 import sys
 import logging
-# import os
+import os
 import traceback
+import atexit
 from aiohttp import web
 from opentrons import robot
 from opentrons.api import MainRouter
@@ -18,6 +19,25 @@ from logging.config import dictConfig
 from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
+lock_file_path = 'tmp/resin/resin-updates.lock'
+
+
+def lock_resin_updates():
+    if os.environ.get('RUNNING_ON_PI'):
+        import fcntl
+
+        try:
+            with open(lock_file_path, 'w') as fd:
+                fd.write('a')
+                fcntl.flock(fd, fcntl.LOCK_EX)
+                fd.close()
+        except OSError:
+            log.warning('Unable to create resin-update lock file')
+
+
+def unlock_resin_updates():
+    if os.environ.get('RUNNING_ON_PI') and os.path.exists(lock_file_path):
+        os.remove(lock_file_path)
 
 
 def log_init():
@@ -210,6 +230,8 @@ def main():
         log.info("Homing Z axes")
         robot.home_z()
 
+    atexit.register(unlock_resin_updates)
+    lock_resin_updates()
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
 
