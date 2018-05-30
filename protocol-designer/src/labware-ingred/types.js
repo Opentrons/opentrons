@@ -4,7 +4,13 @@ import type {LabwareData} from '../step-generation'
 
 //  ===== LABWARE ===========
 
-export type Labware = LabwareData // TODO Ian 2018-03-01 use same name, ("Labware"?)
+// NOTE: In labware-ingred, labware objects have a `disambiguationNumber` field
+// so that UI can render "96 Flat (2)"
+export type Labware = {|
+  ...LabwareData,
+  id: string,
+  disambiguationNumber: number
+|}
 
 // ==== WELLS ==========
 

@@ -58,7 +58,7 @@ describe('wellContentsAllLabware', () => {
   const singleIngredResult = wellContentsAllLabware.resultFunc(
     containerState, // all labware
     ingredsByLabwareXXSingleIngred,
-    {containerId: 'container1Id'}, // selected labware
+    {id: 'container1Id'}, // selected labware
     {A1: 'A1', B1: 'B1'}, // selected
     {A3: 'A3'} // highlighted
   )

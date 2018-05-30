@@ -16,10 +16,10 @@ type PropsWithoutActions = {
 function mapStateToProps (state: BaseState): PropsWithoutActions {
   // TODO Ian 2018-02-21 put these selectors in Header
   // const activeModals = selectors.activeModals(state)
-  const container = selectors.selectedContainer(state)
+  const container = selectors.getSelectedContainer(state)
   const selectedIngredientGroup = selectors.selectedIngredientGroup(state)
   return {
-    ingredients: container ? selectors.ingredientsByLabware(state)[container.containerId] : {},
+    ingredients: container ? selectors.ingredientsByLabware(state)[container.id] : {},
     selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
     selected: false
   }

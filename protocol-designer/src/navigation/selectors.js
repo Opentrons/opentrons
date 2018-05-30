@@ -14,7 +14,7 @@ export const newProtocolModal = (state: BaseState) =>
 
 export const currentPage: Selector<Page> = (state: BaseState) => {
   // If we're in ingredient detail mode, override the nav button page state
-  const ingredDetailMode = labwareIngredSelectors.selectedContainer(state) &&
+  const ingredDetailMode = labwareIngredSelectors.getSelectedContainer(state) &&
     !wellSelectionSelectors.wellSelectionModalData(state)
   const page = navigationRootSelector(state).page
 

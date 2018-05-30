@@ -8,7 +8,6 @@ import wellSelectionSelectors from '../../well-selection/selectors'
 
 import type {Selector, JsonWellData, VolumeJson} from '../../types'
 import type {Wells, AllWellContents, IngredsForLabware} from '../../labware-ingred/types'
-import type {LabwareData} from '../../step-generation'
 import {defaultContainers} from '../../constants.js'
 
 const _getWellContents = (
@@ -62,12 +61,12 @@ const wellContentsAllLabware: Selector<{[labwareId: string]: AllWellContents}> =
   labwareIngredSelectors.getSelectedContainer,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
-  (_labware: {[id: string]: LabwareData}, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
-    const allLabwareIds = Object.keys(_labware)
+  (_labware, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
+    const allLabwareIds: Array<string> = Object.keys(_labware) // TODO Ian 2018-05-29 weird flow error w/o annotation
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: AllWellContents | null}, labwareId: string) => {
       const ingredsForLabware = _ingredsByLabware[labwareId]
-      const isSelectedLabware = _selectedLabware && (_selectedLabware.containerId === labwareId)
+      const isSelectedLabware = _selectedLabware && (_selectedLabware.id === labwareId)
       // Skip labware ids with no ingreds
       return {
         ...acc,

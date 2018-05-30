@@ -2,15 +2,16 @@
 import {createSelector} from 'reselect'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import type {BaseState, Selector} from '../../types'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {IngredInstance} from '../../labware-ingred/types'
+import type {IngredInstance, Labware} from '../../labware-ingred/types'
 
-const all96Tips = reduce( // TODO Ian 2018-04-05 mapValues
+const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
   (acc: {[string]: boolean}, wellName: string) => ({...acc, [wellName]: true}),
   {}
@@ -51,13 +52,25 @@ export const getLabwareLiquidState: Selector<LabwareLiquidState> = createSelecto
   }
 )
 
+function labwareConverter (labwareAppState: {[labwareId: string]: Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
+  // Convert internal PD labware objects into JSON spec labware objects
+  // (just removes keys & makes flow happy)
+  return mapValues(labwareAppState, (l: Labware): StepGeneration.LabwareData => ({
+    name: l.name,
+    type: l.type,
+    slot: l.slot
+  }))
+}
+
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   equippedPipettes,
   labwareIngredSelectors.getLabware,
   getLabwareLiquidState,
-  (pipettes, labware, labwareLiquidState) => {
+  (pipettes, labwareAppState, labwareLiquidState) => {
     type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
     type TiprackTipState = $PropertyType<TipState, 'tipracks'>
+
+    const labware = labwareConverter(labwareAppState)
 
     const tipracks: TiprackTipState = reduce(
       labware,

@@ -8,7 +8,7 @@ import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../s
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+// import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
@@ -33,7 +33,7 @@ type DP = $Diff<$Diff<Props, SP>, OP>
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
   const allSteps = steplistSelectors.allSteps(state)
-  const allLabware = labwareIngredSelectors.getLabware(state)
+  // const allLabware = labwareIngredSelectors.getLabware(state) // TODO
 
   // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
   // Also if you can, use END_STEP const instead of hard-coded '__end__',
@@ -72,8 +72,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
-    getLabwareName: (labwareId: ?string): ?string =>
-      labwareId && allLabware[labwareId] && allLabware[labwareId].name // TODO make mini selector
+    getLabwareName: (labwareId: ?string) => 'todo labware name' // (labwareId: ?string): ?string =>
+      // labwareId && allLabware[labwareId] && allLabware[labwareId].name // TODO IMMEDIATELY make selector
   }
 }
 
