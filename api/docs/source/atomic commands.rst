@@ -150,7 +150,7 @@ Calls to ``pick_up_tip()`` will by default start at the attached tip rack's ``'A
 
 .. code-block:: python
 
-    pipette.start_at_tip(tip_rack_1['C3'])
+    pipette.start_at_tip(tip_rack_1.well('C3'))
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
     pipette.return_tip()
 

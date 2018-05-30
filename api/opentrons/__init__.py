@@ -52,6 +52,10 @@ class InstrumentsWrapper(object):
         self.robot = robot
 
     def Pipette(self, *args, **kwargs):
+        """
+        Deprecated -- do not use this constructor directly. Use the model-
+        specific constructors available in this module.
+        """
         return inst.Pipette(self.robot, *args, **kwargs)
 
     def P10_Single(
@@ -182,9 +186,6 @@ class InstrumentsWrapper(object):
 
     def Magbead(self, *args, **kwargs):
         return inst.Magbead(self.robot, *args, **kwargs)
-
-    def TemperaturePlate(self,  *args, **kwargs):
-        return inst.TemperaturePlate(self.robot, *args, **kwargs)
 
     def _create_pipette_from_config(
             self,
