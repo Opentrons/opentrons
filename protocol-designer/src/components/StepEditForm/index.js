@@ -14,12 +14,14 @@ import {
 
 import WellSelectionInput from '../../containers/WellSelectionInput'
 import FormSection from './FormSection'
-import styles from '../Form.css'
+import formStyles from '../forms.css'
+import styles from './StepEditForm.css'
 import type {FormSectionNames, FormSectionState} from '../../steplist/types' // TODO import from index.js
 import type {FormData} from '../../form-types'
 
 import {formConnectorFactory} from '../../utils'
 
+type FormConnectorType = $Call<typeof formConnectorFactory, *, *>
 type Options = Array<DropdownOption>
 
 export type Props = {
@@ -41,18 +43,13 @@ export type Props = {
 
 type CheckboxRowProps = {
   label?: string,
-  formConnector: $Call<typeof formConnectorFactory, *, *>,
+  formConnector: FormConnectorType,
   checkboxAccessor: string,
   children?: ?React.Node,
-  className?: ?string
+  className?: string
 }
 function CheckboxRow (props: CheckboxRowProps) {
-  const {formConnector, checkboxAccessor, label} = props
-
-  // className prop overrides default class, unless it's null
-  const className = (props.className === undefined)
-    ? styles.column_2_3
-    : props.className || undefined
+  const {formConnector, checkboxAccessor, label, className} = props
 
   const checked = formConnector(checkboxAccessor).value
 
@@ -60,7 +57,7 @@ function CheckboxRow (props: CheckboxRowProps) {
     <div className={styles.field_row}>
       <CheckboxField label={label} className={className}
         {...formConnector(checkboxAccessor)} />
-      {checked && props.children}
+      {checked ? props.children : null}
     </div>
   )
 }
@@ -139,6 +136,20 @@ export default function StepEditForm (props: Props) {
   const {formData} = props
   const formConnector = formConnectorFactory(props.handleChange, formData)
 
+  const pipetteField = (
+    <FormGroup label='Pipette:' className={styles.pipette_field}>
+      <DropdownField
+        options={props.pipetteOptions}
+        {...formConnector('pipette')} />
+    </FormGroup>
+  )
+
+  const volumeField = (
+    <FormGroup label='Volume:' className={styles.volume_field}>
+      <InputField units='μL' {...formConnector('volume')} />
+    </FormGroup>
+  )
+
   const buttonRow = <div className={styles.button_row}>
     <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
       MORE OPTIONS
@@ -147,7 +158,7 @@ export default function StepEditForm (props: Props) {
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>
 
-  const formColumnRight = <div className={cx(styles.column_1_2, styles.rightmost_column)}>
+  const formColumnRight = <div className={styles.right_settings_column}>
       <FormGroup label='CHANGE TIP'>
           <DropdownField
             {...formConnector('aspirate--change-tip')}
@@ -167,31 +178,34 @@ export default function StepEditForm (props: Props) {
   // Especially, make components for the re-used form parts instead of repeating them
   if (formData.stepType === 'mix') {
     return (
-      <div className={styles.form}>
-        <div className={styles.row_wrapper}>
-          <div className={styles.top_row}>
-            {/* TODO Ian 2018-05-08 this labware/wells/pipette could be a component,
-              it's common across most forms */}
-            <FormGroup label='Labware:'>
-              <DropdownField options={props.labwareOptions} {...formConnector('labware')} />
-            </FormGroup>
-            {/* TODO LATER: also 'disable' when selected labware is a trash */}
-            <WellSelectionInput
-              labwareId={formData['labware']}
-              pipetteId={formData['pipette']}
-              initialSelectedWells={formData['wells']}
-              formFieldAccessor={'wells'}
-            />
-            <FormGroup label='Pipette:'>
-              <DropdownField options={props.pipetteOptions} {...formConnector('pipette')} />
-            </FormGroup>
-          </div>
-          <div className={styles.row_wrapper}>
-            <div className={styles.column_1_2}>
-              <FormGroup label='Repetitions' className={styles.field_row}>
-                <InputField units='uL' {...formConnector('volume')} />
-                <InputField units='Times' {...formConnector('times')} />
-              </FormGroup>
+      <div className={formStyles.form}>
+        <div className={formStyles.row_wrapper}>
+          {/* TODO Ian 2018-05-08 this labware/wells/pipette could be a component,
+            it's common across most forms */}
+          <FormGroup label='Labware:' className={styles.labware_field}>
+            <DropdownField options={props.labwareOptions} {...formConnector('labware')} />
+          </FormGroup>
+          {/* TODO LATER: also 'disable' when selected labware is a trash */}
+          <WellSelectionInput
+            className={styles.well_selection_input}
+            labwareId={formData['labware']}
+            pipetteId={formData['pipette']}
+            initialSelectedWells={formData['wells']}
+            formFieldAccessor={'wells'}
+          />
+          {pipetteField}
+        </div>
+
+        <div className={cx(formStyles.row_wrapper)}>
+          <FormGroup label='Repetitions' className={styles.field_row}>
+            <InputField units='uL' {...formConnector('volume')} />
+            <InputField units='Times' {...formConnector('times')} />
+          </FormGroup>
+        </div>
+
+        <div className={formStyles.row_wrapper}>
+          <div className={styles.left_settings_column}>
+            <FormGroup label='TECHNIQUE'>
               <DelayField
                 checkboxAccessor='dispense--delay--checkbox'
                 formConnector={formConnector}
@@ -214,9 +228,9 @@ export default function StepEditForm (props: Props) {
                 formConnector={formConnector}
                 label='Touch tip'
               />
-            </div>
-            {formColumnRight}
+            </FormGroup>
           </div>
+          {formColumnRight}
         </div>
         {buttonRow}
       </div>
@@ -225,16 +239,16 @@ export default function StepEditForm (props: Props) {
 
   if (formData.stepType === 'pause') {
     return (
-      <div className={styles.form}>
-        <div className={styles.row_wrapper}>
-          <div className={styles.column_1_2}>
+      <div className={formStyles.form}>
+        <div className={formStyles.row_wrapper}>
+          <div className={formStyles.column_1_2}>
             <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
               {...formConnector('pause-for-amount-of-time')} />
             <InputField units='hr' {...formConnector('pause-hour')} />
             <InputField units='m' {...formConnector('pause-minute')} />
             <InputField units='s' {...formConnector('pause-second')} />
           </div>
-          <div className={styles.column_1_2}>
+          <div className={formStyles.column_1_2}>
             <RadioGroup options={[{name: 'Pause until told to resume', value: 'false'}]}
               {...formConnector('pause-for-amount-of-time')} />
             <FormGroup label='Message to display'>
@@ -252,32 +266,29 @@ export default function StepEditForm (props: Props) {
     formData.stepType === 'distribute'
   ) {
     return (
-      <div className={styles.form}>
+      <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormSection title='Aspirate'
           onCollapseToggle={props.onToggleFormSection('aspirate')}
           collapsed={props.formSectionCollapse.aspirate}
         >
-          <div className={styles.top_row}>
-            <FormGroup label='Labware:'>
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label='Labware:' className={styles.labware_field}>
               <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
             </FormGroup>
             {/* TODO LATER: also 'disable' when selected labware is a trash */}
             <WellSelectionInput
+              className={styles.well_selection_input}
               labwareId={formData['aspirate--labware']}
               pipetteId={formData['pipette']}
               initialSelectedWells={formData['aspirate--wells']}
               formFieldAccessor={'aspirate--wells'}
             />
-            <FormGroup label='Pipette:'>
-              <DropdownField options={props.pipetteOptions} {...formConnector('pipette')} />
-            </FormGroup>
-            {formData.stepType === 'consolidate' && <FormGroup label='Volume:'>
-              <InputField units='μL' {...formConnector('volume')} />
-            </FormGroup>}
+            {pipetteField}
+            {formData.stepType === 'consolidate' && volumeField}
           </div>
 
-          <div className={styles.row_wrapper}>
-            <div className={styles.column_1_2}>
+          <div className={formStyles.row_wrapper}>
+            <div className={styles.left_settings_column}>
               <FormGroup label='TECHNIQUE'>
                 <CheckboxRow
                   checkboxAccessor='aspirate--pre-wet-tip'
@@ -324,24 +335,23 @@ export default function StepEditForm (props: Props) {
           onCollapseToggle={props.onToggleFormSection('dispense')}
           collapsed={props.formSectionCollapse.dispense}
         >
-          <div className={styles.top_row}>
-            <FormGroup label='Labware:'>
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label='Labware:' className={styles.labware_field}>
               <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />
             </FormGroup>
             <WellSelectionInput
+              className={styles.well_selection_input}
               labwareId={formData['dispense--labware']}
               pipetteId={formData['pipette']}
               initialSelectedWells={formData['dispense--wells']}
               formFieldAccessor={'dispense--wells'}
             />
             {(formData.stepType === 'transfer' || formData.stepType === 'distribute') &&
-              <FormGroup label='Volume:'>
-                <InputField units='μL' {...formConnector('volume')} />
-              </FormGroup>}
+              volumeField}
           </div>
 
-          <div className={styles.row_wrapper}>
-            <div className={styles.column_1_2}>
+          <div className={formStyles.row_wrapper}>
+            <div className={styles.left_settings_column}>
               <FormGroup label='TECHNIQUE'>
                 <MixField
                   checkboxAccessor='dispense--mix--checkbox'
@@ -369,7 +379,7 @@ export default function StepEditForm (props: Props) {
               </FormGroup>
             </div>
 
-            <div className={styles.column_1_2}>
+            <div className={styles.right_settings_column}>
               <FlowRateField />
               <TipPositionField />
             </div>
@@ -383,7 +393,7 @@ export default function StepEditForm (props: Props) {
   }
 
   return (
-    <div className={styles.form}>
+    <div className={formStyles.form}>
       <div>Todo: support {formData.stepType} step</div>
     </div>
   )

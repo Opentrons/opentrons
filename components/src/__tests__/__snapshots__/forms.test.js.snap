@@ -201,10 +201,10 @@ exports[`DropdownField renders correctly with a value 1`] = `
 
 exports[`FormGroup renders correctly 1`] = `
 <div
-  className="foo"
+  className="form_group foo"
 >
   <div
-    className="formgroup_label"
+    className="form_group_label"
   >
     This is the label
   </div>

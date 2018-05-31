@@ -1,5 +1,4 @@
 @import '@opentrons/components';
-@import '../Form.css';
 
 .pipette_text {
   @apply --font-body-1-dark;

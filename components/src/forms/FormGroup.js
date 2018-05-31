@@ -10,7 +10,7 @@ type Props = {
   /** form content */
   children?: React.Node,
   /** classes to apply */
-  className?: string,
+  className?: ?string,
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
   error?: ?string,
   /** enable disabled style. Overridden by truthy `error` */

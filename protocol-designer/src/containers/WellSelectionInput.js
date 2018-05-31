@@ -8,6 +8,7 @@ import {openWellSelectionModal} from '../well-selection/actions'
 import {InputField, FormGroup} from '@opentrons/components'
 
 type OP = {
+  className?: ?string,
   formFieldAccessor: string,
   pipetteId?: string,
   labwareId?: string,
@@ -21,11 +22,11 @@ type DP = {
 type Props = OP & DP
 
 function WellSelectorInput (props: Props) {
-  const {initialSelectedWells, labwareId, pipetteId, onClick} = props
+  const {initialSelectedWells, labwareId, pipetteId, onClick, className} = props
   const disabled = !(labwareId && pipetteId)
 
   return (
-    <FormGroup label='Wells:' disabled={disabled}>
+    <FormGroup label='Wells:' disabled={disabled} className={className}>
       <InputField
         readOnly
         value={initialSelectedWells && `${initialSelectedWells.length}`} // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel

@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 
 import styles from './IngredientPropertiesForm.css'
-import formStyles from './Form.css'
+import formStyles from './forms.css'
 
 import type {
   IngredInputs,
