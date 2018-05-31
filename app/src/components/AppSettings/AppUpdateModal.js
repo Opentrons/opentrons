@@ -16,9 +16,9 @@ type Props = {
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
 export default function AppUpdateModal (props: Props) {
-  const {close, update: {downloadInProgress}} = props
+  const {close, update: {error, downloadInProgress}} = props
   const {button, message} = mapPropsToButtonPropsAndMessage(props)
-  const closeButtonChildren = props.error || downloadInProgress
+  const closeButtonChildren = error || downloadInProgress
     ? 'close'
     : 'not now'
 

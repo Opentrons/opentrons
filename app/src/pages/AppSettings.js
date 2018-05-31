@@ -73,8 +73,8 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
     downloadUpdate: () => dispatch(downloadShellUpdate()),
     quitAndInstall: () => quitAndInstallShellUpdate(),
     closeUpdateModal: () => {
-      dispatch(push('/menu/app'))
       dispatch(setUpdateSeen())
+      dispatch(push('/menu/app'))
     },
     toggleAnalyticsOptedIn: () => dispatch(toggleAnalyticsOptedIn())
   }
