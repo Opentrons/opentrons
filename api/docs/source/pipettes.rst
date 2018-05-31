@@ -1,6 +1,6 @@
 .. _pipettes:
 
-The ``instruments`` module gives your protocol access to the ``Pipette``, which is what you will be primarily using to create protocol commands.
+The ``instruments`` module gives your protocol access to the pipette constructors, which is what you will be primarily using to create protocol commands.
 
 ************************
 
@@ -37,7 +37,7 @@ model names specified above and call it out as ``instruments``.(Model Name)
 Mount
 ===================
 
-To create a ``Pipette``, you must give it a mount. The mount can be either ``'left'`` or ``'right'``.
+To create a pipette object, you must give it a mount. The mount can be either ``'left'`` or ``'right'``.
 In this example, we are using a Single-Channel 300uL pipette.
 
 .. code-block:: python
@@ -59,3 +59,14 @@ The values are in microliters/seconds, and have varying defaults depending on th
         aspirate_flow_rate=200,
         dispense_flow_rate=600)
 
+
+
+Old Pipette Constructor
+=======================
+
+The ``Pipette`` constructor that was used directly in OT-One protocols is now
+an internal-only class. Its behavior is difficult to predict when not used
+through the public constructors mentioned above. ``Pipette`` constructor
+arguments are subject to change of their default values, behaviors, and
+parameters may be added or removed without warning or a major version
+increment.

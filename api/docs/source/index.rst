@@ -28,12 +28,12 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
 .. code-block:: none
 
-    Use the Opentrons API's containers and instruments
+    Use the Opentrons API's labware and instruments
 
-    Add a 96 well plate, and place it in slot 'B1' of the robot deck
-    Add a 200uL tip rack, and place it in slot 'A1' of the robot deck
+    Add a 96 well plate, and place it in slot '2' of the robot deck
+    Add a 200uL tip rack, and place it in slot '1' of the robot deck
 
-    Add a 200uL pipette to axis 'b', and tell it to use that tip rack
+    Add a single-channel 300uL pipette to the left mount, and tell it to use that tip rack
 
     Transfer 100uL from the plate's 'A1' well to it's 'B2' well
 
@@ -42,14 +42,14 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 .. code-block:: python
 
     # imports
-    from opentrons import containers, instruments
+    from opentrons import labware, instruments
 
-    # containers
-    plate = containers.load('96-flat', 'B1')
-    tiprack = containers.load('tiprack-200ul', 'A1')
+    # labware
+    plate = labware.load('96-flat', '2')
+    tiprack = labware.load('tiprack-200ul', '1')
 
     # pipettes
-    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
     # commands
     pipette.transfer(100, plate.wells('A1'), plate.wells('B2'))
@@ -62,48 +62,48 @@ How it's Organized
 When writing protocols using the Opentrons API, there are generally three sections:
 
 1) Imports
-2) Containers
+2) Labware
 3) Pipettes
 4) Commands
 
 Imports
 ^^^^^^^
 
-When writing in Python, you must always include the Opentrons API within your file. We most commonly use the ``containers`` and ``instruments`` sections of the API.
+When writing in Python, you must always include the Opentrons API within your file. We most commonly use the ``labware`` and ``instruments`` sections of the API.
 
 From the example above, the "imports" section looked like:
 
 .. code-block:: python
 
-    from opentrons import containers, instruments
+    from opentrons import labware, instruments
 
 
-Containers
-^^^^^^^^^^
+Labware
+^^^^^^^
 
-While the imports section is usually the same across protocols, the containers section is different depending on the tip racks, well plates, troughs, or tubes you're using on the robot.
+While the imports section is usually the same across protocols, the labware section is different depending on the tip racks, well plates, troughs, or tubes you're using on the robot.
 
-Each container is given a type (ex: ``'96-flat'``), and the slot on the robot it will be placed (ex: ``'B1'``).
+Each labware is given a type (ex: ``'96-flat'``), and the slot on the robot it will be placed (ex: ``'2'``).
 
-From the example above, the "containers" section looked like:
+From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = containers.load('96-flat', 'B1')
-    tiprack = containers.load('tiprack-200ul', 'A1')
+    plate = labware.load('96-flat', '2')
+    tiprack = labware.load('tiprack-200ul', '1')
 
 Pipettes
 ^^^^^^^^
 
-Next, pipettes are created and attached to a specific axis on the OT-One (``'a'`` or ``'b'``). Axis ``'a'`` is on the center of the head, while axis ``'b'`` is on the left.
+Next, pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``).
 
-There are other parameters for pipettes, but the most important are the ``max_volume`` to set it's size, and the tip rack(s) it will use during the protocol.
+There are other parameters for pipettes, but the most important are the tip rack(s) it will use during the protocol.
 
 From the example above, the "pipettes" section looked like:
 
 .. code-block:: python
 
-    pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
 Commands
 ^^^^^^^^

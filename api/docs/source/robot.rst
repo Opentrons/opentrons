@@ -25,7 +25,7 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     plate = labware.load('96-flat', 'B1', 'my-plate')
     tiprack = labware.load('tiprack-200ul', 'A1', 'my-rack')
 
-    pipette = labware.P300_Single(mount='left', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
 
 User-Specified Pause

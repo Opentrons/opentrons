@@ -45,7 +45,13 @@ class PipetteTip:
 
 class Pipette:
     """
-    Through this class you can can:
+    DIRECT USE OF THIS CLASS IS DEPRECATED -- this class should not be used
+    directly. Its parameters, defaults, methods, and behaviors are subject to
+    change without a major version release. Use the model-specific constructors
+    available through `from opentrons import instruments`.
+
+    All model-specific instrument constructors are inheritors of this class.
+    With any of those instances you can can:
         * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
           :meth:`mix`, and :meth:`blow_out`
         * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
@@ -65,7 +71,7 @@ class Pipette:
     Parameters
     ----------
     mount : str
-        The axis of the pipette's actuator on the Opentrons robot
+        The mount of the pipette's actuator on the Opentrons robot
         ('left' or 'right')
     trash_container : Container
         Sets the default location :meth:`drop_tip()` will put tips
