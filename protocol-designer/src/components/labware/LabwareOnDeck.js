@@ -17,7 +17,8 @@ import {
   EmptyDeckSlot,
   SLOT_WIDTH,
   SLOT_HEIGHT,
-  humanizeLabwareType
+  humanizeLabwareType,
+  clickOutside
 } from '@opentrons/components'
 
 import {nonFillableContainers} from '../../constants'
@@ -26,6 +27,8 @@ import styles from './labware.css'
 import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
+
+const EnhancedNameThisLabwareOverlay = clickOutside(NameThisLabwareOverlay)
 
 function OccupiedDeckSlotOverlay ({
   canAddIngreds,
@@ -171,6 +174,11 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
 
   const canAddIngreds = !showNameOverlay && !nonFillableContainers.includes(containerType)
 
+  const setDefaultLabwareName = () => modifyContainer({
+    containerId,
+    modify: {name: null}
+  })
+
   return (
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
@@ -210,13 +218,14 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           deleteContainer
         }} />}
 
-      {deckSetupMode && showNameOverlay && <NameThisLabwareOverlay {...{
+      {deckSetupMode && showNameOverlay && <EnhancedNameThisLabwareOverlay {...{
         containerType,
         containerId,
         slot,
         modifyContainer,
         deleteContainer
-      }} />}
+      }}
+      onClickOutside={setDefaultLabwareName} />}
     </LabwareContainer>
   )
 }

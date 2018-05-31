@@ -3,6 +3,7 @@ import * as React from 'react'
 import ForeignDiv from '../../components/ForeignDiv.js'
 import ClickableText from './ClickableText'
 import styles from './labware.css'
+import type {ClickOutsideInterface} from '@opentrons/components'
 
 type Props = {
   containerType: string,
@@ -11,7 +12,7 @@ type Props = {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   modifyContainer: (args: {containerId: string, modify: {[field: string]: mixed}}) => void,
   deleteContainer: (args: {containerId: string, slot: string, containerType: string}) => void
-}
+} & ClickOutsideInterface
 
 type State = {
   pristine: boolean,
@@ -57,11 +58,12 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
       containerType,
       containerId,
       slot,
-      deleteContainer
+      deleteContainer,
+      passRef
     } = this.props
 
     return (
-      <g className={styles.slot_overlay}>
+      <g className={styles.slot_overlay} ref={passRef}>
         <rect className={styles.overlay_panel} />
         <g transform='translate(5, 0)'>
           <ForeignDiv x='0' y='15%' width='90%'>
