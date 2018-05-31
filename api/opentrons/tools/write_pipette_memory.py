@@ -11,14 +11,14 @@ MODELS = {
         'P300M': 'p300_multi_v1',
         'P1000S': 'p1000_single_v1'
     },
-    'v13': {
-        'P10SV13': 'p10_single_v13',
-        'P10MV13': 'p10_multi_v13',
-        'P50SV13': 'p50_single_v13',
-        'P50MV13': 'p50_multi_v13',
-        'P3HSV13': 'p300_single_v13',
-        'P3HMV13': 'p300_multi_v13',
-        'P1KSV13': 'p1000_single_v13'
+    'v1.3': {
+        'P10SV13': 'p10_single_v1.3',
+        'P10MV13': 'p10_multi_v1.3',
+        'P50SV13': 'p50_single_v1.3',
+        'P50MV13': 'p50_multi_v1.3',
+        'P3HSV13': 'p300_single_v1.3',
+        'P3HMV13': 'p300_multi_v1.3',
+        'P1KSV13': 'p1000_single_v1.3'
     }
 }
 
@@ -83,9 +83,9 @@ def _user_submitted_barcode(max_length):
 
 
 def _parse_model_from_barcode(barcode):
-    # MUST iterate through v13 first, because v1 barcodes did not have
+    # MUST iterate through v1.3 first, because v1 barcodes did not have
     # characters to specify the version number
-    for version in ['v13', 'v1']:
+    for version in ['v1.3', 'v1']:
         for barcode_substring in MODELS[version].keys():
             if barcode.startswith(barcode_substring):
                 return MODELS[version][barcode_substring]
