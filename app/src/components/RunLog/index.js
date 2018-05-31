@@ -25,7 +25,7 @@ function mapStateToProps (state: State): SP {
     sessionStatus: robotSelectors.getSessionStatus(state),
     showSpinner: (
       robotSelectors.getCancelInProgress(state) ||
-      robotSelectors.getUploadInProgress(state)
+      robotSelectors.getSessionLoadInProgress(state)
     )
   }
 }

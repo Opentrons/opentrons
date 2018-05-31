@@ -20,7 +20,7 @@ const mapStateToProps = (state) => ({
   disabled: (
     !robotSelectors.getSessionIsLoaded(state) ||
     robotSelectors.getCancelInProgress(state) ||
-    robotSelectors.getUploadInProgress(state)
+    robotSelectors.getSessionLoadInProgress(state)
   )
 })
 
