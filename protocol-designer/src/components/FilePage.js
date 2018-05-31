@@ -40,7 +40,7 @@ export default function FilePage (props: Props) {
         <h2>
           Pipettes
         </h2>
-        <InstrumentGroup {...instruments} />
+        <InstrumentGroup {...instruments} showMountLabel />
       </section>
     </div>
   )

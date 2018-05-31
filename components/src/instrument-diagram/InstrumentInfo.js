@@ -11,6 +11,8 @@ import styles from './instrument.css'
 export type InstrumentInfoProps = {
   /** 'left' or 'right' */
   mount: Mount,
+  /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
+  showMountLabel?: ?boolean,
   /** human-readable description, eg 'p300 Single-channel' */
   description: string,
   /** recommended tip type */
@@ -38,7 +40,10 @@ export default function InstrumentInfo (props: InstrumentInfoProps) {
   return (
     <div className={className}>
       <div className={cx(styles.pipette_info, props.infoClassName)}>
-        <InfoItem title={'pipette'} value={props.description} />
+        <InfoItem
+          title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
+          value={props.description}
+        />
         <InfoItem title={'suggested tip type'} value={props.tipType} />
         {props.children}
       </div>
