@@ -7,15 +7,27 @@ import {OutlineButton} from '@opentrons/components'
 import styles from './styles.css'
 
 type RunProps = {
+  disabled: boolean,
   isReadyToRun: boolean,
   isPaused: boolean,
   isRunning: boolean,
-  onRunClick: () => void,
-  onPauseClick: () => void,
-  onResumeClick: () => void,
+  onRunClick: () => mixed,
+  onPauseClick: () => mixed,
+  onResumeClick: () => mixed,
+  onResetClick: () => mixed,
 }
 export default function (props: RunProps) {
-  const {isReadyToRun, isPaused, isRunning, onRunClick, onPauseClick, onResumeClick} = props
+  const {
+    disabled,
+    isReadyToRun,
+    isPaused,
+    isRunning,
+    onRunClick,
+    onPauseClick,
+    onResumeClick,
+    onResetClick
+  } = props
+
   const onPauseResumeClick = isPaused
     ? onResumeClick
     : onPauseClick
@@ -27,22 +39,24 @@ export default function (props: RunProps) {
   let runButton
   let pauseResumeButton
   let cancelButton
-  if (!isRunning) {
+  let resetButton
+
+  if (isReadyToRun && !isRunning) {
     runButton = (
       <OutlineButton
         onClick={onRunClick}
         className={styles.run_button}
-        disabled={!isReadyToRun}
+        disabled={disabled}
       >
         Start Run
       </OutlineButton>
     )
-  } else {
+  } else if (isRunning) {
     pauseResumeButton = (
       <OutlineButton
         onClick={onPauseResumeClick}
         className={styles.run_button}
-        disabled={!isRunning}
+        disabled={disabled}
       >
         {pauseResumeText}
       </OutlineButton>
@@ -53,17 +67,29 @@ export default function (props: RunProps) {
         to={'/run/cancel'}
         onClick={onPauseClick}
         className={styles.run_button}
-        disabled={!isRunning}
+        disabled={disabled}
       >
         Cancel Job
       </OutlineButton>
     )
+  } else {
+    resetButton = (
+      <OutlineButton
+        onClick={onResetClick}
+        className={styles.run_button}
+        disabled={disabled}
+      >
+        Reset Run
+      </OutlineButton>
+    )
   }
+
   return (
     <div>
       {runButton}
       {pauseResumeButton}
       {cancelButton}
+      {resetButton}
     </div>
   )
 }

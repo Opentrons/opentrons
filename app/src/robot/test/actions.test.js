@@ -446,6 +446,13 @@ describe('robot actions', () => {
     expect(actions.cancelResponse(new Error('AHHH'))).toEqual(failure)
   })
 
+  test('robot:REFRESH_SESSION action', () => {
+    expect(actions.refreshSession()).toEqual({
+      type: 'robot:REFRESH_SESSION',
+      meta: {robotCommand: true}
+    })
+  })
+
   test('tick run time action', () => {
     const expected = {type: actionTypes.TICK_RUN_TIME}
 

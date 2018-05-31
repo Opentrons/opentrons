@@ -58,7 +58,9 @@ describe('robot reducer - session', () => {
     const state = {
       session: {
         sessionRequest: {inProgress: false, error: new Error('AH')},
-        name: ''
+        name: '',
+        startTime: 40,
+        runTime: 42
       }
     }
     const action = {
@@ -68,7 +70,26 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: {inProgress: true, error: null},
-      name: '/path/to/foo.py'
+      name: '/path/to/foo.py',
+      startTime: null,
+      runTime: 0
+    })
+  })
+
+  test('handles robot:REFRESH_SESSION action', () => {
+    const state = {
+      session: {
+        sessionRequest: {inProgress: false, error: null},
+        startTime: 40,
+        runTime: 42
+      }
+    }
+    const action = {type: 'robot:REFRESH_SESSION'}
+
+    expect(reducer(state, action).session).toEqual({
+      sessionRequest: {inProgress: true, error: null},
+      startTime: null,
+      runTime: 0
     })
   })
 

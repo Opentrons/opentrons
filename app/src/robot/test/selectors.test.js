@@ -7,7 +7,7 @@ const {
   getIsScanning,
   getDiscovered,
   getConnectionStatus,
-  getUploadInProgress,
+  getSessionLoadInProgress,
   getUploadError,
   getSessionName,
   getSessionIsLoaded,
@@ -104,12 +104,12 @@ describe('robot selectors', () => {
     expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTING)
   })
 
-  test('getUploadInProgress', () => {
+  test('getSessionLoadInProgress', () => {
     let state = makeState({session: {sessionRequest: {inProgress: true}}})
-    expect(getUploadInProgress(state)).toBe(true)
+    expect(getSessionLoadInProgress(state)).toBe(true)
 
     state = makeState({session: {sessionRequest: {inProgress: false}}})
-    expect(getUploadInProgress(state)).toBe(false)
+    expect(getSessionLoadInProgress(state)).toBe(false)
   })
 
   test('getUploadError', () => {

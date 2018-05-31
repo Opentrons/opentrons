@@ -97,7 +97,7 @@ export const getConnectionStatus = createSelector(
   }
 )
 
-export function getUploadInProgress (state: State) {
+export function getSessionLoadInProgress (state: State) {
   return sessionRequest(state).inProgress
 }
 

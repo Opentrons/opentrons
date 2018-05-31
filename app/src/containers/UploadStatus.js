@@ -6,7 +6,7 @@ import Upload from '../components/Upload'
 
 const mapStateToProps = (state) => ({
   name: robotSelectors.getSessionName(state),
-  inProgress: robotSelectors.getUploadInProgress(state),
+  inProgress: robotSelectors.getSessionLoadInProgress(state),
   error: robotSelectors.getUploadError(state)
 })
 
