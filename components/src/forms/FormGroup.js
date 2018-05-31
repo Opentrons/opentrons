@@ -20,6 +20,7 @@ type Props = {
 export default function FormGroup (props: Props) {
   const error = props.error != null
   const className = cx(
+    styles.form_group,
     props.className,
     {
       [styles.error]: error,
@@ -29,7 +30,7 @@ export default function FormGroup (props: Props) {
 
   return (
     <div className={className}>
-      <div className={styles.formgroup_label}>
+      <div className={styles.form_group_label}>
         {error &&
           <div className={styles.error_icon}>
             <Icon name='alert' />

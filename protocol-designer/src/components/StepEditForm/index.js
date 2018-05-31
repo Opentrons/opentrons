@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import {
   FlatButton,
   PrimaryButton,
@@ -38,36 +39,128 @@ export type Props = {
     this obj reflects the form selector's return values */
 }
 
+type CheckboxRowProps = {
+  label?: string,
+  formConnector: $Call<typeof formConnectorFactory, *, *>,
+  checkboxAccessor: string,
+  children?: ?React.Node,
+  className?: ?string
+}
+function CheckboxRow (props: CheckboxRowProps) {
+  const {formConnector, checkboxAccessor, label} = props
+
+  // className prop overrides default class, unless it's null
+  const className = (props.className === undefined)
+    ? styles.column_2_3
+    : props.className || undefined
+
+  const checked = formConnector(checkboxAccessor).value
+
+  return (
+    <div className={styles.field_row}>
+      <CheckboxField label={label} className={className}
+        {...formConnector(checkboxAccessor)} />
+      {checked && props.children}
+    </div>
+  )
+}
+
+type MixFieldProps = {
+  timesAccessor: string,
+  volumeAccessor: string
+} & CheckboxRowProps
+function MixField (props: MixFieldProps) {
+  const {
+    formConnector,
+    checkboxAccessor,
+    timesAccessor,
+    volumeAccessor,
+    label
+  } = props
+
+  return (
+    <CheckboxRow
+      checkboxAccessor={checkboxAccessor}
+      formConnector={formConnector}
+      label={label || 'Mix'}
+    >
+      <InputField units='μL' {...formConnector(timesAccessor)} />
+      <InputField units='Times' {...formConnector(volumeAccessor)} />
+    </CheckboxRow>
+  )
+}
+
+type DelayFieldProps = {
+  minutesAccessor: string,
+  secondsAccessor: string
+} & CheckboxRowProps
+function DelayField (props: DelayFieldProps) {
+  const {
+    formConnector,
+    checkboxAccessor,
+    minutesAccessor,
+    secondsAccessor,
+    label
+  } = props
+
+  return (
+    <CheckboxRow
+      checkboxAccessor={checkboxAccessor}
+      formConnector={formConnector}
+      label={label || 'Delay'}
+    >
+      <InputField units='m' {...formConnector(minutesAccessor)} />
+      <InputField units='s' {...formConnector(secondsAccessor)} />
+    </CheckboxRow>
+  )
+}
+
+function FlowRateField () {
+  // NOTE 2018-05-31 Flow rate cannot yet be adjusted,
+  // this is a placeholder
+  return (
+    <FormGroup label='FLOW RATE'>
+      Default
+    </FormGroup>
+  )
+}
+
+function TipPositionField () {
+  // NOTE 2018-05-31 Tip position cannot yet be adjusted,
+  // this is a placeholder
+  return (
+    <FormGroup label='TIP POSITION'>
+      Bottom, center
+    </FormGroup>
+  )
+}
+
 export default function StepEditForm (props: Props) {
   const {formData} = props
   const formConnector = formConnectorFactory(props.handleChange, formData)
 
   const buttonRow = <div className={styles.button_row}>
-    <FlatButton onClick={props.onClickMoreOptions}>MORE OPTIONS</FlatButton>
-    <PrimaryButton onClick={props.onCancel}>CANCEL</PrimaryButton>
+    <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
+      MORE OPTIONS
+    </FlatButton>
+    <PrimaryButton className={styles.cancel_button} onClick={props.onCancel}>CANCEL</PrimaryButton>
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>
 
-  const formColumnRight = <div className={styles.column_1_2}>
-    <FormGroup label='WELL ORDER'>
-      (WellSelectionWidget here)
-    </FormGroup>
+  const formColumnRight = <div className={cx(styles.column_1_2, styles.rightmost_column)}>
+      <FormGroup label='CHANGE TIP'>
+          <DropdownField
+            {...formConnector('aspirate--change-tip')}
+            options={[
+              {name: 'Always', value: 'always'},
+              {name: 'Once', value: 'once'},
+              {name: 'Never', value: 'never'}
+            ]}
+          />
+      </FormGroup>
 
-    <FormGroup label='CHANGE TIP'>
-      <RadioGroup
-        inline
-        {...formConnector('aspirate--change-tip')}
-        options={[
-          {name: 'Always', value: 'always'},
-          {name: 'Once', value: 'once'},
-          {name: 'Never', value: 'never'}
-        ]}
-      />
-    </FormGroup>
-
-    <FormGroup label='FLOW RATE'>
-      (Flow rate SliderInput here)
-    </FormGroup>
+    <FlowRateField />
+    <TipPositionField />
   </div>
 
   // TODO Ian 2018-05-08 break these forms out into own components, put it all in a folder.
@@ -99,19 +192,28 @@ export default function StepEditForm (props: Props) {
                 <InputField units='uL' {...formConnector('volume')} />
                 <InputField units='Times' {...formConnector('times')} />
               </FormGroup>
-              <div className={styles.field_row}>
-                <CheckboxField label='Delay' {...formConnector('dispense--delay--checkbox')} />
-                <InputField units='m' {...formConnector('dispense--delay-minutes')} />
-                <InputField units='s' {...formConnector('dispense--delay-seconds')} />
-              </div>
-              <div className={styles.field_row}>
-                <CheckboxField label='Blow out' {...formConnector('dispense--blowout--checkbox')} />
-                <DropdownField className={styles.column_2_3}
+              <DelayField
+                checkboxAccessor='dispense--delay--checkbox'
+                formConnector={formConnector}
+                minutesAccessor='dispense--delay-minutes'
+                secondsAccessor='dispense--delay-seconds'
+              />
+              <CheckboxRow
+                checkboxAccessor='dispense--blowout--checkbox'
+                formConnector={formConnector}
+                label='Blow out'
+              >
+                <DropdownField className={styles.full_width}
                   options={props.labwareOptions}
                   {...formConnector('dispense--blowout--labware')}
                 />
-              </div>
-              <CheckboxField label='Touch tip' {...formConnector('touch-tip')} />
+              </CheckboxRow>
+
+              <CheckboxRow
+                checkboxAccessor='touch-tip'
+                formConnector={formConnector}
+                label='Touch tip'
+              />
             </div>
             {formColumnRight}
           </div>
@@ -177,22 +279,40 @@ export default function StepEditForm (props: Props) {
           <div className={styles.row_wrapper}>
             <div className={styles.column_1_2}>
               <FormGroup label='TECHNIQUE'>
-                <CheckboxField label='Pre-wet tip' {...formConnector('aspirate--pre-wet-tip')} />
-                <CheckboxField label='Touch tip' {...formConnector('aspirate--touch-tip')} />
-                <div className={styles.field_row}>
-                  <CheckboxField label='Air gap' {...formConnector('aspirate--air-gap--checkbox')} />
+                <CheckboxRow
+                  checkboxAccessor='aspirate--pre-wet-tip'
+                  formConnector={formConnector}
+                  label='Pre-wet tip'
+                />
+
+                <CheckboxRow
+                  checkboxAccessor='aspirate--touch-tip'
+                  formConnector={formConnector}
+                  label='Touch tip'
+                />
+
+                <CheckboxRow
+                  checkboxAccessor='aspirate--air-gap--checkbox'
+                  formConnector={formConnector}
+                  label='Air Gap'
+                >
                   <InputField units='μL' {...formConnector('aspirate--air-gap--volume')} />
-                </div>
-                <div className={styles.field_row}>
-                  <CheckboxField label='Mix' {...formConnector('aspirate--mix--checkbox')} />
-                  <InputField units='μL' {...formConnector('aspirate--mix--volume')} />
-                  <InputField units='Times' {...formConnector('aspirate--mix--times')} />
-                </div>
-                <div className={styles.field_row}>
-                  <CheckboxField label='Disposal volume' className={styles.column_2_3}
-                    {...formConnector('aspirate--disposal-vol--checkbox')} />
+                </CheckboxRow>
+
+                <MixField
+                  checkboxAccessor='aspirate--mix--checkbox'
+                  formConnector={formConnector}
+                  timesAccessor='aspirate--mix--times'
+                  volumeAccessor='aspirate--mix--volume'
+                />
+
+                <CheckboxRow
+                  checkboxAccessor='aspirate--disposal-vol--checkbox'
+                  formConnector={formConnector}
+                  label='Disposal Volume'
+                >
                   <InputField units='μL' {...formConnector('aspirate--disposal-vol--volume')} />
-                </div>
+                </CheckboxRow>
               </FormGroup>
             </div>
             {formColumnRight}
@@ -223,34 +343,35 @@ export default function StepEditForm (props: Props) {
           <div className={styles.row_wrapper}>
             <div className={styles.column_1_2}>
               <FormGroup label='TECHNIQUE'>
-                <div className={styles.field_row}>
-                  <CheckboxField label='Mix' {...formConnector('dispense--mix--checkbox')} />
-                  <InputField units='μL' {...formConnector('dispense--mix--volume')} />
-                  <InputField units='Times' {...formConnector('dispense--mix--times')} />
-                </div>
-                <div className={styles.field_row}>
-                  <CheckboxField label='Delay' {...formConnector('dispense--delay--checkbox')} />
-                  <InputField units='m' {...formConnector('dispense--delay-minutes')} />
-                  <InputField units='s' {...formConnector('dispense--delay-seconds')} />
-                </div>
-                <div className={styles.field_row}>
-                  <CheckboxField label='Blow out' {...formConnector('dispense--blowout--checkbox')} />
-                  <DropdownField className={styles.column_2_3}
+                <MixField
+                  checkboxAccessor='dispense--mix--checkbox'
+                  formConnector={formConnector}
+                  volumeAccessor='dispense--mix--volume'
+                  timesAccessor='dispense--mix--times'
+                />
+                <DelayField
+                  checkboxAccessor='dispense--delay--checkbox'
+                  formConnector={formConnector}
+                  minutesAccessor='dispense--delay-minutes'
+                  secondsAccessor='dispense--delay-seconds'
+                />
+
+                <CheckboxRow
+                  checkboxAccessor='dispense--blowout--checkbox'
+                  formConnector={formConnector}
+                  label='Blow out'
+                >
+                  <DropdownField className={styles.full_width}
                     options={props.labwareOptions}
                     {...formConnector('dispense--blowout--labware')}
                   />
-                </div>
+                </CheckboxRow>
               </FormGroup>
             </div>
 
             <div className={styles.column_1_2}>
-              {formData.stepType === 'transfer' && <FormGroup label='WELL ORDER'>
-                (WellSelectionWidget here)
-              </FormGroup>}
-
-              <FormGroup label='FLOW RATE'>
-                (Flow rate SliderInput here)
-              </FormGroup>
+              <FlowRateField />
+              <TipPositionField />
             </div>
           </div>
 

@@ -28,10 +28,15 @@
   }
 }
 
-.formgroup_label {
+.form_group {
+  margin: 1rem 0;
+}
+
+.form_group_label {
   @apply --font-body-2-dark;
 
   font-weight: var(--fw-bold);
+  margin-bottom: 0.15rem;
 }
 
 .checkbox_icon {
@@ -167,7 +172,7 @@
   /* Disable mouse interaction. NOTE: User can still tab to focus a field */
   pointer-events: none;
 
-  & .formgroup_label {
+  & .form_group_label {
     color: var(--c-light-gray);
   }
 }

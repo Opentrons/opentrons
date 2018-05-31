@@ -4,7 +4,6 @@
 @import '@opentrons/components';
 
 /* TODO Ian 2018-01-24 generic column fraction classes available in component css? */
-
 .column_1_2 {
   lost-column: 1/2;
 }
@@ -27,6 +26,11 @@
   box-shadow: 0 0.25rem 1rem 0 rgba(0, 0, 0, 0.25);
 }
 
+.rightmost_column {
+  /* Make space for the absolute-positioned carats on the right */
+  padding-right: 4rem;
+}
+
 .top_row {
   lost-utility: clearfix;
   margin-bottom: 1rem;
@@ -34,12 +38,6 @@
   & > * {
     lost-column: 1/4;
   }
-
-  /*
-  & > *:first-child {
-    lost-column: 1/2;
-  }
-  */
 }
 
 .row_wrapper {
@@ -48,9 +46,14 @@
 
 .field_row {
   lost-utility: clearfix;
+  min-height: 2.25rem;
 
   & > * {
     lost-column: 1/3;
+  }
+
+  & .full_width {
+    lost-column: 2/3;
   }
 }
 
@@ -71,15 +74,14 @@
   & > * {
     lost-column: 1/6;
   }
+}
 
-  & > *:first-child {
-    /* MORE OPTIONS button */
-    @apply --font-header-dark;
+.more_options_button {
+  @apply --font-header-dark;
 
-    lost-column: 2/6;
-  }
+  lost-column: 2/6;
+}
 
-  & > *:nth-child(2) {
-    lost-offset: 2/6;
-  }
+.cancel_button {
+  lost-offset: 2/6;
 }
