@@ -4,17 +4,17 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Route, Redirect, type ContextRouter} from 'react-router'
 
-import type {State} from '../types'
-import type {Instrument} from '../robot'
-import {selectors as robotSelectors} from '../robot'
-import {makeGetRobotPipettes} from '../http-api-client'
+import type {State} from '../../types'
+import type {Instrument} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
+import {makeGetRobotPipettes} from '../../http-api-client'
 
-import Page from '../components/Page'
-import TipProbe from '../components/TipProbe'
-import ConfirmTipProbeModal from '../components/ConfirmTipProbeModal'
-import {InstrumentTabs, Instruments} from '../components/setup-instruments'
+import Page from '../../components/Page'
+import TipProbe from '../../components/TipProbe'
+import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
+import {InstrumentTabs, Instruments} from '../../components/setup-instruments'
 
-import SessionHeader from '../components/SessionHeader'
+import SessionHeader from '../../components/SessionHeader'
 
 type StateProps = {
   instruments: Array<Instrument>,

@@ -7,6 +7,7 @@ import {withRouter, Route, Redirect, type ContextRouter} from 'react-router'
 import type {State, Dispatch} from '../types'
 import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
+import createLogger from '../logger'
 
 import {TitleBar, Splash} from '@opentrons/components'
 import Page from '../components/Page'
@@ -16,6 +17,7 @@ import CalibrateDeck from '../components/CalibrateDeck'
 
 type StateProps = {
   robot: ?Robot,
+  connectedName: string,
   showConnectAlert: boolean
 }
 
@@ -25,6 +27,8 @@ type DispatchProps = {
 
 type Props = StateProps & DispatchProps & ContextRouter
 
+const log = createLogger(__filename)
+
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(RobotSettingsPage)
 )
@@ -32,14 +36,20 @@ export default withRouter(
 function RobotSettingsPage (props: Props) {
   const {
     robot,
+    connectedName,
     showConnectAlert,
     closeConnectAlert,
     match: {path, url, params: {name}}
   } = props
 
   if (name && !robot) {
-    console.warn(`Robot ${name} does not exist; redirecting`)
-    return (<Redirect to={url.replace(`/${name}`, '')} />)
+    const redirectUrl = url.replace(`/${name}`, '')
+    log.warn(`Robot ${name} does not exist; redirecting`, {redirectUrl})
+    return (<Redirect to={redirectUrl} />)
+  } else if (!name && connectedName) {
+    const redirectUrl = `${url}/${connectedName}`
+    log.debug(`Connected to ${connectedName}; redirecting`, {redirectUrl})
+    return (<Redirect to={redirectUrl} />)
   }
 
   if (!robot) return (<Page><Splash /></Page>)
@@ -69,8 +79,10 @@ function mapStateToProps (state: State, ownProps: ContextRouter): StateProps {
   const {match: {params: {name}}} = ownProps
   const robots = robotSelectors.getDiscovered(state)
   const connectRequest = robotSelectors.getConnectRequest(state)
+  const connectedName = robotSelectors.getConnectedRobotName(state)
 
   return {
+    connectedName,
     robot: robots.find((r) => r.name === name),
     showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
   }
