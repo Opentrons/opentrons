@@ -6,6 +6,33 @@ from opentrons.trackers import pose_tracker
 from numpy import isclose
 
 
+def test_pipette_version_1_0_and_1_3_extended_travel():
+    from opentrons.instruments import pipette_config
+
+    models = [
+        'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
+        'p300_single', 'p300_multi', 'p1000_single'
+    ]
+
+    for m in models:
+        robot.reset()
+        left = instruments._create_pipette_from_config(
+            config=pipette_config.load(m + '_v1'),
+            mount='left')
+        right = instruments._create_pipette_from_config(
+            config=pipette_config.load(m + '_v1.3'),
+            mount='right')
+
+        # the difference between v1 and v1.3 is that the plunger's travel
+        # distance extended, allowing greater ranges for aspirate/dispense
+        # and blow-out. Test that all v1.3 pipette have larger travel thant v1
+        left_poses = left.plunger_positions
+        left_diff = left_poses['top'] - left_poses['blow_out']
+        right_poses = right.plunger_positions
+        right_diff = right_poses['top'] - right_poses['blow_out']
+        assert right_diff > left_diff
+
+
 def test_pipette_models():
     robot.reset()
     p = instruments.P10_Single(mount='left')

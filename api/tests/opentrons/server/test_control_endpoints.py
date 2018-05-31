@@ -71,7 +71,6 @@ async def test_get_cached_pipettes(
     cli = await loop.create_task(test_client(app))
 
     model = list(configs.values())[0]
-
     expected = {
         'left': {
             'model': model.name,
