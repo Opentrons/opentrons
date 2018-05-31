@@ -501,6 +501,11 @@ class Robot(object):
         for module in self.modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
+
+        # the below call to `cache_instrument_models` is relied upon by
+        # `Session._simulate()`, which calls `robot.connect()` after exec'ing a
+        # protocol. That protocol could very well have different pipettes than
+        # what are physically attached to the robot
         self.cache_instrument_models()
 
     def _update_axis_homed(self, *args):

@@ -380,7 +380,7 @@ class SmoothieDriver_3_0_0:
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the _v# designation
                 res = res + '_v1'
-            elif res.endswith('_v13'):
+            elif res and res.endswith('_v13'):
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the "." to seperate version
                 # major and minor values
