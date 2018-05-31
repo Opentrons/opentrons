@@ -2,39 +2,116 @@
 
 from opentrons import instruments, robot
 from opentrons.containers import load as containers_load
+from opentrons.instruments import Pipette
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 
 
 def test_pipette_models():
+    # Test that the configuration position values for a given pipette model
+    # still make sense with any changes to the piecewise functions
     robot.reset()
     p = instruments.P10_Single(mount='left')
+    ul_per_mm = Pipette._p10_single_piecewise(p, 10, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 1
     assert p.max_volume > 10
     p = instruments.P10_Multi(mount='right')
+    ul_per_mm = Pipette._p10_multi_piecewise(p, 10, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 8
     assert p.max_volume > 10
 
     robot.reset()
     p = instruments.P50_Single(mount='left')
+    ul_per_mm = 3.1347  # Change once config blow_out position adjusted
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 1
     assert p.max_volume > 50
     p = instruments.P50_Multi(mount='right')
+    ul_per_mm = Pipette._p50_multi_piecewise(p, 50, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 8
     assert p.max_volume > 50
 
     robot.reset()
     p = instruments.P300_Single(mount='left')
+    ul_per_mm = Pipette._p300_single_piecewise(p, 300, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 1
     assert p.max_volume > 300
     p = instruments.P300_Multi(mount='right')
+    ul_per_mm = Pipette._p300_multi_piecewise(p, 300, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 8
     assert p.max_volume > 300
 
     robot.reset()
     p = instruments.P1000_Single(mount='left')
+    ul_per_mm = Pipette._p1000_piecewise(p, 1000, 'aspirate')
+    p.max_volume = calculate_max_volume(p, ul_per_mm)
     assert p.channels == 1
     assert p.max_volume > 1000
+
+
+def calculate_max_volume(pipette, ul_per_mm):
+    t = pipette._get_plunger_position('top')
+    b = pipette._get_plunger_position('bottom')
+    return (t - b) * ul_per_mm
+
+
+def test_set_flow_rate():
+    # Test new flow-rate functionality on all pipettes with different max vols
+    p10 = instruments.P10_Single(mount='right')
+
+    p10.set_flow_rate(aspirate=10)
+    ul_per_mm = Pipette._p10_single_piecewise(p10, p10.max_volume, 'aspirate')
+    expected_mm_per_sec = round(10 / ul_per_mm, 6)
+    assert p10.speeds['aspirate'] == expected_mm_per_sec
+
+    p10.set_flow_rate(dispense=20)
+    ul_per_mm = Pipette._p10_single_piecewise(p10, p10.max_volume, 'dispense')
+    expected_mm_per_sec = round(20 / ul_per_mm, 6)
+    assert p10.speeds['dispense'] == expected_mm_per_sec
+
+    robot.reset()
+    p50 = instruments.P50_Single(mount='right')
+
+    p50.set_flow_rate(aspirate=50)
+    ul_per_mm = Pipette._p50_single_piecewise(p50, p50.max_volume, 'aspirate')
+    expected_mm_per_sec = round(50 / ul_per_mm, 6)
+    assert p50.speeds['aspirate'] == expected_mm_per_sec
+
+    p50.set_flow_rate(dispense=60)
+    ul_per_mm = Pipette._p50_single_piecewise(p50, p50.max_volume, 'dispense')
+    expected_mm_per_sec = round(60 / ul_per_mm, 6)
+    assert p50.speeds['dispense'] == expected_mm_per_sec
+
+    robot.reset()
+    p300 = instruments.P300_Single(mount='right')
+
+    p300.set_flow_rate(aspirate=300)
+    ul_per_mm = Pipette._p300_single_piecewise(p300, p300.max_volume, 'aspirate')
+    expected_mm_per_sec = round(300 / ul_per_mm, 6)
+    assert p300.speeds['aspirate'] == expected_mm_per_sec
+
+    p300.set_flow_rate(dispense=310)
+    ul_per_mm = Pipette._p300_single_piecewise(p300, p300.max_volume, 'dispense')
+    expected_mm_per_sec = round(310 / ul_per_mm, 6)
+    assert p300.speeds['dispense'] == expected_mm_per_sec
+
+    robot.reset()
+    p1000 = instruments.P1000_Single(mount='right')
+
+    p1000.set_flow_rate(aspirate=1000)
+    ul_per_mm = Pipette._p1000_piecewise(p1000, p1000.max_volume, 'aspirate')
+    expected_mm_per_sec = round(1000 / ul_per_mm, 6)
+    assert p1000.speeds['aspirate'] == expected_mm_per_sec
+
+    p1000.set_flow_rate(dispense=1100)
+    ul_per_mm = Pipette._p1000_piecewise(p1000, p1000.max_volume, 'dispense')
+    expected_mm_per_sec = round(1100 / ul_per_mm, 6)
+    assert p1000.speeds['dispense'] == expected_mm_per_sec
 
 
 def test_pipette_max_deck_height():
@@ -93,7 +170,7 @@ def test_aspirate_move_to():
         robot.poses,
         p300.instrument_actuator)
 
-    assert (current_pos == (7.847594, 0.0, 0.0)).all()
+    assert (current_pos == (7.889964, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
@@ -204,14 +281,12 @@ def test_fallback_config_file():
         _create_config_from_dict, fallback_configs
 
     pipette_dict = {
-        'ulPerMm': 123,
         'tipLength': 321,
         'channels': 4
     }
 
     for model, config in fallback_configs.items():
         new_config = _create_config_from_dict(pipette_dict, model)
-        assert new_config.ul_per_mm == 123
         assert new_config.tip_length == 321
         assert new_config.channels == 4
         assert new_config.name == config.name
