@@ -42,7 +42,6 @@ def write_identifiers(robot, mount, new_id, new_model):
     robot._driver.write_pipette_id(mount, new_id)
     read_id = robot._driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id['pipette_id'])
-
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
@@ -50,10 +49,7 @@ def write_identifiers(robot, mount, new_id, new_model):
 
 def check_previous_data(robot, mount):
     old_id = robot._driver.read_pipette_id(mount)
-    if old_id.get('pipette_id'):
-        old_id = old_id.get('pipette_id')
-    else:
-        old_id = None
+    old_id = old_id.get('pipette_id')
     old_model = robot._driver.read_pipette_model(mount)
     if old_id and old_model:
         print(
@@ -79,6 +75,7 @@ def _user_submitted_barcode(max_length):
     # remove all characters before the letter P
     # for example, remove ASCII selector code "\x1b(B" on chinese keyboards
     barcode = barcode[barcode.index('P'):]
+    barcode = barcode.split('\r')[0].split('\n')[0]  # remove any newlines
     return barcode
 
 
