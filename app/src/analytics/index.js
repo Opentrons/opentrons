@@ -50,6 +50,10 @@ export function toggleAnalyticsOptedIn (): ThunkAction {
   }
 }
 
+export function setAnalyticsSeen () {
+  return updateConfig('analytics.seenOptIn', true)
+}
+
 export const analyticsMiddleware: Middleware =
   (store) => (next) => (action) => {
     const state = store.getState()
@@ -86,6 +90,10 @@ export function getAnalyticsOptedIn (state: State) {
   return state.config.analytics.optedIn
 }
 
+export function getAnalyticsSeen (state: State) {
+  return state.config.analytics.seenOptIn
+}
+
 function initializeIntercom (config: AnalyticsConfig) {
   if (INTERCOM_ID) {
     log.debug('Initializing Intercom')
@@ -111,20 +119,24 @@ function initializeMixpanel (config: AnalyticsConfig) {
 }
 
 function enableMixpanelTracking (config: AnalyticsConfig) {
-  log.debug('User has opted into analytics; tracking with Mixpanel')
+  if (MIXPANEL_ID) {
+    log.debug('User has opted into analytics; tracking with Mixpanel')
 
-  mixpanel.identify(config.appId)
-  mixpanel.opt_in_tracking()
-  mixpanel.register({appVersion: version, appId: config.appId})
+    mixpanel.identify(config.appId)
+    mixpanel.opt_in_tracking()
+    mixpanel.register({appVersion: version, appId: config.appId})
 
-  track = mixpanel.track.bind(mixpanel)
+    track = mixpanel.track.bind(mixpanel)
+  }
 }
 
 function disableMixpanelTracking (config: AnalyticsConfig) {
-  log.debug('User has opted out of analytics; stopping tracking')
+  if (MIXPANEL_ID) {
+    log.debug('User has opted out of analytics; stopping tracking')
 
-  mixpanel.opt_out_tracking()
-  mixpanel.reset()
+    mixpanel.opt_out_tracking()
+    mixpanel.reset()
 
-  track = noop
+    track = noop
+  }
 }

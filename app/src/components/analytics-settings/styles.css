@@ -1,0 +1,50 @@
+@import '@opentrons/components';
+
+.analytics_settings {
+  width: 100%;
+}
+
+.analytics_info {
+  @apply --font-body-1-dark;
+
+  max-width: 25rem;
+
+  & > p {
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+}
+
+.labeled_toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.labeled_toggle_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_toggle_button {
+  flex: none;
+  width: 2rem;
+  margin-right: 1rem;
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.modal_title {
+  @apply --font-header-dark;
+}
+
+.modal_button {
+  float: right;
+  margin: 0.75rem;
+}
