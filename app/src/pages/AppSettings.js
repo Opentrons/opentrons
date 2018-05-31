@@ -2,7 +2,7 @@
 // view info about the app and update
 import React from 'react'
 import {connect} from 'react-redux'
-import {Route, type ContextRouter} from 'react-router'
+import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
 
 import type {State} from '../types'
@@ -11,7 +11,8 @@ import {
   getShellUpdate,
   checkForShellUpdates,
   downloadShellUpdate,
-  quitAndInstallShellUpdate
+  quitAndInstallShellUpdate,
+  setUpdateSeen
 } from '../shell'
 import {toggleAnalyticsOptedIn, getAnalyticsOptedIn} from '../analytics'
 
@@ -38,12 +39,23 @@ type Props = OP & SP & DP
 export default connect(mapStateToProps, mapDispatchToProps)(AppSettingsPage)
 
 function AppSettingsPage (props: Props) {
+  const {update, match: {path}} = props
+
   return (
     <Page>
       <AppSettings {...props} />
-      <Route path='/menu/app/update' render={() => (
-        <AppUpdateModal {...props} close={props.closeUpdateModal} />
-      )} />
+      <Switch>
+        <Route path={`${path}/update`} render={() => (
+          <AppUpdateModal {...props} close={props.closeUpdateModal} />
+        )} />
+        <Route render={() => {
+          if (update.available && !update.seen) {
+            return (<Redirect to='/menu/app/update' />)
+          }
+
+          return null
+        }} />
+      </Switch>
     </Page>
   )
 }
@@ -60,7 +72,10 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
     checkForUpdates: () => dispatch(checkForShellUpdates()),
     downloadUpdate: () => dispatch(downloadShellUpdate()),
     quitAndInstall: () => quitAndInstallShellUpdate(),
-    closeUpdateModal: () => dispatch(push('/menu/app')),
+    closeUpdateModal: () => {
+      dispatch(setUpdateSeen())
+      dispatch(push('/menu/app'))
+    },
     toggleAnalyticsOptedIn: () => dispatch(toggleAnalyticsOptedIn())
   }
 }

@@ -41,7 +41,8 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: null,
           downloaded: false,
-          error: null
+          error: null,
+          seen: false
         }
       }
     }
@@ -171,7 +172,8 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: null,
           downloaded: false,
-          error: null
+          error: null,
+          seen: false
         }
       })
     })
@@ -191,7 +193,8 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: '42.0.0',
           downloaded: false,
-          error: null
+          error: null,
+          seen: false
         }
       })
     })
@@ -211,7 +214,8 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: '42.0.0',
           downloaded: false,
-          error: new Error('AH')
+          error: new Error('AH'),
+          seen: false
         }
       })
     })
@@ -227,7 +231,8 @@ describe('app shell module', () => {
           downloadInProgress: true,
           available: '42.0.0',
           downloaded: false,
-          error: null
+          error: null,
+          seen: true
         }
       })
     })
@@ -248,7 +253,8 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: '42.0.0',
           downloaded: true,
-          error: null
+          error: null,
+          seen: false
         }
       })
     })
@@ -268,7 +274,25 @@ describe('app shell module', () => {
           downloadInProgress: false,
           available: '42.0.0',
           downloaded: false,
-          error: new Error('AH')
+          error: new Error('AH'),
+          seen: false
+        }
+      })
+    })
+
+    test('handles SET_UPDATE_SEEN', () => {
+      state.update.available = '42.0.0'
+      const action = {
+        type: 'shell:SET_UPDATE_SEEN'
+      }
+      expect(shellReducer(state, action)).toEqual({
+        update: {
+          checkInProgress: false,
+          downloadInProgress: false,
+          available: '42.0.0',
+          downloaded: false,
+          error: null,
+          seen: true
         }
       })
     })
