@@ -96,7 +96,10 @@ export default function sessionReducer (
     case 'robot:SESSION_UPDATE':
       return handleSessionUpdate(state, action)
 
-    case SESSION: return handleSession(state, action)
+    case SESSION:
+    case 'robot:REFRESH_SESSION':
+      return handleSession(state, action)
+
     case SESSION_RESPONSE: return handleSessionResponse(state, action)
     case RUN: return handleRun(state, action)
     case RUN_RESPONSE: return handleRunResponse(state, action)
@@ -143,12 +146,18 @@ function handleSessionUpdate (
 }
 
 function handleSession (state: State, action: any): State {
-  if (!action.payload || !action.payload.file) return state
+  let nextState = {
+    ...state,
+    runTime: 0,
+    startTime: null,
+    sessionRequest: {inProgress: true, error: null}
+  }
 
-  const {payload: {file: {name}}} = action
-  const sessionRequest = {inProgress: true, error: null}
+  if (action.payload && action.payload.file && action.payload.file.name) {
+    return {...nextState, name: action.payload.file.name}
+  }
 
-  return {...state, name, sessionRequest}
+  return nextState
 }
 
 function handleSessionResponse (state: State, action: any): State {

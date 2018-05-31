@@ -5,7 +5,7 @@ import moment from 'moment'
 import styles from './styles.css'
 
 type TimeProps = {
-  startTime?: string,
+  startTime: ?number,
   runTime: string
 }
 

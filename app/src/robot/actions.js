@@ -158,6 +158,13 @@ export type SessionUpdateAction = {|
   payload: SessionUpdate,
 |}
 
+export type RefreshSessionAction = {|
+  type: 'robot:REFRESH_SESSION',
+  meta: {|
+    robotCommand: true
+  |},
+|}
+
 export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
@@ -213,6 +220,7 @@ export type Action =
   | ReturnTipResponseAction
   | SetJogDistanceAction
   | SessionUpdateAction
+  | RefreshSessionAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -549,6 +557,10 @@ export const actions = {
     if (error) action.payload = error
 
     return action
+  },
+
+  refreshSession (): RefreshSessionAction {
+    return {type: 'robot:REFRESH_SESSION', meta: {robotCommand: true}}
   },
 
   tickRunTime () {
