@@ -4,11 +4,11 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, type ContextRouter} from 'react-router'
 
-import {selectors as robotSelectors} from '../robot'
-import Page from '../components/Page'
-import LabwareCalibration from '../components/LabwareCalibration'
-import SessionHeader from '../components/SessionHeader'
-import ReviewDeckModal from '../components/ReviewDeckModal'
+import {selectors as robotSelectors} from '../../robot'
+import Page from '../../components/Page'
+import LabwareCalibration from '../../components/LabwareCalibration'
+import SessionHeader from '../../components/SessionHeader'
+import ReviewDeckModal from '../../components/ReviewDeckModal'
 
 type StateProps = {
   deckPopulated: boolean
