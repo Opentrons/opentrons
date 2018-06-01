@@ -5,16 +5,17 @@ import type {SessionStatus} from '../../robot'
 
 type Props = {
   sessionStatus: SessionStatus,
-  className?: string
+  className?: string,
+  onResetClick: () => mixed
 }
 
-// TODO (ka 2018-5-21): only adding text without call to action until redux work in place
-const COMPLETE_MESSAGE = 'Run complete'
-const PAUSE_MESSAGE = 'Run paused'
-const CANCEL_MESSAGE = 'Run canceled'
-
 export default function SessionAlert (props: Props) {
-  const {sessionStatus, className} = props
+  const {sessionStatus, className, onResetClick} = props
+
+  const COMPLETE_MESSAGE = (<p>Run  complete! <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+  const PAUSE_MESSAGE = 'Run paused'
+  const CANCEL_MESSAGE = (<p>Run  canceled. <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+
   switch (sessionStatus) {
     case 'finished':
       return (

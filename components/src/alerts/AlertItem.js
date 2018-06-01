@@ -9,7 +9,7 @@ export type AlertProps = {
   /** name constant of the icon to display */
   type: 'success' | 'warning' | 'info',
   /** title/main message of colored alert bar */
-  title: string,
+  title: string | React.Node,
   /** Alert message body contents */
   children?: React.Node,
   /** Additional class name */
