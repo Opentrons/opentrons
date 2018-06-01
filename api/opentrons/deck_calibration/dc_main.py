@@ -7,6 +7,7 @@ import urwid
 import atexit
 import os
 import sys
+import logging
 from numpy.linalg import inv
 from numpy import dot, array
 from opentrons.robot import robot_configs
@@ -17,6 +18,9 @@ from opentrons.deck_calibration import *
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
+
+# logging.basicConfig(level=logging.DEBUG, filename="/data/calibration.log")
+log = logging.getLogger(__name__)
 
 
 class CLITool:
@@ -189,18 +193,29 @@ class CLITool:
         if self._current_pipette is left:
             msg = self.save_mount_offset()
         else:
-            self._actual_points[self._current_point] = self._position()[:-1]
+            pos = self._position()[:-1]
+            self._actual_points[self._current_point] = pos
+            log.debug("Saving {} for point {}".format(
+                pos, self._current_point))
             msg = 'saved #{}: {}'.format(
                 self._current_point, self._actual_points[self._current_point])
         return msg
 
     def save_mount_offset(self) -> str:
-        cx, cy, cz = self._driver_to_deck_coords(self._position())
+        pos = self._position()
+        log.debug("save_mount_offset position: {}".format(pos))
+        cx, cy, cz = self._driver_to_deck_coords(pos)
+        log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
         ex, ey, ez = apply_mount_offset(self._expected_points[1])
+        log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
         dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+        log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
         mx, my, mz = robot.config.mount_offset
+        log.debug("save_mount_offset mxyz: {}".format((mx, my, mz)))
+        offset = (mx - dx, my - dy, mz - dz)
+        log.debug("save_mount_offset mount offset: {}".format(offset))
         robot.config = robot.config._replace(
-            mount_offset=(mx - dx, my - dy, mz - dz))
+            mount_offset=offset)
         msg = 'saved mount-offset: {}'.format(
             robot.config.mount_offset)
         return msg
@@ -214,16 +229,22 @@ class CLITool:
         Saves this transform to disc.
         """
         expected = [self._expected_points[p][:2] for p in [1, 2, 3]]
+        log.debug("save_transform expected: {}".format(expected))
         actual = [self._actual_points[p][:2] for p in [1, 2, 3]]
+        log.debug("save_transform actual: {}".format(actual))
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
+        log.debug("save_transform flat_matrix: {}".format(flat_matrix))
         current_z = self._calibration_matrix[2][3]
         # Add the z component to form the 3 dimensional transform
         self._calibration_matrix = add_z(flat_matrix, current_z)
+        gantry_calibration = list(
+                map(lambda i: list(i), self._calibration_matrix))
+        log.debug("save_transform calibration_matrix: {}".format(
+            gantry_calibration))
 
         robot.config = robot.config._replace(
-            gantry_calibration=list(
-                map(lambda i: list(i), self._calibration_matrix)))
+            gantry_calibration=gantry_calibration)
         res = str(robot.config)
 
         return '{}\n{}'.format(res, save_config())
@@ -232,6 +253,7 @@ class CLITool:
         actual_z = self._position()[-1]
         expected_z = self._calibration_matrix[2][3] + self._tip_length
         new_z = self._calibration_matrix[2][3] + actual_z - expected_z
+        log.debug("Saving z value: {}".format(new_z))
         self._calibration_matrix[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
@@ -320,6 +342,7 @@ def probe(tip_length: float) -> str:
     pipette = instruments.Pipette(mount='right', channels=1)
     probe_center = tuple(probe_instrument(
         pipette, robot, tip_length=tip_length))
+    log.debug("Setting probe center to {}".format(probe_center))
     robot.config = robot.config._replace(
         probe_center=probe_center
     )
@@ -394,6 +417,7 @@ def main():
     backup_configuration_and_reload()
 
     robot.connect()
+    robot.home()
 
     # lights help the script user to see the points on the deck
     robot.turn_on_rail_lights()
@@ -412,6 +436,7 @@ def main():
 
 def notify_and_restart():
     print('Exiting configuration tool and restarting system')
+    backup_configuration(tag=None)
     os.system("kill 1")
 
 
