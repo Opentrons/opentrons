@@ -1,12 +1,9 @@
 @import '@opentrons/components';
 
-.bottom_button {
-  margin: 1.5rem 4rem 0;
-  width: calc(100% - 4rem * 2);
-}
-
+.bottom_button,
 .download_button {
-  margin: 1.5rem 2.5rem;
+  margin: 1rem 3rem;
+  width: calc(100% - 3rem * 2);
 }
 
 .upload_button {

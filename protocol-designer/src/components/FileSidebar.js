@@ -21,16 +21,20 @@ export default function FileSidebar (props: Props) {
           <div className={styles.download_button}>
             <PrimaryButton Component='a' download={props.downloadData.fileName}
               href={'data:application/json;charset=utf-8,' + encodeURIComponent(props.downloadData.fileContents)}
-            >Download</PrimaryButton>
+            >Export</PrimaryButton>
           </div>
           <div className={styles.divider} />
         </div>
       }
+
       <OutlineButton Component='label' className={cx(styles.upload_button, styles.bottom_button)}>
-        UPLOAD
+        Import JSON
         <input type='file' onChange={props.onUpload} />
       </OutlineButton>
-      <OutlineButton onClick={props.onCreateNew} className={styles.bottom_button}>Create New</OutlineButton>
+
+      <OutlineButton onClick={props.onCreateNew} className={styles.bottom_button}>
+        Create New
+      </OutlineButton>
     </SidePanel>
   )
 }
