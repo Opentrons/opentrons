@@ -2,7 +2,6 @@ import numpy as np
 from opentrons import robot
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.trackers.pose_tracker import absolute
 from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
 
@@ -21,14 +20,14 @@ async def test_transform_from_moves(async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
     # test_mount, test_model = ('right', 'p300_single_v1')
 
-    def dummy_read_model(self, mount):
+    def dummy_read_model(mount):
         if mount == test_mount:
             return test_model
         else:
             return None
 
     monkeypatch.setattr(
-        SmoothieDriver_3_0_0, 'read_pipette_model', dummy_read_model)
+        robot._driver, 'read_pipette_model', dummy_read_model)
 
     robot.reset()
     robot.home()

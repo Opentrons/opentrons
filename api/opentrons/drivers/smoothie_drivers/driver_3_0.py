@@ -8,7 +8,6 @@ from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
-from opentrons.instruments.pipette_config import configs
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -369,10 +368,10 @@ class SmoothieDriver_3_0_0:
         Reads an attached pipette's MODEL
         The MODEL is a unique string for this model of pipette
 
-        :return :dict with key 'model' and model string as value, or None
+        :return model string, or None
         '''
         if self.simulating:
-            res = list(configs.values())[0].name
+            res = None
         else:
             res = self._read_from_pipette(
                 GCODES['READ_INSTRUMENT_MODEL'], mount)
