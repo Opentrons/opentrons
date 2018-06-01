@@ -1417,12 +1417,19 @@ class Pipette:
     def _key_map_pipette_functions(self, model, ul, func):
         function_map = {
             'p10_single_v1': lambda: self._p10_single_piecewise(ul, func),
+            'p10_single_v1.3': lambda: self._p10_single_piecewise(ul, func),
             'p10_multi_v1': lambda: self._p10_multi_piecewise(ul, func),
+            'p10_multi_v1.3': lambda: self._p10_multi_piecewise(ul, func),
             'p50_single_v1': lambda: self._p50_single_piecewise(ul, func),
+            'p50_single_v1.3': lambda: self._p50_single_piecewise(ul, func),
             'p50_multi_v1': lambda: self._p50_multi_piecewise(ul, func),
+            'p50_multi_v1.3': lambda: self._p50_multi_piecewise(ul, func),
             'p300_single_v1': lambda: self._p300_single_piecewise(ul, func),
+            'p300_single_v1.3': lambda: self._p300_single_piecewise(ul, func),
             'p300_multi_v1': lambda: self._p300_multi_piecewise(ul, func),
-            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func)}
+            'p300_multi_v1.3': lambda: self._p300_multi_piecewise(ul, func),
+            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func),
+            'p1000_single_v1.3': lambda: self._p1000_piecewise(ul, func)}
 
         return function_map.get(model)
 
