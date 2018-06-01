@@ -2,11 +2,11 @@
 import * as React from 'react'
 import isNil from 'lodash/isNil'
 import {
-  FlatButton,
   PrimaryButton,
   CheckboxField,
   DropdownField,
-  InputField
+  InputField,
+  FormGroup
 } from '@opentrons/components'
 
 import styles from './IngredientPropertiesForm.css'
@@ -30,19 +30,22 @@ type FieldProps = {|
   label?: string,
   units?: string,
   error?: string,
-  placeholder?: string
+  placeholder?: string,
+  className?: string
 |}
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
   (props: FieldProps) => { /* otherProps */
     const {setSubstate, getSubstate} = args
-    const {accessor, numeric, type, placeholder} = props
+    const {accessor, numeric, type, placeholder, className} = props
 
     if (!type || type === 'input') {
       return <InputField
+        className={className}
         label={props.label}
         units={props.units}
         error={props.error}
+        placeholder={placeholder}
         value={(getSubstate(accessor) || '').toString()}
         onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
           setSubstate(accessor, numeric ? parseFloat(e.target.value) : e.target.value)
@@ -52,18 +55,15 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
 
     if (type === 'checkbox') {
       return <CheckboxField
+        className={className}
         label={props.label}
         value={getSubstate(accessor) === true}
         onChange={(e: SyntheticInputEvent<*>) => setSubstate(accessor, !getSubstate(accessor))}
       />
     }
 
-    // TODO Ian 2018-02-21 make Textbox/Textarea component and get rid of this
-    const ElementType = (type === 'textarea')
-      ? 'textarea'
-      : 'input'
-
-    return <ElementType
+    return <input
+      className={className}
       id={accessor}
       value={getSubstate(accessor) || ''}
       onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
@@ -189,7 +189,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     } = this.props
 
     const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId]
-    const { volume, individualize } = this.state.input
+    const {volume} = this.state.input
 
     const editMode = selectedIngredientFields
     const addMode = !editMode && numWellsSelected > 0
@@ -203,64 +203,73 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     }
 
     return (
-      <div className={formStyles.form}> {/* Was: styles.ingredient_properties_entry */}
-        <h1 className={styles.ingred_form_header}>
-          <div>Ingredient Properties</div>
-          <div>{numWellsSelected} Well(s) Selected</div>
-        </h1>
+      <div className={formStyles.form}>
+        <form className={styles.form_content}>
+          <div className={formStyles.row_wrapper}>
+              <FormGroup label='Ingredient title:' className={styles.ingred_title_field}>
+                <Field accessor='name' />
+              </FormGroup>
 
-        <form>
-          <div className={formStyles.field_row}>
-            <span className={formStyles.column_2_3}>
-              <Field accessor='name' label='Name' />
-            </span>
-            {!editMode && <span>
+              <FormGroup
+                label={'\u00A0'} // non-breaking space
+                className={styles.serialize_name}
+              >
+                <Field
+                  label='Serialize'
+                  accessor='individualize'
+                  type='checkbox'
+                />
+                {/* TODO Ian 2018-06-01 remove all remnants of this text field see issue #1294
+                  {individualize && <Field
+                  accessor='serializeName'
+                  placeholder='i.e. sample'
+                  className={styles.serialize_name_field}
+                />} */}
+              </FormGroup>
+
+            {!editMode && <FormGroup label='Pick Existing Ingredient:' className={styles.existing_ingred_field}>
               <DropdownField
                 onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
                 options={[
-                  {name: 'Select Existing Ingredient', value: ''},
+                  {name: '', value: ''},
                   ...allIngredientNamesIds.map(({ingredientId, name}) => ({
                     name: name || `(unnamed: ${ingredientId})`,
                     value: ingredientId
                   }))
                 ]}
               />
-            </span>}
+            </FormGroup>}
           </div>
-          <div className={formStyles.field_row}>
-              <span>
-                <Field accessor='individualize' type='checkbox' label='Serialize Name' />
-              </span>
-              <span>
-                {individualize && <Field accessor='serializeName' placeholder='Sample' />}
-              </span>
-          </div>
-          <div className={formStyles.field_row}>
-            <span>
-              <Field numeric accessor='volume' label='Volume' units='µL'
+
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label='Volume:' className={styles.volume_field}>
+              <Field numeric accessor='volume' units='µL'
                 error={maxVolExceeded
                   ? `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
                   : undefined}
               />
-            </span>
-            <span>
-              {/* TODO Ian 2018-02-21 make TextareaField component and use here */}
-              <label>Description</label>
-              <Field accessor='description' type='textarea' />
-            </span>
+            </FormGroup>
+          </div>
+
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label='Description:' className={styles.description_field}>
+              <Field accessor='description' />
+            </FormGroup>
           </div>
         </form>
 
         <div className={styles.button_row}>
-          <FlatButton /* disabled={TODO: validate input here} */
+          <PrimaryButton onClick={onCancel}>Cancel</PrimaryButton>
+
+          <PrimaryButton
             onClick={() => onSave({
               ...this.state.input,
               groupId: editingIngredGroupId,
               copyGroupId: this.state.copyGroupId})}
           >
             Save
-          </FlatButton>
-          <FlatButton onClick={onCancel}>Cancel</FlatButton>
+          </PrimaryButton>
+
           {editMode &&
             <PrimaryButton onClick={this.handleDelete}>
               Delete Ingredient

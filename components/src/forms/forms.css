@@ -28,10 +28,6 @@
   }
 }
 
-.form_group {
-  margin: 1rem 0;
-}
-
 .form_group_label {
   @apply --font-body-2-dark;
 

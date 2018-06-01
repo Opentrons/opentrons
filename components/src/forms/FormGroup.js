@@ -20,7 +20,6 @@ type Props = {
 export default function FormGroup (props: Props) {
   const error = props.error != null
   const className = cx(
-    styles.form_group,
     props.className,
     {
       [styles.error]: error,

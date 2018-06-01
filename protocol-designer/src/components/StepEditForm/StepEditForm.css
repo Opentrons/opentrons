@@ -6,6 +6,13 @@
  * Row should add up to 15/16 max to accomodate carat on right.
  */
 
+.left_settings_column,
+.right_settings_column {
+  & > * {
+    margin: 1rem 0;
+  }
+}
+
 .left_settings_column {
   lost-column: 11/16;
 }
