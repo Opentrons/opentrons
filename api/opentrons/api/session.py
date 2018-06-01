@@ -157,6 +157,7 @@ class Session(object):
 
         self.containers = self.get_containers()
         self.instruments = self.get_instruments()
+        self.startTime = None
 
         self.set_state('loaded')
 

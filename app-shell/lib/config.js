@@ -69,7 +69,7 @@ module.exports = {
       if (type === 'config:UPDATE') {
         log().debug('Handling config:UPDATE', payload)
 
-        if (getIn(overrides, payload.path)) {
+        if (getIn(overrides(), payload.path) != null) {
           log().info(`${payload.path} in overrides; not updating`)
         } else {
           log().info(`Updating "${payload.path}" to ${payload.value}`)

@@ -251,6 +251,14 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
+    test('calls session.refresh with REFRESH_SESSION', () => {
+      mockResolvedValue(session.refresh)
+
+      return sendConnect()
+        .then(() => sendToClient({}, actions.refreshSession()))
+        .then(() => expect(session.refresh).toHaveBeenCalled())
+    })
+
     test('start a timer when the run starts', () => {
       mockResolvedValue(session.run)
 

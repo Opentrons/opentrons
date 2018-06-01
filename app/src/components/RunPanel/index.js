@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
 
@@ -13,19 +14,21 @@ import RunControls from './RunControls'
 const mapStateToProps = (state) => ({
   isRunning: robotSelectors.getIsRunning(state),
   isPaused: robotSelectors.getIsPaused(state),
-  sessionName: robotSelectors.getSessionName(state),
   startTime: robotSelectors.getStartTime(state),
   isReadyToRun: robotSelectors.getIsReadyToRun(state),
-  runTime: robotSelectors.getRunTime(state) || '00:00:00',
-  runProgress: robotSelectors.getRunProgress(state),
-  // TODO(mc, 2017-09-26): remove development hardcoded values for errors
-  errors: []
+  runTime: robotSelectors.getRunTime(state),
+  disabled: (
+    !robotSelectors.getSessionIsLoaded(state) ||
+    robotSelectors.getCancelInProgress(state) ||
+    robotSelectors.getSessionLoadInProgress(state)
+  )
 })
 
 const mapDispatchToProps = (dispatch) => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
-  onResumeClick: () => dispatch(robotActions.resume())
+  onResumeClick: () => dispatch(robotActions.resume()),
+  onResetClick: () => dispatch(robotActions.refreshSession())
 })
 
 function RunPanel (props) {

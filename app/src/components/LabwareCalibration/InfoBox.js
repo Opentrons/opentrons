@@ -64,9 +64,13 @@ function InfoBox (props: Props) {
 
     if (button) {
       showButton = !labware.isMoving
-      buttonText = button.isNext
-        ? `Move to next ${button.type}`
-        : `return tip and proceed to run`
+      if (button.isNext) {
+        buttonText = `Move to next ${button.type}`
+      } else if (!button.isConfirmed) {
+        buttonText = `Move to ${button.type}`
+      } else {
+        buttonText = 'return tip and proceed to run'
+      }
     }
   }
 
@@ -120,6 +124,7 @@ function mergeProps (
 ): Props {
   const {_buttonTarget, _buttonTargetIsNext, _calibratorMount} = stateProps
   const {dispatch} = dispatchProps
+  const targetConfirmed = _buttonTarget && _buttonTarget.confirmed
 
   let button = null
 
@@ -127,16 +132,16 @@ function mergeProps (
     button = {
       type: robotSelectors.labwareType(_buttonTarget),
       isNext: _buttonTargetIsNext,
+      isConfirmed: targetConfirmed,
       onClick: () => {
-        if (_calibratorMount && _buttonTargetIsNext) {
+        if (_calibratorMount && (_buttonTargetIsNext || !targetConfirmed)) {
           dispatch(robotActions.moveTo(_calibratorMount, _buttonTarget.slot))
           dispatch(push(`/calibrate/labware/${_buttonTarget.slot}`))
         } else if (_calibratorMount) {
           dispatch(robotActions.returnTip(_calibratorMount))
           dispatch(push(`/run`))
         }
-      },
-      text: 'foobar'
+      }
     }
   }
 

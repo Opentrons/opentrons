@@ -21,12 +21,12 @@ pipette_config = namedtuple(
         'pick_up_current',
         'aspirate_flow_rate',
         'dispense_flow_rate',
-        'ul_per_mm',
         'channels',
         'name',
         'model_offset',
         'plunger_current',
         'drop_tip_current',
+        'max_volume',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
@@ -74,12 +74,12 @@ def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
                 cfg, 'aspirateFlowRate'),
             dispense_flow_rate=_load_config_value(
                 cfg, 'dispenseFlowRate'),
-            ul_per_mm=_load_config_value(cfg, 'ulPerMm'),
             channels=_load_config_value(cfg, 'channels'),
             name=model,
             model_offset=_load_config_value(cfg, 'modelOffset'),
             plunger_current=_load_config_value(cfg, 'plungerCurrent'),
             drop_tip_current=_load_config_value(cfg, 'dropTipCurrent'),
+            max_volume=_load_config_value(cfg, 'max_volume'),
             tip_length=_load_config_value(cfg, 'tipLength')
         )
     except (KeyError, json.decoder.JSONDecodeError) as e:
@@ -139,12 +139,12 @@ p10_single_v1 = pipette_config(
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.77,
     channels=1,
     name='p10_single_v1',
     model_offset=[0.0, 0.0, Z_OFFSET_P10],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=10,
     tip_length=33
 )
 
@@ -177,12 +177,12 @@ p10_multi_v1 = pipette_config(
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=0.77,
     channels=8,
     name='p10_multi_v1',
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=10,
     tip_length=33
 )
 
@@ -215,12 +215,12 @@ p50_single_v1 = pipette_config(
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.35,
     channels=1,
     name='p50_single_v1',
     model_offset=[0.0, 0.0, Z_OFFSET_P50],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=50,
     tip_length=51.7
 )
 
@@ -253,12 +253,12 @@ p50_multi_v1 = pipette_config(
     pick_up_current=0.3,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=3.35,
     channels=8,
     name='p50_multi_v1',
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=50,
     tip_length=51.7
 )
 
@@ -291,12 +291,12 @@ p300_single_v1 = pipette_config(
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=18.7,
     channels=1,
     name='p300_single_v1',
     model_offset=[0.0, 0.0, Z_OFFSET_P300],
     plunger_current=0.3,
     drop_tip_current=0.5,
+    max_volume=300,
     tip_length=51.7
 )
 
@@ -329,12 +329,12 @@ p300_multi_v1 = pipette_config(
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=19,
     channels=8,
     name='p300_multi_v1',
     model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=300,
     tip_length=51.7
 )
 
@@ -367,12 +367,12 @@ p1000_single_v1 = pipette_config(
     pick_up_current=0.1,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
-    ul_per_mm=65,
     channels=1,
     name='p1000_single_v1',
     model_offset=[0.0, 0.0, Z_OFFSET_P1000],
     plunger_current=0.5,
     drop_tip_current=0.5,
+    max_volume=1000,
     tip_length=76.7
 )
 

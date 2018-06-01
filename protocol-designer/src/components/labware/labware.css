@@ -54,3 +54,13 @@
     fill: currentColor;
   }
 }
+
+.name_input {
+  width: 100%;
+  border: none;
+  border-radius: var(--bd-radius-default);
+  padding-left: 0.25rem;
+  background-color: var(--c-light-gray);
+  color: var(--c-font-dark);
+  font-size: var(--fs-body-1);
+}

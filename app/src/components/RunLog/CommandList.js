@@ -13,7 +13,7 @@ export default class CommandList extends Component {
   }
 
   render () {
-    const {commands, sessionStatus, cancelInProgress} = this.props
+    const {commands, sessionStatus, showSpinner} = this.props
     const makeCommandToTemplateMapper = (depth) => (command) => {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
@@ -47,16 +47,28 @@ export default class CommandList extends Component {
     }
 
     const commandItems = commands.map(makeCommandToTemplateMapper(0))
-    // TODO (ka 2018-5-21): Temporarily hiding error to avoid showing smoothie error on halt,
-    // error AlertItem would be useful for future errors
-    const showAlert = (sessionStatus !== 'running' && sessionStatus !== 'loaded' && sessionStatus !== 'error')
+
+    // TODO (ka 2018-5-21): Temporarily hiding error to avoid showing smoothie
+    //  error on halt, error AlertItem would be useful for future errors
+    const showAlert = (
+      sessionStatus !== 'running' &&
+      sessionStatus !== 'loaded' &&
+      sessionStatus !== 'error'
+    )
+
+    const wrapperStyle = cx(styles.run_log_wrapper, {
+      [styles.alert_visible]: showAlert
+    })
+
     return (
       <div className={styles.run_page}>
-      {cancelInProgress && (
+      {showSpinner && (
         <SpinnerModal />
       )}
-      <SessionAlert {...this.props} className={styles.alert}/>
-      <section className={cx(styles.run_log_wrapper, {[styles.alert_visible]: showAlert})}>
+      {!showSpinner && (
+        <SessionAlert {...this.props} className={styles.alert} />
+      )}
+      <section className={wrapperStyle}>
         <ol className={styles.list}>
           {commandItems}
         </ol>

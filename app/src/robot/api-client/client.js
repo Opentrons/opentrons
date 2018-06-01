@@ -48,6 +48,7 @@ export default function client (dispatch) {
       case actionTypes.PAUSE: return pause(state, action)
       case actionTypes.RESUME: return resume(state, action)
       case actionTypes.CANCEL: return cancel(state, action)
+      case 'robot:REFRESH_SESSION': return refreshSession(state, action)
     }
   }
 
@@ -278,6 +279,11 @@ export default function client (dispatch) {
       .then(() => remote.session_manager.session.stop())
       .then(() => dispatch(actions.cancelResponse()))
       .catch((error) => dispatch(actions.cancelResponse(error)))
+  }
+
+  function refreshSession (state, action) {
+    remote.session_manager.session.refresh()
+      .catch((error) => dispatch(actions.sessionResponse(error)))
   }
 
   function setRunTimerInterval () {
