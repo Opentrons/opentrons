@@ -6,11 +6,18 @@ import {
   PrimaryButton,
   FormGroup,
   DropdownField,
-  CheckboxField,
   InputField,
   RadioGroup,
   type DropdownOption
 } from '@opentrons/components'
+
+import {
+  CheckboxRow,
+  DelayField,
+  FlowRateField,
+  MixField,
+  TipPositionField
+} from './formFields'
 
 import WellSelectionInput from '../../containers/WellSelectionInput'
 import FormSection from './FormSection'
@@ -21,7 +28,6 @@ import type {FormData} from '../../form-types'
 
 import {formConnectorFactory} from '../../utils'
 
-type FormConnectorType = $Call<typeof formConnectorFactory, *, *>
 type Options = Array<DropdownOption>
 
 export type Props = {
@@ -39,97 +45,6 @@ export type Props = {
   canSave: boolean
   /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
     this obj reflects the form selector's return values */
-}
-
-type CheckboxRowProps = {
-  label?: string,
-  formConnector: FormConnectorType,
-  checkboxAccessor: string,
-  children?: ?React.Node,
-  className?: string
-}
-function CheckboxRow (props: CheckboxRowProps) {
-  const {formConnector, checkboxAccessor, label, className} = props
-
-  const checked = formConnector(checkboxAccessor).value
-
-  return (
-    <div className={styles.field_row}>
-      <CheckboxField label={label} className={className}
-        {...formConnector(checkboxAccessor)} />
-      {checked ? props.children : null}
-    </div>
-  )
-}
-
-type MixFieldProps = {
-  timesAccessor: string,
-  volumeAccessor: string
-} & CheckboxRowProps
-function MixField (props: MixFieldProps) {
-  const {
-    formConnector,
-    checkboxAccessor,
-    timesAccessor,
-    volumeAccessor,
-    label
-  } = props
-
-  return (
-    <CheckboxRow
-      checkboxAccessor={checkboxAccessor}
-      formConnector={formConnector}
-      label={label || 'Mix'}
-    >
-      <InputField units='μL' {...formConnector(timesAccessor)} />
-      <InputField units='Times' {...formConnector(volumeAccessor)} />
-    </CheckboxRow>
-  )
-}
-
-type DelayFieldProps = {
-  minutesAccessor: string,
-  secondsAccessor: string
-} & CheckboxRowProps
-function DelayField (props: DelayFieldProps) {
-  const {
-    formConnector,
-    checkboxAccessor,
-    minutesAccessor,
-    secondsAccessor,
-    label
-  } = props
-
-  return (
-    <CheckboxRow
-      checkboxAccessor={checkboxAccessor}
-      formConnector={formConnector}
-      label={label || 'Delay'}
-    >
-      <InputField units='m' {...formConnector(minutesAccessor)} />
-      <InputField units='s' {...formConnector(secondsAccessor)} />
-    </CheckboxRow>
-  )
-}
-
-function FlowRateField () {
-  // NOTE 2018-05-31 Flow rate cannot yet be adjusted,
-  // this is a placeholder
-  return (
-    <FormGroup label='FLOW RATE'>
-      Default
-    </FormGroup>
-  )
-}
-
-function TipPositionField () {
-  // NOTE 2018-05-31 Tip position cannot yet be adjusted,
-  // this is a placeholder
-  return (
-    <FormGroup label='TIP POSITION'>
-      Bottom, center
-    </FormGroup>
-  )
 }
 
 export default function StepEditForm (props: Props) {
