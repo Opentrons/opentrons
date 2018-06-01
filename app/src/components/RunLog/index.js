@@ -2,6 +2,7 @@
 import {connect} from 'react-redux'
 import type {State} from '../../types'
 import {
+  actions as robotActions,
   selectors as robotSelectors,
   type SessionStatus
 } from '../../robot'
@@ -15,10 +16,6 @@ type SP = {
   showSpinner: boolean,
 }
 
-export default connect(mapStateToProps)(CommandList)
-
-export {ConfirmCancelModal}
-
 function mapStateToProps (state: State): SP {
   return {
     commands: robotSelectors.getCommands(state),
@@ -29,3 +26,11 @@ function mapStateToProps (state: State): SP {
     )
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  onResetClick: () => dispatch(robotActions.refreshSession())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(CommandList)
+
+export {ConfirmCancelModal}
