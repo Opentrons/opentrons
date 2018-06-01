@@ -4,7 +4,6 @@ from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.robot import robot_configs
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
 
 # Note that several tests in this file have target/expected values that do not
@@ -192,7 +191,7 @@ async def test_create_session(async_client, monkeypatch):
         ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')]
 
     for left_model, right_model, preferred in pipette_combinations:
-        def dummy_read_model(self, mount):
+        def dummy_read_model(mount):
             if mount == 'left':
                 res = left_model
             else:
@@ -200,7 +199,7 @@ async def test_create_session(async_client, monkeypatch):
             return res
 
         monkeypatch.setattr(
-            SmoothieDriver_3_0_0, 'read_pipette_model', dummy_read_model)
+            robot._driver, 'read_pipette_model', dummy_read_model)
 
         robot.reset()
 
@@ -249,12 +248,18 @@ async def test_create_session_fail(async_client, monkeypatch):
     assert endpoints.session is None
 
 
-async def test_release(async_client):
+async def test_release(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
     robot.reset()
 
     resp = await async_client.post('/calibration/deck/start')
@@ -285,6 +290,12 @@ async def test_forcing_new_session(async_client, monkeypatch):
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
     robot.reset()
 
     dummy_token = 'Test Token'
@@ -301,7 +312,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
 
     assert resp.status == 201
     expected = {'token': dummy_token,
-                'pipette': {'mount': 'right', 'model': 'p10_single_v1'}}
+                'pipette': {'mount': 'right', 'model': test_model}}
     assert text == expected
 
     resp1 = await async_client.post('/calibration/deck/start')
@@ -312,7 +323,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
     text2 = await resp2.json()
     assert resp2.status == 201
     expected2 = {'token': dummy_token,
-                 'pipette': {'mount': 'right', 'model': 'p10_single_v1'}}
+                 'pipette': {'mount': 'right', 'model': test_model}}
     assert text2 == expected2
 
 
@@ -321,6 +332,12 @@ async def test_incorrect_token(async_client, monkeypatch):
     Test that putting in an incorrect token for a POST request does not work
     after a session was already created with a different token.
     """
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
     robot.reset()
     dummy_token = 'Test Token'
 
@@ -354,6 +371,12 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
 
     Then jog requests will work as expected.
     """
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
     robot.reset()
     dummy_token = 'Test Token'
 

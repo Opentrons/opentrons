@@ -40,10 +40,18 @@ async def test_get_pipettes_uncommissioned(
 
 async def test_get_pipettes(
         virtual_smoothie_env, loop, test_client, monkeypatch):
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    robot.reset()
+
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = list(configs.values())[0]
+    model = configs[test_model]
     expected = {
         'left': {
             'model': model.name,
@@ -67,10 +75,18 @@ async def test_get_pipettes(
 
 async def test_get_cached_pipettes(
         virtual_smoothie_env, loop, test_client, monkeypatch):
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    robot.reset()
+
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = list(configs.values())[0]
+    model = configs[test_model]
     expected = {
         'left': {
             'model': model.name,
