@@ -12,16 +12,16 @@ type Props = {
 export default function SessionAlert (props: Props) {
   const {sessionStatus, className, onResetClick} = props
 
-  const COMPLETE_MESSAGE = (<p>Run  complete! <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
-  const PAUSE_MESSAGE = 'Run paused'
-  const CANCEL_MESSAGE = (<p>Run  canceled. <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+  const completeMesage = (<p>Run  complete! <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+  const pauseMessage = 'Run paused'
+  const cancelMessage = (<p>Run  canceled. <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
 
   switch (sessionStatus) {
     case 'finished':
       return (
         <AlertItem
           type='success'
-          title={COMPLETE_MESSAGE}
+          title={completeMesage}
           className={className}
         />
       )
@@ -29,7 +29,7 @@ export default function SessionAlert (props: Props) {
       return (
         <AlertItem
           type='info'
-          title={PAUSE_MESSAGE}
+          title={pauseMessage}
           className={className}
           icon={{name: 'pause-circle'}}
         />
@@ -38,7 +38,7 @@ export default function SessionAlert (props: Props) {
       return (
         <AlertItem
         type='warning'
-        title={CANCEL_MESSAGE}
+        title={cancelMessage}
         className={className}
       />)
     default:
