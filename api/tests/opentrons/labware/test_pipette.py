@@ -197,7 +197,7 @@ def test_aspirate_move_to():
         robot.poses,
         p300.instrument_actuator)
 
-    assert (current_pos == (7.889964, 0.0, 0.0)).all()
+    assert (current_pos == (6.889964, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
@@ -225,7 +225,7 @@ def test_dispense_move_to():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300.instrument_actuator)
-    assert (current_pos == (2.5, 0.0, 0.0)).all()
+    assert (current_pos == (1.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
     assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
