@@ -12,6 +12,32 @@ export function sortLabwareBySlot (robotState: RobotState) {
 
 // SELECTORS
 
+export function getPipetteChannels (pipetteId: string, robotState: RobotState): ?Channels {
+  const pipette = robotState.instruments[pipetteId]
+
+  if (!pipette) {
+    // TODO Ian 2018-06-04 use assert
+    console.warn(`no pipette id: "${pipetteId}"`)
+    return null
+  }
+
+  const pipetteChannels = pipette.channels
+  return pipetteChannels
+}
+
+export function getLabwareType (labwareId: string, robotState: RobotState): ?string {
+  const labware = robotState.labware[labwareId]
+
+  if (!labware) {
+    // TODO Ian 2018-06-04 use assert
+    console.warn(`no labware id: "${labwareId}"`)
+    return null
+  }
+
+  const labwareType = labware.type
+  return labwareType
+}
+
 export function _getNextTip (
   pipetteChannels: Channels,
   tiprackWellsState: {[wellName: string]: boolean
