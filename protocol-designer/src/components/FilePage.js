@@ -5,7 +5,7 @@ import type {FilePageFields} from '../file-data'
 import type {FormConnector} from '../utils'
 
 import styles from './FilePage.css'
-import formStyles from '../components/Form.css'
+import formStyles from '../components/forms.css'
 
 type Props = {
   formConnector: FormConnector<FilePageFields>,

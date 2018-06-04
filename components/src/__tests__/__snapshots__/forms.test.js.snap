@@ -204,7 +204,7 @@ exports[`FormGroup renders correctly 1`] = `
   className="foo"
 >
   <div
-    className="formgroup_label"
+    className="form_group_label"
   >
     This is the label
   </div>

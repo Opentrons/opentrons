@@ -9,6 +9,7 @@ import {
 import {pipetteData} from '../../file-data'
 
 import styles from './NewFileModal.css'
+import formStyles from '../forms.css'
 import modalStyles from './modal.css'
 
 type State = {
@@ -88,12 +89,12 @@ export default class NewFileModal extends React.Component<Props, State> {
           Select the pipettes you will be using. This cannot be changed later.
         </div>
 
-        <div className={styles.row_wrapper}>
-          <FormGroup label='Left pipette*:' className={styles.column_1_2}>
+        <div className={formStyles.row_wrapper}>
+          <FormGroup label='Left pipette*:' className={formStyles.column_1_2}>
             <DropdownField options={pipetteOptionsWithInvalid}
               value={leftPipette} onChange={this.handleChange('leftPipette')} />
           </FormGroup>
-          <FormGroup label='Right pipette*:' className={styles.column_1_2}>
+          <FormGroup label='Right pipette*:' className={formStyles.column_1_2}>
             <DropdownField options={pipetteOptionsWithInvalid}
               value={rightPipette} onChange={this.handleChange('rightPipette')} />
           </FormGroup>

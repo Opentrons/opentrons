@@ -1,50 +1,39 @@
-.flex_row {
-  display: flex;
-  justify-content: space-between;
+.form_content {
+  & > * {
+    /* row spacing */
+    margin: 0.5rem 0;
+  }
 }
+
+/* fields */
+.description_field {
+  lost-column: 7/16;
+}
+
+.existing_ingred_field {
+  lost-column: 5/16;
+}
+
+.ingred_title_field {
+  lost-column: 4/16;
+}
+
+.serialize_name {
+  lost-column: 6/16;
+}
+
+.volume_field {
+  lost-column: 3/16;
+}
+
+/* buttons */
 
 .button_row {
   display: flex;
   justify-content: flex-end;
 
   & > * {
-    flex: calc(1 / 4);
-    margin: 0 0.2rem;
-  }
-}
-
-.middle_row {
-  composes: flex_row;
-  justify-content: flex-start;
-
-  & > * {
-    flex: calc(1 / 3);
-  }
-}
-
-.two_thirds {
-  flex: calc(2 / 3);
-}
-
-.ingred_form_header {
-  font-size: 10pt;
-  font-weight: inherit;
-  text-transform: uppercase;
-  float: left;
-  width: 100%;
-
-  & > * {
-    display: inline-block;
-    border-radius: 0;
-    margin: 0;
-    color: gray;
-    float: right;
-  }
-
-  & div:first-of-type {
-    border-bottom: 1px solid gray;
-    margin-right: 1em;
-    color: black;
-    float: left;
+    flex: calc(2 / 16);
+    margin: 0 0.5rem;
   }
 }

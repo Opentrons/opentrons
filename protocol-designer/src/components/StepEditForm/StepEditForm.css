@@ -1,0 +1,100 @@
+@import '@opentrons/components';
+
+@lost gutter 0.5rem;
+
+/* "Advanced options" columns.
+ * Row should add up to 15/16 max to accomodate carat on right.
+ */
+
+.left_settings_column,
+.right_settings_column {
+  & > * {
+    margin: 1rem 0;
+  }
+}
+
+.left_settings_column {
+  lost-column: 11/16;
+}
+
+.right_settings_column {
+  lost-column: 4/16;
+}
+
+/* Special fields: default sizes.
+ * Row of these fields should add up to max of 15/16
+ * to accommodate carat on right.
+ */
+
+.well_selection_input {
+  lost-column: 2/16;
+}
+
+.labware_field {
+  lost-column: 6/16;
+}
+
+.volume_field {
+  lost-column: 7/16;
+}
+
+.pipette_field {
+  lost-column: 7/16;
+}
+
+/* Style overrides for particular step types */
+
+.consolidate {
+  & .pipette_field,
+  & .volume_field {
+    lost-column: 4/16;
+  }
+
+  & .labware_field {
+    lost-column: 5/16;
+  }
+}
+
+/* ------------------- */
+
+.field_row {
+  lost-utility: clearfix;
+  min-height: 2.25rem;
+
+  /* Field row is for: (optional checkbox) + label + associated fields
+   * All items in field row sum to 15/16, leaving 1/16 gap on the right.
+   */
+  & label {
+    lost-column: 7/16;
+    max-width: 8.5rem;
+  }
+
+  & > * {
+    lost-column: 4/16;
+  }
+
+  & .full_width {
+    lost-column: 8/16;
+  }
+}
+
+/* form buttons */
+
+.button_row {
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
+  }
+}
+
+.more_options_button {
+  @apply --font-header-dark;
+
+  lost-column: 2/6;
+}
+
+.cancel_button {
+  lost-offset: 2/6;
+}

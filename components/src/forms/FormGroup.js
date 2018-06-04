@@ -10,7 +10,7 @@ type Props = {
   /** form content */
   children?: React.Node,
   /** classes to apply */
-  className?: string,
+  className?: ?string,
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
   error?: ?string,
   /** enable disabled style. Overridden by truthy `error` */
@@ -29,7 +29,7 @@ export default function FormGroup (props: Props) {
 
   return (
     <div className={className}>
-      <div className={styles.formgroup_label}>
+      <div className={styles.form_group_label}>
         {error &&
           <div className={styles.error_icon}>
             <Icon name='alert' />
