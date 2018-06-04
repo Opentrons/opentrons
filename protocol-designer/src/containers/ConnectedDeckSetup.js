@@ -8,28 +8,22 @@ import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareDropdown from '../containers/LabwareDropdown.js'
 
-import {closeIngredientSelector} from '../labware-ingred/actions'
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import type {BaseState} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 
-// TODO Ian 2017-12-04 make proper component
-const ConnectedIngredSelModal = connect(
-  (state: BaseState) => ({
-    visible: ingredSelModIsVisible(selectors.activeModals(state)) // TODO Ian 2018-02-16 does `visible` prop do anything?
-  }),
-  {
-    onClose: closeIngredientSelector
-  }
-)(IngredientSelectionModal)
-
-type DeckSetupProps = {deckSetupMode: boolean}
+type DeckSetupProps = {
+  deckSetupMode: boolean,
+  ingredSelectionMode: boolean
+}
 
 function mapStateToProps (state: BaseState): DeckSetupProps {
   return {
-    deckSetupMode: steplistSelectors.deckSetupMode(state)
+    deckSetupMode: steplistSelectors.deckSetupMode(state),
+    // TODO SOON remove all uses of the `activeModals` selector
+    ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state))
   }
 }
 
@@ -38,12 +32,20 @@ function DeckSetup (props: DeckSetupProps) {
   if (!props.deckSetupMode) {
     // Temporary quickfix: if we're not in deck setup mode,
     // hide the labware dropdown and ingredient selection modal
+    // and just show the deck.
+    // TODO Ian 2018-05-30 this shouldn't be a responsibility of DeckSetup
     return <Deck LabwareComponent={LabwareContainer} />
   }
+
+  // NOTE: besides `Deck`, these are all modal-like components that show up
+  // only when user is on deck setup / ingred selection "page".
+  // Once DeckSetup is broken apart and moved into ProtocolEditor,
+  // this will go away
   return (
     <div>
       <LabwareDropdown />
-      <ConnectedIngredSelModal />
+      {props.ingredSelectionMode && <IngredientSelectionModal />}
+
       <Deck LabwareComponent={LabwareContainer} />
     </div>
   )

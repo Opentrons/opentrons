@@ -19,7 +19,7 @@ type DispatchProps = {
 type StateProps = $Diff<Props, DispatchProps>
 
 function mapStateToProps (state: BaseState): StateProps {
-  const selectedIngredGroup = selectors.selectedIngredientGroup(state)
+  const selectedIngredGroup = selectors.getSelectedIngredientGroup(state)
   return {
     editingIngredGroupId: selectedIngredGroup && selectedIngredGroup.groupId,
     numWellsSelected: wellSelectionSelectors.numWellsSelected(state),

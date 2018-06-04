@@ -1,35 +1,39 @@
 // @flow
+import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectors} from '../labware-ingred/reducers'
-import {editModeIngredientGroup, deleteIngredient} from '../labware-ingred/actions'
+import {editModeIngredientGroup, deleteIngredient, openRenameLabwareForm} from '../labware-ingred/actions'
 import type {BaseState, ThunkDispatch} from '../types'
 
-import IngredientsList, {type Props} from '../components/IngredientsList.js'
+import IngredientsList from '../components/IngredientsList'
 
-// TODO Ian 2018-02-21 Is there a nicer way to strip out keys from an object type?
-type PropsWithoutActions = {
-  ...Props,
-  editModeIngredientGroup?: *,
-  deleteIngredient?: *
+type Props = React.ElementProps<typeof IngredientsList>
+
+type DP = {
+  editModeIngredientGroup: $ElementType<Props, 'editModeIngredientGroup'>,
+  deleteIngredient: $ElementType<Props, 'deleteIngredient'>,
+  openRenameLabwareForm: $ElementType<Props, 'openRenameLabwareForm'>
 }
 
-function mapStateToProps (state: BaseState): PropsWithoutActions {
+type SP = $Diff<Props, DP>
+
+function mapStateToProps (state: BaseState): SP {
   // TODO Ian 2018-02-21 put these selectors in Header
-  // const activeModals = selectors.activeModals(state)
   const container = selectors.getSelectedContainer(state)
-  const selectedIngredientGroup = selectors.selectedIngredientGroup(state)
+  const selectedIngredientGroup = selectors.getSelectedIngredientGroup(state)
   return {
+    renameLabwareFormMode: selectors.getRenameLabwareFormMode(state),
     ingredients: container ? selectors.ingredientsByLabware(state)[container.id] : {},
     selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
     selected: false
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    // TODO Ian 2018-02-23 How to type action creators so that arg types follow along?
     editModeIngredientGroup: (args) => dispatch(editModeIngredientGroup(args)),
-    deleteIngredient: (args) => dispatch(deleteIngredient(args))
+    deleteIngredient: (args) => dispatch(deleteIngredient(args)),
+    openRenameLabwareForm: () => dispatch(openRenameLabwareForm())
   }
 }
 
