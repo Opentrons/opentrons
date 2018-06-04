@@ -66,6 +66,7 @@
    */
   & label {
     lost-column: 7/16;
+    max-width: 8.5rem;
   }
 
   & > * {
