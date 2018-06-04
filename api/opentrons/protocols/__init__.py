@@ -5,7 +5,8 @@ from opentrons.instruments import pipette_config
 
 
 def _sleep(seconds):
-    time.sleep(seconds)
+    if not robot.is_simulating():
+        time.sleep(seconds)
 
 
 def load_pipettes(protocol_data):
@@ -81,7 +82,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
 
         if command_type == 'delay':
             wait = params.get('wait', 0)
-            if type(wait) is str:
+            if wait is True:
                 # TODO Ian 2018-05-14 pass message
                 robot.pause()
             else:
