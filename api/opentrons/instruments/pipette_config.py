@@ -208,9 +208,9 @@ p10_multi_v1_3 = pipette_config(
 p50_single_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 2.5,
+        'bottom': 2.01,
         'blow_out': 2,
-        'drop_tip': -5
+        'drop_tip': -4.5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
@@ -248,7 +248,7 @@ p50_multi_v1 = pipette_config(
         'top': 19.5,
         'bottom': 2.5,
         'blow_out': 2,
-        'drop_tip': -4
+        'drop_tip': -3.5
     },
     pick_up_current=0.3,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,

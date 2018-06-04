@@ -80,9 +80,9 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 2.5,
+      "bottom": 2.01,
       "blowOut": 2,
-      "dropTip": -5
+      "dropTip": -4.5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 25,
@@ -120,7 +120,7 @@
       "top": 19.5,
       "bottom": 2.5,
       "blowOut": 2,
-      "dropTip": -4
+      "dropTip": -3.5
     },
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 25,
