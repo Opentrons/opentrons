@@ -29,7 +29,6 @@
     background-color: var(--c-bg-success);
     color: var(--c-success);
 
-
     & svg {
       color: var(--c-success);
     }
