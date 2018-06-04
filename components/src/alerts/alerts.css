@@ -52,7 +52,8 @@
 
   & > .title_bar {
     background-color: var(--c-bg-warning);
-    color: var(--c-warning);
+    color: var(--c-warningdark);
+    font-weight: var(--fw-semibold);
 
     & svg {
       fill: var(--c-warning);
