@@ -27,7 +27,7 @@ Currently Selected:
   <NavButton
     onClick={() => alert('you clicked me')}
     iconName='ot-connect'
-    isCurrent={true}
+    selected
   />
 </div>
 ```
