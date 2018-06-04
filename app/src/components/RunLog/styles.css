@@ -59,4 +59,10 @@ li.last_current {
   top: 0;
   left: 0;
   right: 0;
+
+  & a {
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: var(--fw-semibold);
+  }
 }
