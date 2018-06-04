@@ -14,7 +14,6 @@ from tests.opentrons import generate_plate
 class PipetteTest(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()
-        self.robot.reset()
         self.robot.home()
         self.trash = containers_load(self.robot, 'point', '1')
         self.tiprack1 = containers_load(self.robot, 'tiprack-10ul', '5')
@@ -76,11 +75,11 @@ class PipetteTest(unittest.TestCase):
         warnings.filterwarnings('error')
         # Check that user warning occurs when axis is called
         self.assertRaises(
-            RuntimeError, Pipette, self.robot, mount='left')
+            UserWarning, Pipette, self.robot, axis='a')
 
         # Check that the warning is still valid when max_volume is also used
         self.assertRaises(
-            RuntimeError, Pipette, self.robot, mount='left', max_volume=1000)
+            UserWarning, Pipette, self.robot, axis='a', max_volume=300)
 
         warnings.filterwarnings('default')
 
@@ -136,6 +135,8 @@ class PipetteTest(unittest.TestCase):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, 300)
         self.assertEquals(self.p200._volume_percentage(100), 0.5)
         self.assertEquals(len(self.robot.get_warnings()), 0)
+        self.p200._volume_percentage(self.p200.min_volume / 2)
+        self.assertEquals(len(self.robot.get_warnings()), 1)
 
     def test_add_tip(self):
         """
@@ -160,7 +161,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.reset()
         # Setting true instead of calling pick_up_tip because the test is
         # currently based on an exact command list. Should make this better.
-        self.p200.ul_per_mm = 18.5
         self.p200.distribute(
             30,
             self.plate[0],
