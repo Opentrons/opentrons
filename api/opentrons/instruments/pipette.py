@@ -1385,9 +1385,7 @@ class Pipette:
             ul_per_mm = lambda: self.ul_per_mm
         else:
             ul_per_mm = self._key_map_pipette_functions(model, ul, 'aspirate')
-        millimeters = 0.0
-        if ul_per_mm is not None:
-            millimeters = ul / ul_per_mm()
+        millimeters = ul / ul_per_mm()
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
@@ -1407,24 +1405,29 @@ class Pipette:
         else:
             ul_per_mm = self._key_map_pipette_functions(model, ul, 'dispense')
         # Change default of 1000 ul/mm if function returns a value
-        millimeters = 0.0
-        if ul_per_mm is not None:
-            # If ul_per_mm not None, it is a function so must make it callable
-            millimeters = ul / ul_per_mm()
+        millimeters = ul / ul_per_mm()
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
     def _key_map_pipette_functions(self, model, ul, func):
         function_map = {
             'p10_single_v1': lambda: self._p10_single_piecewise(ul, func),
+            'p10_single_v1.3': lambda: self._p10_single_piecewise(ul, func),
             'p10_multi_v1': lambda: self._p10_multi_piecewise(ul, func),
+            'p10_multi_v1.3': lambda: self._p10_multi_piecewise(ul, func),
             'p50_single_v1': lambda: self._p50_single_piecewise(ul, func),
+            'p50_single_v1.3': lambda: self._p50_single_piecewise(ul, func),
             'p50_multi_v1': lambda: self._p50_multi_piecewise(ul, func),
+            'p50_multi_v1.3': lambda: self._p50_multi_piecewise(ul, func),
             'p300_single_v1': lambda: self._p300_single_piecewise(ul, func),
+            'p300_single_v1.3': lambda: self._p300_single_piecewise(ul, func),
             'p300_multi_v1': lambda: self._p300_multi_piecewise(ul, func),
-            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func)}
+            'p300_multi_v1.3': lambda: self._p300_multi_piecewise(ul, func),
+            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func),
+            'p1000_single_v1.3': lambda: self._p1000_piecewise(ul, func)
+        }
 
-        return function_map.get(model)
+        return function_map[model]
 
     def _p10_single_piecewise(self, ul, func):
         # Piecewise function that calculates ul_per_mm for a p10 single
@@ -1514,11 +1517,10 @@ class Pipette:
             return 0*ul + 19.29389273
 
     def _p1000_piecewise(self, ul, func):
-        if ul > 0:
-            if func == 'aspirate':
-                return 65
-            else:
-                return 65
+        if func == 'aspirate':
+            return 65
+        else:
+            return 65
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1741,10 +1743,8 @@ class Pipette:
             else:
                 ul_per_mm = self._key_map_pipette_functions(
                     model, ul, 'aspirate')
-
-            if ul_per_mm is not None:
-                self.set_speed(
-                    aspirate=round(aspirate / ul_per_mm(), 6))
+            self.set_speed(
+                aspirate=round(aspirate / ul_per_mm(), 6))
         if dispense:
             # Set the ul_per_mm for the pipette
             if self.ul_per_mm:
@@ -1752,9 +1752,8 @@ class Pipette:
             else:
                 ul_per_mm = self._key_map_pipette_functions(
                     model, ul, 'dispense')
-            if ul_per_mm is not None:
-                self.set_speed(
-                    dispense=round(dispense / ul_per_mm(), 6))
+            self.set_speed(
+                dispense=round(dispense / ul_per_mm(), 6))
         return self
 
     def set_pick_up_current(self, amperes):

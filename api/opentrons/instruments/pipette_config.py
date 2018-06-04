@@ -94,7 +94,7 @@ def _load_config_dict_from_file(pipette_model: str) -> dict:
     if os.path.exists(config_file):
         with open(config_file) as conf:
             all_configs = json.load(conf)
-            cfg = all_configs[pipette_model]
+            cfg = all_configs.get(pipette_model, cfg)
     return cfg
 
 
@@ -129,12 +129,12 @@ DEFAULT_DISPENSE_SECONDS = 1
 # TODO                 because this is the backup in case that behavior fails,
 # TODO                 but we could make it more reliable if we start bundling
 # TODO                 config data into the wheel file perhaps. Needs research.
-p10_single = pipette_config(
+p10_single_v1 = pipette_config(
     plunger_positions={
-        'top': 19,
-        'bottom': 2.5,
-        'blow_out': -0.5,
-        'drop_tip': -4
+        'top': 19.5,
+        'bottom': 2,
+        'blow_out': -1,
+        'drop_tip': -4.5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -148,12 +148,31 @@ p10_single = pipette_config(
     tip_length=33
 )
 
-p10_multi = pipette_config(
+p10_single_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
-        'bottom': 4,
-        'blow_out': 1,
-        'drop_tip': -4.5
+        'top': 19.5,
+        'bottom': 0.5,
+        'blow_out': -2.5,
+        'drop_tip': -6
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
+    channels=1,
+    name='p10_single_v1.3',
+    model_offset=[0.0, 0.0, Z_OFFSET_P10],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    max_volume=10,
+    tip_length=33
+)
+
+p10_multi_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
+        'bottom': 2,
+        'blow_out': -1,
+        'drop_tip': -4
     },
     pick_up_current=0.2,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
@@ -167,12 +186,31 @@ p10_multi = pipette_config(
     tip_length=33
 )
 
-p50_single = pipette_config(
+p10_multi_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
-        'bottom': 2.5,
+        'top': 19.5,
+        'bottom': 0.5,
+        'blow_out': -2.5,
+        'drop_tip': -5.5
+    },
+    pick_up_current=0.2,
+    aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
+    channels=8,
+    name='p10_multi_v1.3',
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    max_volume=10,
+    tip_length=33
+)
+
+p50_single_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
+        'bottom': 2.01,
         'blow_out': 2,
-        'drop_tip': -5
+        'drop_tip': -4.5
     },
     pick_up_current=0.1,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
@@ -186,12 +224,31 @@ p50_single = pipette_config(
     tip_length=51.7
 )
 
-p50_multi = pipette_config(
+p50_single_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
+        'top': 19.5,
+        'bottom': 2,
+        'blow_out': 0.5,
+        'drop_tip': -6
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
+    channels=1,
+    name='p50_single_v1.3',
+    model_offset=[0.0, 0.0, Z_OFFSET_P50],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    max_volume=50,
+    tip_length=51.7
+)
+
+p50_multi_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
         'bottom': 2.5,
         'blow_out': 2,
-        'drop_tip': -4
+        'drop_tip': -3.5
     },
     pick_up_current=0.3,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
@@ -205,12 +262,31 @@ p50_multi = pipette_config(
     tip_length=51.7
 )
 
-p300_single = pipette_config(
+p50_multi_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
-        'bottom': 2.5,
-        'blow_out': 1,
+        'top': 19.5,
+        'bottom': 2,
+        'blow_out': 0.5,
         'drop_tip': -5
+    },
+    pick_up_current=0.3,
+    aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
+    channels=8,
+    name='p50_multi_v1.3',
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    max_volume=50,
+    tip_length=51.7
+)
+
+p300_single_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
+        'bottom': 1.5,
+        'blow_out': 0,
+        'drop_tip': -4
     },
     pick_up_current=0.1,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -224,12 +300,31 @@ p300_single = pipette_config(
     tip_length=51.7
 )
 
-p300_multi = pipette_config(
+p300_single_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
-        'bottom': 3,
-        'blow_out': 1,
-        'drop_tip': -3.5
+        'top': 19.5,
+        'bottom': 1.5,
+        'blow_out': -1.5,
+        'drop_tip': -5.5
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
+    channels=1,
+    name='p300_single_v1.3',
+    model_offset=[0.0, 0.0, Z_OFFSET_P300],
+    plunger_current=0.3,
+    drop_tip_current=0.5,
+    max_volume=300,
+    tip_length=51.7
+)
+
+p300_multi_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
+        'bottom': 3.5,
+        'blow_out': 3,
+        'drop_tip': -2
     },
     pick_up_current=0.3,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
@@ -243,9 +338,28 @@ p300_multi = pipette_config(
     tip_length=51.7
 )
 
-p1000_single = pipette_config(
+p300_multi_v1_3 = pipette_config(
     plunger_positions={
-        'top': 19,
+        'top': 19.5,
+        'bottom': 3.5,
+        'blow_out': 1.5,
+        'drop_tip': -3.5
+    },
+    pick_up_current=0.3,
+    aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
+    channels=8,
+    name='p300_multi_v1.3',
+    model_offset=[0.0, Y_OFFSET_MULTI, Z_OFFSET_MULTI],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    max_volume=300,
+    tip_length=51.7
+)
+
+p1000_single_v1 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
         'bottom': 3,
         'blow_out': 1,
         'drop_tip': -5
@@ -262,14 +376,40 @@ p1000_single = pipette_config(
     tip_length=76.7
 )
 
+p1000_single_v1_3 = pipette_config(
+    plunger_positions={
+        'top': 19.5,
+        'bottom': 2.5,
+        'blow_out': -0.5,
+        'drop_tip': -4
+    },
+    pick_up_current=0.1,
+    aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
+    dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
+    channels=1,
+    name='p1000_single_v1.3',
+    model_offset=[0.0, 0.0, Z_OFFSET_P1000],
+    plunger_current=0.5,
+    drop_tip_current=0.5,
+    max_volume=1000,
+    tip_length=76.7
+)
+
 fallback_configs = {
-    'p10_single_v1': p10_single,
-    'p10_multi_v1': p10_multi,
-    'p50_single_v1': p50_single,
-    'p50_multi_v1': p50_multi,
-    'p300_single_v1': p300_single,
-    'p300_multi_v1': p300_multi,
-    'p1000_single_v1': p1000_single
+    'p10_single_v1': p10_single_v1,
+    'p10_single_v1.3': p10_single_v1_3,
+    'p10_multi_v1': p10_multi_v1,
+    'p10_multi_v1.3': p10_multi_v1_3,
+    'p50_single_v1': p50_single_v1,
+    'p50_single_v1.3': p50_single_v1_3,
+    'p50_multi_v1': p50_multi_v1,
+    'p50_multi_v1.3': p50_multi_v1_3,
+    'p300_single_v1': p300_single_v1,
+    'p300_single_v1.3': p300_single_v1_3,
+    'p300_multi_v1': p300_multi_v1,
+    'p300_multi_v1.3': p300_multi_v1_3,
+    'p1000_single_v1': p1000_single_v1,
+    'p1000_single_v1.3': p1000_single_v1_3,
 }
 
 
@@ -292,33 +432,9 @@ def select_config(model: str):
 #     protocol writer
 
 
-# model-specific ID's, saved with each Pipette's memory
-# used to identifiy what model pipette is currently connected to machine
-PIPETTE_MODEL_IDENTIFIERS = {
-    'single': {
-        '10': 'p10_single_v1',
-        '50': 'p50_single_v1',
-        '300': 'p300_single_v1',
-        '1000': 'p1000_single_v1'
-    },
-    'multi': {
-        '10': 'p10_multi_v1',
-        '50': 'p50_multi_v1',
-        '300': 'p300_multi_v1',
-    }
-}
-
-
 configs = {
     model: select_config(model)
-    for model in [
-        'p10_single_v1',
-        'p10_multi_v1',
-        'p50_single_v1',
-        'p50_multi_v1',
-        'p300_single_v1',
-        'p300_multi_v1',
-        'p1000_single_v1']}
+    for model in fallback_configs.keys()}
 
 
 def load(pipette_model: str) -> pipette_config:

@@ -8,13 +8,13 @@ pipette_barcode_to_model = {
     'P300S20180101A01': 'p300_single_v1',
     'P300M20180101A01': 'p300_multi_v1',
     'P1000S20180101A01': 'p1000_single_v1',
-    'P10SV1318010101': 'p10_single_v13',
-    'P10MV1318010102': 'p10_multi_v13',
-    'P50SV1318010103': 'p50_single_v13',
-    'P50MV1318010104': 'p50_multi_v13',
-    'P3HSV1318010105': 'p300_single_v13',
-    'P3HMV1318010106': 'p300_multi_v13',
-    'P1KSV1318010107': 'p1000_single_v13'
+    'P10SV1318010101': 'p10_single_v1.3',
+    'P10MV1318010102': 'p10_multi_v1.3',
+    'P50SV1318010103': 'p50_single_v1.3',
+    'P50MV1318010104': 'p50_multi_v1.3',
+    'P3HSV1318010105': 'p300_single_v1.3',
+    'P3HMV1318010106': 'p300_multi_v1.3',
+    'P1KSV1318010107': 'p1000_single_v1.3'
 }
 
 

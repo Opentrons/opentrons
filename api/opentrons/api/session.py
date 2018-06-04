@@ -119,13 +119,16 @@ class Session(object):
         try:
             # TODO (artyom, 20171005): this will go away
             # once robot / driver simulation flow is fixed
-            robot._driver.disconnect()
+            robot.disconnect()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
                 exec(self._protocol, {})
         finally:
-            robot._driver.connect()
+            # physically attached pipettes are re-cached during robot.connect()
+            # which is important, because during a simulation, the robot could
+            # think that it holds a pipette model that it actually does not
+            robot.connect()
             unsubscribe()
 
             # Accumulate containers, instruments, interactions from commands

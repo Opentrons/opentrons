@@ -23,6 +23,7 @@ class PipetteTest(unittest.TestCase):
 
         self.p200 = Pipette(
             self.robot,
+            ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
             min_volume=10,  # These are variable
@@ -45,7 +46,7 @@ class PipetteTest(unittest.TestCase):
 
     def test_add_instrument(self):
         self.robot.reset()
-        Pipette(self.robot, mount='left')
+        Pipette(self.robot, ul_per_mm=18.5, mount='left')
         self.assertRaises(RuntimeError, Pipette, self.robot, mount='left')
 
     def test_aspirate_zero_volume(self):
@@ -85,6 +86,7 @@ class PipetteTest(unittest.TestCase):
     def test_get_instruments_by_name(self):
         self.p1000 = Pipette(
             self.robot,
+            ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1],
             min_volume=10,  # These are variable
@@ -212,7 +214,7 @@ class PipetteTest(unittest.TestCase):
             ['Aspirating', '70', 'well A1'],
             ['Dispensing', '30', 'well H1'],
             ['Dispensing', '30', 'well A2'],
-            ['Blow', 'well A1'],
+            ['Blow', 'well A1']
         ]
         fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
@@ -681,9 +683,7 @@ class PipetteTest(unittest.TestCase):
             ['blow', 'Well A1'],
             ['drop']
         ]
-        fuzzy_assert(self.robot.commands(),
-                     expected=expected
-                     )
+        fuzzy_assert(self.robot.commands(), expected=expected)
         self.robot.clear_commands()
 
     def test_distribute_air_gap_and_disposal_vol(self):
@@ -978,8 +978,6 @@ class PipetteTest(unittest.TestCase):
         self.p200.dispense = mock.Mock()
         self.p200.mix(volume=50, repetitions=2)
 
-        print(self.p200.tip_racks)
-
         self.assertEqual(
             self.p200.dispense.mock_calls,
             [
@@ -1047,7 +1045,8 @@ class PipetteTest(unittest.TestCase):
             mount='right',
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
-            name='pipette-for-transfer-tests'
+            name='pipette-for-transfer-tests',
+            ul_per_mm=18.5
         )
         self.p200.max_volume = 200
 
@@ -1088,7 +1087,8 @@ class PipetteTest(unittest.TestCase):
             tip_racks=[self.tiprack1, self.tiprack2],
             min_volume=10,  # These are variable
             mount='right',
-            channels=8
+            channels=8,
+            ul_per_mm=18.5
         )
 
         p200_multi.calibrate_plunger(
@@ -1159,8 +1159,6 @@ class PipetteTest(unittest.TestCase):
             mock.call(
                 self.plate[2].bottom(), instrument=self.p200, strategy='direct')
         ]
-        from pprint import pprint
-        pprint(self.robot.move_to.mock_calls)
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
     def build_pick_up_tip(self, well):

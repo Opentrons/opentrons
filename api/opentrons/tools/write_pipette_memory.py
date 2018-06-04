@@ -11,14 +11,14 @@ MODELS = {
         'P300M': 'p300_multi_v1',
         'P1000S': 'p1000_single_v1'
     },
-    'v13': {
-        'P10SV13': 'p10_single_v13',
-        'P10MV13': 'p10_multi_v13',
-        'P50SV13': 'p50_single_v13',
-        'P50MV13': 'p50_multi_v13',
-        'P3HSV13': 'p300_single_v13',
-        'P3HMV13': 'p300_multi_v13',
-        'P1KSV13': 'p1000_single_v13'
+    'v1.3': {
+        'P10SV13': 'p10_single_v1.3',
+        'P10MV13': 'p10_multi_v1.3',
+        'P50SV13': 'p50_single_v1.3',
+        'P50MV13': 'p50_multi_v1.3',
+        'P3HSV13': 'p300_single_v1.3',
+        'P3HMV13': 'p300_multi_v1.3',
+        'P1KSV13': 'p1000_single_v1.3'
     }
 }
 
@@ -42,7 +42,6 @@ def write_identifiers(robot, mount, new_id, new_model):
     robot._driver.write_pipette_id(mount, new_id)
     read_id = robot._driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id['pipette_id'])
-
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
@@ -50,10 +49,7 @@ def write_identifiers(robot, mount, new_id, new_model):
 
 def check_previous_data(robot, mount):
     old_id = robot._driver.read_pipette_id(mount)
-    if old_id.get('pipette_id'):
-        old_id = old_id.get('pipette_id')
-    else:
-        old_id = None
+    old_id = old_id.get('pipette_id')
     old_model = robot._driver.read_pipette_model(mount)
     if old_id and old_model:
         print(
@@ -79,13 +75,14 @@ def _user_submitted_barcode(max_length):
     # remove all characters before the letter P
     # for example, remove ASCII selector code "\x1b(B" on chinese keyboards
     barcode = barcode[barcode.index('P'):]
+    barcode = barcode.split('\r')[0].split('\n')[0]  # remove any newlines
     return barcode
 
 
 def _parse_model_from_barcode(barcode):
-    # MUST iterate through v13 first, because v1 barcodes did not have
+    # MUST iterate through v1.3 first, because v1 barcodes did not have
     # characters to specify the version number
-    for version in ['v13', 'v1']:
+    for version in ['v1.3', 'v1']:
         for barcode_substring in MODELS[version].keys():
             if barcode.startswith(barcode_substring):
                 return MODELS[version][barcode_substring]

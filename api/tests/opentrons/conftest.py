@@ -325,7 +325,7 @@ def model(robot):
     from opentrons.containers import load
     from opentrons.instruments.pipette import Pipette
 
-    pipette = Pipette(robot, mount='right')
+    pipette = Pipette(robot, ul_per_mm=18.5, mount='right')
     plate = load(robot, '96-flat', '1')
 
     instrument = models.Instrument(pipette)
