@@ -34,61 +34,49 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
         assert right_diff > left_diff
 
 
-def test_pipette_models():
-    # Test that the configuration position values for a given pipette model
-    # still make sense with any changes to the piecewise functions
-    robot.reset()
-    p = instruments.P10_Single(mount='left')
-    ul_per_mm = Pipette._p10_single_piecewise(p, 10, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 1
-    assert p.max_volume > 10
-    p = instruments.P10_Multi(mount='right')
-    ul_per_mm = Pipette._p10_multi_piecewise(p, 10, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 8
-    assert p.max_volume > 10
+def test_all_pipette_models_can_transfer():
+    from opentrons.instruments import pipette_config
 
-    robot.reset()
-    p = instruments.P50_Single(mount='left')
-    ul_per_mm = 3.1347  # Change once config blow_out position adjusted
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 1
-    assert p.max_volume > 50
-    p = instruments.P50_Multi(mount='right')
-    ul_per_mm = Pipette._p50_multi_piecewise(p, 50, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 8
-    assert p.max_volume > 50
+    models = [
+        'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
+        'p300_single', 'p300_multi', 'p1000_single'
+    ]
 
-    robot.reset()
-    p = instruments.P300_Single(mount='left')
-    ul_per_mm = Pipette._p300_single_piecewise(p, 300, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 1
-    assert p.max_volume > 300
-    p = instruments.P300_Multi(mount='right')
-    ul_per_mm = Pipette._p300_multi_piecewise(p, 300, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 8
-    assert p.max_volume > 300
+    for m in models:
+        robot.reset()
+        left = instruments._create_pipette_from_config(
+            config=pipette_config.load(m + '_v1'),
+            mount='left')
+        right = instruments._create_pipette_from_config(
+            config=pipette_config.load(m + '_v1.3'),
+            mount='right')
 
-    robot.reset()
-    p = instruments.P1000_Single(mount='left')
-    ul_per_mm = Pipette._p1000_piecewise(p, 1000, 'aspirate')
-    p.max_volume = calculate_max_volume(p, ul_per_mm)
-    assert p.channels == 1
-    assert p.max_volume > 1000
+        left.tip_attached = True
+        right.tip_attached = True
+        left.aspirate().dispense()
+        right.aspirate().dispense()
 
 
-def calculate_max_volume(pipette, ul_per_mm):
-    t = pipette._get_plunger_position('top')
-    b = pipette._get_plunger_position('bottom')
-    return (t - b) * ul_per_mm
+def test_pipette_models_reach_max_volume():
+    from opentrons.instruments import pipette_config
+
+    for model, config in pipette_config.configs.items():
+        robot.reset()
+        pipette = instruments._create_pipette_from_config(
+            config=config,
+            mount='right')
+
+        pipette.tip_attached = True
+        pipette.aspirate(pipette.max_volume)
+        pos = pose_tracker.absolute(
+            robot.poses,
+            pipette.instrument_actuator)
+        assert pos[0] < pipette.plunger_positions['top']
 
 
 def test_set_flow_rate():
     # Test new flow-rate functionality on all pipettes with different max vols
+    robot.reset()
     p10 = instruments.P10_Single(mount='right')
 
     p10.set_flow_rate(aspirate=10)

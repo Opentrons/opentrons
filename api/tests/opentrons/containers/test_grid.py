@@ -69,6 +69,7 @@ class GridTestCase(unittest.TestCase):
 
         p200 = pipette.Pipette(
             self.robot,
+            ul_per_mm=18.5,
             trash_container=trash,
             tip_racks=[tiprack],
             min_volume=10,
