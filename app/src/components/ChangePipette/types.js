@@ -21,7 +21,7 @@ export type ChangePipetteProps = {
   title: string,
   subtitle: string,
   mount: Mount,
-  wantedPipette: ?PipetteConfig,
+  wantedPipetteName: ?string,
   actualPipette: ?PipetteConfig,
   displayName: string,
   direction: Direction,

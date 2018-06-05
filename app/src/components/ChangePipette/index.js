@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push, goBack} from 'react-router-redux'
 import {Switch, Route, withRouter, type Match} from 'react-router'
-import {getPipette, getPipetteModels} from '@opentrons/shared-data'
+import {getPipette, getPipetteNames} from '@opentrons/shared-data'
 
 import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, Dispatch} from '../../types'
@@ -39,7 +39,7 @@ const TITLE = 'Pipette Setup'
 // used to guarentee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
 // used to guarentee model param in route is a pipettes model
-const RE_MODEL = `(${getPipetteModels().join('|')})`
+const RE_NAME = `(${getPipetteNames().join('|')})`
 
 const ConnectedChangePipetteRouter = withRouter(
   connect(makeMapStateToProps, mapDispatchToProps)(ChangePipetteRouter)
@@ -50,11 +50,11 @@ export default function ChangePipette (props: Props) {
 
   return (
     <Route
-      path={`${path}/:mount${RE_MOUNT}/:model${RE_MODEL}?`}
+      path={`${path}/:mount${RE_MOUNT}/:name${RE_NAME}?`}
       render={(propsWithMount) => {
         const {match: {params, url: baseUrl}} = propsWithMount
         const mount: Mount = (params.mount: any)
-        const wantedPipette = params.model ? getPipette(params.model) : null
+        const wantedPipetteName = params.name || null
 
         return (
           <ConnectedChangePipetteRouter
@@ -62,7 +62,7 @@ export default function ChangePipette (props: Props) {
             title={TITLE}
             subtitle={`${mount} mount`}
             mount={mount}
-            wantedPipette={wantedPipette}
+            wantedPipetteName={wantedPipetteName}
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             confirmUrl={`${baseUrl}/confirm`}
@@ -79,7 +79,7 @@ type OP = {
   subtitle: string,
   mount: Mount,
   robot: Robot,
-  wantedPipette: ?PipetteConfig,
+  wantedPipetteName: ?string,
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
@@ -150,26 +150,26 @@ function makeMapStateToProps () {
   const getRobotPipettes = makeGetRobotPipettes()
 
   return (state: State, ownProps: OP): SP => {
-    const {mount, wantedPipette} = ownProps
+    const {mount, wantedPipetteName} = ownProps
     const pipettes = getRobotPipettes(state, ownProps.robot).response
     const model = pipettes && pipettes[mount] && pipettes[mount].model
     const actualPipette = model ? getPipette(model) : null
     const direction = actualPipette ? 'detach' : 'attach'
 
     const success = (
-      (wantedPipette && wantedPipette.model) ===
-      (actualPipette && actualPipette.model)
+      (actualPipette && actualPipette.displayName === wantedPipetteName) ||
+      (!actualPipette && !wantedPipetteName)
     )
 
     const attachedWrong = !!(
       !success &&
-      wantedPipette &&
+      wantedPipetteName &&
       actualPipette
     )
 
     const displayName = (
       (actualPipette && actualPipette.displayName) ||
-      (wantedPipette && wantedPipette.displayName) ||
+      (wantedPipetteName) ||
       ''
     )
 

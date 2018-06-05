@@ -5,6 +5,7 @@ import capitalize from 'lodash/capitalize'
 
 import type {ChangePipetteProps} from './types'
 
+import {getPipetteChannelsByName} from '@opentrons/shared-data'
 import {ModalPage, PrimaryButton, type ButtonProps} from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
@@ -14,11 +15,11 @@ const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 
 export default function Instructions (props: ChangePipetteProps) {
-  const {wantedPipette, actualPipette} = props
+  const {wantedPipetteName, actualPipette} = props
 
   const titleBar = {
     ...props,
-    back: wantedPipette
+    back: wantedPipetteName
       ? {onClick: props.back}
       : {Component: Link, to: props.exitUrl, children: 'exit'}
   }
@@ -27,11 +28,11 @@ export default function Instructions (props: ChangePipetteProps) {
     <ModalPage titleBar={titleBar} contentsClassName={styles.modal_contents}>
       <Title {...props} />
 
-      {!actualPipette && !wantedPipette && (
+      {!actualPipette && !wantedPipetteName && (
         <PipetteSelection onChange={props.onPipetteSelect} />
       )}
 
-      {(actualPipette || wantedPipette) && (
+      {(actualPipette || wantedPipetteName) && (
         <div>
           <Steps {...props} />
           <CheckButton onClick={props.confirmPipette}>
@@ -56,7 +57,10 @@ function Title (props: ChangePipetteProps) {
 
 function Steps (props: ChangePipetteProps) {
   const {direction} = props
-  const pipette = props.actualPipette || props.wantedPipette
+  const channels = props.actualPipette
+    ? props.actualPipette.channels
+    : getPipetteChannelsByName(props.wantedPipetteName)
+
   let stepOne
   let stepTwo
 
@@ -86,16 +90,16 @@ function Steps (props: ChangePipetteProps) {
       <InstructionStep
         step='one'
         diagram='screws'
+        channels={channels}
         {...props}
-        {...pipette}
       >
         {stepOne}
       </InstructionStep>
       <InstructionStep
         step='two'
         diagram='tab'
+        channels={channels}
         {...props}
-        {...pipette}
       >
         {stepTwo}
       </InstructionStep>
