@@ -41,9 +41,12 @@ function _getSelectedWellsForStep (
   }
 
   const pipetteId = form.pipette
-  // TODO Ian 2018-04-02 use robotState selectors here
-  const pipetteChannels = robotState.instruments[pipetteId].channels
-  const labwareType = robotState.labware[labwareId].type
+  const pipetteChannels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+  const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
+
+  if (!pipetteChannels || !labwareType) {
+    return []
+  }
 
   const getWells = (wells: Array<string>) => _wellsForPipette(pipetteChannels, labwareType, wells)
 
@@ -70,10 +73,15 @@ function _getSelectedWellsForStep (
       wells.push(...getWells([form.destWell]))
     }
   }
-  // TODO Ian 2018-03-23 once distribute is supported
-  // if (form.stepType === 'distribute') {
-  //   ...
-  // }
+  if (form.stepType === 'distribute') {
+    if (form.sourceLabware === labwareId) {
+      wells.push(...getWells([form.sourceWell]))
+    }
+    if (form.destLabware === labwareId) {
+      wells.push(...getWells(form.destWells))
+    }
+  }
+
   return wells
 }
 
