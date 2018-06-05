@@ -53,6 +53,22 @@ describe('analytics events map', () => {
     })
   })
 
+  test('robot:SESSION_RESPONSE error -> protocolUpload event', () => {
+    const state = {}
+    const success = {type: 'robot:SESSION_RESPONSE'}
+    const failure = {type: 'robot:SESSION_RESPONSE', error: new Error('AH')}
+
+    expect(makeEvent(state, success)).toEqual({
+      name: 'protocolUpload',
+      properties: {success: true, error: ''}
+    })
+
+    expect(makeEvent(state, failure)).toEqual({
+      name: 'protocolUpload',
+      properties: {success: false, error: 'AH'}
+    })
+  })
+
   test('robot:RUN -> runStart event', () => {
     const state = {}
     const action = {type: 'robot:RUN'}
@@ -60,6 +76,33 @@ describe('analytics events map', () => {
     expect(makeEvent(state, action)).toEqual({
       name: 'runStart',
       properties: {}
+    })
+  })
+
+  test('robot:PAUSE -> runPause event', () => {
+    const state = {}
+    const action = {type: 'robot:PAUSE'}
+
+    expect(makeEvent(state, action)).toEqual({
+      name: 'runPause',
+      properties: {}
+    })
+  })
+
+  test('robot:CANCEL -> runCancel event', () => {
+    const state = {
+      robot: {
+        session: {
+          startTime: 1000,
+          runTime: 5000
+        }
+      }
+    }
+    const action = {type: 'robot:CANCEL'}
+
+    expect(makeEvent(state, action)).toEqual({
+      name: 'runCancel',
+      properties: {runTime: 4}
     })
   })
 
@@ -77,6 +120,16 @@ describe('analytics events map', () => {
     expect(makeEvent(state, action)).toEqual({
       name: 'runFinish',
       properties: {runTime: 4}
+    })
+  })
+
+  test('robot:RUN_RESPONSE error -> runError event', () => {
+    const state = {}
+    const action = {type: 'robot:RUN_RESPONSE', error: new Error('AH')}
+
+    expect(makeEvent(state, action)).toEqual({
+      name: 'runError',
+      properties: {error: 'AH'}
     })
   })
 })

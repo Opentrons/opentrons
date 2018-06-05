@@ -35,6 +35,16 @@ export default function makeEvent (state: State, action: Action): ?Event {
         }
       }
 
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:SESSION_RESPONSE
+    case 'robot:SESSION_RESPONSE':
+      return {
+        name: 'protocolUpload',
+        properties: {
+          success: !action.error,
+          error: (action.error && action.error.message) || ''
+        }
+      }
+
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN
     case 'robot:RUN':
       return {name: 'runStart', properties: {}}
@@ -45,8 +55,21 @@ export default function makeEvent (state: State, action: Action): ?Event {
         const runTime = robotSelectors.getRunSeconds(state)
         return {name: 'runFinish', properties: {runTime}}
       } else {
-        // TODO(mc, 2018-05-28): runError event
-        return null
+        return {name: 'runError',
+          properties: {
+            error: action.error.message
+          }
+        }
+      }
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE
+    case 'robot:PAUSE':
+      return {name: 'runPause', properties: {}}
+
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
+    case 'robot:CANCEL':
+      if (!action.error) {
+        const runTime = robotSelectors.getRunSeconds(state)
+        return {name: 'runCancel', properties: {runTime}}
       }
   }
 
