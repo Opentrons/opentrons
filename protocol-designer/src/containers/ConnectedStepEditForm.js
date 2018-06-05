@@ -3,11 +3,13 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {
+  deleteStep,
   changeFormInput,
   cancelStepForm,
   saveStepForm,
   collapseFormSection,
-  openMoreOptionsModal
+  openMoreOptionsModal,
+  openDeleteStepModal
 } from '../steplist/actions' // TODO use steplist/index.js
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
@@ -43,6 +45,7 @@ function mapStateToProps (state: BaseState) {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
+    onDelete: () => dispatch(openDeleteStepModal()),
     onCancel: () => dispatch(cancelStepForm()),
     onSave: () => dispatch(saveStepForm()),
     onClickMoreOptions: () => dispatch(openMoreOptionsModal()),

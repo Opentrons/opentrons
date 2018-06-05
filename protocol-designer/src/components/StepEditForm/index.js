@@ -4,6 +4,7 @@ import cx from 'classnames'
 import {
   FlatButton,
   PrimaryButton,
+  OutlineButton,
   FormGroup,
   DropdownField,
   InputField,
@@ -35,6 +36,7 @@ export type Props = {
   pipetteOptions: Options,
   labwareOptions: Options,
   formSectionCollapse: FormSectionState,
+  onDelete: (event: SyntheticEvent<>) => void,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
@@ -66,9 +68,8 @@ export default function StepEditForm (props: Props) {
   )
 
   const buttonRow = <div className={styles.button_row}>
-    <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
-      MORE OPTIONS
-    </FlatButton>
+    <OutlineButton onClick={props.onDelete}>DELETE</OutlineButton>
+    <OutlineButton onClick={props.onClickMoreOptions}>NOTES</OutlineButton>
     <PrimaryButton className={styles.cancel_button} onClick={props.onCancel}>CANCEL</PrimaryButton>
     <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
   </div>

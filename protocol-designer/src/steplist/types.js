@@ -66,7 +66,8 @@ export type StepItemData = {
   title: string,
   stepType: StepType,
   description?: ?string,
-  formData: ?FormData
+  formData: ?FormData,
+  confirmDelete: ?boolean
 }
 
 export type SubSteps = {[StepIdType]: StepSubItemData | null}

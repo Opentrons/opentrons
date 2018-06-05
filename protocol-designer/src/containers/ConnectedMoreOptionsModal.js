@@ -6,7 +6,6 @@ import MoreOptionsModal from '../components/modals/MoreOptionsModal'
 
 import {selectors} from '../steplist/reducers'
 import {
-  deleteStep,
   cancelMoreOptionsModal,
   changeMoreOptionsModalInput,
   saveMoreOptionsModal
@@ -24,7 +23,6 @@ function mapStateToProps (state: BaseState) {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
-    onDelete: () => dispatch(deleteStep()),
     onCancel: () => dispatch(cancelMoreOptionsModal()),
     onSave: () => dispatch(saveMoreOptionsModal()),
 

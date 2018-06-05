@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import Alerts from '../containers/Alerts'
+import ConnectedConfirmDeleteModal from '../containers/ConnectedConfirmDeleteModal'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedStepEditForm from '../containers/ConnectedStepEditForm'
@@ -32,6 +33,7 @@ export default function ProtocolEditor () {
           <div className={styles.main_page_content}>
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
+            <ConnectedConfirmDeleteModal />
             <ConnectedWellSelectionModal />
             <ConnectedStepEditForm />
 

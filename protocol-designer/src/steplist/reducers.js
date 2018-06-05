@@ -47,7 +47,9 @@ import type {
 
   ChangeMoreOptionsModalInputAction,
   OpenMoreOptionsModal,
-  SaveMoreOptionsModal
+  SaveMoreOptionsModal,
+  OpenDeleteStepModal,
+  CancelDeleteStepModal
 } from './actions' // Thunk action creators
 
 import {
@@ -106,7 +108,6 @@ const unsavedFormModal = handleActions({
     ({...state, ...action.payload.update}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,
   SAVE_MORE_OPTIONS_MODAL: () => null,
-  DELETE_STEP: () => null
 }, null)
 
 type StepsState = {[StepIdType]: StepItemData}
@@ -123,6 +124,20 @@ const steps = handleActions({
   ADD_STEP: (state, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
+  }),
+  OPEN_DELETE_STEP_MODAL: (state, action: OpenDeleteStepModal) => ({
+    ...state,
+    [action.payload]: {
+      ...state[action.payload],
+      confirmDelete: true
+    }
+  }),
+  CANCEL_DELETE_STEP_MODAL: (state, action: CancelDeleteStepModal) => ({
+    ...state,
+    [action.payload]: {
+      ...state[action.payload],
+      confirmDelete: false
+    }
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString())
 }, initialStepState)
