@@ -24,15 +24,20 @@ type NavButtonProps= {
   iconName: IconName,
   /** Display a notification dot */
   notification?: boolean,
+  /** selected styling (can also use react-router & `activeClassName`) */
+  selected?: boolean
 }
 
 export default function NavButton (props: NavButtonProps) {
   const {url} = props
   const className = classnames(
+    props.className,
     styles.button,
-    {[styles.disabled]: props.disabled},
-    {[styles.bottom]: props.isBottom},
-    props.className
+    {
+      [styles.disabled]: props.disabled,
+      [styles.bottom]: props.isBottom,
+      [styles.active]: props.selected
+    }
   )
 
   let buttonProps = {
