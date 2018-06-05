@@ -1,5 +1,5 @@
 # opentrons platform makefile
-# https://github.com/OpenTrons/opentrons
+# https://github.com/Opentrons/opentrons
 
 SHELL := /bin/bash
 
@@ -7,11 +7,7 @@ SHELL := /bin/bash
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
-COMPONENTS_DIR := components
-APP_DIR := app
-APP_SHELL_DIR := app-shell
-LABWARE_DEFINITIONS_DIR := shared-data
-PROTOCOL_DESIGNER_DIR := protocol-designer
+SHARED_DATA_DIR := shared-data
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -29,13 +25,13 @@ install:
 	pip install pipenv==11.6.8
 	$(MAKE) -C $(API_DIR) install
 	yarn
-	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
+	$(MAKE) -C $(SHARED_DATA_DIR) build
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: uninstall
 uninstall:
-	shx rm -rf '**/node_modules'
+	lerna clean
 
 # install flow typed definitions for all JS projects that use flow
 # typedefs are commited, so only needs to be run when we want to update
@@ -85,3 +81,7 @@ lint-css:
 .PHONY: coverage
 coverage:
 	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy
+
+.PHONY: bump
+bump:
+	lerna publish $(opts)

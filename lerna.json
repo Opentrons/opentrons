@@ -1,0 +1,16 @@
+{
+  "command": {
+    "publish": {
+      "cdVersion": "prerelease",
+      "conventionalCommits": true,
+      "exact": true,
+      "forcePublish": "*",
+      "preid": "alpha",
+      "skipNpm": true,
+      "skipGit": true
+    }
+  },
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "3.1.2"
+}
