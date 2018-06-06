@@ -20,14 +20,13 @@ import {
   persistedIngredFields
 } from '../types'
 
+import type {LabwareLiquidState} from '../../step-generation'
+
 import type {
   IngredInputFields,
   AllIngredGroupFields,
   Labware,
-  Wells,
-  IngredsForLabware,
-  IngredsForAllLabware,
-  IngredInstance
+  Wells
 } from '../types'
 import * as actions from '../actions'
 import type {BaseState, Selector} from '../../types'
@@ -81,6 +80,7 @@ const selectedIngredientGroup = handleActions({
   // TODO: SelectedIngredientGroupState is type of payload, type the action though
   EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
     action.payload,
+  SELECT_WELLS: () => null,
   OPEN_INGREDIENT_SELECTOR: () => null,
   EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
   DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
@@ -168,7 +168,8 @@ type IngredientsState = {
 }
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    const { groupId, isUnchangedClone } = action.payload
+    const {groupId} = action.payload
+
     if (!(groupId in state)) {
       // is a new ingredient
       return {
@@ -177,12 +178,6 @@ export const ingredients = handleActions({
       }
     }
 
-    if (isUnchangedClone) {
-      // for an unchanged clone, do nothing
-      return state
-    }
-
-    // otherwise, create a new ingredient group
     return {
       ...state,
       [groupId]: {
@@ -201,32 +196,18 @@ export const ingredients = handleActions({
   }
 }, {})
 
-type LocationsState = {
-  [ingredGroupId: string]: IngredInstance
-}
+type LocationsState = LabwareLiquidState
 
 export const ingredLocations = handleActions({
   EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
-    const { groupId, containerId, isUnchangedClone } = action.payload
+    const {groupId, containerId} = action.payload
 
-    function wellsWithVol (acc, well) {
+    function wellsWithVol (acc: {[well: string]: {volume: number}}, well: string) {
       return {
         ...acc,
         [well]: {
-          volume: action.payload.volume
-        }
-      }
-    }
-
-    if (isUnchangedClone) {
-      // for an unchanged clone, just add the new wells.
-      return {
-        ...state,
-        [groupId]: {
-          ...state[groupId],
-          [containerId]: {
-            ...state[groupId][containerId],
-            ...action.payload.wells.reduce(wellsWithVol, {})
+          [groupId]: {
+            volume: action.payload.volume
           }
         }
       }
@@ -234,8 +215,9 @@ export const ingredLocations = handleActions({
 
     return {
       ...state,
-      [groupId]: {
-        [containerId]: action.payload.wells.reduce(wellsWithVol, {})
+      [containerId]: {
+        ...state[containerId],
+        ...action.payload.wells.reduce(wellsWithVol, {})
       }
     }
   },
@@ -397,37 +379,37 @@ const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelect
     }), {})
 )
 
-const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
-  getLabware,
-  getIngredientGroups,
-  getIngredientLocations,
-  (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
-    const allLabwareIds = Object.keys(_labware)
-    const allIngredIds = Object.keys(_ingredientGroups)
-
-    return allLabwareIds.reduce((acc: IngredsForAllLabware, labwareId: string) => {
-      const ingredsForThisLabware: IngredsForLabware = allIngredIds.reduce(
-        (ingredAcc: IngredsForLabware, ingredId: string) => {
-          if (_ingredLocations[ingredId] && _ingredLocations[ingredId][labwareId]) {
-            return {
-              ...ingredAcc,
-              [ingredId]: {
-                groupId: ingredId,
-                ..._ingredientGroups[ingredId],
-                wells: _ingredLocations[ingredId][labwareId]
-              }
-            }
-          }
-          return ingredAcc
-        }, {})
-
-      return {
-        ...acc,
-        [labwareId]: ingredsForThisLabware
-      }
-    }, {})
-  }
-)
+// const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
+//   getLabware,
+//   getIngredientGroups,
+//   getIngredientLocations,
+//   (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
+//     const allLabwareIds = Object.keys(_labware)
+//     const allIngredIds = Object.keys(_ingredientGroups)
+//
+//     return allLabwareIds.reduce((acc: IngredsForAllLabware, labwareId: string) => {
+//       const ingredsForThisLabware: IngredsForLabware = allIngredIds.reduce(
+//         (ingredAcc: IngredsForLabware, ingredId: string) => {
+//           if (_ingredLocations[ingredId] && _ingredLocations[ingredId][labwareId]) {
+//             return {
+//               ...ingredAcc,
+//               [ingredId]: {
+//                 groupId: ingredId,
+//                 ..._ingredientGroups[ingredId],
+//                 wells: _ingredLocations[ingredId][labwareId]
+//               }
+//             }
+//           }
+//           return ingredAcc
+//         }, {})
+//
+//       return {
+//         ...acc,
+//         [labwareId]: ingredsForThisLabware
+//       }
+//     }, {})
+//   }
+// )
 
 const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
   getIngredientGroups,
@@ -490,7 +472,6 @@ export const selectors = {
   containersBySlot,
   canAdd,
   getSelectedIngredientGroup,
-  ingredientsByLabware,
   labwareOptions
 }
 

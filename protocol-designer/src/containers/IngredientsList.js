@@ -23,7 +23,7 @@ function mapStateToProps (state: BaseState): SP {
   const selectedIngredientGroup = selectors.getSelectedIngredientGroup(state)
   return {
     renameLabwareFormMode: selectors.getRenameLabwareFormMode(state),
-    ingredients: container ? selectors.ingredientsByLabware(state)[container.id] : {},
+    ingredients: container ? selectors.getIngredientLocations(state)[container.id] : null,
     selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
     selected: false
   }

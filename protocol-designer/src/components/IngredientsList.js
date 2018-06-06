@@ -6,7 +6,8 @@ import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {IngredGroupForLabware, IngredsForLabware} from '../labware-ingred/types'
+import type {IngredGroupForLabware} from '../labware-ingred/types'
+import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
 type EditModeIngredientGroup = (args: {|groupId: string, wellName: ?string|}) => mixed
@@ -119,7 +120,7 @@ function IngredIndividual (props: IndividProps) {
 
 type Props = {
   ...CommonProps,
-  ingredients: IngredsForLabware,
+  ingredients: ?SingleLabwareLiquidState,
   selectedIngredientGroupId: string | null,
   renameLabwareFormMode: boolean,
   openRenameLabwareForm: () => mixed
@@ -146,7 +147,8 @@ export default function IngredientsList (props: Props) {
           onClick={openRenameLabwareForm}
         />
 
-        {ingredients && Object.keys(ingredients).map((i) =>
+        {/* TODO IMMEDIATELY: fix the cards. they can't go thru ingredients keys! */}
+        {false && ingredients && Object.keys(ingredients).map((i) =>
           <IngredGroupCard key={i}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}

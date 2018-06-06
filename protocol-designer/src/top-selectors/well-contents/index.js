@@ -51,10 +51,15 @@ export function _wellContentsForLabware (
 
   return reduce(
     allWellsForContainer,
-    (wellAcc, well: string): {[well: string]: WellContents} => ({
-      ...wellAcc,
-      [well]: _wellContentsForWell(labwareLiquids[well], well)
-    }),
+    (wellAcc, well: string): {[well: string]: WellContents} => {
+      const wellHasContents = labwareLiquids && labwareLiquids[well]
+      return {
+        ...wellAcc,
+        [well]: wellHasContents
+          ? _wellContentsForWell(labwareLiquids[well], well)
+          : {}
+      }
+    },
     {}
   )
 }
@@ -138,5 +143,53 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
       // TODO LATER: look at filled wells, not all wells.
       : Object.values(maxVolumesByWell)
     return min(maxVolumesList.map(n => parseInt(n)))
+  }
+)
+
+export const uniformFields: Selector<?{allWellsSameIngred: boolean, volume: ?number}> = createSelector(
+  wellSelectionSelectors.getSelectedWells,
+  labwareIngredSelectors.getSelectedContainerId,
+  labwareIngredSelectors.getIngredientLocations,
+  (selectedWellsObj, labwareId, allIngreds) => {
+    if (!labwareId) {
+      return null
+    }
+
+    const ingredsInLabware = allIngreds[labwareId]
+    const selectedWells = Object.keys(selectedWellsObj)
+
+    if (!ingredsInLabware || selectedWells.length < 1) {
+      return null
+    }
+
+    const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
+    const initialIngred = initialWellContents && Object.keys(initialWellContents)[0]
+
+    const allWellsSameIngred = selectedWells.every(well => {
+      if (!ingredsInLabware[well]) {
+        return false
+      }
+
+      const ingreds = Object.keys(ingredsInLabware[well])
+      return ingreds.length === 1 && ingreds[0] === initialIngred
+    })
+
+    const initialVol: ?number = (initialIngred && initialWellContents)
+       ? initialWellContents[initialIngred] &&
+       initialWellContents[initialIngred].volume
+       : null
+
+    const allWellsSameVolume: boolean = initialVol
+      ? selectedWells.every(well => {
+        return ingredsInLabware[well].volume === initialVol
+      })
+      : false
+
+    return {
+      allWellsSameIngred,
+      volume: (allWellsSameIngred && allWellsSameVolume)
+        ? initialVol
+        : null
+    }
   }
 )

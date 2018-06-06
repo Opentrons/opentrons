@@ -11,6 +11,7 @@ import {
 
 import styles from './IngredientPropertiesForm.css'
 import formStyles from './forms.css'
+import type {EditIngredientPayload} from '../labware-ingred/actions'
 
 import type {
   IngredInputs,
@@ -74,13 +75,13 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
   }
 
 type Props = {
-  onSave: ({copyGroupId: ?string} & IngredInputs) => void,
-  onCancel: () => void,
-  onDelete: (groupId: string) => void,
+  onSave: (EditIngredientPayload) => mixed,
+  onCancel: () => mixed,
+  onDelete: (groupId: string) => mixed,
   numWellsSelected: number,
   selectedWellsMaxVolume: number,
 
-  allIngredientGroupFields: ?AllIngredGroupFields,
+  allIngredientGroupFields: ?AllIngredGroupFields, // TODO IMMEDIATELY unnecessary to pass all this in, right?
   allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
   editingIngredGroupId: string | null,
 
@@ -127,7 +128,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
-      const { name, volume, description, individualize, serializeName } = this.state.input
+      const {name, volume, description, individualize, serializeName} = this.state.input
       const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,

@@ -32,7 +32,7 @@ type IngredInstanceFlat = {|
   volume: number
 |}
 
-export type WellContents = {| // non-ingredient well state
+export type WellContents = {| // non-ingredient well state, for SelectablePlate
   highlighted: boolean,
   selected: boolean,
   error: boolean,
@@ -49,11 +49,19 @@ export type AllWellContents = {
 
 export type IngredInputFields = {|
   name: ?string,
-  volume: ?string,
+  volume: ?number,
   description: ?string,
   individualize: boolean,
   serializeName: ?string
 |}
+
+export type IngredGroupForLabware = {
+  ...IngredInputFields,
+  groupId: string,
+  wells: {
+    [wellName: string]: IngredInstanceFlat
+  }
+}
 
 export type IngredientGroup = {|
   groupId: string,
@@ -73,21 +81,15 @@ export type AllIngredGroups = {
   [groupId: string]: IngredientGroup
 }
 
-export type IngredGroupForLabware = {
-  ...IngredInputFields,
-  groupId: string,
-  wells: {
-    [wellName: string]: IngredInstanceFlat
-  }
-}
-
-export type IngredsForLabware = {
-  [groupId: string]: IngredGroupForLabware
-}
-
-export type IngredsForAllLabware = {
-  [labwareId: string]: IngredsForLabware
-}
+// TODO IMMEDIATELY: Remove
+//
+// export type IngredsForLabware = {
+//   [groupId: string]: IngredGroupForLabware
+// }
+//
+// export type IngredsForAllLabware = {
+//   [labwareId: string]: IngredsForLabware
+// }
 
 export const editableIngredFields = [
   'name',
