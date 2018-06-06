@@ -15,14 +15,18 @@ import type {BaseState, ThunkDispatch} from '../types'
 function mapStateToProps (state: BaseState) {
   const steps = selectors.getSteps(state)
   const stepId = selectors.selectedStepId(state)
-  if (stepId === undefined || steps[stepId] == undefined) {
+  const step = (stepId === '__end__' || stepId === null)
+      ? null
+      : steps[stepId]
+
+  if (step === null) {
     return {
       hideModal: true
     }
   }
 
   return {
-    hideModal: !steps[stepId].confirmDelete
+    hideModal: !step.confirmDelete
   }
 }
 

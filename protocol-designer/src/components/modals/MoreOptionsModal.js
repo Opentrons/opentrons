@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {
   FlatButton,
-  PrimaryButton,
   FormGroup,
   InputField,
   Modal

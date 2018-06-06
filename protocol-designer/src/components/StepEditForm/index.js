@@ -2,7 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {
-  FlatButton,
   PrimaryButton,
   OutlineButton,
   FormGroup,

@@ -107,7 +107,7 @@ const unsavedFormModal = handleActions({
   CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
     ({...state, ...action.payload.update}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,
-  SAVE_MORE_OPTIONS_MODAL: () => null,
+  SAVE_MORE_OPTIONS_MODAL: () => null
 }, null)
 
 type StepsState = {[StepIdType]: StepItemData}
