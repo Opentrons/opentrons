@@ -82,6 +82,10 @@ lint-css:
 coverage:
 	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy
 
+# TODO(mc, 2018-06-06): update publish call and echo note when lerna splits
+# version bump and publish: https://github.com/lerna/lerna/issues/961
 .PHONY: bump
 bump:
+	@echo "Bumping versions"
+	@echo "(please ignore lerna mentioning 'publish'; publish is disabled)"
 	lerna publish $(opts)

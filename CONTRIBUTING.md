@@ -236,11 +236,11 @@ Our release process is still a work-in-progress. All projects are currently vers
 #   e.g. 3.0.1-alpha.0 -> 3.0.1-alpha.1
 make bump
 
-# equivelent to above
+# equivalent to above
 make bump opts="--preid=alpha --cd-version=prerelease"
 
 # bump to a beta version
-make bump opts="--pre-id=beta"
+make bump opts="--preid=beta"
 
 # prerelease minor version bump (e.g. 3.0.0 -> 3.1.0-alpha.0)
 make bump opts="--cd-version=preminor"
