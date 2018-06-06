@@ -37,6 +37,7 @@ export default function makeEvent (state: State, action: Action): ?Event {
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:SESSION_RESPONSE
     case 'robot:SESSION_RESPONSE':
+      // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
       return {
         name: 'protocolUpload',
         properties: {
