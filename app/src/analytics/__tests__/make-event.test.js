@@ -79,17 +79,29 @@ describe('analytics events map', () => {
     })
   })
 
-  test('robot:PAUSE -> runPause event', () => {
+  test('robot:PAUSE_RESPONSE -> runPause event', () => {
     const state = {}
-    const action = {type: 'robot:PAUSE'}
+    const success = {type: 'robot:PAUSE_RESPONSE'}
+    const failure = {type: 'robot:PAUSE_RESPONSE', error: new Error('AH')}
 
-    expect(makeEvent(state, action)).toEqual({
+    expect(makeEvent(state, success)).toEqual({
       name: 'runPause',
-      properties: {}
+      properties: {
+        success: true,
+        error: ''
+      }
+    })
+
+    expect(makeEvent(state, failure)).toEqual({
+      name: 'runPause',
+      properties: {
+        success: false,
+        error: 'AH'
+      }
     })
   })
 
-  test('robot:CANCEL -> runCancel event', () => {
+  test('robot:CANCEL_REPSONSE -> runCancel event', () => {
     const state = {
       robot: {
         session: {
@@ -98,11 +110,25 @@ describe('analytics events map', () => {
         }
       }
     }
-    const action = {type: 'robot:CANCEL'}
+    const success = {type: 'robot:CANCEL_RESPONSE'}
+    const failure = {type: 'robot:CANCEL_RESPONSE', error: new Error('AH')}
 
-    expect(makeEvent(state, action)).toEqual({
+    expect(makeEvent(state, success)).toEqual({
       name: 'runCancel',
-      properties: {runTime: 4}
+      properties: {
+        runTime: 4,
+        success: true,
+        error: ''
+      }
+    })
+
+    expect(makeEvent(state, failure)).toEqual({
+      name: 'runCancel',
+      properties: {
+        runTime: 4,
+        success: false,
+        error: 'AH'
+      }
     })
   })
 

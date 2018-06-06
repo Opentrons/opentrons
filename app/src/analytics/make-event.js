@@ -55,21 +55,33 @@ export default function makeEvent (state: State, action: Action): ?Event {
         const runTime = robotSelectors.getRunSeconds(state)
         return {name: 'runFinish', properties: {runTime}}
       } else {
-        return {name: 'runError',
+        return {
+          name: 'runError',
           properties: {
             error: action.error.message
           }
         }
       }
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE
-    case 'robot:PAUSE':
-      return {name: 'runPause', properties: {}}
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE_RESPONSE
+    case 'robot:PAUSE_RESPONSE':
+      return {
+        name: 'runPause',
+        properties: {
+          success: !action.error,
+          error: (action.error && action.error.message) || ''
+        }
+      }
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
-    case 'robot:CANCEL':
-      if (!action.error) {
-        const runTime = robotSelectors.getRunSeconds(state)
-        return {name: 'runCancel', properties: {runTime}}
+    case 'robot:CANCEL_RESPONSE':
+      const runTime = robotSelectors.getRunSeconds(state)
+      return {
+        name: 'runCancel',
+        properties: {
+          runTime,
+          success: !action.error,
+          error: (action.error && action.error.message) || ''
+        }
       }
   }
 
