@@ -28,7 +28,6 @@ function mapStateToProps (state: BaseState): SP {
       return { _page, title: 'Opentrons Protocol Designer' }
     case 'file-detail':
       return {_page, title: fileName, subtitle: 'FILE DETAILS'}
-
     case 'ingredient-detail': {
       const labware = labwareIngredSelectors.getSelectedContainer(state)
       const labwareNames = labwareIngredSelectors.getLabwareNames(state)
@@ -45,7 +44,7 @@ function mapStateToProps (state: BaseState): SP {
       return { _page, title: 'TODO: Well selection modal' }
     case 'steplist':
     default: {
-      // NOTE: this default case console.error should never be reached, it's just a sanity check
+      // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
       const selectedStep = steplistSelectors.selectedStep(state)
       // TODO: Ian 2018-02-22 add in icon, you need to make it inline and of the correct height
