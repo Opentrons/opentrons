@@ -14,31 +14,21 @@ import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 
-type DispatchProps = {
-    onBackClick: $PropertyType<Props, 'onBackClick'>
-}
+type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
-type StateProps = $Diff<Props, DispatchProps> & {_page: Page}
+type SP = $Diff<Props, DP> & {_page: Page}
 
-function mapStateToProps (state: BaseState): StateProps {
+function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
   // TODO: Ian 2018-02-22 fileName from file
   const fileName = 'Protocol Name'
-
-  const selectedStep = steplistSelectors.selectedStep(state)
-  const stepName = selectedStep && selectedStep.title
 
   switch (_page) {
     case 'file-splash':
       return { _page, title: 'Opentrons Protocol Designer' }
     case 'file-detail':
       return {_page, title: fileName, subtitle: 'FILE DETAILS'}
-    case 'steplist': {
-      // TODO: Ian 2018-02-22 add in icon, you need to make it inline and of the correct height
-      // <Icon name={stepIconsByType[selectedStep]} /> */
-      const subtitle = <span> {} {stepName} </span>
-      return { _page, title: fileName, subtitle }
-    }
+
     case 'ingredient-detail': {
       const labware = labwareIngredSelectors.getSelectedContainer(state)
       const labwareNames = labwareIngredSelectors.getLabwareNames(state)
@@ -51,16 +41,27 @@ function mapStateToProps (state: BaseState): StateProps {
       }
     }
     case 'well-selection-modal':
-      // TODO Ian 2018-02-23 well selection modal's title bar
+      // TODO: Ian 2018-02-23 well selection modal's title bar
       return { _page, title: 'TODO: Well selection modal' }
-    default:
-      // NOTE: this default case should never be reached, it's just to keep flow happy
-      console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
-      return { _page: 'steplist', title: '???' }
+    case 'steplist':
+    default: {
+      // NOTE: this default case console.error should never be reached, it's just a sanity check
+      if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
+      const selectedStep = steplistSelectors.selectedStep(state)
+      // TODO: Ian 2018-02-22 add in icon, you need to make it inline and of the correct height
+      // <Icon name={stepIconsByType[selectedStep]} /> */
+      let subtitle
+      if (selectedStep) {
+        subtitle = selectedStep.stepType === 'deck-setup'
+          ? `DECK SETUP - LABWARE & INGREDIENTS`
+          : selectedStep.title
+      }
+      return { _page: 'steplist', title: fileName, subtitle }
+    }
   }
 }
 
-function mergeProps (stateProps: StateProps, dispatchProps: {dispatch: Dispatch<*>}): Props {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
   const {_page, ...props} = stateProps
   const {dispatch} = dispatchProps
 
