@@ -3,17 +3,21 @@
 import * as React from 'react'
 import {Card, OutlineButton} from '@opentrons/components'
 
-const TITLE = 'Knowledge Base'
+type Props = {
+  title: React.Node,
+  description: React.Node,
+  url: string,
+}
 
-export default function KnowledgeCard () {
+export default function ResourceCard (props: Props) {
   return (
     <Card
-      title={TITLE}
+      title={props.title}
     >
-      <p>Visit our walkthroughs and FAQs</p>
+      <p>{props.description}</p>
       <OutlineButton
         Component="a"
-        href="https://support.opentrons.com"
+        href={props.url}
         target="_blank"
       >
         View in Browser

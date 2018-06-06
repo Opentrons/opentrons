@@ -12,15 +12,17 @@ type Props = {
 
 export default function More (props: Props) {
   const {match: {path}} = props
+  const appPath = `${path}/app`
+
   return (
     <Switch>
-      <Redirect exact from={path} to={'/menu/app'} />
+      <Redirect exact from={path} to={appPath} />
       <Route
-        path={'/menu/app'}
+        path={appPath}
         component={AppSettings}
       />
       <Route
-        path={'/menu/resources'}
+        path={`${path}/resources`}
         component={Resources}
       />
     </Switch>
