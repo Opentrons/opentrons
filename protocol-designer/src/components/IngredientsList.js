@@ -1,4 +1,5 @@
 // @flow
+// TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
 import React from 'react'
 
 import {IconButton, SidePanel, TitledList} from '@opentrons/components'
@@ -50,6 +51,14 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
     const {serializeName, individualize, description, name} = ingredGroup
     const {isExpanded} = this.state
 
+    const wellsWithIngred = Object.keys(labwareWellContents).filter(well =>
+      labwareWellContents[well][groupId])
+
+    if (wellsWithIngred.length < 1) {
+      // do not show ingred card if it has no instances for this labware
+      return null
+    }
+
     return (
       <TitledList
         title={name || 'Unnamed Ingredient'}
@@ -68,12 +77,13 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <span>Name</span>
           <span />
         </div>
-        {Object.keys(labwareWellContents).map((well, i) => { // TODO sort keys
+        {wellsWithIngred.map((well, i) => {
           const wellIngredForCard = labwareWellContents[well][groupId]
           const volume = wellIngredForCard && wellIngredForCard.volume
 
           if (volume == null) {
-            // not all wells that have ingredients contain the ingred groupId for this card
+            // TODO: Ian 2018-06-07 use assert
+            console.warn(`Got null-ish volume for well: ${well}, ingred: ${groupId}`)
             return null
           }
 
@@ -85,7 +95,6 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
             wellName={well}
             canDelete
             volume={volume}
-            // concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
             groupId={groupId}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}

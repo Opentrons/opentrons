@@ -350,16 +350,14 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
     {})
 )
 
-// TODO IMMEDIATELY move these to types.js
-type IngredGroupField = {
-  groupId: string,
-  ...IngredInputFields
-}
-
+// TODO Ian 2018-07-06 consolidate into types.js
 type IngredGroupFields = {
-  [ingredGroupId: string]: IngredGroupField
+  [ingredGroupId: string]: {
+    groupId: string,
+    ...IngredInputFields
+  }
 }
-const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelector(
+const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
   getIngredientGroups,
   (ingreds) => reduce(
     ingreds,

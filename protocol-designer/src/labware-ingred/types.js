@@ -18,20 +18,6 @@ export type Wells = {
   [wellName: string]: string // eg A1: 'A1'.
 }
 
-// export type IngredInstance = {
-//   [containerId: string]: {
-//     [wellName: string]: {
-//       volume: number}
-//   }
-// }
-//
-// type IngredInstanceFlat = {|
-//   labwareId: string,
-//   groupIds: Array<string>,
-//   well: string,
-//   volume: number
-// |}
-
 export type WellContents = {| // non-ingredient well state, for SelectablePlate
   highlighted: boolean,
   selected: boolean,
@@ -47,21 +33,6 @@ export type AllWellContents = {
 
 // ==== INGREDIENTS ====
 
-export type IngredInputFields = {|
-  name: ?string,
-  volume: ?number,
-  description: ?string,
-  individualize: boolean,
-  serializeName: ?string
-|}
-
-export type PersistedIngredInputFields = $Diff<IngredInputFields, {volume: any}>
-
-// TODO IMMEDIATELY: review & consolidate these types. There are more in steplist (for substeps)
-export type IngredientGroups = {
-  [groupId: string]: PersistedIngredInputFields
-}
-
 export type IngredInputs = {
   name: string | null,
   volume: number | null,
@@ -70,12 +41,15 @@ export type IngredInputs = {
   serializeName: string | null
 }
 
-export type IngredGroupAccessor =
-  | 'name'
-  | 'volume'
-  | 'description'
-  | 'individualize'
-  | 'serializeName'
+export type IngredInputFields = $Exact<IngredInputs>
+
+export type IngredGroupAccessor = $Keys<IngredInputs>
+
+export type PersistedIngredInputFields = $Diff<IngredInputFields, {volume: *}>
+
+export type IngredientGroups = {
+  [groupId: string]: PersistedIngredInputFields
+}
 
 export type AllIngredGroupFields = {
   [ingredGroupId: string]: IngredInputs

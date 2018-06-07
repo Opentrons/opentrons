@@ -275,8 +275,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           </PrimaryButton>
 
           {/* TODO: Ian 2018-06-07 allow deleting ingreds,
-            * need ticket (clear selected wells vs delete
-            * ingred group across all labware)
+            * waiting on ticket (clear selected wells vs delete
+            * ingred group across all labware behavior? both?)
           */}
           {/* editMode &&
             <PrimaryButton onClick={this.handleDelete}>
