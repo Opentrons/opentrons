@@ -78,8 +78,10 @@ type Props = {
   onSave: (EditIngredientPayload) => mixed,
   onCancel: () => mixed,
   onDelete: (groupId: string) => mixed,
-  numWellsSelected: number,
+
+  selectedWells: Array<string>,
   selectedWellsMaxVolume: number,
+  commonSelectedIngred: ?string,
 
   allIngredientGroupFields: ?AllIngredGroupFields, // TODO IMMEDIATELY unnecessary to pass all this in, right?
   allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
@@ -126,6 +128,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
     // nextIngredGroupFields allows you to update with nextProps
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
+    console.log({ingredGroupId, zzz: this.props.allIngredientGroupFields, nextIngredGroupFields})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
       const {name, volume, description, individualize, serializeName} = this.state.input
@@ -156,7 +159,11 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps (nextProps: Props) {
-    this.resetInputState(nextProps.editingIngredGroupId, nextProps.allIngredientGroupFields)
+    const nextEditingId = nextProps.editingIngredGroupId || nextProps.commonSelectedIngred
+    this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
+      ...this.state,
+      copyGroupId: nextEditingId
+    }))
   }
 
   selectExistingIngred = (ingredGroupId: string) => {
@@ -180,12 +187,12 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
   render () {
     const {
-      numWellsSelected,
       onSave,
       onCancel,
       allIngredientNamesIds,
       allIngredientGroupFields,
       editingIngredGroupId,
+      selectedWells,
       selectedWellsMaxVolume
     } = this.props
 
@@ -193,7 +200,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const {volume} = this.state.input
 
     const editMode = selectedIngredientFields
-    const addMode = !editMode && numWellsSelected > 0
+    const addMode = !editMode && selectedWells.length > 0
 
     const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing

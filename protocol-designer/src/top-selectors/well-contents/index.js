@@ -146,7 +146,10 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
   }
 )
 
-export const uniformFields: Selector<?{allWellsSameIngred: boolean, volume: ?number}> = createSelector(
+/** Returns the common single ingredient group of selected wells,
+ * or null if there is not a single common ingredient group */
+ // TODO IMMEDIATELY write test
+export const getSelectedWellsIngredId: Selector<?string> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedContainerId,
   labwareIngredSelectors.getIngredientLocations,
@@ -165,31 +168,26 @@ export const uniformFields: Selector<?{allWellsSameIngred: boolean, volume: ?num
     const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
     const initialIngred = initialWellContents && Object.keys(initialWellContents)[0]
 
-    const allWellsSameIngred = selectedWells.every(well => {
+    const result = selectedWells.every(well => {
       if (!ingredsInLabware[well]) {
-        return false
+        return null
       }
 
       const ingreds = Object.keys(ingredsInLabware[well])
       return ingreds.length === 1 && ingreds[0] === initialIngred
     })
 
-    const initialVol: ?number = (initialIngred && initialWellContents)
-       ? initialWellContents[initialIngred] &&
-       initialWellContents[initialIngred].volume
-       : null
+    // const initialVol: ?number = (initialIngred && initialWellContents)
+    //    ? initialWellContents[initialIngred] &&
+    //    initialWellContents[initialIngred].volume
+    //    : null
+    //
+    // const allWellsSameVolume: boolean = initialVol
+    //   ? selectedWells.every(well => {
+    //     return ingredsInLabware[well].volume === initialVol
+    //   })
+    //   : false
 
-    const allWellsSameVolume: boolean = initialVol
-      ? selectedWells.every(well => {
-        return ingredsInLabware[well].volume === initialVol
-      })
-      : false
-
-    return {
-      allWellsSameIngred,
-      volume: (allWellsSameIngred && allWellsSameVolume)
-        ? initialVol
-        : null
-    }
+    return result ? initialIngred : null
   }
 )
