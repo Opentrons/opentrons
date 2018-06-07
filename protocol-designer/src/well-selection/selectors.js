@@ -90,14 +90,8 @@ const selectedWellNames: Selector<Array<string>> = createSelector(
   })
 )
 
-const numWellsSelected: Selector<number> = createSelector(
-  getSelectedWells,
-  selectedWells => Object.keys(selectedWells).length
-)
-
 export default {
   selectedWellNames,
-  numWellsSelected,
   getSelectedWells,
   getHighlightedWells,
   wellSelectionModalData
