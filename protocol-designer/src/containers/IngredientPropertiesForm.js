@@ -15,7 +15,6 @@ import type {BaseState, ThunkDispatch} from '../types'
 
 type Props = React.ElementProps<typeof IngredientPropertiesForm>
 
-// TODO IMMEDIATELY type everything properly in this file
 type DP = {
   onSave: $PropertyType<Props, 'onSave'>,
   onCancel: $PropertyType<Props, 'onCancel'>,
@@ -34,7 +33,7 @@ function mapStateToProps (state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     onSave: (payload: EditIngredientPayload) => dispatch(editIngredient(payload)),
     onCancel: () => dispatch(editModeIngredientGroup(null)),

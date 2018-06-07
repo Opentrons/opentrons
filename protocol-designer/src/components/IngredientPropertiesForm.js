@@ -82,7 +82,7 @@ type Props = {
   selectedWellsMaxVolume: number,
   commonSelectedIngred: ?string,
 
-  allIngredientGroupFields: ?AllIngredGroupFields, // TODO IMMEDIATELY unnecessary to pass all this in, right?
+  allIngredientGroupFields: ?AllIngredGroupFields,
   allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>
 }
 
@@ -104,7 +104,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         individualize: false,
         serializeName: null
       },
-      commonIngredGroupId: null // TODO IMMEDIATELY rename this, "copying" isn't quite what it does
+      commonIngredGroupId: null
     }
 
     // TODO: Ian 2018-06-07 don't use makeInputField or this.Field, it's weird & bad

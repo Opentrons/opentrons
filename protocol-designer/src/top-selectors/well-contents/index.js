@@ -177,17 +177,6 @@ export const getSelectedWellsIngredId: Selector<?string> = createSelector(
       return ingreds.length === 1 && ingreds[0] === initialIngred
     })
 
-    // const initialVol: ?number = (initialIngred && initialWellContents)
-    //    ? initialWellContents[initialIngred] &&
-    //    initialWellContents[initialIngred].volume
-    //    : null
-    //
-    // const allWellsSameVolume: boolean = initialVol
-    //   ? selectedWells.every(well => {
-    //     return ingredsInLabware[well].volume === initialVol
-    //   })
-    //   : false
-
     return result ? initialIngred : null
   }
 )

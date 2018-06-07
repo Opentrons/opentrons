@@ -18,19 +18,19 @@ export type Wells = {
   [wellName: string]: string // eg A1: 'A1'.
 }
 
-export type IngredInstance = {
-  [containerId: string]: {
-    [wellName: string]: {
-      volume: number}
-  }
-}
-
-type IngredInstanceFlat = {|
-  labwareId: string,
-  groupIds: Array<string>,
-  well: string,
-  volume: number
-|}
+// export type IngredInstance = {
+//   [containerId: string]: {
+//     [wellName: string]: {
+//       volume: number}
+//   }
+// }
+//
+// type IngredInstanceFlat = {|
+//   labwareId: string,
+//   groupIds: Array<string>,
+//   well: string,
+//   volume: number
+// |}
 
 export type WellContents = {| // non-ingredient well state, for SelectablePlate
   highlighted: boolean,
@@ -55,56 +55,12 @@ export type IngredInputFields = {|
   serializeName: ?string
 |}
 
-export type IngredGroupForLabware = {
-  ...IngredInputFields,
-  groupId: string,
-  wells: {
-    [wellName: string]: IngredInstanceFlat
-  }
+export type PersistedIngredInputFields = $Diff<IngredInputFields, {volume: any}>
+
+// TODO IMMEDIATELY: review & consolidate these types. There are more in steplist (for substeps)
+export type IngredientGroups = {
+  [groupId: string]: PersistedIngredInputFields
 }
-
-export type IngredientGroup = {|
-  groupId: string,
-  name: string,
-  volume: number, // TODO Ian 2018-03-07 this is the 'default' volume, only used to determine exact clone for EDIT_INGREDIENT. Revisit this.
-  description: string,
-  individualize: boolean,
-  serializeName: string,
-  instances: {
-    [labwareId: string]: {
-      [wellName: string]: IngredInstanceFlat
-    }
-  }
-|}
-
-export type AllIngredGroups = {
-  [groupId: string]: IngredientGroup
-}
-
-// TODO IMMEDIATELY: Remove
-//
-// export type IngredsForLabware = {
-//   [groupId: string]: IngredGroupForLabware
-// }
-//
-// export type IngredsForAllLabware = {
-//   [labwareId: string]: IngredsForLabware
-// }
-
-export const editableIngredFields = [
-  'name',
-  'serializeName',
-  // 'volume',
-  'description',
-  'individualize'
-]
-
-export const persistedIngredFields = [
-  'name',
-  'serializeName',
-  'description',
-  'individualize'
-]
 
 export type IngredInputs = {
   name: string | null,

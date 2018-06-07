@@ -6,13 +6,13 @@ import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {IngredGroupForLabware} from '../labware-ingred/types'
+import type {IngredientGroups, PersistedIngredInputFields} from '../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
 type EditModeIngredientGroup = (args: {|groupId: string, wellName: ?string|}) => mixed
 
-// Props used by both IngredientsList and IngredGroupCard // TODO
+// Props used by both IngredientsList and IngredGroupCard
 type CommonProps = {|
   editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient,
@@ -20,7 +20,9 @@ type CommonProps = {|
 |}
 
 type CardProps = {|
-  ingredGroup: IngredGroupForLabware,
+  groupId: string,
+  ingredGroup: PersistedIngredInputFields,
+  labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps
 |}
 
@@ -37,9 +39,16 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
   toggleAccordion = () => this.setState({isExpanded: !this.state.isExpanded})
 
   render () {
-    const {ingredGroup, editModeIngredientGroup, deleteIngredient, selected} = this.props
-    const { groupId, serializeName, individualize, description, name, wells } = ingredGroup
-    const { isExpanded } = this.state
+    const {
+      ingredGroup,
+      editModeIngredientGroup,
+      deleteIngredient,
+      selected,
+      groupId,
+      labwareWellContents
+    } = this.props
+    const {serializeName, individualize, description, name} = ingredGroup
+    const {isExpanded} = this.state
 
     return (
       <TitledList
@@ -59,8 +68,15 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <span>Name</span>
           <span />
         </div>
-        {Object.keys(wells).map((well, i) => { // TODO sort keys
-          const {volume} = wells[well]
+        {Object.keys(labwareWellContents).map((well, i) => { // TODO sort keys
+          const wellIngredForCard = labwareWellContents[well][groupId]
+          const volume = wellIngredForCard && wellIngredForCard.volume
+
+          if (volume == null) {
+            // not all wells that have ingredients contain the ingred groupId for this card
+            return null
+          }
+
           return <IngredIndividual key={well}
             name={individualize
               ? `${serializeName || 'Sample'} ${i + 1}` // TODO IMMED SORT AND NUMBER
@@ -120,15 +136,17 @@ function IngredIndividual (props: IndividProps) {
 
 type Props = {
   ...CommonProps,
-  ingredients: ?SingleLabwareLiquidState,
-  selectedIngredientGroupId: string | null,
+  ingredientGroups: IngredientGroups,
+  labwareWellContents: SingleLabwareLiquidState,
+  selectedIngredientGroupId: ?string,
   renameLabwareFormMode: boolean,
   openRenameLabwareForm: () => mixed
 }
 
 export default function IngredientsList (props: Props) {
   const {
-    ingredients,
+    labwareWellContents,
+    ingredientGroups,
     editModeIngredientGroup,
     deleteIngredient,
     selectedIngredientGroupId,
@@ -147,13 +165,14 @@ export default function IngredientsList (props: Props) {
           onClick={openRenameLabwareForm}
         />
 
-        {/* TODO IMMEDIATELY: fix the cards. they can't go thru ingredients keys! */}
-        {false && ingredients && Object.keys(ingredients).map((i) =>
-          <IngredGroupCard key={i}
+        {Object.keys(ingredientGroups).map((groupIdForCard) =>
+          <IngredGroupCard key={groupIdForCard}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
-            ingredGroup={ingredients[i]}
-            selected={selectedIngredientGroupId === ingredients[i].groupId}
+            labwareWellContents={labwareWellContents}
+            ingredGroup={ingredientGroups[groupIdForCard]}
+            groupId={groupIdForCard}
+            selected={selectedIngredientGroupId === groupIdForCard}
           />)
         }
     </SidePanel>

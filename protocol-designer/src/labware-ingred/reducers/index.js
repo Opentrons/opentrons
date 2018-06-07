@@ -6,7 +6,6 @@ import {createSelector} from 'reselect'
 
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
@@ -15,16 +14,13 @@ import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
 
-import {
-  editableIngredFields,
-  persistedIngredFields
-} from '../types'
-
 import type {LabwareLiquidState} from '../../step-generation'
 
 import type {
   IngredInputFields,
+  IngredientGroups,
   AllIngredGroupFields,
+  PersistedIngredInputFields,
   Labware,
   Wells
 } from '../types'
@@ -163,26 +159,20 @@ export const savedLabware = handleActions({
   })
 }, {})
 
-type IngredientsState = {
-  [ingredGroupId: string]: IngredInputFields
-}
+type IngredientsState = IngredientGroups
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    const {groupId} = action.payload
-
-    if (!(groupId in state)) {
-      // is a new ingredient
-      return {
-        ...state,
-        [groupId]: pick(action.payload, persistedIngredFields)
-      }
+    const {groupId, description, individualize, name, serializeName} = action.payload
+    const ingredFields: PersistedIngredInputFields = {
+      description,
+      individualize,
+      name,
+      serializeName
     }
 
     return {
       ...state,
-      [groupId]: {
-        ...pick(action.payload, persistedIngredFields)
-      }
+      [groupId]: ingredFields
     }
   },
   // Remove the deleted group (referenced by array index)
@@ -221,23 +211,25 @@ export const ingredLocations = handleActions({
       }
     }
   },
+  // TODO: Ian 2018-06-07
+  //  - refactor to allow clearing multiple wells vs (probably) deleting all
+  //      instances of an ingredient group
+  //  - write tests for this reducer
   DELETE_INGREDIENT: (state: LocationsState, action: DeleteIngredient) => {
-    const { wellName, groupId, containerId } = action.payload
+    const {wellName, groupId, containerId} = action.payload
     if (wellName) {
       // deleting single well location
       return {
         ...state,
-        [groupId]: {
-          ...state[groupId],
-          [containerId]: pickBy(
-            state[groupId][containerId],
-            (wellData: *, wellKey: string) => wellKey !== wellName
-          )
+        [containerId]: {
+          ...omit(state[containerId], wellName)
         }
       }
     }
     // deleting entire ingred group
-    return omit(state, [groupId])
+    // TODO: Ian 2018-06-07
+    console.warn(`TODO: User tried to delete ingred group: ${groupId}. Deleting entire ingred group not supported yet`)
+    return state
   },
   COPY_LABWARE: (state: LocationsState, action: CopyLabware) => {
     const {fromContainer, toContainer} = action.payload
@@ -358,9 +350,7 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
     {})
 )
 
-const ingredFields = [...editableIngredFields, 'groupId']
-
-// TODO move these to types.js
+// TODO IMMEDIATELY move these to types.js
 type IngredGroupField = {
   groupId: string,
   ...IngredInputFields
@@ -375,41 +365,9 @@ const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelect
     ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
       ...acc,
-      [ingredGroupId]: pick(ingredGroup, ingredFields)
+      [ingredGroupId]: ingredGroup
     }), {})
 )
-
-// const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
-//   getLabware,
-//   getIngredientGroups,
-//   getIngredientLocations,
-//   (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
-//     const allLabwareIds = Object.keys(_labware)
-//     const allIngredIds = Object.keys(_ingredientGroups)
-//
-//     return allLabwareIds.reduce((acc: IngredsForAllLabware, labwareId: string) => {
-//       const ingredsForThisLabware: IngredsForLabware = allIngredIds.reduce(
-//         (ingredAcc: IngredsForLabware, ingredId: string) => {
-//           if (_ingredLocations[ingredId] && _ingredLocations[ingredId][labwareId]) {
-//             return {
-//               ...ingredAcc,
-//               [ingredId]: {
-//                 groupId: ingredId,
-//                 ..._ingredientGroups[ingredId],
-//                 wells: _ingredLocations[ingredId][labwareId]
-//               }
-//             }
-//           }
-//           return ingredAcc
-//         }, {})
-//
-//       return {
-//         ...acc,
-//         [labwareId]: ingredsForThisLabware
-//       }
-//     }, {})
-//   }
-// )
 
 const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
   getIngredientGroups,
