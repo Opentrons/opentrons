@@ -233,7 +233,8 @@ function handleProbeTipResponse (state: State, action: any) {
       error: error
         ? payload
         : null
-    }
+    },
+    confirmedBySlot: {}
   }
 }
 
