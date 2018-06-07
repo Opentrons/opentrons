@@ -1,19 +1,18 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, InputField, InstrumentGroup} from '@opentrons/components'
-import type {FilePageFields} from '../file-data'
+import {FormGroup, InputField, InstrumentGroup, PrimaryButton} from '@opentrons/components'
+import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
-
 import styles from './FilePage.css'
 import formStyles from '../components/forms.css'
 
 type Props = {
-  formConnector: FormConnector<FilePageFields>,
+  formConnector: FormConnector<FileMetadataFields>,
   instruments: React.ElementProps<typeof InstrumentGroup>
 }
 
 export default function FilePage (props: Props) {
-  const {formConnector, instruments} = props
+  const {formConnector, isFormAltered, instruments} = props
   return (
     <div className={styles.file_page}>
       <section>
@@ -34,6 +33,9 @@ export default function FilePage (props: Props) {
         <FormGroup label='Description:'>
           <InputField {...formConnector('description')}/>
         </FormGroup>
+        <PrimaryButton className={styles.update_button} disabled={!isFormAltered}>
+          UPDATE
+        </PrimaryButton>
       </section>
 
       <section>

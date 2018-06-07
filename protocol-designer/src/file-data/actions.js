@@ -1,11 +1,14 @@
 // @flow
-import type {FilePageFieldAccessors} from './types'
+import type {FileMetadataFieldAccessors} from './types'
 import type {PipetteName} from './pipetteData'
 
-// NOTE: updateFileFields contains pipette name identifiers, though pipettes aren't file fields.
-// This is because both pipettes and file fields can get changed in the same place
-export const updateFileFields = (payload: {[accessor: FilePageFieldAccessors]: string}) => ({
-  type: 'UPDATE_FILE_FIELDS',
+export const updateFileMetadataFields = (payload: {[accessor: FileMetadataFieldAccessors]: string}) => ({
+  type: 'UPDATE_FILE_METADATA_FIELDS',
+  payload
+})
+
+export const saveFileMetadata = (payload: {[accessor: FileMetadataFieldAccessors]: string}) => ({
+  type: 'SAVE_FILE_METADATA',
   payload
 })
 
