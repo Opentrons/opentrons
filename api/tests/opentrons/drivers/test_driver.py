@@ -148,8 +148,8 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     expected = [
         ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.5 C0.5 X1.25 Y1.5 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.5 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.5 C0.5 X1.25 Y1.25 Z0.1 G4P0.005 M400'],
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
     ]
     # from pprint import pprint
@@ -217,7 +217,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G0F24000 M400'],
         ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.5 Z0.1 G4P0.005 G28.2Y M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y M400'],
         ['M203.1 Y8 M400'],
         ['G91 G0Y-3 G90 M400'],
         ['G28.2Y M400'],
@@ -233,7 +233,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.5 Z1.0 G4P0.005 G0.+ M400']
+        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.25 Z1.0 G4P0.005 G0.+ M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -259,9 +259,9 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5})
     expected = [
         # Set active axes high
-        ['M907 A1.0 B0.5 C0.5 X1.25 Y1.5 Z1.0 G4P0.005 G0.+[BC].+ M400'],
+        ['M907 A1.0 B0.5 C0.5 X1.25 Y1.25 Z1.0 G4P0.005 G0.+[BC].+ M400'],
         # Set plunger current low
-        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.5 Z1.0 G4P0.005 M400'],
+        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.25 Z1.0 G4P0.005 M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -374,7 +374,7 @@ def test_set_pick_upcurrent(model):
         {'C': 0.05},
         {'A': 1.0},
         {'A': 0.1},
-        {'X': 1.25, 'Y': 1.5},
+        {'X': 1.25, 'Y': 1.25},
         {'X': 0.3, 'Y': 0.3},
         {'A': 1.0},
         {'A': 0.42},
