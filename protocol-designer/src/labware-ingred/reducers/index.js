@@ -66,24 +66,6 @@ const selectedContainerId = handleActions({
   CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null
 }, null)
 
-type SelectedIngredientGroupState = {|
-  groupId: string,
-  wellName: string
-|} | null
-
-const selectedIngredientGroup = handleActions({
-  // selected ingredient group to edit
-  // TODO: SelectedIngredientGroupState is type of payload, type the action though
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
-    action.payload,
-  SELECT_WELLS: () => null,
-  OPEN_INGREDIENT_SELECTOR: () => null,
-  EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
-  DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
-  CLOSE_INGREDIENT_SELECTOR: () => null,
-  OPEN_RENAME_LABWARE_FORM: () => null
-}, null)
-
 type RenameLabwareFormModeState = boolean
 const renameLabwareFormMode = handleActions({
   OPEN_RENAME_LABWARE_FORM: () => true,
@@ -251,7 +233,6 @@ export type RootState = {|
   modeLabwareSelection: string | false, // TODO use null, not false
   copyLabwareMode: string | false,
   selectedContainerId: SelectedContainerId,
-  selectedIngredientGroup: SelectedIngredientGroupState,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
@@ -264,7 +245,6 @@ const rootReducer = combineReducers({
   modeLabwareSelection,
   copyLabwareMode,
   selectedContainerId,
-  selectedIngredientGroup,
   containers,
   savedLabware,
   ingredients,
@@ -403,8 +383,6 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
-const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).selectedIngredientGroup
-
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -427,7 +405,6 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
-  getSelectedIngredientGroup,
   labwareOptions
 }
 
