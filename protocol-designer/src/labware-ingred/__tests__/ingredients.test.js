@@ -19,7 +19,12 @@ describe('DELETE_INGREDIENT action', () => {
     )).toEqual({})
   })
 
-  test('delete ingredient by ingredient group id, when id does exist', () => {
+  test('delete all ingredients in well', () => {
+    const deleteWellAction = {
+      type: 'DELETE_INGREDIENT',
+      payload: {well: 'C1'}
+    }
+
     const prevIngredState = {
       '2': 'blaah',
       '3': {
@@ -56,15 +61,12 @@ describe('DELETE_INGREDIENT action', () => {
 
     expect(ingredients(
       prevIngredState,
-      deleteGroup3
-    )).toEqual({
-      '2': 'blaah',
-      '4': 'blah'
-    })
+      deleteWellAction
+    )).toEqual(prevIngredState)
 
     expect(ingredLocations(
       prevLocationsState,
-      deleteGroup3
+      deleteWellAction
     )).toEqual({
       '2': {
         container1Id: {
@@ -72,7 +74,13 @@ describe('DELETE_INGREDIENT action', () => {
           A2: {volume: 123}
         }
       },
-      // 3 is deleted
+      '3': {
+        container1Id: {
+          A1: {volume: 111},
+          B1: {volume: 112},
+          C1: {volume: 113}
+        }
+      },
       '4': {
         container1Id: {
           C1: {volume: 100},
@@ -81,6 +89,9 @@ describe('DELETE_INGREDIENT action', () => {
       }
     })
   })
+
+  // TODO Ian 2018-06-07 rewrite this test when 'delete all ingreds in group' is re-implemented
+  test.skip('delete ingredient by ingredient group id, when id does exist', () => {})
 })
 
 describe('COPY_LABWARE action', () => {

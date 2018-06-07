@@ -12,18 +12,7 @@ const baseIngredFields = {
 
 const allIngredientsXXSingleIngred = {
   '0': {
-    ...baseIngredFields,
-
-    instances: {
-      'container1Id': {
-        A1: {
-          volume: 100
-        },
-        B1: {
-          volume: 150
-        }
-      }
-    }
+    ...baseIngredFields
   }
 }
 
