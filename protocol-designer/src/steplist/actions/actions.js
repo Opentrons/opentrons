@@ -181,6 +181,30 @@ export function collapseFormSection (payload: FormSectionNames): CollapseFormSec
   }
 }
 
+export type OpenDeleteStepModal = {
+  type: 'OPEN_DELETE_STEP_MODAL',
+  payload: any
+}
+
+export const openDeleteStepModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
+  dispatch({
+    type: 'OPEN_DELETE_STEP_MODAL',
+    payload: selectors.selectedStepId(getState())
+  })
+}
+
+export type CancelDeleteStepModal = {
+  type: 'OPEN_DELETE_STEP_MODAL',
+  payload: any
+}
+
+export const cancelDeleteStepModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
+  dispatch({
+    type: 'CANCEL_DELETE_STEP_MODAL',
+    payload: selectors.selectedStepId(getState())
+  })
+}
+
 // ========= MORE OPTIONS MODAL =======
 // Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
 

@@ -89,12 +89,6 @@
   }
 }
 
-.more_options_button {
-  @apply --font-header-dark;
-
-  lost-column: 2/6;
-}
-
 .cancel_button {
   lost-offset: 2/6;
 }

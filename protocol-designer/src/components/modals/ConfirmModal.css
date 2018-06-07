@@ -1,0 +1,18 @@
+@import './grid.css';
+
+.button_row {
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
+  }
+
+  & > *:first-child {
+    lost-column: 2/6;
+  }
+
+  & > *:nth-child(2) {
+    lost-offset: 2/6;
+  }
+}
