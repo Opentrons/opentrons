@@ -25,6 +25,10 @@
 
 .in_progress_contents {
   background-color: transparent;
+
+  & h3 {
+    display: none;
+  }
 }
 
 .position_diagram,
