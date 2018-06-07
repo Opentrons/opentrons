@@ -210,7 +210,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A1.0 B0.5 C0.5 X0.3 Y0.3 Z1.0 G4P0.005 G28.2.+[ABCZ].+ M400'],
+        ['M907 A0.8 B0.5 C0.5 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+ M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['G0F3000 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90 M400'],  # NOQA
@@ -233,7 +233,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.25 Z1.0 G4P0.005 G0.+ M400']
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+ M400']
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -259,9 +259,9 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5})
     expected = [
         # Set active axes high
-        ['M907 A1.0 B0.5 C0.5 X1.25 Y1.25 Z1.0 G4P0.005 G0.+[BC].+ M400'],
+        ['M907 A0.8 B0.5 C0.5 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+ M400'],
         # Set plunger current low
-        ['M907 A1.0 B0.05 C0.05 X1.25 Y1.25 Z1.0 G4P0.005 M400'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -372,13 +372,13 @@ def test_set_pick_upcurrent(model):
     expected = [
         {'C': 0.5},
         {'C': 0.05},
-        {'A': 1.0},
+        {'A': 0.8},
         {'A': 0.1},
         {'X': 1.25, 'Y': 1.25},
         {'X': 0.3, 'Y': 0.3},
-        {'A': 1.0},
+        {'A': 0.8},
         {'A': 0.42},
-        {'A': 1.0},
+        {'A': 0.8},
         {'A': 0.1}
     ]
     # from pprint import pprint
