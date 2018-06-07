@@ -217,8 +217,6 @@ describe('EDIT_INGREDIENT action', () => {
 
         containerId: 'container1Id',
         groupId: 'newIngredId',
-        copyGroupId: 0,
-        isUnchangedClone: false,
         wells: ['B1', 'B2']
       }
     }
@@ -246,35 +244,33 @@ describe('EDIT_INGREDIENT action', () => {
   })
 
   test('copy ingredient without any changes', () => {
-    const ingredGroupId = '0'
+    const groupId = '0'
     const copyIngredAction = {
       type: 'EDIT_INGREDIENT',
       payload: {
         ...ingredFields,
         containerId: 'container1Id',
-        groupId: ingredGroupId,
-        copyGroupId: ingredGroupId,
-        isUnchangedClone: true,
+        groupId,
         wells: ['B1', 'B2'] // new wells
       }
     }
 
     const prevIngredState = {
-      [ingredGroupId]: {...resultingIngred}
+      [groupId]: {...resultingIngred}
     }
 
     expect(ingredients(
       prevIngredState,
       copyIngredAction
     )).toEqual({
-      [ingredGroupId]: {...resultingIngred} // no new ingredient group created
+      [groupId]: {...resultingIngred} // no new ingredient group created
     })
 
     const prevLocationsState = {
       container1Id: {
-        A1: {[ingredGroupId]: {volume: 250}},
-        A2: {[ingredGroupId]: {volume: 250}},
-        A3: {[ingredGroupId]: {volume: 250}}
+        A1: {[groupId]: {volume: 250}},
+        A2: {[groupId]: {volume: 250}},
+        A3: {[groupId]: {volume: 250}}
       }
     }
 
@@ -283,16 +279,12 @@ describe('EDIT_INGREDIENT action', () => {
       copyIngredAction
     )).toEqual({
       container1Id: {
-        A1: {[ingredGroupId]: {volume: 250}},
-        A2: {[ingredGroupId]: {volume: 250}},
-        A3: {[ingredGroupId]: {volume: 250}},
-        B1: {[ingredGroupId]: {volume: 250}},
-        B2: {[ingredGroupId]: {volume: 250}}
+        A1: {[groupId]: {volume: 250}},
+        A2: {[groupId]: {volume: 250}},
+        A3: {[groupId]: {volume: 250}},
+        B1: {[groupId]: {volume: 250}},
+        B2: {[groupId]: {volume: 250}}
       }
     })
-  })
-
-  test.skip('copy ingredient with changes', () => {
-    // TODO
   })
 })

@@ -161,8 +161,7 @@ export type EditIngredient = {
 
 export type EditIngredientPayload = {
   ...IngredInputFields,
-  groupId: string | null,
-  copyGroupId: string | null
+  groupId: string | null // null indicates new ingredient is being created
 }
 
 export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
@@ -170,13 +169,13 @@ export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dis
   const container = selectors.getSelectedContainer(state)
   const allIngredients = selectors.getIngredientGroups(state)
 
-  const {groupId, copyGroupId, ...inputFields} = payload
+  const {groupId, ...inputFields} = payload
 
   if (!container) {
     throw new Error('No container selected, cannot edit ingredient')
   }
 
-  if (groupId && copyGroupId === null) {
+  if (groupId !== null) {
     // Not a copy, just an edit
     return dispatch({
       type: 'EDIT_INGREDIENT',
@@ -189,30 +188,17 @@ export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dis
     })
   }
 
-  const isUnchangedClone = copyGroupId !== null &&
-    allIngredients[copyGroupId] &&
-    allIngredients[copyGroupId].name === payload.name
-
-  // TODO Ian 2018-02-19 make selector
+  // TODO: Ian 2018-02-19 make selector
   const nextGroupId: string = ((max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0).toString()
-
-  const name = (
-    copyGroupId &&
-    allIngredients[copyGroupId] &&
-    allIngredients[copyGroupId].name === payload.name
-    )
-    ? (payload.name || '') + ' copy' // todo: copy 2, copy 3 etc.
-    : payload.name
 
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
       ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
-      name,
       containerId: container.id,
-      groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
-      wells: wellSelectionSelectors.selectedWellNames(state) // TODO use locations: [slot]: [selected wells]
+      groupId: nextGroupId,
+      wells: wellSelectionSelectors.selectedWellNames(state)
     }
   })
 }

@@ -25,11 +25,8 @@ type DP = {
 type SP = $Diff<Props, DP>
 
 function mapStateToProps (state: BaseState): SP {
-  const selectedIngredGroup = selectors.getSelectedIngredientGroup(state)
-
   return {
     commonSelectedIngred: wellContentsSelectors.getSelectedWellsIngredId(state),
-    editingIngredGroupId: selectedIngredGroup && selectedIngredGroup.groupId,
     selectedWells: Object.keys(wellSelectionSelectors.getSelectedWells(state)),
     selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),

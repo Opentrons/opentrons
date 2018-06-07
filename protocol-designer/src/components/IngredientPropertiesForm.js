@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import isNil from 'lodash/isNil'
 import {
   PrimaryButton,
   CheckboxField,
@@ -84,15 +83,12 @@ type Props = {
   commonSelectedIngred: ?string,
 
   allIngredientGroupFields: ?AllIngredGroupFields, // TODO IMMEDIATELY unnecessary to pass all this in, right?
-  allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
-  editingIngredGroupId: string | null,
-
-  initialIngreds?: IngredInputs
+  allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>
 }
 
 type State = {
   input: IngredInputs,
-  copyGroupId: ?string
+  commonIngredGroupId: ?string
 }
 
 class IngredientPropertiesForm extends React.Component<Props, State> {
@@ -100,23 +96,26 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
   constructor (props: Props) {
     super(props)
-    const {name, volume, description, individualize, serializeName} = (props.initialIngreds || {})
     this.state = {
       input: {
-        name: name || null,
-        volume: volume || null,
-        description: description || null,
-        individualize: individualize || false,
-        serializeName: individualize
-          ? serializeName || name || null
-          : null
+        name: null,
+        volume: null,
+        description: null,
+        individualize: false,
+        serializeName: null
       },
-      copyGroupId: null
+      commonIngredGroupId: null // TODO IMMEDIATELY rename this, "copying" isn't quite what it does
     }
 
+    // TODO: Ian 2018-06-07 don't use makeInputField or this.Field, it's weird & bad
     this.Field = makeInputField({
-      setSubstate: (inputKey, inputValue) => {
-        this.setState({...this.state, input: {...this.state.input, [inputKey]: inputValue}})
+      setSubstate: (inputKey, inputValue: any) => { // TODO: Ian 2018-06-07 avoid any type here
+        this.setState({
+          input: {...this.state.input, [inputKey]: inputValue},
+          commonIngredGroupId: (inputKey === 'name')
+            ? null // unset commonIngredGroupId if user changes 'name' field
+            : this.state.commonIngredGroupId
+        })
       },
       getSubstate: (inputKey) => this.state.input[inputKey]
     })
@@ -128,7 +127,6 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
     // nextIngredGroupFields allows you to update with nextProps
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
-    console.log({ingredGroupId, zzz: this.props.allIngredientGroupFields, nextIngredGroupFields})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
       const {name, volume, description, individualize, serializeName} = this.state.input
@@ -159,24 +157,24 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps (nextProps: Props) {
-    const nextEditingId = nextProps.editingIngredGroupId || nextProps.commonSelectedIngred
+    const nextEditingId = nextProps.commonSelectedIngred
     this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
       ...this.state,
-      copyGroupId: nextEditingId
+      commonIngredGroupId: nextEditingId
     }))
   }
 
   selectExistingIngred = (ingredGroupId: string) => {
     this.resetInputState(ingredGroupId, undefined, () => this.setState({
       ...this.state,
-      copyGroupId: ingredGroupId
+      commonIngredGroupId: ingredGroupId
     }))
   }
 
   handleDelete = (e: SyntheticEvent<*>) => {
-    const {onDelete, editingIngredGroupId} = this.props
+    const {onDelete} = this.props
 
-    const groupToDelete = editingIngredGroupId
+    const groupToDelete = null // TODO: Ian 2018-06-07 allow deleting ingreds
     if (groupToDelete) {
       window.confirm('Are you sure you want to delete all ingredients in this group?') &&
         onDelete(groupToDelete)
@@ -190,23 +188,20 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       onSave,
       onCancel,
       allIngredientNamesIds,
-      allIngredientGroupFields,
-      editingIngredGroupId,
       selectedWells,
       selectedWellsMaxVolume
     } = this.props
 
-    const selectedIngredientFields = allIngredientGroupFields && !isNil(editingIngredGroupId) && allIngredientGroupFields[editingIngredGroupId]
+    const {commonIngredGroupId} = this.state
     const {volume} = this.state.input
-
-    const editMode = selectedIngredientFields
-    const addMode = !editMode && selectedWells.length > 0
 
     const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
-    if (!editMode && !addMode) {
-      // Don't show anything, we're not editing or adding
+    const showForm = selectedWells.length > 0
+    const showIngredientDropdown = allIngredientNamesIds.length > 0
+
+    if (!showForm) {
       return null
     }
 
@@ -227,7 +222,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                   accessor='individualize'
                   type='checkbox'
                 />
-                {/* TODO Ian 2018-06-01 remove all remnants of this text field see issue #1294
+                {/* TODO: Ian 2018-06-01 remove all remnants of this text field see issue #1294
                   {individualize && <Field
                   accessor='serializeName'
                   placeholder='i.e. sample'
@@ -235,8 +230,9 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 />} */}
               </FormGroup>
 
-            {!editMode && <FormGroup label='Pick Existing Ingredient:' className={styles.existing_ingred_field}>
+            {showIngredientDropdown && <FormGroup label='Replace With:' className={styles.existing_ingred_field}>
               <DropdownField
+                value={commonIngredGroupId || ''}
                 onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
                 options={[
                   {name: '', value: ''},
@@ -272,17 +268,21 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           <PrimaryButton
             onClick={() => onSave({
               ...this.state.input,
-              groupId: editingIngredGroupId,
-              copyGroupId: this.state.copyGroupId})}
+              groupId: this.state.commonIngredGroupId
+            })}
           >
             Save
           </PrimaryButton>
 
-          {editMode &&
+          {/* TODO: Ian 2018-06-07 allow deleting ingreds,
+            * need ticket (clear selected wells vs delete
+            * ingred group across all labware)
+          */}
+          {/* editMode &&
             <PrimaryButton onClick={this.handleDelete}>
               Delete Ingredient
             </PrimaryButton>
-          }
+          */}
         </div>
       </div>
     )
