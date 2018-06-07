@@ -1,0 +1,16 @@
+/* stylesheet for Resources page components */
+@import '@opentrons/components';
+
+:root {
+  --resources_card_spacing: 0.75rem;
+}
+
+.resources_page {
+  padding: 1.5rem;
+  font-size: var(--fs-body-1);
+}
+
+.row {
+  width: 100%;
+  margin-bottom: var(--resources_card_spacing);
+}

@@ -9,9 +9,13 @@ export default function MenuPanel () {
   return (
     <SidePanel title='Menu'>
       <div className={styles.menu_panel}>
-        <ol>
+        <ol className={styles.menu_list}>
           <ListItem className={styles.menu_item} url={'/menu/app'} activeClassName={styles.active}>
             <span>App</span>
+            <Icon name={'chevron-right'} className={styles.menu_icon}/>
+          </ListItem>
+          <ListItem className={styles.menu_item} url={'/menu/resources'} activeClassName={styles.active}>
+            <span>Resources</span>
             <Icon name={'chevron-right'} className={styles.menu_icon}/>
           </ListItem>
         </ol>
