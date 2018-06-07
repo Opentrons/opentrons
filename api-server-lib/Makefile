@@ -29,13 +29,16 @@ clean:
 		'**/__pycache__' \
 		'**/*.pyc'
 
+# TODO(mc, 2018-06-07): add api-server-lib tests
 .PHONY: test
 test:
-	$(python) -m pytest \
-		--cov=opentrons \
-		--cov-report term-missing:skip-covered \
-		--cov-report xml:coverage.xml \
-		tests
+	@echo "TODO: add api-server-lib tests"
+# test:
+# 	$(python) -m pytest \
+# 		--cov=opentrons \
+# 		--cov-report term-missing:skip-covered \
+# 		--cov-report xml:coverage.xml \
+# 		tests
 
 .PHONY: lint
 lint:
