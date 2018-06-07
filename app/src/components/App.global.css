@@ -24,64 +24,12 @@ a {
   text-decoration: none;
 }
 
-/* TODO(mc, 2018-04-04): just use "system-ui"? */
-.sans {
-  font-family: 'Open Sans';
-}
-
-.trons {
-  font-family: trons;
-}
-
 /*** BUTTONS ***/
 button {
   border: none;
 }
 
-button:focus {
+button:focus,
+button:active {
   outline: 0;
-}
-
-.btn {
-  height: 2.5rem;
-  line-height: 2.5rem;
-  border-radius: 2px;
-  font-family: 'Open Sans';
-  font-size: 14px;
-  text-transform: uppercase;
-  cursor: pointer;
-  background-color: transparent;
-}
-
-.btn:active {
-  outline: none;
-  border: none;
-}
-
-.btn_light {
-  border: 1px solid silver;
-  background-color: #fff;
-  color: #666;
-}
-
-.btn_light:hover {
-  background-color: #eee;
-}
-
-.btn_dark {
-  background-color: #9b9b9b;
-  color: white;
-}
-
-.btn_dark:hover {
-  background-color: #777;
-}
-
-.btn_blue {
-  background-color: #006fff;
-  color: white;
-}
-
-.btn_blue:hover {
-  background-color: #00f;
 }

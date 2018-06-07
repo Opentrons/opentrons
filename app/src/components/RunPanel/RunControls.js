@@ -69,7 +69,7 @@ export default function (props: RunProps) {
         className={styles.run_button}
         disabled={disabled}
       >
-        Cancel Job
+        Cancel Run
       </OutlineButton>
     )
   } else {
