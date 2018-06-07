@@ -11,9 +11,9 @@ export default function Resources () {
     <div className={styles.resources_page}>
       <div className={styles.row}>
         <ResourceCard
-          title='Knowledge Base'
+          title='Support Articles'
           description='Visit our walkthroughs and FAQs'
-          url={'https://support.opentrons.com/'}
+          url={'https://support.opentrons.com/ot-2'}
         />
       </div>
       <div className={styles.row}>
