@@ -14,9 +14,11 @@ from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 
-def setup(motor_current, max_speed):
+def setup(max_speed):
+    x_current = robot.config.high_current['X'] * 0.8
+    y_current = robot.config.high_current['X'] * 0.8
     robot._driver.set_active_current(
-        {'X': motor_current, 'Y': motor_current + 0.2})
+        {'X': x_current, 'Y': y_current})
     robot._driver.set_axis_max_speed({'X': max_speed, 'Y': max_speed})
     robot._driver.set_speed(max_speed)
 
@@ -79,7 +81,7 @@ def run_x_axis():
     # Test X Axis
     for cycle in range(cycles):
         print("Testing X")
-        setup(1.2, 600)
+        setup(600)
         hourglass_pattern(b_x_max, b_y_max)
         try:
             test_axis('X', options.tolerance)
@@ -91,7 +93,7 @@ def run_y_axis():
     # Test Y Axis
     for cycle in range(cycles):
         print("Testing Y")
-        setup(1.2, 600)
+        setup(600)
         bowtie_pattern(b_x_max, b_y_max)
         try:
             test_axis('Y', options.tolerance)
@@ -130,6 +132,8 @@ if __name__ == '__main__':
         robot.home()
         run_x_axis()
         run_y_axis()
+        robot._driver._set_button_light(red=False, green=True, blue=False)
+        print("PASS")
     except KeyboardInterrupt:
         print("Test Cancelled")
         robot._driver.turn_on_blue_button_light()
@@ -137,6 +141,3 @@ if __name__ == '__main__':
     except Exception as e:
         robot._driver.turn_on_red_button_light()
         print("FAIL: {}".format(e))
-
-    robot._driver._set_button_light(red=False, green=True, blue=False)
-    print("PASS")
