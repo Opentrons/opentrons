@@ -3,7 +3,7 @@ import json
 import tempfile
 from aiohttp import web
 from opentrons.server.main import init
-from opentrons.server.endpoints import (control, update)
+import ot2serverlib
 
 
 async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
@@ -11,7 +11,7 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_restart(request):
         return web.json_response(test_data)
-    monkeypatch.setattr(control, 'restart', mock_restart)
+    monkeypatch.setattr(ot2serverlib.endpoints, 'restart', mock_restart)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
@@ -32,13 +32,15 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_install(filename, loop):
         return msg
-    monkeypatch.setattr(update, '_install', mock_install)
+    monkeypatch.setattr(ot2serverlib, '_install', mock_install)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
     data = {'whl': open(os.path.join(tmpdir, filename))}
 
+    # Note: hits API server update endpoint--this test covers backward
+    # compatibility until the update server is universally available
     resp = await cli.post(
         '/server/update',
         data=data)

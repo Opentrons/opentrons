@@ -57,7 +57,7 @@ def _parse_string_value_from_substring(substring) -> str:
     try:
         value = substring.split(':')[1]
         return str(value)
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected arg to _parse_string_value_from_substring:')
         raise ParseError(
             'Unexpected arg to _parse_string_value_from_substring: {}'.format(
@@ -77,7 +77,7 @@ def _parse_number_from_substring(substring) -> int:
         if value.strip().lower() == 'none':
             return None
         return int(value)
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_number_from_substring:')
         raise ParseError(
             'Unexpected argument to _parse_number_from_substring: {}'.format(
@@ -91,7 +91,7 @@ def _parse_key_from_substring(substring) -> str:
     '''
     try:
         return substring.split(':')[0]
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_key_from_substring:')
         raise ParseError(
             'Unexpected argument to _parse_key_from_substring: {}'.format(

@@ -7,6 +7,7 @@ SHELL := /bin/bash
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
+API_LIB_DIR := api-server-lib
 COMPONENTS_DIR := components
 APP_DIR := app
 APP_SHELL_DIR := app-shell
@@ -27,6 +28,7 @@ endif
 .PHONY: install
 install:
 	pip install pipenv==11.6.8
+	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	yarn
 	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
@@ -45,6 +47,12 @@ install-types:
 	flow-mono install-types --overwrite --flowVersion=0.61.0
 	flow-typed install --overwrite --flowVersion=0.61.0
 
+.PHONY: push-api
+push-api:
+	$(MAKE) -C $(API_LIB_DIR) push
+	$(MAKE) -C $(API_DIR) push
+	$(MAKE) -C $(API_DIR) restart
+
 # all tests
 .PHONY: test
 test: test-api test-js
@@ -52,6 +60,7 @@ test: test-api test-js
 .PHONY: test-api
 test-api:
 	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(API_LIB_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -68,6 +77,7 @@ lint: lint-py lint-js lint-css
 .PHONY: lint-py
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
+	$(MAKE) -C $(API_LIB_DIR) lint
 
 .PHONY: lint-js
 lint-js:
