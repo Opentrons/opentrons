@@ -1,11 +1,16 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, InputField, InstrumentGroup, OutlineButton} from '@opentrons/components'
+import {
+  FormGroup,
+  InputField,
+  InstrumentGroup,
+  OutlineButton,
+  KeypressHandler
+} from '@opentrons/components'
 import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
 import styles from './FilePage.css'
 import formStyles from '../components/forms.css'
-import KeypressHandler from './KeypressHandler'
 
 type Props = {
   formConnector: FormConnector<FileMetadataFields>,
@@ -41,7 +46,7 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata}:
         )} />
       <div className={styles.button_row}>
         <OutlineButton type="submit" className={styles.update_button} onClick={saveFileMetadata} disabled={!isFormAltered}>
-          UPDATE
+          {isFormAltered ? 'UPDATE' : 'SAVED'}
         </OutlineButton>
       </div>
     </section>
