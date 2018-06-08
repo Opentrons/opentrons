@@ -154,6 +154,8 @@ def init(loop=None):
         '/lights/off', control.turn_off_rail_lights)
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
+    server.app.router.add_get(
+        '/trash/attached', control.get_trash_attached)
     server.app.router.add_post(
         '/server/update', endpoints.update_api)
     server.app.router.add_post(

@@ -197,6 +197,39 @@ async def test_robot_info(virtual_smoothie_env, loop, test_client):
     assert len(body['positions']['attach_tip']['point']) == 3
 
 
+async def test_trash_attached(
+        virtual_smoothie_env, loop, test_client, monkeypatch):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    res = await cli.get('/trash/attached')
+    assert res.status == 200
+
+    text = await res.text()
+    body = json.loads(text)
+    assert body['trash']['attached'] is False
+
+    def _send_command_mock(cmd):
+        # return a Smoothieware response the report the Probe as being pressed
+        smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'
+        smoothie_switch_res += ' _pins '
+        smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+        smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 1\r\n'
+        return smoothie_switch_res
+
+    monkeypatch.setattr(robot._driver, '_send_command', _send_command_mock)
+    robot._driver.simulating = False
+
+    res = await cli.get('/trash/attached')
+    assert res.status == 200
+
+    text = await res.text()
+    body = json.loads(text)
+    assert body['trash']['attached'] is True
+
+    robot._driver.simulating = True
+
+
 async def test_home_pipette(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
