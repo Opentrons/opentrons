@@ -4,12 +4,14 @@ import {Link} from 'react-router-dom'
 import {AlertModal} from '@opentrons/components'
 import type {Error} from '../../types'
 
+import styles from './styles.css'
+
 type Props = {
   closeUrl: string,
   error: Error
 }
 
-const HEADING = 'Error'
+const HEADING = 'Unexpected Error'
 export default function ErrorModal (props: Props) {
   const {error, closeUrl} = props
 
@@ -17,11 +19,13 @@ export default function ErrorModal (props: Props) {
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: 'close', Component: Link, to: closeUrl}
+        {children: 'try again', Component: Link, to: closeUrl}
       ]}
+      alertOverlay
     >
-      <p>Something went wrong</p>
-      {error.message}
+      <p>An unexpected error has cleared your deck calibration progress, please try again.</p>
+      <p className={styles.error}>{error.message}</p>
+      <p>If you keep getting this message, try restarting your robot. If this does not resolve the issue please contact Opentrons Support.</p>
     </AlertModal>
   )
 }
