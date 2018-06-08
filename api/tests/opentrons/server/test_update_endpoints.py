@@ -3,6 +3,7 @@ import json
 import tempfile
 from aiohttp import web
 from opentrons.server.main import init
+from opentrons.server.endpoints import update
 import ot2serverlib
 
 
@@ -25,19 +26,27 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
     msg = "success"
-    filename = "testy.whl"
+    whl_name = "testy.whl"
+    serverlib_name = "testylib.whl"
+    fw_name = "testy.fw"
     tmpdir = tempfile.mkdtemp("files")
-    with open(os.path.join(tmpdir, filename), 'w') as fd:
-        fd.write("test")
+    for filename in [whl_name, serverlib_name, fw_name]:
+        with open(os.path.join(tmpdir, filename), 'w') as fd:
+            fd.write("test")
 
     async def mock_install(filename, loop):
         return msg
     monkeypatch.setattr(ot2serverlib, '_install', mock_install)
+    monkeypatch.setattr(update, '_update_firmware', mock_install)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    data = {'whl': open(os.path.join(tmpdir, filename))}
+    data = {
+        'whl': open(os.path.join(tmpdir, whl_name)),
+        'serverlib': open(os.path.join(tmpdir, serverlib_name)),
+        'fw': open(os.path.join(tmpdir, fw_name))
+    }
 
     # Note: hits API server update endpoint--this test covers backward
     # compatibility until the update server is universally available
@@ -46,8 +55,8 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
         data=data)
 
     expected = json.dumps({
-        'message': msg,
-        'filename': filename
+        'message': [msg, msg, msg],
+        'filename': [whl_name, serverlib_name, fw_name]
     })
     text = await resp.text()
     assert resp.status == 200

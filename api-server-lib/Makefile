@@ -35,7 +35,7 @@ test:
 	@echo "TODO: add api-server-lib tests"
 # test:
 # 	$(python) -m pytest \
-# 		--cov=opentrons \
+# 		--cov=ot2serverlib \
 # 		--cov-report term-missing:skip-covered \
 # 		--cov-report xml:coverage.xml \
 # 		tests
