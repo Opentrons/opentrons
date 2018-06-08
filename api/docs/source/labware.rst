@@ -102,14 +102,14 @@ Tip rack for a 200 or 300 uL pipette (single or 8-channel)
 
 .. image:: img/labware_lib/Tiprack-200ul.png
 
-GEB-tiprack-300
+opentrons-tiprack-300ul
 ---------------
 
 This is a custom-made 300ul tiprack for the OT 2 model (single or 8-channel)
 
 .. code-block:: python
 
-    labware.load('GEB-tiprack-300', slot)
+    labware.load('opentrons-tiprack-300ul', slot)
 
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
