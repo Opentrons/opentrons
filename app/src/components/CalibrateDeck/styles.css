@@ -33,6 +33,4 @@
 
 .error {
   padding-left: 1rem;
-  color: var(--c-red);
-  font-weight: var(--fw-semibold);
 }
