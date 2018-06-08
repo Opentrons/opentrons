@@ -25,7 +25,7 @@ class Notifications(object):
         def thread_has_event_loop():
             try:
                 asyncio.get_event_loop()
-            except RuntimeError as e:
+            except RuntimeError:
                 return False
             else:
                 return True

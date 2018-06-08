@@ -107,7 +107,7 @@ def _parse_number_from_substring(smoothie_substring):
             float(smoothie_substring.split(':')[1]),
             GCODE_ROUNDING_PRECISION
         )
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_number_from_substring:')
         raise ParseError(
             'Unexpected argument to _parse_number_from_substring: {}'.format(
@@ -121,7 +121,7 @@ def _parse_axis_from_substring(smoothie_substring):
     '''
     try:
         return smoothie_substring.split(':')[0].title()  # upper 1st letter
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_axis_from_substring:')
         raise ParseError(
             'Unexpected argument to _parse_axis_from_substring: {}'.format(
@@ -150,7 +150,7 @@ def _parse_instrument_data(smoothie_response):
         # data received from Smoothieware is stringified HEX values
         # because of how Smoothieware handles GCODE messages
         data = bytearray.fromhex(items[1])
-    except (ValueError, IndexError, TypeError, AttributeError) as e:
+    except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_instrument_data:')
         raise ParseError(
             'Unexpected argument to _parse_instrument_data: {}'.format(
@@ -165,7 +165,7 @@ def _byte_array_to_ascii_string(byte_array):
             if c in byte_array:
                 byte_array = byte_array[:byte_array.index(c)]
         res = byte_array.decode()
-    except (ValueError, TypeError, AttributeError) as e:
+    except (ValueError, TypeError, AttributeError):
         log.exception('Unexpected argument to _byte_array_to_ascii_string:')
         raise ParseError(
             'Unexpected argument to _byte_array_to_ascii_string: {}'.format(
@@ -178,7 +178,7 @@ def _byte_array_to_hex_string(byte_array):
     # because of how Smoothieware parses GCODE messages
     try:
         res = ''.join('%02x' % b for b in byte_array)
-    except TypeError as e:
+    except TypeError:
         log.exception('Unexpected argument to _byte_array_to_hex_string:')
         raise ParseError(
             'Unexpected argument to _byte_array_to_hex_string: {}'.format(

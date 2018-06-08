@@ -8,7 +8,8 @@
     "shared-data",
     "protocol-designer",
     "webpack-config",
-    "api/opentrons"
+    "api/opentrons",
+    "api-server-lib/ot2serverlib"
   ],
   "config": {
     "commitizen": {
