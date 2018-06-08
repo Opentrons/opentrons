@@ -201,11 +201,10 @@ make -C api push
 
 ### Releasing (for Opentrons developers)
 
-Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability. As we move from prerelease to release, several of the manual steps below will be automated in CI and/or scripted.
+Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability.
 
-1.  Manually bump the `version` field in repo-level `package.json`
-    *   The rest of these steps will refer to the bump as `${version}`
-2.  `python scripts/bump_version.py --sync && make install`
+1.  `make bump`
+2.  Inspect version bumps and changelogs
 3.  `git add --all`
 4.  `git cz`
     - Type: `chore`
@@ -217,6 +216,41 @@ Our release process is still a work-in-progress. All projects are currently vers
 8.  Pull latest `edge` to your machine
 9.  `git tag -a v${version} -m 'chore(release): ${version}'`
 10. `git push --tags`
+
+#### `make bump` usage
+
+`make bump` runs `lerna publish` (with npm and git push disabled) to bump all required files. You can pass options to lerna with the `opts` environment variable. See the [lerna publish docs][lerna-publish] for available options. The most important options are:
+
+- `--preid` - Used to specify the pre-release identifier
+    - Default: `alpha`
+    - Valid: `alpha`, `beta`
+- `--cd-version` - Used to specify a semantic version bump
+    - Default: `prerelease`
+    - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
+    - See [semver.inc][semver-inc] for keyword meanings
+- `--repo-version` - Used to specify an explicit version
+
+```shell
+# by default, bump to next alpha prerelease:
+#   e.g. 3.0.0 -> 3.0.1-alpha.0
+#   e.g. 3.0.1-alpha.0 -> 3.0.1-alpha.1
+make bump
+
+# equivalent to above
+make bump opts="--preid=alpha --cd-version=prerelease"
+
+# bump to a beta version
+make bump opts="--preid=beta"
+
+# prerelease minor version bump (e.g. 3.0.0 -> 3.1.0-alpha.0)
+make bump opts="--cd-version=preminor"
+
+# minor version bump (e.g. 3.0.0-alpha.0 -> 3.1.0)
+make bump opts="--cd-version=minor"
+
+# bump to an explicit version
+make bump opts="--repo-version=42.0.0"
+```
 
 ## Prior Art
 
@@ -243,3 +277,5 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [yarn-install]: https://yarnpkg.com/en/docs/install
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
+[lerna-publish]: https://github.com/lerna/lerna#publish
+[semver-inc]: https://github.com/npm/node-semver#functions

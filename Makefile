@@ -1,5 +1,5 @@
 # opentrons platform makefile
-# https://github.com/OpenTrons/opentrons
+# https://github.com/Opentrons/opentrons
 
 SHELL := /bin/bash
 
@@ -8,11 +8,7 @@ PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
 API_LIB_DIR := api-server-lib
-COMPONENTS_DIR := components
-APP_DIR := app
-APP_SHELL_DIR := app-shell
-LABWARE_DEFINITIONS_DIR := shared-data
-PROTOCOL_DESIGNER_DIR := protocol-designer
+SHARED_DATA_DIR := shared-data
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -31,13 +27,13 @@ install:
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	yarn
-	$(MAKE) -C $(LABWARE_DEFINITIONS_DIR) build
+	$(MAKE) -C $(SHARED_DATA_DIR) build
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: uninstall
 uninstall:
-	shx rm -rf '**/node_modules'
+	lerna clean
 
 # install flow typed definitions for all JS projects that use flow
 # typedefs are commited, so only needs to be run when we want to update
@@ -95,3 +91,11 @@ lint-css:
 .PHONY: coverage
 coverage:
 	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy
+
+# TODO(mc, 2018-06-06): update publish call and echo note when lerna splits
+# version bump and publish: https://github.com/lerna/lerna/issues/961
+.PHONY: bump
+bump:
+	@echo "Bumping versions"
+	@echo "(please ignore lerna mentioning 'publish'; publish is disabled)"
+	lerna publish $(opts)
