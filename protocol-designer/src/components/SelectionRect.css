@@ -1,12 +1,10 @@
-@value rectColor: rgba(0, 120, 255, 0.2);
-
 .selection_rect {
   pointer-events: none; /* prevents this div from occluding wells during document.elementFromPoint sampling */
 }
 
 rect.selection_rect {
   /* svg version */
-  fill: rectColor;
+  fill: var(--c-overlay);
   stroke: gray;
   stroke-width: 0.4;
   stroke-dasharray: 0.75, 0.5;
@@ -14,7 +12,7 @@ rect.selection_rect {
 
 div.selection_rect {
   /* normal html version */
-  background-color: rectColor;
+  background-color: var(--c-overlay);
   position: fixed;
   z-index: 1000;
   border-radius: 0;

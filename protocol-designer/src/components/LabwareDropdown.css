@@ -1,6 +1,11 @@
 @import '@opentrons/components';
 
-@value disable_select, close from '../css/mixins.css';
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
 
 .labware_dropdown {
   position: absolute;
@@ -14,7 +19,7 @@
   border: 3px solid darkgray;
   z-index: 500;
   color: var(--c-font-dark);
-  composes: disable_select;
+  user-select: none;
 }
 
 .labware_dropdown label {
@@ -23,7 +28,8 @@
   font-weight: bold;
 }
 
-.labware_dropdown > ul {
+.labware_dropdown ul {
+  list-style-type: none;
   background-color: white;
 
   /* Overflowing, even just y, messes with tooltips... */

@@ -2,23 +2,7 @@
  * (more specifically, top of relative parent)
  */
 @import '@opentrons/components';
-
-/* TODO Ian 2018-01-24 generic column fraction classes available in component css? */
-.column_1_2 {
-  lost-column: 1/2;
-}
-
-.column_1_3 {
-  lost-column: 1/3;
-}
-
-.column_2_3 {
-  lost-column: 2/3;
-}
-
-.column_1_4 {
-  lost-column: 1/4;
-}
+@import '../css/grid.css';
 
 .form {
   background-color: white;
