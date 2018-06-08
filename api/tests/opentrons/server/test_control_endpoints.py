@@ -202,7 +202,7 @@ async def test_trash_attached(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    res = await cli.get('/trash/attached')
+    res = await cli.get('/trash')
     assert res.status == 200
 
     text = await res.text()
@@ -220,7 +220,7 @@ async def test_trash_attached(
     monkeypatch.setattr(robot._driver, '_send_command', _send_command_mock)
     robot._driver.simulating = False
 
-    res = await cli.get('/trash/attached')
+    res = await cli.get('/trash')
     assert res.status == 200
 
     text = await res.text()
