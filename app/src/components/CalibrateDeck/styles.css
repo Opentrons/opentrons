@@ -30,3 +30,7 @@
     height: auto;
   }
 }
+
+.error {
+  padding-left: 1rem;
+}

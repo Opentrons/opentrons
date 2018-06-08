@@ -9,7 +9,7 @@ type Props = {
   error: Error
 }
 
-const HEADING = 'Error'
+const HEADING = 'Unexpected Error'
 export default function ErrorModal (props: Props) {
   const {error, closeUrl} = props
 
@@ -19,9 +19,11 @@ export default function ErrorModal (props: Props) {
       buttons={[
         {children: 'close', Component: Link, to: closeUrl}
       ]}
+      alertOverlay
     >
-      <p>Something went wrong</p>
-      {error.message}
+      <p><em>{error.message}</em></p>
+      <p>An unexpected error has cleared your deck calibration progress, please try again.</p>
+      <p>If you keep getting this message, try restarting your robot. If this does not resolve the issue please contact Opentrons Support.</p>
     </AlertModal>
   )
 }
