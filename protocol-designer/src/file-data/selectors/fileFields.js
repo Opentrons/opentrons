@@ -13,5 +13,5 @@ export const fileFormValues = createSelector(
 
 export const isUnsavedMetadatFormAltered = createSelector(
   rootSelector,
-  state => (_.isEqual(state.unsavedMetadataForm, state.fileMetadata))
+  state => !_.isEqual(state.unsavedMetadataForm, state.fileMetadata)
 )

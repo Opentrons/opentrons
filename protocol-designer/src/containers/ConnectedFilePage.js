@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 
@@ -10,22 +9,21 @@ import {actions, selectors} from '../file-data'
 import type {FileMetadataFields} from '../file-data'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
-export default connect(mapStateToProps, null, mergeProps)(FilePage)
-
 type Props = React.ElementProps<typeof FilePage>
-type StateProps = {
+type SP = {
   instruments: $PropertyType<Props, 'instruments'>,
   _values: {[string]: string}
 }
+type DP = {
+  _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
+  saveFileMetadata: () => void
+}
 
-function mapStateToProps (state: BaseState): StateProps {
-  const formValues = selectors.fileFormValues(state)
-  const isFormAltered = selectors.isUnsavedMetadatFormAltered(state)
+const mapStateToProps = (state: BaseState): SP => {
   const pipetteData = selectors.pipettesForInstrumentGroup(state)
-
   return {
-    _values: formValues,
-    isFormAltered,
+    _values: selectors.fileFormValues(state),
+    isFormAltered: selectors.isUnsavedMetadatFormAltered(state),
     instruments: {
       left: pipetteData.find(i => i.mount === 'left'),
       right: pipetteData.find(i => i.mount === 'right')
@@ -33,16 +31,19 @@ function mapStateToProps (state: BaseState): StateProps {
   }
 }
 
-function mergeProps (
-  stateProps: StateProps,
-  dispatchProps: {dispatch: Dispatch<*>}
-): Props {
-  const {instruments, isFormAltered, _values} = stateProps
-  const {dispatch} = dispatchProps
+const mapDispatchToProps = {
+  _updateFileMetadataFields: actions.updateFileMetadataFields,
+  _saveFileMetadata: actions.saveFileMetadata
+}
 
+const mergeProps = (
+  {instruments, isFormAltered, _values}: SP,
+  {_updateFileMetadataFields, _saveFileMetadata}: DP,
+  props: Props
+) => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
-      dispatch(actions.updateFileMetadataFields({[accessor]: e.target.value}))
+      _updateFileMetadataFields({[accessor]: e.target.value})
     } else {
       console.warn('Invalid accessor in ConnectedFilePage:', accessor)
     }
@@ -51,8 +52,12 @@ function mergeProps (
   const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, _values)
 
   return {
+    ...props,
     formConnector,
     isFormAltered,
-    instruments
+    instruments,
+    saveFileMetadata: () => _saveFileMetadata(_values)
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FilePage)
