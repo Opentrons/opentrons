@@ -33,6 +33,7 @@ type Props = OwnProps & StateProps & DispatchProps
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot Name'
 const SERVER_VERSION_LABEL = 'Server version'
+const FIRMWARE_VERSION_LABEL = 'Firmware version'
 
 export default connect(makeMapStateToProps, mapDispatchToProps)(InformationCard)
 
@@ -47,6 +48,7 @@ function InformationCard (props: Props) {
 
   const realName = (health && health.name) || name
   const version = (health && health.api_version) || 'Unknown'
+  const firmwareVersion = (health && health.fw_version) || 'Unknown'
   const updateText = availableUpdate
     ? 'Update'
     : 'Updated'
@@ -65,6 +67,10 @@ function InformationCard (props: Props) {
       <LabeledValue
         label={SERVER_VERSION_LABEL}
         value={version}
+      />
+      <LabeledValue
+        label={FIRMWARE_VERSION_LABEL}
+        value={firmwareVersion}
       />
       <OutlineButton
         Component={Link}

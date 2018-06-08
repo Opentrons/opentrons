@@ -40,7 +40,7 @@
 
   & > .title_bar {
     background-color: var(--c-bg-selected);
-    color: var(--c-highlight);
+    color: var(--c-selected-dark);
 
     & svg {
       color: var(--c-highlight);

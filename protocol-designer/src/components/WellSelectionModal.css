@@ -1,6 +1,7 @@
 @import '@opentrons/components';
 
 .inverted_text {
+  font-size: var(--fs-body-2);
   color: var(--c-white);
 }
 

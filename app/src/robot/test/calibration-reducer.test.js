@@ -413,7 +413,8 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: null
-      }
+      },
+      confirmedBySlot: {}
     })
     expect(reducer(state, failure).calibration).toEqual({
       calibrationRequest: {
@@ -421,7 +422,8 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         inProgress: false,
         error: new Error('AH')
-      }
+      },
+      confirmedBySlot: {}
     })
   })
 

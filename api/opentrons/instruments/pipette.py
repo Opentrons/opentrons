@@ -250,7 +250,7 @@ class Pipette:
         if self.has_tip_rack():
             try:
                 next_tip = next(self.tip_rack_iter)
-            except StopIteration as e:
+            except StopIteration:
                 raise RuntimeWarning(
                     '{0} has run out of tips'.format(self.name))
         else:

@@ -67,7 +67,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
       iconName: 'dots-horizontal',
       isBottom: true,
       title: 'more',
-      url: '/menu/app',
+      url: '/menu',
       notification: moreNotification
     }
   }

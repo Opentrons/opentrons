@@ -15,6 +15,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
+from ot2serverlib import endpoints
 
 from argparse import ArgumentParser
 
@@ -154,11 +155,11 @@ def init(loop=None):
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(
-        '/server/update', update.install_api)
+        '/server/update', endpoints.update_api)
     server.app.router.add_post(
-        '/server/update/firmware', update.update_firmware)
+        '/server/update/firmware', endpoints.update_firmware)
     server.app.router.add_post(
-        '/server/restart', control.restart)
+        '/server/restart', endpoints.restart)
     server.app.router.add_post(
         '/calibration/deck/start', dc_endp.start)
     server.app.router.add_post(

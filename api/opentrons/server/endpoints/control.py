@@ -2,7 +2,6 @@ import asyncio
 import os
 import json
 import logging
-from time import sleep
 from aiohttp import web
 from threading import Thread
 from opentrons import robot, instruments
@@ -320,15 +319,3 @@ async def take_picture(request):
         return web.json_response({'message': 'picture not saved'}, status=500)
 
     return web.FileResponse(filename)
-
-
-async def restart(request):
-    """
-    Returns OK, then waits approximately 3 seconds and restarts container
-    """
-    def wait_and_restart():
-        log.info('Restarting server')
-        sleep(3)
-        os.system('kill 1')
-    Thread(target=wait_and_restart).start()
-    return web.json_response({"message": "restarting"})

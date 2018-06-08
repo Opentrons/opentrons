@@ -4,9 +4,11 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [requires]
 
 python_version = "3.6"
+
 
 [dev-packages]
 
@@ -21,6 +23,8 @@ twine = "==1.8.1"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 
+
 [packages]
 
 "e1839a8" = {path = ".", editable = true}
+"f7933a7" = {path = "../api-server-lib", editable = true}
