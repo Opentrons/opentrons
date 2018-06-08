@@ -16,7 +16,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 def setup(max_speed):
     x_current = robot.config.high_current['X'] * 0.8
-    y_current = robot.config.high_current['X'] * 0.8
+    y_current = robot.config.high_current['Y'] * 0.8
     robot._driver.set_active_current(
         {'X': x_current, 'Y': y_current})
     robot._driver.set_axis_max_speed({'X': max_speed, 'Y': max_speed})
