@@ -500,6 +500,11 @@ class SmoothieDriver_3_0_0:
     @property
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
+        if self.simulating:
+            return {
+                key: False
+                for key in ['X', 'Y', 'Z', 'A', 'B', 'C', 'Probe']
+            }
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 

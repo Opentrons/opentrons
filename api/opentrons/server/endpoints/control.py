@@ -48,6 +48,27 @@ async def get_attached_pipettes(request):
     return web.json_response(robot.get_attached_pipettes())
 
 
+async def get_trash_lid_attached(request):
+    """
+    Query driver for engaged state by the tip-probe switches. Response key will
+    be trash_bin, and value will be True for if the trash_bin is attached, and
+    False if the trash_bin is removed.
+
+    The tip-probe switches are engaged if the trash_bin is still placed on top
+    of it, due to a small piece of plastic pressing down on the Z switch. It
+    will be fully disengaged when the lid is removed by the user.
+
+    Response shape example:
+        {"trash_bin": {"attached": true}}
+    """
+    return web.json_response({
+        'trash_bin': {
+            'attached': robot._driver.switch_state.get('Probe')
+            }
+        }
+    )
+
+
 async def get_engaged_axes(request):
     """
     Query driver for engaged state by axis. Response keys will be axes XYZABC
