@@ -28,7 +28,8 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     onSave: fields => {
       dispatch(fileActions.saveFileMetadata({
-        name: fields.name || ''
+        name: fields.name || '',
+        description: ''
       }))
 
       dispatch(fileActions.updatePipettes({

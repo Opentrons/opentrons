@@ -9,9 +9,9 @@ import {actions, selectors} from '../file-data'
 import type {FileMetadataFields} from '../file-data'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
-type Props = React.ElementProps<typeof FilePage>
+type OP = React.ElementProps<typeof FilePage>
 type SP = {
-  instruments: $PropertyType<Props, 'instruments'>,
+  instruments: $PropertyType<OP, 'instruments'>,
   _values: {[string]: string}
 }
 type DP = {
@@ -39,7 +39,7 @@ const mapDispatchToProps = {
 const mergeProps = (
   {instruments, isFormAltered, _values}: SP,
   {_updateFileMetadataFields, _saveFileMetadata}: DP,
-  props: Props
+  ownProps: OP
 ) => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
@@ -52,7 +52,7 @@ const mergeProps = (
   const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, _values)
 
   return {
-    ...props,
+    ...ownProps,
     formConnector,
     isFormAltered,
     instruments,
