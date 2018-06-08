@@ -4,6 +4,7 @@
 const {app, Menu} = require('electron')
 
 const pkg = require('../package.json')
+const config = require('./config').getConfig()
 
 // file or application menu
 const firstMenu = {
@@ -25,8 +26,9 @@ if (process.platform === 'darwin') {
       {role: 'hide'},
       {role: 'hideothers'},
       {role: 'unhide'},
-      {type: 'separator'}
-    ].concat(firstMenu.submenu)
+      {type: 'separator'},
+      ...firstMenu.submenu
+    ]
   })
 }
 
@@ -43,11 +45,19 @@ const editMenu = {
 const viewMenu = {
   label: 'View',
   submenu: [
-    {role: 'reload'},
-    {role: 'forcereload'},
-    {type: 'separator'},
     {role: 'togglefullscreen'}
   ]
+}
+
+if (config.devtools) {
+  Object.assign(viewMenu, {
+    submenu: [
+      {role: 'reload'},
+      {role: 'forcereload'},
+      {type: 'separator'},
+      ...viewMenu.submenu
+    ]
+  })
 }
 
 const windowMenu = {
