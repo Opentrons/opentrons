@@ -6,7 +6,6 @@ import {createSelector} from 'reselect'
 
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
@@ -15,19 +14,15 @@ import {uuid} from '../../utils.js'
 
 import type {DeckSlot} from '@opentrons/components'
 
-import {
-  editableIngredFields,
-  persistedIngredFields
-} from '../types'
+import type {LabwareLiquidState} from '../../step-generation'
 
 import type {
   IngredInputFields,
+  IngredientGroups,
   AllIngredGroupFields,
+  PersistedIngredInputFields,
   Labware,
-  Wells,
-  IngredsForLabware,
-  IngredsForAllLabware,
-  IngredInstance
+  Wells
 } from '../types'
 import * as actions from '../actions'
 import type {BaseState, Selector} from '../../types'
@@ -69,23 +64,6 @@ const selectedContainerId = handleActions({
 
   OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId => action.payload.labwareId,
   CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null
-}, null)
-
-type SelectedIngredientGroupState = {|
-  groupId: string,
-  wellName: string
-|} | null
-
-const selectedIngredientGroup = handleActions({
-  // selected ingredient group to edit
-  // TODO: SelectedIngredientGroupState is type of payload, type the action though
-  EDIT_MODE_INGREDIENT_GROUP: (state, action: ActionType<typeof actions.editModeIngredientGroup>) =>
-    action.payload,
-  OPEN_INGREDIENT_SELECTOR: () => null,
-  EDIT_INGREDIENT: () => null, // unselect ingredient group when edited.
-  DELETE_INGREDIENT: () => null, // unselect ingredient group when deleted.
-  CLOSE_INGREDIENT_SELECTOR: () => null,
-  OPEN_RENAME_LABWARE_FORM: () => null
 }, null)
 
 type RenameLabwareFormModeState = boolean
@@ -163,31 +141,20 @@ export const savedLabware = handleActions({
   })
 }, {})
 
-type IngredientsState = {
-  [ingredGroupId: string]: IngredInputFields
-}
+type IngredientsState = IngredientGroups
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    const { groupId, isUnchangedClone } = action.payload
-    if (!(groupId in state)) {
-      // is a new ingredient
-      return {
-        ...state,
-        [groupId]: pick(action.payload, persistedIngredFields)
-      }
+    const {groupId, description, individualize, name, serializeName} = action.payload
+    const ingredFields: PersistedIngredInputFields = {
+      description,
+      individualize,
+      name,
+      serializeName
     }
 
-    if (isUnchangedClone) {
-      // for an unchanged clone, do nothing
-      return state
-    }
-
-    // otherwise, create a new ingredient group
     return {
       ...state,
-      [groupId]: {
-        ...pick(action.payload, persistedIngredFields)
-      }
+      [groupId]: ingredFields
     }
   },
   // Remove the deleted group (referenced by array index)
@@ -201,32 +168,18 @@ export const ingredients = handleActions({
   }
 }, {})
 
-type LocationsState = {
-  [ingredGroupId: string]: IngredInstance
-}
+type LocationsState = LabwareLiquidState
 
 export const ingredLocations = handleActions({
   EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
-    const { groupId, containerId, isUnchangedClone } = action.payload
+    const {groupId, containerId} = action.payload
 
-    function wellsWithVol (acc, well) {
+    function wellsWithVol (acc: {[well: string]: {volume: number}}, well: string) {
       return {
         ...acc,
         [well]: {
-          volume: action.payload.volume
-        }
-      }
-    }
-
-    if (isUnchangedClone) {
-      // for an unchanged clone, just add the new wells.
-      return {
-        ...state,
-        [groupId]: {
-          ...state[groupId],
-          [containerId]: {
-            ...state[groupId][containerId],
-            ...action.payload.wells.reduce(wellsWithVol, {})
+          [groupId]: {
+            volume: action.payload.volume
           }
         }
       }
@@ -234,28 +187,31 @@ export const ingredLocations = handleActions({
 
     return {
       ...state,
-      [groupId]: {
-        [containerId]: action.payload.wells.reduce(wellsWithVol, {})
+      [containerId]: {
+        ...state[containerId],
+        ...action.payload.wells.reduce(wellsWithVol, {})
       }
     }
   },
+  // TODO: Ian 2018-06-07
+  //  - refactor to allow clearing multiple wells vs (probably) deleting all
+  //      instances of an ingredient group
+  //  - write tests for this reducer
   DELETE_INGREDIENT: (state: LocationsState, action: DeleteIngredient) => {
-    const { wellName, groupId, containerId } = action.payload
+    const {wellName, groupId, containerId} = action.payload
     if (wellName) {
       // deleting single well location
       return {
         ...state,
-        [groupId]: {
-          ...state[groupId],
-          [containerId]: pickBy(
-            state[groupId][containerId],
-            (wellData: *, wellKey: string) => wellKey !== wellName
-          )
+        [containerId]: {
+          ...omit(state[containerId], wellName)
         }
       }
     }
     // deleting entire ingred group
-    return omit(state, [groupId])
+    // TODO: Ian 2018-06-07
+    console.warn(`TODO: User tried to delete ingred group: ${groupId}. Deleting entire ingred group not supported yet`)
+    return state
   },
   COPY_LABWARE: (state: LocationsState, action: CopyLabware) => {
     const {fromContainer, toContainer} = action.payload
@@ -277,7 +233,6 @@ export type RootState = {|
   modeLabwareSelection: string | false, // TODO use null, not false
   copyLabwareMode: string | false,
   selectedContainerId: SelectedContainerId,
-  selectedIngredientGroup: SelectedIngredientGroupState,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
@@ -290,7 +245,6 @@ const rootReducer = combineReducers({
   modeLabwareSelection,
   copyLabwareMode,
   selectedContainerId,
-  selectedIngredientGroup,
   containers,
   savedLabware,
   ingredients,
@@ -376,57 +330,21 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
     {})
 )
 
-const ingredFields = [...editableIngredFields, 'groupId']
-
-// TODO move these to types.js
-type IngredGroupField = {
-  groupId: string,
-  ...IngredInputFields
-}
-
+// TODO Ian 2018-07-06 consolidate into types.js
 type IngredGroupFields = {
-  [ingredGroupId: string]: IngredGroupField
+  [ingredGroupId: string]: {
+    groupId: string,
+    ...IngredInputFields
+  }
 }
-const allIngredientGroupFields: BaseState => AllIngredGroupFields = createSelector(
+const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
   getIngredientGroups,
   (ingreds) => reduce(
     ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
       ...acc,
-      [ingredGroupId]: pick(ingredGroup, ingredFields)
+      [ingredGroupId]: ingredGroup
     }), {})
-)
-
-const ingredientsByLabware: Selector<IngredsForAllLabware> = createSelector(
-  getLabware,
-  getIngredientGroups,
-  getIngredientLocations,
-  (_labware: ContainersState, _ingredientGroups: IngredientsState, _ingredLocations: LocationsState) => {
-    const allLabwareIds = Object.keys(_labware)
-    const allIngredIds = Object.keys(_ingredientGroups)
-
-    return allLabwareIds.reduce((acc: IngredsForAllLabware, labwareId: string) => {
-      const ingredsForThisLabware: IngredsForLabware = allIngredIds.reduce(
-        (ingredAcc: IngredsForLabware, ingredId: string) => {
-          if (_ingredLocations[ingredId] && _ingredLocations[ingredId][labwareId]) {
-            return {
-              ...ingredAcc,
-              [ingredId]: {
-                groupId: ingredId,
-                ..._ingredientGroups[ingredId],
-                wells: _ingredLocations[ingredId][labwareId]
-              }
-            }
-          }
-          return ingredAcc
-        }, {})
-
-      return {
-        ...acc,
-        [labwareId]: ingredsForThisLabware
-      }
-    }, {})
-  }
 )
 
 const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
@@ -465,8 +383,6 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
-const getSelectedIngredientGroup = (state: BaseState) => rootSelector(state).selectedIngredientGroup
-
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -489,8 +405,6 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
-  getSelectedIngredientGroup,
-  ingredientsByLabware,
   labwareOptions
 }
 

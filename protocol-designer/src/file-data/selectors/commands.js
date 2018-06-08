@@ -5,11 +5,12 @@ import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import type {BaseState, Selector} from '../../types'
+import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import {equippedPipettes} from './pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {IngredInstance, Labware} from '../../labware-ingred/types'
+import type {Labware} from '../../labware-ingred/types'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -17,38 +18,29 @@ const all96Tips = reduce(
   {}
 )
 
-type LiquidState = $PropertyType<StepGeneration.RobotState, 'liquidState'>
-type LabwareLiquidState = $PropertyType<LiquidState, 'labware'>
-
-/** getLabwareLiquidState reshapes data from labwareIngreds.ingredLocations reducer
-  * to match RobotState.liquidState.labware's shape
-  */
-export const getLabwareLiquidState: Selector<LabwareLiquidState> = createSelector(
-  labwareIngredSelectors.getLabware,
+// NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
+export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getIngredientLocations,
-  (labware, ingredLocs) => {
-    const allLabwareIds = Object.keys(labware)
-
-    type WellVolume = {volume: number}
-
-    function getAllIngredsForLabware (labwareId: string) {
-      return reduce(ingredLocs, (ingredAcc: {[wellName: string]: WellVolume}, ingredGroupData: IngredInstance, ingredGroupId: string) => {
-        return {
-          ...ingredAcc,
-          ...reduce(ingredGroupData[labwareId], (wellAcc, wellData: WellVolume, wellName: string) => ({
-            ...wellAcc,
-            [wellName]: {
-              ...ingredAcc[wellName],
-              [ingredGroupId]: wellData
-            }
-          }), {})
-        }
-      }, {})
-    }
-    return allLabwareIds.reduce((acc, labwareId) => ({
-      ...acc,
-      [labwareId]: getAllIngredsForLabware(labwareId)
-    }), {})
+  labwareIngredSelectors.getLabware,
+  (ingredLocations, allLabware) => {
+    const allLabwareIds: Array<string> = Object.keys(allLabware)
+    return allLabwareIds.reduce((
+      acc: StepGeneration.LabwareLiquidState,
+      labwareId
+    ): StepGeneration.LabwareLiquidState => {
+      const allWells = getAllWellsForLabware(allLabware[labwareId].type)
+      const liquidStateForLabwareAllWells = allWells.reduce(
+        (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
+          ...innerAcc,
+          [well]: (ingredLocations[labwareId] && ingredLocations[labwareId][well]) || {}
+        }),
+        {}
+      )
+      return {
+        ...acc,
+        [labwareId]: liquidStateForLabwareAllWells
+      }
+    }, {})
   }
 )
 

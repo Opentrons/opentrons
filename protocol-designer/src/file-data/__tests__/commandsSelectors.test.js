@@ -1,93 +1,73 @@
-// @flow
 import {getLabwareLiquidState} from '../selectors'
 
-// TODO Ian 2018-03-09 copied from labware-ingred selectors,
-// you should export fixures for each labwareState & ingredLocs
-// then import here instead of copy-paste
-const labwareState = {
-  'FIXED_TRASH_ID': {
-    type: 'trash-box',
-    name: 'Trash',
-    slot: '12'
-  },
-  container1Id: {
-    slot: '10',
-    type: '96-flat',
-    name: 'Labware 1'
-  },
-  container2Id: {
-    slot: '8',
-    type: '96-deep-well',
-    name: 'Labware 2'
-  },
-  container3Id: {
-    slot: '9',
-    type: 'tube-rack-2ml',
-    name: 'Labware 3'
-  }
-}
+let labwareState
+let ingredLocs
 
-const ingredLocs = {
-  '0': {
-    container1Id: {
-      A1: {volume: 100},
-      B1: {volume: 150}
+beforeEach(() => {
+  labwareState = {
+    'FIXED_TRASH_ID': {
+      type: 'fixed-trash',
+      name: 'Trash',
+      slot: '12'
     },
-    container2Id: {
-      A2: {volume: 105},
-      B2: {volume: 155}
-    }
-  },
-  '1': {
-    container2Id: {
-      A2: {volume: 115}, // added this, no longer exactly matching copy
-      H1: {volume: 111}
+    wellPlateId: {
+      slot: '10',
+      type: '96-flat',
+      name: 'Labware 1'
     },
-    container3Id: {
-      H2: {volume: 222}
+    troughId: {
+      slot: '8',
+      type: 'trough-12row',
+      name: 'Labware 2'
     }
   }
+
+  ingredLocs = {
+    wellPlateId: {
+      A1: {'0': {volume: 100}},
+      B1: {'0': {volume: 150}}
+    },
+    troughId: {
+      A1: {'0': {volume: 105}},
+      A2: {'0': {volume: 155}},
+      A3: {'1': {volume: 115}},
+      A6: {'1': {volume: 111}}
+    }
+  }
+})
+
+function hasAllWellKeys (result) {
+  // make sure each labware has keys for all wells added in
+  expect(Object.keys(result.wellPlateId).length).toBe(96)
+  expect(Object.keys(result.troughId).length).toBe(12)
+  expect(Object.keys(result.FIXED_TRASH_ID).length).toBe(1)
 }
 
 describe('getLabwareLiquidState', () => {
-  test('no liquids', () => {
+  test('no labware + no ingreds', () => {
     expect(getLabwareLiquidState.resultFunc(
       {},
       {}
     )).toEqual({})
   })
 
-  test('selects liquids with multiple ingredient groups & multiple labware', () => {
-    expect(getLabwareLiquidState.resultFunc(
-      labwareState,
-      ingredLocs
-    )).toEqual({
-      container1Id: {
-        A1: {
-          '0': {volume: 100}
-        },
-        B1: {
-          '0': {volume: 150}
-        }
-      },
-      container2Id: {
-        A2: {
-          '0': {volume: 105},
-          '1': {volume: 115}
-        },
-        B2: {
-          '0': {volume: 155}
-        },
-        H1: {
-          '1': {volume: 111}
-        }
-      },
-      container3Id: {
-        H2: {
-          '1': {volume: 222}
-        }
-      },
-      'FIXED_TRASH_ID': {}
-    })
+  test('labware + no ingreds: generate empty well keys', () => {
+    const result = getLabwareLiquidState.resultFunc(
+      {},
+      labwareState
+    )
+
+    hasAllWellKeys(result)
+  })
+
+  test('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
+    const result = getLabwareLiquidState.resultFunc(
+      ingredLocs,
+      labwareState
+    )
+
+    expect(result).toMatchObject(ingredLocs)
+
+    hasAllWellKeys(result)
   })
 })

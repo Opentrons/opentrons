@@ -1,41 +1,44 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { editIngredient, editModeIngredientGroup, deleteIngredient } from '../labware-ingred/actions'
-import { selectors } from '../labware-ingred/reducers'
-import {selectedWellsMaxVolume} from '../top-selectors/well-contents'
+import {connect} from 'react-redux'
+import {
+  editIngredient,
+  editModeIngredientGroup,
+  deleteIngredient,
+  type EditIngredientPayload
+} from '../labware-ingred/actions'
+import {selectors} from '../labware-ingred/reducers'
+import * as wellContentsSelectors from '../top-selectors/well-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 import IngredientPropertiesForm from '../components/IngredientPropertiesForm.js'
-import type {BaseState} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
 type Props = React.ElementProps<typeof IngredientPropertiesForm>
 
-type DispatchProps = {
-  onSave: *,
-  onCancel: *,
-  onDelete: *
+type DP = {
+  onSave: $PropertyType<Props, 'onSave'>,
+  onCancel: $PropertyType<Props, 'onCancel'>,
+  onDelete: $PropertyType<Props, 'onDelete'>,
 }
 
-type StateProps = $Diff<Props, DispatchProps>
+type SP = $Diff<Props, DP>
 
-function mapStateToProps (state: BaseState): StateProps {
-  const selectedIngredGroup = selectors.getSelectedIngredientGroup(state)
+function mapStateToProps (state: BaseState): SP {
   return {
-    editingIngredGroupId: selectedIngredGroup && selectedIngredGroup.groupId,
-    numWellsSelected: wellSelectionSelectors.numWellsSelected(state),
-    selectedWellsMaxVolume: selectedWellsMaxVolume(state),
+    commonSelectedIngred: wellContentsSelectors.getSelectedWellsIngredId(state),
+    selectedWells: Object.keys(wellSelectionSelectors.getSelectedWells(state)),
+    selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),
     allIngredientGroupFields: selectors.allIngredientGroupFields(state)
   }
 }
 
-// TODO Ian 2018-03-08 also type mapDispatchToProps
-
-export default connect(
-  mapStateToProps,
-  {
-    onSave: editIngredient,
-    onCancel: () => editModeIngredientGroup(null), // call with no args
-    onDelete: (groupId: string) => deleteIngredient({groupId})
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
+  return {
+    onSave: (payload: EditIngredientPayload) => dispatch(editIngredient(payload)),
+    onCancel: () => dispatch(editModeIngredientGroup(null)),
+    onDelete: (groupId: string) => dispatch(deleteIngredient({groupId}))
   }
-)(IngredientPropertiesForm)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(IngredientPropertiesForm)

@@ -51,10 +51,15 @@ export function _wellContentsForLabware (
 
   return reduce(
     allWellsForContainer,
-    (wellAcc, well: string): {[well: string]: WellContents} => ({
-      ...wellAcc,
-      [well]: _wellContentsForWell(labwareLiquids[well], well)
-    }),
+    (wellAcc, well: string): {[well: string]: WellContents} => {
+      const wellHasContents = labwareLiquids && labwareLiquids[well]
+      return {
+        ...wellAcc,
+        [well]: wellHasContents
+          ? _wellContentsForWell(labwareLiquids[well], well)
+          : {}
+      }
+    },
     {}
   )
 }
@@ -138,5 +143,39 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
       // TODO LATER: look at filled wells, not all wells.
       : Object.values(maxVolumesByWell)
     return min(maxVolumesList.map(n => parseInt(n)))
+  }
+)
+
+/** Returns the common single ingredient group of selected wells,
+ * or null if there is not a single common ingredient group */
+export const getSelectedWellsIngredId: Selector<?string> = createSelector(
+  wellSelectionSelectors.getSelectedWells,
+  labwareIngredSelectors.getSelectedContainerId,
+  labwareIngredSelectors.getIngredientLocations,
+  (selectedWellsObj, labwareId, allIngreds) => {
+    if (!labwareId) {
+      return null
+    }
+
+    const ingredsInLabware = allIngreds[labwareId]
+    const selectedWells = Object.keys(selectedWellsObj)
+
+    if (!ingredsInLabware || selectedWells.length < 1) {
+      return null
+    }
+
+    const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
+    const initialIngred = initialWellContents && Object.keys(initialWellContents)[0]
+
+    const result = selectedWells.every(well => {
+      if (!ingredsInLabware[well]) {
+        return null
+      }
+
+      const ingreds = Object.keys(ingredsInLabware[well])
+      return ingreds.length === 1 && ingreds[0] === initialIngred
+    })
+
+    return result ? initialIngred : null
   }
 )

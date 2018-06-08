@@ -1,4 +1,5 @@
 // @flow
+// TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
 import React from 'react'
 
 import {IconButton, SidePanel, TitledList} from '@opentrons/components'
@@ -6,12 +7,13 @@ import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
 import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {IngredGroupForLabware, IngredsForLabware} from '../labware-ingred/types'
+import type {IngredientGroups, PersistedIngredInputFields} from '../labware-ingred/types'
+import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
 type EditModeIngredientGroup = (args: {|groupId: string, wellName: ?string|}) => mixed
 
-// Props used by both IngredientsList and IngredGroupCard // TODO
+// Props used by both IngredientsList and IngredGroupCard
 type CommonProps = {|
   editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient,
@@ -19,7 +21,9 @@ type CommonProps = {|
 |}
 
 type CardProps = {|
-  ingredGroup: IngredGroupForLabware,
+  groupId: string,
+  ingredGroup: PersistedIngredInputFields,
+  labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps
 |}
 
@@ -36,9 +40,24 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
   toggleAccordion = () => this.setState({isExpanded: !this.state.isExpanded})
 
   render () {
-    const {ingredGroup, editModeIngredientGroup, deleteIngredient, selected} = this.props
-    const { groupId, serializeName, individualize, description, name, wells } = ingredGroup
-    const { isExpanded } = this.state
+    const {
+      ingredGroup,
+      editModeIngredientGroup,
+      deleteIngredient,
+      selected,
+      groupId,
+      labwareWellContents
+    } = this.props
+    const {serializeName, individualize, description, name} = ingredGroup
+    const {isExpanded} = this.state
+
+    const wellsWithIngred = Object.keys(labwareWellContents).filter(well =>
+      labwareWellContents[well][groupId])
+
+    if (wellsWithIngred.length < 1) {
+      // do not show ingred card if it has no instances for this labware
+      return null
+    }
 
     return (
       <TitledList
@@ -58,8 +77,16 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           <span>Name</span>
           <span />
         </div>
-        {Object.keys(wells).map((well, i) => { // TODO sort keys
-          const {volume} = wells[well]
+        {wellsWithIngred.map((well, i) => {
+          const wellIngredForCard = labwareWellContents[well][groupId]
+          const volume = wellIngredForCard && wellIngredForCard.volume
+
+          if (volume == null) {
+            // TODO: Ian 2018-06-07 use assert
+            console.warn(`Got null-ish volume for well: ${well}, ingred: ${groupId}`)
+            return null
+          }
+
           return <IngredIndividual key={well}
             name={individualize
               ? `${serializeName || 'Sample'} ${i + 1}` // TODO IMMED SORT AND NUMBER
@@ -68,7 +95,6 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
             wellName={well}
             canDelete
             volume={volume}
-            // concentration={get(ingredCategoryData, ['wellDetails', wellName, 'concentration'], ingredCategoryData.concentration)}
             groupId={groupId}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
@@ -119,15 +145,17 @@ function IngredIndividual (props: IndividProps) {
 
 type Props = {
   ...CommonProps,
-  ingredients: IngredsForLabware,
-  selectedIngredientGroupId: string | null,
+  ingredientGroups: IngredientGroups,
+  labwareWellContents: SingleLabwareLiquidState,
+  selectedIngredientGroupId: ?string,
   renameLabwareFormMode: boolean,
   openRenameLabwareForm: () => mixed
 }
 
 export default function IngredientsList (props: Props) {
   const {
-    ingredients,
+    labwareWellContents,
+    ingredientGroups,
     editModeIngredientGroup,
     deleteIngredient,
     selectedIngredientGroupId,
@@ -146,12 +174,14 @@ export default function IngredientsList (props: Props) {
           onClick={openRenameLabwareForm}
         />
 
-        {ingredients && Object.keys(ingredients).map((i) =>
-          <IngredGroupCard key={i}
+        {Object.keys(ingredientGroups).map((groupIdForCard) =>
+          <IngredGroupCard key={groupIdForCard}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
-            ingredGroup={ingredients[i]}
-            selected={selectedIngredientGroupId === ingredients[i].groupId}
+            labwareWellContents={labwareWellContents}
+            ingredGroup={ingredientGroups[groupIdForCard]}
+            groupId={groupIdForCard}
+            selected={selectedIngredientGroupId === groupIdForCard}
           />)
         }
     </SidePanel>

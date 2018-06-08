@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectors} from '../labware-ingred/reducers'
+import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import {editModeIngredientGroup, deleteIngredient, openRenameLabwareForm} from '../labware-ingred/actions'
 import type {BaseState, ThunkDispatch} from '../types'
 
@@ -18,13 +19,13 @@ type DP = {
 type SP = $Diff<Props, DP>
 
 function mapStateToProps (state: BaseState): SP {
-  // TODO Ian 2018-02-21 put these selectors in Header
   const container = selectors.getSelectedContainer(state)
-  const selectedIngredientGroup = selectors.getSelectedIngredientGroup(state)
+
   return {
     renameLabwareFormMode: selectors.getRenameLabwareFormMode(state),
-    ingredients: container ? selectors.ingredientsByLabware(state)[container.id] : {},
-    selectedIngredientGroupId: selectedIngredientGroup && selectedIngredientGroup.groupId,
+    ingredientGroups: selectors.getIngredientGroups(state),
+    labwareWellContents: (container && selectors.getIngredientLocations(state)[container.id]) || {},
+    selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsIngredId(state),
     selected: false
   }
 }

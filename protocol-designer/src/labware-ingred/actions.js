@@ -8,7 +8,6 @@ import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
-import {editableIngredFields} from './types'
 import type {IngredInputFields} from './types'
 import type {DeckSlot} from '@opentrons/components'
 
@@ -153,31 +152,30 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
 export type EditIngredient = {
   type: 'EDIT_INGREDIENT',
   payload: {
-    name: string,
+    ...IngredInputFields,
     containerId: string,
     groupId: string,
     wells: Array<string>,
-    isUnchangedClone: boolean,
-    ...IngredInputFields
   }
 }
 
-export const editIngredient = (payload: {|
+export type EditIngredientPayload = {
   ...IngredInputFields,
-  groupId: string | null,
-  copyGroupId: string | null
-|}) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
+  groupId: string | null // null indicates new ingredient is being created
+}
+
+export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.getSelectedContainer(state)
   const allIngredients = selectors.getIngredientGroups(state)
 
-  const {groupId, copyGroupId, ...inputFields} = payload
+  const {groupId, ...inputFields} = payload
 
   if (!container) {
     throw new Error('No container selected, cannot edit ingredient')
   }
 
-  if (groupId && copyGroupId === null) {
+  if (groupId !== null) {
     // Not a copy, just an edit
     return dispatch({
       type: 'EDIT_INGREDIENT',
@@ -185,39 +183,22 @@ export const editIngredient = (payload: {|
         ...inputFields,
         groupId: groupId,
         containerId: container.id,
-        wells: wellSelectionSelectors.selectedWellNames(state),
-        isUnchangedClone: true
+        wells: wellSelectionSelectors.selectedWellNames(state)
       }
     })
   }
 
-  const isUnchangedClone = copyGroupId !== null &&
-    allIngredients[copyGroupId] &&
-    editableIngredFields.every(field =>
-      allIngredients[copyGroupId][field] === payload[field]
-    )
-
-  // TODO Ian 2018-02-19 make selector
+  // TODO: Ian 2018-02-19 make selector
   const nextGroupId: string = ((max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0).toString()
-
-  const name = (
-    copyGroupId &&
-    allIngredients[copyGroupId] &&
-    allIngredients[copyGroupId].name === payload.name
-    )
-    ? (payload.name || '') + ' copy' // todo: copy 2, copy 3 etc.
-    : payload.name
 
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
       ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
-      name,
       containerId: container.id,
-      groupId: (isUnchangedClone && copyGroupId) ? copyGroupId : nextGroupId,
-      wells: wellSelectionSelectors.selectedWellNames(state), // TODO use locations: [slot]: [selected wells]
-      isUnchangedClone
+      groupId: nextGroupId,
+      wells: wellSelectionSelectors.selectedWellNames(state)
     }
   })
 }

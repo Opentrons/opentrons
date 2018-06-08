@@ -19,7 +19,12 @@ describe('DELETE_INGREDIENT action', () => {
     )).toEqual({})
   })
 
-  test('delete ingredient by ingredient group id, when id does exist', () => {
+  test('delete all ingredients in well', () => {
+    const deleteWellAction = {
+      type: 'DELETE_INGREDIENT',
+      payload: {well: 'C1'}
+    }
+
     const prevIngredState = {
       '2': 'blaah',
       '3': {
@@ -56,15 +61,12 @@ describe('DELETE_INGREDIENT action', () => {
 
     expect(ingredients(
       prevIngredState,
-      deleteGroup3
-    )).toEqual({
-      '2': 'blaah',
-      '4': 'blah'
-    })
+      deleteWellAction
+    )).toEqual(prevIngredState)
 
     expect(ingredLocations(
       prevLocationsState,
-      deleteGroup3
+      deleteWellAction
     )).toEqual({
       '2': {
         container1Id: {
@@ -72,7 +74,13 @@ describe('DELETE_INGREDIENT action', () => {
           A2: {volume: 123}
         }
       },
-      // 3 is deleted
+      '3': {
+        container1Id: {
+          A1: {volume: 111},
+          B1: {volume: 112},
+          C1: {volume: 113}
+        }
+      },
       '4': {
         container1Id: {
           C1: {volume: 100},
@@ -81,6 +89,9 @@ describe('DELETE_INGREDIENT action', () => {
       }
     })
   })
+
+  // TODO Ian 2018-06-07 rewrite this test when 'delete all ingreds in group' is re-implemented
+  test.skip('delete ingredient by ingredient group id, when id does exist', () => {})
 })
 
 describe('COPY_LABWARE action', () => {
@@ -174,11 +185,13 @@ describe('EDIT_INGREDIENT action', () => {
   const resultingIngred = omit(ingredFields, ['volume'])
 
   test('new ingredient', () => {
+    const ingredGroupId = '0'
+
     const newIngredAction = {
       type: 'EDIT_INGREDIENT',
       payload: {
         ...ingredFields,
-        groupId: '0',
+        groupId: ingredGroupId,
         containerId: 'container1Id',
         wells: ['A1', 'A2', 'A3']
       }
@@ -195,51 +208,80 @@ describe('EDIT_INGREDIENT action', () => {
       {},
       newIngredAction
     )).toEqual({
-      '0': {
-        container1Id: {
-          A1: {volume: 250},
-          A2: {volume: 250},
-          A3: {volume: 250}
-        }
+      container1Id: {
+        A1: {[ingredGroupId]: {volume: 250}},
+        A2: {[ingredGroupId]: {volume: 250}},
+        A3: {[ingredGroupId]: {volume: 250}}
       }
     })
   })
 
-  test.skip('edit ingredient', () => {
-    // TODO
+  test('override ingredients', () => {
+    const copyIngredAction = {
+      type: 'EDIT_INGREDIENT',
+      payload: {
+        name: 'Cool Ingredient',
+        serializeName: false,
+        volume: 250,
+        description: 'far out!',
+        individualize: false,
+
+        containerId: 'container1Id',
+        groupId: 'newIngredId',
+        wells: ['B1', 'B2']
+      }
+    }
+
+    const prevLocationsState = {
+      container1Id: {
+        A1: {oldIngredId: {volume: 250}},
+        B1: {oldIngredId: {volume: 250}} // will be overridden
+      }
+    }
+
+    const expectedLocations = {
+      container1Id: {
+        A1: {oldIngredId: {volume: 250}}, // A1 is unchanged
+
+        B1: {newIngredId: {volume: 250}}, // B1 replaced
+        B2: {newIngredId: {volume: 250}} // B2 new
+      }
+    }
+
+    expect(ingredLocations(
+      prevLocationsState,
+      copyIngredAction
+    )).toEqual(expectedLocations)
   })
 
   test('copy ingredient without any changes', () => {
+    const groupId = '0'
     const copyIngredAction = {
       type: 'EDIT_INGREDIENT',
       payload: {
         ...ingredFields,
         containerId: 'container1Id',
-        groupId: 0,
-        copyGroupId: 0,
-        isUnchangedClone: true,
+        groupId,
         wells: ['B1', 'B2'] // new wells
       }
     }
 
     const prevIngredState = {
-      0: {...resultingIngred}
+      [groupId]: {...resultingIngred}
     }
 
     expect(ingredients(
       prevIngredState,
       copyIngredAction
     )).toEqual({
-      0: {...resultingIngred} // no new ingredient group created
+      [groupId]: {...resultingIngred} // no new ingredient group created
     })
 
     const prevLocationsState = {
-      0: {
-        container1Id: {
-          A1: {volume: 250},
-          A2: {volume: 250},
-          A3: {volume: 250}
-        }
+      container1Id: {
+        A1: {[groupId]: {volume: 250}},
+        A2: {[groupId]: {volume: 250}},
+        A3: {[groupId]: {volume: 250}}
       }
     }
 
@@ -247,19 +289,13 @@ describe('EDIT_INGREDIENT action', () => {
       prevLocationsState,
       copyIngredAction
     )).toEqual({
-      0: {
-        container1Id: {
-          A1: {volume: 250},
-          A2: {volume: 250},
-          A3: {volume: 250},
-          B1: {volume: 250},
-          B2: {volume: 250}
-        }
+      container1Id: {
+        A1: {[groupId]: {volume: 250}},
+        A2: {[groupId]: {volume: 250}},
+        A3: {[groupId]: {volume: 250}},
+        B1: {[groupId]: {volume: 250}},
+        B2: {[groupId]: {volume: 250}}
       }
     })
-  })
-
-  test.skip('copy ingredient with changes', () => {
-    // TODO
   })
 })
