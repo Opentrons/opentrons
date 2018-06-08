@@ -148,7 +148,6 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
 
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
- // TODO IMMEDIATELY write test
 export const getSelectedWellsIngredId: Selector<?string> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedContainerId,
