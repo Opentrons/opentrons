@@ -1,3 +1,5 @@
+@import '@opentrons/components';
+
 @value disable_select, close from '../css/mixins.css';
 
 .labware_dropdown {
@@ -11,7 +13,7 @@
   background-color: lightgray;
   border: 3px solid darkgray;
   z-index: 500;
-  color: darkgray;
+  color: var(--c-font-dark);
   composes: disable_select;
 }
 
