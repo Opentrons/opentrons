@@ -5,6 +5,7 @@ import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
 import styles from './FilePage.css'
 import formStyles from '../components/forms.css'
+import KeypressHandler from './KeypressHandler'
 
 type Props = {
   formConnector: FormConnector<FileMetadataFields>,
@@ -19,22 +20,27 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata}:
       <h2>
         Information
       </h2>
+      <KeypressHandler
+        keyHandlers={{enter: saveFileMetadata}}
+        render={({onKeyDown}) => (
+          <React.Fragment>
+            <div className={formStyles.row_wrapper}>
+              <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
+                <InputField onKeyDown={onKeyDown} placeholder='Untitled' {...formConnector('name')} />
+              </FormGroup>
 
-      <div className={formStyles.row_wrapper}>
-        <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
-          <InputField placeholder='Untitled' {...formConnector('name')} />
-        </FormGroup>
+              <FormGroup label='Organization/Author:' className={formStyles.column_1_2}>
+                <InputField onKeyDown={onKeyDown} {...formConnector('author')} />
+              </FormGroup>
+            </div>
 
-        <FormGroup label='Organization/Author:' className={formStyles.column_1_2}>
-          <InputField {...formConnector('author')} />
-        </FormGroup>
-      </div>
-
-      <FormGroup label='Description:'>
-        <InputField {...formConnector('description')}/>
-      </FormGroup>
+            <FormGroup label='Description:'>
+              <InputField onKeyDown={onKeyDown} {...formConnector('description')}/>
+            </FormGroup>
+          </React.Fragment>
+        )} />
       <div className={styles.button_row}>
-        <OutlineButton className={styles.update_button} onClick={saveFileMetadata} disabled={!isFormAltered}>
+        <OutlineButton type="submit" className={styles.update_button} onClick={saveFileMetadata} disabled={!isFormAltered}>
           UPDATE
         </OutlineButton>
       </div>

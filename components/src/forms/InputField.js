@@ -75,6 +75,7 @@ function Input (props: Props) {
           placeholder={props.placeholder}
           onChange={props.onChange}
           onClick={props.onClick}
+          onKeyDown={props.onKeyDown}
           readOnly={props.readOnly}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
