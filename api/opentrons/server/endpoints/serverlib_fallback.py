@@ -1,11 +1,65 @@
+# This file duplicates the implementation of ot2serverlib
 import os
+import asyncio
 import logging
 from time import sleep
 from aiohttp import web
 from threading import Thread
-import ot2serverlib
 
 log = logging.getLogger(__name__)
+
+
+async def _install(filename, loop):
+    proc = await asyncio.create_subprocess_shell(
+        'pip install --upgrade --force-reinstall --no-deps {}'.format(
+            filename),
+        stdout=asyncio.subprocess.PIPE,
+        loop=loop)
+
+    rd = await proc.stdout.read()
+    res = rd.decode().strip()
+    print(res)
+    await proc.wait()
+    return res
+
+
+async def install_py(data, loop):
+    filename = data.filename
+    log.info('Preparing to install: {}'.format(filename))
+    content = data.file.read()
+
+    with open(filename, 'wb') as wf:
+        wf.write(content)
+
+    msg = await _install(filename, loop)
+    log.debug('Install complete')
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    log.debug("Result: {}".format(msg))
+    return {'message': msg, 'filename': filename}
+
+
+async def install_smoothie_firmware(data, loop):
+    from opentrons.server.endpoints.update import _update_firmware
+
+    filename = data.filename
+    log.info('Flashing image "{}", this will take about 1 minute'.format(
+        filename))
+    content = data.file.read()
+
+    with open(filename, 'wb') as wf:
+        wf.write(content)
+
+    msg = await _update_firmware(filename, loop)
+    log.debug('Firmware Update complete')
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    log.debug("Result: {}".format(msg))
+    return {'message': msg, 'filename': filename}
 
 
 async def update_api(request: web.Request) -> web.Response:
@@ -22,15 +76,15 @@ async def update_api(request: web.Request) -> web.Response:
     log.debug('Update request received')
     data = await request.post()
     try:
-        res0 = await ot2serverlib.install_py(
+        res0 = await install_py(
             data['whl'], request.loop)
         reslist = [res0]
         if 'serverlib' in data.keys():
-            res1 = await ot2serverlib.install_py(
+            res1 = await install_py(
                 data['serverlib'], request.loop)
             reslist.append(res1)
         if 'fw' in data.keys():
-            res2 = await ot2serverlib.install_smoothie_firmware(
+            res2 = await install_smoothie_firmware(
                 data['fw'], request.loop)
             reslist.append(res2)
         res = {
@@ -55,8 +109,7 @@ async def update_firmware(request):
     log.debug('Update Firmware request received')
     data = await request.post()
     try:
-        res = await ot2serverlib.install_smoothie_firmware(
-            data['hex'], request.loop)
+        res = await install_smoothie_firmware(data['hex'], request.loop)
         status = 200
     except Exception as e:
         log.exception("Exception during firmware update:")

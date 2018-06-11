@@ -19,10 +19,10 @@ async def _install(filename, loop):
     return res
 
 
-async def install_api(data, loop):
-    filename = data['whl'].filename
+async def install_py(data, loop):
+    filename = data.filename
     log.info('Preparing to install: {}'.format(filename))
-    content = data['whl'].file.read()
+    content = data.file.read()
 
     with open(filename, 'wb') as wf:
         wf.write(content)
@@ -40,10 +40,10 @@ async def install_api(data, loop):
 async def install_smoothie_firmware(data, loop):
     from opentrons.server.endpoints.update import _update_firmware
 
-    filename = data['hex'].filename
+    filename = data.filename
     log.info('Flashing image "{}", this will take about 1 minute'.format(
         filename))
-    content = data['hex'].file.read()
+    content = data.file.read()
 
     with open(filename, 'wb') as wf:
         wf.write(content)
