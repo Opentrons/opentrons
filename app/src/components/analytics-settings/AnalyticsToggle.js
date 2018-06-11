@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import type {State, Dispatch} from '../../types'
 import {toggleAnalyticsOptedIn, getAnalyticsOptedIn} from '../../analytics'
-import LabeledToggle from './LabeledToggle'
+import {LabeledToggle} from '../toggles'
 
 type SP = {
   optedIn: boolean
