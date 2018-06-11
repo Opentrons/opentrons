@@ -29,6 +29,8 @@ type Props = {
   type?: 'text' | 'password',
   /** mouse click handler */
   onClick?: (event: SyntheticMouseEvent<*>) => mixed,
+  /** key press handler */
+  onKeyDown?: (event: SyntheticKeyboardEvent<*>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean
 }
