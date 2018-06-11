@@ -20,7 +20,7 @@ type MP = {
 export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
 
 function mapStateToProps (state: BaseState): SP & MP {
-  const protocolName = fileDataSelectors.fileFormValues(state).name || 'untitled'
+  const protocolName = fileDataSelectors.fileMetadata(state).name || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
 
   return {

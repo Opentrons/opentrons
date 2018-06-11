@@ -29,8 +29,6 @@ type Props = {
   type?: 'text' | 'password',
   /** mouse click handler */
   onClick?: (event: SyntheticMouseEvent<*>) => mixed,
-  /** key press handler */
-  onKeyDown?: (event: SyntheticKeyboardEvent<*>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean
 }
@@ -77,7 +75,6 @@ function Input (props: Props) {
           placeholder={props.placeholder}
           onChange={props.onChange}
           onClick={props.onClick}
-          onKeyDown={props.onKeyDown}
           readOnly={props.readOnly}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}

@@ -1,22 +1,21 @@
 // @flow
-import * as React from 'react'
 import {connect} from 'react-redux'
 import type {BaseState} from '../types'
-
 import FilePage from '../components/FilePage'
-
+import type {FilePageProps} from '../components/FilePage'
 import {actions, selectors} from '../file-data'
 import type {FileMetadataFields} from '../file-data'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
-type OP = React.ElementProps<typeof FilePage>
 type SP = {
-  instruments: $PropertyType<OP, 'instruments'>,
+  instruments: $PropertyType<FilePageProps, 'instruments'>,
+  isFormAltered: boolean,
   _values: {[string]: string}
 }
+
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
-  saveFileMetadata: () => void
+  _saveFileMetadata: ({[string]: string}) => void
 }
 
 const mapStateToProps = (state: BaseState): SP => {
@@ -38,9 +37,8 @@ const mapDispatchToProps = {
 
 const mergeProps = (
   {instruments, isFormAltered, _values}: SP,
-  {_updateFileMetadataFields, _saveFileMetadata}: DP,
-  ownProps: OP
-) => {
+  {_updateFileMetadataFields, _saveFileMetadata}: DP
+): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
       _updateFileMetadataFields({[accessor]: e.target.value})
@@ -52,7 +50,6 @@ const mergeProps = (
   const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, _values)
 
   return {
-    ...ownProps,
     formConnector,
     isFormAltered,
     instruments,

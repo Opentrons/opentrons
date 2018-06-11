@@ -235,7 +235,6 @@ exports[`InputField renders correctly 1`] = `
       <input
         onChange={undefined}
         onClick={undefined}
-        onKeyDown={undefined}
         placeholder="Placeholder Text"
         readOnly={undefined}
         type="text"

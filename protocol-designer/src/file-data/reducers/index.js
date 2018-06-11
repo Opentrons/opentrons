@@ -2,7 +2,7 @@
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
-import {updateFileMetadataFields, updatePipettes} from '../actions'
+import {updateFileMetadataFields, updatePipettes, saveFileMetadata} from '../actions'
 import {pipetteDataByName, type PipetteName} from '../pipetteData'
 
 import type {Mount} from '@opentrons/components'
