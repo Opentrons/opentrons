@@ -45,6 +45,8 @@ Y_RETRACT_DISTANCE = 3
 
 DEFAULT_AXES_SPEED = 400
 
+XY_HOMING_SPEED = 80
+
 HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
@@ -888,6 +890,9 @@ class SmoothieDriver_3_0_0:
 
         # now it is safe to home the X axis
         try:
+            # override firmware's default XY homing speed, to avoid resonance
+            self.push_axis_max_speed()
+            self.set_axis_max_speed({'X': XY_HOMING_SPEED})
             self.activate_axes('X')
             command = '{0} {1}'.format(
                 self._generate_current_command(),
@@ -896,11 +901,16 @@ class SmoothieDriver_3_0_0:
             self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
             self.update_homed_flags(flags={'X': True})
         finally:
+            self.pop_axis_max_speed()
             self.dwell_axes('X')
             self._set_saved_current()
 
     def _home_y(self):
         log.debug("_home_y")
+        # override firmware's default XY homing speed, to avoid resonance
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({'Y': XY_HOMING_SPEED})
+
         self.activate_axes('Y')
         # home the Y at normal speed (fast)
         command = '{0} {1}'.format(
@@ -910,7 +920,6 @@ class SmoothieDriver_3_0_0:
         self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
 
         # slow the maximum allowed speed on Y axis
-        self.push_axis_max_speed()
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
 
         # retract, then home, then retract again
@@ -928,8 +937,8 @@ class SmoothieDriver_3_0_0:
             self.update_homed_flags(flags={'Y': True})
             self._send_command(
                 relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-            self.pop_axis_max_speed()  # bring max speeds back to normal
         finally:
+            self.pop_axis_max_speed()  # bring max speeds back to normal
             self.dwell_axes('Y')
             self._set_saved_current()
 
