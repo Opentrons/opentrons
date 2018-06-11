@@ -3,6 +3,7 @@
 import * as React from 'react'
 import type {ShellUpdate} from '../../shell'
 import {AnalyticsSettingsCard} from '../analytics-settings'
+import AdvancedSettingsCard from './AdvancedSettingsCard'
 import AppInfoCard from './AppInfoCard'
 import AppUpdateModal from './AppUpdateModal'
 
@@ -21,6 +22,9 @@ export default function AppSettings (props: Props) {
       </div>
       <div className={styles.row}>
         <AnalyticsSettingsCard {...props} />
+      </div>
+      <div className={styles.row}>
+        <AdvancedSettingsCard />
       </div>
     </div>
   )

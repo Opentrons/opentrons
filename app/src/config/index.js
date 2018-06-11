@@ -85,3 +85,14 @@ export function configReducer (
 export function getConfig (state: State): Config {
   return state.config
 }
+
+export function getDevToolsOn (state: State): boolean {
+  return state.config.devtools
+}
+
+export function toggleDevTools (): Action {
+  return (dispatch, getState) => {
+    const devToolsOn = getDevToolsOn(getState())
+    return dispatch(updateConfig('devtools', !devToolsOn))
+  }
+}
