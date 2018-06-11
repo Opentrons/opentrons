@@ -77,11 +77,6 @@ if not ff.split_labware_definitions():
             self.assertEqual(well_1.coordinates(), (5.86 + 0, 8.19 + 0, 0))
             self.assertEqual(well_2.coordinates(), (5.86 + 0, 8.19 + 19.3, 0))
 
-        def test_load_all_persisted_containers(self):
-            all_persisted_containers = \
-                old_container_loading.load_all_containers()
-            self.assertEqual(len(all_persisted_containers), 46)
-
         def test_create_container_obj_from_dict(self):
             container_data = """{
                 "origin-offset":{
