@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import ToggleButton from '../ToggleButton'
+import {ToggleButton} from './'
 import styles from './styles.css'
 
 type Props = {

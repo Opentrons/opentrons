@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
-import ToggleButton from '../ToggleButton'
+import {ToggleButton} from '../toggles'
 import styles from './connect-panel.css'
 
 type ListProps = {

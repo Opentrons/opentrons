@@ -122,6 +122,27 @@ exports[`modals Modal renders correctly 1`] = `
 </div>
 `;
 
+exports[`modals Modal renders correctly with optional heading 1`] = `
+<div
+  className="modal foo"
+>
+  <div
+    className="overlay clickable"
+    onClick={[Function]}
+  />
+  <div
+    className="modal_contents"
+  >
+    <h3
+      className="modal_page_heading"
+    >
+      Heading Visible
+    </h3>
+    children
+  </div>
+</div>
+`;
+
 exports[`modals ModalPage renders correctly 1`] = `
 <div
   className="modal"
