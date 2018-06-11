@@ -1,7 +1,5 @@
 // @flow
 // robot actions and action types
-// action helpers
-import {makeActionName} from '../util'
 import {_NAME as NAME} from './constants'
 import type {
   Mount,
@@ -15,7 +13,7 @@ import type {
 } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
-const makeRobotActionName = (action) => makeActionName(NAME, action)
+const makeRobotActionName = (action) => `${NAME}:${action}`
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}

@@ -8,6 +8,7 @@ import type {State, Dispatch} from '../../types'
 import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
 import {getPipette} from '@opentrons/shared-data'
+import createLogger from '../../logger'
 
 import {
   home,
@@ -26,21 +27,38 @@ import ErrorModal from './ErrorModal'
 import InstructionsModal from './InstructionsModal'
 import ExitAlertModal from './ExitAlertModal'
 
+const log = createLogger(__filename)
+
 const RE_STEP = '(1|2|3|4|5|6)'
-const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot; please contact support'
+const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
 
 export default withRouter(
   connect(makeMapStateToProps, mapDispatchToProps)(CalibrateDeck)
 )
 
 function CalibrateDeck (props: CalibrateDeckProps) {
-  const {startRequest, pipetteProps, parentUrl, match: {path}} = props
+  const {
+    startRequest,
+    commandRequest,
+    pipetteProps,
+    parentUrl,
+    match: {path}
+  } = props
 
   if (pipetteProps && !pipetteProps.pipette) {
     return (
       <ErrorModal
         closeUrl={parentUrl}
         error={{name: 'BadData', message: BAD_PIPETTE_ERROR}}
+      />
+    )
+  }
+
+  if (commandRequest.error) {
+    return (
+      <ErrorModal
+        closeUrl={parentUrl}
+        error={commandRequest.error}
       />
     )
   }
@@ -114,7 +132,7 @@ function makeMapStateToProps () {
       : null
 
     if (pipetteProps && !pipetteProps.pipette) {
-      console.error('Invalid pipette received from API', pipetteInfo)
+      log.error('Invalid pipette received from API', {pipetteInfo})
     }
 
     return {
