@@ -106,6 +106,7 @@ export const lastValidWellContents: Selector<{[labwareId: string]: AllWellConten
 )
 
 /** NamedIngred-formatted contents of wells, across all steps on the timeline */
+// TODO: Ian 2018-06-08 do not used NamedIngreds. Stay close to 'native' liquid state shape.
 export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = createSelector(
   allWellContentsForSteps,
   labwareIngredSelectors.getIngredientGroups,

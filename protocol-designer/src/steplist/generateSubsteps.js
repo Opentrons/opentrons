@@ -239,7 +239,7 @@ function commandToMultiRows (
 
   return range(channels).map(channel => {
     const well = wellsForTips[channel]
-    const ingreds = getIngreds(labwareId, command.params.well)
+    const ingreds = getIngreds(labwareId, well)
     const volume = command.params.volume
 
     if (command.command === 'aspirate') {
@@ -287,6 +287,7 @@ export function generateSubsteps (
   orderedSteps: Array<StepIdType>,
   robotStateTimeline: RobotStateTimeline
 ): SubSteps {
+  console.log('generateSubsteps', namedIngredsByLabwareAllSteps)
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
     const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
@@ -315,7 +316,7 @@ export function generateSubsteps (
     ) {
       const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
       const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-      // TODO SOON Ian 2018-05-17 all transferlikes will use this fn in next PR
+
       return transferLikeSubsteps({
         validatedForm,
         allPipetteData,
