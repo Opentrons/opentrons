@@ -101,13 +101,13 @@ def attempt_movement(driver, logger, coords_list):
     for c in coords_list:
         try:
             driver.move(c)
-        except SmoothieError as e:
+        except SmoothieError:
             button_red()
             logger.exception('Failed movement: {}'.format(c))
             driver._reset_from_error()
             try:
                 driver.update_position()
-            except Exception as e:
+            except Exception:
                 pass
             logger.info('Current Smoothie pos: {}'.format(driver.position))
             attempt_homing(driver, logger)
@@ -120,7 +120,7 @@ def attempt_homing(driver, logger):
     driver._setup()
     try:
         driver.home('XYZA')
-    except SmoothieError as e:
+    except SmoothieError:
         button_red()
         attempts_to_home += 1
         logger.exception('Failed homing')
@@ -222,7 +222,7 @@ if __name__ == '__main__':
         attempt_homing(robot._driver, logger)
         test_all_axes(robot._driver, logger)
         run_time_trial(robot._driver, logger)
-    except Exception as e:
+    except Exception:
         button_red()
         logger.exception('Unexpected Error')
         exit()
