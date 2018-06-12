@@ -8,8 +8,9 @@ PATH := $(shell yarn bin):$(PATH)
 # ui directory for production build
 ui_dir := ../app
 
-# api directory for robot API update bundled in production build
+# directories for robot API update bundled in production build
 api_dir := ../api
+api_lib_dir := ../api-server-lib
 
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
@@ -61,8 +62,12 @@ ui:
 api:
 	$(MAKE) -C $(api_dir) wheel
 
+.PHONY: api-lib
+api-lib:
+	$(MAKE) -C $(api_lib_dir) wheel
+
 .PHONY: package-deps
-package-deps: clean ui api
+package-deps: clean ui api api-lib
 
 .PHONY: package
 package: package-deps

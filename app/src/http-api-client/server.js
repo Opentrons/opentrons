@@ -10,7 +10,7 @@ import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
 
 // remote module paths relative to app-shell/lib/main.js
-const {AVAILABLE_UPDATE, getUpdateFile} = remote.require('./api-update')
+const {AVAILABLE_UPDATE, getUpdateFiles} = remote.require('./api-update')
 
 type RequestPath = 'update' | 'restart'
 
@@ -223,10 +223,10 @@ function selectRobotServerState (state: State, props: RobotService) {
 }
 
 function getUpdateRequestBody () {
-  return getUpdateFile()
-    .then((file) => {
+  return getUpdateFiles()
+    .then(files => {
       const formData = new FormData()
-      formData.append('whl', new Blob([file.contents]), file.name)
+      files.forEach(f => formData.append(f.id, new Blob([f.contents]), f.name))
       return formData
     })
     .catch((error) => Promise.reject(FetchError(error)))
