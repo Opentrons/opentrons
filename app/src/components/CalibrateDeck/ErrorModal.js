@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 import {AlertModal} from '@opentrons/components'
+
 import type {Error} from '../../types'
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 }
 
 const HEADING = 'Unexpected Error'
+
 export default function ErrorModal (props: Props) {
   const {error, closeUrl} = props
 

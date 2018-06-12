@@ -12,6 +12,7 @@ import {
   deckCalibrationCommand as dcCommand
 } from '../../http-api-client'
 
+import {chainActions} from '../../util'
 import {ModalPage, SpinnerModalPage} from '@opentrons/components'
 import AttachTip from './AttachTip'
 import ConfirmPosition from './ConfirmPosition'
@@ -106,46 +107,46 @@ function getMovementDescription (props: Props): string {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot, pipette, calibrationStep: step, match: {url}} = ownProps
-  const goToNext = () => dispatch(push(`${url}/step-${Number(step) + 1}`))
-  let proceed
+  const goToNext = push(`${url}/step-${Number(step) + 1}`)
+  let actions
 
   if (step === '1') {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength})
-    ).then(() => dispatch(
-      dcCommand(robot, {command: 'move', point: 'safeZ'})
-    )).then(goToNext)
+    actions = [
+      dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength}),
+      dcCommand(robot, {command: 'move', point: 'safeZ'}),
+      goToNext
+    ]
   } else if (step === '2') {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'save z'})
-    ).then(() => dispatch(
-      dcCommand(robot, {command: 'move', point: '1'})
-    )).then(goToNext)
+    actions = [
+      dcCommand(robot, {command: 'save z'}),
+      dcCommand(robot, {command: 'move', point: '1'}),
+      goToNext
+    ]
   } else if (step === '3') {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'save xy', point: '1'})
-    ).then(() => dispatch(
-      dcCommand(robot, {command: 'move', point: '2'})
-    )).then(goToNext)
+    actions = [
+      dcCommand(robot, {command: 'save xy', point: '1'}),
+      dcCommand(robot, {command: 'move', point: '2'}),
+      goToNext
+    ]
   } else if (step === '4') {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'save xy', point: '2'})
-    ).then(() => dispatch(
-      dcCommand(robot, {command: 'move', point: '3'})
-    )).then(goToNext)
+    actions = [
+      dcCommand(robot, {command: 'save xy', point: '2'}),
+      dcCommand(robot, {command: 'move', point: '3'}),
+      goToNext
+    ]
   } else if (step === '5') {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'save xy', point: '3'})
-    ).then(() => dispatch(
-      dcCommand(robot, {command: 'move', point: 'attachTip'})
-    )).then(goToNext)
+    actions = [
+      dcCommand(robot, {command: 'save xy', point: '3'}),
+      dcCommand(robot, {command: 'move', point: 'attachTip'}),
+      goToNext
+    ]
   } else {
-    proceed = () => dispatch(
-      dcCommand(robot, {command: 'save transform'})
-    ).then(() => dispatch(
-      restartRobotServer(robot))
-    ).then(() => dispatch(push(ownProps.parentUrl)))
+    actions = [
+      dcCommand(robot, {command: 'save transform'}),
+      restartRobotServer(robot),
+      push(ownProps.parentUrl)
+    ]
   }
 
-  return {proceed}
+  return {proceed: () => dispatch(chainActions(...actions))}
 }
