@@ -37,8 +37,9 @@ function SetupInstrumentsPage (props: Props) {
   }
 
   return (
-    <Page>
-      <SessionHeader />
+    <Page
+      titleBar={{title: (<SessionHeader />)}}
+    >
       <InstrumentTabs {...{instruments, currentInstrument}} />
       <Instruments {...props} />
       {currentInstrument && (

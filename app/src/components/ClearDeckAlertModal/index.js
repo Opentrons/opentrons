@@ -29,6 +29,7 @@ export default function ClearDeckAlertModal (props: Props) {
           onClick: onContinueClick
         }
       ]}
+      alertOverlay
     >
       <ul className={styles.alert_list}>
         <li>All tipracks</li>

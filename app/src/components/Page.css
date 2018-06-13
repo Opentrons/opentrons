@@ -1,5 +1,9 @@
 .task {
-  flex: 1 1;
+  flex: 1 1 calc(100% - 22rem);
   position: relative;
-  overflow-y: scroll;
+}
+
+.main {
+  width: 100%;
+  height: calc(100% - 3.5rem);
 }

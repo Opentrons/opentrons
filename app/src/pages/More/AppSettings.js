@@ -39,20 +39,24 @@ function AppSettingsPage (props: Props) {
   const {update, match: {path}} = props
 
   return (
-    <Page>
-      <AppSettings {...props} />
-      <Switch>
-        <Route path={`${path}/update`} render={() => (
-          <AppUpdateModal {...props} close={props.closeUpdateModal} />
-        )} />
-        <Route render={() => {
-          if (update.available && !update.seen) {
-            return (<Redirect to='/menu/app/update' />)
-          }
+    <Page
+      titleBar={{title: 'App'}}
+      modals={(
+        <Switch>
+          <Route path={`${path}/update`} render={() => (
+            <AppUpdateModal {...props} close={props.closeUpdateModal} />
+          )} />
+          <Route render={() => {
+            if (update.available && !update.seen) {
+              return (<Redirect to='/menu/app/update' />)
+            }
 
-          return null
-        }} />
-      </Switch>
+            return null
+          }} />
+        </Switch>
+      )}
+    >
+      <AppSettings {...props} />
     </Page>
   )
 }

@@ -1,14 +1,26 @@
-// task component
-import React from 'react'
+// @flow
+import * as React from 'react'
 
-import styles from './Page.css'
+import {TitleBar, type TitleBarProps} from '@opentrons/components'
 import LostConnectionAlert from './LostConnectionAlert'
 import {AnalyticsSettingsModal} from './analytics-settings'
+import styles from './Page.css'
 
-export default function Page (props) {
+type Props = {
+  titleBar?: TitleBarProps,
+  children: any,
+  modals?: React.Node
+}
+
+export default function Page (props: Props) {
+  const {titleBar, children, modals} = props
   return (
     <main className={styles.task}>
-      {props.children}
+      {titleBar && (<TitleBar {...titleBar} />)}
+      <div className={styles.main}>
+      {children}
+      </div>
+      {modals}
       <LostConnectionAlert />
       <AnalyticsSettingsModal />
     </main>
