@@ -1,7 +1,6 @@
 // @flow
 // labware calibration controls modal
 import * as React from 'react'
-import cx from 'classnames'
 
 import type {Labware} from '../../robot'
 
@@ -25,8 +24,8 @@ export default function ConfirmModal (props: Props) {
 
   // TODO (ka 2018-4-18): this is a temporary workaround for a stlye over ride for in progress screens with transparate bg
   const contentsStyle = labware.calibration.match(/^(moving-to-slot|picking-up|dropping-tip|confirming)$/)
-    ? cx(styles.modal_contents, styles.in_progress_contents)
-    : styles.modal_contents
+    ? styles.in_progress_contents
+    : ''
 
   const titleBar = {
     title: 'Calibrate Deck',

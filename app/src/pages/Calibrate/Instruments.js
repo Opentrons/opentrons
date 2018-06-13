@@ -42,13 +42,13 @@ function SetupInstrumentsPage (props: Props) {
     >
       <InstrumentTabs {...{instruments, currentInstrument}} />
       <Instruments {...props} />
-      {currentInstrument && (
+      {!!currentInstrument && (
         <TipProbe
           {...currentInstrument}
           confirmTipProbeUrl={confirmTipProbeUrl}
         />
       )}
-      {currentInstrument && (
+      {!!currentInstrument && (
         <Route path={confirmTipProbeUrl} render={() => (
           <ConfirmTipProbeModal
             mount={currentInstrument.mount}

@@ -8,7 +8,7 @@ import styles from './Page.css'
 
 type Props = {
   titleBar?: TitleBarProps,
-  children: any,
+  children: React.Node,
   modals?: React.Node
 }
 
@@ -16,9 +16,11 @@ export default function Page (props: Props) {
   const {titleBar, children, modals} = props
   return (
     <main className={styles.task}>
-      {titleBar && (<TitleBar {...titleBar} />)}
+      {titleBar && (
+        <TitleBar {...titleBar} />
+      )}
       <div className={styles.main}>
-      {children}
+        {children}
       </div>
       {modals}
       <LostConnectionAlert />

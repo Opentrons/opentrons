@@ -1,9 +1,13 @@
 @import '..';
 
+:root {
+  --navbar-width: 4.5rem;
+}
+
 .navbar {
   flex: none;
   position: relative;
-  width: 4.5rem;
+  width: var(--navbar-width);
   height: 100%;
   background-color: var(--c-bg-light);
   border-right: var(--bd-light);

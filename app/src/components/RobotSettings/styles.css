@@ -6,10 +6,8 @@
 }
 
 .robot_settings {
-  overflow-y: auto;
   padding: calc(2 * var(--robot_settings_card_spacing));
   padding-bottom: 0;
-  max-height: 100%;
 }
 
 .row {
