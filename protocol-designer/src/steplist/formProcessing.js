@@ -167,7 +167,7 @@ function _vapTransferLike (
 
     if (stepType === 'transfer') {
       if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
-        errors._mismatchedWells = 'Numbers of wells must match'
+        errors._mismatchedWells = 'In transfer actions the number of source and destination wells must match'
       }
 
       const validatedForm: TransferFormData = {
@@ -184,7 +184,7 @@ function _vapTransferLike (
 
     if (stepType === 'consolidate') {
       if (sourceWells.length <= 1 || destWells.length !== 1) {
-        errors._mismatchedWells = 'Multiple source wells and exactly one destination well is required.'
+        errors._mismatchedWells = 'In consolidate actions there must be multiple source wells and one destination well'
       }
 
       const validatedForm: ConsolidateFormData = {
@@ -201,7 +201,7 @@ function _vapTransferLike (
 
     if (stepType === 'distribute') {
       if (sourceWells.length !== 1 || destWells.length <= 1) {
-        errors._mismatchedWells = 'Single source well and multiple destination wells is required.'
+        errors._mismatchedWells = 'In distribute actions there must be one source well and multiple destination wells'
       }
 
       const validatedForm: DistributeFormData = {

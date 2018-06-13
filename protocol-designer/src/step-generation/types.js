@@ -211,6 +211,7 @@ export type ErrorType =
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_VOLUME_EXCEEDED'
+  | 'FORM_ERROR'
 
 export type CommandCreatorError = {|
   message: string,
