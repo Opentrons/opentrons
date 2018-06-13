@@ -19,6 +19,7 @@ def labware_setup():
     plates = \
         [containers.load('96-PCR-flat', slot, slot) for slot in ['2', '5']]
 
+    # TODO(mc, 2018-06-13): use standard pipette factories
     p100 = instruments.Pipette(
         name='p100', mount='right', channels=8, tip_racks=tip_racks)
 
