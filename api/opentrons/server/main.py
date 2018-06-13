@@ -162,6 +162,10 @@ def init(loop=None):
         '/server/update', endpoints.update_api)
     server.app.router.add_post(
         '/server/update/firmware', endpoints.update_firmware)
+    server.app.router.add_get(
+        '/server/update/ignore', endpoints.get_ignore_version)
+    server.app.router.add_post(
+        '/server/update/ignore', endpoints.set_ignore_version)
     server.app.router.add_post(
         '/server/restart', endpoints.restart)
     server.app.router.add_post(
