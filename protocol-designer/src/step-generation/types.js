@@ -114,6 +114,13 @@ export type PauseFormData = {|
   }
 |}
 
+export type UnionFormData =
+  | ConsolidateFormData
+  | DistributeFormData
+  | MixFormData
+  | PauseFormData
+  | TransferFormData
+
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
@@ -217,18 +224,12 @@ export type CommandCreatorError = {|
   type: ErrorType
 |}
 
-export type WarningType = string // TODO define
+export type WarningType = string // TODO: Ian 2018-06-14 define string enums
 
 export type CommandCreatorWarning = {|
     message: string,
     type: WarningType
 |}
-
-// TODO IMMEDIATELY move to timeline reducer
-export type ChainedWarningsByIndex = Array<{|
-  index: number,
-  content: Array<CommandCreatorWarning>
-|}>
 
 export type CommandsAndRobotState = {|
   commands: Array<Command>,
@@ -244,9 +245,7 @@ export type CommandCreatorErrorResponse = {
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
 
 export type Timeline = {
-  // formErrors: {[string]: string}, // TODO IMMEDIATELY revisit this, copied from RobotStateTimeline type
-  timeline: Array<CommandsAndRobotState>,
-  // robotState: RobotState,
-  errors?: ?Array<CommandCreatorError>, // TODO was timelineErrors
-  errorIndex: ?number // NOTE: was renamed from errorStepId TODO remove this note once addressed
+  timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline
+  errors?: ?Array<CommandCreatorError>,
+  errorIndex: ?number
 }

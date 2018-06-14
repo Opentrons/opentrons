@@ -90,15 +90,15 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
 )
 
 export const lastValidWellContents: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
-  fileDataSelectors.robotStateTimeline,
-  (timelineFull) => {
+  fileDataSelectors.lastValidRobotState,
+  (robotState) => {
     return mapValues(
-      timelineFull.robotState.labware,
+      robotState.labware,
       (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
         return _wellContentsForLabware(
-          timelineFull.robotState.liquidState.labware[labwareId],
+          robotState.liquidState.labware[labwareId],
           labwareId,
-          timelineFull.robotState.labware[labwareId].type
+          robotState.labware[labwareId].type
         )
       }
     )

@@ -79,7 +79,7 @@ describe('reduceCommandCreators', () => {
         message: 'Cannot divide by zero',
         type: 'DIVIDE_BY_ZERO'
       }],
-      errorStep: 1, // divide step passed the error // TODO IMMEDIATELY this should be a timeline responsibility, not reduceCommandCreators
+      errorStep: 1, // divide step passed the error
       warnings: []
     })
   })

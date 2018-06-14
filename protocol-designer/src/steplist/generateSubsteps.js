@@ -21,7 +21,6 @@ import type {
 } from './types'
 
 import type {StepIdType} from '../form-types'
-import type {RobotStateTimeline} from '../file-data/selectors'
 import {
   consolidate,
   distribute,
@@ -30,7 +29,8 @@ import {
 } from '../step-generation'
 
 import type {
-  AspirateDispenseArgs
+  AspirateDispenseArgs,
+  Timeline
   // CommandCreator
 } from '../step-generation'
 
@@ -62,7 +62,7 @@ function transferLikeSubsteps (args: {
   prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: RobotStateTimeline
+  robotStateTimeline: Timeline
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
@@ -88,7 +88,11 @@ function transferLikeSubsteps (args: {
   const robotState = (
     robotStateTimeline.timeline[prevStepId] &&
     robotStateTimeline.timeline[prevStepId].robotState
-  ) || robotStateTimeline.robotState
+  )
+
+  if (!robotState) {
+    return null
+  }
 
   // if false, show aspirate vol instead
   const showDispenseVol = validatedForm.stepType === 'distribute'
@@ -285,9 +289,8 @@ export function generateSubsteps (
   allLabwareTypes: AllLabwareTypes,
   namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
   orderedSteps: Array<StepIdType>,
-  robotStateTimeline: RobotStateTimeline
+  robotStateTimeline: Timeline
 ): SubSteps {
-  console.log('generateSubsteps', namedIngredsByLabwareAllSteps)
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
     const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)

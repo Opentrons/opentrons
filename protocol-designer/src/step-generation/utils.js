@@ -39,7 +39,7 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             commands: prev.commands,
             errors: next.errors,
             errorStep: stepIdx,
-            warnings: prev.warnings || undefined // TODO IMMEDIATELY this is a flow trick
+            warnings: prev.warnings || undefined // flow fix
           }
         }
 
