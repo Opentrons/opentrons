@@ -4,8 +4,15 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+import last from 'lodash/last'
 import {computeWellAccess} from '@opentrons/shared-data'
-import type {CommandCreator, RobotState} from './types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CommandsAndRobotState,
+  RobotState,
+  Timeline
+} from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
@@ -31,13 +38,15 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             robotState: prev.robotState,
             commands: prev.commands,
             errors: next.errors,
-            errorStep: stepIdx
+            errorStep: stepIdx,
+            warnings: prev.warnings || undefined // TODO IMMEDIATELY this is a flow trick
           }
         }
 
         return {
           robotState: next.robotState,
-          commands: [...prev.commands, ...next.commands]
+          commands: [...prev.commands, ...next.commands],
+          warnings: [...(prev.warnings || []), ...(next.warnings || [])]
         }
       },
       {robotState: cloneDeep(prevRobotState), commands: []}
@@ -45,6 +54,48 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
       // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
     )
   )
+
+type TimelineAcc = { // TODO
+  timeline: Array<CommandsAndRobotState>,
+  errorIndex: ?number,
+  errors: ?Array<CommandCreatorError>
+}
+export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
+(initialRobotState: RobotState): Timeline => {
+  const timeline = commandCreators.reduce(
+    (acc: TimelineAcc, commandCreator: CommandCreator, index: number) => {
+      const prevRobotState = (acc.timeline.length === 0)
+        ? initialRobotState
+        : last(acc.timeline).robotState
+
+      if (acc.errors) {
+        // error short-circuit
+        return acc
+      }
+
+      const nextResult = commandCreator(prevRobotState)
+
+      if (nextResult.errors) {
+        return {
+          timeline: acc.timeline,
+          errorIndex: index,
+          errors: nextResult.errors
+        }
+      }
+
+      return {
+        timeline: [...acc.timeline, nextResult],
+        errorIndex: null,
+        errors: null
+      }
+    }, {timeline: [], errorIndex: null, errors: null})
+
+  return {
+    timeline: timeline.timeline,
+    errorIndex: timeline.errorIndex,
+    errors: timeline.errors
+  }
+}
 
 type Vol = {volume: number}
 type LiquidVolumeState = {[ingredGroup: string]: Vol}

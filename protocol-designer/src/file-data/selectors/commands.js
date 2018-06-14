@@ -115,6 +115,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
+// TODO IMMEDIATELY replace with commandCreatorsTimeline util, and StepGeneration.Timeline type!
 export type RobotStateTimeline = {
   formErrors: {[string]: string},
   timeline: Array<StepGeneration.CommandsAndRobotState>,

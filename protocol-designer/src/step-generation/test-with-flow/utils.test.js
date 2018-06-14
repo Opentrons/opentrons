@@ -1,57 +1,60 @@
 // @flow
-import {repeatArray, reduceCommandCreators, splitLiquid, mergeLiquid, AIR} from '../utils'
+import {
+  reduceCommandCreators,
+  commandCreatorsTimeline,
+  splitLiquid,
+  mergeLiquid,
+  AIR,
+  repeatArray
+} from '../utils'
 
-describe('repeatArray', () => {
-  test('repeat array of objects', () => {
-    expect(repeatArray([{a: 1}, {b: 2}, {c: 3}], 3)).toEqual([
-      {a: 1}, {b: 2}, {c: 3},
-      {a: 1}, {b: 2}, {c: 3},
-      {a: 1}, {b: 2}, {c: 3}
-    ])
-  })
-
-  test('repeat array of arrays', () => {
-    expect(repeatArray([[1, 2], [3, 4]], 4)).toEqual([
-      [1, 2], [3, 4],
-      [1, 2], [3, 4],
-      [1, 2], [3, 4],
-      [1, 2], [3, 4]
-    ])
-  })
+// NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
+type CountState = {count: number}
+const addCreator: any = (num: number) => (prevState: CountState) => ({
+  commands: [`command: add ${num}`],
+  robotState: {count: prevState.count + num}
 })
 
-describe('reduceCommandCreators', () => {
-  // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
-  type CountState = {count: number}
-  const addCreator: any = (num: number) => (prevState: CountState) => ({
-    commands: [`command: add ${num}`],
-    robotState: {count: prevState.count + num}
-  })
+const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
+  // adds a warning for no meaningful reason
+  const result = addCreator(num)(prevState)
+  return {
+    ...result,
+    warnings: [{
+      type: 'ADD_WARNING',
+      message: `adding ${num} with warning example`
+    }]
+  }
+}
 
-  const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
-    commands: [`command: multiply by ${num}`],
-    robotState: {count: prevState.count * num}
-  })
+const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
+  commands: [`command: multiply by ${num}`],
+  robotState: {count: prevState.count * num}
+})
 
-  const divideCreator: any = (num: number) => (prevState: CountState) => {
-    if (num === 0) {
-      return {
-        errors: [{
-          message: 'Cannot divide by zero',
-          type: 'DIVIDE_BY_ZERO'
-        }]
-      }
-    }
-
+const divideCreator: any = (num: number) => (prevState: CountState) => {
+  if (num === 0) {
     return {
-      commands: [`command: divide by ${num}`],
-      robotState: {count: prevState.count / num}
+      errors: [{
+        message: 'Cannot divide by zero',
+        type: 'DIVIDE_BY_ZERO'
+      }]
     }
   }
 
+  return {
+    commands: [`command: divide by ${num}`],
+    robotState: {count: prevState.count / num}
+  }
+}
+
+describe('reduceCommandCreators', () => {
   test('basic command creators', () => {
     const initialState: any = {count: 0}
-    const result: any = reduceCommandCreators([addCreator(1), multiplyCreator(2)])(initialState)
+    const result: any = reduceCommandCreators([
+      addCreator(1),
+      multiplyCreator(2)
+    ])(initialState)
 
     expect(result.robotState).toEqual({count: 2})
 
@@ -76,8 +79,100 @@ describe('reduceCommandCreators', () => {
         message: 'Cannot divide by zero',
         type: 'DIVIDE_BY_ZERO'
       }],
-      errorStep: 1 // divide step passed the error
+      errorStep: 1, // divide step passed the error // TODO IMMEDIATELY this should be a timeline responsibility, not reduceCommandCreators
+      warnings: []
     })
+  })
+
+  test('warnings accumulate in a flat array across the command chain', () => {
+    const initialState: any = {count: 5}
+    const result = reduceCommandCreators([
+      addCreatorWithWarning(3),
+      multiplyCreator(2),
+      addCreatorWithWarning(1)
+    ])(initialState)
+
+    expect(result).toEqual({
+      robotState: {count: 17},
+      commands: [
+        'command: add 3',
+        'command: multiply by 2',
+        'command: add 1'
+      ],
+      warnings: [
+        {type: 'ADD_WARNING', message: 'adding 3 with warning example'},
+        {type: 'ADD_WARNING', message: 'adding 1 with warning example'}
+      ]
+    })
+  })
+})
+
+describe('commandCreatorsTimeline', () => {
+  test('any errors short-circuit the timeline chain and set the correct errorIndex', () => {
+    const initialState: any = {count: 5}
+    const result = commandCreatorsTimeline([
+      addCreatorWithWarning(4),
+      divideCreator(0),
+      multiplyCreator(3)
+    ])(initialState)
+
+    expect(result).toEqual({
+      // error-creating "divide by zero" commands's index in the command creators array
+      errorIndex: 1,
+
+      errors: [
+        {
+          message: 'Cannot divide by zero',
+          type: 'DIVIDE_BY_ZERO'
+        }
+      ],
+
+      timeline: [
+        // add 4 step
+        {
+          robotState: {count: 5 + 4},
+          commands: ['command: add 4'],
+          warnings: [
+            {type: 'ADD_WARNING', message: 'adding 4 with warning example'}
+          ]
+        }
+        // no more steps in the timeline, stopped by error
+      ]
+    })
+  })
+
+  test('warnings are indexed in an indexed command chain', () => {
+    const initialState: any = {count: 5}
+    const result = commandCreatorsTimeline([
+      addCreatorWithWarning(3),
+      multiplyCreator(2),
+      addCreatorWithWarning(1)
+    ])(initialState)
+
+    expect(result.timeline).toEqual([
+      // add 3 w/ warning
+      {
+        robotState: {count: 8},
+        commands: ['command: add 3'],
+        warnings: [
+          {type: 'ADD_WARNING', message: 'adding 3 with warning example'}
+        ]
+      },
+      // multiply by 2
+      {
+        robotState: {count: 16},
+        commands: ['command: multiply by 2']
+        // no warnings -> no `warnings` key
+      },
+      // add 1 w/ warning
+      {
+        robotState: {count: 17},
+        commands: ['command: add 1'],
+        warnings: [
+          {type: 'ADD_WARNING', message: 'adding 1 with warning example'}
+        ]
+      }
+    ])
   })
 })
 
@@ -255,5 +350,24 @@ describe('mergeLiquid', () => {
       ingred2: {volume: 40},
       ingred3: {volume: 25}
     })
+  })
+})
+
+describe('repeatArray', () => {
+  test('repeat array of objects', () => {
+    expect(repeatArray([{a: 1}, {b: 2}, {c: 3}], 3)).toEqual([
+      {a: 1}, {b: 2}, {c: 3},
+      {a: 1}, {b: 2}, {c: 3},
+      {a: 1}, {b: 2}, {c: 3}
+    ])
+  })
+
+  test('repeat array of arrays', () => {
+    expect(repeatArray([[1, 2], [3, 4]], 4)).toEqual([
+      [1, 2], [3, 4],
+      [1, 2], [3, 4],
+      [1, 2], [3, 4],
+      [1, 2], [3, 4]
+    ])
   })
 })

@@ -217,13 +217,36 @@ export type CommandCreatorError = {|
   type: ErrorType
 |}
 
+export type WarningType = string // TODO define
+
+export type CommandCreatorWarning = {|
+    message: string,
+    type: WarningType
+|}
+
+// TODO IMMEDIATELY move to timeline reducer
+export type ChainedWarningsByIndex = Array<{|
+  index: number,
+  content: Array<CommandCreatorWarning>
+|}>
+
 export type CommandsAndRobotState = {|
   commands: Array<Command>,
-  robotState: RobotState
+  robotState: RobotState,
+  warnings?: Array<CommandCreatorWarning>
 |}
 
 export type CommandCreatorErrorResponse = {
-  errors: Array<CommandCreatorError>
+  errors: Array<CommandCreatorError>,
+  warnings?: Array<CommandCreatorWarning>
 }
 
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
+
+export type Timeline = {
+  // formErrors: {[string]: string}, // TODO IMMEDIATELY revisit this, copied from RobotStateTimeline type
+  timeline: Array<CommandsAndRobotState>,
+  // robotState: RobotState,
+  errors?: ?Array<CommandCreatorError>, // TODO was timelineErrors
+  errorIndex: ?number // NOTE: was renamed from errorStepId TODO remove this note once addressed
+}
