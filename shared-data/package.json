@@ -10,9 +10,7 @@
   "license": "Apache-2.0",
   "main": "js/index.js",
   "devDependencies": {
-    "cross-env": "^5.0.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "shx": "^0.2.2"
+    "flow-typed": "^2.4.0"
   }
 }

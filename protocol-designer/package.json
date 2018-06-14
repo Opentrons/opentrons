@@ -33,11 +33,7 @@
     "reselect": "^3.0.1"
   },
   "devDependencies": {
-    "cross-env": "^5.1.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "shx": "^0.2.2",
-    "webpack": "^3.1.0",
-    "webpack-dev-server": "^2.5.1"
+    "flow-typed": "^2.4.0"
   }
 }

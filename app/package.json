@@ -17,14 +17,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
-    "concurrently": "^3.5.0",
-    "cross-env": "^5.0.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "shx": "^0.2.2",
-    "wait-on": "^2.1.0",
-    "webpack": "^3.1.0",
-    "webpack-dev-server": "^2.5.1"
+    "flow-typed": "^2.4.0"
   },
   "dependencies": {
     "@opentrons/components": "3.2.0-beta.0",
