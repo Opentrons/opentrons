@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react'
-import {
-  FormGroup,
-  DropdownField,
-  InputField
-} from '@opentrons/components'
+import {FormGroup, InputField} from '@opentrons/components'
 
 import {
   CheckboxRow,

@@ -5,19 +5,10 @@ import {
   FlatButton,
   PrimaryButton,
   FormGroup,
-  DropdownField,
   InputField,
   RadioGroup,
   type DropdownOption
 } from '@opentrons/components'
-
-import {
-  // CheckboxRow,
-  // DelayField,
-  FlowRateField,
-  // MixField,
-  TipPositionField
-} from './formFields'
 
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
