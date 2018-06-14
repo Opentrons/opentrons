@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import _ from 'lodash';
+import _ from 'lodash'
 import cx from 'classnames'
 import {Icon} from '@opentrons/components'
 
@@ -51,7 +51,7 @@ const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
   collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName]
 })
 const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
-  onCollapseToggle: () => collapseFormSection(ownProps.sectionName)
+  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName))
 })
 const ConnectedFormSection = connect(FormSectionSTP, FormSectionDTP)(FormSection)
 
