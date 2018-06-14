@@ -22,8 +22,9 @@ function SetupDeckPage (props: Props) {
   const {deckPopulated, match: {url, params: {slot}}} = props
 
   return (
-    <Page>
-      <SessionHeader />
+    <Page
+      titleBar={{title: (<SessionHeader />)}}
+    >
       <LabwareCalibration slot={slot} url={url} />
       {!deckPopulated && (
         <ReviewDeckModal slot={slot} />

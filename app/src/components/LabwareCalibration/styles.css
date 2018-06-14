@@ -1,28 +1,5 @@
 @import '@opentrons/components';
 
-.modal {
-  @apply --modal;
-
-  padding: 6rem 4rem;
-}
-
-.title_bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-.modal_contents {
-  z-index: 1;
-  width: 100%;
-  max-width: 38rem;
-  margin: auto;
-  background-color: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-}
-
 .in_progress_contents {
   background-color: transparent;
 

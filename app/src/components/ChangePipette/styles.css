@@ -9,22 +9,8 @@
   };
 }
 
-.modal {
-  @apply --modal;
-
-  padding: 6rem 3rem;
-}
-
-.title_bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
 .modal_contents {
-  max-width: 48rem;
-  min-height: 32rem;
+  min-height: 95%;
   padding: 2rem 1.25rem;
 }
 

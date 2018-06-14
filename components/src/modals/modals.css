@@ -5,10 +5,12 @@
   --modal-contents: {
     z-index: 1;
     width: 100%;
+    max-height: 100%;
     max-width: 38rem;
-    margin: auto;
+    margin: 0 auto;
     padding: 1rem;
     border-radius: 0.5rem;
+    overflow-y: auto;
   }
 }
 
@@ -18,9 +20,22 @@
   padding: 4rem;
 }
 
+.modal_page {
+  @apply --absolute-fill;
+
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem;
+  padding-top: 5rem;
+}
+
 .overlay {
   @apply --absolute-fill;
 
+  z-index: 1;
   background-color: rgba(0, 0, 0, 0.9);
 }
 
@@ -29,7 +44,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 3;
+  z-index: 4;
 }
 
 .modal_contents {
@@ -42,7 +57,7 @@
   @apply --modal-contents;
 
   background-color: white;
-  min-width: 38rem;
+  overflow-y: scroll;
 }
 
 .modal_page_heading {
@@ -87,6 +102,8 @@
 }
 
 .alert_modal {
+  @apply --center-children;
+
   z-index: 10;
 }
 

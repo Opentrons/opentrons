@@ -1,5 +1,10 @@
 .task {
   flex: 1 1;
   position: relative;
-  overflow-y: scroll;
+}
+
+.main {
+  width: 100%;
+  height: calc(100% - 3.5rem);
+  overflow-y: auto;
 }
