@@ -6,7 +6,6 @@ import type {
   StepIdType,
   FormData,
   BlankForm,
-  ProcessedFormData,
   TransferLikeForm,
   MixForm,
   PauseForm
@@ -17,7 +16,8 @@ import type {
   DistributeFormData,
   MixFormData,
   PauseFormData,
-  TransferFormData
+  TransferFormData,
+  CommandCreatorData
 } from '../step-generation'
 
 import {FIXED_TRASH_ID} from '../constants'
@@ -27,7 +27,7 @@ const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
   errors: {[string]: string},
-  validatedForm: ProcessedFormData | null // TODO: incompleteData field when this is null?
+  validatedForm: CommandCreatorData | null // TODO: incompleteData field when this is null?
 }
 
 type ValidationAndErrors<F> = {

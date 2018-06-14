@@ -11,7 +11,6 @@ import {selectors as fileDataSelectors} from '../file-data'
 
 import type {Selector} from '../types'
 import type {StepSubItemData} from '../steplist/types'
-import type {ProcessedFormData} from '../form-types'
 
 type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
@@ -32,7 +31,7 @@ function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: A
 }
 
 function _getSelectedWellsForStep (
-  form: ProcessedFormData,
+  form: StepGeneration.CommandCreatorData,
   labwareId: string,
   robotState: StepGeneration.RobotState
 ): Array<string> {
@@ -87,7 +86,7 @@ function _getSelectedWellsForStep (
 
 /** Scan through given substep rows to get a list of source/dest wells for the given labware */
 function _getSelectedWellsForSubstep (
-  form: ProcessedFormData,
+  form: StepGeneration.CommandCreatorData,
   labwareId: string,
   substeps: StepSubItemData | null,
   substepId: number
@@ -145,7 +144,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       labwareLiquids: StepGeneration.SingleLabwareLiquidState,
       labwareId: string,
       robotState: StepGeneration.RobotState,
-      form: ProcessedFormData,
+      form: StepGeneration.CommandCreatorData,
       formIdx: number
     ): AllWellHighlights {
       let selectedWells: Array<string> = []

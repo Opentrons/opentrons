@@ -115,7 +115,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-function commandCreatorsFromFormData (validatedForm: StepGeneration.UnionFormData) {
+function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreatorData) {
   if (validatedForm.stepType === 'consolidate') {
     return StepGeneration.consolidate(validatedForm)
   } else
@@ -142,14 +142,13 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
   getInitialRobotState,
   (forms, orderedStepsWithDeckSetup, initialRobotState) => {
     const orderedSteps = orderedStepsWithDeckSetup.slice(1)
-    const allFormData: Array<StepGeneration.UnionFormData | null> = orderedSteps.map(stepId => {
-      // TODO IMMEDIATELY replace ProcessedFormData with UnionFormData
+    const allFormData: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
       return (forms[stepId] && forms[stepId].validatedForm) || null
     }, [])
 
     // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
     // $FlowFixMe
-    const continuousValidForms: Array<StepGeneration.UnionFormData> = takeWhile(
+    const continuousValidForms: Array<StepGeneration.CommandCreatorData> = takeWhile(
       allFormData,
       f => f
     )

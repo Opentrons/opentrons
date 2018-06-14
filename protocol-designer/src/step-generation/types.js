@@ -114,7 +114,7 @@ export type PauseFormData = {|
   }
 |}
 
-export type UnionFormData =
+export type CommandCreatorData =
   | ConsolidateFormData
   | DistributeFormData
   | MixFormData
