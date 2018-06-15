@@ -11,7 +11,8 @@ import type {
   CommandCreatorError,
   CommandsAndRobotState,
   RobotState,
-  Timeline
+  Timeline,
+  LocationLiquidState
 } from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
@@ -98,14 +99,13 @@ export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) 
 }
 
 type Vol = {volume: number}
-type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
 export const AIR = '__air__'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
-export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
-  source: LiquidVolumeState,
-  dest: LiquidVolumeState
+export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): {
+  source: LocationLiquidState,
+  dest: LocationLiquidState
 } {
   const totalSourceVolume = reduce(
     sourceLiquidState,
@@ -168,12 +168,12 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
 /** The converse of splitLiquid. Adds all of one liquid to the other.
   * The args are called 'source' and 'dest', but here they're interchangable.
   */
-export function mergeLiquid (source: LiquidVolumeState, dest: LiquidVolumeState): LiquidVolumeState {
+export function mergeLiquid (source: LocationLiquidState, dest: LocationLiquidState): LocationLiquidState {
   return {
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    ...reduce(source, (acc: LiquidVolumeState, ingredState: Vol, ingredId: string) => {
+    ...reduce(source, (acc: LocationLiquidState, ingredState: Vol, ingredId: string) => {
       const isCommonIngred = ingredId in dest
       const ingredVolume = isCommonIngred
         // sum volumes of ingredients common to 'source' and 'dest'
@@ -210,4 +210,13 @@ export function getWellsForTips (channels: 1 | 8, labwareType: string, well: str
   const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
 
   return {wellsForTips, allWellsShared}
+}
+
+/** Total volume of a location (air is not included in the sum) */
+export function totalVolume (location: LocationLiquidState): number {
+  return Object.keys(location).reduce((acc, ingredId) => {
+    return (ingredId !== AIR)
+      ? acc + (location[ingredId].volume || 0)
+      : acc
+  }, 0)
 }

@@ -18,6 +18,7 @@ export default function updateLiquidState (
   },
   prevLiquidState: LiquidState
 ): LiquidState {
+  // TODO: Ian 2018-06-14 return same shape as aspirateUpdateLiquidState fn: {liquidState, warnings}.
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
   type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
 

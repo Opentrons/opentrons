@@ -43,9 +43,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hoveredStep = steplistSelectors.hoveredStepId(state)
   const selected = steplistSelectors.selectedStepId(state) === stepId
 
-  // TODO: Ian 2018-06-14 make mini selector
+  // TODO: Ian 2018-06-14 make mini selector?
   const errorIndex = fileDataSelectors.robotStateTimeline(state).errorIndex
   const error = (errorIndex != null) && ((errorIndex + 1) === stepId)
+
+  const warnings = fileDataSelectors.warningsPerStep(state)[stepId]
+  const hasWarnings = warnings && warnings.length > 0
+
+  const showErrorState = error || hasWarnings
 
   let collapsed
 
@@ -68,7 +73,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hoveredSubstep,
     collapsed,
     selected,
-    error,
+    error: showErrorState,
 
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.

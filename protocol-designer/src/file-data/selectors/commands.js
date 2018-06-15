@@ -4,6 +4,7 @@ import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
+import uniqBy from 'lodash/uniqBy'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
@@ -171,6 +172,23 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
 
     return timeline
   }
+)
+
+type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
+export const warningsPerStep: Selector<WarningsPerStep> = createSelector(
+  steplistSelectors.orderedSteps,
+  robotStateTimeline,
+  (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
+    // add 1 to timelineIdx, because the 0th orderedStep is always initial deck setup,
+    // which isn't included in the timeline
+    const stepId = orderedSteps[timelineIndex + 1]
+
+    // remove warnings of duplicate 'type'. chosen arbitrarily
+    return {
+      ...acc,
+      [stepId]: uniqBy(frame.warnings, w => w.type)
+    }
+  }, {})
 )
 
 export const lastValidRobotState: Selector<StepGeneration.RobotState> = createSelector(

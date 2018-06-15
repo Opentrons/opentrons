@@ -50,7 +50,7 @@ describe('...single-channel pipette', () => {
         initialLiquidState
       )
 
-      expect(result).toMatchObject({
+      expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
             '0': {ingred1: {volume: 50}}
@@ -85,7 +85,7 @@ describe('...single-channel pipette', () => {
         initialLiquidState
       )
 
-      expect(result).toMatchObject({
+      expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
             '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}}
@@ -115,7 +115,7 @@ describe('...single-channel pipette', () => {
 
       const result = updateLiquidState(args, initialLiquidState)
 
-      expect(result).toMatchObject({
+      expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
             '0': {ingred1: {volume: 40}, ingred2: {volume: 20}}
@@ -143,7 +143,7 @@ describe('...single-channel pipette', () => {
 
       const result = updateLiquidState(args, initialLiquidState)
 
-      expect(result).toMatchObject({
+      expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
             '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}}
@@ -170,7 +170,7 @@ describe('...single-channel pipette', () => {
 
       const result = updateLiquidState(aspirateSingleCh50FromA1Args, initialLiquidState)
 
-      expect(result).toMatchObject({
+      expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
             '0': {ingred1: {volume: 30 + 50}}
@@ -217,7 +217,7 @@ describe('...8-channel pipette', () => {
 
     const result = updateLiquidState(aspirate8Ch50FromA1Args, initialLiquidState)
 
-    expect(result).toMatchObject({
+    expect(result.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
           ...createTipLiquidState(8, {[AIR]: {volume: 50}, ingred1: {volume: 30}}),
@@ -251,7 +251,7 @@ describe('...8-channel pipette', () => {
 
     const result = updateLiquidState(args, initialLiquidState)
 
-    expect(result).toMatchObject({
+    expect(result.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
           ...createTipLiquidState(8, {[AIR]: {volume: 250}}),
@@ -287,7 +287,7 @@ describe('...8-channel pipette', () => {
 
     const result = updateLiquidState(args, initialLiquidState)
 
-    expect(result).toMatchObject({
+    expect(result.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
           // aspirate volume divided among the 8 tips

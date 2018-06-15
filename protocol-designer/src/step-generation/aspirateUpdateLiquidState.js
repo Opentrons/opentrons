@@ -1,9 +1,17 @@
 // @flow
 import range from 'lodash/range'
-import {mergeLiquid, splitLiquid, getWellsForTips} from './utils'
-import type {RobotState, PipetteData, SingleLabwareLiquidState} from './'
+import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
+import * as warningCreators from './warningCreators'
+import type {
+  RobotState,
+  PipetteData,
+  SingleLabwareLiquidState,
+  CommandCreatorWarning
+} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
+
+type LiquidStateAndWarnings = {liquidState: LiquidState, warnings: Array<CommandCreatorWarning>}
 
 export default function updateLiquidState (
   args: {
@@ -15,9 +23,10 @@ export default function updateLiquidState (
     well: string
   },
   prevLiquidState: LiquidState
-) {
+): LiquidStateAndWarnings {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
   const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
+  let overAspirationOccurred = false
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
@@ -30,6 +39,11 @@ export default function updateLiquidState (
         volume,
         prevSourceLiquidState
       ).dest
+
+      if (volume > totalVolume(prevSourceLiquidState)) {
+        // TODO: Ian 2018-06-14 it's ugly to do a side-effect mutation inside this reduce...
+        overAspirationOccurred = true
+      }
 
       return {
         ...acc,
@@ -65,5 +79,15 @@ export default function updateLiquidState (
     }
   }
 
-  return nextLiquidState
+  // Handle warnings
+  let warnings = []
+
+  if (overAspirationOccurred) {
+    warnings.push(warningCreators.aspirateMoreThanWellContents())
+  }
+
+  return {
+    liquidState: nextLiquidState,
+    warnings
+  }
 }

@@ -224,7 +224,8 @@ export type CommandCreatorError = {|
   type: ErrorType
 |}
 
-export type WarningType = string // TODO: Ian 2018-06-14 define string enums
+export type WarningType =
+  | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
 
 export type CommandCreatorWarning = {|
     message: string,
@@ -245,7 +246,7 @@ export type CommandCreatorErrorResponse = {
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
 
 export type Timeline = {
-  timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline
+  timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names
   errors?: ?Array<CommandCreatorError>,
   errorIndex: ?number
 }
