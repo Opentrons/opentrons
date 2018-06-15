@@ -1,6 +1,6 @@
 // @flow
 import ToggleButton from './ToggleButton'
 import LabeledToggle from './LabeledToggle'
-import ToggleInfo from './ToggleInfo'
+import LabeledButton from './LabeledButton'
 
-export {ToggleButton, LabeledToggle, ToggleInfo}
+export {ToggleButton, LabeledToggle, LabeledButton}

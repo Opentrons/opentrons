@@ -7,7 +7,6 @@ import {getAnalyticsSeen, setAnalyticsSeen} from '../../analytics'
 import {Modal} from '@opentrons/components'
 import ModalButton from './ModalButton'
 import AnalyticsToggle from './AnalyticsToggle'
-import AnalyticsInfo from './AnalyticsInfo'
 
 import type {State, Dispatch} from '../../types'
 
@@ -37,7 +36,6 @@ function AnalyticsSettingsModal (props: Props) {
   return (
     <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
       <AnalyticsToggle />
-      <AnalyticsInfo />
       <ModalButton onClick={setSeen}>
         {CONTINUE}
       </ModalButton>
