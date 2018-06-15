@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import {Card} from '@opentrons/components'
 import AnalyticsToggle from './AnalyticsToggle'
-import AnalyticsInfo from './AnalyticsInfo'
 
 const TITLE = 'Privacy Settings'
 
@@ -12,7 +11,6 @@ export default function AnalyticsSettingsCard () {
   return (
     <Card title={TITLE} column>
       <AnalyticsToggle />
-      <AnalyticsInfo />
     </Card>
   )
 }

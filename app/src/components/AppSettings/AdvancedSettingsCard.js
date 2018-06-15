@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import type {State, Dispatch} from '../../types'
 import {getDevToolsOn, toggleDevTools} from '../../config'
 import {Card} from '@opentrons/components'
-import {LabeledToggle, ToggleInfo} from '../toggles'
+import {LabeledToggle} from '../controls'
 
 type SP = {
   devToolsOn: boolean,
@@ -28,10 +28,11 @@ function AdvancedSettingsCard (props: Props) {
         label='Enable Developer Tools'
         toggledOn={props.devToolsOn}
         onClick={props.toggleDevTools}
-      />
-      <ToggleInfo>
-        <p>Requires restart. Turns on the app&#39;s developer tools, which provide access to the inner workings of the app and additional logging.</p>
-      </ToggleInfo>
+      >
+        <p>
+          Requires restart. Turns on the app&#39;s developer tools, which provide access to the inner workings of the app and additional logging.
+        </p>
+      </LabeledToggle>
     </Card>
   )
 }

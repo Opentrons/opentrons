@@ -7,6 +7,7 @@ import type {Robot} from '../../robot'
 import StatusCard from './StatusCard'
 import AttachedInstrumentsCard from './AttachedInstrumentsCard'
 import InformationCard from './InformationCard'
+import ControlsCard from './ControlsCard'
 import ConnectivityCard from './ConnectivityCard'
 import CalibrationCard from './CalibrationCard'
 import ConnectAlertModal from './ConnectAlertModal'
@@ -28,6 +29,9 @@ export default function RobotSettings (props: Props) {
       </div>
       <div className={styles.row}>
         <InformationCard {...props} updateUrl={updateUrl} />
+      </div>
+      <div className={styles.row}>
+        <ControlsCard {...props} />
       </div>
       <div className={styles.row}>
         <div className={styles.column_50}>
