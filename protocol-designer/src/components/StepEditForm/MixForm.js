@@ -6,7 +6,7 @@ import {FormGroup, InputField} from '@opentrons/components'
 import {
   CheckboxRow,
   DelayField,
-  ConnectedPipetteField,
+  PipetteField,
   LabwareDropdown,
   TipSettingsColumn
 } from './formFields'
@@ -32,7 +32,7 @@ const MixForm = ({formData, formConnector}: MixFormProps) => (
         initialSelectedWells={formData['wells']}
         formFieldAccessor={'wells'}
       />
-      <ConnectedPipetteField formConnector={formConnector}/>
+      <PipetteField formConnector={formConnector}/>
     </div>
 
     <div className={cx(formStyles.row_wrapper)}>

@@ -88,7 +88,7 @@ export function MixField (props: MixFieldProps) {
 
 const PipetteFieldSTP = state => ({pipetteOptions: fileDataSelectors.equippedPipetteOptions(state)})
 type PipetteFieldProps = {formConnector: FormConnector<*>, pipetteOptions: Options}
-export const ConnectedPipetteField = connect(PipetteFieldSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
+export const PipetteField = connect(PipetteFieldSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
   ({formConnector, pipetteOptions}: PipetteFieldProps) => (
     <FormGroup label='Pipette:' className={styles.pipette_field}>
       <DropdownField options={pipetteOptions} {...formConnector('pipette')} />

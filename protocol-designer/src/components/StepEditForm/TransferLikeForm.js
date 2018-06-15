@@ -6,7 +6,7 @@ import {
   CheckboxRow,
   DelayField,
   MixField,
-  ConnectedPipetteField,
+  PipetteField,
   LabwareDropdown,
   VolumeField,
   TipSettingsColumn
@@ -36,7 +36,7 @@ const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
           initialSelectedWells={formData['aspirate--wells']}
           formFieldAccessor={'aspirate--wells'}
         />
-        <ConnectedPipetteField formConnector={formConnector}/>
+        <PipetteField formConnector={formConnector}/>
         {formData.stepType === 'consolidate' && <VolumeField formConnector={formConnector} />}
       </div>
 
