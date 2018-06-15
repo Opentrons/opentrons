@@ -69,7 +69,7 @@ const MixForm = ({formData, formConnector}: MixFormProps) => (
           />
         </FormGroup>
       </div>
-      <TipSettingsColumn />
+      <TipSettingsColumn formConnector={formConnector} />
     </div>
   </React.Fragment>
 )
