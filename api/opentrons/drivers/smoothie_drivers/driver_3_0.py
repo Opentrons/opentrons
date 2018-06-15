@@ -1265,6 +1265,10 @@ class SmoothieDriver_3_0_0:
     def turn_off_rail_lights(self):
         gpio.set_low(gpio.OUTPUT_PINS['FRAME_LEDS'])
 
+    def get_rail_lights_on(self):
+        value = gpio.read(gpio.OUTPUT_PINS['FRAME_LEDS'])
+        return True if value == 1 else False
+
     def read_button(self):
         # button is normal-HIGH, so invert
         return not bool(gpio.read(gpio.INPUT_PINS['BUTTON_INPUT']))
