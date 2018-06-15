@@ -13,7 +13,7 @@ import TransferLikeForm from './TransferLikeForm'
 import PauseForm from './PauseForm'
 
 export type Props = {
-  formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
+  formData: FormData,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
@@ -30,7 +30,7 @@ const StepFormTypeMap = {
 }
 
 const StepEditForm = ({formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave}: Props) => {
-  const FormComponent = _.get(StepFormTypeMap, formData.stepType)
+  const FormComponent: any = _.get(StepFormTypeMap, formData.stepType)
   if (!FormComponent) return <div className={formStyles.form}><div>Todo: support {formData.stepType} step</div></div>
   return (
     <div className={cx(formStyles.form, styles[formData.stepType])}>
