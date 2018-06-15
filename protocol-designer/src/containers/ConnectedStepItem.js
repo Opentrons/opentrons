@@ -50,7 +50,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const warnings = fileDataSelectors.warningsPerStep(state)[stepId]
   const hasWarnings = warnings && warnings.length > 0
 
-  const showErrorState = error || hasWarnings
+  const showErrorState = (process.env.OT_PD_SHOW_WARNINGS === 'true')
+    ? error || hasWarnings
+    : error // ignore warnings w/o FEATURE FLAG
 
   let collapsed
 
