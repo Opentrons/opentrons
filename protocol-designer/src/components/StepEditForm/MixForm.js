@@ -7,22 +7,22 @@ import {
   CheckboxRow,
   DelayField,
   ConnectedPipetteField,
-  ConnectedLabwareOptionsDropdown,
+  LabwareDropdown,
   TipSettingsColumn
 } from './formFields'
-import type {FormData} from '../../form-types'
+import type {MixForm as MixFormData} from '../../form-types'
 import type {FormConnector} from '../../utils'
 import WellSelectionInput from '../../containers/WellSelectionInput'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 
-type MixFormProps = {formData: FormData, formConnector: FormConnector}
+type MixFormProps = {formData: MixFormData, formConnector: FormConnector<*>}
 
 const MixForm = ({formData, formConnector}: MixFormProps) => (
   <React.Fragment>
     <div className={formStyles.row_wrapper}>
       <FormGroup label='Labware:' className={styles.labware_field}>
-        <ConnectedLabwareOptionsDropdown {...formConnector('labware')} />
+        <LabwareDropdown {...formConnector('labware')} />
       </FormGroup>
       {/* TODO LATER: also 'disable' when selected labware is a trash */}
       <WellSelectionInput
@@ -56,7 +56,7 @@ const MixForm = ({formData, formConnector}: MixFormProps) => (
             formConnector={formConnector}
             label='Blow out'
           >
-            <ConnectedLabwareOptionsDropdown
+            <LabwareDropdown
               className={styles.full_width}
               {...formConnector('dispense--blowout--labware')}
             />

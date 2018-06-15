@@ -7,7 +7,7 @@ import {
   DelayField,
   MixField,
   ConnectedPipetteField,
-  ConnectedLabwareOptionsDropdown,
+  LabwareDropdown,
   VolumeField,
   TipSettingsColumn
 } from './formFields'
@@ -17,16 +17,16 @@ import FormSection from './FormSection'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 import type {FormConnector} from '../../utils'
-import type {FormData} from '../../form-types'
+import type {TransferLikeFrom as TransferLikeFormData} from '../../form-types'
 
-type TransferLikeFormProps = {formData: FormData, formConnector: FormConnector<*>}
+type TransferLikeFormProps = {formData: TransferLikeFormData, formConnector: FormConnector<*>}
 
 const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
   <React.Fragment>
     <FormSection sectionName='aspirate'>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
-          <ConnectedLabwareOptionsDropdown {...formConnector('aspirate--labware')} />
+          <LabwareDropdown {...formConnector('aspirate--labware')} />
         </FormGroup>
         {/* TODO LATER: also 'disable' when selected labware is a trash */}
         <WellSelectionInput
@@ -86,7 +86,7 @@ const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
     <FormSection sectionName='dispense'>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
-          <ConnectedLabwareOptionsDropdown {...formConnector('dispense--labware')} />
+          <LabwareDropdown {...formConnector('dispense--labware')} />
         </FormGroup>
         <WellSelectionInput
           className={styles.well_selection_input}
@@ -120,7 +120,7 @@ const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
               formConnector={formConnector}
               label='Blow out'
             >
-              <ConnectedLabwareOptionsDropdown
+              <LabwareDropdown
                 className={styles.full_width}
                 {...formConnector('dispense--blowout--labware')}
               />

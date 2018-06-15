@@ -1,13 +1,12 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import {FormGroup, InputField, RadioGroup} from '@opentrons/components'
 
-import type {FormData} from '../../form-types'
+import type {PauseForm as PauseFormData} from '../../form-types'
 import type {FormConnector} from '../../utils'
 import formStyles from '../forms.css'
 
-type PauseFormProps = {formData: FormData, formConnector: FormConnector}
+type PauseFormProps = {formData: PauseFormData, formConnector: FormConnector<*>}
 const PauseForm = ({formData, formConnector}: PauseFormProps) => (
   <div className={formStyles.row_wrapper}>
     <div className={formStyles.column_1_2}>

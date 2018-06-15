@@ -96,10 +96,11 @@ export const ConnectedPipetteField = connect(PipetteFieldSTP, (dispatch: Dispatc
   )
 )
 
-const LabwareOptionsDropdownSTP = state => ({labwareOptions: labwareIngredSelectors.labwareOptions(state)})
-type LabwareOptionsDropdownProps = {labwareOptions: Options}
-export const ConnectedLabwareOptionsDropdown = connect(LabwareOptionsDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
-  ({labwareOptions, ...restProps}: LabwareOptionsDropdownProps) => (
+const LabwareDropdownSTP = state => ({labwareOptions: labwareIngredSelectors.labwareOptions(state)})
+type LabwareDropdownStateProps = {labwareOptions: Options}
+type LabwareDropdownOwnProps = {formConnector: FormConnector<*>}
+export const LabwareDropdown = connect(LabwareDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
+  ({labwareOptions, ...restProps}: LabwareDropdownOwnProps & LabwareDropdownStateProps) => (
     <DropdownField options={labwareOptions} {...restProps} />
   )
 )
@@ -141,7 +142,7 @@ export const ChangeTipField = ({formConnector}: ChangeTipFieldProps) => (
   </FormGroup>
 )
 
-type TipSettingsColumnProps = {formConnector: FormConnector<*>, hasChangeField: boolean}
+type TipSettingsColumnProps = {formConnector: FormConnector<*>, hasChangeField?: boolean}
 export const TipSettingsColumn = ({formConnector, hasChangeField = true}: TipSettingsColumnProps) => (
   <div className={styles.right_settings_column}>
     {hasChangeField && <ChangeTipField formConnector={formConnector} />}
