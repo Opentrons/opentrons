@@ -326,24 +326,20 @@ function _vapMix (formData: MixForm): ValidationAndErrors<MixFormData> {
   }
 }
 
-export function validateAndProcessForm (formData: FormData): * { // ValidFormAndErrors
-  if (formData.stepType === 'transfer' || formData.stepType === 'consolidate' || formData.stepType === 'distribute') {
-    return _vapTransferLike(formData)
-  }
-
-  if (formData.stepType === 'pause') {
-    return _vapPause(formData)
-  }
-
-  if (formData.stepType === 'mix') {
-    return _vapMix(formData)
-  }
-
-  // Fallback for unsupported step type. Should be unreachable (...right?)
-  return {
-    errors: {
-      '_form': 'Unsupported step type: ' + formData.stepType
-    },
-    validatedForm: null
+export const validateAndProcessForm = (formData: FormData): * => { // ValidFormAndErrors
+  switch (formData.stepType) {
+    case 'transfer':
+    case 'consolidate':
+    case 'distribute':
+      return _vapTransferLike(formData)
+    case 'pause':
+      return _vapPause(formData)
+    case 'mix':
+      return _vapMix(formData)
+    default:
+      return {
+        errors: {_form: `Unsupported step type: ${formData.stepType}`},
+        validatedForm: null
+      }
   }
 }
