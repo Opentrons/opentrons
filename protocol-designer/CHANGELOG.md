@@ -4,17 +4,17 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="3.2.0-beta.0"></a>
-# [3.2.0-beta.0](https://github.com/OpenTrons/opentrons/compare/v3.1.2...v3.2.0-beta.0) (2018-06-13)
+# [3.2.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.1.2...v3.2.0-beta.0) (2018-06-13)
 
 
 ### Bug Fixes
 
-* **protocol-designer:** fix bug with multi-channel substeps ([#1663](https://github.com/OpenTrons/opentrons/issues/1663)) ([1fca294](https://github.com/OpenTrons/opentrons/commit/1fca294))
+* **protocol-designer:** fix bug with multi-channel substeps ([#1663](https://github.com/Opentrons/opentrons/issues/1663)) ([1fca294](https://github.com/Opentrons/opentrons/commit/1fca294))
 
 
 ### Features
 
-* **protocol-designer:** Darken font in labware selection modal ([#1646](https://github.com/OpenTrons/opentrons/issues/1646)) ([aacc76c](https://github.com/OpenTrons/opentrons/commit/aacc76c)), closes [#1341](https://github.com/OpenTrons/opentrons/issues/1341)
-* **protocol-designer:** elaborate on deck setup in title bar ([#1637](https://github.com/OpenTrons/opentrons/issues/1637)) ([6bda925](https://github.com/OpenTrons/opentrons/commit/6bda925)), closes [#1339](https://github.com/OpenTrons/opentrons/issues/1339)
-* **protocol-designer:** increase selected pipette font-size ([#1629](https://github.com/OpenTrons/opentrons/issues/1629)) ([b90e767](https://github.com/OpenTrons/opentrons/commit/b90e767)), closes [#1325](https://github.com/OpenTrons/opentrons/issues/1325)
-* **protocol-designer:** update behavior for well setup ([#1511](https://github.com/OpenTrons/opentrons/issues/1511)) ([8c611b5](https://github.com/OpenTrons/opentrons/commit/8c611b5))
+* **protocol-designer:** Darken font in labware selection modal ([#1646](https://github.com/Opentrons/opentrons/issues/1646)) ([aacc76c](https://github.com/Opentrons/opentrons/commit/aacc76c)), closes [#1341](https://github.com/Opentrons/opentrons/issues/1341)
+* **protocol-designer:** elaborate on deck setup in title bar ([#1637](https://github.com/Opentrons/opentrons/issues/1637)) ([6bda925](https://github.com/Opentrons/opentrons/commit/6bda925)), closes [#1339](https://github.com/Opentrons/opentrons/issues/1339)
+* **protocol-designer:** increase selected pipette font-size ([#1629](https://github.com/Opentrons/opentrons/issues/1629)) ([b90e767](https://github.com/Opentrons/opentrons/commit/b90e767)), closes [#1325](https://github.com/Opentrons/opentrons/issues/1325)
+* **protocol-designer:** update behavior for well setup ([#1511](https://github.com/Opentrons/opentrons/issues/1511)) ([8c611b5](https://github.com/Opentrons/opentrons/commit/8c611b5))
