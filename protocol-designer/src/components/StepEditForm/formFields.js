@@ -98,10 +98,10 @@ export const ConnectedPipetteField = connect(PipetteFieldSTP, (dispatch: Dispatc
 
 const LabwareDropdownSTP = state => ({labwareOptions: labwareIngredSelectors.labwareOptions(state)})
 type LabwareDropdownStateProps = {labwareOptions: Options}
-type LabwareDropdownOwnProps = {formConnector: FormConnector<*>}
+type LabwareDropdownOwnProps = FormConnector<*>
 export const LabwareDropdown = connect(LabwareDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
-  ({labwareOptions, ...restProps}: LabwareDropdownOwnProps & LabwareDropdownStateProps) => (
-    <DropdownField options={labwareOptions} {...restProps} />
+  ({labwareOptions, ...props}: LabwareDropdownOwnProps & LabwareDropdownStateProps) => (
+    <DropdownField options={labwareOptions} {...props} />
   )
 )
 

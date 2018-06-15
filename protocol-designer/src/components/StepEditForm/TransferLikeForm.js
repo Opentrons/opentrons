@@ -17,7 +17,7 @@ import FormSection from './FormSection'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 import type {FormConnector} from '../../utils'
-import type {TransferLikeFrom as TransferLikeFormData} from '../../form-types'
+import type {TransferLikeForm as TransferLikeFormData} from '../../form-types'
 
 type TransferLikeFormProps = {formData: TransferLikeFormData, formConnector: FormConnector<*>}
 
@@ -127,7 +127,7 @@ const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
             </CheckboxRow>
           </FormGroup>
         </div>
-        <TipSettingsColumn hasChangeField={false} />
+        <TipSettingsColumn formConnector={formConnector} hasChangeField={false} />
       </div>
     </FormSection>
   </React.Fragment>

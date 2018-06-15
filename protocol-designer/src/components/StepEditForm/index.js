@@ -30,18 +30,16 @@ const StepFormTypeMap = {
 }
 
 const StepEditForm = ({formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave}: Props) => {
-  const FormComponent = _.get(StepFormTypeMap, formData.stepType) || <div>Todo: support {formData.stepType} step</div>
+  const FormComponent = _.get(StepFormTypeMap, formData.stepType)
+  if (!FormComponent) return <div className={formStyles.form}><div>Todo: support {formData.stepType} step</div></div>
   return (
     <div className={cx(formStyles.form, styles[formData.stepType])}>
       <FormComponent formData={formData} formConnector={formConnectorFactory(handleChange, formData)} />
-      {
-        FormComponent &&
-        <div className={styles.button_row}>
-          <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
-          <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
-          <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
-        </div>
-      }
+      <div className={styles.button_row}>
+        <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
+        <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
+        <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
+      </div>
     </div>
   )
 }
