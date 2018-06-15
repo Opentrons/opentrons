@@ -19,7 +19,7 @@ export default function ModalPage (props: Props) {
   const {titleBar, heading} = props
 
   return (
-    <div className={styles.modal}>
+    <div className={styles.modal_page}>
       <Overlay />
       <TitleBar {...titleBar} className={styles.title_bar} />
       <div className={cx(styles.modal_page_contents, props.contentsClassName)}>
