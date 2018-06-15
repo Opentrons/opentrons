@@ -14,6 +14,7 @@ import Page from '../components/Page'
 import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
 import ChangePipette from '../components/ChangePipette'
 import CalibrateDeck from '../components/CalibrateDeck'
+import ConnectBanner from '../components/RobotSettings/ConnectBanner'
 
 type StateProps = {
   robot: ?Robot,
@@ -58,6 +59,7 @@ function RobotSettingsPage (props: Props) {
   return (
     <Page>
       <TitleBar title={robot.name} />
+      <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
       <RobotSettings {...robot} />
 
       <Route path={`${path}/pipettes`} render={(props) => (
