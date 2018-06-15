@@ -15,11 +15,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "devDependencies": {
-    "cross-env": "^5.1.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "react-styleguidist": "^6.1.0",
-    "shx": "^0.2.2"
+    "flow-typed": "^2.4.0"
   },
   "peerDependencies": {
     "classnames": "^2.2.5",
