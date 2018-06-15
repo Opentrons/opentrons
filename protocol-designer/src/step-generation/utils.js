@@ -8,8 +8,6 @@ import last from 'lodash/last'
 import {computeWellAccess} from '@opentrons/shared-data'
 import type {
   CommandCreator,
-  CommandCreatorError,
-  CommandsAndRobotState,
   RobotState,
   Timeline,
   LocationLiquidState
@@ -56,15 +54,10 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
     )
   )
 
-type TimelineAcc = {
-  timeline: Array<CommandsAndRobotState>,
-  errorIndex: ?number,
-  errors: ?Array<CommandCreatorError>
-}
 export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
 (initialRobotState: RobotState): Timeline => {
   const timeline = commandCreators.reduce(
-    (acc: TimelineAcc, commandCreator: CommandCreator, index: number) => {
+    (acc: Timeline, commandCreator: CommandCreator, index: number) => {
       const prevRobotState = (acc.timeline.length === 0)
         ? initialRobotState
         : last(acc.timeline).robotState
@@ -79,21 +72,18 @@ export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) 
       if (nextResult.errors) {
         return {
           timeline: acc.timeline,
-          errorIndex: index,
           errors: nextResult.errors
         }
       }
 
       return {
         timeline: [...acc.timeline, nextResult],
-        errorIndex: null,
         errors: null
       }
-    }, {timeline: [], errorIndex: null, errors: null})
+    }, {timeline: [], errors: null})
 
   return {
     timeline: timeline.timeline,
-    errorIndex: timeline.errorIndex,
     errors: timeline.errors
   }
 }

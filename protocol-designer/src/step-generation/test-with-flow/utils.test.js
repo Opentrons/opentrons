@@ -108,7 +108,7 @@ describe('reduceCommandCreators', () => {
 })
 
 describe('commandCreatorsTimeline', () => {
-  test('any errors short-circuit the timeline chain and set the correct errorIndex', () => {
+  test('any errors short-circuit the timeline chain', () => {
     const initialState: any = {count: 5}
     const result = commandCreatorsTimeline([
       addCreatorWithWarning(4),
@@ -118,8 +118,6 @@ describe('commandCreatorsTimeline', () => {
 
     expect(result).toEqual({
       // error-creating "divide by zero" commands's index in the command creators array
-      errorIndex: 1,
-
       errors: [
         {
           message: 'Cannot divide by zero',

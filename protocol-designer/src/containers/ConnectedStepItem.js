@@ -43,16 +43,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hoveredStep = steplistSelectors.hoveredStepId(state)
   const selected = steplistSelectors.selectedStepId(state) === stepId
 
-  // TODO: Ian 2018-06-14 make mini selector?
-  const errorIndex = fileDataSelectors.robotStateTimeline(state).errorIndex
-  const error = (errorIndex != null) && ((errorIndex + 1) === stepId)
-
+  const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = fileDataSelectors.warningsPerStep(state)[stepId]
   const hasWarnings = warnings && warnings.length > 0
 
   const showErrorState = (process.env.OT_PD_SHOW_WARNINGS === 'true')
-    ? error || hasWarnings
-    : error // ignore warnings w/o FEATURE FLAG
+    ? hasError || hasWarnings
+    : hasError // ignore warnings w/o FEATURE FLAG
 
   let collapsed
 

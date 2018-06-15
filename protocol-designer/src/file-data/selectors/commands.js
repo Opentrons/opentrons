@@ -175,8 +175,7 @@ export const warningsPerStep: Selector<WarningsPerStep> = createSelector(
   steplistSelectors.orderedSteps,
   robotStateTimeline,
   (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
-    // add 1 to timelineIdx, because the 0th orderedStep is always initial deck setup,
-    // which isn't included in the timeline
+    // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
     const stepId = orderedSteps[timelineIndex + 1]
 
     // remove warnings of duplicate 'type'. chosen arbitrarily
@@ -185,6 +184,22 @@ export const warningsPerStep: Selector<WarningsPerStep> = createSelector(
       [stepId]: uniqBy(frame.warnings, w => w.type)
     }
   }, {})
+)
+
+export const getErrorStepId: Selector<?number> = createSelector(
+  steplistSelectors.orderedSteps,
+  robotStateTimeline,
+  (orderedSteps, timeline) => {
+    const hasErrors = timeline.errors && timeline.errors.length > 0
+    if (hasErrors) {
+      // the frame *after* the last frame in the timeline is the error-throwing one
+      const errorIndex = timeline.timeline.length
+      // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
+      const errorStepId = orderedSteps[errorIndex + 1]
+      return errorStepId
+    }
+    return null
+  }
 )
 
 export const lastValidRobotState: Selector<StepGeneration.RobotState> = createSelector(

@@ -170,7 +170,11 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
 
     function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {
       const robotState = timeline[timelineIdx].robotState
-      const formIdx = timelineIdx + 1 // add 1 to make up for initial deck setup action
+      // TODO: Ian 2018-06-15 BUG! this doesn't work where there are deleted steps.
+      // Need to use orderedSteps[timelineIdx + 1] to get stepId
+      // (just like in warningsPerStep and getErrorStepId selectors in file-data/selectors/commands)
+      // Make stepId's always UNIQUE STRINGS to avoid trying to add 1 to them?
+      const formIdx = timelineIdx + 1
       const form = _forms[formIdx] && _forms[formIdx].validatedForm
 
       // replace value of each labware with highlighted wells info
