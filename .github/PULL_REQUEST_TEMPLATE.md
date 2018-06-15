@@ -2,7 +2,7 @@
   Thanks for taking the time to open a pull request! Please make sure you've
   read the "Opening Pull Requests" section of our Contributing Guide:
 
-  https://github.com/Opentrons/opentrons/blob/v3a/CONTRIBUTING.md#opening-pull-requests
+  https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-pull-requests
 
   To ensure your code is reviewed quickly and thoroughly, please fill out the
   sections below to the best of your ability!
