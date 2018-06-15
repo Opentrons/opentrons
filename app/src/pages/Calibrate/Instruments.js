@@ -37,17 +37,18 @@ function SetupInstrumentsPage (props: Props) {
   }
 
   return (
-    <Page>
-      <SessionHeader />
+    <Page
+      titleBarProps={{title: (<SessionHeader />)}}
+    >
       <InstrumentTabs {...{instruments, currentInstrument}} />
       <Instruments {...props} />
-      {currentInstrument && (
+      {!!currentInstrument && (
         <TipProbe
           {...currentInstrument}
           confirmTipProbeUrl={confirmTipProbeUrl}
         />
       )}
-      {currentInstrument && (
+      {!!currentInstrument && (
         <Route path={confirmTipProbeUrl} render={() => (
           <ConfirmTipProbeModal
             mount={currentInstrument.mount}

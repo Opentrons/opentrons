@@ -1,26 +1,10 @@
 @import '@opentrons/components';
 
-.modal {
-  @apply --modal;
-
-  padding: 6rem 4rem;
-}
-
 .title_bar {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-}
-
-.modal_contents {
-  z-index: 1;
-  width: 100%;
-  max-width: 38rem;
-  margin: auto;
-  background-color: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
 }
 
 .in_progress_contents {
@@ -34,11 +18,11 @@
 .position_diagram,
 .jog_container {
   width: 100%;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
 }
 
 .position_diagram {
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
 }
 
 .diagram_title {

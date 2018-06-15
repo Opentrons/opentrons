@@ -15,7 +15,7 @@ import {
   setUpdateSeen
 } from '../../shell'
 
-import Page from '../../components/Page'
+import Page, {PageWrapper} from '../../components/Page'
 import AppSettings, {AppUpdateModal} from '../../components/AppSettings'
 
 type OP = ContextRouter
@@ -39,8 +39,12 @@ function AppSettingsPage (props: Props) {
   const {update, match: {path}} = props
 
   return (
-    <Page>
-      <AppSettings {...props} />
+    <PageWrapper>
+      <Page
+        titleBarProps={{title: 'App'}}
+      >
+        <AppSettings {...props} />
+      </Page>
       <Switch>
         <Route path={`${path}/update`} render={() => (
           <AppUpdateModal {...props} close={props.closeUpdateModal} />
@@ -53,7 +57,7 @@ function AppSettingsPage (props: Props) {
           return null
         }} />
       </Switch>
-    </Page>
+    </PageWrapper>
   )
 }
 

@@ -145,7 +145,7 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
 
 exports[`modals ModalPage renders correctly 1`] = `
 <div
-  className="modal"
+  className="modal_page"
 >
   <div
     className="overlay"

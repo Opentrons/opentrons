@@ -9,8 +9,8 @@ import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
 import createLogger from '../logger'
 
-import {TitleBar, Splash} from '@opentrons/components'
-import Page from '../components/Page'
+import {Splash} from '@opentrons/components'
+import Page, {PageWrapper} from '../components/Page'
 import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
 import ChangePipette from '../components/ChangePipette'
 import CalibrateDeck from '../components/CalibrateDeck'
@@ -57,11 +57,13 @@ function RobotSettingsPage (props: Props) {
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
-    <Page>
-      <TitleBar title={robot.name} />
-      <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
-      <RobotSettings {...robot} />
-
+    <PageWrapper>
+      <Page
+        titleBarProps={{title: robot.name}}
+      >
+        <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
+        <RobotSettings {...robot} />
+      </Page>
       <Route path={`${path}/pipettes`} render={(props) => (
         <ChangePipette {...props} robot={robot} parentUrl={url} />
       )} />
@@ -73,7 +75,7 @@ function RobotSettingsPage (props: Props) {
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
-    </Page>
+    </PageWrapper>
   )
 }
 
