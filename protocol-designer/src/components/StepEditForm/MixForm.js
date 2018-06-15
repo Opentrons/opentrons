@@ -1,4 +1,4 @@
-  // @flow
+// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {FormGroup, InputField} from '@opentrons/components'
@@ -11,11 +11,12 @@ import {
   TipSettingsColumn
 } from './formFields'
 import type {FormData} from '../../form-types'
+import type {FormConnector} from '../../utils'
 import WellSelectionInput from '../../containers/WellSelectionInput'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 
-type MixFormProps = {formData: FormData}
+type MixFormProps = {formData: FormData, formConnector: FormConnector}
 
 const MixForm = ({formData, formConnector}: MixFormProps) => (
   <React.Fragment>

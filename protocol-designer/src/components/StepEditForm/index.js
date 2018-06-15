@@ -12,8 +12,7 @@ import {
 
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
-// import WellSelectionInput from '../../containers/WellSelectionInput'
-// import FormSection from './FormSection'
+import PauseForm from './PauseForm'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 import type {FormSectionNames, FormSectionState} from '../../steplist/types' // TODO import from index.js
@@ -40,17 +39,34 @@ export type Props = {
     this obj reflects the form selector's return values */
 }
 
-export default function StepEditForm (props: Props) {
+const StepEditForm = (props: Props) => {
   const {formData} = props
   const formConnector = formConnectorFactory(props.handleChange, formData)
 
-  const buttonRow = <div className={styles.button_row}>
-    <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
-      MORE OPTIONS
-    </FlatButton>
-    <PrimaryButton className={styles.cancel_button} onClick={props.onCancel}>CANCEL</PrimaryButton>
-    <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
-  </div>
+  const buttonRow = (
+    <div className={styles.button_row}>
+      <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
+        MORE OPTIONS
+      </FlatButton>
+      <PrimaryButton className={styles.cancel_button} onClick={props.onCancel}>CANCEL</PrimaryButton>
+      <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
+    </div>
+  )
+  let FormComponent = null
+
+  switch (formData.stepType) {
+    case 'mix'
+    case 'pause'
+    case 'transfer'
+    case 'consolidate'
+    case 'distribute'
+
+  }
+'mix'
+'pause'
+'transfer'
+'consolidate'
+'distribute'
 
   if (formData.stepType === 'mix') {
     return (
@@ -64,22 +80,7 @@ export default function StepEditForm (props: Props) {
   if (formData.stepType === 'pause') {
     return (
       <div className={formStyles.form}>
-        <div className={formStyles.row_wrapper}>
-          <div className={formStyles.column_1_2}>
-            <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
-              {...formConnector('pause-for-amount-of-time')} />
-            <InputField units='hr' {...formConnector('pause-hour')} />
-            <InputField units='m' {...formConnector('pause-minute')} />
-            <InputField units='s' {...formConnector('pause-second')} />
-          </div>
-          <div className={formStyles.column_1_2}>
-            <RadioGroup options={[{name: 'Pause until told to resume', value: 'false'}]}
-              {...formConnector('pause-for-amount-of-time')} />
-            <FormGroup label='Message to display'>
-              <InputField {...formConnector('pause-message')} />
-            </FormGroup>
-          </div>
-        </div>
+        <PauseForm formData={formData} formConnector={formConnector} />
         {buttonRow}
       </div>
     )
@@ -103,3 +104,5 @@ export default function StepEditForm (props: Props) {
     </div>
   )
 }
+
+export default StepEditForm
