@@ -4,7 +4,7 @@ import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../types'
 import type {LabwareData, PipetteData} from '../../step-generation'
-import {fileFormValues} from './fileFields'
+import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
@@ -12,12 +12,12 @@ const protocolSchemaVersion = '1.0.0'
 const applicationVersion = '1.0.0'
 
 export const createFile: BaseState => ?ProtocolFile = createSelector(
-  fileFormValues,
+  fileMetadata,
   getInitialRobotState,
   robotStateTimeline,
-  (fileFormValues, initialRobotState, _robotStateTimeline) => {
-    const {author, description} = fileFormValues
-    const name = fileFormValues.name || 'untitled'
+  (fileMetadata, initialRobotState, _robotStateTimeline) => {
+    const {author, description} = fileMetadata
+    const name = fileMetadata.name || 'untitled'
     const isValidFile = true // TODO Ian 2018-02-28 this will be its own selector
 
     if (!isValidFile) {

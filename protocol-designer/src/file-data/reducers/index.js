@@ -2,12 +2,12 @@
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
-import {updateFileFields, updatePipettes} from '../actions'
+import {updateFileMetadataFields, updatePipettes, saveFileMetadata} from '../actions'
 import {pipetteDataByName, type PipetteName} from '../pipetteData'
 
 import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../../step-generation'
-import type {FilePageFields} from '../types'
+import type {FileMetadataFields} from '../types'
 
 const defaultFields = {
   name: '',
@@ -15,8 +15,19 @@ const defaultFields = {
   description: ''
 }
 
-const metadataFields = handleActions({
-  UPDATE_FILE_FIELDS: (state: FilePageFields, action: ActionType<typeof updateFileFields>) => ({
+const unsavedMetadataForm = handleActions({
+  UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>) => ({
+    ...state,
+    ...action.payload
+  }),
+  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>) => ({
+    ...state,
+    ...action.payload
+  })
+}, defaultFields)
+
+const fileMetadata = handleActions({
+  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>) => ({
     ...state,
     ...action.payload
   })
@@ -58,12 +69,14 @@ const pipettes = handleActions({
 }, {left: null, right: null})
 
 export type RootState = {
-  metadataFields: FilePageFields,
+  unsavedMetadataForm: FileMetadataFields,
+  fileMetadata: FileMetadataFields,
   pipettes: PipetteState
 }
 
 const _allReducers = {
-  metadataFields,
+  unsavedMetadataForm,
+  fileMetadata,
   pipettes
 }
 

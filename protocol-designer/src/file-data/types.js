@@ -2,13 +2,13 @@
 import type {DeckSlot, Mount} from '@opentrons/components'
 import type {Command} from '../step-generation/types'
 
-export type FilePageFields = {
+export type FileMetadataFields = {
   name: string,
   author: string,
   description: string
 }
 
-export type FilePageFieldAccessors = $Keys<FilePageFields>
+export type FileMetadataFieldAccessors = $Keys<FileMetadataFields>
 
 type MsSinceEpoch = number
 type VersionString = string // eg '1.0.0'
