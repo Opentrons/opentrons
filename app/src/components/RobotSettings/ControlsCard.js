@@ -3,7 +3,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {Card} from '@opentrons/components'
+import {
+  fetchRobotLights,
+  setRobotLights,
+  makeGetRobotLights
+} from '../../http-api-client'
+
+import {RefreshCard} from '@opentrons/components'
 import {LabeledToggle, LabeledButton} from '../controls'
 
 import type {State, Dispatch} from '../../types'
@@ -11,20 +17,33 @@ import type {Robot} from '../../robot'
 
 type OP = Robot
 
-type SP = {}
+type SP = {
+  lightsOn: boolean,
+}
 
-type DP = {}
+type DP = {
+  dispatch: Dispatch
+}
 
-type Props = OP & SP & DP
+type Props = OP & SP & {
+  fetchLights: () => mixed,
+  toggleLights: () => mixed
+}
 
 const TITLE = 'Robot Controls'
 
-export default connect(makeMakeStateToProps, mapDispatchToProps)(ControlsCard)
+export default connect(makeMakeStateToProps, null, mergeProps)(ControlsCard)
 
 function ControlsCard (props: Props) {
+  const {name, lightsOn, fetchLights, toggleLights} = props
+
   return (
-    <Card title={TITLE} column>
-      <LabeledToggle label='Lights' toggledOn={false} onClick={() => {}}>
+    <RefreshCard title={TITLE} watch={name} refresh={fetchLights} column>
+      <LabeledToggle
+        label='Lights'
+        toggledOn={lightsOn}
+        onClick={toggleLights}
+      >
         <p>Control lights on deck.</p>
       </LabeledToggle>
       <LabeledButton
@@ -33,14 +52,29 @@ function ControlsCard (props: Props) {
       >
         <p>Return robot to starting position.</p>
       </LabeledButton>
-    </Card>
+    </RefreshCard>
   )
 }
 
 function makeMakeStateToProps (): (state: State, ownProps: OP) => SP {
-  return (state, ownProps) => ({})
+  const getRobotLights = makeGetRobotLights()
+
+  return (state, ownProps) => {
+    const lights = getRobotLights(state, ownProps)
+    const lightsOn = !!(lights && lights.response && lights.response.on)
+
+    return {lightsOn}
+  }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  return {}
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {lightsOn} = stateProps
+  const {dispatch} = dispatchProps
+
+  return {
+    ...ownProps,
+    ...stateProps,
+    fetchLights: () => dispatch(fetchRobotLights(ownProps)),
+    toggleLights: () => dispatch(setRobotLights(ownProps, !lightsOn))
+  }
 }

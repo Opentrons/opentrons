@@ -6,9 +6,12 @@ import client from '../client'
 import {
   moveRobotTo,
   home,
+  fetchRobotLights,
+  setRobotLights,
   reducer,
   makeGetRobotMove,
-  makeGetRobotHome
+  makeGetRobotHome,
+  makeGetRobotLights
 } from '..'
 
 jest.mock('../client')
@@ -139,6 +142,86 @@ describe('robot/*', () => {
     })
   })
 
+  describe('fetchRobotLights action creator', () => {
+    const path = 'lights'
+    const response = {on: true}
+
+    test('calls GET /robot/lights', () => {
+      client.__setMockResponse(response)
+
+      return store.dispatch(fetchRobotLights(robot))
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'GET', 'robot/lights'))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS', () => {
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, path}},
+        {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(fetchRobotLights(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, path}},
+        {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(fetchRobotLights(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('setRobotLights action creator', () => {
+    const path = 'lights'
+    const response = {on: false}
+
+    test('calls POST /robot/home to home robot', () => {
+      const expectedBody = {on: false}
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(setRobotLights(robot, false))
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'POST', 'robot/lights', expectedBody))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_SUCCESS', () => {
+      const request = {on: true}
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_SUCCESS', payload: {robot, response, path}}
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(setRobotLights(robot, true))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches ROBOT_REQUEST and ROBOT_FAILURE', () => {
+      const request = {on: false}
+      const error = {name: 'ResponseError', status: '400'}
+      const expectedActions = [
+        {type: 'api:ROBOT_REQUEST', payload: {robot, request, path}},
+        {type: 'api:ROBOT_FAILURE', payload: {robot, error, path}}
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(setRobotLights(robot, false))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
   const REDUCER_REQUEST_RESPONSE_TESTS = [
     {
       path: 'move',
@@ -149,6 +232,11 @@ describe('robot/*', () => {
       path: 'home',
       request: {target: 'pipette', mount: 'left'},
       response: {message: 'we did it!'}
+    },
+    {
+      path: 'lights',
+      request: null,
+      response: {on: true}
     }
   ]
 
@@ -239,7 +327,8 @@ describe('robot/*', () => {
     beforeEach(() => {
       state.api.robot[NAME] = {
         home: {inProgress: true},
-        move: {inProgress: true}
+        move: {inProgress: true},
+        lights: {inProgress: true}
       }
     })
 
@@ -255,6 +344,13 @@ describe('robot/*', () => {
 
       expect(getHome(state, robot)).toEqual(state.api.robot[NAME].home)
       expect(getHome(state, {name: 'foo'})).toEqual({inProgress: false})
+    })
+
+    test('makeGetRobotLights', () => {
+      const getLights = makeGetRobotLights()
+
+      expect(getLights(state, robot)).toEqual(state.api.robot[NAME].lights)
+      expect(getLights(state, {name: 'foo'})).toEqual({inProgress: false})
     })
   })
 })

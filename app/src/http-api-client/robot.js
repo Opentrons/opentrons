@@ -49,11 +49,19 @@ type RobotHomeResponse = {
   message: string,
 }
 
-type RequestPath = 'move' | 'home'
+type RobotLightsRequest = ?{
+  on: boolean
+}
 
-type RobotRequest = RobotMoveRequest | RobotHomeRequest
+type RobotLightsResponse = {
+  on: boolean
+}
 
-type RobotResponse = RobotMoveResponse | RobotHomeResponse
+type RequestPath = 'move' | 'home' | 'lights'
+
+type RobotRequest = RobotMoveRequest | RobotHomeRequest | RobotLightsRequest
+
+type RobotResponse = RobotMoveResponse | RobotHomeResponse | RobotLightsResponse
 
 type RobotRequestAction = {|
   type: 'api:ROBOT_REQUEST',
@@ -99,9 +107,12 @@ export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
 export type RobotHome = ApiCall<RobotHomeRequest, RobotHomeResponse>
 
+export type RobotLights = ApiCall<RobotLightsRequest, RobotLightsResponse>
+
 type RobotByNameState = {
   move?: RobotMove,
   home?: RobotHome,
+  lights?: RobotLights,
 }
 
 type RobotState = {
@@ -110,6 +121,7 @@ type RobotState = {
 
 const MOVE: RequestPath = 'move'
 const HOME: RequestPath = 'home'
+const LIGHTS: RequestPath = 'lights'
 
 export function moveRobotTo (
   robot: RobotService,
@@ -158,6 +170,37 @@ export function home (robot: RobotService, mount?: Mount): ThunkPromiseAction {
       .then(
         (response) => robotSuccess(robot, HOME, response),
         (error) => robotFailure(robot, HOME, error)
+      )
+      .then(dispatch)
+  }
+}
+
+export function fetchRobotLights (robot: RobotService): ThunkPromiseAction {
+  return (dispatch) => {
+    dispatch(robotRequest(robot, LIGHTS))
+
+    return client(robot, 'GET', 'robot/lights')
+      .then(
+        (response) => robotSuccess(robot, LIGHTS, response),
+        (error) => robotFailure(robot, LIGHTS, error)
+      )
+      .then(dispatch)
+  }
+}
+
+export function setRobotLights (
+  robot: RobotService,
+  on: boolean
+): ThunkPromiseAction {
+  const body = {on}
+
+  return (dispatch) => {
+    dispatch(robotRequest(robot, LIGHTS, body))
+
+    return client(robot, 'POST', 'robot/lights', body)
+      .then(
+        (response) => robotSuccess(robot, LIGHTS, response),
+        (error) => robotFailure(robot, LIGHTS, error)
       )
       .then(dispatch)
   }
@@ -235,6 +278,33 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
   return state
 }
 
+export const makeGetRobotMove = () => {
+  const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
+    selectRobotState,
+    (state) => state.move || {inProgress: false}
+  )
+
+  return selector
+}
+
+export const makeGetRobotHome = () => {
+  const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
+    selectRobotState,
+    (state) => state.home || {inProgress: false}
+  )
+
+  return selector
+}
+
+export const makeGetRobotLights = () => {
+  const selector: Selector<State, BaseRobot, RobotLights> = createSelector(
+    selectRobotState,
+    (state) => state.lights || {inProgress: false}
+  )
+
+  return selector
+}
+
 function robotRequest (
   robot: RobotService,
   path: RequestPath,
@@ -260,24 +330,6 @@ function robotFailure (
   error: ApiRequestError
 ): RobotFailureAction {
   return {type: 'api:ROBOT_FAILURE', payload: {robot, path, error}}
-}
-
-export const makeGetRobotMove = () => {
-  const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
-    selectRobotState,
-    (state) => state.move || {inProgress: false}
-  )
-
-  return selector
-}
-
-export const makeGetRobotHome = () => {
-  const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
-    selectRobotState,
-    (state) => state.home || {inProgress: false}
-  )
-
-  return selector
 }
 
 function selectRobotState (state: State, props: BaseRobot): RobotByNameState {
