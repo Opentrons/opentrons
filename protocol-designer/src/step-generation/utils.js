@@ -56,7 +56,7 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
     )
   )
 
-type TimelineAcc = { // TODO
+type TimelineAcc = {
   timeline: Array<CommandsAndRobotState>,
   errorIndex: ?number,
   errors: ?Array<CommandCreatorError>

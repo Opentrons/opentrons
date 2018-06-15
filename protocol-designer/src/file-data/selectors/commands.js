@@ -117,22 +117,18 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
 )
 
 function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreatorData) {
-  if (validatedForm.stepType === 'consolidate') {
-    return StepGeneration.consolidate(validatedForm)
-  } else
-  if (validatedForm.stepType === 'transfer') {
-    return StepGeneration.transfer(validatedForm)
-  } else
-  if (validatedForm.stepType === 'distribute') {
-    return StepGeneration.distribute(validatedForm)
-  } else
-  if (validatedForm.stepType === 'pause') {
-    return StepGeneration.delay(validatedForm)
-  } else
-  if (validatedForm.stepType === 'mix') {
-    return StepGeneration.mix(validatedForm)
+  switch (validatedForm.stepType) {
+    case 'consolidate':
+      return StepGeneration.consolidate(validatedForm)
+    case 'transfer':
+      return StepGeneration.transfer(validatedForm)
+    case 'distribute':
+      return StepGeneration.distribute(validatedForm)
+    case 'pause':
+      return StepGeneration.delay(validatedForm)
+    case 'mix':
+      return StepGeneration.mix(validatedForm)
   }
-
   return null
 }
 
