@@ -19,7 +19,6 @@ type SP = $Diff<Props, DP> & {_page: Page}
 
 function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
-  // TODO: Ian 2018-02-22 fileName from file
   const fileName = fileDataSelectors.protocolName(state)
 
   switch (_page) {
