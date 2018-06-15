@@ -153,10 +153,6 @@ def init(loop=None):
     server.app.router.add_post(
         '/identify', control.identify)
     server.app.router.add_post(
-        '/lights/on', control.turn_on_rail_lights)
-    server.app.router.add_post(
-        '/lights/off', control.turn_off_rail_lights)
-    server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(
         '/server/update', endpoints.update_api)
@@ -184,6 +180,10 @@ def init(loop=None):
         '/robot/move', control.move)
     server.app.router.add_post(
         '/robot/home', control.home)
+    server.app.router.add_get(
+        '/robot/lights', control.get_rail_lights)
+    server.app.router.add_post(
+        '/robot/lights', control.set_rail_lights)
     server.app.router.add_get(
         '/settings', update.get_feature_flag)
     server.app.router.add_get(
