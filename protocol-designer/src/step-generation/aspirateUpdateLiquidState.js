@@ -26,14 +26,18 @@ export default function updateLiquidState (
 ): LiquidStateAndWarnings {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
   const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
-  let overAspirationOccurred = false
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
-  const pipetteLiquidState: SingleLabwareLiquidState = range(pipetteData.channels).reduce(
-    (acc: SingleLabwareLiquidState, tipIndex) => {
+  type PipetteLiquidStateAcc = {
+    pipetteLiquidState: SingleLabwareLiquidState,
+    pipetteWarnings: Array<CommandCreatorWarning>
+  }
+  const {pipetteLiquidState, pipetteWarnings} = range(pipetteData.channels).reduce(
+    (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
       const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
+      const nextWarnings = []
 
       const newLiquidFromWell = splitLiquid(
         volume,
@@ -41,18 +45,20 @@ export default function updateLiquidState (
       ).dest
 
       if (volume > totalVolume(prevSourceLiquidState)) {
-        // TODO: Ian 2018-06-14 it's ugly to do a side-effect mutation inside this reduce...
-        overAspirationOccurred = true
+        nextWarnings.push(warningCreators.aspirateMoreThanWellContents())
       }
 
       return {
-        ...acc,
-        [tipIndex]: mergeLiquid(
-          prevTipLiquidState,
-          newLiquidFromWell
-        )
+        pipetteLiquidState: {
+          ...acc.pipetteLiquidState,
+          [tipIndex]: mergeLiquid(
+            prevTipLiquidState,
+            newLiquidFromWell
+          )
+        },
+        pipetteWarnings: [...acc.pipetteWarnings, ...nextWarnings]
       }
-    }, {})
+    }, {pipetteLiquidState: {}, pipetteWarnings: []})
 
   // Remove liquid from source well(s)
   const labwareLiquidState: SingleLabwareLiquidState = {
@@ -79,15 +85,8 @@ export default function updateLiquidState (
     }
   }
 
-  // Handle warnings
-  let warnings = []
-
-  if (overAspirationOccurred) {
-    warnings.push(warningCreators.aspirateMoreThanWellContents())
-  }
-
   return {
     liquidState: nextLiquidState,
-    warnings
+    warnings: pipetteWarnings
   }
 }

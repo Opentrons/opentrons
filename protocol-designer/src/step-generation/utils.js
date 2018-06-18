@@ -24,7 +24,7 @@ export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
 export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): CommandCreator =>
   (prevRobotState: RobotState) => (
     commandCreators.reduce(
-      (prev, reducerFn, stepIdx) => {
+      (prev: $Call<CommandCreator, *>, reducerFn: CommandCreator, stepIdx) => {
         if (prev.errors) {
           // if there are errors, short-circuit the reduce
           return prev
@@ -38,7 +38,7 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             commands: prev.commands,
             errors: next.errors,
             errorStep: stepIdx,
-            warnings: prev.warnings || undefined // flow fix
+            warnings: prev.warnings
           }
         }
 

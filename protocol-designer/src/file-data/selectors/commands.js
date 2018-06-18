@@ -141,7 +141,7 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const orderedSteps = orderedStepsWithDeckSetup.slice(1)
     const allFormData: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
       return (forms[stepId] && forms[stepId].validatedForm) || null
-    }, [])
+    })
 
     // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
     // $FlowFixMe
