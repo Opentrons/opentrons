@@ -7,6 +7,10 @@
   right: 0;
 }
 
+.modal_contents {
+  background-color: white;
+}
+
 .in_progress_contents {
   background-color: transparent;
 
@@ -60,6 +64,6 @@
 .spinner {
   width: 6rem;
   display: block;
-  margin: 45% auto auto;
+  margin: 35vh auto auto;
   color: var(--c-font-light);
 }

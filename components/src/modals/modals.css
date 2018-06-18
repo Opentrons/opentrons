@@ -23,7 +23,7 @@
   @apply --absolute-fill;
   @apply --flex-start;
 
-  padding-top: 4.5rem 3rem 1rem;
+  padding: 4.5rem 3rem 1rem 3rem;
 }
 
 .overlay {
@@ -53,6 +53,7 @@
   background-color: white;
   max-height: 100%;
   overflow-y: auto;
+  padding-top: 1rem;
 }
 
 .modal_page_heading {
