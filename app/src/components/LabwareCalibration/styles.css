@@ -60,6 +60,6 @@
 .spinner {
   width: 6rem;
   display: block;
-  margin: auto;
+  margin: 45% auto auto;
   color: var(--c-font-light);
 }
