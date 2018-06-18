@@ -1,6 +1,6 @@
 // @flow
 // connect and configure robots page
-import * as React from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Redirect, type ContextRouter} from 'react-router'
 
@@ -9,12 +9,9 @@ import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
 import createLogger from '../logger'
 
-import {Splash} from '@opentrons/components'
+import {TitleBar, Splash} from '@opentrons/components'
 import Page from '../components/Page'
-import RobotSettings, {
-  ConnectAlertModal,
-  UpdateModal
-} from '../components/RobotSettings'
+import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
 import ChangePipette from '../components/ChangePipette'
 import CalibrateDeck from '../components/CalibrateDeck'
 import ConnectBanner from '../components/RobotSettings/ConnectBanner'
@@ -60,17 +57,10 @@ function RobotSettingsPage (props: Props) {
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
-    <React.Fragment>
-      <Page
-        titleBarProps={{title: robot.name}}
-      >
-        <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
-        <RobotSettings {...robot} />
-      </Page>
-
-      <Route path={`${path}/update`} render={() => (
-        <UpdateModal {...robot} />
-      )} />
+    <Page>
+      <TitleBar title={robot.name} />
+      <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
+      <RobotSettings {...robot} />
 
       <Route path={`${path}/pipettes`} render={(props) => (
         <ChangePipette {...props} robot={robot} parentUrl={url} />
@@ -83,7 +73,7 @@ function RobotSettingsPage (props: Props) {
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
-     </React.Fragment>
+    </Page>
   )
 }
 

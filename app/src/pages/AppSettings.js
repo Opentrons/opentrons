@@ -5,18 +5,18 @@ import {connect} from 'react-redux'
 import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
 
-import type {State} from '../../types'
-import type {ShellUpdate} from '../../shell'
+import type {State} from '../types'
+import type {ShellUpdate} from '../shell'
 import {
   getShellUpdate,
   checkForShellUpdates,
   downloadShellUpdate,
   quitAndInstallShellUpdate,
   setUpdateSeen
-} from '../../shell'
+} from '../shell'
 
-import Page from '../../components/Page'
-import AppSettings, {AppUpdateModal} from '../../components/AppSettings'
+import Page from '../components/Page'
+import AppSettings, {AppUpdateModal} from '../components/AppSettings'
 
 type OP = ContextRouter
 
