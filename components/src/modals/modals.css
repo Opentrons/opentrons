@@ -23,7 +23,7 @@
   @apply --absolute-fill;
   @apply --flex-start;
 
-  padding: 5rem 3rem 2rem;
+  padding-top: 4.5rem 3rem 1rem;
 }
 
 .overlay {
