@@ -6,27 +6,16 @@
     z-index: 1;
     width: 100%;
     max-width: 38rem;
-    margin: 0 auto;
+    margin: auto;
     padding: 1rem;
     border-radius: 0.5rem;
   }
 }
 
 .modal {
-  @apply --absolute-fill;
-  @apply --center-children;
+  @apply --modal;
 
   padding: 4rem;
-}
-
-.modal_page {
-  @apply --absolute-fill;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 5rem 2rem 1rem;
 }
 
 .overlay {
@@ -53,8 +42,7 @@
   @apply --modal-contents;
 
   background-color: white;
-  max-height: 100%;
-  overflow-y: auto;
+  min-width: 38rem;
 }
 
 .modal_page_heading {

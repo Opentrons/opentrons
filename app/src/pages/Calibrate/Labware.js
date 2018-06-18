@@ -1,78 +1,39 @@
 // @flow
 // setup instruments page
-import * as React from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
-import {Route, Redirect, withRouter, type ContextRouter, type Match} from 'react-router'
-import {push} from 'react-router-redux'
-import {
-  selectors as robotSelectors,
-  type Labware
-} from '../../robot'
+import {withRouter, type ContextRouter} from 'react-router'
 
+import {selectors as robotSelectors} from '../../robot'
 import Page from '../../components/Page'
 import LabwareCalibration from '../../components/LabwareCalibration'
 import SessionHeader from '../../components/SessionHeader'
 import ReviewDeckModal from '../../components/ReviewDeckModal'
-import ConfirmModal from '../../components/LabwareCalibration/ConfirmModal'
-
-type OwnProps = {
-  match: Match
-}
 
 type StateProps = {
-  deckPopulated: boolean,
-  labware: ?Labware
+  deckPopulated: boolean
 }
 
-type DispatchProps = {onBackClick: () => void}
+type Props = ContextRouter & StateProps
 
-type Props = ContextRouter & StateProps & OwnProps & DispatchProps
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SetupDeckPage))
+export default withRouter(connect(mapStateToProps)(SetupDeckPage))
 
 function SetupDeckPage (props: Props) {
-  const {labware, deckPopulated, onBackClick, match: {url, params: {slot}}} = props
+  const {deckPopulated, match: {url, params: {slot}}} = props
+
   return (
-    <React.Fragment>
-      <Page
-        titleBarProps={{title: (<SessionHeader />)}}
-      >
-        <LabwareCalibration labware={labware} />
-      </Page>
+    <Page>
+      <SessionHeader />
+      <LabwareCalibration slot={slot} url={url} />
       {!deckPopulated && (
         <ReviewDeckModal slot={slot} />
       )}
-      <Route path={`${url}/confirm`} render={() => {
-        if (!labware || labware.calibration === 'confirmed') {
-          return (
-            <Redirect to={url} />
-          )
-        }
-
-        return (
-          <ConfirmModal labware={labware} onBackClick={onBackClick} />
-        )
-      }} />
-    </React.Fragment>
+    </Page>
   )
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const {match: {url, params: {slot}}} = ownProps
-  const labware = robotSelectors.getLabware(state)
-  const currentLabware = labware.find((lw) => lw.slot === slot)
-
+function mapStateToProps (state): StateProps {
   return {
-    deckPopulated: !!robotSelectors.getDeckPopulated(state),
-    labware: currentLabware,
-    slot,
-    url
-  }
-}
-
-function mapDispatchToProps (dispatch, ownProps: OwnProps): DispatchProps {
-  const {match: {url}} = ownProps
-  return {
-    onBackClick: () => { dispatch(push(url)) }
+    deckPopulated: !!robotSelectors.getDeckPopulated(state)
   }
 }
