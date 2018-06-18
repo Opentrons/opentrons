@@ -24,33 +24,65 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
   distribute: TransferLikeForm
 }
 
-type SP = {formData?: FormData, canSave: boolean}
+type SP = {formData?: FormData, canSave: boolean, isNewStep: boolean}
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
 }
+type StepEditFormState = {
+  focusedField: string, // TODO: BC make this a real enum of field names
+  dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
+}
 
-const StepEditForm = (props: SP & DP) => {
-  const {formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave} = props
-  const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
-  if (!FormComponent) return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
-  return (
-    <div className={cx(formStyles.form, styles[formData.stepType])}>
-      <FormComponent formData={formData} formConnector={formConnectorFactory(handleChange, formData)} />
-      <div className={styles.button_row}>
-        <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
-        <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
-        <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
+class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
+  constructor (props) {
+    super(props)
+    this.state = {
+      focusedField: null,
+      dirtyFields: []
+    }
+  }
+
+  onFieldFocus = (fieldName: string) => { // TODO: BC real field name type
+    this.setState({focusedField: fieldName})
+  }
+
+  onFieldBlur = (fieldName: string) => {
+    this.setState((prevState) => ({
+      focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
+      dirtyFields: [...prevState, fieldName]
+    }))
+  }
+
+  render () {
+    if (!this.props.formData) return null // early-exit if connected formData is absent
+    const {formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave} = this.props
+    const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
+    if (!FormComponent) { // early-exit if step form doesn't exist
+      return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
+    }
+    return (
+      <div className={cx(formStyles.form, styles[formData.stepType])}>
+        <FormComponent
+          formData={formData}
+          onFieldFocus={this.onFieldFocus}
+          onFieldBlur={this.onFieldBlur} />
+        <div className={styles.button_row}>
+          <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
+          <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
+          <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  canSave: selectors.currentFormCanBeSaved(state)
+  canSave: selectors.currentFormCanBeSaved(state),
+  isNewStep: selectors.isNewStepForm(state)
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

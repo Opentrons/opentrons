@@ -333,6 +333,12 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
   }
 )
 
+const isNewStepForm = createSelector(
+  formData,
+  getSavedForms,
+  (formData, savedForms) => formData && formData.id && !savedForms[formData.id]
+)
+
 /** True if app is in Deck Setup Mode. */
 const deckSetupMode: Selector<boolean> = createSelector(
   getSteps,
@@ -517,6 +523,7 @@ export const selectors = {
   formModalData,
   nextStepId,
   validatedForms,
+  isNewStepForm,
   currentFormErrors,
   formSectionCollapse: formSectionCollapseSelector,
   deckSetupMode,

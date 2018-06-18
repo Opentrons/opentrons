@@ -4,7 +4,7 @@ import * as React from 'react'
 import Alerts from '../containers/Alerts'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
-import ConnectedStepEditForm from '../StepEditForm/ConnectedStepEditForm'
+import StepEditForm from '../components/StepEditForm'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
@@ -33,7 +33,7 @@ export default function ProtocolEditor () {
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />
-            <ConnectedStepEditForm />
+            <StepEditForm />
 
             <ConnectedMainPanel />
           </div>
