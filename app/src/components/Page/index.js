@@ -13,12 +13,12 @@ type Props = {
 export default function Page (props: Props) {
   const {titleBarProps, children} = props
   return (
-    <div className={styles.task}>
+    <main className={styles.task}>
       {titleBarProps && (
          <TitleBar {...titleBarProps} />
        )}
       {children}
-    </div>
+    </main>
   )
 }
 

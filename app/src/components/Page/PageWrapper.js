@@ -11,10 +11,10 @@ type Props = {
 }
 export default function PageWrapper (props: Props) {
   return (
-    <main className={styles.relative}>
+    <div className={styles.relative}>
       {props.children}
       <LostConnectionAlert />
       <AnalyticsSettingsModal />
-    </main>
+    </div>
   )
 }
