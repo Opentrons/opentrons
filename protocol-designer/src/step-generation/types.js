@@ -114,6 +114,13 @@ export type PauseFormData = {|
   }
 |}
 
+export type CommandCreatorData =
+  | ConsolidateFormData
+  | DistributeFormData
+  | MixFormData
+  | PauseFormData
+  | TransferFormData
+
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
@@ -217,13 +224,28 @@ export type CommandCreatorError = {|
   type: ErrorType
 |}
 
+export type WarningType =
+  | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
+
+export type CommandCreatorWarning = {|
+    message: string,
+    type: WarningType
+|}
+
 export type CommandsAndRobotState = {|
   commands: Array<Command>,
-  robotState: RobotState
+  robotState: RobotState,
+  warnings?: Array<CommandCreatorWarning>
 |}
 
 export type CommandCreatorErrorResponse = {
-  errors: Array<CommandCreatorError>
+  errors: Array<CommandCreatorError>,
+  warnings?: Array<CommandCreatorWarning>
 }
 
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
+
+export type Timeline = {|
+  timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names
+  errors?: ?Array<CommandCreatorError>
+|}

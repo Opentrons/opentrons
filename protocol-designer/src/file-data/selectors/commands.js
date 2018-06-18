@@ -1,9 +1,10 @@
 // @flow
 import {createSelector} from 'reselect'
-import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import takeWhile from 'lodash/takeWhile'
+import uniqBy from 'lodash/uniqBy'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
@@ -115,129 +116,97 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-export type RobotStateTimeline = {
-  formErrors: {[string]: string},
-  timeline: Array<StepGeneration.CommandsAndRobotState>,
-  robotState: StepGeneration.RobotState,
-  timelineErrors?: ?Array<StepGeneration.CommandCreatorError>,
-  errorStepId?: number
+function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreatorData) {
+  switch (validatedForm.stepType) {
+    case 'consolidate':
+      return StepGeneration.consolidate(validatedForm)
+    case 'transfer':
+      return StepGeneration.transfer(validatedForm)
+    case 'distribute':
+      return StepGeneration.distribute(validatedForm)
+    case 'pause':
+      return StepGeneration.delay(validatedForm)
+    case 'mix':
+      return StepGeneration.mix(validatedForm)
+  }
+  return null
 }
 
 // exposes errors and last valid robotState
-export const robotStateTimeline: Selector<RobotStateTimeline> = createSelector(
+export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
-  (forms, orderedSteps, initialRobotState) => {
-    const finalStepId = last(orderedSteps)
+  (forms, orderedStepsWithDeckSetup, initialRobotState) => {
+    const orderedSteps = orderedStepsWithDeckSetup.slice(1)
+    const allFormData: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
+      return (forms[stepId] && forms[stepId].validatedForm) || null
+    })
 
-    const result: RobotStateTimeline = orderedSteps.reduce((acc: RobotStateTimeline, stepId): RobotStateTimeline => {
-      if (!isEmpty(acc.formErrors)) {
-        // short-circut the reduce if there were errors with validating / processing the form
-        return acc
-      }
+    // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
+    // $FlowFixMe
+    const continuousValidForms: Array<StepGeneration.CommandCreatorData> = takeWhile(
+      allFormData,
+      f => f
+    )
 
-      if (acc.timelineErrors) {
-        // short-circut the reduce if there were timeline errors
-        return acc
-      }
+    const commandCreators = continuousValidForms.reduce(
+      (acc: Array<StepGeneration.CommandCreator>, formData) => {
+        const {stepType} = formData
+        const commandCreator = commandCreatorsFromFormData(formData)
 
-      const form = forms[stepId]
-
-      if (stepId === 0) {
-        // The first stepId is the "initial deck setup" step.
-        // It doesn't have a form, it just sets up initialRobotState
-        return {
-          ...acc,
-          timeline: [
-            ...acc.timeline,
-            {
-              commands: [],
-              robotState: initialRobotState
-            }
-          ]
+        if (!commandCreator) {
+          // TODO Ian 2018-05-08 use assert
+          console.warn(`StepType "${stepType}" not yet implemented`)
+          return acc
         }
-      }
 
-      // un-nest to make flow happy
-      const validatedForm = form.validatedForm
+        return [...acc, commandCreator]
+      }, [])
 
-      // put form errors into accumulator
-      if (!validatedForm) {
-        return {
-          ...acc,
-          formErrors: form.errors
-        }
-      }
+    const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)
 
-      // finally, deal with valid step forms
-      let commandCreators = []
+    return timeline
+  }
+)
 
-      if (validatedForm.stepType === 'consolidate') {
-        commandCreators.push(StepGeneration.consolidate(validatedForm))
-      } else
-      if (validatedForm.stepType === 'transfer') {
-        commandCreators.push(StepGeneration.transfer(validatedForm))
-      } else
-      if (validatedForm.stepType === 'distribute') {
-        commandCreators.push(StepGeneration.distribute(validatedForm))
-      } else
-      if (validatedForm.stepType === 'pause') {
-        commandCreators.push(StepGeneration.delay(validatedForm))
-      } else
-      if (validatedForm.stepType === 'mix') {
-        commandCreators.push(StepGeneration.mix(validatedForm))
-      } else {
-        // TODO Ian 2018-05-08 use assert
-        console.warn(`StepType "${validatedForm.stepType}" not yet implemented`)
-        return {
-          ...acc,
-          formErrors: {
-            ...acc.formErrors,
-            'STEP NOT IMPLEMENTED': validatedForm.stepType
-          }
-        }
-      }
+type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
+export const warningsPerStep: Selector<WarningsPerStep> = createSelector(
+  steplistSelectors.orderedSteps,
+  robotStateTimeline,
+  (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
+    // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
+    const stepId = orderedSteps[timelineIndex + 1]
 
-      if (stepId === finalStepId) {
-        // Drop any tips at end of protocol
-        // (dropTip should do no-op when pipette has no tips)
-        const allPipettes = Object.keys(acc.robotState.instruments)
-
-        allPipettes.forEach(pipetteId =>
-          commandCreators.push(StepGeneration.dropTip(pipetteId))
-        )
-      }
-
-      const nextCommandsAndState = StepGeneration.reduceCommandCreators(commandCreators)(acc.robotState)
-
-      // for supported steps
-      if (nextCommandsAndState.errors) {
-        return {
-          ...acc,
-          timelineErrors: nextCommandsAndState.errors,
-          errorStepId: stepId
-        }
-      }
-
-      return {
-        ...acc,
-        timeline: [...acc.timeline, nextCommandsAndState],
-        robotState: nextCommandsAndState.robotState
-      }
-    }, {formErrors: {}, timeline: [], robotState: initialRobotState, timelineErrors: null})
-    // TODO Ian 2018-03-01 pass along name and description of steps for command annotations in file
-
-    if (!isEmpty(result.formErrors)) {
-      // TODO Ian 2018-03-01 remove log later
-      console.log('Got form errors while constructing timeline', result)
+    // remove warnings of duplicate 'type'. chosen arbitrarily
+    return {
+      ...acc,
+      [stepId]: uniqBy(frame.warnings, w => w.type)
     }
+  }, {})
+)
 
-    if (result.timelineErrors) {
-      // TODO Ian 2018-04-30 remove log later
-      console.log('Got timeline errors', result)
+export const getErrorStepId: Selector<?number> = createSelector(
+  steplistSelectors.orderedSteps,
+  robotStateTimeline,
+  (orderedSteps, timeline) => {
+    const hasErrors = timeline.errors && timeline.errors.length > 0
+    if (hasErrors) {
+      // the frame *after* the last frame in the timeline is the error-throwing one
+      const errorIndex = timeline.timeline.length
+      // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
+      const errorStepId = orderedSteps[errorIndex + 1]
+      return errorStepId
     }
+    return null
+  }
+)
 
-    return result
+export const lastValidRobotState: Selector<StepGeneration.RobotState> = createSelector(
+  robotStateTimeline,
+  getInitialRobotState,
+  (timeline, initialRobotState) => {
+    const lastTimelineFrame = last(timeline.timeline)
+    return (lastTimelineFrame && lastTimelineFrame.robotState) || initialRobotState
   }
 )

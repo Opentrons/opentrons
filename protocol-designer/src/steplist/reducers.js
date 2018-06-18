@@ -64,7 +64,8 @@ type FormState = FormData | null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 const unsavedForm = handleActions({
   CHANGE_FORM_INPUT: (state: FormState, action: ChangeFormInputAction) => {
-    // $FlowFixMe TODO IMMEDIATELY
+    // TODO: Ian 2018-06-14 type properly
+    // $FlowFixMe
     return {
       ...state,
       ...action.payload.update
