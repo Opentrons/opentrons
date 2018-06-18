@@ -46,7 +46,8 @@ export type {
 
 export type {
   RobotMove,
-  RobotHome
+  RobotHome,
+  RobotLights
 } from './robot'
 
 export type {
@@ -112,8 +113,11 @@ export {
   home,
   moveRobotTo,
   clearRobotMoveResponse,
+  fetchRobotLights,
+  setRobotLights,
   makeGetRobotMove,
-  makeGetRobotHome
+  makeGetRobotHome,
+  makeGetRobotLights
 } from './robot'
 
 export {
