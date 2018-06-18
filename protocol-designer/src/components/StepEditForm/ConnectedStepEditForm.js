@@ -8,15 +8,15 @@ import {
   saveStepForm,
   collapseFormSection,
   openMoreOptionsModal
-} from '../steplist/actions' // TODO use steplist/index.js
+} from '../../steplist/actions' // TODO use steplist/index.js
 
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
-import {selectors as fileDataSelectors} from '../file-data'
-import type {FormData} from '../form-types'
-import type {BaseState, ThunkDispatch} from '../types'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors} from '../../steplist/reducers' // TODO use steplist/index.js
+import {selectors as fileDataSelectors} from '../../file-data'
+import type {FormData} from '../../form-types'
+import type {BaseState, ThunkDispatch} from '../../types'
 
-import StepEditForm, {type Props as StepEditFormProps} from '../components/StepEditForm'
+import StepEditForm, {type Props as StepEditFormProps} from '../../components/StepEditForm'
 
 type Props = {
   ...StepEditFormProps,
