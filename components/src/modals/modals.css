@@ -11,13 +11,6 @@
     border-radius: 0.5rem;
     position: relative;
   }
-
-  --flex-start: {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-  }
 }
 
 .modal {
@@ -30,6 +23,7 @@
   @apply --absolute-fill;
   @apply --flex-start;
 
+  flex-direction: column;
   padding: 4.5rem 3rem 1rem 3rem;
 }
 
