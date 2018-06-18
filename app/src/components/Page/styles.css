@@ -14,4 +14,12 @@
   @apply --relative-fill;
 
   overflow-y: auto;
+  padding-top: 3.5rem;
+}
+
+.fixed_title_bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
 }
