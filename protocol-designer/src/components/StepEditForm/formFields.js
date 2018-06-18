@@ -87,13 +87,12 @@ export function MixField (props: MixFieldProps) {
   )
 }
 
-type PipetteFieldOP= {formConnector: FormConnector<*>}
+type PipetteFieldOP = {formConnector: FormConnector<*>}
 type PipetteFieldSP = {pipetteOptions: Options}
 const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
   pipetteOptions: fileDataSelectors.equippedPipetteOptions(state)
 })
-const connectPipetteField = connect(PipetteFieldSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))
-export const PipetteField = connectPipetteField((props: PipetteFieldOP & PipetteFieldSP) => {
+export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & PipetteFieldSP) => {
   const {formConnector, pipetteOptions} = props
   return (
     <FormGroup label='Pipette:' className={styles.pipette_field}>
@@ -102,13 +101,12 @@ export const PipetteField = connectPipetteField((props: PipetteFieldOP & Pipette
   )
 })
 
-type LabwareDropdownOP= FormConnector<*>
+type LabwareDropdownOP = $Call<FormConnector<*>, string>
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
   labwareOptions: labwareIngredSelectors.labwareOptions(state)
 })
-const connectLabwareDropdown = connect(LabwareDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))
-export const LabwareDropdown = connectLabwareDropdown((props: LabwareDropdownOP & LabwareDropdownSP) => {
+export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, ...restProps} = props
   return <DropdownField options={labwareOptions} {...restProps} />
 })
