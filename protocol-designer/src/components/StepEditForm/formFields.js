@@ -11,6 +11,7 @@ import {
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {FormConnector} from '../../utils'
+import type {BaseState} from '../../types'
 import styles from './StepEditForm.css'
 
 type Options = Array<DropdownOption>
@@ -104,11 +105,11 @@ type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
   labwareOptions: labwareIngredSelectors.labwareOptions(state)
 })
-export const LabwareDropdown = connect(LabwareDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
-  ({labwareOptions, ...props}: LabwareDropdownOP & LabwareDropdownSP) => (
-    <DropdownField options={labwareOptions} {...props} />
-  )
-)
+const connectLabwareDropdown = connect(LabwareDropdownSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))
+export const LabwareDropdown = connectLabwareDropdown((props: LabwareDropdownOP & LabwareDropdownSP) => {
+  const {labwareOptions, ...restProps} = props
+  return <DropdownField options={labwareOptions} {...restProps} />
+})
 
 type VolumeFieldProps = {formConnector: FormConnector<*>}
 export const VolumeField = ({formConnector}: VolumeFieldProps) => (
@@ -119,19 +120,11 @@ export const VolumeField = ({formConnector}: VolumeFieldProps) => (
 
 // NOTE 2018-05-31 Flow rate cannot yet be adjusted,
 // this is a placeholder
-export const FlowRateField = () => (
-  <FormGroup label='FLOW RATE'>
-    Default
-  </FormGroup>
-)
+export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGroup>
 
 // NOTE 2018-05-31 Tip position cannot yet be adjusted,
 // this is a placeholder
-export const TipPositionField = () => (
-  <FormGroup label='TIP POSITION'>
-    Bottom, center
-  </FormGroup>
-)
+export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
 
 type ChangeTipFieldProps = {formConnector: FormConnector<*>}
 export const ChangeTipField = ({formConnector}: ChangeTipFieldProps) => (

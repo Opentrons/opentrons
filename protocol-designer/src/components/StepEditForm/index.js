@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import _ from 'lodash'
+import get from 'lodash/get'
 import cx from 'classnames'
 import {FlatButton, PrimaryButton} from '@opentrons/components'
 
@@ -30,7 +30,7 @@ const StepFormTypeMap = {
 }
 
 const StepEditForm = ({formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave}: Props) => {
-  const FormComponent: any = _.get(StepFormTypeMap, formData.stepType)
+  const FormComponent: any = get(StepFormTypeMap, formData.stepType)
   if (!FormComponent) return <div className={formStyles.form}><div>Todo: support {formData.stepType} step</div></div>
   return (
     <div className={cx(formStyles.form, styles[formData.stepType])}>

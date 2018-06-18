@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import _ from 'lodash'
+import startCase from 'lodash/startCase'
 import cx from 'classnames'
 import {Icon} from '@opentrons/components'
 
@@ -25,7 +25,7 @@ const FormSection = (props: FormSectionProps) => {
   const childrenArray = React.Children.toArray(props.children)
   return (
     <div className={cx(styles.form_section, props.className)}>
-      <div className={styles.title}>{_.startCase(props.sectionName)}</div>
+      <div className={styles.title}>{startCase(props.sectionName)}</div>
 
       <div className={styles.content}>
         {/* First child always visible, following children only visible if not collapsed */}
