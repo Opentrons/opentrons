@@ -3,6 +3,7 @@ import {Switch, Route, Redirect} from 'react-router'
 
 import NavBar from './nav-bar'
 
+import {PageWrapper} from '../components/Page'
 import SidePanel from '../pages/SidePanel'
 import Robots from '../pages/Robots'
 import More from '../pages/More'
@@ -18,15 +19,17 @@ export default function App () {
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />
       <SidePanel />
-      <Switch>
-        <Redirect from='(.*)/index.html' to='/' />
-        <Redirect exact from='/' to='/robots' />
-        <Route path='/robots/:name?' component={Robots} />
-        <Route path='/menu' component={More} />
-        <Route path='/upload' component={Upload} />
-        <Route path='/calibrate' component={Calibrate} />
-        <Route path='/run' component={Run} />
-      </Switch>
+      <PageWrapper>
+        <Switch>
+          <Redirect from='(.*)/index.html' to='/' />
+          <Redirect exact from='/' to='/robots' />
+          <Route path='/robots/:name?' component={Robots} />
+          <Route path='/menu' component={More} />
+          <Route path='/upload' component={Upload} />
+          <Route path='/calibrate' component={Calibrate} />
+          <Route path='/run' component={Run} />
+        </Switch>
+      </PageWrapper>
     </div>
   )
 }

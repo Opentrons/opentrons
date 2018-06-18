@@ -13,6 +13,12 @@
     align-items: center;
   };
 
+  --flex-start: {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
   --modal: {
     @apply --absolute-fill;
     @apply --center-children;

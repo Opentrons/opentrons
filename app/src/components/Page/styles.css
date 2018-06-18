@@ -1,0 +1,17 @@
+:root {
+  --relative-fill: {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+}
+
+.relative {
+  @apply --relative-fill;
+}
+
+.task {
+  @apply --relative-fill;
+
+  overflow-y: auto;
+}

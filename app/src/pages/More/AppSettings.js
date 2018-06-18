@@ -1,6 +1,6 @@
 // @flow
 // view info about the app and update
-import React from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
@@ -39,8 +39,12 @@ function AppSettingsPage (props: Props) {
   const {update, match: {path}} = props
 
   return (
-    <Page>
-      <AppSettings {...props} />
+    <React.Fragment>
+      <Page
+        titleBarProps={{title: 'App'}}
+      >
+        <AppSettings {...props} />
+      </Page>
       <Switch>
         <Route path={`${path}/update`} render={() => (
           <AppUpdateModal {...props} close={props.closeUpdateModal} />
@@ -53,7 +57,7 @@ function AppSettingsPage (props: Props) {
           return null
         }} />
       </Switch>
-    </Page>
+     </React.Fragment>
   )
 }
 
