@@ -92,13 +92,15 @@ type PipetteFieldSP = {pipetteOptions: Options}
 const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
   pipetteOptions: fileDataSelectors.equippedPipetteOptions(state)
 })
-export const PipetteField = connect(PipetteFieldSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))(
-  ({formConnector, pipetteOptions}: PipetteFieldOP & PipetteFieldSP) => (
+const connectPipetteField = connect(PipetteFieldSTP, (dispatch: Dispatch) => ({dispatch: dispatch}))
+export const PipetteField = connectPipetteField((props: PipetteFieldOP & PipetteFieldSP) => {
+  const {formConnector, pipetteOptions} = props
+  return (
     <FormGroup label='Pipette:' className={styles.pipette_field}>
       <DropdownField options={pipetteOptions} {...formConnector('pipette')} />
     </FormGroup>
   )
-)
+})
 
 type LabwareDropdownOP= FormConnector<*>
 type LabwareDropdownSP = {labwareOptions: Options}
