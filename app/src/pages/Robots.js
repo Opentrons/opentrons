@@ -11,7 +11,10 @@ import createLogger from '../logger'
 
 import {Splash} from '@opentrons/components'
 import Page from '../components/Page'
-import RobotSettings, {ConnectAlertModal} from '../components/RobotSettings'
+import RobotSettings, {
+  ConnectAlertModal,
+  UpdateModal
+} from '../components/RobotSettings'
 import ChangePipette from '../components/ChangePipette'
 import CalibrateDeck from '../components/CalibrateDeck'
 import ConnectBanner from '../components/RobotSettings/ConnectBanner'
@@ -64,6 +67,11 @@ function RobotSettingsPage (props: Props) {
         <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
         <RobotSettings {...robot} />
       </Page>
+
+      <Route path={`${path}/update`} render={() => (
+        <UpdateModal {...robot} />
+      )} />
+
       <Route path={`${path}/pipettes`} render={(props) => (
         <ChangePipette {...props} robot={robot} parentUrl={url} />
       )} />

@@ -1,7 +1,6 @@
 // @flow
 // robot status panel with connect button
 import * as React from 'react'
-import {Route} from 'react-router'
 import type {Robot} from '../../robot'
 
 import StatusCard from './StatusCard'
@@ -37,11 +36,8 @@ export default function RobotSettings (props: Props) {
           <CalibrationCard {...props} />
         </div>
       </div>
-      <Route path={updateUrl} render={() => (
-        <UpdateModal {...props} />
-      )} />
     </div>
   )
 }
 
-export {ConnectAlertModal}
+export {ConnectAlertModal, UpdateModal}
