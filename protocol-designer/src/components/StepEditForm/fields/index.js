@@ -34,9 +34,9 @@ const StepField = (props): StepFieldProps => {
   const showErrors = !(name === focusedField) && dirtyFields.includes(name)
   const processedValue = processField(name, value)
   let errors = {} // TODO: getFieldErrors(name, processedValue)
-  if (isRequired && isEmpty(value)) {
-    errors = {...errors, REQUIRED_FIELD: 'This field is required'}
-  }
+  // if (isRequired && isEmpty(value)) {
+  //   errors = {...errors, REQUIRED_FIELD: 'This field is required'}
+  // }
   return render({
     value,
     updateField: (rawValue) => updateValue(processedValue),

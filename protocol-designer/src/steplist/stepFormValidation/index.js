@@ -264,12 +264,20 @@ function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
   }
 }
 
+const getRequiredFieldErrors = (requiredFields: Array<string>) => {
+  requiredFields.forEach(field => {
+    if (formData[field] == null) {
+      errors = [...errors, `${field.toUpperCase()}_REQUIRED`]
+    }
+  })
+}
+
 const MIX_REQUIRED_FIELDS = ['pipette', 'labware', 'volume', 'times']
 const getMixFormErrors = (formData: MixForm): FormErrors<MixFormData> => {
-  let errors = {}
+  let errors = []
   MIX_REQUIRED_FIELDS.forEach(field => {
     if (formData[field] == null) {
-      errors = {...errors, [field]: 'This field is required'}
+      errors = [...errors, `${field.toUpperCase()}_REQUIRED`]
     }
   })
 
