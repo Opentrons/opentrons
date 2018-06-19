@@ -29,7 +29,7 @@ type FieldProps = {|
   type?: string,
   label?: string,
   units?: string,
-  error?: string,
+  error?: ?string,
   placeholder?: string,
   className?: string
 |}
@@ -183,36 +183,50 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     }
   }
 
+  getVolumeError (): ?string {
+    const {volume} = this.state.input
+    const {selectedWellsMaxVolume} = this.props
+
+    if (!(volume && volume > 0)) {
+      return 'Must be more than 0'
+    }
+
+    if (selectedWellsMaxVolume < volume) {
+      return `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
+    }
+  }
+
   render () {
     const {
       onSave,
       onCancel,
       allIngredientNamesIds,
-      selectedWells,
-      selectedWellsMaxVolume
+      selectedWells
     } = this.props
 
     const {commonIngredGroupId} = this.state
     const {name, volume} = this.state.input
 
-    const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
+    const volumeError = this.getVolumeError()
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
-    const showForm = selectedWells.length > 0
     const showIngredientDropdown = allIngredientNamesIds.length > 0
+    const allowSave = Boolean(volume && name)
+    const showForm = selectedWells.length > 0
 
     if (!showForm) {
       return null
     }
-
-    const allowSave = Boolean(volume && name)
 
     return (
       <div className={formStyles.form}>
         <form className={styles.form_content}>
           <div className={formStyles.row_wrapper}>
               <FormGroup label='Ingredient title:' className={styles.ingred_title_field}>
-                <Field accessor='name' />
+                <Field
+                  error={name ? null : 'This field is required'}
+                  accessor='name'
+                />
               </FormGroup>
 
               <FormGroup
@@ -250,9 +264,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Volume:' className={styles.volume_field}>
               <Field numeric accessor='volume' units='µL'
-                error={maxVolExceeded
-                  ? `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
-                  : undefined}
+                error={volumeError}
               />
             </FormGroup>
           </div>
