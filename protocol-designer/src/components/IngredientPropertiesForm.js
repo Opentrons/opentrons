@@ -193,7 +193,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     } = this.props
 
     const {commonIngredGroupId} = this.state
-    const {volume} = this.state.input
+    const {name, volume} = this.state.input
 
     const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
@@ -204,6 +204,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     if (!showForm) {
       return null
     }
+
+    const allowSave = Boolean(volume && name)
 
     return (
       <div className={formStyles.form}>
@@ -266,6 +268,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           <PrimaryButton onClick={onCancel}>Cancel</PrimaryButton>
 
           <PrimaryButton
+            disabled={!allowSave}
             onClick={() => onSave({
               ...this.state.input,
               groupId: this.state.commonIngredGroupId
