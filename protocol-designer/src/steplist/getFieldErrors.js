@@ -1,18 +1,27 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
+import get from 'lodash/get'
 
 const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
-type FieldError = 'REQUIRED' // TODO: add other possible field errors
-const FIELD_ERRORS: {[FieldError]: string} = {
+type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
+const FIELD_ERRORS: {[FieldError]: string | (string) => string} = {
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: (minimum) => `${minimum} or more wells are required`
 }
 
-type StepFieldName = 'pipette' // TODO: make enum
+type StepFieldName = 'pipette'
+  | 'labware'
+  | 'volume'
+  | 'times'
+  | 'touch-tip'
+  | 'change-tip'
+  | 'wells'
+  | 'dispense--delay-minutes'
+  | 'dispense--delay-seconds'
 
 type errorGetter = (value: mixed) => Array<FieldError>
-type valueProcessor= (value: mixed) => mixed
+type valueProcessor= (value: mixed) => ?mixed
 
 // Field Error Checkers TODO: fix type for checkers: mixed => ?string)
 const composeErrors = (...errorCheckers) => (value) => {
@@ -21,14 +30,13 @@ const composeErrors = (...errorCheckers) => (value) => {
     return possibleError ? [...accumulatedErrors, possibleError] : accumulatedErrors
   }, [])
 }
-const requiredField = (value) => isEmpty(value) && FIELD_ERRORS.REQUIRED
-const minimumWellCount = (minimum) => (wells) => wells && (wells.length < minimum) && FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum)
+const requiredField = (value: mixed) => isEmpty(value) && FIELD_ERRORS.REQUIRED
+const minimumWellCount = (minimum: number) => (wells: Array<mixed>) => wells && (wells.length < minimum) && FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum)
 
 // Field Processors
-const composeProcessors = (...processors: mixed => mixed) => (
-  (value) => (
-    processors.reduce((processingValue, processor) => processor(processingValue), value)
-  )
+
+const composeProcessors = (...processors: Array<valueProcessor>) => (value) => (
+  processors.reduce((processingValue, processor) => processor(processingValue), value)
 )
 const castToNumber = (rawValue) => {
   if (!rawValue) return null
@@ -56,10 +64,11 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: errorGetter, processVal
 }
 
 export const getFieldErrors = (name: StepFieldName, value: mixed) => {
-  const fieldHelpers = StepFieldHelperMap[name]
-  if (!fieldHelpers || !fieldHelpers.getErrors){
-    return [] // if no helpers or getErrors return empty error array
-  } else {
-    return fieldHelpers.getErrors(value)
-  }
+  const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
+  return fieldErrorGetter ? fieldErrorGetter(value) : []
+}
+
+export const processField = (name: StepFieldName, value: mixed) => {
+  const fieldProcessor = get(StepFieldHelperMap, `${name}.processValue`)
+  return fieldProcessor ? fieldProcessor(value) : value
 }

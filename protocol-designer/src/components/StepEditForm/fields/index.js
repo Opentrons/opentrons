@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 
-import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
+import {actions, selectors, getFieldErrors, processField} from '../../steplist' // TODO use steplist/index.js
 import type {FormData, StepType} from '../../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
 
@@ -13,27 +13,27 @@ type FieldRenderProps = {
   errorsToShow: {[string]: string} // TODO: real field errors type
 }
 type OP = {
-  fieldName: string,
+  name: string, // TODO: real type
   render: (FieldRenderProps) => StepField,
   maskValue?: (mixed) => mixed,
-  dirtyFields?: Array<string>
-  focusedField?: string
-}// TODO: real fieldName type
+  dirtyFields?: Array<string>, // TODO: real type
+  focusedField?: string // TODO: real type
+}
 type SP = {value: $Values<F>}
 type DP = {updateValue: (e: SyntheticInputEvent<*>) => mixed}
 
 const StepField = (props): StepFieldProps => {
   const {
+    name,
     render,
     value,
     updateValue,
-    maskValue = (rawValue) => rawValue,
     focusedField,
     dirtyFields
   } = props
   const showErrors = !(name === focusedField) && dirtyFields.includes(name)
   const processedValue = processField(name, value)
-  let errors = {} // TODO: getFieldErrors(name, processedValue)
+  const errors = getFieldErrors(name, processedValue)
   // if (isRequired && isEmpty(value)) {
   //   errors = {...errors, REQUIRED_FIELD: 'This field is required'}
   // }

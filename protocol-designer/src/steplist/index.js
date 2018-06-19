@@ -3,10 +3,12 @@
 import rootReducer, {selectors} from './reducers'
 import * as actions from './actions'
 import * as utils from './utils'
+import getFieldErrors from './getFieldErrors'
 
 export {
   actions,
   rootReducer,
   selectors,
+  getFieldErrors,
   utils
 }
