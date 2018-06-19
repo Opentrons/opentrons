@@ -33,6 +33,7 @@ type DispatchProps = {
 type Props = StateProps & DispatchProps
 
 const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
+const ALREADY_UPDATED_MSG = "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 const RESTART_MSG = 'Restart your robot to finish the update. It may take several minutes for your robot to restart.'
 const DONE_MSG = 'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
 
@@ -49,8 +50,14 @@ function UpdateModal (props: Props) {
   let message
   let button
 
+  const heading = availableUpdate
+    ? `Version ${availableUpdate || ''} available`
+    : 'Robot is up to date'
+
   if (!updateRequest.response) {
-    message = UPDATE_MSG
+    message = availableUpdate
+      ? UPDATE_MSG
+      : ALREADY_UPDATED_MSG
     button = inProgress
       ? {disabled: true, children: (<Spinner />)}
       : {onClick: update, children: 'update'}
@@ -68,7 +75,7 @@ function UpdateModal (props: Props) {
   return (
     <AlertModal
       onCloseClick={close}
-      heading={`Version ${availableUpdate || ''} Available`}
+      heading={heading}
       buttons={[
         {onClick: close, children: closeButtonText},
         button

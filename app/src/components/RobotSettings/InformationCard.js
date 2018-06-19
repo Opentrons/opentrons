@@ -75,7 +75,6 @@ function InformationCard (props: Props) {
       <OutlineButton
         Component={Link}
         to={updateUrl}
-        disabled={!availableUpdate}
       >
         {updateText}
       </OutlineButton>
