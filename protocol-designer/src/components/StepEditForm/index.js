@@ -7,7 +7,6 @@ import {FlatButton, PrimaryButton} from '@opentrons/components'
 
 import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
 import type {FormData, StepType} from '../../form-types'
-import {formConnectorFactory} from '../../utils'
 import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
@@ -24,7 +23,7 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
   distribute: TransferLikeForm
 }
 
-type SP = {formData?: FormData, canSave: boolean, isNewStep: boolean}
+type SP = {formData?: FormData, canSave?: boolean, isNewStep?: boolean}
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
@@ -32,7 +31,7 @@ type DP = {
   onSave: (event: SyntheticEvent<>) => mixed,
 }
 type StepEditFormState = {
-  focusedField: string, // TODO: BC make this a real enum of field names
+  focusedField: string | null, // TODO: BC make this a real enum of field names
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
 
@@ -58,7 +57,7 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
 
   render () {
     if (!this.props.formData) return null // early-exit if connected formData is absent
-    const {formData, handleChange, onClickMoreOptions, onCancel, onSave, canSave} = this.props
+    const {formData, onClickMoreOptions, onCancel, onSave, canSave} = this.props
     const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
     if (!FormComponent) { // early-exit if step form doesn't exist
       return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
@@ -67,6 +66,8 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent
           formData={formData}
+          focusedField={this.state.focusedField}
+          dirtyFields={this.state.dirtyFields}
           onFieldFocus={this.onFieldFocus}
           onFieldBlur={this.onFieldBlur} />
         <div className={styles.button_row}>

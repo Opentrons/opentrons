@@ -336,7 +336,7 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
 const isNewStepForm = createSelector(
   formData,
   getSavedForms,
-  (formData, savedForms) => formData && formData.id && !savedForms[formData.id]
+  (formData, savedForms) => !!(formData && formData.id && !savedForms[formData.id])
 )
 
 /** True if app is in Deck Setup Mode. */

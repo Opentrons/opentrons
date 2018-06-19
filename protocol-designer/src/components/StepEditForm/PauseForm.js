@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {FormGroup, InputField, RadioGroup} from '@opentrons/components'
 
+import StepField from './fields'
 import type {FormConnector} from '../../utils'
 import formStyles from '../forms.css'
 
@@ -11,8 +12,14 @@ function PauseForm (props: PauseFormProps) {
   return (
     <div className={formStyles.row_wrapper}>
       <div className={formStyles.column_1_2}>
-        <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
-          {...formConnector('pause-for-amount-of-time')} />
+        <StepField
+          fieldName="pause-for-amount-of-time"
+          render={({updateValue, value}) => (
+            <RadioGroup
+              options={[{name: 'Pause for an amount of time', value: 'true'}]}
+              value={value}
+              onChange={updateValue} />
+          )} />
         <InputField units='hr' {...formConnector('pause-hour')} />
         <InputField units='m' {...formConnector('pause-minute')} />
         <InputField units='s' {...formConnector('pause-second')} />
