@@ -11,9 +11,9 @@ import {
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../labware-ingred/reducers'
-import {openWellSelectionModal} from '../../well-selection/actions'
+import {openWellSelectionModal, type OpenWellSelectionModalPayload} from '../../well-selection/actions'
 import type {FormConnector} from '../../utils'
-import type {BaseState} from '../../types'
+import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 import StepField from './StepFormField'
 
@@ -170,58 +170,64 @@ export const TipSettingsColumn = (props: TipSettingsColumnProps) => (
   </div>
 )
 
+// TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
+// TODO: move this to helpers and correct pipette typing add in selectedPipette multiplier
+const formatWellCount = (wells: Array<string>, selectedPipette: any) => wells && wells.length
 
 type WellSelectionInputOP = {
   name: string,
   pipetteFieldName?: string,
   labwareFieldName?: string
 }
-type WellSelectionInputSP = {selectedPipetteId?: string, selectedLabwareId: string}
-type WellSelectionInputDP = {onClick?: (e: SyntheticMouseEvent<*>) => mixed}
-type WellSelectionInputProps = WellSelectionInputOP & WellSelectionInputDP
+type WellSelectionInputSP = {_selectedPipetteId?: string, _selectedLabwareId: string, wellCount: number}
+type WellSelectionInputDP = {_openWellSelectionModal: (OpenWellSelectionModalPayload) => void}
+type WellSelectionInputProps = {
+  wellCount: number,
+  disabled: boolean,
+  onClick?: (e: SyntheticMouseEvent<*>) => mixed
+}
 
 const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP) => {
   const formData = steplistSelectors.getUnsavedForm(state)
+  const selectedPipette = formData[ownProps.pipetteFieldName]
+  const selectedLabware = formData[ownProps.labwareFieldName]
   return {
-    selectedPipetteId: formData[ownProps.pipetteFieldName],
-    selectedLabwareId: formData[ownProps.labwareFieldName]
+    _selectedPipetteId: selectedPipette.id,
+    _selectedLabwareId: selectedLabware.id,
+    wellCount: formatWellCount(formData[name], selectedPipette)
   }
 }
-const WellSelectionInputDTP = {openWellSelectionModal: openWellSelectionModal}
+const WellSelectionInputDTP = (dispatch: ThunkDispatch<*>): WellSelectionInputDP => ({
+  _openWellSelectionModal: (payload) => { dispatch(openWellSelectionModal(payload)) }
+})
 const WellSelectionInputMP = (
   stateProps: WellSelectionInputSP,
   dispatchProps: WellSelectionInputDP,
   ownProps: WellSelectionInputOP
-) => {
-  const {selectedPipetteId, selectedLabwareId} = stateProps
-  if (selectedPipetteId && selectedLabwareId) {
+): WellSelectionInputProps => {
+  const {_selectedPipetteId, _selectedLabwareId} = stateProps
+  const disabled = !(_selectedPipetteId && _selectedLabwareId)
+  if (_selectedPipetteId && _selectedLabwareId) {
     return {
+      disabled,
+      wellCount: stateProps.wellCount,
       onClick: () => {
-        dispatchProps.openWellSelectionModal({
-          pipetteId: selectedPipetteId,
-          labwareId: selectedLabwareId,
+        dispatchProps._openWellSelectionModal({
+          pipetteId: _selectedPipetteId,
+          labwareId: _selectedLabwareId,
           formFieldAccessor: ownProps.name
         })
       }
     }
   }
   // disabled
-  return {...ownProps}
+  return {disabled}
 }
 
 const connectWellSelectionInput = connect(WellSelectionInputSTP, WellSelectionInputDTP, WellSelectionInputMP)
 
-const WellSelectorInput = (props: WellSelectionInputProps) => {
-  const {initialSelectedWells, labwareId, pipetteId, onClick} = props
-  const disabled = !(labwareId && pipetteId)
-
-  return (
-    <FormGroup label='Wells:' disabled={disabled} className={styles.well_selection_input}>
-      <InputField
-        readOnly
-        value={initialSelectedWells && `${initialSelectedWells.length}`} // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
-        onClick={onClick}
-      />
-    </FormGroup>
-  )
-}
+export const WellSelectionInput = connectWellSelectionInput((props: WellSelectionInputProps) => (
+  <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
+    <InputField readOnly value={`${props.wellCount}`} onClick={props.onClick} />
+  </FormGroup>
+))
