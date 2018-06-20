@@ -97,6 +97,7 @@
 }
 
 .input_caption {
+  padding-top: 0.25rem;
   font-size: var(--fs-caption);
   min-height: var(--fs-caption);
   color: var(--c-med-gray);
