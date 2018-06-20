@@ -36,7 +36,7 @@ const StepField = (props): StepFieldProps => {
 
 type ShowFieldErrorParams = {name: StepFieldName, focusedField: StepFieldName, dirtyFields: Array<StepFieldName>}
 export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErrorParams) => (
-  focusedField && !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
+  !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 )
 
 const STP = (state: BaseState, ownProps: OP): SP => ({

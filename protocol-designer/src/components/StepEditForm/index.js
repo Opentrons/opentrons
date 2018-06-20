@@ -58,7 +58,7 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
   onFieldBlur = (fieldName: string) => {
     this.setState((prevState) => ({
       focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
-      dirtyFields: [...prevState, fieldName]
+      dirtyFields: [...prevState.dirtyFields, fieldName]
     }))
   }
 
