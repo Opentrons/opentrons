@@ -51,6 +51,12 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.formData.id !== prevProps.formData.id) {
+      this.setState({focusedField: null, dirtyFields: []})
+    }
+  }
+
   onFieldFocus = (fieldName: string) => { // TODO: BC real field name type
     this.setState({focusedField: fieldName})
   }
