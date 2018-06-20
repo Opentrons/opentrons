@@ -5,11 +5,12 @@ import {FormGroup, InputField} from '@opentrons/components'
 
 import {
   CheckboxRow,
-  DelayField,
+  DelayFields,
   PipetteField,
   LabwareDropdown,
   TipSettingsColumn
 } from './formFields'
+import StepField from './StepFormField'
 import type {MixForm as MixFormData} from '../../form-types'
 import type {FormConnector} from '../../utils'
 import WellSelectionInput from '../../containers/WellSelectionInput'
@@ -18,60 +19,60 @@ import styles from './StepEditForm.css'
 
 type MixFormProps = {formData: MixFormData, formConnector: FormConnector<*>}
 
-const MixForm = ({formData, formConnector}: MixFormProps) => (
-  <React.Fragment>
-    <div className={formStyles.row_wrapper}>
-      <FormGroup label='Labware:' className={styles.labware_field}>
-        <LabwareDropdown {...formConnector('labware')} />
-      </FormGroup>
-      {/* TODO LATER: also 'disable' when selected labware is a trash */}
-      <WellSelectionInput
-        className={styles.well_selection_input}
-        labwareId={formData['labware']}
-        pipetteId={formData['pipette']}
-        initialSelectedWells={formData['wells']}
-        formFieldAccessor={'wells'}
-      />
-      <PipetteField formConnector={formConnector}/>
-    </div>
+const MixForm = (props: MixFormProps) => {
+  const {dirtyFields, focusedField, onFieldFocus, onFieldBlur} = props
+  return (
+    <React.Fragment>
+      <div className={formStyles.row_wrapper}>
+        <FormGroup label='Labware:' className={styles.labware_field}>
+          <LabwareDropdown name="labware" />
+        </FormGroup>
+        {/* TODO LATER: also 'disable' when selected labware is a trash */}
+        <WellSelectionInput
+          labwareFieldName="labware"
+          pipetteFieldName="pipette"
+          initialSelectedWells={formData['wells']}
+          name="wells"
+        />
+        <PipetteField name="pipette" />
+      </div>
 
-    <div className={cx(formStyles.row_wrapper)}>
-      <FormGroup label='Repetitions' className={styles.field_row}>
-        <InputField units='uL' {...formConnector('volume')} />
-        <InputField units='Times' {...formConnector('times')} />
-      </FormGroup>
-    </div>
-
-    <div className={formStyles.row_wrapper}>
-      <div className={styles.left_settings_column}>
-        <FormGroup label='TECHNIQUE'>
-          <DelayField
-            checkboxAccessor='dispense--delay--checkbox'
-            formConnector={formConnector}
-            minutesAccessor='dispense--delay-minutes'
-            secondsAccessor='dispense--delay-seconds'
-          />
-          <CheckboxRow
-            checkboxAccessor='dispense--blowout--checkbox'
-            formConnector={formConnector}
-            label='Blow out'
-          >
-            <LabwareDropdown
-              className={styles.full_width}
-              {...formConnector('dispense--blowout--labware')}
-            />
-          </CheckboxRow>
-
-          <CheckboxRow
-            checkboxAccessor='touch-tip'
-            formConnector={formConnector}
-            label='Touch tip'
-          />
+      <div className={cx(formStyles.row_wrapper)}>
+        <FormGroup label='Repetitions' className={styles.field_row}>
+          <StepField
+            name="volume"
+            focusedField={focusedField}
+            dirtyFields={dirtyFields}
+            render={({value, updateValue}) => (
+              <InputField units='uL' onChange={updateValue} value={value} />
+            )} />
+          <StepField
+            name="times"
+            focusedField={focusedField}
+            dirtyFields={dirtyFields}
+            render={({value, updateValue}) => (
+              <InputField units='Times' onChange={updateValue} value={value} />
+            )} />
         </FormGroup>
       </div>
-      <TipSettingsColumn formConnector={formConnector} />
-    </div>
-  </React.Fragment>
-)
+
+      <div className={formStyles.row_wrapper}>
+        <div className={styles.left_settings_column}>
+          <FormGroup label='TECHNIQUE'>
+            <DelayFields
+              namePrefix="dispense"
+              focusedField={focusedField}
+              dirtyFields={dirtyFields} />
+            <CheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
+              <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+            </CheckboxRow>
+            <CheckboxRow name="touch-tip" label='Touch tip' />
+          </FormGroup>
+        </div>
+        <TipSettingsColumn namePrefix="aspirate" />
+      </div>
+    </React.Fragment>
+  )
+}
 
 export default MixForm

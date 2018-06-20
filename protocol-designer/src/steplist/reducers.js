@@ -230,11 +230,13 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
-// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
-const formData = createSelector(
+const getUnsavedForm = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedForm
 )
+// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
+// NOTE: DEPRECATED use getUnsavedForm instead
+const formData = getUnsavedForm
 
 const formModalData = createSelector(
   rootSelector,

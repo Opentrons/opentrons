@@ -35,7 +35,7 @@ export const deselectWells = createAction(
 export type OpenWellSelectionModalPayload = {
   labwareId: string,
   pipetteId: string,
-  formFieldAccessor: string, // eg 'aspirate--wells' or 'dispense--wells'
+  formFieldAccessor: string, // TODO: BC rename this name and make type StepFieldName eg 'aspirate--wells' or 'dispense--wells'
   pipetteChannels?: ?Channels,
   labwareName?: string
 }

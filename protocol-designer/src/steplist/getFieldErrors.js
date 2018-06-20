@@ -23,6 +23,8 @@ type StepFieldName = 'pipette'
 type errorGetter = (value: mixed) => Array<FieldError>
 type valueProcessor= (value: mixed) => ?mixed
 
+// TODO: test these
+
 // Field Error Checkers TODO: fix type for checkers: mixed => ?string)
 const composeErrors = (...errorCheckers) => (value) => {
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
