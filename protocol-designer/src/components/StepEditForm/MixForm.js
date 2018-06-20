@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {FormGroup, InputField} from '@opentrons/components'
+import {FormGroup} from '@opentrons/components'
 
 import {
   StepInputField,
@@ -12,7 +12,6 @@ import {
   TipSettingsColumn,
   WellSelectionInput
 } from './formFields'
-import type {MixForm as MixFormData} from '../../form-types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 
@@ -26,7 +25,11 @@ const MixForm = (props: MixFormProps) => {
         <FormGroup label='Labware:' className={styles.labware_field}>
           <LabwareDropdown name="labware" />
         </FormGroup>
-        <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" />
+        <WellSelectionInput
+          name="wells"
+          labwareFieldName="labware"
+          pipetteFieldName="pipette"
+          {...focusHandlers} />
         <PipetteField name="pipette" />
       </div>
 
@@ -34,7 +37,7 @@ const MixForm = (props: MixFormProps) => {
         <FormGroup label='Repetitions' className={styles.field_row}>
           <StepInputField
             name="volume"
-            units='uL'
+            units='μL'
             {...focusHandlers} />
           <StepInputField
             name="times"

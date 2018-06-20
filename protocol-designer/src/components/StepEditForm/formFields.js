@@ -10,12 +10,12 @@ import {
 } from '@opentrons/components'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as steplistSelectors, getFieldErrors} from '../../steplist'
 import {openWellSelectionModal, type OpenWellSelectionModalPayload} from '../../well-selection/actions'
 import type {FormConnector} from '../../utils'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
-import StepField from './StepFormField'
+import {default as StepField, showFieldErrors} from './StepFormField'
 
 type Options = Array<DropdownOption>
 
@@ -50,8 +50,8 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
       render={({value, updateValue}) => (
         <InputField
           {...inputProps}
-          onBlur={onFieldBlur}
-          onFocus={onFieldFocus}
+          onBlur={() => onFieldBlur(name)}
+          onFocus={() => onFieldFocus(name)}
           onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
           value={value} />
       )} />
@@ -78,27 +78,13 @@ export function DelayFields (props: DelayFieldsProps) {
   )
 }
 
-type MixFieldProps = {
-  timesAccessor: string,
-  volumeAccessor: string
-} & CheckboxRowProps
+type MixFieldProps = { timesAccessor: string, volumeAccessor: string } & CheckboxRowProps
 export function MixField (props: MixFieldProps) {
-  const {
-    formConnector,
-    checkboxAccessor,
-    timesAccessor,
-    volumeAccessor,
-    label
-  } = props
-
+  const {checkboxAccessor, timesAccessor, volumeAccessor, label} = props
   return (
-    <CheckboxRow
-      checkboxAccessor={checkboxAccessor}
-      formConnector={formConnector}
-      label={label || 'Mix'}
-    >
-      <InputField units='μL' {...formConnector(timesAccessor)} />
-      <InputField units='Times' {...formConnector(volumeAccessor)} />
+    <CheckboxRow name={checkboxAccessor} label={label || 'Mix'}>
+      <StepInputField units='μL' name={timesAccessor} />
+      <StepInputField units='Times' name={volumeAccessor} />
     </CheckboxRow>
   )
 }
@@ -142,6 +128,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
   )
 })
 
+// TODO: remove this and just use StepInputField like MixForm
 type VolumeFieldProps = {formConnector: FormConnector<*>}
 export const VolumeField = ({formConnector}: VolumeFieldProps) => (
   <FormGroup label='Volume:' className={styles.volume_field}>
@@ -168,20 +155,26 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => (
     name={props.name}
     render={({value, updateValue}) => (
       <FormGroup label='CHANGE TIP'>
-        <DropdownField options={CHANGE_TIP_OPTIONS} onChange={updateValue} value={value} />
+        <DropdownField
+          options={CHANGE_TIP_OPTIONS}
+          value={value}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
       </FormGroup>
     )} />
 
 )
 
 type TipSettingsColumnProps = {namePrefix: string, hasChangeField?: boolean}
-export const TipSettingsColumn = (props: TipSettingsColumnProps) => (
-  <div className={styles.right_settings_column}>
-    {props.hasChangeField && <ChangeTipField name={`${props.namePrefix}--change-tip`} />}
-    <FlowRateField />
-    <TipPositionField />
-  </div>
-)
+export const TipSettingsColumn = (props: TipSettingsColumnProps) => {
+  const {namePrefix, hasChangeField = true} = props
+  return (
+    <div className={styles.right_settings_column}>
+      {hasChangeField && <ChangeTipField name={`${namePrefix}--change-tip`} />}
+      <FlowRateField />
+      <TipPositionField />
+    </div>
+  )
+}
 
 // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
 // TODO: move this to helpers and correct pipette typing add in selectedPipette multiplier
@@ -189,28 +182,32 @@ const formatWellCount = (wells: Array<string>, selectedPipette: any) => {
   return wells ? wells.length : 0
 }
 
-type WellSelectionInputOP = {
-  name: string,
-  pipetteFieldName?: string,
-  labwareFieldName?: string
+type WellSelectionInputOP = {name: string, pipetteFieldName?: string, labwareFieldName?: string} & FocusHandlers
+type WellSelectionInputSP = {
+  _selectedPipetteId?: string,
+  _selectedLabwareId: string,
+  _wellFieldErrors: Array<string>, // TODO: real type
+  wellCount: number
 }
-type WellSelectionInputSP = {_selectedPipetteId?: string, _selectedLabwareId: string, wellCount: number}
 type WellSelectionInputDP = {_openWellSelectionModal: (OpenWellSelectionModalPayload) => void}
 type WellSelectionInputProps = {
   wellCount: number,
   disabled: boolean,
-  onClick?: (e: SyntheticMouseEvent<*>) => mixed
+  onClick?: (e: SyntheticMouseEvent<*>) => mixed,
+  errorsToShow?: Array<string>
 }
 
 const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP) => {
   const formData = steplistSelectors.getUnsavedForm(state)
   const selectedPipette = formData[ownProps.pipetteFieldName]
   const selectedLabware = formData[ownProps.labwareFieldName]
-
+  const selectedWells = formData[ownProps.name]
+  console.log(getFieldErrors(ownProps.name, selectedWells))
   return {
     _selectedPipetteId: selectedPipette,
     _selectedLabwareId: selectedLabware,
-    wellCount: formatWellCount(formData[ownProps.name], selectedPipette)
+    _wellFieldErrors: getFieldErrors(ownProps.name, selectedWells),
+    wellCount: formatWellCount(selectedWells, selectedPipette)
   }
 }
 const WellSelectionInputDTP = (dispatch: ThunkDispatch<*>): WellSelectionInputDP => ({
@@ -221,13 +218,22 @@ const WellSelectionInputMP = (
   dispatchProps: WellSelectionInputDP,
   ownProps: WellSelectionInputOP
 ): WellSelectionInputProps => {
-  const {_selectedPipetteId, _selectedLabwareId} = stateProps
+  const {_selectedPipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
   // TODO: LATER: also 'disable' when selected labware is a trash
   const disabled = !(_selectedPipetteId && _selectedLabwareId)
+  let showErrors: boolean = true
+  if (ownProps.focusHandlers) {
+    const {focusedField, dirtyFields} = ownProps.focusHandlers
+    showErrors = showFieldErrors(ownProps.name, focusedField, dirtyFields)
+  }
   return {
     disabled,
     wellCount: stateProps.wellCount,
+    errorsToShow: showErrors && _wellFieldErrors,
     onClick: () => {
+      if (ownProps.onFieldBlur) {
+        ownProps.onFieldBlur(ownProps.name)
+      }
       dispatchProps._openWellSelectionModal({
         pipetteId: _selectedPipetteId,
         labwareId: _selectedLabwareId,
@@ -243,6 +249,10 @@ const connectWellSelectionInput = connect(WellSelectionInputSTP, WellSelectionIn
 
 export const WellSelectionInput = connectWellSelectionInput((props: WellSelectionInputProps) => (
   <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
-    <InputField readOnly value={props.wellCount} onClick={props.onClick} />
+    <InputField
+      readOnly
+      value={props.wellCount}
+      onClick={props.onClick}
+      error={props.errorsToShow} />
   </FormGroup>
 ))

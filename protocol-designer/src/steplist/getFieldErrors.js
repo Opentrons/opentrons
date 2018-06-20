@@ -26,12 +26,12 @@ type valueProcessor= (value: mixed) => ?mixed
 // TODO: test these
 
 // Field Error Checkers TODO: fix type for checkers: mixed => ?string)
-const composeErrors = (...errorCheckers) => (value) => {
+const composeErrors = (...errorCheckers) => (value) => (
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...accumulatedErrors, possibleError] : accumulatedErrors
   }, [])
-}
+)
 const requiredField = (value: mixed) => isEmpty(value) && FIELD_ERRORS.REQUIRED
 const minimumWellCount = (minimum: number) => (wells: Array<mixed>) => wells && (wells.length < minimum) && FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum)
 
@@ -47,7 +47,7 @@ const castToNumber = (rawValue) => {
 }
 const onlyPositiveNumbers = (number) => (number && Number(number) > 0) ? number : null
 const onlyIntegers = (number) => (number && Number.isInteger(number)) ? number : null
-const minutesToSeconds = (seconds) => Number(seconds) * 60 // TODO: this shouldn't be a form field processor
+// const minutesToSeconds = (seconds) => Number(seconds) * 60 // TODO: this shouldn't be a form field processor but a save formatter
 
 const castToBoolean = (rawValue) => !!rawValue
 
@@ -61,13 +61,14 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: errorGetter, processVal
   'touch-tip': {processValue: castToBoolean},
   'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},
   'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])},
-  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0), minutesToSeconds)}, // TODO minutesToSeconds shouldnt be there
+  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0))},
   'dispense--delay-seconds': {processValue: composeProcessors(castToNumber, defaultTo(0))}
 }
 
 export const getFieldErrors = (name: StepFieldName, value: mixed) => {
   const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
-  return fieldErrorGetter ? fieldErrorGetter(value) : []
+  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+  return errors.length === 0 ? null : errors
 }
 
 export const processField = (name: StepFieldName, value: mixed) => {

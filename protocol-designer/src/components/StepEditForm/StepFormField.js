@@ -28,10 +28,15 @@ const StepField = (props): StepFieldProps => {
     focusedField,
     dirtyFields
   } = props
-  const showErrors = focusedField && !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
+  const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
   return render({value, updateValue, errorsToShow: showErrors && errors})
 }
+
+type ShowFieldErrorParams = {name: StepFieldName, focusedField: StepFieldName, dirtyFields: Array<StepFieldName>}
+export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErrorParams) => (
+  focusedField && !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
+)
 
 const STP = (state: BaseState, ownProps: OP): SP => ({
   value: selectors.formData(state)[ownProps.name] || ''
