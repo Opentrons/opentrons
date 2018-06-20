@@ -42,12 +42,12 @@ const composeProcessors = (...processors: Array<valueProcessor>) => (value) => (
 )
 const castToNumber = (rawValue) => {
   if (!rawValue) return null
-  const cleanValue = rawValue.replace(/[\D]+/g, '')
+  const cleanValue = String(rawValue).replace(/[\D]+/g, '')
   return Number(cleanValue)
 }
 const onlyPositiveNumbers = (number) => (number && Number(number) > 0) ? number : null
 const onlyIntegers = (number) => (number && Number.isInteger(number)) ? number : null
-const minutesToSeconds = (seconds) => seconds * 60
+const minutesToSeconds = (seconds) => Number(seconds) * 60 // TODO: this shouldn't be a form field processor
 
 const castToBoolean = (rawValue) => !!rawValue
 
@@ -61,7 +61,7 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: errorGetter, processVal
   'touch-tip': {processValue: castToBoolean},
   'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},
   'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])},
-  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0), minutesToSeconds)},
+  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0), minutesToSeconds)}, // TODO minutesToSeconds shouldnt be there
   'dispense--delay-seconds': {processValue: composeProcessors(castToNumber, defaultTo(0))}
 }
 

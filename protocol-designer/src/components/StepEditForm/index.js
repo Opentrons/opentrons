@@ -23,6 +23,13 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
   distribute: TransferLikeForm
 }
 
+type FocusHandlers = {
+  focusedField: FieldName,
+  dirtyFields: Array<FieldName>,
+  onFieldFocus: () => void,
+  onFieldBlur: () => void
+}
+
 type SP = {formData?: FormData, canSave?: boolean, isNewStep?: boolean}
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
@@ -64,12 +71,14 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
     }
     return (
       <div className={cx(formStyles.form, styles[formData.stepType])}>
+        { /* TODO: insert form level validation */ }
         <FormComponent
-          formData={formData}
-          focusedField={this.state.focusedField}
-          dirtyFields={this.state.dirtyFields}
-          onFieldFocus={this.onFieldFocus}
-          onFieldBlur={this.onFieldBlur} />
+          focusHandlers={{
+            focusedField: this.state.focusedField,
+            dirtyFields: this.state.dirtyFields,
+            onFieldFocus: this.onFieldFocus,
+            onFieldBlur: this.onFieldBlur
+          }} />
         <div className={styles.button_row}>
           <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
           <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>

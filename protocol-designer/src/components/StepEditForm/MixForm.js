@@ -4,6 +4,7 @@ import cx from 'classnames'
 import {FormGroup, InputField} from '@opentrons/components'
 
 import {
+  StepInputField,
   CheckboxRow,
   DelayFields,
   PipetteField,
@@ -11,16 +12,14 @@ import {
   TipSettingsColumn,
   WellSelectionInput
 } from './formFields'
-import StepField from './StepFormField'
 import type {MixForm as MixFormData} from '../../form-types'
-import type {FormConnector} from '../../utils'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 
-type MixFormProps = {formData: MixFormData, formConnector: FormConnector<*>}
+type MixFormProps = {focusHandlers: FocusHandlers}
 
 const MixForm = (props: MixFormProps) => {
-  const {dirtyFields, focusedField, onFieldFocus, onFieldBlur} = props
+  const {focusHandlers} = props
   return (
     <React.Fragment>
       <div className={formStyles.row_wrapper}>
@@ -33,30 +32,14 @@ const MixForm = (props: MixFormProps) => {
 
       <div className={cx(formStyles.row_wrapper)}>
         <FormGroup label='Repetitions' className={styles.field_row}>
-          <StepField
+          <StepInputField
             name="volume"
-            focusedField={focusedField}
-            dirtyFields={dirtyFields}
-            render={({value, updateValue}) => (
-              <InputField
-                units='uL'
-                onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
-                value={value}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur} />
-            )} />
-          <StepField
+            units='uL'
+            {...focusHandlers} />
+          <StepInputField
             name="times"
-            focusedField={focusedField}
-            dirtyFields={dirtyFields}
-            render={({value, updateValue}) => (
-              <InputField
-                units='Times'
-                onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
-                value={value}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur} />
-            )} />
+            units='Times'
+            {...focusHandlers} />
         </FormGroup>
       </div>
 
@@ -65,8 +48,7 @@ const MixForm = (props: MixFormProps) => {
           <FormGroup label='TECHNIQUE'>
             <DelayFields
               namePrefix="dispense"
-              focusedField={focusedField}
-              dirtyFields={dirtyFields} />
+              focusHandlers={focusHandlers} />
             <CheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
               <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
             </CheckboxRow>

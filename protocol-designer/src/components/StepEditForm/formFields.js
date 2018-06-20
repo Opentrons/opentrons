@@ -39,29 +39,41 @@ export function CheckboxRow (props: CheckboxRowProps) {
   )
 }
 
+type StepInputFieldProps = {name: StepFieldName} & FocusHandlers
+export const StepInputField = (props: StepInputFieldProps & React.ElementProps<typeof InputField>) => {
+  const {name, focusedField, dirtyFields, onFieldFocus, onFieldBlur, ...inputProps} = props
+  return (
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue}) => (
+        <InputField
+          {...inputProps}
+          onBlur={onFieldBlur}
+          onFocus={onFieldFocus}
+          onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
+          value={value} />
+      )} />
+  )
+}
+
 type DelayFieldsProps = {
   namePrefix: string,
-  focusedField: StepFieldName,
-  dirtyFields: Array<StepFieldName>
+  focusHandlers: FocusHandlers
 } & CheckboxRowProps
 export function DelayFields (props: DelayFieldsProps) {
-  const {label, namePrefix, focusedField, dirtyFields} = props
+  const {label, namePrefix, focusHandlers} = props
   return (
     <CheckboxRow name={`${namePrefix}--delay--checkbox`} label={label || 'Delay'} >
-      <StepField
+      <StepInputField
+        {...focusHandlers}
         name={`${namePrefix}--delay-minutes`}
-        focusedField={focusedField}
-        dirtyFields={dirtyFields}
-        render={({value, updateValue}) => (
-          <InputField units='m' onChange={updateValue} value={value} />
-        )} />
-      <StepField
+        units='m' />
+      <StepInputField
+        {...focusHandlers}
         name={`${namePrefix}--delay-seconds`}
-        focusedField={focusedField}
-        dirtyFields={dirtyFields}
-        render={({value, updateValue}) => (
-          <InputField units='s' onChange={updateValue} value={value} />
-        )} />
+        units='s' />
     </CheckboxRow>
   )
 }
@@ -104,9 +116,7 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & Pi
         <DropdownField
           options={props.pipetteOptions}
           value={value}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
-            updateValue(e.target.value)
-          }} />
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
       </FormGroup>
     )} />
 ))
@@ -127,9 +137,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
           className={className}
           options={labwareOptions}
           value={value}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
-            updateValue(e.target.value)
-          }} />
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
       )} />
   )
 })
