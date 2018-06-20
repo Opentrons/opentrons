@@ -97,11 +97,19 @@ type ClearMoveResponseAction = {|
   |}
 |}
 
+type ClearHomeResponseAction = {|
+  type: 'api:CLEAR_HOME_RESPONSE',
+  payload: {|
+    robot: BaseRobot,
+  |}
+|}
+
 export type RobotAction =
   | RobotRequestAction
   | RobotSuccessAction
   | RobotFailureAction
   | ClearMoveResponseAction
+  | ClearHomeResponseAction
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
@@ -173,6 +181,12 @@ export function home (robot: RobotService, mount?: Mount): ThunkPromiseAction {
       )
       .then(dispatch)
   }
+}
+
+export function clearHomeResponse (
+  robot: RobotService
+): ClearHomeResponseAction {
+  return {type: 'api:CLEAR_HOME_RESPONSE', payload: {robot}}
 }
 
 export function fetchRobotLights (robot: RobotService): ThunkPromiseAction {
@@ -271,6 +285,18 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         [name]: {
           ...stateByName,
           move: {...stateByName.move, response: null}
+        }
+      }
+
+    case 'api:CLEAR_HOME_RESPONSE':
+      ({robot: {name}} = action.payload)
+      stateByName = state[name] || {}
+
+      return {
+        ...state,
+        [name]: {
+          ...stateByName,
+          home: {...stateByName.home, error: null, response: null}
         }
       }
   }

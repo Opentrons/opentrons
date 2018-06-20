@@ -2,14 +2,16 @@
 // connect and configure robots page
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {withRouter, Route, Redirect, type ContextRouter} from 'react-router'
+import {withRouter, Route, Redirect, type Match} from 'react-router'
 
-import type {State, Dispatch} from '../types'
+import type {State, Dispatch, Error} from '../types'
 import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
+import {makeGetRobotHome, clearHomeResponse} from '../http-api-client'
 import createLogger from '../logger'
 
-import {Splash} from '@opentrons/components'
+import {Splash, SpinnerModalPage} from '@opentrons/components'
+import {ErrorModal} from '../components/modals'
 import Page from '../components/Page'
 import RobotSettings, {
   ConnectAlertModal,
@@ -19,28 +21,36 @@ import ChangePipette from '../components/ChangePipette'
 import CalibrateDeck from '../components/CalibrateDeck'
 import ConnectBanner from '../components/RobotSettings/ConnectBanner'
 
-type StateProps = {
+type SP = {
   robot: ?Robot,
   connectedName: string,
-  showConnectAlert: boolean
+  showConnectAlert: boolean,
+  homeInProgress: ?boolean,
+  homeError: ?Error,
 }
 
-type DispatchProps = {
-  closeConnectAlert: () => *
-}
+type DP = {dispatch: Dispatch}
 
-type Props = StateProps & DispatchProps & ContextRouter
+type OP = {match: Match}
+
+type Props = SP & OP & {
+  closeHomeAlert?: () => mixed,
+  closeConnectAlert: () => mixed,
+}
 
 const log = createLogger(__filename)
 
 export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(RobotSettingsPage)
+  connect(makeMapStateToProps, null, mergeProps)(RobotSettingsPage)
 )
 
 function RobotSettingsPage (props: Props) {
   const {
     robot,
     connectedName,
+    homeInProgress,
+    homeError,
+    closeHomeAlert,
     showConnectAlert,
     closeConnectAlert,
     match: {path, url, params: {name}}
@@ -58,12 +68,12 @@ function RobotSettingsPage (props: Props) {
 
   if (!robot) return (<Page><Splash /></Page>)
 
+  const titleBarProps = {title: robot.name}
+
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
     <React.Fragment>
-      <Page
-        titleBarProps={{title: robot.name}}
-      >
+      <Page titleBarProps={titleBarProps}>
         <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
         <RobotSettings {...robot} />
       </Page>
@@ -83,25 +93,59 @@ function RobotSettingsPage (props: Props) {
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
+
+      {homeInProgress && (
+        <SpinnerModalPage titleBar={titleBarProps} message='Robot is homing.' />
+      )}
+
+      {!!homeError && (
+        <ErrorModal
+          heading='Robot unable to home'
+          error={homeError}
+          description='Robot was unable to home, please try again.'
+          close={closeHomeAlert}
+        />
+      )}
      </React.Fragment>
   )
 }
 
-function mapStateToProps (state: State, ownProps: ContextRouter): StateProps {
-  const {match: {params: {name}}} = ownProps
-  const robots = robotSelectors.getDiscovered(state)
-  const connectRequest = robotSelectors.getConnectRequest(state)
-  const connectedName = robotSelectors.getConnectedRobotName(state)
+function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+  const getHomeRequest = makeGetRobotHome()
 
-  return {
-    connectedName,
-    robot: robots.find((r) => r.name === name),
-    showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
+  return (state, ownProps) => {
+    const {match: {params: {name}}} = ownProps
+    const robots = robotSelectors.getDiscovered(state)
+    const connectRequest = robotSelectors.getConnectRequest(state)
+    const connectedName = robotSelectors.getConnectedRobotName(state)
+    const robot = robots.find(r => r.name === name)
+    const homeRequest = robot && getHomeRequest(state, robot)
+
+    return {
+      connectedName,
+      robot,
+      homeInProgress: homeRequest && homeRequest.inProgress,
+      homeError: homeRequest && homeRequest.error,
+      showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
+    }
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
-  return {
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {robot} = stateProps
+  const {dispatch} = dispatchProps
+  const props = {
+    ...stateProps,
+    ...ownProps,
     closeConnectAlert: () => dispatch(robotActions.clearConnectResponse())
   }
+
+  if (robot) {
+    return {
+      ...props,
+      closeHomeAlert: () => dispatch(clearHomeResponse(robot))
+    }
+  }
+
+  return props
 }
