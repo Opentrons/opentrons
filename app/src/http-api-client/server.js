@@ -2,12 +2,14 @@
 // server endpoints http api module
 import {remote} from 'electron'
 import {createSelector, type Selector} from 'reselect'
-
+import {chainActions} from '../util'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
+import {fetchHealth} from './health'
+import {fetchIgnoredUpdate} from './ignored-update'
 
 // remote module paths relative to app-shell/lib/main.js
 const {AVAILABLE_UPDATE, getUpdateFiles} = remote.require('./api-update')
@@ -61,10 +63,11 @@ export type ServerAction =
 export type RobotServerUpdate = ApiCall<void, ServerUpdateResponse>
 export type RobotServerRestart = ApiCall<void, ServerRestartResponse>
 
-type RobotServerState = {
+export type RobotServerState = {
   update?: ?RobotServerUpdate,
   restart?: ?RobotServerRestart,
-  availableUpdate?: ?string
+  availableUpdate?: ?string,
+  ignored?: ?string,
 }
 
 type ServerState = {
@@ -108,6 +111,13 @@ export function restartRobotServer (
           dispatch(serverFailure(robot, RESTART, error))
       )
   }
+}
+
+export function fetchHealthAndIgnored (robot: RobotService): * {
+  return chainActions(
+    fetchHealth(robot),
+    fetchIgnoredUpdate(robot)
+  )
 }
 
 export function serverReducer (
@@ -174,6 +184,11 @@ export function serverReducer (
       }
 
       return {...state, [name]: {...stateByName, availableUpdate}}
+
+    case 'api:IGNORED_UPDATE_SUCCESS':
+      ({robot: {name}} = action.payload)
+      const version = action.payload.version.version
+      return {...state, [name]: {...state[name], ignored: version}}
   }
 
   return state

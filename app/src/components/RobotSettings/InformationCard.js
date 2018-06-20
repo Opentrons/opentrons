@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {
-  fetchHealth,
+  fetchHealthAndIgnored,
   makeGetRobotHealth,
   makeGetAvailableRobotUpdate,
   type RobotHealth
@@ -25,7 +25,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  fetchHealth: () => *
+  fetchHealth: () => mixed // TODO (ka 2018-6-21): fetchHealthAndIgnored uses chainActions, how do we type this?
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -52,7 +52,6 @@ function InformationCard (props: Props) {
   const updateText = availableUpdate
     ? 'Update'
     : 'Updated'
-
   return (
     <RefreshCard
       watch={name}
@@ -97,6 +96,7 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   return {
-    fetchHealth: () => dispatch(fetchHealth(ownProps))
+    // $FlowFixMe(ka, 2018-06-21): figure out chainActions type here
+    fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps))
   }
 }

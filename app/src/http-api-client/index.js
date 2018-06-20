@@ -4,6 +4,7 @@ import {combineReducers} from 'redux'
 import {calibrationReducer, type CalibrationAction} from './calibration'
 import {healthReducer, type HealthAction} from './health'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
+import {ignoredUpdateReducer, type IgnoredUpdateAction} from './ignored-update'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
 import {robotReducer, type RobotAction} from './robot'
@@ -14,6 +15,7 @@ export const reducer = combineReducers({
   calibration: calibrationReducer,
   health: healthReducer,
   healthCheck: healthCheckReducer,
+  ignoredUpdate: ignoredUpdateReducer,
   motors: motorsReducer,
   pipettes: pipettesReducer,
   robot: robotReducer,
@@ -37,6 +39,13 @@ export type {
   HealthSuccessAction,
   HealthFailureAction
 } from './health'
+
+export type {
+  IgnoredUpdate,
+  IgnoredUpdateRequestAction,
+  IgnoredUpdateSuccessAction,
+  IgnoredUpdateFailureAction
+} from './ignored-update'
 
 export type {
   Pipette,
@@ -70,6 +79,7 @@ export type Action =
   | CalibrationAction
   | HealthAction
   | HealthCheckAction
+  | IgnoredUpdateAction
   | MotorsAction
   | PipettesAction
   | RobotAction
@@ -89,6 +99,11 @@ export {
   fetchHealth,
   makeGetRobotHealth
 } from './health'
+
+export {
+  fetchIgnoredUpdate,
+  makeGetIgnoredUpdate
+} from './ignored-update'
 
 export {
   startHealthCheck,
@@ -127,7 +142,8 @@ export {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable
+  getAnyRobotUpdateAvailable,
+  fetchHealthAndIgnored
 } from './server'
 
 export {

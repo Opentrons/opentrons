@@ -7,7 +7,14 @@ import {withRouter, Route, Redirect, type Match} from 'react-router'
 import type {State, Dispatch, Error} from '../types'
 import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
-import {makeGetRobotHome, clearHomeResponse} from '../http-api-client'
+import {
+  makeGetRobotHome,
+  clearHomeResponse,
+  makeGetIgnoredUpdate,
+  makeGetAvailableRobotUpdate,
+  type IgnoredUpdate
+} from '../http-api-client'
+
 import createLogger from '../logger'
 
 import {Splash, SpinnerModalPage} from '@opentrons/components'
@@ -23,6 +30,8 @@ import ConnectBanner from '../components/RobotSettings/ConnectBanner'
 
 type SP = {
   robot: ?Robot,
+  ignoredRequest: IgnoredUpdate,
+  availableUpdate: ?string,
   connectedName: string,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
@@ -53,7 +62,9 @@ function RobotSettingsPage (props: Props) {
     closeHomeAlert,
     showConnectAlert,
     closeConnectAlert,
-    match: {path, url, params: {name}}
+    match: {path, url, params: {name}},
+    ignoredRequest,
+    availableUpdate
   } = props
 
   if (name && !robot) {
@@ -68,6 +79,13 @@ function RobotSettingsPage (props: Props) {
 
   if (!robot) return (<Page><Splash /></Page>)
 
+  // TODO (ka 2018-6-21): show update modal once update ignored is wired up,
+  let showUpdateModal = false
+  if (ignoredRequest.response && availableUpdate) {
+    const ignored = ignoredRequest.response.version
+    showUpdateModal = ignored !== availableUpdate
+  }
+  if (showUpdateModal === true) { log.debug('Available update has not been ignored', {showUpdateModal}) }
   const titleBarProps = {title: robot.name}
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
@@ -112,7 +130,8 @@ function RobotSettingsPage (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
-
+  const getUpdateIgnoredRequest = makeGetIgnoredUpdate()
+  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   return (state, ownProps) => {
     const {match: {params: {name}}} = ownProps
     const robots = robotSelectors.getDiscovered(state)
@@ -120,10 +139,13 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const connectedName = robotSelectors.getConnectedRobotName(state)
     const robot = robots.find(r => r.name === name)
     const homeRequest = robot && getHomeRequest(state, robot)
-
+    const ignoredRequest = robot && getUpdateIgnoredRequest(state, robot)
+    const availableUpdate = robot && getAvailableRobotUpdate(state, robot)
     return {
       connectedName,
       robot,
+      ignoredRequest,
+      availableUpdate,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
       showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
