@@ -30,7 +30,8 @@ const StepField = (props): StepFieldProps => {
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
-  return render({value, updateValue, errorsToShow: showErrors && errors})
+  if(name === 'times') console.log('logit', name, showErrors, errors)
+  return render({value, updateValue, errorsToShow: showErrors ? errors : null})
 }
 
 type ShowFieldErrorParams = {name: StepFieldName, focusedField: StepFieldName, dirtyFields: Array<StepFieldName>}

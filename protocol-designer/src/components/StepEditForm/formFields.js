@@ -47,11 +47,12 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue}) => (
+      render={({value, updateValue, errorsToShow}) => (
         <InputField
           {...inputProps}
-          onBlur={() => onFieldBlur(name)}
-          onFocus={() => onFieldFocus(name)}
+          error={errorsToShow}
+          onBlur={() => { onFieldBlur(name) }}
+          onFocus={() => { onFieldFocus(name) }}
           onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
           value={value} />
       )} />
@@ -202,7 +203,6 @@ const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP)
   const selectedPipette = formData[ownProps.pipetteFieldName]
   const selectedLabware = formData[ownProps.labwareFieldName]
   const selectedWells = formData[ownProps.name]
-  console.log(getFieldErrors(ownProps.name, selectedWells))
   return {
     _selectedPipetteId: selectedPipette,
     _selectedLabwareId: selectedLabware,

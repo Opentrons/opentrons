@@ -29,6 +29,10 @@ type Props = {
   type?: 'text' | 'password',
   /** mouse click handler */
   onClick?: (event: SyntheticMouseEvent<*>) => mixed,
+  /** focus handler */
+  onFocus?: (event: SyntheticFocusEvent<*>) => mixed,
+  /** blur handler */
+  onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean
 }
@@ -74,6 +78,8 @@ function Input (props: Props) {
           value={props.value || ''}
           placeholder={props.placeholder}
           onChange={props.onChange}
+          onFocus={props.onFocus}
+          onBlur={props.onBlur}
           onClick={props.onClick}
           readOnly={props.readOnly}
         />

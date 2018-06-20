@@ -68,6 +68,7 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: errorGetter, processVal
 export const getFieldErrors = (name: StepFieldName, value: mixed) => {
   const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+  console.log(errors, ' are the errors')
   return errors.length === 0 ? null : errors
 }
 
