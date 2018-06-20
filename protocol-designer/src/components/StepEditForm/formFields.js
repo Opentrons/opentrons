@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../../labware-ingred/reducers'
+import {selectors as steplistSelectors} from '../../steplist'
 import {openWellSelectionModal, type OpenWellSelectionModalPayload} from '../../well-selection/actions'
 import type {FormConnector} from '../../utils'
 import type {BaseState, ThunkDispatch} from '../../types'
@@ -104,7 +104,9 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & Pi
         <DropdownField
           options={props.pipetteOptions}
           value={value}
-          onChange={updateValue} />
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+            updateValue(e.target.value)
+          }} />
       </FormGroup>
     )} />
 ))
@@ -117,6 +119,7 @@ const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, name, className} = props
   return (
+    // TODO: BC abstract e.target.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
     <StepField
       name={name}
       render={({value, updateValue}) => (
@@ -124,7 +127,9 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
           className={className}
           options={labwareOptions}
           value={value}
-          onChange={updateValue} />
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+            updateValue(e.target.value)
+          }} />
       )} />
   )
 })
@@ -172,7 +177,10 @@ export const TipSettingsColumn = (props: TipSettingsColumnProps) => (
 
 // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
 // TODO: move this to helpers and correct pipette typing add in selectedPipette multiplier
-const formatWellCount = (wells: Array<string>, selectedPipette: any) => wells && wells.length
+const formatWellCount = (wells: Array<string>, selectedPipette: any) => {
+  console.log(wells, '   lID')
+  return wells ? wells.length : 0
+}
 
 type WellSelectionInputOP = {
   name: string,
@@ -191,10 +199,11 @@ const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP)
   const formData = steplistSelectors.getUnsavedForm(state)
   const selectedPipette = formData[ownProps.pipetteFieldName]
   const selectedLabware = formData[ownProps.labwareFieldName]
+
   return {
-    _selectedPipetteId: selectedPipette.id,
-    _selectedLabwareId: selectedLabware.id,
-    wellCount: formatWellCount(formData[name], selectedPipette)
+    _selectedPipetteId: selectedPipette,
+    _selectedLabwareId: selectedLabware,
+    wellCount: formatWellCount(formData[ownProps.name], selectedPipette)
   }
 }
 const WellSelectionInputDTP = (dispatch: ThunkDispatch<*>): WellSelectionInputDP => ({
@@ -206,28 +215,27 @@ const WellSelectionInputMP = (
   ownProps: WellSelectionInputOP
 ): WellSelectionInputProps => {
   const {_selectedPipetteId, _selectedLabwareId} = stateProps
+  // TODO: LATER: also 'disable' when selected labware is a trash
   const disabled = !(_selectedPipetteId && _selectedLabwareId)
-  if (_selectedPipetteId && _selectedLabwareId) {
-    return {
-      disabled,
-      wellCount: stateProps.wellCount,
-      onClick: () => {
-        dispatchProps._openWellSelectionModal({
-          pipetteId: _selectedPipetteId,
-          labwareId: _selectedLabwareId,
-          formFieldAccessor: ownProps.name
-        })
-      }
+  return {
+    disabled,
+    wellCount: stateProps.wellCount,
+    onClick: () => {
+      dispatchProps._openWellSelectionModal({
+        pipetteId: _selectedPipetteId,
+        labwareId: _selectedLabwareId,
+        formFieldAccessor: ownProps.name
+      })
     }
   }
-  // disabled
-  return {disabled}
+  // // disabled
+  // return {...stateProps, disabled}
 }
 
 const connectWellSelectionInput = connect(WellSelectionInputSTP, WellSelectionInputDTP, WellSelectionInputMP)
 
 export const WellSelectionInput = connectWellSelectionInput((props: WellSelectionInputProps) => (
   <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
-    <InputField readOnly value={`${props.wellCount}`} onClick={props.onClick} />
+    <InputField readOnly value={props.wellCount} onClick={props.onClick} />
   </FormGroup>
 ))

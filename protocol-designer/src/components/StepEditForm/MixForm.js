@@ -8,12 +8,12 @@ import {
   DelayFields,
   PipetteField,
   LabwareDropdown,
-  TipSettingsColumn
+  TipSettingsColumn,
+  WellSelectionInput
 } from './formFields'
 import StepField from './StepFormField'
 import type {MixForm as MixFormData} from '../../form-types'
 import type {FormConnector} from '../../utils'
-import WellSelectionInput from '../../containers/WellSelectionInput'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 
@@ -27,13 +27,7 @@ const MixForm = (props: MixFormProps) => {
         <FormGroup label='Labware:' className={styles.labware_field}>
           <LabwareDropdown name="labware" />
         </FormGroup>
-        {/* TODO LATER: also 'disable' when selected labware is a trash */}
-        <WellSelectionInput
-          labwareFieldName="labware"
-          pipetteFieldName="pipette"
-          initialSelectedWells={formData['wells']}
-          name="wells"
-        />
+        <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" />
         <PipetteField name="pipette" />
       </div>
 

@@ -521,7 +521,8 @@ export const selectors = {
   hoveredOrSelectedStepId,
   getHoveredSubstep,
   selectedStepFormData: selectedStepFormDataSelector,
-  formData,
+  getUnsavedForm,
+  formData, // TODO: remove after sunset
   formModalData,
   nextStepId,
   validatedForms,

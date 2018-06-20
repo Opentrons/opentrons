@@ -1,13 +1,12 @@
 // @flow
-import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {actions, selectors, getFieldErrors, processField} from '../steplist' // TODO use steplist/index.js
-import type {BaseState, ThunkDispatch} from '../types'
+import {actions, selectors, getFieldErrors, processField} from '../../steplist' // TODO use steplist/index.js
+import type {BaseState, ThunkDispatch} from '../../types'
 
 type FieldRenderProps = {
   value: string,
-  updateField: (mixed) => void,
+  updateValue: (mixed) => void,
   errorsToShow: {[string]: string} // TODO: real field errors type
 }
 type OP = {
@@ -16,7 +15,7 @@ type OP = {
   dirtyFields?: Array<string>, // TODO: real type
   focusedField?: string // TODO: real type
 }
-type SP = {value: $Values<F>}
+type SP = {value: mixed}
 type DP = {updateValue: (e: SyntheticInputEvent<*>) => mixed}
 type StepFieldProps = OP & SP & DP
 
@@ -29,17 +28,9 @@ const StepField = (props): StepFieldProps => {
     focusedField,
     dirtyFields
   } = props
-  const showErrors = !(name === focusedField) && dirtyFields.includes(name)
-  const processedValue = processField(name, value)
-  const errors = getFieldErrors(name, processedValue)
-  // if (isRequired && isEmpty(value)) {
-  //   errors = {...errors, REQUIRED_FIELD: 'This field is required'}
-  // }
-  return render({
-    value,
-    updateField: (rawValue) => updateValue(processedValue),
-    errorsToShow: showErrors && errors
-  })
+  const showErrors = focusedField && !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
+  const errors = getFieldErrors(name, value)
+  return render({value, updateValue, errorsToShow: showErrors && errors})
 }
 
 const STP = (state: BaseState, ownProps: OP): SP => ({
@@ -48,7 +39,8 @@ const STP = (state: BaseState, ownProps: OP): SP => ({
 
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValue: (value: mixed) => {
-    dispatch(actions.changeFormInput({update: {[ownProps.name]: value}}))
+    const processedValue = processField(ownProps.name, value)
+    dispatch(actions.changeFormInput({update: {[ownProps.name]: processedValue}}))
   }
 })
 
