@@ -178,7 +178,6 @@ export const TipSettingsColumn = (props: TipSettingsColumnProps) => (
 // TODO Ian 2018-04-27 use selector to get num wells * 8 if multi-channel
 // TODO: move this to helpers and correct pipette typing add in selectedPipette multiplier
 const formatWellCount = (wells: Array<string>, selectedPipette: any) => {
-  console.log(wells, '   lID')
   return wells ? wells.length : 0
 }
 

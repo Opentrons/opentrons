@@ -38,14 +38,24 @@ const MixForm = (props: MixFormProps) => {
             focusedField={focusedField}
             dirtyFields={dirtyFields}
             render={({value, updateValue}) => (
-              <InputField units='uL' onChange={updateValue} value={value} />
+              <InputField
+                units='uL'
+                onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
+                value={value}
+                onFocus={onFieldFocus}
+                onBlur={onFieldBlur} />
             )} />
           <StepField
             name="times"
             focusedField={focusedField}
             dirtyFields={dirtyFields}
             render={({value, updateValue}) => (
-              <InputField units='Times' onChange={updateValue} value={value} />
+              <InputField
+                units='Times'
+                onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
+                value={value}
+                onFocus={onFieldFocus}
+                onBlur={onFieldBlur} />
             )} />
         </FormGroup>
       </div>

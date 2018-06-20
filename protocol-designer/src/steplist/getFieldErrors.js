@@ -45,8 +45,8 @@ const castToNumber = (rawValue) => {
   const cleanValue = rawValue.replace(/[\D]+/g, '')
   return Number(cleanValue)
 }
-const onlyPositiveNumbers = (number) => number && number < 0
-const onlyIntegers = (number) => number && Number.isInteger(number)
+const onlyPositiveNumbers = (number) => (number && Number(number) > 0) ? number : null
+const onlyIntegers = (number) => (number && Number.isInteger(number)) ? number : null
 const minutesToSeconds = (seconds) => seconds * 60
 
 const castToBoolean = (rawValue) => !!rawValue
