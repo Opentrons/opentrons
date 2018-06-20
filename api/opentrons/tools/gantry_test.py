@@ -8,19 +8,16 @@ with Max speed. This will result to a good assembly vs a bad assembly process.
 Author: Carlos Fernandez
 """
 
-import atexit
-import optparse
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 
-def setup(max_speed):
-    x_current = robot.config.high_current['X'] * 0.8
-    y_current = robot.config.high_current['Y'] * 0.8
+def setup_motor_current():
+    # only set the current, keeping all other settings at the driver's default
+    x_current = robot.config.high_current['X'] * 0.85
+    y_current = robot.config.high_current['Y'] * 0.85
     robot._driver.set_active_current(
         {'X': x_current, 'Y': y_current})
-    robot._driver.set_axis_max_speed({'X': max_speed, 'Y': max_speed})
-    robot._driver.set_speed(max_speed)
 
 
 def bowtie_pattern(X_max, Y_max):
@@ -77,26 +74,26 @@ def test_axis(axis, tolerance):
     robot._driver.pop_speed()
 
 
-def run_x_axis():
+def run_x_axis(cycles, x_max, y_max, tolerance):
     # Test X Axis
     for cycle in range(cycles):
         print("Testing X")
-        setup(600)
-        hourglass_pattern(b_x_max, b_y_max)
+        setup_motor_current()
+        hourglass_pattern(x_max, y_max)
         try:
-            test_axis('X', options.tolerance)
+            test_axis('X', tolerance)
         except Exception as e:
             print("FAIL: {}".format(e))
 
 
-def run_y_axis():
+def run_y_axis(cycles, x_max, y_max, tolerance):
     # Test Y Axis
     for cycle in range(cycles):
         print("Testing Y")
-        setup(600)
-        bowtie_pattern(b_x_max, b_y_max)
+        setup_motor_current()
+        bowtie_pattern(x_max, y_max)
         try:
-            test_axis('Y', options.tolerance)
+            test_axis('Y', tolerance)
         except Exception as e:
             print("FAIL: {}".format(e))
         finally:
@@ -110,34 +107,24 @@ def _exit_test():
 
 
 if __name__ == '__main__':
-    atexit.register(_exit_test)
 
-    parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    parser.add_option(
-        "-t",
-        "--tolerance",
-        dest="tolerance",
-        type="float",
-        default=0.5,
-        help="Axis tolerance in millimeters")
-    options, args = parser.parse_args(args=None, values=None)
-
+    num_cycles = 3
     b_x_max = 417.2
     b_y_max = 320
-
-    cycles = 3
+    tolerance_mm = 0.5
 
     try:
         robot.connect()
         robot.home()
-        run_x_axis()
-        run_y_axis()
+        run_x_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
+        run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
         robot._driver._set_button_light(red=False, green=True, blue=False)
         print("PASS")
+        _exit_test()
     except KeyboardInterrupt:
         print("Test Cancelled")
         robot._driver.turn_on_blue_button_light()
-        exit()
     except Exception as e:
         robot._driver.turn_on_red_button_light()
         print("FAIL: {}".format(e))
+        _exit_test()
