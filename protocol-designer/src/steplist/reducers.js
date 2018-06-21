@@ -438,6 +438,7 @@ const nextStepId: Selector<number> = createSelector( // generates the next step 
   }
 )
 
+// TODO: remove this when we add in form level validation
 const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state: BaseState) => {
   const form = formData(state)
   return form && validateAndProcessForm(form).errors // TODO refactor selectors

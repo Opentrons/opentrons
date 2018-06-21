@@ -15,23 +15,13 @@ import {
   composeProcessors,
   type valueProcessor
 } from './processing'
+import type {StepFieldName} from 'types'
+
+export type {
+  StepFieldName
+}
 
 const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
-
-export type StepFieldName = 'change-tip'
-  | 'dispense--delay-minutes'
-  | 'dispense--delay-seconds'
-  | 'labware'
-  | 'pause-for-amount-of-time'
-  | 'pause-hour'
-  | 'pause-message'
-  | 'pause-minute'
-  | 'pause-second'
-  | 'pipette'
-  | 'times'
-  | 'touch-tip'
-  | 'volume'
-  | 'wells'
 
 const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<FieldError>, processValue?: valueProcessor}} = {
   'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},

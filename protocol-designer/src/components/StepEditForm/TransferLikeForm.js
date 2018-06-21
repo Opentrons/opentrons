@@ -24,9 +24,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
   const {focusHandlers, stepType} = props
   return (
     <React.Fragment>
-      <FormSection sectionName='aspirate'>
+      <FormSection sectionName="aspirate">
         <div className={formStyles.row_wrapper}>
-          <FormGroup label='Labware:' className={styles.labware_field}>
+          <FormGroup label="Labware:" className={styles.labware_field}>
             <LabwareDropdown name="aspirate--labware" />
           </FormGroup>
           {/* TODO LATER: also 'disable' when selected labware is a trash */}
@@ -81,7 +81,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense--mix--volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense--mix--times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <DelayFields namePrefix="dispense" />
+              <DelayFields namePrefix="dispense" focusHandlers={focusHandlers} />
               <StepCheckboxRow name='dispense--blowout--checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
               </StepCheckboxRow>

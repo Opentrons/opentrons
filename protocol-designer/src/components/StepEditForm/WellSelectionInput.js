@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import {selectors as steplistSelectors} from '../../steplist'
-import {getFieldErrors} from '../../steplist/fieldLevel'
+import {getFieldErrors, type StepFieldName} from '../../steplist/fieldLevel'
 import {openWellSelectionModal, type OpenWellSelectionModalPayload} from '../../well-selection/actions'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
@@ -16,7 +16,11 @@ const formatWellCount = (wells: Array<string>, selectedPipette: any) => {
   return wells ? wells.length : 0
 }
 
-type WellSelectionInputOP = {name: StepFieldName, pipetteFieldName?: StepFieldName, labwareFieldName?: StepFieldName} & FocusHandlers
+type WellSelectionInputOP = {
+  name: StepFieldName,
+  pipetteFieldName?: StepFieldName,
+  labwareFieldName?: StepFieldName
+} & FocusHandlers
 type WellSelectionInputSP = {
   _selectedPipetteId?: string,
   _selectedLabwareId: string,
@@ -25,7 +29,7 @@ type WellSelectionInputSP = {
 }
 type WellSelectionInputDP = {_openWellSelectionModal: (OpenWellSelectionModalPayload) => void}
 type WellSelectionInputProps = {
-  wellCount: number,
+  wellCount?: number,
   disabled: boolean,
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
   errorsToShow?: Array<string>
@@ -37,7 +41,7 @@ const WellSelectionInput = (props: WellSelectionInputProps) => (
       readOnly
       value={props.wellCount}
       onClick={props.onClick}
-      error={props.errorsToShow} />
+      error={props.errorsToShow && props.errorsToShow.join(', ')} />
   </FormGroup>
 )
 
