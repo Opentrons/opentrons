@@ -13,7 +13,7 @@ type FieldRenderProps = {
 }
 type OP = {
   name: StepFieldName,
-  render: (FieldRenderProps) => StepField, // TODO: type StepField
+  render: (FieldRenderProps) => any, // TODO: type StepField
   dirtyFields?: Array<StepFieldName>,
   focusedField?: StepFieldName
 }
