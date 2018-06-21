@@ -5,13 +5,14 @@ import {FormGroup} from '@opentrons/components'
 
 import {
   StepInputField,
-  CheckboxRow,
+  StepCheckboxRow,
   DelayFields,
   PipetteField,
   LabwareDropdown,
-  TipSettingsColumn,
-  WellSelectionInput
+  TipSettingsColumn
 } from './formFields'
+
+import WellSelectionInput from './WellSelectionInput'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
@@ -41,10 +42,10 @@ const MixForm = (props: MixFormProps) => {
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
             <DelayFields namePrefix="dispense" focusHandlers={focusHandlers} />
-            <CheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
+            <StepCheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
               <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
-            </CheckboxRow>
-            <CheckboxRow name="touch-tip" label='Touch tip' />
+            </StepCheckboxRow>
+            <StepCheckboxRow name="touch-tip" label='Touch tip' />
           </FormGroup>
         </div>
         <TipSettingsColumn namePrefix="aspirate" />

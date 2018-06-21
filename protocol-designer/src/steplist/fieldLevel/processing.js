@@ -6,6 +6,7 @@ export type valueProcessor= (value: mixed) => ?mixed
 **  Value Casters   **
 **********************/
 
+// TODO: account for floats and negative numbers
 export const castToNumber = (rawValue: mixed): ?number => {
   if (!rawValue) return null // TODO: default to zero?
   const cleanValue = String(rawValue).replace(/[\D]+/g, '')

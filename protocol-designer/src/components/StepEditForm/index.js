@@ -48,19 +48,20 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
     super(props)
     this.state = {
       focusedField: null,
-      dirtyFields: []
+      dirtyFields: [] // TODO: initialize to dirty if not new form
     }
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.formData && prevProps.formData && this.props.formData.id !== prevProps.formData.id) {
-      this.setState({focusedField: null, dirtyFields: []})
+      this.setState({
+        focusedField: null,
+        dirtyFields: [] // TODO: handle switching between clean and dirty forms
+      })
     }
   }
 
-  onFieldFocus = (fieldName: StepFieldName) => { // TODO: BC real field name type
-    this.setState({focusedField: fieldName})
-  }
+  onFieldFocus = (fieldName: StepFieldName) => { this.setState({focusedField: fieldName}) }
 
   onFieldBlur = (fieldName: StepFieldName) => {
     this.setState((prevState) => ({
@@ -80,6 +81,7 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         { /* TODO: insert form level validation */ }
         <FormComponent
+          stepType={formData.stepType}
           focusHandlers={{
             focusedField: this.state.focusedField,
             dirtyFields: this.state.dirtyFields,
