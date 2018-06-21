@@ -18,26 +18,31 @@ import {
 
 const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
-type StepFieldName = 'pipette'
-  | 'labware'
-  | 'volume'
-  | 'times'
-  | 'touch-tip'
-  | 'change-tip'
-  | 'wells'
+export type StepFieldName = 'change-tip'
   | 'dispense--delay-minutes'
   | 'dispense--delay-seconds'
+  | 'labware'
+  | 'pause-for-amount-of-time'
+  | 'pause-hour'
+  | 'pause-message'
+  | 'pause-minute'
+  | 'pause-second'
+  | 'pipette'
+  | 'times'
+  | 'touch-tip'
+  | 'volume'
+  | 'wells'
 
 const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<FieldError>, processValue?: valueProcessor}} = {
-  'pipette': {getErrors: composeErrors(requiredField)},
+  'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},
+  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0))},
+  'dispense--delay-seconds': {processValue: composeProcessors(castToNumber, defaultTo(0))},
   'labware': {getErrors: composeErrors(requiredField)},
-  'volume': {getErrors: composeErrors(requiredField), processValue: composeProcessors(castToNumber, onlyPositiveNumbers, defaultTo(0))},
+  'pipette': {getErrors: composeErrors(requiredField)},
   'times': {getErrors: composeErrors(requiredField), processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0))},
   'touch-tip': {processValue: castToBoolean},
-  'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},
-  'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])},
-  'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0))},
-  'dispense--delay-seconds': {processValue: composeProcessors(castToNumber, defaultTo(0))}
+  'volume': {getErrors: composeErrors(requiredField), processValue: composeProcessors(castToNumber, onlyPositiveNumbers, defaultTo(0))},
+  'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])}
 }
 
 export const getFieldErrors = (name: StepFieldName, value: mixed) => {

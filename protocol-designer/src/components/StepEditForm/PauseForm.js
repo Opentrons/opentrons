@@ -1,27 +1,35 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, InputField, RadioGroup} from '@opentrons/components'
+import {FormGroup} from '@opentrons/components'
 
-import type {FormConnector} from '../../utils'
+import {
+  StepInputField,
+  StepRadioGroup
+} from './formFields'
+import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
 
-type PauseFormProps = {formConnector: FormConnector<*>}
+type PauseFormProps = {focusHandlers: FocusHandlers}
 function PauseForm (props: PauseFormProps) {
-  const {formConnector} = props
+  const {focusHandlers} = props
   return (
     <div className={formStyles.row_wrapper}>
       <div className={formStyles.column_1_2}>
-        <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
-          {...formConnector('pause-for-amount-of-time')} />
-        <InputField units='hr' {...formConnector('pause-hour')} />
-        <InputField units='m' {...formConnector('pause-minute')} />
-        <InputField units='s' {...formConnector('pause-second')} />
+        <StepRadioGroup
+          name="pause-for-amount-of-time"
+          options={[{name: 'Pause for an amount of time', value: 'true'}]}
+          {...focusHandlers} />
+        <StepInputField units="hr" name="pause-hour" {...focusHandlers} />
+        <StepInputField units="m" name="pause-minute" {...focusHandlers} />
+        <StepInputField units="s" name="pause-second" {...focusHandlers} />
       </div>
       <div className={formStyles.column_1_2}>
-        <RadioGroup options={[{name: 'Pause until told to resume', value: 'false'}]}
-          {...formConnector('pause-for-amount-of-time')} />
+        <StepRadioGroup
+          name="pause-for-amount-of-time"
+          options={[{name: 'Pause until told to resume', value: 'false'}]}
+          {...focusHandlers} />
         <FormGroup label='Message to display'>
-          <InputField {...formConnector('pause-message')} />
+          <StepInputField name="pause-message" {...focusHandlers} />
         </FormGroup>
       </div>
     </div>

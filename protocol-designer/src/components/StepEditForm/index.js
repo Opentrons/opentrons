@@ -6,6 +6,7 @@ import cx from 'classnames'
 import {FlatButton, PrimaryButton} from '@opentrons/components'
 
 import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
+import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormData, StepType} from '../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
@@ -24,10 +25,10 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
 }
 
 export type FocusHandlers = {
-  focusedField: FieldName,
-  dirtyFields: Array<FieldName>,
-  onFieldFocus: () => void,
-  onFieldBlur: () => void
+  focusedField: StepFieldName,
+  dirtyFields: Array<StepFieldName>,
+  onFieldFocus: (StepFieldName) => void,
+  onFieldBlur: (StepFieldName) => void
 }
 
 type SP = {formData?: FormData, canSave?: boolean, isNewStep?: boolean}
@@ -57,11 +58,11 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
     }
   }
 
-  onFieldFocus = (fieldName: string) => { // TODO: BC real field name type
+  onFieldFocus = (fieldName: StepFieldName) => { // TODO: BC real field name type
     this.setState({focusedField: fieldName})
   }
 
-  onFieldBlur = (fieldName: string) => {
+  onFieldBlur = (fieldName: StepFieldName) => {
     this.setState((prevState) => ({
       focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
       dirtyFields: [...prevState.dirtyFields, fieldName]

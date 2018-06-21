@@ -26,33 +26,21 @@ const MixForm = (props: MixFormProps) => {
         <FormGroup label='Labware:' className={styles.labware_field}>
           <LabwareDropdown name="labware" />
         </FormGroup>
-        <WellSelectionInput
-          name="wells"
-          labwareFieldName="labware"
-          pipetteFieldName="pipette"
-          {...focusHandlers} />
+        <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
         <PipetteField name="pipette" />
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
         <FormGroup label='Repetitions' className={styles.field_row}>
-          <StepInputField
-            name="volume"
-            units='μL'
-            {...focusHandlers} />
-          <StepInputField
-            name="times"
-            units='Times'
-            {...focusHandlers} />
+          <StepInputField name="volume" units='μL' {...focusHandlers} />
+          <StepInputField name="times" units='Times' {...focusHandlers} />
         </FormGroup>
       </div>
 
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <DelayFields
-              namePrefix="dispense"
-              focusHandlers={focusHandlers} />
+            <DelayFields namePrefix="dispense" focusHandlers={focusHandlers} />
             <CheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
               <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
             </CheckboxRow>

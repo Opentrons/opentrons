@@ -6,16 +6,20 @@ import {
   CheckboxField,
   InputField,
   DropdownField,
+  RadioGroup,
   type DropdownOption
 } from '@opentrons/components'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors, getFieldErrors} from '../../steplist'
+import {selectors as steplistSelectors} from '../../steplist'
+import {getFieldErrors} from '../../steplist/fieldLevel'
+import type {StepFieldName} from '../../steplist/fieldLevel'
 import {openWellSelectionModal, type OpenWellSelectionModalPayload} from '../../well-selection/actions'
 import type {FormConnector} from '../../utils'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 import {default as StepField, showFieldErrors} from './StepFormField'
+import type {FocusHandlers} from './index'
 
 type Options = Array<DropdownOption>
 
@@ -59,14 +63,36 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
   )
 }
 
+type StepRadioGroupProps = {name: StepFieldName, options: Options} & FocusHandlers
+export const StepRadioGroup = (props: StepRadioGroupProps) => {
+  const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
+  return (
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue, errorsToShow}) => (
+        <RadioGroup
+          {...radioGroupProps}
+          value={value}
+          error={errorsToShow}
+          onChange={(e: SyntheticInputEvent<>) => {
+            updateValue(e.target.value)
+            onFieldBlur(name)
+          }} />
+      )} />
+  )
+}
+
 type DelayFieldsProps = {
   namePrefix: string,
-  focusHandlers: FocusHandlers
-} & CheckboxRowProps
+  focusHandlers: FocusHandlers,
+  label?: string
+}
 export function DelayFields (props: DelayFieldsProps) {
-  const {label, namePrefix, focusHandlers} = props
+  const {label = 'Delay', namePrefix, focusHandlers} = props
   return (
-    <CheckboxRow name={`${namePrefix}--delay--checkbox`} label={label || 'Delay'} >
+    <CheckboxRow name={`${namePrefix}--delay--checkbox`} label={label}>
       <StepInputField
         {...focusHandlers}
         name={`${namePrefix}--delay-minutes`}

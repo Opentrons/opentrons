@@ -3,7 +3,7 @@
 import rootReducer, {selectors} from './reducers'
 import * as actions from './actions'
 import * as utils from './utils'
-import {getFieldErrors, processField} from './getFieldErrors'
+import {getFieldErrors, processField} from './fieldLevel'
 
 export {
   actions,

@@ -1,19 +1,21 @@
 // @flow
 import {connect} from 'react-redux'
 
-import {actions, selectors, getFieldErrors, processField} from '../../steplist' // TODO use steplist/index.js
+import {actions, selectors} from '../../steplist'
+import {getFieldErrors, processField, type StepFieldName} from '../../steplist/fieldLevel'
+import type {FieldError} from '../../steplist/fieldLevel/errors'
 import type {BaseState, ThunkDispatch} from '../../types'
 
 type FieldRenderProps = {
   value: string,
   updateValue: (mixed) => void,
-  errorsToShow: {[string]: string} // TODO: real field errors type
+  errorsToShow: Array<FieldError>
 }
 type OP = {
-  name: string, // TODO: real type
-  render: (FieldRenderProps) => StepField,
-  dirtyFields?: Array<string>, // TODO: real type
-  focusedField?: string // TODO: real type
+  name: StepFieldName,
+  render: (FieldRenderProps) => StepField, // TODO: type StepField
+  dirtyFields?: Array<StepFieldName>,
+  focusedField?: StepFieldName
 }
 type SP = {value: mixed}
 type DP = {updateValue: (e: SyntheticInputEvent<*>) => mixed}
