@@ -7,7 +7,7 @@ import isEmpty from 'lodash/isEmpty'
 
 export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
 
-const FIELD_ERRORS: {[FieldError]: string | (string) => string} = {
+const FIELD_ERRORS: {[FieldError]: string | (number) => string} = {
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: (minimum: number): string => `${minimum} or more wells are required`
 }

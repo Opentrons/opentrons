@@ -32,7 +32,7 @@ const StepField = (props): StepFieldProps => {
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
-  return render({value, updateValue, errorsToShow: showErrors ? errors : null})
+  return <React.Fragment>{render({value, updateValue, errorsToShow: showErrors ? errors : null})}</React.Fragment> // NOTE: fragment for flow
 }
 
 type ShowFieldErrorParams = {name: StepFieldName, focusedField: StepFieldName, dirtyFields: Array<StepFieldName>}
@@ -40,9 +40,10 @@ export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErro
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 )
 
-const STP = (state: BaseState, ownProps: OP): SP => ({
-  value: selectors.formData(state)[ownProps.name] || ''
-})
+const STP = (state: BaseState, ownProps: OP): SP => {
+  const formData = selectors.getUnsavedForm(state)
+  return { value: formData ? formData[ownProps.name] : '' }
+}
 
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValue: (value: mixed) => {
