@@ -32,7 +32,7 @@ const composeErrors = (...errorCheckers) => (value) => (
     return possibleError ? [...accumulatedErrors, possibleError] : accumulatedErrors
   }, [])
 )
-const requiredField = (value: mixed) => isEmpty(value) && FIELD_ERRORS.REQUIRED
+const requiredField = (value: mixed) => isEmpty(String(value)) && FIELD_ERRORS.REQUIRED
 const minimumWellCount = (minimum: number) => (wells: Array<mixed>) => wells && (wells.length < minimum) && FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum)
 
 // Field Processors

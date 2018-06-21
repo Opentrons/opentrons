@@ -52,7 +52,7 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.formData.id !== prevProps.formData.id) {
+    if (this.props.formData && prevProps.formData && this.props.formData.id !== prevProps.formData.id) {
       this.setState({focusedField: null, dirtyFields: []})
     }
   }
