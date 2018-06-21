@@ -1,26 +1,32 @@
+// @flow
 
-type valueProcessor= (value: mixed) => ?mixed
-// Field Processors
+export type valueProcessor= (value: mixed) => ?mixed
 
-const composeProcessors = (...processors: Array<valueProcessor>) => (value) => (
-  processors.reduce((processingValue, processor) => processor(processingValue), value)
-)
-const castToNumber = (rawValue) => {
-  if (!rawValue) return null
+/*********************
+**  Value Casters   **
+**********************/
+
+export const castToNumber = (rawValue: mixed): ?number => {
+  if (!rawValue) return null // TODO: default to zero?
   const cleanValue = String(rawValue).replace(/[\D]+/g, '')
   return Number(cleanValue)
 }
-const onlyPositiveNumbers = (number) => (number && Number(number) > 0) ? number : null
-const onlyIntegers = (number) => (number && Number.isInteger(number)) ? number : null
+export const castToBoolean = (rawValue: mixed): boolean => !!rawValue
+
+/*********************
+**  Value Limiters  **
+**********************/
+
+export const onlyPositiveNumbers = (value: mixed) => (value && Number(value) > 0) ? value : null
+export const onlyIntegers = (value: mixed) => (value && Number.isInteger(value)) ? value : null
+export const defaultTo = (defaultValue: mixed) => (value: mixed) => (value || defaultValue)
+
 // const minutesToSeconds = (seconds) => Number(seconds) * 60 // TODO: this shouldn't be a form field processor but a save formatter
 
-const castToBoolean = (rawValue) => !!rawValue
+/*******************
+**     Helpers    **
+********************/
 
-const defaultTo = (defaultValue: mixed) => (value) => (value || defaultValue)
-
-
-
-export const processField = (name: StepFieldName, value: mixed) => {
-  const fieldProcessor = get(StepFieldHelperMap, `${name}.processValue`)
-  return fieldProcessor ? fieldProcessor(value) : value
-}
+export const composeProcessors = (...processors: Array<valueProcessor>) => (value: mixed) => (
+  processors.reduce((processingValue, processor) => processor(processingValue), value)
+)

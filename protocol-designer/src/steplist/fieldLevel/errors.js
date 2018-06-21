@@ -1,15 +1,31 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
-import get from 'lodash/get'
 
-type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
+/*******************
+** Error Messages **
+********************/
 
-type errorChecker = (value: mixed) => ?FieldError
+export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
 
 const FIELD_ERRORS: {[FieldError]: string | (string) => string} = {
   REQUIRED: 'This field is required',
-  UNDER_WELL_MINIMUM: (minimum) => `${minimum} or more wells are required`
+  UNDER_WELL_MINIMUM: (minimum: number): string => `${minimum} or more wells are required`
 }
+
+// TODO: test these
+/*******************
+** Error Checkers **
+********************/
+type errorChecker = (value: mixed | Array<mixed>) => ?FieldError
+
+export const requiredField = (value: mixed) => isEmpty(String(value)) && FIELD_ERRORS.REQUIRED
+export const minimumWellCount = (minimum: number): errorChecker => (wells: Array<mixed>): ?FieldError => (
+  (wells && (wells.length < minimum)) ? FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum) : null
+)
+
+/*******************
+**     Helpers    **
+********************/
 
 export const composeErrors = (...errorCheckers: Array<errorChecker>) => (value: mixed): Array<FieldError> => (
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
@@ -17,13 +33,3 @@ export const composeErrors = (...errorCheckers: Array<errorChecker>) => (value: 
     return possibleError ? [...accumulatedErrors, possibleError] : accumulatedErrors
   }, [])
 )
-
-// TODO: test these
-export const requiredField = (value: mixed) => isEmpty(String(value)) && FIELD_ERRORS.REQUIRED
-export const minimumWellCount = (minimum: number) => (wells: Array<mixed>) => wells && (wells.length < minimum) && FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum)
-
-export const getFieldErrors = (name: StepFieldName, value: mixed) => {
-  const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
-  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
-  return errors.length === 0 ? null : errors
-}
