@@ -5,6 +5,8 @@ import isEmpty from 'lodash/isEmpty'
 ** Error Messages **
 ********************/
 
+// TODO: reconcile difference between returning error string and key
+
 export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
 
 const FIELD_ERRORS: {[FieldError]: string | (number) => string} = {

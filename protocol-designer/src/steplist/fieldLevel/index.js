@@ -15,7 +15,7 @@ import {
   composeProcessors,
   type valueProcessor
 } from './processing'
-import type {StepFieldName} from 'types'
+import type {StepFieldName} from './types'
 
 export type {
   StepFieldName
