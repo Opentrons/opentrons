@@ -12,6 +12,7 @@ import {
   TipSettingsColumn,
   WellSelectionInput
 } from './formFields'
+import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
 

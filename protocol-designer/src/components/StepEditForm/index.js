@@ -23,7 +23,7 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
   distribute: TransferLikeForm
 }
 
-type FocusHandlers = {
+export type FocusHandlers = {
   focusedField: FieldName,
   dirtyFields: Array<FieldName>,
   onFieldFocus: () => void,
