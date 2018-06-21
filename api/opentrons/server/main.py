@@ -6,7 +6,7 @@ import os
 import traceback
 import atexit
 from aiohttp import web
-from opentrons import robot
+from opentrons import robot, __version__
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
@@ -234,6 +234,9 @@ def main():
         robot.connect()
     except Exception as e:
         log.exception("Error while connecting to motor-driver: {}".format(e))
+
+    log.info("API server version:  {}".format(__version__))
+    log.info("Smoothie FW version: {}".format(robot.fw_version))
 
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")
