@@ -114,7 +114,7 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & Pi
         <DropdownField
           options={props.pipetteOptions}
           value={value}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />
 ))
