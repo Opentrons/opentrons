@@ -1,6 +1,7 @@
 import json
 import logging
 import subprocess
+from shlex import quote
 from aiohttp import web
 
 log = logging.getLogger(__name__)
@@ -66,9 +67,8 @@ async def configure(request):
             status = 400
             message = 'Error: "ssid" string is required'
         else:
-            cmd = 'nmcli device wifi connect "{}"'.format(
-                ssid)
-            password = ' password "{}"'.format(psk) if psk else ''
+            cmd = 'nmcli device wifi connect {}'.format(quote(ssid))
+            password = ' password {}'.format(quote(psk)) if psk else ''
             # some nmcli errors go to stdout (e.g. bad psk), while others go to
             # stderr (e.g. bad ssid), so we put both outputs together
             res, err = _subprocess(cmd + password)
