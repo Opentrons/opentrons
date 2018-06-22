@@ -4,7 +4,6 @@ import {
   requiredField,
   minimumWellCount,
   composeErrors,
-  type FieldError
 } from './errors'
 import {
   castToNumber,
@@ -23,7 +22,7 @@ export type {
 
 const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
-const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<FieldError>, processValue?: valueProcessor}} = {
+const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<string>, processValue?: valueProcessor}} = {
   'change-tip': {processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)},
   'dispense--delay-minutes': {processValue: composeProcessors(castToNumber, defaultTo(0))},
   'dispense--delay-seconds': {processValue: composeProcessors(castToNumber, defaultTo(0))},
@@ -38,13 +37,13 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<FieldE
   'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])}
 }
 
-export const getFieldErrors = (name: StepFieldName, value: mixed) => {
+export const getFieldErrors = (name: StepFieldName, value: mixed): ?Array<string> => {
   const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
   return errors.length === 0 ? null : errors
 }
 
-export const processField = (name: StepFieldName, value: mixed) => {
+export const processField = (name: StepFieldName, value: mixed): ?mixed => {
   const fieldProcessor = get(StepFieldHelperMap, `${name}.processValue`)
   return fieldProcessor ? fieldProcessor(value) : value
 }

@@ -1,6 +1,7 @@
 // @flow
 import type {IconName} from '@opentrons/components'
 import type {ChangeTipOptions} from './step-generation'
+import type {StepFieldName} from './steplist/fieldLevel'
 
 export type StepIdType = number // TODO Ian 2018-05-10 change to string
 
@@ -103,10 +104,14 @@ export type PauseForm = {|
   'pause-message'?: string
 |}
 
-export type FormData =
- | MixForm
- | PauseForm
- | TransferLikeForm
+export type FormData = {
+  stepType: StepType,
+  id: StepIdType,
+  [StepFieldName]: ?mixed | ?string
+}
+//  | MixForm
+//  | PauseForm
+//  | TransferLikeForm
 
 export type BlankForm = {
   ...FormModalFields,

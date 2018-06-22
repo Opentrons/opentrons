@@ -24,7 +24,7 @@ type WellSelectionInputOP = {
 type WellSelectionInputSP = {
   _selectedPipetteId: string,
   _selectedLabwareId: string,
-  _wellFieldErrors: Array<string>, // TODO: real type
+  _wellFieldErrors: Array<string>,
   wellCount: number
 }
 type WellSelectionInputDP = {_openWellSelectionModal: (OpenWellSelectionModalPayload) => void}
@@ -45,7 +45,7 @@ const WellSelectionInput = (props: WellSelectionInputProps) => (
   </FormGroup>
 )
 
-const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP): WellSelectionSP => {
+const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP): WellSelectionInputSP => {
   const formData = steplistSelectors.getUnsavedForm(state)
   const selectedPipette = formData && formData[ownProps.pipetteFieldName]
   const selectedLabware = formData && formData[ownProps.labwareFieldName]

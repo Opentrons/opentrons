@@ -1,15 +1,15 @@
 // @flow
+import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {actions, selectors} from '../../steplist'
 import {getFieldErrors, processField, type StepFieldName} from '../../steplist/fieldLevel'
-import type {FieldError} from '../../steplist/fieldLevel/errors'
 import type {BaseState, ThunkDispatch} from '../../types'
 
 type FieldRenderProps = {
-  value: string,
-  updateValue: (mixed) => void,
-  errorsToShow: Array<FieldError>
+  value: ?mixed,
+  updateValue: (?mixed) => void,
+  errorsToShow: ?Array<string>
 }
 type OP = {
   name: StepFieldName,
@@ -17,11 +17,11 @@ type OP = {
   dirtyFields?: Array<StepFieldName>,
   focusedField?: StepFieldName
 }
-type SP = {value: mixed}
-type DP = {updateValue: (e: SyntheticInputEvent<*>) => mixed}
+type SP = {value: ?mixed}
+type DP = {updateValue: (?mixed) => void}
 type StepFieldProps = OP & SP & DP
 
-const StepField = (props): StepFieldProps => {
+const StepField = (props: StepFieldProps) => {
   const {
     name,
     render,
@@ -35,14 +35,15 @@ const StepField = (props): StepFieldProps => {
   return <React.Fragment>{render({value, updateValue, errorsToShow: showErrors ? errors : null})}</React.Fragment> // NOTE: fragment for flow
 }
 
-type ShowFieldErrorParams = {name: StepFieldName, focusedField: StepFieldName, dirtyFields: Array<StepFieldName>}
+type ShowFieldErrorParams = {name: StepFieldName, focusedField?: StepFieldName, dirtyFields?: Array<StepFieldName>}
 export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErrorParams) => (
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 )
 
 const STP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
-  return { value: formData ? formData[ownProps.name] : '' }
+  if (!formData) return null
+  return {value: formData[ownProps.name] || null}
 }
 
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
