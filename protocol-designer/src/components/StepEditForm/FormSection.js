@@ -35,7 +35,6 @@ const FormSection = (props: FormSectionProps) => {
 
       {props.collapsed !== undefined && // if doesn't exist in redux
         <div onClick={props.onCollapseToggle}>
-          {/* TODO Ian 2018-01-29 use an IconButton once it exists */}
           <IconButton
             width='30px'
             name='settings'
