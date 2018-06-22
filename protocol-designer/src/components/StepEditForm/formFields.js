@@ -32,7 +32,7 @@ export function StepCheckboxRow (props: StepCheckboxRowProps) {
       name={name}
       render={({value, updateValue}) => (
         <div className={styles.field_row}>
-          <CheckboxField label={label} className={className} value={value} onChange={updateValue} />
+          <CheckboxField label={label} className={className} value={!!value} onChange={updateValue} />
           {value ? props.children : null}
         </div>
       )} />

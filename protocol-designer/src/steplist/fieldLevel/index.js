@@ -37,10 +37,10 @@ const StepFieldHelperMap: {[StepFieldName]: {getErrors?: (mixed) => Array<string
   'wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])}
 }
 
-export const getFieldErrors = (name: StepFieldName, value: mixed): ?Array<string> => {
-  const fieldErrorGetter = get(StepFieldHelperMap, `${name}.getErrors`)
-  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
-  return errors.length === 0 ? null : errors
+export const getFieldErrors = (name: StepFieldName, value: mixed): Array<string> => {
+  const fieldErrorGetter: (mixed) => Array<string> = get(StepFieldHelperMap, `${name}.getErrors`)
+  const errors: Array<string> = fieldErrorGetter ? fieldErrorGetter(value) : []
+  return errors
 }
 
 export const processField = (name: StepFieldName, value: mixed): ?mixed => {
