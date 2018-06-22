@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {withRouter, Route, Redirect, type Match} from 'react-router'
+import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
 import type {State, Dispatch, Error} from '../types'
 import type {Robot} from '../robot'
@@ -85,7 +85,7 @@ function RobotSettingsPage (props: Props) {
     const ignored = ignoredRequest.response.version
     showUpdateModal = ignored !== availableUpdate
   }
-  if (showUpdateModal === true) { log.debug('Available update has not been ignored', {showUpdateModal}) }
+
   const titleBarProps = {title: robot.name}
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
@@ -95,18 +95,27 @@ function RobotSettingsPage (props: Props) {
         <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
         <RobotSettings {...robot} />
       </Page>
+      <Switch>
+        <Route path={`${path}/update`} render={() => (
+          <UpdateModal {...robot} />
+        )} />
 
-      <Route path={`${path}/update`} render={() => (
-        <UpdateModal {...robot} />
-      )} />
+        <Route render={() => {
+          if (showUpdateModal) {
+            return (<Redirect to={`/robots/${robot.name}/update`} />)
+          }
 
-      <Route path={`${path}/pipettes`} render={(props) => (
-        <ChangePipette {...props} robot={robot} parentUrl={url} />
-      )} />
+          return null
+        }} />
 
-      <Route path={`${path}/calibrate-deck`} render={(props) => (
-        <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
-      )} />
+        <Route path={`${path}/pipettes`} render={(props) => (
+          <ChangePipette {...props} robot={robot} parentUrl={url} />
+        )} />
+
+        <Route path={`${path}/calibrate-deck`} render={(props) => (
+          <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+        )} />
+      </Switch>
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />

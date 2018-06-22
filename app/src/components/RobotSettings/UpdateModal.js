@@ -11,7 +11,8 @@ import {
   restartRobotServer,
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
-  makeGetRobotRestartRequest
+  makeGetRobotRestartRequest,
+  setUpdateIgnored
 } from '../../http-api-client'
 
 import {AlertModal, Icon} from '@opentrons/components'
@@ -25,12 +26,12 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  close: () => *,
   update: () => *,
-  restart: () => *
+  restart: () => *,
+  ignoreUpdate: () => *
 }
 
-type Props = StateProps & DispatchProps
+type Props = OwnProps & StateProps & DispatchProps
 
 const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
 const ALREADY_UPDATED_MSG = "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
@@ -40,16 +41,17 @@ const DONE_MSG = 'Your robot has been updated. Please wait for your robot to ful
 // TODO(mc, 2018-03-19): prop or component for text-height icons
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(UpdateModal)
+// $FlowFixMe(ka, 2018-06-22): flow throwing error because of mergeprops?
+export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
 
 function UpdateModal (props: Props) {
-  const {close, update, restart, updateRequest, restartRequest} = props
+  const {ignoreUpdate, update, restart, updateRequest, restartRequest} = props
   const availableUpdate = props.availableUpdate || ''
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
   let message
   let button
-
+  console.log(availableUpdate)
   const heading = availableUpdate
     ? `Version ${availableUpdate || ''} available`
     : 'Robot is up to date'
@@ -77,9 +79,10 @@ function UpdateModal (props: Props) {
       onCloseClick={close}
       heading={heading}
       buttons={[
-        {onClick: close, children: closeButtonText},
+        {onClick: ignoreUpdate, children: closeButtonText},
         button
       ]}
+      alertOverlay
     >
       {message}
     </AlertModal>
@@ -98,14 +101,19 @@ function makeMapStateToProps () {
   })
 }
 
-function mapDispatchToProps (
-  dispatch: Dispatch,
-  ownProps: OwnProps
-): DispatchProps {
+function mergeProps (stateProps: StateProps, dispatchProps: Dispatch, ownProps: OwnProps): Props {
+  const {availableUpdate} = stateProps
+  const {dispatch} = dispatchProps
+
   const close = () => dispatch(push(`/robots/${ownProps.name}`))
+  let ignoreUpdate = availableUpdate
+    ? () => dispatch(setUpdateIgnored(ownProps, availableUpdate)).then(close)
+    : close
 
   return {
-    close,
+    ...stateProps,
+    ...ownProps,
+    ignoreUpdate,
     update: () => dispatch(updateRobotServer(ownProps)),
     restart: () => dispatch(restartRobotServer(ownProps)).then(close)
   }

@@ -102,7 +102,8 @@ export {
 
 export {
   fetchIgnoredUpdate,
-  makeGetIgnoredUpdate
+  makeGetIgnoredUpdate,
+  setUpdateIgnored
 } from './ignored-update'
 
 export {

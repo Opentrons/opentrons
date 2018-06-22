@@ -3,7 +3,7 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import client from '../client'
-import {fetchIgnoredUpdate, reducer, makeGetIgnoredUpdate} from '..'
+import {fetchIgnoredUpdate, reducer, makeGetIgnoredUpdate, setUpdateIgnored} from '..'
 
 jest.mock('../client')
 
@@ -12,7 +12,8 @@ const mockStore = configureMockStore(middlewares)
 
 const name = 'opentrons-dev'
 const robot = {name, ip: '1.2.3.4', port: '1234'}
-const version = {version: null}
+const version = {version: '1.1.1'}
+const availableUpdate = '1.1.1'
 
 describe('ignored-update', () => {
   beforeEach(() => client.__clearMock())
@@ -86,6 +87,39 @@ describe('ignored-update', () => {
     client.__setMockError(error)
 
     return store.dispatch(fetchIgnoredUpdate(robot))
+      .then(() => expect(store.getActions()).toEqual(expectedActions))
+  })
+
+  test('setUpdateIgnored calls POST server/update/ignore', () => {
+    client.__setMockResponse(availableUpdate)
+    return setUpdateIgnored(robot, availableUpdate)(() => {})
+      .then(() => expect(client).toHaveBeenCalledWith(robot, 'POST', 'server/update/ignore', version))
+  })
+
+  test('setUpdateIgnored dispatches IGNORED_UPDATE_REQUEST and IGNORED_UPDATE_SUCCESS', () => {
+    const store = mockStore({})
+    const expectedActions = [
+      {type: 'api:IGNORED_UPDATE_REQUEST', payload: {robot, version}},
+      {type: 'api:IGNORED_UPDATE_SUCCESS', payload: {robot, version}}
+    ]
+
+    client.__setMockResponse(version)
+
+    return store.dispatch(setUpdateIgnored(robot, availableUpdate))
+      .then(() => expect(store.getActions()).toEqual(expectedActions))
+  })
+
+  test('setUpdateIgnored dispatches IGNORED_UPDATE_REQUEST and IGNORED_UPDATE_FAILURE', () => {
+    const error = new Error('AH')
+    const store = mockStore({})
+    const expectedActions = [
+      {type: 'api:IGNORED_UPDATE_REQUEST', payload: {robot, version}},
+      {type: 'api:IGNORED_UPDATE_FAILURE', payload: {robot, error}}
+    ]
+
+    client.__setMockError(error)
+
+    return store.dispatch(setUpdateIgnored(robot, availableUpdate))
       .then(() => expect(store.getActions()).toEqual(expectedActions))
   })
 

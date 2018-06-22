@@ -16,12 +16,13 @@ type OverlayProps = {
  * just want to use `<Modal>`
  */
 export default function Overlay (props: OverlayProps) {
+  const clickable = props.onClick && !props.alertOverlay
   const className = cx(
     styles.overlay,
-    {[styles.clickable]: props.onClick, [styles.alert_modal_overlay]: props.alertOverlay}
+    {[styles.clickable]: clickable, [styles.alert_modal_overlay]: props.alertOverlay}
   )
 
   return (
-    <div className={className} onClick={props.onClick} />
+    <div className={className} onClick={clickable && props.onClick} />
   )
 }

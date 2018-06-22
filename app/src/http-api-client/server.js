@@ -187,7 +187,9 @@ export function serverReducer (
 
     case 'api:IGNORED_UPDATE_SUCCESS':
       ({robot: {name}} = action.payload)
-      const version = action.payload.version.version
+      const version = action.payload.version
+        ? action.payload.version.version
+        : null
       return {...state, [name]: {...state[name], ignored: version}}
   }
 

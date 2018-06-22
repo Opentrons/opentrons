@@ -8,14 +8,15 @@ import type {RobotService} from '../robot'
 import type {ApiCall} from './types'
 import client, {type ApiRequestError} from './client'
 
-type VersionResponse = {
+type VersionResponse = ?{
   version: ?string,
 }
 
 export type IgnoredUpdateRequestAction = {|
   type: 'api:IGNORED_UPDATE_REQUEST',
   payload: {
-    robot: RobotService
+    robot: RobotService,
+    version?: VersionResponse
   }
 |}
 
@@ -51,6 +52,17 @@ export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
     dispatch(ignoredUpdateRequest(robot))
 
     return client(robot, 'GET', 'server/update/ignore')
+      .then((version) => dispatch(ignoredUpdateSuccess(robot, version)))
+      .catch((error) => dispatch(ignoredUpdateFailure(robot, error)))
+  }
+}
+
+export function setUpdateIgnored (robot: RobotService, version: ?string): ThunkPromiseAction {
+  return (dispatch) => {
+    const body = {version}
+    dispatch(ignoredUpdateRequest(robot, body))
+
+    return client(robot, 'POST', 'server/update/ignore', body)
       .then((version) => dispatch(ignoredUpdateSuccess(robot, version)))
       .catch((error) => dispatch(ignoredUpdateFailure(robot, error)))
   }
@@ -95,8 +107,8 @@ export function ignoredUpdateReducer (
   return state
 }
 
-function ignoredUpdateRequest (robot: RobotService): IgnoredUpdateRequestAction {
-  return {type: 'api:IGNORED_UPDATE_REQUEST', payload: {robot}}
+function ignoredUpdateRequest (robot: RobotService, version: ?VersionResponse): IgnoredUpdateRequestAction {
+  return {type: 'api:IGNORED_UPDATE_REQUEST', payload: {robot, version}}
 }
 
 function ignoredUpdateSuccess (
