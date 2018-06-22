@@ -5,10 +5,7 @@ import type {
   StepType,
   StepIdType,
   FormData,
-  BlankForm,
-  TransferLikeForm,
-  MixForm,
-  PauseForm
+  BlankForm
 } from '../form-types'
 
 import type {
@@ -85,7 +82,7 @@ type TransferLikeValidationAndErrors =
   | ValidationAndErrors<TransferFormData>
 
 function _vapTransferLike (
-  formData: TransferLikeForm
+  formData: FormData
 ): TransferLikeValidationAndErrors {
   const stepType = formData.stepType
   const pipette = formData['pipette']
@@ -223,7 +220,7 @@ function _vapTransferLike (
   }
 }
 
-function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
+function _vapPause (formData: FormData): ValidationAndErrors<PauseFormData> {
   const hours = parseFloat(formData['pause-hour']) || 0
   const minutes = parseFloat(formData['pause-minute']) || 0
   const seconds = parseFloat(formData['pause-second']) || 0
@@ -264,7 +261,7 @@ function _vapPause (formData: PauseForm): ValidationAndErrors<PauseFormData> {
   }
 }
 
-function _vapMix (formData: MixForm): ValidationAndErrors<MixFormData> {
+function _vapMix (formData: FormData): ValidationAndErrors<MixFormData> {
   const requiredFields = ['pipette', 'labware', 'volume', 'times']
 
   let errors = {}

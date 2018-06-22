@@ -107,7 +107,7 @@ export type PauseForm = {|
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
-  [StepFieldName]: ?string
+  [StepFieldName]: any // TODO: form value processing to ensure type
 }
 //  | MixForm
 //  | PauseForm

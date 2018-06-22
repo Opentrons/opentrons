@@ -20,7 +20,7 @@ const FIELD_ERRORS: {[FieldError]: string | (number) => string} = {
 ********************/
 type errorChecker = (value: mixed | Array<mixed>) => ?FieldError
 
-export const requiredField = (value: mixed) => isEmpty(String(value)) && FIELD_ERRORS.REQUIRED
+export const requiredField = (value: mixed) => isEmpty(String(value)) ? FIELD_ERRORS.REQUIRED : null
 export const minimumWellCount = (minimum: number): errorChecker => (wells: Array<mixed>): ?FieldError => (
   (wells && (wells.length < minimum)) ? FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum) : null
 )
