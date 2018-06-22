@@ -43,7 +43,8 @@ describe('server API client', () => {
             [robot.name]: {
               availableUpdate: '42.0.0',
               update: {inProgress: true, error: null, response: null},
-              restart: {inProgress: true, error: null, response: null}
+              restart: {inProgress: true, error: null, response: null},
+              'update/ignore': {inProgress: true, error: null, response: null}
             }
           }
         }

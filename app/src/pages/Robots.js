@@ -10,9 +10,8 @@ import {selectors as robotSelectors, actions as robotActions} from '../robot'
 import {
   makeGetRobotHome,
   clearHomeResponse,
-  makeGetIgnoredUpdate,
-  makeGetAvailableRobotUpdate,
-  type IgnoredUpdate
+  makeGetRobotIgnoredUpdateRequest,
+  makeGetAvailableRobotUpdate
 } from '../http-api-client'
 
 import createLogger from '../logger'
@@ -30,8 +29,7 @@ import ConnectBanner from '../components/RobotSettings/ConnectBanner'
 
 type SP = {
   robot: ?Robot,
-  ignoredRequest: IgnoredUpdate,
-  availableUpdate: ?string,
+  showUpdateModal: boolean,
   connectedName: string,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
@@ -62,9 +60,8 @@ function RobotSettingsPage (props: Props) {
     closeHomeAlert,
     showConnectAlert,
     closeConnectAlert,
-    match: {path, url, params: {name}},
-    ignoredRequest,
-    availableUpdate
+    showUpdateModal,
+    match: {path, url, params: {name}}
   } = props
 
   if (name && !robot) {
@@ -78,13 +75,6 @@ function RobotSettingsPage (props: Props) {
   }
 
   if (!robot) return (<Page><Splash /></Page>)
-
-  // TODO (ka 2018-6-21): show update modal once update ignored is wired up,
-  let showUpdateModal = false
-  if (ignoredRequest.response && availableUpdate) {
-    const ignored = ignoredRequest.response.version
-    showUpdateModal = ignored !== availableUpdate
-  }
 
   const titleBarProps = {title: robot.name}
 
@@ -139,7 +129,7 @@ function RobotSettingsPage (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
-  const getUpdateIgnoredRequest = makeGetIgnoredUpdate()
+  const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   return (state, ownProps) => {
     const {match: {params: {name}}} = ownProps
@@ -150,11 +140,17 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const homeRequest = robot && getHomeRequest(state, robot)
     const ignoredRequest = robot && getUpdateIgnoredRequest(state, robot)
     const availableUpdate = robot && getAvailableRobotUpdate(state, robot)
+    const showUpdateModal = (
+      availableUpdate &&
+      ignoredRequest &&
+      ignoredRequest.response &&
+      ignoredRequest.response.version !== availableUpdate
+    )
+
     return {
       connectedName,
       robot,
-      ignoredRequest,
-      availableUpdate,
+      showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
       showConnectAlert: !connectRequest.inProgress && !!connectRequest.error

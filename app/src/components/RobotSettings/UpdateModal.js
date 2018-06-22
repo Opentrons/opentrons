@@ -17,21 +17,21 @@ import {
 
 import {AlertModal, Icon} from '@opentrons/components'
 
-type OwnProps = Robot
+type OP = Robot
 
-type StateProps = {
+type SP = {
   availableUpdate: ?string,
   updateRequest: RobotServerUpdate,
-  restartRequest: RobotServerRestart
+  restartRequest: RobotServerRestart,
 }
 
-type DispatchProps = {
+type DP = {dispatch: Dispatch}
+
+type Props = OP & SP & {
   update: () => *,
   restart: () => *,
-  ignoreUpdate: () => *
+  ignoreUpdate: () => *,
 }
-
-type Props = OwnProps & StateProps & DispatchProps
 
 const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
 const ALREADY_UPDATED_MSG = "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
@@ -51,7 +51,7 @@ function UpdateModal (props: Props) {
   let closeButtonText = 'not now'
   let message
   let button
-  console.log(availableUpdate)
+
   const heading = availableUpdate
     ? `Version ${availableUpdate || ''} available`
     : 'Robot is up to date'
@@ -89,19 +89,19 @@ function UpdateModal (props: Props) {
   )
 }
 
-function makeMapStateToProps () {
+function makeMapStateToProps (state: State) {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
 
-  return (state: State, ownProps: OwnProps): StateProps => ({
+  return (state: State, ownProps: OP): SP => ({
     availableUpdate: getAvailableRobotUpdate(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
     restartRequest: getRobotRestartRequest(state, ownProps)
   })
 }
 
-function mergeProps (stateProps: StateProps, dispatchProps: Dispatch, ownProps: OwnProps): Props {
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {availableUpdate} = stateProps
   const {dispatch} = dispatchProps
 

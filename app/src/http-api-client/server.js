@@ -9,12 +9,11 @@ import type {RobotService} from '../robot'
 import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
 import {fetchHealth} from './health'
-import {fetchIgnoredUpdate} from './ignored-update'
 
 // remote module paths relative to app-shell/lib/main.js
 const {AVAILABLE_UPDATE, getUpdateFiles} = remote.require('./api-update')
 
-type RequestPath = 'update' | 'restart'
+type RequestPath = 'update' | 'restart' | 'update/ignore'
 
 export type ServerUpdateResponse = {
   filename: string,
@@ -25,9 +24,14 @@ export type ServerRestartResponse = {
   message: 'restarting',
 }
 
+export type ServerUpdateIgnoreResponse = {
+  version: ?string,
+}
+
 type ServerResponse =
   | ServerUpdateResponse
   | ServerRestartResponse
+  | ServerUpdateIgnoreResponse
 
 export type ServerRequestAction = {|
   type: 'api:SERVER_REQUEST',
@@ -62,12 +66,13 @@ export type ServerAction =
 
 export type RobotServerUpdate = ApiCall<void, ServerUpdateResponse>
 export type RobotServerRestart = ApiCall<void, ServerRestartResponse>
+export type RobotServerUpdateIgnore = ApiCall<void, ServerUpdateIgnoreResponse>
 
 export type RobotServerState = {
   update?: ?RobotServerUpdate,
   restart?: ?RobotServerRestart,
   availableUpdate?: ?string,
-  ignored?: ?string,
+  'update/ignore': ?RobotServerUpdateIgnore,
 }
 
 type ServerState = {
@@ -76,6 +81,7 @@ type ServerState = {
 
 const UPDATE: RequestPath = 'update'
 const RESTART: RequestPath = 'restart'
+const IGNORE: RequestPath = 'update/ignore'
 
 // TODO(mc, 2018-03-16): remove debug code when UI is hooked up
 // global.updateRobotServer = updateRobotServer
@@ -118,6 +124,35 @@ export function fetchHealthAndIgnored (robot: RobotService): * {
     fetchHealth(robot),
     fetchIgnoredUpdate(robot)
   )
+}
+
+export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
+  return (dispatch) => {
+    dispatch(serverRequest(robot, IGNORE))
+
+    return client(robot, 'GET', 'server/update/ignore')
+    .then(
+      (response: ServerRestartResponse) =>
+        dispatch(serverSuccess(robot, IGNORE, response)),
+      (error: ApiRequestError) =>
+        dispatch(serverFailure(robot, IGNORE, error))
+    )
+  }
+}
+
+export function setUpdateIgnored (robot: RobotService, version: ?string): ThunkPromiseAction {
+  return (dispatch) => {
+    const body = {version}
+    dispatch(serverRequest(robot, IGNORE))
+
+    return client(robot, 'POST', 'server/update/ignore', body)
+    .then(
+      (response: ServerRestartResponse) =>
+        dispatch(serverSuccess(robot, IGNORE, response)),
+      (error: ApiRequestError) =>
+        dispatch(serverFailure(robot, IGNORE, error))
+    )
+  }
 }
 
 export function serverReducer (
@@ -184,13 +219,6 @@ export function serverReducer (
       }
 
       return {...state, [name]: {...stateByName, availableUpdate}}
-
-    case 'api:IGNORED_UPDATE_SUCCESS':
-      ({robot: {name}} = action.payload)
-      const version = action.payload.version
-        ? action.payload.version.version
-        : null
-      return {...state, [name]: {...state[name], ignored: version}}
   }
 
   return state
@@ -220,6 +248,16 @@ export const makeGetRobotRestartRequest = () => {
     createSelector(
       selectRobotServerState,
       (state) => (state && state.restart) || {inProgress: false}
+    )
+
+  return selector
+}
+
+export const makeGetRobotIgnoredUpdateRequest = () => {
+  const selector: Selector<State, RobotService, RobotServerUpdateIgnore> =
+    createSelector(
+      selectRobotServerState,
+      (state) => (state && state['update/ignore']) || {inProgress: false}
     )
 
   return selector
