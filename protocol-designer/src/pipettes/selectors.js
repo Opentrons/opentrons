@@ -1,14 +1,17 @@
 // @flow
 import {createSelector} from 'reselect'
-import type {BaseState, Selector} from '../types'
 import reduce from 'lodash/reduce'
+import {pipetteDataByName} from './pipetteData'
+
+import type {BaseState, Selector, Options} from '../types'
 import type {DropdownOption} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
-import {pipetteDataByName} from './pipetteData'
+
+type PipettesById = {[pipetteId: string]: PipetteData}
 
 const rootSelector = (state: BaseState) => state.pipettes.pipettes
 
-function _getPipetteName (pipetteData) {
+function _getPipetteName (pipetteData): string {
   const result = Object.keys(pipetteDataByName).find(pipetteName => {
     const p = pipetteDataByName[pipetteName]
     return (
@@ -23,9 +26,8 @@ function _getPipetteName (pipetteData) {
   return result
 }
 
-type Options = Array<{name: string, value: string}> // TODO IMMEDATELY import this from somewhere
 function _makePipetteOption (
-  byId: {[string]: PipetteData},
+  byId: PipettesById,
   pipetteId: ?string,
   idPrefix: 'left' | 'right'
 ): Options {
@@ -40,7 +42,7 @@ function _makePipetteOption (
   }]
 }
 
-export const equippedPipetteOptions: BaseState => Array<DropdownOption> = createSelector(
+export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
   rootSelector,
   pipettes => {
     const byId = pipettes.byId
@@ -52,7 +54,6 @@ export const equippedPipetteOptions: BaseState => Array<DropdownOption> = create
 )
 
 // Shows equipped (left & right) pipettes by ID, not mount
-type PipettesById = {[pipetteId: string]: PipetteData}
 export const equippedPipettes: Selector<PipettesById> = createSelector(
   rootSelector,
   pipettes => reduce(pipettes.byMount, (acc: PipettesById, pipetteId: string): PipettesById => {
@@ -66,7 +67,7 @@ export const equippedPipettes: Selector<PipettesById> = createSelector(
 )
 
 // Formats pipette data specifically for instrumentgroup
-export const pipettesForInstrumentGroup = createSelector(
+export const pipettesForInstrumentGroup: Selector<*> = createSelector(
   rootSelector,
   pipettes => [pipettes.byMount.left, pipettes.byMount.right].reduce((acc, pipetteId) => {
     if (!pipetteId) return acc
@@ -85,4 +86,14 @@ export const pipettesForInstrumentGroup = createSelector(
 
     return [...acc, pipetteForInstrumentGroup]
   }, [])
+)
+
+export const permittedTipracks: Selector<Array<string>> = createSelector(
+  equippedPipettes,
+  (_equippedPipettes) =>
+    reduce(_equippedPipettes, (acc: Array<string>, pipette: PipetteData) => {
+      return (pipette.tiprackModel)
+        ? [...acc, pipette.tiprackModel]
+        : acc
+    }, [])
 )

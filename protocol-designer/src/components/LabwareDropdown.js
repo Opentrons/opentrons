@@ -28,11 +28,12 @@ function LabwareItem (props: LabwareItemProps) {
 type LabwareDropdownProps = {
   onClose: (e?: SyntheticEvent<*>) => void,
   onContainerChoose: OnContainerChoose,
-  slot: string | false
+  slot: string | false,
+  permittedTipracks: Array<string>
 }
 
 export default function LabwareDropdown (props: LabwareDropdownProps) {
-  const {onClose, onContainerChoose, slot} = props
+  const {onClose, onContainerChoose, slot, permittedTipracks} = props
   // do not render without a slot
   if (!slot) return null
 
@@ -58,7 +59,9 @@ export default function LabwareDropdown (props: LabwareDropdownProps) {
             ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
             ['tiprack-1000ul', '1000uL Tip Rack', 'Tiprack-200ul'],
             ['tiprack-1000ul-chem', '10x10 1000uL Chem-Tip Rack', 'Tiprack-1000ul-chem']
-          ].map(labwareItemMapper)}
+          ].filter(labwareModelNameImage =>
+            permittedTipracks.includes(labwareModelNameImage[0])
+          ).map(labwareItemMapper)}
         </Accordion>
         <Accordion title='Tube Rack'>
           {[

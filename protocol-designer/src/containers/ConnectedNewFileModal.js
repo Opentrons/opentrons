@@ -36,8 +36,6 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
       dispatch(pipetteActions.updatePipettes({
         left: fields.leftPipette,
         right: fields.rightPipette,
-
-        // TODO IMMEDATELY handle this in the action
         leftTiprackModel: fields.leftTiprackModel,
         rightTiprackModel: fields.rightTiprackModel
       }))
