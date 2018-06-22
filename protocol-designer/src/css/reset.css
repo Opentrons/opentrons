@@ -5,6 +5,10 @@ body {
   line-height: 1;
 }
 
+button:focus {
+  outline: 0;
+}
+
 * {
   font-family: 'Open Sans', sans-serif;
   box-sizing: border-box;

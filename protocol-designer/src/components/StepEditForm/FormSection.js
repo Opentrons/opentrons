@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import startCase from 'lodash/startCase'
 import cx from 'classnames'
-import {Icon} from '@opentrons/components'
+import {IconButton} from '@opentrons/components'
 
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import {collapseFormSection} from '../../steplist/actions'
@@ -35,10 +35,10 @@ const FormSection = (props: FormSectionProps) => {
 
       {props.collapsed !== undefined && // if doesn't exist in redux
         <div onClick={props.onCollapseToggle}>
-          {/* TODO Ian 2018-01-29 use an IconButton once it exists */}
-          <Icon
+          <IconButton
             width='30px'
-            name={props.collapsed === true ? 'chevron-down' : 'chevron-up'}
+            name='settings'
+            hover={!props.collapsed}
             className={styles.carat}
           />
         </div>
