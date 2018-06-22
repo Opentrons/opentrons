@@ -107,7 +107,7 @@ export type PauseForm = {|
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
-  [StepFieldName]: ?mixed | ?string
+  [StepFieldName]: ?string
 }
 //  | MixForm
 //  | PauseForm

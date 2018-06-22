@@ -3,7 +3,7 @@ import get from 'lodash/get'
 import {
   requiredField,
   minimumWellCount,
-  composeErrors,
+  composeErrors
 } from './errors'
 import {
   castToNumber,
