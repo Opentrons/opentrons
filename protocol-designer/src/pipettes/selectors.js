@@ -23,10 +23,16 @@ function _getPipetteName (pipetteData) {
   return result
 }
 
-function _makePipetteOption (pipetteData: ?PipetteData, idPrefix: 'left' | 'right') {
-  if (!pipetteData) {
+type Options = Array<{name: string, value: string}> // TODO IMMEDATELY import this from somewhere
+function _makePipetteOption (
+  byId: {[string]: PipetteData},
+  pipetteId: ?string,
+  idPrefix: 'left' | 'right'
+): Options {
+  if (!pipetteId || !byId[pipetteId]) {
     return []
   }
+  const pipetteData = byId[pipetteId]
   const name = _getPipetteName(pipetteData)
   return [{
     name,
@@ -37,39 +43,46 @@ function _makePipetteOption (pipetteData: ?PipetteData, idPrefix: 'left' | 'righ
 export const equippedPipetteOptions: BaseState => Array<DropdownOption> = createSelector(
   rootSelector,
   pipettes => {
-    const leftOption = _makePipetteOption(pipettes.left, 'left')
-    const rightOption = _makePipetteOption(pipettes.right, 'right')
+    const byId = pipettes.byId
+    const leftOption = _makePipetteOption(byId, pipettes.byMount.left, 'left')
+    const rightOption = _makePipetteOption(byId, pipettes.byMount.right, 'right')
 
     return [...leftOption, ...rightOption]
   }
 )
 
-// TODO LATER factor out into own file
-// Shows pipettes by ID, not mount
+// Shows equipped (left & right) pipettes by ID, not mount
 type PipettesById = {[pipetteId: string]: PipetteData}
 export const equippedPipettes: Selector<PipettesById> = createSelector(
   rootSelector,
-  pipettes => reduce(pipettes, (acc: PipettesById, pipetteData: ?PipetteData): PipettesById => {
-    return (pipetteData)
-      ? {
-        ...acc,
-        [pipetteData.id]: pipetteData
-      }
-      : acc
+  pipettes => reduce(pipettes.byMount, (acc: PipettesById, pipetteId: string): PipettesById => {
+    const pipetteData = pipettes.byId[pipetteId]
+    if (!pipetteData) return acc
+    return {
+      ...acc,
+      [pipetteId]: pipetteData
+    }
   }, {})
 )
 
 // Formats pipette data specifically for instrumentgroup
 export const pipettesForInstrumentGroup = createSelector(
   rootSelector,
-  pipettes => [pipettes.left, pipettes.right].reduce((acc, pipetteData) => pipetteData
-    ? [...acc, {
+  pipettes => [pipettes.byMount.left, pipettes.byMount.right].reduce((acc, pipetteId) => {
+    if (!pipetteId) return acc
+
+    const pipetteData = pipettes.byId[pipetteId]
+
+    if (!pipetteData) return acc
+
+    const pipetteForInstrumentGroup = {
       mount: pipetteData.mount,
       channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
       tipType: `${pipetteData.maxVolume} uL`
-    }]
-    : acc,
-    [])
+    }
+
+    return [...acc, pipetteForInstrumentGroup]
+  }, [])
 )
