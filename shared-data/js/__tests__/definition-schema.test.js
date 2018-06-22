@@ -59,7 +59,7 @@ describe('test the schema against a minimalist fixture', () => {
   })
 })
 
-describe('test schemas of all definitions', () => { // TODO don't skip
+describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
 
   test('got at least 1 labware definition file', () => {

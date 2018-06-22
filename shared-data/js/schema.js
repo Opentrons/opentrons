@@ -8,6 +8,16 @@ const PositiveNumber = {
   minimum: 0
 }
 
+const LabwareFormats = [
+  '96-standard',
+  '384-standard',
+  'trough',
+  'irregular',
+  'trash',
+  'tiprack-96',
+  'tiprack-irregular'
+]
+
 const schema = {
   type: 'object',
   required: ['metadata', 'ordering', 'wells'],
@@ -18,8 +28,12 @@ const schema = {
       type: 'object',
       required: ['name'],
       properties: {
+        name: {type: 'string'},
 
-        name: {type: 'string'}
+        'display-name': {type: 'string'},
+        'display-category': {type: 'string'},
+        'tip-volume': PositiveNumber,
+        format: {enum: LabwareFormats}
       }
     },
     ordering: {

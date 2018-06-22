@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "PCR-strip-tall"
+    "name": "PCR-strip-tall",
+    "format": "96-standard",
+    "display-category": "well-plate"
   },
   "ordering": [
     [

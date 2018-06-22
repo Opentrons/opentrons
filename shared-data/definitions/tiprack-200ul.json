@@ -1,6 +1,9 @@
 {
   "metadata": {
-    "name": "tiprack-200ul"
+    "name": "tiprack-200ul",
+    "format": "tiprack-96",
+    "tip-volume": 200,
+    "display-category": "tiprack"
   },
   "ordering": [
     [

@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "96-PCR-tall"
+    "name": "96-PCR-tall",
+    "format": "96-standard",
+    "display-category": "well-plate"
   },
   "ordering": [
     [

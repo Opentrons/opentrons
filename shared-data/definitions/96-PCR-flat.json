@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "96-PCR-flat"
+    "name": "96-PCR-flat",
+    "format": "96-standard",
+    "display-category": "well-plate"
   },
   "ordering": [
     [

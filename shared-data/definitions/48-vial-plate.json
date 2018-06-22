@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "48-vial-plate"
+    "name": "48-vial-plate",
+    "format": "irregular",
+    "display-category": "tube-rack"
   },
   "ordering": [
     [

@@ -1,6 +1,7 @@
 {
   "metadata": {
-    "name": "fixed-trash"
+    "name": "fixed-trash",
+    "format": "trash"
   },
   "ordering": [
     [

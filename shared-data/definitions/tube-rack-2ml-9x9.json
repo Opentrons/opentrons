@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "tube-rack-2ml-9x9"
+    "name": "tube-rack-2ml-9x9",
+    "format": "irregular",
+    "display-category": "tube-rack"
   },
   "ordering": [
     [

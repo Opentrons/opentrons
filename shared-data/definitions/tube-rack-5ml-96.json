@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "tube-rack-5ml-96"
+    "name": "tube-rack-5ml-96",
+    "format": "irregular",
+    "display-category": "tube-rack"
   },
   "ordering": [
     [

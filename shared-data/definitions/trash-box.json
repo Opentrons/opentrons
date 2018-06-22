@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "trash-box"
+    "name": "trash-box",
+    "format": "trash",
+    "display-category": "trash"
   },
   "ordering": [
     [

@@ -1,6 +1,7 @@
 {
   "metadata": {
-    "name": "rigaku-compact-crystallization-plate"
+    "name": "rigaku-compact-crystallization-plate",
+    "format": "irregular"
   },
   "ordering": [
     [
