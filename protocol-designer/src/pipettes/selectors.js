@@ -1,10 +1,12 @@
 // @flow
 import {createSelector} from 'reselect'
-import type {BaseState, Selector} from '../../types'
+import type {BaseState, Selector} from '../types'
 import reduce from 'lodash/reduce'
 import type {DropdownOption} from '@opentrons/components'
-import type {PipetteData} from '../../step-generation'
-import {pipetteDataByName} from '../pipetteData'
+import type {PipetteData} from '../step-generation'
+import {pipetteDataByName} from './pipetteData'
+
+const rootSelector = (state: BaseState) => state.pipettes.pipettes
 
 function _getPipetteName (pipetteData) {
   const result = Object.keys(pipetteDataByName).find(pipetteName => {
@@ -20,8 +22,6 @@ function _getPipetteName (pipetteData) {
   }
   return result
 }
-
-const rootSelector = (state: BaseState) => state.fileData.pipettes
 
 function _makePipetteOption (pipetteData: ?PipetteData, idPrefix: 'left' | 'right') {
   if (!pipetteData) {

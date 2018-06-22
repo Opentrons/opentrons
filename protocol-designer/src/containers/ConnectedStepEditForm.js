@@ -12,7 +12,7 @@ import {
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors} from '../steplist/reducers' // TODO use steplist/index.js
-import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as pipetteSelectors} from '../pipettes'
 import type {FormData} from '../form-types'
 import type {BaseState, ThunkDispatch} from '../types'
 
@@ -36,7 +36,7 @@ function mapStateToProps (state: BaseState) {
     formData: selectors.formData(state),
     formSectionCollapse: selectors.formSectionCollapse(state),
     canSave: selectors.currentFormCanBeSaved(state),
-    pipetteOptions: fileDataSelectors.equippedPipetteOptions(state),
+    pipetteOptions: pipetteSelectors.equippedPipetteOptions(state),
     labwareOptions: labwareIngredSelectors.labwareOptions(state)
   }
 }
