@@ -2,7 +2,7 @@
   "metadata": {
     "name": "384-plate",
     "format": "384-standard",
-    "display-category": "well-plate"
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

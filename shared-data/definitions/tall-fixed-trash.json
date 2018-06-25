@@ -1,7 +1,8 @@
 {
   "metadata": {
     "name": "tall-fixed-trash",
-    "format": "trash"
+    "format": "trough",
+    "isValidSource": false
   },
   "ordering": [
     [

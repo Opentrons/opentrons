@@ -18,7 +18,8 @@ describe('test the schema against a minimalist fixture', () => {
   test('...', () => {
     const minimalLabwareDef = {
       metadata: {
-        name: 'test-labware'
+        name: 'test-labware',
+        format: 'trough'
       },
       ordering: [['A1']],
       wells: {

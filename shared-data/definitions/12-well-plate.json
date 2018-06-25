@@ -2,7 +2,7 @@
   "metadata": {
     "name": "12-well-plate",
     "format": "irregular",
-    "display-category": "well-plate"
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

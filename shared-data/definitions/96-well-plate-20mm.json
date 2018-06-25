@@ -2,7 +2,7 @@
   "metadata": {
     "name": "96-well-plate-20mm",
     "format": "96-standard",
-    "display-category": "well-plate"
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

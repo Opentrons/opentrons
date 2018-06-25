@@ -1,8 +1,9 @@
 {
   "metadata": {
     "name": "trash-box",
-    "format": "trash",
-    "display-category": "trash"
+    "format": "trough",
+    "displayCategory": "trash",
+    "isValidSource": false
   },
   "ordering": [
     [

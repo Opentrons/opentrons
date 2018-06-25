@@ -12,10 +12,7 @@ const LabwareFormats = [
   '96-standard',
   '384-standard',
   'trough',
-  'irregular',
-  'trash',
-  'tiprack-96',
-  'tiprack-irregular'
+  'irregular'
 ]
 
 const schema = {
@@ -26,14 +23,17 @@ const schema = {
 
     metadata: {
       type: 'object',
-      required: ['name'],
+      required: ['name', 'format'],
       properties: {
         name: {type: 'string'},
+        format: {enum: LabwareFormats},
 
-        'display-name': {type: 'string'},
-        'display-category': {type: 'string'},
-        'tip-volume': PositiveNumber,
-        format: {enum: LabwareFormats}
+        deprecated: {enum: [true]},
+        displayName: {type: 'string'},
+        displayCategory: {type: 'string'},
+        isValidSource: {enum: [false]},
+        isTiprack: {enum: [true]},
+        tipVolume: PositiveNumber
       }
     },
     ordering: {

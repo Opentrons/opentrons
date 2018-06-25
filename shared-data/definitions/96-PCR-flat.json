@@ -2,7 +2,7 @@
   "metadata": {
     "name": "96-PCR-flat",
     "format": "96-standard",
-    "display-category": "well-plate"
+    "deprecated": true
   },
   "ordering": [
     [
