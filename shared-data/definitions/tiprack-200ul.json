@@ -4,7 +4,8 @@
     "format": "96-standard",
     "tipVolume": 200,
     "displayCategory": "tiprack",
-    "isTiprack": true
+    "isTiprack": true,
+    "isValidSource": false
   },
   "ordering": [
     [
