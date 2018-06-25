@@ -47,10 +47,10 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue, errorsToShow}) => (
+      render={({value, updateValue, errorToShow}) => (
         <InputField
           {...inputProps}
-          error={errorsToShow}
+          error={errorToShow}
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
@@ -67,11 +67,11 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue, errorsToShow}) => (
+      render={({value, updateValue, errorToShow}) => (
         <RadioGroup
           {...radioGroupProps}
           value={value}
-          error={errorsToShow}
+          error={errorToShow}
           onChange={(e: SyntheticInputEvent<>) => {
             updateValue(e.target.value)
             onFieldBlur(name)

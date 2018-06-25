@@ -32,16 +32,16 @@ type WellSelectionInputProps = {
   wellCount?: number,
   disabled: boolean,
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
-  errorsToShow: ?Array<string>
+  errorToShow: ?string
 }
 
 const WellSelectionInput = (props: WellSelectionInputProps) => (
   <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
     <InputField
       readOnly
-      value={props.wellCount && String(props.wellCount)}
+      value={String(props.wellCount)}
       onClick={props.onClick}
-      error={props.errorsToShow && props.errorsToShow.join(', ')} />
+      error={props.errorToShow} />
   </FormGroup>
 )
 
@@ -73,7 +73,7 @@ const WellSelectionInputMP = (
   return {
     disabled,
     wellCount: stateProps.wellCount,
-    errorsToShow: showErrors ? _wellFieldErrors : [],
+    errorToShow: showErrors ? _wellFieldErrors[0] : null,
     onClick: () => {
       if (ownProps.onFieldBlur) {
         ownProps.onFieldBlur(ownProps.name)

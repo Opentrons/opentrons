@@ -9,7 +9,7 @@ import type {BaseState, ThunkDispatch} from '../../types'
 type FieldRenderProps = {
   value: ?mixed,
   updateValue: (?mixed) => void,
-  errorsToShow: ?Array<string>
+  errorToShow: ?string
 }
 type OP = {
   name: StepFieldName,
@@ -17,7 +17,7 @@ type OP = {
   dirtyFields?: Array<StepFieldName>,
   focusedField?: StepFieldName
 }
-type SP = {value: ?mixed}
+type SP = {value?: ?mixed}
 type DP = {updateValue: (?mixed) => void}
 type StepFieldProps = OP & SP & DP
 
@@ -32,7 +32,7 @@ const StepField = (props: StepFieldProps) => {
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
-  return <React.Fragment>{render({value, updateValue, errorsToShow: showErrors ? errors.join(', ') : null})}</React.Fragment> // NOTE: fragment for flow
+  return <React.Fragment>{render({value, updateValue, errorToShow: showErrors ? errors.join(', ') : null})}</React.Fragment> // NOTE: fragment for flow
 }
 
 type ShowFieldErrorParams = {name: StepFieldName, focusedField?: StepFieldName, dirtyFields?: Array<StepFieldName>}
@@ -42,8 +42,7 @@ export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErro
 
 const STP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
-  if (!formData) return null
-  return {value: formData[ownProps.name] || null}
+  return {value: formData ? formData[ownProps.name] : null}
 }
 
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
