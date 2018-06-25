@@ -58,7 +58,7 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(e.currentTarget.value)}
-          value={String(value)} />
+          value={value ? String(value) : null} />
       )} />
   )
 }
@@ -92,14 +92,8 @@ export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
   const {label = 'Delay', focusHandlers} = props
   return (
     <StepCheckboxRow name="dispense--delay--checkbox" label={label}>
-      <StepInputField
-        {...focusHandlers}
-        name="dispense--delay-minutes"
-        units='m' />
-      <StepInputField
-        {...focusHandlers}
-        name="dispense--delay-seconds"
-        units='s' />
+      <StepInputField {...focusHandlers} name="dispense--delay-minutes" units='m' />
+      <StepInputField {...focusHandlers} name="dispense--delay-seconds" units='s' />
     </StepCheckboxRow>
   )
 }
@@ -116,7 +110,7 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & Pi
       <FormGroup label='Pipette:' className={styles.pipette_field}>
         <DropdownField
           options={props.pipetteOptions}
-          value={String(value)}
+          value={value ? String(value) : null}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />
@@ -137,7 +131,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
         <DropdownField
           className={className}
           options={labwareOptions}
-          value={String(value)}
+          value={value ? String(value) : null}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       )} />
   )
@@ -164,7 +158,7 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => (
       <FormGroup label='CHANGE TIP'>
         <DropdownField
           options={CHANGE_TIP_OPTIONS}
-          value={String(value)}
+          value={value ? String(value) : null}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />

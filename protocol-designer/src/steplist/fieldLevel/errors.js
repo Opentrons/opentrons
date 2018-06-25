@@ -1,5 +1,4 @@
 // @flow
-import isEmpty from 'lodash/isEmpty'
 import isArray from 'lodash/isArray'
 
 /*******************
@@ -21,7 +20,7 @@ const FIELD_ERRORS: {[FieldError]: string} = {
 ********************/
 type errorChecker = (value: mixed) => ?string
 
-export const requiredField = (value: mixed): ?string => isEmpty(String(value)) ? FIELD_ERRORS.REQUIRED : null
+export const requiredField = (value: mixed): ?string => !value ? FIELD_ERRORS.REQUIRED : null
 export const minimumWellCount = (minimum: number): errorChecker => (wells: mixed): ?string => (
   (isArray(wells) && (wells.length < minimum)) ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}` : null
 )

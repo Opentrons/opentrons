@@ -38,7 +38,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             pipetteFieldName="pipette"
             {...focusHandlers} />
           <PipetteField name="pipette" />
-          {stepType === 'consolidate' && <StepInputField name="volume" units='μL' {...focusHandlers} />}
+          {stepType === 'consolidate' &&
+            <FormGroup label='Volume:' className={styles.volume_field}>
+              <StepInputField name="volume" units='μL' {...focusHandlers} />
+            </FormGroup>}
         </div>
 
         <div className={formStyles.row_wrapper}>
@@ -77,7 +80,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             pipetteFieldName="pipette"
             {...focusHandlers} />
           {(stepType === 'transfer' || stepType === 'distribute') &&
-            <StepInputField name="volume" units="μL" {...focusHandlers} />}
+            <FormGroup label='Volume:' className={styles.volume_field}>
+              <StepInputField name="volume" units="μL" {...focusHandlers} />
+            </FormGroup>}
         </div>
 
         <div className={formStyles.row_wrapper}>

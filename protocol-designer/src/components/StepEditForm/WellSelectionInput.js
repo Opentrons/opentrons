@@ -39,7 +39,7 @@ const WellSelectionInput = (props: WellSelectionInputProps) => (
   <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
     <InputField
       readOnly
-      value={String(props.wellCount)}
+      value={props.wellCount ? String(props.wellCount) : null}
       onClick={props.onClick}
       error={props.errorToShow} />
   </FormGroup>

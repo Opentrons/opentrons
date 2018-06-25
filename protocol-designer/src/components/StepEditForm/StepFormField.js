@@ -32,7 +32,8 @@ const StepField = (props: StepFieldProps) => {
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
-  return <React.Fragment>{render({value, updateValue, errorToShow: showErrors ? errors.join(', ') : null})}</React.Fragment> // NOTE: fragment for flow
+  const errorToShow = (showErrors && errors.length > 0) ? errors.join(', ') : null
+  return <React.Fragment>{render({value, updateValue, errorToShow})}</React.Fragment> // NOTE: fragment for flow
 }
 
 type ShowFieldErrorParams = {name: StepFieldName, focusedField?: StepFieldName, dirtyFields?: Array<StepFieldName>}
