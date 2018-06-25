@@ -28,9 +28,9 @@ type SP = {
 type DP = {dispatch: Dispatch}
 
 type Props = OP & SP & {
-  update: () => *,
-  restart: () => *,
-  ignoreUpdate: () => *,
+  update: () => mixed,
+  restart: () => mixed,
+  ignoreUpdate: () => mixed,
 }
 
 const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
@@ -41,7 +41,6 @@ const DONE_MSG = 'Your robot has been updated. Please wait for your robot to ful
 // TODO(mc, 2018-03-19): prop or component for text-height icons
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
-// $FlowFixMe(ka, 2018-06-22): flow throwing error because of mergeprops?
 export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
 
 function UpdateModal (props: Props) {
@@ -76,7 +75,6 @@ function UpdateModal (props: Props) {
 
   return (
     <AlertModal
-      onCloseClick={close}
       heading={heading}
       buttons={[
         {onClick: ignoreUpdate, children: closeButtonText},
@@ -89,12 +87,12 @@ function UpdateModal (props: Props) {
   )
 }
 
-function makeMapStateToProps () {
+function makeMapStateToProps (): (State, OP) => SP {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
 
-  return (state: State, ownProps: OP): SP => ({
+  return (state, ownProps) => ({
     availableUpdate: getAvailableRobotUpdate(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
     restartRequest: getRobotRestartRequest(state, ownProps)
