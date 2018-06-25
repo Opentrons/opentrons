@@ -52,7 +52,8 @@ export type {
 
 export type {
   RobotServerUpdate,
-  RobotServerRestart
+  RobotServerRestart,
+  RobotServerUpdateIgnore
 } from './server'
 
 export type {
@@ -127,7 +128,11 @@ export {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable
+  getAnyRobotUpdateAvailable,
+  fetchHealthAndIgnored,
+  fetchIgnoredUpdate,
+  setIgnoredUpdate,
+  makeGetRobotIgnoredUpdateRequest
 } from './server'
 
 export {

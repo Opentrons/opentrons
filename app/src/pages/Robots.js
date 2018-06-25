@@ -2,12 +2,18 @@
 // connect and configure robots page
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {withRouter, Route, Redirect, type Match} from 'react-router'
+import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
 import type {State, Dispatch, Error} from '../types'
 import type {Robot} from '../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../robot'
-import {makeGetRobotHome, clearHomeResponse} from '../http-api-client'
+import {
+  makeGetRobotHome,
+  clearHomeResponse,
+  makeGetRobotIgnoredUpdateRequest,
+  makeGetAvailableRobotUpdate
+} from '../http-api-client'
+
 import createLogger from '../logger'
 
 import {Splash, SpinnerModalPage} from '@opentrons/components'
@@ -23,6 +29,7 @@ import ConnectBanner from '../components/RobotSettings/ConnectBanner'
 
 type SP = {
   robot: ?Robot,
+  showUpdateModal: boolean,
   connectedName: string,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
@@ -53,6 +60,7 @@ function RobotSettingsPage (props: Props) {
     closeHomeAlert,
     showConnectAlert,
     closeConnectAlert,
+    showUpdateModal,
     match: {path, url, params: {name}}
   } = props
 
@@ -77,18 +85,27 @@ function RobotSettingsPage (props: Props) {
         <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
         <RobotSettings {...robot} />
       </Page>
+      <Switch>
+        <Route path={`${path}/update`} render={() => (
+          <UpdateModal {...robot} />
+        )} />
 
-      <Route path={`${path}/update`} render={() => (
-        <UpdateModal {...robot} />
-      )} />
+        <Route render={() => {
+          if (showUpdateModal) {
+            return (<Redirect to={`/robots/${robot.name}/update`} />)
+          }
 
-      <Route path={`${path}/pipettes`} render={(props) => (
-        <ChangePipette {...props} robot={robot} parentUrl={url} />
-      )} />
+          return null
+        }} />
 
-      <Route path={`${path}/calibrate-deck`} render={(props) => (
-        <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
-      )} />
+        <Route path={`${path}/pipettes`} render={(props) => (
+          <ChangePipette {...props} robot={robot} parentUrl={url} />
+        )} />
+
+        <Route path={`${path}/calibrate-deck`} render={(props) => (
+          <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+        )} />
+      </Switch>
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
@@ -112,7 +129,8 @@ function RobotSettingsPage (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
-
+  const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
+  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   return (state, ownProps) => {
     const {match: {params: {name}}} = ownProps
     const robots = robotSelectors.getDiscovered(state)
@@ -120,10 +138,19 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const connectedName = robotSelectors.getConnectedRobotName(state)
     const robot = robots.find(r => r.name === name)
     const homeRequest = robot && getHomeRequest(state, robot)
+    const ignoredRequest = robot && getUpdateIgnoredRequest(state, robot)
+    const availableUpdate = robot && getAvailableRobotUpdate(state, robot)
+    const showUpdateModal = (
+      availableUpdate &&
+      ignoredRequest &&
+      ignoredRequest.response &&
+      ignoredRequest.response.version !== availableUpdate
+    )
 
     return {
       connectedName,
       robot,
+      showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
       showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
