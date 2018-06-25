@@ -90,14 +90,6 @@ function RobotSettingsPage (props: Props) {
           <UpdateModal {...robot} />
         )} />
 
-        <Route render={() => {
-          if (showUpdateModal) {
-            return (<Redirect to={`/robots/${robot.name}/update`} />)
-          }
-
-          return null
-        }} />
-
         <Route path={`${path}/pipettes`} render={(props) => (
           <ChangePipette {...props} robot={robot} parentUrl={url} />
         )} />
@@ -105,23 +97,38 @@ function RobotSettingsPage (props: Props) {
         <Route path={`${path}/calibrate-deck`} render={(props) => (
           <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
         )} />
+
+        <Route exact path={path} render={() => {
+          if (showUpdateModal) {
+            return (<Redirect to={`/robots/${robot.name}/update`} />)
+          }
+
+          // only show homing spinner and error on main page
+          // otherwise, it will show up during homes in pipette swap
+          return (
+            <React.Fragment>
+              {homeInProgress && (
+                <SpinnerModalPage
+                  titleBar={titleBarProps}
+                  message='Robot is homing.'
+                />
+              )}
+
+              {!!homeError && (
+                <ErrorModal
+                  heading='Robot unable to home'
+                  error={homeError}
+                  description='Robot was unable to home, please try again.'
+                  close={closeHomeAlert}
+                />
+              )}
+            </React.Fragment>
+          )
+        }} />
       </Switch>
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
-      )}
-
-      {homeInProgress && (
-        <SpinnerModalPage titleBar={titleBarProps} message='Robot is homing.' />
-      )}
-
-      {!!homeError && (
-        <ErrorModal
-          heading='Robot unable to home'
-          error={homeError}
-          description='Robot was unable to home, please try again.'
-          close={closeHomeAlert}
-        />
       )}
      </React.Fragment>
   )
