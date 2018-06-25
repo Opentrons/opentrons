@@ -5,6 +5,7 @@ import type {Dispatch} from 'redux'
 import type {BaseState} from '../types'
 import {selectors, actions as navigationActions} from '../navigation'
 import {actions as fileActions} from '../file-data'
+import {actions as pipetteActions} from '../pipettes'
 
 import NewFileModal from '../components/modals/NewFileModal'
 
@@ -32,7 +33,7 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
         description: ''
       }))
 
-      dispatch(fileActions.updatePipettes({
+      dispatch(pipetteActions.updatePipettes({
         left: fields.leftPipette,
         right: fields.rightPipette
       }))

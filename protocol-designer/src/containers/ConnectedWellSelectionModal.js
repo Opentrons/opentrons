@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 import type {Dispatch} from 'redux'
 import wellSelectionSelectors from '../well-selection/selectors'
-import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as pipetteSelectors} from '../pipettes'
 import {
   closeWellSelectionModal,
   saveWellSelectionModal
@@ -42,7 +42,7 @@ function mapStateToProps (state: BaseState): SP | HideModal {
   const pipetteId = wellSelectionModalData.pipetteId
 
   return {
-    pipette: fileDataSelectors.equippedPipettes(state)[pipetteId]
+    pipette: pipetteSelectors.equippedPipettes(state)[pipetteId]
   }
 }
 

@@ -6,7 +6,7 @@ import {
   DropdownField,
   AlertModal
 } from '@opentrons/components'
-import {pipetteData} from '../../file-data'
+import {pipetteOptions} from '../../pipettes/pipetteData'
 
 import styles from './NewFileModal.css'
 import formStyles from '../forms.css'
@@ -30,7 +30,7 @@ const INVALID = 'INVALID'
 const pipetteOptionsWithInvalid = [
   {name: '', value: INVALID},
   {name: 'None', value: ''},
-  ...pipetteData.pipetteOptions
+  ...pipetteOptions
 ]
 
 const initialState = {

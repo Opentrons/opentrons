@@ -1,6 +1,7 @@
 // @flow
 import type {Channels} from '@opentrons/components'
 
+// TODO: Ian 2018-06-22 use shared-data
 export const pipetteDataByName: {[pipetteName: string]: {maxVolume: number, channels: Channels}} = {
   'P10 Single-Channel': {
     maxVolume: 10,
