@@ -8,7 +8,7 @@ import {
   DropdownField,
   type DropdownOption
 } from '@opentrons/components'
-import {selectors as fileDataSelectors} from '../../file-data'
+import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {FormConnector} from '../../utils'
 import type {BaseState} from '../../types'
@@ -90,7 +90,7 @@ export function MixField (props: MixFieldProps) {
 type PipetteFieldOP = {formConnector: FormConnector<*>}
 type PipetteFieldSP = {pipetteOptions: Options}
 const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
-  pipetteOptions: fileDataSelectors.equippedPipetteOptions(state)
+  pipetteOptions: pipetteSelectors.equippedPipetteOptions(state)
 })
 export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & PipetteFieldSP) => {
   const {formConnector, pipetteOptions} = props

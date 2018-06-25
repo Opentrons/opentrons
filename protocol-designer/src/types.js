@@ -1,15 +1,17 @@
 // @flow
-import type {RootState as StepList} from './steplist/reducers'
-import type {RootState as Navigation} from './navigation'
-import type {RootState as LabwareIngred} from './labware-ingred/reducers'
 import type {RootState as FileData} from './file-data'
+import type {RootState as LabwareIngred} from './labware-ingred/reducers'
+import type {RootState as Navigation} from './navigation'
+import type {RootState as Pipettes} from './pipettes'
+import type {RootState as StepList} from './steplist/reducers'
 import type {RootState as WellSelection} from './well-selection/reducers'
 
 export type BaseState = {
-  steplist: StepList,
-  navigation: Navigation,
-  labwareIngred: LabwareIngred,
   fileData: FileData,
+  labwareIngred: LabwareIngred,
+  navigation: Navigation,
+  pipettes: Pipettes,
+  steplist: StepList,
   wellSelection: WellSelection
 }
 

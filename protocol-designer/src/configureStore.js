@@ -1,29 +1,32 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 
-import labwareIngredRootReducer from './labware-ingred/reducers'
-import steplistRootReducer from './steplist/reducers'
-import {rootReducer as navigationRootReducer} from './navigation'
 import {rootReducer as fileDataRootReducer} from './file-data'
+import labwareIngredRootReducer from './labware-ingred/reducers'
+import {rootReducer as navigationRootReducer} from './navigation'
+import {rootReducer as pipetteRootReducer} from './pipettes'
+import steplistRootReducer from './steplist/reducers'
 import wellSelectionRootReducer from './well-selection/reducers'
 
 // TODO: Ian 2018-01-15 how to make this more DRY with hot reloading?
 function getRootReducer () {
   return combineReducers({
-    labwareIngred: require('./labware-ingred/reducers'),
-    steplist: require('./steplist/reducers'),
-    navigation: require('./navigation').rootReducer,
     fileData: require('./file-data').rootReducer,
+    labwareIngred: require('./labware-ingred/reducers'),
+    navigation: require('./navigation').rootReducer,
+    pipettes: require('./pipettes').rootReducer,
+    steplist: require('./steplist/reducers'),
     wellSelection: require('./well-selection/reducers')
   })
 }
 
 export default function configureStore () {
   const reducer = combineReducers({
-    labwareIngred: labwareIngredRootReducer,
-    steplist: steplistRootReducer,
-    navigation: navigationRootReducer,
     fileData: fileDataRootReducer,
+    labwareIngred: labwareIngredRootReducer,
+    navigation: navigationRootReducer,
+    pipettes: pipetteRootReducer,
+    steplist: steplistRootReducer,
     wellSelection: wellSelectionRootReducer
   })
 
@@ -41,10 +44,11 @@ export default function configureStore () {
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('./labware-ingred/reducers', replaceReducers)
-    module.hot.accept('./steplist/reducers', replaceReducers)
-    module.hot.accept('./navigation/reducers', replaceReducers)
     module.hot.accept('./file-data/reducers', replaceReducers)
+    module.hot.accept('./labware-ingred/reducers', replaceReducers)
+    module.hot.accept('./navigation/reducers', replaceReducers)
+    module.hot.accept('./pipettes', replaceReducers)
+    module.hot.accept('./steplist/reducers', replaceReducers)
     module.hot.accept('./well-selection/reducers', replaceReducers)
   }
 

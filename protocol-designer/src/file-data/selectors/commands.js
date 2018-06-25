@@ -9,7 +9,7 @@ import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
-import {equippedPipettes} from './pipettes'
+import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {Labware} from '../../labware-ingred/types'
 
@@ -56,7 +56,7 @@ function labwareConverter (labwareAppState: {[labwareId: string]: Labware}): {[l
 }
 
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
-  equippedPipettes,
+  pipetteSelectors.equippedPipettes,
   labwareIngredSelectors.getLabware,
   getLabwareLiquidState,
   (pipettes, labwareAppState, labwareLiquidState) => {
