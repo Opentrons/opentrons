@@ -55,9 +55,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   if (!(stepId === '__end__' || stepId === 0)) {
     // Leave collapsed undefined for special steps
-    collapsed = (selected)
-      ? false // selected steps never collapsed
-      : steplistSelectors.getCollapsedSteps(state)[stepId]
+    collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
   }
 
   return {
