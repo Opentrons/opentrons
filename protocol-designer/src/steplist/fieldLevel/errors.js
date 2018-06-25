@@ -1,5 +1,6 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
+import isArray from 'lodash/isArray'
 
 /*******************
 ** Error Messages **
@@ -9,9 +10,9 @@ import isEmpty from 'lodash/isEmpty'
 
 export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other possible field errors
 
-const FIELD_ERRORS: {[FieldError]: string | ((number) => string)} = {
+const FIELD_ERRORS: {[FieldError]: string} = {
   REQUIRED: 'This field is required',
-  UNDER_WELL_MINIMUM: (minimum: number): string => `${minimum} or more wells are required`
+  UNDER_WELL_MINIMUM: 'or more wells are required'
 }
 
 // TODO: test these
@@ -22,7 +23,7 @@ type errorChecker = (value: mixed) => ?string
 
 export const requiredField = (value: mixed): ?string => isEmpty(String(value)) ? FIELD_ERRORS.REQUIRED : null
 export const minimumWellCount = (minimum: number): errorChecker => (wells: mixed): ?string => (
-  (wells && (wells.length < minimum)) ? FIELD_ERRORS.UNDER_WELL_MINIMUM(minimum) : null
+  (isArray(wells) && (wells.length < minimum)) ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}` : null
 )
 
 /*******************

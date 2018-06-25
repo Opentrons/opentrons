@@ -10,7 +10,7 @@ import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
 
 type PauseFormProps = {focusHandlers: FocusHandlers}
-function PauseForm (props: PauseFormProps) {
+function PauseForm (props: PauseFormProps): React.Element<'div'> {
   const {focusHandlers} = props
   return (
     <div className={formStyles.row_wrapper}>

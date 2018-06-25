@@ -31,7 +31,7 @@ export type FocusHandlers = {
   onFieldBlur: (StepFieldName) => void
 }
 
-type SP = {formData?: FormData, canSave?: boolean, isNewStep?: boolean}
+type SP = {formData?: ?FormData, canSave?: ?boolean, isNewStep?: boolean}
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,

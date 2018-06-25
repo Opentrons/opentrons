@@ -32,7 +32,11 @@ export function StepCheckboxRow (props: StepCheckboxRowProps) {
       name={name}
       render={({value, updateValue}) => (
         <div className={styles.field_row}>
-          <CheckboxField label={label} className={className} value={!!value} onChange={updateValue} />
+          <CheckboxField
+            label={label}
+            className={className}
+            value={!!value}
+            onChange={(e: SyntheticInputEvent<*>) => updateValue(e.currentTarget.value)} />
           {value ? props.children : null}
         </div>
       )} />
@@ -53,8 +57,8 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
           error={errorToShow}
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
-          onChange={(e: SyntheticEvent<HTMLInputElement>) => updateValue(e.target.value)}
-          value={value} />
+          onChange={(e: SyntheticInputEvent<*>) => updateValue(e.currentTarget.value)}
+          value={String(value)} />
       )} />
   )
 }
@@ -70,32 +74,31 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
       render={({value, updateValue, errorToShow}) => (
         <RadioGroup
           {...radioGroupProps}
-          value={value}
+          value={String(value)}
           error={errorToShow}
-          onChange={(e: SyntheticInputEvent<>) => {
-            updateValue(e.target.value)
+          onChange={(e: SyntheticEvent<*>) => {
+            updateValue(e.currentTarget.value)
             onFieldBlur(name)
           }} />
       )} />
   )
 }
 
-type DelayFieldsProps = {
-  namePrefix: string,
+type DispenseDelayFieldsProps = {
   focusHandlers: FocusHandlers,
   label?: string
 }
-export function DelayFields (props: DelayFieldsProps) {
-  const {label = 'Delay', namePrefix, focusHandlers} = props
+export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
+  const {label = 'Delay', focusHandlers} = props
   return (
-    <StepCheckboxRow name={`${namePrefix}--delay--checkbox`} label={label}>
+    <StepCheckboxRow name="dispense--delay--checkbox" label={label}>
       <StepInputField
         {...focusHandlers}
-        name={`${namePrefix}--delay-minutes`}
+        name="dispense--delay-minutes"
         units='m' />
       <StepInputField
         {...focusHandlers}
-        name={`${namePrefix}--delay-seconds`}
+        name="dispense--delay-seconds"
         units='s' />
     </StepCheckboxRow>
   )
@@ -113,7 +116,7 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & Pi
       <FormGroup label='Pipette:' className={styles.pipette_field}>
         <DropdownField
           options={props.pipetteOptions}
-          value={value}
+          value={String(value)}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />
@@ -127,15 +130,15 @@ const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, name, className} = props
   return (
-    // TODO: BC abstract e.target.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
+    // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
     <StepField
       name={name}
       render={({value, updateValue}) => (
         <DropdownField
           className={className}
           options={labwareOptions}
-          value={value}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
+          value={String(value)}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       )} />
   )
 })
@@ -161,21 +164,8 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => (
       <FormGroup label='CHANGE TIP'>
         <DropdownField
           options={CHANGE_TIP_OPTIONS}
-          value={value}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.target.value) } } />
+          value={String(value)}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />
-
 )
-
-type TipSettingsColumnProps = {namePrefix: string, hasChangeField?: boolean}
-export const TipSettingsColumn = (props: TipSettingsColumnProps) => {
-  const {namePrefix, hasChangeField = true} = props
-  return (
-    <div className={styles.right_settings_column}>
-      {hasChangeField && <ChangeTipField name={`${namePrefix}--change-tip`} />}
-      <FlowRateField />
-      <TipPositionField />
-    </div>
-  )
-}

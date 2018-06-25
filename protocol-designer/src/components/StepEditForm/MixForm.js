@@ -6,10 +6,12 @@ import {FormGroup} from '@opentrons/components'
 import {
   StepInputField,
   StepCheckboxRow,
-  DelayFields,
+  DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  TipSettingsColumn
+  ChangeTipField,
+  FlowRateField,
+  TipPositionField
 } from './formFields'
 
 import WellSelectionInput from './WellSelectionInput'
@@ -19,7 +21,7 @@ import styles from './StepEditForm.css'
 
 type MixFormProps = {focusHandlers: FocusHandlers}
 
-const MixForm = (props: MixFormProps) => {
+const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
   const {focusHandlers} = props
   return (
     <React.Fragment>
@@ -41,14 +43,18 @@ const MixForm = (props: MixFormProps) => {
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <DelayFields namePrefix="dispense" focusHandlers={focusHandlers} />
+            <DispenseDelayFields focusHandlers={focusHandlers} />
             <StepCheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
               <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
             </StepCheckboxRow>
             <StepCheckboxRow name="touch-tip" label='Touch tip' />
           </FormGroup>
         </div>
-        <TipSettingsColumn namePrefix="aspirate" />
+        <div className={styles.right_settings_column}>
+          <ChangeTipField name="aspirate--change-tip" />
+          <FlowRateField />
+          <TipPositionField />
+        </div>
       </div>
     </React.Fragment>
   )

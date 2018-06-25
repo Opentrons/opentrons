@@ -5,10 +5,12 @@ import {FormGroup} from '@opentrons/components'
 import {
   StepInputField,
   StepCheckboxRow,
-  DelayFields,
+  DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  TipSettingsColumn
+  ChangeTipField,
+  FlowRateField,
+  TipPositionField
 } from './formFields'
 
 import WellSelectionInput from './WellSelectionInput'
@@ -56,7 +58,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               </StepCheckboxRow>
             </FormGroup>
           </div>
-          <TipSettingsColumn namePrefix="aspirate" />
+          <div className={styles.right_settings_column}>
+            <ChangeTipField name="aspirate--change-tip" />
+            <FlowRateField />
+            <TipPositionField />
+          </div>
         </div>
       </FormSection>
 
@@ -81,13 +87,16 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense--mix--volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense--mix--times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <DelayFields namePrefix="dispense" focusHandlers={focusHandlers} />
+              <DispenseDelayFields focusHandlers={focusHandlers} />
               <StepCheckboxRow name='dispense--blowout--checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
               </StepCheckboxRow>
             </FormGroup>
           </div>
-          <TipSettingsColumn namePrefix="dispense" hasChangeField={false} />
+          <div className={styles.right_settings_column}>
+            <FlowRateField />
+            <TipPositionField />
+          </div>
         </div>
       </FormSection>
     </React.Fragment>

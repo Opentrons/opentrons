@@ -244,10 +244,9 @@ function _vapPause (formData: FormData): ValidationAndErrors<PauseFormData> {
     validatedForm: formHasErrors({errors})
       ? null
       : {
-        stepType: formData.stepType,
+        stepType: 'pause',
         name: `Pause ${formData.id}`, // TODO real name for steps
         description: 'description would be here 2018-03-01', // TODO get from form
-        // stepType: formData.stepType,
         wait: (formData['pause-for-amount-of-time'] === 'false')
           ? true
           : totalSeconds,
@@ -306,7 +305,7 @@ function _vapMix (formData: FormData): ValidationAndErrors<MixFormData> {
     errors,
     validatedForm: (!formHasErrors({errors}) && labware && pipette)
       ? {
-        stepType: formData.stepType,
+        stepType: 'mix',
         name: `Mix ${formData.id}`, // TODO real name for steps
         description: 'description would be here 2018-03-01', // TODO get from form
         labware,

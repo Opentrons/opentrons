@@ -22,8 +22,8 @@ type WellSelectionInputOP = {
   labwareFieldName: StepFieldName
 } & FocusHandlers
 type WellSelectionInputSP = {
-  _selectedPipetteId: string,
-  _selectedLabwareId: string,
+  _selectedPipetteId?: ?string,
+  _selectedLabwareId?: ?string,
   _wellFieldErrors: Array<string>,
   wellCount: number
 }
@@ -48,11 +48,10 @@ const WellSelectionInput = (props: WellSelectionInputProps) => (
 const WellSelectionInputSTP = (state: BaseState, ownProps: WellSelectionInputOP): WellSelectionInputSP => {
   const formData = steplistSelectors.getUnsavedForm(state)
   const selectedPipette = formData && formData[ownProps.pipetteFieldName]
-  const selectedLabware = formData && formData[ownProps.labwareFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
   return {
     _selectedPipetteId: selectedPipette,
-    _selectedLabwareId: selectedLabware,
+    _selectedLabwareId: formData && formData[ownProps.labwareFieldName],
     _wellFieldErrors: getFieldErrors(ownProps.name, selectedWells) || [],
     wellCount: formatWellCount(selectedWells, selectedPipette)
   }
@@ -78,11 +77,13 @@ const WellSelectionInputMP = (
       if (ownProps.onFieldBlur) {
         ownProps.onFieldBlur(ownProps.name)
       }
-      dispatchProps._openWellSelectionModal({
-        pipetteId: _selectedPipetteId,
-        labwareId: _selectedLabwareId,
-        formFieldAccessor: ownProps.name
-      })
+      if (_selectedPipetteId && _selectedLabwareId) {
+        dispatchProps._openWellSelectionModal({
+          pipetteId: _selectedPipetteId,
+          labwareId: _selectedLabwareId,
+          formFieldAccessor: ownProps.name
+        })
+      }
     }
   }
 }
