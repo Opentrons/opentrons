@@ -65,8 +65,7 @@ const WellSelectionInputMP = (
   ownProps: WellSelectionInputOP
 ): WellSelectionInputProps => {
   const {_selectedPipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
-  // TODO: LATER: also 'disable' when selected labware is a trash
-  const disabled = !(_selectedPipetteId && _selectedLabwareId)
+  const disabled = _selectedLabwareId === 'trashId' || !(_selectedPipetteId && _selectedLabwareId)
   const {name, focusedField, dirtyFields} = ownProps
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   return {
