@@ -7,7 +7,7 @@ import styles from './forms.css'
 
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<>) => mixed,
+  onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data */
