@@ -25,9 +25,11 @@ describe('chainActions utility', () => {
       {type: 'baz'}
     ]
 
-    const result = store.dispatch(chainActions(...actions))
-    expect(result).toEqual(actions[2])
-    expect(store.getActions()).toEqual(actions)
+    return store.dispatch(chainActions(...actions))
+      .then(result => {
+        expect(result).toEqual(actions[2])
+        expect(store.getActions()).toEqual(actions)
+      })
   })
 
   test('dispatches a chain of thunk actions', () => {
@@ -38,9 +40,11 @@ describe('chainActions utility', () => {
     ]
     const thunks = actions.map(a => dispatch => dispatch(a))
 
-    const result = store.dispatch(chainActions(...thunks))
-    expect(result).toEqual(actions[2])
-    expect(store.getActions()).toEqual(actions)
+    return store.dispatch(chainActions(...thunks))
+      .then(result => {
+        expect(result).toEqual(actions[2])
+        expect(store.getActions()).toEqual(actions)
+      })
   })
 
   test('dispatches a chain of thunk promise actions', () => {
@@ -83,9 +87,11 @@ describe('chainActions utility', () => {
       {type: 'bar'}
     ]
 
-    const result = store.dispatch(chainActions(...actions))
-    expect(result).toEqual(actions[0])
-    expect(store.getActions()).toEqual(actions.slice(0, 1))
+    return store.dispatch(chainActions(...actions))
+      .then(result => {
+        expect(result).toEqual(actions[0])
+        expect(store.getActions()).toEqual(actions.slice(0, 1))
+      })
   })
 
   test('bails out early if a thunk action has an error', () => {
@@ -95,9 +101,11 @@ describe('chainActions utility', () => {
       {type: 'bar'}
     ]
 
-    const result = store.dispatch(chainActions(...actions))
-    expect(result).toEqual(errorAction)
-    expect(store.getActions()).toEqual([errorAction])
+    return store.dispatch(chainActions(...actions))
+      .then(result => {
+        expect(result).toEqual(errorAction)
+        expect(store.getActions()).toEqual([errorAction])
+      })
   })
 
   test('bails out early if a thunk promise has an error', () => {
@@ -120,9 +128,11 @@ describe('chainActions utility', () => {
       {type: 'bar'}
     ]
 
-    const result = store.dispatch(chainActions(...actions))
-    expect(result).toEqual(actions[0])
-    expect(store.getActions()).toEqual(actions.slice(0, 1))
+    return store.dispatch(chainActions(...actions))
+      .then(result => {
+        expect(result).toEqual(actions[0])
+        expect(store.getActions()).toEqual(actions.slice(0, 1))
+      })
   })
 
   test('bails out early if a thunk action has an error in the payload', () => {
@@ -132,9 +142,11 @@ describe('chainActions utility', () => {
       {type: 'bar'}
     ]
 
-    const result = store.dispatch(chainActions(...actions))
-    expect(result).toEqual(errorAction)
-    expect(store.getActions()).toEqual([errorAction])
+    return store.dispatch(chainActions(...actions))
+      .then(result => {
+        expect(result).toEqual(errorAction)
+        expect(store.getActions()).toEqual([errorAction])
+      })
   })
 
   test('bails out early if a thunk promise has an error in the payload', () => {

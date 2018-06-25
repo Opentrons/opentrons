@@ -8,6 +8,7 @@ import type {State, Dispatch} from '../../types'
 import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
 import {getPipette} from '@opentrons/shared-data'
+import {chainActions} from '../../util'
 import createLogger from '../../logger'
 
 import {
@@ -164,9 +165,11 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     },
     forceStart: () => dispatch(startDeckCalibration(robot, true)),
     // exit button click in title bar, opens exit alert modal, confirm exit click
-    exit: () => dispatch(home(robot))
-      .then(() => dispatch(deckCalibrationCommand(robot, {command: 'release'})))
-      .then(() => dispatch(push(parentUrl))),
+    exit: () => dispatch(chainActions(
+      deckCalibrationCommand(robot, {command: 'release'}),
+      push(parentUrl),
+      home(robot)
+    )),
     // cancel button click in exit alert modal
     back: () => dispatch(goBack())
   }
