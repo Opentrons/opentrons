@@ -12,7 +12,7 @@ import {
   getAnyRobotUpdateAvailable,
   restartRobotServer,
   fetchIgnoredUpdate,
-  setUpdateIgnored,
+  setIgnoredUpdate,
   reducer
 } from '..'
 
@@ -198,11 +198,11 @@ describe('server API client', () => {
     })
   })
 
-  describe('setUpdateIgnored action creator', () => {
+  describe('setIgnoredUpdate action creator', () => {
     test('calls POST /server/update/ignore', () => {
       client.__setMockResponse({inProgress: true, error: null, response: {version: '42.0.0'}})
 
-      return setUpdateIgnored(robot, availableUpdate)(() => {})
+      return setIgnoredUpdate(robot, availableUpdate)(() => {})
         .then(() => expect(client)
           .toHaveBeenCalledWith(robot, 'POST', 'server/update/ignore', {version: availableUpdate})
         )
@@ -221,7 +221,7 @@ describe('server API client', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(setUpdateIgnored(robot, availableUpdate))
+      return store.dispatch(setIgnoredUpdate(robot, availableUpdate))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
@@ -238,7 +238,7 @@ describe('server API client', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(setUpdateIgnored(robot, availableUpdate))
+      return store.dispatch(setIgnoredUpdate(robot, availableUpdate))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })

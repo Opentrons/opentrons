@@ -4,7 +4,6 @@ import {combineReducers} from 'redux'
 import {calibrationReducer, type CalibrationAction} from './calibration'
 import {healthReducer, type HealthAction} from './health'
 import {healthCheckReducer, type HealthCheckAction} from './health-check'
-// import {ignoredUpdateReducer, type IgnoredUpdateAction} from './ignored-update'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
 import {robotReducer, type RobotAction} from './robot'
@@ -132,7 +131,7 @@ export {
   getAnyRobotUpdateAvailable,
   fetchHealthAndIgnored,
   fetchIgnoredUpdate,
-  setUpdateIgnored,
+  setIgnoredUpdate,
   makeGetRobotIgnoredUpdateRequest
 } from './server'
 

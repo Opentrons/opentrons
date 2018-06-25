@@ -83,9 +83,6 @@ const UPDATE: RequestPath = 'update'
 const RESTART: RequestPath = 'restart'
 const IGNORE: RequestPath = 'update/ignore'
 
-// TODO(mc, 2018-03-16): remove debug code when UI is hooked up
-// global.updateRobotServer = updateRobotServer
-
 export function updateRobotServer (
   robot: RobotService
 ): ThunkPromiseAction {
@@ -140,7 +137,7 @@ export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function setUpdateIgnored (robot: RobotService, version: ?string): ThunkPromiseAction {
+export function setIgnoredUpdate (robot: RobotService, version: ?string): ThunkPromiseAction {
   return (dispatch) => {
     const body = {version}
     dispatch(serverRequest(robot, IGNORE))

@@ -12,7 +12,7 @@ import {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  setUpdateIgnored
+  setIgnoredUpdate
 } from '../../http-api-client'
 
 import {AlertModal, Icon} from '@opentrons/components'
@@ -89,7 +89,7 @@ function UpdateModal (props: Props) {
   )
 }
 
-function makeMapStateToProps (state: State) {
+function makeMapStateToProps () {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
@@ -107,7 +107,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
 
   const close = () => dispatch(push(`/robots/${ownProps.name}`))
   let ignoreUpdate = availableUpdate
-    ? () => dispatch(setUpdateIgnored(ownProps, availableUpdate)).then(close)
+    ? () => dispatch(setIgnoredUpdate(ownProps, availableUpdate)).then(close)
     : close
 
   return {
