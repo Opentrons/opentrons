@@ -74,7 +74,7 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
       render={({value, updateValue, errorToShow}) => (
         <RadioGroup
           {...radioGroupProps}
-          value={value ? String(value) : null}
+          value={value ? String(value) : ''}
           error={errorToShow}
           onChange={(e: SyntheticEvent<*>) => {
             updateValue(e.currentTarget.value)
