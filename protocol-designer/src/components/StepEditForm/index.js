@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import get from 'lodash/get'
+import without from 'lodash/without'
 import cx from 'classnames'
 import {FlatButton, PrimaryButton} from '@opentrons/components'
 
@@ -39,7 +40,7 @@ type DP = {
   onSave: (event: SyntheticEvent<>) => mixed,
 }
 type StepEditFormState = {
-  focusedField: string | null, // TODO: BC make this a real enum of field names
+  focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
 
@@ -53,11 +54,14 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.formData && prevProps.formData && this.props.formData.id !== prevProps.formData.id) {
-      this.setState({
-        focusedField: null,
-        dirtyFields: [] // TODO: handle switching between clean and dirty forms
-      })
+    // NOTE: formData is sometimes undefined between steps
+    if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
+      if (this.props.isNewStep) {
+        this.setState({ focusedField: null, dirtyFields: [] })
+      } else {
+        const fieldNames: Array<string> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
+        this.setState({ focusedField: null, dirtyFields: fieldNames })
+      }
     }
   }
 
