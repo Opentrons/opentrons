@@ -51,11 +51,11 @@ const pipetteOptionsWithInvalid = [
 // and exclude options that are incompatible with pipette
 // and also auto-select tiprack if there's only one compatible tiprack for a pipette
 const tiprackOptions = [
-  {name: '10 uL', value: 'tiprack-10ul'},
-  {name: '200 uL', value: 'tiprack-200ul'},
-  {name: '1000 uL', value: 'tiprack-1000ul'},
-  {name: '1000 uL Chem', value: 'tiprack-1000ul-chem'}
-  // {name: '300 uL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
+  {name: '10 μL', value: 'tiprack-10ul'},
+  {name: '200 μL', value: 'tiprack-200ul'},
+  {name: '1000 μL', value: 'tiprack-1000ul'},
+  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'}
+  // {name: '300 μL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
 ]
 
 const initialState = {
@@ -80,26 +80,26 @@ export default class NewFileModal extends React.Component<Props, State> {
   }
 
   handleChange = (accessor: $Keys<State>) => (e: SyntheticInputEvent<*>) => {
+    // skip tiprack update if no pipette selected
+    if (accessor === 'leftTiprackModel' && !this.state.leftPipette) return
+    if (accessor === 'rightTiprackModel' && !this.state.rightPipette) return
+
     const value: string = e.target.value
 
-    const update: {[$Keys<State>]: mixed} = {
+    const nextState: {[$Keys<State>]: mixed} = {
       [accessor]: value
     }
 
     // clear tiprack selection if corresponding pipette model is deselected
     if (accessor === 'leftPipette' && !value) {
-      update.leftTiprackModel = null
+      nextState.leftTiprackModel = null
     } else if (accessor === 'rightPipette' && !value) {
-      update.rightTiprackModel = null
+      nextState.rightTiprackModel = null
     }
-
-    // skip tiprack update if no pipette selected
-    if (accessor === 'leftTiprackModel' && !this.state.leftPipette) return
-    if (accessor === 'rightTiprackModel' && !this.state.rightPipette) return
 
     this.setState({
       ...this.state,
-      ...update
+      ...nextState
     })
   }
 
@@ -135,6 +135,30 @@ export default class NewFileModal extends React.Component<Props, State> {
 
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
+    const pipetteFields = [
+      ['leftPipette', 'Left Pipette'],
+      ['rightPipette', 'Right Pipette']
+    ].map(([name, label]) => {
+      const value = this.state[name]
+      return (
+        <FormGroup key={name} label={`${label}*:`} className={formStyles.column_1_2}>
+          <DropdownField options={value === USER_HAS_NOT_SELECTED
+              ? pipetteOptionsWithInvalid
+              : pipetteOptionsWithNone}
+            value={value}
+            onChange={this.handleChange(name)} />
+        </FormGroup>
+      )
+    })
+
+    const tiprackFields = ['leftTiprackModel', 'rightTiprackModel'].map(name => (
+      <FormGroup key={name} label='Tip rack*:' className={formStyles.column_1_2}>
+        <DropdownField options={tiprackOptions}
+          value={this.state[name]}
+          onChange={this.handleChange(name)} />
+        </FormGroup>
+    ))
+
     return <AlertModal className={modalStyles.modal}
       buttons={[
         {onClick: this.props.onCancel, children: 'Cancel'},
@@ -155,30 +179,11 @@ export default class NewFileModal extends React.Component<Props, State> {
         </div>
 
         <div className={formStyles.row_wrapper}>
-          {[
-            ['leftPipette', 'Left Pipette'],
-            ['rightPipette', 'Right Pipette']
-          ].map(([stateField, label]) => {
-            const fieldValue = this.state[stateField]
-            return (
-              <FormGroup key={stateField} label={`${label}*:`} className={formStyles.column_1_2}>
-                <DropdownField options={fieldValue === USER_HAS_NOT_SELECTED
-                    ? pipetteOptionsWithInvalid
-                    : pipetteOptionsWithNone}
-                  value={fieldValue} onChange={this.handleChange(stateField)} />
-              </FormGroup>
-            )
-          })}
+          {pipetteFields}
         </div>
 
         <div className={formStyles.row_wrapper}>
-          {['leftTiprackModel', 'rightTiprackModel'].map(stateField => (
-            <FormGroup key={stateField} label='Tip rack*:' className={formStyles.column_1_2}>
-              <DropdownField options={tiprackOptions}
-                value={this.state[stateField]}
-                onChange={this.handleChange(stateField)} />
-              </FormGroup>
-          ))}
+          {tiprackFields}
         </div>
       </form>
     </AlertModal>

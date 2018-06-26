@@ -81,7 +81,7 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
       channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
-      tipType: `${pipetteData.maxVolume} uL`
+      tipType: `${pipetteData.maxVolume} μL`
     }
 
     return [...acc, pipetteForInstrumentGroup]
