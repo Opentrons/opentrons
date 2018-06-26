@@ -23,7 +23,7 @@ export const castToNumber = (rawValue: mixed): ?number => {
 **********************/
 // NOTE: these are often preceded by a Value Caster when composed via composeProcessors
 // in practive they will always take parameters of one type (e.g. `(value: number)`)
-// For the sake of simplicity and flow happiness, they are prepared to deal with values of type `mixed`
+// For the sake of simplicity and flow happiness, they are equiped to deal with parameters of type `mixed`
 
 export const onlyPositiveNumbers = (value: mixed) => (value && Number(value) > 0) ? value : null
 export const onlyIntegers = (value: mixed) => (value && Number.isInteger(value)) ? value : null
