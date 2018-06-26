@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "trough-1row-25ml"
+    "name": "trough-1row-25ml",
+    "format": "trough",
+    "displayCategory": "trough"
   },
   "ordering": [
     [

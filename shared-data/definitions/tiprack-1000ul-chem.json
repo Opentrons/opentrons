@@ -1,6 +1,11 @@
 {
   "metadata": {
-    "name": "tiprack-1000ul-chem"
+    "name": "tiprack-1000ul-chem",
+    "format": "irregular",
+    "tipVolume": 1000,
+    "displayCategory": "tiprack",
+    "isTiprack": true,
+    "isValidSource": false
   },
   "ordering": [
     [

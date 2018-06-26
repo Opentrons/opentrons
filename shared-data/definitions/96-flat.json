@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "96-flat"
+    "name": "96-flat",
+    "format": "96-standard",
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

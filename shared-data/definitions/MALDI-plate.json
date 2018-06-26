@@ -1,6 +1,7 @@
 {
   "metadata": {
-    "name": "MALDI-plate"
+    "name": "MALDI-plate",
+    "format": "384-standard"
   },
   "ordering": [
     [

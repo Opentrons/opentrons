@@ -1,6 +1,7 @@
 {
   "metadata": {
-    "name": "point"
+    "name": "point",
+    "format": "irregular"
   },
   "ordering": [
     [

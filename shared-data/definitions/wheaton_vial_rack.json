@@ -1,6 +1,7 @@
 {
   "metadata": {
-    "name": "wheaton_vial_rack"
+    "name": "wheaton_vial_rack",
+    "format": "irregular"
   },
   "ordering": [
     [
