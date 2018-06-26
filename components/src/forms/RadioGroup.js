@@ -25,6 +25,7 @@ type Props = {
 
 export default function RadioGroup (props: Props) {
   const error = props.error != null
+
   return (
     <div className={cx({[styles.inline]: props.inline, [styles.error]: error})}>
       {props.options && props.options.map(radio =>
