@@ -54,8 +54,8 @@ const tiprackOptions = [
   {name: '10 uL', value: 'tiprack-10ul'},
   {name: '200 uL', value: 'tiprack-200ul'},
   {name: '1000 uL', value: 'tiprack-1000ul'},
-  {name: '1000 uL Chem', value: 'tiprack-1000ul-chem'},
-  {name: '300 uL', value: 'GEB-tiprack-300ul'} // TODO IMMEDATELY does PD have the def for this?
+  {name: '1000 uL Chem', value: 'tiprack-1000ul-chem'}
+  // {name: '300 uL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
 ]
 
 const initialState = {
