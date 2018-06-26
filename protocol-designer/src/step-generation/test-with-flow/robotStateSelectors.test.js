@@ -1,5 +1,5 @@
 // @flow
-import {p300Single, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
+import {p300Single, p300Multi, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
 import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
 
 // just a blank liquidState to appease flow
@@ -12,7 +12,8 @@ describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
     // TODO use a fixture, standardize
     const _instrumentsState = {
-      p300SingleId: p300Single
+      p300SingleId: p300Single,
+      p300MultiId: p300Multi
     }
 
     const robotState = {
@@ -159,7 +160,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
@@ -197,7 +198,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result).toEqual(null)
   })
@@ -251,7 +252,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -308,7 +309,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
@@ -358,7 +359,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -408,7 +409,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A3')
@@ -445,7 +446,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
   })
@@ -503,7 +504,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
   })
@@ -565,7 +566,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -655,7 +656,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack10Id')
     expect(result && result.well).toEqual('A2')
@@ -754,7 +755,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
   })
