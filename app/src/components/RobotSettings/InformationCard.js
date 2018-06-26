@@ -25,7 +25,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  fetchHealth: () => mixed // TODO (ka 2018-6-21): fetchHealthAndIgnored uses chainActions, how do we type this?
+  fetchHealth: () => mixed
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -96,7 +96,6 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   return {
-    // $FlowFixMe(ka, 2018-06-21): figure out chainActions type here
     fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps))
   }
 }
