@@ -52,7 +52,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               <StepCheckboxRow name="aspirate--air-gap--checkbox" label="Air Gap">
                 <StepInputField name="aspirate--air-gap--volume" units="μL" {...focusHandlers} />
               </StepCheckboxRow>
-              <StepCheckboxRow name="aspirate--mix--checkbox">
+              <StepCheckboxRow name="aspirate--mix--checkbox" label='Mix'>
                 <StepInputField name="aspirate--mix--volume" units='μL' {...focusHandlers} />
                 <StepInputField name="aspirate--mix--times" units='Times' {...focusHandlers} />
               </StepCheckboxRow>
@@ -88,7 +88,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="dispense--mix--checkbox">
+              <StepCheckboxRow name="dispense--mix--checkbox" label='Mix'>
                 <StepInputField name="dispense--mix--volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense--mix--times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>

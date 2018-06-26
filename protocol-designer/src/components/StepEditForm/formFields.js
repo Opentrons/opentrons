@@ -14,7 +14,7 @@ import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {BaseState} from '../../types'
 import styles from './StepEditForm.css'
-import {default as StepField} from './StepFormField'
+import StepField from './StepFormField'
 import type {FocusHandlers} from './index'
 
 type Options = Array<DropdownOption>
@@ -36,7 +36,7 @@ export function StepCheckboxRow (props: StepCheckboxRowProps) {
             label={label}
             className={className}
             value={!!value}
-            onChange={(e: SyntheticInputEvent<*>) => updateValue(e.currentTarget.value)} />
+            onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
           {value ? props.children : null}
         </div>
       )} />
