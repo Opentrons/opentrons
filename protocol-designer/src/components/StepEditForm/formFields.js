@@ -6,117 +6,136 @@ import {
   CheckboxField,
   InputField,
   DropdownField,
+  RadioGroup,
   type DropdownOption
 } from '@opentrons/components'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {FormConnector} from '../../utils'
+import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {BaseState} from '../../types'
 import styles from './StepEditForm.css'
+import StepField from './StepFormField'
+import type {FocusHandlers} from './index'
 
 type Options = Array<DropdownOption>
 
-type CheckboxRowProps = {
+type StepCheckboxRowProps = {
   label?: string,
-  formConnector: FormConnector<*>,
-  checkboxAccessor: string,
+  name: StepFieldName,
   children?: ?React.Node,
   className?: string
 }
-export function CheckboxRow (props: CheckboxRowProps) {
-  const {formConnector, checkboxAccessor, label, className} = props
-
-  const checked = formConnector(checkboxAccessor).value
-
+export function StepCheckboxRow (props: StepCheckboxRowProps) {
+  const {name, label, className} = props
   return (
-    <div className={styles.field_row}>
-      <CheckboxField label={label} className={className}
-        {...formConnector(checkboxAccessor)} />
-      {checked ? props.children : null}
-    </div>
+    <StepField
+      name={name}
+      render={({value, updateValue}) => (
+        <div className={styles.field_row}>
+          <CheckboxField
+            label={label}
+            className={className}
+            value={!!value}
+            onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
+          {value ? props.children : null}
+        </div>
+      )} />
   )
 }
 
-type DelayFieldProps = {
-  minutesAccessor: string,
-  secondsAccessor: string
-} & CheckboxRowProps
-export function DelayField (props: DelayFieldProps) {
-  const {
-    formConnector,
-    checkboxAccessor,
-    minutesAccessor,
-    secondsAccessor,
-    label
-  } = props
-
+type StepInputFieldProps = {name: StepFieldName} & FocusHandlers
+export const StepInputField = (props: StepInputFieldProps & React.ElementProps<typeof InputField>) => {
+  const {name, focusedField, dirtyFields, onFieldFocus, onFieldBlur, ...inputProps} = props
   return (
-    <CheckboxRow
-      checkboxAccessor={checkboxAccessor}
-      formConnector={formConnector}
-      label={label || 'Delay'}
-    >
-      <InputField units='m' {...formConnector(minutesAccessor)} />
-      <InputField units='s' {...formConnector(secondsAccessor)} />
-    </CheckboxRow>
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue, errorToShow}) => (
+        <InputField
+          {...inputProps}
+          error={errorToShow}
+          onBlur={() => { onFieldBlur(name) }}
+          onFocus={() => { onFieldFocus(name) }}
+          onChange={(e: SyntheticInputEvent<*>) => updateValue(e.currentTarget.value)}
+          value={value ? String(value) : null} />
+      )} />
   )
 }
 
-type MixFieldProps = {
-  timesAccessor: string,
-  volumeAccessor: string
-} & CheckboxRowProps
-export function MixField (props: MixFieldProps) {
-  const {
-    formConnector,
-    checkboxAccessor,
-    timesAccessor,
-    volumeAccessor,
-    label
-  } = props
-
+type StepRadioGroupProps = {name: StepFieldName, options: Options} & FocusHandlers
+export const StepRadioGroup = (props: StepRadioGroupProps) => {
+  const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
   return (
-    <CheckboxRow
-      checkboxAccessor={checkboxAccessor}
-      formConnector={formConnector}
-      label={label || 'Mix'}
-    >
-      <InputField units='μL' {...formConnector(timesAccessor)} />
-      <InputField units='Times' {...formConnector(volumeAccessor)} />
-    </CheckboxRow>
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue, errorToShow}) => (
+        <RadioGroup
+          {...radioGroupProps}
+          value={value ? String(value) : ''}
+          error={errorToShow}
+          onChange={(e: SyntheticEvent<*>) => {
+            updateValue(e.currentTarget.value)
+            onFieldBlur(name)
+          }} />
+      )} />
   )
 }
 
-type PipetteFieldOP = {formConnector: FormConnector<*>}
+type DispenseDelayFieldsProps = {
+  focusHandlers: FocusHandlers,
+  label?: string
+}
+export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
+  const {label = 'Delay', focusHandlers} = props
+  return (
+    <StepCheckboxRow name="dispense--delay--checkbox" label={label}>
+      <StepInputField {...focusHandlers} name="dispense--delay-minutes" units='m' />
+      <StepInputField {...focusHandlers} name="dispense--delay-seconds" units='s' />
+    </StepCheckboxRow>
+  )
+}
+
+type PipetteFieldOP = {name: StepFieldName}
 type PipetteFieldSP = {pipetteOptions: Options}
 const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
   pipetteOptions: pipetteSelectors.equippedPipetteOptions(state)
 })
-export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & PipetteFieldSP) => {
-  const {formConnector, pipetteOptions} = props
-  return (
-    <FormGroup label='Pipette:' className={styles.pipette_field}>
-      <DropdownField options={pipetteOptions} {...formConnector('pipette')} />
-    </FormGroup>
-  )
-})
+export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & PipetteFieldSP) => (
+  <StepField
+    name={props.name}
+    render={({value, updateValue}) => (
+      <FormGroup label='Pipette:' className={styles.pipette_field}>
+        <DropdownField
+          options={props.pipetteOptions}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+      </FormGroup>
+    )} />
+))
 
-type LabwareDropdownOP = $Call<FormConnector<*>, string>
+type LabwareDropdownOP = {name: StepFieldName, className?: string}
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
   labwareOptions: labwareIngredSelectors.labwareOptions(state)
 })
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
-  const {labwareOptions, ...restProps} = props
-  return <DropdownField options={labwareOptions} {...restProps} />
+  const {labwareOptions, name, className} = props
+  return (
+    // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
+    <StepField
+      name={name}
+      render={({value, updateValue}) => (
+        <DropdownField
+          className={className}
+          options={labwareOptions}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+      )} />
+  )
 })
-
-type VolumeFieldProps = {formConnector: FormConnector<*>}
-export const VolumeField = ({formConnector}: VolumeFieldProps) => (
-  <FormGroup label='Volume:' className={styles.volume_field}>
-    <InputField units='μL' {...formConnector('volume')} />
-  </FormGroup>
-)
 
 // NOTE 2018-05-31 Flow rate cannot yet be adjusted,
 // this is a placeholder
@@ -126,25 +145,21 @@ export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGro
 // this is a placeholder
 export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
 
-type ChangeTipFieldProps = {formConnector: FormConnector<*>}
-export const ChangeTipField = ({formConnector}: ChangeTipFieldProps) => (
-  <FormGroup label='CHANGE TIP'>
-    <DropdownField
-      {...formConnector('aspirate--change-tip')}
-      options={[
-        {name: 'Always', value: 'always'},
-        {name: 'Once', value: 'once'},
-        {name: 'Never', value: 'never'}
-      ]}
-    />
-  </FormGroup>
-)
-
-type TipSettingsColumnProps = {formConnector: FormConnector<*>, hasChangeField?: boolean}
-export const TipSettingsColumn = ({formConnector, hasChangeField = true}: TipSettingsColumnProps) => (
-  <div className={styles.right_settings_column}>
-    {hasChangeField && <ChangeTipField formConnector={formConnector} />}
-    <FlowRateField />
-    <TipPositionField />
-  </div>
+const CHANGE_TIP_OPTIONS = [
+  {name: 'Always', value: 'always'},
+  {name: 'Once', value: 'once'},
+  {name: 'Never', value: 'never'}
+]
+type ChangeTipFieldProps = {name: StepFieldName}
+export const ChangeTipField = (props: ChangeTipFieldProps) => (
+  <StepField
+    name={props.name}
+    render={({value, updateValue}) => (
+      <FormGroup label='CHANGE TIP'>
+        <DropdownField
+          options={CHANGE_TIP_OPTIONS}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+      </FormGroup>
+    )} />
 )

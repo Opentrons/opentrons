@@ -7,6 +7,7 @@ import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
+import type {StepFieldName} from '../steplist/fieldLevel'
 import type {ThunkDispatch, GetState} from '../types'
 import type {Wells} from '../labware-ingred/types'
 import type {Channels} from '@opentrons/components'
@@ -35,7 +36,7 @@ export const deselectWells = createAction(
 export type OpenWellSelectionModalPayload = {
   labwareId: string,
   pipetteId: string,
-  formFieldAccessor: string, // eg 'aspirate--wells' or 'dispense--wells'
+  formFieldAccessor: StepFieldName, // TODO: BC rename this 'name'
   pipetteChannels?: ?Channels,
   labwareName?: string
 }
