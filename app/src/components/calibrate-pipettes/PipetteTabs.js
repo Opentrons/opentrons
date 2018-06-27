@@ -13,7 +13,7 @@ type Props = {
   currentInstrument: ?Instrument
 }
 
-export default function InstrumentTabs (props: Props) {
+export default function PipetteTabs (props: Props) {
   const {instruments, currentInstrument} = props
 
   const pages = robotConstants.INSTRUMENT_MOUNTS.map((mount) => ({

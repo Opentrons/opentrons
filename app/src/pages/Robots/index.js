@@ -4,28 +4,28 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
-import type {State, Dispatch, Error} from '../types'
-import type {Robot} from '../robot'
-import {selectors as robotSelectors, actions as robotActions} from '../robot'
+import type {State, Dispatch, Error} from '../../types'
+import type {Robot} from '../../robot'
+import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 import {
   makeGetRobotHome,
   clearHomeResponse,
   makeGetRobotIgnoredUpdateRequest,
   makeGetAvailableRobotUpdate
-} from '../http-api-client'
+} from '../../http-api-client'
 
-import createLogger from '../logger'
+import createLogger from '../../logger'
 
 import {Splash, SpinnerModalPage} from '@opentrons/components'
-import {ErrorModal} from '../components/modals'
-import Page from '../components/Page'
+import {ErrorModal} from '../../components/modals'
+import Page from '../../components/Page'
 import RobotSettings, {
   ConnectAlertModal,
   UpdateModal
-} from '../components/RobotSettings'
-import ChangePipette from '../components/ChangePipette'
-import CalibrateDeck from '../components/CalibrateDeck'
-import ConnectBanner from '../components/RobotSettings/ConnectBanner'
+} from '../../components/RobotSettings'
+import ChangePipette from '../../components/ChangePipette'
+import CalibrateDeck from '../../components/CalibrateDeck'
+import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 
 type SP = {
   robot: ?Robot,

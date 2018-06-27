@@ -12,7 +12,7 @@ import {makeGetRobotPipettes} from '../../http-api-client'
 import Page from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
 import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
-import {InstrumentTabs, Instruments} from '../../components/setup-instruments'
+import {PipetteTabs, Pipettes} from '../../components/calibrate-pipettes'
 
 import SessionHeader from '../../components/SessionHeader'
 
@@ -25,9 +25,9 @@ type OwnProps = ContextRouter
 
 type Props = StateProps & OwnProps
 
-export default connect(makeMapStateToProps)(SetupInstrumentsPage)
+export default connect(makeMapStateToProps)(CalibratePipettesPage)
 
-function SetupInstrumentsPage (props: Props) {
+function CalibratePipettesPage (props: Props) {
   const {instruments, currentInstrument, match: {url, params}} = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
@@ -40,8 +40,8 @@ function SetupInstrumentsPage (props: Props) {
     <Page
       titleBarProps={{title: (<SessionHeader />)}}
     >
-      <InstrumentTabs {...{instruments, currentInstrument}} />
-      <Instruments {...props} />
+      <PipetteTabs {...{instruments, currentInstrument}} />
+      <Pipettes {...props} />
       {!!currentInstrument && (
         <TipProbe
           {...currentInstrument}

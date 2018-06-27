@@ -6,7 +6,7 @@ import {
   selectors as robotSelectors
 } from '../../robot'
 
-const TITLE = 'Deck Calibration'
+const TITLE = 'Labware Calibration'
 
 type StateProps = {
   title: string,

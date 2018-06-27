@@ -8,7 +8,7 @@ import type {State} from '../../types'
 import type {Instrument, Labware} from '../../robot'
 
 import {selectors as robotSelectors} from '../../robot'
-import CalibrateInstruments from './Instruments'
+import CalibratePipettes from './Pipettes'
 import CalibrateLabware from './Labware'
 
 type SP = {
@@ -31,8 +31,8 @@ function Calibrate (props: Props) {
     <Switch>
       <Redirect exact from={path} to={getRedirectUrl(props)} />
       <Route
-        path={`${path}/instruments/:mount?`}
-        component={CalibrateInstruments}
+        path={`${path}/pipettes/:mount?`}
+        component={CalibratePipettes}
       />
       <Route
         path={`${path}/labware/:slot`}
@@ -60,10 +60,10 @@ function getRedirectUrl (props: Props) {
   } = props
 
   if (!isTipsProbed && nextInstrument) {
-    return `/calibrate/instruments/${nextInstrument.mount}`
+    return `/calibrate/pipettes/${nextInstrument.mount}`
   }
   if (nextLabware) return `/calibrate/labware/${nextLabware.slot}`
   if (labware[0]) return `/calibrate/labware/${labware[0].slot}`
 
-  return '/calibrate/instruments'
+  return '/calibrate/pipettes'
 }

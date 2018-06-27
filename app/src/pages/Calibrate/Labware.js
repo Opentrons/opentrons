@@ -10,10 +10,10 @@ import {
 } from '../../robot'
 
 import Page from '../../components/Page'
-import LabwareCalibration from '../../components/LabwareCalibration'
+import CalibrateLabware from '../../components/CalibrateLabware'
 import SessionHeader from '../../components/SessionHeader'
 import ReviewDeckModal from '../../components/ReviewDeckModal'
-import ConfirmModal from '../../components/LabwareCalibration/ConfirmModal'
+import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
 
 type OwnProps = {
   match: Match
@@ -37,7 +37,7 @@ function SetupDeckPage (props: Props) {
       <Page
         titleBarProps={{title: (<SessionHeader />)}}
       >
-        <LabwareCalibration labware={labware} />
+        <CalibrateLabware labware={labware} />
       </Page>
       {!deckPopulated && (
         <ReviewDeckModal slot={slot} />

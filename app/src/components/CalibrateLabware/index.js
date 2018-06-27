@@ -9,9 +9,9 @@ import InfoBox from './InfoBox'
 type Props = {
   labware: ?Labware
 }
-export default withRouter(LabwareCalibration)
+export default withRouter(CalibrateLabware)
 
-function LabwareCalibration (props: Props) {
+function CalibrateLabware (props: Props) {
   return (
     <div>
       <InfoBox {...props} />
