@@ -98,7 +98,7 @@ export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
   )
 }
 
-type PipetteFieldOP = {name: StepFieldName}
+type PipetteFieldOP = {name: StepFieldName} & FocusHandlers
 type PipetteFieldSP = {pipetteOptions: Options}
 const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
   pipetteOptions: pipetteSelectors.equippedPipetteOptions(state)
@@ -106,31 +106,39 @@ const PipetteFieldSTP = (state: BaseState): PipetteFieldSP => ({
 export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldOP & PipetteFieldSP) => (
   <StepField
     name={props.name}
+    focusedField={props.focusedField}
+    dirtyFields={props.dirtyFields}
     render={({value, updateValue}) => (
       <FormGroup label='Pipette:' className={styles.pipette_field}>
         <DropdownField
           options={props.pipetteOptions}
           value={value ? String(value) : null}
+          onBlur={() => { props.onFieldBlur(props.name) }}
+          onFocus={() => { props.onFieldFocus(props.name) }}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       </FormGroup>
     )} />
 ))
 
-type LabwareDropdownOP = {name: StepFieldName, className?: string}
+type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
   labwareOptions: labwareIngredSelectors.labwareOptions(state)
 })
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
-  const {labwareOptions, name, className} = props
+  const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
   return (
     // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
     <StepField
       name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
       render={({value, updateValue}) => (
         <DropdownField
           className={className}
           options={labwareOptions}
+          onBlur={() => { onFieldBlur(name) }}
+          onFocus={() => { onFieldFocus(name) }}
           value={value ? String(value) : null}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       )} />
@@ -150,6 +158,7 @@ const CHANGE_TIP_OPTIONS = [
   {name: 'Once', value: 'once'},
   {name: 'Never', value: 'never'}
 ]
+// NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type ChangeTipFieldProps = {name: StepFieldName}
 export const ChangeTipField = (props: ChangeTipFieldProps) => (
   <StepField

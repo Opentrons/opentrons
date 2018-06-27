@@ -29,7 +29,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
       <FormSection sectionName="aspirate">
         <div className={formStyles.row_wrapper}>
           <FormGroup label="Labware:" className={styles.labware_field}>
-            <LabwareDropdown name="aspirate--labware" />
+            <LabwareDropdown name="aspirate--labware" {...focusHandlers} />
           </FormGroup>
           {/* TODO LATER: also 'disable' when selected labware is a trash */}
           <WellSelectionInput
@@ -37,7 +37,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             labwareFieldName="aspirate--labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
-          <PipetteField name="pipette" />
+          <PipetteField name="pipette" {...focusHandlers} />
           {stepType === 'consolidate' &&
             <FormGroup label='Volume:' className={styles.volume_field}>
               <StepInputField name="volume" units='μL' {...focusHandlers} />
@@ -72,7 +72,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
       <FormSection sectionName='dispense'>
         <div className={formStyles.row_wrapper}>
           <FormGroup label='Labware:' className={styles.labware_field}>
-            <LabwareDropdown name="dispense--labware" />
+            <LabwareDropdown name="dispense--labware" {...focusHandlers} />
           </FormGroup>
           <WellSelectionInput
             name="dispense--wells"
