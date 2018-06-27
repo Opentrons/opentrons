@@ -38,7 +38,7 @@ type StepEditFormState = {
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
 
-class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
+class StepEditForm extends React.Component<SP, StepEditFormState> {
   constructor (props) {
     super(props)
     this.state = {

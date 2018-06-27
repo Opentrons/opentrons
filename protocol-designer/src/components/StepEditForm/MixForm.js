@@ -45,7 +45,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
           <FormGroup label='TECHNIQUE'>
             <DispenseDelayFields focusHandlers={focusHandlers} />
             <StepCheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
-              <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+              <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} {...focusHandlers} />
             </StepCheckboxRow>
             <StepCheckboxRow name="touch-tip" label='Touch tip' />
           </FormGroup>

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import Alerts from '../containers/Alerts'
+import TimelineAlerts from '../components/steplist/TimelineAlerts'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import StepEditForm from '../components/StepEditForm'
@@ -27,7 +27,7 @@ export default function ProtocolEditor () {
         <ConnectedSidebar />
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
-          <Alerts />
+          <TimelineAlerts />
 
           <div className={styles.main_page_content}>
             <ConnectedNewFileModal />

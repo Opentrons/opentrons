@@ -94,7 +94,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               </StepCheckboxRow>
               <DispenseDelayFields focusHandlers={focusHandlers} />
               <StepCheckboxRow name='dispense--blowout--checkbox' label='Blow out' >
-                <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+                <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} {...focusHandlers} />
               </StepCheckboxRow>
             </FormGroup>
           </div>
