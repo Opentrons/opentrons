@@ -1,6 +1,6 @@
 // @flow
 import {connect} from 'react-redux'
-import {SidePanelGroup, type IconName} from '@opentrons/components'
+import {SidePanelGroup} from '@opentrons/components'
 
 import {
   selectors as robotSelectors
@@ -10,7 +10,6 @@ const TITLE = 'Labware Calibration'
 
 type StateProps = {
   title: string,
-  iconName: IconName,
   disabled: boolean,
 }
 
@@ -22,7 +21,6 @@ function mapStateToProps (state): StateProps {
 
   return {
     title: TITLE,
-    iconName: 'flask-outline',
     disabled
   }
 }

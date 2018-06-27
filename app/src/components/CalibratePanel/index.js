@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import {SidePanel} from '@opentrons/components'
 import PipetteList from './PipetteList'
-import LabwareCalibrationGroup from './LabwareCalibrationGroup'
+import LabwareGroup from './LabwareGroup'
 import TipRackList from './TipRackList'
 import LabwareList from './LabwareList'
 import styles from './styles.css'
@@ -13,10 +13,10 @@ export default function CalibratePanel () {
     <SidePanel title='Prepare for Run'>
       <div className={styles.setup_panel}>
         <PipetteList />
-        <LabwareCalibrationGroup>
+        <LabwareGroup>
           <TipRackList />
           <LabwareList />
-        </LabwareCalibrationGroup>
+        </LabwareGroup>
       </div>
     </SidePanel>
   )
