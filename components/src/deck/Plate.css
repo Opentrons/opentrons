@@ -15,8 +15,17 @@
   fill: gray;
 }
 
-.fallback_plate {
+.fallback_plate_text {
   font-size: 0.75rem;
   font-style: italic;
   fill: gray;
+}
+
+.plate_outline {
+  fill: var(--c-white);
+  stroke: var(--c-black);
+}
+
+.tiprack_plate_outline {
+  fill: #d6d6d6;
 }
