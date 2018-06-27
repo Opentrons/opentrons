@@ -27,10 +27,10 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
     <React.Fragment>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
-          <LabwareDropdown name="labware" />
+          <LabwareDropdown name="labware" {...focusHandlers} />
         </FormGroup>
         <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
-        <PipetteField name="pipette" />
+        <PipetteField name="pipette" {...focusHandlers} />
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
