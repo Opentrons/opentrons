@@ -1,16 +1,18 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import {
-  FormGroup,
-  InputField,
+  AlertModal,
   DropdownField,
-  AlertModal
+  FormGroup,
+  InputField
 } from '@opentrons/components'
-import {pipetteOptions} from '../../pipettes/pipetteData'
-
+import {pipetteOptions} from '../../../pipettes/pipetteData'
+import PipetteDiagram from './PipetteDiagram'
+import TiprackDiagram from './TiprackDiagram'
 import styles from './NewFileModal.css'
-import formStyles from '../forms.css'
-import modalStyles from './modal.css'
+import formStyles from '../../forms.css'
+import modalStyles from '../modal.css'
 
 type State = {
   name: string,
@@ -159,7 +161,7 @@ export default class NewFileModal extends React.Component<Props, State> {
         </FormGroup>
     ))
 
-    return <AlertModal className={modalStyles.modal}
+    return <AlertModal className={cx(modalStyles.modal, styles.new_file_modal)}
       buttons={[
         {onClick: this.props.onCancel, children: 'Cancel'},
         {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
@@ -167,16 +169,25 @@ export default class NewFileModal extends React.Component<Props, State> {
       <form className={modalStyles.modal_contents}>
         <h2>Create New Protocol</h2>
 
-        <FormGroup label='Protocol Name:'>
+        <FormGroup label='Name:'>
           <InputField placeholder='Untitled'
             value={name}
             onChange={this.handleChange('name')}
           />
         </FormGroup>
 
-        <div className={styles.pipette_text}>
-          Select the pipettes you will be using. This cannot be changed later.
-        </div>
+        <h3>Beta Pipette Restrictions:</h3>
+        <ol>
+          <li>
+            You can't change your pipette selection later. If in doubt go for
+            smaller pipettes. The Protocol Designer automatically breaks up transfer
+            volumes that exceed pipette capacity into multiple transfers.
+          </li>
+          <li>
+            Pipettes can't share tip racks. There needs to be at least 1 tip rack per
+            pipette on the deck.
+          </li>
+        </ol>
 
         <div className={formStyles.row_wrapper}>
           {pipetteFields}
@@ -184,6 +195,15 @@ export default class NewFileModal extends React.Component<Props, State> {
 
         <div className={formStyles.row_wrapper}>
           {tiprackFields}
+        </div>
+
+        <div className={styles.diagrams}>
+          <TiprackDiagram containerType={this.state.leftTiprackModel} />
+          <PipetteDiagram
+            leftPipette={this.state.leftPipette}
+            rightPipette={this.state.rightPipette}
+          />
+          <TiprackDiagram containerType={this.state.rightTiprackModel} />
         </div>
       </form>
     </AlertModal>
