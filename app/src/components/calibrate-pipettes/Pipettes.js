@@ -22,7 +22,7 @@ const {INSTRUMENT_MOUNTS} = robotConstants
 const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
-export default function Instruments (props: Props) {
+export default function Pipettes (props: Props) {
   const {name, currentInstrument, instruments, actualPipettes} = props
   const currentMount = currentInstrument && currentInstrument.mount
 

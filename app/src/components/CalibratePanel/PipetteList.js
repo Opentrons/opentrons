@@ -10,7 +10,7 @@ import {
 } from '../../robot'
 
 import {TitledList} from '@opentrons/components'
-import InstrumentListItem from './InstrumentListItem'
+import PipetteListItem from './PipetteListItem'
 
 type Props = {
   instruments: Instrument[],
@@ -19,15 +19,15 @@ type Props = {
 
 const TITLE = 'Pipette Calibration'
 
-export default withRouter(connect(mapStateToProps)(InstrumentList))
+export default withRouter(connect(mapStateToProps)(PipetteList))
 
-function InstrumentList (props: Props) {
+function PipetteList (props: Props) {
   const {instruments, isRunning} = props
 
   return (
     <TitledList title={TITLE}>
       {robotConstants.INSTRUMENT_MOUNTS.map((mount) => (
-        <InstrumentListItem
+        <PipetteListItem
           key={mount}
           mount={mount}
           isRunning={isRunning}

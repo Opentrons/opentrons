@@ -5,7 +5,7 @@ import {Switch, Route} from 'react-router'
 
 import ConnectPanel from '../components/ConnectPanel'
 import UploadPanel from '../components/UploadPanel'
-import SetupPanel from '../components/SetupPanel'
+import CalibratePanel from '../components/CalibratePanel'
 import MenuPanel from '../components/MenuPanel'
 import RunPanel from '../components/RunPanel'
 
@@ -15,7 +15,7 @@ export default function NavPanel () {
       <Route path='/robots' component={ConnectPanel} />
       <Route path='/menu' component={MenuPanel} />
       <Route path='/upload' component={UploadPanel} />
-      <Route path='/calibrate' component={SetupPanel} />
+      <Route path='/calibrate' component={CalibratePanel} />
       <Route path='/run' component={RunPanel} />
     </Switch>
   )

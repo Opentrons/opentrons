@@ -16,12 +16,12 @@ type Props = {
   instrument: ?Instrument
 }
 
-export default function InstrumentListItem (props: Props) {
+export default function PipetteListItem (props: Props) {
   const {isRunning, mount, instrument} = props
   const confirmed = instrument && instrument.probed
   const isDisabled = !instrument || isRunning
   const url = !isDisabled
-    ? `/calibrate/instruments/${mount}`
+    ? `/calibrate/pipettes/${mount}`
     : '#'
 
   const iconName: IconName = confirmed
