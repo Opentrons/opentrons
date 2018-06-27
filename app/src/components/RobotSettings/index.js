@@ -9,6 +9,7 @@ import InformationCard from './InformationCard'
 import ControlsCard from './ControlsCard'
 import ConnectivityCard from './ConnectivityCard'
 import CalibrationCard from './CalibrationCard'
+import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 import UpdateModal from './UpdateModal'
 import styles from './styles.css'
@@ -39,6 +40,9 @@ export default function RobotSettings (props: Props) {
         <div className={styles.column_50}>
           <CalibrationCard {...props} />
         </div>
+      </div>
+      <div className={styles.row}>
+        <AdvancedSettingsCard {...props} />
       </div>
     </div>
   )
