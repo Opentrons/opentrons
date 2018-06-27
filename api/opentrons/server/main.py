@@ -164,6 +164,8 @@ def init(loop=None):
         '/server/update/ignore', endpoints.get_ignore_version)
     server.app.router.add_post(
         '/server/update/ignore', endpoints.set_ignore_version)
+    server.app.router.add_get(
+        '/server/logs', endpoints.get_logs)
     server.app.router.add_post(
         '/server/restart', endpoints.restart)
     server.app.router.add_post(

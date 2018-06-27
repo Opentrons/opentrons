@@ -116,6 +116,32 @@ def __wait_and_restart():
     os.system('kill 1')
 
 
+async def get_logs(request):
+    """
+    This handler accepts a GET request and returns a blob with
+    Content-Type: multipart/form-data.
+    """
+    path = 'data/user_storage/opentrons_data/logs/'
+    file1 = os.path.join(path, 'api.log')
+    file2 = os.path.join(path, 'serial.log')
+    logs = {'apiLog': open(file1, 'rb'), 'serialLog': open(file2, 'rb')}
+    # data = await request.text()
+    # packet1 = data['serial']
+    # packet2 = data['api']
+    # filename = packet1.filename
+    # content = packet1.file.read()
+
+    # with open(filename, 'wb') as f:
+    #     f.write(content)
+
+    res = {}
+    status = 200
+
+    return web.json_response(
+        content_type='multipart/form-data', data=logs, status=status
+    )
+
+
 async def restart(request):
     """
     Returns OK, then waits approximately 1 second and restarts container
