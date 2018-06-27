@@ -25,7 +25,7 @@ import type {
   Wells
 } from '../types'
 import * as actions from '../actions'
-import type {BaseState, Selector} from '../../types'
+import type {BaseState, Selector, Options} from '../../types'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
 // external actions (for types)
@@ -282,7 +282,6 @@ const loadedContainersBySlot = createSelector(
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
-type Options = Array<{value: string, name: string}>
 const labwareOptions: Selector<Options> = createSelector(
   getLabware,
   getLabwareNames,

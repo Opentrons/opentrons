@@ -125,7 +125,8 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
   maxVolume: number,
-  channels: Channels
+  channels: Channels,
+  tiprackModel?: string // NOTE: this will go away when tiprack sharing is implemented
 |}
 
 export type LabwareData = {|

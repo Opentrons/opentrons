@@ -35,7 +35,9 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
 
       dispatch(pipetteActions.updatePipettes({
         left: fields.leftPipette,
-        right: fields.rightPipette
+        right: fields.rightPipette,
+        leftTiprackModel: fields.leftTiprackModel,
+        rightTiprackModel: fields.rightTiprackModel
       }))
 
       dispatch(navigationActions.toggleNewProtocolModal(false))

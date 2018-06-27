@@ -32,3 +32,5 @@ export type VolumeJson = {
     [wellName: string]: JsonWellData
   }
 }
+
+export type Options = Array<{value: string, name: string}>
