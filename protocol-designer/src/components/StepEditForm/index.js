@@ -32,7 +32,7 @@ export type FocusHandlers = {
   onFieldBlur: (StepFieldName) => void
 }
 
-type SP = {formData?: ?FormData, isNewStep?: boolean}
+type SP = {formData?: ?FormData, isNewStep?: boolean, formWarnings?: Array<string>}
 type StepEditFormState = {
   focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
@@ -78,6 +78,7 @@ class StepEditForm extends React.Component<SP, StepEditFormState> {
     return (
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         { /* TODO: insert form level validation */ }
+        {this.props.formWarnings.join(', ')}
         <FormComponent
           stepType={formData.stepType}
           focusHandlers={{
@@ -94,7 +95,8 @@ class StepEditForm extends React.Component<SP, StepEditFormState> {
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  isNewStep: selectors.isNewStepForm(state)
+  isNewStep: selectors.isNewStepForm(state),
+  formWarnings: selectors.formLevelWarnings(state)
 })
 
 export default connect(mapStateToProps)(StepEditForm)

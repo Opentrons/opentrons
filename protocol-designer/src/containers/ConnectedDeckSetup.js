@@ -9,7 +9,7 @@ import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareDropdown from '../containers/LabwareDropdown.js'
 
 import {selectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import type {BaseState} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot

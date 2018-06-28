@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import MoreOptionsModal from '../components/modals/MoreOptionsModal'
 
-import {selectors} from '../steplist/reducers'
+import {selectors} from '../steplist'
 import {
   deleteStep,
   cancelMoreOptionsModal,

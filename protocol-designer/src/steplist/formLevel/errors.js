@@ -4,8 +4,6 @@
 ** Error Messages **
 ********************/
 
-// TODO: reconcile difference between returning error string and key
-
 const FORM_ERRORS: {[string]: string} = {
   INCOMPATIBLE_PIPETTE: 'Selected labware may be incompatible with an 8-channel pipette',
   WELL_RATIO_TRANSFER: 'In transfer actions the number of source and destination wells must match',
