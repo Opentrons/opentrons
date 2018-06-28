@@ -20,7 +20,7 @@ DISTNAME = 'ot2serverlib'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
-URL = "https://github.com/OpenTrons/opentrons"
+URL = "https://github.com/Opentrons/opentrons"
 DOWNLOAD_URL = ''
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
