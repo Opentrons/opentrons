@@ -91,9 +91,9 @@ type DispenseDelayFieldsProps = {
 export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
   const {label = 'Delay', focusHandlers} = props
   return (
-    <StepCheckboxRow name="dispense--delay--checkbox" label={label}>
-      <StepInputField {...focusHandlers} name="dispense--delay-minutes" units='m' />
-      <StepInputField {...focusHandlers} name="dispense--delay-seconds" units='s' />
+    <StepCheckboxRow name="dispense_delay_checkbox" label={label}>
+      <StepInputField {...focusHandlers} name="dispense_delayMinutes" units='m' />
+      <StepInputField {...focusHandlers} name="dispense_delaySeconds" units='s' />
     </StepCheckboxRow>
   )
 }

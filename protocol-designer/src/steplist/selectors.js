@@ -241,7 +241,7 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
 
 const formLevelWarnings: Selector<null | Array<string>> = createSelector(
   getUnsavedForm,
-  (_formData, state) => {
+  (_formData) => {
     if (!_formData) return null
     // const {stepId, stepType, ...fields} = formData
     // const hydratedFields = fields.map(field => ({
