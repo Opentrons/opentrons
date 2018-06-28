@@ -1,4 +1,5 @@
 // @flow
+import {getWellTotalVolume} from '@opentrons/shared-data'
 
 /*******************
 ** Warning Messages **
@@ -9,7 +10,7 @@
 export type FormWarning = 'OVER_WELL_VOLUME_MAXIMUM'
 
 const FORM_ERRORS: {[FormError]: string} = {
-  OVER_WELL_VOLUME_MAXIMUM: 'Dispense volume will overflow a destination well'
+  OVER_MAX_WELL_VOLUME: 'Dispense volume will overflow a destination well'
 }
 
 // TODO: test these
@@ -17,9 +18,13 @@ const FORM_ERRORS: {[FormError]: string} = {
 ** Warning Checkers **
 ********************/
 
-export const maximumWellVolume = (maximum: number, volume: number): ?string => (
-  volume > maximum ? FORM_ERRORS.OVER_WELL_VOLUME_MAXIMUM : null
-)
+type maxWellVolumeParams = {labware?: ?string, wells?: ?Array<string>, volume?: ?number}
+export const maxWellVolume = ({labware, wells, volume}: maxWellVolumeParams): ?string => {
+  wells.forEach(well => {
+    if (volume > getWellTotalVolume(labware, well)) return FORM_ERRORS.OVER_MAX_WELL_VOLUME
+  })
+  return null
+}
 
 /*******************
 **     Helpers    **

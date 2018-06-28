@@ -17,6 +17,7 @@ export * from './pipettes'
 
 export {
   computeWellAccess,
+  getWellTotalVolume,
   getLabware,
   labwareList
 }
