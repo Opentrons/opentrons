@@ -2,7 +2,7 @@
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
-import {selectors} from '../reducers'
+import {selectors} from '../index'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {GetState} from '../../types'
 

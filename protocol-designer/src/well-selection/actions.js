@@ -3,7 +3,7 @@ import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 

@@ -2,7 +2,7 @@
 
 import getLabware from '../getLabware'
 
-const getWellTotalVolume = (labwareName: string, wellName: string) => {
+const getWellTotalVolume = (labwareName: string, wellName: string): ?number => {
   const labware = getLabware(labwareName)
   if (!labware) {
     console.warn(`No labware definition found for labware ${labwareName}`)

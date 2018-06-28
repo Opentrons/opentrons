@@ -35,7 +35,8 @@ export type FocusHandlers = {
 
 type SP = {
   formData?: ?FormData,
-  isNewStep?: boolean
+  isNewStep?: boolean,
+  formWarnings?: Array<string>
 }
 type DP = {
   onDelete: () => mixed
@@ -105,6 +106,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
         />}
         <div className={cx(formStyles.form, styles[formData.stepType])}>
           { /* TODO: insert form level validation */ }
+          {this.props.formWarnings.join(', ')}
           <FormComponent
             stepType={formData.stepType}
             focusHandlers={{
@@ -113,7 +115,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
               onFieldFocus: this.onFieldFocus,
               onFieldBlur: this.onFieldBlur
             }} />
-          <ButtonRow onDelete={this.toggleConfirmDeleteModal} />
+          <ButtonRow />
         </div>
       </React.Fragment>
     )
@@ -122,7 +124,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  isNewStep: selectors.isNewStepForm(state)
+  isNewStep: selectors.isNewStepForm(state),
+  formWarnings: selectors.formLevelWarnings(state)
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 
-import {selectors} from '../steplist/reducers'
+import {selectors} from '../steplist'
 import {StepList} from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
