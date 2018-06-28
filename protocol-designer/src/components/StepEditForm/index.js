@@ -98,7 +98,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
       return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
     }
     return (
-      <div>
+      <React.Fragment>
         {this.state.showConfirmDeleteModal && <ConfirmDeleteModal
           onCancelClick={this.toggleConfirmDeleteModal}
           onContinueClick={() => {
@@ -124,7 +124,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
             <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
           </div>
         </div>
-      </div>
+      </React.Fragment>
     )
   }
 }

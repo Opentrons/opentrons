@@ -10,11 +10,11 @@ type Props = $Diff<React.ElementProps<typeof ContinueModal>, {children: *}>
 
 function ConfirmDeleteModal (props: Props) {
   return (
-    <ConfirmModalPortal render={() =>
+    <ConfirmModalPortal>
       <ContinueModal className={modalStyles.modal} {...props}>
         {CONFIRM_DELETE_TEXT}
       </ContinueModal>
-    } />
+    </ConfirmModalPortal>
   )
 }
 
