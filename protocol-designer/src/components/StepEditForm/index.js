@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import get from 'lodash/get'
 import without from 'lodash/without'
 import cx from 'classnames'
-import {FlatButton, PrimaryButton} from '@opentrons/components'
+import {OutlineButton} from '@opentrons/components'
 
 import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
 import type {StepFieldName} from '../../steplist/fieldLevel'
@@ -36,6 +36,7 @@ type SP = {formData?: ?FormData, canSave?: ?boolean, isNewStep?: boolean}
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete: () => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
 }
@@ -44,8 +45,10 @@ type StepEditFormState = {
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
 
-class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
-  constructor (props) {
+type Props = SP & DP
+
+class StepEditForm extends React.Component<Props, StepEditFormState> {
+  constructor (props: Props) {
     super(props)
     this.state = {
       focusedField: null,
@@ -76,7 +79,7 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
 
   render () {
     if (!this.props.formData) return null // early-exit if connected formData is absent
-    const {formData, onClickMoreOptions, onCancel, onSave, canSave} = this.props
+    const {formData, onClickMoreOptions, onDelete, onCancel, onSave, canSave} = this.props
     const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
     if (!FormComponent) { // early-exit if step form doesn't exist
       return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
@@ -93,9 +96,10 @@ class StepEditForm extends React.Component<SP & DP, StepEditFormState> {
             onFieldBlur: this.onFieldBlur
           }} />
         <div className={styles.button_row}>
-          <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
-          <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
-          <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
+          <OutlineButton onClick={onDelete}>DELETE</OutlineButton>
+          <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
+          <OutlineButton className={styles.cancel_button} onClick={onCancel}>CANCEL</OutlineButton>
+          <OutlineButton disabled={!canSave} onClick={onSave}>SAVE</OutlineButton>
         </div>
       </div>
     )
@@ -109,6 +113,8 @@ const mapStateToProps = (state: BaseState): SP => ({
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+  onDelete: () => window.confirm('Are you sure you want to delete this step?') &&
+    dispatch(actions.deleteStep()), // TODO IMMEDIATELY use confirm modal
   onCancel: () => dispatch(actions.cancelStepForm()),
   onSave: () => dispatch(actions.saveStepForm()),
   onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),

@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {
   FlatButton,
-  PrimaryButton,
   FormGroup,
   InputField,
   Modal
@@ -14,7 +13,6 @@ import styles from './MoreOptionsModal.css'
 import modalStyles from './modal.css'
 
 type Props = {
-  onDelete: (event: SyntheticEvent<>) => void,
   onCancel: (event: SyntheticEvent<>) => void,
   onSave: (event: SyntheticEvent<>) => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
@@ -44,7 +42,6 @@ export default function (props: Props) {
           <textarea className={styles.big_text_box} {...formConnector('step-details')} />
         </FormGroup>
         <div className={styles.button_row}>
-          <PrimaryButton onClick={props.onDelete}>DELETE STEP</PrimaryButton> {/* TODO! */}
           <FlatButton onClick={props.onCancel}>CANCEL</FlatButton>
           <FlatButton onClick={props.onSave}>SAVE</FlatButton>
         </div>
