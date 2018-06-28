@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../../types'
-import type {ProtocolFile, FilePipette, FileLabware} from '../types'
+import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'

@@ -4,6 +4,7 @@ import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {actions, selectors} from '../navigation'
 import {selectors as fileDataSelectors} from '../file-data'
+import {actions as loadFileActions} from '../load-file'
 import FileSidebar from '../components/FileSidebar'
 import type {BaseState} from '../types'
 
@@ -53,8 +54,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: Dispatch<*>}
             const parsedProtocol = JSON.parse(result)
             // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
 
-            // TODO IMMEDIATELY (next PR) dispatch a FILE_UPLOAD action
-            console.log({parsedProtocol})
+            dispatch(loadFileActions.loadFile(parsedProtocol))
           } catch (error) {
             // TODO LATER Ian 2018-05-18 use a real modal
             window.alert(`Could not parse JSON protocol.\n\nError message: "${error.message}"`)
