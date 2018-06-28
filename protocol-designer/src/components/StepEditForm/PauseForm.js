@@ -16,20 +16,20 @@ function PauseForm (props: PauseFormProps): React.Element<'div'> {
     <div className={formStyles.row_wrapper}>
       <div className={formStyles.column_1_2}>
         <StepRadioGroup
-          name="pause-for-amount-of-time"
+          name="pauseForAmountOfTime"
           options={[{name: 'Pause for an amount of time', value: 'true'}]}
           {...focusHandlers} />
-        <StepInputField units="hr" name="pause-hour" {...focusHandlers} />
-        <StepInputField units="m" name="pause-minute" {...focusHandlers} />
-        <StepInputField units="s" name="pause-second" {...focusHandlers} />
+        <StepInputField units="hr" name="pauseHour" {...focusHandlers} />
+        <StepInputField units="m" name="pauseMinute" {...focusHandlers} />
+        <StepInputField units="s" name="pauseSecond" {...focusHandlers} />
       </div>
       <div className={formStyles.column_1_2}>
         <StepRadioGroup
-          name="pause-for-amount-of-time"
+          name="pauseForAmountOfTime"
           options={[{name: 'Pause until told to resume', value: 'false'}]}
           {...focusHandlers} />
         <FormGroup label='Message to display'>
-          <StepInputField name="pause-message" {...focusHandlers} />
+          <StepInputField name="pauseMessage" {...focusHandlers} />
         </FormGroup>
       </div>
     </div>

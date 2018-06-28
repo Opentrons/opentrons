@@ -15,16 +15,15 @@ export type warningChecker = (mixed) => ?string
 /*******************
 ** Warning Checkers **
 ********************/
+//TODO: real HydratedFormData type
+type HydratedFormData = any
 
-type maxWellVolumeFields = {'dispense--labware'?: ?string, 'dispense--wells'?: ?Array<string>, volume?: ?number}
-export const maxWellVolume = (fields: maxWellVolumeFields): ?string => {
-  // const labware = fields['dispense--labware']
-  // const wells = fields['dispense--wells']
-  const {volume} = fields
-  if (!wells) return null
-  wells.forEach(well => {
-    const maximum = getWellTotalVolume(labware, well)
-    console.log('warnings', labware, wells, volume, maximum)
+export const maxWellVolume = (fields: HydratedFormData): ?string => {
+  const {dispense_labware, dispense_wells, volume} = fields
+  if (!dispense_wells) return null
+  dispense_wells.forEach(well => {
+    const maximum = getWellTotalVolume(dispense_labware, well)
+    console.log('warnings', dispense_labware, dispense_wells, volume, maximum)
     if (maximum && (volume > maximum)) return FORM_WARNINGS.OVER_MAX_WELL_VOLUME
   })
 }
