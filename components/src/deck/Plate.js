@@ -4,22 +4,16 @@ import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 
-import { defaultContainers } from '../'
+import {getLabware, type LabwareDefinition} from '@opentrons/shared-data'
 import { wellNameSplit } from '../utils.js'
 import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
 
 import styles from './Plate.css'
 import Well from './Well'
-import type {SingleWell, WellLocation} from './Well'
-import type {LabwareLocations} from '../labware-types'
+import type {SingleWell} from './Well'
 
 const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
 // TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
-
-type WellDims = {
-  ...WellLocation,
-  maxVolume: number
-}
 
 export type PlateProps = {
   containerType: string,
@@ -30,13 +24,21 @@ export type PlateProps = {
   handleMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
-const plateOutline = <rect {...rectStyle} x='0' y='0' width={SLOT_WIDTH} height={SLOT_HEIGHT} stroke='black' fill='white' />
+type PlateOutlineProps = {className?: ?string}
+function PlateOutline (props: PlateOutlineProps) {
+  return <rect {...rectStyle}
+    x='0' y='0'
+    className={cx(styles.plate_outline, props.className)}
+    width={SLOT_WIDTH}
+    height={SLOT_HEIGHT}
+  />
+}
 
 function FallbackPlate () {
   return (
     <g>
-      {plateOutline}
-      <text x='50%' y='50%' textAnchor='middle' className={styles.fallback_plate}>
+      <PlateOutline />
+      <text x='50%' y='50%' textAnchor='middle' className={styles.fallback_plate_text}>
         Custom Container
       </text>
     </g>
@@ -44,28 +46,26 @@ function FallbackPlate () {
 }
 
 type LabwareData = {
-  originOffset: {x: number, y: number},
-  firstWell: WellDims,
-  containerLocations: LabwareLocations,
-  allWellNames: Array<string>
+  allWells: $PropertyType<LabwareDefinition, 'wells'>,
+  allWellNames: Array<string>,
+  isTiprack: boolean
 }
 
 export default class Plate extends React.Component<PlateProps> {
   getContainerData = (): LabwareData => {
-    const { containerType } = this.props
+    // TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
+    const {containerType} = this.props
+    const labwareDefinition = getLabware(containerType)
 
-    if (!(containerType in defaultContainers.containers)) {
-      throw new Error(`<Plate>: No container type "${containerType}" in defaultContainers`)
+    if (!labwareDefinition) {
+      throw new Error(`<Plate>: No container type "${containerType}" in labware definitions`)
     }
 
-    const infoForContainerType = defaultContainers.containers[containerType]
-    const originOffset = infoForContainerType['origin-offset'] || {x: 0, y: 0}
-    const containerLocations = infoForContainerType.locations
-    const firstWell: WellDims = containerLocations['A1']
+    const allWells = labwareDefinition.wells
+    const isTiprack = Boolean(labwareDefinition.metadata && labwareDefinition.metadata.isTiprack)
+    const allWellNames = Object.keys(allWells)
 
-    const allWellNames = Object.keys(containerLocations)
-
-    return { originOffset, firstWell, containerLocations, allWellNames }
+    return {allWells, allWellNames, isTiprack}
   }
 
   handleMouseOverWell = (well: string) => {
@@ -76,30 +76,29 @@ export default class Plate extends React.Component<PlateProps> {
 
   createWell = (wellName: string) => {
     const { selectable, wellContents, handleMouseExitWell } = this.props
-    const { originOffset, firstWell, containerLocations } = this.getContainerData()
+    const {allWells, isTiprack} = this.getContainerData()
     const singleWellContents = wellContents && wellContents[wellName]
 
-    // rectangular wells are centered around x, y
-    const svgOffset = (typeof firstWell.width === 'number' && typeof firstWell.length === 'number')
-      ? {
-        x: (SLOT_HEIGHT - firstWell.width) / 2,
-        y: originOffset.y - firstWell.length / 2
-      }
-      : {
-        x: originOffset.x,
-        y: originOffset.y
-      }
+    // TODO: Ian 2018-06-27 remove scale & transform so this offset isn't needed
+    const svgOffset = {
+      x: 1,
+      y: -3
+    }
 
-    const wellLocation = containerLocations[wellName]
+    const wellLocation = allWells[wellName]
 
     return <Well
       key={wellName}
+      isTip={isTiprack}
       {...{
         ...singleWellContents,
         wellName,
         selectable,
 
-        wellLocation,
+        wellLocation: {
+          ...wellLocation,
+          y: SLOT_HEIGHT - wellLocation.y // labware Y vs SVG Y is flipped
+        },
         svgOffset,
 
         onMouseOver: this.handleMouseOverWell(wellName),
@@ -109,56 +108,57 @@ export default class Plate extends React.Component<PlateProps> {
   }
 
   createLabels = () => {
-    const { originOffset, containerLocations, allWellNames } = this.getContainerData()
+    // TODO: Ian 2018-06-27 Labels are not aligned nicely, but in new designs they're
+    // supposed to be moved outside of the Plate anyway
+    const {allWells, allWellNames} = this.getContainerData()
 
     const allWellsSplit = allWellNames.map(wellNameSplit)
     // NOTE: can definitely be optimized
-    const rowLetters = uniq(allWellsSplit.map(([letters, numbers]) => letters))
-    const colNumbers = uniq(allWellsSplit.map(([letters, numbers]) => numbers))
+    const rowLetters = uniq(allWellsSplit.map(([letters, numbers]) => letters)).sort()
+    const colNumbers = uniq(allWellsSplit.map(([letters, numbers]) => numbers)).sort((a, b) => Number(a) - Number(b))
 
-    return <g>
-      {
-        // Letters of Rows. Aligned with rows on Y, fixed place on X
-        rowLetters.map(letter =>
-          <text key={letter}
-            // Remember: X and Y and switched in default-containers.json
-            x={originOffset.y / 2.5}
-            y={containerLocations[letter + '1'].x + originOffset.x + 1.5}
-            className={cx(styles.plate_label, {[styles.tiny_labels]: rowLetters.length > 8})}
-          >
-            {letter}
-          </text>
-        )
-      }
+    const ROW_OFFSET = 4
 
-      {
-        // Numbers of Columns. Aligned with columns in Y, fixed place on X
-        colNumbers.map(number =>
-          <text key={number}
-            // Remember: X and Y and switched in default-containers.json
-            x={containerLocations['A' + number].y + originOffset.y}
-            y={6}
-            className={cx(styles.plate_label, {[styles.tiny_labels]: colNumbers.length > 12})}
-          >
-            {number}
-          </text>
-        )
-      }
-    </g>
+    const rowLabels = rowLetters.map(letter =>
+      <text key={letter}
+        x={ROW_OFFSET}
+        y={SLOT_HEIGHT - allWells[letter + '1'].y}
+        className={cx(styles.plate_label, {[styles.tiny_labels]: rowLetters.length > 8})}
+      >
+        {letter}
+      </text>
+    )
+
+    const colLabels = colNumbers.map(number =>
+      <text key={number}
+        x={allWells['A' + number].x}
+        y={6}
+        className={cx(styles.plate_label, {[styles.tiny_labels]: colNumbers.length > 12})}
+      >
+        {number}
+      </text>
+    )
+
+    return (
+      <g>
+        {rowLabels}
+        {colLabels}
+      </g>
+    )
   }
 
   render () {
     const { showLabels, containerType } = this.props
 
-    if (!(containerType in defaultContainers.containers)) {
+    if (!(getLabware(containerType))) {
       return <FallbackPlate />
     }
 
-    const { allWellNames } = this.getContainerData()
+    const {allWellNames, isTiprack} = this.getContainerData()
 
     return (
       <g>
-        {plateOutline}
+        <PlateOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
 
         {/* The wells: */}
         {map(allWellNames, this.createWell)}

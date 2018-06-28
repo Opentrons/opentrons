@@ -1,11 +1,9 @@
 // @flow
 import reduce from 'lodash/reduce'
 import * as componentLib from '@opentrons/components'
-import type {JsonWellData, WellVolumes, VolumeJson} from './types'
+import {getLabware} from '@opentrons/shared-data'
+import type {JsonWellData, WellVolumes} from './types'
 export const {
-  // CONTAINER INFO
-  defaultContainers,
-  nonFillableContainers,
   // OT2 DECK CONSTANTS
   SLOTNAME_MATRIX,
   sortedSlotnames,
@@ -21,11 +19,11 @@ export const {
   SELECTABLE_WELL_CLASS
 } = componentLib
 
-export const getMaxVolumes = (containerType: string): WellVolumes => {
-  const cont: VolumeJson = defaultContainers.containers[containerType]
-  if (cont) {
+export const getMaxVolumes = (labwareType: string): WellVolumes => {
+  const labware = getLabware(labwareType)
+  if (labware) {
     return reduce(
-      cont.locations,
+      labware.wells,
       (acc, wellData: JsonWellData, wellName): WellVolumes => ({
         ...acc,
         [wellName]: wellData['total-liquid-volume']
@@ -33,18 +31,18 @@ export const getMaxVolumes = (containerType: string): WellVolumes => {
       {}
     )
   }
-  console.warn(`Container type ${containerType} not in default-containers.json, max vol defaults to 30000`)
-  return {default: 300}
+  console.warn(`Container type ${labwareType} not in labware definitions, couldn't get max volume`)
+  return {}
 }
 
 /** All wells for labware, in arbitrary order. */
 export function getAllWellsForLabware (labwareType: string): Array<string> {
-  const cont: VolumeJson = defaultContainers.containers[labwareType]
-  if (!cont) {
+  const labware = getLabware(labwareType)
+  if (!labware) {
     console.error(`getAllWellsForLabware: invalid labware type "${labwareType}"`)
     return []
   }
-  return Object.keys(cont.locations)
+  return Object.keys(labware.wells)
 }
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
