@@ -92,6 +92,7 @@ function ConnectivityCard (props: Props) {
           value={`${connectedBy} - ${ip}`}
         />
         <WifiConnectForm
+          key={name}
           disabled={configInProgress}
           activeSsid={activeSsid}
           networks={listOptions}
