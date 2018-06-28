@@ -83,18 +83,21 @@ export default class JogControls extends React.Component<JogControlsProps> {
     const {step, onStepSelect} = this.props
 
     return (
-      <HandleKeypress handlers={[
-        {key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left},
-        {key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right},
-        {key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back},
-        {key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward},
-        {key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up},
-        {key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down},
-        {key: '-', onPress: this.decreaseStepSize},
-        {key: '_', onPress: this.decreaseStepSize},
-        {key: '=', onPress: this.increaseStepSize},
-        {key: '+', onPress: this.increaseStepSize}
-      ]}>
+      <HandleKeypress
+        preventDefault
+        handlers={[
+          {key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left},
+          {key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right},
+          {key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back},
+          {key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward},
+          {key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up},
+          {key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down},
+          {key: '-', onPress: this.decreaseStepSize},
+          {key: '_', onPress: this.decreaseStepSize},
+          {key: '=', onPress: this.increaseStepSize},
+          {key: '+', onPress: this.increaseStepSize}
+        ]}
+      >
         {JOG_BUTTON_NAMES.map(name => (
           <JogButton
             key={name}
