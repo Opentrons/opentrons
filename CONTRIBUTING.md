@@ -260,6 +260,41 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 *   [Node.js Contributing Guide][node-contributing]
 *   [Kibana Contributing Guide][kibana-contributing]
 
+## Developer "Gotchas"
+
+This section contains general information about problems we've encountered before so we don't have to keep researching the same issue over and over (and instead of keeping the info in the heads of individual developers)
+
+### Docker issues
+
+#### COPY
+
+If you get an error in Docker build like this:
+
+```
+Step 24/45 : COPY ./api-server-lib /tmp/api-server-lib
+COPY failed: stat /var/lib/docker/tmp/docker-builder657112660/api-server-lib: no such file or directory
+```
+
+You need to add an exception the directory to the ".dockerignore" file. In this case, the exception is `!/api-server-lib/**`
+
+#### Architecture
+
+If you run a Docker image on your computer and get:
+
+```
+Unknown target IFA type: 6
+```
+
+You probably built against the wrong CPU architecture (ARM instead of x86_64). The top of the Dockerfile has two `FROM` lines, with one of them commented out. Comment out the one that contains "raspberrypi3" and uncomment the one that contains "amd64", and then re-build your image.
+
+If you get:
+
+```
+panic: standard_init_linux.go:175: exec user process caused "exec format error"
+```
+
+You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch to the "raspberrypi" `FROM` line.
+
 [repo]: https://github.com/Opentrons/opentrons
 [api-readme]: ./api/README.rst
 [easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix

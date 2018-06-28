@@ -8,6 +8,7 @@
     "shared-data",
     "protocol-designer",
     "webpack-config",
+    "update-server/otupdate",
     "api/opentrons",
     "api-server-lib/ot2serverlib"
   ],
