@@ -11,6 +11,8 @@ import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
 import ConnectedWellSelectionModal from '../containers/ConnectedWellSelectionModal'
 
+import {CONFIRM_MODAL_ROOT_ID} from '../constants'
+
 import styles from './ProtocolEditor.css'
 
 const SelectorDebugger = process.env.NODE_ENV === 'development'
@@ -33,6 +35,9 @@ export default function ProtocolEditor () {
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />
+            {/* TODO: Ian 2018-06-28 All "Confirm" modals will go here */}
+            <div id={CONFIRM_MODAL_ROOT_ID} />
+
             <StepEditForm />
 
             <ConnectedMainPanel />

@@ -4,7 +4,10 @@ import {connect} from 'react-redux'
 import get from 'lodash/get'
 import without from 'lodash/without'
 import cx from 'classnames'
-import {OutlineButton} from '@opentrons/components'
+import {
+  PrimaryButton,
+  OutlineButton
+} from '@opentrons/components'
 
 import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
 import type {StepFieldName} from '../../steplist/fieldLevel'
@@ -15,6 +18,7 @@ import styles from './StepEditForm.css'
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
 import PauseForm from './PauseForm'
+import ConfirmDeleteModal from './ConfirmDeleteModal'
 
 type StepForm = typeof MixForm | typeof PauseForm | typeof TransferLikeForm
 const STEP_FORM_MAP: {[StepType]: StepForm} = {
@@ -41,6 +45,7 @@ type DP = {
   onSave: (event: SyntheticEvent<>) => mixed,
 }
 type StepEditFormState = {
+  showConfirmDeleteModal: boolean,
   focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
@@ -51,6 +56,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
   constructor (props: Props) {
     super(props)
     this.state = {
+      showConfirmDeleteModal: false,
       focusedField: null,
       dirtyFields: [] // TODO: initialize to dirty if not new form
     }
@@ -72,9 +78,16 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
   onFieldBlur = (fieldName: StepFieldName) => {
     this.setState((prevState) => ({
+      ...prevState,
       focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
       dirtyFields: prevState.dirtyFields.includes(fieldName) ? prevState.dirtyFields : [...prevState.dirtyFields, fieldName]
     }))
+  }
+
+  toggleConfirmDeleteModal = () => {
+    this.setState({
+      showConfirmDeleteModal: !this.state.showConfirmDeleteModal
+    })
   }
 
   render () {
@@ -85,21 +98,31 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
       return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
     }
     return (
-      <div className={cx(formStyles.form, styles[formData.stepType])}>
-        { /* TODO: insert form level validation */ }
-        <FormComponent
-          stepType={formData.stepType}
-          focusHandlers={{
-            focusedField: this.state.focusedField,
-            dirtyFields: this.state.dirtyFields,
-            onFieldFocus: this.onFieldFocus,
-            onFieldBlur: this.onFieldBlur
-          }} />
-        <div className={styles.button_row}>
-          <OutlineButton onClick={onDelete}>DELETE</OutlineButton>
-          <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
-          <OutlineButton className={styles.cancel_button} onClick={onCancel}>CANCEL</OutlineButton>
-          <OutlineButton disabled={!canSave} onClick={onSave}>SAVE</OutlineButton>
+      <div>
+        {this.state.showConfirmDeleteModal && <ConfirmDeleteModal
+          onCancelClick={this.toggleConfirmDeleteModal}
+          onContinueClick={() => {
+            this.toggleConfirmDeleteModal()
+            onDelete()
+          }}
+        />}
+
+        <div className={cx(formStyles.form, styles[formData.stepType])}>
+          { /* TODO: insert form level validation */ }
+          <FormComponent
+            stepType={formData.stepType}
+            focusHandlers={{
+              focusedField: this.state.focusedField,
+              dirtyFields: this.state.dirtyFields,
+              onFieldFocus: this.onFieldFocus,
+              onFieldBlur: this.onFieldBlur
+            }} />
+          <div className={styles.button_row}>
+            <OutlineButton onClick={this.toggleConfirmDeleteModal}>DELETE</OutlineButton>
+            <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
+            <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
+            <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
+          </div>
         </div>
       </div>
     )
@@ -113,8 +136,7 @@ const mapStateToProps = (state: BaseState): SP => ({
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  onDelete: () => window.confirm('Are you sure you want to delete this step?') &&
-    dispatch(actions.deleteStep()), // TODO IMMEDIATELY use confirm modal
+  onDelete: () => dispatch(actions.deleteStep()),
   onCancel: () => dispatch(actions.cancelStepForm()),
   onSave: () => dispatch(actions.saveStepForm()),
   onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),

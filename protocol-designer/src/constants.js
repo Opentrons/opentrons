@@ -46,3 +46,5 @@ export function getAllWellsForLabware (labwareType: string): Array<string> {
 }
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+
+export const CONFIRM_MODAL_ROOT_ID = 'confirm-modal-root'
