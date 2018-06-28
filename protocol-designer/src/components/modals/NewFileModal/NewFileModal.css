@@ -22,6 +22,10 @@
 .new_file_modal {
   line-height: 1.5;
 
+  /* override default modal top/bottom to allow scroll */
+  top: auto;
+  bottom: auto;
+
   & form > * {
     margin-bottom: 1rem;
   }
