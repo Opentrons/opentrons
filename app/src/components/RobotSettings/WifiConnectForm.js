@@ -2,68 +2,86 @@
 import * as React from 'react'
 
 import {OutlineButton, type DropdownOption} from '@opentrons/components'
-import type {FormProps, InputProps} from './inputs'
 import {Form, Select, TextInput} from './inputs'
 import styles from './styles.css'
 
 type Props = {
   disabled: boolean,
-  ssid: ?string,
-  psk: ?string,
   activeSsid: ?string,
   networks: Array<DropdownOption>,
-  onChange: $PropertyType<InputProps<*>, 'onChange'>,
-  onSubmit: $PropertyType<FormProps, 'onSubmit'>,
+  onSubmit: (?string, ?string) => mixed,
 }
 
-export default function ConfigureWifiForm (props: Props) {
-  const {
-    ssid,
-    psk,
-    activeSsid,
-    networks,
-    onChange,
-    onSubmit
-  } = props
+type State = {
+  ssid: ?string,
+  psk: ?string,
+}
 
-  const inputDisabled = props.disabled
-  const formDisabled = inputDisabled || !ssid || (ssid === activeSsid)
+type Update = {
+  ssid?: string,
+  psk?: string,
+}
 
-  return (
-    <Form
-      onSubmit={onSubmit}
-      disabled={formDisabled}
-      className={styles.configure_form}
-    >
-      <label className={styles.configure_label}>
-        {'WiFi network:'}
-        <Select
-          name='ssid'
-          value={ssid || activeSsid}
-          options={networks}
-          disabled={inputDisabled}
-          onChange={onChange}
-          className={styles.configure_input}
-        />
-      </label>
-      <label className={styles.configure_label}>
-        {'Password:'}
-        <TextInput
-          type='password'
-          name='psk'
-          value={psk}
-          disabled={inputDisabled}
-          onChange={onChange}
-          className={styles.configure_input}
-        />
-      </label>
-      <OutlineButton
-        type='submit'
+export default class ConfigureWifiForm extends React.Component<Props, State> {
+  constructor (props: Props) {
+    super(props)
+    this.state = {ssid: null, psk: null}
+  }
+
+  onChange = (update: Update) => this.setState(update)
+
+  onSubmit = () => {
+    this.props.onSubmit(this.getSsid(), this.state.psk)
+    this.setState({psk: null})
+  }
+
+  getSsid (): ?string {
+    return this.state.ssid || this.props.activeSsid
+  }
+
+  render () {
+    const {activeSsid, networks} = this.props
+    const {psk} = this.state
+    const ssid = this.getSsid()
+    const inputDisabled = this.props.disabled
+    const formDisabled = inputDisabled || !ssid
+
+    return (
+      <Form
+        onSubmit={this.onSubmit}
         disabled={formDisabled}
-        className={styles.configure_button}
+        className={styles.configure_form}
       >
-        Join
-      </OutlineButton>
-    </Form>
-  )
+        <label className={styles.configure_label}>
+          {'WiFi network:'}
+          <Select
+            name='ssid'
+            value={ssid}
+            options={networks}
+            disabled={inputDisabled}
+            onChange={this.onChange}
+            className={styles.configure_input}
+          />
+        </label>
+        <label className={styles.configure_label}>
+          {'Password:'}
+          <TextInput
+            type='password'
+            name='psk'
+            value={psk}
+            disabled={inputDisabled}
+            onChange={this.onChange}
+            className={styles.configure_input}
+          />
+        </label>
+        <OutlineButton
+          type='submit'
+          disabled={formDisabled}
+          className={styles.configure_button}
+        >
+          {(ssid && ssid === activeSsid) ? 'Connected' : 'Join'}
+        </OutlineButton>
+      </Form>
+    )
+  }
 }

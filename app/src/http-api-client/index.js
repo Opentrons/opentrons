@@ -138,7 +138,6 @@ export {
 export {
   fetchWifiList,
   fetchWifiStatus,
-  setConfigureWifiBody,
   clearConfigureWifiResponse,
   configureWifi,
   makeGetRobotWifiStatus,

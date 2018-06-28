@@ -6,6 +6,8 @@
 }
 
 .robot_settings {
+  /* TODO(mc, 2018-06-28): hotfix for wifi response modal; remove */
+  position: relative;
   overflow-y: auto;
   padding: calc(2 * var(--robot_settings_card_spacing));
   padding-bottom: 0;
