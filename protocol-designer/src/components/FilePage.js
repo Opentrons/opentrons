@@ -19,10 +19,11 @@ export type FilePageProps = {
 }
 
 const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata}: FilePageProps) => {
-  const handleSubmit = () => {
+  const handleSubmit = (e: SyntheticEvent<*>) => {
     // blur focused field on submit
     if (document && document.activeElement) document.activeElement.blur()
     saveFileMetadata()
+    e.preventDefault()
   }
   return (
     <div className={styles.file_page}>
