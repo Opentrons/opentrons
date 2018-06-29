@@ -244,7 +244,6 @@ const formLevelWarnings: Selector<null | Array<string>> = (state) => {
   const formData = getUnsavedForm(state)
   if (!formData) return null
   const {id, stepType, ...fields} = formData
-  console.log('fields ', fields)
   const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
   return getFormWarnings(stepType, hydratedFields)
 }
