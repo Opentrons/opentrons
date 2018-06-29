@@ -20,10 +20,9 @@ type HydratedFormData = any
 
 export const maxWellVolume = (fields: HydratedFormData): ?string => {
   const {dispense_labware, dispense_wells, volume} = fields
-  if (!dispense_wells) return null
+  if (!dispense_labware || !dispense_wells) return null
   dispense_wells.forEach(well => {
-    const maximum = getWellTotalVolume(dispense_labware, well)
-    console.log('warnings', dispense_labware, dispense_wells, volume, maximum)
+    const maximum = getWellTotalVolume(dispense_labware.type, well)
     if (maximum && (volume > maximum)) return FORM_WARNINGS.OVER_MAX_WELL_VOLUME
   })
 }
@@ -35,6 +34,7 @@ export const maxWellVolume = (fields: HydratedFormData): ?string => {
 export const composeWarnings = (...warningCheckers: Array<warningChecker>) => (formData: mixed): Array<string> => (
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)
+    console.log('warnings', possibleWarning)
     return possibleWarning ? [...acc, possibleWarning] : acc
   }, [])
 )

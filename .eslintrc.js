@@ -14,7 +14,8 @@ module.exports = {
 
   rules: {
     'react/jsx-uses-react': 'error',
-    'react/jsx-uses-vars': 'error'
+    'react/jsx-uses-vars': 'error',
+    'camelcase': {properties: 'never', ignoreDestructuring: true}
   },
 
   globals: {},
