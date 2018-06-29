@@ -27,10 +27,10 @@ type Props = SP & OP
 const log = createLogger(__filename)
 
 export default withRouter(
-  connect(mapStateToProps, null)(RobotRouter)
+  connect(mapStateToProps, null)(Robots)
 )
 
-function RobotRouter (props: Props) {
+function Robots (props: Props) {
   const {
     robot,
     connectedName,
@@ -54,10 +54,10 @@ function RobotRouter (props: Props) {
       <Route
         path={`${path}/instruments`}
         render={(props) => (
-          <InstrumentSettings robot={robot} />
+          <InstrumentSettings {...props} robot={robot} />
         )} />
       />
-      <Route path={`${path}`} render={(props) => (
+      <Route path={path} render={(props) => (
         <RobotSettings robot={robot} />
       )} />
     </Switch>
