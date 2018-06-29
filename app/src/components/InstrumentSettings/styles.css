@@ -11,7 +11,7 @@
   padding-top: 1rem;
   width: 49.5%;
 
-  & > button {
+  & > a {
     width: 8rem;
   }
 }
