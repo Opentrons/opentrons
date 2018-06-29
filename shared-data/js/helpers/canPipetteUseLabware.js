@@ -17,8 +17,7 @@ const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?bool
     console.warn(`No labware definition found for labware ${labwareModel}`)
     return null
   }
-  const format = get(labware, 'metadata.properties.format')
-  console.log('shared: ', labware, pipette, format)
+  const format = get(labware, 'metadata.format')
   if (!format) {
     console.warn(`No format found for labware ${labwareModel}`)
     return null
