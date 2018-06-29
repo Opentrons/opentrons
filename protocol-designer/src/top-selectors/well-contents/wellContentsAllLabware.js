@@ -3,12 +3,12 @@ import {createSelector} from 'reselect'
 
 import reduce from 'lodash/reduce'
 
+import {getLabware, type WellDefinition} from '@opentrons/shared-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import wellSelectionSelectors from '../../well-selection/selectors'
 
-import type {Selector, JsonWellData, VolumeJson} from '../../types'
+import type {Selector} from '../../types'
 import type {Wells, AllWellContents} from '../../labware-ingred/types'
-import {defaultContainers} from '../../constants.js'
 import type {SingleLabwareLiquidState} from '../../step-generation'
 
 const _getWellContents = (
@@ -24,15 +24,15 @@ const _getWellContents = (
     return null
   }
 
-  const containerData: VolumeJson = defaultContainers.containers[containerType]
+  const containerData = getLabware(containerType)
   if (!containerData) {
     console.warn('No data for container type ' + containerType)
     return null
   }
 
-  const allLocations = containerData.locations
+  const allWells = containerData.wells
 
-  return reduce(allLocations, (acc: AllWellContents, location: JsonWellData, wellName: string): AllWellContents => {
+  return reduce(allWells, (acc: AllWellContents, well: WellDefinition, wellName: string): AllWellContents => {
     const groupIds = (__ingredientsForContainer && __ingredientsForContainer[wellName])
       ? Object.keys(__ingredientsForContainer[wellName])
       : []
@@ -42,7 +42,7 @@ const _getWellContents = (
       [wellName]: {
         highlighted: highlightedWells ? (wellName in highlightedWells) : false,
         selected: selectedWells ? wellName in selectedWells : false,
-        maxVolume: location['total-liquid-volume'] || Infinity,
+        maxVolume: well['total-liquid-volume'] || Infinity,
         groupIds
       }
     }

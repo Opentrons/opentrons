@@ -9,14 +9,14 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_version():
-    with open(os.path.join(HERE, 'ot2serverlib', 'package.json')) as pkg:
+    with open(os.path.join(HERE, 'otupdate', 'package.json')) as pkg:
         package_json = json.load(pkg)
         return package_json.get('version')
 
 
 VERSION = get_version()
 
-DISTNAME = 'ot2serverlib'
+DISTNAME = 'otupdate'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
@@ -32,10 +32,9 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.6',
     'Topic :: Scientific/Engineering',
 ]
-KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
+KEYWORDS = ["robots", "automation", "lab"]
 DESCRIPTION = (
-    "A library of shared server functions for servers running on Opentrons "
-    "robots.")
+    "A server to update software and firmware on Opentrons robots")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = ['aiohttp==2.3.8']
 

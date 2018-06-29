@@ -8,9 +8,10 @@ import type {
 } from '../../http-api-client'
 
 import {AlertModal} from '@opentrons/components'
+import {ErrorModal} from '../modals'
 
 type Props = {
-  onClose: () => mixed,
+  close: () => mixed,
   error: ?ApiRequestError,
   response: ?WifiConfigureResponse
 }
@@ -19,30 +20,36 @@ const SUCCESS_TITLE = 'Successfully connected to '
 const FAILURE_TITLE = 'Could not join network'
 
 const SUCCESS_MESSAGE = 'Your robot has successfully connected to WiFi and should appear in the robot list shortly. If not, try refreshing the list manually or rebooting the robot.'
-const FAILURE_MESSAGE = 'Please double check your network credentials. If this problem persists, try rebooting the robot or contacting our support team.'
+const FAILURE_MESSAGE = 'The robot was unable to connect to the selected WiFi network. Please double check your network credentials.'
 
 export default function WifiConnectModal (props: Props) {
-  const {onClose} = props
-  let title
-  let message
+  const {response, error, close} = props
 
-  if (props.response) {
-    title = `${SUCCESS_TITLE} ${props.response.ssid}`
-    message = SUCCESS_MESSAGE
-  } else {
-    title = FAILURE_TITLE
-    message = FAILURE_MESSAGE
+  if (error || !response) {
+    const modalError = error || {
+      name: 'NoResponseError',
+      message: 'No response received'
+    }
+
+    return (
+      <ErrorModal
+        heading={FAILURE_TITLE}
+        description={FAILURE_MESSAGE}
+        close={close}
+        error={modalError}
+      />
+    )
   }
 
   return (
     <AlertModal
-      heading={title}
-      onCloseClick={onClose}
+      heading={`${SUCCESS_TITLE} ${response.ssid}`}
+      onCloseClick={close}
       buttons={[
-        {onClick: onClose, children: 'close'}
+        {onClick: close, children: 'close'}
       ]}
     >
-      {message}
+      {SUCCESS_MESSAGE}
     </AlertModal>
   )
 }

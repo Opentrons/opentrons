@@ -25,6 +25,7 @@ export type WellLocation = {
 
 type Props = {
   ...SingleWell,
+  isTip?: ?boolean,
   selectable: boolean,
   wellLocation: WellLocation,
   svgOffset: {
@@ -39,6 +40,7 @@ export default function Well (props: Props) {
   const {
     wellName,
     selectable,
+    isTip,
     highlighted,
     selected,
     error,
@@ -67,18 +69,20 @@ export default function Well (props: Props) {
     onMouseLeave
   }
 
-  const isRect = typeof wellLocation.length === 'number' && typeof wellLocation.width === 'number'
   const isCircle = typeof wellLocation.diameter === 'number'
+  const isRect = !isCircle
 
-  // flip x and y coordinates for landscape (default-containers.json is in portrait)
-  // TODO: Ian 2017-12-13 is there a better way to tell flow:
-  // "if this has diameter, it's circleWell type. if this has length & width, it's rectWell type" ?
   if (isRect) {
+    const baseY = wellLocation.y + svgOffset.y
     const rectProps = {
-      x: wellLocation.y + svgOffset.y,
-      y: wellLocation.x + svgOffset.x,
-      width: wellLocation.length,
-      height: wellLocation.width
+      x: wellLocation.x + svgOffset.x,
+      y: baseY - (wellLocation.length || 0), // zero fallback for flow
+      width: wellLocation.width,
+      height: baseY
+    }
+
+    if (isTip) {
+      console.warn('Well component does not support isTip for rectangular wells (bad labware definition???)')
     }
 
     return <g>
@@ -99,9 +103,27 @@ export default function Well (props: Props) {
 
   if (isCircle) {
     const circleProps = {
-      cx: wellLocation.y + svgOffset.y,
-      cy: wellLocation.x + svgOffset.x,
+      cx: wellLocation.x + svgOffset.x,
+      cy: wellLocation.y + svgOffset.y,
       r: (wellLocation.diameter || 0) / 2
+    }
+
+    // smaller circle inside the main circle for tips in a tiprack
+    let tipCircle = null
+    if (isTip) {
+      const radius = (circleProps.r > 3)
+        ? circleProps.r * 0.7 // big radius, tipCircle is smaller
+        : circleProps.r * 1.75 // small radius, tipCircle is bigger
+
+      const innerCircleProps = {
+        ...circleProps,
+        r: radius
+      }
+
+      tipCircle = <circle
+        {...innerCircleProps}
+        className={styles.well_border}
+      />
     }
 
     return <g>
@@ -117,6 +139,8 @@ export default function Well (props: Props) {
         {...circleProps}
         className={wellOverlayClassname}
       />
+      {/* Unfilled circle for tips only */}
+      {tipCircle}
     </g>
   }
 

@@ -2,4 +2,6 @@
 !/shared-data/**
 !/audio/**
 !/compute/**
+!/api-server-lib/**
+!/update-server/**
 !/api/**

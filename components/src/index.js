@@ -1,14 +1,9 @@
 // @flow
 // opentrons components library
-
-import defaultContainers from './default-containers.json'
-
 import LabwareContainerStyles from './deck/LabwareContainer.css'
 export const allStyles = {
   LabwareContainer: LabwareContainerStyles
 }
-
-export {defaultContainers}
 
 export * from './constants'
 export * from './utils'

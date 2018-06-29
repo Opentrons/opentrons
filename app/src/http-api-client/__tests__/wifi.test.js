@@ -6,7 +6,6 @@ import client from '../client'
 import {
   fetchWifiList,
   fetchWifiStatus,
-  setConfigureWifiBody,
   clearConfigureWifiResponse,
   configureWifi,
   reducer,
@@ -189,29 +188,6 @@ describe('wifi', () => {
     })
   })
 
-  describe('setConfigureWifiBody action creator', () => {
-    const ssid = 'some-ssid'
-    const psk = 'some-psk'
-
-    test('works with ssid', () => {
-      const expected = {
-        type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, update: {ssid}}
-      }
-
-      expect(setConfigureWifiBody(robot, {ssid})).toEqual(expected)
-    })
-
-    test('works with psk', () => {
-      const expected = {
-        type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, update: {psk}}
-      }
-
-      expect(setConfigureWifiBody(robot, {psk})).toEqual(expected)
-    })
-  })
-
   test('clearConfigureWifiResponse action creator', () => {
     const expected = {
       type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
@@ -225,24 +201,13 @@ describe('wifi', () => {
     const ssid = 'some-ssid'
     const psk = 'some-psk'
     const response = {ssid, message: 'Success!'}
-    const initialState = {
-      api: {
-        wifi: {
-          opentrons: {
-            configure: {
-              request: {ssid, psk}
-            }
-          }
-        }
-      }
-    }
 
     test('calls POST /wifi/configure, GET /wifi/list', () => {
-      const store = mockStore(initialState)
+      const store = mockStore({})
 
       client.__setMockResponse(response)
 
-      return store.dispatch(configureWifi(robot))
+      return store.dispatch(configureWifi(robot, ssid, psk))
         .then(() => expect(client).toHaveBeenCalledWith(
           robot,
           'POST',
@@ -252,7 +217,7 @@ describe('wifi', () => {
     })
 
     test('dispatches WIFI_REQUEST and WIFI_SUCCESS', () => {
-      const store = mockStore(initialState)
+      const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
         {
@@ -263,13 +228,13 @@ describe('wifi', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(configureWifi(robot))
+      return store.dispatch(configureWifi(robot, 'ssid', 'psk'))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
     test('dispatches WIFI_REQUEST and WIFI_FAILURE', () => {
       const error = {name: 'ResponseError', status: '400'}
-      const store = mockStore(initialState)
+      const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
         {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'configure'}}
@@ -277,7 +242,7 @@ describe('wifi', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(configureWifi(robot))
+      return store.dispatch(configureWifi(robot, 'ssid', 'psk'))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -466,37 +431,6 @@ describe('wifi', () => {
 
   describe('reducer with /wifi/configure', () => {
     const path = 'configure'
-
-    test('handles SET_CONFIGURE_WIFI_BODY', () => {
-      const state = {
-        wifi: {
-          opentrons: {
-            configure: {
-              request: null,
-              inProgress: false,
-              error: new Error('AH'),
-              response: {ssid: 'foo', message: 'bar'}
-            }
-          }
-        }
-      }
-
-      const action = {
-        type: 'api:SET_CONFIGURE_WIFI_BODY',
-        payload: {robot, update: {ssid: 'baz', psk: 'qux'}}
-      }
-
-      expect(reducer(state, action).wifi).toEqual({
-        opentrons: {
-          configure: {
-            request: {ssid: 'baz', psk: 'qux'},
-            inProgress: false,
-            error: new Error('AH'),
-            response: {ssid: 'foo', message: 'bar'}
-          }
-        }
-      })
-    })
 
     test('handles CLEAR_CONFIGURE_WIFI_RESPONSE', () => {
       const state = {

@@ -1,34 +1,29 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 
-import {rootReducer as fileDataRootReducer} from './file-data'
-import labwareIngredRootReducer from './labware-ingred/reducers'
-import {rootReducer as navigationRootReducer} from './navigation'
-import {rootReducer as pipetteRootReducer} from './pipettes'
-import steplistRootReducer from './steplist/reducers'
-import wellSelectionRootReducer from './well-selection/reducers'
-
-// TODO: Ian 2018-01-15 how to make this more DRY with hot reloading?
 function getRootReducer () {
-  return combineReducers({
+  const LOAD_FILE = require('./load-file').LOAD_FILE
+
+  const rootReducer = combineReducers({
     fileData: require('./file-data').rootReducer,
-    labwareIngred: require('./labware-ingred/reducers'),
+    labwareIngred: require('./labware-ingred/reducers').default,
     navigation: require('./navigation').rootReducer,
     pipettes: require('./pipettes').rootReducer,
-    steplist: require('./steplist/reducers'),
-    wellSelection: require('./well-selection/reducers')
+    steplist: require('./steplist/reducers').default,
+    wellSelection: require('./well-selection/reducers').default
   })
+
+  return (state, action) => {
+    if (action.type === LOAD_FILE) {
+      // reset entire state, then pass LOAD_FILE action
+      return rootReducer(undefined, action)
+    }
+    return rootReducer(state, action)
+  }
 }
 
 export default function configureStore () {
-  const reducer = combineReducers({
-    fileData: fileDataRootReducer,
-    labwareIngred: labwareIngredRootReducer,
-    navigation: navigationRootReducer,
-    pipettes: pipetteRootReducer,
-    steplist: steplistRootReducer,
-    wellSelection: wellSelectionRootReducer
-  })
+  const reducer = getRootReducer()
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   const store = createStore(
@@ -44,12 +39,14 @@ export default function configureStore () {
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('./file-data/reducers', replaceReducers)
-    module.hot.accept('./labware-ingred/reducers', replaceReducers)
-    module.hot.accept('./navigation/reducers', replaceReducers)
-    module.hot.accept('./pipettes', replaceReducers)
-    module.hot.accept('./steplist/reducers', replaceReducers)
-    module.hot.accept('./well-selection/reducers', replaceReducers)
+    module.hot.accept([
+      './file-data/reducers',
+      './labware-ingred/reducers',
+      './navigation/reducers',
+      './pipettes',
+      './steplist/reducers',
+      './well-selection/reducers'
+    ], replaceReducers)
   }
 
   return store

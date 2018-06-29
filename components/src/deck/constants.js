@@ -1,14 +1,4 @@
 // @flow
-
-// These 'nonfillable' container types render on the deck as an image instead of Wells
-export const nonFillableContainers = [
-  'trash-box',
-  'tiprack-10ul',
-  'tiprack-200ul',
-  'tiprack-1000ul',
-  'tiprack-1000ul-chem'
-]
-
 // ========= OT2 DECK ===============
 
 export const SLOTNAME_MATRIX = [ // used for deckmap
