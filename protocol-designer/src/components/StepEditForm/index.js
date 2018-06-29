@@ -106,7 +106,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
         />}
         <div className={cx(formStyles.form, styles[formData.stepType])}>
           { /* TODO: insert form level validation */ }
-          {this.props.formWarnings.join(', ')}
+          {this.props.formWarnings && this.props.formWarnings.map((warning) => warning.message).join(', ')}
           <FormComponent
             stepType={formData.stepType}
             focusHandlers={{

@@ -35,7 +35,7 @@ const StepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     getErrors: composeErrors(requiredField),
     hydrate: (state, id) => (labwareIngredSelectors.getLabware(state)[id])
   },
-  'dispense_wells': { getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([]) },
+  'dispense_wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])},
   'labware': {getErrors: composeErrors(requiredField)},
   'pauseHour': {processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers)},
   'pauseMinute': {processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers)},
