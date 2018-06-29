@@ -16,9 +16,9 @@ function getRootReducer () {
   })
 
   const prereducers = {
-    fileData: require('./load-file/reducers/file-data').default,
-    navigation: require('./load-file/reducers/navigation').default,
-    pipettes: require('./load-file/reducers/pipettes').default
+    fileData: require('./load-file/prereducers/file-data').default,
+    navigation: require('./load-file/prereducers/navigation').default,
+    pipettes: require('./load-file/prereducers/pipettes').default
   }
 
   return (state, action) => {

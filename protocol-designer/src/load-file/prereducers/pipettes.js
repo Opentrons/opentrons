@@ -10,12 +10,12 @@ import type {PipetteData} from '../../step-generation'
 // TODO IMMEDIATELY have space in file for pipette tiprack type
 const TODO_TIPRACK_MODEL = 'tiprack-10ul'
 
-function createPipette (p: FilePipette, id: string, tiprackModel: string): PipetteData {
+// TODO: Ian 2018-06-28 replace createPipette fn in pipettes/reducers.js with this one?
+function createPipette (p: FilePipette, id: string, tiprackModel: string): ?PipetteData {
   const pipetteData = getPipette(p.model)
   if (!pipetteData) {
-    // TODO Ian 2018-03-01 I want Flow to enforce `name` is a key in pipetteDataByName,
-    // but it doesn't seem to want to be strict about it
-    throw new Error('Invalid pipette name, no entry in pipetteDataByName')
+    console.error(`Pipette model '${p.model}' does not exist in shared-data`)
+    return null
   }
   return {
     id,
