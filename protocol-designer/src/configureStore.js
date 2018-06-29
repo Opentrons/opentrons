@@ -1,10 +1,8 @@
 import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
-import mapValues from 'lodash/mapValues'
-import merge from 'lodash/merge'
 
 function getRootReducer () {
-  const LOAD_FILE = require('./load-file').actions.LOAD_FILE
+  const LOAD_FILE = require('./load-file').LOAD_FILE
 
   const rootReducer = combineReducers({
     fileData: require('./file-data').rootReducer,
@@ -15,27 +13,10 @@ function getRootReducer () {
     wellSelection: require('./well-selection/reducers').default
   })
 
-  const prereducers = {
-    fileData: require('./load-file/prereducers/file-data').default,
-    navigation: require('./load-file/prereducers/navigation').default,
-    pipettes: require('./load-file/prereducers/pipettes').default
-  }
-
   return (state, action) => {
     if (action.type === LOAD_FILE) {
-      const initialState = rootReducer(undefined, {})
-      const file = action.payload
-
-      // merge initial Redux state with result of "prereducers"
-      return merge(
-        {}, // avoid mutating initialState, so root selectors aren't cached on old values
-        initialState,
-        mapValues(prereducers, prereducerKeys =>
-          mapValues(prereducerKeys, prereducer =>
-            prereducer(file)
-          )
-        )
-      )
+      // reset entire state, then pass LOAD_FILE action
+      return rootReducer(undefined, action)
     }
     return rootReducer(state, action)
   }

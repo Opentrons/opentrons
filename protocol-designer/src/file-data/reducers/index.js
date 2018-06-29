@@ -7,6 +7,7 @@ import {
   updateFileMetadataFields
 } from '../actions'
 import type {FileMetadataFields} from '../types'
+import {LOAD_FILE, type LoadFileAction} from '../../load-file'
 
 const defaultFields = {
   name: '',
@@ -14,7 +15,20 @@ const defaultFields = {
   description: ''
 }
 
+const updateMetadataFields = (
+  state: FileMetadataFields,
+  action: LoadFileAction
+): FileMetadataFields => {
+  const {metadata} = action.payload
+  return {
+    author: metadata.author,
+    description: metadata.description,
+    name: metadata['protocol-name']
+  }
+}
+
 const unsavedMetadataForm = handleActions({
+  [LOAD_FILE]: updateMetadataFields,
   UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>) => ({
     ...state,
     ...action.payload
@@ -26,6 +40,7 @@ const unsavedMetadataForm = handleActions({
 }, defaultFields)
 
 const fileMetadata = handleActions({
+  [LOAD_FILE]: updateMetadataFields,
   SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>) => ({
     ...state,
     ...action.payload
