@@ -7,7 +7,7 @@ import AdvancedSettingsCard from './AdvancedSettingsCard'
 import AppInfoCard from './AppInfoCard'
 import AppUpdateModal from './AppUpdateModal'
 
-import styles from './styles.css'
+import {CardContainer, CardRow} from '../layout'
 
 type Props = {
   update: ShellUpdate,
@@ -16,17 +16,17 @@ type Props = {
 
 export default function AppSettings (props: Props) {
   return (
-    <div className={styles.app_settings}>
-      <div className={styles.row}>
+    <CardContainer>
+      <CardRow>
         <AppInfoCard {...props}/>
-      </div>
-      <div className={styles.row}>
+      </CardRow>
+      <CardRow>
         <AnalyticsSettingsCard {...props} />
-      </div>
-      <div className={styles.row}>
+      </CardRow>
+      <CardRow>
         <AdvancedSettingsCard />
-      </div>
-    </div>
+      </CardRow>
+    </CardContainer>
   )
 }
 

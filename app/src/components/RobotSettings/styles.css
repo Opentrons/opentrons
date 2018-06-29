@@ -1,31 +1,6 @@
 /* stylesheet for RobotSettings components */
 @import '@opentrons/components';
 
-:root {
-  --robot_settings_card_spacing: 0.75rem;
-}
-
-.robot_settings {
-  overflow-y: auto;
-  padding: calc(2 * var(--robot_settings_card_spacing));
-  padding-bottom: 0;
-}
-
-.row {
-  width: 100%;
-  margin-bottom: var(--robot_settings_card_spacing);
-}
-
-.column_50 {
-  display: inline-block;
-  vertical-align: top;
-  width: calc(50% - (0.5 * var(--robot_settings_card_spacing)));
-
-  &:not(:last-child) {
-    margin-right: var(--robot_settings_card_spacing);
-  }
-}
-
 .configure_form {
   width: 100%;
   margin-top: 1rem;
@@ -51,53 +26,6 @@
 .configure_button {
   float: right;
   margin-top: 0.5rem;
-}
-
-.instrument_card {
-  display: flex;
-  position: relative;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  height: 4rem;
-  padding-top: 1rem;
-  width: 49.5%;
-
-  & > button {
-    width: 8rem;
-  }
-}
-
-.instrument_diagram {
-  height: 100%;
-  padding: 0 0 0.5rem;
-  text-align: center;
-
-  & * {
-    height: 100%;
-    width: auto;
-  }
-}
-
-.image {
-  height: 8rem;
-  width: 2.25rem;
-  margin-top: -3rem;
-  border: 1px solid var(--c-light-gray);
-}
-
-.right {
-  & > div {
-    order: 2;
-  }
-
-  & > .image {
-    order: 1;
-  }
-
-  & > a {
-    order: 3;
-  }
 }
 
 /* TODO (ka 2018-5-14): temporariliy hide last calibrated labeled value without affecting card layout */

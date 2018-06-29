@@ -5,10 +5,14 @@
   margin-left: 0;
 }
 
-.robot_item {
-  text-transform: uppercase;
+.robot_group {
   margin-bottom: 0.25rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.robot_item {
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--c-light-gray);
 }
 
 .robot_item_icon {

@@ -27,7 +27,7 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette'
 }
 
-export default function InstrumentInfo (props: Props) {
+export default function PipetteInfo (props: Props) {
   const {mount, model, name, onClick} = props
   const label = LABEL_BY_MOUNT[mount]
   const channelsMatch = model && model.match(RE_CHANNELS)
@@ -36,9 +36,9 @@ export default function InstrumentInfo (props: Props) {
     ? 'change'
     : 'attach'
 
-  const url = `/robots/${name}/pipettes/${mount}`
+  const url = `/robots/${name}/instruments/pipettes/${mount}`
 
-  const className = cx(styles.instrument_card, {
+  const className = cx(styles.pipette_card, {
     [styles.right]: props.mount === 'right'
   })
 
@@ -55,7 +55,7 @@ export default function InstrumentInfo (props: Props) {
         {channels && (
           <InstrumentDiagram
             channels={channels === 'multi' ? 8 : 1}
-            className={styles.instrument_diagram}
+            className={styles.pipette_diagram}
           />
         )}
       </div>

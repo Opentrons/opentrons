@@ -5,7 +5,7 @@ import NavBar from './nav-bar'
 
 import {PageWrapper} from '../components/Page'
 import SidePanel from '../pages/SidePanel'
-import Robots from '../pages/Robots'
+import RobotRouter from '../pages/Robots'
 import More from '../pages/More'
 import Upload from '../pages/Upload'
 import Calibrate from '../pages/Calibrate'
@@ -23,7 +23,7 @@ export default function App () {
         <Switch>
           <Redirect from='(.*)/index.html' to='/' />
           <Redirect exact from='/' to='/robots' />
-          <Route path='/robots/:name?' component={Robots} />
+          <Route path='/robots/:name?' component={RobotRouter} />
           <Route path='/menu' component={More} />
           <Route path='/upload' component={Upload} />
           <Route path='/calibrate' component={Calibrate} />

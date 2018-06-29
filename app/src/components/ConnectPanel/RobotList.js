@@ -4,7 +4,8 @@ import * as React from 'react'
 
 import {
   ListItem,
-  NotificationIcon
+  NotificationIcon,
+  Icon
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
@@ -36,10 +37,12 @@ export function RobotListItem (props: ItemProps) {
     : connect
 
   return (
+    <div className={styles.robot_group}>
     <ListItem
       url={`/robots/${name}`}
       className={styles.robot_item}
       activeClassName={styles.active}
+      exact
     >
       <NotificationIcon
         name={wired ? 'usb' : 'wifi'}
@@ -58,5 +61,19 @@ export function RobotListItem (props: ItemProps) {
         className={styles.robot_item_icon}
       />
     </ListItem>
+    <ListItem
+      url={`/robots/${name}/instruments`}
+      className={styles.robot_item}
+      activeClassName={styles.active}
+    >
+      <p className={styles.robot_name}>
+        Pipettes & Modules
+      </p>
+      <Icon
+        name='chevron-right'
+        className={styles.robot_item_icon}
+      />
+    </ListItem>
+    </div>
   )
 }
