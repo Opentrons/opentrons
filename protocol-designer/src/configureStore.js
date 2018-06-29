@@ -5,6 +5,7 @@ function getRootReducer () {
   const LOAD_FILE = require('./load-file').LOAD_FILE
 
   const rootReducer = combineReducers({
+    dismiss: require('./dismiss').rootReducer,
     fileData: require('./file-data').rootReducer,
     labwareIngred: require('./labware-ingred/reducers').default,
     navigation: require('./navigation').rootReducer,
