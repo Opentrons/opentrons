@@ -168,6 +168,7 @@ make test
 
 # run a specific project's tests
 make -C api test
+make -C update-server test
 make -C components test
 make -C protocol-designer test
 make -C app test
@@ -196,14 +197,14 @@ make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
 make -C api dev
 
 # push the current contents of the api directory to robot for testing
-make -C api push
+make push-api
 ```
 
 ### Releasing (for Opentrons developers)
 
 Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability.
 
-1.  `make bump`
+1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
 3.  `git add --all`
 4.  `git cz`
@@ -250,6 +251,13 @@ make bump opts="--cd-version=minor"
 
 # bump to an explicit version
 make bump opts="--repo-version=42.0.0"
+```
+
+We use [lerna][], a monorepo management tool, to work with our various projects. You can use lerna to do things like see which projects have changed since the last release, or run a command in every project directory. To run a one-off lerna command, use:
+
+```shell
+# use yarn run to run devDependency CLI tools like lerna
+yarn run lerna [opts]
 ```
 
 ## Prior Art
@@ -312,5 +320,6 @@ You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch 
 [yarn-install]: https://yarnpkg.com/en/docs/install
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
+[lerna]: https://github.com/lerna/lerna
 [lerna-publish]: https://github.com/lerna/lerna#publish
 [semver-inc]: https://github.com/npm/node-semver#functions
