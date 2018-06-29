@@ -37,25 +37,6 @@ function createPipette (mount: string, model: string, tiprackModel: ?string): ?P
   }
 }
 
-// /** Creates a pipette from "name" of pipetteDataByName,
-//   * instead of by shared-data's pipette definitions' `model` */
-// // TODO: Ian 2018-06-29 remove this and all references to 'pipetteDataByName'
-// function createPipetteDeprecated (name: PipetteName, mount: Mount, tiprackModel: string): PipetteData {
-//   const pipetteData = pipetteDataByName[name]
-//   if (!pipetteData) {
-//     // TODO Ian 2018-03-01 I want Flow to enforce `name` is a key in pipetteDataByName,
-//     // but it doesn't seem to want to be strict about it
-//     throw new Error('Invalid pipette name, no entry in pipetteDataByName')
-//   }
-//   return {
-//     id: `${mount}:${name}`,
-//     mount,
-//     maxVolume: pipetteData.maxVolume,
-//     channels: pipetteData.channels,
-//     tiprackModel
-//   }
-// }
-
 export type PipetteReducerState = {
   byMount: {|
     left: ?string,
