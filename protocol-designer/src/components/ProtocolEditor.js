@@ -10,8 +10,7 @@ import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
 import ConnectedWellSelectionModal from '../containers/ConnectedWellSelectionModal'
-
-import {CONFIRM_MODAL_ROOT_ID} from '../constants'
+import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 
 import styles from './ProtocolEditor.css'
 
@@ -35,8 +34,8 @@ export default function ProtocolEditor () {
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />
-            {/* TODO: Ian 2018-06-28 All "Confirm" modals will go here */}
-            <div id={CONFIRM_MODAL_ROOT_ID} />
+            {/* TODO: Ian 2018-06-28 All main page modals will go here */}
+            <MainPageModalPortalRoot />
 
             <StepEditForm />
 
