@@ -37,7 +37,7 @@ export function RobotListItem (props: ItemProps) {
     : connect
 
   return (
-    <div className={styles.robot_group}>
+    <ol className={styles.robot_group}>
     <ListItem
       url={`/robots/${name}`}
       className={styles.robot_item}
@@ -63,7 +63,7 @@ export function RobotListItem (props: ItemProps) {
     </ListItem>
     <ListItem
       url={`/robots/${name}/instruments`}
-      className={styles.robot_item}
+      className={styles.instrument_item}
       activeClassName={styles.active}
     >
       <p className={styles.robot_name}>
@@ -74,6 +74,6 @@ export function RobotListItem (props: ItemProps) {
         className={styles.robot_item_icon}
       />
     </ListItem>
-    </div>
+    </ol>
   )
 }
