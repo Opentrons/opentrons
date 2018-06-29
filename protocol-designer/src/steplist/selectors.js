@@ -6,6 +6,7 @@ import max from 'lodash/max'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {getFormWarnings} from './formLevel'
+import {hydrateField} from './fieldLevel'
 
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'
@@ -239,17 +240,14 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
   return form && validateAndProcessForm(form).errors // TODO refactor selectors
 }
 
-const formLevelWarnings: Selector<null | Array<string>> = createSelector(
-  getUnsavedForm,
-  (_formData) => {
-    if (!_formData) return null
-    // const {stepId, stepType, ...fields} = formData
-    // const hydratedFields = fields.map(field => ({
-    //   [field.name]: StepFieldHelpers[field.name].hydrate(state, field.value)
-    // })
-    return getFormWarnings(_formData.stepType, _formData)// hydratedFields)
-  }
-)
+const formLevelWarnings: Selector<null | Array<string>> = (state) => {
+  const formData = getUnsavedForm(state)
+  if (!formData) return null
+  const {id, stepType, ...fields} = formData
+  console.log('fields ', fields)
+  const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
+  return getFormWarnings(stepType, hydratedFields)
+}
 
 const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   rootSelector,

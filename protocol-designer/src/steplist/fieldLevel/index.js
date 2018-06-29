@@ -57,8 +57,8 @@ export const processField = (name: StepFieldName, value: mixed): ?mixed => {
   return fieldProcessor ? fieldProcessor(value) : value
 }
 
-export const hydrateField = (name: StepFieldName, value: mixed, state: BaseState): ?mixed => {
-  const hydrateField = get(StepFieldHelperMap, `${name}.hydrate`)
-  return hydrateField ? hydrateField(state, value) : value
+export const hydrateField = (state: BaseState, name: StepFieldName, value: mixed): ?mixed => {
+  const hydrator = get(StepFieldHelperMap, `${name}.hydrate`)
+  return hydrator ? hydrator(state, value) : value
 }
 
