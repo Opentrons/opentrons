@@ -10,7 +10,7 @@ const FORMAT_METADATA = {
   'trough': {multichannelAccess: true},
   'irregular': {multichannelAccess: false}
 }
-const canPipetteUseLabware = (labwareModel: string, pipetteModel: string): ?boolean => {
+const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?boolean => {
   const labware = getLabware(labwareModel)
   const pipette = getPipette(pipetteModel)
   if (!labware) {
@@ -18,6 +18,7 @@ const canPipetteUseLabware = (labwareModel: string, pipetteModel: string): ?bool
     return null
   }
   const format = get(labware, 'metadata.properties.format')
+  console.log('shared: ', labware, pipette, format)
   if (!format) {
     console.warn(`No format found for labware ${labwareModel}`)
     return null

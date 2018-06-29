@@ -37,8 +37,8 @@ export type FocusHandlers = {
 type SP = {
   formData?: ?FormData,
   isNewStep?: boolean,
-  formErrors?: Array<FormError>,
-  formWarnings?: Array<FormWarning>
+  formErrors?: ?Array<FormError>,
+  formWarnings?: ?Array<FormWarning>
 }
 
 type DP = {

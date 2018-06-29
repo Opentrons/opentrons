@@ -11,6 +11,11 @@ type PipettesById = {[pipetteId: string]: PipetteData}
 
 const rootSelector = (state: BaseState) => state.pipettes.pipettes
 
+export const pipettesById = createSelector(
+  rootSelector,
+  pipettes => pipettes.byId
+)
+
 function _getPipetteName (pipetteData): string {
   const result = getPipetteModels().find(pipetteModel => {
     const p = getPipette(pipetteModel)
@@ -38,7 +43,7 @@ function _makePipetteOption (
   const name = _getPipetteName(pipetteData)
   return [{
     name,
-    value: idPrefix + ':' + name
+    value: `${idPrefix}:${pipetteData.model}`
   }]
 }
 
