@@ -36,7 +36,10 @@ export type ProtocolFile = {
     'application-name': 'opentrons/protocol-designer',
     'application-version': VersionString,
     data: {
-      // TODO
+      // pipetteId to tiprackModel. may be unassigned
+      pipetteTiprackAssignments: {[pipetteId: string]: ?string}
+
+      // TODO add more fields
     }
   },
 

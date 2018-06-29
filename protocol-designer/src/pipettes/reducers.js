@@ -1,8 +1,8 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
-import mapValues from 'lodash/mapValues'
-import {getPipette} from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
+import {getPipette, getLabware} from '@opentrons/shared-data'
 import {pipetteDataByName, type PipetteName} from './pipetteData'
 import {updatePipettes} from './actions'
 import {LOAD_FILE, type LoadFileAction} from '../load-file'
@@ -11,17 +11,24 @@ import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 
-// TODO IMMEDIATELY have space in file for pipette tiprack type
-const TODO_TIPRACK_MODEL = 'tiprack-10ul'
-
-function createPipette (p: FilePipette, id: ?string, tiprackModel: string): ?PipetteData {
+function createPipette (p: FilePipette, _id: ?string, tiprackModel: ?string): ?PipetteData {
+  const id = _id || `${p.mount}:${p.model}`
   const pipetteData = getPipette(p.model)
+
   if (!pipetteData) {
-    console.error(`Pipette model '${p.model}' does not exist in shared-data`)
+    console.error(`Pipette ${id} - model '${p.model}' does not exist in shared-data`)
+    return null
+  }
+  if (!tiprackModel) {
+    console.error(`Pipette ${id} - no tiprackModel assigned. Skipping pipette creation.`)
+    return null
+  }
+  if (!getLabware(tiprackModel)) {
+    console.error(`Pipette ${id} - tiprackModel '${tiprackModel}' does not exist in shared-data`)
     return null
   }
   return {
-    id: id || `${p.mount}:${p.model}`,
+    id,
     mount: p.mount,
     maxVolume: pipetteData.nominalMaxVolumeUl,
     channels: pipetteData.channels,
@@ -31,6 +38,7 @@ function createPipette (p: FilePipette, id: ?string, tiprackModel: string): ?Pip
 
 /** Creates a pipette from "name" of pipetteDataByName,
   * instead of by shared-data's pipette definitions' `model` */
+// TODO: Ian 2018-06-29 remove this and all references to 'pipetteDataByName'
 function createPipetteDeprecated (name: PipetteName, mount: Mount, tiprackModel: string): PipetteData {
   const pipetteData = pipetteDataByName[name]
   if (!pipetteData) {
@@ -59,15 +67,24 @@ export type PipetteReducerState = {
 
 const pipettes = handleActions({
   [LOAD_FILE]: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
-    const {pipettes} = action.payload
+    const file = action.payload
+    const {pipettes} = file
+    // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
+    const {pipetteTiprackAssignments} = file['designer-application'].data
     const pipetteIds = Object.keys(pipettes)
     return {
       byMount: {
         left: pipetteIds.find(id => pipettes[id].mount === 'left'),
         right: pipetteIds.find(id => pipettes[id].mount === 'right')
       },
-      byId: mapValues(pipettes, (p: FilePipette, id: string) =>
-        createPipette(p, id, TODO_TIPRACK_MODEL))
+      byId: reduce(
+        pipettes,
+        (acc: {[pipetteId: string]: PipetteData}, p: FilePipette, id: string) => {
+          const newPipette = createPipette(p, id, pipetteTiprackAssignments[id])
+          return newPipette
+            ? {...acc, [id]: newPipette}
+            : acc
+        }, {})
     }
   },
   UPDATE_PIPETTES: (state: PipetteReducerState, action: ActionType<typeof updatePipettes>) => {
