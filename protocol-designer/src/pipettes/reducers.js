@@ -23,7 +23,7 @@ function createPipette (name: PipetteName, mount: Mount, tiprackModel: string): 
   }
 }
 
-type PipetteReducerState = {
+export type PipetteReducerState = {
   byMount: {|
     left: ?string,
     right: ?string

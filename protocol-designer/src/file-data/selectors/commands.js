@@ -62,6 +62,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   (pipettes, labwareAppState, labwareLiquidState) => {
     type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
     type TiprackTipState = $PropertyType<TipState, 'tipracks'>
+    console.log('get initial robot state!!!')
 
     const labware = labwareConverter(labwareAppState)
 
