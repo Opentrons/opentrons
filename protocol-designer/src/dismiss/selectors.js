@@ -6,7 +6,6 @@ import {selectors as steplistSelectors} from '../steplist'
 import type {BaseState, Selector} from '../types'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {RootState, DismissedWarningState} from './reducers'
-import type {DismissInfo} from './types'
 
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 
@@ -15,38 +14,39 @@ const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
   s => s.dismissedWarnings
 )
 
+type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
 /** Non-dismissed warnings for selected step */
-export const getWarningsForSelectedStep: Selector<Array<DismissInfo>> = createSelector(
+export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   getDismissedWarnings,
   fileDataSelectors.warningsPerStep,
-  steplistSelectors.selectedStepId,
-  (dismissedWarnings, warningsPerStep, selectedStepId) => {
-    // show warnings only for the selected step
-    const rawWarnings = selectedStepId ? warningsPerStep[selectedStepId] : null
+  steplistSelectors.orderedSteps,
+  (dismissedWarnings, warningsPerStep, orderedSteps) => {
+    // TODO: show warnings only for the selected step
+    return orderedSteps.reduce(
+      (stepAcc: WarningsPerStep, stepId) => {
+        const warningsForStep = warningsPerStep[stepId]
+        if (!warningsForStep) return stepAcc
+        const result = warningsForStep.reduce(
+        (warningAcc: Array<CommandCreatorWarning>, warning: CommandCreatorWarning) => {
+          const isDismissed = dismissedWarnings[stepId].some(dismissedWarning =>
+            isMatch(dismissedWarning, warning))
 
-    // hide warnings without explicit FEATURE FLAG
-    if (
-      !rawWarnings ||
-      !selectedStepId ||
-      process.env.OT_PD_SHOW_WARNINGS !== 'true'
-    ) return []
+          return isDismissed
+            ? warningAcc
+            : [...warningAcc, warning]
+        }, [])
 
-    // annotate warnings with dismissInfo and filter out any that are already dismissed
-    const warnings = rawWarnings.reduce((acc: Array<DismissInfo>, warning: CommandCreatorWarning) => {
-      const annotatedWarning: DismissInfo = {
-        ...warning,
-        stepId: selectedStepId,
-        isDismissable: true
-      }
-
-      const isDismissed = dismissedWarnings.some(dismissedWarning =>
-        isMatch(dismissedWarning, annotatedWarning))
-
-      return isDismissed
-        ? acc
-        : [...acc, annotatedWarning]
-    }, [])
-
-    return warnings
+        return {
+          ...stepAcc,
+          [stepId]: result
+        }
+      }, {})
   }
+)
+
+export const getWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
+  getWarningsPerStep,
+  steplistSelectors.selectedStepId,
+  (warningsPerStep, stepId) =>
+    (typeof stepId === 'number' && warningsPerStep[stepId]) || []
 )

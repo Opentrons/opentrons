@@ -2,19 +2,24 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {actions as dismissActions, selectors as dismissSelectors, type DismissInfo} from '../dismiss'
+import {
+  actions as dismissActions,
+  selectors as dismissSelectors
+} from '../dismiss'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../types'
-import type {CommandCreatorError} from '../step-generation'
+import type {CommandCreatorError, CommandCreatorWarning} from '../step-generation'
 
 type SP = {
   errors: Array<CommandCreatorError>,
-  warnings: Array<DismissInfo>
+  warnings: Array<CommandCreatorWarning>,
+  _stepId: *
 }
 
 type DP = {
-  onDismiss: (DismissInfo) => () => mixed
+  onDismiss: (*) => () => mixed // TODO TYPE THIS
 }
 
 type Props = SP & DP
@@ -27,7 +32,7 @@ const captions: {[warningOrErrorType: string]: string} = {
 }
 
 function Alerts (props: Props) {
-  const alertItemHelper = (alert: CommandCreatorError | DismissInfo, key) => (
+  const alertItemHelper = (alert: CommandCreatorError | CommandCreatorWarning, key) => (
     <AlertItem
       type='warning'
       key={key}
@@ -50,19 +55,30 @@ function Alerts (props: Props) {
 
 function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.robotStateTimeline(state)
-  const warnings = dismissSelectors.getWarningsForSelectedStep(state)
   const errors = timeline.errors || []
+  const warnings = dismissSelectors.getWarningsForSelectedStep(state)
+  const _stepId: any = steplistSelectors.selectedStepId(state)
 
   return {
     errors,
-    warnings
+    warnings,
+    _stepId
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {dispatch} = dispatchProps
+  const onDismiss = (warning: CommandCreatorWarning) =>
+    () =>
+      dispatch(dismissActions.dismissWarning({
+        warning,
+        stepId: stateProps._stepId
+      }))
+
   return {
-    onDismiss: dismissInfo => () => dispatch(dismissActions.dismissWarning(dismissInfo))
+    ...stateProps,
+    onDismiss
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Alerts)
+export default connect(mapStateToProps, null, mergeProps)(Alerts)

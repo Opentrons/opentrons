@@ -1,11 +1,16 @@
 // @flow
-import type {DismissInfo} from './types'
+import type {CommandCreatorWarning} from '../step-generation'
 
 type DismissWarning = {
   type: 'DISMISS_WARNING',
-  payload: DismissInfo
+  payload: {
+    warning: CommandCreatorWarning,
+    stepId: number
+  }
 }
-export const dismissWarning = (payload: DismissInfo): DismissWarning => ({
+export const dismissWarning = (
+  payload: $ElementType<DismissWarning, 'payload'>
+): DismissWarning => ({
   type: 'DISMISS_WARNING',
   payload
 })
