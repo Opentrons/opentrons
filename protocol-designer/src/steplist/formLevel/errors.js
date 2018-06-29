@@ -56,7 +56,6 @@ export const incompatibleLabware = (fields: HydratedFormData): ?FormError => {
 }
 
 export const incompatibleDispenseLabware = (fields: HydratedFormData): ?FormError => {
-  console.log('incompatible check: ', fields)
   const {dispense_labware, pipette} = fields
   if (!dispense_labware || !pipette) return null
   return (!canPipetteUseLabware(pipette.model, dispense_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_DISPENSE_LABWARE : null
