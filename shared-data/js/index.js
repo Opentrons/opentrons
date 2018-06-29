@@ -1,5 +1,6 @@
 // @flow
 import {
+  canPipetteUseLabware,
   computeWellAccess,
   getWellTotalVolume
 } from './helpers'
@@ -16,6 +17,7 @@ export * from './types'
 export * from './pipettes'
 
 export {
+  canPipetteUseLabware,
   computeWellAccess,
   getWellTotalVolume,
   getLabware,

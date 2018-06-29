@@ -32,6 +32,8 @@ const StepFormHelperMap: {[StepType]: FormHelpers} = {
   }
 }
 
+export type {FormError, FormWarning}
+
 export const getFormErrors = (stepType: StepType, formData: mixed): Array<FormError> => {
   const formErrorGetter: (mixed) => Array<FormError> = get(StepFormHelperMap, `${stepType}.getErrors`)
   const errors: Array<FormError> = formErrorGetter ? formErrorGetter(formData) : []

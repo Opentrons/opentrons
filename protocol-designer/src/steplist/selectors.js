@@ -5,7 +5,8 @@ import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {getFormWarnings} from './formLevel'
+import {getFormWarnings, getFormErrors} from './formLevel'
+import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
 
 import {END_STEP} from './types'
@@ -240,12 +241,20 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
   return form && validateAndProcessForm(form).errors // TODO refactor selectors
 }
 
-const formLevelWarnings: Selector<null | Array<string>> = (state) => {
+const formLevelWarnings: Selector<null | Array<FormWarning>> = (state) => {
   const formData = getUnsavedForm(state)
   if (!formData) return null
   const {id, stepType, ...fields} = formData
   const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
   return getFormWarnings(stepType, hydratedFields)
+}
+
+const formLevelErrors: Selector<null | Array<FormError>> = (state) => {
+  const formData = getUnsavedForm(state)
+  if (!formData) return null
+  const {id, stepType, ...fields} = formData
+  const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
+  return getFormErrors(stepType, hydratedFields)
 }
 
 const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
@@ -334,6 +343,7 @@ export default {
   isNewStepForm,
   currentFormErrors, // TODO: remove after sunset
   formLevelWarnings,
+  formLevelErrors,
   formSectionCollapse: formSectionCollapseSelector,
   deckSetupMode,
   hoveredStepLabware,

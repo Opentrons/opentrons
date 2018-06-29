@@ -7,6 +7,7 @@ import cx from 'classnames'
 
 import {selectors} from '../../steplist'
 import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {FormData, StepType} from '../../form-types'
 import type {BaseState} from '../../types'
 import formStyles from '../forms.css'
@@ -32,7 +33,12 @@ export type FocusHandlers = {
   onFieldBlur: (StepFieldName) => void
 }
 
-type SP = {formData?: ?FormData, isNewStep?: boolean, formWarnings?: Array<string>}
+type SP = {
+  formData?: ?FormData,
+  isNewStep?: boolean,
+  formErrors?: Array<FormError>,
+  formWarnings?: Array<FormWarning>
+}
 type StepEditFormState = {
   focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
   dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
@@ -78,6 +84,7 @@ class StepEditForm extends React.Component<SP, StepEditFormState> {
     return (
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         { /* TODO: insert form level validation */ }
+        {this.props.formErrors && this.props.formErrors.map((error) => error.message).join(', ')}
         {this.props.formWarnings && this.props.formWarnings.map((warning) => warning.message).join(', ')}
         <FormComponent
           stepType={formData.stepType}
@@ -96,6 +103,7 @@ class StepEditForm extends React.Component<SP, StepEditFormState> {
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
   isNewStep: selectors.isNewStepForm(state),
+  formErrors: selectors.formLevelErrors(state),
   formWarnings: selectors.formLevelWarnings(state)
 })
 
