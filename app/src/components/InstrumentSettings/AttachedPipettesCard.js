@@ -31,9 +31,9 @@ const TITLE = 'Pipettes'
 export default connect(
   makeMapStateToProps,
   mapDispatchToProps
-)(AttachedInstrumentsCard)
+)(AttachedPipettesCard)
 
-function AttachedInstrumentsCard (props: Props) {
+function AttachedPipettesCard (props: Props) {
   return (
     <RefreshCard
       title={TITLE}
