@@ -42,6 +42,7 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
     : null
 }
 
+// TODO: type pipette
 export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
   // Add default values to a new step form
   const baseForm = {
@@ -61,6 +62,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   if (stepType === 'distribute') {
     return {
       ...baseForm,
+      'aspirate_disposalVol_checkbox': true,
       'dispense_blowout_checkbox': true,
       'dispense_blowout_labware': FIXED_TRASH_ID
     }

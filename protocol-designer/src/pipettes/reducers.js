@@ -11,7 +11,7 @@ import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 
-function createPipette (mount: string, model: string, tiprackModel: ?string): ?PipetteData {
+function createPipette (mount: Mount, model: string, tiprackModel: ?string): ?PipetteData {
   const id = `${mount}:${model}`
   const pipetteData = getPipette(model)
 
@@ -81,7 +81,7 @@ const pipettes = handleActions({
       : null
 
     const newPipettes = ([leftPipette, rightPipette]).reduce(
-      (acc: {[string]: PipetteData}, pipette: PipetteData | null) => {
+      (acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
         if (!pipette) return acc
         return {
           ...acc,

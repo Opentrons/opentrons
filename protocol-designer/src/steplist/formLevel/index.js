@@ -5,34 +5,39 @@ import {
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
+  wellRatioTransfer,
+  wellRatioConsolidate,
+  wellRatioDistribute,
   type FormError
 } from './errors'
 import {
   composeWarnings,
   maxDispenseWellVolume,
-  type FormWarning
+  minDisposalVolume,
+  type FormWarning,
+  type FormWarningKey
 } from './warnings'
 import type {StepType} from '../../form-types'
 
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
 const StepFormHelperMap: {[StepType]: FormHelpers} = {
-  mix: {getErrors: composeErrors(incompatibleLabware), getWarnings: () => {}},
-  pause: {getErrors: composeErrors(incompatibleLabware), getWarnings: () => {}},
+  mix: {getErrors: composeErrors(incompatibleLabware)},
+  pause: {getErrors: composeErrors(incompatibleLabware)},
   transfer: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware),
+    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
     getWarnings: composeWarnings(maxDispenseWellVolume)
   },
   consolidate: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware),
+    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioConsolidate),
     getWarnings: composeWarnings(maxDispenseWellVolume)
   },
   distribute: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware),
-    getWarnings: composeWarnings(maxDispenseWellVolume)
+    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioDistribute),
+    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume)
   }
 }
 
-export type {FormError, FormWarning}
+export type {FormError, FormWarning, FormWarningKey}
 
 export const getFormErrors = (stepType: StepType, formData: mixed): Array<FormError> => {
   const formErrorGetter: (mixed) => Array<FormError> = get(StepFormHelperMap, `${stepType}.getErrors`)

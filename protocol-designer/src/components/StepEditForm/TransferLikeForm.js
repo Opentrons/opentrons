@@ -37,7 +37,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             labwareFieldName="aspirate_labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
-          <PipetteField name="pipette" {...focusHandlers} />
+          <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
           {stepType === 'consolidate' &&
             <FormGroup label='Volume:' className={styles.volume_field}>
               <StepInputField name="volume" units='μL' {...focusHandlers} />
