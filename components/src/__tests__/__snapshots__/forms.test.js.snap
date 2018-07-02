@@ -87,7 +87,9 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
   >
     <select
       className="dropdown"
+      onBlur={undefined}
       onChange={undefined}
+      onFocus={undefined}
       value=""
     >
       <option
@@ -150,7 +152,9 @@ exports[`DropdownField renders correctly with a value 1`] = `
   >
     <select
       className="dropdown"
+      onBlur={undefined}
       onChange={undefined}
+      onFocus={undefined}
       value="rna"
     >
       <option
