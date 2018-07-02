@@ -133,7 +133,7 @@ const collapsedSteps = handleActions({
   })
 }, {})
 
-type OrderedStepsState = Array<StepIdType>
+export type OrderedStepsState = Array<StepIdType>
 
 const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
