@@ -191,11 +191,11 @@ async def update_firmware(request):
 
 async def restart(request):
     """
-    Returns OK, then waits approximately 3 seconds and restarts container
+    Returns OK, then waits approximately 1 second and restarts container
     """
     def wait_and_restart():
         log.info('Restarting server')
-        sleep(3)
+        sleep(1)
         os.system('kill 1')
     Thread(target=wait_and_restart).start()
     return web.json_response({"message": "restarting"})

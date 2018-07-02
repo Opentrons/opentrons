@@ -4,7 +4,8 @@ import logging
 
 from aiohttp import web
 from functools import partial
-from otupdate import endpoints as endp
+from otupdate import control
+from otupdate import endpoints as bootstrap_endp
 
 log = logging.getLogger(__name__)
 
@@ -49,18 +50,19 @@ def get_app(
     log.info("  Smoothie FW version:    {}".format(smoothie_version))
     log.info("  Test mode:              {}".format(test))
 
-    health = endp.build_health_endpoint(
+    health = bootstrap_endp.build_health_endpoint(
         name=device_name,
         update_server_version=update_server_version,
         api_server_version=api_server_version,
         smoothie_version=smoothie_version
     )
     bootstrap_fn = partial(
-        endp.bootstrap_update_server, test_flag=test)
+        bootstrap_endp.bootstrap_update_server, test_flag=test)
 
     app = web.Application(loop=loop)
     app.router.add_routes([
         web.get('/server/update/health', health),
-        web.post('/server/update/bootstrap', bootstrap_fn)
+        web.post('/server/update/bootstrap', bootstrap_fn),
+        web.post('/server/update/restart', control.restart)
     ])
     return app

@@ -9,7 +9,7 @@ import json
 import tempfile
 import subprocess
 import otupdate
-from otupdate import bootstrap
+from otupdate import bootstrap, control
 # Tests should closely reflect the tasks in selftest.py
 
 
@@ -108,3 +108,32 @@ print('intentionally malformed'
 
     assert res.get('status') == 'failure'
     assert int(resp.status/100.0) == 4
+
+
+async def test_restart(loop, test_client, monkeypatch):
+    restart_flag = False
+
+    def mock_restart():
+        nonlocal restart_flag
+        restart_flag = True
+
+    monkeypatch.setattr(control, '__wait_and_restart', mock_restart)
+
+    update_package = os.path.join(
+        os.path.abspath(os.path.dirname(otupdate.__file__)), 'package.json')
+
+    app = otupdate.get_app(
+        api_package=None,
+        update_package=update_package,
+        smoothie_version='not available',
+        loop=loop,
+        test=True)
+    cli = await loop.create_task(test_client(app))
+
+    resp = await cli.post('/server/update/restart')
+    res = await resp.json()
+    assert resp.status == 200
+
+    expected = {"message": "restarting"}
+    assert res == expected
+    assert restart_flag
