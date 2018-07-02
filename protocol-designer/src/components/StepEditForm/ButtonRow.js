@@ -7,7 +7,16 @@ import {actions, selectors} from '../../steplist'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 
-const ButtonRow = (props) => {
+type OP = {toggleConfirmDeleteModal: () => void}
+type SP = {canSave?: ?boolean}
+type DP = {
+  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete: () => mixed,
+  onCancel: (event: SyntheticEvent<>) => mixed,
+  onSave: (event: SyntheticEvent<>) => mixed,
+}
+
+const ButtonRow = (props: OP & SP & DP) => {
   const {toggleConfirmDeleteModal, canSave, onSave, onCancel, onClickMoreOptions} = props
   return (
     <div className={styles.button_row}>
@@ -19,16 +28,8 @@ const ButtonRow = (props) => {
   )
 }
 
-type OP = {toggleConfirmDeleteModal: () => void}
-type SP = {canSave?: ?boolean}
 const STP = (state: BaseState): SP => ({ canSave: selectors.currentFormCanBeSaved(state) })
 
-type DP = {
-  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
-  onDelete: () => mixed,
-  onCancel: (event: SyntheticEvent<>) => mixed,
-  onSave: (event: SyntheticEvent<>) => mixed,
-}
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onDelete: () => dispatch(actions.deleteStep()),
   onCancel: () => dispatch(actions.cancelStepForm()),
