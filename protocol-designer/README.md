@@ -23,3 +23,7 @@ Any env var that starts with `OT_PD_` will be picked up by `webpack.EnvironmentP
 Right now we are using them as feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`.
 
 Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
+
+### `OT_PD_SHOW_WARNINGS`
+
+Shows warning AlertItems (which are hidden by default) when `process.env.OT_PD_SHOW_WARNINGS === 'true'`
