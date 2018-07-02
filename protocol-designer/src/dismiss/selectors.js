@@ -1,5 +1,4 @@
 // @flow
-import isMatch from 'lodash/isMatch'
 import {createSelector} from 'reselect'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as steplistSelectors} from '../steplist'
@@ -28,9 +27,11 @@ export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
         const result = warningsForStep.reduce(
         (warningAcc: Array<CommandCreatorWarning>, warning: CommandCreatorWarning) => {
           const dismissedWarningsForStep = dismissedWarnings[stepId]
+          // warnings match when their `type` is the same.
+          // their `message` doesn't matter.
           const isDismissed = dismissedWarningsForStep
             ? dismissedWarningsForStep.some(dismissedWarning =>
-              isMatch(dismissedWarning, warning))
+              dismissedWarning.type === warning.type)
             : false
 
           return isDismissed
