@@ -16,6 +16,7 @@ import {
   type valueProcessor
 } from './processing'
 import type {StepFieldName} from './types'
+import type {BaseState} from '../../types'
 
 export type {
   StepFieldName
@@ -41,6 +42,7 @@ const StepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     hydrate: (state, id) => (labwareIngredSelectors.getLabware(state)[id])
   },
   'dispense_wells': {getErrors: composeErrors(minimumWellCount(1)), processValue: defaultTo([])},
+  'aspirate_disposalVol_volume': {processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers)},
   'labware': {
     getErrors: composeErrors(requiredField),
     hydrate: (state, id) => (labwareIngredSelectors.getLabware(state)[id])

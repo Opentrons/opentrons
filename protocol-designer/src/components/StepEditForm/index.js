@@ -7,11 +7,11 @@ import cx from 'classnames'
 
 import {actions, selectors} from '../../steplist'
 import type {StepFieldName} from '../../steplist/fieldLevel'
-import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {FormData, StepType} from '../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
+import FormAlerts from './FormAlerts'
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
 import PauseForm from './PauseForm'
@@ -36,9 +36,7 @@ export type FocusHandlers = {
 
 type SP = {
   formData?: ?FormData,
-  isNewStep?: boolean,
-  formErrors?: ?Array<FormError>,
-  formWarnings?: ?Array<FormWarning>
+  isNewStep?: boolean
 }
 
 type DP = {
@@ -47,8 +45,8 @@ type DP = {
 
 type StepEditFormState = {
   showConfirmDeleteModal: boolean,
-  focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
-  dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
+  focusedField: StepFieldName | null,
+  dirtyFields: Array<StepFieldName>
 }
 
 type Props = SP & DP
@@ -70,7 +68,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
         this.setState({ focusedField: null, dirtyFields: [] })
       } else {
         const fieldNames: Array<string> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
-        this.setState({ focusedField: null, dirtyFields: fieldNames })
+        // $FlowFixMe
+        this.setState({focusedField: null, dirtyFields: fieldNames})
       }
     }
   }
@@ -108,9 +107,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
           }}
         />}
         <div className={cx(formStyles.form, styles[formData.stepType])}>
-          { /* TODO: insert form level validation */ }
-          {this.props.formErrors && this.props.formErrors.map((error) => error.message).join(', ')}
-          {this.props.formWarnings && this.props.formWarnings.map((warning) => warning.message).join(', ')}
+          <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
           <FormComponent
             stepType={formData.stepType}
             focusHandlers={{
@@ -128,9 +125,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  isNewStep: selectors.isNewStepForm(state),
-  formErrors: selectors.formLevelErrors(state),
-  formWarnings: selectors.formLevelWarnings(state)
+  isNewStep: selectors.isNewStepForm(state)
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

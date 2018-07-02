@@ -8,6 +8,7 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {getFormWarnings, getFormErrors} from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
+import type {RootState, OrderedStepsState} from './reducers'
 
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'

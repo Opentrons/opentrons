@@ -21,14 +21,15 @@ function _getPipetteName (pipetteData): string {
     const p = getPipette(pipetteModel)
     return p && (
       p.channels === pipetteData.channels &&
-      p.maxVolume === pipetteData.maxVolume
+      p.nominalMaxVolumeUl === pipetteData.maxVolume
     )
   })
   if (!result) {
     console.error('_getPipetteName: No name found for given pipette')
     return '???'
   }
-  return getPipette(result).displayName
+  const pipette = getPipette(result)
+  return pipette ? pipette.displayName : '???'
 }
 
 function _makePipetteOption (
