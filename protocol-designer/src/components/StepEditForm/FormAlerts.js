@@ -9,7 +9,6 @@ import {selectors as steplistSelectors} from '../../steplist'
 import {END_STEP} from '../../steplist/types'
 import {type StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning, FormWarningKey} from '../../steplist/formLevel'
-import Alerts from '../Alerts'
 import type {BaseState} from '../../types'
 
 type SP = {errors: Array<FormError>, warnings: Array<FormWarning>, _stepId: ?StepIdType | typeof END_STEP}

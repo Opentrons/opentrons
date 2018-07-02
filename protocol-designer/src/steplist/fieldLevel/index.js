@@ -74,4 +74,3 @@ export const hydrateField = (state: BaseState, name: StepFieldName, value: mixed
   const hydrator = get(StepFieldHelperMap, `${name}.hydrate`)
   return hydrator ? hydrator(state, value) : value
 }
-

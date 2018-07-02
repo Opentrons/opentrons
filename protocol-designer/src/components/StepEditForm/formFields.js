@@ -132,7 +132,6 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
             if (props.stepType === 'distribute') {
               const hydratedPipette = props.getHydratedPipette(e.currentTarget.value)
               if (hydratedPipette) {
-                hydratedPipette.maxVolume
                 props.updateDisposalVolume(hydratedPipette.maxVolume * DISPOSAL_PERCENTAGE)
               }
             }

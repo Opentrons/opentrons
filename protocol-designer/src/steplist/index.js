@@ -14,5 +14,5 @@ export {
   selectors,
   getFieldErrors,
   processField,
-  utils,
+  utils
 }

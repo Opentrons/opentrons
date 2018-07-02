@@ -46,7 +46,7 @@ export type FormErrorChecker = (mixed) => ?FormError
 ** Error Checkers **
 ********************/
 
-//TODO: real HydratedFormData type
+// TODO: real HydratedFormData type
 type HydratedFormData = any
 
 export const incompatibleLabware = (fields: HydratedFormData): ?FormError => {
@@ -76,14 +76,14 @@ export const wellRatioTransfer = (fields: HydratedFormData): ?FormError => {
 export const wellRatioDistribute = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
   if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length !== 1 && dispense_wells.length <= 1 ? FORM_ERRORS.WELL_RATIO_DISTRIBUTE: null
+  return aspirate_wells.length !== 1 && dispense_wells.length <= 1 ? FORM_ERRORS.WELL_RATIO_DISTRIBUTE : null
 }
 
 export const wellRatioConsolidate = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
   console.table({aspirate_wells, dispense_wells})
   if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length <= 1 || dispense_wells.length !== 1 ? FORM_ERRORS.WELL_RATIO_CONSOLIDATE: null
+  return aspirate_wells.length <= 1 || dispense_wells.length !== 1 ? FORM_ERRORS.WELL_RATIO_CONSOLIDATE : null
 }
 /*******************
 **     Helpers    **

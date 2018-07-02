@@ -26,7 +26,7 @@ const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?bool
     console.warn(`No pipette definition found for pipette ${pipetteModel}`)
     return null
   }
-  if (pipette.channels > 1){
+  if (pipette.channels > 1) {
     return FORMAT_METADATA[format].multichannelAccess
   } else {
     return true

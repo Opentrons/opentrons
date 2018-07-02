@@ -1,6 +1,4 @@
 // @flow
-import type {PipetteName} from './pipetteData'
-
 type UpdatePipettesPayload = {
   leftModel: ?string,
   rightModel: ?string,
