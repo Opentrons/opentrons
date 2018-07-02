@@ -111,9 +111,9 @@ def test_save_user_definition():
 
 
 def test_labware_create(dummy_db):
-    from opentrons import containers
+    from opentrons import labware
     lw_name = '15-well-plate'
-    if lw_name in containers.list():
+    if lw_name in labware.list():
         database.delete_container(lw_name)
     n_cols = 5
     n_rows = 3
@@ -122,7 +122,7 @@ def test_labware_create(dummy_db):
     diameter = 5
     height = 20
     volume = 3.14 * (diameter / 2.0)**2
-    res = containers.create(
+    res = labware.create(
         lw_name,
         (n_cols, n_rows),
         (col_space, row_space),
@@ -138,12 +138,14 @@ def test_labware_create(dummy_db):
         assert res[name].coordinates() == well.coordinates()
         for prop in ['height', 'diameter']:
             assert res[name].properties[prop] == well.properties[prop]
-    assert lw.well("C5").coordinates() == (
-        (n_cols - 1) * col_space, (n_rows - 1) * row_space, 0)
+    assert lw.well("B5").coordinates() == (
+        (n_cols - 1) * col_space, row_space, 0)
+    assert lw.well("C3").coordinates() == (
+        2 * col_space, 0, 0)
 
 
 def test_new_labware_create(split_labware_def):
-    from opentrons import containers
+    from opentrons import labware
     lw_name = '15-well-plate'
     n_cols = 5
     n_rows = 3
@@ -152,7 +154,7 @@ def test_new_labware_create(split_labware_def):
     diameter = 5
     height = 20
     volume = 3.14 * (diameter / 2.0)**2
-    res = containers.create(
+    res = labware.create(
         lw_name,
         (n_cols, n_rows),
         (col_space, row_space),
@@ -167,5 +169,7 @@ def test_new_labware_create(split_labware_def):
         assert res[name].coordinates() == well.coordinates()
         for prop in ['height', 'diameter']:
             assert res[name].properties[prop] == well.properties[prop]
-    assert lw.well("C5").coordinates() == (
-        (n_cols - 1) * col_space, (n_rows - 1) * row_space, 0)
+    assert lw.well("B5").coordinates() == (
+        (n_cols - 1) * col_space, row_space, 0)
+    assert lw.well("C3").coordinates() == (
+        2 * col_space, 0, 0)

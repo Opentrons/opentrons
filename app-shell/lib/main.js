@@ -19,7 +19,7 @@ log.debug('App config', {
 })
 
 if (config.devtools) {
-  require('electron-debug')({showDevTools: true})
+  require('electron-debug')({enabled: true, showDevTools: true})
 }
 
 // hold on to references so they don't get garbage collected
@@ -36,9 +36,7 @@ function startUp () {
   rendererLogger = createRendererLogger()
 
   initializeMenu()
-
   initializeApiUpdate()
-    .catch((error) => log.error('Initialize API update module error', error))
 
   // wire modules to UI dispatches
   const dispatch = (action) => {

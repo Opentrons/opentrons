@@ -7,3 +7,13 @@
 .file_page section {
   margin: 0 2.5rem;
 }
+
+.button_row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.update_button {
+  width: 8rem;
+  align-self: flex-start;
+}

@@ -69,6 +69,16 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  test('Modal renders correctly with optional heading', () => {
+    const tree = Renderer.create(
+      <Modal onCloseClick={() => {}} className='foo' heading={'Heading Visible'}>
+        children
+      </Modal>
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
   test('AlertModal renders correctly', () => {
     const tree = Renderer.create(
       <AlertModal

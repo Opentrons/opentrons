@@ -1,38 +1,25 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {Link} from 'react-router-dom'
 
+import type {State} from '../../types'
 import {PrimaryButton} from '@opentrons/components'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 
 import {selectors as robotSelectors} from '../../robot'
 
-type StateProps = {
+type SP = {
   done: boolean,
-  _button: ?{
-    href: string,
-    text: string
-  }
+  buttonText: string,
 }
 
-type DispatchProps = {
-  dispatch: Dispatch<*>
-}
+type Props = SP
 
-type RemoveTipProps = {
-  done: boolean,
-  button: ?{
-    text: string,
-    onClick: () => void
-  }
-}
+export default connect(mapStateToProps)(RemoveTipPanel)
 
-export default connect(mapStateToProps, null, mergeProps)(RemoveTipPanel)
-
-function RemoveTipPanel (props: RemoveTipProps) {
-  const {done, button} = props
+function RemoveTipPanel (props: Props) {
+  const {done, buttonText} = props
 
   return (
     <CalibrationInfoContent leftChildren={(
@@ -41,55 +28,21 @@ function RemoveTipPanel (props: RemoveTipProps) {
         {done && (
           <p>Replace trash bin on top of tip probe before continuing</p>
         )}
-        {button && (
-          <PrimaryButton onClick={button.onClick}>
-            {button.text}
-          </PrimaryButton>
-        )}
-        {!button && (
-          <p>
-            Your protocol is ready to run!
-          </p>
-        )}
+        {/* redirect for next pipette or labware lives in /calibrate */}
+        <PrimaryButton Component={Link} to='/calibrate'>
+          {buttonText}
+        </PrimaryButton>
       </div>
     )} />
   )
 }
 
-function mapStateToProps (state): StateProps {
+function mapStateToProps (state: State): SP {
   const instruments = robotSelectors.getInstruments(state)
-  const nextLabware = robotSelectors.getNextLabware(state)
   const nextInstrument = instruments.find((inst) => !inst.probed)
+  const buttonText = nextInstrument
+    ? 'Continue to next pipette'
+    : 'Continue to labware setup'
 
-  let _button = null
-
-  if (nextInstrument) {
-    _button = {
-      href: `/calibrate/instruments/${nextInstrument.mount}`,
-      text: 'Continue to Next Pipette'
-    }
-  } else if (nextLabware) {
-    _button = {
-      href: `/calibrate/labware/${nextLabware.slot}`,
-      text: 'Continue to Labware setup'
-    }
-  }
-
-  return {_button, done: nextInstrument == null}
-}
-
-function mergeProps (
-  stateProps: StateProps,
-  dispatchProps: DispatchProps
-): RemoveTipProps {
-  const {done, _button} = stateProps
-  const {dispatch} = dispatchProps
-
-  return {
-    done,
-    button: _button && {
-      text: _button.text,
-      onClick: () => dispatch(push(_button.href))
-    }
-  }
+  return {buttonText, done: nextInstrument == null}
 }

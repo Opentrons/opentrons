@@ -10,6 +10,7 @@ type UrlProtocol = 'file:' | 'http:'
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type Config = {
   devtools: boolean,
+  modules: boolean,
 
   // logging config
   log: {
@@ -84,4 +85,19 @@ export function configReducer (
 
 export function getConfig (state: State): Config {
   return state.config
+}
+
+export function getDevToolsOn (state: State): boolean {
+  return state.config.devtools
+}
+
+export function getModulesOn (state: State): boolean {
+  return state.config.modules
+}
+
+export function toggleDevTools (): Action {
+  return (dispatch, getState) => {
+    const devToolsOn = getDevToolsOn(getState())
+    return dispatch(updateConfig('devtools', !devToolsOn))
+  }
 }

@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "trough-12row"
+    "name": "trough-12row",
+    "format": "trough",
+    "displayCategory": "trough"
   },
   "ordering": [
     [

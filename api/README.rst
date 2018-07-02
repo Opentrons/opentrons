@@ -2,12 +2,12 @@
 Opentrons API
 =============
 
-.. image:: https://travis-ci.org/OpenTrons/opentrons-api.svg?branch=master
-   :target: https://travis-ci.org/OpenTrons/opentrons-api
+.. image:: https://travis-ci.org/Opentrons/opentrons.svg?branch=edge
+   :target: https://travis-ci.org/Opentrons/opentrons
    :alt: Build Status
 
-.. image:: https://coveralls.io/repos/github/OpenTrons/opentrons-api/badge.svg?branch=master
-   :target: https://coveralls.io/github/OpenTrons/opentrons-api?branch=master
+.. image:: https://coveralls.io/repos/github/Opentrons/opentrons/badge.svg?branch=edge
+   :target: https://coveralls.io/github/Opentrons/opentrons?branch=edge
    :alt: Coverage Status
 
 .. _Full API Documentation: http://docs.opentrons.com

@@ -13,6 +13,8 @@ export type ButtonProps = {
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
   disabled?: ?boolean,
+  /** use hover style even when not hovered */
+  hover?: ?boolean,
   /** optional Icon name */
   iconName?: IconName,
   /** classes to apply */
@@ -40,7 +42,8 @@ const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
  * ```
  */
 export default function Button (props: ButtonProps) {
-  const {title, disabled, className} = props
+  const {title, disabled, hover} = props
+  const className = cx(props.className, {[styles.hover]: hover})
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
   const type = props.type || 'button'

@@ -21,7 +21,6 @@ import type {
 } from './types'
 
 import type {StepIdType} from '../form-types'
-import type {RobotStateTimeline} from '../file-data/selectors'
 import {
   consolidate,
   distribute,
@@ -30,7 +29,8 @@ import {
 } from '../step-generation'
 
 import type {
-  AspirateDispenseArgs
+  AspirateDispenseArgs,
+  Timeline
   // CommandCreator
 } from '../step-generation'
 
@@ -62,7 +62,7 @@ function transferLikeSubsteps (args: {
   prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: RobotStateTimeline
+  robotStateTimeline: Timeline
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
@@ -88,7 +88,11 @@ function transferLikeSubsteps (args: {
   const robotState = (
     robotStateTimeline.timeline[prevStepId] &&
     robotStateTimeline.timeline[prevStepId].robotState
-  ) || robotStateTimeline.robotState
+  )
+
+  if (!robotState) {
+    return null
+  }
 
   // if false, show aspirate vol instead
   const showDispenseVol = validatedForm.stepType === 'distribute'
@@ -239,7 +243,7 @@ function commandToMultiRows (
 
   return range(channels).map(channel => {
     const well = wellsForTips[channel]
-    const ingreds = getIngreds(labwareId, command.params.well)
+    const ingreds = getIngreds(labwareId, well)
     const volume = command.params.volume
 
     if (command.command === 'aspirate') {
@@ -285,7 +289,7 @@ export function generateSubsteps (
   allLabwareTypes: AllLabwareTypes,
   namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
   orderedSteps: Array<StepIdType>,
-  robotStateTimeline: RobotStateTimeline
+  robotStateTimeline: Timeline
 ): SubSteps {
   return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
     const validatedForm = valForm.validatedForm
@@ -315,7 +319,7 @@ export function generateSubsteps (
     ) {
       const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
       const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-      // TODO SOON Ian 2018-05-17 all transferlikes will use this fn in next PR
+
       return transferLikeSubsteps({
         validatedForm,
         allPipetteData,

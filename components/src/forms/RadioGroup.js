@@ -7,7 +7,7 @@ import styles from './forms.css'
 
 type Props = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<>) => mixed,
+  onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data */
@@ -25,6 +25,7 @@ type Props = {
 
 export default function RadioGroup (props: Props) {
   const error = props.error != null
+
   return (
     <div className={cx({[styles.inline]: props.inline, [styles.error]: error})}>
       {props.options && props.options.map(radio =>

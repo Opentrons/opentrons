@@ -1,7 +1,7 @@
 {
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenTrons/opentrons.git"
+    "url": "https://github.com/Opentrons/opentrons.git"
   },
   "author": {
     "name": "Opentrons Labworks",
@@ -9,19 +9,18 @@
   },
   "name": "protocol-designer",
   "private": true,
-  "version": "3.1.2",
+  "version": "3.2.0-beta.3",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "bugs": {
-    "url": "https://github.com/OpenTrons/opentrons/issues"
+    "url": "https://github.com/Opentrons/opentrons/issues"
   },
-  "homepage": "https://github.com/OpenTrons/opentrons",
+  "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.1.2",
+    "@opentrons/components": "3.2.0-beta.3",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
-    "normalize.css": "^7.0.0",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -34,11 +33,7 @@
     "reselect": "^3.0.1"
   },
   "devDependencies": {
-    "cross-env": "^5.1.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "shx": "^0.2.2",
-    "webpack": "^3.1.0",
-    "webpack-dev-server": "^2.5.1"
+    "flow-typed": "^2.4.0"
   }
 }

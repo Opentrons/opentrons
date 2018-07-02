@@ -10,7 +10,7 @@ type Props = React.ElementProps<typeof Card> & {
   /** a change in the watch prop will trigger a refresh */
   watch?: string,
   /** refreshing flag */
-  refreshing: boolean,
+  refreshing?: boolean,
   /** refresh function */
   refresh: () => mixed,
 }
@@ -26,13 +26,15 @@ export default class RefreshCard extends React.Component<Props> {
 
     return (
       <Card {...this.props}>
-        <IconButton
-          name={refreshing ? 'ot-spinner' : 'refresh'}
-          className={styles.refresh_card_icon}
-          spin={refreshing}
-          disabled={refreshing}
-          onClick={refresh}
-        />
+        {refreshing != null && (
+          <IconButton
+            name={refreshing ? 'ot-spinner' : 'refresh'}
+            className={styles.refresh_card_icon}
+            spin={refreshing}
+            disabled={refreshing}
+            onClick={refresh}
+          />
+        )}
         {children}
       </Card>
     )

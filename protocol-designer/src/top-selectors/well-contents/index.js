@@ -90,15 +90,15 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
 )
 
 export const lastValidWellContents: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
-  fileDataSelectors.robotStateTimeline,
-  (timelineFull) => {
+  fileDataSelectors.lastValidRobotState,
+  (robotState) => {
     return mapValues(
-      timelineFull.robotState.labware,
+      robotState.labware,
       (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
         return _wellContentsForLabware(
-          timelineFull.robotState.liquidState.labware[labwareId],
+          robotState.liquidState.labware[labwareId],
           labwareId,
-          timelineFull.robotState.labware[labwareId].type
+          robotState.labware[labwareId].type
         )
       }
     )
@@ -106,6 +106,7 @@ export const lastValidWellContents: Selector<{[labwareId: string]: AllWellConten
 )
 
 /** NamedIngred-formatted contents of wells, across all steps on the timeline */
+// TODO: Ian 2018-06-08 do not used NamedIngreds. Stay close to 'native' liquid state shape.
 export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = createSelector(
   allWellContentsForSteps,
   labwareIngredSelectors.getIngredientGroups,

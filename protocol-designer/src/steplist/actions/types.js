@@ -6,6 +6,6 @@ export type ChangeFormPayload = {
   // Accessor strings and values depend on StepType
   stepType?: string,
   update: {
-    [accessor: string]: string | boolean | Array<string> | null,
+    [accessor: string]: ?mixed // string | boolean | Array<string> | null,
   }
 }

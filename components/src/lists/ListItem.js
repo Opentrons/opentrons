@@ -14,6 +14,8 @@ type ListItemProps = {
   url?: string,
   /** if URL is specified NavLink can receive an active class name */
   activeClassName?: string,
+  /** if URL is specified NavLink can receive an exact property for matching routes */
+  exact?: boolean,
   /** Additional class name */
   className?: string,
   /** if disabled, the onClick handler / NavLink will be disabled */
@@ -28,7 +30,7 @@ type ListItemProps = {
  *
  */
 export default function ListItem (props: ListItemProps) {
-  const {url, isDisabled, iconName, activeClassName} = props
+  const {url, isDisabled, iconName, activeClassName, exact} = props
   const onClick = props.onClick && !isDisabled
     ? props.onClick
     : undefined
@@ -51,6 +53,7 @@ export default function ListItem (props: ListItemProps) {
           disabled={isDisabled}
           className={className}
           activeClassName={activeClassName}
+          exact={exact}
         >
           {itemIcon}
           {props.children}

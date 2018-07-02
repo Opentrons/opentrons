@@ -5,10 +5,8 @@ import {connect} from 'react-redux'
 import {getAnalyticsSeen, setAnalyticsSeen} from '../../analytics'
 
 import {Modal} from '@opentrons/components'
-import ModalTitle from './ModalTitle'
 import ModalButton from './ModalButton'
 import AnalyticsToggle from './AnalyticsToggle'
-import AnalyticsInfo from './AnalyticsInfo'
 
 import type {State, Dispatch} from '../../types'
 
@@ -36,12 +34,8 @@ function AnalyticsSettingsModal (props: Props) {
   const {setSeen} = props
 
   return (
-    <Modal onCloseClick={setSeen} alertOverlay>
-      <ModalTitle>
-        {TITLE}
-      </ModalTitle>
+    <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
       <AnalyticsToggle />
-      <AnalyticsInfo />
       <ModalButton onClick={setSeen}>
         {CONTINUE}
       </ModalButton>

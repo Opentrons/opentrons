@@ -11,46 +11,54 @@ import {
   restartRobotServer,
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
-  makeGetRobotRestartRequest
+  makeGetRobotRestartRequest,
+  setIgnoredUpdate
 } from '../../http-api-client'
 
 import {AlertModal, Icon} from '@opentrons/components'
 
-type OwnProps = Robot
+type OP = Robot
 
-type StateProps = {
+type SP = {
   availableUpdate: ?string,
   updateRequest: RobotServerUpdate,
-  restartRequest: RobotServerRestart
+  restartRequest: RobotServerRestart,
 }
 
-type DispatchProps = {
-  close: () => *,
-  update: () => *,
-  restart: () => *
-}
+type DP = {dispatch: Dispatch}
 
-type Props = StateProps & DispatchProps
+type Props = OP & SP & {
+  update: () => mixed,
+  restart: () => mixed,
+  ignoreUpdate: () => mixed,
+}
 
 const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
+const ALREADY_UPDATED_MSG = "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 const RESTART_MSG = 'Restart your robot to finish the update. It may take several minutes for your robot to restart.'
 const DONE_MSG = 'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
 
 // TODO(mc, 2018-03-19): prop or component for text-height icons
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(UpdateModal)
+export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
 
 function UpdateModal (props: Props) {
-  const {close, update, restart, updateRequest, restartRequest} = props
+  const {ignoreUpdate, update, restart, updateRequest, restartRequest} = props
   const availableUpdate = props.availableUpdate || ''
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
   let message
   let button
 
+  const heading = availableUpdate
+    ? `Version ${availableUpdate || ''} available`
+    : 'Robot is up to date'
+
   if (!updateRequest.response) {
-    message = UPDATE_MSG
+    message = availableUpdate
+      ? UPDATE_MSG
+      : ALREADY_UPDATED_MSG
     button = inProgress
       ? {disabled: true, children: (<Spinner />)}
       : {onClick: update, children: 'update'}
@@ -67,38 +75,43 @@ function UpdateModal (props: Props) {
 
   return (
     <AlertModal
-      onCloseClick={close}
-      heading={`Version ${availableUpdate || ''} Available`}
+      heading={heading}
       buttons={[
-        {onClick: close, children: closeButtonText},
+        {onClick: ignoreUpdate, children: closeButtonText},
         button
       ]}
+      alertOverlay
     >
       {message}
     </AlertModal>
   )
 }
 
-function makeMapStateToProps () {
+function makeMapStateToProps (): (State, OP) => SP {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
 
-  return (state: State, ownProps: OwnProps): StateProps => ({
+  return (state, ownProps) => ({
     availableUpdate: getAvailableRobotUpdate(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
     restartRequest: getRobotRestartRequest(state, ownProps)
   })
 }
 
-function mapDispatchToProps (
-  dispatch: Dispatch,
-  ownProps: OwnProps
-): DispatchProps {
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {availableUpdate} = stateProps
+  const {dispatch} = dispatchProps
+
   const close = () => dispatch(push(`/robots/${ownProps.name}`))
+  let ignoreUpdate = availableUpdate
+    ? () => dispatch(setIgnoredUpdate(ownProps, availableUpdate)).then(close)
+    : close
 
   return {
-    close,
+    ...stateProps,
+    ...ownProps,
+    ignoreUpdate,
     update: () => dispatch(updateRobotServer(ownProps)),
     restart: () => dispatch(restartRobotServer(ownProps)).then(close)
   }

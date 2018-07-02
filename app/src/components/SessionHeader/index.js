@@ -1,7 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
-import {TitleBar} from '@opentrons/components'
 
 import {
   selectors as robotSelectors
@@ -10,14 +9,10 @@ import {
 export default connect(mapStateToProps)(SessionHeader)
 
 function SessionHeader (props) {
-  const title = (
+  return (
     <Link to='/upload'>
       {props.sessionName}
     </Link>
-  )
-
-  return (
-    <TitleBar title={title} subtitle={props.subtitle} />
   )
 }
 

@@ -141,6 +141,9 @@ export default function calibrationReducer (
     case 'robot:SET_JOG_DISTANCE':
       return handleSetJogDistance(state, action)
 
+    case 'robot:REFRESH_SESSION':
+      return handleSession(state, action)
+
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)

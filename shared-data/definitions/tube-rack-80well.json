@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "tube-rack-80well"
+    "name": "tube-rack-80well",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

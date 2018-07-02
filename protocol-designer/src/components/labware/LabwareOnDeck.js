@@ -20,8 +20,7 @@ import {
   humanizeLabwareType,
   clickOutside
 } from '@opentrons/components'
-
-import {nonFillableContainers} from '../../constants'
+import {getLabware} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
@@ -60,20 +59,9 @@ function OccupiedDeckSlotOverlay ({
   )
 }
 
-// TODO HACK Ian 2018-05-23 this is a temporary workaround until we use SVG tip racks
-const IMG_TIP_RACK_10UL = require('../../images/labware/10 uL Tip Rack.png')
-const IMG_TIP_RACK_GENERIC = require('../../images/labware/Tip Rack.png')
+// Including a labware type in `labwareImages` will use that image instead of an SVG
 const IMG_TRASH = require('../../images/labware/Trash.png')
-const FALLBACK_IMG = IMG_TIP_RACK_GENERIC // TODO LATER OR NEVER Ian 2018-04-23 better fallback img?
 const labwareImages = {
-  'tiprack-10ul': IMG_TIP_RACK_10UL,
-
-  'tiprack-200ul': IMG_TIP_RACK_GENERIC,
-  'GEB-tiprack-300ul': IMG_TIP_RACK_GENERIC,
-
-  'tiprack-1000ul': IMG_TIP_RACK_GENERIC,
-  'tiprack-1000ul-chem': IMG_TIP_RACK_GENERIC,
-
   'trash-box': IMG_TRASH
 }
 
@@ -88,15 +76,14 @@ function SlotWithContainer (props: SlotWithContainerProps) {
 
   return (
     <g>
-      {nonFillableContainers.includes(containerType)
-        ? <image // TODO do real styles and maybe get SVG landscape images
-          href={labwareImages[containerType] || FALLBACK_IMG}
+      {labwareImages[containerType]
+        ? <image
+          href={labwareImages[containerType]}
           width={SLOT_WIDTH} height={SLOT_HEIGHT}
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
       <ContainerNameOverlay title={displayName || humanizeLabwareType(containerType)} />
-      {/* TODO NEXT Ian 2018-05-25 support disambiguation number '96 Flat (1)' */}
     </g>
   )
 }
@@ -172,7 +159,14 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
 
   const slotIsOccupied = !!containerType
 
-  const canAddIngreds = !showNameOverlay && !nonFillableContainers.includes(containerType)
+  let canAddIngreds: boolean = !showNameOverlay
+
+  // labware definition's metadata.isValueSource defaults to true,
+  // only use it when it's defined as false
+  const labwareInfo = getLabware(containerType)
+  if (!labwareInfo || labwareInfo.metadata.isValidSource === false) {
+    canAddIngreds = false
+  }
 
   const setDefaultLabwareName = () => modifyContainer({
     containerId,

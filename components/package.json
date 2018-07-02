@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "3.1.2",
+  "version": "3.2.0-beta.3",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",
@@ -15,16 +15,13 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "devDependencies": {
-    "cross-env": "^5.1.1",
     "flow-bin": "^0.66.0",
-    "flow-typed": "^2.4.0",
-    "react-styleguidist": "^6.1.0",
-    "shx": "^0.2.2"
+    "flow-typed": "^2.4.0"
   },
   "peerDependencies": {
-    "react": "^16.2.0",
-    "react-router-dom": "^4.2.2",
     "classnames": "^2.2.5",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "react": "^16.2.0",
+    "react-router-dom": "^4.2.2"
   }
 }

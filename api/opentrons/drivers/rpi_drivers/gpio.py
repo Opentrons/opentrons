@@ -129,9 +129,9 @@ def set_low(pin):
 
 def read(pin):
     """
-    Reads a pin's value. This pin must have been previously initialized
-    and set up as with direction of IN, otherwise this operation will not
-    behave as expected.
+    Reads a pin's value. If the pin has been previously initialized with
+    a direction of IN, the value will be the input signal. If pin is configured
+    as OUT, the value will be the current output state.
 
     :param pin: An integer corresponding to the GPIO number of the pin in RPi
       GPIO board numbering (not physical pin numbering)

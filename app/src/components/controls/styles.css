@@ -1,0 +1,63 @@
+@import '@opentrons/components';
+
+:root {
+  --mw-labeled-toggle: 25rem;
+}
+
+/* Toggle Button */
+.toggled_on {
+  fill: #0ec9eb;
+  color: #0ec9eb;
+}
+
+.toggled_off {
+  fill: var(--c-dark-gray);
+}
+
+.labeled_control_wrapper {
+  width: 100%;
+}
+
+.labeled_control {
+  display: block;
+}
+
+label.labeled_control {
+  @apply --clickable;
+}
+
+.labeled_control_label {
+  @apply --font-body-1-dark;
+
+  max-width: var(--mw-labeled-toggle);
+  display: inline-block;
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_toggle_button {
+  float: right;
+  width: 2rem;
+  margin-right: 1rem;
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.labeled_button {
+  float: right;
+  width: 7.5rem;
+  margin-top: 0.25rem;
+}
+
+.control_info {
+  @apply --font-body-1-dark;
+
+  max-width: var(--mw-labeled-toggle);
+
+  & > p {
+    margin: 0.375rem 0 0.625rem;
+    line-height: 1.5;
+  }
+}

@@ -64,7 +64,8 @@ type FormState = FormData | null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 const unsavedForm = handleActions({
   CHANGE_FORM_INPUT: (state: FormState, action: ChangeFormInputAction) => {
-    // $FlowFixMe TODO IMMEDIATELY
+    // TODO: Ian 2018-06-14 type properly
+    // $FlowFixMe
     return {
       ...state,
       ...action.payload.update
@@ -229,11 +230,13 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
-// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
-const formData = createSelector(
+const getUnsavedForm = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedForm
 )
+// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
+// NOTE: DEPRECATED use getUnsavedForm instead
+const formData = getUnsavedForm
 
 const formModalData = createSelector(
   rootSelector,
@@ -330,6 +333,12 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
       }
     }, {})
   }
+)
+
+const isNewStepForm = createSelector(
+  formData,
+  getSavedForms,
+  (formData, savedForms) => !!(formData && formData.id && !savedForms[formData.id])
 )
 
 /** True if app is in Deck Setup Mode. */
@@ -429,6 +438,7 @@ const nextStepId: Selector<number> = createSelector( // generates the next step 
   }
 )
 
+// TODO: remove this when we add in form level validation
 const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state: BaseState) => {
   const form = formData(state)
   return form && validateAndProcessForm(form).errors // TODO refactor selectors
@@ -512,10 +522,12 @@ export const selectors = {
   hoveredOrSelectedStepId,
   getHoveredSubstep,
   selectedStepFormData: selectedStepFormDataSelector,
-  formData,
+  getUnsavedForm,
+  formData, // TODO: remove after sunset
   formModalData,
   nextStepId,
   validatedForms,
+  isNewStepForm,
   currentFormErrors,
   formSectionCollapse: formSectionCollapseSelector,
   deckSetupMode,

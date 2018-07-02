@@ -1,30 +1,41 @@
 // @flow
-import { connect } from 'react-redux'
+import * as React from 'react'
+import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
-import { closeLabwareSelector, createContainer } from '../labware-ingred/actions'
-import { selectors } from '../labware-ingred/reducers'
+import {closeLabwareSelector, createContainer} from '../labware-ingred/actions'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as pipetteSelectors} from '../pipettes'
 import LabwareDropdown from '../components/LabwareDropdown.js'
 import type {BaseState} from '../types'
 
-export default connect(
-  (state: BaseState) => ({
-    slot: selectors.canAdd(state)
-  }),
-  (dispatch: Dispatch<*>) => ({dispatch}), // TODO Ian 2018-02-19 what does flow want for no-op mapDispatchToProps?
-  (stateProps, dispatchProps: {dispatch: Dispatch<*>}) => {
-    // TODO Ian 2017-12-04: Use thunks to grab slot, don't use this funky mergeprops
-    const dispatch = dispatchProps.dispatch
+type Props = React.ElementProps<typeof LabwareDropdown>
 
-    return {
-      ...stateProps,
-      onClose: () => {
-        dispatch(closeLabwareSelector())
-      },
-      onContainerChoose: (containerType) => {
-        if (stateProps.slot) {
-          dispatch(createContainer({slot: stateProps.slot, containerType}))
-        }
+type SP = {
+  slot: $PropertyType<Props, 'slot'>,
+  permittedTipracks: $PropertyType<Props, 'permittedTipracks'>
+}
+
+function mapStateToProps (state: BaseState): SP {
+  return {
+    slot: labwareIngredSelectors.canAdd(state),
+    permittedTipracks: pipetteSelectors.permittedTipracks(state)
+  }
+}
+
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const dispatch = dispatchProps.dispatch
+
+  return {
+    ...stateProps,
+    onClose: () => {
+      dispatch(closeLabwareSelector())
+    },
+    onContainerChoose: (containerType) => {
+      if (stateProps.slot) {
+        dispatch(createContainer({slot: stateProps.slot, containerType}))
       }
     }
   }
-)(LabwareDropdown)
+}
+
+export default connect(mapStateToProps, null, mergeProps)(LabwareDropdown)

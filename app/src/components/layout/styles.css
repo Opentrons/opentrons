@@ -1,0 +1,27 @@
+/* stylesheet for Card layout components */
+@import '@opentrons/components';
+
+:root {
+  --card_spacing: 0.75rem;
+}
+
+.card_container {
+  overflow-y: auto;
+  padding: calc(2 * var(--card_spacing));
+  padding-bottom: 0;
+}
+
+.row {
+  width: 100%;
+  margin-bottom: var(--card_spacing);
+}
+
+.column_50 {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(50% - (0.5 * var(--card_spacing)));
+
+  &:not(:last-child) {
+    margin-right: var(--card_spacing);
+  }
+}

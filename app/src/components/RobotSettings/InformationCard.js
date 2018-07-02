@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {
-  fetchHealth,
+  fetchHealthAndIgnored,
   makeGetRobotHealth,
   makeGetAvailableRobotUpdate,
   type RobotHealth
@@ -25,7 +25,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  fetchHealth: () => *
+  fetchHealth: () => mixed
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -52,7 +52,6 @@ function InformationCard (props: Props) {
   const updateText = availableUpdate
     ? 'Update'
     : 'Updated'
-
   return (
     <RefreshCard
       watch={name}
@@ -75,7 +74,6 @@ function InformationCard (props: Props) {
       <OutlineButton
         Component={Link}
         to={updateUrl}
-        disabled={!availableUpdate}
       >
         {updateText}
       </OutlineButton>
@@ -98,6 +96,6 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   return {
-    fetchHealth: () => dispatch(fetchHealth(ownProps))
+    fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps))
   }
 }

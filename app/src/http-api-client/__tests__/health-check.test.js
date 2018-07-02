@@ -1,6 +1,7 @@
 // health check tests
 import {actions as robotActions} from '../../robot'
 import {__mockThunk, fetchHealth} from '../health'
+
 import {
   reducer,
   startHealthCheck,

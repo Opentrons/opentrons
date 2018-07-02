@@ -9,7 +9,6 @@ import {actions as robotActions, type Robot} from '../../robot'
 import {
   fetchWifiList,
   configureWifi,
-  setConfigureWifiBody,
   clearConfigureWifiResponse,
   makeGetRobotWifiList,
   makeGetRobotWifiConfigure,
@@ -30,11 +29,10 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  fetchList: () => *,
-  configure: () => *,
-  setConfigureBody: ({['ssid' | 'psk']: string}) => *,
-  clearSuccessfulConfigure: () => *,
-  clearFailedConfigure: () => *
+  fetchList: () => mixed,
+  configure: (?string, ?string) => mixed,
+  clearSuccessfulConfigure: () => mixed,
+  clearFailedConfigure: () => mixed,
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -53,7 +51,6 @@ function ConnectivityCard (props: Props) {
     wired,
     name,
     fetchList,
-    setConfigureBody,
     clearSuccessfulConfigure,
     clearFailedConfigure,
     configure,
@@ -63,23 +60,26 @@ function ConnectivityCard (props: Props) {
     },
     configureRequest: {
       inProgress: configInProgress,
-      request: configRequest,
       response: configResponse,
       error: configError
     }
   } = props
 
-  const credentials = configRequest || {ssid: '', psk: ''}
   const list = (listResponse && listResponse.list) || []
 
   const active = list.find((network) => network.active)
+  const activeSsid = active && active.ssid
+  const connectedBy = wired
+    ? 'USB'
+    : `${activeSsid || ''} (WiFi)`
+
   const listOptions = list.map(({active, ssid}) => ({
-    name: (active ? `${ssid} *` : ssid),
+    name: active ? `${ssid} *` : ssid,
     value: ssid
   }))
 
   return (
-    <div>
+    <React.Fragment>
       <RefreshCard
         watch={name}
         refresh={fetchList}
@@ -89,29 +89,27 @@ function ConnectivityCard (props: Props) {
       >
         <LabeledValue
           label={CONNECTED_BY_LABEL}
-          value={`${wired ? 'USB' : 'WiFi'} - ${ip}`}
+          value={`${connectedBy} - ${ip}`}
         />
         <WifiConnectForm
-          disabled={!wired || configInProgress}
-          ssid={credentials.ssid}
-          psk={credentials.psk}
-          activeSsid={active && active.ssid}
+          key={name}
+          disabled={configInProgress}
+          activeSsid={activeSsid}
           networks={listOptions}
-          onChange={setConfigureBody}
           onSubmit={configure}
         />
       </RefreshCard>
       {(!!configError || !!configResponse) && (
         <WifiConnectModal
-          onClose={(configError
+          error={configError}
+          response={configResponse}
+          close={(configError
             ? clearFailedConfigure
             : clearSuccessfulConfigure
           )}
-          error={configError}
-          response={configResponse}
         />
       )}
-    </div>
+    </React.Fragment>
   )
 }
 
@@ -130,11 +128,7 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   const fetchList = () => dispatch(fetchWifiList(ownProps))
-  const configure = () => dispatch(configureWifi(ownProps))
-
-  const setConfigureBody = (update) => {
-    dispatch(setConfigureWifiBody(ownProps, update))
-  }
+  const configure = (ssid, psk) => dispatch(configureWifi(ownProps, ssid, psk))
 
   // TODO(mc, 2018-02-26): handle refreshing the list and kicking off dispatch
   //   more elegantly and closer to the configure response
@@ -147,7 +141,6 @@ function mapDispatchToProps (
   return {
     fetchList,
     configure,
-    setConfigureBody,
     clearSuccessfulConfigure,
     clearFailedConfigure
   }

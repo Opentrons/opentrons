@@ -7,21 +7,19 @@ import {TitleBar, humanizeLabwareType} from '@opentrons/components'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 
 import {selectors, type Page} from '../navigation'
 import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
-
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-
 type SP = $Diff<Props, DP> & {_page: Page}
 
 function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
-  // TODO: Ian 2018-02-22 fileName from file
-  const fileName = 'Protocol Name'
+  const fileName = fileDataSelectors.protocolName(state)
 
   switch (_page) {
     case 'file-splash':

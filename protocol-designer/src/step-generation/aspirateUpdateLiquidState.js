@@ -1,9 +1,17 @@
 // @flow
 import range from 'lodash/range'
-import {mergeLiquid, splitLiquid, getWellsForTips} from './utils'
-import type {RobotState, PipetteData, SingleLabwareLiquidState} from './'
+import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
+import * as warningCreators from './warningCreators'
+import type {
+  RobotState,
+  PipetteData,
+  SingleLabwareLiquidState,
+  CommandCreatorWarning
+} from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
+
+type LiquidStateAndWarnings = {liquidState: LiquidState, warnings: Array<CommandCreatorWarning>}
 
 export default function updateLiquidState (
   args: {
@@ -15,30 +23,42 @@ export default function updateLiquidState (
     well: string
   },
   prevLiquidState: LiquidState
-) {
+): LiquidStateAndWarnings {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
   const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
-  const pipetteLiquidState: SingleLabwareLiquidState = range(pipetteData.channels).reduce(
-    (acc: SingleLabwareLiquidState, tipIndex) => {
+  type PipetteLiquidStateAcc = {
+    pipetteLiquidState: SingleLabwareLiquidState,
+    pipetteWarnings: Array<CommandCreatorWarning>
+  }
+  const {pipetteLiquidState, pipetteWarnings} = range(pipetteData.channels).reduce(
+    (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
       const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
+      const nextWarnings = []
 
       const newLiquidFromWell = splitLiquid(
         volume,
         prevSourceLiquidState
       ).dest
 
-      return {
-        ...acc,
-        [tipIndex]: mergeLiquid(
-          prevTipLiquidState,
-          newLiquidFromWell
-        )
+      if (volume > totalVolume(prevSourceLiquidState)) {
+        nextWarnings.push(warningCreators.aspirateMoreThanWellContents())
       }
-    }, {})
+
+      return {
+        pipetteLiquidState: {
+          ...acc.pipetteLiquidState,
+          [tipIndex]: mergeLiquid(
+            prevTipLiquidState,
+            newLiquidFromWell
+          )
+        },
+        pipetteWarnings: [...acc.pipetteWarnings, ...nextWarnings]
+      }
+    }, {pipetteLiquidState: {}, pipetteWarnings: []})
 
   // Remove liquid from source well(s)
   const labwareLiquidState: SingleLabwareLiquidState = {
@@ -65,5 +85,8 @@ export default function updateLiquidState (
     }
   }
 
-  return nextLiquidState
+  return {
+    liquidState: nextLiquidState,
+    warnings: pipetteWarnings
+  }
 }

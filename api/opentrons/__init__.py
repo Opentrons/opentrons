@@ -234,18 +234,15 @@ class InstrumentsWrapper(object):
         return p
 
     def _retrieve_version_number(self, mount, expected_model_substring):
-        # pass a default pipette model-version, for when robot is simulating
-        # this allows any pipette to be simulated, regardless of what is
-        # actually attached/cached on the robot's mounts
-        default_model = expected_model_substring + '_v1'  # default to v1
-        if robot.is_simulating():
-            return default_model
-
         attached_model = robot.get_attached_pipettes()[mount]['model']
+
         if attached_model and expected_model_substring in attached_model:
             return attached_model
         else:
-            return default_model
+            # pass a default pipette model-version for when robot is simulating
+            # this allows any pipette to be simulated, regardless of what is
+            # actually attached/cached on the robot's mounts
+            return expected_model_substring + '_v1'  # default to v1
 
 
 instruments = InstrumentsWrapper(robot)
