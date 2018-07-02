@@ -18,7 +18,7 @@ export default function PipetteTabs (props: Props) {
 
   const pages = robotConstants.INSTRUMENT_MOUNTS.map((mount) => ({
     title: mount,
-    href: `/calibrate/instruments/${mount}`,
+    href: `./${mount}`,
     isActive: currentInstrument != null && mount === currentInstrument.mount,
     isDisabled: !instruments.some((inst) => inst.mount === mount)
   }))

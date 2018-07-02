@@ -31,7 +31,7 @@ function CalibratePipettesPage (props: Props) {
   const {instruments, currentInstrument, match: {url, params}} = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
-  // redirect back to /calibrate/instruments if mount doesn't exist
+  // redirect back to mountless route if mount doesn't exist
   if (params.mount && !currentInstrument) {
     return (<Redirect to={url.replace(`/${params.mount}`, '')} />)
   }
