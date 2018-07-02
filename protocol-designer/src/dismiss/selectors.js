@@ -1,6 +1,12 @@
 // @flow
 import {createSelector} from 'reselect'
-import {selectors as fileDataSelectors} from '../file-data'
+
+// TODO: Ian 2018-07-02 split apart file-data concerns to avoid circular dependencies
+// Eg, right now if you import {selectors as fileDataSelectors} from '../file-data',
+// PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
+// imports getDismissedWarnings selector from 'dismiss/
+import {warningsPerStep} from '../file-data/selectors/commands'
+
 import {selectors as steplistSelectors} from '../steplist'
 import type {BaseState, Selector} from '../types'
 import type {CommandCreatorWarning} from '../step-generation'
@@ -8,7 +14,7 @@ import type {RootState, DismissedWarningState} from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 
-const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
+export const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
   rootSelector,
   s => s.dismissedWarnings
 )
@@ -17,7 +23,7 @@ type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
 /** Non-dismissed warnings for each step */
 export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   getDismissedWarnings,
-  fileDataSelectors.warningsPerStep,
+  warningsPerStep,
   steplistSelectors.orderedSteps,
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
     return orderedSteps.reduce(

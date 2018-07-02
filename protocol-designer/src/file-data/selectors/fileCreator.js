@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
+import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../steplist/reducers'
 import type {BaseState} from '../../types'
@@ -17,6 +18,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   fileMetadata,
   getInitialRobotState,
   robotStateTimeline,
+  dismissSelectors.getDismissedWarnings,
   ingredSelectors.getIngredientGroups,
   ingredSelectors.getIngredientLocations,
   steplistSelectors.getSavedForms,
@@ -25,6 +27,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     fileMetadata,
     initialRobotState,
     _robotStateTimeline,
+    dismissedWarnings,
     ingredients,
     ingredLocations,
     savedStepForms,
@@ -73,7 +76,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
             initialRobotState.instruments,
             (p: PipetteData): ?string => p.tiprackModel
           ),
-          // TODO IMMEDIATELY add dismissedWarnings after PR merge & rebase
+          dismissedWarnings,
           ingredients,
           ingredLocations,
           savedStepForms,
