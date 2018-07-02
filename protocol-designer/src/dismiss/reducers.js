@@ -8,7 +8,7 @@ import type {BaseState} from '../types'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {DeleteStepAction} from '../steplist/actions'
 
-export type DismissedWarningState = {[stepId: number]: Array<CommandCreatorWarning>}
+export type DismissedWarningState = {[stepId: number]: ?Array<CommandCreatorWarning>}
 const dismissedWarnings = handleActions({
   DISMISS_WARNING: (
     state: DismissedWarningState,

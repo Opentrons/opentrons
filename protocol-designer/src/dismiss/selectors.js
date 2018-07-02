@@ -15,7 +15,7 @@ const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
 
 type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
 /** Non-dismissed warnings for each step */
-export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
+export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   getDismissedWarnings,
   fileDataSelectors.warningsPerStep,
   steplistSelectors.orderedSteps,
@@ -26,13 +26,11 @@ export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
         if (!warningsForStep) return stepAcc
         const result = warningsForStep.reduce(
         (warningAcc: Array<CommandCreatorWarning>, warning: CommandCreatorWarning) => {
-          const dismissedWarningsForStep = dismissedWarnings[stepId]
+          const dismissedWarningsForStep = dismissedWarnings[stepId] || []
           // warnings match when their `type` is the same.
           // their `message` doesn't matter.
-          const isDismissed = dismissedWarningsForStep
-            ? dismissedWarningsForStep.some(dismissedWarning =>
+          const isDismissed = dismissedWarningsForStep.some(dismissedWarning =>
               dismissedWarning.type === warning.type)
-            : false
 
           return isDismissed
             ? warningAcc
@@ -47,8 +45,8 @@ export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   }
 )
 
-export const getWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
-  getWarningsPerStep,
+export const getVisibleWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
+  getVisibleWarningsPerStep,
   steplistSelectors.selectedStepId,
   (warningsPerStep, stepId) =>
     (typeof stepId === 'number' && warningsPerStep[stepId]) || []

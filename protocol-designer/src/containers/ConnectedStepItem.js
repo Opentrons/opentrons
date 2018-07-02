@@ -45,8 +45,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selected = steplistSelectors.selectedStepId(state) === stepId
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
-  // Non-dismissed warnings
-  const warnings = dismissSelectors.getWarningsPerStep(state)[stepId]
+  const warnings = dismissSelectors.getVisibleWarningsPerStep(state)[stepId]
   const hasWarnings = warnings && warnings.length > 0
 
   const showErrorState = hasError || hasWarnings

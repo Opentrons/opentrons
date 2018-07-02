@@ -65,7 +65,7 @@ function Alerts (props: Props) {
 function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.robotStateTimeline(state)
   const errors = timeline.errors || []
-  const warnings = dismissSelectors.getWarningsForSelectedStep(state)
+  const warnings = dismissSelectors.getVisibleWarningsForSelectedStep(state)
   const _stepId: any = steplistSelectors.selectedStepId(state) // TODO: Ian 2018-07-02 type properly once stepId is always string type
 
   return {
