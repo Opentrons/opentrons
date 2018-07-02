@@ -24,7 +24,6 @@
   min-height: 100%;
 
   /* override default modal top/bottom to allow scroll */
-  top: auto;
   bottom: auto;
 
   & form > * {
