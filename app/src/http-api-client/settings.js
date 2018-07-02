@@ -83,22 +83,12 @@ export function settingsReducer (
   state: SettingsState = {},
   action: Action
 ): SettingsState {
-  let name
-  let path
-  let request
-  let response
-  let error
-  let stateByName
-  let stateByPath
-
   switch (action.type) {
-    case 'api:REQUEST':
-      path = action.payload.path
+    case 'api:REQUEST': {
+      const {payload: {path, request, robot: {name}}} = action
       if (path !== SETTINGS_PATH) return state
-      name = action.payload.robot.name
-      request = action.payload.request
-      stateByName = state[name] || {}
-      stateByPath = stateByName[path] || {}
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
@@ -107,14 +97,13 @@ export function settingsReducer (
           [path]: {...stateByPath, request, inProgress: true, error: null}
         }
       }
+    }
 
-    case 'api:SUCCESS':
-      path = action.payload.path
+    case 'api:SUCCESS': {
+      const {payload: {path, response, robot: {name}}} = action
       if (path !== SETTINGS_PATH) return state
-      name = action.payload.robot.name
-      response = action.payload.response
-      stateByName = state[name] || {}
-      stateByPath = stateByName[path] || {}
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
@@ -123,14 +112,13 @@ export function settingsReducer (
           [path]: {...stateByPath, response, inProgress: false, error: null}
         }
       }
+    }
 
-    case 'api:FAILURE':
-      path = action.payload.path
+    case 'api:FAILURE': {
+      const {payload: {path, error, robot: {name}}} = action
       if (path !== SETTINGS_PATH) return state
-      name = action.payload.robot.name
-      error = action.payload.error
-      stateByName = state[name] || {}
-      stateByPath = stateByName[path] || {}
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
@@ -139,6 +127,7 @@ export function settingsReducer (
           [path]: {...stateByPath, error, inProgress: false}
         }
       }
+    }
   }
 
   return state
