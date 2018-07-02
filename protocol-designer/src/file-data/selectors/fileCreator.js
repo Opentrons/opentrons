@@ -1,11 +1,14 @@
 // @flow
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
+import {fileMetadata} from './fileFields'
+import {getInitialRobotState, robotStateTimeline} from './commands'
+import {selectors as dismissSelectors} from '../../dismiss'
+import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
+import {selectors as steplistSelectors} from '../../steplist/reducers'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
-import {fileMetadata} from './fileFields'
-import {getInitialRobotState, robotStateTimeline} from './commands'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
@@ -15,7 +18,21 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   fileMetadata,
   getInitialRobotState,
   robotStateTimeline,
-  (fileMetadata, initialRobotState, _robotStateTimeline) => {
+  dismissSelectors.getDismissedWarnings,
+  ingredSelectors.getIngredientGroups,
+  ingredSelectors.getIngredientLocations,
+  steplistSelectors.getSavedForms,
+  steplistSelectors.orderedSteps,
+  (
+    fileMetadata,
+    initialRobotState,
+    _robotStateTimeline,
+    dismissedWarnings,
+    ingredients,
+    ingredLocations,
+    savedStepForms,
+    orderedSteps
+  ) => {
     const {author, description} = fileMetadata
     const name = fileMetadata.name || 'untitled'
 
@@ -58,8 +75,12 @@ export const createFile: BaseState => ProtocolFile = createSelector(
           pipetteTiprackAssignments: mapValues(
             initialRobotState.instruments,
             (p: PipetteData): ?string => p.tiprackModel
-          )
-          // TODO: Ian 2018-06-29 Add all info needed to restore a protocol
+          ),
+          dismissedWarnings,
+          ingredients,
+          ingredLocations,
+          savedStepForms,
+          orderedSteps
         }
       },
 

@@ -1,6 +1,9 @@
 // @flow
 import type {DeckSlot, Mount} from '@opentrons/components'
 import type {Command} from './step-generation/types'
+import type {RootState as IngredRoot} from './labware-ingred/reducers'
+import type {RootState as StepformRoot} from './steplist/reducers'
+import type {RootState as DismissRoot} from './dismiss'
 
 type MsSinceEpoch = number
 type VersionString = string // eg '1.0.0'
@@ -37,9 +40,15 @@ export type ProtocolFile = {
     'application-version': VersionString,
     data: {
       // pipetteId to tiprackModel. may be unassigned
-      pipetteTiprackAssignments: {[pipetteId: string]: ?string}
+      pipetteTiprackAssignments: {[pipetteId: string]: ?string},
 
-      // TODO add more fields
+      dismissedWarnings: $PropertyType<DismissRoot, 'dismissedWarnings'>,
+
+      ingredients: $PropertyType<IngredRoot, 'ingredients'>,
+      ingredLocations: $PropertyType<IngredRoot, 'ingredLocations'>,
+
+      savedStepForms: $PropertyType<StepformRoot, 'savedStepForms'>,
+      orderedSteps: $PropertyType<StepformRoot, 'orderedSteps'>
     }
   },
 
