@@ -33,7 +33,7 @@ export type WarningChecker = (mixed) => ?FormWarning
 /*******************
 ** Warning Checkers **
 ********************/
-//TODO: real HydratedFormData type
+// TODO: real HydratedFormData type
 type HydratedFormData = any
 
 export const maxDispenseWellVolume = (fields: HydratedFormData): ?FormWarning => {

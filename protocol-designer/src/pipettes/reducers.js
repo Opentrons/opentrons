@@ -3,7 +3,6 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import reduce from 'lodash/reduce'
 import {getPipette, getLabware} from '@opentrons/shared-data'
-import type {PipetteName} from './pipetteData'
 import {updatePipettes} from './actions'
 import {LOAD_FILE, type LoadFileAction} from '../load-file'
 

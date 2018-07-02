@@ -7,5 +7,5 @@ import getWellTotalVolume from './getWellTotalVolume'
 export {
   canPipetteUseLabware,
   computeWellAccess,
-  getWellTotalVolume,
+  getWellTotalVolume
 }
