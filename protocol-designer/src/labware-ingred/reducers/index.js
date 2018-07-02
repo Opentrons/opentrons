@@ -25,6 +25,8 @@ import type {
   Wells
 } from '../types'
 import * as actions from '../actions'
+import {LOAD_FILE, type LoadFileAction} from '../../load-file'
+import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
@@ -124,6 +126,26 @@ export const containers = handleActions({
   COPY_LABWARE: (state: ContainersState, action: CopyLabware) => {
     const { fromContainer, toContainer, toSlot } = action.payload
     return {...state, [toContainer]: {...state[fromContainer], slot: toSlot}}
+  },
+  [LOAD_FILE]: (state: ContainersState, action: LoadFileAction): ContainersState => {
+    const file = action.payload
+    const allFileLabware = file.labware
+    const labwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
+      Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot))
+
+    return labwareIds.reduce((acc: ContainersState, id): ContainersState => {
+      const fileLabware = allFileLabware[id]
+      return {
+        ...acc,
+        [id]: {
+          slot: fileLabware.slot,
+          id,
+          type: fileLabware.model,
+          name: fileLabware['display-name'],
+          disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model)
+        }
+      }
+    }, {})
   }
 },
 initialLabwareState)
@@ -138,7 +160,9 @@ export const savedLabware = handleActions({
   MODIFY_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.modifyContainer>) => ({
     ...state,
     [action.payload.containerId]: true
-  })
+  }),
+  [LOAD_FILE]: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState =>
+    mapValues(action.payload.labware, () => true)
 }, {})
 
 type IngredientsState = IngredientGroups
@@ -165,7 +189,9 @@ export const ingredients = handleActions({
       ? state
       // otherwise, the whole ingred group is deleted
       : omit(state, [groupId])
-  }
+  },
+  [LOAD_FILE]: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
+    getPDMetadata(action.payload).ingredients
 }, {})
 
 type LocationsState = LabwareLiquidState
@@ -226,7 +252,9 @@ export const ingredLocations = handleActions({
           : ingredLocations
       }
     }, {})
-  }
+  },
+  [LOAD_FILE]: (state: LocationsState, action: LoadFileAction): LocationsState =>
+    getPDMetadata(action.payload).ingredLocations
 }, {})
 
 export type RootState = {|
