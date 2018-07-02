@@ -31,7 +31,6 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           <FormGroup label="Labware:" className={styles.labware_field}>
             <LabwareDropdown name="aspirate_labware" {...focusHandlers} />
           </FormGroup>
-          {/* TODO LATER: also 'disable' when selected labware is a trash */}
           <WellSelectionInput
             name="aspirate_wells"
             labwareFieldName="aspirate_labware"
