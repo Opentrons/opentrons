@@ -1,4 +1,5 @@
-# This file duplicates the implementation of ot2serverlib
+# This file duplicates the implementation of ot2serverlib. Remove once all
+# robots have new update endpoints
 import os
 import json
 import asyncio
