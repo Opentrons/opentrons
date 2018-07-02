@@ -28,8 +28,11 @@ export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
         if (!warningsForStep) return stepAcc
         const result = warningsForStep.reduce(
         (warningAcc: Array<CommandCreatorWarning>, warning: CommandCreatorWarning) => {
-          const isDismissed = dismissedWarnings[stepId].some(dismissedWarning =>
-            isMatch(dismissedWarning, warning))
+          const dismissedWarningsForStep = dismissedWarnings[stepId]
+          const isDismissed = dismissedWarningsForStep
+            ? dismissedWarningsForStep.some(dismissedWarning =>
+              isMatch(dismissedWarning, warning))
+            : false
 
           return isDismissed
             ? warningAcc

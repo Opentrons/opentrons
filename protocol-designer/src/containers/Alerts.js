@@ -32,23 +32,32 @@ const captions: {[warningOrErrorType: string]: string} = {
 }
 
 function Alerts (props: Props) {
-  const alertItemHelper = (alert: CommandCreatorError | CommandCreatorWarning, key) => (
+  const errors = props.errors.map((error, key) => (
     <AlertItem
       type='warning'
-      key={key}
-      title={alert.message}
-      onCloseClick={alert.isDismissable
-        ? props.onDismiss(alert)
-        : undefined
-      }
+      key={`error:${key}`}
+      title={error.message}
+      onCloseClick={undefined}
       >
-        {captions[alert.type]}
+        {captions[error.type]}
       </AlertItem>
-  )
+    ))
+
+  const warnings = props.warnings.map((warning, key) => (
+    <AlertItem
+      type='warning'
+      key={`warning:${key}`}
+      title={warning.message}
+      onCloseClick={props.onDismiss(warning)}
+      >
+        {captions[warning.type]}
+      </AlertItem>
+    ))
+
   return (
     <div>
-      {props.errors.map(alertItemHelper)}
-      {props.warnings.map(alertItemHelper)}
+      {errors}
+      {warnings}
     </div>
   )
 }
@@ -69,11 +78,10 @@ function mapStateToProps (state: BaseState): SP {
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
   const {dispatch} = dispatchProps
   const onDismiss = (warning: CommandCreatorWarning) =>
-    () =>
-      dispatch(dismissActions.dismissWarning({
-        warning,
-        stepId: stateProps._stepId
-      }))
+    () => dispatch(dismissActions.dismissWarning({
+      warning,
+      stepId: stateProps._stepId
+    }))
 
   return {
     ...stateProps,

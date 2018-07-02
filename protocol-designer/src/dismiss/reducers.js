@@ -15,7 +15,10 @@ const dismissedWarnings = handleActions({
     const {stepId, warning} = action.payload
     return {
       ...state,
-      [stepId]: [...state[stepId], warning]
+      [stepId]: [
+        ...(state[stepId] || []),
+        warning
+      ]
     }
   }
   // DELETE_STEP: () => {} // TODO IMMEDIATELY remove keys when step deleted!
