@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "fixed-trash"
+    "name": "fixed-trash",
+    "format": "trough",
+    "isValidSource": false
   },
   "ordering": [
     [

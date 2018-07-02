@@ -18,7 +18,8 @@ describe('test the schema against a minimalist fixture', () => {
   test('...', () => {
     const minimalLabwareDef = {
       metadata: {
-        name: 'test-labware'
+        name: 'test-labware',
+        format: 'trough'
       },
       ordering: [['A1']],
       wells: {
@@ -59,7 +60,7 @@ describe('test the schema against a minimalist fixture', () => {
   })
 })
 
-describe('test schemas of all definitions', () => { // TODO don't skip
+describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
 
   test('got at least 1 labware definition file', () => {

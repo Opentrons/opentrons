@@ -3,7 +3,8 @@ import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import type {FilePageProps} from '../components/FilePage'
-import {actions, selectors} from '../file-data'
+import {actions, selectors as fileSelectors} from '../file-data'
+import {selectors as pipetteSelectors} from '../pipettes'
 import type {FileMetadataFields} from '../file-data'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
@@ -19,10 +20,10 @@ type DP = {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const pipetteData = selectors.pipettesForInstrumentGroup(state)
+  const pipetteData = pipetteSelectors.pipettesForInstrumentGroup(state)
   return {
-    _values: selectors.fileFormValues(state),
-    isFormAltered: selectors.isUnsavedMetadatFormAltered(state),
+    _values: fileSelectors.fileFormValues(state),
+    isFormAltered: fileSelectors.isUnsavedMetadatFormAltered(state),
     instruments: {
       left: pipetteData.find(i => i.mount === 'left'),
       right: pipetteData.find(i => i.mount === 'right')

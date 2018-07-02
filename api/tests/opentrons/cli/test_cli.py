@@ -1,6 +1,6 @@
 import pytest
 from opentrons.config import get_config_index
-from opentrons.config import feature_flags as ff
+from opentrons.config import advanced_settings as advs
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ async def test_new_deck_points():
     # if feature_flag is set (or not)
     from opentrons.deck_calibration.dc_main import get_calibration_points
     from opentrons.deck_calibration.endpoints import expected_points
-    ff.set_feature_flag('dots-deck-type', True)
+    advs.set_adv_setting('deckCalibrationDots', True)
     calibration_points = get_calibration_points()
     expected_points1 = expected_points()
     # Check that old calibration points are used in cli
@@ -67,7 +67,7 @@ async def test_new_deck_points():
     assert expected_points1['2'] == (380.87, 6.0)
     assert expected_points1['3'] == (12.13, 261.0)
 
-    ff.set_feature_flag('dots-deck-type', False)
+    advs.set_adv_setting('deckCalibrationDots', False)
     calibration_points2 = get_calibration_points()
     expected_points2 = expected_points()
     # Check that new calibration points are used

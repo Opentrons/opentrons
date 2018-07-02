@@ -30,10 +30,6 @@
     background: transparent;
     border-radius: var(--bd-radius-default);
 
-    &:hover {
-      background-color: color(var(--c-bg-light) shade(5%));
-    }
-
     &:active {
       font-weight: var(--fw-regular);
       background-color: color(var(--c-bg-light) shade(10%));
@@ -43,15 +39,18 @@
     &.disabled {
       @apply --button-disabled;
     }
+
+    /* stylelint-disable no-descending-specificity */
+    &:hover,
+    &.hover {
+      background-color: color(var(--c-bg-light) shade(5%));
+    }
+    /* stylelint-enable */
   }
 
   --button-inverted: {
     color: var(--c-font-light);
     border-color: var(--c-font-light);
-
-    &:hover {
-      background-color: color(var(--c-bg-dark) tint(5%));
-    }
 
     &:active {
       font-weight: var(--fw-regular);
@@ -62,6 +61,13 @@
     &.disabled {
       @apply --button-disabled;
     }
+
+    /* stylelint-disable no-descending-specificity */
+    &:hover,
+    &.hover {
+      background-color: color(var(--c-bg-dark) tint(5%));
+    }
+    /* stylelint-enable */
   }
 }
 
@@ -79,7 +85,8 @@
     0 0 2px rgba(0, 0, 0, 0.12),
     0 2px 2px rgba(0, 0, 0, 0.24);
 
-  &:hover {
+  &:hover,
+  &.hover {
     background-color: color(var(--c-bg-dark) shade(30%));
   }
 
@@ -97,7 +104,8 @@
     background-color: var(--c-bg-light);
     color: var(--c-font-dark);
 
-    &:hover {
+    &:hover,
+    &.hover {
       background-color: color(var(--c-bg-light) shade(5%));
     }
 

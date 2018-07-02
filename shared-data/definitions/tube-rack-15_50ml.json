@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "tube-rack-15_50ml"
+    "name": "tube-rack-15_50ml",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

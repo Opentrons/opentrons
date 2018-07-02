@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "6-well-plate"
+    "name": "6-well-plate",
+    "format": "irregular",
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

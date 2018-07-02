@@ -1,6 +1,11 @@
 {
   "metadata": {
-    "name": "GEB-tiprack-300ul"
+    "name": "GEB-tiprack-300ul",
+    "format": "96-standard",
+    "tipVolume": 300,
+    "displayCategory": "tiprack",
+    "isTiprack": true,
+    "isValidSource": false
   },
   "ordering": [
     [

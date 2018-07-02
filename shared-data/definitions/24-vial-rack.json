@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "24-vial-rack"
+    "name": "24-vial-rack",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

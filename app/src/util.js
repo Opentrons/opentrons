@@ -1,13 +1,11 @@
 // @flow
 // utility functions
-import type {Dispatch, GetState, Action, ThunkAction, ThunkPromiseAction} from './types'
+import type {Action, ThunkAction, ThunkPromiseAction} from './types'
 import createLogger from './logger'
 
 type Chainable = Action | ThunkAction | ThunkPromiseAction
 
-type ChainAction = ?Action | Promise<?Action>
-
-type ThunkChain = (Dispatch, GetState) => ChainAction
+type ChainAction = Promise<?Action>
 
 const log = createLogger(__filename)
 
@@ -19,7 +17,7 @@ export function delay (ms: number): Promise<void> {
 // error means: error in action, error in payload, or promise rejection
 // TODO(mc, 2018-06-11): This is a little too bespoke for my tastes. Explore
 //   npm for available ecosystem solutions soon
-export function chainActions (...actions: Array<Chainable>): ThunkChain {
+export function chainActions (...actions: Array<Chainable>): ThunkPromiseAction {
   let i = 0
   let result: ?Action = null
 
@@ -29,13 +27,12 @@ export function chainActions (...actions: Array<Chainable>): ThunkChain {
     function next (): ChainAction {
       const current = actions[i]
 
-      if (!current) return result
+      if (!current) return resolveResult()
 
       i++
       // TODO(mc, 2018-06-11): Should we debounce plain actions with RAF?
       result = dispatch(current)
-
-      if (result.then) return result.then(handleAction, handleError)
+      if (result && result.then) return result.then(handleAction, handleError)
       return handleAction(result)
     }
 
@@ -46,15 +43,20 @@ export function chainActions (...actions: Array<Chainable>): ThunkChain {
         (action.error || (action.payload && action.payload.error))
       ) {
         log.debug('Early return from action chain', {action})
-        return result
+        return resolveResult()
       }
 
       return next()
     }
 
-    function handleError (error) {
+    function handleError (error): ChainAction {
       log.error('ThunkPromiseAction in chain rejected', {error})
-      return null
+      result = null
+      return resolveResult()
+    }
+
+    function resolveResult (): ChainAction {
+      return Promise.resolve(result)
     }
   }
 }

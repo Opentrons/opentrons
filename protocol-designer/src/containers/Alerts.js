@@ -2,21 +2,24 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {selectors as fileDataSelectors} from '../file-data'
+import {
+  actions as dismissActions,
+  selectors as dismissSelectors
+} from '../dismiss'
 import {selectors as steplistSelectors} from '../steplist'
+import {selectors as fileDataSelectors} from '../file-data'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../types'
 import type {CommandCreatorError, CommandCreatorWarning} from '../step-generation'
 
 type SP = {
-  alerts: Array<CommandCreatorError | {
-    ...CommandCreatorWarning,
-    dismissId?: string // presence of dismissId allows alert to be dismissed
-  }>
+  errors: Array<CommandCreatorError>,
+  warnings: Array<CommandCreatorWarning>,
+  _stepId: *
 }
 
 type DP = {
-  onDismiss: (id: string) => () => mixed
+  onDismiss: (CommandCreatorWarning) => () => mixed
 }
 
 type Props = SP & DP
@@ -29,58 +32,61 @@ const captions: {[warningOrErrorType: string]: string} = {
 }
 
 function Alerts (props: Props) {
+  const errors = props.errors.map((error, key) => (
+    <AlertItem
+      type='warning'
+      key={`error:${key}`}
+      title={error.message}
+      onCloseClick={undefined}
+      >
+        {captions[error.type]}
+      </AlertItem>
+    ))
+
+  const warnings = props.warnings.map((warning, key) => (
+    <AlertItem
+      type='warning'
+      key={`warning:${key}`}
+      title={warning.message}
+      onCloseClick={props.onDismiss(warning)}
+      >
+        {captions[warning.type]}
+      </AlertItem>
+    ))
+
   return (
     <div>
-      {props.alerts.map((alert, key) =>
-        <AlertItem
-          type='warning'
-          key={key}
-          title={alert.message}
-          onCloseClick={alert.dismissId
-            ? props.onDismiss(alert.dismissId)
-            : undefined
-          }
-        >
-          {captions[alert.type]}
-        </AlertItem>)
-      }
+      {errors}
+      {warnings}
     </div>
   )
 }
 
 function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.robotStateTimeline(state)
-  const warningsPerStep = fileDataSelectors.warningsPerStep(state)
-  const selectedStepId = steplistSelectors.selectedStepId(state)
-
-  const {errors} = timeline
-  const rawWarnings = (
-    // hide warnings without explicit FEATURE FLAG
-    process.env.OT_PD_SHOW_WARNINGS === 'true' &&
-    // show warnings only for the selected step
-    selectedStepId &&
-    warningsPerStep[selectedStepId]
-  ) || []
-
-  const warnings = rawWarnings.map(warning => ({
-    ...warning,
-    // TODO Ian 2018-06-14 once warning dismissal is actually implemented,
-    // the dismiss ID will probably have more info than just the type.
-    // This is a placeholder.
-    dismissId: warning.type
-  }))
-
-  let alerts = errors ? [...errors, ...warnings] : warnings
+  const errors = timeline.errors || []
+  const warnings = dismissSelectors.getVisibleWarningsForSelectedStep(state)
+  const _stepId: any = steplistSelectors.selectedStepId(state) // TODO: Ian 2018-07-02 type properly once stepId is always string type
 
   return {
-    alerts
+    errors,
+    warnings,
+    _stepId
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {dispatch} = dispatchProps
+  const onDismiss = (warning: CommandCreatorWarning) =>
+    () => dispatch(dismissActions.dismissWarning({
+      warning,
+      stepId: stateProps._stepId
+    }))
+
   return {
-    onDismiss: (id: string) => () => console.log('dismiss warning here', id)
+    ...stateProps,
+    onDismiss
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Alerts)
+export default connect(mapStateToProps, null, mergeProps)(Alerts)

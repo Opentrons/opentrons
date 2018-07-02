@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "384-plate"
+    "name": "384-plate",
+    "format": "384-standard",
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

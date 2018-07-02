@@ -6,6 +6,7 @@ import {TitleBar, type TitleBarProps} from '../structure'
 
 import styles from './modals.css'
 
+// TODO(mc, 2018-06-20): s/titleBar/titleBarProps
 type Props = {
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps,

@@ -17,6 +17,6 @@ this project.
 
 ## Test
 
-Currently, `ot2updateserver` is imported and tested under tests in the
+Currently, `ot2serverlib` is imported and tested under tests in the
 API server project (in particular, the
 [server test suite](https://github.com/Opentrons/opentrons/tree/edge/api/tests/opentrons/server))

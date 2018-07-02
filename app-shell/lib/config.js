@@ -22,6 +22,7 @@ const PARSE_ARGS_OPTS = {
 // TODO(mc, 2018-05-25): future config changes will require migration strategy
 const DEFAULTS = {
   devtools: false,
+  modules: false,
 
   // logging config
   log: {
@@ -50,6 +51,7 @@ const DEFAULTS = {
     optedIn: false,
     seenOptIn: false
   }
+
 }
 
 // lazy load store, overrides, and log because of config/log interdependency

@@ -73,17 +73,6 @@ export type WifiFailureAction = {|
   |}
 |}
 
-export type SetConfigureWifiBodyAction = {|
-  type: 'api:SET_CONFIGURE_WIFI_BODY',
-  payload: {|
-    robot: RobotService,
-    update: {
-      ssid?: Ssid,
-      psk?: Psk
-    }
-  |}
-|}
-
 export type ClearConfigureWifiResponseAction = {|
   type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
   payload: {|
@@ -95,7 +84,6 @@ export type WifiAction =
   | WifiRequestAction
   | WifiSuccessAction
   | WifiFailureAction
-  | SetConfigureWifiBodyAction
   | ClearConfigureWifiResponseAction
 
 export type RobotWifiList = ApiCall<void, WifiListResponse>
@@ -139,30 +127,16 @@ export function fetchWifiStatus (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function setConfigureWifiBody (
-  robot: RobotService,
-  update: {ssid?: Ssid, psk?: Psk}
-): SetConfigureWifiBodyAction {
-  return {type: 'api:SET_CONFIGURE_WIFI_BODY', payload: {robot, update}}
-}
-
 export function clearConfigureWifiResponse (
   robot: RobotService
 ): ClearConfigureWifiResponseAction {
   return {type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE', payload: {robot}}
 }
 
-export function configureWifi (robot: RobotService): ThunkPromiseAction {
-  return (dispatch, getState) => {
-    const robotWifiState = selectRobotWifiState(getState(), robot) || {}
-    const configureState = robotWifiState.configure || {}
-    const body = configureState.request
+export function configureWifi (robot: RobotService, ssid: ?string, psk: ?string): ThunkPromiseAction {
+  const body = {ssid, psk}
 
-    if (!body) {
-      console.warn('configureWifi called without setConfigureWifiBody')
-      return Promise.resolve()
-    }
-
+  return (dispatch) => {
     dispatch(wifiRequest(robot, CONFIGURE))
 
     return client(robot, 'POST', `wifi/${CONFIGURE}`, body).then(
@@ -185,9 +159,8 @@ export function wifiReducer (state: ?WifiState, action: Action): WifiState {
     case 'api:WIFI_FAILURE':
       return reduceWifiFailure(state, action)
 
-    case 'api:SET_CONFIGURE_WIFI_BODY':
     case 'api:CLEAR_CONFIGURE_WIFI_RESPONSE':
-      return reduceConfigureWifiAction(state, action)
+      return reduceClearConfigureWifiAction(state, action)
   }
 
   return state
@@ -333,28 +306,19 @@ function reduceWifiFailure (
   }
 }
 
-function reduceConfigureWifiAction (
+function reduceClearConfigureWifiAction (
   state: WifiState,
-  action: SetConfigureWifiBodyAction | ClearConfigureWifiResponseAction
+  action: ClearConfigureWifiResponseAction
 ): WifiState {
   const {payload: {robot: {name}}} = action
   const stateByName = state[name] || {}
   const configureState = stateByName.configure || {}
-  let {request, response, error} = configureState
-
-  if (action.type === 'api:SET_CONFIGURE_WIFI_BODY') {
-    const requestState = request || {ssid: '', psk: ''}
-    request = {...requestState, ...action.payload.update}
-  } else {
-    response = null
-    error = null
-  }
 
   return {
     ...state,
     [name]: {
       ...stateByName,
-      configure: {...configureState, request, response, error}
+      configure: {...configureState, response: null, error: null}
     }
   }
 }

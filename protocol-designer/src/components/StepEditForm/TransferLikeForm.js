@@ -1,136 +1,111 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, InputField} from '@opentrons/components'
+import {FormGroup} from '@opentrons/components'
 
 import {
-  CheckboxRow,
-  DelayField,
-  MixField,
+  StepInputField,
+  StepCheckboxRow,
+  DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  VolumeField,
-  TipSettingsColumn
+  ChangeTipField,
+  FlowRateField,
+  TipPositionField
 } from './formFields'
 
-import WellSelectionInput from '../../containers/WellSelectionInput'
-import FormSection from './FormSection'
+import WellSelectionInput from './WellSelectionInput'
+import type {StepType} from '../../form-types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
-import type {FormConnector} from '../../utils'
-import type {TransferLikeForm as TransferLikeFormData} from '../../form-types'
+import FormSection from './FormSection'
+import type {FocusHandlers} from './index'
 
-type TransferLikeFormProps = {formData: TransferLikeFormData, formConnector: FormConnector<*>}
+type TransferLikeFormProps = {focusHandlers: FocusHandlers, stepType: StepType}
 
-const TransferLikeForm = ({formData, formConnector}: TransferLikeFormProps) => (
-  <React.Fragment>
-    <FormSection sectionName='aspirate'>
-      <div className={formStyles.row_wrapper}>
-        <FormGroup label='Labware:' className={styles.labware_field}>
-          <LabwareDropdown {...formConnector('aspirate--labware')} />
-        </FormGroup>
-        {/* TODO LATER: also 'disable' when selected labware is a trash */}
-        <WellSelectionInput
-          className={styles.well_selection_input}
-          labwareId={formData['aspirate--labware']}
-          pipetteId={formData['pipette']}
-          initialSelectedWells={formData['aspirate--wells']}
-          formFieldAccessor={'aspirate--wells'}
-        />
-        <PipetteField formConnector={formConnector}/>
-        {formData.stepType === 'consolidate' && <VolumeField formConnector={formConnector} />}
-      </div>
-
-      <div className={formStyles.row_wrapper}>
-        <div className={styles.left_settings_column}>
-          <FormGroup label='TECHNIQUE'>
-            <CheckboxRow
-              checkboxAccessor='aspirate--pre-wet-tip'
-              formConnector={formConnector}
-              label='Pre-wet tip'
-            />
-
-            <CheckboxRow
-              checkboxAccessor='aspirate--touch-tip'
-              formConnector={formConnector}
-              label='Touch tip'
-            />
-
-            <CheckboxRow
-              checkboxAccessor='aspirate--air-gap--checkbox'
-              formConnector={formConnector}
-              label='Air Gap'
-            >
-              <InputField units='μL' {...formConnector('aspirate--air-gap--volume')} />
-            </CheckboxRow>
-
-            <MixField
-              checkboxAccessor='aspirate--mix--checkbox'
-              formConnector={formConnector}
-              timesAccessor='aspirate--mix--times'
-              volumeAccessor='aspirate--mix--volume'
-            />
-
-            <CheckboxRow
-              checkboxAccessor='aspirate--disposal-vol--checkbox'
-              formConnector={formConnector}
-              label='Disposal Volume'
-            >
-              <InputField units='μL' {...formConnector('aspirate--disposal-vol--volume')} />
-            </CheckboxRow>
+const TransferLikeForm = (props: TransferLikeFormProps) => {
+  const {focusHandlers, stepType} = props
+  return (
+    <React.Fragment>
+      <FormSection sectionName="aspirate">
+        <div className={formStyles.row_wrapper}>
+          <FormGroup label="Labware:" className={styles.labware_field}>
+            <LabwareDropdown name="aspirate--labware" />
           </FormGroup>
+          {/* TODO LATER: also 'disable' when selected labware is a trash */}
+          <WellSelectionInput
+            name="aspirate--wells"
+            labwareFieldName="aspirate--labware"
+            pipetteFieldName="pipette"
+            {...focusHandlers} />
+          <PipetteField name="pipette" />
+          {stepType === 'consolidate' &&
+            <FormGroup label='Volume:' className={styles.volume_field}>
+              <StepInputField name="volume" units='μL' {...focusHandlers} />
+            </FormGroup>}
         </div>
-        <TipSettingsColumn formConnector={formConnector} />
-      </div>
-    </FormSection>
 
-    <FormSection sectionName='dispense'>
-      <div className={formStyles.row_wrapper}>
-        <FormGroup label='Labware:' className={styles.labware_field}>
-          <LabwareDropdown {...formConnector('dispense--labware')} />
-        </FormGroup>
-        <WellSelectionInput
-          className={styles.well_selection_input}
-          labwareId={formData['dispense--labware']}
-          pipetteId={formData['pipette']}
-          initialSelectedWells={formData['dispense--wells']}
-          formFieldAccessor={'dispense--wells'}
-        />
-        {(formData.stepType === 'transfer' || formData.stepType === 'distribute') &&
-          <VolumeField formConnector={formConnector} />}
-      </div>
+        <div className={formStyles.row_wrapper}>
+          <div className={styles.left_settings_column}>
+            <FormGroup label='TECHNIQUE'>
+              <StepCheckboxRow name="aspirate--pre-wet-tip" label="Pre-wet tip" />
+              <StepCheckboxRow name="aspirate--touch-tip" label="Touch tip" />
+              <StepCheckboxRow name="aspirate--air-gap--checkbox" label="Air Gap">
+                <StepInputField name="aspirate--air-gap--volume" units="μL" {...focusHandlers} />
+              </StepCheckboxRow>
+              <StepCheckboxRow name="aspirate--mix--checkbox" label='Mix'>
+                <StepInputField name="aspirate--mix--volume" units='μL' {...focusHandlers} />
+                <StepInputField name="aspirate--mix--times" units='Times' {...focusHandlers} />
+              </StepCheckboxRow>
+              <StepCheckboxRow name="aspirate--disposal-vol--checkbox" label="Disposal Volume" >
+                <StepInputField name="aspirate--disposal-vol--volume" units="μL" {...focusHandlers} />
+              </StepCheckboxRow>
+            </FormGroup>
+          </div>
+          <div className={styles.right_settings_column}>
+            <ChangeTipField name="aspirate--change-tip" />
+            <FlowRateField />
+            <TipPositionField />
+          </div>
+        </div>
+      </FormSection>
 
-      <div className={formStyles.row_wrapper}>
-        <div className={styles.left_settings_column}>
-          <FormGroup label='TECHNIQUE'>
-            <MixField
-              checkboxAccessor='dispense--mix--checkbox'
-              formConnector={formConnector}
-              volumeAccessor='dispense--mix--volume'
-              timesAccessor='dispense--mix--times'
-            />
-            <DelayField
-              checkboxAccessor='dispense--delay--checkbox'
-              formConnector={formConnector}
-              minutesAccessor='dispense--delay-minutes'
-              secondsAccessor='dispense--delay-seconds'
-            />
-
-            <CheckboxRow
-              checkboxAccessor='dispense--blowout--checkbox'
-              formConnector={formConnector}
-              label='Blow out'
-            >
-              <LabwareDropdown
-                className={styles.full_width}
-                {...formConnector('dispense--blowout--labware')}
-              />
-            </CheckboxRow>
+      <FormSection sectionName='dispense'>
+        <div className={formStyles.row_wrapper}>
+          <FormGroup label='Labware:' className={styles.labware_field}>
+            <LabwareDropdown name="dispense--labware" />
           </FormGroup>
+          <WellSelectionInput
+            name="dispense--wells"
+            labwareFieldName="dispense--labware"
+            pipetteFieldName="pipette"
+            {...focusHandlers} />
+          {(stepType === 'transfer' || stepType === 'distribute') &&
+            <FormGroup label='Volume:' className={styles.volume_field}>
+              <StepInputField name="volume" units="μL" {...focusHandlers} />
+            </FormGroup>}
         </div>
-        <TipSettingsColumn formConnector={formConnector} hasChangeField={false} />
-      </div>
-    </FormSection>
-  </React.Fragment>
-)
+
+        <div className={formStyles.row_wrapper}>
+          <div className={styles.left_settings_column}>
+            <FormGroup label='TECHNIQUE'>
+              <StepCheckboxRow name="dispense--mix--checkbox" label='Mix'>
+                <StepInputField name="dispense--mix--volume" units="μL" {...focusHandlers} />
+                <StepInputField name="dispense--mix--times" units="Times" {...focusHandlers} />
+              </StepCheckboxRow>
+              <DispenseDelayFields focusHandlers={focusHandlers} />
+              <StepCheckboxRow name='dispense--blowout--checkbox' label='Blow out' >
+                <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+              </StepCheckboxRow>
+            </FormGroup>
+          </div>
+          <div className={styles.right_settings_column}>
+            <FlowRateField />
+            <TipPositionField />
+          </div>
+        </div>
+      </FormSection>
+    </React.Fragment>
+  )
+}
 
 export default TransferLikeForm
