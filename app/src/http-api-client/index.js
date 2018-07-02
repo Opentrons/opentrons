@@ -8,6 +8,7 @@ import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
 import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
+import {settingsReducer, type SettingsAction} from './settings'
 import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
@@ -18,6 +19,7 @@ export const reducer = combineReducers({
   pipettes: pipettesReducer,
   robot: robotReducer,
   server: serverReducer,
+  settings: settingsReducer,
   wifi: wifiReducer
 })
 
@@ -57,6 +59,10 @@ export type {
 } from './server'
 
 export type {
+  Setting
+} from './settings'
+
+export type {
   WifiListResponse,
   WifiStatusResponse,
   WifiConfigureResponse,
@@ -75,6 +81,7 @@ export type Action =
   | PipettesAction
   | RobotAction
   | ServerAction
+  | SettingsAction
   | WifiAction
 
 export {
@@ -134,6 +141,12 @@ export {
   setIgnoredUpdate,
   makeGetRobotIgnoredUpdateRequest
 } from './server'
+
+export {
+  fetchSettings,
+  setSettings,
+  makeGetRobotSettings
+} from './settings'
 
 export {
   fetchWifiList,

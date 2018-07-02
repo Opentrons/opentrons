@@ -1,32 +1,36 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {FlatButton, PrimaryButton} from '@opentrons/components'
+import {OutlineButton, PrimaryButton} from '@opentrons/components'
 
 import {actions, selectors} from '../../steplist'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 
 const ButtonRow = (props) => {
-  const {canSave, onSave, onCancel, onClickMoreOptions} = props
+  const {toggleConfirmDeleteModal, canSave, onSave, onCancel, onClickMoreOptions} = props
   return (
     <div className={styles.button_row}>
-      <FlatButton className={styles.more_options_button} onClick={onClickMoreOptions}>MORE OPTIONS</FlatButton>
+      <OutlineButton onClick={toggleConfirmDeleteModal}>DELETE</OutlineButton>
+      <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
       <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
       <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
     </div>
   )
 }
 
+type OP = {toggleConfirmDeleteModal: () => void}
 type SP = {canSave?: ?boolean}
 const STP = (state: BaseState): SP => ({ canSave: selectors.currentFormCanBeSaved(state) })
 
 type DP = {
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete: () => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
 }
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
+  onDelete: () => dispatch(actions.deleteStep()),
   onCancel: () => dispatch(actions.cancelStepForm()),
   onSave: () => dispatch(actions.saveStepForm()),
   onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal())

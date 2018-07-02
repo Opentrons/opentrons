@@ -4,7 +4,6 @@ import * as React from 'react'
 import type {Robot} from '../../robot'
 
 import StatusCard from './StatusCard'
-import AttachedInstrumentsCard from './AttachedInstrumentsCard'
 import InformationCard from './InformationCard'
 import ControlsCard from './ControlsCard'
 import ConnectivityCard from './ConnectivityCard'
@@ -12,7 +11,7 @@ import CalibrationCard from './CalibrationCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 import UpdateModal from './UpdateModal'
-import styles from './styles.css'
+import {CardContainer, CardRow, CardColumn} from '../layout'
 
 type Props = Robot
 
@@ -20,31 +19,28 @@ export default function RobotSettings (props: Props) {
   const updateUrl = `/robots/${props.name}/update`
 
   return (
-    <div className={styles.robot_settings}>
-      <div className={styles.row}>
+    <CardContainer>
+      <CardRow>
         <StatusCard {...props} />
-      </div>
-      <div className={styles.row}>
-        <AttachedInstrumentsCard {...props} />
-      </div>
-      <div className={styles.row}>
+      </CardRow>
+      <CardRow>
         <InformationCard {...props} updateUrl={updateUrl} />
-      </div>
-      <div className={styles.row}>
+      </CardRow>
+      <CardRow>
         <ControlsCard {...props} />
-      </div>
-      <div className={styles.row}>
-        <div className={styles.column_50}>
+      </CardRow>
+      <CardRow>
+        <CardColumn>
           <ConnectivityCard {...props} />
-        </div>
-        <div className={styles.column_50}>
+        </CardColumn>
+        <CardColumn>
           <CalibrationCard {...props} />
-        </div>
-      </div>
-      <div className={styles.row}>
+        </CardColumn>
+      </CardRow>
+      <CardRow>
         <AdvancedSettingsCard {...props} />
-      </div>
-    </div>
+      </CardRow>
+    </CardContainer>
   )
 }
 

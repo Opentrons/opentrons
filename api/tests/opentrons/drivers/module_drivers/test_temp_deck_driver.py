@@ -90,10 +90,10 @@ def test_set_temp_deck_temperature(monkeypatch):
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
     temp_deck.set_temperature(99)
-    assert command_log[-1] == 'M104 S99'
+    assert command_log[-1] == 'M104 S99.0'
 
     temp_deck.set_temperature(-9)
-    assert command_log[-1] == 'M104 S-9'
+    assert command_log[-1] == 'M104 S-9.0'
 
 
 def test_fail_set_temp_deck_temperature(monkeypatch):

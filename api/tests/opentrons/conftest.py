@@ -16,7 +16,7 @@ from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons import config
-from opentrons.config import feature_flags as ff
+from opentrons.config import advanced_settings as advs
 from opentrons.server.main import init
 from opentrons.deck_calibration import endpoints
 
@@ -152,23 +152,23 @@ def dummy_db(tmpdir):
 # -------feature flag fixtures-------------
 @pytest.fixture
 def calibrate_bottom_flag():
-    ff.set_feature_flag('calibrate-to-bottom', True)
+    advs.set_adv_setting('calibrateToBottom', True)
     yield
-    ff.set_feature_flag('calibrate-to-bottom', False)
+    advs.set_adv_setting('calibrateToBottom', False)
 
 
 @pytest.fixture
 def short_trash_flag():
-    ff.set_feature_flag('short-fixed-trash', True)
+    advs.set_adv_setting('shortFixedTrash', True)
     yield
-    ff.set_feature_flag('short-fixed-trash', False)
+    advs.set_adv_setting('shortFixedTrash', False)
 
 
 @pytest.fixture
 def split_labware_def():
-    ff.set_feature_flag('split-labware-def', True)
+    advs.set_adv_setting('splitLabwareDefinitions', True)
     yield
-    ff.set_feature_flag('split-labware-def', False)
+    advs.set_adv_setting('splitLabwareDefinitions', False)
 
 
 # -----end feature flag fixtures-----------
