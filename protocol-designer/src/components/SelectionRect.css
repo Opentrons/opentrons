@@ -1,4 +1,4 @@
-@value rectColor: rgba(0, 120, 255, 0.2);
+@import '@opentrons/components';
 
 .selection_rect {
   pointer-events: none; /* prevents this div from occluding wells during document.elementFromPoint sampling */
@@ -6,17 +6,16 @@
 
 rect.selection_rect {
   /* svg version */
-  fill: rectColor;
-  stroke: gray;
+  fill: var(--c-selection-overlay);
+  stroke: var(--c-highlight);
   stroke-width: 0.4;
-  stroke-dasharray: 0.75, 0.5;
 }
 
 div.selection_rect {
   /* normal html version */
-  background-color: rectColor;
+  background-color: var(--c-selection-overlay);
   position: fixed;
   z-index: 1000;
   border-radius: 0;
-  border: 1px gray dashed;
+  border: 1px var(--c-highlight);
 }

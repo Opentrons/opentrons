@@ -312,6 +312,9 @@ class Robot(object):
     def turn_off_rail_lights(self):
         self._driver.turn_off_rail_lights()
 
+    def get_rail_lights_on(self):
+        return self._driver.get_rail_lights_on()
+
     def identify(self, seconds):
         """
         Identify a robot by flashing the light around the frame button for 10s

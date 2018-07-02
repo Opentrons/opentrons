@@ -117,6 +117,9 @@ class Session(object):
         unsubscribe = subscribe(types.COMMAND, on_command)
 
         try:
+            # ensure actual pipettes are cached before driver is disconnected
+            robot.cache_instrument_models()
+
             # TODO (artyom, 20171005): this will go away
             # once robot / driver simulation flow is fixed
             robot.disconnect()

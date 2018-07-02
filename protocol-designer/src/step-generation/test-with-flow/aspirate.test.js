@@ -13,6 +13,17 @@ jest.mock('../aspirateUpdateLiquidState')
 const aspirate = commandCreatorNoErrors(_aspirate)
 const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
 
+const mockLiquidReturnValue = {
+  // using strings instead of properly-shaped objects for easier assertions
+  liquidState: 'expected liquid state',
+  warnings: 'expected warnings'
+}
+
+beforeEach(() => {
+  // $FlowFixMe
+  updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+})
+
 describe('aspirate', () => {
   let initialRobotState
   let robotStateWithTip
@@ -121,12 +132,6 @@ describe('aspirate', () => {
   })
 
   describe('liquid tracking', () => {
-    const mockLiquidReturnValue = 'expected liquid state'
-    beforeEach(() => {
-      // $FlowFixMe
-      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
-    })
-
     test('aspirate calls aspirateUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
       const result = aspirate({
         pipette: 'p300SingleId',
@@ -147,7 +152,8 @@ describe('aspirate', () => {
         robotStateWithTip.liquidState
       )
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue.liquidState)
+      expect(result.warnings).toBe(mockLiquidReturnValue.warnings)
     })
   })
 })

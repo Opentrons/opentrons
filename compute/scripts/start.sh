@@ -15,7 +15,9 @@ inetd -e /etc/inetd.conf
 mkdir -p /data/boot.d
 run-parts /data/boot.d
 
-# Start Jupyter Notebook server
+echo "Starting Opentrons update server"
+python -m otupdate --debug --port $OT_UPDATE_PORT &
+
 echo "Starting Jupyter Notebook server"
 mkdir -p /data/user_storage/opentrons_data/jupyter
 jupyter notebook --allow-root &

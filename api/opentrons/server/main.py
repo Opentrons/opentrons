@@ -6,11 +6,11 @@ import os
 import traceback
 import atexit
 from aiohttp import web
-from opentrons import robot
+from opentrons import robot, __version__
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
-from opentrons.server.endpoints import (wifi, control, update)
+from opentrons.server.endpoints import (wifi, control)
 from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
@@ -153,15 +153,15 @@ def init(loop=None):
     server.app.router.add_post(
         '/identify', control.identify)
     server.app.router.add_post(
-        '/lights/on', control.turn_on_rail_lights)
-    server.app.router.add_post(
-        '/lights/off', control.turn_off_rail_lights)
-    server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(
         '/server/update', endpoints.update_api)
     server.app.router.add_post(
         '/server/update/firmware', endpoints.update_firmware)
+    server.app.router.add_get(
+        '/server/update/ignore', endpoints.get_ignore_version)
+    server.app.router.add_post(
+        '/server/update/ignore', endpoints.set_ignore_version)
     server.app.router.add_post(
         '/server/restart', endpoints.restart)
     server.app.router.add_post(
@@ -181,11 +181,13 @@ def init(loop=None):
     server.app.router.add_post(
         '/robot/home', control.home)
     server.app.router.add_get(
-        '/settings', update.get_feature_flag)
-    server.app.router.add_get(
-        '/settings/environment', update.environment)
+        '/robot/lights', control.get_rail_lights)
     server.app.router.add_post(
-        '/settings/set', update.set_feature_flag)
+        '/robot/lights', control.set_rail_lights)
+    server.app.router.add_get(
+        '/settings', endp.get_advanced_settings)
+    server.app.router.add_post(
+        '/settings', endp.set_advanced_setting)
 
     return server.app
 
@@ -230,6 +232,9 @@ def main():
         robot.connect()
     except Exception as e:
         log.exception("Error while connecting to motor-driver: {}".format(e))
+
+    log.info("API server version:  {}".format(__version__))
+    log.info("Smoothie FW version: {}".format(robot.fw_version))
 
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")

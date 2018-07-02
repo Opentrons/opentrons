@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "tiprack-10ul-H"
+    "name": "tiprack-10ul-H",
+    "format": "96-standard",
+    "deprecated": true
   },
   "ordering": [
     [

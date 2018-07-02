@@ -4,8 +4,14 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+import last from 'lodash/last'
 import {computeWellAccess} from '@opentrons/shared-data'
-import type {CommandCreator, RobotState} from './types'
+import type {
+  CommandCreator,
+  RobotState,
+  Timeline,
+  LocationLiquidState
+} from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
@@ -18,7 +24,7 @@ export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
 export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): CommandCreator =>
   (prevRobotState: RobotState) => (
     commandCreators.reduce(
-      (prev, reducerFn, stepIdx) => {
+      (prev: $Call<CommandCreator, *>, reducerFn: CommandCreator, stepIdx) => {
         if (prev.errors) {
           // if there are errors, short-circuit the reduce
           return prev
@@ -31,13 +37,15 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             robotState: prev.robotState,
             commands: prev.commands,
             errors: next.errors,
-            errorStep: stepIdx
+            errorStep: stepIdx,
+            warnings: prev.warnings
           }
         }
 
         return {
           robotState: next.robotState,
-          commands: [...prev.commands, ...next.commands]
+          commands: [...prev.commands, ...next.commands],
+          warnings: [...(prev.warnings || []), ...(next.warnings || [])]
         }
       },
       {robotState: cloneDeep(prevRobotState), commands: []}
@@ -46,15 +54,48 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
     )
   )
 
+export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
+(initialRobotState: RobotState): Timeline => {
+  const timeline = commandCreators.reduce(
+    (acc: Timeline, commandCreator: CommandCreator, index: number) => {
+      const prevRobotState = (acc.timeline.length === 0)
+        ? initialRobotState
+        : last(acc.timeline).robotState
+
+      if (acc.errors) {
+        // error short-circuit
+        return acc
+      }
+
+      const nextResult = commandCreator(prevRobotState)
+
+      if (nextResult.errors) {
+        return {
+          timeline: acc.timeline,
+          errors: nextResult.errors
+        }
+      }
+
+      return {
+        timeline: [...acc.timeline, nextResult],
+        errors: null
+      }
+    }, {timeline: [], errors: null})
+
+  return {
+    timeline: timeline.timeline,
+    errors: timeline.errors
+  }
+}
+
 type Vol = {volume: number}
-type LiquidVolumeState = {[ingredGroup: string]: Vol}
 
 export const AIR = '__air__'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
-export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeState): {
-  source: LiquidVolumeState,
-  dest: LiquidVolumeState
+export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): {
+  source: LocationLiquidState,
+  dest: LocationLiquidState
 } {
   const totalSourceVolume = reduce(
     sourceLiquidState,
@@ -117,12 +158,12 @@ export function splitLiquid (volume: number, sourceLiquidState: LiquidVolumeStat
 /** The converse of splitLiquid. Adds all of one liquid to the other.
   * The args are called 'source' and 'dest', but here they're interchangable.
   */
-export function mergeLiquid (source: LiquidVolumeState, dest: LiquidVolumeState): LiquidVolumeState {
+export function mergeLiquid (source: LocationLiquidState, dest: LocationLiquidState): LocationLiquidState {
   return {
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    ...reduce(source, (acc: LiquidVolumeState, ingredState: Vol, ingredId: string) => {
+    ...reduce(source, (acc: LocationLiquidState, ingredState: Vol, ingredId: string) => {
       const isCommonIngred = ingredId in dest
       const ingredVolume = isCommonIngred
         // sum volumes of ingredients common to 'source' and 'dest'
@@ -159,4 +200,13 @@ export function getWellsForTips (channels: 1 | 8, labwareType: string, well: str
   const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
 
   return {wellsForTips, allWellsShared}
+}
+
+/** Total volume of a location (air is not included in the sum) */
+export function totalVolume (location: LocationLiquidState): number {
+  return Object.keys(location).reduce((acc, ingredId) => {
+    return (ingredId !== AIR)
+      ? acc + (location[ingredId].volume || 0)
+      : acc
+  }, 0)
 }

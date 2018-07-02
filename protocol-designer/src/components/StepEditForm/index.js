@@ -1,315 +1,155 @@
 // @flow
 import * as React from 'react'
+import {connect} from 'react-redux'
+import get from 'lodash/get'
+import without from 'lodash/without'
 import cx from 'classnames'
 import {
-  FlatButton,
   PrimaryButton,
-  FormGroup,
-  DropdownField,
-  InputField,
-  RadioGroup,
-  type DropdownOption
+  OutlineButton
 } from '@opentrons/components'
 
-import {
-  CheckboxRow,
-  DelayField,
-  FlowRateField,
-  MixField,
-  TipPositionField
-} from './formFields'
-
-import WellSelectionInput from '../../containers/WellSelectionInput'
-import FormSection from './FormSection'
+import {actions, selectors} from '../../steplist' // TODO use steplist/index.js
+import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {FormData, StepType} from '../../form-types'
+import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
-import type {FormSectionNames, FormSectionState} from '../../steplist/types' // TODO import from index.js
-import type {FormData} from '../../form-types'
+import MixForm from './MixForm'
+import TransferLikeForm from './TransferLikeForm'
+import PauseForm from './PauseForm'
+import ConfirmDeleteModal from './ConfirmDeleteModal'
 
-import {formConnectorFactory} from '../../utils'
+type StepForm = typeof MixForm | typeof PauseForm | typeof TransferLikeForm
+const STEP_FORM_MAP: {[StepType]: StepForm} = {
+  mix: MixForm,
+  pause: PauseForm,
+  transfer: TransferLikeForm,
+  consolidate: TransferLikeForm,
+  distribute: TransferLikeForm
+}
 
-type Options = Array<DropdownOption>
+export type FocusHandlers = {
+  focusedField: StepFieldName,
+  dirtyFields: Array<StepFieldName>,
+  onFieldFocus: (StepFieldName) => void,
+  onFieldBlur: (StepFieldName) => void
+}
 
-export type Props = {
-  // ingredientOptions: Options,
-  pipetteOptions: Options,
-  labwareOptions: Options,
-  formSectionCollapse: FormSectionState,
+type SP = {formData?: ?FormData, canSave?: ?boolean, isNewStep?: boolean}
+type DP = {
+  handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
+  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete: () => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
-  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
-  onToggleFormSection: (section: FormSectionNames) => mixed => mixed, // ???
-  handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
-  openWellSelectionModal: (args: {labwareId: string, pipetteId: string}) => mixed,
-  formData: FormData, // TODO: make sure flow will give clear warning if you put transfer field in pause form, etc
-  canSave: boolean
-  /* TODO Ian 2018-01-24 **type** the different forms for different stepTypes,
-    this obj reflects the form selector's return values */
+}
+type StepEditFormState = {
+  showConfirmDeleteModal: boolean,
+  focusedField: StepFieldName | null, // TODO: BC make this a real enum of field names
+  dirtyFields: Array<string> // TODO: BC make this an array of a real enum of field names
 }
 
-export default function StepEditForm (props: Props) {
-  const {formData} = props
-  const formConnector = formConnectorFactory(props.handleChange, formData)
+type Props = SP & DP
 
-  const pipetteField = (
-    <FormGroup label='Pipette:' className={styles.pipette_field}>
-      <DropdownField
-        options={props.pipetteOptions}
-        {...formConnector('pipette')} />
-    </FormGroup>
-  )
-
-  const volumeField = (
-    <FormGroup label='Volume:' className={styles.volume_field}>
-      <InputField units='μL' {...formConnector('volume')} />
-    </FormGroup>
-  )
-
-  const buttonRow = <div className={styles.button_row}>
-    <FlatButton className={styles.more_options_button} onClick={props.onClickMoreOptions}>
-      MORE OPTIONS
-    </FlatButton>
-    <PrimaryButton className={styles.cancel_button} onClick={props.onCancel}>CANCEL</PrimaryButton>
-    <PrimaryButton disabled={!props.canSave} onClick={props.onSave}>SAVE</PrimaryButton>
-  </div>
-
-  const formColumnRight = <div className={styles.right_settings_column}>
-      <FormGroup label='CHANGE TIP'>
-          <DropdownField
-            {...formConnector('aspirate--change-tip')}
-            options={[
-              {name: 'Always', value: 'always'},
-              {name: 'Once', value: 'once'},
-              {name: 'Never', value: 'never'}
-            ]}
-          />
-      </FormGroup>
-
-    <FlowRateField />
-    <TipPositionField />
-  </div>
-
-  // TODO Ian 2018-05-08 break these forms out into own components, put it all in a folder.
-  // Especially, make components for the re-used form parts instead of repeating them
-  if (formData.stepType === 'mix') {
-    return (
-      <div className={formStyles.form}>
-        <div className={formStyles.row_wrapper}>
-          {/* TODO Ian 2018-05-08 this labware/wells/pipette could be a component,
-            it's common across most forms */}
-          <FormGroup label='Labware:' className={styles.labware_field}>
-            <DropdownField options={props.labwareOptions} {...formConnector('labware')} />
-          </FormGroup>
-          {/* TODO LATER: also 'disable' when selected labware is a trash */}
-          <WellSelectionInput
-            className={styles.well_selection_input}
-            labwareId={formData['labware']}
-            pipetteId={formData['pipette']}
-            initialSelectedWells={formData['wells']}
-            formFieldAccessor={'wells'}
-          />
-          {pipetteField}
-        </div>
-
-        <div className={cx(formStyles.row_wrapper)}>
-          <FormGroup label='Repetitions' className={styles.field_row}>
-            <InputField units='uL' {...formConnector('volume')} />
-            <InputField units='Times' {...formConnector('times')} />
-          </FormGroup>
-        </div>
-
-        <div className={formStyles.row_wrapper}>
-          <div className={styles.left_settings_column}>
-            <FormGroup label='TECHNIQUE'>
-              <DelayField
-                checkboxAccessor='dispense--delay--checkbox'
-                formConnector={formConnector}
-                minutesAccessor='dispense--delay-minutes'
-                secondsAccessor='dispense--delay-seconds'
-              />
-              <CheckboxRow
-                checkboxAccessor='dispense--blowout--checkbox'
-                formConnector={formConnector}
-                label='Blow out'
-              >
-                <DropdownField className={styles.full_width}
-                  options={props.labwareOptions}
-                  {...formConnector('dispense--blowout--labware')}
-                />
-              </CheckboxRow>
-
-              <CheckboxRow
-                checkboxAccessor='touch-tip'
-                formConnector={formConnector}
-                label='Touch tip'
-              />
-            </FormGroup>
-          </div>
-          {formColumnRight}
-        </div>
-        {buttonRow}
-      </div>
-    )
+class StepEditForm extends React.Component<Props, StepEditFormState> {
+  constructor (props: Props) {
+    super(props)
+    this.state = {
+      showConfirmDeleteModal: false,
+      focusedField: null,
+      dirtyFields: [] // TODO: initialize to dirty if not new form
+    }
   }
 
-  if (formData.stepType === 'pause') {
+  componentDidUpdate (prevProps) {
+    // NOTE: formData is sometimes undefined between steps
+    if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
+      if (this.props.isNewStep) {
+        this.setState({ focusedField: null, dirtyFields: [] })
+      } else {
+        const fieldNames: Array<string> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
+        this.setState({ focusedField: null, dirtyFields: fieldNames })
+      }
+    }
+  }
+
+  onFieldFocus = (fieldName: StepFieldName) => { this.setState({focusedField: fieldName}) }
+
+  onFieldBlur = (fieldName: StepFieldName) => {
+    this.setState((prevState) => ({
+      ...prevState,
+      focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
+      dirtyFields: prevState.dirtyFields.includes(fieldName) ? prevState.dirtyFields : [...prevState.dirtyFields, fieldName]
+    }))
+  }
+
+  toggleConfirmDeleteModal = () => {
+    this.setState({
+      showConfirmDeleteModal: !this.state.showConfirmDeleteModal
+    })
+  }
+
+  render () {
+    if (!this.props.formData) return null // early-exit if connected formData is absent
+    const {formData, onClickMoreOptions, onDelete, onCancel, onSave, canSave} = this.props
+    const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
+    if (!FormComponent) { // early-exit if step form doesn't exist
+      return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
+    }
     return (
-      <div className={formStyles.form}>
-        <div className={formStyles.row_wrapper}>
-          <div className={formStyles.column_1_2}>
-            <RadioGroup options={[{name: 'Pause for an amount of time', value: 'true'}]}
-              {...formConnector('pause-for-amount-of-time')} />
-            <InputField units='hr' {...formConnector('pause-hour')} />
-            <InputField units='m' {...formConnector('pause-minute')} />
-            <InputField units='s' {...formConnector('pause-second')} />
-          </div>
-          <div className={formStyles.column_1_2}>
-            <RadioGroup options={[{name: 'Pause until told to resume', value: 'false'}]}
-              {...formConnector('pause-for-amount-of-time')} />
-            <FormGroup label='Message to display'>
-              <InputField {...formConnector('pause-message')} />
-            </FormGroup>
+      <React.Fragment>
+        {this.state.showConfirmDeleteModal && <ConfirmDeleteModal
+          onCancelClick={this.toggleConfirmDeleteModal}
+          onContinueClick={() => {
+            this.toggleConfirmDeleteModal()
+            onDelete()
+          }}
+        />}
+
+        <div className={cx(formStyles.form, styles[formData.stepType])}>
+          { /* TODO: insert form level validation */ }
+          <FormComponent
+            stepType={formData.stepType}
+            focusHandlers={{
+              focusedField: this.state.focusedField,
+              dirtyFields: this.state.dirtyFields,
+              onFieldFocus: this.onFieldFocus,
+              onFieldBlur: this.onFieldBlur
+            }} />
+          <div className={styles.button_row}>
+            <OutlineButton onClick={this.toggleConfirmDeleteModal}>DELETE</OutlineButton>
+            <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
+            <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
+            <PrimaryButton disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
           </div>
         </div>
-        {buttonRow}
-      </div>
+      </React.Fragment>
     )
   }
-
-  if (formData.stepType === 'transfer' ||
-    formData.stepType === 'consolidate' ||
-    formData.stepType === 'distribute'
-  ) {
-    return (
-      <div className={cx(formStyles.form, styles[formData.stepType])}>
-        <FormSection title='Aspirate'
-          onCollapseToggle={props.onToggleFormSection('aspirate')}
-          collapsed={props.formSectionCollapse.aspirate}
-        >
-          <div className={formStyles.row_wrapper}>
-            <FormGroup label='Labware:' className={styles.labware_field}>
-              <DropdownField options={props.labwareOptions} {...formConnector('aspirate--labware')} />
-            </FormGroup>
-            {/* TODO LATER: also 'disable' when selected labware is a trash */}
-            <WellSelectionInput
-              className={styles.well_selection_input}
-              labwareId={formData['aspirate--labware']}
-              pipetteId={formData['pipette']}
-              initialSelectedWells={formData['aspirate--wells']}
-              formFieldAccessor={'aspirate--wells'}
-            />
-            {pipetteField}
-            {formData.stepType === 'consolidate' && volumeField}
-          </div>
-
-          <div className={formStyles.row_wrapper}>
-            <div className={styles.left_settings_column}>
-              <FormGroup label='TECHNIQUE'>
-                <CheckboxRow
-                  checkboxAccessor='aspirate--pre-wet-tip'
-                  formConnector={formConnector}
-                  label='Pre-wet tip'
-                />
-
-                <CheckboxRow
-                  checkboxAccessor='aspirate--touch-tip'
-                  formConnector={formConnector}
-                  label='Touch tip'
-                />
-
-                <CheckboxRow
-                  checkboxAccessor='aspirate--air-gap--checkbox'
-                  formConnector={formConnector}
-                  label='Air Gap'
-                >
-                  <InputField units='μL' {...formConnector('aspirate--air-gap--volume')} />
-                </CheckboxRow>
-
-                <MixField
-                  checkboxAccessor='aspirate--mix--checkbox'
-                  formConnector={formConnector}
-                  timesAccessor='aspirate--mix--times'
-                  volumeAccessor='aspirate--mix--volume'
-                />
-
-                <CheckboxRow
-                  checkboxAccessor='aspirate--disposal-vol--checkbox'
-                  formConnector={formConnector}
-                  label='Disposal Volume'
-                >
-                  <InputField units='μL' {...formConnector('aspirate--disposal-vol--volume')} />
-                </CheckboxRow>
-              </FormGroup>
-            </div>
-            {formColumnRight}
-          </div>
-
-        </FormSection>
-
-        <FormSection title='Dispense'
-          onCollapseToggle={props.onToggleFormSection('dispense')}
-          collapsed={props.formSectionCollapse.dispense}
-        >
-          <div className={formStyles.row_wrapper}>
-            <FormGroup label='Labware:' className={styles.labware_field}>
-              <DropdownField options={props.labwareOptions} {...formConnector('dispense--labware')} />
-            </FormGroup>
-            <WellSelectionInput
-              className={styles.well_selection_input}
-              labwareId={formData['dispense--labware']}
-              pipetteId={formData['pipette']}
-              initialSelectedWells={formData['dispense--wells']}
-              formFieldAccessor={'dispense--wells'}
-            />
-            {(formData.stepType === 'transfer' || formData.stepType === 'distribute') &&
-              volumeField}
-          </div>
-
-          <div className={formStyles.row_wrapper}>
-            <div className={styles.left_settings_column}>
-              <FormGroup label='TECHNIQUE'>
-                <MixField
-                  checkboxAccessor='dispense--mix--checkbox'
-                  formConnector={formConnector}
-                  volumeAccessor='dispense--mix--volume'
-                  timesAccessor='dispense--mix--times'
-                />
-                <DelayField
-                  checkboxAccessor='dispense--delay--checkbox'
-                  formConnector={formConnector}
-                  minutesAccessor='dispense--delay-minutes'
-                  secondsAccessor='dispense--delay-seconds'
-                />
-
-                <CheckboxRow
-                  checkboxAccessor='dispense--blowout--checkbox'
-                  formConnector={formConnector}
-                  label='Blow out'
-                >
-                  <DropdownField className={styles.full_width}
-                    options={props.labwareOptions}
-                    {...formConnector('dispense--blowout--labware')}
-                  />
-                </CheckboxRow>
-              </FormGroup>
-            </div>
-
-            <div className={styles.right_settings_column}>
-              <FlowRateField />
-              <TipPositionField />
-            </div>
-          </div>
-
-        </FormSection>
-
-        {buttonRow}
-      </div>
-    )
-  }
-
-  return (
-    <div className={formStyles.form}>
-      <div>Todo: support {formData.stepType} step</div>
-    </div>
-  )
 }
+
+const mapStateToProps = (state: BaseState): SP => ({
+  formData: selectors.formData(state),
+  canSave: selectors.currentFormCanBeSaved(state),
+  isNewStep: selectors.isNewStepForm(state)
+})
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+  onDelete: () => dispatch(actions.deleteStep()),
+  onCancel: () => dispatch(actions.cancelStepForm()),
+  onSave: () => dispatch(actions.saveStepForm()),
+  onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),
+  handleChange: (accessor: string) => (e: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => {
+    // TODO Ian 2018-01-26 factor this nasty type handling out
+    const dispatchEvent = value => dispatch(actions.changeFormInput({update: {[accessor]: value}}))
+
+    if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
+      dispatchEvent(e.target.checked)
+    } else if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
+      dispatchEvent(e.target.value)
+    }
+  }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(StepEditForm)

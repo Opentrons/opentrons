@@ -283,14 +283,21 @@ async def identify(request):
     return web.json_response({"message": "identifying"})
 
 
-async def turn_on_rail_lights(request):
-    robot.turn_on_rail_lights()
-    return web.json_response({"lights": "on"})
+async def get_rail_lights(request):
+    return web.json_response({'on': robot.get_rail_lights_on()})
 
 
-async def turn_off_rail_lights(request):
-    robot.turn_off_rail_lights()
-    return web.json_response({"lights": "off"})
+async def set_rail_lights(request):
+    data = await request.json()
+    on = data.get('on')
+
+    if on is None:
+        return web.json_response(
+            {'message': '"on" must be true or false, got {}'.format(on)},
+            status=400)
+
+    robot.turn_on_rail_lights() if on else robot.turn_off_rail_lights()
+    return web.json_response({'on': on})
 
 
 async def take_picture(request):

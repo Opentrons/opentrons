@@ -25,7 +25,7 @@
   --c-success: #60b120;
 
   /* Misc */
-  --c-overlay: rgba(0, 0, 0, 0.7);
+  --c-selection-overlay: color(var(--c-highlight) alpha(0.3));
   --c-plate-bg: #ccc;
   --c-white: #fff;
   --c-black: #000;

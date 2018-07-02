@@ -1,0 +1,69 @@
+@import '@opentrons/components';
+
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.modal_contents {
+  background-color: white;
+}
+
+.in_progress_contents {
+  background-color: transparent;
+
+  & h3 {
+    display: none;
+  }
+}
+
+.position_diagram,
+.jog_container {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.position_diagram {
+  padding: 0.5rem 2rem;
+}
+
+.diagram_title {
+  @apply --font-header-dark;
+
+  margin: 0 1rem 0.5rem;
+}
+
+.diagram_instructions {
+  @apply --font-body-2-dark;
+
+  margin: 0 1rem;
+}
+
+.diagram_image {
+  max-width: 100%;
+}
+
+.confirm_pickup {
+  width: 25rem;
+  margin: auto;
+  text-align: center;
+}
+
+.confirm_pickup_text {
+  @apply --font-header-dark;
+
+  margin-bottom: 1.5rem;
+}
+
+.confirm_pickup_button {
+  margin-bottom: 0.75rem;
+}
+
+.spinner {
+  width: 6rem;
+  display: block;
+  margin: 35vh auto auto;
+  color: var(--c-font-light);
+}

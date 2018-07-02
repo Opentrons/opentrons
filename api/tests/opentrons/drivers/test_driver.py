@@ -481,6 +481,26 @@ def test_read_and_write_pipettes(model):
     driver._send_command = types.MethodType(_old_send_command, driver)
 
 
+def test_read_pipette_v13(model):
+    import types
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+        _byte_array_to_hex_string
+
+    driver = model.robot._driver
+    _old_send_command = driver._send_command
+    driver.simulating = False
+
+    def _new_send_message(self, command, timeout=None):
+        return 'L:' + _byte_array_to_hex_string(b'p300_single_v13')
+
+    driver._send_command = types.MethodType(_new_send_message, driver)
+
+    res = driver.read_pipette_model('left')
+    assert res == 'p300_single_v1.3'
+
+    driver._send_command = types.MethodType(_old_send_command, driver)
+
+
 def test_fast_home(model):
     import types
     driver = model.robot._driver

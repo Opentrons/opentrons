@@ -87,18 +87,10 @@ type ToggleStepCollapsedAction = {
   payload: StepIdType
 }
 
-export const toggleStepCollapsed = (stepId: StepIdType): ThunkAction<?ToggleStepCollapsedAction> =>
-  (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    if (stepId === selectors.selectedStepId(getState())) {
-      // User cannot collapse the currently selected step
-      return
-    }
-
-    dispatch({
-      type: 'TOGGLE_STEP_COLLAPSED',
-      payload: stepId
-    })
-  }
+export const toggleStepCollapsed = (stepId: StepIdType): ToggleStepCollapsedAction => ({
+  type: 'TOGGLE_STEP_COLLAPSED',
+  payload: stepId
+})
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',

@@ -6,10 +6,13 @@ import electron from 'electron'
 import client from '../client'
 import {
   makeGetAvailableRobotUpdate,
+  makeGetRobotIgnoredUpdateRequest,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
   getAnyRobotUpdateAvailable,
   restartRobotServer,
+  fetchIgnoredUpdate,
+  setIgnoredUpdate,
   reducer
 } from '..'
 
@@ -18,7 +21,8 @@ jest.mock('../client')
 
 const REQUESTS_TO_TEST = [
   {path: 'update', response: {message: 'foo', filename: 'bar'}},
-  {path: 'restart', response: {message: 'restarting'}}
+  {path: 'restart', response: {message: 'restarting'}},
+  {path: 'update/ignore', response: {version: '42.0.0'}}
 ]
 
 const middlewares = [thunk]
@@ -26,6 +30,7 @@ const mockStore = configureMockStore(middlewares)
 
 const robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
 const mockApiUpdate = electron.__mockRemotes['./api-update']
+const availableUpdate = '42.0.0'
 
 describe('server API client', () => {
   beforeEach(() => {
@@ -43,7 +48,8 @@ describe('server API client', () => {
             [robot.name]: {
               availableUpdate: '42.0.0',
               update: {inProgress: true, error: null, response: null},
-              restart: {inProgress: true, error: null, response: null}
+              restart: {inProgress: true, error: null, response: null},
+              'update/ignore': {inProgress: true, error: null, response: null}
             }
           }
         }
@@ -73,6 +79,13 @@ describe('server API client', () => {
         .toBe(state.api.server[robot.name].restart)
       expect(getRestartRequest(state, {name: 'foo'}))
         .toEqual({inProgress: false})
+    })
+
+    test('makeGetRobotIgnoredUpdateRequest', () => {
+      const getIngoredUpdate = makeGetRobotIgnoredUpdateRequest()
+
+      expect(getIngoredUpdate(state, robot)).toEqual(state.api.server[robot.name]['update/ignore'])
+      expect(getIngoredUpdate(state, {name: 'foo'})).toEqual({inProgress: false})
     })
 
     test('getAnyRobotUpdateAvailable is true if any robot has update', () => {
@@ -136,6 +149,96 @@ describe('server API client', () => {
       client.__setMockError(error)
 
       return store.dispatch(restartRobotServer(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('fetchIgnoredUpdate action creator', () => {
+    test('calls GET /server/update/ignore', () => {
+      client.__setMockResponse({inProgress: true, error: null, response: {version: '42.0.0'}})
+
+      return fetchIgnoredUpdate(robot)(() => {})
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'GET', 'server/update/ignore')
+        )
+    })
+
+    test('dispatches SERVER_REQUEST and SERVER_SUCCESS', () => {
+      const response = {version: '42.0.0'}
+      const store = mockStore({})
+      const expectedActions = [
+        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_SUCCESS',
+          payload: {robot, response, path: 'update/ignore'}
+        }
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(fetchIgnoredUpdate(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches SERVER_REQUEST and SERVER_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const store = mockStore({})
+      const expectedActions = [
+        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_FAILURE',
+          payload: {robot, error, path: 'update/ignore'}
+        }
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(fetchIgnoredUpdate(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('setIgnoredUpdate action creator', () => {
+    test('calls POST /server/update/ignore', () => {
+      client.__setMockResponse({inProgress: true, error: null, response: {version: '42.0.0'}})
+
+      return setIgnoredUpdate(robot, availableUpdate)(() => {})
+        .then(() => expect(client)
+          .toHaveBeenCalledWith(robot, 'POST', 'server/update/ignore', {version: availableUpdate})
+        )
+    })
+
+    test('dispatches SERVER_REQUEST and SERVER_SUCCESS', () => {
+      const response = {version: '42.0.0'}
+      const store = mockStore({})
+      const expectedActions = [
+        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_SUCCESS',
+          payload: {robot, response, path: 'update/ignore'}
+        }
+      ]
+
+      client.__setMockResponse(response)
+
+      return store.dispatch(setIgnoredUpdate(robot, availableUpdate))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches SERVER_REQUEST and SERVER_FAILURE', () => {
+      const error = {name: 'ResponseError', status: '400'}
+      const store = mockStore({})
+      const expectedActions = [
+        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_FAILURE',
+          payload: {robot, error, path: 'update/ignore'}
+        }
+      ]
+
+      client.__setMockError(error)
+
+      return store.dispatch(setIgnoredUpdate(robot, availableUpdate))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })

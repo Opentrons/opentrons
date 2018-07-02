@@ -1,0 +1,38 @@
+@import '@opentrons/components';
+
+.diagrams {
+  display: flex;
+  align-items: baseline;
+}
+
+.tiprack_labware {
+  flex: 3;
+}
+
+.left_pipette,
+.right_pipette {
+  flex: 1;
+}
+
+.left_pipette {
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.new_file_modal {
+  line-height: 1.5;
+
+  & form > * {
+    margin-bottom: 1rem;
+  }
+
+  & ol > li {
+    counter-increment: step-counter;
+    list-style: none;
+    margin: 1rem 0;
+  }
+
+  & ol > li::before {
+    content: counter(step-counter) ") ";
+  }
+}

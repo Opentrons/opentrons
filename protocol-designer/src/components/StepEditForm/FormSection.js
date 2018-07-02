@@ -1,12 +1,19 @@
 // @flow
 import * as React from 'react'
+import {connect} from 'react-redux'
+import startCase from 'lodash/startCase'
 import cx from 'classnames'
-import {Icon} from '@opentrons/components'
+import {IconButton} from '@opentrons/components'
 
+import {selectors as steplistSelectors} from '../../steplist/reducers'
+import {collapseFormSection} from '../../steplist/actions'
+import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './FormSection.css'
 
-type Props = {
-  title?: string,
+// TODO: get these from src/steplist/types.js
+type OP = {sectionName: 'aspirate' | 'dispense'}
+type FormSectionProps = {
+  sectionName?: string,
   children?: React.Node,
   className?: string,
   /** if defined, carat shows */
@@ -14,11 +21,11 @@ type Props = {
   collapsed?: boolean
 }
 
-export default function FormSection (props: Props) {
+const FormSection = (props: FormSectionProps) => {
   const childrenArray = React.Children.toArray(props.children)
   return (
     <div className={cx(styles.form_section, props.className)}>
-      <div className={styles.title}>{props.title}</div>
+      <div className={styles.title}>{startCase(props.sectionName)}</div>
 
       <div className={styles.content}>
         {/* First child always visible, following children only visible if not collapsed */}
@@ -26,12 +33,12 @@ export default function FormSection (props: Props) {
         {props.collapsed !== true && childrenArray.slice(1)}
       </div>
 
-      {props.onCollapseToggle &&
+      {props.collapsed !== undefined && // if doesn't exist in redux
         <div onClick={props.onCollapseToggle}>
-          {/* TODO Ian 2018-01-29 use an IconButton once it exists */}
-          <Icon
+          <IconButton
             width='30px'
-            name={props.collapsed === true ? 'chevron-down' : 'chevron-up'}
+            name='settings'
+            hover={!props.collapsed}
             className={styles.carat}
           />
         </div>
@@ -39,3 +46,13 @@ export default function FormSection (props: Props) {
     </div>
   )
 }
+
+const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
+  collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName]
+})
+const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
+  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName))
+})
+const ConnectedFormSection = connect(FormSectionSTP, FormSectionDTP)(FormSection)
+
+export default ConnectedFormSection

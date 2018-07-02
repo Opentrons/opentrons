@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import mapValues from 'lodash/mapValues'
 import {
   PrimaryButton,
   CheckboxField,
@@ -23,13 +24,15 @@ type SetStateCallback = (...args: Array<*>) => *
 type SetSubstate = (accessor: string, value: string | boolean | number) => mixed
 type GetSubstate = (accessor: Accessor) => string | boolean | number | null
 
+type FieldErrors = {[errorField: string]: string}
+
 type FieldProps = {|
   accessor: Accessor,
   numeric?: boolean,
   type?: string,
   label?: string,
   units?: string,
-  error?: string,
+  error?: ?string,
   placeholder?: string,
   className?: string
 |}
@@ -88,7 +91,8 @@ type Props = {
 
 type State = {
   input: IngredInputs,
-  commonIngredGroupId: ?string
+  commonIngredGroupId: ?string,
+  pristine: {[string]: boolean}
 }
 
 class IngredientPropertiesForm extends React.Component<Props, State> {
@@ -97,6 +101,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = {
+      pristine: {
+        name: true,
+        volume: true
+      },
       input: {
         name: null,
         volume: null,
@@ -121,7 +129,11 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     })
   }
 
-  resetInputState = (ingredGroupId: ?string, nextIngredGroupFields: ?AllIngredGroupFields, cb?: SetStateCallback) => {
+  resetInputState = (
+    ingredGroupId: ?string,
+    nextIngredGroupFields: ?AllIngredGroupFields,
+    cb?: SetStateCallback
+  ) => {
     // with a valid ingredGroupId, reset fields to values from that group.
     // otherwise, clear all fields
 
@@ -145,6 +157,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       // No/invalid ingredGroupId, set inputs to "blank" state
       this.setState({
         ...this.state,
+        pristine: {
+          name: true,
+          volume: true
+        },
         input: {
           name: null,
           volume: null,
@@ -158,13 +174,20 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
   componentWillReceiveProps (nextProps: Props) {
     const nextEditingId = nextProps.commonSelectedIngred
-    this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
-      ...this.state,
-      commonIngredGroupId: nextEditingId
-    }))
+    const prevEditingId = this.props.commonSelectedIngred
+
+    const wellSelectionCleared = nextProps.selectedWells.length === 0
+
+    if (nextEditingId !== prevEditingId || wellSelectionCleared) {
+      this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
+        ...this.state,
+        commonIngredGroupId: nextEditingId
+      }))
+    }
   }
 
   selectExistingIngred = (ingredGroupId: string) => {
+    // Used to populate ingred fields from dropdown
     this.resetInputState(ingredGroupId, undefined, () => this.setState({
       ...this.state,
       commonIngredGroupId: ingredGroupId
@@ -183,23 +206,64 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     }
   }
 
+  getFieldErrors: () => FieldErrors = () => {
+    const {name, volume} = this.state.input
+    const {selectedWellsMaxVolume} = this.props
+
+    let errors: FieldErrors = {}
+
+    if (!(volume && volume > 0)) {
+      errors.volume = 'Must be more than 0'
+    } else if (selectedWellsMaxVolume < volume) {
+      errors.volume = `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
+    }
+
+    if (!name) {
+      errors.name = 'This field is required'
+    }
+
+    return errors
+  }
+
+  handleSave: () => mixed = () => {
+    // dirty all fields
+    this.setState({pristine: mapValues(this.state.pristine, () => false)}, () => {
+      const formIsValid = Object.values(this.getFieldErrors()).length === 0
+
+      if (formIsValid) {
+        // actually save only when valid
+        this.props.onSave({
+          ...this.state.input,
+          groupId: this.state.commonIngredGroupId
+        })
+      }
+    })
+  }
+
   render () {
     const {
-      onSave,
       onCancel,
       allIngredientNamesIds,
-      selectedWells,
-      selectedWellsMaxVolume
+      selectedWells
     } = this.props
 
     const {commonIngredGroupId} = this.state
-    const {volume} = this.state.input
 
-    const maxVolExceeded = volume !== null && selectedWellsMaxVolume < volume
     const Field = this.Field // ensures we don't lose focus on input re-render during typing
 
-    const showForm = selectedWells.length > 0
+    // mask pristine errors
+    const visibleErrors = mapValues(
+      this.getFieldErrors(),
+      (errMsg: ?string, fieldName: string): ?string =>
+        this.state.pristine[fieldName] ? null : errMsg
+      )
+
     const showIngredientDropdown = allIngredientNamesIds.length > 0
+    const showForm = selectedWells.length > 0
+
+    const ingredDropdownLabel = commonIngredGroupId
+      ? 'Replace With:'
+      : 'Pick Existing:'
 
     if (!showForm) {
       return null
@@ -210,7 +274,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         <form className={styles.form_content}>
           <div className={formStyles.row_wrapper}>
               <FormGroup label='Ingredient title:' className={styles.ingred_title_field}>
-                <Field accessor='name' />
+                <Field
+                  error={visibleErrors.name}
+                  accessor='name'
+                />
               </FormGroup>
 
               <FormGroup
@@ -230,7 +297,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 />} */}
               </FormGroup>
 
-            {showIngredientDropdown && <FormGroup label='Replace With:' className={styles.existing_ingred_field}>
+            {showIngredientDropdown && <FormGroup label={ingredDropdownLabel} className={styles.existing_ingred_field}>
               <DropdownField
                 value={commonIngredGroupId || ''}
                 onChange={(e: SyntheticInputEvent<*>) => this.selectExistingIngred(e.target.value)}
@@ -248,9 +315,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Volume:' className={styles.volume_field}>
               <Field numeric accessor='volume' units='µL'
-                error={maxVolExceeded
-                  ? `Warning: exceeded max volume per well: ${selectedWellsMaxVolume}µL`
-                  : undefined}
+                error={visibleErrors.volume}
               />
             </FormGroup>
           </div>
@@ -266,10 +331,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           <PrimaryButton onClick={onCancel}>Cancel</PrimaryButton>
 
           <PrimaryButton
-            onClick={() => onSave({
-              ...this.state.input,
-              groupId: this.state.commonIngredGroupId
-            })}
+            onClick={this.handleSave}
           >
             Save
           </PrimaryButton>

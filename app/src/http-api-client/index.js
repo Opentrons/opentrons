@@ -46,12 +46,14 @@ export type {
 
 export type {
   RobotMove,
-  RobotHome
+  RobotHome,
+  RobotLights
 } from './robot'
 
 export type {
   RobotServerUpdate,
-  RobotServerRestart
+  RobotServerRestart,
+  RobotServerUpdateIgnore
 } from './server'
 
 export type {
@@ -110,10 +112,14 @@ export {
 
 export {
   home,
+  clearHomeResponse,
   moveRobotTo,
   clearRobotMoveResponse,
+  fetchRobotLights,
+  setRobotLights,
   makeGetRobotMove,
-  makeGetRobotHome
+  makeGetRobotHome,
+  makeGetRobotLights
 } from './robot'
 
 export {
@@ -122,13 +128,16 @@ export {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable
+  getAnyRobotUpdateAvailable,
+  fetchHealthAndIgnored,
+  fetchIgnoredUpdate,
+  setIgnoredUpdate,
+  makeGetRobotIgnoredUpdateRequest
 } from './server'
 
 export {
   fetchWifiList,
   fetchWifiStatus,
-  setConfigureWifiBody,
   clearConfigureWifiResponse,
   configureWifi,
   makeGetRobotWifiStatus,

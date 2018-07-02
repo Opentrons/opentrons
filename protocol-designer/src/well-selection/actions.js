@@ -4,9 +4,10 @@ import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
 import {selectors as steplistSelectors} from '../steplist/reducers'
-import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
+import type {StepFieldName} from '../steplist/fieldLevel'
 import type {ThunkDispatch, GetState} from '../types'
 import type {Wells} from '../labware-ingred/types'
 import type {Channels} from '@opentrons/components'
@@ -35,7 +36,7 @@ export const deselectWells = createAction(
 export type OpenWellSelectionModalPayload = {
   labwareId: string,
   pipetteId: string,
-  formFieldAccessor: string, // eg 'aspirate--wells' or 'dispense--wells'
+  formFieldAccessor: StepFieldName, // TODO: BC rename this 'name'
   pipetteChannels?: ?Channels,
   labwareName?: string
 }
@@ -62,7 +63,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
     // initially selected wells in form get selected in state before modal opens
     dispatch(selectWells(wells))
 
-    const pipettes = fileDataSelectors.equippedPipettes(state)
+    const pipettes = pipetteSelectors.equippedPipettes(state)
     const labware = labwareIngredSelectors.getLabware(state)
     // TODO type this action, make an underline fn action creator
 

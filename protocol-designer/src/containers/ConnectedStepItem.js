@@ -6,6 +6,7 @@ import type {BaseState, ThunkDispatch} from '../types'
 import type {SubstepIdentifier} from '../steplist/types'
 import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
 import * as substepSelectors from '../top-selectors/substeps'
+import {selectors as dismissSelectors} from '../dismiss'
 import {selectors as steplistSelectors} from '../steplist/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
@@ -43,13 +44,17 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hoveredStep = steplistSelectors.hoveredStepId(state)
   const selected = steplistSelectors.selectedStepId(state) === stepId
 
+  const hasError = fileDataSelectors.getErrorStepId(state) === stepId
+  const warnings = dismissSelectors.getVisibleWarningsPerStep(state)[stepId]
+  const hasWarnings = warnings && warnings.length > 0
+
+  const showErrorState = hasError || hasWarnings
+
   let collapsed
 
   if (!(stepId === '__end__' || stepId === 0)) {
     // Leave collapsed undefined for special steps
-    collapsed = (selected)
-      ? false // selected steps never collapsed
-      : steplistSelectors.getCollapsedSteps(state)[stepId]
+    collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
   }
 
   return {
@@ -64,12 +69,11 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hoveredSubstep,
     collapsed,
     selected,
+    error: showErrorState,
 
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.
     hovered: hoveredStep === stepId && !hoveredSubstep,
-
-    error: fileDataSelectors.robotStateTimeline(state).errorStepId === stepId, // TODO make mini selector
 
     getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId]
   }

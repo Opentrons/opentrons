@@ -60,6 +60,7 @@
 .field_row {
   lost-utility: clearfix;
   min-height: 2.25rem;
+  max-width: 24rem;
 
   /* Field row is for: (optional checkbox) + label + associated fields
    * All items in field row sum to 15/16, leaving 1/16 gap on the right.
@@ -87,12 +88,6 @@
   & > * {
     lost-column: 1/6;
   }
-}
-
-.more_options_button {
-  @apply --font-header-dark;
-
-  lost-column: 2/6;
 }
 
 .cancel_button {

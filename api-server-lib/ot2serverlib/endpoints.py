@@ -4,8 +4,52 @@ from time import sleep
 from aiohttp import web
 from threading import Thread
 import ot2serverlib
+from ot2serverlib import ignore_update
 
 log = logging.getLogger(__name__)
+
+
+async def get_ignore_version(request):
+    """
+    This handler returns a GET request of form application/json.
+
+    The return body will be formatted as:
+    {"version": version_ignored}
+
+    If no version has been previously ignored, the value will be null
+    """
+    ignored_version = ignore_update._get_ignored_version()
+    res = {'version': ignored_version}
+    return web.json_response(res)
+
+
+async def set_ignore_version(request):
+    """
+    This handler expects a POST request of form application/json.
+
+    The request body should be formatted as:
+    {"version": version_ignored}
+
+    The POST will 400 in the following scenarios:
+    1. Sending an empty dict
+    2. Sending a dict with an empty string
+    """
+    data = await request.json()
+    if 'version' in data.keys():
+        ignored_version = data.get('version')
+        log.debug('Set Ignore Version to {}'.format(ignored_version))
+        if ignored_version == '':
+            status = 400
+            res = {'version': None}
+        else:
+            ignore_update._set_ignored_version(ignored_version)
+            status = 200
+            res = {'version': ignored_version}
+    else:
+        status = 400
+        res = {'version': None}
+
+    return web.json_response(res, status=status)
 
 
 async def update_api(request: web.Request) -> web.Response:
@@ -66,13 +110,15 @@ async def update_firmware(request):
     return web.json_response(res, status=status)
 
 
+def __wait_and_restart():
+    log.info('Restarting server')
+    sleep(1)
+    os.system('kill 1')
+
+
 async def restart(request):
     """
-    Returns OK, then waits approximately 3 seconds and restarts container
+    Returns OK, then waits approximately 1 second and restarts container
     """
-    def wait_and_restart():
-        log.info('Restarting server')
-        sleep(3)
-        os.system('kill 1')
-    Thread(target=wait_and_restart).start()
+    Thread(target=__wait_and_restart).start()
     return web.json_response({"message": "restarting"})

@@ -3,7 +3,9 @@ import Page from '../../components/Page'
 import Resources from '../../components/Resources'
 export default function ResourcesPage () {
   return (
-    <Page>
+    <Page
+      titleBarProps={{title: 'Resources'}}
+    >
       <Resources />
     </Page>
   )

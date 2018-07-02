@@ -5,7 +5,7 @@ import {Provider} from 'react-redux'
 import {AppContainer} from 'react-hot-loader'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
-import createHistory from 'history/createBrowserHistory'
+import createHistory from 'history/createHashHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
 import createLogger from './logger'

@@ -233,8 +233,10 @@ exports[`InputField renders correctly 1`] = `
       className="input_field"
     >
       <input
+        onBlur={undefined}
         onChange={undefined}
         onClick={undefined}
+        onFocus={undefined}
         placeholder="Placeholder Text"
         readOnly={undefined}
         type="text"

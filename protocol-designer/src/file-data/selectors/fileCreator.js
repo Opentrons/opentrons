@@ -2,27 +2,22 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../../types'
-import type {ProtocolFile, FilePipette, FileLabware} from '../types'
+import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
-import {fileFormValues} from './fileFields'
+import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
 const applicationVersion = '1.0.0'
 
-export const createFile: BaseState => ?ProtocolFile = createSelector(
-  fileFormValues,
+export const createFile: BaseState => ProtocolFile = createSelector(
+  fileMetadata,
   getInitialRobotState,
   robotStateTimeline,
-  (fileFormValues, initialRobotState, _robotStateTimeline) => {
-    const {author, description} = fileFormValues
-    const name = fileFormValues.name || 'untitled'
-    const isValidFile = true // TODO Ian 2018-02-28 this will be its own selector
-
-    if (!isValidFile) {
-      return null
-    }
+  (fileMetadata, initialRobotState, _robotStateTimeline) => {
+    const {author, description} = fileMetadata
+    const name = fileMetadata.name || 'untitled'
 
     const instruments = mapValues(
       initialRobotState.instruments,
@@ -59,7 +54,13 @@ export const createFile: BaseState => ?ProtocolFile = createSelector(
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',
         'application-version': applicationVersion,
-        data: {/* TODO */}
+        data: {
+          pipetteTiprackAssignments: mapValues(
+            initialRobotState.instruments,
+            (p: PipetteData): ?string => p.tiprackModel
+          )
+          // TODO: Ian 2018-06-29 Add all info needed to restore a protocol
+        }
       },
 
       robot: {

@@ -38,9 +38,9 @@ export type HealthFailureAction = {|
 |}
 
 export type HealthAction =
- | HealthRequestAction
- | HealthSuccessAction
- | HealthFailureAction
+  | HealthRequestAction
+  | HealthSuccessAction
+  | HealthFailureAction
 
 export type RobotHealth = ApiCall<void, HealthResponse>
 
@@ -51,7 +51,6 @@ type HealthState = {
 export function fetchHealth (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
     dispatch(healthRequest(robot))
-
     return client(robot, 'GET', 'health')
       .then((health) => dispatch(healthSuccess(robot, health)))
       .catch((error) => dispatch(healthFailure(robot, error)))

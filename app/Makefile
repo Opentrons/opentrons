@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell yarn bin):$(PATH)
+PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # desktop shell directory for dev
 shell_dir := ../app-shell
