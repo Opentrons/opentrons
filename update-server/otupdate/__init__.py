@@ -4,7 +4,7 @@ import logging
 
 from aiohttp import web
 from functools import partial
-from otupdate import control
+from otupdate import control, install
 from otupdate import endpoints as bootstrap_endp
 
 log = logging.getLogger(__name__)
@@ -62,7 +62,8 @@ def get_app(
     app = web.Application(loop=loop)
     app.router.add_routes([
         web.get('/server/update/health', health),
+        web.post('/server/update', install.update_api),
         web.post('/server/update/bootstrap', bootstrap_fn),
-        web.post('/server/update/restart', control.restart)
+        web.post('/server/restart', control.restart)
     ])
     return app
