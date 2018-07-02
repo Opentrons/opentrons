@@ -552,6 +552,7 @@ def test_homing_flags(model):
 def test_switch_state(model):
     import types
     driver = model.robot._driver
+    driver.simulating = False
 
     def send_mock(self, target):
         smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'

@@ -154,6 +154,8 @@ def init(loop=None):
         '/identify', control.identify)
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
+    server.app.router.add_get(
+        '/trash', control.get_trash_attached)
     server.app.router.add_post(
         '/server/update', endpoints.update_api)
     server.app.router.add_post(
