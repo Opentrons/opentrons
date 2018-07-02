@@ -40,6 +40,10 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
+# Number of digits after the decimal point for temperatures being sent
+# to/from Temp-Deck
+GCODE_ROUNDING_PRECISION = 3
+
 
 class TempDeckError(Exception):
     pass
@@ -64,7 +68,7 @@ def _parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def _parse_number_from_substring(substring) -> int:
+def _parse_number_from_substring(substring) -> float:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -76,7 +80,7 @@ def _parse_number_from_substring(substring) -> int:
         value = substring.split(':')[1]
         if value.strip().lower() == 'none':
             return None
-        return int(value)
+        return round(float(value), GCODE_ROUNDING_PRECISION)
     except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to _parse_number_from_substring:')
         raise ParseError(
@@ -202,8 +206,9 @@ class TempDeck:
     def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
         try:
+            celsius = round(float(celsius), GCODE_ROUNDING_PRECISION)
             self._send_command(
-                '{0} S{1}'.format(GCODES['SET_TEMP'], int(celsius)))
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
