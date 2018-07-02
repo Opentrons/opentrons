@@ -66,8 +66,8 @@ test: test-py test-js
 .PHONY: test-py
 test-py:
 #	lerna exec --scope @opentrons/update-server --since origin/edge -- $(MAKE) -C .. test
-	lerna exec --scope @opentrons/api-server --since origin/edge -- $(MAKE) -C .. test
-	lerna exec --scope @opentrons/ot2serverlib --since origin/edge -- $(MAKE) -C .. test
+	$(MAKE) -C api test
+	$(MAKE) -C api-server-lib test
 
 .PHONY: test-js
 test-js:
