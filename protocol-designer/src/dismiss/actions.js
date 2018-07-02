@@ -9,7 +9,7 @@ type DismissWarning = {
   }
 }
 export const dismissWarning = (
-  payload: $ElementType<DismissWarning, 'payload'>
+  payload: $PropertyType<DismissWarning, 'payload'>
 ): DismissWarning => ({
   type: 'DISMISS_WARNING',
   payload

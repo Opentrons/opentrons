@@ -22,24 +22,20 @@ export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelect
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
     return orderedSteps.reduce(
       (stepAcc: WarningsPerStep, stepId) => {
-        const warningsForStep = warningsPerStep[stepId]
-        if (!warningsForStep) return stepAcc
-        const result = warningsForStep.reduce(
-        (warningAcc: Array<CommandCreatorWarning>, warning: CommandCreatorWarning) => {
-          const dismissedWarningsForStep = dismissedWarnings[stepId] || []
-          // warnings match when their `type` is the same.
-          // their `message` doesn't matter.
-          const isDismissed = dismissedWarningsForStep.some(dismissedWarning =>
-              dismissedWarning.type === warning.type)
+        const warningsForCurrentStep = warningsPerStep[stepId]
+        const dismissedWarningsForStep = dismissedWarnings[stepId] || []
 
-          return isDismissed
-            ? warningAcc
-            : [...warningAcc, warning]
-        }, [])
+        if (!warningsForCurrentStep) return stepAcc
+
+        // warnings match when their `type` is the same.
+        // their `message` doesn't matter.
+        const visibleWarnings = warningsForCurrentStep.filter(warning =>
+          dismissedWarningsForStep.every(d => d.type !== warning.type)
+        )
 
         return {
           ...stepAcc,
-          [stepId]: result
+          [stepId]: visibleWarnings
         }
       }, {})
   }
