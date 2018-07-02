@@ -104,9 +104,12 @@ export type PauseForm = {|
   'pauseMessage'?: string
 |}
 
+// TODO: separate field values from from metadata
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
+  'step-name'?: string,
+  'step-details'?: string,
   [StepFieldName]: any // TODO: form value processing to ensure type
 }
 //  | MixForm

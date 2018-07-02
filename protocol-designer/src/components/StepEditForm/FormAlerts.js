@@ -6,12 +6,13 @@ import difference from 'lodash/difference'
 import {AlertItem} from '@opentrons/components'
 import type {StepIdType} from '../../form-types'
 import {selectors as steplistSelectors} from '../../steplist'
+import {END_STEP} from '../../steplist/types'
 import {type StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning, FormWarningKey} from '../../steplist/formLevel'
 import Alerts from '../Alerts'
 import type {BaseState} from '../../types'
 
-type SP = {errors: Array<FormError>, warnings: Array<FormWarning>, _stepId: StepIdType}
+type SP = {errors: Array<FormError>, warnings: Array<FormWarning>, _stepId: ?StepIdType | typeof END_STEP}
 type OP = {focusedField: ?StepFieldName, dirtyFields: Array<StepFieldName>}
 type FormAlertsProps = {
   errors: Array<FormError>,
