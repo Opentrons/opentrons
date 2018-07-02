@@ -15,13 +15,12 @@ const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
 )
 
 type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
-/** Non-dismissed warnings for selected step */
+/** Non-dismissed warnings for each step */
 export const getWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   getDismissedWarnings,
   fileDataSelectors.warningsPerStep,
   steplistSelectors.orderedSteps,
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
-    // TODO: show warnings only for the selected step
     return orderedSteps.reduce(
       (stepAcc: WarningsPerStep, stepId) => {
         const warningsForStep = warningsPerStep[stepId]
