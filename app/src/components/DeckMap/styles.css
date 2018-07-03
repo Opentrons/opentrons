@@ -1,12 +1,9 @@
 @import '@opentrons/components';
 
 .deck {
-  box-sizing: border-box;
-  display: block;
   padding: 1rem 2rem;
   margin: 0 auto;
-  width: 38rem;
-  height: 33rem;
+  max-width: 100%;
 }
 
 .disabled {
