@@ -395,7 +395,7 @@ class Robot(object):
             raise RuntimeError('Instrument {0} already on {1} mount'.format(
                 prev_instr.name, mount))
         self._instruments[mount] = instrument
-        self.cache_instrument_models()
+
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
 
