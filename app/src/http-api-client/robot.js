@@ -65,8 +65,7 @@ type RobotLightsResponse = {
   on: boolean
 }
 
-type RequestPath =
-  | 'robot/positions'
+type RobotPath =
   | 'robot/move'
   | 'robot/home'
   | 'robot/lights'
@@ -82,10 +81,10 @@ type RobotResponse =
   | RobotLightsResponse
 
 export type RobotAction =
-  | ApiRequestAction<RequestPath, RobotRequest>
-  | ApiSuccessAction<RequestPath, RobotResponse>
-  | ApiFailureAction<RequestPath>
-  | ClearApiResponseAction<RequestPath>
+  | ApiRequestAction<RobotPath, RobotRequest>
+  | ApiSuccessAction<RobotPath, RobotResponse>
+  | ApiFailureAction<RobotPath>
+  | ClearApiResponseAction<RobotPath>
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
@@ -94,27 +93,28 @@ export type RobotHome = ApiCall<RobotHomeRequest, RobotHomeResponse>
 export type RobotLights = ApiCall<RobotLightsRequest, RobotLightsResponse>
 
 type RobotByNameState = {
-  move?: RobotMove,
-  home?: RobotHome,
-  lights?: RobotLights,
+  'robot/move'?: RobotMove,
+  'robot/home'?: RobotHome,
+  'robot/lights'?: RobotLights,
 }
 
 type RobotState = {
   [robotName: string]: ?RobotByNameState,
 }
 
-const POSITIONS: RequestPath = 'robot/positions'
-const MOVE: RequestPath = 'robot/move'
-const HOME: RequestPath = 'robot/home'
-const LIGHTS: RequestPath = 'robot/lights'
+// note: POSITIONS only used inside `moveRobotTo`
+const POSITIONS = 'robot/positions'
+const MOVE: RobotPath = 'robot/move'
+const HOME: RobotPath = 'robot/home'
+const LIGHTS: RobotPath = 'robot/lights'
 
-function isRobotPath (path: string): boolean %checks {
-  return (
-    path === POSITIONS ||
-    path === MOVE ||
-    path === HOME ||
-    path === LIGHTS
-  )
+// TODO(mc, 2018-07-03): flow helper until we have one reducer
+function getRobotPath (p: string): ?RobotPath {
+  if (p === 'robot/move' || p === 'robot/home' || p === 'robot/lights') {
+    return p
+  }
+
+  return null
 }
 
 export function moveRobotTo (
@@ -177,11 +177,15 @@ export function fetchRobotLights (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function clearHomeResponse (robot: BaseRobot): ClearApiResponseAction {
+export function clearHomeResponse (
+  robot: BaseRobot
+): ClearApiResponseAction<RobotPath> {
   return clearApiResponse(robot, HOME)
 }
 
-export function clearMoveResponse (robot: BaseRobot): ClearApiResponseAction {
+export function clearMoveResponse (
+  robot: BaseRobot
+): ClearApiResponseAction<RobotPath> {
   return clearApiResponse(robot, MOVE)
 }
 
@@ -203,16 +207,15 @@ export function setRobotLights (
   }
 }
 
-
-
 // TODO(mc, 2018-07-03): remove in favor of single HTTP API reducer
 export function robotReducer (state: ?RobotState, action: Action): RobotState {
   if (!state) return {}
 
   switch (action.type) {
     case 'api:REQUEST': {
-      const {payload: {path, request, robot: {name}}} = action
-      if (!isRobotPath(path)) return state
+      const path = getRobotPath(action.payload.path)
+      if (!path) return state
+      const {payload: {request, robot: {name}}} = action
       const stateByName = state[name] || {}
 
       return {
@@ -225,8 +228,9 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
     }
 
     case 'api:SUCCESS': {
-      const {payload: {path, response, robot: {name}}} = action
-      if (!isRobotPath(path)) return state
+      const path = getRobotPath(action.payload.path)
+      if (!path) return state
+      const {payload: {response, robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -240,8 +244,9 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
     }
 
     case 'api:FAILURE': {
-      const {payload: {path, error, robot: {name}}} = action
-      if (!isRobotPath(path)) return state
+      const path = getRobotPath(action.payload.path)
+      if (!path) return state
+      const {payload: {error, robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -255,8 +260,9 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
     }
 
     case 'api:CLEAR_RESPONSE': {
-      const {payload: {path, robot: {name}}} = action
-      if (!isRobotPath(path)) return state
+      const path = getRobotPath(action.payload.path)
+      if (!path) return state
+      const {payload: {robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
