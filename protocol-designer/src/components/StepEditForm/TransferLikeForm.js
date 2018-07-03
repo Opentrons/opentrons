@@ -29,15 +29,14 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
       <FormSection sectionName="aspirate">
         <div className={formStyles.row_wrapper}>
           <FormGroup label="Labware:" className={styles.labware_field}>
-            <LabwareDropdown name="aspirate--labware" />
+            <LabwareDropdown name="aspirate_labware" {...focusHandlers} />
           </FormGroup>
-          {/* TODO LATER: also 'disable' when selected labware is a trash */}
           <WellSelectionInput
-            name="aspirate--wells"
-            labwareFieldName="aspirate--labware"
+            name="aspirate_wells"
+            labwareFieldName="aspirate_labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
-          <PipetteField name="pipette" />
+          <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
           {stepType === 'consolidate' &&
             <FormGroup label='Volume:' className={styles.volume_field}>
               <StepInputField name="volume" units='μL' {...focusHandlers} />
@@ -47,22 +46,22 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="aspirate--pre-wet-tip" label="Pre-wet tip" />
-              <StepCheckboxRow name="aspirate--touch-tip" label="Touch tip" />
-              <StepCheckboxRow name="aspirate--air-gap--checkbox" label="Air Gap">
-                <StepInputField name="aspirate--air-gap--volume" units="μL" {...focusHandlers} />
+              <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
+              <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
+              <StepCheckboxRow name="aspirate_airGap_checkbox" label="Air Gap">
+                <StepInputField name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
               </StepCheckboxRow>
-              <StepCheckboxRow name="aspirate--mix--checkbox" label='Mix'>
-                <StepInputField name="aspirate--mix--volume" units='μL' {...focusHandlers} />
-                <StepInputField name="aspirate--mix--times" units='Times' {...focusHandlers} />
+              <StepCheckboxRow name="aspirate_mix_checkbox" label='Mix'>
+                <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
+                <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
               </StepCheckboxRow>
-              <StepCheckboxRow name="aspirate--disposal-vol--checkbox" label="Disposal Volume" >
-                <StepInputField name="aspirate--disposal-vol--volume" units="μL" {...focusHandlers} />
+              <StepCheckboxRow name="aspirate_disposalVol_checkbox" label="Disposal Volume" >
+                <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
               </StepCheckboxRow>
             </FormGroup>
           </div>
           <div className={styles.right_settings_column}>
-            <ChangeTipField name="aspirate--change-tip" />
+            <ChangeTipField name="aspirate_changeTip" />
             <FlowRateField />
             <TipPositionField />
           </div>
@@ -72,11 +71,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
       <FormSection sectionName='dispense'>
         <div className={formStyles.row_wrapper}>
           <FormGroup label='Labware:' className={styles.labware_field}>
-            <LabwareDropdown name="dispense--labware" />
+            <LabwareDropdown name="dispense_labware" {...focusHandlers} />
           </FormGroup>
           <WellSelectionInput
-            name="dispense--wells"
-            labwareFieldName="dispense--labware"
+            name="dispense_wells"
+            labwareFieldName="dispense_labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
           {(stepType === 'transfer' || stepType === 'distribute') &&
@@ -88,13 +87,13 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="dispense--mix--checkbox" label='Mix'>
-                <StepInputField name="dispense--mix--volume" units="μL" {...focusHandlers} />
-                <StepInputField name="dispense--mix--times" units="Times" {...focusHandlers} />
+              <StepCheckboxRow name="dispense_mix_checkbox" label='Mix'>
+                <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
+                <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
               <DispenseDelayFields focusHandlers={focusHandlers} />
-              <StepCheckboxRow name='dispense--blowout--checkbox' label='Blow out' >
-                <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+              <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
+                <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
               </StepCheckboxRow>
             </FormGroup>
           </div>

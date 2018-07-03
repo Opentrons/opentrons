@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {TitleBar, humanizeLabwareType} from '@opentrons/components'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 

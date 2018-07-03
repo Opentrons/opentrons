@@ -121,7 +121,7 @@ export {
   home,
   clearHomeResponse,
   moveRobotTo,
-  clearRobotMoveResponse,
+  clearMoveResponse,
   fetchRobotLights,
   setRobotLights,
   makeGetRobotMove,

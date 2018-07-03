@@ -4,7 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 
-import {selectors as steplist} from '../steplist/reducers'
+import {selectors as steplist} from '../steplist'
 import {selectors as labwareIngred} from '../labware-ingred/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
 import type {BaseState} from '../types'

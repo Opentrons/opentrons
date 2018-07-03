@@ -1,7 +1,7 @@
 // @flow
 import type {Dispatch} from 'redux'
 
-import {selectors} from '../reducers'
+import {selectors} from '../index'
 import {END_STEP} from '../types'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
 import type {ChangeFormPayload} from './types'
