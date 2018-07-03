@@ -76,12 +76,11 @@ export const wellRatioTransfer = (fields: HydratedFormData): ?FormError => {
 export const wellRatioDistribute = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
   if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length !== 1 && dispense_wells.length <= 1 ? FORM_ERRORS.WELL_RATIO_DISTRIBUTE : null
+  return aspirate_wells.length !== 1 || dispense_wells.length <= 1 ? FORM_ERRORS.WELL_RATIO_DISTRIBUTE : null
 }
 
 export const wellRatioConsolidate = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
-  console.table({aspirate_wells, dispense_wells})
   if (!aspirate_wells || !dispense_wells) return null
   return aspirate_wells.length <= 1 || dispense_wells.length !== 1 ? FORM_ERRORS.WELL_RATIO_CONSOLIDATE : null
 }
