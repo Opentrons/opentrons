@@ -47,7 +47,7 @@ type StepEditFormState = {
 type Props = SP & DP
 
 class StepEditForm extends React.Component<Props, StepEditFormState> {
-  constructor (props) {
+  constructor (props: Props) {
     super(props)
     this.state = {
       showConfirmDeleteModal: false,
@@ -62,8 +62,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
       if (this.props.isNewStep) {
         this.setState({ focusedField: null, dirtyFields: [] })
       } else {
-        const fieldNames: Array<string> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
-        // $FlowFixMe
+        // TODO: type fieldNames, don't use `any`
+        const fieldNames: Array<any> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
         this.setState({focusedField: null, dirtyFields: fieldNames})
       }
     }
@@ -88,6 +88,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
   render () {
     if (!this.props.formData) return null // early-exit if connected formData is absent
     const {formData, onDelete} = this.props
+    // TODO: FormComponent should be type ?StepForm. That also requires making focusedField prop consistently allow null
     const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
     if (!FormComponent) { // early-exit if step form doesn't exist
       return <div className={formStyles.form}><div>Todo: support {formData && formData.stepType} step</div></div>
