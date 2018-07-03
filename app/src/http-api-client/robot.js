@@ -6,6 +6,14 @@ import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
+import type {
+  ApiRequestAction,
+  ApiSuccessAction,
+  ApiFailureAction,
+  ClearApiResponseAction
+} from './actions'
+
+import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
 import client from './client'
 
 type Point = [number, number, number]
@@ -57,59 +65,27 @@ type RobotLightsResponse = {
   on: boolean
 }
 
-type RequestPath = 'move' | 'home' | 'lights'
+type RequestPath =
+  | 'robot/positions'
+  | 'robot/move'
+  | 'robot/home'
+  | 'robot/lights'
 
-type RobotRequest = RobotMoveRequest | RobotHomeRequest | RobotLightsRequest
+type RobotRequest =
+  | RobotMoveRequest
+  | RobotHomeRequest
+  | RobotLightsRequest
 
-type RobotResponse = RobotMoveResponse | RobotHomeResponse | RobotLightsResponse
-
-type RobotRequestAction = {|
-  type: 'api:ROBOT_REQUEST',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    request: RobotRequest,
-  |}
-|}
-
-type RobotSuccessAction = {|
-  type: 'api:ROBOT_SUCCESS',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    response: RobotResponse,
-  |}
-|}
-
-type RobotFailureAction = {|
-  type: 'api:ROBOT_FAILURE',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    error: ApiRequestError,
-  |}
-|}
-
-type ClearMoveResponseAction = {|
-  type: 'api:CLEAR_ROBOT_MOVE_RESPONSE',
-  payload: {|
-    robot: BaseRobot,
-  |}
-|}
-
-type ClearHomeResponseAction = {|
-  type: 'api:CLEAR_HOME_RESPONSE',
-  payload: {|
-    robot: BaseRobot,
-  |}
-|}
+type RobotResponse =
+  | RobotMoveResponse
+  | RobotHomeResponse
+  | RobotLightsResponse
 
 export type RobotAction =
-  | RobotRequestAction
-  | RobotSuccessAction
-  | RobotFailureAction
-  | ClearMoveResponseAction
-  | ClearHomeResponseAction
+  | ApiRequestAction<RequestPath, RobotRequest>
+  | ApiSuccessAction<RequestPath, RobotResponse>
+  | ApiFailureAction<RequestPath>
+  | ClearApiResponseAction<RequestPath>
 
 export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
@@ -127,9 +103,19 @@ type RobotState = {
   [robotName: string]: ?RobotByNameState,
 }
 
-const MOVE: RequestPath = 'move'
-const HOME: RequestPath = 'home'
-const LIGHTS: RequestPath = 'lights'
+const POSITIONS: RequestPath = 'robot/positions'
+const MOVE: RequestPath = 'robot/move'
+const HOME: RequestPath = 'robot/home'
+const LIGHTS: RequestPath = 'robot/lights'
+
+function isRobotPath (path: string): boolean %checks {
+  return (
+    path === POSITIONS ||
+    path === MOVE ||
+    path === HOME ||
+    path === LIGHTS
+  )
+}
 
 export function moveRobotTo (
   robot: RobotService,
@@ -138,9 +124,9 @@ export function moveRobotTo (
   const {position, mount} = request
 
   return (dispatch) => {
-    dispatch(robotRequest(robot, MOVE, request))
+    dispatch(apiRequest(robot, MOVE, request))
 
-    return client(robot, 'GET', `robot/positions`)
+    return client(robot, 'GET', POSITIONS)
       .then((response: RobotPositionsResponse) => {
         const positionInfo = response.positions
         const {target} = positionInfo[position]
@@ -151,19 +137,14 @@ export function moveRobotTo (
         let body = {target, point, mount}
         if (request.pipette) body = {...body, model: request.pipette.model}
 
-        return client(robot, 'POST', 'robot/move', body)
+        return client(robot, 'POST', MOVE, body)
       })
       .then(
-        (r: RobotMoveResponse) => dispatch(robotSuccess(robot, MOVE, r)),
-        (e: ApiRequestError) => dispatch(robotFailure(robot, MOVE, e))
+        (resp: RobotMoveResponse) => apiSuccess(robot, MOVE, resp),
+        (err: ApiRequestError) => apiFailure(robot, MOVE, err)
       )
+      .then(dispatch)
   }
-}
-
-export function clearRobotMoveResponse (
-  robot: RobotService
-): ClearMoveResponseAction {
-  return {type: 'api:CLEAR_ROBOT_MOVE_RESPONSE', payload: {robot}}
 }
 
 export function home (robot: RobotService, mount?: Mount): ThunkPromiseAction {
@@ -172,68 +153,67 @@ export function home (robot: RobotService, mount?: Mount): ThunkPromiseAction {
       ? {target: 'pipette', mount}
       : {target: 'robot'}
 
-    dispatch(robotRequest(robot, HOME, body))
+    dispatch(apiRequest(robot, HOME, body))
 
-    return client(robot, 'POST', 'robot/home', body)
+    return client(robot, 'POST', HOME, body)
       .then(
-        (response) => robotSuccess(robot, HOME, response),
-        (error) => robotFailure(robot, HOME, error)
+        (resp: RobotHomeResponse) => apiSuccess(robot, HOME, resp),
+        (err: ApiRequestError) => apiFailure(robot, HOME, err)
       )
       .then(dispatch)
   }
-}
-
-export function clearHomeResponse (
-  robot: RobotService
-): ClearHomeResponseAction {
-  return {type: 'api:CLEAR_HOME_RESPONSE', payload: {robot}}
 }
 
 export function fetchRobotLights (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
-    dispatch(robotRequest(robot, LIGHTS))
+    dispatch(apiRequest(robot, LIGHTS, null))
 
-    return client(robot, 'GET', 'robot/lights')
+    return client(robot, 'GET', LIGHTS)
       .then(
-        (response) => robotSuccess(robot, LIGHTS, response),
-        (error) => robotFailure(robot, LIGHTS, error)
+        (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
+        (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
       )
       .then(dispatch)
   }
+}
+
+export function clearHomeResponse (robot: BaseRobot): ClearApiResponseAction {
+  return clearApiResponse(robot, HOME)
+}
+
+export function clearMoveResponse (robot: BaseRobot): ClearApiResponseAction {
+  return clearApiResponse(robot, MOVE)
 }
 
 export function setRobotLights (
   robot: RobotService,
   on: boolean
 ): ThunkPromiseAction {
-  const body = {on}
+  const request: RobotLightsRequest = {on}
 
   return (dispatch) => {
-    dispatch(robotRequest(robot, LIGHTS, body))
+    dispatch(apiRequest(robot, LIGHTS, request))
 
-    return client(robot, 'POST', 'robot/lights', body)
+    return client(robot, 'POST', LIGHTS, request)
       .then(
-        (response) => robotSuccess(robot, LIGHTS, response),
-        (error) => robotFailure(robot, LIGHTS, error)
+        (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
+        (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
       )
       .then(dispatch)
   }
 }
 
+
+
+// TODO(mc, 2018-07-03): remove in favor of single HTTP API reducer
 export function robotReducer (state: ?RobotState, action: Action): RobotState {
   if (!state) return {}
 
-  let name
-  let path
-  let request
-  let response
-  let error
-  let stateByName
-
   switch (action.type) {
-    case 'api:ROBOT_REQUEST':
-      ({path, request, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:REQUEST': {
+      const {payload: {path, request, robot: {name}}} = action
+      if (!isRobotPath(path)) return state
+      const stateByName = state[name] || {}
 
       return {
         ...state,
@@ -242,63 +222,52 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
           [path]: {request, inProgress: true, response: null, error: null}
         }
       }
+    }
 
-    case 'api:ROBOT_SUCCESS':
-      ({path, response, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
-
-      return {
-        ...state,
-        [name]: {
-          ...stateByName,
-          [path]: {
-            ...stateByName[path],
-            response,
-            inProgress: false,
-            error: null
-          }
-        }
-      }
-
-    case 'api:ROBOT_FAILURE':
-      ({path, error, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:SUCCESS': {
+      const {payload: {path, response, robot: {name}}} = action
+      if (!isRobotPath(path)) return state
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {
-            ...stateByName[path],
-            error,
-            inProgress: false
-          }
+          [path]: {...stateByPath, response, inProgress: false, error: null}
         }
       }
+    }
 
-    case 'api:CLEAR_ROBOT_MOVE_RESPONSE':
-      ({robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:FAILURE': {
+      const {payload: {path, error, robot: {name}}} = action
+      if (!isRobotPath(path)) return state
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          move: {...stateByName.move, response: null}
+          [path]: {...stateByPath, error, inProgress: false}
         }
       }
+    }
 
-    case 'api:CLEAR_HOME_RESPONSE':
-      ({robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:CLEAR_RESPONSE': {
+      const {payload: {path, robot: {name}}} = action
+      if (!isRobotPath(path)) return state
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          home: {...stateByName.home, error: null, response: null}
+          [path]: {...stateByPath, response: null, error: null}
         }
       }
+    }
   }
 
   return state
@@ -307,7 +276,7 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
 export const makeGetRobotMove = () => {
   const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
     selectRobotState,
-    (state) => state.move || {inProgress: false}
+    (state) => state[MOVE] || {inProgress: false}
   )
 
   return selector
@@ -316,7 +285,7 @@ export const makeGetRobotMove = () => {
 export const makeGetRobotHome = () => {
   const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
     selectRobotState,
-    (state) => state.home || {inProgress: false}
+    (state) => state[HOME] || {inProgress: false}
   )
 
   return selector
@@ -325,37 +294,10 @@ export const makeGetRobotHome = () => {
 export const makeGetRobotLights = () => {
   const selector: Selector<State, BaseRobot, RobotLights> = createSelector(
     selectRobotState,
-    (state) => state.lights || {inProgress: false}
+    (state) => state[LIGHTS] || {inProgress: false}
   )
 
   return selector
-}
-
-function robotRequest (
-  robot: RobotService,
-  path: RequestPath,
-  request: RobotRequest
-): RobotRequestAction {
-  return {type: 'api:ROBOT_REQUEST', payload: {robot, path, request}}
-}
-
-function robotSuccess (
-  robot: RobotService,
-  path: RequestPath,
-  response: RobotResponse
-): RobotSuccessAction {
-  return {
-    type: 'api:ROBOT_SUCCESS',
-    payload: {robot, path, response}
-  }
-}
-
-function robotFailure (
-  robot: RobotService,
-  path: RequestPath,
-  error: ApiRequestError
-): RobotFailureAction {
-  return {type: 'api:ROBOT_FAILURE', payload: {robot, path, error}}
 }
 
 function selectRobotState (state: State, props: BaseRobot): RobotByNameState {

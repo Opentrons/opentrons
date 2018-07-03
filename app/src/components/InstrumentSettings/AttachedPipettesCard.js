@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import type {State} from '../../types'
 import type {Robot} from '../../robot'
 import type {Pipette} from '../../http-api-client'
-import {makeGetRobotPipettes, fetchPipettes, clearRobotMoveResponse} from '../../http-api-client'
+import {makeGetRobotPipettes, fetchPipettes, clearMoveResponse} from '../../http-api-client'
 
 import InstrumentInfo from './InstrumentInfo'
 import {RefreshCard} from '@opentrons/components'
@@ -61,6 +61,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchPipettes: () => dispatch(fetchPipettes(ownProps)),
-    clearMove: () => dispatch(clearRobotMoveResponse(ownProps))
+    clearMove: () => dispatch(clearMoveResponse(ownProps))
   }
 }
