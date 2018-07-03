@@ -794,3 +794,103 @@ def test_send_command_with_retry(model, monkeypatch):
     count = -1
     with pytest.raises(serial_communication.SerialNoResponse):
         robot._driver._send_command('test')
+
+
+def test_unstick_axes(model):
+    import types
+    driver = model.robot._driver
+    driver.simulating = True
+
+    current_log = []
+
+    def send_command_mock(self, command, timeout=None):
+        nonlocal current_log
+        current_log.append(command)
+        if 'M119' in command:
+            smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'  # NOQA
+            smoothie_switch_res += ' _pins '
+            smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+            smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 0\r\n'   # NOQA
+            return smoothie_switch_res
+
+    driver._send_command = types.MethodType(send_command_mock, driver)
+
+    driver.unstick_axes('BC')
+
+    expected = [
+        'M203.1 B1 C1',  # slow them down
+        'M119',  # get the switch status
+        'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',  # move
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # set plunger current
+        'M203.1 A125 B50 C50 X600 Y400 Z125'  # return to normal speed
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    current_log = []
+    driver.unstick_axes('XYZA')
+
+    expected = [
+        'M203.1 A1 X1 Y1 Z1',  # slow them down
+        'M119',  # get the switch status
+        'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0A-1X-1Y-1Z-1',
+        'M203.1 A125 B50 C50 X600 Y400 Z125'  # return to normal speed
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    def send_command_mock(self, command, timeout=None):
+        nonlocal current_log
+        current_log.append(command)
+        if 'M119' in command:
+            smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:1'  # NOQA
+            smoothie_switch_res += ' _pins '
+            smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+            smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 0\r\n'   # NOQA
+            return smoothie_switch_res
+
+    driver._send_command = types.MethodType(send_command_mock, driver)
+
+    current_log = []
+    driver.unstick_axes('BC')
+
+    expected = [
+        'M203.1 B1 C1',  # set max-speeds
+        'M119',  # get switch status
+        'M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-2',  # MOVE B
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current B
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',  # HOME C
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
+        'M203.1 A125 B50 C50 X600 Y400 Z125'  # reset max-speeds
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
+
+    def send_command_mock(self, command, timeout=None):
+        nonlocal current_log
+        current_log.append(command)
+        if 'M119' in command:
+            smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:1 C_max:1'  # NOQA
+            smoothie_switch_res += ' _pins '
+            smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
+            smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 0\r\n'   # NOQA
+            return smoothie_switch_res
+
+    driver._send_command = types.MethodType(send_command_mock, driver)
+
+    current_log = []
+    driver.unstick_axes('BC')
+
+    expected = [
+        'M203.1 B1 C1',  # set max-speeds
+        'M119',  # get switch status
+        'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2BC',  # HOME BC
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current BC
+        'M203.1 A125 B50 C50 X600 Y400 Z125'  # reset max-speeds
+    ]
+    # from pprint import pprint
+    # pprint(current_log)
+    assert current_log == expected
