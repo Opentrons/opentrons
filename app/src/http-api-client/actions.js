@@ -34,6 +34,14 @@ export type ApiFailureAction<Path: string> = {|
   |},
 |}
 
+export type ClearApiResponseAction<Path: string> = {|
+  type: 'api:CLEAR_RESPONSE',
+  payload: {|
+    robot: BaseRobot,
+    path: Path,
+  |}
+|}
+
 export function apiRequest<Path: string, Body: ?{}> (
   robot: BaseRobot,
   path: Path,
@@ -56,4 +64,11 @@ export function apiFailure<Path: string> (
   error: ApiRequestError
 ): ApiFailureAction<Path> {
   return {type: 'api:FAILURE', payload: {robot, path, error}}
+}
+
+export function clearApiResponse<Path: string> (
+  robot: BaseRobot,
+  path: Path
+): ClearApiResponseAction<Path> {
+  return {type: 'api:CLEAR_RESPONSE', payload: {robot, path}}
 }
