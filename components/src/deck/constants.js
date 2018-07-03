@@ -16,6 +16,4 @@ export const TRASH_SLOTNAME = '12'
 export const SLOT_WIDTH = 127.8
 export const SLOT_HEIGHT = 85.5
 export const SLOT_SPACING = 5
-export const DECK_WIDTH = SLOT_WIDTH * 3 + SLOT_SPACING * 4
-export const DECK_HEIGHT = SLOT_HEIGHT * 4 + SLOT_SPACING * 5
 export const SLOT_OFFSET = 10

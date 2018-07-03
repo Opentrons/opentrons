@@ -3,6 +3,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 import {Deck} from '@opentrons/components'
+import styles from './Deck.css'
 
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -29,12 +30,13 @@ function mapStateToProps (state: BaseState): DeckSetupProps {
 
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
 function DeckSetup (props: DeckSetupProps) {
+  const deck = <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
   if (!props.deckSetupMode) {
     // Temporary quickfix: if we're not in deck setup mode,
     // hide the labware dropdown and ingredient selection modal
     // and just show the deck.
     // TODO Ian 2018-05-30 this shouldn't be a responsibility of DeckSetup
-    return <Deck LabwareComponent={LabwareContainer} />
+    return deck
   }
 
   // NOTE: besides `Deck`, these are all modal-like components that show up
@@ -45,8 +47,7 @@ function DeckSetup (props: DeckSetupProps) {
     <div>
       <LabwareDropdown />
       {props.ingredSelectionMode && <IngredientSelectionModal />}
-
-      <Deck LabwareComponent={LabwareContainer} />
+      {deck}
     </div>
   )
 }
