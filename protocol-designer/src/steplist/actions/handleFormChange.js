@@ -1,9 +1,10 @@
 // @flow
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-
 import {selectors} from '../index'
+import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {GetState} from '../../types'
 
 import type {ChangeFormPayload} from './types'
@@ -85,10 +86,14 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     const prevPipette = unsavedForm.pipette
     const nextPipette = payload.update.pipette
 
-    const getChannels = (pipetteId: string): 1 | 8 => {
-      // TODO HACK Ian 2018-05-04 use pipette definitions for this;
-      // you'd also need a way to grab pipette model from a given pipetteId here
-      return pipetteId.endsWith('8-Channel') ? 8 : 1
+    const getChannels = (pipetteId: string): PipetteChannels => {
+      const pipettes = pipetteSelectors.pipettesById(getState())
+      const pipette = pipettes[pipetteId]
+      if (!pipette) {
+        console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
+        return 1
+      }
+      return pipette.channels
     }
 
     if (typeof nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
