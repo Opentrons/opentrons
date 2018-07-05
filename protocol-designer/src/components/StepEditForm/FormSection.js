@@ -5,7 +5,7 @@ import startCase from 'lodash/startCase'
 import cx from 'classnames'
 import {IconButton} from '@opentrons/components'
 
-import {selectors as steplistSelectors} from '../../steplist/reducers'
+import {selectors as steplistSelectors} from '../../steplist'
 import {collapseFormSection} from '../../steplist/actions'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './FormSection.css'

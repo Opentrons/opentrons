@@ -110,8 +110,8 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       formData.stepType === 'distribute'
     )
   ) {
-    const sourceLabwareName = getLabwareName(formData['aspirate--labware'])
-    const destLabwareName = getLabwareName(formData['dispense--labware'])
+    const sourceLabwareName = getLabwareName(formData['aspirate_labware'])
+    const destLabwareName = getLabwareName(formData['dispense_labware'])
 
     result.push(
       <AspirateDispenseHeader

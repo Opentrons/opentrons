@@ -25,22 +25,22 @@ export type FormModalFields = {|
 |}
 
 export type DelayFields = {|
-  'dispense--delay--checkbox'?: boolean,
-  'dispense--delay-minutes'?: string,
-  'dispense--delay-seconds'?: string
+  'dispense_delay_checkbox'?: boolean,
+  'dispense_delayMinutes'?: string,
+  'dispense_delaySeconds'?: string
 |}
 
 export type BlowoutFields = {|
-  'dispense--blowout--checkbox'?: boolean,
-  'dispense--blowout--labware'?: string
+  'dispense_blowout_checkbox'?: boolean,
+  'dispense_blowout_labware'?: string
 |}
 
 export type ChangeTipFields = {|
-  'aspirate--change-tip'?: ChangeTipOptions,
+  'aspirate_changeTip'?: ChangeTipOptions,
 |}
 
 export type TouchTipFields = {|
-  'aspirate--touch-tip'?: boolean
+  'aspirate_touchTip'?: boolean
 |}
 
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
@@ -55,24 +55,24 @@ export type TransferLikeForm = {|
   stepType: TransferLikeStepType,
   id: StepIdType,
 
-  'aspirate--labware'?: string,
-  'aspirate--wells'?: Array<string>,
+  'aspirate_labware'?: string,
+  'aspirate_wells'?: Array<string>,
   'pipette'?: string,
-  'aspirate--pre-wet-tip'?: boolean,
-  'aspirate--air-gap--checkbox'?: boolean,
-  'aspirate--air-gap--volume'?: string,
-  'aspirate--mix--checkbox'?: boolean,
-  'aspirate--mix--volume'?: string,
-  'aspirate--mix--times'?: string,
-  'aspirate--disposal-vol--checkbox'?: boolean,
-  'aspirate--disposal-vol--volume'?: string,
+  'aspirate_preWetTip'?: boolean,
+  'aspirate_airGap_checkbox'?: boolean,
+  'aspirate_airGap_volume'?: string,
+  'aspirate_mix_checkbox'?: boolean,
+  'aspirate_mix_volume'?: string,
+  'aspirate_mix_times'?: string,
+  'aspirate_disposalVol_checkbox'?: boolean,
+  'aspirate_disposalVol_volume'?: string,
 
   'volume'?: string,
-  'dispense--labware'?: string,
-  'dispense--wells'?: Array<string>,
-  'dispense--mix--checkbox'?: boolean,
-  'dispense--mix--volume'?: string,
-  'dispense--mix--times'?: string
+  'dispense_labware'?: string,
+  'dispense_wells'?: Array<string>,
+  'dispense_mix_checkbox'?: boolean,
+  'dispense_mix_volume'?: string,
+  'dispense_mix_times'?: string
 |}
 
 export type MixForm = {|
@@ -97,16 +97,19 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  'pause-for-amount-of-time'?: 'true' | 'false',
-  'pause-hour'?: string,
-  'pause-minute'?: string,
-  'pause-second'?: string,
-  'pause-message'?: string
+  'pauseForAmountOfTime'?: 'true' | 'false',
+  'pauseHour'?: string,
+  'pauseMinute'?: string,
+  'pauseSecond'?: string,
+  'pauseMessage'?: string
 |}
 
+// TODO: separate field values from from metadata
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
+  'step-name'?: string,
+  'step-details'?: string,
   [StepFieldName]: any // TODO: form value processing to ensure type
 }
 //  | MixForm

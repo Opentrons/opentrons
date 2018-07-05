@@ -1,5 +1,9 @@
 // @flow
-import computeWellAccess from './computeWellAccess'
+import {
+  canPipetteUseLabware,
+  computeWellAccess,
+  getWellTotalVolume
+} from './helpers'
 import getLabware from './getLabware'
 
 // Requires `make build` to have run to create this .json
@@ -13,7 +17,9 @@ export * from './types'
 export * from './pipettes'
 
 export {
+  canPipetteUseLabware,
   computeWellAccess,
+  getWellTotalVolume,
   getLabware,
   labwareList
 }

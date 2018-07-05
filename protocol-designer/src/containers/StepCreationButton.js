@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import StepCreationButton from '../components/StepCreationButton'
 
 import {addStep, expandAddStepButton} from '../steplist/actions'
-import {selectors} from '../steplist/reducers'
+import {selectors} from '../steplist'
 import type {StepType} from '../form-types'
 import type {BaseState, ThunkDispatch} from '../types'
 

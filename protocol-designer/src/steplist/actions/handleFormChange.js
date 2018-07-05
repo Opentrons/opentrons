@@ -1,9 +1,10 @@
 // @flow
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-
-import {selectors} from '../reducers'
+import {selectors} from '../index'
+import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import type {PipetteChannels} from '@opentrons/shared-data'
 import type {GetState} from '../../types'
 
 import type {ChangeFormPayload} from './types'
@@ -40,12 +41,12 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   // Changing labware clears wells selection: source labware
   if (
     unsavedForm !== null &&
-    'aspirate--labware' in payload.update
+    'aspirate_labware' in payload.update
   ) {
     return {
       update: {
         ...payload.update,
-        'aspirate--wells': null
+        'aspirate_wells': null
       }
     }
   }
@@ -53,12 +54,12 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   // Changing labware clears wells selection: dest labware
   if (
     unsavedForm !== null &&
-    'dispense--labware' in payload.update
+    'dispense_labware' in payload.update
   ) {
     return {
       update: {
         ...payload.update,
-        'dispense--wells': null
+        'dispense_wells': null
       }
     }
   }
@@ -85,10 +86,14 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     const prevPipette = unsavedForm.pipette
     const nextPipette = payload.update.pipette
 
-    const getChannels = (pipetteId: string): 1 | 8 => {
-      // TODO HACK Ian 2018-05-04 use pipette definitions for this;
-      // you'd also need a way to grab pipette model from a given pipetteId here
-      return pipetteId.endsWith('8-Channel') ? 8 : 1
+    const getChannels = (pipetteId: string): PipetteChannels => {
+      const pipettes = pipetteSelectors.pipettesById(getState())
+      const pipette = pipettes[pipetteId]
+      if (!pipette) {
+        console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
+        return 1
+      }
+      return pipette.channels
     }
 
     if (typeof nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
@@ -112,8 +117,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       return {
         update: {
           ...payload.update,
-          'aspirate--wells': null,
-          'dispense--wells': null
+          'aspirate_wells': null,
+          'dispense_wells': null
         }
       }
     }
@@ -138,8 +143,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       }
 
       // source + dest well steptypes
-      const sourceLabwareId = unsavedForm['aspirate--labware']
-      const destLabwareId = unsavedForm['dispense--labware']
+      const sourceLabwareId = unsavedForm['aspirate_labware']
+      const destLabwareId = unsavedForm['dispense_labware']
 
       const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
       const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
@@ -147,8 +152,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       return {
         update: {
           ...payload.update,
-          'aspirate--wells': _getAllWells(unsavedForm['aspirate--wells'], sourceLabwareType),
-          'dispense--wells': _getAllWells(unsavedForm['dispense--wells'], destLabwareType)
+          'aspirate_wells': _getAllWells(unsavedForm['aspirate_wells'], sourceLabwareType),
+          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType)
         }
       }
     }
