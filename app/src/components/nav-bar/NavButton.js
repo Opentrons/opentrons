@@ -30,8 +30,9 @@ export default withRouter(connect(mapStateToProps)(NavButton))
 
 function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
   const {name} = ownProps
-  const isSessionLoaded = robotSelectors.getSessionIsLoaded(state)
-  const isRunning = robotSelectors.getIsRunning(state)
+  const isProtocolLoaded = robotSelectors.getSessionIsLoaded(state)
+  const isProtocolRunning = robotSelectors.getIsRunning(state)
+  const isProtocolDone = robotSelectors.getIsDone(state)
   const isConnected = (
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
@@ -46,19 +47,19 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
       notification: robotNotification
     },
     upload: {
-      disabled: !isConnected || isRunning,
+      disabled: !isConnected || isProtocolRunning,
       iconName: 'ot-file',
       title: 'protocol',
       url: '/upload'
     },
     setup: {
-      disabled: !isSessionLoaded || isRunning,
+      disabled: !isProtocolLoaded || isProtocolRunning || isProtocolDone,
       iconName: 'ot-calibrate',
       title: 'calibrate',
       url: '/calibrate'
     },
     run: {
-      disabled: !isSessionLoaded,
+      disabled: !isProtocolLoaded,
       iconName: 'ot-run',
       title: 'run',
       url: '/run'
