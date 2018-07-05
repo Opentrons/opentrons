@@ -10,7 +10,7 @@ function getRootReducer () {
     labwareIngred: require('./labware-ingred/reducers').default,
     navigation: require('./navigation').rootReducer,
     pipettes: require('./pipettes').rootReducer,
-    steplist: require('./steplist/reducers').default,
+    steplist: require('./steplist').rootReducer,
     wellSelection: require('./well-selection/reducers').default
   })
 
@@ -41,6 +41,7 @@ export default function configureStore () {
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
     module.hot.accept([
+      './dismiss/reducers',
       './file-data/reducers',
       './labware-ingred/reducers',
       './navigation/reducers',
