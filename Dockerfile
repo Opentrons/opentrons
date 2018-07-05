@@ -38,6 +38,7 @@ RUN apk add --update \
       py3-zmq \
       py3-urwid \
       py3-numpy \
+      avrdude \
       ffmpeg \
       mpg123 \
       && rm -rf /var/cache/apk/*
@@ -85,6 +86,9 @@ RUN pipenv install /tmp/api-server-lib --system && \
 # Redirect nginx logs to stdout and stderr
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
+
+# Use udev rules file from opentrons_data
+RUN ln -sf /data/user_storage/opentrons_data/95-opentrons-modules.rules /etc/udev/rules.d/95-opentrons-modules.rules
 
 # GPG public key to verify signed packages
 COPY ./compute/opentrons.asc .
