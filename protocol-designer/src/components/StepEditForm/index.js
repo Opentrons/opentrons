@@ -39,7 +39,8 @@ export type FocusHandlers = {
 
 type SP = {
   formData?: ?FormData,
-  isNewStep?: boolean
+  isNewStep?: boolean,
+  canSave?: ?boolean
 }
 type DP = {
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
