@@ -45,9 +45,9 @@ export type SettingsState = {
 
 const SETTINGS: 'settings' = 'settings'
 
-// TODO(mc, 2018-07-03): flow helper until we have one reducer
-// note: p === 'settings' works but p === SETTINGS does not, even if
-// SETTINGS is defined as `const SETTINGS: 'settings' = 'settings'`
+// TODO(mc, 2018-07-03): flow helper until we have one reducer, since
+// p === 'constant' checks but p === CONSTANT does not, even if
+// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
 function getSettingsPath (p: string): ?SettingsPath {
   if (p === 'settings') return p
 

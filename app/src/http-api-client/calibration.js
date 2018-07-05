@@ -4,7 +4,9 @@ import {createSelector, type Selector} from 'reselect'
 import type {State, Action, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService, Mount} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
+import type {ApiRequestAction, ApiSuccessAction, ApiFailureAction} from './actions'
 
+import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
 import client from './client'
 
 export type JogAxis = 'x' | 'y' | 'z'
@@ -17,9 +19,9 @@ export type DeckCalPoint = '1' | '2' | '3'
 
 export type DeckCalMovePoint = 'attachTip' | 'safeZ' | DeckCalPoint
 
-type DeckStartRequest = {
+type DeckStartRequest = {|
   force?: boolean
-}
+|}
 
 type DeckStartResponse = {
   token: string,
@@ -43,72 +45,43 @@ type DeckCalResponse = {
   message: string,
 }
 
+type CalPath =
+  | 'calibration/deck/start'
+  | 'calibration/deck'
+
 type CalRequest = DeckStartRequest | DeckCalRequest
 
 type CalResponse = DeckStartResponse | DeckCalResponse
 
-type RequestPath =
-  | 'deck/start'
-  | 'deck'
-
-type CalRequestAction = {|
-  type: 'api:CAL_REQUEST',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    request: CalRequest,
-  |},
-|}
-
-type CalSuccessAction = {|
-  type: 'api:CAL_SUCCESS',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    response: CalResponse,
-  |},
-|}
-
-type CalFailureAction = {|
-  type: 'api:CAL_FAILURE',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    error: ApiRequestError,
-  |},
-|}
-
-type SetCalJogStepAction = {|
-  type: 'api:SET_CAL_JOG_STEP',
-  payload: {|
-    step: JogStep,
-  |},
-|}
-
 export type CalibrationAction =
-  | CalRequestAction
-  | CalSuccessAction
-  | CalFailureAction
-  | SetCalJogStepAction
+  | ApiRequestAction<CalPath, CalRequest>
+  | ApiSuccessAction<CalPath, CalResponse>
+  | ApiFailureAction<CalPath>
 
 export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
 
 export type DeckCalCommandState = ApiCall<DeckCalRequest, DeckCalResponse>
 
 type RobotCalState = {
-  'deck/start'?: DeckCalStartState,
-  deck?: DeckCalCommandState,
+  'calibration/deck/start'?: DeckCalStartState,
+  'calibration/deck'?: DeckCalCommandState,
 }
 
 type CalState = {
-  jogStep: JogStep,
   [robotName: string]: ?RobotCalState,
 }
 
-const DECK: 'deck' = 'deck'
-const DECK_START: 'deck/start' = 'deck/start'
+const DECK: 'calibration/deck' = 'calibration/deck'
+const DECK_START: 'calibration/deck/start' = 'calibration/deck/start'
 
-const DEFAULT_JOG_STEP = 0.1
+// TODO(mc, 2018-07-05): flow helper until we have one reducer, since
+// p === 'constant' checks but p === CONSTANT does not, even if
+// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
+function getCalPath (p: string): ?CalPath {
+  if (p === 'calibration/deck/start' || p === 'calibration/deck') return p
+
+  return null
+}
 
 export function startDeckCalibration (
   robot: RobotService,
@@ -117,11 +90,13 @@ export function startDeckCalibration (
   const request = {force}
 
   return (dispatch) => {
-    dispatch(calRequest(robot, DECK_START, request))
+    dispatch(apiRequest(robot, DECK_START, request))
 
-    return client(robot, 'POST', `calibration/${DECK_START}`, request)
-      .then((res: DeckStartResponse) => calSuccess(robot, DECK_START, res))
-      .catch((err: ApiRequestError) => calFailure(robot, DECK_START, err))
+    return client(robot, 'POST', DECK_START, request)
+      .then(
+        (res: DeckStartResponse) => apiSuccess(robot, DECK_START, res),
+        (err: ApiRequestError) => apiFailure(robot, DECK_START, err)
+      )
       .then(dispatch)
   }
 }
@@ -135,36 +110,33 @@ export function deckCalibrationCommand (
     const startState = getStartStateFromCalState(state)
     const token = startState.response && startState.response.token
 
-    dispatch(calRequest(robot, DECK, request))
+    if (request.command === 'release') {
+      dispatch(clearApiResponse(robot, DECK_START))
+    }
 
-    return client(robot, 'POST', `calibration/${DECK}`, {...request, token})
-      .then((res: DeckCalResponse) => calSuccess(robot, DECK, res))
-      .catch((err: ApiRequestError) => calFailure(robot, DECK, err))
+    dispatch(apiRequest(robot, DECK, request))
+
+    return client(robot, 'POST', DECK, {...request, token})
+      .then(
+        (res: DeckCalResponse) => apiSuccess(robot, DECK, res),
+        (err: ApiRequestError) => apiFailure(robot, DECK, err)
+      )
       .then(dispatch)
   }
-}
-
-export function setCalibrationJogStep (step: JogStep): SetCalJogStepAction {
-  return {type: 'api:SET_CAL_JOG_STEP', payload: {step}}
 }
 
 export function calibrationReducer (
   state: ?CalState,
   action: Action
 ): CalState {
-  if (!state) return {jogStep: DEFAULT_JOG_STEP}
-
-  let name
-  let path
-  let request
-  let response
-  let error
-  let stateByName
+  if (!state) return {}
 
   switch (action.type) {
-    case 'api:CAL_REQUEST':
-      ({path, request, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:REQUEST': {
+      const path = getCalPath(action.payload.path)
+      if (!path) return state
+      const {payload: {request, robot: {name}}} = action
+      const stateByName = state[name] || {}
 
       return {
         ...state,
@@ -173,58 +145,55 @@ export function calibrationReducer (
           [path]: {request, inProgress: true, response: null, error: null}
         }
       }
+    }
 
-    case 'api:CAL_SUCCESS':
-      ({path, response, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
-
-      // TODO(mc, 2018-05-07): this has a race condition if a new /deck request
-      //  is fired w/ one already in flight; disallow this
-      if (
-        path === DECK && stateByName[DECK] && stateByName[DECK].request &&
-        stateByName[DECK].request.command === 'release'
-      ) {
-        stateByName = {
-          ...stateByName,
-          [DECK_START]: {
-            ...stateByName[DECK_START],
-            error: null,
-            response: null
-          }
-        }
-      }
+    case 'api:SUCCESS': {
+      const path = getCalPath(action.payload.path)
+      if (!path) return state
+      const {payload: {response, robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {
-            ...stateByName[path],
-            response,
-            inProgress: false,
-            error: null
-          }
+          [path]: {...stateByPath, response, inProgress: false, error: null}
         }
       }
+    }
 
-    case 'api:CAL_FAILURE':
-      ({path, error, robot: {name}} = action.payload)
-      stateByName = state[name] || {}
+    case 'api:FAILURE': {
+      const path = getCalPath(action.payload.path)
+      if (!path) return state
+      const {payload: {error, robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {
-            ...stateByName[path],
-            error,
-            inProgress: false
-          }
+          [path]: {...stateByPath, error, inProgress: false}
         }
       }
+    }
 
-    case 'api:SET_CAL_JOG_STEP':
-      return {...state, jogStep: action.payload.step}
+    case 'api:CLEAR_RESPONSE': {
+      const path = getCalPath(action.payload.path)
+      if (!path) return state
+      const {payload: {robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
+
+      return {
+        ...state,
+        [name]: {
+          ...stateByName,
+          [path]: {...stateByPath, error: null, response: null}
+        }
+      }
+    }
   }
 
   return state
@@ -248,52 +217,14 @@ export function makeGetDeckCalibrationCommandState () {
   return sel
 }
 
-export function getCalibrationJogStep (state: State): JogStep {
-  return state.api.calibration.jogStep
-}
-
 function getRobotCalState (state: State, props: BaseRobot): RobotCalState {
   return state.api.calibration[props.name] || {}
 }
 
 function getStartStateFromCalState (state: RobotCalState): DeckCalStartState {
-  return state[DECK_START] || {
-    inProgress: false,
-    error: null,
-    request: null,
-    response: null
-  }
+  return state[DECK_START] || {inProgress: false}
 }
 
 function getDeckStateFromCalState (state: RobotCalState): DeckCalCommandState {
-  return state[DECK] || {
-    inProgress: false,
-    error: null,
-    request: null,
-    response: null
-  }
-}
-
-function calRequest (
-  robot: RobotService,
-  path: RequestPath,
-  request: CalRequest
-): CalRequestAction {
-  return {type: 'api:CAL_REQUEST', payload: {robot, path, request}}
-}
-
-function calSuccess (
-  robot: RobotService,
-  path: RequestPath,
-  response: CalResponse
-): CalSuccessAction {
-  return {type: 'api:CAL_SUCCESS', payload: {robot, path, response}}
-}
-
-function calFailure (
-  robot: RobotService,
-  path: RequestPath,
-  error: ApiRequestError
-): CalFailureAction {
-  return {type: 'api:CAL_FAILURE', payload: {robot, path, error}}
+  return state[DECK] || {inProgress: false}
 }

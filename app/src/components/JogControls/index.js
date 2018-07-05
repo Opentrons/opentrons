@@ -15,7 +15,7 @@ import {
 
 import styles from './styles.css'
 
-type Jog = (axis: JogAxis, direction: JogDirection, step: JogStep) => mixed
+export type Jog = (axis: JogAxis, direction: JogDirection, step: JogStep) => mixed
 
 type JogButtonProps = {
   name: string,
@@ -23,11 +23,9 @@ type JogButtonProps = {
   onClick: () => mixed,
 }
 
-export type JogControlsProps = {
-  jog: Jog,
-  step: JogStep,
-  onStepSelect: (event: SyntheticInputEvent<*>) => mixed,
-}
+type Props = {jog: Jog}
+
+type State = {step: JogStep}
 
 const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
 
@@ -49,28 +47,32 @@ const JOG_PARAMS_BY_NAME = {
   down: ['z', -1]
 }
 
-const STEPS = [0.1, 1, 10]
+const STEPS: Array<JogStep> = [0.1, 1, 10]
 const STEP_OPTIONS = STEPS.map(s => ({name: `${s} mm`, value: `${s}`}))
 
-export default class JogControls extends React.Component<JogControlsProps> {
+export default class JogControls extends React.Component<Props, State> {
+  constructor (props: Props) {
+    super(props)
+    this.state = {step: STEPS[0]}
+  }
+
   increaseStepSize = () => {
-    const current = STEPS.indexOf(this.props.step)
-    if (current < STEPS.length - 1) {
-      // $FlowFixMe: (mc, 2018-06-26) refactor so event trickery isn't needed
-      this.props.onStepSelect({target: {value: `${STEPS[current + 1]}`}})
-    }
+    const i = STEPS.indexOf(this.state.step)
+    if (i < STEPS.length - 1) this.setState({step: STEPS[i + 1]})
   }
 
   decreaseStepSize = () => {
-    const current = STEPS.indexOf(this.props.step)
-    if (current > 0) {
-      // $FlowFixMe: (mc, 2018-06-26) refactor so event trickery isn't needed
-      this.props.onStepSelect({target: {value: `${STEPS[current - 1]}`}})
-    }
+    const i = STEPS.indexOf(this.state.step)
+    if (i > 0) this.setState({step: STEPS[i - 1]})
+  }
+
+  handleStepSelect = (event: SyntheticInputEvent<*>) => {
+    this.setState({step: Number(event.target.value)})
   }
 
   getJogHandlers () {
-    const {jog, step} = this.props
+    const {jog} = this.props
+    const {step} = this.state
 
     return JOG_BUTTON_NAMES.reduce((result, name) => ({
       ...result,
@@ -79,8 +81,8 @@ export default class JogControls extends React.Component<JogControlsProps> {
   }
 
   renderJogControls () {
+    const {step} = this.state
     const jogHandlers = this.getJogHandlers()
-    const {step, onStepSelect} = this.props
 
     return (
       <HandleKeypress
@@ -111,7 +113,7 @@ export default class JogControls extends React.Component<JogControlsProps> {
             className={styles.increment_item}
             value={`${step}`}
             options={STEP_OPTIONS}
-            onChange={onStepSelect}
+            onChange={this.handleStepSelect}
             disableKeypress
           />
         </span>

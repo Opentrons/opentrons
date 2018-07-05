@@ -91,7 +91,8 @@ export type PipetteCalibrationAction = {|
   payload: {|
     mount: Mount,
     axis?: Axis,
-    direction?: Direction
+    direction?: Direction,
+    step?: number
   |},
   meta: {|
     robotCommand: true
@@ -451,11 +452,12 @@ export const actions = {
   jog (
     mount: Mount,
     axis: Axis,
-    direction: Direction
+    direction: Direction,
+    step: number
   ): PipetteCalibrationAction {
     return {
       type: 'robot:JOG',
-      payload: {mount, axis, direction},
+      payload: {mount, axis, direction, step},
       meta: {robotCommand: true}
     }
   },

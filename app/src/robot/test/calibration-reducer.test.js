@@ -1,25 +1,32 @@
 // calibration reducer tests
 import {reducer, actionTypes} from '../'
 
+const EXPECTED_INITIAL_STATE = {
+  deckPopulated: null,
+
+  // intrument probed + basic tip-tracking flags
+  // TODO(mc, 2018-01-22): combine these into subreducer
+  probedByMount: {},
+  tipOnByMount: {},
+
+  // labware confirmed flags
+  confirmedBySlot: {},
+
+  // TODO(mc, 2018-01-22): make this state a sub-reducer
+  calibrationRequest: {type: '', inProgress: false, error: null}
+}
+
 describe('robot reducer - calibration', () => {
   test('initial state', () => {
-    const state = reducer(undefined, {}).calibration
+    const state = reducer(undefined, {})
 
-    expect(state).toEqual({
-      deckPopulated: null,
-      jogDistance: 0.1,
+    expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
+  })
 
-      // intrument probed + basic tip-tracking flags
-      // TODO(mc, 2018-01-22): combine these into subreducer
-      probedByMount: {},
-      tipOnByMount: {},
+  test('handles robot:REFRESH_SESSION', () => {
+    const state = reducer({calibration: {}}, {type: 'robot:REFRESH_SESSION'})
 
-      // labware confirmed flags
-      confirmedBySlot: {},
-
-      // TODO(mc, 2018-01-22): make this state a sub-reducer
-      calibrationRequest: {type: '', inProgress: false, error: null}
-    })
+    expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
   test('handles DISCONNECT_RESPONSE success', () => {
@@ -508,19 +515,6 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5'
       }
-    })
-  })
-
-  test('handles SET_JOG_DISTANCE action', () => {
-    const state = {
-      calibration: {
-        jogDistance: 10
-      }
-    }
-
-    const action = {type: 'robot:SET_JOG_DISTANCE', payload: 1}
-    expect(reducer(state, action).calibration).toEqual({
-      jogDistance: 1
     })
   })
 

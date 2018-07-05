@@ -104,11 +104,13 @@ type RobotState = {
 
 // note: POSITIONS only used inside `moveRobotTo`
 const POSITIONS = 'robot/positions'
-const MOVE: RobotPath = 'robot/move'
-const HOME: RobotPath = 'robot/home'
-const LIGHTS: RobotPath = 'robot/lights'
+const MOVE: 'robot/move' = 'robot/move'
+const HOME: 'robot/home' = 'robot/home'
+const LIGHTS: 'robot/lights' = 'robot/lights'
 
-// TODO(mc, 2018-07-03): flow helper until we have one reducer
+// TODO(mc, 2018-07-03): flow helper until we have one reducer, since
+// p === 'constant' checks but p === CONSTANT does not, even if
+// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
 function getRobotPath (p: string): ?RobotPath {
   if (p === 'robot/move' || p === 'robot/home' || p === 'robot/lights') {
     return p

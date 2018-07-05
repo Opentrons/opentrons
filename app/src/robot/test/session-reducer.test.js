@@ -77,34 +77,11 @@ describe('robot reducer - session', () => {
   })
 
   test('handles robot:REFRESH_SESSION action', () => {
-    const INITIAL_CALIBRATION_STATE = {
-      deckPopulated: null,
-      jogDistance: 0.1,
-
-      // TODO(mc, 2018-01-22): combine these into subreducer
-      probedByMount: {},
-      tipOnByMount: {},
-
-      confirmedBySlot: {},
-
-      calibrationRequest: {type: '', inProgress: false, error: null}
-    }
-
     const state = {
       session: {
         sessionRequest: {inProgress: false, error: null},
         startTime: 40,
         runTime: 42
-      },
-      calibration: {
-        deckPopulated: true,
-        jogDistance: 1,
-        probedByMount: {
-          left: true
-        },
-        confirmedBySlot: {
-          9: true
-        }
       }
     }
     const action = {type: 'robot:REFRESH_SESSION'}
@@ -114,7 +91,6 @@ describe('robot reducer - session', () => {
       startTime: null,
       runTime: 0
     })
-    expect(reducer(state, action).calibration).toEqual(INITIAL_CALIBRATION_STATE)
   })
 
   test('handles SESSION_RESPONSE success', () => {
