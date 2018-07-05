@@ -43,7 +43,9 @@ const FormAlerts = (props: FormAlertsProps) => (
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const errors = steplistSelectors.formLevelErrors(state)
-  const warnings = steplistSelectors.formLevelWarnings(state)
+  const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true')
+    ? steplistSelectors.formLevelWarnings(state)
+    : []
   const _stepId = steplistSelectors.selectedStepId(state)
 
   const {focusedField, dirtyFields} = ownProps
