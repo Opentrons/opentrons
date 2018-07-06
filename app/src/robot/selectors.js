@@ -432,10 +432,6 @@ export function getOffsetUpdateInProgress (state: State): boolean {
   return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
 
-export function getJogDistance (state: State): number {
-  return calibration(state).jogDistance
-}
-
 // get current instrument selector factory
 // to be used by a react-router Route component
 export const makeGetCurrentInstrument = () => createSelector(

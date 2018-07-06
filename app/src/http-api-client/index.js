@@ -87,10 +87,8 @@ export type Action =
 export {
   startDeckCalibration,
   deckCalibrationCommand,
-  setCalibrationJogStep,
   makeGetDeckCalibrationStartState,
-  makeGetDeckCalibrationCommandState,
-  getCalibrationJogStep
+  makeGetDeckCalibrationCommandState
 } from './calibration'
 
 export {
