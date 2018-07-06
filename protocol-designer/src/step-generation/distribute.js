@@ -7,7 +7,7 @@ import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators
 import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
-import type {DistributeFormData, RobotState, CommandCreator} from './'
+import type {DistributeFormData, RobotState, CommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
 const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -51,27 +51,13 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol, break up into 1 transfer per dest well
     const transferCommands = data.destWells.map((destWell) => {
-      const transferData = {
+      const transferData: TransferFormData = {
+        ...(data: TransferLikeFormDataFields),
         stepType: 'transfer',
         sourceWells: [data.sourceWell],
         destWells: [destWell],
-        mixInDestination: null,
-
-        // can't do `...data` b/c of flow, must be explicit:
-        name: data.name,
-        description: data.description,
-        volume: data.volume,
-        blowout: data.blowout,
-        changeTip: data.changeTip,
-        delayAfterDispense: data.delayAfterDispense,
-        destLabware: data.destLabware,
-        disposalVolume: data.disposalVolume,
         mixBeforeAspirate: data.mixBeforeAspirate,
-        pipette: data.pipette,
-        preWetTip: data.preWetTip,
-        sourceLabware: data.sourceLabware,
-        touchTipAfterAspirate: data.touchTipAfterAspirate,
-        touchTipAfterDispense: data.touchTipAfterDispense
+        mixInDestination: null
       }
       return transfer(transferData)
     })
