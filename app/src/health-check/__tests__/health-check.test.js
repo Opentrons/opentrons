@@ -1,19 +1,19 @@
 // health check tests
 import {actions as robotActions} from '../../robot'
-import {__mockThunk, fetchHealth} from '../health'
+import {__mockThunk, fetchHealth} from '../../http-api-client/health'
 
 import {
-  reducer,
   startHealthCheck,
   stopHealthCheck,
   setHealthCheckId,
   clearHealthCheckId,
   resetHealthCheck,
+  healthCheckReducer,
   healthCheckMiddleware,
   makeGetHealthCheckOk
 } from '..'
 
-jest.mock('../health')
+jest.mock('../../http-api-client/health')
 
 const name = 'opentrons-dev'
 const robot = {name, ip: '1.2.3.4', port: '1234'}
@@ -29,12 +29,10 @@ describe('health check', () => {
           connectRequest: {name},
           discoveredByName: {[name]: robot}}
       },
-      api: {
-        healthCheck: {
-          alreadyRunning: {id: 1, missed: 0},
-          alreadyMissed: {id: 2, missed: 2},
-          [name]: {id: null, missed: 1}
-        }
+      healthCheck: {
+        alreadyRunning: {id: 1, missed: 0},
+        alreadyMissed: {id: 2, missed: 2},
+        [name]: {id: null, missed: 1}
       }
     }
   })
@@ -169,27 +167,27 @@ describe('health check', () => {
         .toHaveBeenCalledWith(resetHealthCheck(expectedRobot))
     })
 
-    test('HEALTH_FAILURE sends STOP_HEALTH_CHECK if over threshold', () => {
+    test('api:FAILURE sends STOP_HEALTH_CHECK if over threshold', () => {
       const robot = {name: 'alreadyMissed'}
-      invoke({type: 'api:HEALTH_FAILURE', payload: {robot}})
+      invoke({type: 'api:FAILURE', payload: {robot, path: 'health'}})
       expect(store.dispatch).toHaveBeenCalledWith(stopHealthCheck(robot))
     })
 
-    test('HEALTH_FAILURE noops if under threshold', () => {
+    test('api:FAILURE noops if under threshold', () => {
       const robot = {name: 'alreadyRunning'}
-      invoke({type: 'api:HEALTH_FAILURE', payload: {robot}})
+      invoke({type: 'api:FAILURE', payload: {robot, path: 'health'}})
       expect(store.dispatch).not.toHaveBeenCalledWith(stopHealthCheck(robot))
     })
 
-    test('HEALTH_FAILURE noops if not running', () => {
-      state.api.healthCheck[name].missed = 2
-      invoke({type: 'api:HEALTH_FAILURE', payload: {robot}})
+    test('api:FAILURE noops if not running', () => {
+      state.healthCheck[name].missed = 2
+      invoke({type: 'api:FAILURE', payload: {robot, path: 'health'}})
       expect(store.dispatch).not.toHaveBeenCalledWith(stopHealthCheck(robot))
     })
   })
 
   describe('reducer', () => {
-    const reduce = (action) => reducer(state.api, action).healthCheck
+    const reduce = (action) => healthCheckReducer(state.healthCheck, action)
 
     test('RESET_HEALTH_CHECK resets interval ID and count', () => {
       const action = resetHealthCheck({name: 'alreadyMissed'})
@@ -218,9 +216,9 @@ describe('health check', () => {
       })
     })
 
-    test('HEALTH_SUCCESS resets missed to 0', () => {
+    test('api:SUCCESS resets missed to 0', () => {
       const robot = {name: 'alreadyMissed'}
-      const action = {type: 'api:HEALTH_SUCCESS', payload: {robot}}
+      const action = {type: 'api:SUCCESS', payload: {robot, path: 'health'}}
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 0},
@@ -228,8 +226,8 @@ describe('health check', () => {
       })
     })
 
-    test('HEALTH_SUCCESS noops if not running', () => {
-      const action = {type: 'api:HEALTH_SUCCESS', payload: {robot}}
+    test('api:SUCCESS noops if not running', () => {
+      const action = {type: 'api:SUCCESS', payload: {robot, path: 'health'}}
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
@@ -237,9 +235,9 @@ describe('health check', () => {
       })
     })
 
-    test('HEALTH_FAILURE increases missed by 1', () => {
+    test('api:FAILURE increases missed by 1', () => {
       const robot = {name: 'alreadyRunning'}
-      const action = {type: 'api:HEALTH_FAILURE', payload: {robot}}
+      const action = {type: 'api:FAILURE', payload: {robot, path: 'health'}}
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 1},
         alreadyMissed: {id: 2, missed: 2},
@@ -247,8 +245,8 @@ describe('health check', () => {
       })
     })
 
-    test('HEALTH_FAILURE noops if not running', () => {
-      const action = {type: 'api:HEALTH_FAILURE', payload: {robot}}
+    test('api:FAILURE noops if not running', () => {
+      const action = {type: 'api:FAILURE', payload: {robot, path: 'health'}}
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
@@ -259,7 +257,7 @@ describe('health check', () => {
 
   describe('selectors', () => {
     test('makeGetHealthCheckOk', () => {
-      state.api.healthCheck[name].missed = 2
+      state.healthCheck[name].missed = 2
       const getHealthCheckOk = makeGetHealthCheckOk()
 
       // health check fails if id is cleared and missed threshold exceeded

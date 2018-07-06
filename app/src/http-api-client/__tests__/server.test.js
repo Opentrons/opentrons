@@ -252,9 +252,12 @@ describe('server API client', () => {
       }
     }))
 
-    test('sets availableUpdate on HEALTH_SUCCESS', () => {
+    test('sets availableUpdate on /health api:SUCCESS', () => {
       const health = {name, api_version: 'foobar', fw_version: '7.8.9'}
-      const action = {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
+      const action = {
+        type: 'api:SUCCESS',
+        payload: {robot, path: 'health', response: health}
+      }
 
       // test update available
       state.server[robot.name].availableUpdate = null
@@ -267,7 +270,7 @@ describe('server API client', () => {
       })
 
       // test no update available
-      action.payload.health.api_version = mockApiUpdate.AVAILABLE_UPDATE
+      action.payload.response.api_version = mockApiUpdate.AVAILABLE_UPDATE
       state.server[robot.name].availableUpdate = mockApiUpdate.AVAILABLE_UPDATE
       expect(reducer(state, action).server).toEqual({
         [robot.name]: {availableUpdate: null, update: null, restart: null}

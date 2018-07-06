@@ -5,11 +5,6 @@ import without from 'lodash/without'
 
 import type {Action} from '../../types'
 
-import type {
-  HealthSuccessAction,
-  HealthFailureAction
-} from '../../http-api-client'
-
 import type {RobotService} from '../types'
 
 import type {
@@ -83,11 +78,24 @@ export default function connectionReducer (
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
 
-    case 'api:HEALTH_SUCCESS':
-      return maybeDiscoverWired(state, action)
+    case 'api:SUCCESS': {
+      const {robot, path} = action.payload
+      if (path === 'health') {
+        // $FlowFixMe: api:_ actions use BaseRobot, discovery needs RobotService
+        return maybeDiscoverWired(state, robot)
+      }
 
-    case 'api:HEALTH_FAILURE':
-      return maybeRemoveWired(state, action)
+      break
+    }
+
+    case 'api:FAILURE': {
+      const {robot, path} = action.payload
+      if (path === 'health') {
+        // $FlowFixMe: api:_ actions use BaseRobot, discovery needs RobotService
+        return maybeRemoveWired(state, robot)
+      }
+      break
+    }
   }
 
   return state
@@ -195,17 +203,13 @@ function handleClearConnectResponse (
   return {...state, connectRequest: INITIAL_STATE.connectRequest}
 }
 
-function maybeDiscoverWired (state: State, action: HealthSuccessAction): State {
-  const robot = action.payload.robot
-
+function maybeDiscoverWired (state: State, robot: RobotService): State {
   if (!robot.wired) return state
 
   return handleAddDiscovered(state, {payload: robot})
 }
 
-function maybeRemoveWired (state: State, action: HealthFailureAction): State {
-  const robot = action.payload.robot
-
+function maybeRemoveWired (state: State, robot: RobotService): State {
   if (!robot.wired) return state
 
   return handleRemoveDiscovered(state, {payload: robot})

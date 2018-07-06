@@ -11,7 +11,7 @@ import {
   actions as robotActions
 } from '../../robot'
 
-import {makeGetHealthCheckOk} from '../../http-api-client'
+import {makeGetHealthCheckOk} from '../../health-check'
 
 import {AlertModal} from '@opentrons/components'
 import ModalCopy from './ModalCopy'

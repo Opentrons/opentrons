@@ -3,7 +3,6 @@
 import {combineReducers} from 'redux'
 import {calibrationReducer, type CalibrationAction} from './calibration'
 import {healthReducer, type HealthAction} from './health'
-import {healthCheckReducer, type HealthCheckAction} from './health-check'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
 import {robotReducer, type RobotAction} from './robot'
@@ -14,7 +13,6 @@ import {wifiReducer, type WifiAction} from './wifi'
 export const reducer = combineReducers({
   calibration: calibrationReducer,
   health: healthReducer,
-  healthCheck: healthCheckReducer,
   motors: motorsReducer,
   pipettes: pipettesReducer,
   robot: robotReducer,
@@ -26,6 +24,13 @@ export const reducer = combineReducers({
 export * from './types'
 
 export type {
+  ApiRequestAction,
+  ApiSuccessAction,
+  ApiFailureAction,
+  ClearApiResponseAction
+} from './actions'
+
+export type {
   DeckCalStartState,
   DeckCalCommandState,
   JogAxis,
@@ -35,9 +40,7 @@ export type {
 } from './calibration'
 
 export type {
-  RobotHealth,
-  HealthSuccessAction,
-  HealthFailureAction
+  RobotHealth
 } from './health'
 
 export type {
@@ -76,7 +79,6 @@ export type State = $Call<typeof reducer>
 export type Action =
   | CalibrationAction
   | HealthAction
-  | HealthCheckAction
   | MotorsAction
   | PipettesAction
   | RobotAction
@@ -95,16 +97,6 @@ export {
   fetchHealth,
   makeGetRobotHealth
 } from './health'
-
-export {
-  startHealthCheck,
-  stopHealthCheck,
-  setHealthCheckId,
-  clearHealthCheckId,
-  resetHealthCheck,
-  healthCheckMiddleware,
-  makeGetHealthCheckOk
-} from './health-check'
 
 export {
   disengagePipetteMotors

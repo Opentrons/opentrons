@@ -1,12 +1,16 @@
 // @flow
 // health http api module
-import {createSelector} from 'reselect'
+import {createSelector, type Selector} from 'reselect'
 
 import type {State, ThunkPromiseAction, Action} from '../types'
-import type {RobotService} from '../robot'
+import type {BaseRobot, RobotService} from '../robot'
+import type {ApiCall, ApiRequestError} from './types'
+import type {ApiRequestAction, ApiSuccessAction, ApiFailureAction} from './actions'
 
-import type {ApiCall} from './types'
-import client, {type ApiRequestError} from './client'
+import {apiRequest, apiSuccess, apiFailure} from './actions'
+import client from './client'
+
+type HealthPath = 'health'
 
 type HealthResponse = {
   name: string,
@@ -14,46 +18,41 @@ type HealthResponse = {
   fw_version: string,
 }
 
-export type HealthRequestAction = {|
-  type: 'api:HEALTH_REQUEST',
-  payload: {
-    robot: RobotService
-  }
-|}
-
-export type HealthSuccessAction = {|
-  type: 'api:HEALTH_SUCCESS',
-  payload: {|
-    robot: RobotService,
-    health: HealthResponse,
-  |}
-|}
-
-export type HealthFailureAction = {|
-  type: 'api:HEALTH_FAILURE',
-  payload: {|
-    robot: RobotService,
-    error: ApiRequestError,
-  |}
-|}
-
 export type HealthAction =
-  | HealthRequestAction
-  | HealthSuccessAction
-  | HealthFailureAction
+  | ApiRequestAction<HealthPath, void>
+  | ApiSuccessAction<HealthPath, HealthResponse>
+  | ApiFailureAction<HealthPath>
 
 export type RobotHealth = ApiCall<void, HealthResponse>
 
+type RobotHealthState = {
+  health?: RobotHealth,
+}
+
 type HealthState = {
-  [robotName: string]: ?RobotHealth
+  [robotName: string]: ?RobotHealthState
+}
+
+const HEALTH: 'health' = 'health'
+
+// TODO(mc, 2018-07-03): flow helper until we have one reducer, since
+// p === 'constant' checks but p === CONSTANT does not, even if
+// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
+function getHealthPath (p: string): ?HealthPath {
+  if (p === 'health') return p
+  return null
 }
 
 export function fetchHealth (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
-    dispatch(healthRequest(robot))
-    return client(robot, 'GET', 'health')
-      .then((health) => dispatch(healthSuccess(robot, health)))
-      .catch((error) => dispatch(healthFailure(robot, error)))
+    dispatch(apiRequest(robot, HEALTH, null))
+
+    return client(robot, 'GET', HEALTH)
+      .then(
+        (resp: HealthResponse) => apiSuccess(robot, HEALTH, resp),
+        (err: ApiRequestError) => apiFailure(robot, HEALTH, err)
+      )
+      .then(dispatch)
   }
 }
 
@@ -64,65 +63,70 @@ export function healthReducer (
   if (state == null) return {}
 
   switch (action.type) {
-    case 'api:HEALTH_REQUEST':
-      return {
-        ...state,
-        [action.payload.robot.name]: {
-          ...state[action.payload.robot.name],
-          inProgress: true,
-          error: null
-        }
-      }
+    case 'api:REQUEST': {
+      const path = getHealthPath(action.payload.path)
+      if (!path) return state
+      const {payload: {request, robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
 
-    case 'api:HEALTH_SUCCESS':
       return {
         ...state,
-        [action.payload.robot.name]: {
-          ...state[action.payload.robot.name],
-          inProgress: false,
-          response: action.payload.health
+        [name]: {
+          ...stateByName,
+          [path]: {...stateByPath, request, inProgress: true, error: null}
         }
       }
+    }
 
-    case 'api:HEALTH_FAILURE':
+    case 'api:SUCCESS': {
+      const path = getHealthPath(action.payload.path)
+      if (!path) return state
+      const {payload: {response, robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
+
       return {
         ...state,
-        [action.payload.robot.name]: {
-          ...state[action.payload.robot.name],
-          inProgress: false,
-          error: action.payload.error
+        [name]: {
+          ...stateByName,
+          [path]: {...stateByPath, response, inProgress: false, error: null}
         }
       }
+    }
+
+    case 'api:FAILURE': {
+      const path = getHealthPath(action.payload.path)
+      if (!path) return state
+      const {payload: {error, robot: {name}}} = action
+      const stateByName = state[name] || {}
+      const stateByPath = stateByName[path] || {}
+
+      return {
+        ...state,
+        [name]: {
+          ...stateByName,
+          [path]: {...stateByPath, error, inProgress: false}
+        }
+      }
+    }
   }
 
   return state
 }
 
-export const makeGetRobotHealth = () => createSelector(
-  selectRobotHealthState,
-  (state: ?RobotHealth): RobotHealth => {
-    return state || {inProgress: false, error: null, response: null}
-  }
-)
+export const makeGetRobotHealth = () => {
+  const selector: Selector<State, BaseRobot, RobotHealth> = createSelector(
+    selectRobotHealthState,
+    state => state[HEALTH] || {inProgress: false}
+  )
 
-function selectRobotHealthState (state: State, props: RobotService) {
-  return state.api.health[props.name]
+  return selector
 }
 
-function healthRequest (robot: RobotService): HealthRequestAction {
-  return {type: 'api:HEALTH_REQUEST', payload: {robot}}
-}
-
-function healthSuccess (
-  robot: RobotService,
-  health: HealthResponse
-): HealthSuccessAction {
-  return {type: 'api:HEALTH_SUCCESS', payload: {robot, health}}
-}
-
-function healthFailure (
-  robot: RobotService,
-  error: ApiRequestError
-): HealthFailureAction {
-  return {type: 'api:HEALTH_FAILURE', payload: {robot, error}}
+function selectRobotHealthState (
+  state: State,
+  props: BaseRobot
+): RobotHealthState {
+  return state.api.health[props.name] || {}
 }

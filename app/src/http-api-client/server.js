@@ -202,11 +202,13 @@ export function serverReducer (
         }
       }
 
-    case 'api:HEALTH_SUCCESS':
-      ({robot: {name}} = action.payload)
+    // TODO(mc, 2018-07-05): this logic should live in a selector
+    case 'api:SUCCESS': {
+      if (action.payload.path !== 'health') return state
+      const name = action.payload.robot.name
       let stateByName = state[name]
       const previousUpdate = stateByName && stateByName.availableUpdate
-      const currentVersion = action.payload.health.api_version
+      const currentVersion = action.payload.response.api_version
       const availableUpdate = currentVersion !== AVAILABLE_UPDATE
         ? AVAILABLE_UPDATE
         : null
@@ -216,6 +218,7 @@ export function serverReducer (
       }
 
       return {...state, [name]: {...stateByName, availableUpdate}}
+    }
   }
 
   return state
