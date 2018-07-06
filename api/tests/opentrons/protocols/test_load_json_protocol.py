@@ -7,7 +7,7 @@ def test_load_pipettes():
         "pipettes": {
             "leftPipetteHere": {
                 "mount": "left",
-                "model": "p10_single_v1"
+                "model": "p10_single"
             }
         }
     }

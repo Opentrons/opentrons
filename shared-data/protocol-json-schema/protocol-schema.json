@@ -163,17 +163,17 @@
               "enum": ["left", "right"]
             },
             "model": {
-              "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
+              "description": "Special keyword specifying the model of the pipette, without version suffix. Version number will be read from pipettes on robot at runtime",
               "type": "string",
               "enum": [
-                "p10_single_v1",
-                "p10_multi_v1",
-                "p50_single_v1",
-                "p50_multi_v1",
-                "p300_single_v1",
-                "p300_multi_v1",
-                "p1000_single_v1",
-                "p1000_multi_v1"
+                "p10_single",
+                "p10_multi",
+                "p50_single",
+                "p50_multi",
+                "p300_single",
+                "p300_multi",
+                "p1000_single",
+                "p1000_multi"
               ]
             }
           }
