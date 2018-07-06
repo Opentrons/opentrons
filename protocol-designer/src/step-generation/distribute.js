@@ -4,6 +4,7 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 // import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator} from './'
@@ -46,6 +47,37 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
   )
 
   const {pipette} = data
+
+  if (maxWellsPerChunk === 0) {
+    // distribute vol exceeds pipette vol, break up into 1 transfer per dest well
+    const transferCommands = data.destWells.map((destWell) => {
+      const transferData = {
+        stepType: 'transfer',
+        sourceWells: [data.sourceWell],
+        destWells: [destWell],
+        mixInDestination: null,
+
+        // can't do `...data` b/c of flow, must be explicit:
+        name: data.name,
+        description: data.description,
+        volume: data.volume,
+        blowout: data.blowout,
+        changeTip: data.changeTip,
+        delayAfterDispense: data.delayAfterDispense,
+        destLabware: data.destLabware,
+        disposalVolume: data.disposalVolume,
+        mixBeforeAspirate: data.mixBeforeAspirate,
+        pipette: data.pipette,
+        preWetTip: data.preWetTip,
+        sourceLabware: data.sourceLabware,
+        touchTipAfterAspirate: data.touchTipAfterAspirate,
+        touchTipAfterDispense: data.touchTipAfterDispense
+      }
+      return transfer(transferData)
+    })
+
+    return reduceCommandCreators(transferCommands)(prevRobotState)
+  }
 
   const commandCreators = flatMap(
     chunk(data.destWells, maxWellsPerChunk),
