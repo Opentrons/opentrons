@@ -38,10 +38,7 @@ type SP = {
   formData?: ?FormData,
   isNewStep?: boolean
 }
-
-type DP = {
-  onDelete: () => mixed
-}
+type DP = { deleteStep: () => mixed }
 
 type StepEditFormState = {
   showConfirmDeleteModal: boolean,
@@ -92,7 +89,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
   render () {
     if (!this.props.formData) return null // early-exit if connected formData is absent
-    const {formData, onDelete} = this.props
+    const {formData, deleteStep} = this.props
     // TODO: FormComponent should be type ?StepForm. That also requires making focusedField prop consistently allow null
     const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
     if (!FormComponent) { // early-exit if step form doesn't exist
@@ -104,7 +101,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
           onCancelClick={this.toggleConfirmDeleteModal}
           onContinueClick={() => {
             this.toggleConfirmDeleteModal()
-            onDelete()
+            deleteStep()
           }}
         />}
         <div className={cx(formStyles.form, styles[formData.stepType])}>
@@ -117,7 +114,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
               onFieldFocus: this.onFieldFocus,
               onFieldBlur: this.onFieldBlur
             }} />
-          <ButtonRow />
+          <ButtonRow onDelete={this.toggleConfirmDeleteModal}/>
         </div>
       </React.Fragment>
     )
@@ -130,7 +127,7 @@ const mapStateToProps = (state: BaseState): SP => ({
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  onDelete: () => dispatch(actions.deleteStep())
+  deleteStep: () => dispatch(actions.deleteStep())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(StepEditForm)

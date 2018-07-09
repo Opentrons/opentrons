@@ -7,14 +7,14 @@ import {actions, selectors} from '../../steplist'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 
+type OP = {onDelete?: (event: SyntheticEvent<>) => mixed}
 type SP = {canSave?: ?boolean}
 type DP = {
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
-  onDelete?: (event: SyntheticEvent<>) => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
 }
-type Props = SP & DP
+type Props = OP & SP & DP
 
 const ButtonRow = (props: Props) => {
   const {canSave, onDelete, onSave, onCancel, onClickMoreOptions} = props
