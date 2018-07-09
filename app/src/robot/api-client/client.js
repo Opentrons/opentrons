@@ -119,12 +119,12 @@ export default function client (dispatch) {
 
   function moveToFront (state, action) {
     const {payload: {mount}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
 
-    remote.calibration_manager.move_to_front(instrument)
+    remote.calibration_manager.move_to_front(pipette)
       .then(() => dispatch(actions.moveToFrontResponse()))
       .catch((error) => dispatch(actions.moveToFrontResponse(error)))
   }
