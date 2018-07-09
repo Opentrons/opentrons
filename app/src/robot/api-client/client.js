@@ -118,8 +118,8 @@ export default function client (dispatch) {
   }
 
   function moveToFront (state, action) {
-    const {payload: {pipette: axis}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[axis]._id}
+    const {payload: {mount}} = action
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
@@ -179,8 +179,8 @@ export default function client (dispatch) {
   }
 
   function probeTip (state, action) {
-    const {payload: {pipette: axis}} = action
-    const pipette = {_id: selectors.getPipettesByMount(state)[axis]._id}
+    const {payload: {mount}} = action
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
@@ -191,7 +191,7 @@ export default function client (dispatch) {
   }
 
   function returnTip (state, action) {
-    const {payload: {pipette: mount}} = action
+    const {payload: {mount}} = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE

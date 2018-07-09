@@ -376,10 +376,10 @@ export const actions = {
     }
   },
 
-  moveToFront (pipette: Mount) {
+  moveToFront (mount: Mount) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {pipette}
+      payload: {mount}
     })
   },
 
@@ -393,8 +393,8 @@ export const actions = {
     return action
   },
 
-  probeTip (pipette: Mount) {
-    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {pipette}})
+  probeTip (mount: Mount) {
+    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {mount}})
   },
 
   probeTipResponse (error: ?Error = null) {
@@ -407,12 +407,12 @@ export const actions = {
     return action
   },
 
-  confirmProbed (pipette: Mount): ConfirmProbedAction {
-    return {type: 'robot:CONFIRM_PROBED', payload: pipette}
+  confirmProbed (mount: Mount): ConfirmProbedAction {
+    return {type: 'robot:CONFIRM_PROBED', payload: mount}
   },
 
-  returnTip (pipette: Mount) {
-    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {pipette}})
+  returnTip (mount: Mount) {
+    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {mount}})
   },
 
   returnTipResponse (error: ?Error = null) {

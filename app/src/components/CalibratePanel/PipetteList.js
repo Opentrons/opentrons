@@ -13,7 +13,7 @@ import {TitledList} from '@opentrons/components'
 import PipetteListItem from './PipetteListItem'
 
 type Props = {
-  pipettes: Pipette[],
+  pipettes: Array<Pipette>,
   isRunning: boolean,
 }
 
@@ -31,7 +31,7 @@ function PipetteList (props: Props) {
           key={mount}
           mount={mount}
           isRunning={isRunning}
-          instrument={pipettes.find((i) => i.mount === mount)}
+          pipette={pipettes.find((i) => i.mount === mount)}
         />
       ))}
     </TitledList>
