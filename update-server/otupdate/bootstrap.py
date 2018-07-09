@@ -13,67 +13,9 @@ import asyncio
 import aiohttp
 import subprocess as sp
 from otupdate import selftest
+from otupdate.install import _install, VENV_NAME
 
 log = logging.getLogger(__name__)
-VENV_NAME = 'env'
-
-
-async def _install(python, filename, loop) -> (str, str):
-    running_on_pi = os.environ.get('RUNNING_ON_PI') and '/tmp' in python
-    python_home = python.split(VENV_NAME)[0] + VENV_NAME
-
-    if running_on_pi:
-        env_vars = 'PYTHONHOME={} '.format(python_home)
-    else:
-        env_vars = ''
-
-    pip_opts = '--upgrade --force-reinstall --no-deps'
-    command = '{}{} -m pip install {} {}'.format(
-        env_vars, python, pip_opts, filename)
-
-    log.debug('cmd: {}'.format(command))
-    proc = await asyncio.create_subprocess_shell(
-        command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        loop=loop)
-
-    rd_out = await proc.stdout.read()
-    rd_err = await proc.stderr.read()
-    out = rd_out.decode().strip()
-    err = rd_err.decode().strip()
-    log.debug("Out: {}".format(out))
-    log.debug("Err: {}".format(err))
-    await proc.communicate()
-
-    if running_on_pi:
-        # For some reason, the pip install above (using a python binary at
-        # "/tmp/tmp<hash>/env/bin/python" causes the package to be installed
-        # in "/data/packages/tmp/tmp<hash>/env/lib/python3.6/site-packages",
-        # so it is not found unless it is subsequently copied into the same
-        # path without the preceeding "/data/packages". Note that for the join
-        # to work correctly, the leading '/' has to be dropped from
-        # `python_home`. This whole difficulty is a side-effect of not calling
-        # the `activate` script of the virtual environment, but if the activate
-        # script is called in a subprocess then the server must be started in
-        # the same shell and we lose the reference to the server (the
-        # subprocess ends up pointing to the activate shell and killing it does
-        # not halt the server.
-        src_spk = os.path.join(
-            '/data/packages',
-            python_home[1:],
-            'lib',
-            'python3.6',
-            'site-packages')
-        dst_spk = os.path.join(python_home, 'lib', 'python3.6')
-        dst_packages = os.listdir(dst_spk)
-        for pkg in os.listdir(src_spk):
-            if pkg not in dst_packages:
-                src = os.path.join(src_spk, pkg)
-                dst = os.path.join(dst_spk, pkg)
-                log.debug("Moving {} to {}".format(src, dst))
-                shutil.move(src, dst)
-    return out, err
 
 
 async def create_virtual_environment(loop=None) -> (str, str):
@@ -209,25 +151,29 @@ async def install_sandboxed_update(filename, loop) -> (dict, str, str):
     log.debug("Creating virtual environment")
     python, venv_site_pkgs = await create_virtual_environment(loop=loop)
     log.debug("Installing update server into virtual environment")
-    out, err = await _install(python, filename, loop)
-    if err:
+    out, err, returncode = await _install(python, filename, loop)
+    if err or returncode != 0:
         log.error("Install failed: {}".format(err))
-        res = {'status': 'failure', 'error': err}
+        res = {'status': 'failure', 'message': err}
     else:
         log.debug("Install successful")
         res = {'status': 'success'}
     return res, python, venv_site_pkgs
 
 
-async def install_update(filename, loop) -> dict:
+async def install_update(filename, loop) -> (dict, int):
     """
     Install the update into the system environment.
     """
     log.info("Installing update server into system environment")
     log.debug('File {} exists? {}'.format(filename, os.path.exists(filename)))
-    msg = await _install(sys.executable, filename, loop)
+    out, err, returncode = await _install(sys.executable, filename, loop)
+    if returncode == 0:
+        msg = out
+    else:
+        msg = err
     res = {'message': msg, 'filename': filename}
-    return res
+    return res, returncode
 
 
 async def test_update_server(

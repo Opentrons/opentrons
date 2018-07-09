@@ -130,7 +130,7 @@ async def test_restart(loop, test_client, monkeypatch):
         test=True)
     cli = await loop.create_task(test_client(app))
 
-    resp = await cli.post('/server/update/restart')
+    resp = await cli.post('/server/restart')
     res = await resp.json()
     assert resp.status == 200
 

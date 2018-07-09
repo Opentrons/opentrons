@@ -59,4 +59,4 @@ bootstrap: wheel
 
 .PHONY: restart
 restart:
-	curl -X POST http://$(host):31950/server/update/restart
+	curl -X POST http://$(host):31950/server/restart
