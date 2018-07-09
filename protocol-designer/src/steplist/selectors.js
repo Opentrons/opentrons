@@ -10,6 +10,7 @@ import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
 import type {RootState, OrderedStepsState} from './reducers'
 
+import {DECK_SETUP_TITLE} from '../constants'
 import {END_STEP} from './types'
 import type {BaseState, Selector} from '../types'
 
@@ -280,7 +281,7 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
         if (savedForm && savedForm['step-name']) {
           title = savedForm['step-name']
         } else if (step.stepType === 'deck-setup') {
-          title = 'Deck Setup'
+          title = DECK_SETUP_TITLE
         } else {
           title = `${step.stepType} ${id}`
         }

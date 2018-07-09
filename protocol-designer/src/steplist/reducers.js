@@ -5,6 +5,7 @@ import type {ActionType} from 'redux-actions'
 import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
+import {DECK_SETUP_TITLE} from '../constants'
 import {getPDMetadata} from '../file-types'
 import {END_STEP} from './types'
 
@@ -92,7 +93,7 @@ type StepsState = {[StepIdType]: StepItemData}
 const initialStepState = {
   [INITIAL_DECK_SETUP_ID]: {
     id: INITIAL_DECK_SETUP_ID,
-    title: 'Deck Setup',
+    title: DECK_SETUP_TITLE,
     stepType: 'deck-setup'
   }
 }
