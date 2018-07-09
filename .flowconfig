@@ -4,6 +4,8 @@
 .*/coverage/.*
 .*/docs/.*
 api/.*
+api-server-lib/.*
+update-server/.*
 
 [include]
 
