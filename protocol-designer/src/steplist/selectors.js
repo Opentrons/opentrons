@@ -244,7 +244,7 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
 
 const formLevelWarnings: Selector<Array<FormWarning>> = (state) => {
   const formData = getUnsavedForm(state)
-  if (!formData) return null
+  if (!formData) return []
   const {id, stepType, ...fields} = formData
   const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
   return getFormWarnings(stepType, hydratedFields)
@@ -252,7 +252,7 @@ const formLevelWarnings: Selector<Array<FormWarning>> = (state) => {
 
 const formLevelErrors: Selector<Array<FormError>> = (state) => {
   const formData = getUnsavedForm(state)
-  if (!formData) return null
+  if (!formData) return []
   const {id, stepType, ...fields} = formData
   const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
   return getFormErrors(stepType, hydratedFields)

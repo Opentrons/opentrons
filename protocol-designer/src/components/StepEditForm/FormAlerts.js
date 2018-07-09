@@ -18,7 +18,7 @@ type SP = {
   stepId: MaybeStepId
 }
 type DP = {dismissWarning: (FormWarning, MaybeStepId) => void}
-type OP = {_focusedField: ?StepFieldName, _dirtyFields: Array<StepFieldName>}
+type OP = {focusedField: ?StepFieldName, dirtyFields: Array<StepFieldName>}
 type FormAlertsProps = SP & DP
 
 class FormAlerts extends React.Component<FormAlertsProps> {
@@ -55,14 +55,14 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const errors = steplistSelectors.formLevelErrors(state)
   const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') ? steplistSelectors.formLevelWarnings(state) : []
 
-  const {_focusedField, _dirtyFields} = ownProps
+  const {focusedField, dirtyFields} = ownProps
   // const showWarnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') // hide warnings without explicit FEATURE FLAG
   // if (!showWarnings) return {errors: [], warnings: [], _stepId}
   const filteredErrors = errors
-    ? errors.filter(e => (!e.dependentFields.includes(_focusedField) && difference(e.dependentFields, _dirtyFields).length === 0))
+    ? errors.filter(e => (!e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0))
     : []
   const filteredWarnings = warnings
-    ? warnings.filter(w => (!w.dependentFields.includes(_focusedField) && difference(w.dependentFields, _dirtyFields).length === 0))
+    ? warnings.filter(w => (!w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0))
     : []
   return {errors: filteredErrors, warnings: filteredWarnings, stepId: steplistSelectors.selectedStepId(state)}
 }
