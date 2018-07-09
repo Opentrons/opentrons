@@ -282,7 +282,7 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
         } else if (step.stepType === 'deck-setup') {
           title = 'Deck Setup'
         } else {
-          title = `${step.stepType} ${id}`
+          title = step.stepType
         }
 
         return {
