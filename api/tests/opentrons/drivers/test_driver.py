@@ -799,7 +799,16 @@ def test_send_command_with_retry(model, monkeypatch):
 def test_unstick_axes(model):
     import types
     driver = model.robot._driver
-    driver.simulating = True
+    driver.simulating = False
+
+    def update_position_mock(self, default=None):
+        if default is None:
+            default = self._position
+
+        updated_position = self._position.copy()
+        updated_position.update(**default)
+
+    driver.update_position = types.MethodType(update_position_mock, driver)
 
     current_log = []
 
