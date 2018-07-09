@@ -3,7 +3,7 @@
 
 import type {Error} from '../types'
 import type {RobotService} from '../robot'
-import type {ApiRequestError} from './client'
+import type {ApiRequestError} from './types'
 
 type Method = 'GET' | 'POST'
 

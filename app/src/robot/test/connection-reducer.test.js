@@ -228,7 +228,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('adds wired robot to discovered on HEALTH_SUCCESS', () => {
+  test('adds wired robot to discovered on /health api:SUCCESS', () => {
     const state = {
       connection: {
         discovered: ['foo'],
@@ -239,9 +239,10 @@ describe('robot reducer - connection', () => {
     }
 
     const action = {
-      type: 'api:HEALTH_SUCCESS',
+      type: 'api:SUCCESS',
       payload: {
-        robot: {name: 'bar', host: 'ghijkl.local', wired: true}
+        robot: {name: 'bar', host: 'ghijkl.local', wired: true},
+        path: 'health'
       }
     }
 
@@ -254,7 +255,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('removes wired robot from discovered on HEALTH_FAILURE', () => {
+  test('removes wired robot from discovered on /health api:FAILURE', () => {
     const state = {
       connection: {
         discovered: ['foo', 'bar'],
@@ -266,9 +267,10 @@ describe('robot reducer - connection', () => {
     }
 
     const action = {
-      type: 'api:HEALTH_FAILURE',
+      type: 'api:FAILURE',
       payload: {
-        robot: {name: 'bar', host: 'ghijkl.local', wired: true}
+        robot: {name: 'bar', host: 'ghijkl.local', wired: true},
+        path: 'health'
       }
     }
 

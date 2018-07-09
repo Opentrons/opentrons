@@ -2,7 +2,7 @@
 // config redux module
 import {setIn} from '@thi.ng/paths'
 import {getShellConfig} from '../shell'
-import type {State, Action} from '../types'
+import type {State, Action, ThunkAction} from '../types'
 import type {LogLevel} from '../logger'
 
 type UrlProtocol = 'file:' | 'http:'
@@ -95,7 +95,7 @@ export function getModulesOn (state: State): boolean {
   return state.config.modules
 }
 
-export function toggleDevTools (): Action {
+export function toggleDevTools (): ThunkAction {
   return (dispatch, getState) => {
     const devToolsOn = getDevToolsOn(getState())
     return dispatch(updateConfig('devtools', !devToolsOn))

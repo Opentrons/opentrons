@@ -10,6 +10,7 @@ import type {RouterAction} from 'react-router-redux'
 
 import typeof reducer from './reducer'
 import type {Action as RobotAction} from './robot'
+import type {HealthCheckAction} from './health-check'
 import type {Action as HttpApiAction} from './http-api-client'
 import type {ShellAction} from './shell'
 import type {ConfigAction} from './config'
@@ -20,6 +21,7 @@ export type GetState = () => State
 
 export type Action =
   | RobotAction
+  | HealthCheckAction
   | HttpApiAction
   | ShellAction
   | ConfigAction
