@@ -242,7 +242,7 @@ export const getPipettes = createSelector(
     probedByMount,
     tipOnByMount,
     calibrationRequest
-  ): Pipette[] => {
+  ): Array<Pipette> => {
     return PIPETTE_MOUNTS
       .filter((mount) => pipettesByMount[mount] != null)
       .map((mount) => {

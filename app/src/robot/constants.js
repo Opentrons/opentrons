@@ -59,8 +59,8 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
 ])
 
 // deck layout
-export const PIPETTE_MOUNTS: Mount[] = ['left', 'right']
-export const DECK_SLOTS: Slot[] = [
+export const PIPETTE_MOUNTS: Array<Mount> = ['left', 'right']
+export const DECK_SLOTS: Array<Slot> = [
   '1',
   '2',
   '3',

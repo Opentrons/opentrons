@@ -132,30 +132,30 @@ export default function client (dispatch) {
   // saves container offset and then attempts a tip pickup
   function pickupAndHome (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.pickupAndHomeResponse()), 1000)
 
     remote.calibration_manager
-      .update_container_offset(labware, instrument)
-      .then(() => remote.calibration_manager.pick_up_tip(instrument, labware))
+      .update_container_offset(labware, pipette)
+      .then(() => remote.calibration_manager.pick_up_tip(pipette, labware))
       .then(() => dispatch(actions.pickupAndHomeResponse()))
       .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
   }
 
   function dropTipAndHome (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.dropTipAndHomeResponse()), 1000)
 
-    remote.calibration_manager.drop_tip(instrument, labware)
-      .then(() => remote.calibration_manager.home(instrument))
-      .then(() => remote.calibration_manager.move_to(instrument, labware))
+    remote.calibration_manager.drop_tip(pipette, labware)
+      .then(() => remote.calibration_manager.home(pipette))
+      .then(() => remote.calibration_manager.move_to(pipette, labware))
       .then(() => dispatch(actions.dropTipAndHomeResponse()))
       .catch((error) => dispatch(actions.dropTipAndHomeResponse(error)))
   }
@@ -163,7 +163,7 @@ export default function client (dispatch) {
   // drop the tip unless the tiprack is the last one to be confirmed
   function confirmTiprack (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     if (selectors.getUnconfirmedTipracks(state).length === 1) {
@@ -173,7 +173,7 @@ export default function client (dispatch) {
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.confirmTiprackResponse()), 1000)
 
-    remote.calibration_manager.drop_tip(instrument, labware)
+    remote.calibration_manager.drop_tip(pipette, labware)
       .then(() => dispatch(actions.confirmTiprackResponse()))
       .catch((error) => dispatch(actions.confirmTiprackResponse(error)))
   }
@@ -204,7 +204,7 @@ export default function client (dispatch) {
 
   function moveTo (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
@@ -213,7 +213,7 @@ export default function client (dispatch) {
     //   dispatch(push(`/setup-deck/${slot}/confirm`))
     // }, 1000)
 
-    remote.calibration_manager.move_to(instrument, labware)
+    remote.calibration_manager.move_to(pipette, labware)
       .then(() => {
         dispatch(actions.moveToResponse())
         dispatch(push(`/calibrate/labware/${slot}/confirm`))
@@ -223,13 +223,13 @@ export default function client (dispatch) {
 
   function jog (state, action) {
     const {payload: {mount, axis, direction, step}} = action
-    const instrument = selectors.getPipettesByMount(state)[mount]
+    const pipette = selectors.getPipettesByMount(state)[mount]
     const distance = step * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.jogResponse()), 1000)
 
-    remote.calibration_manager.jog(instrument, distance, axis)
+    remote.calibration_manager.jog(pipette, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
       .catch((error) => dispatch(actions.jogResponse(error)))
   }
@@ -240,14 +240,14 @@ export default function client (dispatch) {
     const {payload: {mount, slot}} = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
-    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: labwareObject._id}
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.updateOffsetResponse()), 2000)
 
     remote.calibration_manager
-      .update_container_offset(labware, instrument)
+      .update_container_offset(labware, pipette)
       .then(() => dispatch(actions.updateOffsetResponse()))
       .catch((error) => dispatch(actions.updateOffsetResponse(error)))
   }
