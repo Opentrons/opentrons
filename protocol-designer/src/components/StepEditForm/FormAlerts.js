@@ -11,35 +11,45 @@ import {type StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning, FormWarningKey} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
 
-type SP = {errors: Array<FormError>, warnings: Array<FormWarning>, _stepId: ?StepIdType | typeof END_STEP}
+type SP = {
+  errors: Array<FormError>,
+  warnings: Array<FormWarning>,
+  _stepId: ?StepIdType | typeof END_STEP,
+}
 type OP = {focusedField: ?StepFieldName, dirtyFields: Array<StepFieldName>}
 type FormAlertsProps = {
   errors: Array<FormError>,
   warnings: Array<FormWarning>,
-  onDismiss: (FormWarningKey) => () => void
+  dismissWarning: (FormWarning) => void
 }
 
-const FormAlerts = (props: FormAlertsProps) => (
-  <React.Fragment>
-    {props.errors.map((error, index) => (
-      <AlertItem
-        type="warning"
-        key={index}
-        title={error.title || error.message}>
-        {error.title ? error.message : null}
-      </AlertItem>
-    ))}
-    {props.warnings.map((warning, index) => (
-      <AlertItem
-        type="warning"
-        key={index}
-        title={warning.title || warning.message}
-        onCloseClick={props.onDismiss(warning.warningId)}>
-        {warning.title ? warning.message : null}
-      </AlertItem>
-    ))}
-  </React.Fragment>
-)
+class FormAlerts extends React.Component<FormAlertsProps> {
+  makeHandleCloseWarning = (warning) => () => { this.props.dismissWarning(warning) }
+
+  render(){
+    return (
+      <React.Fragment>
+        {this.props.errors.map((error, index) => (
+          <AlertItem
+            type="warning"
+            key={index}
+            title={error.title || error.message}>
+            {error.title ? error.message : null}
+          </AlertItem>
+        ))}
+        {this.props.warnings.map((warning, index) => (
+          <AlertItem
+            type="warning"
+            key={index}
+            title={warning.title || warning.message}
+            onCloseClick={this.makeHandleCloseWarning(warning)}>
+            {warning.title ? warning.message : null}
+          </AlertItem>
+        ))}
+      </React.Fragment>
+    )
+  }
+}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const errors = steplistSelectors.formLevelErrors(state)
@@ -61,16 +71,16 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 }
 
 const mergeProps = (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): FormAlertsProps => {
-  const onDismiss = (warningId: FormWarningKey) => () => console.log('dismiss warning here', warningId, stateProps._stepId)
+  const dismissWarning = (warning: FormWarning) => console.log('dismiss warning here', warning, stateProps._stepId)
   // TODO: un-comment after Ian's dismiss reducer is merged
-  // const onDismiss = (warning: CommandCreatorWarning) =>
+  // const dismissWarning = (warning: CommandCreatorWarning) =>
   // () => dispatch(dismissActions.dismissWarning({
   //   warning,
   //   stepId: stateProps._stepId
   // }))
   return {
     ...stateProps,
-    onDismiss
+    dismissWarning
   }
 }
 

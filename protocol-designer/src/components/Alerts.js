@@ -9,27 +9,26 @@ type Props = {
     ...CommandCreatorWarning,
     dismissId?: string // presence of dismissId allows alert to be dismissed
   }>,
-  onDismiss: (id: string) => () => mixed
+  dismissWarning: (mixed) => void
 }
 
-function Alerts (props: Props) {
-  return (
-    <div>
-      {props.alerts.map((alert, key) =>
-        <AlertItem
-          type='warning'
-          key={key}
-          title={alert.message}
-          onCloseClick={alert.dismissId
-            ? props.onDismiss(alert.dismissId)
-            : undefined
-          }
-        >
-          {props.captions[alert.type]}
-        </AlertItem>)
-      }
-    </div>
-  )
+class Alerts extends React.Component<Props> {
+  makeHandleCloseWarning = (warning) => () => {this.props.dismissWarning(warning)}
+  render(){
+    return (
+      <div>
+        {props.alerts.map((alert, key) =>
+          <AlertItem
+            type='warning'
+            key={key}
+            title={alert.message}
+            onCloseClick={alert.dismissId ? this.makeHandleCloseWarning(alert.dismissId) : undefined } >
+            {props.captions[alert.type]}
+          </AlertItem>)
+        }
+      </div>
+    )
+  }
 }
 
 export default Alerts

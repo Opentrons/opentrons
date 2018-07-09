@@ -29,6 +29,7 @@ type WellSelectionInputSP = {
 }
 type WellSelectionInputDP = {_openWellSelectionModal: (OpenWellSelectionModalPayload) => void}
 type WellSelectionInputProps = {
+  name: StepFieldName,
   wellCount?: number,
   disabled: boolean,
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
@@ -39,6 +40,7 @@ const WellSelectionInput = (props: WellSelectionInputProps) => (
   <FormGroup label='Wells:' disabled={props.disabled} className={styles.well_selection_input}>
     <InputField
       readOnly
+      name={props.name}
       value={props.wellCount ? String(props.wellCount) : null}
       onClick={props.onClick}
       error={props.errorToShow} />
@@ -69,6 +71,7 @@ const WellSelectionInputMP = (
   const {name, focusedField, dirtyFields} = ownProps
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   return {
+    name,
     disabled,
     wellCount: stateProps.wellCount,
     errorToShow: showErrors ? _wellFieldErrors[0] : null,
