@@ -20,7 +20,7 @@ export default function PipetteTabs (props: Props) {
     title: mount,
     href: `./${mount}`,
     isActive: currentPipette != null && mount === currentPipette.mount,
-    isDisabled: !pipettes.some((pip) => pip.mount === mount)
+    isDisabled: !pipettes.some((pipette) => pipette.mount === mount)
   }))
 
   return (
