@@ -242,7 +242,7 @@ const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state
   return form && validateAndProcessForm(form).errors // TODO refactor selectors
 }
 
-const formLevelWarnings: Selector<null | Array<FormWarning>> = (state) => {
+const formLevelWarnings: Selector<Array<FormWarning>> = (state) => {
   const formData = getUnsavedForm(state)
   if (!formData) return null
   const {id, stepType, ...fields} = formData
@@ -250,7 +250,7 @@ const formLevelWarnings: Selector<null | Array<FormWarning>> = (state) => {
   return getFormWarnings(stepType, hydratedFields)
 }
 
-const formLevelErrors: Selector<null | Array<FormError>> = (state) => {
+const formLevelErrors: Selector<Array<FormError>> = (state) => {
   const formData = getUnsavedForm(state)
   if (!formData) return null
   const {id, stepType, ...fields} = formData

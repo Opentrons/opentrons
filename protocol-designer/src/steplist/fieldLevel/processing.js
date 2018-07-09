@@ -1,6 +1,6 @@
 // @flow
 
-export type ValueProcessor= (value: mixed) => ?mixed
+export type ValueProcessor = (value: mixed) => ?mixed
 
 /*********************
 **  Value Casters   **

@@ -8,25 +8,25 @@ import type {StepIdType} from '../../form-types'
 import {selectors as steplistSelectors} from '../../steplist'
 import {END_STEP} from '../../steplist/types'
 import {type StepFieldName} from '../../steplist/fieldLevel'
-import type {FormError, FormWarning, FormWarningKey} from '../../steplist/formLevel'
+import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
 
+type MaybeStepId = ?StepIdType | typeof END_STEP
 type SP = {
   errors: Array<FormError>,
   warnings: Array<FormWarning>,
-  _stepId: ?StepIdType | typeof END_STEP,
+  stepId: MaybeStepId
 }
-type OP = {focusedField: ?StepFieldName, dirtyFields: Array<StepFieldName>}
-type FormAlertsProps = {
-  errors: Array<FormError>,
-  warnings: Array<FormWarning>,
-  dismissWarning: (FormWarning) => void
-}
+type DP = {dismissWarning: (FormWarning, MaybeStepId) => void}
+type OP = {_focusedField: ?StepFieldName, _dirtyFields: Array<StepFieldName>}
+type FormAlertsProps = SP & DP
 
 class FormAlerts extends React.Component<FormAlertsProps> {
-  makeHandleCloseWarning = (warning) => () => { this.props.dismissWarning(warning) }
+  makeHandleCloseWarning = (warning: FormWarning) => () => {
+    this.props.dismissWarning(warning, this.props.stepId)
+  }
 
-  render(){
+  render () {
     return (
       <React.Fragment>
         {this.props.errors.map((error, index) => (
@@ -53,35 +53,26 @@ class FormAlerts extends React.Component<FormAlertsProps> {
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const errors = steplistSelectors.formLevelErrors(state)
-  const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true')
-    ? steplistSelectors.formLevelWarnings(state)
-    : []
-  const _stepId = steplistSelectors.selectedStepId(state)
+  const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') ? steplistSelectors.formLevelWarnings(state) : []
 
-  const {focusedField, dirtyFields} = ownProps
+  const {_focusedField, _dirtyFields} = ownProps
   // const showWarnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') // hide warnings without explicit FEATURE FLAG
   // if (!showWarnings) return {errors: [], warnings: [], _stepId}
   const filteredErrors = errors
-    ? errors.filter(e => (!e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0))
+    ? errors.filter(e => (!e.dependentFields.includes(_focusedField) && difference(e.dependentFields, _dirtyFields).length === 0))
     : []
   const filteredWarnings = warnings
-    ? warnings.filter(w => (!w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0))
+    ? warnings.filter(w => (!w.dependentFields.includes(_focusedField) && difference(w.dependentFields, _dirtyFields).length === 0))
     : []
-  return {errors: filteredErrors, warnings: filteredWarnings, _stepId}
+  return {errors: filteredErrors, warnings: filteredWarnings, stepId: steplistSelectors.selectedStepId(state)}
 }
 
-const mergeProps = (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): FormAlertsProps => {
-  const dismissWarning = (warning: FormWarning) => console.log('dismiss warning here', warning, stateProps._stepId)
-  // TODO: un-comment after Ian's dismiss reducer is merged
-  // const dismissWarning = (warning: CommandCreatorWarning) =>
-  // () => dispatch(dismissActions.dismissWarning({
-  //   warning,
-  //   stepId: stateProps._stepId
-  // }))
-  return {
-    ...stateProps,
-    dismissWarning
+const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
+  dismissWarning: (warning: FormWarning, stepId: MaybeStepId) => {
+    console.log('dismiss warning here', warning, stepId)
+    // TODO: BC 2018-07-09 un-comment after Ian's dismiss reducer is merged
+    //   dispatch(dismissActions.dismissWarning({warning, stepId}))
   }
-}
+})
 
-export default connect(mapStateToProps, null, mergeProps)(FormAlerts)
+export default connect(mapStateToProps, mapDispatchToProps)(FormAlerts)
