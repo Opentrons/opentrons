@@ -5,31 +5,34 @@ import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 
 import type {State} from '../../types'
+import type {RobotService} from '../../robot'
 
 import {
   selectors as robotSelectors,
   constants as robotConstants
 } from '../../robot'
-import {getAnyRobotUpdateAvailable} from '../../http-api-client'
+import {getAnyRobotUpdateAvailable, fetchPipettes} from '../../http-api-client'
 import {getShellUpdate} from '../../shell'
 
-import type {IconName} from '@opentrons/components'
 import {NavButton} from '@opentrons/components'
 
-type OwnProps = {
+type Props = React.ElementProps<typeof NavButton>
+
+type OP = {
   name: string
 }
 
-type StateProps = {
-  iconName: IconName,
-  title?: string,
-  url?: string
+type SP = Props & {
+  _robot: ?RobotService,
 }
 
-export default withRouter(connect(mapStateToProps)(NavButton))
+type DP = {dispatch: Dispatch}
 
-function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
+export default withRouter(connect(mapStateToProps, null, mergeProps)(NavButton))
+
+function mapStateToProps (state: State, ownProps: OP): SP {
   const {name} = ownProps
+  const _robot = robotSelectors.getConnectedRobot(state)
   const isProtocolLoaded = robotSelectors.getSessionIsLoaded(state)
   const isProtocolRunning = robotSelectors.getIsRunning(state)
   const isProtocolDone = robotSelectors.getIsDone(state)
@@ -73,5 +76,17 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
     }
   }
 
-  return NAV_ITEM_BY_NAME[name]
+  return {...NAV_ITEM_BY_NAME[name], _robot}
+}
+
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {dispatch} = dispatchProps
+  const {_robot, url, disabled} = stateProps
+  let props: Props = {...ownProps, ...stateProps}
+
+  if (_robot && url === '/calibrate' && !disabled) {
+    props = {...props, onClick: () => dispatch(fetchPipettes(_robot))}
+  }
+
+  return props
 }
