@@ -22,15 +22,15 @@ log = logging.getLogger(__name__)
 ERROR_KEYWORD = 'error'
 ALARM_KEYWORD = 'alarm'
 
-DEFAULT_MAG_DECK_TIMEOUT = 1
+DEFAULT_MAG_DECK_TIMEOUT = 10   # Quite large to account for probe time
 
 DEFAULT_STABILIZE_DELAY = 0.1
 DEFAULT_COMMAND_RETRIES = 3
 
 GCODES = {
-    'HOME': 'G28',
+    'HOME': 'G28.2',
     'PROBE_PLATE': 'G38.2',
-    'GET_PLATE_POSITION': 'M836',
+    'GET_PLATE_HEIGHT': 'M836',
     'GET_CURRENT_POSITION': 'M114.2',
     'MOVE': 'G0',
     'DEVICE_INFO': 'M115',
@@ -106,9 +106,8 @@ def _parse_key_from_substring(substring) -> str:
 
 def _parse_device_information(device_info_string) -> dict:
     '''
-        Parse the mag-deck's device information response.
-
-        Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
+    Parse the mag-deck's device information response.
+    Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
     '''
     error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
         device_info_string)
@@ -129,6 +128,23 @@ def _parse_device_information(device_info_string) -> dict:
     return res
 
 
+def _parse_distance_response(distance_string) -> float:
+    '''
+    Parse responses of 'GET_PLATE_HEIGHT' & 'GET_CURRENT_POSITION'
+    Example response of-
+    GET_PLATE_HEIGHT: "height:12.34"
+    GET_CURRENT_POSITION: "Z:12.34"
+    '''
+    err_msg = 'Unexpected argument to _parse_distance_response: {}'.format(
+        distance_string)
+    if not distance_string or \
+            not isinstance(distance_string, str):
+        raise ParseError(err_msg)
+    if 'Z' not in distance_string and 'height' not in distance_string:
+        raise ParseError(err_msg)
+    return _parse_number_from_substring(distance_string.strip())
+
+
 class MagDeck:
     def __init__(self, config={}):
         self.run_flag = Event()
@@ -137,6 +153,143 @@ class MagDeck:
         self.simulating = True
         self._connection = None
         self._config = config
+
+        self._plate_height = None
+        self._mag_position = None
+
+    def connect(self, port=None) -> str:
+        '''
+        :param port: '/dev/ttyMagDeck'
+        NOTE: Using the symlink above to connect makes sure that the robot
+        connects/reconnects to the module even after a device
+        reset/reconnection
+        '''
+        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+            self.simulating = True
+            return ''
+        try:
+            self.disconnect()
+            self._connect_to_port(port)
+            self._wait_for_ack()    # verify the device is there
+        except (SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
+
+    def disconnect(self):
+        if self.is_connected():
+            self._connection.close()
+        self._connection = None
+        self.simulating = True
+
+    def is_connected(self) -> bool:
+        # Does not detect if the module was physically plugged out
+        # TODO: have it test actual connection
+        if not self._connection:
+            return False
+        return self._connection.is_open
+
+    @property
+    def port(self) -> str:
+        if not self._connection:
+            return ''
+        return self._connection.port
+
+    def home(self) -> str:
+        '''
+        Homes the magnet
+        '''
+        self.run_flag.wait()
+
+        try:
+            self._send_command(GCODES['HOME'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
+
+    def probe_plate(self) -> str:
+        '''
+        Probes for the deck plate and calculates the plate distance
+        from home.
+        To be used for calibrating MagDeck
+        '''
+        self.run_flag.wait()
+
+        try:
+            self._send_command(GCODES['PROBE_PLATE'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
+
+    @property
+    def plate_height(self) -> float:
+        '''
+        Default plate_height for the device is 30;
+        calculated as MAX_TRAVEL_DISTANCE(45mm) - 15mm
+        '''
+        self._update_plate_height()
+        return self._plate_height
+
+    @property
+    def mag_position(self) -> float:
+        '''
+        Default mag_position for the device is 0.0
+        i.e. it boots with the current position as 0.0
+        '''
+        self._update_mag_position()
+        return self._mag_position
+
+    def move(self, position_mm) -> str:
+        '''
+        Move the magnets along Z axis where the home position is 0.0;
+        position_mm-> a point along Z. Does not self-check if the position
+        is outside of the deck's linear range
+        '''
+        self.run_flag.wait()
+
+        try:
+            position_mm = round(float(position_mm), GCODE_ROUNDING_PRECISION)
+            self._send_command('{0} Z{1}'.format(GCODES['MOVE'], position_mm))
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
+
+    def get_device_info(self) -> dict:
+        '''
+        Queries Temp-Deck for it's build version, model, and serial number
+
+        returns: dict
+            Where keys are the strings 'version', 'model', and 'serial',
+            and each value is a string identifier
+
+            {
+                'serial': '1aa11bb22',
+                'model': '1aa11bb22',
+                'version': '1aa11bb22'
+            }
+
+        Example input from Temp-Deck's serial response:
+            "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
+        '''
+        if self.simulating:
+            return {}
+        try:
+            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return {'error': str(e)}
+
+    def enter_programming_mode(self) -> str:
+        '''
+        Enters and stays in DFU mode for 8 seconds.
+        The module resets upon exiting the mode
+        which causes the robot to lose serial connection to it.
+        The connection can be restored by performing a .disconnect()
+        followed by a .connect() to the same symlink node
+        '''
+        try:
+            self._send_command(GCODES['PROGRAMMING_MODE'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:
@@ -185,7 +338,7 @@ class MagDeck:
 
     def _connect_to_port(self, port=None):
         try:
-            mag_deck = environ.get('OT_MAG_DECK_ID', None)
+            mag_deck = environ.get('OT_MAG_DECK_ID')
             self._connection = serial_communication.connect(
                 device_name=mag_deck,
                 port=port,
@@ -195,45 +348,37 @@ class MagDeck:
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
-            error_msg = 'Unable to access Serial port to Mag-Deck. This is '
-            error_msg += 'because another process is currently using it, or '
-            error_msg += 'the Serial port is disabled on this device (OS)'
+            error_msg = "Unable to access Serial port to Mag-Deck. This is"
+            " because another process is currently using it, or"
+            " the Serial port is disabled on this device (OS)"
             raise SerialException(error_msg)
 
-    def connect(self, port=None) -> str:
-        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            self.simulating = True
-            return
+    def _update_plate_height(self) -> str:
         try:
-            self.disconnect()
-            self._connect_to_port(port)
-            self._wait_for_ack()    # verify the device is there
-        except (SerialException, SerialNoResponse) as e:
-            return str(e)
-        return ''
-
-    def disconnect(self):
-        if self.is_connected():
-            self._connection.close()
-        self._connection = None
-        self.simulating = True
-
-    def is_connected(self) -> bool:
-        if not self._connection:
-            return False
-        return self._connection.is_open
-
-    @property
-    def port(self) -> str:
-        if not self._connection:
-            return None
-        return self._connection.port
-
-    def home(self) -> str:
-        self.run_flag.wait()
-
-        try:
-            self._send_command(GCODES['HOME'])
+            res = self._send_command(GCODES['GET_PLATE_HEIGHT'])
+            distance = _parse_distance_response(res)
         except (MagDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
+        self._plate_height = distance
         return ''
+
+    def _update_mag_position(self) -> str:
+        try:
+            res = self._send_command(GCODES['GET_CURRENT_POSITION'])
+            distance = _parse_distance_response(res)
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._mag_position = distance
+        return ''
+
+    def _recursive_get_info(self, retries) -> dict:
+        try:
+            device_info = self._send_command(GCODES['DEVICE_INFO'])
+            return _parse_device_information(device_info)
+        except ParseError as e:
+            retries -= 1
+            if retries <= 0:
+                raise MagDeckError(e)
+            if not self.simulating:
+                sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_get_info(retries)
