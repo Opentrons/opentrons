@@ -2,6 +2,7 @@
 import type {RootState as Dismiss} from './dismiss'
 import type {RootState as FileData} from './file-data'
 import type {RootState as LabwareIngred} from './labware-ingred/reducers'
+import type {RootState as LoadFile} from './load-file'
 import type {RootState as Navigation} from './navigation'
 import type {RootState as Pipettes} from './pipettes'
 import type {RootState as StepList} from './steplist/reducers'
@@ -10,6 +11,7 @@ export type BaseState = {
   dismiss: Dismiss,
   fileData: FileData,
   labwareIngred: LabwareIngred,
+  loadFile: LoadFile,
   navigation: Navigation,
   pipettes: Pipettes,
   steplist: StepList,

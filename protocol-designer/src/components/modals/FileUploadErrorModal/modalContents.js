@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import type {ModalContents, FileUploadErrorType} from './types'
 import styles from './modalContents.css'
+import type {ModalContents} from './types'
+import type {FileUploadErrorType} from '../../../load-file'
 
 const INVALID_FILE_TYPE: ModalContents = {
   title: 'Incorrect file type',
@@ -27,11 +28,11 @@ const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
 
 export default function getModalContents (
   errorType: FileUploadErrorType,
-  errorMessage: ?string
+  message: ?string
 ): ModalContents {
   switch (errorType) {
     case 'INVALID_FILE_TYPE': return INVALID_FILE_TYPE
-    case 'INVALID_JSON_FILE': return invalidJsonModal(errorMessage)
+    case 'INVALID_JSON_FILE': return invalidJsonModal(message)
   }
   console.warn('Invalid error type specified for modal')
   return {title: 'Error', body: 'Error'}

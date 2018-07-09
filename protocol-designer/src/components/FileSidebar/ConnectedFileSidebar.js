@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {actions, selectors} from '../navigation'
-import {selectors as fileDataSelectors} from '../file-data'
-import {loadFile} from '../load-file'
-import FileSidebar from '../components/FileSidebar'
-import type {BaseState} from '../types'
+import {actions, selectors} from '../../navigation'
+import {selectors as fileDataSelectors} from '../../file-data'
+import {loadFile} from '../../load-file'
+import FileSidebar from './FileSidebar'
+import type {BaseState, ThunkDispatch} from '../../types'
 
 type Props = React.ElementProps<typeof FileSidebar>
 
@@ -34,12 +33,12 @@ function mapStateToProps (state: BaseState): SP & MP {
   }
 }
 
-function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatch<*>}): Props {
   const {_canCreateNew, downloadData} = stateProps
   const {dispatch} = dispatchProps
   return {
     downloadData,
-    loadFile: (parsedProtocol) => dispatch(loadFile(parsedProtocol)),
+    loadFile: (fileChangeEvent) => dispatch(loadFile(fileChangeEvent)),
     onCreateNew: _canCreateNew
       ? () => dispatch(actions.toggleNewProtocolModal(true))
       : undefined

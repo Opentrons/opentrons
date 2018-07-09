@@ -1,31 +1,29 @@
 // @flow
 import * as React from 'react'
-import {AlertModal} from '@opentrons/components'
-import {Portal} from '../../portals/MainPageModalPortal'
-import modalStyles from '../modal.css'
-import getModalContents from './modalContents'
-import type {FileUploadErrorType} from './types'
+import FileUploadErrorModal from './FileUploadErrorModal'
+import {connect} from 'react-redux'
+import {selectors as loadFileSelectors, actions as loadFileActions} from '../../../load-file'
+import type {Dispatch} from 'redux'
+import type {BaseState} from '../../../types'
 
-type Props = {
-  errorType: FileUploadErrorType,
-  errorMessage: ?string,
-  onClose: (SyntheticEvent<*>) => mixed
+type Props = React.ElementProps<typeof FileUploadErrorModal>
+
+type SP = {
+  error: $PropertyType<Props, 'error'>
 }
 
-export type {FileUploadErrorType}
+type DP = $Diff<Props, SP>
 
-export default function FileUploadErrorModal (props: Props) {
-  const {title, body} = getModalContents(props.errorType, props.errorMessage)
-  return (
-    <Portal>
-      <AlertModal
-        heading={title}
-        buttons={[{children: 'ok', onClick: props.onClose}]}
-        className={modalStyles.modal}
-        alertOverlay
-      >
-        {body}
-      </AlertModal>
-    </Portal>
-  )
+function mapStateToProps (state: BaseState): SP {
+  return {
+    error: loadFileSelectors.getFileLoadErrors(state)
+  }
 }
+
+function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+  return {
+    onClose: () => dispatch(loadFileActions.fileErrors(null))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FileUploadErrorModal)

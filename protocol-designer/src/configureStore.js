@@ -8,6 +8,7 @@ function getRootReducer () {
     dismiss: require('./dismiss').rootReducer,
     fileData: require('./file-data').rootReducer,
     labwareIngred: require('./labware-ingred/reducers').default,
+    loadFile: require('./load-file').rootReducer,
     navigation: require('./navigation').rootReducer,
     pipettes: require('./pipettes').rootReducer,
     steplist: require('./steplist/reducers').default,
@@ -43,6 +44,7 @@ export default function configureStore () {
     module.hot.accept([
       './file-data/reducers',
       './labware-ingred/reducers',
+      './load-file/reducers',
       './navigation/reducers',
       './pipettes',
       './steplist/reducers',
