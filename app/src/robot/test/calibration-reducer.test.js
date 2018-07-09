@@ -316,7 +316,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {instrument: 'left'}
+      payload: {pipette: 'left'}
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -382,7 +382,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: actionTypes.PROBE_TIP,
-      payload: {instrument: 'left'}
+      payload: {pipette: 'left'}
     }
 
     expect(reducer(state, action).calibration).toEqual({

@@ -2,7 +2,7 @@
 // robot session (protocol) state and reducer
 import type {
   Command,
-  StateInstrument,
+  StatePipette,
   StateLabware,
   Mount,
   Slot,
@@ -33,8 +33,8 @@ export type State = {
   protocolCommandsById: {
     [number]: Command
   },
-  instrumentsByMount: {
-    [Mount]: StateInstrument
+  pipettesByMount: {
+    [Mount]: StatePipette
   },
   labwareBySlot: {
     [Slot]: StateLabware
@@ -73,7 +73,7 @@ const INITIAL_STATE: State = {
   protocolCommandsById: {},
 
   // deck setup from protocol
-  instrumentsByMount: {},
+  pipettesByMount: {},
   labwareBySlot: {},
 
   // running a protocol

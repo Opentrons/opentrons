@@ -118,8 +118,8 @@ export default function client (dispatch) {
   }
 
   function moveToFront (state, action) {
-    const {payload: {instrument: axis}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {pipette: axis}} = action
+    const instrument = {_id: selectors.getPipettesByMount(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
@@ -132,7 +132,7 @@ export default function client (dispatch) {
   // saves container offset and then attempts a tip pickup
   function pickupAndHome (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
@@ -147,7 +147,7 @@ export default function client (dispatch) {
 
   function dropTipAndHome (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
@@ -163,7 +163,7 @@ export default function client (dispatch) {
   // drop the tip unless the tiprack is the last one to be confirmed
   function confirmTiprack (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     if (selectors.getUnconfirmedTipracks(state).length === 1) {
@@ -179,32 +179,32 @@ export default function client (dispatch) {
   }
 
   function probeTip (state, action) {
-    const {payload: {instrument: axis}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[axis]._id}
+    const {payload: {pipette: axis}} = action
+    const pipette = {_id: selectors.getPipettesByMount(state)[axis]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
 
-    remote.calibration_manager.tip_probe(instrument)
+    remote.calibration_manager.tip_probe(pipette)
       .then(() => dispatch(actions.probeTipResponse()))
       .catch((error) => dispatch(actions.probeTipResponse(error)))
   }
 
   function returnTip (state, action) {
-    const {payload: {instrument: mount}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const {payload: {pipette: mount}} = action
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
 
-    remote.calibration_manager.return_tip(instrument)
+    remote.calibration_manager.return_tip(pipette)
       .then(() => dispatch(actions.returnTipResponse()))
       .catch((error) => dispatch(actions.returnTipResponse(error)))
   }
 
   function moveTo (state, action) {
     const {payload: {mount, slot}} = action
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME - MORE DEBUG CODE
@@ -223,7 +223,7 @@ export default function client (dispatch) {
 
   function jog (state, action) {
     const {payload: {mount, axis, direction, step}} = action
-    const instrument = selectors.getInstrumentsByMount(state)[mount]
+    const instrument = selectors.getPipettesByMount(state)[mount]
     const distance = step * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
@@ -240,7 +240,7 @@ export default function client (dispatch) {
     const {payload: {mount, slot}} = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
-    const instrument = {_id: selectors.getInstrumentsByMount(state)[mount]._id}
+    const instrument = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: labwareObject._id}
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
@@ -330,7 +330,7 @@ export default function client (dispatch) {
       }
 
       if (apiSession.instruments) {
-        update.instrumentsByMount = {}
+        update.pipettesByMount = {}
         apiSession.instruments.forEach(apiInstrumentToInstrument)
       }
 
@@ -377,7 +377,7 @@ export default function client (dispatch) {
       //  interacts with
       const volume = Number(name.match(RE_VOLUME)[1])
 
-      update.instrumentsByMount[mount] = {_id, mount, name, channels, volume}
+      update.pipettesByMount[mount] = {_id, mount, name, channels, volume}
     }
 
     function apiContainerToContainer (apiContainer) {

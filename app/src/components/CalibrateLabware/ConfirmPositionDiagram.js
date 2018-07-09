@@ -2,13 +2,13 @@
 // diagram and instructions for ConfirmPositionContents
 import * as React from 'react'
 
-import type {Labware, Instrument} from '../../robot'
+import type {Labware, Pipette} from '../../robot'
 import InstructionStep from '../InstructionStep'
 import {getInstructionsByType, getDiagramSrc} from './instructions-data'
 import styles from '../InstructionStep/styles.css'
 
 export type LabwareCalibrationProps = Labware & {
-  calibrator: Instrument,
+  calibrator: Pipette,
   buttonText: string
 }
 

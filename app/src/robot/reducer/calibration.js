@@ -169,9 +169,9 @@ function handleSetDeckPopulated (state: State, action: any): State {
 }
 
 function handleMoveToFront (state: State, action: any): State {
-  if (!action.payload || !action.payload.instrument) return state
+  if (!action.payload || !action.payload.pipette) return state
 
-  const {payload: {instrument: mount}} = action
+  const {payload: {pipette: mount}} = action
 
   return {
     ...state,
@@ -201,21 +201,21 @@ function handleMoveToFrontResponse (state: State, action: any): State {
 }
 
 function handleProbeTip (state: State, action: any) {
-  if (!action.payload || !action.payload.instrument) return state
+  if (!action.payload || !action.payload.pipette) return state
 
-  const {payload: {instrument}} = action
+  const {payload: {pipette}} = action
 
   return {
     ...state,
     calibrationRequest: {
       type: 'PROBE_TIP',
-      mount: instrument,
+      mount: pipette,
       inProgress: true,
       error: null
     },
     probedByMount: {
       ...state.probedByMount,
-      [instrument]: false
+      [pipette]: false
     }
   }
 }

@@ -19,14 +19,14 @@ const {
   getIsPaused,
   getIsDone,
   getRunTime,
-  getInstruments,
+  getPipettes,
   getCalibratorMount,
-  getInstrumentsCalibrated,
+  getPipettesCalibrated,
   getLabware,
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
-  makeGetCurrentInstrument
+  makeGetCurrentPipette
 } = selectors
 
 describe('robot selectors', () => {
@@ -350,7 +350,7 @@ describe('robot selectors', () => {
     beforeEach(() => {
       state = makeState({
         session: {
-          instrumentsByMount: {
+          pipettesByMount: {
             left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
             right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
           }
@@ -373,8 +373,8 @@ describe('robot selectors', () => {
     })
 
     // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
-    test('get instruments', () => {
-      expect(getInstruments(state)).toEqual([
+    test('get pipettes', () => {
+      expect(getPipettes(state)).toEqual([
         {
           mount: 'left',
           name: 'p200m',
@@ -397,10 +397,10 @@ describe('robot selectors', () => {
     })
 
     test('make get current instrument from props', () => {
-      const getCurrentInstrument = makeGetCurrentInstrument()
+      const getCurrentPipette = makeGetCurrentPipette()
       let props = {match: {params: {mount: 'left'}}}
 
-      expect(getCurrentInstrument(state, props)).toEqual({
+      expect(getCurrentPipette(state, props)).toEqual({
         mount: 'left',
         name: 'p200m',
         channels: 8,
@@ -411,7 +411,7 @@ describe('robot selectors', () => {
       })
 
       props = {match: {params: {mount: 'right'}}}
-      expect(getCurrentInstrument(state, props)).toEqual({
+      expect(getCurrentPipette(state, props)).toEqual({
         mount: 'right',
         name: 'p50s',
         channels: 1,
@@ -422,14 +422,14 @@ describe('robot selectors', () => {
       })
 
       props = {match: {params: {}}}
-      expect(getCurrentInstrument(state, props)).toBeFalsy()
+      expect(getCurrentPipette(state, props)).toBeFalsy()
     })
   })
 
   test('get calibrator mount', () => {
     const leftState = makeState({
       session: {
-        instrumentsByMount: {
+        pipettesByMount: {
           left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
           right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
         }
@@ -443,7 +443,7 @@ describe('robot selectors', () => {
 
     const rightState = makeState({
       session: {
-        instrumentsByMount: {
+        pipettesByMount: {
           left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
           right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
         }
@@ -462,7 +462,7 @@ describe('robot selectors', () => {
   test('get instruments are calibrated', () => {
     const twoPipettesCalibrated = makeState({
       session: {
-        instrumentsByMount: {
+        pipettesByMount: {
           left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
           right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
@@ -476,7 +476,7 @@ describe('robot selectors', () => {
 
     const twoPipettesNotCalibrated = makeState({
       session: {
-        instrumentsByMount: {
+        pipettesByMount: {
           left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
           right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
@@ -490,7 +490,7 @@ describe('robot selectors', () => {
 
     const onePipetteCalibrated = makeState({
       session: {
-        instrumentsByMount: {
+        pipettesByMount: {
           right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
         }
       },
@@ -501,9 +501,9 @@ describe('robot selectors', () => {
       }
     })
 
-    expect(getInstrumentsCalibrated(twoPipettesCalibrated)).toBe(true)
-    expect(getInstrumentsCalibrated(twoPipettesNotCalibrated)).toBe(false)
-    expect(getInstrumentsCalibrated(onePipetteCalibrated)).toBe(true)
+    expect(getPipettesCalibrated(twoPipettesCalibrated)).toBe(true)
+    expect(getPipettesCalibrated(twoPipettesNotCalibrated)).toBe(false)
+    expect(getPipettesCalibrated(onePipetteCalibrated)).toBe(true)
   })
 
   describe('labware selectors', () => {
@@ -528,7 +528,7 @@ describe('robot selectors', () => {
             5: {slot: '5', type: 'a', isTiprack: false},
             9: {slot: '9', type: 'b', isTiprack: false}
           },
-          instrumentsByMount: {
+          pipettesByMount: {
             left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
             right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
           }

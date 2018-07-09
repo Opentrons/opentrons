@@ -9,8 +9,8 @@ import type {State} from '../types'
 
 import type {
   Mount,
-  Instrument,
-  InstrumentCalibrationStatus,
+  Pipette,
+  PipetteCalibrationStatus,
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
@@ -21,7 +21,7 @@ import type {
 import {
   type ConnectionStatus,
   _NAME,
-  INSTRUMENT_MOUNTS,
+  PIPETTE_MOUNTS,
   DECK_SLOTS
 } from './constants'
 
@@ -32,7 +32,7 @@ const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
 
 export function isMount (target: ?string): boolean {
-  return INSTRUMENT_MOUNTS.indexOf(target) > -1
+  return PIPETTE_MOUNTS.indexOf(target) > -1
 }
 
 export function isSlot (target: ?string): boolean {
@@ -228,31 +228,31 @@ export function getCalibrationRequest (state: State) {
   return calibration(state).calibrationRequest
 }
 
-export function getInstrumentsByMount (state: State) {
-  return session(state).instrumentsByMount
+export function getPipettesByMount (state: State) {
+  return session(state).pipettesByMount
 }
 
-export const getInstruments = createSelector(
-  getInstrumentsByMount,
+export const getPipettes = createSelector(
+  getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
   (state: State) => getCalibrationRequest(state),
   (
-    instrumentsByMount,
+    pipettesByMount,
     probedByMount,
     tipOnByMount,
     calibrationRequest
-  ): Instrument[] => {
-    return INSTRUMENT_MOUNTS
-      .filter((mount) => instrumentsByMount[mount] != null)
+  ): Pipette[] => {
+    return PIPETTE_MOUNTS
+      .filter((mount) => pipettesByMount[mount] != null)
       .map((mount) => {
-        const instrument = instrumentsByMount[mount]
+        const pipette = pipettesByMount[mount]
 
         const probed = probedByMount[mount] || false
         const tipOn = tipOnByMount[mount] || false
-        let calibration: InstrumentCalibrationStatus = 'unprobed'
+        let calibration: PipetteCalibrationStatus = 'unprobed'
 
-        // TODO(mc: 2018-01-10): rethink instrument level "calibration" prop
+        // TODO(mc: 2018-01-10): rethink pipette level "calibration" prop
         // TODO(mc: 2018-01-23): handle probe error state better
         if (calibrationRequest.mount === mount && !calibrationRequest.error) {
           if (calibrationRequest.type === 'MOVE_TO_FRONT') {
@@ -271,7 +271,7 @@ export const getInstruments = createSelector(
         }
 
         return {
-          ...instrument,
+          ...pipette,
           calibration,
           probed,
           tipOn
@@ -280,23 +280,23 @@ export const getInstruments = createSelector(
   }
 )
 
-export const getNextInstrument = createSelector(
-  getInstruments,
-  (instruments): ?Instrument => {
-    const nextInst = instruments.find((i) => !i.probed)
+export const getNextPipette = createSelector(
+  getPipettes,
+  (pipettes): ?Pipette => {
+    const nextPipette = pipettes.find((i) => !i.probed)
 
-    return nextInst || instruments[0]
+    return nextPipette || pipettes[0]
   }
 )
 
 // returns the mount of the pipette to use for deckware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
 export const getCalibrator = createSelector(
-  getInstruments,
-  (instruments): ?Instrument => {
-    const tipOn = instruments.find((i) => i.probed && i.tipOn)
+  getPipettes,
+  (pipettes): ?Pipette => {
+    const tipOn = pipettes.find((i) => i.probed && i.tipOn)
 
-    return tipOn || instruments[0]
+    return tipOn || pipettes[0]
   }
 )
 
@@ -309,11 +309,11 @@ export function getCalibratorMount (state: State): ?Mount {
   return calibrator.mount
 }
 
-export const getInstrumentsCalibrated = createSelector(
-  getInstruments,
-  (instruments): boolean => (
-    instruments.length !== 0 &&
-    instruments.every((i) => i.probed)
+export const getPipettesCalibrated = createSelector(
+  getPipettes,
+  (pipettes): boolean => (
+    pipettes.length !== 0 &&
+    pipettes.every((i) => i.probed)
   )
 )
 
@@ -322,7 +322,7 @@ export function getLabwareBySlot (state: State) {
 }
 
 export const getLabware = createSelector(
-  getInstrumentsByMount,
+  getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
   getCalibrationRequest,
@@ -432,10 +432,10 @@ export function getOffsetUpdateInProgress (state: State): boolean {
   return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
 
-// get current instrument selector factory
+// get current pipette selector factory
 // to be used by a react-router Route component
-export const makeGetCurrentInstrument = () => createSelector(
+export const makeGetCurrentPipette = () => createSelector(
   (_, props: ContextRouter) => props.match.params.mount,
-  getInstruments,
-  (mount, instruments) => instruments.find((i) => i.mount === mount)
+  getPipettes,
+  (mount, pipettes) => pipettes.find((i) => i.mount === mount)
 )

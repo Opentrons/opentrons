@@ -38,7 +38,7 @@ function RemoveTipPanel (props: Props) {
 }
 
 function mapStateToProps (state: State): SP {
-  const instruments = robotSelectors.getInstruments(state)
+  const instruments = robotSelectors.getPipettes(state)
   const nextInstrument = instruments.find((inst) => !inst.probed)
   const buttonText = nextInstrument
     ? 'Continue to next pipette'

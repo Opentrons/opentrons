@@ -7,13 +7,13 @@ import {
   type IconName
 } from '@opentrons/components'
 
-import type {Mount, Instrument} from '../../robot'
+import type {Mount, Pipette} from '../../robot'
 import styles from './styles.css'
 
 type Props = {
   isRunning: boolean,
   mount: Mount,
-  instrument: ?Instrument
+  instrument: ?Pipette
 }
 
 export default function PipetteListItem (props: Props) {
