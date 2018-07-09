@@ -43,8 +43,8 @@ Y_BACKOFF_SLOW_SPEED = 50
 Y_RETRACT_SPEED = 8
 Y_RETRACT_DISTANCE = 3
 
-UNSTICK_AXES_DISTANCE = 1
-UNSTICK_AXES_SPEED = 1
+UNSTICK_DISTANCE = 1
+UNSTICK_SPEED = 1
 
 DEFAULT_AXES_SPEED = 400
 
@@ -1210,7 +1210,8 @@ class SmoothieDriver_3_0_0:
         disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
         return self.home(axis=axis, disabled=disabled)
 
-    def unstick_axes(self, axes):
+    def unstick_axes(
+            self, axes, distance=UNSTICK_DISTANCE, speed=UNSTICK_SPEED):
         '''
         Some axes (specifically plunger axis in OT2) build up static friction
         over time. To get over this, the robot can move that plunger at normal
@@ -1225,15 +1226,17 @@ class SmoothieDriver_3_0_0:
                 raise ValueError('Unknown axes: {}'.format(axes))
 
         self.push_axis_max_speed()
-        self.set_axis_max_speed({ax: UNSTICK_AXES_SPEED for ax in axes})
+        self.set_axis_max_speed({ax: speed for ax in axes})
 
         # only need to request switch state once
-        state_of_switches = self.switch_state
+        state_of_switches = {ax: False for ax in AXES}
+        if not self.simulating:
+            state_of_switches = self.switch_state
 
         # incase axes is pressing endstop, home it slowly instead of moving
         homing_axes = ''.join([ax for ax in axes if state_of_switches[ax]])
         moving_axes = {
-            ax: self.position[ax] - UNSTICK_AXES_DISTANCE  # retract
+            ax: self.position[ax] - distance  # retract
             for ax in axes
             if (not state_of_switches[ax]) and (ax not in homing_axes)
         }
