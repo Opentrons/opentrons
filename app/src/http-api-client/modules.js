@@ -11,12 +11,16 @@ import {apiRequest, apiSuccess, apiFailure} from './actions'
 import {getRobotApiState} from './reducer'
 import client from './client'
 
-type FetchModulesResponse = {
+export type Module = {
   model: string,
   serial: string,
   fwVersion: string,
   status: string,
   displayName: string,
+}
+
+type FetchModulesResponse = {
+  modules: Array<Module>,
 }
 
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
