@@ -5,6 +5,8 @@
 .*/docs/.*
 api/.*
 api-server-lib/.*
+audio/.*
+compute/.*
 update-server/.*
 
 [include]

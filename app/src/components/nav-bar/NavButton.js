@@ -82,14 +82,11 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {dispatch} = dispatchProps
   const {_robot, url, disabled} = stateProps
-  let sp = stateProps
+  let props: Props = {...ownProps, ...stateProps}
 
   if (_robot && url === '/calibrate' && !disabled) {
-    sp = {...stateProps, onClick: () => dispatch(fetchPipettes(_robot))}
+    props = {...props, onClick: () => dispatch(fetchPipettes(_robot))}
   }
 
-  return {
-    ...ownProps,
-    ...sp
-  }
+  return props
 }
