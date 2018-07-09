@@ -39,7 +39,6 @@ type CalibrationRequest = {
 
 export type State = {
   +deckPopulated: ?boolean,
-  +jogDistance: number,
 
   +probedByMount: {[Mount]: boolean},
   +tipOnByMount: {[Mount]: boolean},
@@ -62,7 +61,6 @@ const {
 
 const INITIAL_STATE: State = {
   deckPopulated: null,
-  jogDistance: 0.1,
 
   // TODO(mc, 2018-01-22): combine these into subreducer
   probedByMount: {},
@@ -137,9 +135,6 @@ export default function calibrationReducer (
 
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
-
-    case 'robot:SET_JOG_DISTANCE':
-      return handleSetJogDistance(state, action)
 
     case 'robot:REFRESH_SESSION':
       return handleSession(state, action)
@@ -482,13 +477,6 @@ function handleConfirmTiprackFailure (
       inProgress: false,
       error
     }
-  }
-}
-
-function handleSetJogDistance (state: State, action: any) {
-  return {
-    ...state,
-    jogDistance: Number(action.payload)
   }
 }
 

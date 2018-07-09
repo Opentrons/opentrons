@@ -68,7 +68,7 @@ GCODES = {'HOME': 'G28.2',
           'DWELL': 'G4',
           'CURRENT_POSITION': 'M114.2',
           'LIMIT_SWITCH_STATUS': 'M119',
-          'PROBE': 'G38.2',
+          'PROBE': 'G38.2 F420',  # 420 mm/min (7 mm/sec) to avoid resonance
           'ABSOLUTE_COORDS': 'G90',
           'RELATIVE_COORDS': 'G91',
           'RESET_FROM_ERROR': 'M999',

@@ -11,8 +11,6 @@ export const {
   SLOT_WIDTH,
   SLOT_HEIGHT,
   SLOT_SPACING,
-  DECK_WIDTH,
-  DECK_HEIGHT,
   // STYLE CONSTANTS
   swatchColors,
   // SPECIAL SELECTORS

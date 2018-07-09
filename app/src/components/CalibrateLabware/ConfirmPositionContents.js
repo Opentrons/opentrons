@@ -3,31 +3,26 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import type {State, Dispatch} from '../../types'
+import type {Dispatch} from '../../types'
 import type {Instrument, Labware} from '../../robot'
 
-import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import {actions as robotActions} from '../../robot'
 import {PrimaryButton} from '@opentrons/components'
 import ConfirmPositionDiagram from './ConfirmPositionDiagram'
-import JogControls, {type JogControlsProps} from '../JogControls'
-
-type SP = {
-  step: $PropertyType<JogControlsProps, 'step'>,
-}
+import JogControls, {type Jog} from '../JogControls'
 
 type DP = {
-  onConfirmClick: () => void,
-  jog: $PropertyType<JogControlsProps, 'jog'>,
-  onStepSelect: $PropertyType<JogControlsProps, 'onStepSelect'>,
+  onConfirmClick: () => mixed,
+  jog: Jog,
 }
 
 type OP = Labware & {
   calibrator: Instrument
 }
 
-type Props = SP & DP & OP
+type Props = DP & OP
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConfirmPositionContents)
+export default connect(null, mapDispatchToProps)(ConfirmPositionContents)
 
 function ConfirmPositionContents (props: Props) {
   const {isTiprack, onConfirmClick, calibrator: {channels}} = props
@@ -46,12 +41,6 @@ function ConfirmPositionContents (props: Props) {
   )
 }
 
-function mapStateToProps (state: State): SP {
-  return {
-    step: robotSelectors.getJogDistance(state)
-  }
-}
-
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {slot, isTiprack, calibrator: {mount}} = ownProps
   const onConfirmAction = isTiprack
@@ -59,13 +48,9 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     : robotActions.updateOffset(mount, slot)
 
   return {
-    jog: (axis, direction) => {
-      dispatch(robotActions.jog(mount, axis, direction))
+    jog: (axis, direction, step) => {
+      dispatch(robotActions.jog(mount, axis, direction, step))
     },
-    onStepSelect: (event) => {
-      const step = Number(event.target.value)
-      dispatch(robotActions.setJogDistance(step))
-    },
-    onConfirmClick: () => { dispatch(onConfirmAction) }
+    onConfirmClick: () => dispatch(onConfirmAction)
   }
 }

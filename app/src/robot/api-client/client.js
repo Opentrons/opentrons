@@ -222,9 +222,9 @@ export default function client (dispatch) {
   }
 
   function jog (state, action) {
-    const {payload: {mount, axis, direction}} = action
+    const {payload: {mount, axis, direction, step}} = action
     const instrument = selectors.getInstrumentsByMount(state)[mount]
-    const distance = selectors.getJogDistance(state) * direction
+    const distance = step * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.jogResponse()), 1000)

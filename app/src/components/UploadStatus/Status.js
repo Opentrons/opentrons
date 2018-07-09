@@ -1,33 +1,33 @@
+// @flow
 // upload summary component
-import React from 'react'
-import PropTypes from 'prop-types'
+import * as React from 'react'
 import cx from 'classnames'
 import {Link} from 'react-router-dom'
 
 import {Icon, Splash} from '@opentrons/components'
 
-import styles from './Upload.css'
+import styles from './styles.css'
 
 const UPLOAD_ERROR_MESSAGE = 'Your protocol could not be opened.'
 const UPLOAD_SUCCESS_MESSAGE = 'Your protocol has successfully loaded.'
 
-Upload.propTypes = {
-  name: PropTypes.string.isRequired,
-  inProgress: PropTypes.bool.isRequired,
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired
-  })
+type Props = {
+  name: string,
+  uploadInProgress: boolean,
+  uploadError: ?{message: string},
+  protocolRunning: boolean,
+  protocolDone: boolean,
 }
 
-export default function Upload (props) {
-  const {name, inProgress, error} = props
+export default function Status (props: Props) {
+  const {name, uploadInProgress, uploadError} = props
 
   // display splash if nothing is happening
-  if (!name && !inProgress && !error) {
+  if (!name && !uploadInProgress && !uploadError) {
     return (<Splash />)
   }
 
-  const content = inProgress
+  const content = uploadInProgress
     ? (<Icon name='ot-spinner' spin className={styles.status_icon} />)
     : (<UploadResults {...props} />)
 
@@ -38,20 +38,22 @@ export default function Upload (props) {
   )
 }
 
-function UploadResults (props) {
-  const {name, error} = props
-  const message = error
+function UploadResults (props: Props) {
+  const {name, uploadError, protocolRunning, protocolDone} = props
+  const message = uploadError
     ? UPLOAD_ERROR_MESSAGE
     : UPLOAD_SUCCESS_MESSAGE
 
   let instructions
 
-  if (error) {
+  console.log(props)
+
+  if (uploadError) {
     // instructions for an unsuccessful upload
     instructions = (
       <div className={styles.details}>
         <p className={styles.error_message}>
-          {error.message}
+          {uploadError.message}
         </p>
         <p>
           Looks like there might be a problem with your protocol file. Please
@@ -59,6 +61,15 @@ function UploadResults (props) {
           and provide them with your protocol file and the error message above.
         </p>
       </div>
+    )
+  } else if (protocolRunning || protocolDone) {
+    // instructions while protocol is running
+    instructions = (
+      <p className={styles.details}>
+        <span>{'Continue to '}</span>
+        <Link to='/run'>Run</Link>
+        <span>{' to view progress of the current protocol run'}</span>
+      </p>
     )
   } else {
     // instructions for a successful upload
@@ -73,7 +84,7 @@ function UploadResults (props) {
 
   return (
     <div className={styles.results}>
-      <StatusIcon success={!error} />
+      <StatusIcon success={!uploadError} />
       <div className={styles.status}>
         <p className={styles.status_message}>
           {message}
@@ -92,7 +103,7 @@ function UploadResults (props) {
   )
 }
 
-function StatusIcon (props) {
+function StatusIcon (props: {success: boolean}) {
   const {success} = props
   const iconClassName = cx(styles.status_icon, {
     [styles.success]: success,

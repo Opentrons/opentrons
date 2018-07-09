@@ -15,8 +15,6 @@ import {
   home,
   startDeckCalibration,
   deckCalibrationCommand,
-  setCalibrationJogStep,
-  getCalibrationJogStep,
   makeGetDeckCalibrationCommandState,
   makeGetDeckCalibrationStartState
 } from '../../http-api-client'
@@ -127,11 +125,11 @@ function CalibrateDeck (props: CalibrateDeckProps) {
   )
 }
 
-function makeMapStateToProps () {
+function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getDeckCalCommand = makeGetDeckCalibrationCommandState()
   const getDeckCalStartState = makeGetDeckCalibrationStartState()
 
-  return (state: State, ownProps: OP): SP => {
+  return (state, ownProps) => {
     const {robot} = ownProps
     const startRequest = getDeckCalStartState(state, robot)
     const pipetteInfo = startRequest.response && startRequest.response.pipette
@@ -146,8 +144,7 @@ function makeMapStateToProps () {
     return {
       startRequest,
       pipetteProps,
-      commandRequest: getDeckCalCommand(state, robot),
-      jogStep: getCalibrationJogStep(state)
+      commandRequest: getDeckCalCommand(state, robot)
     }
   }
 }
@@ -159,10 +156,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     jog: (axis, direction, step) => dispatch(
       deckCalibrationCommand(robot, {command: 'jog', axis, direction, step})
     ),
-    onJogStepSelect: (event) => {
-      const step = Number(event.target.value)
-      dispatch(setCalibrationJogStep(step))
-    },
     forceStart: () => dispatch(startDeckCalibration(robot, true)),
     // exit button click in title bar, opens exit alert modal, confirm exit click
     exit: () => dispatch(chainActions(

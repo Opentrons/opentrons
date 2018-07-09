@@ -422,8 +422,7 @@ describe('api client', () => {
           calibration: {
             calibrationRequest: {},
             confirmedBySlot: {},
-            labwareBySlot: {},
-            jogDistance: constants.JOG_DISTANCE_FAST_MM
+            labwareBySlot: {}
           },
           session: {
             instrumentsByMount: {
@@ -670,7 +669,7 @@ describe('api client', () => {
     })
 
     test('handles JOG success', () => {
-      const action = actions.jog('left', 'y', -1)
+      const action = actions.jog('left', 'y', -1, 10)
       const expectedResponse = actions.jogResponse()
 
       mockResolvedValue(calibrationManager.jog)
@@ -680,7 +679,7 @@ describe('api client', () => {
         .then(() => {
           expect(calibrationManager.jog).toHaveBeenCalledWith(
             {_id: 'inst-2'},
-            -constants.JOG_DISTANCE_FAST_MM,
+            -10,
             'y'
           )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
@@ -688,7 +687,7 @@ describe('api client', () => {
     })
 
     test('handles JOG failure', () => {
-      const action = actions.jog('left', 'x', 1)
+      const action = actions.jog('left', 'x', 1, 10)
       const expectedResponse = actions.jogResponse(new Error('AH'))
 
       mockRejectedValue(calibrationManager.jog, new Error('AH'))

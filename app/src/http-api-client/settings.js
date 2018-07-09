@@ -43,18 +43,27 @@ export type SettingsState = {
   [robotName: string]: ?RobotSettingsState,
 }
 
-const SETTINGS_PATH: SettingsPath = 'settings'
+const SETTINGS: 'settings' = 'settings'
+
+// TODO(mc, 2018-07-03): flow helper until we have one reducer, since
+// p === 'constant' checks but p === CONSTANT does not, even if
+// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
+function getSettingsPath (p: string): ?SettingsPath {
+  if (p === 'settings') return p
+
+  return null
+}
 
 export function fetchSettings (robot: RobotService): ThunkPromiseAction {
   const request: SettingsRequest = null
 
   return (dispatch) => {
-    dispatch(apiRequest(robot, SETTINGS_PATH, request))
+    dispatch(apiRequest(robot, SETTINGS, request))
 
-    return client(robot, 'GET', SETTINGS_PATH)
+    return client(robot, 'GET', SETTINGS)
       .then(
-        (res: SettingsResponse) => apiSuccess(robot, SETTINGS_PATH, res),
-        (err: ApiRequestError) => apiFailure(robot, SETTINGS_PATH, err)
+        (res: SettingsResponse) => apiSuccess(robot, SETTINGS, res),
+        (err: ApiRequestError) => apiFailure(robot, SETTINGS, err)
       )
       .then(dispatch)
   }
@@ -68,25 +77,27 @@ export function setSettings (
   const request: SettingsRequest = {id, value}
 
   return (dispatch) => {
-    dispatch(apiRequest(robot, SETTINGS_PATH, request))
+    dispatch(apiRequest(robot, SETTINGS, request))
 
-    return client(robot, 'POST', SETTINGS_PATH, request)
+    return client(robot, 'POST', SETTINGS, request)
       .then(
-        (res: SettingsResponse) => apiSuccess(robot, SETTINGS_PATH, res),
-        (err: ApiRequestError) => apiFailure(robot, SETTINGS_PATH, err)
+        (res: SettingsResponse) => apiSuccess(robot, SETTINGS, res),
+        (err: ApiRequestError) => apiFailure(robot, SETTINGS, err)
       )
       .then(dispatch)
   }
 }
 
+// TODO(mc, 2018-07-03): remove in favor of single HTTP API reducer
 export function settingsReducer (
   state: SettingsState = {},
   action: Action
 ): SettingsState {
   switch (action.type) {
     case 'api:REQUEST': {
-      const {payload: {path, request, robot: {name}}} = action
-      if (path !== SETTINGS_PATH) return state
+      const path = getSettingsPath(action.payload.path)
+      if (!path) return state
+      const {payload: {request, robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -100,8 +111,9 @@ export function settingsReducer (
     }
 
     case 'api:SUCCESS': {
-      const {payload: {path, response, robot: {name}}} = action
-      if (path !== SETTINGS_PATH) return state
+      const path = getSettingsPath(action.payload.path)
+      if (!path) return state
+      const {payload: {response, robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -115,8 +127,9 @@ export function settingsReducer (
     }
 
     case 'api:FAILURE': {
-      const {payload: {path, error, robot: {name}}} = action
-      if (path !== SETTINGS_PATH) return state
+      const path = getSettingsPath(action.payload.path)
+      if (!path) return state
+      const {payload: {error, robot: {name}}} = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -150,7 +163,7 @@ function getRobotSettingsState (
 function getSettingsRequest (
   state: RobotSettingsState
 ): RobotSettingsRequestState {
-  let requestState = state[SETTINGS_PATH] || {inProgress: false}
+  let requestState = state[SETTINGS] || {inProgress: false}
 
   // guard against an older version of GET /settings
   if (requestState.response && !('settings' in requestState.response)) {

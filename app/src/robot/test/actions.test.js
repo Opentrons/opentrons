@@ -298,19 +298,14 @@ describe('robot actions', () => {
     expect(actions.moveToResponse(new Error('AH'))).toEqual(failure)
   })
 
-  test('set jog distance action', () => {
-    const expected = {type: 'robot:SET_JOG_DISTANCE', payload: 10}
-    expect(actions.setJogDistance(10)).toEqual(expected)
-  })
-
   test('JOG action', () => {
     const expected = {
       type: 'robot:JOG',
-      payload: {mount: 'left', axis: 'x', direction: -1},
+      payload: {mount: 'left', axis: 'x', direction: -1, step: 10},
       meta: {robotCommand: true}
     }
 
-    expect(actions.jog('left', 'x', -1)).toEqual(expected)
+    expect(actions.jog('left', 'x', -1, 10)).toEqual(expected)
   })
 
   test('jog response action', () => {

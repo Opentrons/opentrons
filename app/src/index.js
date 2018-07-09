@@ -11,7 +11,7 @@ import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 import createLogger from './logger'
 import {checkForShellUpdates, shellMiddleware} from './shell'
 
-import {healthCheckMiddleware} from './http-api-client'
+import {healthCheckMiddleware} from './health-check'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
 

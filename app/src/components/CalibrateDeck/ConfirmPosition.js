@@ -13,11 +13,7 @@ export default function ConfirmPosition (props: Props) {
   return (
     <div>
       <Instructions {...props} />
-      <JogControls
-        jog={props.jog}
-        step={props.jogStep}
-        onStepSelect={props.onJogStepSelect}
-      />
+      <JogControls jog={props.jog} />
       <PrimaryButton onClick={props.proceed}>
         Save Calibration and Continue
       </PrimaryButton>

@@ -26,7 +26,6 @@ const {
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
-  getJogDistance,
   makeGetCurrentInstrument
 } = selectors
 
@@ -425,14 +424,6 @@ describe('robot selectors', () => {
       props = {match: {params: {}}}
       expect(getCurrentInstrument(state, props)).toBeFalsy()
     })
-  })
-
-  test('get jog distance', () => {
-    const state = makeState({
-      calibration: {jogDistance: constants.JOG_DISTANCE_SLOW_MM}
-    })
-
-    expect(getJogDistance(state)).toBe(constants.JOG_DISTANCE_SLOW_MM)
   })
 
   test('get calibrator mount', () => {

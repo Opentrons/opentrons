@@ -6,8 +6,6 @@ import type {DeckSlot} from '../robot-types'
 
 import {
   SLOTNAME_MATRIX,
-  DECK_WIDTH,
-  DECK_HEIGHT,
   SLOT_WIDTH,
   SLOT_HEIGHT,
   SLOT_SPACING,
@@ -28,20 +26,12 @@ type Props = {
   LabwareComponent: React.ComponentType<LabwareComponentProps>
 }
 
-// TODO(mc, 2018-02-05): this viewbox is wrong; fix it
-const VIEWBOX = [
-  -SLOT_OFFSET,
-  -SLOT_OFFSET,
-  DECK_WIDTH + SLOT_OFFSET * 2,
-  DECK_HEIGHT + SLOT_OFFSET * 4
-].join(' ')
-
 export default function Deck (props: Props) {
   const {className, LabwareComponent} = props
 
   return (
     // TODO css not inline style on svg
-    <svg viewBox={VIEWBOX} className={cx(styles.deck, className)}>
+    <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
 
       {/* Deck outline */}
       <g transform='scale(0.666)' className={styles.deck_outline}>

@@ -12,7 +12,7 @@ import {
   getConnectedRobotName
 } from '../robot/selectors'
 
-import {fetchHealth} from './health'
+import {fetchHealth} from '../http-api-client'
 
 // since middleware triggers before actions are reduced, health check failure
 // is triggered after CHECK_THRESHOLD + 1 missed polls
@@ -115,8 +115,10 @@ export const healthCheckMiddleware: Middleware =
         stopChecking(store, action.payload.robot)
         break
 
-      case 'api:HEALTH_FAILURE':
-        handleHealthFailure(store, action.payload.robot)
+      case 'api:FAILURE':
+        if (action.payload.path === 'health') {
+          handleHealthFailure(store, action.payload.robot)
+        }
         break
 
       case 'robot:CONNECT_RESPONSE':
@@ -143,36 +145,38 @@ export function healthCheckReducer (
 ): HealthCheckState {
   if (!state) return {}
 
-  let name
-  let stateByName
-
   switch (action.type) {
-    case 'api:RESET_HEALTH_CHECK':
-      name = action.payload.robot.name
+    case 'api:RESET_HEALTH_CHECK': {
+      const name = action.payload.robot.name
       return {...state, [name]: INITIAL_STATE_BY_NAME}
+    }
 
-    case 'api:SET_HEALTH_CHECK_ID':
-      name = action.payload.robot.name
+    case 'api:SET_HEALTH_CHECK_ID': {
+      const name = action.payload.robot.name
       return {...state, [name]: {id: action.payload.id, missed: 0}}
+    }
 
-    case 'api:CLEAR_HEALTH_CHECK_ID':
-      name = action.payload.robot.name
-      stateByName = state[name]
+    case 'api:CLEAR_HEALTH_CHECK_ID': {
+      const name = action.payload.robot.name
+      const stateByName = state[name]
       return {...state, [name]: {...stateByName, id: null}}
+    }
 
-    case 'api:HEALTH_SUCCESS':
-      name = action.payload.robot.name
-      stateByName = state[name]
-      return stateByName && stateByName.id
+    case 'api:SUCCESS': {
+      const name = action.payload.robot.name
+      const stateByName = state[name] || {}
+      return action.payload.path === 'health' && stateByName.id
         ? {...state, [name]: {...stateByName, missed: 0}}
         : state
+    }
 
-    case 'api:HEALTH_FAILURE':
-      name = action.payload.robot.name
-      stateByName = state[name]
-      return stateByName && stateByName.id
+    case 'api:FAILURE': {
+      const name = action.payload.robot.name
+      const stateByName = state[name] || {}
+      return action.payload.path === 'health' && stateByName.id
         ? {...state, [name]: {...stateByName, missed: stateByName.missed + 1}}
         : state
+    }
   }
 
   return state
@@ -225,5 +229,5 @@ function selectRobotHealthCheck (
   state: State,
   props: BaseRobot
 ): ?RobotHealthCheck {
-  return state.api.healthCheck[props.name]
+  return state.healthCheck[props.name]
 }
