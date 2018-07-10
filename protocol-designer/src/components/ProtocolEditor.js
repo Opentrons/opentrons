@@ -10,6 +10,7 @@ import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
 import ConnectedWellSelectionModal from '../containers/ConnectedWellSelectionModal'
+import FileUploadErrorModal from './modals/FileUploadErrorModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 
 import styles from './ProtocolEditor.css'
@@ -34,6 +35,7 @@ export default function ProtocolEditor () {
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />
+            <FileUploadErrorModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
 

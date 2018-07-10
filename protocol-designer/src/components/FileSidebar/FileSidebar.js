@@ -1,12 +1,16 @@
 // @flow
 import * as React from 'react'
-import {PrimaryButton, OutlineButton, SidePanel} from '@opentrons/components'
 import cx from 'classnames'
+import {
+  PrimaryButton,
+  OutlineButton,
+  SidePanel
+} from '@opentrons/components'
 import styles from './FileSidebar.css'
 
 type Props = {
-  onUpload: (SyntheticInputEvent<HTMLInputElement>) => mixed,
-  onCreateNew?: () => mixed,
+  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  createNewFile?: () => mixed,
   downloadData: ?{
     fileContents: string,
     fileName: string
@@ -14,13 +18,14 @@ type Props = {
 }
 
 export default function FileSidebar (props: Props) {
+  const {downloadData, loadFile, createNewFile} = props
   return (
     <SidePanel title='Protocol File' className={styles.file_sidebar}>
-      {props.downloadData &&
+      {downloadData &&
         <div>
           <div className={styles.download_button}>
-            <PrimaryButton Component='a' download={props.downloadData.fileName}
-              href={'data:application/json;charset=utf-8,' + encodeURIComponent(props.downloadData.fileContents)}
+            <PrimaryButton Component='a' download={downloadData.fileName}
+              href={'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
             >Export</PrimaryButton>
           </div>
           <div className={styles.divider} />
@@ -29,10 +34,10 @@ export default function FileSidebar (props: Props) {
 
       <OutlineButton Component='label' className={cx(styles.upload_button, styles.bottom_button)}>
         Import JSON
-        <input type='file' onChange={props.onUpload} />
+        <input type='file' onChange={loadFile} />
       </OutlineButton>
 
-      <OutlineButton onClick={props.onCreateNew} className={styles.bottom_button}>
+      <OutlineButton onClick={createNewFile} className={styles.bottom_button}>
         Create New
       </OutlineButton>
     </SidePanel>
