@@ -10,8 +10,7 @@
         "transform-es2015-modules-commonjs",
         ["transform-imports", {
           "popper.js": {
-              "transform": "popper.js/dist/${member}",
-              "preventFullImport": true
+            "transform": "popper.js/dist/popper.js"
           }
         }]
       ]
