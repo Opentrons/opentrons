@@ -109,7 +109,7 @@ class Mover:
     def delay(self, seconds):
         self._driver.delay(seconds)
 
-    def unstick_axes(self, pose_tree, axes=None):
+    def unstick_axes(self, pose_tree, axes=None, distance=None, speed=None):
         if axes is None:
             axes = ''.join(list(self._axis_mapping.keys()))
         axes = ''.join([
@@ -118,7 +118,7 @@ class Mover:
             if self._axis_mapping.get(ax)
         ])
         if axes:
-            self._driver.unstick_axes(axes)
+            self._driver.unstick_axes(axes, distance=distance, speed=speed)
         return self.update_pose_from_driver(pose_tree)
 
     def axis_maximum(self, pose_tree, axis):

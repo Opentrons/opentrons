@@ -1210,8 +1210,7 @@ class SmoothieDriver_3_0_0:
         disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
         return self.home(axis=axis, disabled=disabled)
 
-    def unstick_axes(
-            self, axes, distance=UNSTICK_DISTANCE, speed=UNSTICK_SPEED):
+    def unstick_axes(self, axes, distance=None, speed=None):
         '''
         Some axes (specifically plunger axis in OT2) build up static friction
         over time. To get over this, the robot can move that plunger at normal
@@ -1224,6 +1223,11 @@ class SmoothieDriver_3_0_0:
         for ax in axes:
             if ax not in AXES:
                 raise ValueError('Unknown axes: {}'.format(axes))
+
+        if distance is None:
+            distance = UNSTICK_DISTANCE
+        if speed is None:
+            speed = UNSTICK_SPEED
 
         self.push_axis_max_speed()
         self.set_axis_max_speed({ax: speed for ax in axes})
