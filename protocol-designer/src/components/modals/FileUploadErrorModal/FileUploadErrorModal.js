@@ -7,11 +7,11 @@ import type {FileError} from '../../../load-file'
 
 type Props = {
   error: ?FileError,
-  onClose: (SyntheticEvent<*>) => mixed
+  dismissModal: (SyntheticEvent<*>) => mixed
 }
 
 export default function FileUploadErrorModal (props: Props) {
-  const {error, onClose} = props
+  const {error, dismissModal} = props
 
   if (!error) return null
 
@@ -19,7 +19,7 @@ export default function FileUploadErrorModal (props: Props) {
   return (
     <AlertModal
       heading={title}
-      buttons={[{children: 'ok', onClick: onClose}]}
+      buttons={[{children: 'ok', onClick: dismissModal}]}
       className={modalStyles.modal}
       alertOverlay
     >

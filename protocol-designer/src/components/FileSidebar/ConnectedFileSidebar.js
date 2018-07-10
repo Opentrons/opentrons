@@ -39,7 +39,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
   return {
     downloadData,
     loadFile: (fileChangeEvent) => dispatch(loadFile(fileChangeEvent)),
-    onCreateNew: _canCreateNew
+    createNewFile: _canCreateNew
       ? () => dispatch(actions.toggleNewProtocolModal(true))
       : undefined
   }

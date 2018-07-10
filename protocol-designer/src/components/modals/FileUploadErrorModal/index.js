@@ -22,7 +22,7 @@ function mapStateToProps (state: BaseState): SP {
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   return {
-    onClose: () => dispatch(loadFileActions.fileErrors(null))
+    dismissModal: () => dispatch(loadFileActions.fileErrors(null))
   }
 }
 

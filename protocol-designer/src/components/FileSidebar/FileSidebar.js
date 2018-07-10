@@ -10,7 +10,7 @@ import styles from './FileSidebar.css'
 
 type Props = {
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  onCreateNew?: () => mixed,
+  createNewFile?: () => mixed,
   downloadData: ?{
     fileContents: string,
     fileName: string
@@ -18,7 +18,7 @@ type Props = {
 }
 
 export default function FileSidebar (props: Props) {
-  const {downloadData, loadFile, onCreateNew} = props
+  const {downloadData, loadFile, createNewFile} = props
   return (
     <SidePanel title='Protocol File' className={styles.file_sidebar}>
       {downloadData &&
@@ -37,7 +37,7 @@ export default function FileSidebar (props: Props) {
         <input type='file' onChange={loadFile} />
       </OutlineButton>
 
-      <OutlineButton onClick={onCreateNew} className={styles.bottom_button}>
+      <OutlineButton onClick={createNewFile} className={styles.bottom_button}>
         Create New
       </OutlineButton>
     </SidePanel>
