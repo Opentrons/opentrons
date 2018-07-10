@@ -322,7 +322,7 @@ export const actions = {
     }
   },
 
-  // drop the tip on instrument on `mount` into the tiprack in `slot`
+  // drop the tip on pipette on `mount` into the tiprack in `slot`
   dropTipAndHome (mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:DROP_TIP_AND_HOME',
@@ -357,7 +357,7 @@ export const actions = {
   },
 
   // response for pickup and home
-  // payload.tipOn is a flag for whether a tip remains on the instrument
+  // payload.tipOn is a flag for whether a tip remains on the pipette
   confirmTiprackResponse (
     error: ?Error = null,
     tipOn: boolean = false
@@ -376,10 +376,10 @@ export const actions = {
     }
   },
 
-  moveToFront (instrument: Mount) {
+  moveToFront (mount: Mount) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {instrument}
+      payload: {mount}
     })
   },
 
@@ -393,8 +393,8 @@ export const actions = {
     return action
   },
 
-  probeTip (instrument: Mount) {
-    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {instrument}})
+  probeTip (mount: Mount) {
+    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {mount}})
   },
 
   probeTipResponse (error: ?Error = null) {
@@ -407,12 +407,12 @@ export const actions = {
     return action
   },
 
-  confirmProbed (instrument: Mount): ConfirmProbedAction {
-    return {type: 'robot:CONFIRM_PROBED', payload: instrument}
+  confirmProbed (mount: Mount): ConfirmProbedAction {
+    return {type: 'robot:CONFIRM_PROBED', payload: mount}
   },
 
-  returnTip (instrument: Mount) {
-    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {instrument}})
+  returnTip (mount: Mount) {
+    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {mount}})
   },
 
   returnTipResponse (error: ?Error = null) {

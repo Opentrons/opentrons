@@ -1,0 +1,15 @@
+@import '@opentrons/components';
+
+.error_wrapper {
+  padding-top: 1rem;
+
+  & > * {
+    padding-bottom: 1rem;
+  }
+}
+
+.error_text {
+  font-family: monospace;
+  margin: 0 1rem;
+  color: var(--c-red);
+}

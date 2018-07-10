@@ -278,7 +278,7 @@ describe('api client', () => {
         protocolText: session.protocol_text,
         protocolCommands: [],
         protocolCommandsById: {},
-        instrumentsByMount: {},
+        pipettesByMount: {},
         labwareBySlot: {}
       })
     })
@@ -347,7 +347,7 @@ describe('api client', () => {
 
     test('maps api instruments and intruments by mount', () => {
       const expected = actions.sessionResponse(null, expect.objectContaining({
-        instrumentsByMount: {
+        pipettesByMount: {
           left: {_id: 2, mount: 'left', name: 'p200', channels: 1, volume: 200},
           right: {_id: 1, mount: 'right', name: 'p50', channels: 8, volume: 50}
         }
@@ -425,7 +425,7 @@ describe('api client', () => {
             labwareBySlot: {}
           },
           session: {
-            instrumentsByMount: {
+            pipettesByMount: {
               left: {_id: 'inst-2'},
               right: {_id: 'inst-1'}
             },

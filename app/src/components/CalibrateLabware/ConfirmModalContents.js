@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 
 import {
   selectors as robotSelectors,
-  type Instrument,
+  type Pipette,
   type Labware
 } from '../../robot'
 
@@ -16,7 +16,7 @@ import InProgressContents from './InProgressContents'
 type OwnProps = Labware
 
 type StateProps = {
-  calibrator: ?Instrument
+  calibrator: ?Pipette
 }
 
 type Props = OwnProps & StateProps
@@ -48,9 +48,9 @@ function ConfirmModalContents (props: Props) {
 
 function mapStateToProps (state, ownProps: OwnProps): StateProps {
   const calibratorMount = ownProps.calibratorMount
-  const instruments = robotSelectors.getInstruments(state)
+  const pipettes = robotSelectors.getPipettes(state)
   const calibrator = (
-    instruments.find((i) => i.mount === calibratorMount) ||
+    pipettes.find((i) => i.mount === calibratorMount) ||
     robotSelectors.getCalibrator(state)
   )
 

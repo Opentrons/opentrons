@@ -7,19 +7,19 @@ import {
   type IconName
 } from '@opentrons/components'
 
-import type {Mount, Instrument} from '../../robot'
+import type {Mount, Pipette} from '../../robot'
 import styles from './styles.css'
 
 type Props = {
   isRunning: boolean,
   mount: Mount,
-  instrument: ?Instrument
+  pipette: ?Pipette
 }
 
 export default function PipetteListItem (props: Props) {
-  const {isRunning, mount, instrument} = props
-  const confirmed = instrument && instrument.probed
-  const isDisabled = !instrument || isRunning
+  const {isRunning, mount, pipette} = props
+  const confirmed = pipette && pipette.probed
+  const isDisabled = !pipette || isRunning
   const url = !isDisabled
     ? `/calibrate/pipettes/${mount}`
     : '#'
@@ -28,12 +28,12 @@ export default function PipetteListItem (props: Props) {
     ? 'check-circle'
     : 'checkbox-blank-circle-outline'
 
-  const description = instrument
-    ? `${capitalize(instrument.channels === 8 ? 'multi' : 'single')}-channel`
+  const description = pipette
+    ? `${capitalize(pipette.channels === 8 ? 'multi' : 'single')}-channel`
     : 'N/A'
 
-  const name = instrument
-    ? instrument.name
+  const name = pipette
+    ? pipette.name
     : 'N/A'
 
   return (
