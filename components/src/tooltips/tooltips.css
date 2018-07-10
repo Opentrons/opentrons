@@ -1,0 +1,16 @@
+/* common styling for tooltips */
+@import '..';
+
+.tooltip_box {
+  @apply --font-body-1-light;
+
+  background-color: var(--c-bg-dark);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.13), 0 3px 6px 0 rgba(0, 0, 0, 0.23);
+  padding: 1rem 2rem;
+  cursor: pointer;
+  z-index: 9001;
+}
+
+.hover_wrapper {
+  display: inline-block;
+}
