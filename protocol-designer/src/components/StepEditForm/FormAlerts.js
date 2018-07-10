@@ -56,14 +56,12 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') ? steplistSelectors.formLevelWarnings(state) : []
 
   const {focusedField, dirtyFields} = ownProps
-  // const showWarnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') // hide warnings without explicit FEATURE FLAG
-  // if (!showWarnings) return {errors: [], warnings: [], _stepId}
-  const filteredErrors = errors
-    ? errors.filter(e => (!e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0))
-    : []
-  const filteredWarnings = warnings
-    ? warnings.filter(w => (!w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0))
-    : []
+  const filteredErrors = errors.filter(e => (
+    !e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0)
+  )
+  const filteredWarnings = warnings.filter(w => (
+    !w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0)
+  )
   return {errors: filteredErrors, warnings: filteredWarnings, stepId: steplistSelectors.selectedStepId(state)}
 }
 
