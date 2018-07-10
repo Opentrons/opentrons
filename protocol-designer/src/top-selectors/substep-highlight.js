@@ -6,7 +6,7 @@ import mapValues from 'lodash/mapValues'
 
 import {allSubsteps} from './substeps'
 import * as StepGeneration from '../step-generation'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 
 import type {Selector} from '../types'

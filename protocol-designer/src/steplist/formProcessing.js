@@ -42,6 +42,7 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
     : null
 }
 
+// TODO: type pipette
 export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
   // Add default values to a new step form
   const baseForm = {
@@ -54,15 +55,16 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
-      'aspirate--change-tip': 'once'
+      'aspirate_change-tip': 'once'
     }
   }
 
   if (stepType === 'distribute') {
     return {
       ...baseForm,
-      'dispense--blowout--checkbox': true,
-      'dispense--blowout--labware': FIXED_TRASH_ID
+      'aspirate_disposalVol_checkbox': true,
+      'dispense_blowout_checkbox': true,
+      'dispense_blowout_labware': FIXED_TRASH_ID
     }
   }
 
@@ -87,13 +89,13 @@ function _vapTransferLike (
   const stepType = formData.stepType
   const pipette = formData['pipette']
   const volume = Number(formData['volume'])
-  const sourceLabware = formData['aspirate--labware']
-  const destLabware = formData['dispense--labware']
+  const sourceLabware = formData['aspirate_labware']
+  const destLabware = formData['dispense_labware']
 
   const requiredFieldErrors = [
     'pipette',
-    'aspirate--labware',
-    'dispense--labware'
+    'aspirate_labware',
+    'dispense_labware'
   ].reduce((acc, fieldName) => (!formData[fieldName])
     ? {...acc, [fieldName]: 'This field is required'}
     : acc,
@@ -106,39 +108,39 @@ function _vapTransferLike (
     errors['volume'] = 'Volume must be a positive number'
   }
 
-  const blowout = formData['dispense--blowout--labware']
+  const blowout = formData['dispense_blowout_labware']
 
-  const delayAfterDispense = formData['dispense--delay--checkbox']
-    ? ((Number(formData['dispense--delay-minutes']) || 0) * 60) +
-      (Number(formData['dispense--delay-seconds'] || 0))
+  const delayAfterDispense = formData['dispense_delay_checkbox']
+    ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
+      (Number(formData['dispense_delaySeconds'] || 0))
     : null
 
-  const mixFirstAspirate = formData['aspirate--mix--checkbox']
+  const mixFirstAspirate = formData['aspirate_mix_checkbox']
     ? {
-      volume: Number(formData['aspirate--mix--volume']),
-      times: parseInt(formData['aspirate--mix--times']) // TODO handle unparseable
+      volume: Number(formData['aspirate_mix_volume']),
+      times: parseInt(formData['aspirate_mix_times']) // TODO handle unparseable
     }
     : null
 
   const mixBeforeAspirate = getMixData(
     formData,
-    'aspirate--mix--checkbox',
-    'aspirate--mix--volume',
-    'aspirate--mix--times'
+    'aspirate_mix_checkbox',
+    'aspirate_mix_volume',
+    'aspirate_mix_times'
   )
 
   const mixInDestination = getMixData(
     formData,
-    'dispense--mix--checkbox',
-    'dispense--mix--volume',
-    'dispense--mix--times'
+    'dispense_mix_checkbox',
+    'dispense_mix_volume',
+    'dispense_mix_times'
   )
 
-  const disposalVolume = formData['aspirate--disposal-vol--checkbox']
-    ? Number('aspirate--disposal-vol--volume') // TODO handle unparseable
+  const disposalVolume = formData['aspirate_disposalVol_checkbox']
+    ? Number('aspirate_disposal-vol_volume') // TODO handle unparseable
     : null
 
-  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
     pipette,
@@ -152,15 +154,15 @@ function _vapTransferLike (
     delayAfterDispense,
     disposalVolume,
     mixInDestination,
-    preWetTip: formData['aspirate--pre-wet-tip'] || false,
-    touchTipAfterAspirate: formData['aspirate--touch-tip'] || false,
+    preWetTip: formData['aspirate_preWetTip'] || false,
+    touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
     touchTipAfterDispense: false, // TODO Ian 2018-03-01 Not in form
     description: 'description would be here 2018-03-01' // TODO get from form
   }
 
   if (!formHasErrors({errors})) {
-    const sourceWells = formData['aspirate--wells'] || []
-    const destWells = formData['dispense--wells'] || []
+    const sourceWells = formData['aspirate_wells'] || []
+    const destWells = formData['dispense_wells'] || []
 
     if (stepType === 'transfer') {
       if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
@@ -221,19 +223,19 @@ function _vapTransferLike (
 }
 
 function _vapPause (formData: FormData): ValidationAndErrors<PauseFormData> {
-  const hours = parseFloat(formData['pause-hour']) || 0
-  const minutes = parseFloat(formData['pause-minute']) || 0
-  const seconds = parseFloat(formData['pause-second']) || 0
+  const hours = parseFloat(formData['pauseHour']) || 0
+  const minutes = parseFloat(formData['pauseMinute']) || 0
+  const seconds = parseFloat(formData['pauseSecond']) || 0
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
 
-  const message = formData['pause-message'] || ''
+  const message = formData['pauseMessage'] || ''
 
   const errors = {
-    ...(!formData['pause-for-amount-of-time']
-      ? {'pause-for-amount-of-time': 'Pause for amount of time vs pause until user input is required'}
+    ...(!formData['pauseForAmountOfTime']
+      ? {'pauseForAmountOfTime': 'Pause for amount of time vs pause until user input is required'}
       : {}
     ),
-    ...(formData['pause-for-amount-of-time'] === 'true' && (totalSeconds <= 0)
+    ...(formData['pauseForAmountOfTime'] === 'true' && (totalSeconds <= 0)
       ? {'_pause-times': 'Must include hours, minutes, or seconds'}
       : {}
     )
@@ -247,7 +249,7 @@ function _vapPause (formData: FormData): ValidationAndErrors<PauseFormData> {
         stepType: 'pause',
         name: `Pause ${formData.id}`, // TODO real name for steps
         description: 'description would be here 2018-03-01', // TODO get from form
-        wait: (formData['pause-for-amount-of-time'] === 'false')
+        wait: (formData['pauseForAmountOfTime'] === 'false')
           ? true
           : totalSeconds,
         message,
@@ -272,20 +274,20 @@ function _vapMix (formData: FormData): ValidationAndErrors<MixFormData> {
   })
 
   const {labware, pipette} = formData
-  const touchTip = !!formData['touch-tip']
+  const touchTip = !!formData['touchTip']
 
   const wells = formData.wells || []
   const volume = Number(formData.volume) || 0
   const times = Number(formData.times) || 0
 
   // It's radiobutton, so one should always be selected.
-  const changeTip = formData['aspirate--change-tip'] || DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowout = formData['dispense--blowout--labware']
+  const blowout = formData['dispense_blowout_labware']
 
-  const delay = formData['dispense--delay--checkbox']
-    ? ((Number(formData['dispense--delay-minutes']) || 0) * 60) +
-      (Number(formData['dispense--delay-seconds'] || 0))
+  const delay = formData['dispense_delay_checkbox']
+    ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
+      (Number(formData['dispense_delaySeconds'] || 0))
     : null
   // TODO Ian 2018-05-08 delay number parsing errors
 

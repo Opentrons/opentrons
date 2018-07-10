@@ -1,9 +1,7 @@
 // @flow
-import type {PipetteName} from './pipetteData'
-
 type UpdatePipettesPayload = {
-  left: ?PipetteName,
-  right: ?PipetteName,
+  leftModel: ?string,
+  rightModel: ?string,
   leftTiprackModel: ?string,
   rightTiprackModel: ?string
 }

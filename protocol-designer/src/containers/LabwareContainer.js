@@ -16,7 +16,7 @@ import {
   setCopyLabwareMode,
   copyLabware
 } from '../labware-ingred/actions'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 
 import {LabwareOnDeck} from '../components/labware'
 import type {BaseState} from '../types'

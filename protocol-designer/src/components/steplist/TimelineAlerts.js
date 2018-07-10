@@ -1,17 +1,18 @@
 // @flow
-// TODO: This file is currently not used
+// TODO: TimelineAlerts.js was replaced by Alerts.js, and Alerts.js is currently not used.
+// See issue #1814. NOTE: for original TimelineAlerts, find an earlier commit
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {
   actions as dismissActions,
   selectors as dismissSelectors
-} from '../dismiss'
-import {selectors as steplistSelectors} from '../steplist'
-import {selectors as fileDataSelectors} from '../file-data'
+} from '../../dismiss'
+import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as fileDataSelectors} from '../../file-data'
 import {AlertItem} from '@opentrons/components'
-import type {BaseState} from '../types'
-import type {CommandCreatorError, CommandCreatorWarning} from '../step-generation'
+import type {BaseState} from '../../types'
+import type {CommandCreatorError, CommandCreatorWarning} from '../../step-generation'
 
 type SP = {
   errors: Array<CommandCreatorError>,

@@ -34,8 +34,8 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
       }))
 
       dispatch(pipetteActions.updatePipettes({
-        left: fields.leftPipette,
-        right: fields.rightPipette,
+        leftModel: fields.leftPipette,
+        rightModel: fields.rightPipette,
         leftTiprackModel: fields.leftTiprackModel,
         rightTiprackModel: fields.rightTiprackModel
       }))

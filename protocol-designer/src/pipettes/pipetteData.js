@@ -1,48 +1,22 @@
 // @flow
-import type {Channels} from '@opentrons/components'
+import compact from 'lodash/compact'
+import {getPipette} from '@opentrons/shared-data'
 
-// TODO: Ian 2018-06-22 use shared-data
-export const pipetteDataByName: {[pipetteName: string]: {maxVolume: number, channels: Channels}} = {
-  'P10 Single-Channel': {
-    maxVolume: 10,
-    channels: 1
-  },
-  'P10 8-Channel': {
-    maxVolume: 10,
-    channels: 8
-  },
-  'P50 Single-Channel': {
-    maxVolume: 50,
-    channels: 1
-  },
-  'P50 8-Channel': {
-    maxVolume: 50,
-    channels: 8
-  },
-  'P300 Single-Channel': {
-    maxVolume: 300,
-    channels: 1
-  },
-  'P300 8-Channel': {
-    maxVolume: 300,
-    channels: 8
-  },
-  'P1000 Single-Channel': {
-    maxVolume: 1000,
-    channels: 1
-  }
-}
+// TODO: figure out what pipette versions mean in context of PD,
+// and annotate pipette-config so it's more straightforward to compare models
+const supportedPipetteModels = [
+  'p10_single_v1.3',
+  'p10_multi_v1.3',
+  'p50_single_v1.3',
+  'p50_multi_v1.3',
+  'p300_single_v1.3',
+  'p300_multi_v1.3',
+  'p1000_single_v1.3'
+]
 
-export type PipetteName = $Keys<typeof pipetteDataByName>
-
-export const pipetteOptions = [
-  'P10 Single-Channel',
-  'P10 8-Channel',
-  'P50 Single-Channel',
-  'P50 8-Channel',
-  'P300 Single-Channel',
-  'P300 8-Channel',
-  'P1000 Single-Channel'
-].map(
-  (name: string) => ({name, value: name})
-)
+// TODO: should a version of pipetteOptions be moved to shared-data,
+// and used for both PD and Run App?
+export const pipetteOptions = compact(supportedPipetteModels.map((model: string) => {
+  const pipette = getPipette(model)
+  return pipette ? {name: pipette.displayName, value: pipette.model} : null
+}))
