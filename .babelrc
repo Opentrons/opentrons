@@ -13,8 +13,7 @@
   },
   "plugins": [
     "transform-object-rest-spread",
-    "transform-class-properties",
-    "transform-es2015-modules-strip"
+    "transform-class-properties"
   ],
   "presets": [
     "react",
