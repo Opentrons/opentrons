@@ -64,9 +64,9 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
-    "css-loader": "^0.28.4",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
+    "css-loader": "^0.28.4",
     "cz-conventional-changelog": "2.1.0",
     "electron": "1.8.3",
     "electron-builder": "20.6.2",
@@ -115,5 +115,8 @@
     "webpack-dev-server": "^2.5.1",
     "worker-loader": "^1.1.0",
     "ws": "3.1.0"
+  },
+  "dependencies": {
+    "babel-plugin-transform-es2015-modules-strip": "^0.1.1"
   }
 }

@@ -25,7 +25,6 @@
     "react-router-dom": "^4.2.2"
   },
   "dependencies": {
-    "babel-plugin-transform-es2015-modules-strip": "^0.1.1",
     "react-popper": "^1.0.0-beta.6"
   }
 }
