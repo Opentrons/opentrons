@@ -12,8 +12,8 @@ export default function ModulesCardContents (props: Props) {
   if (modulesFound) {
     return (
       <React.Fragment>
-      {props.modules.map((mod) => (
-        <ModuleItem {...mod} />
+      {props.modules.map((mod, index) => (
+        <ModuleItem {...mod} key={index}/>
       ))}
       </React.Fragment>
     )

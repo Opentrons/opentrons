@@ -17,7 +17,7 @@ export default function ModuleUpdate (props: Props) {
   return (
     <div className={styles.module_update}>
       <OutlineButton
-        disabled={!!availableUpdate}
+        disabled={!availableUpdate}
       >
         {buttonText}
       </OutlineButton>
