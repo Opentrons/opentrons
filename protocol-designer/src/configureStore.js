@@ -2,8 +2,6 @@ import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 
 function getRootReducer () {
-  const LOAD_FILE = require('./load-file').LOAD_FILE
-
   const rootReducer = combineReducers({
     dismiss: require('./dismiss').rootReducer,
     fileData: require('./file-data').rootReducer,
@@ -16,8 +14,8 @@ function getRootReducer () {
   })
 
   return (state, action) => {
-    if (action.type === LOAD_FILE) {
-      // reset entire state, then pass LOAD_FILE action
+    if (action.type === 'LOAD_FILE' || action.type === 'CREATE_NEW_PROTOCOL') {
+      // reset entire state, then pass the action
       return rootReducer(undefined, action)
     }
     return rootReducer(state, action)

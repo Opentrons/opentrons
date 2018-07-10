@@ -13,23 +13,14 @@ import TiprackDiagram from './TiprackDiagram'
 import styles from './NewFileModal.css'
 import formStyles from '../../forms.css'
 import modalStyles from '../modal.css'
+import type {NewProtocolFields} from '../../../load-file'
 
-type State = {
-  name: string,
-
-  // TODO: make this union of pipette option values
-  leftPipette: string,
-  rightPipette: string,
-
-  // TODO: Ian 2018-06-22 type as labware-type enums of tipracks
-  leftTiprackModel: ?string,
-  rightTiprackModel: ?string
-}
+type State = NewProtocolFields
 
 type Props = {
   hideModal: boolean,
   onCancel: () => mixed,
-  onSave: State => mixed
+  onSave: (NewProtocolFields) => mixed
 }
 
 // 'USER_HAS_NOT_SELECTED' state is just a concern of these dropdowns,
@@ -62,8 +53,8 @@ const tiprackOptions = [
 
 const initialState = {
   name: '',
-  leftPipette: USER_HAS_NOT_SELECTED,
-  rightPipette: USER_HAS_NOT_SELECTED,
+  leftPipetteModel: USER_HAS_NOT_SELECTED,
+  rightPipetteModel: USER_HAS_NOT_SELECTED,
   leftTiprackModel: null,
   rightTiprackModel: null
 }
@@ -83,8 +74,8 @@ export default class NewFileModal extends React.Component<Props, State> {
 
   handleChange = (accessor: $Keys<State>) => (e: SyntheticInputEvent<*>) => {
     // skip tiprack update if no pipette selected
-    if (accessor === 'leftTiprackModel' && !this.state.leftPipette) return
-    if (accessor === 'rightTiprackModel' && !this.state.rightPipette) return
+    if (accessor === 'leftTiprackModel' && !this.state.leftPipetteModel) return
+    if (accessor === 'rightTiprackModel' && !this.state.rightPipetteModel) return
 
     const value: string = e.target.value
 
@@ -93,9 +84,9 @@ export default class NewFileModal extends React.Component<Props, State> {
     }
 
     // clear tiprack selection if corresponding pipette model is deselected
-    if (accessor === 'leftPipette' && !value) {
+    if (accessor === 'leftPipetteModel' && !value) {
       nextState.leftTiprackModel = null
-    } else if (accessor === 'rightPipette' && !value) {
+    } else if (accessor === 'rightPipetteModel' && !value) {
       nextState.rightTiprackModel = null
     }
 
@@ -116,30 +107,30 @@ export default class NewFileModal extends React.Component<Props, State> {
 
     const {
       name,
-      leftPipette,
-      rightPipette,
+      leftPipetteModel,
+      rightPipetteModel,
       leftTiprackModel,
       rightTiprackModel
     } = this.state
 
     const pipetteSelectionIsValid = (
       // neither can be invalid
-      (leftPipette !== USER_HAS_NOT_SELECTED && rightPipette !== USER_HAS_NOT_SELECTED) &&
+      (leftPipetteModel !== USER_HAS_NOT_SELECTED && rightPipetteModel !== USER_HAS_NOT_SELECTED) &&
       // at least one must not be none (empty string)
-      (leftPipette || rightPipette)
+      (leftPipetteModel || rightPipetteModel)
     )
 
     // if pipette selected, corresponding tiprack type also selected
     const tiprackSelectionIsValid = (
-      (leftPipette ? Boolean(leftTiprackModel) : true) &&
-      (rightPipette ? Boolean(rightTiprackModel) : true)
+      (leftPipetteModel ? Boolean(leftTiprackModel) : true) &&
+      (rightPipetteModel ? Boolean(rightTiprackModel) : true)
     )
 
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
     const pipetteFields = [
-      ['leftPipette', 'Left Pipette'],
-      ['rightPipette', 'Right Pipette']
+      ['leftPipetteModel', 'Left Pipette'],
+      ['rightPipetteModel', 'Right Pipette']
     ].map(([name, label]) => {
       const value = this.state[name]
       return (
@@ -200,8 +191,8 @@ export default class NewFileModal extends React.Component<Props, State> {
         <div className={styles.diagrams}>
           <TiprackDiagram containerType={this.state.leftTiprackModel} />
           <PipetteDiagram
-            leftPipette={this.state.leftPipette}
-            rightPipette={this.state.rightPipette}
+            leftPipette={this.state.leftPipetteModel}
+            rightPipette={this.state.rightPipetteModel}
           />
           <TiprackDiagram containerType={this.state.rightTiprackModel} />
         </div>
