@@ -70,7 +70,11 @@ class RpcContext extends EventEmitter {
         reject(new RemoteError(reason, name, args, traceback))
       }
 
-      const handleFailure = (res) => handleError(res.message, res.traceback)
+      const handleFailure = (res) => {
+        if (typeof res === 'string') return handleError(res)
+        handleError(res.message, res.traceback)
+      }
+
       const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
 
       const handleAck = () => {

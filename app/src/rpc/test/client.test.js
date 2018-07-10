@@ -206,7 +206,24 @@ describe('rpc client', () => {
       })
     })
 
-    test('rejects if call is unsuccessful', () => {
+    test('rejects if call is unsuccessful (string response)', () => {
+      sendControlAndResolveRemote((message) => {
+        const token = message.$.token
+        const ack = makeAckResponse(token)
+        const result = makeCallResponse(token, FAILURE, 'ahhh')
+        setTimeout(() => ws.send(ack), 1)
+        setTimeout(() => ws.send(result), 5)
+      })
+
+      const call = Client(url)
+        .then((client) => client.callRemote(id, name, args))
+
+      return expect(call).rejects.toMatchObject({
+        message: expect.stringMatching(/ahhh/)
+      })
+    })
+
+    test('rejects if call is unsuccessful (object response)', () => {
       sendControlAndResolveRemote((message) => {
         const token = message.$.token
         const ack = makeAckResponse(token)
