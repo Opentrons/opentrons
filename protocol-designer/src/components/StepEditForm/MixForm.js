@@ -27,10 +27,10 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
     <React.Fragment>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
-          <LabwareDropdown name="labware" />
+          <LabwareDropdown name="labware" {...focusHandlers} />
         </FormGroup>
         <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
-        <PipetteField name="pipette" />
+        <PipetteField name="pipette" {...focusHandlers} />
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
@@ -44,14 +44,14 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
             <DispenseDelayFields focusHandlers={focusHandlers} />
-            <StepCheckboxRow name="dispense--blowout--checkbox" label='Blow out'>
-              <LabwareDropdown name="dispense--blowout--labware" className={styles.full_width} />
+            <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
+              <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
             </StepCheckboxRow>
-            <StepCheckboxRow name="touch-tip" label='Touch tip' />
+            <StepCheckboxRow name="touchTip" label='Touch tip' />
           </FormGroup>
         </div>
         <div className={styles.right_settings_column}>
-          <ChangeTipField name="aspirate--change-tip" />
+          <ChangeTipField name="aspirate_changeTip" />
           <FlowRateField />
           <TipPositionField />
         </div>

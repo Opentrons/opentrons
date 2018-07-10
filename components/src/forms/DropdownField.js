@@ -14,6 +14,10 @@ export type DropdownOption = {
 type Props = {
   /** change handler */
   onChange: (event: SyntheticInputEvent<*>) => mixed,
+  /** focus handler */
+  onFocus?: (event: SyntheticFocusEvent<*>) => mixed,
+  /** blur handler */
+  onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
   /** value that is selected */
   value?: ?string,
   /** Array of {name, value} data */
@@ -38,7 +42,12 @@ export default function DropdownField (props: Props) {
   return (
     <div className={className}>
       <div className={styles.dropdown_field}>
-        <select value={props.value || ''} onChange={props.onChange} className={styles.dropdown}>
+        <select
+          value={props.value || ''}
+          onChange={props.onChange}
+          onBlur={props.onBlur}
+          onFocus={props.onFocus}
+          className={styles.dropdown}>
           {options.map(opt =>
             <option key={opt.value} value={opt.value}>
               {opt.name}
