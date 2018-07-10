@@ -210,7 +210,7 @@ describe('rpc client', () => {
       sendControlAndResolveRemote((message) => {
         const token = message.$.token
         const ack = makeAckResponse(token)
-        const result = makeCallResponse(token, FAILURE, 'ahhh')
+        const result = makeCallResponse(token, FAILURE, {message: 'ahhh'})
         setTimeout(() => ws.send(ack), 1)
         setTimeout(() => ws.send(result), 5)
       })
