@@ -6,14 +6,14 @@ import {withRouter} from 'react-router'
 import {
   constants as robotConstants,
   selectors as robotSelectors,
-  type Instrument
+  type Pipette
 } from '../../robot'
 
 import {TitledList} from '@opentrons/components'
 import PipetteListItem from './PipetteListItem'
 
 type Props = {
-  instruments: Instrument[],
+  pipettes: Array<Pipette>,
   isRunning: boolean,
 }
 
@@ -22,16 +22,16 @@ const TITLE = 'Pipette Calibration'
 export default withRouter(connect(mapStateToProps)(PipetteList))
 
 function PipetteList (props: Props) {
-  const {instruments, isRunning} = props
+  const {pipettes, isRunning} = props
 
   return (
     <TitledList title={TITLE}>
-      {robotConstants.INSTRUMENT_MOUNTS.map((mount) => (
+      {robotConstants.PIPETTE_MOUNTS.map((mount) => (
         <PipetteListItem
           key={mount}
           mount={mount}
           isRunning={isRunning}
-          instrument={instruments.find((i) => i.mount === mount)}
+          pipette={pipettes.find((i) => i.mount === mount)}
         />
       ))}
     </TitledList>
@@ -40,7 +40,7 @@ function PipetteList (props: Props) {
 
 function mapStateToProps (state): Props {
   return {
-    instruments: robotSelectors.getInstruments(state),
+    pipettes: robotSelectors.getPipettes(state),
     isRunning: robotSelectors.getIsRunning(state)
   }
 }

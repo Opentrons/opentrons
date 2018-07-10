@@ -1,8 +1,10 @@
 // @flow
 // robot HTTP API client module
 import {combineReducers} from 'redux'
+import apiReducer from './reducer'
 import {calibrationReducer, type CalibrationAction} from './calibration'
 import {healthReducer, type HealthAction} from './health'
+import type {ModulesAction} from './modules'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
 import {robotReducer, type RobotAction} from './robot'
@@ -18,7 +20,9 @@ export const reducer = combineReducers({
   robot: robotReducer,
   server: serverReducer,
   settings: settingsReducer,
-  wifi: wifiReducer
+  wifi: wifiReducer,
+  // TODO(mc, 2018-07-09): api subreducer will become the sole reducer
+  api: apiReducer
 })
 
 export * from './types'
@@ -79,6 +83,7 @@ export type State = $Call<typeof reducer>
 export type Action =
   | CalibrationAction
   | HealthAction
+  | ModulesAction
   | MotorsAction
   | PipettesAction
   | RobotAction
@@ -97,6 +102,8 @@ export {
   fetchHealth,
   makeGetRobotHealth
 } from './health'
+
+export * from './modules'
 
 export {
   disengagePipetteMotors

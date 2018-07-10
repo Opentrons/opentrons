@@ -84,7 +84,7 @@ async def run_self_test(port, filename) -> dict:
                     type(e).__name__)
 
     if test_status == 'failure':
-        res = {'status': 'failure', 'error': detail}
+        res = {'status': 'failure', 'message': detail}
     else:
         res = {'status': 'success'}
     log.debug('Selftest result: {}'.format(res))

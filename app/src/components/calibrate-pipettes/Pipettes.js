@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import cx from 'classnames'
 
 import type {PipettesResponse} from '../../http-api-client'
-import type {Instrument} from '../../robot'
+import type {Pipette} from '../../robot'
 import {constants as robotConstants} from '../../robot'
 
 import {getPipette} from '@opentrons/shared-data'
@@ -13,27 +13,27 @@ import styles from './styles.css'
 
 type Props = {
   name: string,
-  instruments: Array<Instrument>,
-  currentInstrument: ?Instrument,
+  pipettes: Array<Pipette>,
+  currentPipette: ?Pipette,
   actualPipettes: ?PipettesResponse
 }
 
-const {INSTRUMENT_MOUNTS} = robotConstants
+const {PIPETTE_MOUNTS} = robotConstants
 const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
 export default function Pipettes (props: Props) {
-  const {name, currentInstrument, instruments, actualPipettes} = props
-  const currentMount = currentInstrument && currentInstrument.mount
+  const {name, currentPipette, pipettes, actualPipettes} = props
+  const currentMount = currentPipette && currentPipette.mount
 
-  const infoByMount = INSTRUMENT_MOUNTS.reduce((result, mount) => {
-    const inst = instruments.find((i) => i.mount === mount)
+  const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
+    const pipette = pipettes.find((p) => p.mount === mount)
     // TODO(mc, 2018-04-25)
-    const pipetteConfig = inst
-      ? getPipette(inst.name)
+    const pipetteConfig = pipette
+      ? getPipette(pipette.name)
       : null
 
-    const isDisabled = !inst || mount !== currentMount
+    const isDisabled = !pipette || mount !== currentMount
     const details = !pipetteConfig
       ? {description: 'N/A', tipType: 'N/A'}
       : {

@@ -42,6 +42,12 @@ export type ClearApiResponseAction<Path: string> = {|
   |}
 |}
 
+export type ApiAction<Path: string, Request: ?{}, Response: {}> =
+  | ApiRequestAction<Path, Request>
+  | ApiSuccessAction<Path, Response>
+  | ApiFailureAction<Path>
+  | ClearApiResponseAction<Path>
+
 export function apiRequest<Path: string, Body: ?{}> (
   robot: BaseRobot,
   path: Path,

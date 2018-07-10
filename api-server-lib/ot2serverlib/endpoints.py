@@ -83,7 +83,7 @@ async def update_api(request: web.Request) -> web.Response:
         }
         status = 200
     except Exception as e:
-        res = {'error': 'Exception {} raised by update of {}: {}'.format(
+        res = {'message': 'Exception {} raised by update of {}: {}'.format(
                 type(e), data, e.__traceback__)}
         status = 500
     return web.json_response(res, status=status)
@@ -104,7 +104,7 @@ async def update_firmware(request):
         status = 200
     except Exception as e:
         log.exception("Exception during firmware update:")
-        res = {'error': 'Exception {} raised by update of {}: {}'.format(
+        res = {'message': 'Exception {} raised by update of {}: {}'.format(
                 type(e), data, e.__traceback__)}
         status = 500
     return web.json_response(res, status=status)

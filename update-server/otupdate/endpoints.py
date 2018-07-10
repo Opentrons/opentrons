@@ -30,7 +30,7 @@ async def bootstrap_update_server(
     wheel = data.get('whl')
     log.debug('Got whl: {}'.format(wheel))
     log.debug('  filename: {}'.format(wheel.filename))
-    res = {}
+    res = {'status': 'in progress'}
     tmpd = None
     filename = None
     python = None
@@ -41,9 +41,9 @@ async def bootstrap_update_server(
         log.debug('No wheel file provided')
         res = {
             'status': 'failure',
-            'error': '"whl" parameter missing from request'}
+            'message': '"whl" parameter missing from request'}
 
-    if 'error' not in res.keys():
+    if res.get('status') != 'failure':
         tmpd = tempfile.mkdtemp()
         filename = os.path.join(tmpd, wheel.filename)
         log.info('Preparing to install: {}'.format(filename))
@@ -59,7 +59,7 @@ async def bootstrap_update_server(
             filename, request.loop)
         log.debug('Install complete with status: {}'.format(res.get('status')))
 
-    if python and 'error' not in res.keys():
+    if python and res.get('status') != 'failure':
         if test_flag:
             log.debug('Test mode, not testing successive install')
             res = {'status': 'Successfully installed update'}
@@ -68,15 +68,18 @@ async def bootstrap_update_server(
             res = await bootstrap.test_update_server(
                 python, test_port, filename, venv_site_pkgs)
 
-    if 'error' in res.keys():
+    if res.get('status') == 'failure':
         log.debug('Test failed, not installing update')
         status = 400
     elif not test_flag:
         log.debug('Test successful, installing update')
-        install_res = await bootstrap.install_update(
+        install_res, returncode = await bootstrap.install_update(
             filename, request.loop)
         res.update(install_res)
-        status = 200
+        if returncode == 0:
+            status = 200
+        else:
+            status = 400
     else:
         log.debug('Self-test successful on test server')
         status = 200

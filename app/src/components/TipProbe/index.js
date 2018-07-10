@@ -2,7 +2,7 @@
 // TipProbe controls
 import * as React from 'react'
 
-import type {Instrument, InstrumentCalibrationStatus} from '../../robot'
+import type {Pipette, PipetteCalibrationStatus} from '../../robot'
 
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import UnprobedPanel from './UnprobedPanel'
@@ -11,12 +11,12 @@ import AttachTipPanel from './AttachTipPanel'
 import RemoveTipPanel from './RemoveTipPanel'
 import ContinuePanel from './ContinuePanel'
 
-type Props = Instrument & {
+type Props = Pipette & {
   confirmTipProbeUrl: string
 }
 
 const PANEL_BY_CALIBRATION: {
-  [InstrumentCalibrationStatus]: React.ComponentType<Props>
+  [PipetteCalibrationStatus]: React.ComponentType<Props>
 } = {
   'unprobed': UnprobedPanel,
   'preparing-to-probe': InstrumentMovingPanel,

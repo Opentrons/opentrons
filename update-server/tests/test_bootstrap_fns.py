@@ -26,7 +26,7 @@ async def test_install_fail(monkeypatch, loop):
     test_data = wheel_data('bad_test.whl', 'bad data')
 
     async def mock_install(python, filename, _loop):
-        return '', 'error'
+        return '', 'error', 1
 
     monkeypatch.setattr(bootstrap, '_install', mock_install)
 
@@ -39,7 +39,7 @@ async def test_install_sandboxed_update(monkeypatch, loop):
     test_data = wheel_data('testy.whl', 'wheel data')
 
     async def mock_install(python, filename, _loop):
-        return 'success', None
+        return 'success', None, 0
 
     monkeypatch.setattr(bootstrap, '_install', mock_install)
 
@@ -53,7 +53,7 @@ async def test_install_sandboxed_update(monkeypatch, loop):
 
 
 async def test_startstop_server(monkeypatch):
-    test_port = 34016
+    test_port = 34020
 
     td = tempfile.mkdtemp()
     tmpd = os.path.join(td, 'testy')
