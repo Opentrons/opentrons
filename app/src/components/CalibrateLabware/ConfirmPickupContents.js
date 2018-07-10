@@ -6,13 +6,13 @@ import {connect} from 'react-redux'
 import {
   actions as robotActions,
   type Labware,
-  type Instrument
+  type Pipette
 } from '../../robot'
 
 import ConfirmPickupPrompt from './ConfirmPickupPrompt'
 
 type OwnProps = Labware & {
-  calibrator: Instrument
+  calibrator: Pipette
 }
 
 type DispatchProps = {

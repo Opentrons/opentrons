@@ -23,7 +23,7 @@ describe('robot reducer - session', () => {
       protocolCommandsById: {},
 
       // deck setup from protocol
-      instrumentsByMount: {},
+      pipettesByMount: {},
       labwareBySlot: {},
 
       // running a protocol

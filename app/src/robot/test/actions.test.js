@@ -140,7 +140,7 @@ describe('robot actions', () => {
   test('move tip to front action', () => {
     const expected = {
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {instrument: 'right'},
+      payload: {mount: 'right'},
       meta: {robotCommand: true}
     }
 
@@ -242,7 +242,7 @@ describe('robot actions', () => {
   test('probe tip action', () => {
     const expected = {
       type: actionTypes.PROBE_TIP,
-      payload: {instrument: 'left'},
+      payload: {mount: 'left'},
       meta: {robotCommand: true}
     }
 

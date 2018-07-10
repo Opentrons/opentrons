@@ -4,7 +4,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import type {Dispatch} from '../../types'
-import type {Instrument, Labware} from '../../robot'
+import type {Pipette, Labware} from '../../robot'
 
 import {actions as robotActions} from '../../robot'
 import {PrimaryButton} from '@opentrons/components'
@@ -17,7 +17,7 @@ type DP = {
 }
 
 type OP = Labware & {
-  calibrator: Instrument
+  calibrator: Pipette
 }
 
 type Props = DP & OP

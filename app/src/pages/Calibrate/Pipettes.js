@@ -1,11 +1,11 @@
 // @flow
-// setup instruments component
+// setup pipettes component
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Route, Redirect, type ContextRouter} from 'react-router'
 
 import type {State} from '../../types'
-import type {Instrument} from '../../robot'
+import type {Pipette} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes} from '../../http-api-client'
 
@@ -17,8 +17,8 @@ import {PipetteTabs, Pipettes} from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
 
 type StateProps = {
-  instruments: Array<Instrument>,
-  currentInstrument: ?Instrument
+  pipettes: Array<Pipette>,
+  currentPipette: ?Pipette
 }
 
 type OwnProps = ContextRouter
@@ -28,11 +28,11 @@ type Props = StateProps & OwnProps
 export default connect(makeMapStateToProps)(CalibratePipettesPage)
 
 function CalibratePipettesPage (props: Props) {
-  const {instruments, currentInstrument, match: {url, params}} = props
+  const {pipettes, currentPipette, match: {url, params}} = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
   // redirect back to mountless route if mount doesn't exist
-  if (params.mount && !currentInstrument) {
+  if (params.mount && !currentPipette) {
     return (<Redirect to={url.replace(`/${params.mount}`, '')} />)
   }
 
@@ -40,18 +40,18 @@ function CalibratePipettesPage (props: Props) {
     <Page
       titleBarProps={{title: (<SessionHeader />)}}
     >
-      <PipetteTabs {...{instruments, currentInstrument}} />
+      <PipetteTabs {...{pipettes, currentPipette}} />
       <Pipettes {...props} />
-      {!!currentInstrument && (
+      {!!currentPipette && (
         <TipProbe
-          {...currentInstrument}
+          {...currentPipette}
           confirmTipProbeUrl={confirmTipProbeUrl}
         />
       )}
-      {!!currentInstrument && (
+      {!!currentPipette && (
         <Route path={confirmTipProbeUrl} render={() => (
           <ConfirmTipProbeModal
-            mount={currentInstrument.mount}
+            mount={currentPipette.mount}
             backUrl={url}
           />
         )} />
@@ -61,7 +61,7 @@ function CalibratePipettesPage (props: Props) {
 }
 
 function makeMapStateToProps (): (State, OwnProps) => StateProps {
-  const getCurrentInstrument = robotSelectors.makeGetCurrentInstrument()
+  const getCurrentPipette = robotSelectors.makeGetCurrentPipette()
   const getAttachedPipettes = makeGetRobotPipettes()
 
   return (state, props) => {
@@ -70,8 +70,8 @@ function makeMapStateToProps (): (State, OwnProps) => StateProps {
 
     return {
       name,
-      instruments: robotSelectors.getInstruments(state),
-      currentInstrument: getCurrentInstrument(state, props),
+      pipettes: robotSelectors.getPipettes(state),
+      currentPipette: getCurrentPipette(state, props),
       actualPipettes: pipettesResponse.response
     }
   }

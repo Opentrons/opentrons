@@ -54,7 +54,7 @@ export type ProtocolFile = {
 
 // TODO(mc, 2018-01-22): pay attention to this when deprecating status contants
 //   in constants.js. Also re-evaluate the need for this logic / type
-export type InstrumentCalibrationStatus =
+export type PipetteCalibrationStatus =
   | 'unprobed'
   | 'preparing-to-probe'
   | 'ready-to-probe'
@@ -87,7 +87,7 @@ export type Command = {
 }
 
 // instrument as stored in redux state
-export type StateInstrument = {
+export type StatePipette = {
   // resource ID
   _id: number,
   // robot mount instrument is installed on
@@ -102,8 +102,8 @@ export type StateInstrument = {
   volume: number,
 }
 
-export type Instrument = StateInstrument & {
-  calibration: InstrumentCalibrationStatus,
+export type Pipette = StatePipette & {
+  calibration: PipetteCalibrationStatus,
   probed: boolean,
   tipOn: boolean
 }
