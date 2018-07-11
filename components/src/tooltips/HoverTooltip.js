@@ -7,7 +7,12 @@ import styles from './tooltips.css'
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 150
 
-type Props = {tooltipComponent: React.Node, children: React.Node}
+type PopperProps = React.ElementProps<typeof Popper>
+type Props = {
+  tooltipComponent: React.Node,
+  placement?: $PropertyType<PopperProps, 'placement'>,
+  children: React.Node
+}
 type State = {isOpen: boolean}
 class HoverTooltip extends React.Component<Props, State> {
   openTimeout: ?TimeoutID
@@ -45,7 +50,7 @@ class HoverTooltip extends React.Component<Props, State> {
         </Reference>
         {
           this.state.isOpen &&
-          <Popper>
+          <Popper placement={this.props.placement}>
             {({ref, style, placement}) => (
               <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
                 {this.props.tooltipComponent}
