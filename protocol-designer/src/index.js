@@ -5,8 +5,15 @@ import { AppContainer } from 'react-hot-loader'
 
 import configureStore from './configureStore.js'
 import App from './components/App'
-
+import {selectors as loadFileSelectors} from './load-file'
 const store = configureStore()
+
+window.onbeforeunload = (e) => {
+  // NOTE: the custom text will be ignored in modern browsers
+  return loadFileSelectors.hasUnsavedChanges(store.getState())
+    ? 'Are you sure you want to leave? You have may unsaved changes.'
+    : undefined
+}
 
 const render = (Component) => {
   ReactDOM.render(
