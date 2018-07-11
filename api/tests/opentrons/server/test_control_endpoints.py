@@ -2,6 +2,7 @@ import json
 from copy import deepcopy
 from opentrons import robot
 from opentrons.server.main import init
+from opentrons.server.endpoints import control
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.instruments.pipette_config import configs
 
@@ -71,6 +72,41 @@ async def test_get_pipettes(
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
+
+
+async def test_get_modules(
+        virtual_smoothie_env, loop, test_client, monkeypatch):
+    test_module_data = {
+        "name": "magdeck",
+        "model": "magdeck_v1",
+        "serial": "12ab",
+        "fwVersion": "1.0.0",
+        "status": "engaged",
+        "displayName": "Magbead Module"
+    }
+
+    def dummy_discover_modules():
+        return [
+            test_module_data
+        ]
+
+    # Note: once modules API object is implemented, it will probably be better
+    # to mock a lower-level function so this test will be more realistic
+    monkeypatch.setattr(control, "_discover_modules", dummy_discover_modules)
+
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    expected = {
+        "modules": [
+            test_module_data
+        ]
+    }
+
+    resp = await cli.get('/modules')
+    body = await resp.json()
+    assert resp.status == 200
+    assert body == expected
 
 
 async def test_get_cached_pipettes(

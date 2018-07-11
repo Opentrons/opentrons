@@ -7,6 +7,7 @@ from threading import Thread
 from opentrons import robot, instruments
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
+from typing import List, Dict
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +47,52 @@ async def get_attached_pipettes(request):
     if request.url.query.get('refresh') == 'true':
         robot.cache_instrument_models()
     return web.json_response(robot.get_attached_pipettes())
+
+
+def _discover_modules() -> List[Dict]:
+    """
+    This is a stub, awaiting implementation of module API class. Returns a list
+    of dicts where each dict represents one attached module, and each dict
+    contains the keys "name", "model", "serial", "fwVersion", "status", and
+    "displayName". All values should be strings. If not modules are attached,
+    return an empty list.
+    """
+    return []
+
+
+async def get_attached_modules(request):
+    """
+    On success (including an empty "modules" list if no modules are detected):
+    // status: 200
+    {
+        "modules": [
+            {
+                /** name of module */
+                "name": "string",
+                /** model identifier (i.e. part number) */
+                "model": "string",
+                /** unique serial number */
+                "serial": "string",
+                /** current firmware version */
+                "fwVersion": "string",
+                /** human readable status */
+                "status": "string",
+                /** human readable display name */
+                "displayName": "string",
+            },
+            // ...
+        ],
+    }
+
+    On failure:
+    // status: 500
+    {
+        "message": "..."
+    }
+    """
+    module_list = _discover_modules()
+    data = {"modules": module_list}
+    return web.json_response(data, status=200)
 
 
 async def get_engaged_axes(request):
