@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {actions, selectors} from '../../navigation'
 import {selectors as fileDataSelectors} from '../../file-data'
-import {loadFile} from '../../load-file'
+import {actions as loadFileActions} from '../../load-file'
 import FileSidebar from './FileSidebar'
 import type {BaseState, ThunkDispatch} from '../../types'
 
@@ -38,7 +38,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
   const {dispatch} = dispatchProps
   return {
     downloadData,
-    loadFile: (fileChangeEvent) => dispatch(loadFile(fileChangeEvent)),
+    loadFile: (fileChangeEvent) => dispatch(loadFileActions.loadProtocolFile(fileChangeEvent)),
     createNewFile: _canCreateNew
       ? () => dispatch(actions.toggleNewProtocolModal(true))
       : undefined

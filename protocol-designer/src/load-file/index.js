@@ -4,19 +4,12 @@ import * as actions from './actions'
 import * as selectors from './selectors'
 export * from './types'
 
-const {loadFile, LOAD_FILE} = actions
-type LoadFileAction = actions.LoadFileAction
-
 export {
   actions,
   rootReducer,
-  selectors,
-  // redundant top-level exports for importer's convenience
-  loadFile,
-  LOAD_FILE
+  selectors
 }
 
 export type {
-  RootState,
-  LoadFileAction
+  RootState
 }

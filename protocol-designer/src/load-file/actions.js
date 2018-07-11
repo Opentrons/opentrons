@@ -1,10 +1,7 @@
 // @flow
 import type {ProtocolFile} from '../file-types'
-import type {ActionType} from 'redux-actions'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
-import type {FileError} from './types'
-
-export const LOAD_FILE: 'LOAD_FILE' = 'LOAD_FILE'
+import type {FileError, LoadFileAction, NewProtocolFields} from './types'
 
 export const fileErrors = (payload: FileError) => ({
   type: 'FILE_ERRORS',
@@ -12,13 +9,13 @@ export const fileErrors = (payload: FileError) => ({
 })
 
 // expects valid, parsed JSON protocol.
-const loadFileAction = (payload: ProtocolFile) => ({
-  type: LOAD_FILE,
+const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
+  type: 'LOAD_FILE',
   payload
 })
 
 // load file thunk, handles file loading errors
-export const loadFile = (event: SyntheticInputEvent<HTMLInputElement>): ThunkAction<*> =>
+export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const parseAndLoadFile = fileBody => {
       const parsedProtocol: ProtocolFile = JSON.parse(fileBody)
@@ -54,4 +51,7 @@ export const loadFile = (event: SyntheticInputEvent<HTMLInputElement>): ThunkAct
     }
   }
 
-export type LoadFileAction = ActionType<typeof loadFile>
+export const createNewProtocol = (payload: NewProtocolFields) => ({
+  type: 'CREATE_NEW_PROTOCOL',
+  payload
+})

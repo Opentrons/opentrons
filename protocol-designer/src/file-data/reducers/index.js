@@ -7,7 +7,7 @@ import {
   updateFileMetadataFields
 } from '../actions'
 import type {FileMetadataFields} from '../types'
-import {LOAD_FILE, type LoadFileAction} from '../../load-file'
+import type {LoadFileAction, NewProtocolFields} from '../../load-file'
 
 const defaultFields = {
   name: '',
@@ -27,21 +27,33 @@ const updateMetadataFields = (
   }
 }
 
+function newProtocolMetadata (
+  state: FileMetadataFields,
+  action: {payload: NewProtocolFields}
+): FileMetadataFields {
+  return {
+    ...defaultFields,
+    name: action.payload.name || ''
+  }
+}
+
 const unsavedMetadataForm = handleActions({
-  [LOAD_FILE]: updateMetadataFields,
-  UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>) => ({
+  LOAD_FILE: updateMetadataFields,
+  CREATE_NEW_PROTOCOL: newProtocolMetadata,
+  UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>): FileMetadataFields => ({
     ...state,
     ...action.payload
   }),
-  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>) => ({
+  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
     ...action.payload
   })
 }, defaultFields)
 
 const fileMetadata = handleActions({
-  [LOAD_FILE]: updateMetadataFields,
-  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>) => ({
+  LOAD_FILE: updateMetadataFields,
+  CREATE_NEW_PROTOCOL: newProtocolMetadata,
+  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
     ...action.payload
   })

@@ -1,12 +1,11 @@
 // @flow
 import {combineReducers} from 'redux'
-import {handleActions, type ActionType} from 'redux-actions'
+import {handleActions} from 'redux-actions'
 import reduce from 'lodash/reduce'
 import {getPipette, getLabware} from '@opentrons/shared-data'
-import {updatePipettes} from './actions'
-import {LOAD_FILE, type LoadFileAction} from '../load-file'
 
 import type {Mount} from '@opentrons/components'
+import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 
@@ -47,7 +46,7 @@ export type PipetteReducerState = {
 }
 
 const pipettes = handleActions({
-  [LOAD_FILE]: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
+  LOAD_FILE: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
     const file = action.payload
     const {pipettes} = file
     // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
@@ -68,15 +67,23 @@ const pipettes = handleActions({
         }, {})
     }
   },
-  UPDATE_PIPETTES: (state: PipetteReducerState, action: ActionType<typeof updatePipettes>) => {
-    const {leftModel, rightModel, leftTiprackModel, rightTiprackModel} = action.payload
+  CREATE_NEW_PROTOCOL: (
+    state: PipetteReducerState,
+    action: {payload: NewProtocolFields}
+  ): PipetteReducerState => {
+    const {
+      leftPipetteModel,
+      rightPipetteModel,
+      leftTiprackModel,
+      rightTiprackModel
+    } = action.payload
 
-    const leftPipette = (leftModel && leftTiprackModel)
-      ? createPipette('left', leftModel, leftTiprackModel)
+    const leftPipette = (leftPipetteModel && leftTiprackModel)
+      ? createPipette('left', leftPipetteModel, leftTiprackModel)
       : null
 
-    const rightPipette = (rightModel && rightTiprackModel)
-      ? createPipette('right', rightModel, rightTiprackModel)
+    const rightPipette = (rightPipetteModel && rightTiprackModel)
+      ? createPipette('right', rightPipetteModel, rightTiprackModel)
       : null
 
     const newPipettes = ([leftPipette, rightPipette]).reduce(
