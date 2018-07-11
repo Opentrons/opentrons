@@ -10,12 +10,16 @@ import NoModulesMessage from './NoModulesMessage'
 
 import styles from './styles.css'
 
-export default function ModuleItem (props: Module) {
+type Props = Module & {
+  availableUpdate?: ?string
+}
+
+export default function ModuleItem (props: Props) {
   return (
     <div className={styles.module_item}>
-      <ModuleImage {...props}/>
+      <ModuleImage name={props.name}/>
       <ModuleInfo {...props}/>
-      <ModuleUpdate {...props}/>
+      <ModuleUpdate availableUpdate={props.availableUpdate}/>
     </div>
   )
 }

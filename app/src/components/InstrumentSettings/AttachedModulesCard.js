@@ -20,7 +20,7 @@ type Props = SP
 
 const TITLE = 'Modules'
 
-const MODULE_DATA = [
+const STUBBED_MODULE_DATA = [
   {
     name: 'temp_deck',
     model: 'temp_deck',
@@ -58,6 +58,6 @@ function AttachedModulesCard (props: Props) {
 function mapStateToProps (state: State): SP {
   return {
     modulesFlag: getModulesOn(state),
-    modules: MODULE_DATA
+    modules: STUBBED_MODULE_DATA
   }
 }
