@@ -1,6 +1,6 @@
 // @flow
 // tooltip components
 
-import HoverTooltip from './HoverToolTip'
+import HoverTooltip from './HoverTooltip'
 
 export {HoverTooltip}
