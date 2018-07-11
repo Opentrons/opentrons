@@ -5,11 +5,11 @@ import type {ActionType} from 'redux-actions'
 import omit from 'lodash/omit'
 
 import {INITIAL_DECK_SETUP_ID} from './constants'
-import {LOAD_FILE, type LoadFileAction} from '../load-file'
 import {getPDMetadata} from '../file-types'
 import {END_STEP} from './types'
 
 import type { StepItemData, FormSectionState, SubstepIdentifier } from './types'
+import type {LoadFileAction} from '../load-file'
 import type { FormData, StepIdType, FormModalFields } from '../form-types'
 
 import type {
@@ -103,7 +103,7 @@ const steps = handleActions({
     [action.payload.id]: createDefaultStep(action)
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
-  [LOAD_FILE]: (state: StepsState, action: LoadFileAction): StepsState => {
+  LOAD_FILE: (state: StepsState, action: LoadFileAction): StepsState => {
     const {savedStepForms, orderedSteps} = getPDMetadata(action.payload)
     return orderedSteps.reduce((acc: StepsState, stepId) => {
       const stepForm = savedStepForms[stepId]
@@ -135,7 +135,7 @@ const savedStepForms = handleActions({
     [action.payload.id]: action.payload
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
-  [LOAD_FILE]: (state: SavedStepFormState, action: LoadFileAction): SavedStepFormState =>
+  LOAD_FILE: (state: SavedStepFormState, action: LoadFileAction): SavedStepFormState =>
     getPDMetadata(action.payload).savedStepForms
 }, {})
 
@@ -164,8 +164,8 @@ const orderedSteps = handleActions({
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
     // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
     state.filter(stepId => !(stepId === action.payload || `${stepId}` === action.payload)),
-  [LOAD_FILE]: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
-    getPDMetadata(action.payload).orderedSteps
+  LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
+    [INITIAL_DECK_SETUP_ID, ...getPDMetadata(action.payload).orderedSteps]
 }, [INITIAL_DECK_SETUP_ID])
 
 type SelectedStepState = null | StepIdType | typeof END_STEP

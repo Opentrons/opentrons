@@ -25,9 +25,9 @@ import type {
   Wells
 } from '../types'
 import * as actions from '../actions'
-import {LOAD_FILE, type LoadFileAction} from '../../load-file'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
+import type {LoadFileAction} from '../../load-file'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
 // external actions (for types)
@@ -127,7 +127,7 @@ export const containers = handleActions({
     const { fromContainer, toContainer, toSlot } = action.payload
     return {...state, [toContainer]: {...state[fromContainer], slot: toSlot}}
   },
-  [LOAD_FILE]: (state: ContainersState, action: LoadFileAction): ContainersState => {
+  LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
     const file = action.payload
     const allFileLabware = file.labware
     const labwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
@@ -161,7 +161,7 @@ export const savedLabware = handleActions({
     ...state,
     [action.payload.containerId]: true
   }),
-  [LOAD_FILE]: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState =>
+  LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState =>
     mapValues(action.payload.labware, () => true)
 }, {})
 
@@ -190,7 +190,7 @@ export const ingredients = handleActions({
       // otherwise, the whole ingred group is deleted
       : omit(state, [groupId])
   },
-  [LOAD_FILE]: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
+  LOAD_FILE: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
     getPDMetadata(action.payload).ingredients
 }, {})
 
@@ -253,7 +253,7 @@ export const ingredLocations = handleActions({
       }
     }, {})
   },
-  [LOAD_FILE]: (state: LocationsState, action: LoadFileAction): LocationsState =>
+  LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
     getPDMetadata(action.payload).ingredLocations
 }, {})
 
