@@ -152,6 +152,8 @@ def init(loop=None):
         '/wifi/status', wifi.status)
     server.app.router.add_post(
         '/identify', control.identify)
+    server.app.router.add_get(
+        '/modules', control.get_attached_modules)
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(
