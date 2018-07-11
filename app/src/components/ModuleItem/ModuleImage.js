@@ -4,14 +4,14 @@ import * as React from 'react'
 import styles from './styles.css'
 
 type Props = {
-  displayName: string
+  name: string
 }
 
 export default function ModuleImage (props: Props) {
-  const imgSrc = getModuleImg(props.displayName)
+  const imgSrc = getModuleImg(props.name)
   return (
-    <div className={styles.module_image}>
-      <img src={imgSrc} />
+    <div className={styles.module_image_wrapper}>
+      <img src={imgSrc} className={styles.module_image}/>
     </div>
   )
 }
@@ -22,6 +22,6 @@ function getModuleImg (name: string) {
 
 // TODO (ka 2018-7-10): replace with design assets onces available
 const MODULE_IMGS = {
-  'Temperature Module': 'http://via.placeholder.com/100x75',
-  'Magnetic Bead Module': 'http://via.placeholder.com/100x75'
+  'temp_deck': require('./images/module-temp@3x.png'),
+  'mag_deck': require('./images/module-mag@3x.png')
 }

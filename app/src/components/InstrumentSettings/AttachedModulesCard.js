@@ -22,6 +22,7 @@ const TITLE = 'Modules'
 
 const MODULE_DATA = [
   {
+    name: 'temp_deck',
     model: 'temp_deck',
     serial: '123123124',
     fwVersion: '1.2.13',
@@ -29,6 +30,7 @@ const MODULE_DATA = [
     displayName: 'Temperature Module'
   },
   {
+    name: 'mag_deck',
     model: 'mag_deck',
     serial: '123123124',
     fwVersion: '1.2.13',
