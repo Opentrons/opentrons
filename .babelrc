@@ -7,12 +7,7 @@
     },
     "test": {
       "plugins": [
-        "transform-es2015-modules-commonjs",
-        ["transform-imports", {
-          "popper.js": {
-            "transform": "popper.js/dist/popper.js"
-          }
-        }]
+        "transform-es2015-modules-commonjs"
       ]
     }
   },
