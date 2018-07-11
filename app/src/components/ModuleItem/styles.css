@@ -1,0 +1,48 @@
+/* style sheet for module settings card on instrument settings page */
+@import '@opentrons/components';
+
+.modules_description {
+  @apply --font-body-2-dark;
+
+  margin: 0.5rem 0;
+}
+
+.module_item {
+  width: 100%;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.module_image_wrapper {
+  flex-basis: 25%;
+  padding-right: 1rem;
+}
+
+.module_image {
+  width: 100%;
+}
+
+.module_info {
+  flex-basis: 55%;
+}
+
+.grid_50 {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(50% - 2rem);
+  margin: 0 1rem;
+
+  & > div {
+    margin-bottom: 2rem;
+  }
+}
+
+.module_update {
+  flex-basis: 20%;
+  padding-top: 4.5rem;
+
+  & > button {
+    width: 8rem;
+  }
+}

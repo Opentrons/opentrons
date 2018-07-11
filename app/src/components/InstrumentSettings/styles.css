@@ -47,9 +47,3 @@
     order: 3;
   }
 }
-
-.modules_description {
-  @apply --font-body-2-dark;
-
-  margin: 0.5rem 0;
-}
