@@ -22,12 +22,15 @@ export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
 function mapStateToProps (state: BaseState): SP & MP {
   const protocolName = fileDataSelectors.fileMetadata(state).name || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
+  const canDownload = selectors.currentPage(state) !== 'file-splash'
 
   return {
-    downloadData: fileData && {
-      fileContents: JSON.stringify(fileData, null, 4),
-      fileName: protocolName + '.json'
-    },
+    downloadData: (canDownload)
+      ? {
+        fileContents: JSON.stringify(fileData, null, 4),
+        fileName: protocolName + '.json'
+      }
+      : null,
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.newProtocolModal(state)
   }
