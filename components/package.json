@@ -23,5 +23,8 @@
     "lodash": "^4.17.4",
     "react": "^16.2.0",
     "react-router-dom": "^4.2.2"
+  },
+  "dependencies": {
+    "react-popper": "^1.0.0"
   }
 }
