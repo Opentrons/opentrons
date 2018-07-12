@@ -52,36 +52,45 @@ describe('COPY_LABWARE action', () => {
     expect(containers(
       {
         clonePlate: {
+          id: 'clonePlate',
           type: '96-flat',
           name: 'Samples Plate',
-          slot: 'A2'
+          slot: '1',
+          disambiguationNumber: 1
         },
         otherPlate: {
+          id: 'otherPlate',
           type: '384-flat',
           name: 'Destination Plate',
-          slot: 'B2'
+          slot: '2',
+          disambiguationNumber: 1
         }
       },
       {
         type: 'COPY_LABWARE',
-        payload: {fromContainer: 'clonePlate', toContainer: 'newContainer', toSlot: 'A3'}
+        payload: {fromContainer: 'clonePlate', toContainer: 'newContainer', toSlot: '5'}
       }
     )).toEqual({
       clonePlate: {
+        id: 'clonePlate',
         type: '96-flat',
         name: 'Samples Plate',
-        slot: 'A2'
+        slot: '1',
+        disambiguationNumber: 1
       },
       newContainer: {
+        id: 'newContainer',
         type: '96-flat',
         name: 'Samples Plate',
-        slot: 'A3'
+        slot: '5',
+        disambiguationNumber: 2
       },
-
       otherPlate: {
+        id: 'otherPlate',
         type: '384-flat',
         name: 'Destination Plate',
-        slot: 'B2'
+        slot: '2',
+        disambiguationNumber: 1
       }
     })
   })
