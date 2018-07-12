@@ -32,7 +32,7 @@ DEFAULT_TIP_PRESS_MM = -10
 
 DEFAULT_PLUNGE_CURRENT = 0.1
 
-SHAKE_OFF_TIPS_SPEED = 50
+SHAKE_OFF_TIPS_SPEED = 25
 SHAKE_OFF_TIPS_DISTANCE = 2
 
 
@@ -1026,6 +1026,7 @@ class Pipette:
                 self.robot.poses,
                 x=pos_drop_tip
             )
+            self._shake_off_tips(location)
 
             if home_after:
                 self._home_after_drop_tip()
