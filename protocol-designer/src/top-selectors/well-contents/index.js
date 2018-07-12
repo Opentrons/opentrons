@@ -175,10 +175,8 @@ const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
     } else {
       const hasCommonVolume = selectedWells.every(well => {
         if (!ingredsInLabware[well]) return null
-        console.log('heyoo', ingredsInLabware[well])
         return ingredsInLabware[well][initialIngredId].volume === initialVolume
       })
-      console.table({hasCommonVolume, selectedWells, initialVolume})
       return {ingredientId: initialIngredId, volume: hasCommonVolume ? initialVolume : null}
     }
   }
