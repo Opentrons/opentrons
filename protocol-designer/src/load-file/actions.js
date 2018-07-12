@@ -55,3 +55,7 @@ export const createNewProtocol = (payload: NewProtocolFields) => ({
   type: 'CREATE_NEW_PROTOCOL',
   payload
 })
+
+export const saveProtocolFile = () => ({
+  type: 'SAVE_PROTOCOL_FILE'
+})

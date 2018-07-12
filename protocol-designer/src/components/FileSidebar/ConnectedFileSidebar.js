@@ -44,6 +44,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
     loadFile: (fileChangeEvent) => dispatch(loadFileActions.loadProtocolFile(fileChangeEvent)),
     createNewFile: _canCreateNew
       ? () => dispatch(actions.toggleNewProtocolModal(true))
-      : undefined
+      : undefined,
+    onDownload: () => dispatch(loadFileActions.saveProtocolFile())
   }
 }

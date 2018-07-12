@@ -13,8 +13,9 @@ const fileErrors = handleActions({
 const unsavedChanges = (state: boolean = false, action: {type: string}): boolean => {
   switch (action.type) {
     case 'LOAD_FILE':
-    case 'CREATE_NEW_FILE':
+    case 'SAVE_PROTOCOL_FILE':
       return false
+    case 'CREATE_NEW_PROTOCOL':
     case 'DISMISS_WARNING':
     case 'CREATE_CONTAINER':
     case 'DELETE_CONTAINER':
