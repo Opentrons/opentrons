@@ -112,6 +112,59 @@ const INSTRUCTIONS: {[TypeKey]: {[Channels]: {[Step]: string | React.Node}}} = {
   }
 }
 
+const INSTRUCTIONS_BOTTOM: {[TypeKey]: {[Channels]: {[Step]: string | React.Node}}} = {
+  tiprack: {
+    single: {
+      one: 'Jog pipette until it is centered above tip A1.',
+      two: (<p>Jog pipette until it is <strong>flush</strong> with the top of the tip.</p>)
+    },
+    multi: {
+      one: 'Jog pipette until it is centered above tips in column 1.',
+      two: (<p>Jog pipette until it is flush with the top of the tips.</p>)
+    }
+  },
+  trough: {
+    single: {
+      one: 'Jog pipette until tip is centered by the back of trough A1.',
+      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the bottom of the trough.</p>)
+    },
+    multi: {
+      one: 'Jog pipette until tips are centered above trough A1.',
+      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the bottom of the trough.</p>)
+    }
+  },
+  tuberack: {
+    single: {
+      one: 'Jog pipette until tip is centered above tube A1.',
+      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the bottom of the tube.</p>)
+    },
+    multi: {
+      one: 'warning: you can not use a multichannel pipette with a tube rack',
+      two: 'warning: you can not use a multichannel pipette with a tube rack'
+    }
+  },
+  plate96: {
+    single: {
+      one: 'Jog pipette until tip is centered above well A1.',
+      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the bottom of the well.</p>)
+    },
+    multi: {
+      one: 'Jog pipette until tips are centered above the wells in column 1.',
+      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the bottom of the wells.</p>)
+    }
+  },
+  plate384: {
+    single: {
+      one: 'Jog pipette until tip is centered above well A1.',
+      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the bottom of the well.</p>)
+    },
+    multi: {
+      one: 'Jog pipette until tips are centered above the wells indicated in column 1.',
+      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the bottom of the wells.</p>)
+    }
+  }
+}
+
 export function getDiagramSrc (props: LabwareCalibrationProps) {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
@@ -121,6 +174,10 @@ export function getDiagramSrc (props: LabwareCalibrationProps) {
 export function getInstructionsByType (props: LabwareCalibrationProps) {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
+
+  if (props.calibrateToBottom) {
+    return INSTRUCTIONS_BOTTOM[typeKey][channelsKey]
+  }
   return INSTRUCTIONS[typeKey][channelsKey]
 }
 

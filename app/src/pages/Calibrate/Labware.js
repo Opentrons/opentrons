@@ -4,11 +4,12 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Route, Redirect, withRouter, type ContextRouter, type Match} from 'react-router'
 import {push} from 'react-router-redux'
+import type {State} from '../../types'
 import {
   selectors as robotSelectors,
   type Labware
 } from '../../robot'
-
+import {makeGetRobotSettings} from '../../http-api-client'
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
 import SessionHeader from '../../components/SessionHeader'
@@ -21,17 +22,19 @@ type OwnProps = {
 
 type StateProps = {
   deckPopulated: boolean,
-  labware: ?Labware
+  labware: ?Labware,
+  calibrateToBottom: boolean
 }
 
 type DispatchProps = {onBackClick: () => void}
 
 type Props = ContextRouter & StateProps & OwnProps & DispatchProps
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SetupDeckPage))
+export default withRouter(connect(makeMapStateToProps, mapDispatchToProps)(SetupDeckPage))
 
 function SetupDeckPage (props: Props) {
-  const {labware, deckPopulated, onBackClick, match: {url, params: {slot}}} = props
+  const {calibrateToBottom, labware, deckPopulated, onBackClick, match: {url, params: {slot}}} = props
+
   return (
     <React.Fragment>
       <Page
@@ -50,23 +53,30 @@ function SetupDeckPage (props: Props) {
         }
 
         return (
-          <ConfirmModal labware={labware} onBackClick={onBackClick} />
+          <ConfirmModal labware={labware} onBackClick={onBackClick} calibrateToBottom={calibrateToBottom}/>
         )
       }} />
     </React.Fragment>
   )
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const {match: {url, params: {slot}}} = ownProps
-  const labware = robotSelectors.getLabware(state)
-  const currentLabware = labware.find((lw) => lw.slot === slot)
+function makeMapStateToProps (): (state: State, ownProps: OwnProps) => StateProps {
+  const getRobotSettings = makeGetRobotSettings()
 
-  return {
-    deckPopulated: !!robotSelectors.getDeckPopulated(state),
-    labware: currentLabware,
-    slot,
-    url
+  return (state, ownProps) => {
+    const {match: {url, params: {slot}}} = ownProps
+    const labware = robotSelectors.getLabware(state)
+    const currentLabware = labware.find((lw) => lw.slot === slot)
+    const name = robotSelectors.getConnectedRobotName(state)
+    const response = getRobotSettings(state, {name}).response
+    const settings = response && response.settings
+    return {
+      deckPopulated: !!robotSelectors.getDeckPopulated(state),
+      labware: currentLabware,
+      slot,
+      url,
+      calibrateToBottom: !!settings && settings[2].value
+    }
   }
 }
 
