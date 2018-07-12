@@ -1,6 +1,7 @@
 // @flow
 // robot status panel with connect button
 import * as React from 'react'
+
 import type {Robot} from '../../robot'
 
 import AttachedPipettesCard from './AttachedPipettesCard'
