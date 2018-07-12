@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
+import {getLabware} from '@opentrons/shared-data'
 import {selectors} from '../labware-ingred/reducers'
 import {
   openIngredientSelector,
@@ -56,10 +57,15 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
   const deckSetupMode = steplistSelectors.deckSetupMode(state)
+  const labwareHasName = container && selectors.getSavedLabware(state)[container.id]
+  const labwareData = container && getLabware(container.type)
+  // TODO: Ian 2018-07-10 use shared-data accessor
+  const isTiprack = labwareData && labwareData.metadata.isTiprack
+
   return {
     ...containerInfo,
     slot,
-    showNameOverlay: (container && !selectors.getSavedLabware(state)[container.id]),
+    showNameOverlay: container && !isTiprack && !labwareHasName,
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
     labwareToCopy: selectors.labwareToCopy(state),
