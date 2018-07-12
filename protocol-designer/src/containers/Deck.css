@@ -1,4 +1,13 @@
+@import '@opentrons/components';
+
 .deck {
   padding: 1rem;
   max-width: 100%;
+}
+
+.deck_header {
+  @apply --font-header-dark;
+
+  text-align: center;
+  padding-top: 1rem;
 }
