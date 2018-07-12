@@ -6,6 +6,7 @@ import styles from './tooltips.css'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 150
+const DISTANCE_FROM_REFERENCE = 4
 
 type PopperProps = React.ElementProps<typeof Popper>
 type Props = {
@@ -50,7 +51,7 @@ class HoverTooltip extends React.Component<Props, State> {
         </Reference>
         {
           this.state.isOpen &&
-          <Popper placement={this.props.placement}>
+          <Popper placement={this.props.placement} modifiers={{offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`}}}>
             {({ref, style, placement}) => (
               <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
                 {this.props.tooltipComponent}
