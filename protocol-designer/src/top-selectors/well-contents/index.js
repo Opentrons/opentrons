@@ -147,36 +147,49 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
   }
 )
 
+type CommonWellValues = {ingredientId: ?string, volume: ?number}
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
-export const getSelectedWellsIngredId: Selector<?string> = createSelector(
+const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedContainerId,
   labwareIngredSelectors.getIngredientLocations,
   (selectedWellsObj, labwareId, allIngreds) => {
-    if (!labwareId) {
-      return null
-    }
-
+    if (!labwareId) return {ingredientId: null, volume: null}
     const ingredsInLabware = allIngreds[labwareId]
     const selectedWells = Object.keys(selectedWellsObj)
-
-    if (!ingredsInLabware || selectedWells.length < 1) {
-      return null
-    }
+    if (!ingredsInLabware || selectedWells.length < 1) return {ingredientId: null, volume: null}
 
     const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
-    const initialIngred = initialWellContents && Object.keys(initialWellContents)[0]
+    const initialIngredId = initialWellContents && Object.keys(initialWellContents)[0]
+    const initialVolume = initialIngredId && initialWellContents[initialIngredId].volume
 
-    const result = selectedWells.every(well => {
-      if (!ingredsInLabware[well]) {
-        return null
-      }
-
+    const hasCommonIngred = selectedWells.every(well => {
+      if (!ingredsInLabware[well]) return null
       const ingreds = Object.keys(ingredsInLabware[well])
-      return ingreds.length === 1 && ingreds[0] === initialIngred
+      return ingreds.length === 1 && ingreds[0] === initialIngredId
     })
 
-    return result ? initialIngred : null
+    if (!hasCommonIngred) {
+      return {ingredientId: null, volume: null}
+    } else {
+      const hasCommonVolume = selectedWells.every(well => {
+        if (!ingredsInLabware[well]) return null
+        console.log('heyoo', ingredsInLabware[well])
+        return ingredsInLabware[well][initialIngredId].volume === initialVolume
+      })
+      console.table({hasCommonVolume, selectedWells, initialVolume})
+      return {ingredientId: initialIngredId, volume: hasCommonVolume ? initialVolume : null}
+    }
   }
+)
+
+export const getSelectedWellsCommonIngredId: Selector<?string> = createSelector(
+  getSelectedWellsCommonValues,
+  (commonValues) => commonValues.ingredientId
+)
+
+export const getSelectedWellsCommonVolume: Selector<?string> = createSelector(
+  getSelectedWellsCommonValues,
+  (commonValues) => commonValues.volume
 )

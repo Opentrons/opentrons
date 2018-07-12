@@ -1,4 +1,4 @@
-import {getSelectedWellsIngredId} from '../'
+import {getSelectedWellsCommonIngredId} from '../'
 
 let ingredLocations
 let selectedLabwareId
@@ -17,12 +17,12 @@ beforeEach(() => {
   }
 })
 
-describe('getSelectedWellsIngredId', () => {
+describe('getSelectedWellsCommonIngredId', () => {
   test('labware id not in ingredientLocations', () => {
     const selectedWells = {A1: 'A1'}
     const selectedLabwareId = 'badLabwareId'
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations
@@ -35,7 +35,7 @@ describe('getSelectedWellsIngredId', () => {
     const selectedWells = {A1: 'A1'}
     const selectedLabwareId = null
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations
@@ -47,7 +47,7 @@ describe('getSelectedWellsIngredId', () => {
   test('all selected wells same ingred: return ingred group id', () => {
     const selectedWells = {A1: 'A1', 'A2': 'A2'}
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations
@@ -59,7 +59,7 @@ describe('getSelectedWellsIngredId', () => {
   test('2 well different ingreds: return null', () => {
     const selectedWells = {'A2': 'A2', A3: 'A3'}
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations
@@ -71,7 +71,7 @@ describe('getSelectedWellsIngredId', () => {
   test('2 well one empty: return null', () => {
     const selectedWells = {'A2': 'A2', A6: 'A6'}
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations
@@ -83,7 +83,7 @@ describe('getSelectedWellsIngredId', () => {
   test('1 well mixed ingreds: return null', () => {
     const selectedWells = {'A4': 'A4'}
 
-    const result = getSelectedWellsIngredId.resultFunc(
+    const result = getSelectedWellsCommonIngredId.resultFunc(
       selectedWells,
       selectedLabwareId,
       ingredLocations

@@ -84,6 +84,7 @@ type Props = {
   selectedWells: Array<string>,
   selectedWellsMaxVolume: number,
   commonSelectedIngred: ?string,
+  commonSelectedVolume: ?number,
 
   allIngredientGroupFields: ?AllIngredGroupFields,
   allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>
@@ -147,7 +148,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         ...this.state,
         input: {
           name: newIngredFields.name || name,
-          volume: newIngredFields.volume || volume,
+          volume: this.props.commonSelectedVolume || newIngredFields.volume || volume,
           description: newIngredFields.description || description,
           individualize: newIngredFields.individualize || individualize,
           serializeName: newIngredFields.serializeName || serializeName
@@ -181,6 +182,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     if (nextEditingId !== prevEditingId || wellSelectionCleared) {
       this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
         ...this.state,
+        input: {
+          ...this.state.input,
+          volume: nextProps.commonSelectedVolume
+        },
         commonIngredGroupId: nextEditingId
       }))
     }
@@ -314,7 +319,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Volume:' className={styles.volume_field}>
-              <Field numeric accessor='volume' units='µL'
+              <Field
+                numeric
+                accessor='volume'
+                units='µL'
                 error={visibleErrors.volume}
               />
             </FormGroup>
