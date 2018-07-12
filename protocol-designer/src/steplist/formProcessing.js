@@ -48,7 +48,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   const baseForm = {
     id: stepId,
     stepType: stepType,
-    'step-name': startCase(stepType) + ' ' + stepId,
+    'step-name': startCase(stepType),
     'step-details': ''
   }
 
