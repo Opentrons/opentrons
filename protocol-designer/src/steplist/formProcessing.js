@@ -105,6 +105,7 @@ function _vapTransferLike (
   let errors = {...requiredFieldErrors}
 
   if (isNaN(volume) || !(volume > 0)) {
+    // $FlowFixMe: Cannot assign `'Volume mus...'` to `errors['volume']` because property `volume` is missing in object literal
     errors['volume'] = 'Volume must be a positive number'
   }
 
@@ -166,6 +167,7 @@ function _vapTransferLike (
 
     if (stepType === 'transfer') {
       if (sourceWells.length !== destWells.length || sourceWells.length === 0) {
+        // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
         errors._mismatchedWells = 'Numbers of wells must match'
       }
 
@@ -183,6 +185,7 @@ function _vapTransferLike (
 
     if (stepType === 'consolidate') {
       if (sourceWells.length <= 1 || destWells.length !== 1) {
+        // $FlowFixMe: Cannot assign `'Multiple s...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
         errors._mismatchedWells = 'Multiple source wells and exactly one destination well is required.'
       }
 
@@ -200,6 +203,7 @@ function _vapTransferLike (
 
     if (stepType === 'distribute') {
       if (sourceWells.length !== 1 || destWells.length <= 1) {
+        // $FlowFixMe: Cannot assign `'Single sou...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
         errors._mismatchedWells = 'Single source well and multiple destination wells is required.'
       }
 

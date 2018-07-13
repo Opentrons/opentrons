@@ -35,6 +35,7 @@ export default function NotificationIcon (props: Props) {
   const scaledHeight = height / SCALE_FACTOR
 
   return (
+    // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
     <Icon {...props}>
       {childName && (
         <Icon
