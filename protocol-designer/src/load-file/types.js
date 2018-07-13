@@ -17,10 +17,6 @@ export type LoadFileAction = {
 
 export type NewProtocolFields = {
   name: ?string,
-
-  leftPipetteModel: string,
-  rightPipetteModel: string,
-
-  leftTiprackModel: ?string,
-  rightTiprackModel: ?string
+  left: {pipetteModel: string, tiprackModel: ?string},
+  right: {pipetteModel: string, tiprackModel: ?string}
 }
