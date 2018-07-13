@@ -46,10 +46,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = dismissSelectors.getVisibleWarningsPerStep(state)[stepId]
-  // TODO: Ian 2018-07-03 show warnings once dismissable
-  const hasWarnings = process.env.OT_PD_SHOW_WARNINGS === 'true'
-    ? warnings && warnings.length > 0
-    : false
+  const hasWarnings = warnings && warnings.length > 0
 
   const showErrorState = hasError || hasWarnings
 

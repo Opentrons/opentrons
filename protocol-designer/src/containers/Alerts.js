@@ -79,7 +79,7 @@ function mapStateToProps (state: BaseState): SP {
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
   const {dispatch} = dispatchProps
   const onDismiss = (warning: CommandCreatorWarning) =>
-    () => dispatch(dismissActions.dismissWarning({
+    () => dispatch(dismissActions.dismissTimelineWarning({
       warning,
       stepId: stateProps._stepId
     }))

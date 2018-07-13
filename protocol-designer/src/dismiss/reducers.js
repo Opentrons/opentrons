@@ -1,20 +1,25 @@
 // @flow
 import {combineReducers} from 'redux'
-import {handleActions} from 'redux-actions'
+import {combineActions, handleActions} from 'redux-actions'
 import omit from 'lodash/omit'
-import {dismissWarning} from './actions'
+import type {
+  DismissFormWarning,
+  DismissTimelineWarning
+} from './actions'
 import {getPDMetadata} from '../file-types'
-import type {ActionType} from 'redux-actions'
 import type {BaseState} from '../types'
 import type {LoadFileAction} from '../load-file'
 import type {CommandCreatorWarning} from '../step-generation'
+import type {FormWarning} from '../steplist'
 import type {DeleteStepAction} from '../steplist/actions'
 
-export type DismissedWarningState = {[stepId: number]: ?Array<CommandCreatorWarning>}
+export type MixedWarnings = CommandCreatorWarning | FormWarning
+type DismissedWarningState = {[stepId: number]: ?Array<MixedWarnings>}
+
 const dismissedWarnings = handleActions({
-  DISMISS_WARNING: (
+  [combineActions('DISMISS_FORM_WARNING', 'DISMISS_TIMELINE_WARNING')]: (
     state: DismissedWarningState,
-    action: ActionType<typeof dismissWarning>
+    action: DismissFormWarning | DismissTimelineWarning
   ): DismissedWarningState => {
     const {stepId, warning} = action.payload
     return {
@@ -25,7 +30,7 @@ const dismissedWarnings = handleActions({
       ]
     }
   },
-  DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction) => {
+  DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction): DismissedWarningState => {
     // remove key for deleted step
     const stepId = action.payload.toString(10)
     return omit(state, stepId)

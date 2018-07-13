@@ -1,29 +1,27 @@
 // @flow
 import {createSelector} from 'reselect'
-
 // TODO: Ian 2018-07-02 split apart file-data concerns to avoid circular dependencies
 // Eg, right now if you import {selectors as fileDataSelectors} from '../file-data',
 // PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
 // imports getDismissedWarnings selector from 'dismiss/
-import {warningsPerStep} from '../file-data/selectors/commands'
+import {timelineWarningsPerStep} from '../file-data/selectors/commands'
 
 import {selectors as steplistSelectors} from '../steplist'
 import type {BaseState, Selector} from '../types'
-import type {CommandCreatorWarning} from '../step-generation'
-import type {RootState, DismissedWarningState} from './reducers'
+import type {RootState} from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 
-export const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
+export const getDismissedWarnings: Selector<*> = createSelector(
   rootSelector,
   s => s.dismissedWarnings
 )
 
-type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
+type WarningsPerStep = {[stepId: string | number]: Array<*>}
 /** Non-dismissed warnings for each step */
 export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   getDismissedWarnings,
-  warningsPerStep,
+  timelineWarningsPerStep,
   steplistSelectors.orderedSteps,
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
     return orderedSteps.reduce(
@@ -47,9 +45,15 @@ export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelect
   }
 )
 
-export const getVisibleWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
+export const getVisibleWarningsForSelectedStep: Selector<Array<*>> = createSelector(
   getVisibleWarningsPerStep,
   steplistSelectors.selectedStepId,
   (warningsPerStep, stepId) =>
     (typeof stepId === 'number' && warningsPerStep[stepId]) || []
+)
+
+export const getDismissedWarningsForSelectedStep: Selector<Array<*>> = createSelector(
+  getDismissedWarnings,
+  steplistSelectors.selectedStepId,
+  (dismissedWarnings, stepId) => (typeof stepId === 'number' && dismissedWarnings[stepId]) || []
 )
