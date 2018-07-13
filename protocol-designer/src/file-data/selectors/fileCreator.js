@@ -18,7 +18,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   fileMetadata,
   getInitialRobotState,
   robotStateTimeline,
-  dismissSelectors.getDismissedWarnings,
+  dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getIngredientGroups,
   ingredSelectors.getIngredientLocations,
   steplistSelectors.getSavedForms,
