@@ -44,16 +44,6 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual(expected)
   })
 
-  test('handles DISCONNECT_RESPONSE failure', () => {
-    const state = {session: {dummy: 'state'}}
-    const action = {
-      type: 'robot:DISCONNECT_RESPONSE',
-      payload: {error: new Error('AH')}
-    }
-
-    expect(reducer(state, action).session).toEqual(state.session)
-  })
-
   test('handles SESSION action', () => {
     const state = {
       session: {

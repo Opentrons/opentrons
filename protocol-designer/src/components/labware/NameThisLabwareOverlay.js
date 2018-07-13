@@ -37,7 +37,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
     })
   }
 
-  handleKeyUp = (e: SyntheticEvent<*>) => {
+  handleKeyUp = (e: SyntheticKeyboardEvent<*>) => {
     if (e.key === 'Enter') {
       this.onSubmit()
     }

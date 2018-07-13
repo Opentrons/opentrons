@@ -17,6 +17,7 @@ type HideModal = {hideModal: true}
 export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionModalWrapper)
 
 function WellSelectionModalWrapper (props: Props) {
+  // $FlowFixMe: property `hideModal` is missing in `Props`
   if (props.hideModal) {
     return null
   }

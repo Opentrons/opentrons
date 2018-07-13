@@ -178,7 +178,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
       }
     },
 
-    handleMouseOverWell: (well: string) => (e: SyntheticEvent<*>) => {
+    handleMouseOverWell: (well: string) => (e: SyntheticMouseEvent<*>) => {
       if (!e.shiftKey) {
         const hoveredWell = {[well]: well}
         dispatch(highlightWells(_wellsFromSelected(hoveredWell)))

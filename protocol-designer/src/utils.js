@@ -9,6 +9,7 @@ export type FormConnectorFactory<F> = (
 ) => FormConnector<F>
 
 export type FormConnector<F> = (accessor: $Keys<F>) =>
+  // $FlowFixMe: Missing type annotation for `$Values`
   {onChange: (e: SyntheticInputEvent<*>) => mixed, value: $Values<F>}
 
 export const formConnectorFactory = (
@@ -27,6 +28,7 @@ export const uuid = () => new Date().getTime() + '.' + Math.random()
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
 
+// $FlowFixMe: Missing type annotation for `U`
 export const transpose = (matrix: Array<Array<mixed>>) => matrix[0].map((_col, i) =>
   matrix.map(row => row[i])
 )

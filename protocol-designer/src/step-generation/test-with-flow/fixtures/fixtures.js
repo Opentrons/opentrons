@@ -97,10 +97,12 @@ export function createEmptyLiquidState (args: {
   const {sourcePlateType, destPlateType, pipettes} = args
 
   const sourceLabware = sourcePlateType
+    // $FlowFixMe: Missing type annotation for `T`
     ? {sourcePlateId: createLabwareLiquidState(sourcePlateType, {})}
     : {}
 
   const destLabware = destPlateType
+    // $FlowFixMe: Missing type annotation for `T`
     ? {destPlateId: createLabwareLiquidState(destPlateType, {})}
     : {}
 

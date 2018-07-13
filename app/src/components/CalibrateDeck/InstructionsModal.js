@@ -69,6 +69,7 @@ function InstructionsModal (props: Props) {
       }}
       heading={getHeading(props)}
     >
+      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
       <StepInstructions {...props} />
     </ModalPage>
   )
