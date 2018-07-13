@@ -1221,13 +1221,19 @@ class SmoothieDriver_3_0_0:
 
     def unstick_axes(self, axes, distance=None, speed=None):
         '''
-        Some axes (specifically plunger axis in OT2) build up static friction
-        over time. To get over this, the robot can move that plunger at normal
-        current and a very slow speed to increase the torque, removing the
-        static friction
+        The plunger axes on OT2 can build up static friction over time and
+        when it's cold. To get over this, the robot can move that plunger at
+        normal current and a very slow speed to increase the torque, removing
+        the static friction
 
         axes:
             String containing each axis to be moved. Ex: 'BC' or 'ZABC'
+
+        distance:
+            Distance to travel in millimeters (default is 1mm)
+
+        speed:
+            Millimeters-per-second to travel to travel at (default is 1mm/sec)
         '''
         for ax in axes:
             if ax not in AXES:
@@ -1238,6 +1244,11 @@ class SmoothieDriver_3_0_0:
         if speed is None:
             speed = UNSTICK_SPEED
 
+        self.push_active_current()
+        self.set_active_current({
+            ax: self._config.high_current[ax]
+            for ax in axes
+            })
         self.push_axis_max_speed()
         self.set_axis_max_speed({ax: speed for ax in axes})
 
@@ -1260,6 +1271,7 @@ class SmoothieDriver_3_0_0:
             if homing_axes:
                 self.home(homing_axes)
         finally:
+            self.pop_active_current()
             self.pop_axis_max_speed()
 
     def pause(self):
