@@ -150,7 +150,7 @@ export const selectedWellsMaxVolume: Selector<number> = createSelector(
 type CommonWellValues = {ingredientId: ?string, volume: ?number}
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
-const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
+export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedContainerId,
   labwareIngredSelectors.getIngredientLocations,
@@ -161,8 +161,8 @@ const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
     if (!ingredsInLabware || selectedWells.length < 1) return {ingredientId: null, volume: null}
 
     const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
-    const initialIngredId = initialWellContents && Object.keys(initialWellContents)[0]
-    const initialVolume = initialIngredId && initialWellContents[initialIngredId].volume
+    const initialIngredId: ?string = initialWellContents && Object.keys(initialWellContents)[0]
+    const initialVolume: ?number = initialWellContents && initialIngredId && initialWellContents[initialIngredId].volume
 
     const hasCommonIngred = selectedWells.every(well => {
       if (!ingredsInLabware[well]) return null
@@ -184,10 +184,10 @@ const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
 
 export const getSelectedWellsCommonIngredId: Selector<?string> = createSelector(
   getSelectedWellsCommonValues,
-  (commonValues) => commonValues.ingredientId
+  (commonValues) => commonValues.ingredientId || null
 )
 
-export const getSelectedWellsCommonVolume: Selector<?string> = createSelector(
+export const getSelectedWellsCommonVolume: Selector<?number> = createSelector(
   getSelectedWellsCommonValues,
-  (commonValues) => commonValues.volume
+  (commonValues) => commonValues.volume || null
 )
