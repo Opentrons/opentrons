@@ -17,7 +17,8 @@ type DP = {
 }
 
 type OP = Labware & {
-  calibrator: Pipette
+  calibrator: Pipette,
+  calibrateToBottom: boolean,
 }
 
 type Props = DP & OP
