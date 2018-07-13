@@ -30,7 +30,7 @@ type StepCheckboxRowProps = {
   children?: ?React.Node,
   className?: string,
   disabled?: boolean,
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: HoverTooltipHandlers,
 }
 export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
   <StepField
@@ -92,14 +92,20 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
 
 type DispenseDelayFieldsProps = {
   focusHandlers: FocusHandlers,
-  label?: string
+  label?: string,
+  disabled?: boolean,
+  hoverTooltipHandlers?: HoverTooltipHandlers,
 }
 export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
-  const {label = 'Delay', focusHandlers} = props
+  const {label = 'Delay', focusHandlers, hoverTooltipHandlers, disabled} = props
   return (
-    <StepCheckboxRow name="dispense_delay_checkbox" label={label}>
-      <StepInputField {...focusHandlers} name="dispense_delayMinutes" units='m' />
-      <StepInputField {...focusHandlers} name="dispense_delaySeconds" units='s' />
+    <StepCheckboxRow
+      disabled={disabled}
+      hoverTooltipHandlers={hoverTooltipHandlers}
+      name="dispense_delay_checkbox"
+      label={label}>
+      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delayMinutes" units='m' />
+      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delaySeconds" units='s' />
     </StepCheckboxRow>
   )
 }

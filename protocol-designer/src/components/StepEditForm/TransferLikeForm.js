@@ -96,7 +96,12 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
               <HoverTooltip tooltipComponent="This feature is not available in Beta">
-                <DispenseDelayFields focusHandlers={focusHandlers} />
+                {(hoverTooltipHandlers) => (
+                  <DispenseDelayFields
+                    disabled
+                    hoverTooltipHandlers={hoverTooltipHandlers}
+                    focusHandlers={focusHandlers} />
+                )}
               </HoverTooltip>
               <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />

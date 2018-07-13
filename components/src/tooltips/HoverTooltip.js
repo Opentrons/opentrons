@@ -10,8 +10,8 @@ const DISTANCE_FROM_REFERENCE = 4
 
 export type HoverTooltipHandlers = {
   ref: React.Ref<*>,
-  onMouseEnter: () => SyntheticMouseEvent<*>,
-  onMouseLeave: () => SyntheticMouseEvent<*>,
+  onMouseEnter: (SyntheticMouseEvent<*>) => void,
+  onMouseLeave: (SyntheticMouseEvent<*>) => void,
 }
 type PopperProps = React.ElementProps<typeof Popper>
 type Props = {

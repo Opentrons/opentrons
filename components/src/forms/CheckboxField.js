@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {Icon} from '../icons'
-import type HoverTooltipHandlers from '../tooltips'
+import type {HoverTooltipHandlers} from '../tooltips'
 
 import styles from './forms.css'
 
@@ -26,8 +26,8 @@ type Props = {
 export default function CheckboxField (props: Props) {
   const error = props.error != null
   return (
-    <label className={cx(styles.form_field, props.className)}>
-      <div className={cx(styles.checkbox_icon, {[styles.error]: error})}>
+    <label {...props.hoverTooltipHandlers} className={cx(styles.form_field, props.className, {[styles.checkbox_disabled]: props.disabled})}>
+      <div className={cx(styles.checkbox_icon, {[styles.error]: error, [styles.checkbox_disabled]: props.disabled})}>
         <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
       </div>
       <input
@@ -37,7 +37,7 @@ export default function CheckboxField (props: Props) {
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div {...props.hoverTooltipHandlers} className={styles.label_text}>{props.label}</div>
+      <div className={styles.label_text}>{props.label}</div>
     </label>
   )
 }
