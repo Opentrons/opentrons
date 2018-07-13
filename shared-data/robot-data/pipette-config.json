@@ -4,9 +4,9 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 2.5,
-      "blowOut": -0.5,
-      "dropTip": -3.5
+      "bottom": 4.5,
+      "blowOut": 1.5,
+      "dropTip": -3
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 5,
@@ -23,8 +23,8 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 1,
-      "blowOut": -2,
+      "bottom": 3,
+      "blowOut": 0,
       "dropTip": -4.5
     },
     "pickUpCurrent": 0.1,
@@ -42,9 +42,9 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 4,
-      "blowOut": 1,
-      "dropTip": -2.5
+      "bottom": 6,
+      "blowOut": 3,
+      "dropTip": -2
     },
     "pickUpCurrent": 0.2,
     "aspirateFlowRate": 5,
@@ -61,8 +61,8 @@
     "nominalMaxVolumeUl": 10,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 2.5,
-      "blowOut": -0.5,
+      "bottom": 4.5,
+      "blowOut": 1.5,
       "dropTip": -3.5
     },
     "pickUpCurrent": 0.2,
@@ -80,9 +80,9 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 1.51,
-      "blowOut": 1.5,
-      "dropTip": -3
+      "bottom": 2.3,
+      "blowOut": 2,
+      "dropTip": -2.5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 25,
@@ -99,8 +99,8 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 1.5,
-      "blowOut": 0,
+      "bottom": 2,
+      "blowOut": 0.5,
       "dropTip": -4
     },
     "pickUpCurrent": 0.1,
@@ -118,9 +118,9 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 3,
-      "blowOut": 2.5,
-      "dropTip": -2
+      "bottom": 3.18,
+      "blowOut": 3,
+      "dropTip": -1.5
     },
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 25,
@@ -137,8 +137,8 @@
     "nominalMaxVolumeUl": 50,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 2.5,
-      "blowOut": 1,
+      "bottom": 3,
+      "blowOut": 1.5,
       "dropTip": -3
     },
     "pickUpCurrent": 0.3,
@@ -156,9 +156,9 @@
     "nominalMaxVolumeUl": 300,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 3,
-      "blowOut": 1.5,
-      "dropTip": -3
+      "bottom": 3.3,
+      "blowOut": 2.5,
+      "dropTip": -2.5
     },
     "pickUpCurrent": 0.1,
     "aspirateFlowRate": 150,
@@ -176,7 +176,7 @@
     "plungerPositions": {
       "top": 19.5,
       "bottom": 3,
-      "blowOut": 0,
+      "blowOut": 1,
       "dropTip": -4
     },
     "pickUpCurrent": 0.1,
@@ -194,9 +194,9 @@
     "nominalMaxVolumeUl": 300,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 3.5,
-      "blowOut": 2.5,
-      "dropTip": -2
+      "bottom": 3.9,
+      "blowOut": 3,
+      "dropTip": -1.5
     },
     "pickUpCurrent": 0.3,
     "aspirateFlowRate": 150,
@@ -213,8 +213,8 @@
     "nominalMaxVolumeUl": 300,
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 3,
-      "blowOut": 1,
+      "bottom": 3.5,
+      "blowOut": 1.5,
       "dropTip": -3
     },
     "pickUpCurrent": 0.3,
