@@ -155,6 +155,12 @@ export type RobotState = {|
   labware: {
     [labwareId: string]: LabwareData
   },
+  // tiprackAssignment: maps tiprackLabwareId to its assigned PipetteId.
+  // Each tiprack is either unassigned, or assigned to one pipette.
+  // `tiprackAssignment` will go away when tiprack sharing is implemented
+  tiprackAssignment?: ?{
+    [tiprackLabwareId: string]: ?string
+  },
   tipState: {
     tipracks: {
       [labwareId: string]: {

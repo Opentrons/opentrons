@@ -1,6 +1,6 @@
 // @flow
-import {p300Single, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
+import {p300Single, p300Multi, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
+import {sortLabwareBySlot, getNextTiprack, tiprackIsAvailableToPipette, _getNextTip} from '../'
 
 // just a blank liquidState to appease flow
 const basicLiquidState = {
@@ -12,7 +12,8 @@ describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
     // TODO use a fixture, standardize
     const _instrumentsState = {
-      p300SingleId: p300Single
+      p300SingleId: p300Single,
+      p300MultiId: p300Multi
     }
 
     const robotState = {
@@ -159,7 +160,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
@@ -197,7 +198,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result).toEqual(null)
   })
@@ -251,7 +252,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -308,13 +309,64 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(1, robotState)
+    const result = getNextTiprack(p300Single, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
   })
 
   test('multiple tipracks, all empty, should return null', () => {
+    // TODO use a fixture, standardize
+    const robotState = {
+      instruments: {
+        p300SingleId: p300Single
+      },
+      labware: {
+        tiprack2Id: {
+          slot: '2',
+          type: 'tiprack-200uL',
+          name: 'Tip rack 2'
+        },
+        tiprack11Id: {
+          slot: '11',
+          type: 'tiprack-200uL',
+          name: 'Tip rack 11'
+        },
+        sourcePlateId: {
+          slot: '10',
+          type: 'trough-12row',
+          name: 'Source (Buffer)'
+        },
+        destPlateId: {
+          slot: '1',
+          type: '96-flat',
+          name: 'Destination Plate'
+        },
+        trashId: {
+          slot: '12',
+          type: 'fixed-trash',
+          name: 'Trash'
+        }
+      },
+      tipState: {
+        tipracks: {
+          tiprack2Id: {
+            ...getTiprackTipstate(false)
+          },
+          tiprack11Id: {
+            ...getTiprackTipstate(false)
+          }
+        },
+        pipettes: {
+          p300SingleId: false
+        }
+      },
+      liquidState: basicLiquidState
+    }
+
+    const result = getNextTiprack(p300Single, robotState)
+
+    expect(result).toBe(null)
   })
 })
 
@@ -358,7 +410,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -408,7 +460,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A3')
@@ -445,7 +497,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
   })
@@ -503,7 +555,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
   })
@@ -565,7 +617,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -655,7 +707,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack10Id')
     expect(result && result.well).toEqual('A2')
@@ -754,8 +806,60 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState
     }
 
-    const result = getNextTiprack(8, robotState)
+    const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
+  })
+})
+
+describe('tiprackIsAvailableToPipette', () => {
+  let pipette
+  let tiprack
+  const tiprackModel = 'tiprack-200uL'
+  const pipetteId = 'pipetteId'
+
+  beforeEach(() => {
+    pipette = {
+      channels: 1,
+      id: pipetteId,
+      maxVolume: 300,
+      model: 'some-model',
+      mount: 'left',
+      tiprackModel
+    }
+
+    tiprack = {
+      name: 'Tiprack',
+      type: tiprackModel,
+      slot: '1'
+    }
+  })
+  test('tiprack unassigned, can use', () => {
+    const unassignedValues = [undefined, null]
+
+    unassignedValues.forEach(tiprackAssignment => {
+      expect(
+        tiprackIsAvailableToPipette(pipette, tiprack, tiprackAssignment)
+      ).toBe(true)
+    })
+  })
+
+  test('tiprack already assigned to current pipette, can use', () => {
+    expect(
+      tiprackIsAvailableToPipette(pipette, tiprack, pipetteId)
+    ).toBe(true)
+  })
+
+  test('tiprack assigned to different pipette, cannot use', () => {
+    expect(
+      tiprackIsAvailableToPipette(pipette, tiprack, 'differentPipetteId')
+    ).toBe(false)
+  })
+
+  test('tiprack unassigned but of wrong type, cannot use', () => {
+    pipette.tiprackModel = 'tiprack-wrong-type'
+    expect(
+      tiprackIsAvailableToPipette(pipette, tiprack, pipetteId)
+    ).toBe(false)
   })
 })

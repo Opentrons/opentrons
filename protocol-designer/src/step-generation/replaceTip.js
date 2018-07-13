@@ -15,9 +15,10 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   let robotState = cloneDeep(prevRobotState)
 
   // get next full tiprack in slot order
-  const nextTiprack = getNextTiprack(pipetteData.channels, robotState)
+  const nextTiprack = getNextTiprack(pipetteData, robotState)
 
   if (!nextTiprack) {
+    // no valid next tip / tiprack, bail out
     return {
       errors: [insufficientTips()]
     }
@@ -45,6 +46,12 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
 
   // pipette now has tip
   robotState.tipState.pipettes[pipetteId] = true
+
+  // update tiprack-to-pipette assignment
+  robotState.tiprackAssignment = {
+    ...robotState.tiprackAssignment,
+    [nextTiprack.tiprackId]: pipetteId
+  }
 
   // remove tips from tiprack
   if (pipetteData.channels === 1 && nextTiprack.well) {
