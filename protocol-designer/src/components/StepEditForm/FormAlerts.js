@@ -56,22 +56,17 @@ class FormAlerts extends React.Component<FormAlertsProps> {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const errors = steplistSelectors.formLevelErrors(state)
-  const warnings = steplistSelectors.formLevelWarnings(state)
-  const dismissedWarnings = dismissSelectors.getDismissedWarningsForSelectedStep(state)
-  const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)
-  const visibleWarnings = warnings.filter(w => !dismissedTypesForStep.includes(w.type))
-
   const {focusedField, dirtyFields} = ownProps
+  const visibleWarnings = dismissSelectors.makeGetVisibleFormWarningsForSelectedStep({focusedField, dirtyFields})(state)
+
+  const errors = steplistSelectors.formLevelErrors(state)
   const filteredErrors = errors.filter(e => (
     !e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0)
   )
-  const filteredWarnings = visibleWarnings.filter(w => (
-    !w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0)
-  )
+
   return {
     errors: filteredErrors,
-    warnings: filteredWarnings,
+    warnings: visibleWarnings,
     stepId: steplistSelectors.selectedStepId(state)
   }
 }

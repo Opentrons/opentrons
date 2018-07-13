@@ -1,4 +1,5 @@
 // @flow
+import difference from 'lodash/difference'
 import {createSelector} from 'reselect'
 // TODO: Ian 2018-07-02 split apart file-data concerns to avoid circular dependencies
 // Eg, right now if you import {selectors as fileDataSelectors} from '../file-data',
@@ -6,7 +7,8 @@ import {createSelector} from 'reselect'
 // imports getDismissedWarnings selector from 'dismiss/
 import {timelineWarningsPerStep} from '../file-data/selectors/commands'
 
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as steplistSelectors, type FormWarning} from '../steplist'
+import type {StepFieldName} from '../steplist/fieldLevel'
 import type {BaseState, Selector} from '../types'
 import type {RootState} from './reducers'
 
@@ -57,3 +59,22 @@ export const getDismissedWarningsForSelectedStep: Selector<Array<*>> = createSel
   steplistSelectors.selectedStepId,
   (dismissedWarnings, stepId) => (typeof stepId === 'number' && dismissedWarnings[stepId]) || []
 )
+
+export const makeGetVisibleFormWarningsForSelectedStep: ({
+  focusedField: ?StepFieldName,
+  dirtyFields: Array<StepFieldName>
+}) => Selector<Array<FormWarning>> = ({focusedField, dirtyFields}) =>
+  createSelector(
+    steplistSelectors.formLevelWarnings,
+    getDismissedWarningsForSelectedStep,
+    (warnings, dismissedWarnings) => {
+      const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)
+      const visibleWarnings = warnings.filter(w => !dismissedTypesForStep.includes(w.type))
+
+      const filteredWarnings = visibleWarnings.filter(w => (
+        !w.dependentFields.includes(focusedField) &&
+        difference(w.dependentFields, dirtyFields).length === 0)
+      )
+      return filteredWarnings
+    }
+  )
