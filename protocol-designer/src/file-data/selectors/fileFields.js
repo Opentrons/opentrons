@@ -1,5 +1,5 @@
 // @flow
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
 import {createSelector} from 'reselect'
 import type {BaseState} from '../../types'
 import type {RootState} from '../reducers'
@@ -13,7 +13,7 @@ export const fileFormValues = createSelector(
 
 export const isUnsavedMetadatFormAltered = createSelector(
   rootSelector,
-  state => !_.isEqual(state.unsavedMetadataForm, state.fileMetadata)
+  state => !isEqual(state.unsavedMetadataForm, state.fileMetadata)
 )
 
 export const protocolName = createSelector(rootSelector, state => state.fileMetadata.name)

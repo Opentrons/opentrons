@@ -1,4 +1,4 @@
-import computeWellAccess from '../computeWellAccess'
+import computeWellAccess from '../helpers/computeWellAccess'
 
 describe('96 plate', () => {
   const labware = '96-flat'

@@ -1,6 +1,6 @@
 // @flow
 
-export type valueProcessor= (value: mixed) => ?mixed
+export type ValueProcessor = (value: mixed) => ?mixed
 
 /*********************
 **  Value Casters   **
@@ -33,6 +33,6 @@ export const defaultTo = (defaultValue: mixed) => (value: mixed) => (value || de
 **     Helpers    **
 ********************/
 
-export const composeProcessors = (...processors: Array<valueProcessor>) => (value: mixed) => (
+export const composeProcessors = (...processors: Array<ValueProcessor>) => (value: mixed) => (
   processors.reduce((processingValue, processor) => processor(processingValue), value)
 )

@@ -12,6 +12,7 @@ import {getRobotApiState} from './reducer'
 import client from './client'
 
 export type Module = {
+  name: string,
   model: string,
   serial: string,
   fwVersion: string,

@@ -1,7 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
-import {pipetteDataByName} from './pipetteData'
+import {getPipetteModels, getPipette} from '@opentrons/shared-data'
 
 import type {BaseState, Selector, Options} from '../types'
 import type {DropdownOption} from '@opentrons/components'
@@ -11,19 +11,25 @@ type PipettesById = {[pipetteId: string]: PipetteData}
 
 const rootSelector = (state: BaseState) => state.pipettes.pipettes
 
+export const pipettesById = createSelector(
+  rootSelector,
+  pipettes => pipettes.byId
+)
+
 function _getPipetteName (pipetteData): string {
-  const result = Object.keys(pipetteDataByName).find(pipetteName => {
-    const p = pipetteDataByName[pipetteName]
-    return (
+  const result = getPipetteModels().find(pipetteModel => {
+    const p = getPipette(pipetteModel)
+    return p && (
       p.channels === pipetteData.channels &&
-      p.maxVolume === pipetteData.maxVolume
+      p.nominalMaxVolumeUl === pipetteData.maxVolume
     )
   })
   if (!result) {
     console.error('_getPipetteName: No name found for given pipette')
     return '???'
   }
-  return result
+  const pipette = getPipette(result)
+  return pipette ? pipette.displayName : '???'
 }
 
 function _makePipetteOption (
@@ -38,7 +44,7 @@ function _makePipetteOption (
   const name = _getPipetteName(pipetteData)
   return [{
     name,
-    value: idPrefix + ':' + name
+    value: `${idPrefix}:${pipetteData.model}`
   }]
 }
 

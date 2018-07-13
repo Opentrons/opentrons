@@ -14,23 +14,24 @@ type Props = {
   downloadData: ?{
     fileContents: string,
     fileName: string
-  }
+  },
+  onDownload: (event: SyntheticEvent<*>) => mixed
 }
 
 export default function FileSidebar (props: Props) {
-  const {downloadData, loadFile, createNewFile} = props
+  const {downloadData, loadFile, createNewFile, onDownload} = props
   return (
     <SidePanel title='Protocol File' className={styles.file_sidebar}>
-      {downloadData &&
-        <div>
-          <div className={styles.download_button}>
-            <PrimaryButton Component='a' download={downloadData.fileName}
-              href={'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
-            >Export</PrimaryButton>
-          </div>
-          <div className={styles.divider} />
-        </div>
-      }
+      <div className={styles.download_button}>
+        <PrimaryButton
+          Component='a'
+          download={downloadData && downloadData.fileName}
+          onClick={onDownload}
+          disabled={!downloadData}
+          href={downloadData && 'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
+        >Export</PrimaryButton>
+      </div>
+      <div className={styles.divider} />
 
       <OutlineButton Component='label' className={cx(styles.upload_button, styles.bottom_button)}>
         Import JSON

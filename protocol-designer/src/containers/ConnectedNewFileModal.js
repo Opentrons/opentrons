@@ -4,8 +4,7 @@ import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import type {BaseState} from '../types'
 import {selectors, actions as navigationActions} from '../navigation'
-import {actions as fileActions} from '../file-data'
-import {actions as pipetteActions} from '../pipettes'
+import {actions as fileActions} from '../load-file'
 
 import NewFileModal from '../components/modals/NewFileModal'
 
@@ -28,21 +27,7 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DispatchProps {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     onSave: fields => {
-      dispatch(fileActions.saveFileMetadata({
-        name: fields.name || '',
-        description: ''
-      }))
-
-      dispatch(pipetteActions.updatePipettes({
-        left: fields.leftPipette,
-        right: fields.rightPipette,
-        leftTiprackModel: fields.leftTiprackModel,
-        rightTiprackModel: fields.rightTiprackModel
-      }))
-
-      dispatch(navigationActions.toggleNewProtocolModal(false))
-
-      dispatch(navigationActions.navigateToPage('file-detail'))
+      dispatch(fileActions.createNewProtocol(fields))
     }
   }
 }

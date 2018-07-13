@@ -7,7 +7,7 @@ import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 
 import * as StepGeneration from '../../step-generation'
-import {selectors as steplistSelectors} from '../../steplist/reducers'
+import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import wellSelectionSelectors from '../../well-selection/selectors'

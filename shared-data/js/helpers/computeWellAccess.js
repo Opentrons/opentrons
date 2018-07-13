@@ -1,5 +1,5 @@
 // @flow
-import getLabware from './getLabware'
+import getLabware from '../getLabware'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm

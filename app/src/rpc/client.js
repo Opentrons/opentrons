@@ -65,12 +65,16 @@ class RpcContext extends EventEmitter {
     return new Promise((resolve, reject) => {
       let timeout
 
-      const handleError = (reason) => {
+      const handleError = (reason, traceback) => {
         cleanup()
-        reject(new RemoteError(reason, name, args))
+        reject(new RemoteError(reason, name, args, traceback))
       }
 
-      const handleFailure = (result) => handleError(result)
+      const handleFailure = (res) => {
+        if (typeof res === 'string') return handleError(res)
+        handleError(res.message, res.traceback)
+      }
+
       const handleNack = (reason) => handleError(`Received NACK with ${reason}`)
 
       const handleAck = () => {

@@ -5,7 +5,7 @@ import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../../steplist/reducers'
+import {selectors as steplistSelectors} from '../../steplist'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
@@ -54,6 +54,11 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       })
     )
 
+    // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
+    // step never have saved forms.
+    // (We could just export the `steps` reducer, but we've sunset it)
+    const savedOrderedSteps = orderedSteps.filter(stepId => savedStepForms[stepId])
+
     return {
       'protocol-schema': protocolSchemaVersion,
 
@@ -80,7 +85,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
           ingredients,
           ingredLocations,
           savedStepForms,
-          orderedSteps
+          orderedSteps: savedOrderedSteps
         }
       },
 

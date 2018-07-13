@@ -19,6 +19,19 @@ export type FileLabware = {
   'display-name': string
 }
 
+export type PDMetadata = {
+  // pipetteId to tiprackModel. may be unassigned
+  pipetteTiprackAssignments: {[pipetteId: string]: ?string},
+
+  dismissedWarnings: $PropertyType<DismissRoot, 'dismissedWarnings'>,
+
+  ingredients: $PropertyType<IngredRoot, 'ingredients'>,
+  ingredLocations: $PropertyType<IngredRoot, 'ingredLocations'>,
+
+  savedStepForms: $PropertyType<StepformRoot, 'savedStepForms'>,
+  orderedSteps: $PropertyType<StepformRoot, 'orderedSteps'>
+}
+
 // A JSON protocol
 export type ProtocolFile = {
   'protocol-schema': VersionString,
@@ -38,18 +51,7 @@ export type ProtocolFile = {
   'designer-application': {
     'application-name': 'opentrons/protocol-designer',
     'application-version': VersionString,
-    data: {
-      // pipetteId to tiprackModel. may be unassigned
-      pipetteTiprackAssignments: {[pipetteId: string]: ?string},
-
-      dismissedWarnings: $PropertyType<DismissRoot, 'dismissedWarnings'>,
-
-      ingredients: $PropertyType<IngredRoot, 'ingredients'>,
-      ingredLocations: $PropertyType<IngredRoot, 'ingredLocations'>,
-
-      savedStepForms: $PropertyType<StepformRoot, 'savedStepForms'>,
-      orderedSteps: $PropertyType<StepformRoot, 'orderedSteps'>
-    }
+    data: PDMetadata
   },
 
   robot: {
@@ -71,4 +73,8 @@ export type ProtocolFile = {
     },
     subprocedure: Array<Command>
   }>
+}
+
+export function getPDMetadata (file: ProtocolFile): PDMetadata {
+  return file['designer-application'].data
 }
