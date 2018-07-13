@@ -157,12 +157,11 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
   (selectedWellsObj, labwareId, allIngreds) => {
     if (!labwareId) return {ingredientId: null, volume: null}
     const ingredsInLabware = allIngreds[labwareId]
-    const selectedWells = Object.keys(selectedWellsObj)
+    const selectedWells: Array<string> = Object.keys(selectedWellsObj)
     if (!ingredsInLabware || selectedWells.length < 1) return {ingredientId: null, volume: null}
 
     const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
     const initialIngredId: ?string = initialWellContents && Object.keys(initialWellContents)[0]
-    const initialVolume: ?number = initialWellContents && initialIngredId && initialWellContents[initialIngredId].volume
 
     const hasCommonIngred = selectedWells.every(well => {
       if (!ingredsInLabware[well]) return null
@@ -170,11 +169,12 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
       return ingreds.length === 1 && ingreds[0] === initialIngredId
     })
 
-    if (!hasCommonIngred) {
+    if (!hasCommonIngred || !initialIngredId || !initialWellContents) {
       return {ingredientId: null, volume: null}
     } else {
+      const initialVolume: ?number = initialWellContents[initialIngredId].volume
       const hasCommonVolume = selectedWells.every(well => {
-        if (!ingredsInLabware[well]) return null
+        if (!ingredsInLabware[well] || !initialIngredId) return null
         return ingredsInLabware[well][initialIngredId].volume === initialVolume
       })
       return {ingredientId: initialIngredId, volume: hasCommonVolume ? initialVolume : null}
