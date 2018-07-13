@@ -148,7 +148,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         ...this.state,
         input: {
           name: newIngredFields.name || name,
-          volume: this.props.commonSelectedVolume || newIngredFields.volume || volume,
+          volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
           individualize: newIngredFields.individualize || individualize,
           serializeName: newIngredFields.serializeName || serializeName
@@ -178,8 +178,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const prevEditingId = this.props.commonSelectedIngred
 
     const wellSelectionCleared = nextProps.selectedWells.length === 0
+    const ingredsChanged = nextEditingId !== prevEditingId
+    const volumeChanged = nextProps.commonSelectedVolume !== this.props.commonSelectedVolume
 
-    if (nextEditingId !== prevEditingId || wellSelectionCleared) {
+    if (ingredsChanged || volumeChanged || wellSelectionCleared) {
       this.resetInputState(nextEditingId, nextProps.allIngredientGroupFields, () => this.setState({
         ...this.state,
         input: {
