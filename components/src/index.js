@@ -9,18 +9,19 @@ export * from './constants'
 export * from './utils'
 
 // Components
+export * from './alerts'
 export * from './buttons'
-export * from './deck'
 export * from './CenteredTextSvg'
+export * from './deck'
 export * from './forms'
 export * from './icons'
 export * from './instrument-diagram'
 export * from './interaction-enhancers'
-export * from './structure'
-export * from './nav'
 export * from './lists'
 export * from './modals'
-export * from './alerts'
+export * from './nav'
+export * from './structure'
+export * from './tooltips'
 
 // Pure Types
 export * from './robot-types'

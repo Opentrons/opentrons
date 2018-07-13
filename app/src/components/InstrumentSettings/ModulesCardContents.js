@@ -1,18 +1,22 @@
 // @flow
 import * as React from 'react'
-import styles from './styles.css'
+import type {Module} from '../../http-api-client'
+import ModuleItem, {NoModulesMessage} from '../ModuleItem'
 
 type Props = {
-  modules?: any
+  modules: Array<Module>,
 }
 
 export default function ModulesCardContents (props: Props) {
+  const modulesFound = props.modules[0]
+
+  if (!modulesFound) return (<NoModulesMessage />)
+
   return (
     <React.Fragment>
-    <p className={styles.modules_description}>No modules detected.</p>
-
-    <p className={styles.modules_description}>Connect a module to your robot via USB, then power it on.
-    Press the refresh icon to the top to detect your module.</p>
+      {props.modules.map((mod, index) => (
+        <ModuleItem {...mod} key={index}/>
+      ))}
     </React.Fragment>
   )
 }

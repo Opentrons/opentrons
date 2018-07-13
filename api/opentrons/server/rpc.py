@@ -276,8 +276,11 @@ class Server(object):
                 line_no = 'unknown'
             finally:
                 response['$']['status'] = 'error'
-                call_result = '{0} [line {1}]: {2}'.format(
-                    e.__class__.__name__, line_no, str(e))
+                call_result = {
+                    'message': '{0} [line {1}]: {2}'.format(
+                        e.__class__.__name__, line_no, str(e)),
+                    'traceback': traceback.format_exc()
+                }
         finally:
             response['data'] = call_result
         return response

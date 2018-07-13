@@ -3,8 +3,10 @@ import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import omit from 'lodash/omit'
 import {dismissWarning} from './actions'
+import {getPDMetadata} from '../file-types'
 import type {ActionType} from 'redux-actions'
 import type {BaseState} from '../types'
+import type {LoadFileAction} from '../load-file'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {DeleteStepAction} from '../steplist/actions'
 
@@ -27,7 +29,9 @@ const dismissedWarnings = handleActions({
     // remove key for deleted step
     const stepId = action.payload.toString(10)
     return omit(state, stepId)
-  }
+  },
+  LOAD_FILE: (state: DismissedWarningState, action: LoadFileAction): DismissedWarningState =>
+    getPDMetadata(action.payload).dismissedWarnings
 }, {})
 
 export const _allReducers = {

@@ -436,7 +436,7 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: true, right: true},
+        probedByMount: {},
         tipOnByMount: {left: true}
       }
     })
@@ -450,7 +450,7 @@ describe('robot selectors', () => {
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: true, right: true},
+        probedByMount: {},
         tipOnByMount: {right: true}
       }
     })

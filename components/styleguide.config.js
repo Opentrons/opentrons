@@ -74,6 +74,10 @@ module.exports = {
     {
       name: 'Structure',
       components: 'src/structure/[A-Z]*.js'
+    },
+    {
+      name: 'Tooltips',
+      components: 'src/tooltips/[A-Z]*.js'
     }
   ],
   getComponentPathLine (componentPath) {

@@ -4,6 +4,7 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
+import cloneDeep from 'lodash/cloneDeep'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
@@ -21,11 +22,12 @@ import type {
   IngredientGroups,
   AllIngredGroupFields,
   PersistedIngredInputFields,
-  Labware,
-  Wells
+  Labware
 } from '../types'
 import * as actions from '../actions'
+import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
+import type {LoadFileAction} from '../../load-file'
 import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
 
 // external actions (for types)
@@ -121,12 +123,39 @@ export const containers = handleActions({
     const { containerId, modify } = action.payload
     return {...state, [containerId]: {...state[containerId], ...modify}}
   },
-  COPY_LABWARE: (state: ContainersState, action: CopyLabware) => {
+  COPY_LABWARE: (state: ContainersState, action: CopyLabware): ContainersState => {
     const { fromContainer, toContainer, toSlot } = action.payload
-    return {...state, [toContainer]: {...state[fromContainer], slot: toSlot}}
+    return {
+      ...state,
+      [toContainer]: {
+        ...state[fromContainer],
+        slot: toSlot,
+        id: toContainer,
+        disambiguationNumber: getNextDisambiguationNumber(state, state[fromContainer].type)
+      }
+    }
+  },
+  LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
+    const file = action.payload
+    const allFileLabware = file.labware
+    const labwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
+      Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot))
+
+    return labwareIds.reduce((acc: ContainersState, id): ContainersState => {
+      const fileLabware = allFileLabware[id]
+      return {
+        ...acc,
+        [id]: {
+          slot: fileLabware.slot,
+          id,
+          type: fileLabware.model,
+          name: fileLabware['display-name'],
+          disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model)
+        }
+      }
+    }, {})
   }
-},
-initialLabwareState)
+}, initialLabwareState)
 
 type SavedLabwareState = {[labwareId: string]: boolean}
 /** Keeps track of which labware have saved nicknames */
@@ -138,6 +167,12 @@ export const savedLabware = handleActions({
   MODIFY_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.modifyContainer>) => ({
     ...state,
     [action.payload.containerId]: true
+  }),
+  LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState =>
+    mapValues(action.payload.labware, () => true),
+  COPY_LABWARE: (state: SavedLabwareState, action: CopyLabware): SavedLabwareState => ({
+    ...state,
+    [action.payload.toContainer]: true
   })
 }, {})
 
@@ -165,7 +200,9 @@ export const ingredients = handleActions({
       ? state
       // otherwise, the whole ingred group is deleted
       : omit(state, [groupId])
-  }
+  },
+  LOAD_FILE: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
+    getPDMetadata(action.payload).ingredients
 }, {})
 
 type LocationsState = LabwareLiquidState
@@ -213,20 +250,15 @@ export const ingredLocations = handleActions({
     console.warn(`TODO: User tried to delete ingred group: ${groupId}. Deleting entire ingred group not supported yet`)
     return state
   },
-  COPY_LABWARE: (state: LocationsState, action: CopyLabware) => {
+  COPY_LABWARE: (state: LocationsState, action: CopyLabware): LocationsState => {
     const {fromContainer, toContainer} = action.payload
-    return reduce(state, (acc, ingredLocations: {[containerId: string]: Wells}, ingredId) => {
-      return {
-        ...acc,
-        [ingredId]: (state[ingredId] && state[ingredId][fromContainer])
-          ? {
-            ...ingredLocations,
-            [toContainer]: state[ingredId][fromContainer]
-          }
-          : ingredLocations
-      }
-    }, {})
-  }
+    return {
+      ...state,
+      [toContainer]: cloneDeep(state[fromContainer])
+    }
+  },
+  LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
+    getPDMetadata(action.payload).ingredLocations
 }, {})
 
 export type RootState = {|

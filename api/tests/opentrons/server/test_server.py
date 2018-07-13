@@ -199,13 +199,16 @@ async def test_exception_on_call(session, root):
 
     await session.socket.receive_json()  # Skip ack
     res = await session.socket.receive_json()  # Get call result
-    expected = {'$': {
-                    'token': session.token,
-                    'status': 'error',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 'Exception [line unknown]: Kaboom!'}
+    expectedMeta = {
+        'token': session.token,
+        'status': 'error',
+        'type': rpc.CALL_RESULT_MESSAGE
+    }
+    expectedMessage = 'Exception [line unknown]: Kaboom!'
 
-    assert res == expected
+    assert res['$'] == expectedMeta
+    assert res['data']['message'] == expectedMessage
+    assert isinstance(res['data']['traceback'], str)
 
 
 @pytest.mark.parametrize('root', [Foo(0)])

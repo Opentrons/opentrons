@@ -293,11 +293,7 @@ export const getNextPipette = createSelector(
 // TODO(mc, 2018-02-07): be smarter about the backup case
 export const getCalibrator = createSelector(
   getPipettes,
-  (pipettes): ?Pipette => {
-    const tipOn = pipettes.find((i) => i.probed && i.tipOn)
-
-    return tipOn || pipettes[0]
-  }
+  (pipettes): ?Pipette => pipettes.find(i => i.tipOn) || pipettes[0]
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above

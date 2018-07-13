@@ -1,4 +1,5 @@
 // @flow
+// TODO: This file is currently not used
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'

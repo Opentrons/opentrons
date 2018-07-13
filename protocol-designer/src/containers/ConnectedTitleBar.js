@@ -4,9 +4,9 @@ import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
 import {TitleBar, humanizeLabwareType} from '@opentrons/components'
-
+import {DECK_SETUP_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 
@@ -50,7 +50,7 @@ function mapStateToProps (state: BaseState): SP {
       let subtitle
       if (selectedStep) {
         subtitle = selectedStep.stepType === 'deck-setup'
-          ? `DECK SETUP - LABWARE & INGREDIENTS`
+          ? DECK_SETUP_TITLE
           : selectedStep.title
       }
       return { _page: 'steplist', title: fileName, subtitle }

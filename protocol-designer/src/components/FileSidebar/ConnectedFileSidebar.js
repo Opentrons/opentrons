@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {actions, selectors} from '../../navigation'
 import {selectors as fileDataSelectors} from '../../file-data'
-import {loadFile} from '../../load-file'
+import {actions as loadFileActions} from '../../load-file'
 import FileSidebar from './FileSidebar'
 import type {BaseState, ThunkDispatch} from '../../types'
 
@@ -22,12 +22,15 @@ export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
 function mapStateToProps (state: BaseState): SP & MP {
   const protocolName = fileDataSelectors.fileMetadata(state).name || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
+  const canDownload = selectors.currentPage(state) !== 'file-splash'
 
   return {
-    downloadData: fileData && {
-      fileContents: JSON.stringify(fileData, null, 4),
-      fileName: protocolName + '.json'
-    },
+    downloadData: (canDownload)
+      ? {
+        fileContents: JSON.stringify(fileData, null, 4),
+        fileName: protocolName + '.json'
+      }
+      : null,
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.newProtocolModal(state)
   }
@@ -38,9 +41,10 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
   const {dispatch} = dispatchProps
   return {
     downloadData,
-    loadFile: (fileChangeEvent) => dispatch(loadFile(fileChangeEvent)),
+    loadFile: (fileChangeEvent) => dispatch(loadFileActions.loadProtocolFile(fileChangeEvent)),
     createNewFile: _canCreateNew
       ? () => dispatch(actions.toggleNewProtocolModal(true))
-      : undefined
+      : undefined,
+    onDownload: () => dispatch(loadFileActions.saveProtocolFile())
   }
 }

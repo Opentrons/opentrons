@@ -98,18 +98,18 @@ describe('COPY_LABWARE action', () => {
   test('copy ingredient locations from cloned container', () => {
     const copyLabwareAction = {
       type: 'COPY_LABWARE',
-      payload: {fromContainer: 'myTrough', toContainer: 'newContainer', toSlot: 'A3'}
+      payload: {fromContainer: 'myTrough', toContainer: 'newContainer', toSlot: '5'}
     }
 
     const prevIngredState = {
-      '3': {
+      ingred3: {
         name: 'Buffer',
         wellDetailsByLocation: null,
         concentration: '50 mol/ng',
         description: '',
         individualize: false
       },
-      '4': {
+      ingred4: {
         name: 'Other Ingred',
         wellDetailsByLocation: null,
         concentration: '100%',
@@ -119,22 +119,16 @@ describe('COPY_LABWARE action', () => {
     }
 
     const prevLocationsState = {
-      '3': {
-        myTrough: {
-          A1: {volume: 101},
-          A2: {volume: 102},
-          A3: {volume: 103}
-        },
-        otherContainer: {
-          D4: {volume: 201},
-          E4: {volume: 202}
-        }
+      myTrough: {
+        A1: {ingred3: {volume: 101}},
+        A2: {ingred3: {volume: 102}},
+        A3: {ingred3: {volume: 103}}
       },
-      '4': {
-        otherContainer: {
-          A4: {volume: 301},
-          B4: {volume: 302}
-        }
+      otherContainer: {
+        D4: {ingred3: {volume: 201}},
+        E4: {ingred3: {volume: 202}},
+        A4: {ingred4: {volume: 301}},
+        B4: {ingred4: {volume: 302}}
       }
     }
 
@@ -147,27 +141,22 @@ describe('COPY_LABWARE action', () => {
       prevLocationsState,
       copyLabwareAction
     )).toEqual({
-      '3': {
-        myTrough: {
-          A1: {volume: 101},
-          A2: {volume: 102},
-          A3: {volume: 103}
-        },
-        newContainer: { // this is newly copied
-          A1: {volume: 101},
-          A2: {volume: 102},
-          A3: {volume: 103}
-        },
-        otherContainer: {
-          D4: {volume: 201},
-          E4: {volume: 202}
-        }
+      myTrough: {
+        A1: {ingred3: {volume: 101}},
+        A2: {ingred3: {volume: 102}},
+        A3: {ingred3: {volume: 103}}
       },
-      '4': {
-        otherContainer: {
-          A4: {volume: 301},
-          B4: {volume: 302}
-        }
+      // this is newly copied
+      newContainer: {
+        A1: {ingred3: {volume: 101}},
+        A2: {ingred3: {volume: 102}},
+        A3: {ingred3: {volume: 103}}
+      },
+      otherContainer: {
+        D4: {ingred3: {volume: 201}},
+        E4: {ingred3: {volume: 202}},
+        A4: {ingred4: {volume: 301}},
+        B4: {ingred4: {volume: 302}}
       }
     })
   })

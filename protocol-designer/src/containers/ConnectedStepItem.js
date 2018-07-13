@@ -7,7 +7,7 @@ import type {SubstepIdentifier} from '../steplist/types'
 import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as dismissSelectors} from '../dismiss'
-import {selectors as steplistSelectors} from '../steplist/reducers'
+import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
@@ -46,7 +46,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = dismissSelectors.getVisibleWarningsPerStep(state)[stepId]
-  const hasWarnings = warnings && warnings.length > 0
+  // TODO: Ian 2018-07-03 show warnings once dismissable
+  const hasWarnings = process.env.OT_PD_SHOW_WARNINGS === 'true'
+    ? warnings && warnings.length > 0
+    : false
 
   const showErrorState = hasError || hasWarnings
 
