@@ -70,12 +70,15 @@ function makeMapStateToProps (): (state: State, ownProps: OwnProps) => StateProp
     const name = robotSelectors.getConnectedRobotName(state)
     const response = getRobotSettings(state, {name}).response
     const settings = response && response.settings
+    const flag = !!settings && settings.find((s) => s.id === 'calibrateToBottom')
+    const calibrateToBottom = !!flag && flag.value
+
     return {
       deckPopulated: !!robotSelectors.getDeckPopulated(state),
       labware: currentLabware,
       slot,
       url,
-      calibrateToBottom: !!settings && settings[2].value
+      calibrateToBottom
     }
   }
 }
