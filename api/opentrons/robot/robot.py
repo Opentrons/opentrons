@@ -526,15 +526,9 @@ class Robot(object):
         # and to make sure tips are not in the liquid while
         # homing plungers. Z/A axis will automatically home before X/Y
         self.poses = self.gantry.home(self.poses)
-
-        # Then plungers, but only home a plunger if a pipette is detected
-        for m in self.model_by_mount.keys():
-            if self.model_by_mount[m]:
-                # before homing, ensure that the pipette is not stuck from
-                # a build-up of static friction
-                self.poses = self._actuators[m]['plunger'].unstick_axes(
-                    self.poses)
-                self.poses = self._actuators[m]['plunger'].home(self.poses)
+        # Then plungers
+        self.poses = self._actuators['left']['plunger'].home(self.poses)
+        self.poses = self._actuators['right']['plunger'].home(self.poses)
 
         # next move should not use any previously used instrument or labware
         # to prevent robot.move_to() from using risky path optimization
