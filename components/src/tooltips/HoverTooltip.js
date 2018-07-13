@@ -8,11 +8,16 @@ const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 150
 const DISTANCE_FROM_REFERENCE = 4
 
+export type HoverTooltipHandlers = {
+  ref: React.Ref<*>,
+  onMouseEnter: () => SyntheticMouseEvent<*>,
+  onMouseLeave: () => SyntheticMouseEvent<*>,
+}
 type PopperProps = React.ElementProps<typeof Popper>
 type Props = {
   tooltipComponent: React.Node,
   placement?: $PropertyType<PopperProps, 'placement'>,
-  children: React.Node
+  children: (HoverTooltipHandlers) => React.Node
 }
 type State = {isOpen: boolean}
 class HoverTooltip extends React.Component<Props, State> {
@@ -39,15 +44,7 @@ class HoverTooltip extends React.Component<Props, State> {
     return (
       <Manager>
         <Reference>
-          {({ref}) => (
-            <div
-              ref={ref}
-              className={styles.hover_wrapper}
-              onMouseEnter={this.delayedOpen}
-              onMouseLeave={this.delayedClose}>
-              {this.props.children}
-            </div>
-          )}
+          {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
         {
           this.state.isOpen &&
