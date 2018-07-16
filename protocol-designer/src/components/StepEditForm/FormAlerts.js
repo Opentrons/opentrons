@@ -2,9 +2,9 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import difference from 'lodash/difference'
 import {AlertItem} from '@opentrons/components'
 import {actions as dismissActions, selectors as dismissSelectors} from '../../dismiss'
+import {getVisibleAlerts} from './helpers'
 import type {StepIdType} from '../../form-types'
 import {selectors as steplistSelectors} from '../../steplist'
 import type {StepFieldName} from '../../steplist/fieldLevel'
@@ -57,12 +57,18 @@ class FormAlerts extends React.Component<FormAlertsProps> {
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const {focusedField, dirtyFields} = ownProps
-  const visibleWarnings = dismissSelectors.makeGetVisibleFormWarningsForSelectedStep({focusedField, dirtyFields})(state)
+  const visibleWarnings = getVisibleAlerts({
+    focusedField,
+    dirtyFields,
+    alerts: dismissSelectors.getFormWarningsForSelectedStep(state)
+  })
 
   const errors = steplistSelectors.formLevelErrors(state)
-  const filteredErrors = errors.filter(e => (
-    !e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0)
-  )
+  const filteredErrors = getVisibleAlerts({
+    focusedField,
+    dirtyFields,
+    alerts: errors
+  })
 
   return {
     errors: filteredErrors,
