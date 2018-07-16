@@ -25,7 +25,8 @@ type SP = $Diff<Props, DP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    commonSelectedIngred: wellContentsSelectors.getSelectedWellsIngredId(state),
+    commonSelectedIngred: wellContentsSelectors.getSelectedWellsCommonIngredId(state),
+    commonSelectedVolume: wellContentsSelectors.getSelectedWellsCommonVolume(state),
     selectedWells: Object.keys(wellSelectionSelectors.getSelectedWells(state)),
     selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),

@@ -84,6 +84,7 @@ export const wellRatioConsolidate = (fields: HydratedFormData): ?FormError => {
   if (!aspirate_wells || !dispense_wells) return null
   return aspirate_wells.length <= 1 || dispense_wells.length !== 1 ? FORM_ERRORS.WELL_RATIO_CONSOLIDATE : null
 }
+
 /*******************
 **     Helpers    **
 ********************/
