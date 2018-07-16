@@ -8800,17 +8800,6 @@ react-popper@^1.0.0:
     typed-styles "^0.0.5"
     warning "^3.0.0"
 
-react-popper@^1.0.0-beta.6:
-  version "1.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-1.0.0-beta.6.tgz#cb27a2ac56adccbaf5f9c4132387289069240834"
-  dependencies:
-    babel-runtime "6.x.x"
-    create-react-context "^0.2.1"
-    popper.js "^1.14.1"
-    prop-types "^15.6.1"
-    typed-styles "^0.0.5"
-    warning "^3.0.0"
-
 react-proxy@^3.0.0-alpha.0:
   version "3.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/react-proxy/-/react-proxy-3.0.0-alpha.1.tgz#4400426bcfa80caa6724c7755695315209fa4b07"
