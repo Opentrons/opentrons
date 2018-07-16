@@ -4,7 +4,8 @@ import {
   FormGroup,
   InputField,
   InstrumentGroup,
-  OutlineButton
+  OutlineButton,
+  PrimaryButton
 } from '@opentrons/components'
 import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
@@ -15,10 +16,11 @@ export type FilePageProps = {
   formConnector: FormConnector<FileMetadataFields>,
   isFormAltered: boolean,
   instruments: React.ElementProps<typeof InstrumentGroup>,
+  goToDesignPage: () => void,
   saveFileMetadata: () => void
 }
 
-const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata}: FilePageProps) => {
+const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage}: FilePageProps) => {
   const handleSubmit = (e: SyntheticEvent<*>) => {
     // blur focused field on submit
     if (document && document.activeElement) document.activeElement.blur()
@@ -58,6 +60,11 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata}:
           Pipettes
         </h2>
         <InstrumentGroup {...instruments} showMountLabel />
+        <div className={styles.button_row}>
+          <PrimaryButton onClick={goToDesignPage} className={styles.continue_button} iconName="arrow-right">
+             Continue to Design
+          </PrimaryButton>
+        </div>
       </section>
     </div>
   )

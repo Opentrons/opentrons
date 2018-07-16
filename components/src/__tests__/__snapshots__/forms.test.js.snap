@@ -28,6 +28,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
   <input
     checked={true}
     className="input_field accessibly_hidden"
+    disabled={undefined}
     onChange={undefined}
     type="checkbox"
   />
@@ -67,6 +68,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
   <input
     checked={false}
     className="input_field accessibly_hidden"
+    disabled={undefined}
     onChange={undefined}
     type="checkbox"
   />

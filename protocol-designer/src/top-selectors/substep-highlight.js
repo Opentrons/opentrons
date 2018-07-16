@@ -121,9 +121,11 @@ function _getSelectedWellsForSubstep (
   }
 
   // source + dest steps
+  // $FlowFixMe: property `sourceLabware` is missing in `MixFormData`
   if (form.sourceLabware && form.sourceLabware === labwareId) {
     wells.push(...getWells('sourceWell'))
   }
+  // $FlowFixMe: property `destLabware` is missing in `MixFormData`
   if (form.destLabware && form.destLabware === labwareId) {
     wells.push(...getWells('destWell'))
   }

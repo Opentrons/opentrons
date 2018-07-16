@@ -11,11 +11,12 @@ import styles from './styles.css'
 
 type Props = {
   labware: Labware,
-  onBackClick: () => void
+  calibrateToBottom: boolean,
+  onBackClick: () => void,
 }
 
 export default function ConfirmModal (props: Props) {
-  const {labware, onBackClick} = props
+  const {labware, onBackClick, calibrateToBottom} = props
 
   // disable back click if we're moving or if we've loaded up with tips
   const backClickDisabled = (
@@ -40,7 +41,7 @@ export default function ConfirmModal (props: Props) {
       contentsClassName={contentsStyle}
       heading={`Calibrate pipette to ${labware.type}`}
     >
-      <ConfirmModalContents {...labware} />
+      <ConfirmModalContents {...labware} calibrateToBottom={calibrateToBottom} />
     </ModalPage>
   )
 }

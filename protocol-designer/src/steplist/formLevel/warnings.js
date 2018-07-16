@@ -7,21 +7,24 @@ export const DISPOSAL_PERCENTAGE = 0.2 // 20% percent of pipette capacity
 ** Warning Messages **
 ********************/
 
-export type FormWarningKey = 'OVER_MAX_WELL_VOLUME' | 'BELOW_MIN_DISPOSAL_VOLUME'
+export type FormWarningType =
+  | 'OVER_MAX_WELL_VOLUME'
+  | 'BELOW_MIN_DISPOSAL_VOLUME'
+
 export type FormWarning = {
-  warningId: FormWarningKey,
+  type: FormWarningType,
   message: string,
   dependentFields: Array<StepFieldName>,
   title?: string
 }
-const FORM_WARNINGS: {[FormWarningKey]: FormWarning} = {
+const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
   OVER_MAX_WELL_VOLUME: {
-    warningId: 'OVER_MAX_WELL_VOLUME',
+    type: 'OVER_MAX_WELL_VOLUME',
     message: 'Dispense volume will overflow a destination well',
     dependentFields: ['dispense_labware', 'dispense_wells', 'volume']
   },
   BELOW_MIN_DISPOSAL_VOLUME: {
-    warningId: 'BELOW_MIN_DISPOSAL_VOLUME',
+    type: 'BELOW_MIN_DISPOSAL_VOLUME',
     title: 'Below Recommended disposal volume',
     message: 'For accuracy in distribute actions we recommend you use a disposal volume of at least 20% of the tip\'s capacity. Read more here:', // TODO: BC link knowledgebase article here.
     dependentFields: ['aspirate_disposalVol_volume', 'pipette']

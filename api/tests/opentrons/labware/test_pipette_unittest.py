@@ -1162,13 +1162,13 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
     def build_pick_up_tip(self, well):
-        plunge = -10
+        from opentrons.instruments.pipette import DEFAULT_TIP_PRESS_MM
         return [
             mock.call(well.top()),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(well.top(DEFAULT_TIP_PRESS_MM), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 1), strategy='direct'),
+            mock.call(well.top(DEFAULT_TIP_PRESS_MM - 1), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 2), strategy='direct'),
+            mock.call(well.top(DEFAULT_TIP_PRESS_MM - 2), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]

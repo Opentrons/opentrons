@@ -14,7 +14,7 @@ import {
   maxDispenseWellVolume,
   minDisposalVolume,
   type FormWarning,
-  type FormWarningKey
+  type FormWarningType
 } from './warnings'
 import type {StepType} from '../../form-types'
 
@@ -36,7 +36,7 @@ const stepFormHelperMap: {[StepType]: FormHelpers} = {
   }
 }
 
-export type {FormError, FormWarning, FormWarningKey}
+export type {FormError, FormWarning, FormWarningType}
 
 export const getFormErrors = (stepType: StepType, formData: mixed): Array<FormError> => {
   const formErrorGetter = stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
@@ -47,6 +47,5 @@ export const getFormErrors = (stepType: StepType, formData: mixed): Array<FormEr
 export const getFormWarnings = (stepType: StepType, formData: mixed): Array<FormWarning> => {
   const formWarningGetter = stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings
   const warnings = formWarningGetter ? formWarningGetter(formData) : []
-  // TODO: filter out dismissed warnings here
   return warnings
 }
