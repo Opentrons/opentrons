@@ -16,7 +16,8 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
     case 'SAVE_PROTOCOL_FILE':
       return false
     case 'CREATE_NEW_PROTOCOL':
-    case 'DISMISS_WARNING':
+    case 'DISMISS_FORM_WARNING':
+    case 'DISMISS_TIMELINE_WARNING':
     case 'CREATE_CONTAINER':
     case 'DELETE_CONTAINER':
     case 'MODIFY_CONTAINER':
