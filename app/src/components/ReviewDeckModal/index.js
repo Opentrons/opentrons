@@ -37,6 +37,7 @@ export default connect(mapStateToProps, null, mergeProps)(ReviewDeckModal)
 function ReviewDeckModal (props: Props) {
   return (
     <Modal>
+      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
       <Prompt {...props} />
       <Deck />
     </Modal>

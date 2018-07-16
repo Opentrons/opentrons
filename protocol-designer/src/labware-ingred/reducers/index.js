@@ -64,7 +64,9 @@ const selectedContainerId = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>): SelectedContainerId => action.payload,
   CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>): SelectedContainerId => null,
 
-  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId => action.payload.labwareId,
+  // $FlowFixMe: Cannot get `action.payload` because property `payload` is missing in function
+  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId =>
+   action.payload.labwareId,
   CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null
 }, null)
 

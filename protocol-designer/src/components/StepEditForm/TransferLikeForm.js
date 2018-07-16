@@ -55,9 +55,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
                 <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
               </StepCheckboxRow>
-              <StepCheckboxRow name="aspirate_disposalVol_checkbox" label="Disposal Volume" >
-                <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
-              </StepCheckboxRow>
+              {stepType === 'distribute' &&
+                <StepCheckboxRow name="aspirate_disposalVol_checkbox" label="Disposal Volume" >
+                  <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
+                </StepCheckboxRow>
+              }
             </FormGroup>
           </div>
           <div className={styles.right_settings_column}>

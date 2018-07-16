@@ -34,6 +34,7 @@ export default function TipProbe (props: Props) {
 
   return (
     <CalibrationInfoBox confirmed={probed} title={title}>
+      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
       <Panel {...props} />
     </CalibrationInfoBox>
   )

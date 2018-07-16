@@ -20,6 +20,7 @@ export default connect(mapStateToProps)(LabwareComponent)
 
 function LabwareComponent (props: Props) {
   return (
+    // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
     <LabwareItem {...props} />
   )
 }

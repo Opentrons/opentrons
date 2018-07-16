@@ -32,7 +32,9 @@ export default function LabwareItem (props: LabwareItemProps) {
 
   if (!labware) {
     return (
+      // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
       <LabwareContainer {...props}>
+        {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
         <EmptyDeckSlot {...props} />
       </LabwareContainer>
     )

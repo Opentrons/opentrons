@@ -1,7 +1,7 @@
 // @flow
 import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
 import type {Channels} from '@opentrons/components'
-import type {RobotState} from './'
+import type {RobotState, PipetteData, LabwareData} from './'
 import sortBy from 'lodash/sortBy'
 
 // SELECTOR UTILITIES
@@ -58,24 +58,52 @@ export function _getNextTip (
   return fullColumn ? fullColumn[0] : null
 }
 
-export function getNextTiprack (pipetteChannels: Channels, robotState: RobotState) {
+/** Tipracks are "available" if they match the assignment type,
+  * and are not assigned to another pipette. */
+export function tiprackIsAvailableToPipette (
+  pipette: PipetteData,
+  tiprackData: LabwareData,
+  assignedPipetteId: ?string
+): boolean {
+  const matchingTiprackModel = (pipette.tiprackModel)
+    ? pipette.tiprackModel === tiprackData.type
+    : true // with no tiprack assigned, pipette can use anything
+
+  // robotState.tiprackAssignment key may not exist,
+  // or tiprack id may not be in tiprackAssignment
+  // both these indicate that the tiprack is unassigned
+  const tiprackAssignmentOk = (
+    assignedPipetteId == null ||
+    assignedPipetteId === pipette.id
+  )
+
+  return matchingTiprackModel && tiprackAssignmentOk
+}
+
+type NextTiprack = {|tiprackId: string, well: string|} | null
+export function getNextTiprack (pipette: PipetteData, robotState: RobotState): NextTiprack {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
     For 8-channel pipette, tipracks need a full column of tips.
     If there are no available tipracks, returns null.
   */
-
   const sortedTipracksIds = sortLabwareBySlot(robotState).filter(labwareId =>
-    robotState.tipState.tipracks[labwareId]
+    // assume if labwareId is not in tipState.tipracks, it's not a tiprack
+    robotState.tipState.tipracks[labwareId] &&
+    tiprackIsAvailableToPipette(
+      pipette,
+      robotState.labware[labwareId],
+      robotState.tiprackAssignment && robotState.tiprackAssignment[labwareId]
+    )
   )
 
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
-    _getNextTip(pipetteChannels, robotState.tipState.tipracks[tiprackId])
+    _getNextTip(pipette.channels, robotState.tipState.tipracks[tiprackId])
   )
 
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip = firstAvailableTiprack &&
-    _getNextTip(pipetteChannels, robotState.tipState.tipracks[firstAvailableTiprack])
+    _getNextTip(pipette.channels, robotState.tipState.tipracks[firstAvailableTiprack])
 
   if (firstAvailableTiprack && nextTip) {
     return {

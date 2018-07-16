@@ -90,7 +90,7 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '**/*.js'
-	flow check
+	flow $(if $(CI),check,status)
 
 .PHONY: lint-css
 lint-css:

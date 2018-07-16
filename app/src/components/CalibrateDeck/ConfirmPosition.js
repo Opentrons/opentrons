@@ -12,6 +12,7 @@ type Props = CalibrateDeckStartedProps & {
 export default function ConfirmPosition (props: Props) {
   return (
     <div>
+      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
       <Instructions {...props} />
       <JogControls jog={props.jog} />
       <PrimaryButton onClick={props.proceed}>

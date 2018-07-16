@@ -3,13 +3,15 @@
 import * as React from 'react'
 
 import type {Labware, Pipette} from '../../robot'
+
 import InstructionStep from '../InstructionStep'
 import {getInstructionsByType, getDiagramSrc} from './instructions-data'
 import styles from '../InstructionStep/styles.css'
 
 export type LabwareCalibrationProps = Labware & {
   calibrator: Pipette,
-  buttonText: string
+  buttonText: string,
+  calibrateToBottom: boolean,
 }
 
 export default function ConfirmPositionDiagram (props: LabwareCalibrationProps) {

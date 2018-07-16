@@ -17,7 +17,8 @@ type DP = {
 }
 
 type OP = Labware & {
-  calibrator: Pipette
+  calibrator: Pipette,
+  calibrateToBottom: boolean,
 }
 
 type Props = DP & OP
@@ -32,6 +33,7 @@ function ConfirmPositionContents (props: Props) {
 
   return (
     <div>
+      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
       <ConfirmPositionDiagram {...props} buttonText={confirmButtonText} />
       <JogControls {...props} />
       <PrimaryButton title='confirm' onClick={onConfirmClick}>
