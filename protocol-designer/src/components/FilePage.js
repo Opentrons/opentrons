@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {
+  Card,
   FormGroup,
   InputField,
   InstrumentGroup,
@@ -16,11 +17,12 @@ export type FilePageProps = {
   formConnector: FormConnector<FileMetadataFields>,
   isFormAltered: boolean,
   instruments: React.ElementProps<typeof InstrumentGroup>,
-  goToDesignPage: () => void,
-  saveFileMetadata: () => void
+  goToDesignPage: () => mixed,
+  saveFileMetadata: () => mixed,
+  swapPipettes: () => mixed
 }
 
-const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage}: FilePageProps) => {
+const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage, swapPipettes}: FilePageProps) => {
   const handleSubmit = (e: SyntheticEvent<*>) => {
     // blur focused field on submit
     if (document && document.activeElement) document.activeElement.blur()
@@ -29,10 +31,7 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
   }
   return (
     <div className={styles.file_page}>
-      <section>
-        <h2>
-          Information
-        </h2>
+      <Card title='Information' contentClassNameOverride={null}>
         <form onSubmit={handleSubmit}>
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
@@ -53,19 +52,28 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
             </OutlineButton>
           </div>
         </form>
-      </section>
+      </Card>
 
-      <section>
-        <h2>
-          Pipettes
-        </h2>
+      <Card title='Pipettes' contentClassNameOverride={null}>
         <InstrumentGroup {...instruments} showMountLabel />
-        <div className={styles.button_row}>
-          <PrimaryButton onClick={goToDesignPage} className={styles.continue_button} iconName="arrow-right">
-             Continue to Design
-          </PrimaryButton>
-        </div>
-      </section>
+        <OutlineButton
+          onClick={swapPipettes}
+          className={styles.swap_button}
+          iconName='swap-horizontal'
+        >
+          Swap
+        </OutlineButton>
+      </Card>
+
+      <div className={styles.button_row}>
+        <PrimaryButton
+          onClick={goToDesignPage}
+          className={styles.continue_button}
+          iconName="arrow-right"
+        >
+          Continue to Design
+        </PrimaryButton>
+      </div>
     </div>
   )
 }

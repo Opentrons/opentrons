@@ -1,4 +1,5 @@
 // @flow
+import uuidv1 from 'uuid/v1'
 import {wellNameSplit} from '@opentrons/components'
 import type {BoundingRect, GenericRect} from './collision-types'
 import type {Wells} from './labware-ingred/types'
@@ -22,8 +23,7 @@ export const formConnectorFactory = (
   value: formData[accessor] || ''
 })
 
-// Not really a UUID, but close enough...?
-export const uuid = () => new Date().getTime() + '.' + Math.random()
+export const uuid: () => string = uuidv1
 
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)

@@ -4,21 +4,22 @@ import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import type {FilePageProps} from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
-import {selectors as pipetteSelectors} from '../pipettes'
-import type {FileMetadataFields} from '../file-data'
+import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
+import type {FileMetadataFields, FileMetadataFieldAccessors} from '../file-data'
 import {actions as navActions} from '../navigation'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
 type SP = {
   instruments: $PropertyType<FilePageProps, 'instruments'>,
-  isFormAltered: boolean,
-  _values: {[string]: string}
+  isFormAltered: $PropertyType<FilePageProps, 'isFormAltered'>,
+  _values: {[accessor: FileMetadataFieldAccessors]: string}
 }
 
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
-  _saveFileMetadata: ({[string]: string}) => void,
-  goToDesignPage: () => void
+  _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: string}) => mixed,
+  goToDesignPage: $PropertyType<FilePageProps, 'goToDesignPage'>,
+  swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>
 }
 
 const mapStateToProps = (state: BaseState): SP => {
@@ -33,15 +34,16 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = {
+const mapDispatchToProps: DP = {
   _updateFileMetadataFields: actions.updateFileMetadataFields,
   _saveFileMetadata: actions.saveFileMetadata,
-  goToDesignPage: () => navActions.navigateToPage('steplist')
+  goToDesignPage: () => navActions.navigateToPage('steplist'),
+  swapPipettes: pipetteActions.swapPipettes
 }
 
 const mergeProps = (
   {instruments, isFormAltered, _values}: SP,
-  {_updateFileMetadataFields, _saveFileMetadata, goToDesignPage}: DP
+  {_updateFileMetadataFields, _saveFileMetadata, goToDesignPage, swapPipettes}: DP
 ): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
@@ -58,7 +60,8 @@ const mergeProps = (
     isFormAltered,
     instruments,
     goToDesignPage,
-    saveFileMetadata: () => _saveFileMetadata(_values)
+    saveFileMetadata: () => _saveFileMetadata(_values),
+    swapPipettes
   }
 }
 

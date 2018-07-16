@@ -4,13 +4,18 @@
   @apply var(--font-header-dark);
 }
 
-.file_page section {
-  margin: 0 2.5rem;
+.file_page > * {
+  margin: 1rem 2.5rem;
 }
 
 .button_row {
   display: flex;
   justify-content: flex-end;
+}
+
+.swap_button {
+  display: block;
+  margin: auto;
 }
 
 .update_button {

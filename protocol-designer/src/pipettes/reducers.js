@@ -1,7 +1,9 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import {uuid} from '../utils'
 import {getPipette, getLabware} from '@opentrons/shared-data'
 
 import type {Mount} from '@opentrons/components'
@@ -10,7 +12,7 @@ import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 
 function createPipette (mount: Mount, model: string, tiprackModel: ?string): ?PipetteData {
-  const id = `${mount}:${model}`
+  const id = `pipette:${model}:${uuid()}`
   const pipetteData = getPipette(model)
 
   if (!pipetteData) {
@@ -105,6 +107,23 @@ const pipettes = handleActions({
         ...newPipettes
       }
     }
+  },
+  SWAP_PIPETTES: (
+    state: PipetteReducerState,
+    action: {payload: NewProtocolFields}
+  ): PipetteReducerState => {
+    const byId = mapValues(state.byId, (pipette: PipetteData): PipetteData => ({
+      ...pipette,
+      mount: (pipette.mount === 'left') ? 'right' : 'left'
+    }))
+
+    return ({
+      byMount: {
+        left: state.byMount.right,
+        right: state.byMount.left
+      },
+      byId
+    })
   }
 }, {byMount: {left: null, right: null}, byId: {}})
 
