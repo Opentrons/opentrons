@@ -36,7 +36,7 @@ const mapStateToProps = (state: BaseState): SP => {
 const mapDispatchToProps = {
   _updateFileMetadataFields: actions.updateFileMetadataFields,
   _saveFileMetadata: actions.saveFileMetadata,
-  goToDesignPage: () => navActions.navigateToPage('ingredient-detail')
+  goToDesignPage: () => navActions.navigateToPage('steplist')
 }
 
 const mergeProps = (
