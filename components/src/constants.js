@@ -7,9 +7,9 @@ export const MIXED_WELL_COLOR = '#9b9b9b' // NOTE: matches `--c-med-gray` in col
 // TODO factor into CSS or constants or elsewhere
 export const swatchColors = (n: number) => {
   const colors = [
+    '#00d781',
     '#0076ff',
     '#ff4888',
-    '#00d781',
     '#7b21d6',
     '#ff6161',
     '#065596',
