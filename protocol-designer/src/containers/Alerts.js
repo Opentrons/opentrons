@@ -66,7 +66,7 @@ function Alerts (props: Props) {
 function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.robotStateTimeline(state)
   const errors = timeline.errors || []
-  const warnings = dismissSelectors.getVisibleWarningsForSelectedStep(state)
+  const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state)
   const _stepId: any = steplistSelectors.selectedStepId(state) // TODO: Ian 2018-07-02 type properly once stepId is always string type
 
   return {
@@ -79,7 +79,7 @@ function mapStateToProps (state: BaseState): SP {
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
   const {dispatch} = dispatchProps
   const onDismiss = (warning: CommandCreatorWarning) =>
-    () => dispatch(dismissActions.dismissWarning({
+    () => dispatch(dismissActions.dismissTimelineWarning({
       warning,
       stepId: stateProps._stepId
     }))

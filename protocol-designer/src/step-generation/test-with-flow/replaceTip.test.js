@@ -15,10 +15,12 @@ const replaceTip = commandCreatorNoErrors(_replaceTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 
-describe('replaceTip', () => {
-  const tiprack1Id = 'tiprack1Id'
-  const tiprack2Id = 'tiprack2Id'
+const tiprack1Id = 'tiprack1Id'
+const tiprack2Id = 'tiprack2Id'
+const p300SingleId = 'p300SingleId'
+const p300MultiId = 'p300MultiId'
 
+describe('replaceTip', () => {
   let labwareTypes1
   let robotInitialState
   beforeEach(() => {
@@ -42,13 +44,13 @@ describe('replaceTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('Single-channel: first tip', () => {
-      const result = replaceTip('p300SingleId')(robotInitialState)
+      const result = replaceTip(p300SingleId)(robotInitialState)
 
       expect(result.commands).toEqual([
         cmd.pickUpTip(0)
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         robotInitialState,
         {
@@ -67,7 +69,7 @@ describe('replaceTip', () => {
     })
 
     test('Single-channel: second tip B1', () => {
-      const result = replaceTip('p300SingleId')(merge(
+      const result = replaceTip(p300SingleId)(merge(
         {},
         robotInitialState,
         {
@@ -88,7 +90,7 @@ describe('replaceTip', () => {
         cmd.pickUpTip(1)
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         robotInitialState,
         {
@@ -123,13 +125,13 @@ describe('replaceTip', () => {
         }
       )
 
-      const result = replaceTip('p300SingleId')(initialTestRobotState)
+      const result = replaceTip(p300SingleId)(initialTestRobotState)
 
       expect(result.commands).toEqual([
         cmd.pickUpTip('A2')
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         initialTestRobotState,
         {
@@ -165,28 +167,26 @@ describe('replaceTip', () => {
         }
       )
 
-      const result = replaceTip('p300SingleId')(initialTestRobotState)
+      const result = replaceTip(p300SingleId)(initialTestRobotState)
 
       expect(result.commands).toEqual([
         cmd.dropTip('A1'),
         cmd.pickUpTip('B1')
       ])
 
-      expect(result.robotState).toEqual(
-        merge(
-          {},
-          initialTestRobotState,
-          {
-            tipState: {
-              tipracks: {
-                [tiprack1Id]: {
-                  B1: false
-                }
+      expect(result.robotState).toMatchObject(merge(
+        {},
+        initialTestRobotState,
+        {
+          tipState: {
+            tipracks: {
+              [tiprack1Id]: {
+                B1: false
               }
             }
           }
-        )
-      )
+        }
+      ))
     })
 
     test('Single-channel: used all tips in first rack, move to second rack', () => {
@@ -205,13 +205,13 @@ describe('replaceTip', () => {
         }
       )
 
-      const result = replaceTip('p300SingleId')(initialTestRobotState)
+      const result = replaceTip(p300SingleId)(initialTestRobotState)
 
       expect(result.commands).toEqual([
         cmd.pickUpTip('A1', {labware: tiprack2Id})
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         initialTestRobotState,
         {
@@ -231,7 +231,6 @@ describe('replaceTip', () => {
   })
 
   describe('replaceTip: multi-channel', () => {
-    const p300MultiId = 'p300MultiId'
     test('multi-channel, all tipracks have tips', () => {
       const result = replaceTip(p300MultiId)(robotInitialState)
 
@@ -239,7 +238,7 @@ describe('replaceTip', () => {
         cmd.pickUpTip('A1', {pipette: p300MultiId})
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         robotInitialState,
         {
@@ -273,7 +272,7 @@ describe('replaceTip', () => {
         cmd.pickUpTip('A2', {pipette: p300MultiId})
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         robotStateWithTipA1Missing,
         {
@@ -316,7 +315,7 @@ describe('replaceTip', () => {
         cmd.pickUpTip('A1', {pipette: p300MultiId})
       ])
 
-      expect(result.robotState).toEqual(merge(
+      expect(result.robotState).toMatchObject(merge(
         {},
         robotStateWithTipsOnMulti,
         {
@@ -334,6 +333,82 @@ describe('replaceTip', () => {
           }
         }
       ))
+    })
+  })
+
+  describe('tip assignment', () => {
+    let firstTiprackAssignedState
+    let twoTipracksAssignedState
+
+    beforeEach(() => {
+      firstTiprackAssignedState = {
+        [tiprack1Id]: p300MultiId
+      }
+
+      twoTipracksAssignedState = {
+        [tiprack1Id]: p300MultiId,
+        [tiprack2Id]: p300MultiId
+      }
+    })
+
+    test('initial assignment (no tiprackAssignment key)', () => {
+      const result = replaceTip(p300MultiId)(robotInitialState)
+
+      expect(result.robotState.tiprackAssignment).toEqual(firstTiprackAssignedState)
+
+      expect(result.commands[0].params).toEqual({
+        labware: tiprack1Id,
+        pipette: p300MultiId,
+        well: 'A1'
+      })
+    })
+
+    test('use same non-empty tiprack that was already assigned to selected pipette', () => {
+      robotInitialState.tiprackAssignment = {...firstTiprackAssignedState}
+
+      const result = replaceTip(p300MultiId)(robotInitialState)
+
+      expect(result.robotState.tiprackAssignment).toEqual({...firstTiprackAssignedState})
+
+      expect(result.commands[0].params).toEqual({
+        labware: tiprack1Id,
+        pipette: p300MultiId,
+        well: 'A1'
+      })
+    })
+
+    test('get next unassigned tiprack when assigned is empty', () => {
+      // first tiprack was previously assigned to our pipette (p300Multi)
+      robotInitialState.tiprackAssignment = {...firstTiprackAssignedState}
+      // but it's empty
+      robotInitialState.tipState.tipracks[tiprack1Id] = getTiprackTipstate(false)
+
+      const result = replaceTip(p300MultiId)(robotInitialState)
+
+      expect(result.robotState.tiprackAssignment).toEqual({...twoTipracksAssignedState})
+
+      expect(result.commands[0].params).toEqual({
+        labware: tiprack2Id,
+        pipette: p300MultiId,
+        well: 'A1'
+      })
+    })
+
+    test('skip full tiprack when it is assigned to a different pipette', () => {
+      robotInitialState.tiprackAssignment = {...firstTiprackAssignedState}
+
+      const result = replaceTip(p300SingleId)(robotInitialState)
+
+      expect(result.robotState.tiprackAssignment).toEqual({
+        ...firstTiprackAssignedState,
+        [tiprack2Id]: p300SingleId
+      })
+
+      expect(result.commands[0].params).toEqual({
+        labware: tiprack2Id,
+        pipette: p300SingleId,
+        well: 'A1'
+      })
     })
   })
 })

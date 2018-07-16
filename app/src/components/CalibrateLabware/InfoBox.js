@@ -39,7 +39,8 @@ type Props = OwnProps & {
   button: ?{
     type: LabwareType,
     isNext: boolean,
-    onClick: () => void
+    isConfirmed: ?boolean,
+    onClick: () => void,
   }
 }
 

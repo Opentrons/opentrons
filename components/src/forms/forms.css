@@ -42,13 +42,17 @@
   min-width: 1.25rem;
   color: var(--c-dark-gray);
 
-  &:hover {
+  &:not(.checkbox_disabled):hover {
     cursor: pointer;
   }
 
   &.error {
     color: var(--c-mustard);
   }
+}
+
+.checkbox_disabled {
+  opacity: 0.5;
 }
 
 .input_field_container {

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {FormGroup} from '@opentrons/components'
+import {FormGroup, HoverTooltip} from '@opentrons/components'
 
 import {
   StepInputField,
@@ -43,7 +43,14 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <DispenseDelayFields focusHandlers={focusHandlers} />
+            <HoverTooltip tooltipComponent="This feature is not available in Beta">
+              {(hoverTooltipHandlers) => (
+                <DispenseDelayFields
+                  disabled
+                  hoverTooltipHandlers={hoverTooltipHandlers}
+                  focusHandlers={focusHandlers} />
+              )}
+            </HoverTooltip>
             <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
               <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
             </StepCheckboxRow>

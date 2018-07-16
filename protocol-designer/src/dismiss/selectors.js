@@ -1,33 +1,39 @@
 // @flow
 import {createSelector} from 'reselect'
-
 // TODO: Ian 2018-07-02 split apart file-data concerns to avoid circular dependencies
 // Eg, right now if you import {selectors as fileDataSelectors} from '../file-data',
 // PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
 // imports getDismissedWarnings selector from 'dismiss/
-import {warningsPerStep} from '../file-data/selectors/commands'
-
-import {selectors as steplistSelectors} from '../steplist'
-import type {BaseState, Selector} from '../types'
+import {timelineWarningsPerStep} from '../file-data/selectors/commands'
+import {selectors as steplistSelectors, type FormWarning} from '../steplist'
 import type {CommandCreatorWarning} from '../step-generation'
-import type {RootState, DismissedWarningState} from './reducers'
+import type {BaseState, Selector} from '../types'
+import type {RootState, DismissedWarningsAllSteps} from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 
-export const getDismissedWarnings: Selector<DismissedWarningState> = createSelector(
+export const getAllDismissedWarnings: Selector<*> = createSelector(
   rootSelector,
   s => s.dismissedWarnings
 )
 
-type WarningsPerStep = {[stepId: string | number]: Array<CommandCreatorWarning>}
-/** Non-dismissed warnings for each step */
-export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  getDismissedWarnings,
-  warningsPerStep,
+export const getDismissedFormWarnings: Selector<DismissedWarningsAllSteps<FormWarning>> = createSelector(
+  getAllDismissedWarnings,
+  all => all.form
+)
+
+export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
+  getAllDismissedWarnings,
+  all => all.timeline
+)
+
+export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
+  getDismissedTimelineWarnings,
+  timelineWarningsPerStep,
   steplistSelectors.orderedSteps,
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
     return orderedSteps.reduce(
-      (stepAcc: WarningsPerStep, stepId) => {
+      (stepAcc: DismissedWarningsAllSteps<CommandCreatorWarning>, stepId) => {
         const warningsForCurrentStep = warningsPerStep[stepId]
         const dismissedWarningsForStep = dismissedWarnings[stepId] || []
 
@@ -47,9 +53,26 @@ export const getVisibleWarningsPerStep: Selector<WarningsPerStep> = createSelect
   }
 )
 
-export const getVisibleWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
-  getVisibleWarningsPerStep,
+export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
+  getTimelineWarningsPerStep,
   steplistSelectors.selectedStepId,
   (warningsPerStep, stepId) =>
     (typeof stepId === 'number' && warningsPerStep[stepId]) || []
+)
+
+export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
+  getDismissedFormWarnings,
+  steplistSelectors.selectedStepId,
+  (dismissedWarnings, stepId) => (typeof stepId === 'number' && dismissedWarnings[stepId]) || []
+)
+
+/** Non-dismissed form-level warnings for selected step */
+export const getFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
+  steplistSelectors.formLevelWarnings,
+  getDismissedFormWarningsForSelectedStep,
+  (warnings, dismissedWarnings) => {
+    const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)
+    const formWarnings = warnings.filter(w => !dismissedTypesForStep.includes(w.type))
+    return formWarnings
+  }
 )

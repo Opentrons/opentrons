@@ -2,23 +2,27 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import difference from 'lodash/difference'
 import {AlertItem} from '@opentrons/components'
+import {actions as dismissActions, selectors as dismissSelectors} from '../../dismiss'
+import {getVisibleAlerts} from './helpers'
 import type {StepIdType} from '../../form-types'
 import {selectors as steplistSelectors} from '../../steplist'
-import {END_STEP} from '../../steplist/types'
-import {type StepFieldName} from '../../steplist/fieldLevel'
+import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
 
-type MaybeStepId = ?StepIdType | typeof END_STEP
 type SP = {
   errors: Array<FormError>,
   warnings: Array<FormWarning>,
-  stepId: MaybeStepId
+  stepId: ?(StepIdType | string)
 }
-type DP = {dismissWarning: (FormWarning, MaybeStepId) => void}
-type OP = {focusedField: ?StepFieldName, dirtyFields: Array<StepFieldName>}
+type DP = {
+  dismissWarning: (FormWarning, $PropertyType<SP, 'stepId'>) => mixed
+}
+type OP = {
+  focusedField: ?StepFieldName,
+  dirtyFields: Array<StepFieldName>
+}
 type FormAlertsProps = SP & DP
 
 class FormAlerts extends React.Component<FormAlertsProps> {
@@ -52,24 +56,39 @@ class FormAlerts extends React.Component<FormAlertsProps> {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const errors = steplistSelectors.formLevelErrors(state)
-  const warnings = (process.env.OT_PD_SHOW_WARNINGS === 'true') ? steplistSelectors.formLevelWarnings(state) : []
-
   const {focusedField, dirtyFields} = ownProps
-  const filteredErrors = errors.filter(e => (
-    !e.dependentFields.includes(focusedField) && difference(e.dependentFields, dirtyFields).length === 0)
-  )
-  const filteredWarnings = warnings.filter(w => (
-    !w.dependentFields.includes(focusedField) && difference(w.dependentFields, dirtyFields).length === 0)
-  )
-  return {errors: filteredErrors, warnings: filteredWarnings, stepId: steplistSelectors.selectedStepId(state)}
+  const visibleWarnings = getVisibleAlerts({
+    focusedField,
+    dirtyFields,
+    alerts: dismissSelectors.getFormWarningsForSelectedStep(state)
+  })
+
+  const errors = steplistSelectors.formLevelErrors(state)
+  const filteredErrors = getVisibleAlerts({
+    focusedField,
+    dirtyFields,
+    alerts: errors
+  })
+
+  return {
+    errors: filteredErrors,
+    warnings: visibleWarnings,
+    stepId: steplistSelectors.selectedStepId(state)
+  }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
-  dismissWarning: (warning: FormWarning, stepId: MaybeStepId) => {
-    console.log('dismiss warning here', warning, stepId)
-    // TODO: BC 2018-07-09 un-comment after Ian's dismiss reducer is merged
-    //   dispatch(dismissActions.dismissWarning({warning, stepId}))
+  dismissWarning: (warning, stepId) => {
+    if (typeof stepId === 'string') {
+      // TODO: Ian 2018-07-13 remove this conditional once stepIds are always numbers
+      console.warn(`Tried to dismiss form-level warning for "special" stepId ${stepId}`)
+      return
+    }
+    if (stepId == null) {
+      console.warn('Tried to dismiss form-level warning with no stepId.')
+      return
+    }
+    dispatch(dismissActions.dismissFormWarning({warning, stepId}))
   }
 })
 

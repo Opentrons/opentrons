@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
 
+import type {HoverTooltipHandlers} from '../tooltips'
 import {Icon, type IconName} from '../icons'
 import styles from './buttons.css'
 
@@ -27,6 +28,8 @@ export type ButtonProps = {
   type?: 'submit' | 'reset' | 'button',
   /** custom element or component to use instead of `<button>` */
   Component?: React.ElementType,
+  /** handlers for HoverTooltipComponent */
+  hoverTooltipHandlers?: HoverTooltipHandlers
 }
 
 // props to strip if using a custom component
@@ -58,7 +61,7 @@ export default function Button (props: ButtonProps) {
     }
 
   return (
-    <Component {...buttonProps}>
+    <Component {...props.hoverTooltipHandlers} {...buttonProps}>
       {props.iconName && (
         <Icon name={props.iconName} className={styles.icon} />
       )}

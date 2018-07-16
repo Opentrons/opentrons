@@ -2,37 +2,66 @@
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import omit from 'lodash/omit'
-import {dismissWarning} from './actions'
+import type {
+  DismissFormWarning,
+  DismissTimelineWarning
+} from './actions'
 import {getPDMetadata} from '../file-types'
-import type {ActionType} from 'redux-actions'
 import type {BaseState} from '../types'
 import type {LoadFileAction} from '../load-file'
 import type {CommandCreatorWarning} from '../step-generation'
+import type {FormWarning} from '../steplist'
 import type {DeleteStepAction} from '../steplist/actions'
 
-export type DismissedWarningState = {[stepId: number]: ?Array<CommandCreatorWarning>}
+export type DismissedWarningsAllSteps<WarningType> = {[stepId: number]: ?Array<WarningType>}
+export type DismissedWarningState = {
+  form: DismissedWarningsAllSteps<FormWarning>,
+  timeline: DismissedWarningsAllSteps<CommandCreatorWarning>
+}
 const dismissedWarnings = handleActions({
-  DISMISS_WARNING: (
+  DISMISS_FORM_WARNING: (
     state: DismissedWarningState,
-    action: ActionType<typeof dismissWarning>
+    action: DismissFormWarning
   ): DismissedWarningState => {
     const {stepId, warning} = action.payload
     return {
       ...state,
-      [stepId]: [
-        ...(state[stepId] || []),
-        warning
-      ]
+      form: {
+        ...state.form,
+        [stepId]: [
+          ...(state.form[stepId] || []),
+          warning
+        ]
+      }
     }
   },
-  DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction) => {
+  DISMISS_TIMELINE_WARNING: (
+    state: DismissedWarningState,
+    action: DismissTimelineWarning
+  ): DismissedWarningState => {
+    const {stepId, warning} = action.payload
+    return {
+      ...state,
+      timeline: {
+        ...state.timeline,
+        [stepId]: [
+          ...(state.timeline[stepId] || []),
+          warning
+        ]
+      }
+    }
+  },
+  DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction): DismissedWarningState => {
     // remove key for deleted step
     const stepId = action.payload.toString(10)
-    return omit(state, stepId)
+    return {
+      form: omit(state.form, stepId),
+      timeline: omit(state.timeline, stepId)
+    }
   },
   LOAD_FILE: (state: DismissedWarningState, action: LoadFileAction): DismissedWarningState =>
     getPDMetadata(action.payload).dismissedWarnings
-}, {})
+}, {form: {}, timeline: {}})
 
 export const _allReducers = {
   dismissedWarnings

@@ -156,7 +156,6 @@ function handleDisconnectResponse (
   state: State,
   action: DisconnectResponseAction
 ): State {
-  if (action.payload.error) return state
   return INITIAL_STATE
 }
 

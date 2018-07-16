@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-
 import {actions, selectors} from '../../steplist'
 import {getFieldErrors, processField, type StepFieldName} from '../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../types'

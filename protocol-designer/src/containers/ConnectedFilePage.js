@@ -6,6 +6,7 @@ import type {FilePageProps} from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
 import {selectors as pipetteSelectors} from '../pipettes'
 import type {FileMetadataFields} from '../file-data'
+import {actions as navActions} from '../navigation'
 import {formConnectorFactory, type FormConnector} from '../utils'
 
 type SP = {
@@ -16,7 +17,8 @@ type SP = {
 
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
-  _saveFileMetadata: ({[string]: string}) => void
+  _saveFileMetadata: ({[string]: string}) => void,
+  goToDesignPage: () => void
 }
 
 const mapStateToProps = (state: BaseState): SP => {
@@ -33,12 +35,13 @@ const mapStateToProps = (state: BaseState): SP => {
 
 const mapDispatchToProps = {
   _updateFileMetadataFields: actions.updateFileMetadataFields,
-  _saveFileMetadata: actions.saveFileMetadata
+  _saveFileMetadata: actions.saveFileMetadata,
+  goToDesignPage: () => navActions.navigateToPage('steplist')
 }
 
 const mergeProps = (
   {instruments, isFormAltered, _values}: SP,
-  {_updateFileMetadataFields, _saveFileMetadata}: DP
+  {_updateFileMetadataFields, _saveFileMetadata, goToDesignPage}: DP
 ): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
@@ -54,6 +57,7 @@ const mergeProps = (
     formConnector,
     isFormAltered,
     instruments,
+    goToDesignPage,
     saveFileMetadata: () => _saveFileMetadata(_values)
   }
 }

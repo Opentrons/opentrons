@@ -6,8 +6,13 @@ import selectors from './selectors'
 import * as actions from './actions'
 import * as utils from './utils'
 import {getFieldErrors, processField} from './fieldLevel'
+import type {FormWarning, FormWarningType} from './formLevel'
 
-export type {RootState}
+export type {
+  RootState,
+  FormWarning,
+  FormWarningType
+}
 export {
   actions,
   rootReducer,
