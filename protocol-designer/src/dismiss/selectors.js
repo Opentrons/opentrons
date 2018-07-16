@@ -27,7 +27,7 @@ export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<Co
   all => all.timeline
 )
 
-export const getVisibleTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
+export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
   getDismissedTimelineWarnings,
   timelineWarningsPerStep,
   steplistSelectors.orderedSteps,
@@ -53,8 +53,8 @@ export const getVisibleTimelineWarningsPerStep: Selector<DismissedWarningsAllSte
   }
 )
 
-export const getVisibleTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
-  getVisibleTimelineWarningsPerStep,
+export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
+  getTimelineWarningsPerStep,
   steplistSelectors.selectedStepId,
   (warningsPerStep, stepId) =>
     (typeof stepId === 'number' && warningsPerStep[stepId]) || []

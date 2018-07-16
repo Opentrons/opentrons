@@ -46,7 +46,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
-    ? dismissSelectors.getVisibleTimelineWarningsPerStep(state)[stepId]
+    ? dismissSelectors.getTimelineWarningsPerStep(state)[stepId]
     : []
   const hasWarnings = warnings && warnings.length > 0
 
