@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {FormGroup} from '@opentrons/components'
+import {FormGroup, HoverTooltip} from '@opentrons/components'
 
 import {
   StepInputField,
@@ -48,9 +48,13 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FormGroup label='TECHNIQUE'>
               <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
               <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
-              <StepCheckboxRow name="aspirate_airGap_checkbox" label="Air Gap">
-                <StepInputField name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
-              </StepCheckboxRow>
+              <HoverTooltip tooltipComponent="This feature is not available in Beta">
+                {(hoverTooltipHandlers) => (
+                  <StepCheckboxRow disabled hoverTooltipHandlers={hoverTooltipHandlers} name="aspirate_airGap_checkbox" label="Air Gap">
+                    <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
+                  </StepCheckboxRow>
+                )}
+              </HoverTooltip>
               <StepCheckboxRow name="aspirate_mix_checkbox" label='Mix'>
                 <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
                 <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
@@ -93,7 +97,14 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <DispenseDelayFields focusHandlers={focusHandlers} />
+              <HoverTooltip tooltipComponent="This feature is not available in Beta">
+                {(hoverTooltipHandlers) => (
+                  <DispenseDelayFields
+                    disabled
+                    hoverTooltipHandlers={hoverTooltipHandlers}
+                    focusHandlers={focusHandlers} />
+                )}
+              </HoverTooltip>
               <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
               </StepCheckboxRow>

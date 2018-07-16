@@ -10,7 +10,3 @@
   cursor: pointer;
   z-index: 9001;
 }
-
-.hover_wrapper {
-  display: inline-flex;
-}
