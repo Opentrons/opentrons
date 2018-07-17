@@ -25,6 +25,7 @@ describe('robot reducer - session', () => {
       // deck setup from protocol
       pipettesByMount: {},
       labwareBySlot: {},
+      modulesBySlot: {},
 
       // running a protocol
       runRequest: {inProgress: false, error: null},
