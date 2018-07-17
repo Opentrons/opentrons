@@ -11,7 +11,7 @@ from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons import robot
 
-from .models import Container, Instrument
+from .models import Container, Instrument, Module
 
 log = logging.getLogger(__name__)
 
@@ -44,10 +44,12 @@ class Session(object):
 
         self._containers = []
         self._instruments = []
+        self._modules = []
         self._interactions = []
 
         self.instruments = None
         self.containers = None
+        self.modules = None
 
         self.startTime = None
 
@@ -79,6 +81,12 @@ class Session(object):
             for container in self._containers
         ]
 
+    def get_modules(self):
+        return [
+            Module(module=module)
+            for module in self._modules
+        ]
+
     def clear_logs(self):
         self.command_log.clear()
         self.errors.clear()
@@ -92,6 +100,7 @@ class Session(object):
 
         self._containers.clear()
         self._instruments.clear()
+        self._modules.clear()
         self._interactions.clear()
 
         def on_command(message):
@@ -134,12 +143,12 @@ class Session(object):
             robot.connect()
             unsubscribe()
 
-            # Accumulate containers, instruments, interactions from commands
-            instruments, containers, interactions = _accumulate(
+            instruments, containers, modules, interactions = _accumulate(
                 [_get_labware(command) for command in commands])
 
             self._containers.extend(_dedupe(containers))
             self._instruments.extend(_dedupe(instruments))
+            self._modules.extend(_dedupe(modules))
             self._interactions.extend(_dedupe(interactions))
 
         return res
@@ -160,6 +169,7 @@ class Session(object):
 
         self.containers = self.get_containers()
         self.instruments = self.get_instruments()
+        self.modules = self.get_modules()
         self.startTime = None
 
         self.set_state('loaded')
@@ -280,7 +290,7 @@ def _accumulate(iterable):
     return reduce(
         lambda x, y: tuple([x + y for x, y in zip(x, y)]),
         iterable,
-        ([], [], []))
+        ([], [], [], []))
 
 
 def _dedupe(iterable):
@@ -299,10 +309,12 @@ def now():
 def _get_labware(command):
     containers = []
     instruments = []
+    modules = []
     interactions = []
 
     location = command.get('location')
     instrument = command.get('instrument')
+    # module = command.get('module')
     locations = command.get('locations')
 
     if location:
@@ -314,10 +326,11 @@ def _get_labware(command):
             [get_container(location) for location in list_of_locations])
 
     containers = [c for c in containers if c is not None]
+    modules = [m for m in modules if m is not None]
 
     if instrument:
         instruments.append(instrument)
         interactions.extend(
             [(instrument, container) for container in containers])
 
-    return instruments, containers, interactions
+    return instruments, containers, modules, interactions
