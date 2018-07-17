@@ -59,6 +59,6 @@ NOTE: available defs are:
 }
 
 .name_overlay .display_name {
-  font-weight: var(--fw-bold);
+  font-weight: var(--fw-semibold);
   text-transform: uppercase;
 }
