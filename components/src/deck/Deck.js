@@ -59,7 +59,7 @@ function renderLabware (LabwareComponent): React.Node[] {
         return (
           <g key={slot} transform={transform}>
             <EmptyDeckSlot {...props} />
-            {!!LabwareComponent && (
+            {LabwareComponent && (
               <LabwareComponent {...props} />
             )}
           </g>
