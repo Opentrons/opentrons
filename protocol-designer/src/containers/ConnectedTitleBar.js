@@ -31,7 +31,7 @@ function TitleWithIcon (props: TitleWithIconProps) {
     <div>
       {iconName &&
         <Icon className={styles.icon} name={iconName} />}
-      {text}
+      <div className={styles.icon_inline_text}>{text}</div>
     </div>
   )
 }
