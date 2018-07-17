@@ -1,5 +1,11 @@
 @import '@opentrons/components';
 
+/* TODO: Ian 2018-07-17 When Card doesn't impose flex, remove this */
+.override_card_flex {
+  width: 100%;
+  height: 100%;
+}
+
 .file_page h1 {
   @apply var(--font-header-dark);
 }

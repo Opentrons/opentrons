@@ -17,26 +17,22 @@ type Props = {
   column?: boolean,
   /** If card can not be used, gray it out and remove pointer events */
   disabled?: boolean,
-  /** Override children's className with this class, if given */
-  contentClassNameOverride?: ?string,
   /** Additional class names */
   className?: string
 }
 
 export default function Card (props: Props) {
-  const {title, column, children, contentClassNameOverride} = props
+  const {title, column, children} = props
 
-  const className = cx(styles.card, props.className, {
+  const style = cx(styles.card, props.className, {
     [styles.disabled]: props.disabled
   })
-  const contentClassName = contentClassNameOverride !== undefined
-    ? contentClassNameOverride
-    : cx(styles.card_content, {
-      [styles.card_column]: column
-    })
+  const childrenStyle = cx(styles.card_content, {
+    [styles.card_column]: column
+  })
 
   return (
-    <section className={className}>
+    <section className={style}>
       <h3 className={styles.card_title}>{title}</h3>
       {props.description &&
         (<p
@@ -45,7 +41,7 @@ export default function Card (props: Props) {
           {props.description}
         </p>)
       }
-      <div className={contentClassName}>
+      <div className={childrenStyle}>
         {children}
       </div>
     </section>
