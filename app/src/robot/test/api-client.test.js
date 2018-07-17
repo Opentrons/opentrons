@@ -279,7 +279,8 @@ describe('api client', () => {
         protocolCommands: [],
         protocolCommandsById: {},
         pipettesByMount: {},
-        labwareBySlot: {}
+        labwareBySlot: {},
+        modulesBySlot: {}
       })
     })
 
@@ -388,6 +389,39 @@ describe('api client', () => {
         },
         {_id: 2, slot: '5', name: 'b', type: 'B'},
         {_id: 3, slot: '9', name: 'c', type: 'C'}
+      ]
+
+      return sendConnect()
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('maps api modules to modules by slot', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        modulesBySlot: {
+          1: {
+            _id: 1,
+            slot: '1',
+            name: 'tempdeck'
+          },
+          9: {
+            _id: 9,
+            slot: '9',
+            name: 'magdeck'
+          }
+        }
+      }))
+
+      session.modules = [
+        {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck'
+        },
+        {
+          _id: 9,
+          slot: '9',
+          name: 'magdeck'
+        }
       ]
 
       return sendConnect()

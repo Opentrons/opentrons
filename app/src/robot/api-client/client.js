@@ -331,12 +331,17 @@ export default function client (dispatch) {
 
       if (apiSession.instruments) {
         update.pipettesByMount = {}
-        apiSession.instruments.forEach(apiInstrumentToInstrument)
+        apiSession.instruments.forEach(addApiInstrumentToPipettes)
       }
 
       if (apiSession.containers) {
         update.labwareBySlot = {}
-        apiSession.containers.forEach(apiContainerToContainer)
+        apiSession.containers.forEach(addApiContainerToLabware)
+      }
+
+      if (apiSession.modules) {
+        update.modulesBySlot = {}
+        apiSession.modules.forEach(addApiModuleToModules)
       }
 
       if (apiSession.protocol_text) {
@@ -371,7 +376,7 @@ export default function client (dispatch) {
       }
     }
 
-    function apiInstrumentToInstrument (apiInstrument) {
+    function addApiInstrumentToPipettes (apiInstrument) {
       const {_id, mount, name, channels} = apiInstrument
       // TODO(mc, 2018-01-17): pull this somehow from tiprack the instrument
       //  interacts with
@@ -380,7 +385,7 @@ export default function client (dispatch) {
       update.pipettesByMount[mount] = {_id, mount, name, channels, volume}
     }
 
-    function apiContainerToContainer (apiContainer) {
+    function addApiContainerToLabware (apiContainer) {
       const {_id, name, type, slot} = apiContainer
       const isTiprack = RE_TIPRACK.test(type)
       const labware = {_id, name, slot, type, isTiprack}
@@ -390,6 +395,10 @@ export default function client (dispatch) {
       }
 
       update.labwareBySlot[slot] = labware
+    }
+
+    function addApiModuleToModules (apiModule) {
+      update.modulesBySlot[apiModule.slot] = apiModule
     }
   }
 

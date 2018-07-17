@@ -10,6 +10,9 @@ export default function MockSession () {
     instruments: [],
     containers: [],
 
+    // TODO(mc, 2018-07-16): THIS IS A MOCK
+    modules: [],
+
     run: jest.fn(),
     pause: jest.fn(),
     resume: jest.fn(),
