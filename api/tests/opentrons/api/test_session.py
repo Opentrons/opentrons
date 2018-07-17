@@ -158,7 +158,7 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     instruments, tip_racks, plates, commands = labware_setup
     p100, p1000 = instruments
 
-    instruments, containers, interactions = \
+    instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
     session = Session(name='', text='')
@@ -166,10 +166,12 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))
     session._containers.extend(_dedupe(containers))
+    session._modules.extend(_dedupe(modules))
     session._interactions.extend(_dedupe(interactions))
 
     instruments = session.get_instruments()
     containers = session.get_containers()
+    modules = session.get_modules()
 
     assert [i.name for i in instruments] == ['p100', 'p1000']
     assert [i.axis for i in instruments] == ['a', 'b']
@@ -184,6 +186,10 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
         [[id(p100), id(p1000)], [id(p1000)]]
     assert [c.id for c in containers] == [id(plates[0]), id(plates[1])]
 
+    # TODO(ben 20180717): Add meaningful data and assertions for modules once
+    # TODO                the API object is in place
+    assert modules == []
+
 
 def test_accumulate():
     res = \
@@ -193,7 +199,7 @@ def test_accumulate():
         ])
 
     assert res == (['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'])
-    assert _accumulate([]) == ([], [], [])
+    assert _accumulate([]) == ([], [], [], [])
 
 
 def test_dedupe():
@@ -205,28 +211,31 @@ def test_get_labware(labware_setup):
     p100, p1000 = instruments
 
     assert _get_labware(commands[0]) == \
-        ([p100], [plates[0]], [(p100, plates[0])])
+        ([p100], [plates[0]], [], [(p100, plates[0])])
 
     assert _get_labware(commands[1]) == \
-        ([], [plates[1]], [])
+        ([], [plates[1]], [], [])
 
     assert _get_labware(commands[2]) == \
         ([p1000],
          [plates[0], plates[1]],
+         [],
          [(p1000, plates[0]), (p1000, plates[1])])
 
-    instruments, containers, interactions = \
+    instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
     assert \
         [
             list(_dedupe(instruments)),
             list(_dedupe(containers)),
+            list(_dedupe(modules)),
             list(_dedupe(interactions))
         ] == \
         [
             [p100, p1000],
             [plates[0], plates[1]],
+            [],
             [(p100, plates[0]), (p1000, plates[0]), (p1000, plates[1])]
         ]
 
