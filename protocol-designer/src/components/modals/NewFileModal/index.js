@@ -74,7 +74,6 @@ export default class NewFileModal extends React.Component<Props, State> {
     const value: string = e.target.value
     let nextMountState = {[fieldName]: value}
     if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
-    console.log('PREV: ', this.state[mount])
     this.setState({[mount]: {...this.state[mount], ...nextMountState}})
   }
   handleNameChange = (e: SyntheticInputEvent<*>) => this.setState({name: e.target.value})
@@ -116,7 +115,7 @@ export default class NewFileModal extends React.Component<Props, State> {
           </FormGroup>
           <BetaRestrictions />
 
-          <div className={formStyles.row_wrapper}>
+          <div className={styles.mount_fields_row}>
             <MountFields mount="left" values={this.state.left} makeOnChange={this.makeHandleMountFieldChange} />
             <MountFields mount="right" values={this.state.right} makeOnChange={this.makeHandleMountFieldChange} />
           </div>
@@ -141,7 +140,7 @@ type MountFieldsProps = {
   makeOnChange: (mount: 'left' | 'right', fieldName: string) => (SyntheticInputEvent<*>) => void
 }
 const MountFields = (props: MountFieldsProps) => (
-  <div className={styles.mountColumn}>
+  <div className={styles.mount_column}>
     <FormGroup key={`${props.mount}PipetteModel`} label={`${startCase(props.mount)} Pipette*`}>
       <DropdownField
         options={props.values.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
@@ -151,7 +150,7 @@ const MountFields = (props: MountFieldsProps) => (
 
     <FormGroup key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
       <DropdownField
-        disabled={isEmpty(props.values.pipetteModel)}
+        disabled={isEmpty(props.values.pipetteModel) || props.values.pipetteModel === USER_HAS_NOT_SELECTED}
         options={tiprackOptions}
         value={props.values.tiprackModel}
         onChange={props.makeOnChange(props.mount, 'tiprackModel')} />

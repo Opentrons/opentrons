@@ -73,19 +73,14 @@ const pipettes = handleActions({
     state: PipetteReducerState,
     action: {payload: NewProtocolFields}
   ): PipetteReducerState => {
-    const {
-      leftPipetteModel,
-      rightPipetteModel,
-      leftTiprackModel,
-      rightTiprackModel
-    } = action.payload
+    const {left, right} = action.payload
 
-    const leftPipette = (leftPipetteModel && leftTiprackModel)
-      ? createPipette('left', leftPipetteModel, leftTiprackModel)
+    const leftPipette = (left.pipetteModel && left.tiprackModel)
+      ? createPipette('left', left.pipetteModel, left.tiprackModel)
       : null
 
-    const rightPipette = (rightPipetteModel && rightTiprackModel)
-      ? createPipette('right', rightPipetteModel, rightTiprackModel)
+    const rightPipette = (right.pipetteModel && right.tiprackModel)
+      ? createPipette('right', right.pipetteModel, right.tiprackModel)
       : null
 
     const newPipettes = ([leftPipette, rightPipette]).reduce(
