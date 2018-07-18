@@ -8,8 +8,15 @@ type CenteredTextSvgProps = {
 
 export function CenteredTextSvg (props: CenteredTextSvgProps) {
   const { text, className } = props
+
   return (
-    <text x='50%' y='50%' textAnchor='middle' {...{className}}>
+    <text
+      className={className}
+      x='50%'
+      y='50%'
+      textAnchor='middle'
+      dominantBaseline='middle'
+    >
       {text}
     </text>
   )

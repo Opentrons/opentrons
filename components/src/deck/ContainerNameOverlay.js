@@ -5,7 +5,7 @@ import styles from './LabwareContainer.css'
 
 type Props = {
   title: string,
-  subtitle?: string
+  subtitle?: string,
 }
 
 export function ContainerNameOverlay (props: Props) {
@@ -31,9 +31,11 @@ export function ContainerNameOverlay (props: Props) {
         >
           {title}
         </text>
-        {subtitle && <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>
-          {subtitle}
-        </text>}
+        {subtitle && (
+          <text x={paddingLeft} y={0.85 * boxHeight + paddingTop}>
+            {subtitle}
+          </text>
+        )}
       </g>
     </g>
   )
