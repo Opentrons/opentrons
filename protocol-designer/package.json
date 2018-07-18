@@ -30,7 +30,8 @@
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-thunk": "^2.2.0",
-    "reselect": "^3.0.1"
+    "reselect": "^3.0.1",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "flow-bin": "^0.76.0",

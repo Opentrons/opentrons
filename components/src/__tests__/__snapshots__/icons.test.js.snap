@@ -977,6 +977,26 @@ exports[`icons settings renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons swap-horizontal renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M21,9L17,5V8H10V10H17V13M7,11L3,15L7,19V16H14V14H7V11Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons upload renders correctly 1`] = `
 <svg
   aria-hidden="true"
