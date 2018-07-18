@@ -89,22 +89,22 @@ function _getSelectedWellsForSubstep (
   form: StepGeneration.CommandCreatorData,
   labwareId: string,
   substeps: StepSubItemData | null,
-  substepId: number
+  substepIndex: number
 ): Array<string> {
   if (substeps === null) {
     return []
   }
 
   function getWells (wellField): Array<string> {
-    if (substeps && substeps.rows && substeps.rows[substepId]) {
+    if (substeps && substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
-      const well = substeps.rows[substepId][wellField]
+      const well = substeps.rows[substepIndex][wellField]
       return well ? [well] : []
     }
 
-    if (substeps && substeps.multiRows && substeps.multiRows[substepId]) {
+    if (substeps && substeps.multiRows && substeps.multiRows[substepIndex]) {
       // multi-channel
-      return substeps.multiRows[substepId].reduce((acc, multiRow) => {
+      return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
         const well = multiRow[wellField]
         return well ? [...acc, well] : acc
       }, [])
@@ -158,7 +158,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
             form,
             labwareId,
             _allSubsteps[_hoveredSubstep.stepId],
-            _hoveredSubstep.substepId
+            _hoveredSubstep.substepIndex
           )
         } else {
           // wells for step overall

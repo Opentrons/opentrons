@@ -21,8 +21,9 @@ import type {
   IngredInputFields,
   IngredientGroups,
   AllIngredGroupFields,
-  PersistedIngredInputFields,
-  Labware
+  IngredientInstance,
+  Labware,
+  LabwareTypeById
 } from '../types'
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
@@ -182,7 +183,7 @@ type IngredientsState = IngredientGroups
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
     const {groupId, description, individualize, name, serializeName} = action.payload
-    const ingredFields: PersistedIngredInputFields = {
+    const ingredFields: IngredientInstance = {
       description,
       individualize,
       name,
@@ -301,8 +302,21 @@ const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
     (l: Labware) => l.name || `${humanizeLabwareType(l.type)} (${l.disambiguationNumber})`)
 )
 
+const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
+  getLabware,
+  (_labware) => mapValues(
+    _labware,
+    (l: Labware) => l.type
+  )
+)
+
 const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
 const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
+
+const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelector(
+  getIngredientGroups,
+  ingredGroups => mapValues(ingredGroups, (ingred: IngredientInstance) => ingred.name)
+)
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
   reduce(containers, (acc, container: Labware, containerId) => (container.slot)
@@ -422,8 +436,10 @@ export const selectors = {
 
   getIngredientGroups,
   getIngredientLocations,
+  getIngredientNames,
   getLabware,
   getLabwareNames,
+  getLabwareTypes,
   getSavedLabware,
   getSelectedContainer,
   getSelectedContainerId,

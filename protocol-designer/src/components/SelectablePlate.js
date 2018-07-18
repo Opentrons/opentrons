@@ -11,14 +11,14 @@ import {
 } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
-import type {AllWellContents, WellContents} from '../labware-ingred/types'
+import type {ContentsByWell, WellContents} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
 type PlateProps = React.ElementProps<typeof Plate>
 type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
 
 export type Props = {
-  wellContents: AllWellContents,
+  wellContents: ContentsByWell,
   containerType: $PropertyType<PlateProps, 'containerType'>,
 
   selectable?: $PropertyType<PlateProps, 'selectable'>,
@@ -33,7 +33,7 @@ export type Props = {
   pipetteChannels?: Channels
 }
 
-function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
+function wellContentsGroupIdsToColor (wc: ContentsByWell): PlateWellContents {
   return mapValues(
     wc,
     (well: WellContents): SingleWell => ({

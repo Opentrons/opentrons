@@ -2,22 +2,26 @@
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
+import type {LabwareTypeById} from '../labware-ingred/types'
 import {getWellsForTips} from '../step-generation/utils'
-import {utils as steplistUtils} from '../steplist'
+import {
+  utils as steplistUtils,
+  type NamedIngred
+} from '../steplist'
 
 import {
   formHasErrors,
   type ValidFormAndErrors
 } from './formProcessing'
 
+import type {WellContentsByLabware} from '../top-selectors/well-contents'
+
 import type {
-  NamedIngredsByLabwareAllSteps,
   SubSteps,
   SourceDestSubstepItem,
   StepItemSourceDestRow,
   StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel,
-  NamedIngred
+  SourceDestSubstepItemSingleChannel
 } from './types'
 
 import type {StepIdType} from '../form-types'
@@ -44,9 +48,9 @@ import type {
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
-type AllLabwareTypes = {[labwareId: string]: string}
 type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
 type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
+
 type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
@@ -269,16 +273,22 @@ function commandToMultiRows (
 }
 
 const getIngredsFactory = (
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  stepId: StepIdType
+  wellContentsByLabwareAllSteps: Array<WellContentsByLabware>,
+  ingredNames: {[ingredId: string]: string},
+  stepIndex: number
 ): GetIngreds => (labware, well) => {
-  return (namedIngredsByLabwareAllSteps &&
-    namedIngredsByLabwareAllSteps[stepId] &&
-    namedIngredsByLabwareAllSteps[stepId][labware] &&
-    namedIngredsByLabwareAllSteps[stepId][labware][well]) || []
+  const wellContents = (wellContentsByLabwareAllSteps &&
+    wellContentsByLabwareAllSteps[stepIndex] &&
+    wellContentsByLabwareAllSteps[stepIndex][labware] &&
+    wellContentsByLabwareAllSteps[stepIndex][labware][well])
+
+  return wellContents.groupIds.map(id => ({
+    id: id,
+    name: ingredNames[id]
+  })) || []
 }
 
-const getLabwareTypeFactory = (allLabwareTypes: AllLabwareTypes): GetLabwareType => (labwareId) => {
+const getLabwareTypeFactory = (allLabwareTypes: LabwareTypeById): GetLabwareType => (labwareId) => {
   return allLabwareTypes && allLabwareTypes[labwareId]
 }
 
@@ -286,8 +296,9 @@ const getLabwareTypeFactory = (allLabwareTypes: AllLabwareTypes): GetLabwareType
 export function generateSubsteps (
   validatedForms: {[StepIdType]: ValidFormAndErrors},
   allPipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
+  allLabwareTypes: LabwareTypeById,
+  ingredNames: {[ingredId: string]: string},
+  wellContentsByLabwareAllSteps: Array<WellContentsByLabware>,
   orderedSteps: Array<StepIdType>,
   robotStateTimeline: Timeline
 ): SubSteps {
@@ -317,7 +328,7 @@ export function generateSubsteps (
       validatedForm.stepType === 'transfer' ||
       validatedForm.stepType === 'mix'
     ) {
-      const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
+      const getIngreds = getIngredsFactory(wellContentsByLabwareAllSteps, ingredNames, prevStepId)
       const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
 
       return transferLikeSubsteps({

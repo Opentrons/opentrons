@@ -16,7 +16,9 @@ export const swatchColors = (n: number) => {
     '#2a97dc',
     '#d24193'
   ]
-  return colors[n % colors.length]
+  return (Number.isInteger(n))
+    ? colors[n % colors.length]
+    : MIXED_WELL_COLOR
 }
 
 // ========= SPECIAL SELECTORS ========

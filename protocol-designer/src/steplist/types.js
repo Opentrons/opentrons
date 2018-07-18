@@ -11,19 +11,16 @@ export const END_STEP: '__end__' = '__end__' // Special ID of "End" pseudo-step.
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,
-  substepId: number
+  substepIndex: number
 |} | null
 
 export type NamedIngred = {|
-  id: number,
+  id: string,
   name: string
 |}
 
-export type NamedIngredsByLabware = {[labwareId: string]: {[well: string]: Array<NamedIngred>}}
-export type NamedIngredsByLabwareAllSteps = Array<NamedIngredsByLabware>
-
 export type StepItemSourceDestRow = {|
-  substepId?: number, // TODO should this be a string or is this ID properly a number?
+  substepIndex?: number,
   sourceIngredients?: Array<NamedIngred>,
   destIngredients?: Array<NamedIngred>,
   sourceWell?: ?string,

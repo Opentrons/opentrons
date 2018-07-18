@@ -12,6 +12,8 @@ export type Labware = {|
   disambiguationNumber: number
 |}
 
+export type LabwareTypeById = {[labwareId: string]: ?string}
+
 // ==== WELLS ==========
 
 export type Wells = {
@@ -27,8 +29,12 @@ export type WellContents = {| // non-ingredient well state, for SelectablePlate
   groupIds: Array<string>
 |}
 
-export type AllWellContents = {
+export type ContentsByWell = {
   [wellName: string]: WellContents
+}
+
+export type WellContentsByLabware = {
+  [labwareId: string]: ContentsByWell
 }
 
 // ==== INGREDIENTS ====
@@ -45,10 +51,10 @@ export type IngredInputFields = $Exact<IngredInputs>
 
 export type IngredGroupAccessor = $Keys<IngredInputs>
 
-export type PersistedIngredInputFields = $Diff<IngredInputFields, {volume: *}>
+export type IngredientInstance = $Diff<IngredInputFields, {volume: *}>
 
 export type IngredientGroups = {
-  [groupId: string]: PersistedIngredInputFields
+  [groupId: string]: IngredientInstance
 }
 
 export type AllIngredGroupFields = {
