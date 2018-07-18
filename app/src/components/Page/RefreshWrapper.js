@@ -2,8 +2,6 @@
 import * as React from 'react'
 
 type Props = {
-  watch?: string,
-  refreshing?: boolean,
   refresh: () => mixed,
   children: React.Node,
 }
@@ -18,11 +16,5 @@ export default class RefreshWrapper extends React.Component<Props> {
   }
   componentDidMount () {
     this.props.refresh()
-  }
-
-  componentDidUpdate (prevProps: Props) {
-    if (prevProps.watch !== this.props.watch) {
-      this.props.refresh()
-    }
   }
 }
