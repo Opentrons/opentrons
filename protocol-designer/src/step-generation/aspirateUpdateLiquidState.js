@@ -1,5 +1,6 @@
 // @flow
 import range from 'lodash/range'
+import isEmpty from 'lodash/isEmpty'
 import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
 import * as warningCreators from './warningCreators'
 import type {
@@ -37,15 +38,18 @@ export default function updateLiquidState (
     (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
       const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
-      const nextWarnings = []
 
       const newLiquidFromWell = splitLiquid(
         volume,
         prevSourceLiquidState
       ).dest
 
-      if (volume > totalVolume(prevSourceLiquidState)) {
-        nextWarnings.push(warningCreators.aspirateMoreThanWellContents())
+      let nextWarnings = []
+      console.table({prevSourceLiquidState, volume})
+      if (isEmpty(prevSourceLiquidState)) {
+        nextWarnings = [...nextWarnings, warningCreators.aspirateFromPristineWell()]
+      } else if (volume > totalVolume(prevSourceLiquidState)) {
+        nextWarnings = [...nextWarnings, warningCreators.aspirateMoreThanWellContents()]
       }
 
       return {

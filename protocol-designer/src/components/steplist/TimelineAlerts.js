@@ -59,6 +59,10 @@ const warningOverrides: {[WarningType]: AlertContent} = {
   'ASPIRATE_MORE_THAN_WELL_CONTENTS': {
     title: 'Not enough liquid in well(s)',
     body: 'You are trying to aspirate more than the current volume of one of your well(s). If you intended to add air to your tip, please use the Air Gap advanced setting.'
+  },
+  'ASPIRATE_FROM_PRISTINE_WELL': {
+    title: 'Source well is empty',
+    body: "The well(s) you're trying to aspirate from are empty. You can add a starting liquid to this labware in Labware & Liquids"
   }
 }
 
