@@ -26,7 +26,9 @@ const {
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
-  makeGetCurrentPipette
+  makeGetCurrentPipette,
+  getModulesBySlot,
+  getModules
 } = selectors
 
 describe('robot selectors', () => {
@@ -504,6 +506,44 @@ describe('robot selectors', () => {
     expect(getPipettesCalibrated(twoPipettesCalibrated)).toBe(true)
     expect(getPipettesCalibrated(twoPipettesNotCalibrated)).toBe(false)
     expect(getPipettesCalibrated(onePipetteCalibrated)).toBe(true)
+  })
+
+  describe('module selectors', () => {
+    let state
+
+    beforeEach(() => {
+      state = makeState({
+        session: {
+          modulesBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              name: 'tempdeck'
+            }
+          }
+        }
+      })
+    })
+
+    test('get modules by slot', () => {
+      expect(getModulesBySlot(state)).toEqual({
+        1: {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck'
+        }
+      })
+    })
+
+    test('get modules', () => {
+      expect(getModules(state)).toEqual([
+        {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck'
+        }
+      ])
+    })
   })
 
   describe('labware selectors', () => {

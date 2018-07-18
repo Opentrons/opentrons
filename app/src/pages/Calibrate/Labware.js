@@ -2,41 +2,59 @@
 // setup instruments page
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {Route, Redirect, withRouter, type ContextRouter, type Match} from 'react-router'
+import {Route, Redirect, withRouter, type Match} from 'react-router'
 import {push} from 'react-router-redux'
-import type {State} from '../../types'
-import {
-  selectors as robotSelectors,
-  type Labware
-} from '../../robot'
-import {makeGetRobotSettings} from '../../http-api-client'
-import Page from '../../components/Page'
+import type {State, Dispatch} from '../../types'
+import type {Labware, Robot, StateModule} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
+import {getModulesOn} from '../../config'
+import type {Module} from '../../http-api-client'
+import {makeGetRobotSettings, makeGetRobotModules, fetchModules} from '../../http-api-client'
+import Page, {RefreshWrapper} from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
 import SessionHeader from '../../components/SessionHeader'
 import ReviewDeckModal from '../../components/ReviewDeckModal'
 import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
 
-type OwnProps = {
+type OP = {
   match: Match
 }
 
-type StateProps = {
+type SP = {
   deckPopulated: boolean,
   labware: ?Labware,
-  calibrateToBottom: boolean
+  calibrateToBottom: boolean,
+  robot: Robot,
+  modulesFlag: ?boolean,
+  modules: Array<StateModule>,
+  actualModules: ?Array<Module>,
 }
 
-type DispatchProps = {onBackClick: () => void}
+type DP = {
+  dispatch: Dispatch
+}
 
-type Props = ContextRouter & StateProps & OwnProps & DispatchProps
+type Props = SP & OP & {
+  onBackClick: () => void,
+  fetchModules: () => mixed,
+}
 
-export default withRouter(connect(makeMapStateToProps, mapDispatchToProps)(SetupDeckPage))
+export default withRouter(connect(makeMapStateToProps, null, mergeProps)(SetupDeckPage))
 
 function SetupDeckPage (props: Props) {
-  const {calibrateToBottom, labware, deckPopulated, onBackClick, match: {url, params: {slot}}} = props
+  const {
+    calibrateToBottom,
+    labware,
+    deckPopulated,
+    onBackClick,
+    fetchModules,
+    match: {url, params: {slot}}
+  } = props
 
   return (
-    <React.Fragment>
+    <RefreshWrapper
+      refresh={fetchModules}
+    >
       <Page
         titleBarProps={{title: (<SessionHeader />)}}
       >
@@ -56,36 +74,55 @@ function SetupDeckPage (props: Props) {
           <ConfirmModal labware={labware} onBackClick={onBackClick} calibrateToBottom={calibrateToBottom}/>
         )
       }} />
-    </React.Fragment>
+    </RefreshWrapper>
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OwnProps) => StateProps {
+function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
+  const getRobotModules = makeGetRobotModules()
 
   return (state, ownProps) => {
     const {match: {url, params: {slot}}} = ownProps
     const labware = robotSelectors.getLabware(state)
     const currentLabware = labware.find((lw) => lw.slot === slot)
     const name = robotSelectors.getConnectedRobotName(state)
-    const response = getRobotSettings(state, {name}).response
-    const settings = response && response.settings
+    const robot = robotSelectors.getConnectedRobot(state)
+
+    const settingsResponse = getRobotSettings(state, {name}).response
+    const settings = settingsResponse && settingsResponse.settings
     const flag = !!settings && settings.find((s) => s.id === 'calibrateToBottom')
     const calibrateToBottom = !!flag && flag.value
+
+    const modules = robotSelectors.getModules(state)
+    const modulesCall = getRobotModules(state, robot)
+    const modulesResponse = modulesCall.response
+    const actualModules = modulesResponse && modulesResponse.modules
 
     return {
       deckPopulated: !!robotSelectors.getDeckPopulated(state),
       labware: currentLabware,
       slot,
       url,
-      calibrateToBottom
+      calibrateToBottom,
+      robot,
+      modulesFlag: getModulesOn(state),
+      modules,
+      actualModules
     }
   }
 }
 
-function mapDispatchToProps (dispatch, ownProps: OwnProps): DispatchProps {
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {match: {url}} = ownProps
+  const {dispatch} = dispatchProps
+  const {robot} = stateProps
   return {
-    onBackClick: () => { dispatch(push(url)) }
+    ...stateProps,
+    ...ownProps,
+    onBackClick: () => { dispatch(push(url)) },
+    fetchModules: () => {
+      dispatch(fetchModules(robot))
+    }
   }
 }
