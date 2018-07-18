@@ -5,7 +5,8 @@ import {
   AlertModal,
   DropdownField,
   FormGroup,
-  InputField
+  InputField,
+  type Mount
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
@@ -13,9 +14,8 @@ import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './NewFileModal.css'
-import formStyles from '../../forms.css'
 import modalStyles from '../modal.css'
-import type {NewProtocolFields} from '../../../load-file'
+import type {NewProtocolFields, PipetteFields} from '../../../load-file'
 
 type State = NewProtocolFields
 
@@ -70,7 +70,7 @@ export default class NewFileModal extends React.Component<Props, State> {
     if (!this.props.hideModal && nextProps.hideModal) this.setState(initialState)
   }
 
-  makeHandleMountFieldChange = (mount: 'left' | 'right', fieldName) => (e: SyntheticInputEvent<*>) => {
+  makeHandleMountFieldChange = (mount: Mount, fieldName: $Keys<PipetteFields>) => (e: SyntheticInputEvent<*>) => {
     const value: string = e.target.value
     let nextMountState = {[fieldName]: value}
     if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
@@ -135,9 +135,9 @@ export default class NewFileModal extends React.Component<Props, State> {
 }
 
 type MountFieldsProps = {
-  mount: 'left' | 'right',
-  values: {pipetteModel: ?string, tiprackModel: ?string},
-  makeOnChange: (mount: 'left' | 'right', fieldName: string) => (SyntheticInputEvent<*>) => void
+  mount: Mount,
+  values: {pipetteModel: string, tiprackModel: ?string},
+  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void
 }
 const MountFields = (props: MountFieldsProps) => (
   <div className={styles.mount_column}>

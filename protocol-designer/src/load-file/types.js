@@ -15,8 +15,10 @@ export type LoadFileAction = {
   payload: ProtocolFile
 }
 
+export type PipetteFields = {pipetteModel: string, tiprackModel: ?string}
+
 export type NewProtocolFields = {
   name: ?string,
-  left: {pipetteModel: string, tiprackModel: ?string},
-  right: {pipetteModel: string, tiprackModel: ?string}
+  left: PipetteFields,
+  right: PipetteFields
 }

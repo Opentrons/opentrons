@@ -25,7 +25,12 @@ export type InputProps<T> = {
   className?: string,
 }
 
-type SelectProps<T> = InputProps<T> & {
+type SelectProps<T> = {
+  name: T,
+  value: ?string,
+  disabled: boolean,
+  onChange: ({[name: T]: string}) => *,
+  className?: string,
   options: Array<DropdownOption>
 }
 
