@@ -43,6 +43,9 @@ Y_BACKOFF_SLOW_SPEED = 50
 Y_RETRACT_SPEED = 8
 Y_RETRACT_DISTANCE = 3
 
+UNSTICK_DISTANCE = 1
+UNSTICK_SPEED = 1
+
 DEFAULT_AXES_SPEED = 400
 
 XY_HOMING_SPEED = 80
@@ -1215,6 +1218,61 @@ class SmoothieDriver_3_0_0:
         # then home once we're closer to the endstop(s)
         disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
         return self.home(axis=axis, disabled=disabled)
+
+    def unstick_axes(self, axes, distance=None, speed=None):
+        '''
+        The plunger axes on OT2 can build up static friction over time and
+        when it's cold. To get over this, the robot can move that plunger at
+        normal current and a very slow speed to increase the torque, removing
+        the static friction
+
+        axes:
+            String containing each axis to be moved. Ex: 'BC' or 'ZABC'
+
+        distance:
+            Distance to travel in millimeters (default is 1mm)
+
+        speed:
+            Millimeters-per-second to travel to travel at (default is 1mm/sec)
+        '''
+        for ax in axes:
+            if ax not in AXES:
+                raise ValueError('Unknown axes: {}'.format(axes))
+
+        if distance is None:
+            distance = UNSTICK_DISTANCE
+        if speed is None:
+            speed = UNSTICK_SPEED
+
+        self.push_active_current()
+        self.set_active_current({
+            ax: self._config.high_current[ax]
+            for ax in axes
+            })
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({ax: speed for ax in axes})
+
+        # only need to request switch state once
+        state_of_switches = {ax: False for ax in AXES}
+        if not self.simulating:
+            state_of_switches = self.switch_state
+
+        # incase axes is pressing endstop, home it slowly instead of moving
+        homing_axes = ''.join([ax for ax in axes if state_of_switches[ax]])
+        moving_axes = {
+            ax: self.position[ax] - distance  # retract
+            for ax in axes
+            if (not state_of_switches[ax]) and (ax not in homing_axes)
+        }
+
+        try:
+            if moving_axes:
+                self.move(moving_axes)
+            if homing_axes:
+                self.home(homing_axes)
+        finally:
+            self.pop_active_current()
+            self.pop_axis_max_speed()
 
     def pause(self):
         if not self.simulating:

@@ -32,3 +32,10 @@ class Instrument:
             Container(container)
             for container in containers
         ]
+
+
+class Module:
+    def __init__(self, module):
+        self.id = id(module)
+        self.name = module.get_name()
+        self.slot = module.parent.get_name()

@@ -171,7 +171,7 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
 )
 
 type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
-export const warningsPerStep: Selector<WarningsPerStep> = createSelector(
+export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   steplistSelectors.orderedSteps,
   robotStateTimeline,
   (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {

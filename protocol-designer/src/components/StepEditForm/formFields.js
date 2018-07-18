@@ -7,7 +7,8 @@ import {
   InputField,
   DropdownField,
   RadioGroup,
-  type DropdownOption
+  type DropdownOption,
+  type HoverTooltipHandlers
 } from '@opentrons/components'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
@@ -27,25 +28,26 @@ type StepCheckboxRowProps = {
   label?: string,
   name: StepFieldName,
   children?: ?React.Node,
-  className?: string
+  className?: string,
+  disabled?: boolean,
+  hoverTooltipHandlers?: HoverTooltipHandlers,
 }
-export function StepCheckboxRow (props: StepCheckboxRowProps) {
-  const {name, label, className} = props
-  return (
-    <StepField
-      name={name}
-      render={({value, updateValue}) => (
-        <div className={styles.field_row}>
-          <CheckboxField
-            label={label}
-            className={className}
-            value={!!value}
-            onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
-          {value ? props.children : null}
-        </div>
-      )} />
-  )
-}
+export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
+  <StepField
+    name={props.name}
+    render={({value, updateValue}) => (
+      <div className={styles.field_row}>
+        <CheckboxField
+          label={props.label}
+          disabled={props.disabled}
+          hoverTooltipHandlers={props.hoverTooltipHandlers}
+          className={props.className}
+          value={!!value}
+          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
+        {value ? props.children : null}
+      </div>
+    )} />
+)
 
 type StepInputFieldProps = {name: StepFieldName} & FocusHandlers
 export const StepInputField = (props: StepInputFieldProps & React.ElementProps<typeof InputField>) => {
@@ -90,14 +92,20 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
 
 type DispenseDelayFieldsProps = {
   focusHandlers: FocusHandlers,
-  label?: string
+  label?: string,
+  disabled?: boolean,
+  hoverTooltipHandlers?: HoverTooltipHandlers,
 }
 export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
-  const {label = 'Delay', focusHandlers} = props
+  const {label = 'Delay', focusHandlers, hoverTooltipHandlers, disabled} = props
   return (
-    <StepCheckboxRow name="dispense_delay_checkbox" label={label}>
-      <StepInputField {...focusHandlers} name="dispense_delayMinutes" units='m' />
-      <StepInputField {...focusHandlers} name="dispense_delaySeconds" units='s' />
+    <StepCheckboxRow
+      disabled={disabled}
+      hoverTooltipHandlers={hoverTooltipHandlers}
+      name="dispense_delay_checkbox"
+      label={label}>
+      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delayMinutes" units='m' />
+      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delaySeconds" units='s' />
     </StepCheckboxRow>
   )
 }
