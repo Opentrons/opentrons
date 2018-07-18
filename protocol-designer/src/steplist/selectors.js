@@ -143,7 +143,7 @@ const isNewStepForm = createSelector(
 /** True if app is in Deck Setup Mode. */
 const deckSetupMode: Selector<boolean> = createSelector(
   getSteps,
-  hoveredOrSelectedStepId,
+  selectedStepId,
   (steps, selectedStepId) => (selectedStepId !== null && selectedStepId !== '__end__' && steps[selectedStepId])
     ? steps[selectedStepId].stepType === 'deck-setup'
     : false
