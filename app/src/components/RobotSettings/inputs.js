@@ -20,17 +20,12 @@ export type FormProps = {
 export type InputProps<T> = {
   name: T,
   value: ?string,
-  disabled: ?boolean,
+  disabled?: ?boolean,
   onChange: ({[name: T]: string}) => *,
   className?: string,
 }
 
-type SelectProps<T> = {
-  name: T,
-  value: ?string,
-  disabled: boolean,
-  onChange: ({[name: T]: string}) => *,
-  className?: string,
+type SelectProps<T> = InputProps<T> & {
   options: Array<DropdownOption>
 }
 
