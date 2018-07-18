@@ -17,6 +17,7 @@ type Props = {
 function Sidebar (props: Props) {
   switch (props.page) {
     case 'steplist':
+    case 'well-selection-modal':
       return <ConnectedStepList />
     case 'ingredient-detail':
       return <IngredientsList />
