@@ -132,8 +132,8 @@ DEFAULT_DISPENSE_SECONDS = 1
 p10_single_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 4.5,
-        'blow_out': 1.5,
+        'bottom': 2.5,
+        'blow_out': -0.5,
         'drop_tip': -3
     },
     pick_up_current=0.1,
@@ -151,8 +151,8 @@ p10_single_v1 = pipette_config(
 p10_single_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 3,
-        'blow_out': 0,
+        'bottom': 1,
+        'blow_out': -2,
         'drop_tip': -4.5
     },
     pick_up_current=0.1,
@@ -170,8 +170,8 @@ p10_single_v1_3 = pipette_config(
 p10_multi_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 6,
-        'blow_out': 3,
+        'bottom': 4,
+        'blow_out': 1,
         'drop_tip': -2
     },
     pick_up_current=0.2,
@@ -189,8 +189,8 @@ p10_multi_v1 = pipette_config(
 p10_multi_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 4.5,
-        'blow_out': 1.5,
+        'bottom': 2.5,
+        'blow_out': -0.5,
         'drop_tip': -3.5
     },
     pick_up_current=0.2,
@@ -208,8 +208,8 @@ p10_multi_v1_3 = pipette_config(
 p50_single_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 2.3,
-        'blow_out': 2,
+        'bottom': 2.25,
+        'blow_out': 1.5,
         'drop_tip': -2.5
     },
     pick_up_current=0.1,
@@ -228,7 +228,7 @@ p50_single_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
         'bottom': 2,
-        'blow_out': 0.5,
+        'blow_out': 0,
         'drop_tip': -4
     },
     pick_up_current=0.1,
@@ -246,8 +246,8 @@ p50_single_v1_3 = pipette_config(
 p50_multi_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 3.18,
-        'blow_out': 3,
+        'bottom': 3,
+        'blow_out': 2.5,
         'drop_tip': -1.5
     },
     pick_up_current=0.3,
@@ -266,7 +266,7 @@ p50_multi_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
         'bottom': 3,
-        'blow_out': 1.5,
+        'blow_out': 1,
         'drop_tip': -3
     },
     pick_up_current=0.3,
@@ -284,8 +284,8 @@ p50_multi_v1_3 = pipette_config(
 p300_single_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 3.3,
-        'blow_out': 2.5,
+        'bottom': 3,
+        'blow_out': 1.5,
         'drop_tip': -2.5
     },
     pick_up_current=0.1,
@@ -304,7 +304,7 @@ p300_single_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
         'bottom': 3,
-        'blow_out': 1,
+        'blow_out': 0,
         'drop_tip': -4
     },
     pick_up_current=0.1,
@@ -323,7 +323,7 @@ p300_multi_v1 = pipette_config(
     plunger_positions={
         'top': 19.5,
         'bottom': 3.9,
-        'blow_out': 3,
+        'blow_out': 2.5,
         'drop_tip': -1.5
     },
     pick_up_current=0.3,
@@ -342,7 +342,7 @@ p300_multi_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
         'bottom': 3.5,
-        'blow_out': 1.5,
+        'blow_out': 1,
         'drop_tip': -3
     },
     pick_up_current=0.3,
@@ -379,7 +379,7 @@ p1000_single_v1 = pipette_config(
 p1000_single_v1_3 = pipette_config(
     plunger_positions={
         'top': 19.5,
-        'bottom': 2,
+        'bottom': 3,
         'blow_out': 0,
         'drop_tip': -4
     },
