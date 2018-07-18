@@ -1,7 +1,6 @@
 // @flow
 import range from 'lodash/range'
 
-import type {LabwareTypeById} from '../labware-ingred/types'
 import {getWellsForTips} from '../step-generation/utils'
 import {
   utils as steplistUtils,
@@ -12,8 +11,6 @@ import {
   formHasErrors,
   type ValidFormAndErrors
 } from './formProcessing'
-
-import type {WellContentsByLabware} from '../top-selectors/well-contents'
 
 import type {
   SubstepItemData,
@@ -48,7 +45,7 @@ type AllPipetteData = {[pipetteId: string]: PipetteData}
 type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
 type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
 
-type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
+export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
 type AspDispCommandType = {
@@ -261,32 +258,12 @@ function commandToMultiRows (
   })
 }
 
-// TODO IMMEDIATELY: move these factories into the selector, getIngreds / getLabwareType is passed into generateSubsteps fn in allSubsteps
-const getIngredsFactory = (
-  wellContentsByLabware: WellContentsByLabware,
-  ingredNames: {[ingredId: string]: string}
-): GetIngreds => (labware, well) => {
-  const wellContents = (wellContentsByLabware &&
-    wellContentsByLabware[labware] &&
-    wellContentsByLabware[labware][well])
-
-  return wellContents.groupIds.map(id => ({
-    id: id,
-    name: ingredNames[id]
-  })) || []
-}
-
-const getLabwareTypeFactory = (allLabwareTypes: LabwareTypeById): GetLabwareType => (labwareId) => {
-  return allLabwareTypes && allLabwareTypes[labwareId]
-}
-
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
   valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
-  allLabwareTypes: LabwareTypeById,
-  ingredNames: {[ingredId: string]: string},
-  wellContentsByLabware: WellContentsByLabware,
+  getLabwareType: GetLabwareType,
+  getIngreds: GetIngreds,
   robotState: ?RobotState,
   stepId: number
 ): ?SubstepItemData {
@@ -316,9 +293,6 @@ export function generateSubsteps (
     validatedForm.stepType === 'transfer' ||
     validatedForm.stepType === 'mix'
   ) {
-    const getIngreds = getIngredsFactory(wellContentsByLabware, ingredNames)
-    const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-
     return transferLikeSubsteps({
       validatedForm,
       allPipetteData,
