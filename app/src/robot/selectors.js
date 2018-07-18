@@ -15,7 +15,8 @@ import type {
   LabwareCalibrationStatus,
   LabwareType,
   Robot,
-  SessionStatus
+  SessionStatus,
+  StateModule
 } from './types'
 
 import {
@@ -311,6 +312,22 @@ export const getPipettesCalibrated = createSelector(
     pipettes.length !== 0 &&
     pipettes.every((i) => i.probed)
   )
+)
+
+export function getModulesBySlot (state: State) {
+  return session(state).modulesBySlot
+}
+
+export const getModules = createSelector(
+  getModulesBySlot,
+  (modules): ?StateModule[] => {
+    return Object.keys(modules)
+     .filter(isSlot)
+     .map((slot) => {
+       const module = modules[slot]
+       return {...module}
+     })
+  }
 )
 
 export function getLabwareBySlot (state: State) {

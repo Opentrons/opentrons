@@ -46,8 +46,6 @@ function UploadResults (props: Props) {
 
   let instructions
 
-  console.log(props)
-
   if (uploadError) {
     // instructions for an unsuccessful upload
     instructions = (

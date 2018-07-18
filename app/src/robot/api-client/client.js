@@ -341,6 +341,14 @@ export default function client (dispatch) {
 
       if (apiSession.modules) {
         update.modulesBySlot = {}
+        // TODO (ka 2018-7-17): MOCKED MODULES by slot here instead of session.py uncomment below to test
+        // update.modulesBySlot = {
+        //   '1': {
+        //     id: '4374062089',
+        //     name: 'magdeck',
+        //     slot: '1'
+        //   }
+        // }
         apiSession.modules.forEach(addApiModuleToModules)
       }
 

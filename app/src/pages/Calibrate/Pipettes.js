@@ -2,33 +2,45 @@
 // setup pipettes component
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {Route, Redirect, type ContextRouter} from 'react-router'
+import {Route, Redirect, type Match} from 'react-router'
 
 import type {State} from '../../types'
-import type {Pipette} from '../../robot'
+import type {Pipette, Robot} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
-import {makeGetRobotPipettes} from '../../http-api-client'
+import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
 
-import Page from '../../components/Page'
+import Page, {RefreshWrapper} from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
 import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
 import {PipetteTabs, Pipettes} from '../../components/calibrate-pipettes'
 
 import SessionHeader from '../../components/SessionHeader'
 
-type StateProps = {
+type SP = {
   pipettes: Array<Pipette>,
-  currentPipette: ?Pipette
+  currentPipette: ?Pipette,
+  robot: Robot,
 }
 
-type OwnProps = ContextRouter
+type DP = {dispatch: Dispatch}
 
-type Props = StateProps & OwnProps
+type OP = {
+  match: Match
+}
 
-export default connect(makeMapStateToProps)(CalibratePipettesPage)
+type Props = SP & OP & {
+  fetchPipettes: () => mixed
+}
+
+export default connect(makeMapStateToProps, null, mergeProps)(CalibratePipettesPage)
 
 function CalibratePipettesPage (props: Props) {
-  const {pipettes, currentPipette, match: {url, params}} = props
+  const {
+    pipettes,
+    currentPipette,
+    fetchPipettes,
+    match: {url, params}
+  } = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
   // redirect back to mountless route if mount doesn't exist
@@ -37,6 +49,9 @@ function CalibratePipettesPage (props: Props) {
   }
 
   return (
+    <RefreshWrapper
+      refresh={fetchPipettes}
+    >
     <Page
       titleBarProps={{title: (<SessionHeader />)}}
     >
@@ -57,22 +72,35 @@ function CalibratePipettesPage (props: Props) {
         )} />
       )}
     </Page>
+    </RefreshWrapper>
   )
 }
 
-function makeMapStateToProps (): (State, OwnProps) => StateProps {
+function makeMapStateToProps (): (State, OP) => SP {
   const getCurrentPipette = robotSelectors.makeGetCurrentPipette()
   const getAttachedPipettes = makeGetRobotPipettes()
 
   return (state, props) => {
     const name = robotSelectors.getConnectedRobotName(state)
+    const robot = robotSelectors.getConnectedRobot(state)
     const pipettesResponse = getAttachedPipettes(state, {name})
 
     return {
       name,
+      robot,
       pipettes: robotSelectors.getPipettes(state),
       currentPipette: getCurrentPipette(state, props),
       actualPipettes: pipettesResponse.response
     }
+  }
+}
+
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {dispatch} = dispatchProps
+  const {robot} = stateProps
+  return {
+    ...stateProps,
+    ...ownProps,
+    fetchPipettes: () => { dispatch(fetchPipettes(robot)) }
   }
 }
