@@ -54,7 +54,7 @@ export type SourceDestSubstepItemMultiChannel = {|
 
 export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
 
-export type StepSubItemData =
+export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseFormData // Pause substep uses same data as processed form
 
@@ -66,6 +66,6 @@ export type StepItemData = {
   formData: ?FormData
 }
 
-export type SubSteps = {[StepIdType]: StepSubItemData | null}
+export type SubSteps = {[StepIdType]: ?SubstepItemData}
 
 export type StepIdTypeWithEnd = StepIdType | typeof END_STEP

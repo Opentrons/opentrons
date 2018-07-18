@@ -10,7 +10,7 @@ import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 
 import type {Selector} from '../types'
-import type {StepSubItemData} from '../steplist/types'
+import type {SubstepItemData} from '../steplist/types'
 
 type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
@@ -88,7 +88,7 @@ function _getSelectedWellsForStep (
 function _getSelectedWellsForSubstep (
   form: StepGeneration.CommandCreatorData,
   labwareId: string,
-  substeps: StepSubItemData | null,
+  substeps: ?SubstepItemData,
   substepIndex: number
 ): Array<string> {
   if (substeps === null) {
@@ -170,13 +170,13 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       return selectedWells.reduce((acc, well) => ({...acc, [well]: true}), {})
     }
 
-    function highlightedWellsForTimelineFrame (liquidState, timelineIdx): AllWellHighlightsAllLabware {
-      const robotState = timeline[timelineIdx].robotState
+    function highlightedWellsForTimelineFrame (liquidState, timelineIndex): AllWellHighlightsAllLabware {
+      const robotState = timeline[timelineIndex].robotState
       // TODO: Ian 2018-06-15 BUG! this doesn't work where there are deleted steps.
-      // Need to use orderedSteps[timelineIdx + 1] to get stepId
+      // Need to use orderedSteps[timelineIndex + 1] to get stepId
       // (just like in warningsPerStep and getErrorStepId selectors in file-data/selectors/commands)
       // Make stepId's always UNIQUE STRINGS to avoid trying to add 1 to them?
-      const formIdx = timelineIdx + 1
+      const formIdx = timelineIndex + 1
       const form = _forms[formIdx] && _forms[formIdx].validatedForm
 
       // replace value of each labware with highlighted wells info
