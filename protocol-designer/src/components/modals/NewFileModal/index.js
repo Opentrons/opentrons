@@ -8,6 +8,7 @@ import {
   InputField
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
+import isEmpty from 'lodash/isEmpty'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
@@ -72,8 +73,9 @@ export default class NewFileModal extends React.Component<Props, State> {
   makeHandleMountFieldChange = (mount: 'left' | 'right', fieldName) => (e: SyntheticInputEvent<*>) => {
     const value: string = e.target.value
     let nextMountState = {[fieldName]: value}
-    if (fieldName === 'pipetteModel' && !value) nextMountState = {...nextMountState, tiprackModel: null}
-    this.setState({[mount]: {...this.state.mount, ...nextMountState}})
+    if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
+    console.log('PREV: ', this.state[mount])
+    this.setState({[mount]: {...this.state[mount], ...nextMountState}})
   }
   handleNameChange = (e: SyntheticInputEvent<*>) => this.setState({name: e.target.value})
 
@@ -149,7 +151,7 @@ const MountFields = (props: MountFieldsProps) => (
 
     <FormGroup key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
       <DropdownField
-        disabled={!props.values.pipetteModel}
+        disabled={isEmpty(props.values.pipetteModel)}
         options={tiprackOptions}
         value={props.values.tiprackModel}
         onChange={props.makeOnChange(props.mount, 'tiprackModel')} />
