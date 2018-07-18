@@ -148,9 +148,9 @@ const MountFields = (props: MountFieldsProps) => (
         onChange={props.makeOnChange(props.mount, 'pipetteModel')} />
     </FormGroup>
 
-    <FormGroup key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
+    <FormGroup disabled={isEmpty(props.values.pipetteModel)} key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
       <DropdownField
-        disabled={isEmpty(props.values.pipetteModel) || props.values.pipetteModel === USER_HAS_NOT_SELECTED}
+        disabled={isEmpty(props.values.pipetteModel)}
         options={tiprackOptions}
         value={props.values.tiprackModel}
         onChange={props.makeOnChange(props.mount, 'tiprackModel')} />
