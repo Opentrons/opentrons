@@ -10,12 +10,12 @@ import hintManifest from './hintManifest'
 
 type SP = {hints: Array<string>}
 
-type DP = {dismissHint: (CommandCreatorWarning) => () => mixed}
+type DP = {removeHint: (CommandCreatorWarning) => () => mixed}
 
 type Props = SP & DP
 
 class Hints extends React.Component<Props> {
-  makeHandleCloseClick = (hint) => () => this.props.dismissHint(hint)
+  makeHandleCloseClick = (hint) => () => this.props.removeHint(hint)
 
   render () {
     return (
@@ -39,7 +39,7 @@ const mapStateToProps = (state: BaseState): SP => ({
   hints: selectors.getHints(state)
 })
 const mapDispatchToProps = (dispatch: Dispatch): DP => ({
-  dismissHint: (hint) => dispatch(actions.dismissHint(hint))
+  removeHint: (hint) => dispatch(actions.removeHint(hint))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Hints)

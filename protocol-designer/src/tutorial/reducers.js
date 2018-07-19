@@ -1,6 +1,7 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
+import without from 'lodash/without'
 import type {HintKey} from './index'
 
 type HintReducerState = Array<HintKey>
@@ -9,7 +10,7 @@ const hints = handleActions({
     [...state, action.payload.hint]
   ),
   REMOVE_HINT: (state: HintReducerState, action: DequeueHintAction): HintReducerState => (
-    state.slice(1)
+    without(state, action.payload.hint)
   )
 }, [])
 

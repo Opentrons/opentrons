@@ -3,6 +3,8 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
 import {END_STEP} from '../types'
+import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
+import {actions as tutorialActions} from '../../tutorial'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
 import type {ChangeFormPayload} from './types'
 import type {SubstepIdentifier, FormSectionNames} from '../types'
@@ -48,7 +50,8 @@ type NewStepPayload = {
 // addStep thunk adds an incremental integer ID for Step reducers.
 export const addStep = (payload: NewStepPayload) =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const stepId = selectors.nextStepId(getState())
+    const state = getState()
+    const stepId = selectors.nextStepId(state)
     dispatch({
       type: 'ADD_STEP',
       payload: {
@@ -56,7 +59,12 @@ export const addStep = (payload: NewStepPayload) =>
         id: stepId
       }
     })
-
+    const deckHasLiquid = labwareIngredsSelectors.hasLiquid(state)
+    const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
+    console.table({deckHasLiquid, stepNeedsLiquid})
+    if (stepNeedsLiquid && !deckHasLiquid) {
+      dispatch(tutorialActions.addHint('add_liquids_and_labware'))
+    }
     dispatch(selectStep(stepId))
   }
 

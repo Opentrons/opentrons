@@ -9,6 +9,7 @@ import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
+import isEmpty from 'lodash/isEmpty'
 
 import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils.js'
@@ -430,6 +431,8 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
+const hasLiquid = (state) => !isEmpty(getIngredientGroups(state))
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -454,7 +457,8 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
-  labwareOptions
+  labwareOptions,
+  hasLiquid
 }
 
 export default rootReducer

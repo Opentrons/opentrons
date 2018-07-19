@@ -6,5 +6,7 @@ const rootSelector = (state: BaseState) => state.tutorial
 
 export const getHints = createSelector(
   rootSelector,
-  tutorial => tutorial.hints
+  tutorial => (
+    tutorial.hints.filter(hint => !tutorial.dismissedHints.includes(hint))
+  )
 )

@@ -5,6 +5,7 @@ export const addHint = (hint: HintKey) => ({
   payload: {hint}
 })
 
-export const dequeueHint = () => ({
-  type: 'REMOVE_HINT'
+export const removeHint = (hint: HintKey) => ({
+  type: 'REMOVE_HINT',
+  payload: {hint}
 })
