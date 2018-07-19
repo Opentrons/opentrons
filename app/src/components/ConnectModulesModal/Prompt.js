@@ -31,6 +31,9 @@ export default function Prompt (props: Props) {
   const message = modulesMissing
     ? 'Plug in and power up the required module via USB to your robot.'
     : 'Module succesfully detected.'
+  const buttonText = modulesMissing
+    ? 'try searching for missing module'
+    : 'continue to labware setup'
   return (
     <div className={styles.prompt}>
       {alert}
@@ -38,7 +41,7 @@ export default function Prompt (props: Props) {
         {message}
       </p>
       <OutlineButton className={styles.prompt_button} onClick={onClick} inverted>
-        try searching for missing module
+        {buttonText}
       </OutlineButton>
     </div>
   )
