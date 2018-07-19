@@ -16,7 +16,7 @@ type OP = Robot
 
 type SP = {
   modulesFlag: ?boolean,
-  modules: Array<Module>,
+  modules: Array<?Module>,
   refreshing: boolean
 }
 
@@ -28,7 +28,7 @@ const TITLE = 'Modules'
 
 const STUBBED_MODULE_DATA = [
   {
-    name: 'temp_deck',
+    name: 'tempdeck',
     model: 'temp_deck',
     serial: '123123124',
     fwVersion: '1.2.13',
@@ -36,7 +36,7 @@ const STUBBED_MODULE_DATA = [
     displayName: 'Temperature Module'
   },
   {
-    name: 'mag_deck',
+    name: 'magdeck',
     model: 'mag_deck',
     serial: '123123124',
     fwVersion: '1.2.13',

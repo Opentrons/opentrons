@@ -168,6 +168,11 @@ export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
 
+export type SetModulesReviewedAction = {
+  type: 'robot:SET_MODULES_REVIEWED',
+  payload: boolean
+}
+
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
@@ -220,6 +225,7 @@ export type Action =
   | SetJogDistanceAction
   | SessionUpdateAction
   | RefreshSessionAction
+  | SetModulesReviewedAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -291,6 +297,10 @@ export const actions = {
       type: 'robot:SESSION_UPDATE',
       payload: update
     }
+  },
+
+  setModulesReviewed (payload: boolean) {
+    return {type: 'robot:SET_MODULES_REVIEWED', payload}
   },
 
   setDeckPopulated (payload: boolean) {

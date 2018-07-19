@@ -132,13 +132,15 @@ export type Labware = StateLabware & {
 
 export type LabwareType = 'tiprack' | 'labware'
 
+export type ModuleType = 'magdeck' | 'tempdeck'
+
 export type StateModule = {
   // resource ID
   _id: number,
   // slot module is installed in
   slot: Slot,
   // name identifier of the module
-  type: 'magdeck' | 'tempdeck',
+  name: ModuleType
 }
 
 export type SessionStatus =

@@ -1,3 +1,24 @@
+@import '@opentrons/components';
+
+.modal {
+  @apply --modal;
+
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 4rem 2rem 2rem;
+}
+
+.modal * {
+  z-index: 1;
+}
+
 .error_modal_message {
   font-style: italic;
+}
+
+.title_bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }

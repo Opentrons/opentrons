@@ -1,5 +1,5 @@
 // @flow
-// modal component for ReviewDeckModal of labware calibration page
+// modal component to replace Modal after refactor
 import * as React from 'react'
 
 import {Overlay} from '@opentrons/components'

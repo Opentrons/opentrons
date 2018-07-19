@@ -393,6 +393,10 @@ export const getLabware = createSelector(
   }
 )
 
+export function getModulesReviewed (state: State) {
+  return calibration(state).modulesReviewed
+}
+
 export function getDeckPopulated (state: State) {
   return calibration(state).deckPopulated
 }
