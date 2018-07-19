@@ -1,7 +1,5 @@
 // @flow
-
-type HintKey =
-  | 'add_liquids_and_labware'
+import type {HintKey} from '../../tutorial'
 
 type Hint = {title: string, body: string}
 

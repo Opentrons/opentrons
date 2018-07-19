@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import TimelineAlerts from '../components/steplist/TimelineAlerts'
-import HelpfulTips from '../components/HelpfulTips'
+import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import StepEditForm from '../components/StepEditForm'
@@ -31,7 +31,7 @@ export default function ProtocolEditor () {
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
           <TimelineAlerts />
-          <HelpfulTips />
+          <Hints />
 
           <div className={styles.main_page_content}>
             <ConnectedNewFileModal />
