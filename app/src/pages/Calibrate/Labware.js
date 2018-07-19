@@ -4,8 +4,10 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Route, Redirect, withRouter, type Match} from 'react-router'
 import {push} from 'react-router-redux'
+import countBy from 'lodash/countBy'
+
 import type {State, Dispatch} from '../../types'
-import type {Labware, Robot, StateModule} from '../../robot'
+import type {Labware, Robot, SessionModule} from '../../robot'
 import {
   selectors as robotSelectors,
   actions as robotActions
@@ -27,20 +29,17 @@ type SP = {
   deckPopulated: boolean,
   labware: ?Labware,
   calibrateToBottom: boolean,
-  robot: Robot,
-  modules: Array<StateModule>,
-  actualModules: Array<?Module>,
-  reviewModules: ?boolean
+  _robot: ?Robot,
+  modulesMissing: boolean,
+  reviewModules: ?boolean,
 }
 
-type DP = {
-  dispatch: Dispatch
-}
+type DP = {dispatch: Dispatch}
 
 type Props = SP & OP & {
-  onBackClick: () => void,
+  onBackClick: () => mixed,
   fetchModules: () => mixed,
-  setModulesReviewed: () => mixed,
+  onReviewPromptClick: () => mixed,
 }
 
 export default withRouter(connect(makeMapStateToProps, null, mergeProps)(SetupDeckPage))
@@ -50,19 +49,14 @@ function SetupDeckPage (props: Props) {
     calibrateToBottom,
     labware,
     deckPopulated,
-    modules,
-    actualModules,
+    modulesMissing,
     reviewModules,
     onBackClick,
     fetchModules,
-    setModulesReviewed,
+    onReviewPromptClick,
     match: {url, params: {slot}}
   } = props
 
-  const modulesMissing = compareNames(modules, actualModules)
-  const onClick = modulesMissing
-    ? fetchModules
-    : setModulesReviewed
   return (
     <RefreshWrapper
       refresh={fetchModules}
@@ -74,7 +68,7 @@ function SetupDeckPage (props: Props) {
       </Page>
       {reviewModules && (
         <ConnectModulesModal
-          onClick={onClick}
+          onClick={onReviewPromptClick}
           modulesMissing={modulesMissing}
         />
       )}
@@ -105,7 +99,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const labware = robotSelectors.getLabware(state)
     const currentLabware = labware.find((lw) => lw.slot === slot)
     const name = robotSelectors.getConnectedRobotName(state)
-    const robot = robotSelectors.getConnectedRobot(state)
+    const _robot = robotSelectors.getConnectedRobot(state)
 
     const settingsResponse = getRobotSettings(state, {name}).response
     const settings = settingsResponse && settingsResponse.settings
@@ -114,25 +108,25 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
     const modules = robotSelectors.getModules(state)
 
-    const modulesCall = getRobotModules(state, robot)
-    const modulesResponse = modulesCall.response
+    const modulesCall = _robot && getRobotModules(state, _robot)
+    const modulesResponse = modulesCall && modulesCall.response
     const actualModules = modulesResponse && modulesResponse.modules
 
     const modulesReviewed = robotSelectors.getModulesReviewed(state)
     const modulesFlag = getModulesOn(state)
     const modulesRequired = modules[0]
 
-    const reviewModules = modulesFlag && !modulesReviewed && modulesRequired
+    const reviewModules = modulesFlag && !modulesReviewed && !!modulesRequired
+
     return {
-      deckPopulated: !!robotSelectors.getDeckPopulated(state),
-      labware: currentLabware,
       slot,
       url,
       calibrateToBottom,
-      robot,
-      modules,
-      actualModules: actualModules || [],
-      reviewModules
+      reviewModules,
+      _robot,
+      modulesMissing: checkModules(modules, actualModules),
+      deckPopulated: !!robotSelectors.getDeckPopulated(state),
+      labware: currentLabware
     }
   }
 }
@@ -140,33 +134,29 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {match: {url}} = ownProps
   const {dispatch} = dispatchProps
-  const {robot} = stateProps
+  const {_robot, modulesMissing} = stateProps
+
+  const fetchMods = () => _robot && dispatch(fetchModules(_robot))
+  const onReviewPromptClick = modulesMissing
+    ? fetchMods
+    : () => dispatch(robotActions.setModulesReviewed(true))
+
   return {
     ...stateProps,
     ...ownProps,
-    onBackClick: () => { dispatch(push(url)) },
-    fetchModules: () => {
-      dispatch(fetchModules(robot))
-    },
-    setModulesReviewed: () => { dispatch(robotActions.setModulesReviewed(true)) }
+    onReviewPromptClick,
+    fetchModules: fetchMods,
+    onBackClick: () => dispatch(push(url))
   }
 }
 
-// TODO (ka 2018-7-19): type this more specifically
-function getNames (array: Array<any> | []): Array<string> {
-  const names = array
-    ? array.map((m) => { return m.name }).sort()
-    : []
-  return names
-}
+function checkModules (
+  required: Array<SessionModule>,
+  actual: ?Array<Module>
+): boolean {
+  const requiredNames = countBy(required, 'name')
+  const actualNames = countBy(actual, 'name')
 
-function compareNames (a: Array<StateModule>, b: Array<?Module> | null) {
-  const mods = getNames(a)
-  const actMods = b
-    ? getNames(b)
-    : []
-  if (mods.length !== actMods.length) {
-    return true
-  }
-  return !mods.every(e => actMods.includes(e))
+  return Object.keys(requiredNames)
+    .some(n => requiredNames[n] !== actualNames[n])
 }

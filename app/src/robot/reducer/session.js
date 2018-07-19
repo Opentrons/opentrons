@@ -4,7 +4,7 @@ import type {
   Command,
   StatePipette,
   StateLabware,
-  StateModule,
+  SessionModule,
   Mount,
   Slot,
   SessionStatus
@@ -41,7 +41,7 @@ export type State = {
     [Slot]: StateLabware,
   },
   modulesBySlot: {
-    [Slot]: StateModule,
+    [Slot]: SessionModule,
   },
   runRequest: Request,
   pauseRequest: Request,

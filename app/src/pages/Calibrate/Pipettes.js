@@ -19,18 +19,14 @@ import SessionHeader from '../../components/SessionHeader'
 type SP = {
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
-  robot: Robot,
+  _robot: ?Robot,
 }
 
 type DP = {dispatch: Dispatch}
 
-type OP = {
-  match: Match
-}
+type OP = {match: Match}
 
-type Props = SP & OP & {
-  fetchPipettes: () => mixed
-}
+type Props = SP & OP & {fetchPipettes: () => mixed}
 
 export default connect(makeMapStateToProps, null, mergeProps)(CalibratePipettesPage)
 
@@ -82,12 +78,12 @@ function makeMapStateToProps (): (State, OP) => SP {
 
   return (state, props) => {
     const name = robotSelectors.getConnectedRobotName(state)
-    const robot = robotSelectors.getConnectedRobot(state)
+    const _robot = robotSelectors.getConnectedRobot(state)
     const pipettesResponse = getAttachedPipettes(state, {name})
 
     return {
       name,
-      robot,
+      _robot,
       pipettes: robotSelectors.getPipettes(state),
       currentPipette: getCurrentPipette(state, props),
       actualPipettes: pipettesResponse.response
@@ -97,10 +93,11 @@ function makeMapStateToProps (): (State, OP) => SP {
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {dispatch} = dispatchProps
-  const {robot} = stateProps
+  const {_robot} = stateProps
+
   return {
     ...stateProps,
     ...ownProps,
-    fetchPipettes: () => { dispatch(fetchPipettes(robot)) }
+    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot))
   }
 }

@@ -21,7 +21,7 @@ export type Module = {
 }
 
 type FetchModulesResponse = {
-  modules: Array<?Module>,
+  modules: Array<Module>,
 }
 
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>

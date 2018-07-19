@@ -16,7 +16,7 @@ type OP = Robot
 
 type SP = {
   modulesFlag: ?boolean,
-  modules: Array<?Module>,
+  modules: ?Array<Module>,
   refreshing: boolean
 }
 
@@ -74,7 +74,7 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
 
     return {
       modulesFlag: getModulesOn(state),
-      modules: modules || STUBBED_MODULE_DATA,
+      modules: modules /* || STUBBED_MODULE_DATA */,
       refreshing: modulesCall.inProgress
     }
   }

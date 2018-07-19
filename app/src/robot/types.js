@@ -134,7 +134,7 @@ export type LabwareType = 'tiprack' | 'labware'
 
 export type ModuleType = 'magdeck' | 'tempdeck'
 
-export type StateModule = {
+export type SessionModule = {
   // resource ID
   _id: number,
   // slot module is installed in

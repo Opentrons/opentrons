@@ -4,13 +4,11 @@ import type {Module} from '../../http-api-client'
 import ModuleItem, {NoModulesMessage} from '../ModuleItem'
 
 type Props = {
-  modules: Array<?Module>,
+  modules: ?Array<Module>,
 }
 
 export default function ModulesCardContents (props: Props) {
-  const modulesFound = props.modules && props.modules[0]
-
-  if (!modulesFound) return (<NoModulesMessage />)
+  if (!props.modules || !props.modules[0]) return (<NoModulesMessage />)
 
   return (
     <React.Fragment>

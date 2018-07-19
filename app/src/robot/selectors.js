@@ -2,13 +2,14 @@
 // robot selectors
 import padStart from 'lodash/padStart'
 import sortBy from 'lodash/sortBy'
-import {createSelector} from 'reselect'
+import {createSelector, type Selector} from 'reselect'
 import type {ContextRouter} from 'react-router'
 
 import type {State} from '../types'
 
 import type {
   Mount,
+  Slot,
   Pipette,
   PipetteCalibrationStatus,
   Labware,
@@ -16,7 +17,7 @@ import type {
   LabwareType,
   Robot,
   SessionStatus,
-  StateModule
+  SessionModule
 } from './types'
 
 import {
@@ -76,11 +77,11 @@ export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export function getConnectedRobotName (state: State) {
+export function getConnectedRobotName (state: State): string {
   return connection(state).connectedTo
 }
 
-export const getConnectedRobot = createSelector(
+export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
   getDiscovered,
   (discovered) => discovered.find((r) => r.isConnected)
 )
@@ -314,21 +315,18 @@ export const getPipettesCalibrated = createSelector(
   )
 )
 
-export function getModulesBySlot (state: State) {
+export function getModulesBySlot (state: State): {[Slot]: ?SessionModule} {
   return session(state).modulesBySlot
 }
 
-export const getModules = createSelector(
-  getModulesBySlot,
-  (modules): ?StateModule[] => {
-    return Object.keys(modules)
-     .filter(isSlot)
-     .map((slot) => {
-       const module = modules[slot]
-       return {...module}
-     })
-  }
-)
+export const getModules: Selector<State, void, Array<SessionModule>> =
+  createSelector(
+    getModulesBySlot,
+    modulesBySlot => Object
+      .keys(modulesBySlot)
+      .map(slot => modulesBySlot[slot])
+      .filter(Boolean)
+  )
 
 export function getLabwareBySlot (state: State) {
   return session(state).labwareBySlot
