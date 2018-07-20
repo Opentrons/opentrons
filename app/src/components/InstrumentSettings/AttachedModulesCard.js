@@ -26,24 +26,26 @@ type Props = OP & SP & DP
 
 const TITLE = 'Modules'
 
-const STUBBED_MODULE_DATA = [
-  {
-    name: 'tempdeck',
-    model: 'temp_deck',
-    serial: '123123124',
-    fwVersion: '1.2.13',
-    status: '86',
-    displayName: 'Temperature Module'
-  },
-  {
-    name: 'magdeck',
-    model: 'mag_deck',
-    serial: '123123124',
-    fwVersion: '1.2.13',
-    status: 'disengaged',
-    displayName: 'Magnetic Bead Module'
-  }
-]
+// TODO(mc, 2018-07-19): remove this testing code when API returns modules
+// const STUBBED_MODULE_DATA = [
+//   {
+//     name: 'tempdeck',
+//     model: 'temp_deck',
+//     serial: '123123124',
+//     fwVersion: '1.2.13',
+//     status: '86',
+//     displayName: 'Temperature Module'
+//   },
+//   {
+//     name: 'magdeck',
+//     model: 'mag_deck',
+//     serial: '123123124',
+//     fwVersion: '1.2.13',
+//     status: 'disengaged',
+//     displayName: 'Magnetic Bead Module'
+//   }
+// ]
+
 export default connect(makeSTP, DTP)(AttachedModulesCard)
 
 // TODO (ka 2018-6-29): change this to a refresh card once we have endpoints
