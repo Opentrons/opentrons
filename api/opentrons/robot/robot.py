@@ -23,92 +23,6 @@ TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
 
 
-class InstrumentMosfet(object):
-    """
-    Provides access to MagBead's MOSFET.
-    """
-
-    def __init__(self, this_robot, mosfet_index):
-        self.robot = this_robot
-        self.mosfet_index = mosfet_index
-
-    def engage(self):
-        """
-        Engages the MOSFET.
-        """
-        self.robot._driver.set_mosfet(self.mosfet_index, True)
-
-    def disengage(self):
-        """
-        Disengages the MOSFET.
-        """
-        self.robot._driver.set_mosfet(self.mosfet_index, False)
-
-    def wait(self, seconds):
-        """
-        Pauses protocol execution.
-
-        Parameters
-        ----------
-        seconds : int
-            Number of seconds to pause for.
-        """
-        self.robot._driver.wait(seconds)
-
-
-class InstrumentMotor(object):
-    """
-    Provides access to Robot's head motor.
-    """
-
-    def __init__(self, this_robot, axis):
-        self.robot = this_robot
-        self.axis = axis
-
-    def move(self, value, mode='absolute'):
-        """
-        Move plunger motor.
-
-        Parameters
-        ----------
-        value : int
-            A one-dimensional coordinate to move to.
-        mode : {'absolute', 'relative'}
-        """
-        kwargs = {self.axis: value}
-        self.robot._driver.move_plunger(
-            mode=mode, **kwargs
-        )
-
-    def home(self):
-        """
-        Home plunger motor.
-        """
-        self.robot._driver.home(self.axis)
-
-    def wait(self, seconds):
-        """
-        Wait.
-
-        Parameters
-        ----------
-        seconds : int
-            Number of seconds to pause for.
-        """
-        self.robot._driver.wait(seconds)
-
-    def speed(self, rate):
-        """
-        Set motor speed.
-
-        Parameters
-        ----------
-        rate : int
-        """
-        self.robot._driver.set_plunger_speed(rate, self.axis)
-        return self
-
-
 def _setup_container(container_name):
     try:
         container = database.load_container(container_name)
@@ -453,24 +367,6 @@ class Robot(object):
         or :func:`simulate`.
         """
         return list(self._runtime_warnings)
-
-    def get_motor(self, axis):
-        """
-        Get robot's head motor.
-
-        Parameters
-        ----------
-        axis : {'a', 'b'}
-            Axis name. Please check stickers on robot's gantry for the name.
-        """
-        instr_type = 'instrument'
-        key = (instr_type, axis)
-
-        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
-        if not motor_obj:
-            motor_obj = InstrumentMotor(self, axis)
-            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
-        return motor_obj
 
     def connect(self, port=None, options=None):
         """
