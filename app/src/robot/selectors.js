@@ -9,7 +9,6 @@ import type {State} from '../types'
 
 import type {
   Mount,
-  Slot,
   Pipette,
   PipetteCalibrationStatus,
   Labware,
@@ -315,7 +314,7 @@ export const getPipettesCalibrated = createSelector(
   )
 )
 
-export function getModulesBySlot (state: State): {[Slot]: ?SessionModule} {
+export function getModulesBySlot (state: State): {[string]: ?SessionModule} {
   return session(state).modulesBySlot
 }
 
