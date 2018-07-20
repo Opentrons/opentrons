@@ -44,7 +44,7 @@ function OccupiedDeckSlotOverlay ({
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
         <ClickableText onClick={() => openIngredientSelector(containerId)}
-          iconName='pen' y='25%' text='Name & Liquids' />
+          iconName='pencil' y='25%' text='Name & Liquids' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
         iconName='cursor-move' y='50%' text='Copy' />
