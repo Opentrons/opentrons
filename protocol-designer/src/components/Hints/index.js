@@ -10,9 +10,7 @@ import type {BaseState} from '../../types'
 import hintManifest from './hintManifest'
 
 type SP = {hints: Array<HintKey>}
-
 type DP = {removeHint: (HintKey) => mixed}
-
 type Props = SP & DP
 
 class Hints extends React.Component<Props> {

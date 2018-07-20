@@ -45,7 +45,6 @@ export default function updateLiquidState (
       ).dest
 
       let nextWarnings = []
-      console.table({prevSourceLiquidState, volume})
       if (isEmpty(prevSourceLiquidState)) {
         nextWarnings = [...nextWarnings, warningCreators.aspirateFromPristineWell()]
       } else if (volume > totalVolume(prevSourceLiquidState)) {

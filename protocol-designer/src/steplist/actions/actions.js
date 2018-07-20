@@ -61,7 +61,6 @@ export const addStep = (payload: NewStepPayload) =>
     })
     const deckHasLiquid = labwareIngredsSelectors.hasLiquid(state)
     const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
-    console.table({deckHasLiquid, stepNeedsLiquid})
     if (stepNeedsLiquid && !deckHasLiquid) {
       dispatch(tutorialActions.addHint('add_liquids_and_labware'))
     }

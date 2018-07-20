@@ -234,7 +234,7 @@ export type CommandCreatorError = {|
 
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
-  |  'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'ASPIRATE_FROM_PRISTINE_WELL'
 
 export type CommandCreatorWarning = {|
     message: string,
