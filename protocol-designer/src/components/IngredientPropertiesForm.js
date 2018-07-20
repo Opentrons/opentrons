@@ -280,7 +280,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       <div className={formStyles.form}>
         <form className={styles.form_content}>
           <div className={formStyles.row_wrapper}>
-              <FormGroup label='Ingredient title:' className={styles.ingred_title_field}>
+              <FormGroup label='Liquid title:' className={styles.ingred_title_field}>
                 <Field
                   error={visibleErrors.name}
                   accessor='name'
