@@ -49,13 +49,14 @@ function wellContentsGroupIdsToColor (wc: ContentsByWell): PlateWellContents {
   )
 }
 
+// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
 function getFillColor (groupIds: Array<string>): ?string {
   if (groupIds.length === 0) {
     return null
   }
 
   if (groupIds.length === 1) {
-    return swatchColors(parseInt(groupIds[0]))
+    return swatchColors(Number(groupIds[0]))
   }
 
   return MIXED_WELL_COLOR

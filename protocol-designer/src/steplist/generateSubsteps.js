@@ -1,6 +1,7 @@
 // @flow
 import range from 'lodash/range'
 
+import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
 import {
   utils as steplistUtils,
@@ -220,7 +221,7 @@ function commandToMultiRows (
   command: AspDispCommandType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  channels: 1 | 8
+  channels: Channels
 ): ?Array<StepItemSourceDestRowMulti> {
   const labwareId = command.params.labware
   const labwareType = getLabwareType(labwareId)

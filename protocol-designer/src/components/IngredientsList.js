@@ -62,7 +62,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       <TitledList
         title={name || 'Unnamed Ingredient'}
         className={styles.ingredient_titled_list}
-        iconProps={{style: {fill: swatchColors(parseInt(groupId))}}}
+        iconProps={{style: {fill: swatchColors(Number(groupId))}}}
         iconName='circle'
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}
