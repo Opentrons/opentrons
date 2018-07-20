@@ -254,6 +254,10 @@ def test_delay_calls(monkeypatch):
     def mock_sleep(seconds):
         cmd.append("sleep {}".format(seconds))
 
+    def mock_is_simulating():
+        return False
+
+    monkeypatch.setattr(robot, 'is_simulating', mock_is_simulating)
     monkeypatch.setattr(robot, 'pause', mock_pause)
     monkeypatch.setattr(robot, 'resume', mock_resume)
     monkeypatch.setattr(pipette, '_sleep', mock_sleep)
