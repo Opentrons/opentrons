@@ -12,7 +12,7 @@ import {getRobotApiState} from './reducer'
 import client from './client'
 
 export type Module = {
-  name: string,
+  name: 'magdeck' | 'tempdeck',
   model: string,
   serial: string,
   fwVersion: string,

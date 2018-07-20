@@ -125,6 +125,18 @@ describe('robot actions', () => {
     expect(actions.sessionUpdate(update)).toEqual(expected)
   })
 
+  test('set modules reviewed action', () => {
+    expect(actions.setModulesReviewed(false)).toEqual({
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: false
+    })
+
+    expect(actions.setModulesReviewed(true)).toEqual({
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: true
+    })
+  })
+
   test('set deck populated action', () => {
     expect(actions.setDeckPopulated(false)).toEqual({
       type: actionTypes.SET_DECK_POPULATED,

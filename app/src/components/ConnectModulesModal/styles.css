@@ -1,13 +1,20 @@
 @import '@opentrons/components';
 
+.alert {
+  position: absolute;
+  top: 3rem;
+  left: 0;
+  right: 0;
+}
+
 .prompt {
-  max-width: 32rem;
-  margin: 0 0 0.5rem;
+  padding-top: 2rem;
 }
 
 .prompt_text {
   @apply --font-header-light;
 
+  font-weight: normal;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -18,16 +25,4 @@
   margin: 1rem auto;
   padding-left: 3rem;
   padding-right: 3rem;
-}
-
-.prompt_details {
-  @apply --font-body-2-light;
-
-  margin: 1rem 0 0;
-  text-align: center;
-}
-
-.deck {
-  width: 100%;
-  overflow: visible;
 }

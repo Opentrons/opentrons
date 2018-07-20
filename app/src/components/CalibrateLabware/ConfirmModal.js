@@ -12,7 +12,7 @@ import styles from './styles.css'
 type Props = {
   labware: Labware,
   calibrateToBottom: boolean,
-  onBackClick: () => void,
+  onBackClick: () => mixed,
 }
 
 export default function ConfirmModal (props: Props) {

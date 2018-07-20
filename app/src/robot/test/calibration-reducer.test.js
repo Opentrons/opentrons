@@ -3,6 +3,7 @@ import {reducer, actionTypes} from '../'
 
 const EXPECTED_INITIAL_STATE = {
   deckPopulated: null,
+  modulesReviewed: null,
 
   // intrument probed + basic tip-tracking flags
   // TODO(mc, 2018-01-22): combine these into subreducer
@@ -48,6 +49,21 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
+  test('handles SET_MODULES_REVIEWED action', () => {
+    const setToTrue = {type: 'robot:SET_MODULES_REVIEWED', payload: true}
+    const setToFalse = {type: 'robot:SET_MODULES_REVIEWED', payload: false}
+
+    let state = {calibration: {modulesReviewed: false}}
+    expect(reducer(state, setToTrue).calibration).toEqual({
+      modulesReviewed: true
+    })
+
+    state = {calibration: {modulesReviewed: true}}
+    expect(reducer(state, setToFalse).calibration).toEqual({
+      modulesReviewed: false
+    })
+  })
+
   test('handles SET_DECK_POPULATED action', () => {
     const setToTrue = {type: actionTypes.SET_DECK_POPULATED, payload: true}
     const setToFalse = {type: actionTypes.SET_DECK_POPULATED, payload: false}
@@ -67,6 +83,7 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         deckPopulated: false,
+        modulesReviewed: false,
         calibrationRequest: {
           type: '',
           inProgress: false,
@@ -81,6 +98,7 @@ describe('robot reducer - calibration', () => {
     }
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: true,
+      modulesReviewed: true,
       calibrationRequest: {
         type: 'PICKUP_AND_HOME',
         mount: 'left',
@@ -296,6 +314,7 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         deckPopulated: true,
+        modulesReviewed: true,
         calibrationRequest: {
           type: '',
           mount: '',
@@ -311,6 +330,7 @@ describe('robot reducer - calibration', () => {
 
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: false,
+      modulesReviewed: false,
       calibrationRequest: {
         type: 'MOVE_TO_FRONT',
         mount: 'left',
@@ -444,6 +464,7 @@ describe('robot reducer - calibration', () => {
     const state = {
       calibration: {
         deckPopulated: false,
+        modulesReviewed: false,
         calibrationRequest: {
           type: '',
           inProgress: false,
@@ -458,6 +479,7 @@ describe('robot reducer - calibration', () => {
 
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: true,
+      modulesReviewed: true,
       calibrationRequest: {
         type: 'MOVE_TO',
         inProgress: true,

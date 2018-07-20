@@ -11,7 +11,7 @@ import {
   type Labware
 } from '../../robot'
 
-import Modal from './Modal'
+import {Modal} from '../modals'
 import Prompt from './Prompt'
 import Deck from './Deck'
 
