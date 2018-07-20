@@ -58,14 +58,6 @@ def _setup_container(container_name):
     return container
 
 
-# NOTE: modules are stored in the Containers db table
-def _setup_module(module):
-    x, y, z = database.load_module(module.name)
-    from opentrons.util.vector import Vector
-    module._coordinates = Vector(x, y, z)
-    return module
-
-
 class Robot(object):
     """
     This class is the main interface to the robot.
@@ -128,7 +120,11 @@ class Robot(object):
             location = self._deck[placement]
         elif getattr(placement, 'stackable', False):
             location = placement
-        return location
+
+        # Look for any module placed in the given slot
+        # If there is, then the labware will be placed on the module
+        module = location.get_module()
+        return location if not module else module
 
     def _is_available_slot(self, location, share, slot, container_name):
         if pose_tracker.has_children(self.poses, location) and not share:
@@ -729,17 +725,6 @@ class Robot(object):
             self.add_container_to_pose_tracker(location, container)
             self.max_deck_height.cache_clear()
         return container
-
-    def add_module(self, module, slot, label=None):
-        module = _setup_module(module)
-        location = self._get_placement_location(slot)
-        location.add(module, label or module.__class__.__name__)
-        self.modules.append(module)
-        self.poses = pose_tracker.add(
-            self.poses,
-            module,
-            location,
-            pose_tracker.Point(*module._coordinates))
 
     def add_container_to_pose_tracker(self, location, container: Container):
         """

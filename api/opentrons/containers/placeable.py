@@ -11,6 +11,9 @@ from opentrons.util.vector import Vector
 from opentrons.config import feature_flags as ff
 
 
+SUPPORTED_MODULES = ['magdeck']
+
+
 def unpack_location(location):
     """
     Returns (:Placeable:, :Vector:) tuple
@@ -283,6 +286,14 @@ class Placeable(object):
         # Pop last (and hopefully only Deck) or None if there is no deck
         return res.pop()
 
+    def get_module(self):
+        """
+        Returns the module placeable if present
+        """
+        res = list(map(lambda x: self.get_child_by_name(x), SUPPORTED_MODULES))
+        # No probability of a slot having more than one module
+        return res[0] if len(res) > 0 else None
+
     def get_parent(self):
         """
         Returns parent
@@ -489,6 +500,13 @@ class Well(Placeable):
 class Slot(Placeable):
     """
     Class representing a Slot
+    """
+    stackable = True
+
+
+class Module(Placeable):
+    """
+    Class representing a module as a child of Slot and parent of Labware
     """
     stackable = True
 

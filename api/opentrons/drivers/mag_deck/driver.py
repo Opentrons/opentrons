@@ -352,6 +352,10 @@ class MagDeck:
             " because another process is currently using it, or"
             " the Serial port is disabled on this device (OS)"
             raise SerialException(error_msg)
+        except TypeError:
+            # This happens if there are no ttyMagDeck devices in /dev
+            # For development use ENABLE_VIRTUAL_SMOOTHIE=true
+            raise SerialException('No port specified')
 
     def _update_plate_height(self) -> str:
         try:
