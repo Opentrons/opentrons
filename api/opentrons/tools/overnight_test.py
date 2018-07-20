@@ -185,7 +185,7 @@ def test_axis(driver, logger, axis):
     if axis == 'Y':
         driver.move({'X': driver.homed_position['X']})
     driver.push_speed()
-    driver.set_speed(10)
+    driver.set_speed(8)
     driver.update_position()
     try:
         driver.move({axis: points[0]})
