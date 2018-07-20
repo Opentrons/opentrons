@@ -4,13 +4,14 @@ import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {actions, selectors} from '../../tutorial'
+import type {HintKey} from '../../tutorial'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../../types'
 import hintManifest from './hintManifest'
 
-type SP = {hints: Array<string>}
+type SP = {hints: Array<HintKey>}
 
-type DP = {removeHint: (CommandCreatorWarning) => () => mixed}
+type DP = {removeHint: (HintKey) => mixed}
 
 type Props = SP & DP
 
@@ -38,7 +39,7 @@ class Hints extends React.Component<Props> {
 const mapStateToProps = (state: BaseState): SP => ({
   hints: selectors.getHints(state)
 })
-const mapDispatchToProps = (dispatch: Dispatch): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   removeHint: (hint) => dispatch(actions.removeHint(hint))
 })
 

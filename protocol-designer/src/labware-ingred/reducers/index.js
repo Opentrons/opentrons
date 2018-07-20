@@ -431,7 +431,7 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
 
-const hasLiquid = (state) => !isEmpty(getIngredientGroups(state))
+const hasLiquid = (state: BaseState) => !isEmpty(getIngredientGroups(state))
 
 // TODO: prune selectors
 export const selectors = {
