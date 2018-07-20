@@ -13,14 +13,14 @@ import {stepIconsByType} from '../../form-types'
 import type {
   SubstepIdentifier,
   StepItemData,
-  StepSubItemData,
+  SubstepItemData,
   StepIdTypeWithEnd
 } from '../../steplist/types'
 
 type StepItemProps = {
   stepId: StepIdTypeWithEnd,
   step: ?StepItemData,
-  substeps: ?StepSubItemData,
+  substeps: ?SubstepItemData,
 
   collapsed?: boolean,
   error?: ?boolean,

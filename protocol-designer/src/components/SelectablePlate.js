@@ -11,14 +11,14 @@ import {
 } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
-import type {AllWellContents, WellContents} from '../labware-ingred/types'
+import type {ContentsByWell, WellContents} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
 type PlateProps = React.ElementProps<typeof Plate>
 type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
 
 export type Props = {
-  wellContents: AllWellContents,
+  wellContents: ContentsByWell,
   containerType: $PropertyType<PlateProps, 'containerType'>,
 
   selectable?: $PropertyType<PlateProps, 'selectable'>,
@@ -33,7 +33,7 @@ export type Props = {
   pipetteChannels?: Channels
 }
 
-function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
+function wellContentsGroupIdsToColor (wc: ContentsByWell): PlateWellContents {
   return mapValues(
     wc,
     (well: WellContents): SingleWell => ({
@@ -49,13 +49,14 @@ function wellContentsGroupIdsToColor (wc: AllWellContents): PlateWellContents {
   )
 }
 
+// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
 function getFillColor (groupIds: Array<string>): ?string {
   if (groupIds.length === 0) {
     return null
   }
 
   if (groupIds.length === 1) {
-    return swatchColors(parseInt(groupIds[0]))
+    return swatchColors(Number(groupIds[0]))
   }
 
   return MIXED_WELL_COLOR

@@ -2,12 +2,11 @@
 // TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
 import React from 'react'
 
-import {IconButton, SidePanel, TitledList} from '@opentrons/components'
+import {IconButton, SidePanel, TitledList, swatchColors} from '@opentrons/components'
 import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
-import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {IngredientGroups, PersistedIngredInputFields} from '../labware-ingred/types'
+import type {IngredientGroups, IngredientInstance} from '../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
@@ -22,7 +21,7 @@ type CommonProps = {|
 
 type CardProps = {|
   groupId: string,
-  ingredGroup: PersistedIngredInputFields,
+  ingredGroup: IngredientInstance,
   labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps
 |}
@@ -63,7 +62,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       <TitledList
         title={name || 'Unnamed Ingredient'}
         className={styles.ingredient_titled_list}
-        iconProps={{style: {fill: swatchColors(parseInt(groupId))}}}
+        iconProps={{style: {fill: swatchColors(Number(groupId))}}}
         iconName='circle'
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}

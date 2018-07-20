@@ -14,13 +14,17 @@ import wellSelectionSelectors from '../../well-selection/selectors'
 import {getAllWellsForLabware, getMaxVolumes} from '../../constants'
 
 import type {Selector} from '../../types'
-import type {WellContents, AllWellContents} from '../../labware-ingred/types'
-import type {NamedIngredsByLabwareAllSteps} from '../../steplist/types'
+import type {
+  WellContents,
+  WellContentsByLabware,
+  ContentsByWell
+} from '../../labware-ingred/types'
 
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import wellContentsAllLabwareExport from './wellContentsAllLabware'
 export const wellContentsAllLabware = wellContentsAllLabwareExport
+export type {WellContentsByLabware}
 
 function _wellContentsForWell (
   liquidVolState: StepGeneration.LocationLiquidState,
@@ -46,7 +50,7 @@ export function _wellContentsForLabware (
   labwareLiquids: StepGeneration.SingleLabwareLiquidState,
   labwareId: string,
   labwareType: string
-): AllWellContents {
+): ContentsByWell {
   const allWellsForContainer = getAllWellsForLabware(labwareType)
 
   return reduce(
@@ -64,18 +68,19 @@ export function _wellContentsForLabware (
   )
 }
 
-export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWellContents}>> = createSelector(
+export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
+  fileDataSelectors.getInitialRobotState,
   fileDataSelectors.robotStateTimeline,
   steplistSelectors.validatedForms,
-  (_robotStateTimeline, _forms) => {
-    const timeline = _robotStateTimeline.timeline
+  (_initialRobotState, _robotStateTimeline, _forms) => {
+    const timeline = [{robotState: _initialRobotState}, ..._robotStateTimeline.timeline]
     const liquidStateTimeline = timeline.map(t => t.robotState.liquidState.labware)
 
     return liquidStateTimeline.map(
-      (liquidState, timelineIdx) => mapValues(
+      (liquidState, timelineIndex) => mapValues(
         liquidState,
         (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
-          const robotState = timeline[timelineIdx].robotState
+          const robotState = timeline[timelineIndex].robotState
           const labwareType = robotState.labware[labwareId].type
 
           return _wellContentsForLabware(
@@ -89,7 +94,7 @@ export const allWellContentsForSteps: Selector<Array<{[labwareId: string]: AllWe
   }
 )
 
-export const lastValidWellContents: Selector<{[labwareId: string]: AllWellContents}> = createSelector(
+export const lastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
   (robotState) => {
     return mapValues(
@@ -103,27 +108,6 @@ export const lastValidWellContents: Selector<{[labwareId: string]: AllWellConten
       }
     )
   }
-)
-
-/** NamedIngred-formatted contents of wells, across all steps on the timeline */
-// TODO: Ian 2018-06-08 do not used NamedIngreds. Stay close to 'native' liquid state shape.
-export const namedIngredsByLabware: Selector<NamedIngredsByLabwareAllSteps> = createSelector(
-  allWellContentsForSteps,
-  labwareIngredSelectors.getIngredientGroups,
-  (_allWellContentsForSteps, _ingredientGroups) =>
-    _allWellContentsForSteps.map(stepWellContents =>
-      mapValues(stepWellContents, (labwareContents: AllWellContents, labwareId: string) =>
-        mapValues(labwareContents, (wellContents: WellContents, wellId: string) => {
-          return wellContents.groupIds
-            .filter(id => id in _ingredientGroups) // strip out __air__, etc pseudo-ingreds not in ingredientGroups
-            .map(id => ({
-              id: parseInt(id),
-              name: _ingredientGroups[id].name
-              // NOTE: serializeName is available too, but is being deprecated?
-            }))
-        })
-      )
-    )
 )
 
 export const selectedWellsMaxVolume: Selector<number> = createSelector(

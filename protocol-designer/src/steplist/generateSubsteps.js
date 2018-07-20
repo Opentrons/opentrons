@@ -1,9 +1,12 @@
 // @flow
-import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
+import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
-import {utils as steplistUtils} from '../steplist'
+import {
+  utils as steplistUtils,
+  type NamedIngred
+} from '../steplist'
 
 import {
   formHasErrors,
@@ -11,16 +14,13 @@ import {
 } from './formProcessing'
 
 import type {
-  NamedIngredsByLabwareAllSteps,
-  SubSteps,
+  SubstepItemData,
   SourceDestSubstepItem,
   StepItemSourceDestRow,
   StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel,
-  NamedIngred
+  SourceDestSubstepItemSingleChannel
 } from './types'
 
-import type {StepIdType} from '../form-types'
 import {
   consolidate,
   distribute,
@@ -30,8 +30,7 @@ import {
 
 import type {
   AspirateDispenseArgs,
-  Timeline
-  // CommandCreator
+  RobotState
 } from '../step-generation'
 
 import type {
@@ -44,10 +43,10 @@ import type {
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
-type AllLabwareTypes = {[labwareId: string]: string}
 type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
 type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
-type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
+
+export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
 type AspDispCommandType = {
@@ -58,20 +57,18 @@ type AspDispCommandType = {
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
-  stepId: StepIdType,
-  prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: Timeline
+  robotState: RobotState,
+  stepId: number
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
     allPipetteData,
-    stepId,
-    prevStepId,
     getIngreds,
     getLabwareType,
-    robotStateTimeline
+    robotState,
+    stepId
   } = args
 
   const {
@@ -83,15 +80,6 @@ function transferLikeSubsteps (args: {
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
     console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
-  }
-
-  const robotState = (
-    robotStateTimeline.timeline[prevStepId] &&
-    robotStateTimeline.timeline[prevStepId].robotState
-  )
-
-  if (!robotState) {
-    return null
   }
 
   // if false, show aspirate vol instead
@@ -204,7 +192,10 @@ function transferLikeSubsteps (args: {
   }
 }
 
-function commandToRows (command: AspDispCommandType, getIngreds: GetIngreds): ?StepItemSourceDestRow {
+function commandToRows (
+  command: AspDispCommandType,
+  getIngreds: GetIngreds
+): ?StepItemSourceDestRow {
   if (command.command === 'aspirate') {
     const {well, volume, labware} = command.params
     return {
@@ -230,7 +221,7 @@ function commandToMultiRows (
   command: AspDispCommandType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  channels: *
+  channels: Channels
 ): ?Array<StepItemSourceDestRowMulti> {
   const labwareId = command.params.labware
   const labwareType = getLabwareType(labwareId)
@@ -268,70 +259,51 @@ function commandToMultiRows (
   })
 }
 
-const getIngredsFactory = (
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  stepId: StepIdType
-): GetIngreds => (labware, well) => {
-  return (namedIngredsByLabwareAllSteps &&
-    namedIngredsByLabwareAllSteps[stepId] &&
-    namedIngredsByLabwareAllSteps[stepId][labware] &&
-    namedIngredsByLabwareAllSteps[stepId][labware][well]) || []
-}
-
-const getLabwareTypeFactory = (allLabwareTypes: AllLabwareTypes): GetLabwareType => (labwareId) => {
-  return allLabwareTypes && allLabwareTypes[labwareId]
-}
-
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
-  validatedForms: {[StepIdType]: ValidFormAndErrors},
+  valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  orderedSteps: Array<StepIdType>,
-  robotStateTimeline: Timeline
-): SubSteps {
-  return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
-    const validatedForm = valForm.validatedForm
-    const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
+  getLabwareType: GetLabwareType,
+  getIngreds: GetIngreds,
+  robotState: ?RobotState,
+  stepId: number
+): ?SubstepItemData {
+  if (!robotState) return null
 
-    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (validatedForm === null || formHasErrors(valForm)) {
-      return null
-    }
-
-    if (validatedForm.stepType === 'deck-setup') {
-      // No substeps for Deck Setup
-      return null
-    }
-
-    if (validatedForm.stepType === 'pause') {
-      // just returns formData
-      const formData: PauseFormData = validatedForm
-      return formData
-    }
-
-    if (
-      validatedForm.stepType === 'consolidate' ||
-      validatedForm.stepType === 'distribute' ||
-      validatedForm.stepType === 'transfer' ||
-      validatedForm.stepType === 'mix'
-    ) {
-      const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
-      const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-
-      return transferLikeSubsteps({
-        validatedForm,
-        allPipetteData,
-        stepId,
-        prevStepId,
-        getIngreds,
-        getLabwareType,
-        robotStateTimeline
-      })
-    }
-
-    console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
+  // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
+  if (!valForm || !valForm.validatedForm || formHasErrors(valForm)) {
     return null
-  })
+  }
+
+  const validatedForm = valForm.validatedForm
+
+  if (validatedForm.stepType === 'deck-setup') {
+    // No substeps for Deck Setup
+    return null
+  }
+
+  if (validatedForm.stepType === 'pause') {
+    // just returns formData
+    const formData: PauseFormData = validatedForm
+    return formData
+  }
+
+  if (
+    validatedForm.stepType === 'consolidate' ||
+    validatedForm.stepType === 'distribute' ||
+    validatedForm.stepType === 'transfer' ||
+    validatedForm.stepType === 'mix'
+  ) {
+    return transferLikeSubsteps({
+      validatedForm,
+      allPipetteData,
+      getIngreds,
+      getLabwareType,
+      robotState,
+      stepId
+    })
+  }
+
+  console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
+  return null
 }
