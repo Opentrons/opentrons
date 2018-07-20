@@ -1307,7 +1307,8 @@ class Pipette:
         seconds += float(minutes * 60)
 
         self.robot.pause()
-        _sleep(seconds)
+        if not self.robot.is_simulating():
+            _sleep(seconds)
         self.robot.resume()
 
         return self
