@@ -22,3 +22,20 @@
 .module_icon {
   color: var(--c-white);
 }
+
+.module_review_icon {
+  color: var(--c-orange);
+}
+
+.module_review_icon_present {
+  color: var(--c-green);
+}
+
+.module_review_text {
+  fill: currentColor;
+  font-size: 0.5rem;
+  font-weight: var(--fw-semibold);
+  color: var(--c-white);
+  text-transform: uppercase;
+  white-space: pre;
+}

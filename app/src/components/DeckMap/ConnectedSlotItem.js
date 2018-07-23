@@ -8,7 +8,8 @@ import type {State, Dispatch} from '../../types'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount
+  type Mount,
+  type SessionModule
 } from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
@@ -20,14 +21,14 @@ type OP = LabwareComponentProps & {match: Match}
 type SP = {
   _calibrator?: ?Mount,
   _labware?: $PropertyType<LabwareItemProps, 'labware'>,
-  module?: {}
+  module?: SessionModule
 }
 
 type DP = {dispatch: Dispatch}
 
 type Props = LabwareComponentProps & {
   labware?: $PropertyType<LabwareItemProps, 'labware'>,
-  module?: {},
+  module?: SessionModule,
 }
 
 export default withRouter(connect(mapStateToProps, null, mergeProps)(SlotItem))
@@ -38,7 +39,7 @@ function SlotItem (props: Props) {
   return (
     <React.Fragment>
       {module && (
-        <ModuleItem />
+        <ModuleItem module={module} />
       )}
       {labware && (
         <LabwareItem

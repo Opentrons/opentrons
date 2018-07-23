@@ -52,6 +52,32 @@ export function makeGetRobotModules () {
   const selector: Selector<State, BaseRobot, FetchModulesCall> = createSelector(
     getRobotApiState,
     (state) => state[MODULES] || {inProgress: false}
+    // TODO(mc, 2018-07-23): DEBUG code; remove soon
+    // () => ({
+    //   inProgress: false,
+    //   error: null,
+    //   request: null,
+    //   response: {
+    //     modules: [
+    //       {
+    //         name: 'tempdeck',
+    //         model: 'temp_deck',
+    //         serial: '123123124',
+    //         fwVersion: '1.2.13',
+    //         status: '86',
+    //         displayName: 'Temperature Module'
+    //       },
+    //       {
+    //         name: 'magdeck',
+    //         model: 'mag_deck',
+    //         serial: '123123124',
+    //         fwVersion: '1.2.13',
+    //         status: 'disengaged',
+    //         displayName: 'Magnetic Bead Module'
+    //       }
+    //     ]
+    //   }
+    // })
   )
 
   return selector
