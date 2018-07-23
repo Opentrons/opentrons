@@ -4,6 +4,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {selectors as robotSelectors, type SessionModule} from '../../robot'
+import {getModulesOn} from '../../config'
 
 import type {LabwareComponentProps} from '@opentrons/components'
 import type {LabwareItemProps} from '../DeckMap'
@@ -22,17 +23,20 @@ type Props = OP & SP
 export default connect(mapStateToProps)(LabwareComponent)
 
 function LabwareComponent (props: Props) {
+  const {labware, module} = props
+
   return (
     <React.Fragment>
-      {props.module && (
-        <ModuleItem module={props.module} />
+      {module && (
+        <ModuleItem module={module} />
       )}
-      {props.labware && (
+      {labware && (
         <LabwareItem
           slot={props.slot}
           width={props.width}
           height={props.height}
-          labware={props.labware}
+          labware={labware}
+          module={module}
         />
       )}
     </React.Fragment>
@@ -45,6 +49,8 @@ function mapStateToProps (state, ownProps: OP): SP {
 
   return {
     labware: allLabware.find((lw) => lw.slot === slot),
-    module: robotSelectors.getModulesBySlot(state)[slot]
+    module: getModulesOn(state)
+      ? robotSelectors.getModulesBySlot(state)[slot]
+      : null
   }
 }
