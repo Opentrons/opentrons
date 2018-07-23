@@ -209,6 +209,7 @@ class Session(object):
 
         try:
             self.resume()
+            robot.home_z()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
