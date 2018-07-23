@@ -55,7 +55,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
-      'aspirate_change-tip': 'once'
+      'aspirate_changeTip': 'once'
     }
   }
 
