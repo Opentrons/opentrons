@@ -21,7 +21,7 @@ import type {
 
 type AlertContent = {
   title: string,
-  body?: ?React.Node
+  body?: React.Node
 }
 
 type SP = {
