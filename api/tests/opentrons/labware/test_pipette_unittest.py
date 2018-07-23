@@ -1002,8 +1002,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
 
         assert self.p200.move_to.mock_calls == \
-            self.build_pick_up_tip(self.tiprack1[0]) + \
-            self.build_pick_up_tip(self.tiprack1[1])
+            self.build_pick_up_tip(self.p200, self.tiprack1[0]) + \
+            self.build_pick_up_tip(self.p200, self.tiprack1[1])
 
     def test_simulate_plunger_while_enqueing(self):
 
@@ -1058,9 +1058,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_pick_up_tip(self.tiprack1[i]))
+            expected.extend(self.build_pick_up_tip(self.p200, self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_pick_up_tip(self.tiprack2[i]))
+            expected.extend(self.build_pick_up_tip(self.p200, self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -1101,9 +1101,11 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack1.cols[i]))
+            expected.extend(
+                self.build_pick_up_tip(p200_multi, self.tiprack1.cols[i]))
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack2.cols[i]))
+            expected.extend(
+                self.build_pick_up_tip(p200_multi, self.tiprack2.cols[i]))
 
         self.assertEqual(
             p200_multi.move_to.mock_calls,
@@ -1161,14 +1163,16 @@ class PipetteTest(unittest.TestCase):
         ]
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
-    def build_pick_up_tip(self, well):
-        plunge = -10
+    def build_pick_up_tip(self, pipette, well):
         return [
             mock.call(well.top()),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 1), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance - 1), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 2), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance - 2), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]

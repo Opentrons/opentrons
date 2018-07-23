@@ -19,6 +19,7 @@ pipette_config = namedtuple(
     [
         'plunger_positions',
         'pick_up_current',
+        'pick_up_distance',
         'aspirate_flow_rate',
         'dispense_flow_rate',
         'channels',
@@ -70,6 +71,7 @@ def _create_config_from_dict(cfg: dict, model: str) -> pipette_config:
                     'dropTip', plunger_pos.get('drop_tip')),
             },
             pick_up_current=_load_config_value(cfg, 'pickUpCurrent'),
+            pick_up_distance=_load_config_value(cfg, 'pickUpDistance'),
             aspirate_flow_rate=_load_config_value(
                 cfg, 'aspirateFlowRate'),
             dispense_flow_rate=_load_config_value(
@@ -137,6 +139,7 @@ p10_single_v1 = pipette_config(
         'drop_tip': -4.5
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -156,6 +159,7 @@ p10_single_v1_3 = pipette_config(
         'drop_tip': -6
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -175,6 +179,7 @@ p10_multi_v1 = pipette_config(
         'drop_tip': -4
     },
     pick_up_current=0.2,
+    pick_up_distance=10,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -194,6 +199,7 @@ p10_multi_v1_3 = pipette_config(
         'drop_tip': -5.5
     },
     pick_up_current=0.2,
+    pick_up_distance=10,
     aspirate_flow_rate=10 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=10 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -213,6 +219,7 @@ p50_single_v1 = pipette_config(
         'drop_tip': -4.5
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -232,6 +239,7 @@ p50_single_v1_3 = pipette_config(
         'drop_tip': -6
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -251,6 +259,7 @@ p50_multi_v1 = pipette_config(
         'drop_tip': -3.5
     },
     pick_up_current=0.3,
+    pick_up_distance=10,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -270,6 +279,7 @@ p50_multi_v1_3 = pipette_config(
         'drop_tip': -5
     },
     pick_up_current=0.3,
+    pick_up_distance=10,
     aspirate_flow_rate=50 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=50 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -289,6 +299,7 @@ p300_single_v1 = pipette_config(
         'drop_tip': -4
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -308,6 +319,7 @@ p300_single_v1_3 = pipette_config(
         'drop_tip': -5.5
     },
     pick_up_current=0.1,
+    pick_up_distance=10,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -327,6 +339,7 @@ p300_multi_v1 = pipette_config(
         'drop_tip': -2
     },
     pick_up_current=0.3,
+    pick_up_distance=10,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -346,6 +359,7 @@ p300_multi_v1_3 = pipette_config(
         'drop_tip': -3.5
     },
     pick_up_current=0.3,
+    pick_up_distance=10,
     aspirate_flow_rate=300 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=300 / DEFAULT_DISPENSE_SECONDS,
     channels=8,
@@ -365,6 +379,7 @@ p1000_single_v1 = pipette_config(
         'drop_tip': -5
     },
     pick_up_current=0.1,
+    pick_up_distance=15,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
@@ -384,6 +399,7 @@ p1000_single_v1_3 = pipette_config(
         'drop_tip': -4
     },
     pick_up_current=0.1,
+    pick_up_distance=15,
     aspirate_flow_rate=1000 / DEFAULT_ASPIRATE_SECONDS,
     dispense_flow_rate=1000 / DEFAULT_DISPENSE_SECONDS,
     channels=1,
