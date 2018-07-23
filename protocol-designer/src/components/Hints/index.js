@@ -3,11 +3,10 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {actions, selectors} from '../../tutorial'
+import {actions, selectors, hintManifest} from '../../tutorial'
 import type {HintKey} from '../../tutorial'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../../types'
-import hintManifest from './hintManifest'
 
 type SP = {hints: Array<HintKey>}
 type DP = {removeHint: (HintKey) => mixed}
@@ -25,10 +24,9 @@ class Hints extends React.Component<Props> {
             key={`hint:${hint}`}
             title={hintManifest[hint].title}
             onCloseClick={this.makeHandleCloseClick(hint)}>
-              {hintManifest[hint].body}
-            </AlertItem>
-          ))
-        }
+            {hintManifest[hint].body}
+          </AlertItem>
+        ))}
       </div>
     )
   }

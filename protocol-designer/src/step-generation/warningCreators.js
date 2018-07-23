@@ -11,6 +11,6 @@ export function aspirateMoreThanWellContents (): CommandCreatorWarning {
 export function aspirateFromPristineWell (): CommandCreatorWarning {
   return {
     type: 'ASPIRATE_FROM_PRISTINE_WELL',
-    message: 'Source well is empty'
+    message: 'Aspirating from a pristine well. No liquids were ever added to this well'
   }
 }
