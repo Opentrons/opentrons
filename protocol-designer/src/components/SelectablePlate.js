@@ -30,7 +30,7 @@ export type Props = {
 
   // used by container
   containerId: string,
-  pipetteChannels?: Channels
+  pipetteChannels?: ?Channels
 }
 
 function wellContentsGroupIdsToColor (wc: ContentsByWell): PlateWellContents {
