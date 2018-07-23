@@ -28,7 +28,8 @@ module.exports = {
   },
 
   devServer: {
-    historyApiFallback: true
+    historyApiFallback: true,
+    disableHostCheck: true
   },
 
   devtool: DEV ? 'eval-source-map' : 'source-map',
