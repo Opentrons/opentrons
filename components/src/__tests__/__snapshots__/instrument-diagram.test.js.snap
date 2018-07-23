@@ -36,7 +36,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
         <h2
           className="title"
         >
-          pipette
+          Pipette
         </h2>
         <span
           className="value"
@@ -50,7 +50,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
         <h2
           className="title"
         >
-          suggested tip type
+          Suggested Tip Type
         </h2>
         <span
           className="value"
@@ -79,7 +79,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
         <h2
           className="title"
         >
-          pipette
+          Pipette
         </h2>
         <span
           className="value"
@@ -93,7 +93,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
         <h2
           className="title"
         >
-          suggested tip type
+          Suggested Tip Type
         </h2>
         <span
           className="value"

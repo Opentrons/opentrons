@@ -75,12 +75,14 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
 
     if (!pipetteData) return acc
 
+    const {mount, channels, tiprackModel} = pipetteData
+
     const pipetteForInstrumentGroup = {
-      mount: pipetteData.mount,
-      channels: pipetteData.channels,
+      mount,
+      channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
-      tipType: `${pipetteData.maxVolume} μL`
+      tiprackModel: tiprackModel && tiprackModel.slice(tiprackModel.search(/\d./)) // TODO: BC 2018-07-23 tiprack displayName
     }
 
     return [...acc, pipetteForInstrumentGroup]

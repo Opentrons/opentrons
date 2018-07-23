@@ -43,11 +43,13 @@
 
 .title {
   font-size: var(--fs-body-2);
-  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-dark);
   margin: 2rem 0 0.25rem;
 }
 
 .value {
-  font-size: var(--fs-body-2);
+  @apply --font-body-2-dark;
+
   margin-left: 1rem;
 }

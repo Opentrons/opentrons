@@ -1,5 +1,6 @@
 // @flow
 import React from 'react'
+import startCase from 'lodash/startCase'
 
 import styles from './instrument.css'
 
@@ -17,7 +18,7 @@ export default function InfoItem (props: Props) {
   const {title, value, className} = props
   return (
     <div className={className}>
-      <h2 className={styles.title}>{title}</h2>
+      <h2 className={styles.title}>{startCase(title)}</h2>
       <span className={styles.value}>{value}</span>
     </div>
   )
