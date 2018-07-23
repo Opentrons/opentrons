@@ -168,7 +168,7 @@ export default function IngredientsList (props: Props) {
         <TitledList
           className={stepItemStyles.step_item}
           title='labware name'
-          iconName='pen'
+          iconName='pencil'
           selected={renameLabwareFormMode}
           onClick={openRenameLabwareForm}
         />
