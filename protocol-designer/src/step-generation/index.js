@@ -5,6 +5,7 @@ import consolidate from './consolidate'
 import distribute from './distribute'
 import delay from './delay'
 import dispense from './dispense'
+import dropAllTips from './dropAllTips'
 import dropTip from './dropTip'
 import mix from './mix'
 import replaceTip from './replaceTip'
@@ -22,6 +23,7 @@ export {
   distribute,
   delay,
   dispense,
+  dropAllTips,
   dropTip,
   mix,
   replaceTip,

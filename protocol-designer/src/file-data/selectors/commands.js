@@ -164,7 +164,15 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
         return [...acc, commandCreator]
       }, [])
 
-    const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)
+    // cleanup procedure(s) after last step
+    const cleanupCommandCreators = [
+      StepGeneration.dropAllTips()
+    ]
+
+    const timeline = StepGeneration.commandCreatorsTimeline([
+      ...commandCreators,
+      ...cleanupCommandCreators
+    ])(initialRobotState)
 
     return timeline
   }
