@@ -15,7 +15,7 @@ type OP = LabwareComponentProps
 
 type Props = {
   module: ?SessionModule,
-  ok: boolean
+  present: boolean
 }
 
 export default connect(makeMapStateToProps)(ReviewModuleItem)
@@ -23,7 +23,9 @@ export default connect(makeMapStateToProps)(ReviewModuleItem)
 function ReviewModuleItem (props: Props) {
   if (!props.module) return null
 
-  return <ModuleItem module={props.module} review={true} ok={props.ok} />
+  return (
+    <ModuleItem module={props.module} present={props.present} review />
+  )
 }
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => Props {
@@ -43,9 +45,9 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => Props {
 
     const requiredNames = countBy(sessionModules, 'name')
     const actualNames = countBy(actualModules || [], 'name')
-    const ok =
+    const present =
       !module || requiredNames[module.name] === actualNames[module.name]
 
-    return {ok, module}
+    return {present, module}
   }
 }

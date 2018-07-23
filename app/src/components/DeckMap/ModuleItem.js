@@ -10,7 +10,7 @@ import styles from './styles.css'
 export type ModuleItemProps = {
   module: SessionModule,
   review?: boolean,
-  ok?: boolean,
+  present?: boolean,
 }
 
 const DIMENSIONS = {
@@ -50,8 +50,8 @@ function ModuleItemContents (props: ModuleItemProps) {
   }
 
   // TODO(mc, 2018-07-23): displayName?
-  const {ok, module: {name}} = props
-  const message = ok
+  const {present, module: {name}} = props
+  const message = present
     ? (<tspan x='55%'>{name}</tspan>)
     : (
       <React.Fragment>
@@ -61,7 +61,7 @@ function ModuleItemContents (props: ModuleItemProps) {
     )
 
   const iconClassName = cx(styles.module_review_icon, {
-    [styles.module_review_icon_ok]: ok
+    [styles.module_review_icon_present]: present
   })
 
   return (
@@ -71,7 +71,7 @@ function ModuleItemContents (props: ModuleItemProps) {
         x='8'
         y='0'
         width='16'
-        name={ok ? 'check-circle' : 'alert-circle'}
+        name={present ? 'check-circle' : 'alert-circle'}
       />
       <CenteredTextSvg className={styles.module_review_text} text={message} />
     </React.Fragment>

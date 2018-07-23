@@ -32,7 +32,7 @@ export default function Prompt (props: Props) {
 
   const message = modulesMissing
     ? 'Plug in and power up the required module(s) via USB to your robot.'
-    : 'Module(s) succesfully detected.'
+    : 'Module(s) successfully detected.'
 
   const buttonText = modulesMissing
     ? 'try searching for missing module(s)'
