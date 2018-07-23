@@ -5,15 +5,17 @@ import {
   AlertModal,
   DropdownField,
   FormGroup,
-  InputField
+  InputField,
+  type Mount
 } from '@opentrons/components'
+import startCase from 'lodash/startCase'
+import isEmpty from 'lodash/isEmpty'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './NewFileModal.css'
-import formStyles from '../../forms.css'
 import modalStyles from '../modal.css'
-import type {NewProtocolFields} from '../../../load-file'
+import type {NewProtocolFields, PipetteFields} from '../../../load-file'
 
 type State = NewProtocolFields
 
@@ -53,10 +55,8 @@ const tiprackOptions = [
 
 const initialState = {
   name: '',
-  leftPipetteModel: USER_HAS_NOT_SELECTED,
-  rightPipetteModel: USER_HAS_NOT_SELECTED,
-  leftTiprackModel: null,
-  rightTiprackModel: null
+  left: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
+  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null}
 }
 
 export default class NewFileModal extends React.Component<Props, State> {
@@ -67,136 +67,110 @@ export default class NewFileModal extends React.Component<Props, State> {
 
   componentWillReceiveProps (nextProps: Props) {
     // reset form state when modal is hidden
-    if (!this.props.hideModal && nextProps.hideModal) {
-      this.setState(initialState)
-    }
+    if (!this.props.hideModal && nextProps.hideModal) this.setState(initialState)
   }
 
-  handleChange = (accessor: $Keys<State>) => (e: SyntheticInputEvent<*>) => {
-    // skip tiprack update if no pipette selected
-    if (accessor === 'leftTiprackModel' && !this.state.leftPipetteModel) return
-    if (accessor === 'rightTiprackModel' && !this.state.rightPipetteModel) return
-
+  makeHandleMountFieldChange = (mount: Mount, fieldName: $Keys<PipetteFields>) => (e: SyntheticInputEvent<*>) => {
     const value: string = e.target.value
-
-    const nextState: {[$Keys<State>]: mixed} = {
-      [accessor]: value
-    }
-
-    // clear tiprack selection if corresponding pipette model is deselected
-    if (accessor === 'leftPipetteModel' && !value) {
-      nextState.leftTiprackModel = null
-    } else if (accessor === 'rightPipetteModel' && !value) {
-      nextState.rightTiprackModel = null
-    }
-
-    this.setState({
-      ...this.state,
-      ...nextState
-    })
+    let nextMountState = {[fieldName]: value}
+    if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
+    this.setState({[mount]: {...this.state[mount], ...nextMountState}})
   }
+  handleNameChange = (e: SyntheticInputEvent<*>) => this.setState({name: e.target.value})
 
-  handleSubmit = () => {
-    this.props.onSave(this.state)
-  }
+  handleSubmit = () => { this.props.onSave(this.state) }
 
   render () {
-    if (this.props.hideModal) {
-      return null
-    }
+    if (this.props.hideModal) return null
 
-    const {
-      name,
-      leftPipetteModel,
-      rightPipetteModel,
-      leftTiprackModel,
-      rightTiprackModel
-    } = this.state
+    const {name, left, right} = this.state
 
     const pipetteSelectionIsValid = (
       // neither can be invalid
-      (leftPipetteModel !== USER_HAS_NOT_SELECTED && rightPipetteModel !== USER_HAS_NOT_SELECTED) &&
+      (left.pipetteModel !== USER_HAS_NOT_SELECTED && right.pipetteModel !== USER_HAS_NOT_SELECTED) &&
       // at least one must not be none (empty string)
-      (leftPipetteModel || rightPipetteModel)
+      (left.pipetteModel || right.pipetteModel)
     )
 
     // if pipette selected, corresponding tiprack type also selected
     const tiprackSelectionIsValid = (
-      (leftPipetteModel ? Boolean(leftTiprackModel) : true) &&
-      (rightPipetteModel ? Boolean(rightTiprackModel) : true)
+      (left.pipetteModel ? Boolean(left.tiprackModel) : true) &&
+      (right.pipetteModel ? Boolean(right.tiprackModel) : true)
     )
 
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
-    const pipetteFields = [
-      ['leftPipetteModel', 'Left Pipette'],
-      ['rightPipetteModel', 'Right Pipette']
-    ].map(([name, label]) => {
-      const value = this.state[name]
-      return (
-        <FormGroup key={name} label={`${label}*:`} className={formStyles.column_1_2}>
-          <DropdownField options={value === USER_HAS_NOT_SELECTED
-              ? pipetteOptionsWithInvalid
-              : pipetteOptionsWithNone}
-            value={value}
-            onChange={this.handleChange(name)} />
-        </FormGroup>
-      )
-    })
+    return (
+      <AlertModal
+        className={cx(modalStyles.modal, styles.new_file_modal)}
+        buttons={[
+          {onClick: this.props.onCancel, children: 'Cancel'},
+          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
+        ]}>
+        <form className={modalStyles.modal_contents}>
+          <h2>Create New Protocol</h2>
 
-    const tiprackFields = ['leftTiprackModel', 'rightTiprackModel'].map(name => (
-      <FormGroup key={name} label='Tip rack*:' className={formStyles.column_1_2}>
-        <DropdownField options={tiprackOptions}
-          value={this.state[name]}
-          onChange={this.handleChange(name)} />
-        </FormGroup>
-    ))
+          <FormGroup label='Name:'>
+            <InputField placeholder='Untitled' value={name} onChange={this.handleNameChange} />
+          </FormGroup>
+          <BetaRestrictions />
 
-    return <AlertModal className={cx(modalStyles.modal, styles.new_file_modal)}
-      buttons={[
-        {onClick: this.props.onCancel, children: 'Cancel'},
-        {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
-      ]}>
-      <form className={modalStyles.modal_contents}>
-        <h2>Create New Protocol</h2>
+          <div className={styles.mount_fields_row}>
+            <MountFields mount="left" values={this.state.left} makeOnChange={this.makeHandleMountFieldChange} />
+            <MountFields mount="right" values={this.state.right} makeOnChange={this.makeHandleMountFieldChange} />
+          </div>
 
-        <FormGroup label='Name:'>
-          <InputField placeholder='Untitled'
-            value={name}
-            onChange={this.handleChange('name')}
-          />
-        </FormGroup>
-
-        <h3>Beta Pipette Restrictions:</h3>
-        <ol>
-          <li>
-            You can't change your pipette selection later. If in doubt go for
-            smaller pipettes. The Protocol Designer automatically breaks up transfer
-            volumes that exceed pipette capacity into multiple transfers.
-          </li>
-          <li>
-            Pipettes can't share tip racks. There needs to be at least 1 tip rack per
-            pipette on the deck.
-          </li>
-        </ol>
-
-        <div className={formStyles.row_wrapper}>
-          {pipetteFields}
-        </div>
-
-        <div className={formStyles.row_wrapper}>
-          {tiprackFields}
-        </div>
-
-        <div className={styles.diagrams}>
-          <TiprackDiagram containerType={this.state.leftTiprackModel} />
-          <PipetteDiagram
-            leftPipette={this.state.leftPipetteModel}
-            rightPipette={this.state.rightPipetteModel}
-          />
-          <TiprackDiagram containerType={this.state.rightTiprackModel} />
-        </div>
-      </form>
-    </AlertModal>
+          <div className={styles.diagrams}>
+            <TiprackDiagram containerType={this.state.left.tiprackModel} />
+            <PipetteDiagram
+              leftPipette={this.state.left.pipetteModel}
+              rightPipette={this.state.right.pipetteModel}
+            />
+            <TiprackDiagram containerType={this.state.right.tiprackModel} />
+          </div>
+        </form>
+      </AlertModal>
+    )
   }
 }
+
+type MountFieldsProps = {
+  mount: Mount,
+  values: {pipetteModel: string, tiprackModel: ?string},
+  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void
+}
+const MountFields = (props: MountFieldsProps) => (
+  <div className={styles.mount_column}>
+    <FormGroup key={`${props.mount}PipetteModel`} label={`${startCase(props.mount)} Pipette*`}>
+      <DropdownField
+        options={props.values.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
+        value={props.values.pipetteModel}
+        onChange={props.makeOnChange(props.mount, 'pipetteModel')} />
+    </FormGroup>
+
+    <FormGroup disabled={isEmpty(props.values.pipetteModel)} key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
+      <DropdownField
+        disabled={isEmpty(props.values.pipetteModel)}
+        options={tiprackOptions}
+        value={props.values.tiprackModel}
+        onChange={props.makeOnChange(props.mount, 'tiprackModel')} />
+    </FormGroup>
+  </div>
+)
+
+const BetaRestrictions = () => (
+  <React.Fragment>
+    <h3>Beta Pipette Restrictions:</h3>
+    <ol>
+      <li>
+        You can't change your pipette selection later. If in doubt go for
+        smaller pipettes. The Protocol Designer automatically breaks up transfer
+        volumes that exceed pipette capacity into multiple transfers.
+      </li>
+      <li>
+        Pipettes can't share tip racks. There needs to be at least 1 tip rack per
+        pipette on the deck.
+      </li>
+    </ol>
+  </React.Fragment>
+)

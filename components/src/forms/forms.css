@@ -51,6 +51,7 @@
   }
 }
 
+.dropdown_disabled,
 .checkbox_disabled {
   opacity: 0.5;
 }
