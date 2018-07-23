@@ -44,17 +44,17 @@ function OccupiedDeckSlotOverlay ({
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
         <ClickableText onClick={() => openIngredientSelector(containerId)}
-          iconName='pencil' y='25%' text='Name & Liquids' />
+          iconName='pencil' y='15%' text='Name & Liquids' />
       }
       <ClickableText onClick={() => setCopyLabwareMode(containerId)}
-        iconName='cursor-move' y='50%' text='Copy' />
+        iconName='cursor-move' y='40%' text='Copy' />
       {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
 
       <ClickableText onClick={() =>
           window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
           deleteContainer({containerId, slot, containerType})
       }
-        iconName='close' y='75%' text='Delete' />
+        iconName='close' y='65%' text='Delete' />
     </g>
   )
 }
@@ -193,9 +193,9 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
             : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
               <rect className={styles.overlay_panel} />
               <ClickableText onClick={e => openLabwareSelector({slot})}
-                iconName='plus' y='40%' text='Add Labware' />
+                iconName='plus' y='30%' text='Add Labware' />
               <ClickableText onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
-                iconName='content-copy' y='65%' text='Add Copy' />
+                iconName='content-copy' y='55%' text='Add Copy' />
             </g>
         )
       }
