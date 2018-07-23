@@ -7,29 +7,43 @@ import {selectors as robotSelectors} from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
 import LabwareItem, {type LabwareItemProps} from '../DeckMap/LabwareItem'
+import ModuleItem from '../DeckMap/ModuleItem'
 
-type OwnProps = LabwareComponentProps
+type OP = LabwareComponentProps
 
-type StateProps = {
-  labware?: $PropertyType<LabwareItemProps, 'labware'>
+type SP = {
+  labware: ?$PropertyType<LabwareItemProps, 'labware'>,
+  module: ?{}
 }
 
-type Props = OwnProps & StateProps
+type Props = OP & SP
 
 export default connect(mapStateToProps)(LabwareComponent)
 
 function LabwareComponent (props: Props) {
   return (
-    // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
-    <LabwareItem {...props} />
+    <React.Fragment>
+      {props.module && (
+        <ModuleItem />
+      )}
+      {props.labware && (
+        <LabwareItem
+          slot={props.slot}
+          width={props.width}
+          height={props.height}
+          labware={props.labware}
+        />
+      )}
+    </React.Fragment>
   )
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
+function mapStateToProps (state, ownProps: OP): SP {
+  const {slot} = ownProps
   const allLabware = robotSelectors.getLabware(state)
-  const labware = allLabware.find((lw) => lw.slot === ownProps.slot)
 
-  if (!labware) return {}
-
-  return {labware: {...labware}}
+  return {
+    labware: allLabware.find((lw) => lw.slot === slot),
+    module: robotSelectors.getModulesBySlot(state)[slot]
+  }
 }

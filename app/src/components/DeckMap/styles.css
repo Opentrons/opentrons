@@ -14,3 +14,11 @@
 .spinner {
   color: var(--c-font-light);
 }
+
+.module {
+  color: var(--c-black);
+}
+
+.module_icon {
+  color: var(--c-white);
+}

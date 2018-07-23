@@ -25,6 +25,7 @@ type OP = {
   match: Match
 }
 
+// TODO(mc, 2018-07-19): rename mergeProps-only properties with _privateName
 type SP = {
   deckPopulated: boolean,
   labware: ?Labware,
@@ -98,10 +99,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const {match: {url, params: {slot}}} = ownProps
     const labware = robotSelectors.getLabware(state)
     const currentLabware = labware.find((lw) => lw.slot === slot)
-    const name = robotSelectors.getConnectedRobotName(state)
     const _robot = robotSelectors.getConnectedRobot(state)
 
-    const settingsResponse = getRobotSettings(state, {name}).response
+    // TODO(mc, 2018-07-19): API selector for getting the response directly
+    const settingsResponse = _robot && getRobotSettings(state, _robot).response
     const settings = settingsResponse && settingsResponse.settings
     const flag = !!settings && settings.find((s) => s.id === 'calibrateToBottom')
     const calibrateToBottom = !!flag && flag.value

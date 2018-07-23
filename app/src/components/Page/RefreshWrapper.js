@@ -8,6 +8,7 @@ type Props = {
 export default class RefreshWrapper extends React.Component<Props> {
   render () {
     const {children} = this.props
+
     return (
       <React.Fragment>
         {children}
