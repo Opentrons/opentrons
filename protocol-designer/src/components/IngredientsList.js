@@ -163,7 +163,7 @@ export default function IngredientsList (props: Props) {
   } = props
 
   return (
-    <SidePanel title='Ingredients'>
+    <SidePanel title='Name & Liquids'>
         {/* Labware Name "button" to open LabwareNameEditForm */}
         <TitledList
           className={stepItemStyles.step_item}
