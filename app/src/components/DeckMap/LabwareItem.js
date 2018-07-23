@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import {Link} from 'react-router-dom'
 
-import type {Labware} from '../../robot'
+import type {Labware, SessionModule} from '../../robot'
 import type {LabwareComponentProps} from '@opentrons/components'
 
 import {
@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 
 import LabwareSpinner from './LabwareSpinner'
+import ModuleNameOverlay from './ModuleNameOverlay'
 import styles from './styles.css'
 
 export type LabwareItemProps = LabwareComponentProps & {
@@ -23,11 +24,12 @@ export type LabwareItemProps = LabwareComponentProps & {
     showSpinner?: boolean,
     onClick?: () => void,
     url?: string
-  }
+  },
+  module: ?SessionModule,
 }
 
 export default function LabwareItem (props: LabwareItemProps) {
-  const {width, height, labware} = props
+  const {width, height, labware, module} = props
 
   const {
     name,
@@ -47,7 +49,15 @@ export default function LabwareItem (props: LabwareItemProps) {
         <Plate containerType={type} />
 
         {!showSpinner && (
-          <ContainerNameOverlay title={humanizeLabwareType(type)} subtitle={name} />
+          <ContainerNameOverlay
+            title={humanizeLabwareType(type)}
+            subtitle={name}
+          />
+        )}
+
+        {!showSpinner && module && (
+          // TODO(mc, 2018-07-23): displayName?
+          <ModuleNameOverlay name={module.name} width={width}/>
         )}
 
         {showSpinner && (

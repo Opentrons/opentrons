@@ -12,6 +12,7 @@ import {
   type SessionModule
 } from '../../robot'
 
+import {getModulesOn} from '../../config'
 import type {LabwareComponentProps} from '@opentrons/components'
 import LabwareItem, {type LabwareItemProps} from './LabwareItem'
 import ModuleItem from './ModuleItem'
@@ -44,6 +45,7 @@ function SlotItem (props: Props) {
       {labware && (
         <LabwareItem
           labware={labware}
+          module={module}
           slot={slot}
           height={height}
           width={width}
@@ -58,11 +60,14 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   const allLabware = robotSelectors.getLabware(state)
   const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   const labware = allLabware.find((lw) => lw.slot === slot)
-  const module = robotSelectors.getModulesBySlot(state)[slot]
   const highlighted = slot === selectedSlot
+  const modulesEnabled = getModulesOn(state)
+  const module = modulesEnabled
+    ? robotSelectors.getModulesBySlot(state)[slot]
+    : null
+
   const stateProps: SP = {}
 
-  // bail out if it's an empty slot
   if (labware) {
     const {isTiprack, confirmed, calibratorMount} = labware
 

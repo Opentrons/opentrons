@@ -39,3 +39,16 @@
   text-transform: uppercase;
   white-space: pre;
 }
+
+.module_name_overlay {
+  color: var(--c-black);
+  opacity: 0.7;
+}
+
+.module_name_text {
+  fill: currentColor;
+  color: var(--c-white);
+  font-size: 0.5rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
