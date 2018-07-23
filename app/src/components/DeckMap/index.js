@@ -3,7 +3,8 @@ import React from 'react'
 
 import {Deck} from '@opentrons/components'
 import ConnectedSlotItem from './ConnectedSlotItem'
-
+import ModuleItem from './ModuleItem'
+import LabwareItem from './LabwareItem'
 import styles from './styles.css'
 
 export default function DeckMap () {
@@ -15,3 +16,7 @@ export default function DeckMap () {
     />
   )
 }
+
+export {LabwareItem, ModuleItem}
+export type {LabwareItemProps} from './LabwareItem'
+export type {ModuleItemProps} from './ModuleItem'

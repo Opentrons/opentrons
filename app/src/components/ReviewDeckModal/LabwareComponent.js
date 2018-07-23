@@ -3,17 +3,18 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {selectors as robotSelectors} from '../../robot'
+import {selectors as robotSelectors, type SessionModule} from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
-import LabwareItem, {type LabwareItemProps} from '../DeckMap/LabwareItem'
-import ModuleItem from '../DeckMap/ModuleItem'
+import type {LabwareItemProps} from '../DeckMap'
+
+import {LabwareItem, ModuleItem} from '../DeckMap'
 
 type OP = LabwareComponentProps
 
 type SP = {
   labware: ?$PropertyType<LabwareItemProps, 'labware'>,
-  module: ?{}
+  module: ?SessionModule
 }
 
 type Props = OP & SP
@@ -24,7 +25,7 @@ function LabwareComponent (props: Props) {
   return (
     <React.Fragment>
       {props.module && (
-        <ModuleItem />
+        <ModuleItem module={props.module} />
       )}
       {props.labware && (
         <LabwareItem

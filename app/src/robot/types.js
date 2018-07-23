@@ -140,7 +140,7 @@ export type SessionModule = {
   // slot module is installed in
   slot: Slot,
   // name identifier of the module
-  name: ModuleType
+  name: ModuleType,
 }
 
 export type SessionStatus =

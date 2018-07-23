@@ -15,14 +15,14 @@
   @apply --font-header-light;
 
   font-weight: normal;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
 .prompt_button {
   display: block;
   width: auto;
-  margin: 1rem auto;
+  margin: 1.5rem auto;
   padding-left: 3rem;
   padding-right: 3rem;
 }

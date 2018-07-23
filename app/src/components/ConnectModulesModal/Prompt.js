@@ -25,15 +25,19 @@ const connectedAlertProps = {
 
 export default function Prompt (props: Props) {
   const {modulesMissing, onClick} = props
+
   const alert = modulesMissing
     ? <AlertItem {...missingAlertProps}/>
     : <AlertItem {...connectedAlertProps}/>
+
   const message = modulesMissing
-    ? 'Plug in and power up the required module via USB to your robot.'
-    : 'Module succesfully detected.'
+    ? 'Plug in and power up the required module(s) via USB to your robot.'
+    : 'Module(s) succesfully detected.'
+
   const buttonText = modulesMissing
-    ? 'try searching for missing module'
+    ? 'try searching for missing module(s)'
     : 'continue to labware setup'
+
   return (
     <div className={styles.prompt}>
       {alert}
