@@ -99,7 +99,6 @@ async def get_ignore_version(request):
 
     If no version has been previously ignored, the value will be null
     """
-    # Trying to get this to push to resin again
     ignored_version = _get_ignored_version()
     res = {'version': ignored_version}
     return web.json_response(res)
@@ -201,28 +200,3 @@ async def restart(request):
         os.system('kill 1')
     Thread(target=wait_and_restart).start()
     return web.json_response({"message": "restarting"})
-
-
-async def get_logs(request):
-    """
-    This handler accepts a GET request and returns a blob with
-    Content-Type: multipart/form-data.
-    """
-    path = 'data/user_storage/opentrons_data/logs/'
-    file1 = os.path.join(path, 'api.log')
-    file2 = os.path.join(path, 'serial.log')
-    logs = {'apiLog': open(file1, 'rb'), 'serialLog': open(file2, 'rb')}
-    # data = await request.text()
-    # packet1 = data['serial']
-    # packet2 = data['api']
-    # filename = packet1.filename
-    # content = packet1.file.read()
-
-    # with open(filename, 'wb') as f:
-    #     f.write(content)
-
-    status = 200
-
-    return web.json_response(
-        content_type='multipart/form-data', data=logs, status=status
-    )

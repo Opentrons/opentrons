@@ -3,6 +3,7 @@
 import sys
 import logging
 import os
+import tempfile
 import traceback
 import atexit
 from aiohttp import web
@@ -25,6 +26,11 @@ from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
 lock_file_path = 'tmp/resin/resin-updates.lock'
+if os.environ.get('RUNNING_ON_PI'):
+    log_file_path = '/data/user_storage/opentrons_data/logs'
+else:
+    tmpdir = tempfile.mkdtemp("logs")
+    log_file_path = os.path.abspath(tmpdir)
 
 
 def lock_resin_updates():
@@ -122,6 +128,12 @@ def log_init():
 async def error_middleware(request, handler):
     try:
         response = await handler(request)
+    except web.HTTPNotFound:
+        log.exception("Exception handler for request {}".format(request))
+        data = {
+            'message': 'File was not found at {}'.format(request)
+        }
+        response = web.json_response(data, status=404)
     except Exception as e:
         log.exception("Exception in handler for request {}".format(request))
         data = {
@@ -164,8 +176,8 @@ def init(loop=None):
         '/server/update/ignore', endpoints.get_ignore_version)
     server.app.router.add_post(
         '/server/update/ignore', endpoints.set_ignore_version)
-    server.app.router.add_get(
-        '/server/logs', endpoints.get_logs)
+    server.app.router.add_static(
+        '/logs', log_file_path, show_index=True)
     server.app.router.add_post(
         '/server/restart', endpoints.restart)
     server.app.router.add_post(
