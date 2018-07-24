@@ -1,7 +1,8 @@
 // @flow
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
-import {getPipetteModels, getPipette} from '@opentrons/shared-data'
+import get from 'lodash/get'
+import {getPipetteModels, getPipette, getLabware} from '@opentrons/shared-data'
 
 import type {BaseState, Selector} from '../types'
 import type {DropdownOption} from '@opentrons/components'
@@ -75,14 +76,14 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
 
     if (!pipetteData) return acc
 
-    const {mount, channels, tiprackModel} = pipetteData
+    const tipVolume = pipetteData.tiprackModel && get(getLabware(pipetteData.tiprackModel), 'metadata.tipVolume')
 
     const pipetteForInstrumentGroup = {
-      mount,
-      channels,
+      mount: pipetteData.mount,
+      channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
-      tiprackModel: tiprackModel && tiprackModel.slice(tiprackModel.search(/\d./)) // TODO: BC 2018-07-23 tiprack displayName
+      tiprackModel: tipVolume && `${tipVolume} µl`// TODO: BC 2018-07-23 tiprack displayName
     }
 
     return [...acc, pipetteForInstrumentGroup]
