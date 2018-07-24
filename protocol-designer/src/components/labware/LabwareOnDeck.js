@@ -20,7 +20,7 @@ import {
   humanizeLabwareType,
   clickOutside
 } from '@opentrons/components'
-import {getLabware} from '@opentrons/shared-data'
+import {getLabware, type DeckSlot} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
@@ -48,7 +48,7 @@ function OccupiedDeckSlotOverlay ({
           iconName='pencil' y='15%' text='Name & Liquids' />
       }
       <ClickableText
-        onClick={() => setMoveLabwareMode(containerId)}
+        onClick={() => setMoveLabwareMode(slot)}
         iconName='cursor-move' y='40%' text='Move' />
       <ClickableText
         onClick={() => (
@@ -115,8 +115,8 @@ type LabwareOnDeckProps = {
   openLabwareSelector: ({slot: string}) => void,
   // closeLabwareSelector: ({slot: string}) => mixed,
 
-  setMoveLabwareMode: (containerId: string) => void,
-  labwareToMove: string | false,
+  setMoveLabwareMode: (slot: DeckSlot) => void,
+  slotToMoveFrom: DeckSlot | false,
   moveLabware: (slot: string) => void,
 
   height?: number,
@@ -148,7 +148,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     // closeLabwareSelector,
 
     setMoveLabwareMode,
-    labwareToMove,
+    slotToMoveFrom,
     moveLabware,
 
     height,
@@ -185,7 +185,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
       {(!deckSetupMode || (!slotIsOccupied && activeModals.labwareSelection))
         // "Add Labware" labware selection dropdown menu
         ? null
-        : (labwareToMove
+        : (slotToMoveFrom
             // Mouseover empty slot -- Add (or Copy if in copy mode)
             ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
               <rect className={styles.overlay_panel} onClick={() => moveLabware(slot)} />

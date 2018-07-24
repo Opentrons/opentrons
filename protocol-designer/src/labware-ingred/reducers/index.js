@@ -128,7 +128,7 @@ export const containers = handleActions({
     return {...state, [containerId]: {...state[containerId], ...modify}}
   },
   MOVE_LABWARE: (state: ContainersState, action: MoveLabware): ContainersState => {
-    const { fromSlot, toSlot } = action.payload
+    const { toSlot, fromSlot } = action.payload
     const fromContainers = reduce(state, (acc, container, id) => (
       container.slot === fromSlot ? {...acc, [id]: {...container, slot: toSlot}} : acc
     ), {})
@@ -421,7 +421,7 @@ const activeModals: Selector<ActiveModals> = createSelector(
 
 const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renameLabwareFormMode
 
-const labwareToMove = (state: BaseState) => rootSelector(state).moveLabwareMode
+const slotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
 const hasLiquid = (state: BaseState) => !isEmpty(getIngredientGroups(state))
 
@@ -442,7 +442,7 @@ export const selectors = {
   activeModals,
   getRenameLabwareFormMode,
 
-  labwareToMove,
+  slotToMoveFrom,
 
   allIngredientGroupFields,
   allIngredientNamesIds,

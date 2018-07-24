@@ -3,7 +3,6 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
 
-import {uuid} from '../utils'
 import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
@@ -25,7 +24,7 @@ export const closeLabwareSelector = createAction(
 
 export const setMoveLabwareMode = createAction(
   'SET_MOVE_LABWARE_MODE',
-  (containerId: string) => containerId
+  (slot: DeckSlot) => slot
 )
 
 // ===== Open and close Ingredient Selector modal ====
@@ -100,7 +99,9 @@ export type MoveLabware = {
   }
 }
 
-export const moveLabware = (fromSlot: DeckSlot, toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
+export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
+  const state = getState()
+  const fromSlot = selectors.slotToMoveFrom(state)
   return dispatch({
     type: 'MOVE_LABWARE',
     payload: {fromSlot, toSlot}

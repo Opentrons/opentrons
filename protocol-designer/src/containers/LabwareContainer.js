@@ -68,7 +68,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     showNameOverlay: container && !isTiprack && !labwareHasName,
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
-    labwareToMove: selectors.labwareToMove(state),
+    slotToMoveFrom: selectors.slotToMoveFrom(state),
     highlighted: (deckSetupMode)
       // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
       // or when targeted by an open "Add Labware" modal
