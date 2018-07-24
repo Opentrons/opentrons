@@ -2,11 +2,11 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
-import {closeLabwareSelector, createContainer} from '../labware-ingred/actions'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as pipetteSelectors} from '../pipettes'
-import LabwareDropdown from '../components/LabwareDropdown.js'
-import type {BaseState} from '../types'
+import LabwareDropdown from './LabwareDropdown'
+import {closeLabwareSelector, createContainer} from '../../labware-ingred/actions'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as pipetteSelectors} from '../../pipettes'
+import type {BaseState} from '../../types'
 
 type Props = React.ElementProps<typeof LabwareDropdown>
 
