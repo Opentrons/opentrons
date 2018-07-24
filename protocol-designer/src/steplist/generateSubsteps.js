@@ -107,7 +107,8 @@ function transferLikeSubsteps (args: {
   } else if (validatedForm.stepType === 'consolidate') {
     const commandCallArgs = {
       ...validatedForm,
-      mixBeforeAspirate: null
+      mixFirstAspirate: null,
+      mixInDestination: null
     }
 
     result = consolidate(commandCallArgs)(robotState)
