@@ -1,6 +1,7 @@
 // @flow
 import {END_STEP} from './types'
 import type {StepIdType} from '../form-types'
+import {INITIAL_DECK_SETUP_ID} from './constants'
 
 export function getPrevStepId (
   orderedSteps: Array<StepIdType>,
@@ -50,3 +51,7 @@ export function mergeWhen<T> (
 
   return result
 }
+
+export const isDeckSetupId = (stepId: StepIdType | typeof END_STEP | null) => (
+  stepId === INITIAL_DECK_SETUP_ID
+)

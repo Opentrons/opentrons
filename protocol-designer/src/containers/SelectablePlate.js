@@ -68,15 +68,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const orderedSteps = steplistSelectors.orderedSteps(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
-  const deckSetupMode = steplistSelectors.deckSetupMode(state)
-
   const wellSelectionMode = true
   const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
   const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
 
   let wellContents = {}
-  if (deckSetupMode) {
+  if (steplistUtils.isDeckSetupId(stepId)) {
     // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
