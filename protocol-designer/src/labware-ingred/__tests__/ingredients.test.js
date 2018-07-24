@@ -94,6 +94,7 @@ describe('DELETE_INGREDIENT action', () => {
   test.skip('delete ingredient by ingredient group id, when id does exist', () => {})
 })
 
+// TODO: IMMEDIATELY BC 2018-7-24 test move instead
 describe('COPY_LABWARE action', () => {
   test('copy ingredient locations from cloned container', () => {
     const copyLabwareAction = {

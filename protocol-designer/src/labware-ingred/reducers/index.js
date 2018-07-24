@@ -30,7 +30,7 @@ import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
-import type {CopyLabware, DeleteIngredient, EditIngredient} from '../actions'
+import type {MoveLabware, DeleteIngredient, EditIngredient} from '../actions'
 
 // external actions (for types)
 import typeof {openWellSelectionModal} from '../../well-selection/actions'
@@ -54,11 +54,11 @@ const modeLabwareSelection = handleActions({
   CREATE_CONTAINER: () => false
 }, false)
 
-// If falsey, we aren't copying labware. Else, value should be the containerID we're
-// ready to copy.
-const copyLabwareMode = handleActions({
-  SET_COPY_LABWARE_MODE: (state, action: ActionType<typeof actions.setCopyLabwareMode>) => action.payload,
-  COPY_LABWARE: (state, action: CopyLabware) => false // leave copy mode after performing a copy action
+// If falsey, we aren't moving labware. Else, value should be the containerID we're
+// ready to move.
+const moveLabwareMode = handleActions({
+  SET_MOVE_LABWARE_MODE: (state, action: ActionType<typeof actions.setMoveLabwareMode>) => action.payload,
+  MOVE_LABWARE: (state, action: MoveLabware) => false // leave move mode after performing a move action
 }, false)
 
 type SelectedContainerId = string | null
@@ -127,16 +127,18 @@ export const containers = handleActions({
     const { containerId, modify } = action.payload
     return {...state, [containerId]: {...state[containerId], ...modify}}
   },
-  COPY_LABWARE: (state: ContainersState, action: CopyLabware): ContainersState => {
-    const { fromContainer, toContainer, toSlot } = action.payload
+  MOVE_LABWARE: (state: ContainersState, action: MoveLabware): ContainersState => {
+    const { fromSlot, toSlot } = action.payload
+    const fromContainers = reduce(state, (acc, container, id) => (
+      container.slot === fromSlot ? {...acc, [id]: {...container, slot: toSlot}} : acc
+    ), {})
+    const toContainers = reduce(state, (acc, container, id) => (
+      container.slot === toSlot ? {...acc, [id]: {...container, slot: fromSlot}} : acc
+    ), {})
     return {
       ...state,
-      [toContainer]: {
-        ...state[fromContainer],
-        slot: toSlot,
-        id: toContainer,
-        disambiguationNumber: getNextDisambiguationNumber(state, state[fromContainer].type)
-      }
+      ...fromContainers,
+      ...toContainers
     }
   },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
@@ -172,12 +174,9 @@ export const savedLabware = handleActions({
     ...state,
     [action.payload.containerId]: true
   }),
-  LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState =>
-    mapValues(action.payload.labware, () => true),
-  COPY_LABWARE: (state: SavedLabwareState, action: CopyLabware): SavedLabwareState => ({
-    ...state,
-    [action.payload.toContainer]: true
-  })
+  LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
+    mapValues(action.payload.labware, () => true)
+  )
 }, {})
 
 type IngredientsState = IngredientGroups
@@ -254,20 +253,13 @@ export const ingredLocations = handleActions({
     console.warn(`TODO: User tried to delete ingred group: ${groupId}. Deleting entire ingred group not supported yet`)
     return state
   },
-  COPY_LABWARE: (state: LocationsState, action: CopyLabware): LocationsState => {
-    const {fromContainer, toContainer} = action.payload
-    return {
-      ...state,
-      [toContainer]: cloneDeep(state[fromContainer])
-    }
-  },
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
     getPDMetadata(action.payload).ingredLocations
 }, {})
 
 export type RootState = {|
   modeLabwareSelection: string | false, // TODO use null, not false
-  copyLabwareMode: string | false,
+  moveLabwareMode: string | false,
   selectedContainerId: SelectedContainerId,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
@@ -279,7 +271,7 @@ export type RootState = {|
 // TODO Ian 2018-01-15 factor into separate files
 const rootReducer = combineReducers({
   modeLabwareSelection,
-  copyLabwareMode,
+  moveLabwareMode,
   selectedContainerId,
   containers,
   savedLabware,
@@ -429,7 +421,7 @@ const activeModals: Selector<ActiveModals> = createSelector(
 
 const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renameLabwareFormMode
 
-const labwareToCopy = (state: BaseState) => rootSelector(state).copyLabwareMode
+const labwareToMove = (state: BaseState) => rootSelector(state).moveLabwareMode
 
 const hasLiquid = (state: BaseState) => !isEmpty(getIngredientGroups(state))
 
@@ -450,7 +442,7 @@ export const selectors = {
   activeModals,
   getRenameLabwareFormMode,
 
-  labwareToCopy,
+  labwareToMove,
 
   allIngredientGroupFields,
   allIngredientNamesIds,

@@ -23,8 +23,8 @@ export const closeLabwareSelector = createAction(
   () => {}
 )
 
-export const setCopyLabwareMode = createAction(
-  'SET_COPY_LABWARE_MODE',
+export const setMoveLabwareMode = createAction(
+  'SET_MOVE_LABWARE_MODE',
   (containerId: string) => containerId
 )
 
@@ -92,31 +92,18 @@ export const closeRenameLabwareForm = createAction(
 
 // ===========
 
-export type CopyLabware = {
-  type: 'COPY_LABWARE',
+export type MoveLabware = {
+  type: 'MOVE_LABWARE',
   payload: {
-    fromContainer: string,
-    toContainer: string,
+    fromSlot: DeckSlot,
     toSlot: DeckSlot
   }
 }
 
-export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>, getState: GetState) => {
-  const state = getState()
-  const fromContainer = selectors.labwareToCopy(state)
-  if (fromContainer === false) {
-    console.warn('Attempted to copy labware with no fromContainer')
-    return
-  }
+export const moveLabware = (fromSlot: DeckSlot, toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
   return dispatch({
-    type: 'COPY_LABWARE',
-    payload: {
-      fromContainer,
-      toContainer: uuid() + ':' + fromContainer.split(':')[1],
-      // 'toContainer' is the containerId of the new clone.
-      // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'FIXED_TRASH_ID'.
-      toSlot: slot
-    }
+    type: 'MOVE_LABWARE',
+    payload: {fromSlot, toSlot}
   })
 }
 
