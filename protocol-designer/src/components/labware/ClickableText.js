@@ -4,19 +4,37 @@ import {Icon, type IconName} from '@opentrons/components'
 import styles from './labware.css'
 
 type Props = {
-  y: string | number;
+  y: string | number,
+  height?: string | number,
   text?: string,
   iconName?: IconName,
   onClick?: (e: SyntheticEvent<*>) => void,
 }
 
+const DEFAULT_HEIGHT = 15
+
 export default function (props: Props) {
+  const height = (props.height == null) ? DEFAULT_HEIGHT : props.height
   return (
-    <g className={styles.clickable_text} onClick={props.onClick}>
-      <text x='0' y={props.y}>{props.text}</text>
-      {props.iconName && <g className={styles.icon}>
-        <Icon name={props.iconName} y={props.y} height='15%' />
-      </g>}
+    <g onClick={props.onClick}>
+      {/* Invisible clickable area (otherwise line-drawing icons are hard
+        to get 'cursor: pointer' on!) */}
+      <rect
+        x='0'
+        y={props.y}
+        width='100%'
+        height={height}
+        className={styles.clickable_area}
+      />
+
+      <g className={styles.clickable_text}>
+        <text x='0' y={props.y}>{props.text}</text>
+        {props.iconName && (
+          <g className={styles.icon}>
+            <Icon name={props.iconName} y={props.y} height={height} />
+          </g>
+        )}
+      </g>
     </g>
   )
 }
