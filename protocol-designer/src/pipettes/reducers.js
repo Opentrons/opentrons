@@ -11,8 +11,13 @@ import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 
-function createPipette (mount: Mount, model: string, tiprackModel: ?string): ?PipetteData {
-  const id = `pipette:${model}:${uuid()}`
+function createPipette (
+  mount: Mount,
+  model: string,
+  tiprackModel: ?string,
+  overrideId?: string
+): ?PipetteData {
+  const id = overrideId || `pipette:${model}:${uuid()}`
   const pipetteData = getPipette(model)
 
   if (!pipetteData) {
@@ -62,7 +67,7 @@ const pipettes = handleActions({
       byId: reduce(
         pipettes,
         (acc: {[pipetteId: string]: PipetteData}, p: FilePipette, id: string) => {
-          const newPipette = createPipette(p.mount, p.model, pipetteTiprackAssignments[id])
+          const newPipette = createPipette(p.mount, p.model, pipetteTiprackAssignments[id], id)
           return newPipette
             ? {...acc, [id]: newPipette}
             : acc
