@@ -30,7 +30,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     onClose: () => {
       dispatch(closeLabwareSelector())
     },
-    onContainerChoose: (containerType) => {
+    selectLabware: (containerType) => {
       if (stateProps.slot) {
         dispatch(createContainer({slot: stateProps.slot, containerType}))
       }
