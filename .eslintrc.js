@@ -3,7 +3,7 @@ module.exports = {
 
   extends: [
     'standard',
-    // TODO(mc, 2018-02-10): plugin:react/recommended
+    'plugin:react/recommended',
     'plugin:flowtype/recommended'
   ],
 
@@ -13,9 +13,10 @@ module.exports = {
   ],
 
   rules: {
-    'react/jsx-uses-react': 'error',
-    'react/jsx-uses-vars': 'error',
-    'camelcase': [0, {'properties': 'never'}]
+    'camelcase': [0, {'properties': 'never'}],
+    // TODO(mc, 2018-07-24): disabled until fix for crash is released
+    // https://github.com/yannickcr/eslint-plugin-react/pull/1860
+    'react/prop-types': [0]
   },
 
   globals: {},

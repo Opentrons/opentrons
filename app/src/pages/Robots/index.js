@@ -53,13 +53,12 @@ function Robots (props: Props) {
     <Switch>
       <Route
         path={`${path}/instruments`}
-        render={(props) => (
-          <InstrumentSettings {...props} robot={robot} />
-        )} />
+        render={props => (<InstrumentSettings {...props} robot={robot} />)}
       />
-      <Route path={path} render={(props) => (
-        <RobotSettings robot={robot} />
-      )} />
+      <Route
+        path={path}
+        render={() => (<RobotSettings robot={robot} />)}
+      />
     </Switch>
   )
 }

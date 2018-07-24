@@ -20,7 +20,7 @@ type Props = {
   hideModal: boolean
 }
 
-export default function (props: Props) {
+export default function MoreOptionsModal (props: Props) {
   const formConnector = formConnectorFactory(props.handleChange, props.formData)
 
   if (props.hideModal) {
