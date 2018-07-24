@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {getWellTotalVolume} from '@opentrons/shared-data'
 import type {StepFieldName} from '../fieldLevel'
+import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 
 export const DISPOSAL_PERCENTAGE = 0.2 // 20% percent of pipette capacity
 /*******************
@@ -31,7 +32,7 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
       <React.Fragment>
         For accuracy in distribute actions we recommend you use a disposal volume
         of at least 20% of the tip&apos;s capacity.
-        Read more <a target='_blank' rel='noopener' href='https://support.opentrons.com/protocol-designer/actions/distribute'>here</a>.
+        Read more <KnowledgeBaseLink to='distribute'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
     dependentFields: ['aspirate_disposalVol_volume', 'pipette']
