@@ -1,8 +1,12 @@
 // @flow
 import * as React from 'react'
-import type {DeckSlot} from '@opentrons/components'
-import styles from './LabwareDropdown.css'
-import Accordion from './Accordion.js'
+import {
+  TitledList,
+  OutlineButton,
+  type DeckSlot
+} from '@opentrons/components'
+import SelectedWrapper from './SelectedWrapper'
+import styles from './styles.css'
 
 type OnContainerChoose = (containerType: string) => void
 
@@ -26,15 +30,17 @@ function LabwareItem (props: LabwareItemProps) {
   )
 }
 
-type LabwareDropdownProps = {
-  onClose: (e?: SyntheticEvent<*>) => void,
+type Props = {
+  onClose: (e?: SyntheticEvent<*>) => mixed,
   onContainerChoose: OnContainerChoose,
   slot: ?DeckSlot,
-  permittedTipracks: Array<string>
+  permittedTipracks: Array<string>,
+  select: (?string) => mixed,
+  selectedSection: ?string
 }
 
-export default function LabwareDropdown (props: LabwareDropdownProps) {
-  const {onClose, onContainerChoose, slot, permittedTipracks} = props
+function LabwareDropdown (props: Props) {
+  const {onClose, onContainerChoose, slot, permittedTipracks, selectedSection, select} = props
   // do not render without a slot
   if (!slot) return null
 
@@ -49,12 +55,20 @@ export default function LabwareDropdown (props: LabwareDropdownProps) {
     />
   )
 
+  // TODO IMMEDIATELY should I continue with this, or ditch SelectedWrapper?
+  // Is collapsing one section independent of others, or can only one be open?
+  const listPropsHack = (title: string) => ({
+    title,
+    collapsed: selectedSection !== title,
+    onCollapseToggle: () => select(title),
+    onClick: () => select(title)
+  })
+
   return (
     <div className={styles.labware_dropdown}>
-      <label>Add Labware to Slot {slot}</label>
-      <div className={styles.close} onClick={onClose}>X</div>
+      <div className={styles.title}>Slot {slot} Labware</div>
       <ul>
-        <Accordion title='Tip Rack'>
+        <TitledList {...listPropsHack('Tip Rack')}>
           {[
             ['tiprack-10ul', '10uL Tip Rack', 'Tiprack-10ul'],
             ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
@@ -63,16 +77,16 @@ export default function LabwareDropdown (props: LabwareDropdownProps) {
           ].filter(labwareModelNameImage =>
             permittedTipracks.includes(labwareModelNameImage[0])
           ).map(labwareItemMapper)}
-        </Accordion>
-        <Accordion title='Tube Rack'>
+        </TitledList>
+        <TitledList {...listPropsHack('Tube Rack')}>
           {[
             ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
             ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
             ['24-vial-rack', '3.5mL Tube Rack'],
             ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml']
           ].map(labwareItemMapper)}
-        </Accordion>
-        <Accordion title='Well Plate'>
+        </TitledList>
+        <TitledList {...listPropsHack('Well Plate')}>
           {[
             ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
             ['96-flat', '96 Flat', '96-PCR-Flatt'],
@@ -83,23 +97,31 @@ export default function LabwareDropdown (props: LabwareDropdownProps) {
             ['24-well-plate', '24 Well Plate']
             // ['rigaku-compact-crystallization-plate', 'Rigaku Compact Crystallization Plate']
           ].map(labwareItemMapper)}
-        </Accordion>
-        <Accordion title='Trough'>
+        </TitledList>
+        <TitledList {...listPropsHack('Trough')}>
           {[
             ['trough-12row', '12-row Trough', 'Trough-12row']
           ].map(labwareItemMapper)}
-        </Accordion>
-        {/* <Accordion title='PCR Strip'>
+        </TitledList>
+        {/* <TitledList title='PCR Strip'>
           {[
             ['PCR-strip-tall', 'PCR Strip Tall', '96-PCR-Strip']
           ].map(labwareItemMapper)}
-        </Accordion> */}
-        <Accordion title='Trash'>
+        </TitledList> */}
+        <TitledList {...listPropsHack('Trash')}>
           {[
             ['trash-box', 'Trash Box'] // no container img
           ].map(labwareItemMapper)}
-        </Accordion>
+        </TitledList>
       </ul>
+      <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
     </div>
   )
+}
+
+type FinalProps = $Diff<Props, {selectedSection: *, select: *}>
+
+export default function WrappedLabwareDropdown (props: FinalProps) {
+  return <SelectedWrapper render={({selected, select}) =>
+    <LabwareDropdown {...{...props, selectedSection: selected, select}}/>} />
 }

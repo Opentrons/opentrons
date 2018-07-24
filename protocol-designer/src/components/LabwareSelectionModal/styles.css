@@ -1,0 +1,56 @@
+@import '@opentrons/components';
+
+.title {
+  @apply --font-header-dark;
+
+  padding-bottom: 1rem;
+}
+
+.labware_dropdown {
+  position: absolute;
+  background-color: var(--c-white);
+  box-shadow: 0 0.25rem 1rem 0 rgba(0, 0, 0, 0.25); /* TODO Ian 2018-07-24 this whole thing should be a var */
+  left: 0;
+  right: 0;
+  top: 20%;
+  width: 35%;
+  margin: auto;
+  padding: 1rem 2rem;
+  user-select: none;
+
+  & button {
+    margin-top: 2rem;
+    float: right;
+  }
+}
+
+/* ----- */
+
+.labware_list_item {
+  position: relative;
+  width: 100%;
+  padding: 0.25rem 1rem;
+}
+
+.labware_list_item:hover {
+  background-color: lightgray; /* TODO Ian 2018-07-24 */
+}
+
+.labware_list_item:hover::after {
+  content: var(--image-url);
+  background-size: 80px 60px;
+  border: 2px solid darkgray;
+  position: absolute;
+
+  /* Images too large, and need to be cropped from left */
+  zoom: 0.5;
+  clip-path: inset(0 0 0 360px);
+  top: 0;
+
+  /* left: calc(slotWidth * slotScale * 1); */
+  left: 0;
+
+  /* width: 200px;
+  height: 200px; */
+  z-index: 5000;
+}
