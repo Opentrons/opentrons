@@ -345,7 +345,7 @@ export default function client (dispatch) {
         // update.modulesBySlot = {
         //   '1': {
         //     id: '4374062089',
-        //     name: 'magdeck',
+        //     name: 'tempdeck',
         //     slot: '1'
         //   }
         // }

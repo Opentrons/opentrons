@@ -16,7 +16,7 @@
 
 .module_image_wrapper {
   flex-basis: 25%;
-  padding-right: 1rem;
+  padding-right: 0.5rem;
 }
 
 .module_image {
@@ -24,7 +24,7 @@
 }
 
 .module_info {
-  flex-basis: 55%;
+  flex-basis: 65%;
 }
 
 .grid_50 {

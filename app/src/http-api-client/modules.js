@@ -11,14 +11,37 @@ import {apiRequest, apiSuccess, apiFailure} from './actions'
 import {getRobotApiState} from './reducer'
 import client from './client'
 
-export type Module = {
-  name: 'magdeck' | 'tempdeck',
+export type BaseModule = {|
   model: string,
   serial: string,
   fwVersion: string,
   status: string,
-  displayName: string,
-}
+|}
+
+type TempDeckData = {|
+  currentTemp: number,
+  targetTemp: number,
+|}
+
+type MagDeckData = {|
+  engaged: boolean,
+|}
+
+export type TempDeckModule = {|
+  ...BaseModule,
+  name: 'tempdeck',
+  displayName: 'Temperature Module',
+  data: TempDeckData,
+|}
+
+export type MagDeckModule = {|
+  ...BaseModule,
+  name: 'magdeck',
+  displayName: 'Magnetic Bead Module',
+  data: MagDeckData,
+|}
+
+export type Module = MagDeckModule | TempDeckModule
 
 type FetchModulesResponse = {
   modules: Array<Module>,
@@ -64,8 +87,12 @@ export function makeGetRobotModules () {
     //         model: 'temp_deck',
     //         serial: '123123124',
     //         fwVersion: '1.2.13',
-    //         status: '86',
-    //         displayName: 'Temperature Module'
+    //         status: 'heating',
+    //         displayName: 'Temperature Module',
+    //         data: {
+    //           currentTemp: 60,
+    //           targetTemp: 70
+    //         }
     //       },
     //       {
     //         name: 'magdeck',
@@ -73,7 +100,10 @@ export function makeGetRobotModules () {
     //         serial: '123123124',
     //         fwVersion: '1.2.13',
     //         status: 'disengaged',
-    //         displayName: 'Magnetic Bead Module'
+    //         displayName: 'Magnetic Bead Module',
+    //         data: {
+    //           engaged: false
+    //         }
     //       }
     //     ]
     //   }
