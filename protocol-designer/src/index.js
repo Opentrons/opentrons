@@ -1,11 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import { AppContainer } from 'react-hot-loader'
-
-import configureStore from './configureStore.js'
+import {Provider} from 'react-redux'
+import {AppContainer} from 'react-hot-loader'
+import configureStore from './configureStore'
+import {initializeIntercom} from './analytics'
 import App from './components/App'
 import {selectors as loadFileSelectors} from './load-file'
+
 const store = configureStore()
 
 if (process.env.NODE_ENV === 'production') {
@@ -29,6 +30,7 @@ const render = (Component) => {
 }
 
 render(App)
+initializeIntercom()
 
 // Hot Module Replacement API
 if (module.hot) {

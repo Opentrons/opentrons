@@ -24,6 +24,7 @@ Right now we are using them as feature flags for development, to avoid introduci
 
 Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
 
-### `OT_PD_SHOW_WARNINGS`
-
-Shows warning AlertItems (which are hidden by default) when `process.env.OT_PD_SHOW_WARNINGS === 'true'`
+| variable             | default      | description                                          |
+| -------------------- | ------------ | ---------------------------------------------------- |
+| `NODE_ENV`           | `production` | Environment: production, development, or test        |
+| `OT_PD_INTERCOM_ID`  | unset        | Sets the Intercom application ID                     |
