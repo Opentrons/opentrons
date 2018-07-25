@@ -38,7 +38,7 @@ type FieldProps = {|
 |}
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
-  (props: FieldProps) => { /* otherProps */
+  function InputFieldFactory (props: FieldProps) { /* otherProps */
     const {setSubstate, getSubstate} = args
     const {accessor, numeric, type, placeholder, className} = props
 
@@ -173,6 +173,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     }
   }
 
+  // TODO(mc, 2018-07-24): use a different lifecycle hook
   componentWillReceiveProps (nextProps: Props) {
     const nextEditingId = nextProps.commonSelectedIngred
     const prevEditingId = this.props.commonSelectedIngred

@@ -5,7 +5,7 @@ import * as React from 'react'
 import removeTrashSrc from './img/trash@3x.png'
 import styles from './Contents.css'
 
-export default function () {
+export default function Contents () {
   return (
     <div>
       <p className={styles.attention}>

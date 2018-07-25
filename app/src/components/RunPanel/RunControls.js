@@ -16,7 +16,7 @@ type RunProps = {
   onResumeClick: () => mixed,
   onResetClick: () => mixed,
 }
-export default function (props: RunProps) {
+export default function RunControls (props: RunProps) {
   const {
     disabled,
     isReadyToRun,

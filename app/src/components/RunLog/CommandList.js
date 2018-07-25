@@ -9,7 +9,8 @@ import styles from './styles.css'
 
 export default class CommandList extends Component {
   componentDidUpdate () {
-    if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true)
+    // TODO(mc, 2018-07-24): use new refs
+    if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs
   }
 
   render () {

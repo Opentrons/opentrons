@@ -65,6 +65,7 @@ export default class NewFileModal extends React.Component<Props, State> {
     this.state = initialState
   }
 
+  // TODO(mc, 2018-07-24): use a different lifecycle hook
   componentWillReceiveProps (nextProps: Props) {
     // reset form state when modal is hidden
     if (!this.props.hideModal && nextProps.hideModal) this.setState(initialState)
@@ -163,12 +164,12 @@ const BetaRestrictions = () => (
     <h3>Beta Pipette Restrictions:</h3>
     <ol>
       <li>
-        You can't change your pipette selection later. If in doubt go for
+        You can&apos;t change your pipette selection later. If in doubt go for
         smaller pipettes. The Protocol Designer automatically breaks up transfer
         volumes that exceed pipette capacity into multiple transfers.
       </li>
       <li>
-        Pipettes can't share tip racks. There needs to be at least 1 tip rack per
+        Pipettes can&apos;t share tip racks. There needs to be at least 1 tip rack per
         pipette on the deck.
       </li>
     </ol>

@@ -41,6 +41,7 @@ class LabwareNameEditForm extends React.Component<Props, State> {
     this.setState({name: e.target.value})
   }
 
+  // TODO(mc, 2018-07-24): use a different lifecycle hook
   componentWillReceiveProps (nextProps: Props) {
     this.setState({name: nextProps.labwareName})
   }

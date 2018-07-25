@@ -13,7 +13,7 @@ type Props = {
 
 const DEFAULT_HEIGHT = 15
 
-export default function (props: Props) {
+export default function ClickableText (props: Props) {
   const height = (props.height == null) ? DEFAULT_HEIGHT : props.height
   return (
     <g onClick={props.onClick}>
