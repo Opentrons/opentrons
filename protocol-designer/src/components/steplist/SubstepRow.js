@@ -4,7 +4,7 @@ import last from 'lodash/last'
 
 import {Icon} from '@opentrons/components'
 import IngredPill from '../IngredPill'
-
+import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 
 import type {NamedIngred} from '../../steplist/types'
@@ -74,7 +74,7 @@ export default function SubstepRow (props: SubstepRowProps) {
   const formattedVolume = formatVolume(props.volume)
 
   return (
-    <li className={props.className}
+    <PDListItem className={props.className}
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}
     >
@@ -93,6 +93,6 @@ export default function SubstepRow (props: SubstepRowProps) {
         </span>
         : <IngredPill ingreds={props.destIngredients} />
       }
-    </li>
+    </PDListItem>
   )
 }

@@ -1,0 +1,32 @@
+@import '@opentrons/components';
+
+.pd_titled_list {
+  margin: 0.4rem 0.125rem;
+  color: var(--c-dark-gray);
+  box-shadow: 0 0.125rem 0.5rem color(var(--c-black) alpha(0.25));
+
+  & ol {
+    padding: 0;
+    margin: 0;
+  }
+
+  & h3 {
+    text-transform: uppercase;
+  }
+}
+
+.pd_list_item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: var(--fs-body-1);
+
+  & > * {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
