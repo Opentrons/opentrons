@@ -17,23 +17,24 @@ import type {BaseState, ThunkDispatch} from '../types'
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 const DECK_HEADER = 'Tell the robot where labware and liquids start on the deck'
 
-type DeckSetupProps = {
+type StateProps = {
   deckSetupMode: boolean,
   ingredSelectionMode: boolean
 }
+type DispatchProps = {cancelMoveLabwareMode: () => mixed}
 
-const mapStateToProps = (state: BaseState): DeckSetupProps => ({
+const mapStateToProps = (state: BaseState): StateProps => ({
   deckSetupMode: steplistSelectors.deckSetupMode(state),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state))
 })
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>) => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
   cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode(false))
 })
 
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
-class DeckSetup extends React.Component<DeckSetupProps> {
+class DeckSetup extends React.Component<StateProps & DispatchProps> {
   renderDeck = () => (
     <div className={styles.deck_row}>
       <ClickOutside onClickOutside={this.props.cancelMoveLabwareMode}>

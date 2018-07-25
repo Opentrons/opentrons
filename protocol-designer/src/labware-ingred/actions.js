@@ -14,7 +14,7 @@ import type {DeckSlot} from '@opentrons/components'
 
 export const openLabwareSelector = createAction(
   'OPEN_LABWARE_SELECTOR',
-  (args: {slot: string}) => args
+  (args: {slot: DeckSlot}) => args
 )
 
 export const closeLabwareSelector = createAction(
@@ -24,7 +24,7 @@ export const closeLabwareSelector = createAction(
 
 export const setMoveLabwareMode = createAction(
   'SET_MOVE_LABWARE_MODE',
-  (slot: DeckSlot) => slot
+  (slot: DeckSlot | false) => slot
 )
 
 // ===== Open and close Ingredient Selector modal ====
@@ -54,7 +54,7 @@ export const editModeIngredientGroup = createAction(
 export const createContainer = createAction(
   'CREATE_CONTAINER',
   (args: {|
-    slot: string,
+    slot: DeckSlot,
     containerType: string
   |}) => args
 )
@@ -63,7 +63,7 @@ export const deleteContainer = createAction(
   'DELETE_CONTAINER',
   (args: {|
     containerId: string,
-    slot: string,
+    slot: DeckSlot,
     containerType: string
   |}) => args
 )
@@ -102,10 +102,12 @@ export type MoveLabware = {
 export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
   const state = getState()
   const fromSlot = selectors.slotToMoveFrom(state)
-  return dispatch({
-    type: 'MOVE_LABWARE',
-    payload: {fromSlot, toSlot}
-  })
+  if (fromSlot) {
+    return dispatch({
+      type: 'MOVE_LABWARE',
+      payload: {fromSlot, toSlot}
+    })
+  }
 }
 
 type DeleteIngredientPrepayload = {

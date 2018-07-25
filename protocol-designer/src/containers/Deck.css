@@ -3,6 +3,7 @@
 .deck {
   padding: 1rem;
   max-width: 100%;
+  width: 100vh;
 }
 
 .deck_header {

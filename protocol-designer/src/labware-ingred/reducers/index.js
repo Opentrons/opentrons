@@ -257,8 +257,8 @@ export const ingredLocations = handleActions({
 }, {})
 
 export type RootState = {|
-  modeLabwareSelection: string | false, // TODO use null, not false
-  moveLabwareMode: string | false,
+  modeLabwareSelection: DeckSlot | false, // TODO use null, not false
+  moveLabwareMode: DeckSlot | false,
   selectedContainerId: SelectedContainerId,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
@@ -397,7 +397,7 @@ const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?st
 type ActiveModals = {
   labwareSelection: boolean,
   ingredientSelection: ?{
-    slot: ?string,
+    slot: ?DeckSlot,
     containerName: ?string
   }
 }
@@ -411,7 +411,7 @@ const activeModals: Selector<ActiveModals> = createSelector(
     return ({
       labwareSelection: state.modeLabwareSelection !== false,
       ingredientSelection: {
-        slot: selectedContainer && selectedContainer.slot,
+        slot: selectedContainer ? selectedContainer.slot : null,
         containerName: selectedContainer && selectedContainer.type
       }
     })

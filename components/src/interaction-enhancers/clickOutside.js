@@ -66,12 +66,12 @@ export default function clickOutside<
 // TODO: BC 2018-7-25 deprecate HOC version (clickOutside) and move to just ClickOutside FOC
 type ClickOutsideProps = {
   onClickOutside: ?(MouseEvent => mixed),
-  children: ({ref: React.Ref<*>}) => React.Element
+  children: ({ref: React.Ref<*>}) => React.Element<*>
 }
 export class ClickOutside extends React.Component<ClickOutsideProps> {
-  wrapperRef: React.Ref<*>
+  wrapperRef: ?Element
 
-  constructor (props: Props) {
+  constructor (props: ClickOutsideProps) {
     super(props)
     this.wrapperRef = null
   }
@@ -82,7 +82,7 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
-  setWrapperRef = (el) => { this.wrapperRef = el }
+  setWrapperRef = (el: ?Element) => { this.wrapperRef = el }
 
   handleClickOutside = (event: MouseEvent) => {
     const clickedElem = event.target

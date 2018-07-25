@@ -1,10 +1,10 @@
 // @flow
 import React from 'react'
 import cx from 'classnames'
-import {HandleKeypress} from '@opentrons/components'
+import {HandleKeypress, type DeckSlot} from '@opentrons/components'
 import styles from './labware.css'
 
-type DisabledSelectSlotOverlayProps = {setMoveLabwareMode: (slot: DeckSlot) => void}
+type DisabledSelectSlotOverlayProps = {setMoveLabwareMode: (slot: DeckSlot | false) => void}
 class DisabledSelectSlotOverlay extends React.Component<DisabledSelectSlotOverlayProps> {
   cancelMove = () => {
     this.props.setMoveLabwareMode(false)

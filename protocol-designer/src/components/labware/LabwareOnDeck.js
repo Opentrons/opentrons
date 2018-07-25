@@ -17,10 +17,10 @@ import {
   SLOT_WIDTH,
   SLOT_HEIGHT,
   humanizeLabwareType,
-  clickOutside
+  clickOutside,
+  type DeckSlot
 } from '@opentrons/components'
-import type {ClickOutsideInterface} from '@opentrons/components'
-import {getLabware, type DeckSlot} from '@opentrons/shared-data'
+import {getLabware} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
@@ -91,7 +91,7 @@ function SlotWithContainer (props: SlotWithContainerProps) {
 }
 
 type LabwareOnDeckProps = {
-  slot: string,
+  slot: DeckSlot,
 
   containerId: string,
   containerType: string,
@@ -103,22 +103,22 @@ type LabwareOnDeckProps = {
   activeModals: {
     ingredientSelection: ?{
       containerName: ?string,
-      slot: ?string
+      slot: ?DeckSlot
     },
     labwareSelection: boolean
   },
   openIngredientSelector: (containerId: string) => void,
 
   // createContainer: ({slot: string, containerType: string}) => mixed,
-  deleteContainer: ({containerId: string, slot: string, containerType: string}) => void,
+  deleteContainer: ({containerId: string, slot: DeckSlot, containerType: string}) => void,
   modifyContainer: ({containerId: string, modify: {[field: string]: mixed}}) => void, // eg modify = {name: 'newName'}
 
-  openLabwareSelector: ({slot: string}) => void,
+  openLabwareSelector: ({slot: DeckSlot}) => void,
   // closeLabwareSelector: ({slot: string}) => mixed,
 
-  setMoveLabwareMode: (slot: DeckSlot) => void,
+  setMoveLabwareMode: (slot: DeckSlot | false) => void,
   slotToMoveFrom: DeckSlot | false,
-  moveLabware: (slot: string) => void,
+  moveLabware: (slot: DeckSlot) => void,
 
   height?: number,
   width?: number,
@@ -175,7 +175,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     modify: {name: null}
   })
 
-  const makeHandleSelectMoveDestination = (slot) => (e: SyntheticMouseEvent<*>) => {
+  const makeHandleSelectMoveDestination = (slot) => (e: SyntheticEvent<*>) => {
     e.preventDefault()
     moveLabware(slot)
   }
