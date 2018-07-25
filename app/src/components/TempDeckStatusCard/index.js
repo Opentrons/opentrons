@@ -36,7 +36,7 @@ function TempDeckStatusCard (props: Props) {
           </CardContentRow>
           <CardContentRow>
             <LabeledValue label='Current Temp' value={CURRENT} />
-            <LabeledValue label='Current Temp' value={TARGET} />
+            <LabeledValue label='Target Temp' value={TARGET} />
           </CardContentRow>
         </StatusCard>
     </React.Fragment>

@@ -20,8 +20,7 @@ export default function ModuleItem (props: Props) {
   return (
     <div className={styles.module_item}>
       <ModuleImage name={module.name}/>
-      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
-      <ModuleInfo {...module}/>
+      <ModuleInfo module={module}/>
       <ModuleUpdate availableUpdate={props.availableUpdate}/>
     </div>
   )
