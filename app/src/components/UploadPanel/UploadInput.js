@@ -5,7 +5,7 @@ import {PrimaryButton, Icon} from '@opentrons/components'
 import styles from './upload-panel.css'
 
 type Props = {
-  onUpload: (SyntheticEvent<>) => void,
+  onUpload: (SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => void,
   isButton?: boolean
 }
 
