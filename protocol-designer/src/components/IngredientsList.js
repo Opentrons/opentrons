@@ -70,7 +70,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         onClick={() => editModeIngredientGroup({groupId, wellName: null})}
         description={<StepDescription description={description} header='Description:' />}
       >
-        <PDListItem border className={styles.ingredient_row_header}>
+        <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>
           <span>μL</span>
           <span>Name</span>

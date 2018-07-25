@@ -74,7 +74,9 @@ export default function SubstepRow (props: SubstepRowProps) {
   const formattedVolume = formatVolume(props.volume)
 
   return (
-    <PDListItem className={props.className}
+    <PDListItem
+      border
+      className={props.className}
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}
     >

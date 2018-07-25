@@ -1,8 +1,6 @@
 @import '@opentrons/components';
 
 .step_subitem {
-  border-top: 2px solid var(--c-light-gray);
-
   & svg {
     /* Subitem group carat */
     flex: 1;
@@ -24,7 +22,7 @@
 .step_subitem_column_header {
   & svg {
     /* Source labware -> Dest Labware arrow icon */
-    flex: 1;
+    flex: 0.5;
     height: 1.5rem;
     color: var(--c-med-gray);
   }
@@ -52,6 +50,7 @@
 
 /* Multi-channel row representing a single channel */
 .step_subitem_channel_row {
+  border-top: 0;
   border-bottom: 1px var(--c-med-gray) dashed;
   background-color: var(--c-light-gray);
 }
