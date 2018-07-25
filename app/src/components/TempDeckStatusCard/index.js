@@ -18,9 +18,9 @@ type SP = {
 
 type Props = SP
 
-export default connect(makeSTP, null)(TempdeckStatusCard)
+export default connect(makeSTP, null)(TempDeckStatusCard)
 
-function TempdeckStatusCard (props: Props) {
+function TempDeckStatusCard (props: Props) {
   const {tempDeck} = props
 
   if (!tempDeck) return null

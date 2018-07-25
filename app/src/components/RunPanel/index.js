@@ -10,7 +10,7 @@ import {getModulesOn} from '../../config'
 import {SidePanel, SidePanelGroup} from '@opentrons/components'
 import RunTimer from './RunTimer'
 import RunControls from './RunControls'
-import TempdeckStatusCard from '../TempdeckStatusCard'
+import TempDeckStatusCard from '../TempDeckStatusCard'
 
 const mapStateToProps = (state) => ({
   modulesFlag: getModulesOn(state),
@@ -41,7 +41,7 @@ function RunPanel (props) {
           <RunControls {...props} />
         </SidePanelGroup>
         {props.modulesFlag && (
-          <TempdeckStatusCard />
+          <TempDeckStatusCard />
         )}
     </SidePanel>
   )
