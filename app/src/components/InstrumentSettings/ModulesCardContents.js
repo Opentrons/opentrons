@@ -13,7 +13,7 @@ export default function ModulesCardContents (props: Props) {
   return (
     <React.Fragment>
       {props.modules.map((mod, index) => (
-        <ModuleItem {...mod} key={index}/>
+        <ModuleItem module={mod} key={index}/>
       ))}
     </React.Fragment>
   )
