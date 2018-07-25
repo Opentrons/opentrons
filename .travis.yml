@@ -57,7 +57,7 @@ script:
   - make test
   - if [[ $LINT = true ]]; then make lint; fi
   - if [[ $BUILD_COMPONENTS = true ]]; then make -C components build; fi
-  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer build; fi
+  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer dist; fi
   - if [[ $BUILD_APP = true ]]; then make -C app-shell dist-$APP_OS_TARGET; fi
   - if [[ $BUILD_API_DOCS = true ]]; then (make -C api docs > /dev/null); fi
 
