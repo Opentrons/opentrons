@@ -66,7 +66,7 @@ export default class NewFileModal extends React.Component<Props, State> {
   }
 
   // TODO(mc, 2018-07-24): use a different lifecycle hook
-  UNSAFE_componentWillReceiveProps (nextProps: Props) {
+  componentWillReceiveProps (nextProps: Props) {
     // reset form state when modal is hidden
     if (!this.props.hideModal && nextProps.hideModal) this.setState(initialState)
   }

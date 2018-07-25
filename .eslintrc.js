@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = {
   parser: 'babel-eslint',
 
@@ -25,5 +27,11 @@ module.exports = {
     node: true,
     browser: true,
     jest: true
+  },
+
+  settings: {
+    react: {
+      version: '16.2'
+    }
   }
 }

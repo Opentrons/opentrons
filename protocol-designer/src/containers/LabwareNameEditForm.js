@@ -42,7 +42,7 @@ class LabwareNameEditForm extends React.Component<Props, State> {
   }
 
   // TODO(mc, 2018-07-24): use a different lifecycle hook
-  UNSAFE_componentWillReceiveProps (nextProps: Props) {
+  componentWillReceiveProps (nextProps: Props) {
     this.setState({name: nextProps.labwareName})
   }
 
