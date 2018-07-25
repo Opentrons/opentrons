@@ -29,4 +29,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+
+  &.border {
+    border-bottom: 2px solid var(--c-light-gray);
+  }
 }
