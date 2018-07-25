@@ -31,7 +31,6 @@ export default function clickOutside<
     handleClickOutside = (event: MouseEvent) => {
       const clickedElem = event.target
 
-      console.log('INTERNAL HANDLER', this.wrapperRef)
       if (!(clickedElem instanceof Node)) {
         // NOTE: this is some flow type checking funkiness
         // TODO Ian 2018-05-24 use assert.

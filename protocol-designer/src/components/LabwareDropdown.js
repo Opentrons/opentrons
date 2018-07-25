@@ -29,7 +29,7 @@ function LabwareItem (props: LabwareItemProps) {
 type LabwareDropdownProps = {
   onClose: (e?: SyntheticEvent<*>) => void,
   onContainerChoose: OnContainerChoose,
-  slot: DeckSlot | false,
+  slot: ?DeckSlot,
   permittedTipracks: Array<string>
 }
 

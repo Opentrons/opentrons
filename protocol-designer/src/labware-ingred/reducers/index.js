@@ -257,8 +257,8 @@ export const ingredLocations = handleActions({
 }, {})
 
 export type RootState = {|
-  modeLabwareSelection: DeckSlot | false, // TODO use null, not false
-  moveLabwareMode: DeckSlot | false,
+  modeLabwareSelection: ?DeckSlot,
+  moveLabwareMode: ?DeckSlot,
   selectedContainerId: SelectedContainerId,
   containers: ContainersState,
   savedLabware: SavedLabwareState,

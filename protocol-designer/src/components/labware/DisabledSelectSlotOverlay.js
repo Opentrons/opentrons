@@ -4,10 +4,10 @@ import cx from 'classnames'
 import {HandleKeypress, type DeckSlot} from '@opentrons/components'
 import styles from './labware.css'
 
-type DisabledSelectSlotOverlayProps = {setMoveLabwareMode: (slot: DeckSlot | false) => void}
+type DisabledSelectSlotOverlayProps = {setMoveLabwareMode: (slot: ?DeckSlot) => void}
 class DisabledSelectSlotOverlay extends React.Component<DisabledSelectSlotOverlayProps> {
   cancelMove = () => {
-    this.props.setMoveLabwareMode(false)
+    this.props.setMoveLabwareMode()
   }
   render () {
     return (

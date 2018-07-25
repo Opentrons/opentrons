@@ -38,12 +38,6 @@
   pointer-events: none;
 }
 
-.move_icon {
-  height: 15px;
-  fill: currentColor;
-  color: var(--c-white);
-}
-
 .appear_on_mouseover {
   opacity: 0;
 

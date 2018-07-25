@@ -30,7 +30,7 @@ const mapStateToProps = (state: BaseState): StateProps => ({
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
-  cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode(false))
+  cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode())
 })
 
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor

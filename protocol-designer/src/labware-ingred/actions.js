@@ -24,7 +24,7 @@ export const closeLabwareSelector = createAction(
 
 export const setMoveLabwareMode = createAction(
   'SET_MOVE_LABWARE_MODE',
-  (slot: DeckSlot | false) => slot
+  (slot: ?DeckSlot) => slot
 )
 
 // ===== Open and close Ingredient Selector modal ====

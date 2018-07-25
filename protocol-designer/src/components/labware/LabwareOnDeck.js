@@ -116,8 +116,8 @@ type LabwareOnDeckProps = {
   openLabwareSelector: ({slot: DeckSlot}) => void,
   // closeLabwareSelector: ({slot: string}) => mixed,
 
-  setMoveLabwareMode: (slot: DeckSlot | false) => void,
-  slotToMoveFrom: DeckSlot | false,
+  setMoveLabwareMode: (slot: ?DeckSlot) => void,
+  slotToMoveFrom: ?DeckSlot,
   moveLabware: (slot: DeckSlot) => void,
 
   height?: number,
@@ -180,7 +180,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     moveLabware(slot)
   }
   const cancelMove = () => {
-    setMoveLabwareMode(false)
+    setMoveLabwareMode()
   }
 
   return (
