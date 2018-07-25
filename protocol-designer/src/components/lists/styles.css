@@ -21,7 +21,3 @@
     text-overflow: ellipsis;
   }
 }
-
-.border {
-  border-top: var(--bd-light);
-}
