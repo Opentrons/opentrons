@@ -20,8 +20,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+}
 
-  &.border {
-    border-bottom: 2px solid var(--c-light-gray);
-  }
+.border {
+  border-top: 2px solid var(--c-light-gray);
 }
