@@ -11,7 +11,6 @@
 import React from 'react'
 import cx from 'classnames'
 import {
-  CenteredTextSvg,
   LabwareContainer,
   ContainerNameOverlay,
   EmptyDeckSlot,
@@ -20,12 +19,14 @@ import {
   humanizeLabwareType,
   clickOutside
 } from '@opentrons/components'
+import type {ClickOutsideInterface} from '@opentrons/components'
 import {getLabware, type DeckSlot} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
+import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
 
 const EnhancedNameThisLabwareOverlay = clickOutside(NameThisLabwareOverlay)
 
@@ -174,6 +175,14 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     modify: {name: null}
   })
 
+  const makeHandleSelectMoveDestination = (slot) => (e: SyntheticMouseEvent<*>) => {
+    e.preventDefault()
+    moveLabware(slot)
+  }
+  const cancelMove = () => {
+    setMoveLabwareMode(false)
+  }
+
   return (
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
@@ -182,14 +191,14 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
         : <EmptyDeckSlot {...{height, width, slot}} />
       }
 
-      {(!deckSetupMode || (!slotIsOccupied && activeModals.labwareSelection))
+      {(!deckSetupMode || activeModals.labwareSelection)
         // "Add Labware" labware selection dropdown menu
         ? null
         : (slotToMoveFrom
             // Mouseover empty slot -- Add (or Copy if in copy mode)
             ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
               <rect className={styles.overlay_panel} onClick={() => moveLabware(slot)} />
-              <CenteredTextSvg className={cx(styles.pass_thru_mouse, styles.clickable_text)} text='Place Here' />
+              <ClickableText onClick={makeHandleSelectMoveDestination(slot)} iconName='cursor-move' y='40%' text='Place Here' />
             </g>
             : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
               <rect className={styles.overlay_panel} />
@@ -201,7 +210,10 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
         )
       }
 
-      {deckSetupMode && slotIsOccupied && !showNameOverlay &&
+      {slotToMoveFrom === slot &&
+        <DisabledSelectSlotOverlay onClickOutside={cancelMove} setMoveLabwareMode={setMoveLabwareMode} />}
+
+      {deckSetupMode && slotIsOccupied && !slotToMoveFrom && !showNameOverlay &&
         <OccupiedDeckSlotOverlay {...{
           canAddIngreds,
           containerId,
@@ -211,16 +223,19 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           openIngredientSelector,
           setMoveLabwareMode,
           deleteContainer
-        }} />}
+        }} />
+      }
 
-      {deckSetupMode && showNameOverlay && <EnhancedNameThisLabwareOverlay {...{
-        containerType,
-        containerId,
-        slot,
-        modifyContainer,
-        deleteContainer
-      }}
-      onClickOutside={setDefaultLabwareName} />}
+      {deckSetupMode && showNameOverlay &&
+        <EnhancedNameThisLabwareOverlay {...{
+          containerType,
+          containerId,
+          slot,
+          modifyContainer,
+          deleteContainer
+        }}
+        onClickOutside={setDefaultLabwareName} />
+      }
     </LabwareContainer>
   )
 }

@@ -11,3 +11,9 @@
   text-align: center;
   padding-top: 1rem;
 }
+
+.deck_row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

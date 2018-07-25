@@ -31,6 +31,7 @@ export default function clickOutside<
     handleClickOutside = (event: MouseEvent) => {
       const clickedElem = event.target
 
+      console.log('INTERNAL HANDLER', this.wrapperRef)
       if (!(clickedElem instanceof Node)) {
         // NOTE: this is some flow type checking funkiness
         // TODO Ian 2018-05-24 use assert.
@@ -59,5 +60,50 @@ export default function clickOutside<
       const {onClickOutside, ...passedProps} = this.props
       return <WrappedComponent {...passedProps} passRef={this.setWrapperRef} />
     }
+  }
+}
+
+// TODO: BC 2018-7-25 deprecate HOC version (clickOutside) and move to just ClickOutside FOC
+type ClickOutsideProps = {
+  onClickOutside: ?(MouseEvent => mixed),
+  children: ({ref: React.Ref<*>}) => React.Element
+}
+export class ClickOutside extends React.Component<ClickOutsideProps> {
+  wrapperRef: React.Ref<*>
+
+  constructor (props: Props) {
+    super(props)
+    this.wrapperRef = null
+  }
+
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutside)
+  }
+  componentWillUnmount () {
+    document.removeEventListener('mousedown', this.handleClickOutside)
+  }
+  setWrapperRef = (el) => { this.wrapperRef = el }
+
+  handleClickOutside = (event: MouseEvent) => {
+    const clickedElem = event.target
+
+    if (!(clickedElem instanceof Node)) {
+      // NOTE: this is some flow type checking funkiness
+      // TODO Ian 2018-05-24 use assert.
+      console.warn('expected clicked element to be Node - something went wrong in ClickOutside')
+      return
+    }
+
+    if (
+      this.props.onClickOutside &&
+      this.wrapperRef &&
+      !this.wrapperRef.contains(clickedElem)
+    ) {
+      this.props.onClickOutside(event)
+    }
+  }
+
+  render () {
+    return this.props.children({ref: this.setWrapperRef})
   }
 }
