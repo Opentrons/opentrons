@@ -2,7 +2,7 @@
 import sqlite3
 # import warnings
 from typing import List
-from opentrons.containers.placeable import Container, Well
+from opentrons.containers.placeable import Container, Well, Module
 from opentrons.data_storage import database_queries as db_queries
 from opentrons.util import environment
 from opentrons.util.vector import Vector
@@ -10,6 +10,8 @@ from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
 import logging
+
+SUPPORTED_MODULES = ['magdeck']
 
 log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')
@@ -67,7 +69,11 @@ def _load_container_object_from_db(db, container_name: str):
             .format(container_name)
         )
 
-    container = Container()
+    if container_name in SUPPORTED_MODULES:
+        container = Module()
+    else:
+        container = Container()
+
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)
     log.debug("Loading {} with coords {}".format(rel_coords, container_type))
