@@ -61,12 +61,12 @@ class DeckSetup extends React.Component<StateProps & DispatchProps> {
     // Once DeckSetup is broken apart and moved into ProtocolEditor,
     // this will go away
     return (
-      <div>
+      <React.Fragment>
         <LabwareDropdown />
         {this.props.ingredSelectionMode && <IngredientSelectionModal />}
         <div className={styles.deck_header}>{DECK_HEADER}</div>
         {this.renderDeck()}
-      </div>
+      </React.Fragment>
     )
   }
 }

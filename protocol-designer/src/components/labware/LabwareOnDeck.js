@@ -175,7 +175,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     modify: {name: null}
   })
 
-  const makeHandleSelectMoveDestination = (slot) => (e: SyntheticEvent<*>) => {
+  const handleSelectMoveDestination = (e: SyntheticEvent<*>) => {
     e.preventDefault()
     moveLabware(slot)
   }
@@ -198,7 +198,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
             // Mouseover empty slot -- Add (or Copy if in copy mode)
             ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
               <rect className={styles.overlay_panel} onClick={() => moveLabware(slot)} />
-              <ClickableText onClick={makeHandleSelectMoveDestination(slot)} iconName='cursor-move' y='40%' text='Place Here' />
+              <ClickableText onClick={handleSelectMoveDestination} iconName='cursor-move' y='40%' text='Place Here' />
             </g>
             : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
               <rect className={styles.overlay_panel} />
