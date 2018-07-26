@@ -2,7 +2,7 @@
 
 .step_description {
   padding: 0.5rem;
-  border-bottom: 2px solid var(--c-light-gray);
+  border-bottom: var(--bd-light);
 }
 
 .step_description header {
