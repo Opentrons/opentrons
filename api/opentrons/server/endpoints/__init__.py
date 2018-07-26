@@ -15,10 +15,12 @@ NAME = 'opentrons-{}'.format(
 
 
 async def health(request: web.Request) -> web.Response:
+    static_paths = ['/logs/serial.log', '/logs/api.log']
     res = {
         'name': NAME,
         'api_version': __version__,
-        'fw_version': robot.fw_version
+        'fw_version': robot.fw_version,
+        'logs': static_paths
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
