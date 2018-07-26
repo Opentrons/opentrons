@@ -3,7 +3,6 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 import max from 'lodash/max'
 
-import {uuid} from '../utils'
 import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
@@ -15,7 +14,7 @@ import type {DeckSlot} from '@opentrons/components'
 
 export const openLabwareSelector = createAction(
   'OPEN_LABWARE_SELECTOR',
-  (args: {slot: string}) => args
+  (args: {slot: DeckSlot}) => args
 )
 
 export const closeLabwareSelector = createAction(
@@ -23,9 +22,9 @@ export const closeLabwareSelector = createAction(
   () => {}
 )
 
-export const setCopyLabwareMode = createAction(
-  'SET_COPY_LABWARE_MODE',
-  (containerId: string) => containerId
+export const setMoveLabwareMode = createAction(
+  'SET_MOVE_LABWARE_MODE',
+  (slot: ?DeckSlot) => slot
 )
 
 // ===== Open and close Ingredient Selector modal ====
@@ -55,7 +54,7 @@ export const editModeIngredientGroup = createAction(
 export const createContainer = createAction(
   'CREATE_CONTAINER',
   (args: {|
-    slot: string,
+    slot: DeckSlot,
     containerType: string
   |}) => args
 )
@@ -64,7 +63,7 @@ export const deleteContainer = createAction(
   'DELETE_CONTAINER',
   (args: {|
     containerId: string,
-    slot: string,
+    slot: DeckSlot,
     containerType: string
   |}) => args
 )
@@ -92,32 +91,23 @@ export const closeRenameLabwareForm = createAction(
 
 // ===========
 
-export type CopyLabware = {
-  type: 'COPY_LABWARE',
+export type MoveLabware = {
+  type: 'MOVE_LABWARE',
   payload: {
-    fromContainer: string,
-    toContainer: string,
+    fromSlot: DeckSlot,
     toSlot: DeckSlot
   }
 }
 
-export const copyLabware = (slot: DeckSlot) => (dispatch: Dispatch<CopyLabware>, getState: GetState) => {
+export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
   const state = getState()
-  const fromContainer = selectors.labwareToCopy(state)
-  if (fromContainer === false) {
-    console.warn('Attempted to copy labware with no fromContainer')
-    return
+  const fromSlot = selectors.slotToMoveFrom(state)
+  if (fromSlot) {
+    return dispatch({
+      type: 'MOVE_LABWARE',
+      payload: {fromSlot, toSlot}
+    })
   }
-  return dispatch({
-    type: 'COPY_LABWARE',
-    payload: {
-      fromContainer,
-      toContainer: uuid() + ':' + fromContainer.split(':')[1],
-      // 'toContainer' is the containerId of the new clone.
-      // So you get 'uuid:containerType', or 'uuid:undefined' if you're cloning 'FIXED_TRASH_ID'.
-      toSlot: slot
-    }
-  })
 }
 
 type DeleteIngredientPrepayload = {

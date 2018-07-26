@@ -8,8 +8,6 @@
 }
 
 .deck {
-  /* TODO(mc, 2018-07-16): remove max-height from common styling */
-  max-height: 90vh;
   overflow: visible;
 }
 

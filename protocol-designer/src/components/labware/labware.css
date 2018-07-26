@@ -11,15 +11,27 @@
   @apply --round-slot;
 
   fill: var(--c-black);
+}
 
-  & text {
-    font-size: var(--fs-caption);
-  }
+.slot_overlay.disabled {
+  fill: var(--c-light-gray);
+}
 
-  & .overlay_panel {
-    width: 100%;
-    height: 100%;
-  }
+.overlay_panel {
+  width: 100%;
+  height: 100%;
+}
+
+.slot_overlay.disabled .overlay_panel {
+  opacity: 0.9;
+}
+
+.slot_overlay text {
+  font-size: var(--fs-caption);
+}
+
+.slot_overlay.disabled text {
+  color: var(--c-font-dark);
 }
 
 .pass_thru_mouse {

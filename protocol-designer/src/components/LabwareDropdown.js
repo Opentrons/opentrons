@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import type {DeckSlot} from '@opentrons/components'
 import styles from './LabwareDropdown.css'
 import Accordion from './Accordion.js'
 
@@ -28,7 +29,7 @@ function LabwareItem (props: LabwareItemProps) {
 type LabwareDropdownProps = {
   onClose: (e?: SyntheticEvent<*>) => void,
   onContainerChoose: OnContainerChoose,
-  slot: string | false,
+  slot: ?DeckSlot,
   permittedTipracks: Array<string>
 }
 
