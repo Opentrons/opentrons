@@ -151,7 +151,7 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     )
 
     const commandCreators = continuousValidForms.reduce(
-      (acc: Array<StepGeneration.CommandCreator>, formData) => {
+      (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
         const commandCreator = commandCreatorsFromFormData(formData)
 
@@ -161,18 +161,27 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
           return acc
         }
 
-        return [...acc, commandCreator]
+        let next = [...acc, commandCreator]
+
+        // Drop tips eagerly, per pipette
+        // NOTE: this assumes all step forms that use a pipette have both
+        // 'pipette' and 'changeTip' fields (and they're not named something else).
+        const pipetteId = formData.pipette
+        if (pipetteId) {
+          const nextFormForPipette = continuousValidForms
+            .slice(formIndex + 1)
+            .find(form => form.pipette === pipetteId)
+
+          const willReuseTip = nextFormForPipette && nextFormForPipette.changeTip === 'never'
+          if (!willReuseTip) {
+            next.push(StepGeneration.dropTip(pipetteId))
+          }
+        }
+
+        return next
       }, [])
 
-    // cleanup procedure(s) after last step
-    const cleanupCommandCreators = [
-      StepGeneration.dropAllTips()
-    ]
-
-    const timeline = StepGeneration.commandCreatorsTimeline([
-      ...commandCreators,
-      ...cleanupCommandCreators
-    ])(initialRobotState)
+    const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)
 
     return timeline
   }
