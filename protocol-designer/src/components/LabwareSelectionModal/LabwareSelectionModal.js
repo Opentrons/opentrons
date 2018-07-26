@@ -63,12 +63,9 @@ const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
   'Trash'
 ]
 
-function LabwareDropdown (props: Props) {
-  const {onClose, selectLabware, slot, permittedTipracks, selectedSection, select} = props
-  // do not render without a slot
-  if (!slot) return null
-
-  const labwareItemMapper = (dataRow, key) => {
+class LabwareDropdown extends React.Component <Props> {
+  labwareItemMapper = (dataRow, key) => {
+    const {selectLabware} = this.props
     const [labwareType, displayName, img] = dataRow
     return (
       <LabwareItem
@@ -85,41 +82,55 @@ function LabwareDropdown (props: Props) {
     )
   }
 
-  const sections = labwareSectionOrder.map(section => {
-    let labwareInSection = hardcodedLabware[section]
-    if (section === 'Tip Rack') {
-      // filter out tip rack labware that doesn't match pipettes
-      labwareInSection = labwareInSection.filter(labwareModelNameImage =>
-        permittedTipracks.includes(labwareModelNameImage[0])
-      )
-    }
-    return (
-      <PDTitledList
-        key={section}
-        title={section}
-        collapsed={selectedSection !== section}
-        // TODO IMMEDIATELY: use a maker for these fns
-        onCollapseToggle={() => select(section)}
-        onClick={() => select(section)}
-        >
-        {labwareInSection.map(labwareItemMapper)}
-      </PDTitledList>
-    )
-  })
+  generateSections = () => {
+    const {permittedTipracks, selectedSection, select} = this.props
 
-  return (
-    <ClickOutside onClickOutside={onClose}>
-      {({ref}) => (
-        <div ref={ref} className={styles.labware_dropdown}>
-          <div className={styles.title}>Slot {slot} Labware</div>
-          <ul>
-            {sections}
-          </ul>
-          <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
-        </div>
-      )}
-    </ClickOutside>
-  )
+    const sections = labwareSectionOrder.map(section => {
+      const selectSection = () => select(section)
+      let labwareInSection = hardcodedLabware[section]
+
+      if (section === 'Tip Rack') {
+        // filter out tip rack labware that doesn't match pipettes
+        labwareInSection = labwareInSection.filter(labwareModelNameImage =>
+          permittedTipracks.includes(labwareModelNameImage[0])
+        )
+      }
+
+      return (
+        <PDTitledList
+          key={section}
+          title={section}
+          collapsed={selectedSection !== section}
+          onCollapseToggle={selectSection}
+          onClick={selectSection}
+          >
+          {labwareInSection.map(this.labwareItemMapper)}
+        </PDTitledList>
+      )
+    })
+
+    return sections
+  }
+
+  render () {
+    const {onClose, slot} = this.props
+    // do not render without a slot
+    if (!slot) return null
+
+    return (
+      <ClickOutside onClickOutside={onClose}>
+        {({ref}) => (
+          <div ref={ref} className={styles.labware_dropdown}>
+            <div className={styles.title}>Slot {slot} Labware</div>
+            <ul>
+              {this.generateSections()}
+            </ul>
+            <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
+          </div>
+        )}
+      </ClickOutside>
+    )
+  }
 }
 
 type FinalProps = $Diff<Props, {selectedSection: *, select: *}>
