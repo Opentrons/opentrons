@@ -1,34 +1,6 @@
 @import '@opentrons/components';
 
-:root {
-  --step_subitem: {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0.5rem;
-    text-align: center;
-    font-size: var(--fs-body-1);
-  };
-
-  --subitem_cell: {
-    flex: 2;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  };
-}
-
 .step_subitem {
-  @apply --step_subitem;
-
-  border-top: 2px solid var(--c-light-gray);
-
-  & > * {
-    @apply --subitem_cell;
-
-    flex: 1;
-  }
-
   & svg {
     /* Subitem group carat */
     flex: 1;
@@ -41,21 +13,6 @@
   }
 }
 
-.step_item {
-  margin: 0.4rem 0.125rem;
-  color: var(--c-dark-gray);
-  box-shadow: 0 0.125rem 0.5rem color(var(--c-black) alpha(0.25));
-}
-
-.step_item ol {
-  padding: 0;
-  margin: 0;
-}
-
-.step_item h3 {
-  text-transform: uppercase;
-}
-
 .emphasized_cell {
   font-weight: bold;
 }
@@ -63,18 +20,14 @@
 /* Step Subitem Column Header */
 
 .step_subitem_column_header {
-  @apply --step_subitem;
-
   & svg {
     /* Source labware -> Dest Labware arrow icon */
-    flex: 1;
+    flex: 0.5;
     height: 1.5rem;
     color: var(--c-med-gray);
   }
 
   & > * {
-    @apply --subitem_cell;
-
     text-align: left;
   }
 }
@@ -97,14 +50,9 @@
 
 /* Multi-channel row representing a single channel */
 .step_subitem_channel_row {
-  @apply --step_subitem;
-
+  border-top: 0;
   border-bottom: 1px var(--c-med-gray) dashed;
   background-color: var(--c-light-gray);
-
-  & > * {
-    @apply --subitem_cell;
-  }
 }
 
 /* Inner collapse carat */

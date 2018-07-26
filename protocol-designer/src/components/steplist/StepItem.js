@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {TitledList} from '@opentrons/components'
+import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
 
@@ -63,8 +63,7 @@ export default function StepItem (props: StepItemProps) {
   const Description = <StepDescription description={step && step.description} />
 
   return (
-    <TitledList
-      className={styles.step_item}
+    <PDTitledList
       description={Description}
       iconName={error ? 'alert-circle' : iconName}
       iconProps={{className: error ? styles.error_icon : ''}}
@@ -76,7 +75,7 @@ export default function StepItem (props: StepItemProps) {
       {...{selected, collapsed, hovered}}
     >
       {getStepItemContents(props)}
-    </TitledList>
+    </PDTitledList>
   )
 }
 
