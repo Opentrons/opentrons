@@ -95,8 +95,9 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const calibrateToBottom = !!calToBottomFlag && calToBottomFlag.value
 
     const modulesEnabled = getModulesOn(state)
+    const modulesRequired = robotSelectors.getModules(state).length > 0
     const modulesReviewed = robotSelectors.getModulesReviewed(state)
-    const reviewModules = modulesEnabled && !modulesReviewed
+    const reviewModules = modulesEnabled && modulesRequired && !modulesReviewed
 
     return {
       slot,
