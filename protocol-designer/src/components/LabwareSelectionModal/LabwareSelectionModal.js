@@ -4,44 +4,22 @@ import {
   OutlineButton,
   type DeckSlot
 } from '@opentrons/components'
-import {PDListItem, PDTitledList} from '../lists'
+import {PDTitledList} from '../lists'
 import SelectedWrapper from './SelectedWrapper'
+import LabwareItem from './LabwareItem'
 import styles from './styles.css'
-
-type selectLabware = (containerType: string) => void
-
-type LabwareItemProps = {
-  selectLabware: selectLabware,
-  containerType: string,
-  displayName: string,
-  containerImgUrl?: string
-}
-
-function LabwareItem (props: LabwareItemProps) {
-  const {selectLabware, containerType, containerImgUrl, displayName} = props
-  return (
-    <PDListItem
-      border
-      hoverable
-      className={styles.labware_list_item}
-      onClick={() => selectLabware(containerType)}
-      style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
-    >
-      {displayName}
-    </PDListItem>
-  )
-}
 
 type Props = {
   onClose: (e?: SyntheticEvent<*>) => mixed,
-  selectLabware: selectLabware,
+  selectLabware: (containerType: string) => mixed,
   slot: ?DeckSlot,
   permittedTipracks: Array<string>,
   select: (?string) => mixed,
   selectedSection: ?string
 }
 
-// labware type, display name, and image url
+// TODO: Ian 2017-07-26 use shared-data labware, need displayName
+// [labware type, display name, and optional image url]
 const hardcodedLabware = {
   'Tip Rack': [
     ['tiprack-10ul', '10uL Tip Rack', 'Tiprack-10ul'],
@@ -89,16 +67,22 @@ function LabwareDropdown (props: Props) {
   // do not render without a slot
   if (!slot) return null
 
-  const labwareItemMapper = (item, key) => (
-    // LabwareItem expects item = [type, displayName, containerImgUrl(optional)]
-    <LabwareItem key={key}
-      containerType={item[0]}
-      displayName={item[1]}
-      selectLabware={selectLabware}
-      // TODO Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
-      containerImgUrl={item.length >= 3 ? `http://docs.opentrons.com/_images/${item[2]}.png` : undefined}
-    />
-  )
+  const labwareItemMapper = (dataRow, key) => {
+    const [labwareType, displayName, img] = dataRow
+    return (
+      <LabwareItem
+        key={key}
+        containerType={labwareType}
+        displayName={displayName}
+        selectLabware={selectLabware}
+        // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
+        labwareImgUrl={img
+          ? `http://docs.opentrons.com/_images/${img}.png`
+          : null
+        }
+      />
+    )
+  }
 
   const sections = labwareSectionOrder.map(section => {
     let labwareInSection = hardcodedLabware[section]
