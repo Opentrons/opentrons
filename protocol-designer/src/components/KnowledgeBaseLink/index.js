@@ -17,7 +17,7 @@ function KnowledgeBaseLink (props: Props) {
   return (
     <a
       target='_blank'
-      rel="noopener noreferrer"
+      rel='noopener noreferrer'
       href={links[props.to]}
     >
       {props.children}
