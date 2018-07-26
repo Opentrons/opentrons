@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 import {
-  TitledList,
   OutlineButton,
   type DeckSlot
 } from '@opentrons/components'
+import {PDListItem, PDTitledList} from '../lists'
 import SelectedWrapper from './SelectedWrapper'
 import styles from './styles.css'
 
@@ -20,13 +20,14 @@ type LabwareItemProps = {
 function LabwareItem (props: LabwareItemProps) {
   const {selectLabware, containerType, containerImgUrl, displayName} = props
   return (
-    <li
+    <PDListItem
+      border
       className={styles.labware_list_item}
       onClick={() => selectLabware(containerType)}
       style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}
     >
       {displayName}
-    </li>
+    </PDListItem>
   )
 }
 
@@ -99,13 +100,6 @@ function LabwareDropdown (props: Props) {
   )
 
   const sections = labwareSectionOrder.map(section => {
-    const listProps = {
-      title: section,
-      collapsed: selectedSection !== section,
-      onCollapseToggle: () => select(section),
-      onClick: () => select(section)
-    }
-
     let labwareInSection = hardcodedLabware[section]
     if (section === 'Tip Rack') {
       // filter out tip rack labware that doesn't match pipettes
@@ -114,9 +108,16 @@ function LabwareDropdown (props: Props) {
       )
     }
     return (
-      <TitledList {...listProps} key={section}>
+      <PDTitledList
+        key={section}
+        title={section}
+        collapsed={selectedSection !== section}
+        // TODO IMMEDIATELY: use a maker for these fns
+        onCollapseToggle={() => select(section)}
+        onClick={() => select(section)}
+        >
         {labwareInSection.map(labwareItemMapper)}
-      </TitledList>
+      </PDTitledList>
     )
   })
 

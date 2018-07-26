@@ -9,11 +9,11 @@
 .labware_dropdown {
   position: absolute;
   background-color: var(--c-white);
-  box-shadow: 0 0.25rem 1rem 0 rgba(0, 0, 0, 0.25); /* TODO Ian 2018-07-24 this whole thing should be a var */
+  box-shadow: var(--shadow-lvl-2);
   left: 0;
   right: 0;
-  top: 20%;
-  width: 35%;
+  top: 12%;
+  max-width: 20rem;
   margin: auto;
   padding: 1rem 2rem;
   user-select: none;
@@ -28,12 +28,11 @@
 
 .labware_list_item {
   position: relative;
-  width: 100%;
-  padding: 0.25rem 1rem;
+  padding: 0.75rem 1rem;
 }
 
 .labware_list_item:hover {
-  background-color: lightgray; /* TODO Ian 2018-07-24 */
+  background-color: lightgray; /* TODO Ian 2018-07-24 what color? any? border instead? */
 }
 
 .labware_list_item:hover::after {
