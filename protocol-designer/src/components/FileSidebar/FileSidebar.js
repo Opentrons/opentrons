@@ -21,26 +21,27 @@ type Props = {
 export default function FileSidebar (props: Props) {
   const {downloadData, loadFile, createNewFile, onDownload} = props
   return (
-    <SidePanel title='Protocol File' className={styles.file_sidebar}>
-      <div className={styles.download_button}>
-        <PrimaryButton
-          Component='a'
-          download={downloadData && downloadData.fileName}
-          onClick={onDownload}
-          disabled={!downloadData}
-          href={downloadData && 'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
-        >Export</PrimaryButton>
+    <SidePanel title='Protocol File'>
+      <div className={styles.file_sidebar}>
+        <OutlineButton onClick={createNewFile} className={styles.button}>
+          Create New
+        </OutlineButton>
+
+        <OutlineButton Component='label' className={cx(styles.upload_button)}>
+          Import
+          <input type='file' onChange={loadFile} />
+        </OutlineButton>
+
+        <div className={styles.button}>
+          <PrimaryButton
+            Component='a'
+            download={downloadData && downloadData.fileName}
+            onClick={onDownload}
+            disabled={!downloadData}
+            href={downloadData && 'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
+          >Export</PrimaryButton>
+        </div>
       </div>
-      <div className={styles.divider} />
-
-      <OutlineButton Component='label' className={cx(styles.upload_button, styles.bottom_button)}>
-        Import JSON
-        <input type='file' onChange={loadFile} />
-      </OutlineButton>
-
-      <OutlineButton onClick={createNewFile} className={styles.bottom_button}>
-        Create New
-      </OutlineButton>
     </SidePanel>
   )
 }
