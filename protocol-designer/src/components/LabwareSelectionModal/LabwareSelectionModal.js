@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {
+  ClickOutside,
   OutlineButton,
   type DeckSlot
 } from '@opentrons/components'
@@ -10,7 +11,7 @@ import LabwareItem from './LabwareItem'
 import styles from './styles.css'
 
 type Props = {
-  onClose: (e?: SyntheticEvent<*>) => mixed,
+  onClose: (e?: *) => mixed,
   selectLabware: (containerType: string) => mixed,
   slot: ?DeckSlot,
   permittedTipracks: Array<string>,
@@ -107,13 +108,17 @@ function LabwareDropdown (props: Props) {
   })
 
   return (
-    <div className={styles.labware_dropdown}>
-      <div className={styles.title}>Slot {slot} Labware</div>
-      <ul>
-        {sections}
-      </ul>
-      <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
-    </div>
+    <ClickOutside onClickOutside={onClose}>
+      {({ref}) => (
+        <div ref={ref} className={styles.labware_dropdown}>
+          <div className={styles.title}>Slot {slot} Labware</div>
+          <ul>
+            {sections}
+          </ul>
+          <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
+        </div>
+      )}
+    </ClickOutside>
   )
 }
 
