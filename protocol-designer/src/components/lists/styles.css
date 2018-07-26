@@ -23,5 +23,5 @@
 }
 
 .border {
-  border-top: 2px solid var(--c-light-gray);
+  border-top: var(--bd-light);
 }
