@@ -3,7 +3,8 @@ import * as React from 'react'
 import type {ThunkDispatch, BaseState} from '../types'
 import {connect} from 'react-redux'
 
-import {NavButton, VerticalNavBar} from '@opentrons/components'
+import {KNOWLEDGEBASE_ROOT_URL} from '../components/KnowledgeBaseLink'
+import {NavButton, VerticalNavBar, OutsideLinkButton} from '@opentrons/components'
 import {type Page, actions, selectors} from '../navigation'
 import styles from './NavBar.css'
 
@@ -27,6 +28,13 @@ function Nav (props: Props) {
         disabled={props.currentPage === 'file-splash'}
         selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
         onClick={props.handleClick('steplist')} />
+
+      <OutsideLinkButton
+        iconName='help-circle'
+        title='HELP'
+        isBottom
+        to={KNOWLEDGEBASE_ROOT_URL}
+      />
     </VerticalNavBar>
   )
 }
