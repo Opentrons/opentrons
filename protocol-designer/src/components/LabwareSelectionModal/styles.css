@@ -27,29 +27,21 @@
 /* ----- */
 
 .labware_list_item {
-  position: relative;
   padding: 0.75rem 1rem;
 }
 
-.labware_list_item:hover {
-  background-color: lightgray; /* TODO Ian 2018-07-24 what color? any? border instead? */
-}
-
+/* TODO: Ian 2018-07-26 replace these image with some alternative design...
+ * these are still ugly but not going to be long-lived. Might be tooltips, dunno
+ */
 .labware_list_item:hover::after {
-  content: var(--image-url);
-  background-size: 80px 60px;
-  border: 2px solid darkgray;
   position: absolute;
+  content: var(--image-url);
+  border: var(--bd-light);
+  top: 4rem;
+  left: 8rem;
 
   /* Images too large, and need to be cropped from left */
   zoom: 0.5;
   clip-path: inset(0 0 0 360px);
-  top: 0;
-
-  /* left: calc(slotWidth * slotScale * 1); */
-  left: 0;
-
-  /* width: 200px;
-  height: 200px; */
   z-index: 5000;
 }

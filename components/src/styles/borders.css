@@ -1,10 +1,20 @@
 @import './colors.css';
 
 :root {
+  /* borders */
   --bd-radius-default: 2px;
   --bd-radius-pill: 12px;
   --bd-width-default: 2px;
   --bd-light: var(--bd-width-default) solid var(--c-light-gray);
+
+  /* outlines */
+  --outline-highlight: {
+    border-color: transparent;
+    outline: 2px solid var(--c-highlight);
+    outline-width: 2px 0;
+  }
+
+  /* dropshadows */
 
   /* TODO: Ian 2018-07-26 consolidate all shadows here (eg from buttons) */
   --shadow-lvl-1:

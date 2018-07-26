@@ -22,6 +22,7 @@ function LabwareItem (props: LabwareItemProps) {
   return (
     <PDListItem
       border
+      hoverable
       className={styles.labware_list_item}
       onClick={() => selectLabware(containerType)}
       style={containerImgUrl ? {'--image-url': `url(${containerImgUrl})`} : {}}

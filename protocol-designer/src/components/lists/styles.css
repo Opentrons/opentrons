@@ -25,3 +25,9 @@
 .border {
   border-top: var(--bd-light);
 }
+
+.hoverable {
+  &:hover {
+    @apply --outline-highlight;
+  }
+}
