@@ -7,7 +7,7 @@ import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/com
 import styles from './TitleBar.css'
 import {DECK_SETUP_TITLE, END_PSEUDOSTEP_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as steplistSelectors, END_TERMINAL_ID} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {stepIconsByType} from '../form-types'
@@ -40,7 +40,7 @@ function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = steplistSelectors.selectedStep(state)
-  const endStepIsSelected = steplistSelectors.getEndPseudostepIsSelected(state)
+  const endStepIsSelected = steplistSelectors.getSelectedTerminalItemId(state) === END_TERMINAL_ID
   const labware = labwareIngredSelectors.getSelectedContainer(state)
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
@@ -75,7 +75,7 @@ function mapStateToProps (state: BaseState): SP {
       if (endStepIsSelected) {
         subtitle = END_PSEUDOSTEP_TITLE
       } else if (selectedStep) {
-        subtitle = selectedStep.stepType === 'deck-setup'
+        subtitle = selectedStep.stepType === 'deck-setup' // TODO IMMEDIATELY
           ? DECK_SETUP_TITLE
           : selectedStep.title
       }

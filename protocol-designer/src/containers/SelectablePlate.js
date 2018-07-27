@@ -8,7 +8,6 @@ import SelectablePlate from '../components/SelectablePlate.js'
 
 import {getCollidingWells} from '../utils'
 import {getWellSetForMultichannel} from '../well-selection/utils'
-import {END_STEP} from '../steplist/types'
 import {selectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors, utils as steplistUtils} from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
@@ -71,16 +70,15 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const wellSelectionMode = true
   const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
 
-  const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
-
   let wellContents = {}
-  if (steplistUtils.isDeckSetupId(stepId)) {
+  if (steplistSelectors.deckSetupMode(state)) {
     // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else {
     // well contents for step, not inital state.
     // shows liquids the current step in timeline
-    const wellContentsWithoutHighlight = (stepId === END_STEP || !allWellContentsForSteps[prevStepId])
+    const prevStepId = (stepId == null) ? null : steplistUtils.getPrevStepId(orderedSteps, stepId)
+    const wellContentsWithoutHighlight = (prevStepId == null) ? null : !allWellContentsForSteps[prevStepId]
       // End step, or erroring step: show last valid well contents in timeline
       ? wellContentsSelectors.lastValidWellContents(state)[containerId]
       // Valid non-end step
@@ -98,7 +96,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
       // even when prev step isn't processed (due to encountering an upstream error
       // in the timeline reduce op)
-      const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
+      const highlightedWellsAllLabware = (prevStepId == null)
+        ? null
+        : highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
       highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
     }
 

@@ -8,17 +8,16 @@ import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
-import {stepIconsByType} from '../../form-types'
+import {stepIconsByType, type StepIdType} from '../../form-types'
 
 import type {
   SubstepIdentifier,
   StepItemData,
-  SubstepItemData,
-  StepIdTypeWithEnd
+  SubstepItemData
 } from '../../steplist/types'
 
 type StepItemProps = {
-  stepId: StepIdTypeWithEnd,
+  stepId: StepIdType,
   step: ?StepItemData,
   substeps: ?SubstepItemData,
 

@@ -137,8 +137,7 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
   steplistSelectors.validatedForms,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
-  (forms, orderedStepsWithDeckSetup, initialRobotState) => {
-    const orderedSteps = orderedStepsWithDeckSetup.slice(1)
+  (forms, orderedSteps, initialRobotState) => {
     const allFormData: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
       return (forms[stepId] && forms[stepId].validatedForm) || null
     })
