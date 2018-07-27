@@ -2,3 +2,5 @@ include opentrons/package.json
 include opentrons/config/containers/default-containers.json
 include opentrons/config/smoothie/smoothie-defaults.ini
 include opentrons/config/smoothie/config_one_pro_plus
+include opentrons/config/modules/avrdude.conf
+include opentrons/config/modules/95-opentrons-modules.rules

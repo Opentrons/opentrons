@@ -26,7 +26,6 @@ ENV ETHERNET_NETWORK_PREFIX_LENGTH=64
 # See compute/README.md for details. Make sure to keep them in sync
 RUN apk add --update \
       util-linux \
-      dumb-init \
       vim \
       radvd \
       dropbear \
@@ -39,6 +38,7 @@ RUN apk add --update \
       py3-zmq \
       py3-urwid \
       py3-numpy \
+      avrdude \
       ffmpeg \
       mpg123 \
       && rm -rf /var/cache/apk/*
@@ -86,6 +86,9 @@ RUN pipenv install /tmp/api-server-lib --system && \
 # Redirect nginx logs to stdout and stderr
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
+
+# Use udev rules file from opentrons_data
+RUN ln -sf /data/user_storage/opentrons_data/95-opentrons-modules.rules /etc/udev/rules.d/95-opentrons-modules.rules
 
 # GPG public key to verify signed packages
 COPY ./compute/opentrons.asc .
@@ -140,18 +143,13 @@ EXPOSE 80 443 31950
 
 STOPSIGNAL SIGTERM
 
-# dumb-init is a simple process supervisor and init system designed to
-# run as PID 1 inside minimal container environments (such as Docker).
-# It is deployed as a small, statically-linked binary written in C.
-#
-# We are using it to bootstrap setup.sh for configuration and start.sh
-# for running all the services, redirecting child process output to
-# PID 1 stdout
-#
-# More: https://github.com/Yelp/dumb-init
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+# For backward compatibility, udev is enabled by default
+ENV UDEV on
+
 # For interactive one-off use:
 #   docker run --name opentrons -it opentrons /bin/sh
 # or uncomment:
 # CMD ["python", "-c", "while True: pass"]
 CMD ["bash", "-c", "source /etc/profile && setup.sh && exec start.sh"]
+
+# Using Resin base image's default entrypoint and init system- tini

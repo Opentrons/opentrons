@@ -1,0 +1,2 @@
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee93", ATTRS{idVendor}=="04d8", SYMLINK+="ttyTempDeck"
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee90", ATTRS{idVendor}=="04d8", SYMLINK+="ttyMagDeck"

@@ -208,6 +208,39 @@ def init(loop=None):
     return server.app
 
 
+def setup_udev_rules_file():
+    """
+    Copy the udev rules file for Opentrons Modules to opentrons_data directory
+    and trigger the new rules.
+    This rules file in opentrons_data is symlinked into udev rules directory
+    NOTE: This setup can also be run after python package install (which would
+    mean that it is performed only once, which might be sufficient)
+    instead of running it every time on server boot. Revisit this once the
+    redundant api-server-lib setup has been fixed
+    """
+    import shutil
+    import subprocess
+    import opentrons
+
+    rules_file = os.path.join(
+        os.path.abspath(os.path.dirname(opentrons.__file__)),
+        'config', 'modules', '95-opentrons-modules.rules')
+
+    shutil.copy2(
+        rules_file,
+        '/data/user_storage/opentrons_data/95-opentrons-modules.rules')
+
+    res0 = subprocess.run('udevadm control --reload-rules',
+                          shell=True, stdout=subprocess.PIPE).stdout.decode()
+    if res0 is not '':
+        log.warning(res0.strip())
+
+    res1 = subprocess.run('udevadm trigger',
+                          shell=True, stdout=subprocess.PIPE).stdout.decode()
+    if res1 is not '':
+        log.warning(res1.strip())
+
+
 def main():
     """
     This application creates and starts the server for both the RPC routes
@@ -256,6 +289,7 @@ def main():
         log.info("Homing Z axes")
         robot.home_z()
 
+    setup_udev_rules_file()
     atexit.register(unlock_resin_updates)
     lock_resin_updates()
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
