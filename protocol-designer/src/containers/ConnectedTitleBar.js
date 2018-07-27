@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 
 import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/components'
 import styles from './TitleBar.css'
-import {DECK_SETUP_TITLE} from '../constants'
+import {DECK_SETUP_TITLE, END_PSEUDOSTEP_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
@@ -40,6 +40,7 @@ function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = steplistSelectors.selectedStep(state)
+  const endStepIsSelected = steplistSelectors.getEndPseudostepIsSelected(state)
   const labware = labwareIngredSelectors.getSelectedContainer(state)
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
@@ -71,7 +72,9 @@ function mapStateToProps (state: BaseState): SP {
       // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
       let subtitle
-      if (selectedStep) {
+      if (endStepIsSelected) {
+        subtitle = END_PSEUDOSTEP_TITLE
+      } else if (selectedStep) {
         subtitle = selectedStep.stepType === 'deck-setup'
           ? DECK_SETUP_TITLE
           : selectedStep.title

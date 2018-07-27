@@ -16,7 +16,7 @@ type StepListProps = {
 export default function StepList (props: StepListProps) {
   return (
     <SidePanel
-      title='Protocol Step List'
+      title='Protocol Timeline'
       onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
     >
       {props.orderedSteps.map((stepId: StepIdType) => (

@@ -47,6 +47,13 @@ const selectedStepId = createSelector(
   (state: RootState) => state.selectedStep
 )
 
+// TODO Ian 2018-07-27 this is a working placeholder, will be changed
+// when __end__ is moved out of steps
+const getEndPseudostepIsSelected: Selector<boolean> = createSelector(
+  selectedStepId,
+  (stepId) => stepId === '__end__'
+)
+
 const hoveredStepId = createSelector(
   rootSelector,
   (state: RootState) => state.hoveredStep
@@ -333,6 +340,7 @@ export default {
   stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
   orderedSteps: orderedStepsSelector,
   selectedStepId, // TODO ??? replace with selectedStep: selectedStepSelector ???
+  getEndPseudostepIsSelected,
   hoveredStepId,
   hoveredOrSelectedStepId,
   getHoveredSubstep,

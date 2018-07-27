@@ -11,8 +11,7 @@ export const stepIconsByType: {[string]: IconName} = {
   'distribute': 'ot-distribute',
   'consolidate': 'ot-consolidate',
   'mix': 'ot-mix',
-  'pause': 'pause',
-  'deck-setup': 'flask-outline'
+  'pause': 'pause'
 }
 
 export type StepType = $Keys<typeof stepIconsByType>

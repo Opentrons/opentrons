@@ -3,7 +3,7 @@ import * as React from 'react'
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
-
+import {END_PSEUDOSTEP_TITLE} from '../../constants'
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
@@ -53,11 +53,11 @@ export default function StepItem (props: StepItemProps) {
   } = props
 
   const iconName = stepId === '__end__'
-    ? 'check'
+    ? null
     : (step && stepIconsByType[step.stepType])
 
   const title = stepId === '__end__'
-    ? 'END'
+    ? END_PSEUDOSTEP_TITLE
     : (step && step.title)
 
   const Description = <StepDescription description={step && step.description} />
