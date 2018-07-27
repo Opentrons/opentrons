@@ -7,10 +7,12 @@ i18next.init({
   lng: 'en',
   debug: true,
   resources: {
-    ...en
+    en
   }
 }, (err, t) => {
   if (err) {
     console.error('Internationalization was not initialized properly. error: ', err)
   }
 })
+
+export default i18next

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 
+import i18n from '../../localization'
 import {
   StepInputField,
   StepCheckboxRow,
@@ -48,7 +49,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FormGroup label='TECHNIQUE'>
               <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
               <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
-              <HoverTooltip tooltipComponent="This feature is not available in Beta">
+              <HoverTooltip tooltipComponent={i18n.t('tooltip.not_in_beta')}>
                 {(hoverTooltipHandlers) => (
                   <StepCheckboxRow disabled hoverTooltipHandlers={hoverTooltipHandlers} name="aspirate_airGap_checkbox" label="Air Gap">
                     <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
@@ -97,7 +98,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <HoverTooltip tooltipComponent="This feature is not available in Beta">
+              <HoverTooltip tooltipComponent={i18n.t('tooltip.not_in_beta')}>
                 {(hoverTooltipHandlers) => (
                   <DispenseDelayFields
                     disabled
