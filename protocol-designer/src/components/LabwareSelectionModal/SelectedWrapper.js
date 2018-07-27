@@ -17,7 +17,12 @@ export default class SelectedWrapper extends React.Component<Props, State> {
   }
 
   select = (selected: ?string) => {
-    this.setState({selected})
+    if (this.state.selected === selected) {
+      // "selecting" what is already selected deselects it
+      this.setState({selected: null})
+    } else {
+      this.setState({selected})
+    }
   }
 
   render () {

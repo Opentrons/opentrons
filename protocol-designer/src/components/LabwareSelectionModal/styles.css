@@ -1,5 +1,9 @@
 @import '@opentrons/components';
 
+.labware_selection_modal {
+  background-color: var(--c-bg-light);
+}
+
 .title {
   @apply --font-header-dark;
 
