@@ -194,6 +194,7 @@ class TempDeck:
             return None
         return self._connection.port
 
+    # TODO: change to 'deactivate'/'stop'
     def disengage(self) -> str:
         self.run_flag.wait()
 
@@ -234,6 +235,23 @@ class TempDeck:
     @property
     def temperature(self) -> int:
         return self._temperature.get('current')
+
+    @property
+    def status(self) -> str:
+        self.update_temperature()
+        current = self._temperature.get('current')
+        target = self._temperature.get('target')
+        delta = 0.7
+        if target:
+            diff = target - current
+            if abs(diff) < delta:   # To avoid status fluctuation near target
+                return 'holding at target'
+            elif diff < 0:
+                return 'cooling'
+            else:
+                return 'heating'
+        else:
+            return 'idle'
 
     def get_device_info(self) -> dict:
         '''

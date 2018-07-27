@@ -5531,6 +5531,22 @@
                     }
                }
           },
+          "tempdeck": {
+               "origin-offset": {
+                    "x": 0,
+                    "y": 0
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 0,
+                         "depth": 80.09,
+                         "length": 127.8,
+                         "width": 85.6
+                    }
+               }
+          },
           "trash-box": {
                "origin-offset": {
                     "x": 42.75,
