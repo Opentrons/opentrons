@@ -54,7 +54,7 @@ def test_axis(axis, tolerance):
     # expected_point = home_position + retract
     # safe distance from switch?
     robot._driver.push_speed()
-    robot._driver.set_speed(10)
+    robot._driver.set_speed(8)
     try:
         robot._driver.move({axis: points[0]})
     except SmoothieError:
