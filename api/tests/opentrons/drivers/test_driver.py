@@ -212,9 +212,8 @@ def test_plunger_commands(smoothie, monkeypatch):
     expected = [
         ['M907 A0.8 B0.5 C0.5 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+ M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['G0F3000 M400'],
+        ['M203.1 Y50 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90 M400'],  # NOQA
-        ['G0F24000 M400'],
         ['M203.1 X80 M400'],
         ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
         ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
