@@ -72,7 +72,7 @@ export type DeleteStepAction = {
 export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'DELETE_STEP',
-    payload: selectors.selectedStepId(getState())
+    payload: selectors.getSelectedStepId(getState())
   })
 }
 
@@ -143,7 +143,7 @@ export const hoverOnStep = (stepId: ?StepIdType) => ({
   payload: stepId
 })
 
-export const hoverOnTerminalItem = (terminalId: TerminalItemId) => ({
+export const hoverOnTerminalItem = (terminalId: ?TerminalItemId) => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId
 })

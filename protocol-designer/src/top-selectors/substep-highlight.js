@@ -136,7 +136,7 @@ function _getSelectedWellsForSubstep (
 export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>> = createSelector(
   fileDataSelectors.robotStateTimeline,
   steplistSelectors.validatedForms,
-  steplistSelectors.hoveredStepId,
+  steplistSelectors.getHoveredStepId,
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
   (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps) => {

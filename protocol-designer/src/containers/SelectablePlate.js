@@ -63,7 +63,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 
   const labware = selectors.getLabware(state)[containerId]
-  const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
+  const stepId = steplistSelectors.getHoveredOrSelectedStepId(state)
   const orderedSteps = steplistSelectors.orderedSteps(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 

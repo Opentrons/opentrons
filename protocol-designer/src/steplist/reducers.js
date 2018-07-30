@@ -6,6 +6,7 @@ import omit from 'lodash/omit'
 
 import {getPDMetadata} from '../file-types'
 
+import {START_TERMINAL_ID} from './types'
 import type {
   StepItemData,
   FormSectionState,
@@ -174,6 +175,7 @@ type SelectedItemState = {
 } | null
 
 function stepIdHelper (id: StepIdType): SelectedItemState {
+  if (id == null) return null
   return {
     isStep: true,
     id
@@ -181,10 +183,16 @@ function stepIdHelper (id: StepIdType): SelectedItemState {
 }
 
 function terminalItemIdHelper (id: TerminalItemId): SelectedItemState {
+  if (id == null) return null
   return {
     isStep: false,
     id
   }
+}
+
+const initialSelectedItemState = {
+  isStep: false,
+  id: START_TERMINAL_ID
 }
 
 const selectedItem: Reducer<SelectedItemState, *> = handleActions({
@@ -193,7 +201,7 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions({
   SELECT_TERMINAL_ITEM: (state: SelectedItemState, action: SelectTerminalItemAction) =>
     terminalItemIdHelper(action.payload),
   DELETE_STEP: () => null
-}, null)
+}, initialSelectedItemState)
 
 type HoveredItemState = SelectedItemState
 

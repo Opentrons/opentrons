@@ -3,7 +3,6 @@ import * as React from 'react'
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
-import {END_PSEUDOSTEP_TITLE} from '../../constants'
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
@@ -37,7 +36,6 @@ type StepItemProps = {
 
 export default function StepItem (props: StepItemProps) {
   const {
-    stepId,
     step,
 
     collapsed,
@@ -51,14 +49,8 @@ export default function StepItem (props: StepItemProps) {
     onStepHover
   } = props
 
-  const iconName = stepId === '__end__'
-    ? null
-    : (step && stepIconsByType[step.stepType])
-
-  const title = stepId === '__end__'
-    ? END_PSEUDOSTEP_TITLE
-    : (step && step.title)
-
+  const iconName = step && stepIconsByType[step.stepType]
+  const title = step && step.title
   const Description = <StepDescription description={step && step.description} />
 
   return (
