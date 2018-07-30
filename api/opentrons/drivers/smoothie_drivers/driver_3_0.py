@@ -872,8 +872,8 @@ class SmoothieDriver_3_0_0:
         log.debug("_home_x")
         # move the gantry forward on Y axis with low power
         self._save_current({'Y': Y_BACKOFF_LOW_CURRENT})
-        self.push_speed()
-        self.set_speed(Y_BACKOFF_SLOW_SPEED)
+        self.push_axis_max_speed()
+        self.set_axis_max_speed({'Y': Y_BACKOFF_SLOW_SPEED})
 
         # move away from the Y endstop switch, then backward half that distance
         relative_retract_command = '{0} {1}Y{2} {3}Y{4} {5}'.format(
@@ -888,13 +888,11 @@ class SmoothieDriver_3_0_0:
         command = '{0} {1}'.format(
             self._generate_current_command(), relative_retract_command)
         self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-        self.pop_speed()
         self.dwell_axes('Y')
 
         # now it is safe to home the X axis
         try:
             # override firmware's default XY homing speed, to avoid resonance
-            self.push_axis_max_speed()
             self.set_axis_max_speed({'X': XY_HOMING_SPEED})
             self.activate_axes('X')
             command = '{0} {1}'.format(
