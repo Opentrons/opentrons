@@ -9,7 +9,8 @@ import type {Pipette, Robot} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
 
-import Page, {RefreshWrapper} from '../../components/Page'
+import {IntervalWrapper} from '@opentrons/components'
+import Page from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
 import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
 import {PipetteTabs, Pipettes} from '../../components/calibrate-pipettes'
@@ -45,8 +46,9 @@ function CalibratePipettesPage (props: Props) {
   }
 
   return (
-    <RefreshWrapper
+    <IntervalWrapper
       refresh={fetchPipettes}
+      interval={1000}
     >
     <Page
       titleBarProps={{title: (<SessionHeader />)}}
@@ -68,7 +70,7 @@ function CalibratePipettesPage (props: Props) {
         )} />
       )}
     </Page>
-    </RefreshWrapper>
+    </IntervalWrapper>
   )
 }
 

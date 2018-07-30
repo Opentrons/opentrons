@@ -4,7 +4,6 @@ import * as React from 'react'
 import styles from './styles.css'
 import {TitleBar, type TitleBarProps} from '@opentrons/components'
 import PageWrapper from './PageWrapper'
-import RefreshWrapper from './RefreshWrapper'
 
 type Props = {
   titleBarProps?: TitleBarProps,
@@ -23,4 +22,4 @@ export default function Page (props: Props) {
   )
 }
 
-export {PageWrapper, RefreshWrapper}
+export {PageWrapper}

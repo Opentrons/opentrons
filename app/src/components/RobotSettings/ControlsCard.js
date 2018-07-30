@@ -12,7 +12,7 @@ import {
 
 import {selectors as robotSelectors} from '../../robot'
 
-import {RefreshCard} from '@opentrons/components'
+import {IntervalWrapper, Card} from '@opentrons/components'
 import {LabeledToggle, LabeledButton} from '../controls'
 
 import type {State, Dispatch} from '../../types'
@@ -40,28 +40,33 @@ const TITLE = 'Robot Controls'
 export default connect(makeMakeStateToProps, null, mergeProps)(ControlsCard)
 
 function ControlsCard (props: Props) {
-  const {name, lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
+  const {lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
 
   return (
-    <RefreshCard title={TITLE} watch={name} refresh={fetchLights} column>
-      <LabeledToggle
-        label='Lights'
-        toggledOn={lightsOn}
-        onClick={toggleLights}
-      >
-        <p>Control lights on deck.</p>
-      </LabeledToggle>
-      <LabeledButton
-        label='Home all axes'
-        buttonProps={{
-          onClick: homeAll,
-          disabled: !homeEnabled,
-          children: 'Home'
-        }}
-      >
-        <p>Return robot to starting position.</p>
-      </LabeledButton>
-    </RefreshCard>
+    <IntervalWrapper
+      refresh={fetchLights}
+      interval={1000}
+    >
+      <Card title={TITLE} column>
+        <LabeledToggle
+          label='Lights'
+          toggledOn={lightsOn}
+          onClick={toggleLights}
+        >
+          <p>Control lights on deck.</p>
+        </LabeledToggle>
+        <LabeledButton
+          label='Home all axes'
+          buttonProps={{
+            onClick: homeAll,
+            disabled: !homeEnabled,
+            children: 'Home'
+          }}
+        >
+          <p>Return robot to starting position.</p>
+        </LabeledButton>
+      </Card>
+    </IntervalWrapper>
   )
 }
 

@@ -7,7 +7,7 @@ import type {State, Dispatch} from '../../types'
 import type {Module} from '../../http-api-client'
 import type {Robot} from '../../robot'
 
-import {RefreshCard} from '@opentrons/components'
+import {IntervalWrapper, Card} from '@opentrons/components'
 import {getModulesOn} from '../../config'
 import {fetchModules, makeGetRobotModules} from '../../http-api-client'
 import ModulesCardContents from './ModulesCardContents'
@@ -31,15 +31,17 @@ export default connect(makeSTP, DTP)(AttachedModulesCard)
 function AttachedModulesCard (props: Props) {
   if (props.modulesFlag) {
     return (
-      <RefreshCard
-        title={TITLE}
-        watch={props.name}
-        refreshing={props.refreshing}
+      <IntervalWrapper
         refresh={props.refresh}
-        column
+        interval={1000}
       >
-        <ModulesCardContents modules={props.modules} />
-      </RefreshCard>
+        <Card
+          title={TITLE}
+          column
+        >
+          <ModulesCardContents modules={props.modules} />
+        </Card>
+      </IntervalWrapper>
     )
   }
   return null
