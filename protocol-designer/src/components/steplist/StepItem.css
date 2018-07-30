@@ -62,9 +62,7 @@
 }
 
 .highlighted {
-  border-color: transparent;
-  outline: 2px solid var(--c-highlight);
-  outline-width: 2px 0;
+  @apply --outline-highlight;
 }
 
 .clear_border {

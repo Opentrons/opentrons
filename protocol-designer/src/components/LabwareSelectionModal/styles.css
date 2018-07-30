@@ -1,0 +1,51 @@
+@import '@opentrons/components';
+
+.labware_selection_modal {
+  background-color: var(--c-bg-light);
+}
+
+.title {
+  @apply --font-header-dark;
+
+  padding-bottom: 1rem;
+}
+
+.labware_dropdown {
+  position: absolute;
+  background-color: var(--c-white);
+  box-shadow: var(--shadow-lvl-2);
+  left: 0;
+  right: 0;
+  top: 12%;
+  max-width: 20rem;
+  margin: auto;
+  padding: 1rem 2rem;
+  user-select: none;
+
+  & button {
+    margin-top: 2rem;
+    float: right;
+  }
+}
+
+/* ----- */
+
+.labware_list_item {
+  padding: 0.75rem 1rem;
+}
+
+/* TODO: Ian 2018-07-26 replace these image with some alternative design...
+ * these are still ugly but not going to be long-lived. Might be tooltips, dunno
+ */
+.labware_list_item:hover::after {
+  position: absolute;
+  content: var(--image-url);
+  border: var(--bd-light);
+  top: 4rem;
+  left: 8rem;
+
+  /* Images too large, and need to be cropped from left */
+  zoom: 0.5;
+  clip-path: inset(0 0 0 360px);
+  z-index: 5000;
+}

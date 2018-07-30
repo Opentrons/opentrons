@@ -128,7 +128,7 @@ function IngredIndividual (props: IndividProps) {
   } = props
 
   return (
-    <PDListItem border>
+    <PDListItem border hoverable>
       <span>{wellName}</span>
       <span>{volume ? volume + ' μL' : '-'}</span>
       <span>{name}</span>

@@ -7,7 +7,7 @@ import styles from './Deck.css'
 
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
-import LabwareDropdown from '../containers/LabwareDropdown.js'
+import LabwareSelectionModal from '../components/LabwareSelectionModal'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
@@ -62,7 +62,7 @@ class DeckSetup extends React.Component<StateProps & DispatchProps> {
     // this will go away
     return (
       <React.Fragment>
-        <LabwareDropdown />
+        <LabwareSelectionModal />
         {this.props.ingredSelectionMode && <IngredientSelectionModal />}
         <div className={styles.deck_header}>{DECK_HEADER}</div>
         {this.renderDeck()}
