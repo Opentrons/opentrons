@@ -8,7 +8,7 @@ import type {Robot} from '../../robot'
 import type {Setting} from '../../http-api-client'
 import {fetchSettings, setSettings, makeGetRobotSettings} from '../../http-api-client'
 
-import {RefreshCard} from '@opentrons/components'
+import {IntervalWrapper, Card} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
 
 type OP = Robot
@@ -54,23 +54,28 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch} = props
+  const {settings, set, fetch} = props
 
   return (
-    <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
-      {settings.map(s => (
-        <BooleanSettingToggle {...s} key={s.id} set={set} />
-      ))}
-      <LabeledButton
-        label='Download Logs'
-        buttonProps={{
-          disabled: true,
-          children: 'Download'
-        }}
-      >
-        <p>Access logs from this robot.</p>
-      </LabeledButton>
-    </RefreshCard>
+    <IntervalWrapper
+      refresh={fetch}
+      interval={1000}
+    >
+      <Card title={TITLE} column>
+        {settings.map(s => (
+          <BooleanSettingToggle {...s} key={s.id} set={set} />
+        ))}
+        <LabeledButton
+          label='Download Logs'
+          buttonProps={{
+            disabled: true,
+            children: 'Download'
+          }}
+        >
+          <p>Access logs from this robot.</p>
+        </LabeledButton>
+      </Card>
+    </IntervalWrapper>
   )
 }
 

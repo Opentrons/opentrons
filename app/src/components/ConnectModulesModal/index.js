@@ -6,8 +6,7 @@ import countBy from 'lodash/countBy'
 import {makeGetRobotModules, fetchModules} from '../../http-api-client'
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 
-import {Deck} from '@opentrons/components'
-import {RefreshWrapper} from '../Page'
+import {Deck, IntervalWrapper} from '@opentrons/components'
 import {Modal} from '../modals'
 import Prompt from './Prompt'
 import ReviewModuleItem from './ReviewModuleItem'
@@ -44,12 +43,15 @@ function ConnectModulesModal (props: Props) {
   const onPromptClick = modulesMissing ? fetchModules : setReviewed
 
   return (
-    <RefreshWrapper refresh={fetchModules}>
+    <IntervalWrapper
+      refresh={fetchModules}
+      interval={1000}
+    >
       <Modal>
         <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
         <Deck LabwareComponent={ReviewModuleItem} />
       </Modal>
-    </RefreshWrapper>
+    </IntervalWrapper>
   )
 }
 

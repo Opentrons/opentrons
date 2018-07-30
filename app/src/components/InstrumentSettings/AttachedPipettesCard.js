@@ -9,7 +9,7 @@ import type {Pipette} from '../../http-api-client'
 import {makeGetRobotPipettes, fetchPipettes, clearMoveResponse} from '../../http-api-client'
 
 import InstrumentInfo from './InstrumentInfo'
-import {RefreshCard} from '@opentrons/components'
+import {IntervalWrapper, Card} from '@opentrons/components'
 
 type OP = Robot
 
@@ -35,15 +35,17 @@ export default connect(
 
 function AttachedPipettesCard (props: Props) {
   return (
-    <RefreshCard
-      title={TITLE}
-      watch={props.name}
+    <IntervalWrapper
       refresh={props.fetchPipettes}
-      refreshing={props.inProgress}
+      interval={1000}
     >
-      <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
-      <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
-    </RefreshCard>
+      <Card
+        title={TITLE}
+      >
+        <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
+        <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
+      </Card>
+    </IntervalWrapper>
   )
 }
 

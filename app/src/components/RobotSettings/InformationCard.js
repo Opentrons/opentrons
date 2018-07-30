@@ -13,7 +13,7 @@ import {
   type RobotHealth
 } from '../../http-api-client'
 
-import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
+import {IntervalWrapper, Card, LabeledValue, OutlineButton} from '@opentrons/components'
 
 type OwnProps = Robot & {
   updateUrl: string
@@ -43,7 +43,7 @@ function InformationCard (props: Props) {
     availableUpdate,
     fetchHealth,
     updateUrl,
-    healthRequest: {inProgress, response: health}
+    healthRequest: {response: health}
   } = props
 
   const realName = (health && health.name) || name
@@ -53,31 +53,33 @@ function InformationCard (props: Props) {
     ? 'Update'
     : 'Updated'
   return (
-    <RefreshCard
-      watch={name}
+    <IntervalWrapper
       refresh={fetchHealth}
-      refreshing={inProgress}
-      title={TITLE}
+      interval={1000}
     >
-      <LabeledValue
-        label={NAME_LABEL}
-        value={realName}
-      />
-      <LabeledValue
-        label={SERVER_VERSION_LABEL}
-        value={version}
-      />
-      <LabeledValue
-        label={FIRMWARE_VERSION_LABEL}
-        value={firmwareVersion}
-      />
-      <OutlineButton
-        Component={Link}
-        to={updateUrl}
+      <Card
+        title={TITLE}
       >
-        {updateText}
-      </OutlineButton>
-    </RefreshCard>
+        <LabeledValue
+          label={NAME_LABEL}
+          value={realName}
+        />
+        <LabeledValue
+          label={SERVER_VERSION_LABEL}
+          value={version}
+        />
+        <LabeledValue
+          label={FIRMWARE_VERSION_LABEL}
+          value={firmwareVersion}
+        />
+        <OutlineButton
+          Component={Link}
+          to={updateUrl}
+        >
+          {updateText}
+        </OutlineButton>
+      </Card>
+    </IntervalWrapper>
   )
 }
 
