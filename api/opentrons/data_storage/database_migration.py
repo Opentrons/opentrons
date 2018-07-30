@@ -10,32 +10,39 @@ from opentrons.data_storage.schema_changes import \
 from opentrons.util.vector import Vector
 
 
-def rotate_well_offset(well):
-    x, y, z = well._coordinates
-    well._coordinates = Vector(y, x, z)
-    return well
+def transpose_coordinates(wells):
+    # Calculate XY coordinates based on width of container
+    # TODO (Laura 7/27/2018): This only works for SBS footprint containers.
+    # Will need to be changed once correct geometry system implemented
+    w = 85.48
+    for well in wells:
+        curr_x, curr_y, z = well._coordinates
+        offset_y = w-curr_x
+        well._coordinates = Vector(curr_y, offset_y, z)
 
 
-def flip_wells(wells):
-    sorted_wells = sorted(wells, key=lambda well: well._coordinates[1])
-    opposite_y_offsets = reversed(
-        [well._coordinates[1] for well in sorted_wells])
+def add_offset(container):
+    # Adds associated origin offset to all well coordinates
+    # so that the origin can be transposed
+    x, y, _ = container._coordinates
+    for well in container.wells():
+        old_x, old_y, z = well._coordinates
+        dx = x + old_x
+        dy = y + old_y
+        well._coordinates = Vector(dx, dy, z)
 
-    for well, opposite_offset in zip(sorted_wells, opposite_y_offsets):
-        x, y, z = well._coordinates
-        well._coordinates = Vector(x, opposite_offset, 0)
-        length, width = (well.properties['length'], well.properties['width'])
-        well.properties['length'] = width
-        well.properties['width'] = length
+    return container
 
 
 def rotate_container_for_alpha(container):
-    x, y, z = container._coordinates
-    container._coordinates = Vector(y, x, z)  # flipping x and y
+    add_offset(container)
+    _, _, z = container._coordinates
+    # Change container coordinates to be at the origin + top of container
+    container._coordinates = Vector(0, 0, z)
 
-    flip_wells(
+    transpose_coordinates(
         [
-            rotate_well_offset(well)
+            well
             for well in container.wells()
         ]
     )
