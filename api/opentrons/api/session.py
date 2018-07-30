@@ -311,7 +311,7 @@ def _get_parent_module(placeable):
     if isinstance(placeable, ModulePlaceable) or not placeable:
         res = placeable
     else:
-        res = get_parent_module(placeable.parent)
+        res = _get_parent_module(placeable.parent)
     return res
 
 
