@@ -307,7 +307,7 @@ def _dedupe(iterable):
 def now():
     return int(time() * 1000)
 
-def get_parent_module(placeable):
+def _get_parent_module(placeable):
     if isinstance(placeable, ModulePlaceable) or not placeable:
         res = placeable
     else:
@@ -328,7 +328,7 @@ def _get_labware(command):
     if (type(location) == tuple):
         placeable = location[0]
 
-    maybe_module = get_parent_module(placeable)
+    maybe_module = _get_parent_module(placeable)
     modules.append(maybe_module)
 
     locations = command.get('locations')

@@ -97,11 +97,7 @@ def log_init():
             },
             'opentrons.server': {
                 'handlers': ['debug'],
-                'level': logging.DEBUG # TODO: revert
-            },
-            'opentrons.session': {
-                'handlers': ['debug'],
-                'level': logging.DEBUG # TODO: revert
+                'level': level_value
             },
             'opentrons.api': {
                 'handlers': ['debug'],

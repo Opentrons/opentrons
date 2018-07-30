@@ -92,7 +92,7 @@ export function getDevToolsOn (state: State): boolean {
 }
 
 export function getModulesOn (state: State): boolean {
-  return true // state.config.modules
+  return state.config.modules
 }
 
 export function toggleDevTools (): ThunkAction {
