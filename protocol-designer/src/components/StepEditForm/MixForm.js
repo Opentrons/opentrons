@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import i18n from '../../localization'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 
 import {
@@ -43,7 +44,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <HoverTooltip tooltipComponent="This feature is not available in Beta">
+            <HoverTooltip tooltipComponent={i18n.t('tooltip.not_in_beta')}>
               {(hoverTooltipHandlers) => (
                 <DispenseDelayFields
                   disabled
