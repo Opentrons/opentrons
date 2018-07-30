@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react'
 
+export const KNOWLEDGEBASE_ROOT_URL = 'https://intercom.help/opentrons-protocol-designer/beta-help-center'
+
 export const links = {
-  'distribute': 'https://support.opentrons.com/protocol-designer/actions/distribute'
+  'distribute': `${KNOWLEDGEBASE_ROOT_URL}/protocol-steps/distribute`
 }
 
 type Link = $Keys<typeof links>
