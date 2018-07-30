@@ -7,6 +7,7 @@
 }
 
 .pd_list_item {
+  min-height: 2.5rem;
   display: flex;
   flex-direction: row;
   align-items: center;
