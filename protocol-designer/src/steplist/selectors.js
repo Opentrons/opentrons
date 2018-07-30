@@ -1,5 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
+import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
@@ -8,9 +9,9 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {getFormWarnings, getFormErrors} from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
-import type {RootState, OrderedStepsState} from './reducers'
+import {initialSelectedItemState} from './reducers'
+import type {RootState, OrderedStepsState, SelectableItem} from './reducers'
 import {DECK_SETUP_TITLE} from '../constants'
-import {START_TERMINAL_ID} from './types'
 import type {BaseState, Selector} from '../types'
 
 import type {
@@ -51,32 +52,39 @@ const formModalData = createSelector(
   (state: RootState) => state.unsavedFormModal
 )
 
-const getSelectedStepId: Selector<?StepIdType> = createSelector(
+/** fallbacks for selectedItem reducer, when null */
+const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => (state.selectedItem && state.selectedItem.isStep)
-    ? state.selectedItem.id
-    : null
+  (state: RootState) => {
+    if (state.selectedItem != null) return state.selectedItem
+    if (state.orderedSteps.length > 0) return {isStep: true, id: last(state.orderedSteps)}
+    return initialSelectedItemState
+  }
+)
+
+const getSelectedStepId: Selector<?StepIdType> = createSelector(
+  getNonNullSelectedItem,
+  (item) => item.isStep ? item.id : null
 )
 
 const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+  getNonNullSelectedItem,
+  (item) => !item.isStep ? item.id : null
+)
+
+const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => (state.selectedItem && !state.selectedItem.isStep)
-    ? state.selectedItem.id
-    : null
+  (state: RootState) => state.hoveredItem
 )
 
 const getHoveredStepId: Selector<?StepIdType> = createSelector(
-  rootSelector,
-  (state: RootState) => (state.hoveredItem && state.hoveredItem.isStep)
-    ? state.hoveredItem.id
-    : null
+  getHoveredItem,
+  (item) => (item && item.isStep) ? item.id : null
 )
 
 const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
-  rootSelector,
-  (state: RootState) => (state.hoveredItem && !state.hoveredItem.isStep)
-    ? state.hoveredItem.id
-    : null
+  getHoveredItem,
+  (item) => (item && !item.isStep) ? item.id : null
 )
 
 const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
@@ -90,12 +98,6 @@ const getHoveredOrSelectedStepId: Selector<?StepIdType> = createSelector(
   (hoveredId, selectedId) => hoveredId !== null
     ? hoveredId
     : selectedId
-)
-
-/** True if app is in Deck Setup Mode. */
-const deckSetupMode: Selector<boolean> = createSelector(
-  getSelectedTerminalItemId,
-  (id) => id === START_TERMINAL_ID
 )
 
 const getSteps = createSelector(
@@ -354,7 +356,6 @@ export default {
   formLevelWarnings,
   formLevelErrors,
   formSectionCollapse: formSectionCollapseSelector,
-  deckSetupMode,
   hoveredStepLabware,
 
   // NOTE: these are exposed only for substeps/selectors.js

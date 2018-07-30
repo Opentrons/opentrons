@@ -152,15 +152,13 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const commandCreators = continuousValidForms.reduce(
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
-        const commandCreator = commandCreatorsFromFormData(formData)
+        const stepCommandCreator = commandCreatorsFromFormData(formData)
 
-        if (!commandCreator) {
+        if (!stepCommandCreator) {
           // TODO Ian 2018-05-08 use assert
           console.warn(`StepType "${stepType}" not yet implemented`)
           return acc
         }
-
-        let next = [...acc, commandCreator]
 
         // Drop tips eagerly, per pipette
         // NOTE: this assumes all step forms that use a pipette have both
@@ -173,11 +171,17 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
 
           const willReuseTip = nextFormForPipette && nextFormForPipette.changeTip === 'never'
           if (!willReuseTip) {
-            next.push(StepGeneration.dropTip(pipetteId))
+            return [
+              ...acc,
+              StepGeneration.reduceCommandCreators([
+                stepCommandCreator,
+                StepGeneration.dropTip(pipetteId)
+              ])
+            ]
           }
         }
 
-        return next
+        return [...acc, stepCommandCreator]
       }, [])
 
     const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)

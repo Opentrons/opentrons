@@ -166,13 +166,15 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
     getPDMetadata(action.payload).orderedSteps
 }, [])
 
-type SelectedItemState = {
+export type SelectableItem = {
   isStep: true,
   id: StepIdType
 } | {
   isStep: false,
   id: TerminalItemId
-} | null
+}
+
+type SelectedItemState = ?SelectableItem
 
 function stepIdHelper (id: StepIdType): SelectedItemState {
   if (id == null) return null
@@ -190,7 +192,7 @@ function terminalItemIdHelper (id: TerminalItemId): SelectedItemState {
   }
 }
 
-const initialSelectedItemState = {
+export const initialSelectedItemState = {
   isStep: false,
   id: START_TERMINAL_ID
 }
