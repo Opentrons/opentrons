@@ -4,7 +4,9 @@ import {SidePanel} from '@opentrons/components'
 
 import StepItem from '../../containers/ConnectedStepItem'
 import StepCreationButton from '../../containers/StepCreationButton'
-import DeckSetupStepItem from './DeckSetupStepItem'
+import TerminalItem from './TerminalItem'
+import {START_TERMINAL_ID, END_TERMINAL_ID} from '../../steplist'
+
 import type {StepIdType} from '../../form-types'
 
 type StepListProps = {
@@ -18,15 +20,16 @@ export default function StepList (props: StepListProps) {
       title='Protocol Timeline'
       onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
     >
-      <DeckSetupStepItem />
+      <TerminalItem id={START_TERMINAL_ID} title='Start stuff TODO'>
+        Blah blah stuff
+      </TerminalItem>
+
       {props.orderedSteps.map((stepId: StepIdType) => (
         <StepItem key={stepId} stepId={stepId} />
       ))}
 
       <StepCreationButton />
-
-      {/* TODO IMMEDIATELY create EndSetStepItem leaf & put it here instead of using END_STEP */}
-      {/* <StepItem stepId={END_STEP} /> */}
+      <TerminalItem id={END_TERMINAL_ID} title='Final stuff TODO' />
     </SidePanel>
   )
 }

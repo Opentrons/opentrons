@@ -38,6 +38,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
   const hoveredStep = steplistSelectors.getHoveredStepId(state)
   const selected = steplistSelectors.getSelectedStepId(state) === stepId
+  const collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
@@ -46,10 +47,6 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hasWarnings = warnings && warnings.length > 0
 
   const showErrorState = hasError || hasWarnings
-
-  const collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
-
-  console.log({stepId, hoveredStep, hoveredSubstep, selected, collapsed})
 
   return {
     step: allSteps[stepId],

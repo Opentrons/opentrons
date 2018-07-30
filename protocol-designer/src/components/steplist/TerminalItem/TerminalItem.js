@@ -1,19 +1,23 @@
 // @flow
 import * as React from 'react'
-import {DECK_SETUP_TITLE} from '../../../constants'
 import {PDTitledList} from '../../lists'
 
 type Props = {
+  title: string,
+  children?: React.Node,
+
   hovered: boolean,
   selected: boolean,
-  showDescription: boolean,
+
   onStepClick?: (event?: SyntheticEvent<>) => mixed,
   onStepHover?: (event?: SyntheticEvent<>) => mixed,
   onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed
 }
 
-export default function DeckSetupStepItem (props: Props) {
+export default function TerminalItem (props: Props) {
   const {
+    title,
+    children,
     hovered,
     selected,
     onStepClick,
@@ -23,14 +27,14 @@ export default function DeckSetupStepItem (props: Props) {
 
   return (
     <PDTitledList
-      title={DECK_SETUP_TITLE}
+      title={title}
       onClick={onStepClick}
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}
       selected={selected}
       hovered={hovered}
     >
-      <span>Add labware to the deck and assign liquids to the wells they start in</span>
+      {children}
     </PDTitledList>
   )
 }
