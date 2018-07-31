@@ -7,7 +7,7 @@ import StepItem from '../../containers/ConnectedStepItem'
 import StepCreationButton from '../../containers/StepCreationButton'
 import TerminalItem from './TerminalItem'
 import {END_TERMINAL_TITLE} from '../../constants'
-import {END_TERMINAL_ID} from '../../steplist'
+import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
 
@@ -29,7 +29,7 @@ export default function StepList (props: StepListProps) {
       ))}
 
       <StepCreationButton />
-      <TerminalItem id={END_TERMINAL_ID} title={END_TERMINAL_TITLE} />
+      <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
     </SidePanel>
   )
 }

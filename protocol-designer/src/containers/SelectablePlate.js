@@ -11,8 +11,8 @@ import {getWellSetForMultichannel} from '../well-selection/utils'
 import {selectors} from '../labware-ingred/reducers'
 import {
   selectors as steplistSelectors,
-  START_TERMINAL_ID,
-  END_TERMINAL_ID
+  START_TERMINAL_ITEM_ID,
+  END_TERMINAL_ITEM_ID
 } from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
@@ -73,12 +73,12 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const activeItem = steplistSelectors.getActiveItem(state)
   if (
-    !activeItem.isStep && activeItem.id === START_TERMINAL_ID
+    !activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID
   ) {
     // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else if (
-    !activeItem.isStep && activeItem.id === END_TERMINAL_ID
+    !activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID
   ) {
     // "end" terminal
     wellContents = wellContentsSelectors.lastValidWellContents(state)[containerId]
@@ -87,10 +87,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
-    let timelineIdx: ?number = steplistSelectors.orderedSteps(state).findIndex(idx => idx === stepId)
-    if (timelineIdx === -1) {
-      timelineIdx = null
-    }
+    const orderedSteps = steplistSelectors.orderedSteps(state)
+    const timelineIdx = orderedSteps.includes(stepId)
+      ? orderedSteps.findIndex(id => id === stepId)
+      : null
 
     // shows liquids the current step in timeline
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)

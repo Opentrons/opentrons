@@ -6,7 +6,7 @@ import omit from 'lodash/omit'
 
 import {getPDMetadata} from '../file-types'
 
-import {START_TERMINAL_ID} from './types'
+import {START_TERMINAL_ITEM_ID} from './types'
 import type {
   StepItemData,
   FormSectionState,
@@ -194,7 +194,7 @@ function terminalItemIdHelper (id: TerminalItemId): SelectedItemState {
 
 export const initialSelectedItemState = {
   isStep: false,
-  id: START_TERMINAL_ID
+  id: START_TERMINAL_ITEM_ID
 }
 
 const selectedItem: Reducer<SelectedItemState, *> = handleActions({

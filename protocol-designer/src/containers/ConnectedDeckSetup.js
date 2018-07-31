@@ -11,7 +11,7 @@ import LabwareSelectionModal from '../components/LabwareSelectionModal'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
-import {selectors as steplistSelectors, START_TERMINAL_ID} from '../steplist'
+import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
 import type {BaseState, ThunkDispatch} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
@@ -25,7 +25,7 @@ type DispatchProps = {cancelMoveLabwareMode: () => mixed}
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   deckSetupMode: (
-    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ID
+    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
   ),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state))

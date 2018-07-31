@@ -7,9 +7,9 @@ export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
 
 // timeline start and end
-export const START_TERMINAL_ID: '__initial_setup__' = '__initial_setup__'
-export const END_TERMINAL_ID: '__end__' = '__end__'
-export type TerminalItemId = typeof START_TERMINAL_ID | typeof END_TERMINAL_ID
+export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
+export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
+export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,

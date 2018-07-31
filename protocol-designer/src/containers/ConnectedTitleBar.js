@@ -9,8 +9,8 @@ import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
   selectors as steplistSelectors,
-  END_TERMINAL_ID,
-  START_TERMINAL_ID
+  END_TERMINAL_ITEM_ID,
+  START_TERMINAL_ITEM_ID
 } from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
@@ -76,9 +76,9 @@ function mapStateToProps (state: BaseState): SP {
       // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
       let subtitle
-      if (selectedTerminalId === START_TERMINAL_ID) {
+      if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
-      } else if (selectedTerminalId === END_TERMINAL_ID) {
+      } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
       } else if (selectedStep) {
         subtitle = selectedStep.title

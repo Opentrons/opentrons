@@ -5,7 +5,7 @@ import TerminalItem from './TerminalItem'
 import {PDListItem} from '../lists'
 import {START_TERMINAL_TITLE} from '../../constants'
 import type {BaseState} from '../../types'
-import {START_TERMINAL_ID} from '../../steplist'
+import {START_TERMINAL_ITEM_ID} from '../../steplist'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 
 type Props = {
@@ -21,7 +21,7 @@ function StartingDeckStateTerminalItem (props: Props) {
   )
 
   return (
-    <TerminalItem id={START_TERMINAL_ID} title={START_TERMINAL_TITLE}>
+    <TerminalItem id={START_TERMINAL_ITEM_ID} title={START_TERMINAL_TITLE}>
       {showHint && hintContents}
     </TerminalItem>
   )

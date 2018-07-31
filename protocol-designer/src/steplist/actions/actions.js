@@ -111,15 +111,15 @@ export type SelectTerminalItemAction = {
   payload: TerminalItemId
 }
 
-const selectTerminalItemAction = (terminalId): SelectTerminalItemAction => ({
-  type: 'SELECT_TERMINAL_ITEM',
-  payload: terminalId
-})
-
 export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
+    const selectTerminalItemAction: SelectTerminalItemAction = {
+      type: 'SELECT_TERMINAL_ITEM',
+      payload: terminalId
+    }
+
     dispatch(cancelStepForm())
-    dispatch(selectTerminalItemAction(terminalId))
+    dispatch(selectTerminalItemAction)
   }
 
 export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
