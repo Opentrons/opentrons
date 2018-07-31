@@ -5,6 +5,7 @@ import {SidePanel} from '@opentrons/components'
 import StepItem from '../../containers/ConnectedStepItem'
 import StepCreationButton from '../../containers/StepCreationButton'
 import TerminalItem from './TerminalItem'
+import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../../constants'
 import {START_TERMINAL_ID, END_TERMINAL_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
@@ -20,7 +21,7 @@ export default function StepList (props: StepListProps) {
       title='Protocol Timeline'
       onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
     >
-      <TerminalItem id={START_TERMINAL_ID} title='Start stuff TODO'>
+      <TerminalItem id={START_TERMINAL_ID} title={START_TERMINAL_TITLE}>
         Blah blah stuff
       </TerminalItem>
 
@@ -29,7 +30,7 @@ export default function StepList (props: StepListProps) {
       ))}
 
       <StepCreationButton />
-      <TerminalItem id={END_TERMINAL_ID} title='Final stuff TODO' />
+      <TerminalItem id={END_TERMINAL_ID} title={END_TERMINAL_TITLE} />
     </SidePanel>
   )
 }

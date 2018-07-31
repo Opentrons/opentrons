@@ -25,8 +25,7 @@ type DispatchProps = {cancelMoveLabwareMode: () => mixed}
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   deckSetupMode: (
-    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ID ||
-    steplistSelectors.getHoveredTerminalItemId(state) === START_TERMINAL_ID
+    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ID
   ),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state))

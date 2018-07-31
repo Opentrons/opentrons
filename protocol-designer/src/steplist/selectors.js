@@ -11,7 +11,7 @@ import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
 import {initialSelectedItemState} from './reducers'
 import type {RootState, OrderedStepsState, SelectableItem} from './reducers'
-import {DECK_SETUP_TITLE} from '../constants'
+import {START_TERMINAL_TITLE} from '../constants'
 import type {BaseState, Selector} from '../types'
 
 import type {
@@ -92,12 +92,14 @@ const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   (state: RootState) => state.hoveredSubstep
 )
 
-const getHoveredOrSelectedStepId: Selector<?StepIdType> = createSelector(
-  getHoveredStepId,
-  getSelectedStepId,
-  (hoveredId, selectedId) => hoveredId !== null
-    ? hoveredId
-    : selectedId
+// Hovered or selected item. Hovered has priority.
+// Uses fallback of getNonNullSelectedItem if not hovered or selected
+const getActiveItem: Selector<SelectableItem> = createSelector(
+  getNonNullSelectedItem,
+  getHoveredItem,
+  (selected, hovered) => hovered != null
+    ? hovered
+    : selected
 )
 
 const getSteps = createSelector(
@@ -288,7 +290,7 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
         if (savedForm && savedForm['step-name']) {
           title = savedForm['step-name']
         } else if (step.stepType === 'deck-setup') {
-          title = DECK_SETUP_TITLE
+          title = START_TERMINAL_TITLE
         } else {
           title = step.stepType
         }
@@ -343,7 +345,7 @@ export default {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
   getHoveredStepId,
-  getHoveredOrSelectedStepId,
+  getActiveItem,
   getHoveredSubstep,
   selectedStepFormData: selectedStepFormDataSelector,
   getUnsavedForm,

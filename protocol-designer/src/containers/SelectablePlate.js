@@ -70,28 +70,27 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents = {}
+
+  const activeItem = steplistSelectors.getActiveItem(state)
   if (
-    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ID ||
-    steplistSelectors.getHoveredTerminalItemId(state) === START_TERMINAL_ID
+    !activeItem.isStep && activeItem.id === START_TERMINAL_ID
   ) {
     // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
   } else if (
-    steplistSelectors.getSelectedTerminalItemId(state) === END_TERMINAL_ID ||
-    steplistSelectors.getHoveredTerminalItemId(state) === END_TERMINAL_ID
+    !activeItem.isStep && activeItem.id === END_TERMINAL_ID
   ) {
     // "end" terminal
     wellContents = wellContentsSelectors.lastValidWellContents(state)[containerId]
+  } else if (!activeItem.isStep) {
+    console.warn(`SelectablePlate got unhandled terminal id: "${activeItem.id}"`)
   } else {
-    const stepId = steplistSelectors.getHoveredOrSelectedStepId(state)
+    const stepId = activeItem.id
     // TODO IMMEDIATELY replace with util function
     let timelineIdx: ?number = steplistSelectors.orderedSteps(state).findIndex(idx => idx === stepId)
     if (timelineIdx === -1) {
       timelineIdx = null
     }
-
-    const invalidStep = stepId == null || timelineIdx == null
-    console.log({allWellContentsForSteps, stepId, orderedSteps: steplistSelectors.orderedSteps(state), timelineIdx, invalidStep})
 
     // shows liquids the current step in timeline
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)
@@ -107,7 +106,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     }
 
     if (wellSelectionModeForLabware) {
-      // wells are highlighted for well selection hover
+      // we're in the well selection modal, highlight hovered/selected wells
       highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
     } else {
       // wells are highlighted for steps / substep hover

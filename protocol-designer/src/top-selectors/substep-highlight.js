@@ -176,7 +176,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
       // Need to use orderedSteps[timelineIndex + 1] to get stepId
       // (just like in warningsPerStep and getErrorStepId selectors in file-data/selectors/commands)
       // Make stepId's always UNIQUE STRINGS to avoid trying to add 1 to them?
-      const formIdx = timelineIndex + 1
+      const formIdx = timelineIndex
       const form = _forms[formIdx] && _forms[formIdx].validatedForm
 
       // replace value of each labware with highlighted wells info
