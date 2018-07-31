@@ -86,7 +86,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     console.warn(`SelectablePlate got unhandled terminal id: "${activeItem.id}"`)
   } else {
     const stepId = activeItem.id
-    // TODO IMMEDIATELY replace with util function
+    // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
     let timelineIdx: ?number = steplistSelectors.orderedSteps(state).findIndex(idx => idx === stepId)
     if (timelineIdx === -1) {
       timelineIdx = null

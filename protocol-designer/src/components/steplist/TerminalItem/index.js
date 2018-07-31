@@ -9,9 +9,9 @@ import {
   type TerminalItemId
 } from '../../../steplist'
 
-import TerminalItem from './TerminalItem'
+import {PDTitledList} from '../../lists'
 
-type Props = React.ElementProps<typeof TerminalItem>
+type Props = React.ElementProps<typeof PDTitledList>
 
 type OP = {
   id: TerminalItemId,
@@ -34,17 +34,18 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props {
+// TODO Ian: 2018-07-31 annotate type of mergeProps correctly. Related to https://github.com/flow-typed/flow-typed/issues/1269 ?
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): * {
   const {id, title, children} = ownProps
   const {dispatch} = dispatchProps
   return {
     ...stateProps,
     title,
     children,
-    onStepClick: () => dispatch(steplistActions.selectTerminalItem(id)),
-    onStepHover: () => dispatch(steplistActions.hoverOnTerminalItem(id)),
-    onStepMouseLeave: () => dispatch(steplistActions.hoverOnTerminalItem(null))
+    onClick: () => dispatch(steplistActions.selectTerminalItem(id)),
+    onMouseEnter: () => dispatch(steplistActions.hoverOnTerminalItem(id)),
+    onMouseLeave: () => dispatch(steplistActions.hoverOnTerminalItem(null))
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(TerminalItem)
+export default connect(mapStateToProps, null, mergeProps)(PDTitledList)
