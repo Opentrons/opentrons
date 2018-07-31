@@ -118,7 +118,7 @@ const selectTerminalItemAction = (terminalId): SelectTerminalItemAction => ({
 
 export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    dispatch(cancelStepForm()) // TODO IMMEDIATELY is this needed?
+    dispatch(cancelStepForm())
     dispatch(selectTerminalItemAction(terminalId))
   }
 
@@ -137,7 +137,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
     })
   }
 
-// TODO IMMEDIATELY types aren't being inferred by ActionType in hoveredItem reducer...
+// TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
 export const hoverOnStep = (stepId: ?StepIdType) => ({
   type: 'HOVER_ON_STEP',
   payload: stepId

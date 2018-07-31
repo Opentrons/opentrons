@@ -43,7 +43,7 @@ function TitleWithIcon (props: TitleWithIconProps) {
 function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
-  const selectedStep = steplistSelectors.selectedStep(state)
+  const selectedStep = steplistSelectors.getSelectedStep(state)
   const selectedTerminalId = steplistSelectors.getSelectedTerminalItemId(state)
   const labware = labwareIngredSelectors.getSelectedContainer(state)
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)

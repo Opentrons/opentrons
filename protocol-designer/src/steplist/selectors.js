@@ -301,7 +301,7 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
   }
 )
 
-export const selectedStepSelector = createSelector(
+const getSelectedStep = createSelector(
   allSteps,
   getSelectedStepId,
   (_allSteps, selectedStepId) => {
@@ -332,7 +332,7 @@ export default {
 
   allSteps,
   currentFormCanBeSaved,
-  selectedStep: selectedStepSelector, /* TODO IMMEDIATELY is this used? */
+  getSelectedStep,
 
   stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
   orderedSteps: orderedStepsSelector,
