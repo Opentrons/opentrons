@@ -12,7 +12,7 @@ import type {LabwareData, PipetteData} from '../../step-generation'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
-const applicationVersion = '1.0.0'
+const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 
 export const createFile: BaseState => ProtocolFile = createSelector(
   fileMetadata,

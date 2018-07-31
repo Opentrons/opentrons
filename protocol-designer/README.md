@@ -27,3 +27,7 @@ Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
 ### `OT_PD_SHOW_WARNINGS`
 
 Shows warning AlertItems (which are hidden by default) when `process.env.OT_PD_SHOW_WARNINGS === 'true'`
+
+### `OT_PD_VERSION`
+
+Defaults to the `git describe` version specified in the Webpack build. This version string is saved to the `designer-application.application-name` field in PD files.
