@@ -27,7 +27,7 @@ import wellSelectionSelectors from '../well-selection/selectors'
 import {SELECTABLE_WELL_CLASS} from '../constants'
 import type {GenericRect} from '../collision-types'
 
-import type {WellContents, Wells} from '../labware-ingred/types'
+import type {WellContents, Wells, ContentsByWell} from '../labware-ingred/types'
 import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof SelectablePlate>
@@ -69,7 +69,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const labware = selectors.getLabware(state)[containerId]
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
   const wellSelectionModeForLabware = selectedContainerId === containerId
-  let wellContents = {}
+  let wellContents: ContentsByWell = {}
 
   const activeItem = steplistSelectors.getActiveItem(state)
   if (
@@ -123,14 +123,16 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       ) || {}
     }
 
-    wellContents = mapValues(
+    // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
+    // others {[wellName]: wellName}. Use Set instead!
+    wellContents = (mapValues(
       wellContentsWithoutHighlight,
-      (wellContentsForWell: WellContents, well: string) => ({
+      (wellContentsForWell: WellContents, well: string): WellContents => ({
         ...wellContentsForWell,
-        highlighted: highlightedWells[well],
-        selected: selectedWells[well]
+        highlighted: Boolean(highlightedWells[well]),
+        selected: Boolean(selectedWells[well])
       })
-    )
+    ): ContentsByWell)
   }
 
   return {
