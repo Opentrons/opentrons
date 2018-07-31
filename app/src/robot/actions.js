@@ -305,7 +305,8 @@ export const actions = {
   },
 
   clearSession () {
-    return {type: 'robot:CLEAR_SESSION'}
+    // return {type: 'robot:CLEAR_SESSION'}
+    return tagForRobotApi({type: 'robot:CLEAR_SESSION'})
   },
 
   setModulesReviewed (payload: boolean) {
