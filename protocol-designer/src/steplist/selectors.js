@@ -11,7 +11,6 @@ import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
 import {initialSelectedItemState} from './reducers'
 import type {RootState, OrderedStepsState, SelectableItem} from './reducers'
-import {START_TERMINAL_TITLE} from '../constants'
 import type {BaseState, Selector} from '../types'
 
 import type {
@@ -126,8 +125,6 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
     _orderedSteps.forEach(stepId => {
       if (!_steps[stepId]) {
         console.error(`Encountered an undefined step: ${stepId}`)
-      } else if (_steps[stepId].stepType === 'deck-setup') {
-        console.error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
       }
     })
 
@@ -289,8 +286,6 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
 
         if (savedForm && savedForm['step-name']) {
           title = savedForm['step-name']
-        } else if (step.stepType === 'deck-setup') {
-          title = START_TERMINAL_TITLE
         } else {
           title = step.stepType
         }
