@@ -19,8 +19,8 @@ ENV OT_UPDATE_PORT=34000
 ENV OT_SERVER_UNIX_SOCKET_PATH=/tmp/aiohttp.sock
 
 # Static IPv6 used on Ethernet interface for USB connectivity
-ENV ETHERNET_STATIC_IP=fd00:0000:cafe:fefe::1
-ENV ETHERNET_NETWORK_PREFIX=fd00:0000:cafe:fefe::
+ENV ETHERNET_STATIC_IP=fe80::3c68:f2a4:a5f8:58bf
+ENV ETHERNET_NETWORK_PREFIX=fe80::
 ENV ETHERNET_NETWORK_PREFIX_LENGTH=64
 
 # See compute/README.md for details. Make sure to keep them in sync

@@ -83,7 +83,6 @@ Directory structure:
   * `static` — static pages to support auto-update
 
 Services:
-  * `dumb-init` (init system, PID 1) — setup (`scripts/setup.sh`) and start (`scripts/start.sh`) robot services
   * `nginx` — serve update page (static/) and proxy `POST` to `/upload`
   * `inetd` — dispatch connections to local ssh server and update uploads (`updates.sh`)
   * `ssh` (dropbear) — passwordless ssh on ethernet port 22
@@ -93,7 +92,26 @@ Services:
 Tools:
   * `nmcli` — manage network connections (https://fedoraproject.org/wiki/Networking/CLI)
 
-Ethernet over USB static IPv6 address `fd00:0:cafe:fefe::1`
+For communication with the robot directly (not using WiFi), we use ethernet over USB, with IPv6 link-local
+addressing. After plugging the USB cable from the OT2 into a computer, pull up IP configuration information
+on the computer.
+
+On Windows, open a terminal and enter:
+
+```
+ipconfig
+```
+
+On Linux or OSX, open a terminal and enter:
+
+```
+ifconfig
+```
+
+In either case, you will get a printout of networking information for all the interfaces on the computer.
+Find the one that is a physical ethernet device (it will have a name like "eth0", "en0", or something like
+that, and will not include "Docker" or "NAT"). The "Default Gateway" for the physical ethernet interface
+is the IP address of the robot, and can be used for ethernet operations such as ssh.
 
 ### Flashing a device
 Flashing a device means associating some device with some resin application. For the RPi, this is done by flashing

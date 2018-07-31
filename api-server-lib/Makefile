@@ -4,7 +4,7 @@ SHELL := /bin/bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # make push host
-host ?= \[fd00:0:cafe:fefe::1\]
+host ?= \[fe80::3c68:f2a4:a5f8:58bf\]
 # make push wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
 firmware = $(wildcard smoothie/*.hex)
