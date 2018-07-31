@@ -67,6 +67,10 @@ export type ClearConnectResponseAction = {|
   type: 'robot:CLEAR_CONNECT_RESPONSE',
 |}
 
+export type ClearSessionAction = {|
+  type: 'robot:CLEAR_SESSION',
+|}
+
 export type DisconnectAction = {|
   type: 'robot:DISCONNECT',
   meta: {|
@@ -226,6 +230,7 @@ export type Action =
   | SessionUpdateAction
   | RefreshSessionAction
   | SetModulesReviewedAction
+  | ClearSessionAction
 
 export const actions = {
   discover (): DiscoverAction {
@@ -297,6 +302,10 @@ export const actions = {
       type: 'robot:SESSION_UPDATE',
       payload: update
     }
+  },
+
+  clearSession () {
+    return {type: 'robot:CLEAR_SESSION'}
   },
 
   setModulesReviewed (payload: boolean) {

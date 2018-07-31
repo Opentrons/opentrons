@@ -1,5 +1,5 @@
+// @flow
 import React from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 
@@ -11,13 +11,16 @@ import {
 import {SidePanel} from '@opentrons/components'
 import Upload from './Upload'
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
-
-UploadPanel.propTypes = {
-  isSessionLoaded: PropTypes.bool.isRequired
+type Props = {
+  sessionLoaded: ?boolean,
+  confirmUpload: () => void,
+  createSession: () => void,
+  cancelUpload: () => mixed,
 }
 
-function UploadPanel (props) {
+export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
+
+function UploadPanel (props: Props) {
   return (
     <SidePanel title='Open Protocol'>
       <Upload {...props}/>
@@ -28,7 +31,7 @@ function UploadPanel (props) {
 // move me to UploadIntercept  rename to Upload
 function mapStateToProps (state) {
   return {
-    isSessionLoaded: robotSelectors.getSessionIsLoaded(state)
+    sessionLoaded: robotSelectors.getSessionIsLoaded(state)
   }
 }
 

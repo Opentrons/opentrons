@@ -3,7 +3,7 @@ import * as React from 'react'
 import UploadInput from './UploadInput'
 
 type Props = {
-  sessionLoaded: boolean,
+  sessionLoaded: ?boolean,
   createSession: (file: File) => void,
   confirmUpload: () => void,
 }
@@ -24,6 +24,8 @@ export default class Upload extends React.Component<Props, State> {
     event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
   ) => {
     let files: Array<File> = []
+    // $FlowFixMe type EventTarget missing value
+    console.log('ONE' + event.target.value)
     if (event.dataTransfer && event.dataTransfer.files) {
       files = (event.dataTransfer.files: any)
     } else if (event.target.files) {
@@ -34,12 +36,13 @@ export default class Upload extends React.Component<Props, State> {
       return
     }
 
-    if (!this.props.sessionLoaded) {
-      return this.props.createSession(files[0])
-    }
-
     this.setState({uploadedFile: files[0]})
-    return this.props.confirmUpload()
+    if (this.state.uploadedFile && this.props.sessionLoaded) {
+      console.log('GOT HERE')
+      this.props.confirmUpload()
+    }
+    // $FlowFixMe type EventTarget missing value
+    event.target.value = null
   }
 
   // TODO (ka 2018-7-30): refactor to consider edge case where robot disconnects while on upload page

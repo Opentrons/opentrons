@@ -1,27 +1,47 @@
 import React from 'react'
-import {Route} from 'react-router'
-
+import {connect} from 'react-redux'
+import {Switch, Route} from 'react-router'
+import {push} from 'react-router-redux'
 import {AlertModal} from '@opentrons/components'
 import UploadStatus from '../components/UploadStatus'
 import Page from '../components/Page'
 
-export default function UploadPage () {
+import {
+  actions as robotActions
+} from '../robot'
+
+export default connect(null, mapDTP)(UploadPage)
+
+function UploadPage (props) {
+  const {match: {path}} = props
   return (
     <Page>
       <UploadStatus />
-      <Route path='/upload/cancel' component={ConfirmUploadModal} />
+      <Switch>
+        <Route exact path={`${path}/confirm`} render={() => {
+          return (<ConfirmUploadModal {...props} />)
+        }}/>
+      </Switch>
     </Page>
   )
 }
 
-function ConfirmUploadModal () {
+function mapDTP (dispatch) {
+  return {
+    cancelUpload: () => { dispatch(push('/upload')) },
+    confirmUpload: () => { dispatch(robotActions.clearSession()) }
+  }
+}
+
+function ConfirmUploadModal (props) {
   return (
     <AlertModal
       heading={'Are you sure you want to open a new protocol?'}
       buttons={[
-        {children: 'cancel', onClick: () => console.log('cancel upload')},
-        {children: 'continue', onClick: () => console.log('continue upload')}
+        {children: 'cancel', onClick: props.cancelUpload},
+        {children: 'continue', onClick: props.confirmUpload}
       ]}
+      alertOverlay
     >
       Doing so will close your current protocol and clear any unsaved calibration progress.
     </AlertModal>
