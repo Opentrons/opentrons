@@ -195,8 +195,7 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
   steplistSelectors.orderedSteps,
   robotStateTimeline,
   (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
-    // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
-    const stepId = orderedSteps[timelineIndex + 1]
+    const stepId = orderedSteps[timelineIndex]
 
     // remove warnings of duplicate 'type'. chosen arbitrarily
     return {
@@ -214,8 +213,7 @@ export const getErrorStepId: Selector<?number> = createSelector(
     if (hasErrors) {
       // the frame *after* the last frame in the timeline is the error-throwing one
       const errorIndex = timeline.timeline.length
-      // TODO: Ian 2018-06-15 add 1 to orderedSteps because 0th orderedStep is deck setup. DRYer way?
-      const errorStepId = orderedSteps[errorIndex + 1]
+      const errorStepId = orderedSteps[errorIndex]
       return errorStepId
     }
     return null
