@@ -5,7 +5,7 @@ const {
   steps,
   collapsedSteps,
   orderedSteps,
-  selectedStep,
+  selectedItem,
   stepCreationButtonExpanded
 } = _allReducers
 
@@ -125,23 +125,29 @@ describe('orderedSteps reducer', () => {
   })
 })
 
-describe('selectedStep reducer', () => {
-  test('select step action: deselect with null', () => {
+describe('selectedItem reducer', () => {
+  test('select step', () => {
+    const stepId = 123
     const action = {
       type: 'SELECT_STEP',
-      payload: null
+      payload: stepId
     }
-    expect(selectedStep(123, action)).toEqual(null)
-    expect(selectedStep(null, action)).toEqual(null)
+    expect(selectedItem(null, action)).toEqual({
+      isStep: true,
+      id: stepId
+    })
   })
 
-  test('select step action: select by id', () => {
+  test('select terminal item', () => {
+    const terminalId = 'test'
     const action = {
-      type: 'SELECT_STEP',
-      payload: 123
+      type: 'SELECT_TERMINAL_ITEM',
+      payload: terminalId
     }
-    expect(selectedStep(5, action)).toEqual(123)
-    expect(selectedStep(null, action)).toEqual(123)
+    expect(selectedItem(null, action)).toEqual({
+      isStep: false,
+      id: terminalId
+    })
   })
 })
 
