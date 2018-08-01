@@ -20,14 +20,13 @@ echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_dad
 
 # Cleanup any connections. This will leave only wlan0
 nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(--)/\1/p' | xargs nmcli connection del || true
-nmcli con add con-name "static-eth0" ifname eth0 type ethernet \
-    ipv6.addr-gen-mode eui64 ipv6.method link-local ipv4.never-default true \
-    ipv4.route-metric 2000 ipv4.ignore-auto-routes true
+nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p' | xargs nmcli connection del || true
 
 # nmcli makes an async call which might not finish before next network-related
 # operation starts. There is no graceful way to await for D-BUS event in shell
 # hence sleep is added to avoid race condition
-sleep 5
+sleep 1
+nmcli con add con-name "static-eth0" ifname eth0 type ethernet ipv4.method link-local
 
 # Clean up opentrons package dir if it's a first start of a new container
 touch /data/id
@@ -40,6 +39,3 @@ if [ "$previous_id" != "$current_id" ] ; then
   rm -rf /data/packages/usr/local/lib/python3.6/site-packages/otupdate*
   echo "$current_id" > /data/id
 fi
-
-# Add host name record so other services can bind to address by hostname
-echo "$ETHERNET_STATIC_IP local-ethernet" >> /etc/hosts
