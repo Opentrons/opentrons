@@ -16,6 +16,7 @@ from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
+from opentrons.modules import discover_connected_ports
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-        self.modules = []
+        self._modules = []
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -202,6 +203,7 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
+        self.register_modules()
         return self
 
     def cache_instrument_models(self):
@@ -209,6 +211,21 @@ class Robot(object):
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
             log.debug("{}: {}".format(mount, self.model_by_mount[mount]))
+        for module in self._modules:
+            self.connected_modules = module.device_info
+
+    # TODO: BC Document the error case where you load a module in a protocol
+    # that is currently not connected to the robot as return by the following method
+    # and run it without calibrating, it will probably fail silently, though
+    # it should probably raise and be shown to the run app user
+    def register_modules(self):
+        for module in self._modules:
+            module.disconnect()
+        log.debug("Registering connected modules")
+        discovered_modules = discover_modules()
+        for module in discovered_modules:
+            module.connect()
+        self._modules = discovered_modules
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -393,7 +410,7 @@ class Robot(object):
         """
 
         self._driver.connect(port=port)
-        for module in self.modules:
+        for module in self._modules:
             module.connect()
         self.fw_version = self._driver.get_fw_version()
 
@@ -600,7 +617,7 @@ class Robot(object):
         if self._driver:
             self._driver.disconnect()
 
-        for module in self.modules:
+        for module in self._modules:
             module.disconnect()
 
         self.axis_homed = {
@@ -811,6 +828,9 @@ class Robot(object):
             'left': left_data,
             'right': right_data
         }
+
+    def get_connected_modules(self):
+        return self._modules
 
     def get_serial_ports_list(self):
         ports = []
