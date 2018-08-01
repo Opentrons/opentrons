@@ -5,3 +5,4 @@ include opentrons/config/smoothie/config_one_pro_plus
 include opentrons/config/modules/avrdude.conf
 include opentrons/config/modules/95-opentrons-modules.rules
 include opentrons/config/pipette-config.json
+recursive-include opentrons/resources *

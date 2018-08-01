@@ -3,6 +3,7 @@ import sys
 import shutil
 import asyncio
 import logging
+import traceback
 from aiohttp import web
 
 log = logging.getLogger(__name__)
@@ -156,6 +157,22 @@ async def install_py(python, data, loop) -> (dict, int):
     return {'message': msg, 'filename': filename}, returncode
 
 
+async def _provision_container(python, loop) -> (str, int):
+    provision_command = 'provision-api-resources'
+    proc = await asyncio.create_subprocess_shell(
+        provision_command, stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE, loop=loop)
+    sub_stdout = await proc.stdout.read()
+    sub_stderr = await proc.stderr.read()
+    await proc.communicate()
+    rc = proc.returncode
+    if rc != 0:
+        res = sub_stderr.decode().strip()
+    else:
+        res = sub_stdout.decode().strip()
+    return {'message': res, 'filename': '<provision>'}, rc
+
+
 async def update_api(request: web.Request) -> web.Response:
     """
     This handler accepts a POST request with Content-Type: multipart/form-data
@@ -173,6 +190,12 @@ async def update_api(request: web.Request) -> web.Response:
         res0, rc0 = await install_py(
             sys.executable, data['whl'], request.loop)
         reslist = [res0]
+        if rc0 == 0 and os.environ.get('RUNNING_ON_PI'):
+            resprov, rcprov = await _provision_container(
+                sys.executable, request.loop)
+            reslist.append(resprov)
+        else:
+            rcprov = 0
         if 'serverlib' in data.keys():
             res1, rc1 = await install_py(
                 sys.executable, data['serverlib'], request.loop)
@@ -189,14 +212,14 @@ async def update_api(request: web.Request) -> web.Response:
             'message': [r['message'] for r in reslist],
             'filename': [r['filename'] for r in reslist]
         }
-        returncode = rc0 + rc1 + rc2
+        returncode = rc0 + rc1 + rc2 + rcprov
         if returncode == 0:
             status = 200
         else:
             status = 400
     except Exception as e:
         res = {'message': 'Exception {} raised by update of {}: {}'.format(
-                type(e), data, e.__traceback__)}
+                type(e), data, traceback.format_tb(e.__traceback__))}
         status = 500
     return web.json_response(res, status=status)
 

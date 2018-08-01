@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+""" Copy everything here (except this script) into /data/system.
+
+This should be run
+- On the first boot of a new container (handled by `container_setup.sh`)
+- When a new version of the API server is installed by runapp (handled by `setup.py`) in the API server wheel
+"""
+
+import os
+import shutil
+import sys
+
+sys.path.append('/usr/local/bin')
+import find_python_module_path
+
+def provision():
+    """ Should be called the first time a given version of the server is run in a container.
+
+    Should not be called if the server is not running in a container.
+    """
+    provision_from_module = find_python_module_path.find_module('opentrons')
+    provision_from_resources = os.path.join(provision_from_module, 'resources')
+    print("Provisioning config and initialization from {}"
+          .format(provision_from_resources))
+    config_dir = os.environ.get('OT_CONFIG_PATH', '/data/system')
+    if os.path.exists(config_dir):
+        shutil.rmtree(config_dir)
+    shutil.copytree(provision_from_resources, config_dir)
+
+if __name__ == '__main__':
+    provision()
