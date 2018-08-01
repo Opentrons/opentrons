@@ -33,6 +33,7 @@ type FieldProps = {|
   label?: string,
   units?: string,
   error?: ?string,
+  caption?: ?string,
   placeholder?: string,
   className?: string
 |}
@@ -48,6 +49,7 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
         label={props.label}
         units={props.units}
         error={props.error}
+        caption={props.caption}
         placeholder={placeholder}
         value={(getSubstate(accessor) || '').toString()}
         onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
@@ -252,7 +254,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const {
       onCancel,
       allIngredientNamesIds,
-      selectedWells
+      selectedWells,
+      selectedWellsMaxVolume
     } = this.props
 
     const {commonIngredGroupId} = this.state
@@ -326,6 +329,9 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 numeric
                 accessor='volume'
                 units='µL'
+                caption={isFinite(selectedWellsMaxVolume)
+                  ? `max ${selectedWellsMaxVolume}`
+                  : null}
                 error={visibleErrors.volume}
               />
             </FormGroup>
