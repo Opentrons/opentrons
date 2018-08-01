@@ -15,13 +15,13 @@
   --c-bg-selected: #f0f3ff;
   --c-bg-hover: #f1f1f1;
   --c-bg-success: #b6febc;
-  --c-bg-warning: #ffd58f;
 
   /* general UI */
   --c-highlight: #5fd8ee;
   --c-selected-dark: #00c3e6;
+  --c-warning-dark: #9e5e00;
   --c-warning: #e28200;
-  --c-warningdark: #9e5e00;
+  --c-warning-light: #ffd58f;
   --c-success: #60b120;
 
   /* Misc */
