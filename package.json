@@ -2,15 +2,16 @@
   "name": "opentrons",
   "private": true,
   "workspaces": [
+    "api/opentrons",
+    "api-server-lib/ot2serverlib",
     "app",
     "app-shell",
     "components",
-    "shared-data",
+    "discovery-client",
     "protocol-designer",
-    "webpack-config",
+    "shared-data",
     "update-server/otupdate",
-    "api/opentrons",
-    "api-server-lib/ot2serverlib"
+    "webpack-config"
   ],
   "config": {
     "commitizen": {
@@ -64,6 +65,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
