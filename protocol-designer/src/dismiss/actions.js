@@ -6,7 +6,7 @@ export type DismissAction<ActionType, WarningType> = {
   type: ActionType,
   payload: {
     warning: WarningType,
-    stepId: number
+    stepId: ?number
   }
 }
 

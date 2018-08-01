@@ -1,5 +1,7 @@
 // @flow
+import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
+import mapValues from 'lodash/mapValues'
 
 import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
@@ -67,9 +69,13 @@ function transferLikeSubsteps (args: {
     allPipetteData,
     getIngreds,
     getLabwareType,
-    robotState,
     stepId
   } = args
+
+  // Add tips to pipettes, since this is just a "simulation"
+  // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
+  const robotState = cloneDeep(args.robotState)
+  robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
 
   const {
     pipette: pipetteId
@@ -121,6 +127,7 @@ function transferLikeSubsteps (args: {
   }
 
   if (result.errors) {
+    console.warn('Could not get substep, had errors:', result)
     return null
   }
 
@@ -267,9 +274,13 @@ export function generateSubsteps (
   getLabwareType: GetLabwareType,
   getIngreds: GetIngreds,
   robotState: ?RobotState,
-  stepId: number
+  stepId: number // stepId is used only for substeps to reference parent step
 ): ?SubstepItemData {
-  if (!robotState) return null
+  if (!robotState) {
+    console.info(`No robot state, could not generate substeps for step ${stepId}.` +
+      `There was probably an upstream error.`)
+    return null
+  }
 
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
   if (!valForm || !valForm.validatedForm || formHasErrors(valForm)) {
@@ -277,11 +288,6 @@ export function generateSubsteps (
   }
 
   const validatedForm = valForm.validatedForm
-
-  if (validatedForm.stepType === 'deck-setup') {
-    // No substeps for Deck Setup
-    return null
-  }
 
   if (validatedForm.stepType === 'pause') {
     // just returns formData

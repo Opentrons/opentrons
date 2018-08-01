@@ -4,6 +4,11 @@
   margin: 0.4rem 0.125rem;
   color: var(--c-dark-gray);
   box-shadow: var(--shadow-lvl-1);
+
+  & > div {
+    /* title of the titled list */
+    min-height: 3.5rem;
+  }
 }
 
 .pd_list_item {

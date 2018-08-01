@@ -1,5 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
+import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
@@ -8,14 +9,22 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {getFormWarnings, getFormErrors} from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
-import type {RootState, OrderedStepsState} from './reducers'
-
-import {DECK_SETUP_TITLE} from '../constants'
-import {END_STEP} from './types'
+import {initialSelectedItemState} from './reducers'
+import type {RootState, OrderedStepsState, SelectableItem} from './reducers'
 import type {BaseState, Selector} from '../types'
 
-import type { StepItemData, FormSectionState, SubstepIdentifier } from './types'
-import type { FormData, BlankForm, StepIdType } from '../form-types'
+import type {
+  StepItemData,
+  FormSectionState,
+  SubstepIdentifier,
+  TerminalItemId
+} from './types'
+
+import type {
+  FormData,
+  BlankForm,
+  StepIdType
+} from '../form-types'
 
 import {
   type ValidFormAndErrors,
@@ -42,14 +51,39 @@ const formModalData = createSelector(
   (state: RootState) => state.unsavedFormModal
 )
 
-const selectedStepId = createSelector(
+/** fallbacks for selectedItem reducer, when null */
+const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => state.selectedStep
+  (state: RootState) => {
+    if (state.selectedItem != null) return state.selectedItem
+    if (state.orderedSteps.length > 0) return {isStep: true, id: last(state.orderedSteps)}
+    return initialSelectedItemState
+  }
 )
 
-const hoveredStepId = createSelector(
+const getSelectedStepId: Selector<?StepIdType> = createSelector(
+  getNonNullSelectedItem,
+  (item) => item.isStep ? item.id : null
+)
+
+const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+  getNonNullSelectedItem,
+  (item) => !item.isStep ? item.id : null
+)
+
+const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => state.hoveredStep
+  (state: RootState) => state.hoveredItem
+)
+
+const getHoveredStepId: Selector<?StepIdType> = createSelector(
+  getHoveredItem,
+  (item) => (item && item.isStep) ? item.id : null
+)
+
+const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
+  getHoveredItem,
+  (item) => (item && !item.isStep) ? item.id : null
 )
 
 const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
@@ -57,12 +91,14 @@ const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   (state: RootState) => state.hoveredSubstep
 )
 
-const hoveredOrSelectedStepId: Selector<StepIdType | typeof END_STEP | null> = createSelector(
-  hoveredStepId,
-  selectedStepId,
-  (hoveredId, selectedId) => hoveredId !== null
-    ? hoveredId
-    : selectedId
+// Hovered or selected item. Hovered has priority.
+// Uses fallback of getNonNullSelectedItem if not hovered or selected
+const getActiveItem: Selector<SelectableItem> = createSelector(
+  getNonNullSelectedItem,
+  getHoveredItem,
+  (selected, hovered) => hovered != null
+    ? hovered
+    : selected
 )
 
 const getSteps = createSelector(
@@ -86,22 +122,9 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   orderedStepsSelector,
   (state: BaseState) => rootSelector(state).savedStepForms,
   (_steps, _orderedSteps, _savedStepForms) => {
-    if (_orderedSteps.length === 0) {
-      // No steps -- since initial Deck Setup step exists in default Redux state,
-      // this probably should never happen
-      console.warn('validatedForms called with no steps in "orderedSteps"')
-      return {}
-    }
-
-    if (_steps[0].stepType !== 'deck-setup') {
-      console.error('Error: expected deck-setup to be first step.', _orderedSteps)
-    }
-
-    _orderedSteps.slice(1).forEach(stepId => {
+    _orderedSteps.forEach(stepId => {
       if (!_steps[stepId]) {
         console.error(`Encountered an undefined step: ${stepId}`)
-      } else if (_steps[stepId].stepType === 'deck-setup') {
-        console.error('Encountered a deck-setup step which was not the first step in orderedSteps. This is not supported yet.')
       }
     })
 
@@ -115,9 +138,7 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
   getSavedForms,
   orderedStepsSelector,
   (_steps, _savedStepForms, _orderedSteps) => {
-    const orderedNonDeckSteps = _orderedSteps.slice(1)
-
-    return reduce(orderedNonDeckSteps, (acc, stepId) => {
+    return reduce(_orderedSteps, (acc, stepId) => {
       const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
         ? validateAndProcessForm(_savedStepForms[stepId])
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
@@ -140,19 +161,10 @@ const isNewStepForm = createSelector(
   (formData, savedForms) => !!(formData && formData.id && !savedForms[formData.id])
 )
 
-/** True if app is in Deck Setup Mode. */
-const deckSetupMode: Selector<boolean> = createSelector(
-  getSteps,
-  selectedStepId,
-  (steps, selectedStepId) => (selectedStepId !== null && selectedStepId !== '__end__' && steps[selectedStepId])
-    ? steps[selectedStepId].stepType === 'deck-setup'
-    : false
-)
-
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
 const hoveredStepLabware: Selector<Array<string>> = createSelector(
   validatedForms,
-  hoveredStepId,
+  getHoveredStepId,
   (_forms, _hoveredStep) => {
     const blank = []
     if (typeof _hoveredStep !== 'number' || !_forms[_hoveredStep]) {
@@ -199,22 +211,16 @@ const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
 
 const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = createSelector(
   getSavedForms,
-  selectedStepId,
+  getSelectedStepId,
   getSteps,
   (savedStepForms, selectedStepId, steps) => {
-    if (selectedStepId === null) {
+    if (selectedStepId == null) {
       // no step selected
       return false
     }
 
-    if (
-      selectedStepId === '__end__' ||
-      !steps[selectedStepId] ||
-      steps[selectedStepId].stepType === 'deck-setup'
-    ) {
-      // End step has no stepType
-      // Deck Setup step has no form data
-      // Also skip undefined steps to avoid white-screening, though they shouldn't happen
+    if (!steps[selectedStepId]) {
+      console.error(`Step id ${selectedStepId} not in 'steps', could not get form data`)
       return false
     }
 
@@ -280,8 +286,6 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
 
         if (savedForm && savedForm['step-name']) {
           title = savedForm['step-name']
-        } else if (step.stepType === 'deck-setup') {
-          title = DECK_SETUP_TITLE
         } else {
           title = step.stepType
         }
@@ -297,13 +301,13 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
   }
 )
 
-export const selectedStepSelector = createSelector(
+const getSelectedStep = createSelector(
   allSteps,
-  selectedStepId,
+  getSelectedStepId,
   (_allSteps, selectedStepId) => {
     const stepId = selectedStepId
 
-    if (!_allSteps || stepId === null || stepId === '__end__') {
+    if (!_allSteps || stepId == null) {
       return null
     }
 
@@ -313,7 +317,7 @@ export const selectedStepSelector = createSelector(
 
 export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   formData,
-  selectedStepId,
+  getSelectedStepId,
   allSteps,
   (formData, selectedStepId, allSteps) =>
     ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
@@ -328,13 +332,15 @@ export default {
 
   allSteps,
   currentFormCanBeSaved,
-  selectedStep: selectedStepSelector,
+  getSelectedStep,
 
   stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
   orderedSteps: orderedStepsSelector,
-  selectedStepId, // TODO ??? replace with selectedStep: selectedStepSelector ???
-  hoveredStepId,
-  hoveredOrSelectedStepId,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
+  getHoveredTerminalItemId,
+  getHoveredStepId,
+  getActiveItem,
   getHoveredSubstep,
   selectedStepFormData: selectedStepFormDataSelector,
   getUnsavedForm,
@@ -347,7 +353,6 @@ export default {
   formLevelWarnings,
   formLevelErrors,
   formSectionCollapse: formSectionCollapseSelector,
-  deckSetupMode,
   hoveredStepLabware,
 
   // NOTE: these are exposed only for substeps/selectors.js

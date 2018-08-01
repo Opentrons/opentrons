@@ -75,7 +75,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return {
     errors: filteredErrors,
     warnings: visibleWarnings,
-    stepId: steplistSelectors.selectedStepId(state)
+    stepId: steplistSelectors.getSelectedStepId(state)
   }
 }
 

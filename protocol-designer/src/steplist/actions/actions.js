@@ -2,16 +2,13 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
-import {END_STEP} from '../types'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 import {actions as tutorialActions} from '../../tutorial'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
 import type {ChangeFormPayload} from './types'
-import type {SubstepIdentifier, FormSectionNames} from '../types'
+import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import handleFormChange from './handleFormChange'
-
-type EndStepId = typeof END_STEP
 
 export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
@@ -75,7 +72,7 @@ export type DeleteStepAction = {
 export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'DELETE_STEP',
-    payload: selectors.selectedStepId(getState())
+    payload: selectors.getSelectedStepId(getState())
   })
 }
 
@@ -101,7 +98,7 @@ export const toggleStepCollapsed = (stepId: StepIdType): ToggleStepCollapsedActi
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',
-  payload: StepIdType | EndStepId
+  payload: StepIdType
 }
 
 export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
@@ -109,41 +106,46 @@ export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
   payload: payload
 })
 
-export const selectStep = (stepId: StepIdType | EndStepId): ThunkAction<*> =>
+export type SelectTerminalItemAction = {
+  type: 'SELECT_TERMINAL_ITEM',
+  payload: TerminalItemId
+}
+
+export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =>
+  (dispatch: ThunkDispatch<*>, getState: GetState) => {
+    const selectTerminalItemAction: SelectTerminalItemAction = {
+      type: 'SELECT_TERMINAL_ITEM',
+      payload: terminalId
+    }
+
+    dispatch(cancelStepForm())
+    dispatch(selectTerminalItemAction)
+  }
+
+export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
       payload: stepId
     }
 
-    if (stepId === '__end__') {
-      // End step has no form
-      dispatch(cancelStepForm())
-      dispatch(selectStepAction)
-
-      return
-    }
-
-    const stepData = selectors.allSteps(getState())[stepId]
-    const stepType = stepData && stepData.stepType
-
     dispatch(selectStepAction)
 
-    // 'deck-setup' steps don't use a Step Form, all others do
-    if (stepType === 'deck-setup') {
-      // Cancel open step form, if any
-      dispatch(cancelStepForm())
-    } else {
-      dispatch({
-        type: 'POPULATE_FORM',
-        payload: selectors.selectedStepFormData(getState())
-      })
-    }
+    dispatch({
+      type: 'POPULATE_FORM',
+      payload: selectors.selectedStepFormData(getState())
+    })
   }
 
-export const hoverOnStep = (stepId: StepIdType | EndStepId | null): * => ({
+// TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
+export const hoverOnStep = (stepId: ?StepIdType) => ({
   type: 'HOVER_ON_STEP',
   payload: stepId
+})
+
+export const hoverOnTerminalItem = (terminalId: ?TerminalItemId) => ({
+  type: 'HOVER_ON_TERMINAL_ITEM',
+  payload: terminalId
 })
 
 export type SaveStepFormAction = {

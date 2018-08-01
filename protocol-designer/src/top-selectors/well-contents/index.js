@@ -74,10 +74,10 @@ export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = c
   steplistSelectors.validatedForms,
   (_initialRobotState, _robotStateTimeline, _forms) => {
     const timeline = [{robotState: _initialRobotState}, ..._robotStateTimeline.timeline]
-    const liquidStateTimeline = timeline.map(t => t.robotState.liquidState.labware)
 
-    return liquidStateTimeline.map(
-      (liquidState, timelineIndex) => mapValues(
+    return timeline.map((timelineStep, timelineIndex) => {
+      const liquidState = timelineStep.robotState.liquidState.labware
+      return mapValues(
         liquidState,
         (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
           const robotState = timeline[timelineIndex].robotState
@@ -90,7 +90,7 @@ export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = c
           )
         }
       )
-    )
+    })
   }
 )
 
