@@ -67,10 +67,6 @@ export type ClearConnectResponseAction = {|
   type: 'robot:CLEAR_CONNECT_RESPONSE',
 |}
 
-export type ClearSessionAction = {|
-  type: 'robot:CLEAR_SESSION',
-|}
-
 export type DisconnectAction = {|
   type: 'robot:DISCONNECT',
   meta: {|
@@ -163,6 +159,13 @@ export type SessionUpdateAction = {|
 
 export type RefreshSessionAction = {|
   type: 'robot:REFRESH_SESSION',
+  meta: {|
+    robotCommand: true
+  |},
+|}
+
+export type ClearSessionAction = {|
+  type: 'robot:CLEAR_SESSION',
   meta: {|
     robotCommand: true
   |},
@@ -305,7 +308,6 @@ export const actions = {
   },
 
   clearSession () {
-    // return {type: 'robot:CLEAR_SESSION'}
     return tagForRobotApi({type: 'robot:CLEAR_SESSION'})
   },
 

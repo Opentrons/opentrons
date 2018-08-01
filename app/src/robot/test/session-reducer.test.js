@@ -84,6 +84,36 @@ describe('robot reducer - session', () => {
     })
   })
 
+  test('handles robot:CLEAR_SESSION action', () => {
+    const state = {
+      session: {
+        sessionRequest: {inProgress: false, error: null},
+        startTime: 40,
+        runTime: 42
+      }
+    }
+    const action = {type: 'robot:CLEAR_SESSION'}
+
+    expect(reducer(state, action).session).toEqual({
+      sessionRequest: {inProgress: false, error: null},
+      name: '',
+      state: '',
+      errors: [],
+      protocolText: '',
+      protocolCommands: [],
+      protocolCommandsById: {},
+      pipettesByMount: {},
+      labwareBySlot: {},
+      modulesBySlot: {},
+      runRequest: {inProgress: false, error: null},
+      pauseRequest: {inProgress: false, error: null},
+      resumeRequest: {inProgress: false, error: null},
+      cancelRequest: {inProgress: false, error: null},
+      startTime: null,
+      runTime: 0
+    })
+  })
+
   test('handles SESSION_RESPONSE success', () => {
     const state = {
       session: {
