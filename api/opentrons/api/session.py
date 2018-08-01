@@ -26,6 +26,11 @@ class SessionManager(object):
         self.session = Session(name=name, text=text)
         return self.session
 
+    def clear(self):
+        if self.session:
+            self.session.refresh()
+        self.session = None
+
     def get_session(self):
         return self.session
 
