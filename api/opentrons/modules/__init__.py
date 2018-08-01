@@ -23,12 +23,12 @@ def load(name, slot):
 
 def discover_devices(module_prefix):
     if os.environ.get('RUNNING_ON_PI'):
-        devices = os.listdir('/dev')
+        devices = os.listdir('/dev/modules')
     else:
         devices = []
     matches = filter(
-        lambda x: x.startswith('tty{}'.format(module_prefix)), devices)
-    res = list(map(lambda x: '/dev/{}'.format(x), matches))
+        lambda x: x.endswith('_{}'.format(module_prefix)), devices)
+    res = list(map(lambda x: '/dev/modules/{}'.format(x), matches))
     log.debug('Discovered devices for prefix {}: {}'.format(
         module_prefix, res))
     return res
@@ -77,7 +77,7 @@ class MagDeck:
         MagDecks
         """
         if not robot.is_simulating():
-            ports = discover_devices('MagDeck')
+            ports = discover_devices('magdeck')
             # Connect to the first module. Need more advanced selector to
             # support more than one of the same type of module
             port = ports[0] if len(ports) > 0 else None
@@ -152,7 +152,7 @@ class TempDeck:
         TempDecks
         """
         if not robot.is_simulating():
-            ports = discover_devices('TempDeck')
+            ports = discover_devices('tempdeck')
             # Connect to the first module. Need more advanced selector to
             # support more than one of the same type of module
             port = ports[0] if len(ports) > 0 else None
