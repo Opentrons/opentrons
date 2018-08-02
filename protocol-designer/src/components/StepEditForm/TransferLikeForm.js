@@ -94,6 +94,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
+              <StepCheckboxRow name="dispense_touchTip" label="Touch tip" />
               <StepCheckboxRow name="dispense_mix_checkbox" label='Mix'>
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />

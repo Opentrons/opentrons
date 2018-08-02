@@ -20,6 +20,7 @@ export type StepFieldName =
   | 'dispense_delayMinutes'
   | 'dispense_delaySeconds'
   | 'dispense_labware'
+  | 'dispense_touchTip'
   | 'dispense_mix_checkbox'
   | 'dispense_mix_times'
   | 'dispense_mix_volume'
