@@ -103,6 +103,9 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
         elif command_type == 'dispense':
             pipette.dispense(volume, location)
 
+        elif command_type == 'touch-tip':
+            pipette.touch_tip(location)
+
 
 def execute_protocol(protocol):
     loaded_pipettes = load_pipettes(protocol)
