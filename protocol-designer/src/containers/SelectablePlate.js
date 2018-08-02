@@ -8,9 +8,12 @@ import SelectablePlate from '../components/SelectablePlate.js'
 
 import {getCollidingWells} from '../utils'
 import {getWellSetForMultichannel} from '../well-selection/utils'
-import {END_STEP} from '../steplist/types'
 import {selectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors, utils as steplistUtils} from '../steplist'
+import {
+  selectors as steplistSelectors,
+  START_TERMINAL_ITEM_ID,
+  END_TERMINAL_ITEM_ID
+} from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 
@@ -24,7 +27,7 @@ import wellSelectionSelectors from '../well-selection/selectors'
 import {SELECTABLE_WELL_CLASS} from '../constants'
 import type {GenericRect} from '../collision-types'
 
-import type {WellContents, Wells} from '../labware-ingred/types'
+import type {WellContents, Wells, ContentsByWell} from '../labware-ingred/types'
 import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof SelectablePlate>
@@ -64,33 +67,46 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 
   const labware = selectors.getLabware(state)[containerId]
-  const stepId = steplistSelectors.hoveredOrSelectedStepId(state)
-  const orderedSteps = steplistSelectors.orderedSteps(state)
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+  const wellSelectionModeForLabware = selectedContainerId === containerId
+  let wellContents: ContentsByWell = {}
 
-  const wellSelectionMode = true
-  const wellSelectionModeForLabware = wellSelectionMode && selectedContainerId === containerId
-
-  const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
-
-  let wellContents = {}
-  if (steplistUtils.isDeckSetupId(stepId)) {
+  const activeItem = steplistSelectors.getActiveItem(state)
+  if (
+    !activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID
+  ) {
     // selection for deck setup: shows initial state of liquids
     wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
+  } else if (
+    !activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID
+  ) {
+    // "end" terminal
+    wellContents = wellContentsSelectors.lastValidWellContents(state)[containerId]
+  } else if (!activeItem.isStep) {
+    console.warn(`SelectablePlate got unhandled terminal id: "${activeItem.id}"`)
   } else {
-    // well contents for step, not inital state.
-    // shows liquids the current step in timeline
-    const wellContentsWithoutHighlight = (stepId === END_STEP || !allWellContentsForSteps[prevStepId])
-      // End step, or erroring step: show last valid well contents in timeline
-      ? wellContentsSelectors.lastValidWellContents(state)[containerId]
-      // Valid non-end step
-      : allWellContentsForSteps[prevStepId][containerId]
+    const stepId = activeItem.id
+    // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
+    const orderedSteps = steplistSelectors.orderedSteps(state)
+    const timelineIdx = orderedSteps.includes(stepId)
+      ? orderedSteps.findIndex(id => id === stepId)
+      : null
 
-    let highlightedWells = {}
+    // shows liquids the current step in timeline
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)
+    let wellContentsWithoutHighlight = null
+    let highlightedWells
+
+    if ((timelineIdx != null)) {
+      wellContentsWithoutHighlight = (allWellContentsForSteps[timelineIdx])
+        // Valid non-end step
+        ? allWellContentsForSteps[timelineIdx][containerId]
+        // Erroring step: show last valid well contents in timeline
+        : wellContentsSelectors.lastValidWellContents(state)[containerId]
+    }
 
     if (wellSelectionModeForLabware) {
-      // wells are highlighted for well selection hover
+      // we're in the well selection modal, highlight hovered/selected wells
       highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
     } else {
       // wells are highlighted for steps / substep hover
@@ -98,18 +114,25 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
       // even when prev step isn't processed (due to encountering an upstream error
       // in the timeline reduce op)
-      const highlightedWellsAllLabware = highlightSelectors.wellHighlightsForSteps(state)[prevStepId]
-      highlightedWells = (highlightedWellsAllLabware && highlightedWellsAllLabware[containerId]) || {}
+      const highlightedWellsForSteps = highlightSelectors.wellHighlightsForSteps(state)
+      highlightedWells = (
+        timelineIdx != null &&
+        highlightedWellsForSteps &&
+        highlightedWellsForSteps[timelineIdx] &&
+        highlightedWellsForSteps[timelineIdx][containerId]
+      ) || {}
     }
 
-    wellContents = mapValues(
+    // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
+    // others {[wellName]: wellName}. Use Set instead!
+    wellContents = (mapValues(
       wellContentsWithoutHighlight,
-      (wellContentsForWell: WellContents, well: string) => ({
+      (wellContentsForWell: WellContents, well: string): WellContents => ({
         ...wellContentsForWell,
-        highlighted: highlightedWells[well],
-        selected: selectedWells[well]
+        highlighted: Boolean(highlightedWells[well]),
+        selected: Boolean(selectedWells[well])
       })
-    )
+    ): ContentsByWell)
   }
 
   return {

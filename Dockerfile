@@ -19,9 +19,8 @@ ENV OT_UPDATE_PORT=34000
 ENV OT_SERVER_UNIX_SOCKET_PATH=/tmp/aiohttp.sock
 
 # Static IPv6 used on Ethernet interface for USB connectivity
-ENV ETHERNET_STATIC_IP=fd00:0000:cafe:fefe::1
-ENV ETHERNET_NETWORK_PREFIX=fd00:0000:cafe:fefe::
-ENV ETHERNET_NETWORK_PREFIX_LENGTH=64
+ENV ETHERNET_NETWORK_PREFIX=169.254
+ENV ETHERNET_NETWORK_PREFIX_LENGTH=16
 
 # See compute/README.md for details. Make sure to keep them in sync
 RUN apk add --update \
@@ -98,7 +97,6 @@ RUN gpg --import opentrons.asc && rm opentrons.asc
 COPY ./compute/scripts/* /usr/local/bin/
 
 # All configuration files live in compute/etc and dispatched here
-COPY ./compute/conf/radvd.conf /etc/
 COPY ./compute/conf/inetd.conf /etc/
 COPY ./compute/conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./compute/static /usr/share/nginx/html
@@ -107,9 +105,7 @@ COPY ./compute/static /usr/share/nginx/html
 COPY ./compute/opentrons.motd /etc/motd
 
 # Replace placeholders with actual environment variable values
-RUN sed -i "s/{ETHERNET_NETWORK_PREFIX}/$ETHERNET_NETWORK_PREFIX/g" /etc/radvd.conf && \
-    sed -i "s/{ETHERNET_NETWORK_PREFIX_LENGTH}/$ETHERNET_NETWORK_PREFIX_LENGTH/g" /etc/radvd.conf && \
-    sed -i "s/{OT_SERVER_PORT}/$OT_SERVER_PORT/g" /etc/nginx/nginx.conf && \
+RUN sed -i "s/{OT_SERVER_PORT}/$OT_SERVER_PORT/g" /etc/nginx/nginx.conf && \
     sed -i "s#{OT_SERVER_UNIX_SOCKET_PATH}#$OT_SERVER_UNIX_SOCKET_PATH#g" /etc/nginx/nginx.conf
 
 # All newly installed packages will go to persistent storage
@@ -123,7 +119,6 @@ RUN ssh_key_gen.sh
 # and persist all environment variables from the docker definition,
 # because they are sometimes not picked up from PID 1
 RUN echo "export CONTAINER_ID=$(uuidgen)" >> /etc/profile && \
-    echo "export ETHERNET_STATIC_IP=$ETHERNET_STATIC_IP" >> /etc/profile && \
     echo "export OT_SETTINGS_DIR=$OT_SETTINGS_DIR" >> /etc/profile && \
     echo "export OT_SERVER_PORT=$OT_SERVER_PORT" >> /etc/profile && \
     echo "export OT_SERVER_UNIX_SOCKET_PATH=$OT_SERVER_UNIX_SOCKET_PATH" >> /etc/profile && \

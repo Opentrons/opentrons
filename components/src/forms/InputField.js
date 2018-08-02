@@ -22,9 +22,9 @@ type Props = {
   /** if included, InputField will use error style and display error instead of caption */
   error?: ?string,
   /** optional caption. hidden when `error` is given */
-  caption?: string,
+  caption?: ?string,
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string,
+  secondaryCaption?: ?string,
   /** optional input type (default "text") */
   type?: 'text' | 'password',
   /** mouse click handler */

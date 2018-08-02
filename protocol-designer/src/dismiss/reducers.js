@@ -24,6 +24,11 @@ const dismissedWarnings = handleActions({
     action: DismissFormWarning
   ): DismissedWarningState => {
     const {stepId, warning} = action.payload
+    if (stepId == null) {
+      console.warn('Tried to dismiss form warning with no stepId')
+      return state
+    }
+
     return {
       ...state,
       form: {
@@ -40,6 +45,10 @@ const dismissedWarnings = handleActions({
     action: DismissTimelineWarning
   ): DismissedWarningState => {
     const {stepId, warning} = action.payload
+    if (stepId == null) {
+      console.warn('Tried to dismiss timeline warning with no stepId')
+      return state
+    }
     return {
       ...state,
       timeline: {

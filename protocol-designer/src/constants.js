@@ -45,4 +45,5 @@ export function getAllWellsForLabware (labwareType: string): Array<string> {
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
-export const DECK_SETUP_TITLE = 'LABWARE & LIQUIDS'
+export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
+export const END_TERMINAL_TITLE = 'FINAL DECK STATE'

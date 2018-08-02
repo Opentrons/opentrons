@@ -55,6 +55,14 @@ class MagDeck:
 
     @property
     def device_info(self):
+        """
+        Returns a dict:
+        {
+                'serial': '1aa11bb22',
+                'model': '1aa11bb22',
+                'version': '1aa11bb22'
+        }
+        """
         return self._device_info
 
     @property

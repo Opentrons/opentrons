@@ -6,8 +6,10 @@ import type {FormData, StepIdType, StepType, TransferLikeStepType} from '../form
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
 
-export const END_STEP: '__end__' = '__end__' // Special ID of "End" pseudo-step.
-// NOTE: explicit type annotation so that typeof END_STEP is `'__end__'` and not `string`
+// timeline start and end
+export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
+export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
+export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,
@@ -67,5 +69,3 @@ export type StepItemData = {
 }
 
 export type SubSteps = {[StepIdType]: ?SubstepItemData}
-
-export type StepIdTypeWithEnd = StepIdType | typeof END_STEP

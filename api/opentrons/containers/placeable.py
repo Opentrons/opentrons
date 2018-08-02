@@ -11,7 +11,7 @@ from opentrons.util.vector import Vector
 from opentrons.config import feature_flags as ff
 
 
-SUPPORTED_MODULES = ['magdeck']
+SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
 
 def unpack_location(location):
@@ -290,9 +290,12 @@ class Placeable(object):
         """
         Returns the module placeable if present
         """
-        res = list(map(lambda x: self.get_child_by_name(x), SUPPORTED_MODULES))
-        # No probability of a slot having more than one module
-        return res[0] if len(res) > 0 else None
+        for md in SUPPORTED_MODULES:
+            maybe_module = self.get_child_by_name(md)
+            if maybe_module:
+                # No probability of a placeable having more than one module
+                return maybe_module
+        return None
 
     def get_parent(self):
         """

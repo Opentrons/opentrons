@@ -17,7 +17,7 @@ import {
   setMoveLabwareMode,
   moveLabware
 } from '../labware-ingred/actions'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
 
 import {LabwareOnDeck} from '../components/labware'
 import type {BaseState} from '../types'
@@ -56,7 +56,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const selectedContainer = selectors.getSelectedContainer(state)
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
-  const deckSetupMode = steplistSelectors.deckSetupMode(state)
+  const deckSetupMode = steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
   const labwareHasName = container && selectors.getSavedLabware(state)[container.id]
   const labwareData = container && getLabware(container.type)
   // TODO: Ian 2018-07-10 use shared-data accessor

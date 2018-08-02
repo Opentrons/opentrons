@@ -11,7 +11,7 @@ from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
 import logging
 
-SUPPORTED_MODULES = ['magdeck']
+SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
 log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')

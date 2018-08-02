@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-radvd --logmethod=stderr_syslog --pidfile=/run/radvd.pid
-
 # mdns announcement
 announce_mdns.py &
 

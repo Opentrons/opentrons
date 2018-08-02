@@ -1,17 +1,20 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
-import type {ActionType} from 'redux-actions'
+import type {ActionType, Reducer} from 'redux-actions'
 import omit from 'lodash/omit'
 
-import {INITIAL_DECK_SETUP_ID} from './constants'
-import {DECK_SETUP_TITLE} from '../constants'
 import {getPDMetadata} from '../file-types'
-import {END_STEP} from './types'
 
-import type { StepItemData, FormSectionState, SubstepIdentifier } from './types'
+import {START_TERMINAL_ITEM_ID} from './types'
+import type {
+  StepItemData,
+  FormSectionState,
+  SubstepIdentifier,
+  TerminalItemId
+} from './types'
 import type {LoadFileAction} from '../load-file'
-import type { FormData, StepIdType, FormModalFields } from '../form-types'
+import type {FormData, StepIdType, FormModalFields} from '../form-types'
 
 import type {
   AddStepAction,
@@ -19,6 +22,7 @@ import type {
   DeleteStepAction,
   SaveStepFormAction,
   SelectStepAction,
+  SelectTerminalItemAction,
 
   PopulateFormAction,
   CollapseFormSectionAction, // <- TODO this isn't a thunk
@@ -34,13 +38,14 @@ import {
   hoverOnSubstep,
   expandAddStepButton,
   hoverOnStep,
+  hoverOnTerminalItem,
   toggleStepCollapsed
 } from './actions'
 
 type FormState = FormData | null
 
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
-const unsavedForm = handleActions({
+const unsavedForm: Reducer<FormState, *> = handleActions({
   CHANGE_FORM_INPUT: (state: FormState, action: ChangeFormInputAction) => {
     // TODO: Ian 2018-06-14 type properly
     // $FlowFixMe
@@ -90,16 +95,10 @@ const unsavedFormModal = handleActions({
 
 type StepsState = {[StepIdType]: StepItemData}
 
-const initialStepState = {
-  [INITIAL_DECK_SETUP_ID]: {
-    id: INITIAL_DECK_SETUP_ID,
-    title: DECK_SETUP_TITLE,
-    stepType: 'deck-setup'
-  }
-}
+const initialStepState = {}
 
-const steps = handleActions({
-  ADD_STEP: (state, action: AddStepAction) => ({
+const steps: Reducer<StepsState, *> = handleActions({
+  ADD_STEP: (state, action: AddStepAction): StepsState => ({
     ...state,
     [action.payload.id]: createDefaultStep(action)
   }),
@@ -109,9 +108,7 @@ const steps = handleActions({
     return orderedSteps.reduce((acc: StepsState, stepId) => {
       const stepForm = savedStepForms[stepId]
       if (!stepForm) {
-        if (stepId !== INITIAL_DECK_SETUP_ID) {
-          console.warn(`Step id ${stepId} found in orderedSteps but not in savedStepForms`)
-        }
+        console.warn(`Step id ${stepId} found in orderedSteps but not in savedStepForms`)
         return acc
       }
       return {
@@ -130,7 +127,7 @@ type SavedStepFormState = {
   [StepIdType]: FormData
 }
 
-const savedStepForms = handleActions({
+const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
     [action.payload.id]: action.payload
@@ -144,7 +141,7 @@ type CollapsedStepsState = {
   [StepIdType]: boolean
 }
 
-const collapsedSteps = handleActions({
+const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions({
   ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
     ...state,
     [action.payload.id]: false
@@ -159,27 +156,62 @@ const collapsedSteps = handleActions({
 
 export type OrderedStepsState = Array<StepIdType>
 
-const orderedSteps = handleActions({
+const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
     // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
     state.filter(stepId => !(stepId === action.payload || `${stepId}` === action.payload)),
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
-    [INITIAL_DECK_SETUP_ID, ...getPDMetadata(action.payload).orderedSteps]
-}, [INITIAL_DECK_SETUP_ID])
+    getPDMetadata(action.payload).orderedSteps
+}, [])
 
-type SelectedStepState = null | StepIdType | typeof END_STEP
+export type SelectableItem = {
+  isStep: true,
+  id: StepIdType
+} | {
+  isStep: false,
+  id: TerminalItemId
+}
 
-const selectedStep = handleActions({
-  SELECT_STEP: (state: SelectedStepState, action: SelectStepAction) => action.payload,
+type SelectedItemState = ?SelectableItem
+
+function stepIdHelper (id: StepIdType): SelectedItemState {
+  if (id == null) return null
+  return {
+    isStep: true,
+    id
+  }
+}
+
+function terminalItemIdHelper (id: TerminalItemId): SelectedItemState {
+  if (id == null) return null
+  return {
+    isStep: false,
+    id
+  }
+}
+
+export const initialSelectedItemState = {
+  isStep: false,
+  id: START_TERMINAL_ITEM_ID
+}
+
+const selectedItem: Reducer<SelectedItemState, *> = handleActions({
+  SELECT_STEP: (state: SelectedItemState, action: SelectStepAction) =>
+    stepIdHelper(action.payload),
+  SELECT_TERMINAL_ITEM: (state: SelectedItemState, action: SelectTerminalItemAction) =>
+    terminalItemIdHelper(action.payload),
   DELETE_STEP: () => null
-}, INITIAL_DECK_SETUP_ID)
+}, initialSelectedItemState)
 
-type HoveredStepState = SelectedStepState
+type HoveredItemState = SelectedItemState
 
-const hoveredStep = handleActions({
-  HOVER_ON_STEP: (state: HoveredStepState, action: ActionType<typeof hoverOnStep>) => action.payload
+const hoveredItem: Reducer<HoveredItemState, *> = handleActions({
+  HOVER_ON_STEP: (state: HoveredItemState, action: ActionType<typeof hoverOnStep>) =>
+    stepIdHelper(action.payload),
+  HOVER_ON_TERMINAL_ITEM: (state: HoveredItemState, action: ActionType<typeof hoverOnTerminalItem>) =>
+    terminalItemIdHelper(action.payload)
 }, null)
 
 const hoveredSubstep = handleActions({
@@ -205,8 +237,8 @@ export type RootState = {|
   savedStepForms: SavedStepFormState,
   collapsedSteps: CollapsedStepsState,
   orderedSteps: OrderedStepsState,
-  selectedStep: SelectedStepState,
-  hoveredStep: HoveredStepState,
+  selectedItem: SelectedItemState,
+  hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
   stepCreationButtonExpanded: StepCreationButtonExpandedState
 |}
@@ -219,8 +251,8 @@ export const _allReducers = {
   savedStepForms,
   collapsedSteps,
   orderedSteps,
-  selectedStep,
-  hoveredStep,
+  selectedItem,
+  hoveredItem,
   hoveredSubstep,
   stepCreationButtonExpanded
 }

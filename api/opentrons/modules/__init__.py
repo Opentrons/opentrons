@@ -2,11 +2,14 @@ import os
 import logging
 import re
 from .magdeck import MagDeck
-from opentrons import labware, robot
+from .tempdeck import MagDeck
+from opentrons import robot, labware
+from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
+from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 
 log = logging.getLogger(__name__)
 
-SUPPORTED_MODULES = {'magdeck': MagDeck}
+SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
 
 class UnsupportedModuleError(Exception):
     pass
@@ -66,9 +69,6 @@ def discover_and_connect():
         except AttributeError:
             log.exception('Failed to connect module')
 
-
-
     return discovered_modules
-
 
 

@@ -35,14 +35,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
   const allSteps = steplistSelectors.allSteps(state)
 
-  // TODO Ian 2018-05-10 is there a way to avoid these ternaries and still have flow pass?
-  // Also if you can, use END_STEP const instead of hard-coded '__end__',
-  // but flow doesn't like that :(
-  // Same issue with repeating `stepId === '__end__' || stepId === 0` 2x
-
   const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
-  const hoveredStep = steplistSelectors.hoveredStepId(state)
-  const selected = steplistSelectors.selectedStepId(state) === stepId
+  const hoveredStep = steplistSelectors.getHoveredStepId(state)
+  const selected = steplistSelectors.getSelectedStepId(state) === stepId
+  const collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
 
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
@@ -52,22 +48,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const showErrorState = hasError || hasWarnings
 
-  let collapsed
-
-  if (!(stepId === '__end__' || stepId === 0)) {
-    // Leave collapsed undefined for special steps
-    collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
-  }
-
   return {
-    step: (stepId === '__end__')
-      ? null
-      : allSteps[stepId],
-
-    substeps: (stepId === '__end__' || stepId === 0)
-      ? null
-      : substepSelectors.allSubsteps(state)[stepId],
-
+    step: allSteps[stepId],
+    substeps: substepSelectors.allSubsteps(state)[stepId],
     hoveredSubstep,
     collapsed,
     selected,
@@ -75,7 +58,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.
-    hovered: hoveredStep === stepId && !hoveredSubstep,
+    hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
     getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId]
   }
@@ -88,9 +71,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     handleSubstepHover: (payload: SubstepIdentifier) => dispatch(hoverOnSubstep(payload)),
 
     onStepClick: () => dispatch(selectStep(stepId)),
-    onStepItemCollapseToggle: (stepId === '__end__' || stepId === 0)
-      ? undefined
-      : () => dispatch(toggleStepCollapsed(stepId)),
+    onStepItemCollapseToggle: () => dispatch(toggleStepCollapsed(stepId)),
     onStepHover: () => dispatch(hoverOnStep(stepId)),
     onStepMouseLeave: () => dispatch(hoverOnStep(null))
   }

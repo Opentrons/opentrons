@@ -25,7 +25,8 @@ nmcli --terse --fields uuid,device connection show | sed -rn 's/(.*):(eth0)/\1/p
 # nmcli makes an async call which might not finish before next network-related
 # operation starts. There is no graceful way to await for D-BUS event in shell
 # hence sleep is added to avoid race condition
-sleep 5
+sleep 1
+nmcli con add con-name "static-eth0" ifname eth0 type ethernet ipv4.method link-local
 
 # Clean up opentrons package dir if it's a first start of a new container
 touch /data/id
@@ -38,16 +39,3 @@ if [ "$previous_id" != "$current_id" ] ; then
   rm -rf /data/packages/usr/local/lib/python3.6/site-packages/otupdate*
   echo "$current_id" > /data/id
 fi
-
-# Set static address so we can find the device from host computer over
-# ethernet without using Bonjour or any kind of service discovery, making
-# overall solution more cross-platform compatible
-ip link set dev eth0 down
-ip address flush dev eth0
-ip address \
-  add $ETHERNET_STATIC_IP/$ETHERNET_NETWORK_PREFIX_LENGTH \
-  dev eth0
-ip link set dev eth0 up
-
-# Add host name record so other services can bind to address by hostname
-echo "$ETHERNET_STATIC_IP local-ethernet" >> /etc/hosts
