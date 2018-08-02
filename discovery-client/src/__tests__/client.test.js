@@ -245,7 +245,7 @@ describe('discovery client', () => {
     poller.poll.mockReturnValueOnce({id: 'foobar'})
     client.start()
     client.stop()
-    expect(poller.stop).toHaveBeenCalledWith({id: 'foobar'})
+    expect(poller.stop).toHaveBeenCalledWith({id: 'foobar'}, client._logger)
   })
 
   test('if poll comes back bad, ok should be flagged false', () => {
@@ -360,7 +360,7 @@ describe('discovery client', () => {
     )
 
     client.once('service', robot => {
-      expect(poller.stop).toHaveBeenLastCalledWith({id: 1234})
+      expect(poller.stop).toHaveBeenLastCalledWith({id: 1234}, client._logger)
       expect(poller.poll).toHaveBeenLastCalledWith(
         [{ip: '192.168.1.42', port: 31950}],
         expect.anything(),
@@ -409,7 +409,7 @@ describe('discovery client', () => {
     poller.poll.mockReturnValueOnce({id: 1234})
     client.start()
     client.remove('opentrons-dev')
-    expect(poller.stop).toHaveBeenLastCalledWith({id: 1234})
+    expect(poller.stop).toHaveBeenLastCalledWith({id: 1234}, client._logger)
     expect(poller.poll).toHaveBeenLastCalledWith(
       [],
       expect.anything(),
