@@ -178,34 +178,35 @@ export class DiscoveryClient extends EventEmitter {
 
   _handleService (service: Service): mixed {
     const candidateExists = this.candidates.some(matchCandidate(service))
-    const existingService =
+    const serviceConflicts = this.services.filter(matchConflict(service))
+    const prevService =
       this.services.find(matchService(service)) ||
       this.services.find(matchUnassigned(service))
-    const serviceConflicts = this.services.filter(matchConflict(service))
-
     let nextServices = this.services
 
     // add service if necessary
-    if (!existingService) nextServices = nextServices.concat(service)
+    if (!prevService) nextServices = nextServices.concat(service)
 
     // update existing services and null out conflics
     nextServices = nextServices.map(s => {
-      if (s === existingService && s.ok !== service.ok) return service
+      if (s === prevService && s.ok !== service.ok) return service
       if (serviceConflicts.includes(s)) return {...s, ip: null, ok: null}
       return s
     })
 
     // promote candidates and update service list
+    // repoll if our IP addresses may have changed
+    const pollNeeed = candidateExists || !prevService || !prevService.ip
     this.candidates = this.candidates.filter(rejectCandidate(service))
-    this._updateServiceList(nextServices, candidateExists)
+    this._updateServiceList(nextServices, pollNeeed)
   }
 
   // update this.services, emit if necessary, return number of services updated
-  _updateServiceList (nextServices: Array<Service>, forcePoll?: boolean): void {
+  _updateServiceList (nextServices: Array<Service>, poll?: boolean): void {
     const updated = nextServices.filter((s, i) => s !== this.services[i])
     this.services = nextServices
 
-    if (forcePoll || updated.length) this._poll()
+    if (poll) this._poll()
     if (updated.length) {
       updated.forEach(s => this.emit(SERVICE_EVENT, s))
       log(this._logger, 'debug', 'updated services', {services: this.services})

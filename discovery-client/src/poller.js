@@ -42,7 +42,10 @@ export function poll (
 
         return null
       })
-      .then(body => onHealth(next, body))
+      .then(body => {
+        log && log.http('GET', {url, body})
+        onHealth(next, body)
+      })
   }
 
   function getNextCandidate () {
