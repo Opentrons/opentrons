@@ -8,6 +8,7 @@ class MagDeck:
         self.labware = lw
         self._port = port
         self._engaged = False
+        self._driver = None
         self._device_info = None
 
     def calibrate(self):
@@ -40,9 +41,10 @@ class MagDeck:
     def to_dict(self):
         return {
             'name': 'magdeck',
-            'serial': self.device_info and self.device_info.name,
-            'model': self.device_info and self.device_info.model,
-            'fwVersion': self.device_info and self.device_info.version,
+            'port': self.port,
+            'serial': self.device_info and self.device_info.get('serial'),
+            'model': self.device_info and self.device_info.get('model'),
+            'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': 'Magnetic Deck',
             'status': self.status
         }
@@ -80,4 +82,5 @@ class MagDeck:
         '''
         Disconnect the serial connection
         '''
-        self._driver.disconnect()
+        if self._driver:
+          self._driver.disconnect()

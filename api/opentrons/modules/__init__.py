@@ -56,7 +56,8 @@ def discover_and_connect():
         match = module_port_regex.search(port)
         if match:
             module_class = SUPPORTED_MODULES.get(match.group().lower())
-            discovered_modules.append(module_class(port=port))
+            absolute_port = '/dev/{}'.format(port)
+            discovered_modules.append(module_class(port=absolute_port))
 
     log.debug('Discovered modules: {}'.format(discovered_modules))
     for module in discovered_modules:
