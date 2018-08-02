@@ -15,7 +15,6 @@ type Props = {
   sessionLoaded: ?boolean,
   confirmUpload: () => void,
   createSession: () => void,
-  cancelUpload: () => mixed,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
@@ -28,7 +27,6 @@ function UploadPanel (props: Props) {
   )
 }
 
-// move me to UploadIntercept  rename to Upload
 function mapStateToProps (state) {
   return {
     sessionLoaded: robotSelectors.getSessionIsLoaded(state)
@@ -43,19 +41,5 @@ function mapDispatchToProps (dispatch) {
     createSession: (file) => {
       dispatch(robotActions.session(file))
     }
-    // onUpload: (event) => {
-    //   let files
-    //
-    //   if (event.dataTransfer) {
-    //     files = event.dataTransfer.files
-    //   } else {
-    //     files = event.target.files
-    //   }
-    //
-    //   dispatch(robotActions.session(files[0]))
-    //
-    //   // reset the state of the input to allow file re-uploads
-    //   event.target.value = null
-    // }
   }
 }

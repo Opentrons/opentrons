@@ -24,8 +24,6 @@ export default class Upload extends React.Component<Props, State> {
     event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
   ) => {
     let files: Array<File> = []
-    // $FlowFixMe type EventTarget missing value
-    console.log('ONE' + event.target.value)
     if (event.dataTransfer && event.dataTransfer.files) {
       files = (event.dataTransfer.files: any)
     } else if (event.target.files) {
@@ -37,10 +35,8 @@ export default class Upload extends React.Component<Props, State> {
     }
 
     this.setState({uploadedFile: files[0]})
-    if (this.state.uploadedFile && this.props.sessionLoaded) {
-      console.log('GOT HERE')
-      this.props.confirmUpload()
-    }
+
+    this.props.confirmUpload()
     // $FlowFixMe type EventTarget missing value
     event.target.value = null
   }
@@ -57,8 +53,8 @@ export default class Upload extends React.Component<Props, State> {
   render () {
     return (
       <div>
-        <UploadInput onUpload={this.onUpload} isButton />
-        <UploadInput onUpload={this.onUpload}/>
+        <UploadInput onUpload={this.onUpload} isButton value={null}/>
+        <UploadInput onUpload={this.onUpload} value={null}/>
       </div>
     )
   }
