@@ -18,6 +18,8 @@ export function poll (
 ): PollRequest {
   if (!candidates.length) return {id: null}
 
+  log && log.debug('poller start', {interval, candidates: candidates.length})
+
   const subInterval = interval / candidates.length
   const id = setInterval(pollIp, subInterval)
   const request = {id}
@@ -59,6 +61,11 @@ export function poll (
   }
 }
 
-export function stop (request: ?PollRequest) {
-  request && request.id && clearInterval(request.id)
+export function stop (request: ?PollRequest, log: ?Logger) {
+  const id = request && request.id
+
+  if (id) {
+    clearInterval(id)
+    log && log.debug('poller stop', {id})
+  }
 }

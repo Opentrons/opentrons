@@ -88,7 +88,7 @@ export class DiscoveryClient extends EventEmitter {
   stop (): DiscoveryClient {
     log(this._logger, 'debug', 'stopping discovery client', {})
     if (this._browser) this._browser.stop()
-    stop(this._pollRequest)
+    stop(this._pollRequest, this._logger)
     this._pollRequest = null
 
     return this
@@ -129,7 +129,7 @@ export class DiscoveryClient extends EventEmitter {
 
   _poll (): void {
     log(this._logger, 'debug', '(re)starting polling', {})
-    stop(this._pollRequest)
+    stop(this._pollRequest, this._logger)
     this._pollRequest = poll(
       this.services
         .map(toCandidate)
