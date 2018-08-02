@@ -30,4 +30,4 @@ Shows warning AlertItems (which are hidden by default) when `process.env.OT_PD_S
 
 ### `OT_PD_VERSION`
 
-Defaults to the `git describe` version specified in the Webpack build. This version string is saved to the `designer-application.application-name` field in PD files.
+Defaults to the `git describe` version specified in the Webpack build. This version string is saved to the `designer-application.application-version` field in PD files.
