@@ -145,7 +145,7 @@ export class DiscoveryClient extends EventEmitter {
     if (this._browser) return this._browser.start()
 
     // the bonjour browser calls `start` in its constructor
-    this._browser = Bonjour({type: 'udp6', ip: 'ff02::fb', interface: '::%en4'})
+    this._browser = Bonjour()
       .find({type: 'http'})
       .on('up', this._handleUp.bind(this))
       .on('error', e => this.emit('error', e))
