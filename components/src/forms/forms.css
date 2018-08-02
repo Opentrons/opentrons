@@ -47,7 +47,7 @@
   }
 
   &.error {
-    color: var(--c-mustard);
+    color: var(--c-warning-dark);
   }
 }
 
@@ -104,6 +104,7 @@
 .input_caption {
   padding-top: 0.25rem;
   font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   min-height: var(--fs-caption);
   color: var(--c-med-gray);
 
@@ -152,15 +153,12 @@
 
 .error div,
 .error span {
-  color: var(--c-mustard);
+  color: var(--c-warning-dark);
 }
 
-.error select {
-  background-color: var(--c-mustard);
-}
-
+.error select,
 .error .input_field {
-  background-color: var(--c-mustard);
+  background-color: var(--c-warning-light);
 }
 
 .error_icon {
