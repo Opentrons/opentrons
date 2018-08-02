@@ -11,7 +11,7 @@ import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 
 import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
-import {uuid} from '../../utils.js'
+import {uuid} from '../../utils'
 
 import type {DeckSlot} from '@opentrons/components'
 
@@ -181,12 +181,11 @@ export const savedLabware = handleActions({
 type IngredientsState = IngredientGroups
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    const {groupId, description, individualize, name, serializeName} = action.payload
+    const {groupId, description, individualize, name} = action.payload
     const ingredFields: IngredientInstance = {
       description,
       individualize,
-      name,
-      serializeName
+      name
     }
 
     return {

@@ -1,8 +1,8 @@
 // @flow
 import uuidv1 from 'uuid/v1'
 import {wellNameSplit} from '@opentrons/components'
-import type {BoundingRect, GenericRect} from './collision-types'
-import type {Wells} from './labware-ingred/types'
+import type {BoundingRect, GenericRect} from '../collision-types'
+import type {Wells} from '../labware-ingred/types'
 
 export type FormConnectorFactory<F> = (
   handleChange: (accessor: F) => (e: SyntheticInputEvent<*>) => mixed,
@@ -100,4 +100,34 @@ export const getCollidingWells = (rectPositions: GenericRect, selectableClassnam
   }, {})
 
   return collidedWellData
+}
+
+function _parseWell (well: string): ([string, number]) {
+  const letterMatches = well.match(/\D+/)
+  const numberMatches = well.match(/\d+/)
+
+  return [
+    (letterMatches && letterMatches[0]) || '',
+    (numberMatches && numberMatches[0] && parseInt(numberMatches[0])) || NaN
+  ]
+}
+
+/** A compareFunction for sorting an array of well names
+  * Goes down the columns (A1 to H1 on 96 plate)
+  * Then L to R across rows (1 to 12 on 96 plate)
+  */
+export function sortWells (a: string, b: string): number {
+  const [letterA, numberA] = _parseWell(a)
+  const [letterB, numberB] = _parseWell(b)
+
+  if (numberA !== numberB) {
+    return (numberA > numberB) ? 1 : -1
+  }
+
+  if (letterA.length !== letterB.length) {
+    // Eg 'B' vs 'AA'
+    return (letterA.length > letterB.length) ? 1 : -1
+  }
+
+  return (letterA > letterB) ? 1 : -1
 }
