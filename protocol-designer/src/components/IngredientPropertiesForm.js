@@ -329,7 +329,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 numeric
                 accessor='volume'
                 units='µL'
-                caption={isFinite(selectedWellsMaxVolume)
+                caption={Number.isFinite(selectedWellsMaxVolume)
                   ? `max ${selectedWellsMaxVolume}`
                   : null}
                 error={visibleErrors.volume}
