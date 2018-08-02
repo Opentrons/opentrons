@@ -3,8 +3,6 @@ SHELL := /bin/bash
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# make push host
-host ?= \[fd00:0:cafe:fefe::1\]
 # make push wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
 firmware = $(wildcard smoothie/*.hex)

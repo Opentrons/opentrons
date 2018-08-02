@@ -83,17 +83,16 @@ Directory structure:
   * `static` — static pages to support auto-update
 
 Services:
-  * `dumb-init` (init system, PID 1) — setup (`scripts/setup.sh`) and start (`scripts/start.sh`) robot services
   * `nginx` — serve update page (static/) and proxy `POST` to `/upload`
   * `inetd` — dispatch connections to local ssh server and update uploads (`updates.sh`)
   * `ssh` (dropbear) — passwordless ssh on ethernet port 22
   * `announce_mdns.sh` — send mdns announcements using host OS avahi over D-Bus
-  * `radvd` — Router Advertisement service to support IPv6 SLAAC over Ethernet (USB)
 
 Tools:
   * `nmcli` — manage network connections (https://fedoraproject.org/wiki/Networking/CLI)
 
-Ethernet over USB static IPv6 address `fd00:0:cafe:fefe::1`
+For communication with the robot directly (not using WiFi), we use ethernet over USB, with IPv4 link-local
+addressing.
 
 ### Flashing a device
 Flashing a device means associating some device with some resin application. For the RPi, this is done by flashing

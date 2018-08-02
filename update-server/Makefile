@@ -8,8 +8,6 @@ pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--ignore-pipfile)
 port ?= 34000
 
-# curl host
-host ?= \[fd00:0:cafe:fefe::1\]
 # make bootstrap wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
 
