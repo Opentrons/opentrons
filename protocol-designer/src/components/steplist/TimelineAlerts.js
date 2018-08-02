@@ -51,7 +51,7 @@ const errorOverrides: {[ErrorType]: AlertContent} = {
   },
   'NO_TIP_ON_PIPETTE': {
     title: 'No tip on pipette',
-    body: 'For the first step in a protocol the "change tip" setting must be set to always or once.'
+    body: 'The first time a pipette is used in a protocol the "change tip" setting must be set to always or once.'
   }
 }
 
