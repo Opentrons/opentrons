@@ -307,6 +307,7 @@ def _dedupe(iterable):
 def now():
     return int(time() * 1000)
 
+
 def _get_parent_module(placeable):
     if isinstance(placeable, ModulePlaceable) or not placeable:
         res = placeable
