@@ -12,13 +12,20 @@ import {
   fromResponse,
   toCandidate,
   matchService,
+  matchUnassigned,
   matchConflict,
   matchCandidate,
   rejectCandidate
 } from './service'
 
 import type {Browser, BrowserService} from 'bonjour'
-import type {Candidate, Service, HealthResponse, LogLevel, Logger} from './types'
+import type {
+  Candidate,
+  Service,
+  HealthResponse,
+  LogLevel,
+  Logger
+} from './types'
 
 export * from './types'
 
@@ -28,7 +35,7 @@ type Options = {
   candidates?: Array<string | Candidate>,
   nameFilter?: string | RegExp,
   allowedPorts?: Array<number>,
-  logger?: Logger,
+  logger?: Logger
 }
 
 export default function DiscoveryClientFactory (options?: Options) {
@@ -138,7 +145,7 @@ export class DiscoveryClient extends EventEmitter {
     if (this._browser) return this._browser.start()
 
     // the bonjour browser calls `start` in its constructor
-    this._browser = Bonjour()
+    this._browser = Bonjour({type: 'udp6', ip: 'ff02::fb', interface: '::%en4'})
       .find({type: 'http'})
       .on('up', this._handleUp.bind(this))
       .on('error', e => this.emit('error', e))
@@ -162,16 +169,20 @@ export class DiscoveryClient extends EventEmitter {
 
     // else, response was not ok, so unset ok flag in all matching ips
     const {ip} = candidate
-    const nextServices = this.services
-      .map(s => (s.ip === ip && s.ok !== false) ? {...s, ok: false} : s)
+    const nextServices = this.services.map(
+      s => (s.ip === ip && s.ok !== false ? {...s, ok: false} : s)
+    )
 
     this._updateServiceList(nextServices)
   }
 
   _handleService (service: Service): mixed {
     const candidateExists = this.candidates.some(matchCandidate(service))
-    const existingService = this.services.find(matchService(service))
+    const existingService =
+      this.services.find(matchService(service)) ||
+      this.services.find(matchUnassigned(service))
     const serviceConflicts = this.services.filter(matchConflict(service))
+
     let nextServices = this.services
 
     // add service if necessary

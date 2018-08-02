@@ -15,7 +15,7 @@
 const DiscoveryClient = require('@opentrons/discovery-client')
 ```
 
-### DiscoveryClient(options?: Options): Client
+### DiscoveryClientFactory(options?: Options): DiscoveryClient
 
 Creates a new `DiscoveryClient`.
 
@@ -27,7 +27,7 @@ const options = {
   candidates: [{ip: '[fd00:0:cafe:fefe::1]', port: 31950}, 'localhost']
 }
 
-const client = DiscoveryClient(options)
+const client = DiscoveryClientFactory(options)
 ```
 
 The discovery client is an [Event Emitter][event-emitter]. In addition to the normal `EventEmitter` methods and properties, the client has:
@@ -150,12 +150,24 @@ type Option = {
 }
 ```
 
+If you need access to the `DiscoveryClient` class itself for some reason:
+
+```js
+import {DiscoveryClient} from '@opentrons/discovery-client'
+
+const client = new DiscoveryClient({})
+```
+
 [event-emitter]: https://nodejs.org/api/events.html
 
 #### events
 
 ```js
-client.on(eventName, (data) => /* do something with data */)
+import {SERVICE_EVENT, SERVICE_REMOVED_EVENT} from '@opentrons/discovery-client'
+
+client.on(SERVICE_EVENT, (data) => console.log('service added/updated', data))
+client.on(SERVICE_REMOVED_EVENT, (data) => console.log('service removed', data))
+client.on('error', (error) => console.error(error)
 ```
 
 | event name       | data      | description                                   |

@@ -42,7 +42,10 @@ export function toCandidate (service: Service): ?Candidate {
 }
 
 export const matchService = (source: Service) => (target: Service) =>
-  source.name === target.name && (source.ip === target.ip || target.ip === null)
+  source.name === target.name && source.ip === target.ip
+
+export const matchUnassigned = (source: Service) => (target: Service) =>
+  source.name === target.name && target.ip === null
 
 export const matchConflict = (source: Service) => (target: Service) =>
   source.ok && source.name !== target.name && source.ip === target.ip
