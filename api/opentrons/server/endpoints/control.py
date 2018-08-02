@@ -4,7 +4,7 @@ import json
 import logging
 from aiohttp import web
 from threading import Thread
-from opentrons import robot, instruments
+from opentrons import robot, instruments, modules
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
 from typing import List, Dict
@@ -49,17 +49,6 @@ async def get_attached_pipettes(request):
     return web.json_response(robot.get_attached_pipettes())
 
 
-def _discover_modules() -> List[Dict]:
-    """
-    This is a stub, awaiting implementation of module API class. Returns a list
-    of dicts where each dict represents one attached module, and each dict
-    contains the keys "name", "model", "serial", "fwVersion", "status", and
-    "displayName". All values should be strings. If not modules are attached,
-    return an empty list.
-    """
-    return []
-
-
 async def get_attached_modules(request):
     """
     On success (including an empty "modules" list if no modules are detected):
@@ -90,8 +79,10 @@ async def get_attached_modules(request):
         "message": "..."
     }
     """
-    module_list = _discover_modules()
-    data = {"modules": module_list}
+    robot.register_modules = modules.discover_and_connect
+    robot.reset()
+
+    data = {"modules": list(map(lambda md: md.to_dict(), robot.modules))}
     return web.json_response(data, status=200)
 
 

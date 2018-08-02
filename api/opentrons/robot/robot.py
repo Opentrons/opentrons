@@ -16,7 +16,6 @@ from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
-from opentrons.modules import discover_connected_ports
 
 log = logging.getLogger(__name__)
 
@@ -101,6 +100,7 @@ class Robot(object):
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
         self._modules = []
+        self.register_modules = lambda: []
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -203,7 +203,12 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
-        self.register_modules()
+
+        # clean out and re-register connected modules
+        for module in self._modules:
+            module.disconnect()
+        self._modules = self.register_modules()
+
         return self
 
     def cache_instrument_models(self):
@@ -218,14 +223,6 @@ class Robot(object):
     # that is currently not connected to the robot as return by the following method
     # and run it without calibrating, it will probably fail silently, though
     # it should probably raise and be shown to the run app user
-    def register_modules(self):
-        for module in self._modules:
-            module.disconnect()
-        log.debug("Registering connected modules")
-        discovered_modules = discover_modules()
-        for module in discovered_modules:
-            module.connect()
-        self._modules = discovered_modules
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -704,6 +701,10 @@ class Robot(object):
     @property
     def deck(self):
         return self._deck
+
+    @property
+    def modules(self):
+        return self._modules
 
     @property
     def fixed_trash(self):

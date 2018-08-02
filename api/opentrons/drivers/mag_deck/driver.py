@@ -150,7 +150,7 @@ class MagDeck:
         self.run_flag = Event()
         self.run_flag.set()
 
-        self.simulating = True
+        self.simulating = False
         self._connection = None
         self._config = config
 
@@ -179,7 +179,7 @@ class MagDeck:
         if self.is_connected():
             self._connection.close()
         self._connection = None
-        self.simulating = True
+        self.simulating = False
 
     def is_connected(self) -> bool:
         # Does not detect if the module was physically plugged out

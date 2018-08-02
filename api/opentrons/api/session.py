@@ -9,7 +9,7 @@ from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
-from opentrons import robot
+from opentrons import robot, modules
 
 from .models import Container, Instrument, Module
 
@@ -21,6 +21,8 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
+        robot.register_modules = modules.discover_and_connect
+        robot.reset()
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -53,6 +55,8 @@ class Session(object):
 
         self.startTime = None
 
+        robot.register_fn = modules.discover_and_connect
+        robot.reset()
         self.refresh()
 
     def get_instruments(self):
