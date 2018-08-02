@@ -16,6 +16,7 @@ type HealthResponse = {
   name: string,
   api_version: string,
   fw_version: string,
+  logs: Array<string>,
 }
 
 export type HealthAction =

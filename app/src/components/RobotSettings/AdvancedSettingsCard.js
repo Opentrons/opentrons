@@ -7,6 +7,7 @@ import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import type {Setting} from '../../http-api-client'
 import {fetchSettings, setSettings, makeGetRobotSettings} from '../../http-api-client'
+import {downloadLogs} from '../../shell'
 
 import {RefreshCard} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
@@ -18,6 +19,7 @@ type SP = {settings: Array<Setting>}
 type DP = {
   fetch: () => mixed,
   set: (id: string, value: boolean) => mixed,
+  download: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -54,7 +56,7 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch} = props
+  const {name, settings, set, fetch, download} = props
 
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
@@ -64,7 +66,7 @@ function AdvancedSettingsCard (props: Props) {
       <LabeledButton
         label='Download Logs'
         buttonProps={{
-          disabled: true,
+          onClick: download,
           children: 'Download'
         }}
       >
@@ -84,6 +86,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
-    set: (id, value) => dispatch(setSettings(ownProps, id, value))
+    set: (id, value) => dispatch(setSettings(ownProps, id, value)),
+    download: () => dispatch(downloadLogs(ownProps))
   }
 }
