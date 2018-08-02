@@ -15,7 +15,7 @@ port ?= 8080
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: install
 install:
@@ -28,10 +28,9 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build:
-	$(env)=production webpack -p
-	shx cp index.html dist/
+.PHONY: dist
+dist:
+	$(env)=production webpack --profile
 
 # development
 #####################################################################

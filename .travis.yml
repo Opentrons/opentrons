@@ -57,7 +57,7 @@ script:
   - make test
   - if [[ $LINT = true ]]; then make lint; fi
   - if [[ $BUILD_COMPONENTS = true ]]; then make -C components build; fi
-  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer build; fi
+  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer dist; fi
   - if [[ $BUILD_APP = true ]]; then make -C app-shell dist-$APP_OS_TARGET; fi
   - if [[ $BUILD_API_DOCS = true ]]; then (make -C api docs > /dev/null); fi
 
@@ -141,6 +141,10 @@ env:
 
     # OT_APP_INTERCOM_ID
     - secure: "B+OLp0ZNWX6T9BFFGdNYA6vmXYJH0KXFGdyrEKHh0bFC4BnbPbbhN1SFp50Au+uMY1lzIhnihrkLpabie89N8HfHVuvTf27KDGP2vUrs7Vnnf+goSb2PrtcFcRNDjOM5bKQAWNfrjDVUBYkDWWL+zkS9ms6+mF+E8keCDGeMacPSus6NNK1v8+i9yK1/lJHYHxA353BkU73iP2SdrZ3IFuysEG8DVj9wBl7fXYOHrP2Dzw/ZQYzQOiagPYGAPoyMDcbr0Pnq1wu9sPADbPAA+UFOq0LfNTLDd8iP6EZuahwVIhldKBFOuT15YmbHG2c00Hepjl9V72d2FwnkXWcbKf/tgOrgCO+mDgYXtwE7rVfBQdhCZGgfxY7w8MTmNNm/WRrFhLBVvLpRGmVprIrA0fTJVUUo5O+YUHXuSAWwE2OPM3MfXj4Qdy656mTg6A/FWRuE1IZffhr/YhfcHiW6VG/W5t5wF5dzR1so4QILcL+aU2wfoHaFQ+c25ejoo7aPaY4D1bbQl0AtpQMJLtMSUH8X7xJGkVgc3mbwFdpvHNAhh2rhtOJtftwhTXSZ0WLfcJLl4Hj2F/6IqZj/DvTO5xMjuqdTigFVJzUSFdG6C61Af5C49v+ag9hqTHyQ59kOIFoKeyW4SPmqQIm7ZSVs1h3wCkmtZVOHWSV+n41JJ/I="
+
+    # OT_PD_INTERCOM_ID
+    - secure: "RFTmW32ytRG1vl3IfINI/5nBXUqJMQn27gKX3m6LzXDvhPm6sSECSSFIG4gAqIUQ8Efyy1FOyccLQd19sDbAuzWPGfCJeSMGPeQz748GCVSdZeyKLAogty2UNQwb+D3RDhQKe8JFBqvej4kynBnousaVX9hib7Of5/7YUJMAxuu73g+b8oDZ9QtkC7bDeHTxPiw50dxE2uYfYFq2f5xmvr5RpUCHhjATiNLdMT4DlPTxfpsitrl02ZQxKpFefUQL/VgPqJFtNG6s+IJ/mpuK4scKd89FSSDgUkqEafHX7/DWrOE5AAYruhy6x8vOUDV4OFOtDceR2ZsWZWYrNRJkxp4/Yn3H+H7GTQGBgIDie4A4OuUAU1Wk3XXSZempq+chUpGbnwX6ASZaRP2arm3zoaxGwJnVR4uQEbqnlXFw7MAssJ0K2ze099pVFqP/JhS6El6pu6W9of9+U1LEsRWRs1FrXNUhSiED5UaBVnIrWpYyGPli+oZn9j8dcu+xdMcQhMuZb4VQzZUf8OaFgZU2vrR7fi7QWDJ0cpxpLnxJlmpymT6iBYORhaPk8CuV+LYxo3OyEI5wYAhfQaeQvkwid58iUijGMsb3oBaC89OdcxudrHNeH+yYfpoSHhQ+cOE48kG209J/xbaWO7Oe+mfTbqsnVY5UTz3c5Xp6fNEfRpA="
+
 
 notifications:
   email:
