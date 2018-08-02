@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.3.0-beta.1"></a>
+# [3.3.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.3.0-beta.0...v3.3.0-beta.1) (2018-08-02)
+
+
+### Bug Fixes
+
+* **api:** check virtual smoothie before copying udev file on server start ([#1960](https://github.com/Opentrons/opentrons/issues/1960)) ([9a31f3d](https://github.com/Opentrons/opentrons/commit/9a31f3d))
+* **api:** Fix pipette.delay() so it does not sleep during protocol simulation ([#1902](https://github.com/Opentrons/opentrons/issues/1902)) ([f63bdba](https://github.com/Opentrons/opentrons/commit/f63bdba))
+* **api:** Fix the database migration script geometry logic ([#1959](https://github.com/Opentrons/opentrons/issues/1959)) ([7ae9756](https://github.com/Opentrons/opentrons/commit/7ae9756))
+* **api:** Home Z axes before run to guarantee that pipettes will be retracted ([#1914](https://github.com/Opentrons/opentrons/issues/1914)) ([7252a73](https://github.com/Opentrons/opentrons/commit/7252a73))
+* **api:** support touch-tip for JSON protocols ([#2000](https://github.com/Opentrons/opentrons/issues/2000)) ([43125b7](https://github.com/Opentrons/opentrons/commit/43125b7)), closes [#1997](https://github.com/Opentrons/opentrons/issues/1997)
+* **docker:** Switch out dumb-init, add modules tools & udev config ([#1952](https://github.com/Opentrons/opentrons/issues/1952)) ([caac645](https://github.com/Opentrons/opentrons/commit/caac645)), closes [#1822](https://github.com/Opentrons/opentrons/issues/1822)
+
+
+### Features
+
+* **api:** Add "modules" field to RPC ([#1890](https://github.com/Opentrons/opentrons/issues/1890)) ([f80ad18](https://github.com/Opentrons/opentrons/commit/f80ad18)), closes [#1733](https://github.com/Opentrons/opentrons/issues/1733)
+* **api:** Add clear method to RPC SessionManager ([#1969](https://github.com/Opentrons/opentrons/issues/1969)) ([8228e6d](https://github.com/Opentrons/opentrons/commit/8228e6d))
+* **api:** Add endpoints to get robot logs ([#1928](https://github.com/Opentrons/opentrons/issues/1928)) ([9224719](https://github.com/Opentrons/opentrons/commit/9224719))
+* **api:** add magdeck api object ([#1925](https://github.com/Opentrons/opentrons/issues/1925)) ([b016eec](https://github.com/Opentrons/opentrons/commit/b016eec)), closes [#1889](https://github.com/Opentrons/opentrons/issues/1889) [#1887](https://github.com/Opentrons/opentrons/issues/1887) [#1886](https://github.com/Opentrons/opentrons/issues/1886) [#1645](https://github.com/Opentrons/opentrons/issues/1645)
+* **api:** Add tempdeck api object ([#1962](https://github.com/Opentrons/opentrons/issues/1962)) ([cb7f107](https://github.com/Opentrons/opentrons/commit/cb7f107)), closes [#1965](https://github.com/Opentrons/opentrons/issues/1965) [#1648](https://github.com/Opentrons/opentrons/issues/1648) [#1649](https://github.com/Opentrons/opentrons/issues/1649)
+* **api:** Brings back the shake after drop-tip ([#1871](https://github.com/Opentrons/opentrons/issues/1871)) ([304c71d](https://github.com/Opentrons/opentrons/commit/304c71d))
+
+
+### Performance Improvements
+
+* **api:** Set axis-testing speed to 8mm/sec to avoid resonance ([#1912](https://github.com/Opentrons/opentrons/issues/1912)) ([d7bb03b](https://github.com/Opentrons/opentrons/commit/d7bb03b))
+
+
+
+
+
 <a name="3.3.0-beta.0"></a>
 # [3.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.2.0-beta.3...v3.3.0-beta.0) (2018-07-12)
 
