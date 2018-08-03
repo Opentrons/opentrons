@@ -288,8 +288,9 @@ export default function client (dispatch) {
   }
 
   function clearSession (state, action) {
-    remote.session_manager.session.clear()
-      .catch((error) => dispatch(actions.sessionResponse(error)))
+    remote.session_manager.clear()
+      .catch((error) => console.warn('error clearing session', error))
+      .then(() => (remote.session_manager.session = null))
   }
 
   function setRunTimerInterval () {

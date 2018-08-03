@@ -28,7 +28,7 @@ class SessionManager(object):
 
     def clear(self):
         if self.session:
-            self.session.refresh()
+            robot.reset()
         self.session = None
 
     def get_session(self):

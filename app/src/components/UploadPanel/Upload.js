@@ -30,10 +30,11 @@ export default class Upload extends React.Component<Props, State> {
       files = (event.target.files: any)
     }
 
-    this.setState({uploadedFile: files[0]})
-
     if (this.props.sessionLoaded) {
+      this.setState({uploadedFile: files[0]})
       this.props.confirmUpload()
+    } else {
+      this.props.createSession(files[0])
     }
 
     // $FlowFixMe
@@ -51,10 +52,10 @@ export default class Upload extends React.Component<Props, State> {
 
   render () {
     return (
-      <div>
+      <React.Fragment>
         <UploadInput onUpload={this.onUpload} isButton />
         <UploadInput onUpload={this.onUpload} />
-      </div>
+      </React.Fragment>
     )
   }
 }
