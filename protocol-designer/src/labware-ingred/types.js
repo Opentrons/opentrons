@@ -43,8 +43,7 @@ export type IngredInputs = {
   name: string | null,
   volume: number | null,
   description: string | null,
-  individualize: boolean,
-  serializeName: string | null
+  individualize: boolean
 }
 
 export type IngredInputFields = $Exact<IngredInputs>

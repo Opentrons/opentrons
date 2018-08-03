@@ -112,8 +112,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         name: null,
         volume: null,
         description: null,
-        individualize: false,
-        serializeName: null
+        individualize: false
       },
       commonIngredGroupId: null
     }
@@ -144,7 +143,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
-      const {name, volume, description, individualize, serializeName} = this.state.input
+      const {name, volume, description, individualize} = this.state.input
       const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,
@@ -152,8 +151,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: newIngredFields.name || name,
           volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
-          individualize: newIngredFields.individualize || individualize,
-          serializeName: newIngredFields.serializeName || serializeName
+          individualize: newIngredFields.individualize || individualize
         }
       }, cb)
     } else {
@@ -168,8 +166,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: null,
           volume: null,
           description: null,
-          individualize: false,
-          serializeName: null
+          individualize: false
         }
       }, cb)
     }
@@ -293,19 +290,13 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
               <FormGroup
                 label={'\u00A0'} // non-breaking space
-                className={styles.serialize_name}
+                className={styles.individualize}
               >
                 <Field
                   label='Serialize'
                   accessor='individualize'
                   type='checkbox'
                 />
-                {/* TODO: Ian 2018-06-01 remove all remnants of this text field see issue #1294
-                  {individualize && <Field
-                  accessor='serializeName'
-                  placeholder='i.e. sample'
-                  className={styles.serialize_name_field}
-                />} */}
               </FormGroup>
 
             {showIngredientDropdown && <FormGroup label={ingredDropdownLabel} className={styles.existing_ingred_field}>

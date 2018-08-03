@@ -166,7 +166,6 @@ describe.skip('COPY_LABWARE action', () => {
 describe('EDIT_INGREDIENT action', () => {
   const ingredFields = {
     name: 'Cool Ingredient',
-    serializeName: null,
     volume: 250,
     description: 'far out!',
     individualize: false
@@ -211,7 +210,6 @@ describe('EDIT_INGREDIENT action', () => {
       type: 'EDIT_INGREDIENT',
       payload: {
         name: 'Cool Ingredient',
-        serializeName: false,
         volume: 250,
         description: 'far out!',
         individualize: false,

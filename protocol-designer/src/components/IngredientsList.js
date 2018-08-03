@@ -3,6 +3,7 @@
 import React from 'react'
 
 import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
+import {sortWells} from '../utils'
 import {PDTitledList, PDListItem} from './lists'
 import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
@@ -48,11 +49,12 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       groupId,
       labwareWellContents
     } = this.props
-    const {serializeName, individualize, description, name} = ingredGroup
+    const {individualize, description, name} = ingredGroup
     const {isExpanded} = this.state
 
-    const wellsWithIngred = Object.keys(labwareWellContents).filter(well =>
-      labwareWellContents[well][groupId])
+    const wellsWithIngred = Object.keys(labwareWellContents)
+      .sort(sortWells)
+      .filter(well => labwareWellContents[well][groupId])
 
     if (wellsWithIngred.length < 1) {
       // do not show ingred card if it has no instances for this labware
@@ -89,7 +91,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
 
           return <IngredIndividual key={well}
             name={individualize
-              ? `${serializeName || 'Sample'} ${i + 1}` // TODO IMMED SORT AND NUMBER
+              ? `${ingredGroup.name || ''} ${i + 1}`
               : ''
             }
             wellName={well}
