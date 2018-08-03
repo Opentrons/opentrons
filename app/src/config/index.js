@@ -38,6 +38,13 @@ export type Config = {
     optedIn: boolean,
     seenOptIn: boolean,
   },
+
+  support: {
+    userId: string,
+    createdAt: number,
+    name: string,
+    email: ?string,
+  },
 }
 
 type UpdateConfigAction = {|

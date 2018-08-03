@@ -45,13 +45,20 @@ const DEFAULTS = {
     }
   },
 
-  // analytics
+  // analytics (mixpanel)
   analytics: {
     appId: uuid(),
     optedIn: false,
     seenOptIn: false
-  }
+  },
 
+  // user support (intercom)
+  support: {
+    userId: uuid(),
+    createdAt: Math.floor(Date.now() / 1000),
+    name: 'App User',
+    email: null
+  }
 }
 
 // lazy load store, overrides, and log because of config/log interdependency
