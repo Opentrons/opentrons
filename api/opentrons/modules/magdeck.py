@@ -1,5 +1,10 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 
+class MissingDevicePortError(Exception):
+    pass
+
+# TODO: BC 2018-08-03 this class shares a fair amount verbatim from TempDeck,
+# there should be an upstream ABC in the future to contain shared logic between modules
 class MagDeck:
     '''
     Under development. API subject to change
@@ -51,17 +56,13 @@ class MagDeck:
 
     @property
     def port(self):
+        """ Serial Port """
         return self._port
 
     @property
     def device_info(self):
         """
-        Returns a dict:
-        {
-                'serial': '1aa11bb22',
-                'model': '1aa11bb22',
-                'version': '1aa11bb22'
-        }
+        Returns a dict: { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
         """
         return self._device_info
 
@@ -75,7 +76,7 @@ class MagDeck:
 
     def connect(self):
         '''
-        Connect the serial connection
+        Connect to the serial port
         '''
         if self._port:
             self._driver = MagDeckDriver()
@@ -88,7 +89,7 @@ class MagDeck:
 
     def disconnect(self):
         '''
-        Disconnect the serial connection
+        Disconnect from the serial port
         '''
         if self._driver:
           self._driver.disconnect()

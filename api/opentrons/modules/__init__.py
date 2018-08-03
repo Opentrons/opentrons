@@ -2,7 +2,7 @@ import os
 import logging
 import re
 from .magdeck import MagDeck
-from .tempdeck import MagDeck
+from .tempdeck import TempDeck
 from opentrons import robot, labware
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
@@ -15,9 +15,6 @@ class UnsupportedModuleError(Exception):
     pass
 
 class AbsentModuleError(Exception):
-    pass
-
-class MissingDevicePortError(Exception):
     pass
 
 
