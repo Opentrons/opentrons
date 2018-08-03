@@ -45,7 +45,7 @@ def load(name, slot):
 # of the circular dependency that would create
 def discover_and_connect():
     if os.environ.get('RUNNING_ON_PI'):
-        devices = os.listdir('/dev')
+        devices = os.listdir('/dev/modules')
     else:
         devices = []
 
@@ -56,7 +56,7 @@ def discover_and_connect():
         match = module_port_regex.search(port)
         if match:
             module_class = SUPPORTED_MODULES.get(match.group().lower())
-            absolute_port = '/dev/{}'.format(port)
+            absolute_port = '/dev/modules/{}'.format(port)
             discovered_modules.append(module_class(port=absolute_port))
 
     log.debug('Discovered modules: {}'.format(discovered_modules))
