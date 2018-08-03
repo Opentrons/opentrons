@@ -7,6 +7,7 @@ import json
 
 from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
+from opentrons.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons import robot
@@ -312,6 +313,14 @@ def now():
     return int(time() * 1000)
 
 
+def _get_parent_module(placeable):
+    if isinstance(placeable, ModulePlaceable) or not placeable:
+        res = placeable
+    else:
+        res = _get_parent_module(placeable.parent)
+    return res
+
+
 def _get_labware(command):
     containers = []
     instruments = []
@@ -320,7 +329,14 @@ def _get_labware(command):
 
     location = command.get('location')
     instrument = command.get('instrument')
-    # module = command.get('module')
+
+    placeable = location
+    if (type(location) == tuple):
+        placeable = location[0]
+
+    maybe_module = _get_parent_module(placeable)
+    modules.append(maybe_module)
+
     locations = command.get('locations')
 
     if location:
