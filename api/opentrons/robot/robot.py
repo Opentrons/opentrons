@@ -220,9 +220,9 @@ class Robot(object):
             self.connected_modules = module.device_info
 
     # TODO: BC Document the error case where you load a module in a protocol
-    # that is currently not connected to the robot as return by the following method
-    # and run it without calibrating, it will probably fail silently, though
-    # it should probably raise and be shown to the run app user
+    # that is currently not connected to the robot as return by the
+    # following method and run it without calibrating, it will probably fail
+    # silently, though it should probably raise and be shown to the RA user
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()

@@ -1,10 +1,13 @@
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 
+
 class MissingDevicePortError(Exception):
     pass
 
+
 # TODO: BC 2018-08-03 this class shares a fair amount verbatim from MagDeck,
-# there should be an upstream ABC in the future to contain shared logic between modules
+# there should be an upstream ABC in the future to contain shared logic
+# between modules
 class TempDeck:
     """
     Under development. API subject to change without a version bump
@@ -38,8 +41,8 @@ class TempDeck:
             while self.status != 'holding at target':
                 pass
 
-    # TODO: there should be a separate decoupled set of classes that construct the
-    # http api response entity given the model instance.
+    # TODO: there should be a separate decoupled set of classes that construct
+    # the http api response entity given the model instance.
     def to_dict(self):
         return {
             'name': 'tempdeck',
@@ -59,7 +62,8 @@ class TempDeck:
     @property
     def device_info(self):
         """
-        Returns a dict: { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
+        Returns a dict:
+            { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
         """
         return self._device_info
 
@@ -85,9 +89,7 @@ class TempDeck:
         """
         return self._driver and self._driver.status
 
-    ######################
-    ## Internal Methods ##
-    ######################
+    # Internal Methods
 
     def connect(self):
         """
@@ -100,14 +102,15 @@ class TempDeck:
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
         else:
-            # Sanity check:
-            # Should never happen, because connect should never be called without a port on Module
-            raise MissingDevicePortError("TempDeck couldnt connect to port {}".format(self._port))
+            # Sanity check Should never happen, because connect should never
+            # be called without a port on Module
+            raise MissingDevicePortError(
+                "TempDeck couldnt connect to port {}".format(self._port)
+            )
 
     def disconnect(self):
         '''
         Disconnect from the serial port
         '''
         if self._driver:
-          self._driver.disconnect()
-
+            self._driver.disconnect()

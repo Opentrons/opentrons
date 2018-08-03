@@ -7,7 +7,6 @@ from threading import Thread
 from opentrons import robot, instruments, modules
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
-from typing import List, Dict
 
 log = logging.getLogger(__name__)
 

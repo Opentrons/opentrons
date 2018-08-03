@@ -1,10 +1,13 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 
+
 class MissingDevicePortError(Exception):
     pass
 
+
 # TODO: BC 2018-08-03 this class shares a fair amount verbatim from TempDeck,
-# there should be an upstream ABC in the future to contain shared logic between modules
+# there should be an upstream ABC in the future to contain shared logic
+# between modules
 class MagDeck:
     '''
     Under development. API subject to change
@@ -41,8 +44,8 @@ class MagDeck:
             self._driver.home()
             self._engaged = False
 
-    # TODO: there should be a separate decoupled set of classes that construct the
-    # http api response entity given the model instance.
+    # TODO: there should be a separate decoupled set of classes that
+    # construct the http api response entity given the model instance.
     def to_dict(self):
         return {
             'name': 'magdeck',
@@ -62,7 +65,8 @@ class MagDeck:
     @property
     def device_info(self):
         """
-        Returns a dict: { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
+        Returns a dict:
+            { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
         """
         return self._device_info
 
@@ -70,9 +74,7 @@ class MagDeck:
     def status(self):
         return 'engaged' if self._engaged else 'disengaged'
 
-    ######################
-    ## Internal Methods ##
-    ######################
+    # Internal Methods
 
     def connect(self):
         '''
@@ -83,13 +85,15 @@ class MagDeck:
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
         else:
-            # Sanity check:
-            # Should never happen, because connect should never be called without a port on Module
-            raise MissingDevicePortError("MagDeck couldnt connect to port {}".format(self._port))
+            # Sanity check: Should never happen, because connect should
+            # never be called without a port on Module
+            raise MissingDevicePortError(
+                "MagDeck couldnt connect to port {}".format(self._port)
+            )
 
     def disconnect(self):
         '''
         Disconnect from the serial port
         '''
         if self._driver:
-          self._driver.disconnect()
+            self._driver.disconnect()
