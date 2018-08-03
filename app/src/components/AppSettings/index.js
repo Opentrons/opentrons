@@ -24,7 +24,7 @@ export default function AppSettings (props: Props) {
         <AnalyticsSettingsCard {...props} />
       </CardRow>
       <CardRow>
-        <AdvancedSettingsCard />
+        <AdvancedSettingsCard checkForUpdates={props.checkForUpdates} />
       </CardRow>
     </CardContainer>
   )

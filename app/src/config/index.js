@@ -7,10 +7,17 @@ import type {LogLevel} from '../logger'
 
 type UrlProtocol = 'file:' | 'http:'
 
+export type UpdateChannel = 'latest' | 'beta' | 'alpha'
+
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type Config = {
   devtools: boolean,
   modules: boolean,
+
+  // app update config
+  update: {
+    channel: UpdateChannel,
+  },
 
   // logging config
   log: {
@@ -87,17 +94,13 @@ export function getConfig (state: State): Config {
   return state.config
 }
 
-export function getDevToolsOn (state: State): boolean {
-  return state.config.devtools
-}
-
 export function getModulesOn (state: State): boolean {
   return state.config.modules
 }
 
 export function toggleDevTools (): ThunkAction {
   return (dispatch, getState) => {
-    const devToolsOn = getDevToolsOn(getState())
+    const devToolsOn = getConfig(getState()).devtools
     return dispatch(updateConfig('devtools', !devToolsOn))
   }
 }
