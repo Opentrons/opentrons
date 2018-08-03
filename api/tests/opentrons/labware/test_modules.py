@@ -59,7 +59,9 @@ def test_run_magdeck_connected(
         return 'ok\n\rok\n\r'
 
     def mock_discover():
-        return [modules.SUPPORTED_MODULES.get('magdeck')(port='/dev/modules/tty1_magdeck')]
+        magdeck = modules.MagDeck(port='/dev/modules/tty1_magdeck')
+        magdeck.connect()
+        return [magdeck]
 
     monkeypatch.setattr(MagDeckDriver, 'connect', mock_connect)
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
@@ -80,7 +82,9 @@ def test_run_tempdeck_connected(
         return 'ok\n\rok\n\r'
 
     def mock_discover():
-        return [modules.SUPPORTED_MODULES.get('magdeck')(port='/dev/modules/tty1_magdeck')]
+        tempdeck = modules.TempDeck(port='/dev/modules/tty1_tempdeck')
+        tempdeck.connect()
+        return [tempdeck]
 
     monkeypatch.setattr(TempDeckDriver, 'connect', mock_connect)
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
