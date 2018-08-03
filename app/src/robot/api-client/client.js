@@ -49,6 +49,7 @@ export default function client (dispatch) {
       case actionTypes.RESUME: return resume(state, action)
       case actionTypes.CANCEL: return cancel(state, action)
       case 'robot:REFRESH_SESSION': return refreshSession(state, action)
+      case 'robot:CLEAR_SESSION': return clearSession(state, action)
     }
   }
 
@@ -283,6 +284,11 @@ export default function client (dispatch) {
 
   function refreshSession (state, action) {
     remote.session_manager.session.refresh()
+      .catch((error) => dispatch(actions.sessionResponse(error)))
+  }
+
+  function clearSession (state, action) {
+    remote.session_manager.session.clear()
       .catch((error) => dispatch(actions.sessionResponse(error)))
   }
 

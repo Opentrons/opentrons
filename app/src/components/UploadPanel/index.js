@@ -13,8 +13,8 @@ import Upload from './Upload'
 
 type Props = {
   sessionLoaded: ?boolean,
-  confirmUpload: () => void,
-  createSession: () => void,
+  confirmUpload: () => mixed,
+  createSession: () => mixed,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
@@ -22,7 +22,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
 function UploadPanel (props: Props) {
   return (
     <SidePanel title='Open Protocol'>
-      <Upload {...props}/>
+      <Upload {...props} />
     </SidePanel>
   )
 }
@@ -35,11 +35,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    confirmUpload: () => {
-      dispatch(push('/upload/confirm'))
-    },
-    createSession: (file) => {
-      dispatch(robotActions.session(file))
-    }
+    confirmUpload: () => dispatch(push('/upload/confirm')),
+    createSession: (file) => dispatch(robotActions.session(file))
   }
 }

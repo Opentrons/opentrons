@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import {Switch, Route, type Match} from 'react-router'
+import {Route, type Match} from 'react-router'
 import UploadStatus from '../components/UploadStatus'
 import UploadAlert from '../components/UploadAlert'
 import Page from '../components/Page'
@@ -14,9 +14,7 @@ export default function UploadPage (props: Props) {
   return (
     <Page>
       <UploadStatus />
-      <Switch>
-        <Route exact path={`${path}/confirm`} component={UploadAlert} />
-      </Switch>
+      <Route exact path={`${path}/confirm`} component={UploadAlert} />
     </Page>
   )
 }

@@ -9,8 +9,8 @@ import {
 } from '../../robot'
 
 type Props = {
-  cancelUpload: () => void,
-  confirmUpload: () => void,
+  cancelUpload: () => mixed,
+  confirmUpload: () => mixed,
 }
 
 export default connect(null, mapDTP)(ConfirmUploadModal)
@@ -32,7 +32,7 @@ function ConfirmUploadModal (props: Props) {
 
 function mapDTP (dispatch) {
   return {
-    cancelUpload: () => { dispatch(goBack()) },
-    confirmUpload: () => { dispatch(robotActions.clearSession()) }
+    cancelUpload: () => dispatch(goBack()),
+    confirmUpload: () => dispatch(robotActions.clearSession())
   }
 }

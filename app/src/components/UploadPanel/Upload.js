@@ -4,8 +4,8 @@ import UploadInput from './UploadInput'
 
 type Props = {
   sessionLoaded: ?boolean,
-  createSession: (file: File) => void,
-  confirmUpload: () => void,
+  createSession: (file: File) => mixed,
+  confirmUpload: () => mixed,
 }
 
 type State = {
@@ -30,14 +30,13 @@ export default class Upload extends React.Component<Props, State> {
       files = (event.target.files: any)
     }
 
-    if (files.length < 1) {
-      return
-    }
-
     this.setState({uploadedFile: files[0]})
 
-    this.props.confirmUpload()
-    // $FlowFixMe type EventTarget missing value
+    if (this.props.sessionLoaded) {
+      this.props.confirmUpload()
+    }
+
+    // $FlowFixMe
     event.target.value = null
   }
 
@@ -53,8 +52,8 @@ export default class Upload extends React.Component<Props, State> {
   render () {
     return (
       <div>
-        <UploadInput onUpload={this.onUpload} isButton value={null}/>
-        <UploadInput onUpload={this.onUpload} value={null}/>
+        <UploadInput onUpload={this.onUpload} isButton />
+        <UploadInput onUpload={this.onUpload} />
       </div>
     )
   }
