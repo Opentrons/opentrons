@@ -56,7 +56,7 @@ const DEFAULTS = {
   support: {
     userId: uuid(),
     createdAt: Math.floor(Date.now() / 1000),
-    name: 'App User',
+    name: 'Unknown User',
     email: null
   }
 }
