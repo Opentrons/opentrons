@@ -159,7 +159,6 @@ class TempDeck:
         self.run_flag = Event()
         self.run_flag.set()
 
-        self.simulating = True
         self._connection = None
         self._config = config
 
@@ -167,7 +166,6 @@ class TempDeck:
 
     def connect(self, port=None) -> str:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            self.simulating = True
             return
         try:
             self.disconnect()
@@ -181,7 +179,6 @@ class TempDeck:
         if self.is_connected():
             self._connection.close()
         self._connection = None
-        self.simulating = True
 
     def is_connected(self) -> bool:
         if not self._connection:
@@ -218,13 +215,12 @@ class TempDeck:
         if default is None:
             default = self._temperature.copy()
         updated_temperature = default
-        if not self.simulating:
-            try:
-                res = self._recursive_update_temperature(
-                    DEFAULT_COMMAND_RETRIES)
-                updated_temperature.update(res)
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+        try:
+            res = self._recursive_update_temperature(
+                DEFAULT_COMMAND_RETRIES)
+            updated_temperature.update(res)
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
         self._temperature.update(updated_temperature)
         return ''
 
@@ -270,24 +266,16 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        if self.simulating:
-            return {
-                'serial': '1aa11bb22',
-                'model': '1aa11bb22',
-                'version': '1aa11bb22'
-            }
         try:
             return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return {'error': str(e)}
 
     def pause(self):
-        if not self.simulating:
-            self.run_flag.clear()
+        self.run_flag.clear()
 
     def resume(self):
-        if not self.simulating:
-            self.run_flag.set()
+        self.run_flag.set()
 
     def enter_programming_mode(self) -> str:
         try:
@@ -304,7 +292,6 @@ class TempDeck:
                 port=port,
                 baudrate=TEMP_DECK_BAUDRATE
             )
-            self.simulating = False
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
@@ -325,8 +312,6 @@ class TempDeck:
         """
 
         """
-        if self.simulating:
-            return
 
         command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
@@ -352,8 +337,7 @@ class TempDeck:
             retries -= 1
             if retries <= 0:
                 raise e
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
+            sleep(DEFAULT_STABILIZE_DELAY)
             if self._connection:
                 self._connection.close()
                 self._connection.open()
@@ -369,8 +353,7 @@ class TempDeck:
             retries -= 1
             if retries <= 0:
                 raise TempDeckError(e)
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
+            sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_update_temperature(retries)
 
     def _recursive_get_info(self, retries) -> dict:
@@ -381,6 +364,5 @@ class TempDeck:
             retries -= 1
             if retries <= 0:
                 raise TempDeckError(e)
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
+            sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_get_info(retries)

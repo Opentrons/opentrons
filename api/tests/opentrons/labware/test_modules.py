@@ -3,6 +3,7 @@ import pytest
 from opentrons import robot, labware, modules
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons.drivers import serial_communication
 
 
 @pytest.fixture
@@ -54,7 +55,15 @@ def test_run_magdeck_connected(
         nonlocal connected
         connected = True
 
+    def mock_write(command, ack, serial_connection):
+        return 'ok\n\rok\n\r'
+
+    def mock_discover():
+        return [modules.SUPPORTED_MODULES.get('magdeck')(port='/dev/modules/tty1_magdeck')]
+
     monkeypatch.setattr(MagDeckDriver, 'connect', mock_connect)
+    monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
+    monkeypatch.setattr(modules, 'discover_and_connect', mock_discover)
     modules.load('magdeck', '4')
     assert connected
 
@@ -67,6 +76,14 @@ def test_run_tempdeck_connected(
         nonlocal connected
         connected = True
 
+    def mock_write(command, ack, serial_connection):
+        return 'ok\n\rok\n\r'
+
+    def mock_discover():
+        return [modules.SUPPORTED_MODULES.get('magdeck')(port='/dev/modules/tty1_magdeck')]
+
     monkeypatch.setattr(TempDeckDriver, 'connect', mock_connect)
+    monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
+    monkeypatch.setattr(modules, 'discover_and_connect', mock_discover)
     modules.load('tempdeck', '5')
     assert connected

@@ -1,8 +1,8 @@
 import os
 import logging
 import re
-from .magdeck import MagDeck
-from .tempdeck import TempDeck
+from opentrons.modules.magdeck import MagDeck
+from opentrons.modules.tempdeck import TempDeck
 from opentrons import robot, labware
 
 log = logging.getLogger(__name__)
@@ -22,12 +22,12 @@ def load(name, slot):
     # TODO: if robot.is_simulating create class without setting up
     # it will be out of scope and gc'ed at end of simulation exec
     # if not simnulating grab from list of modules on robot
-
+    module_instance = None
     if name in SUPPORTED_MODULES:
         if robot.is_simulating():
             labware_instance = labware.load(name, slot)
             module_class = SUPPORTED_MODULES.get(name)
-            return module_class(lw=labware_instance)
+            module_instance = module_class(lw=labware_instance)
         else:
             # TODO: BC 2018-08-01 this currently loads the first module of
             # that type that is on the robot, in the future we should add
@@ -40,7 +40,7 @@ def load(name, slot):
                 )
             ]
             if matching_modules:
-                return matching_modules[0]
+                module_instance = matching_modules[0]
             else:
                 raise AbsentModuleError(
                     "no module of name {} is currently connected".format(name)
@@ -48,12 +48,14 @@ def load(name, slot):
     else:
         raise UnsupportedModuleError("{} is not a valid module".format(name))
 
+    return module_instance
+
 
 # Note: this function should be assigned to the robot.register_modules member
 # it cannot be imported and called directly inside the robot class, because
 # of the circular dependency that would create
 def discover_and_connect():
-    if os.environ.get('RUNNING_ON_PI'):
+    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
         devices = []
