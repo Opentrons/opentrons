@@ -157,7 +157,7 @@ function _vapTransferLike (
     mixInDestination,
     preWetTip: formData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
-    touchTipAfterDispense: false, // TODO Ian 2018-03-01 Not in form
+    touchTipAfterDispense: formData['dispense_touchTip'] || false,
     description: 'description would be here 2018-03-01' // TODO get from form
   }
 

@@ -69,6 +69,7 @@ export type TransferLikeForm = {|
   'volume'?: string,
   'dispense_labware'?: string,
   'dispense_wells'?: Array<string>,
+  'dispense_touchTip'?: boolean,
   'dispense_mix_checkbox'?: boolean,
   'dispense_mix_volume'?: string,
   'dispense_mix_times'?: string
