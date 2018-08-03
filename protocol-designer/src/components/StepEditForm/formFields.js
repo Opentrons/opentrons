@@ -181,22 +181,36 @@ export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGro
 // this is a placeholder
 export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
 
-const CHANGE_TIP_OPTIONS = [
-  {name: 'Always', value: 'always'},
-  {name: 'Once', value: 'once'},
+const getChangeTipOptions = () => [
+  {name: 'For each aspirate', value: 'always'},
+  {name: 'Only the first aspirate', value: 'once'},
   {name: 'Never', value: 'never'}
 ]
+
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
-type ChangeTipFieldProps = {name: StepFieldName}
-export const ChangeTipField = (props: ChangeTipFieldProps) => (
-  <StepField
-    name={props.name}
-    render={({value, updateValue}) => (
-      <FormGroup label='CHANGE TIP'>
-        <DropdownField
-          options={CHANGE_TIP_OPTIONS}
-          value={value ? String(value) : null}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-      </FormGroup>
-    )} />
-)
+type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
+export const ChangeTipField = (props: ChangeTipFieldProps) => {
+  const {name, stepType} = props
+  let options = getChangeTipOptions()
+  // Override change tip option names for certain step types
+  switch (stepType) {
+    case 'consolidate':
+      options[0].name = 'For each dispense'
+      break
+    case 'mix':
+      options[0].name = 'For each well'
+      break
+  }
+  return (
+    <StepField
+      name={name}
+      render={({value, updateValue}) => (
+        <FormGroup label='Get new tip'>
+          <DropdownField
+            options={options}
+            value={value ? String(value) : null}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+        </FormGroup>
+      )} />
+  )
+}

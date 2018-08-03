@@ -68,7 +68,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             </FormGroup>
           </div>
           <div className={styles.right_settings_column}>
-            <ChangeTipField name="aspirate_changeTip" />
+            <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
             <FlowRateField />
             <TipPositionField />
           </div>
