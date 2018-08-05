@@ -61,7 +61,7 @@ class Session(object):
 
         self.startTime = None
 
-        robot.register_fn = modules.discover_and_connect
+        robot.register_modules = modules.discover_and_connect
         robot.reset()
         self.refresh()
 

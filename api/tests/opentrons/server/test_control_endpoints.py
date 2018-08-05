@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from opentrons import robot, modules
 from opentrons.server.main import init
-from opentrons.server.endpoints import control
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.instruments.pipette_config import configs
 
@@ -78,10 +77,10 @@ async def test_get_modules(
         virtual_smoothie_env, loop, test_client, monkeypatch):
     test_module = modules.MagDeck(port="/dev/modules/tty1_magdeck")
 
-    def dummy_discover_modules():
+    def stub_discover_modules():
         return [test_module]
 
-    monkeypatch.setattr(modules, "discover_and_connect", dummy_discover_modules)
+    monkeypatch.setattr(modules, "discover_and_connect", stub_discover_modules)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))

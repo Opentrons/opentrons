@@ -58,11 +58,11 @@ def test_run_magdeck_connected(
     def mock_write(command, ack, serial_connection):
         return 'ok\n\rok\n\r'
 
-    def mock_get_device_info(self):
-        return { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
+    def mock_get_info(self):
+        return {'serial': 'abc123', 'model': '8675309', 'version': '9001'}
 
     monkeypatch.setattr(MagDeckDriver, 'connect', mock_connect)
-    monkeypatch.setattr(MagDeckDriver, 'get_device_info', mock_get_device_info)
+    monkeypatch.setattr(MagDeckDriver, 'get_device_info', mock_get_info)
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     magdeck = modules.MagDeck(port='/dev/modules/tty1_magdeck')
     magdeck.connect()
@@ -82,12 +82,11 @@ def test_run_tempdeck_connected(
     def mock_write(command, ack, serial_connection):
         return 'ok\n\rok\n\r'
 
-
-    def mock_get_device_info(self):
-        return { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
+    def mock_get_info(self):
+        return {'serial': 'abc123', 'model': '8675309', 'version': '9001'}
 
     monkeypatch.setattr(TempDeckDriver, 'connect', mock_connect)
-    monkeypatch.setattr(TempDeckDriver, 'get_device_info', mock_get_device_info)
+    monkeypatch.setattr(TempDeckDriver, 'get_device_info', mock_get_info)
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     tempdeck = modules.TempDeck(port='/dev/modules/tty1_tempdeck')
     tempdeck.connect()
