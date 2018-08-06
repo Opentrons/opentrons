@@ -45,10 +45,10 @@ function AdvancedSettingsCard (props: Props) {
         onChange={props.handleChannel}
       >
         <p>
-          Sets the update channel of your app. &quot;Stable&quot; will keep
-          you on the latest stable release. The &quot;Beta&quot; channel will
-          recieve updates more frequently so you can try out new features, but
-          the releases may be less well tested than &quot;Stable&quot;.
+          Sets the update channel of your app. &quot;Stable&quot; receives the
+          latest stable releases. &quot;Beta&quot; is updated more frequently
+          so you can try out new features, but the releases may be less well
+          tested than &quot;Stable&quot;.
         </p>
       </LabeledSelect>
       <LabeledToggle
