@@ -1,13 +1,20 @@
 import os
 import logging
 import re
+import asyncio
 from opentrons.modules.magdeck import MagDeck
 from opentrons.modules.tempdeck import TempDeck
 from opentrons import robot, labware
 
 log = logging.getLogger(__name__)
 
+PORT_SEARCH_TIMEOUT = 5.5
 SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
+
+# avrdude_options
+PART_NO = 'atmega32u4'
+PROGRAMMER_ID = 'avr109'
+BAUDRATE = '57600'
 
 
 class UnsupportedModuleError(Exception):
@@ -76,3 +83,129 @@ def discover_and_connect():
             log.exception('Failed to connect module')
 
     return discovered_modules
+
+
+async def enter_bootloader(module):
+    """
+    Using the driver method, enter bootloader mode of the atmega32u4.
+    The bootloader mode opens a new port on the uC to upload the hex file.
+    After receiving a 'dfu' command, the firmware provides a 3-second window to
+    close the current port so as to do a clean switch to the bootloader port.
+    The new port shows up as 'ttyn_bootloader' on the pi; upload fw through it.
+    NOTE: Modules with old bootloader will have the bootloader port show up as
+    a regular module port- 'ttyn_tempdeck'/ 'ttyn_magdeck' with the port number
+    being either different or same as the one that the module was originally on
+    So we check for changes in ports and use the appropriate one
+    """
+    # Required for old bootloader
+    ports_before_dfu_mode = await _discover_ports()
+
+    module._driver.enter_programming_mode()
+    module.disconnect()
+    new_port = ''
+    try:
+        new_port = await asyncio.wait_for(
+            _port_poll(_has_old_bootloader(module), ports_before_dfu_mode),
+            PORT_SEARCH_TIMEOUT)
+    except asyncio.TimeoutError:
+        pass
+    return new_port
+
+
+async def update_firmware(module, firmware_file_path, config_file_path, loop):
+    """
+    Run avrdude firmware upload command. Switch back to normal module port
+
+    Note: For modules with old bootloader, the kernel could assign the module
+    a new port after the update (since the board is automatically reset).
+    Scan for such a port change and use the appropriate port
+    """
+    # TODO: Make sure the module isn't in the middle of operation
+
+    ports_before_update = await _discover_ports()
+
+    proc = await asyncio.create_subprocess_exec(
+        'avrdude', '-C{}'.format(config_file_path), '-v',
+        '-p{}'.format(PART_NO),
+        '-c{}'.format(PROGRAMMER_ID),
+        '-P{}'.format(module.port),
+        '-b{}'.format(BAUDRATE), '-D',
+        '-Uflash:w:{}:i'.format(firmware_file_path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE, loop=loop)
+    await proc.wait()
+
+    _result = await proc.communicate()
+    result = _result[1].decode()
+    log.debug(result)
+    log.debug("Switching back to non-bootloader port")
+    module._port = _port_on_mode_switch(ports_before_update)
+
+    return _format_avrdude_response(result)
+
+
+def _format_avrdude_response(raw_response):
+    response = {'message': '', 'avrdudeResponse': ''}
+    avrdude_log = ''
+    for line in raw_response.splitlines():
+        if 'avrdude:' in line and line != raw_response.splitlines()[1]:
+            avrdude_log += line.lstrip('avrdude:') + '..'
+            if 'flash verified' in line:
+                response['message'] = 'Firmware update successful'
+                response['avrdudeResponse'] = line.lstrip('avrdude: ')
+    if not response['message']:
+        response['message'] = 'Firmware update failed'
+        response['avrdudeResponse'] = avrdude_log
+    return response
+
+
+async def _port_on_mode_switch(ports_before_switch):
+    ports_after_switch = await _discover_ports()
+    new_port = ''
+    if ports_after_switch and \
+            len(ports_after_switch) >= len(ports_before_switch) and \
+            not set(ports_before_switch) == set(ports_after_switch):
+        new_ports = list(filter(
+            lambda x: x not in ports_before_switch,
+            ports_after_switch))
+        if len(new_ports) > 1:
+            raise OSError('Multiple new ports found on mode switch')
+        new_port = '/dev/modules/{}'.format(new_ports[0])
+    return new_port
+
+
+async def _port_poll(is_old_bootloader, ports_before_switch=None):
+    """
+    Checks for the bootloader port
+    """
+    new_port = ''
+    while not new_port:
+        if is_old_bootloader:
+            new_port = await _port_on_mode_switch(ports_before_switch)
+        else:
+            ports = await _discover_ports()
+            if ports:
+                discovered_ports = list(filter(
+                    lambda x: x.endswith('bootloader'), ports))
+                if len(discovered_ports) == 1:
+                    new_port = '/dev/modules/{}'.format(discovered_ports[0])
+        await asyncio.sleep(0.05)
+    return new_port
+
+
+def _has_old_bootloader(module):
+    return True if module.device_info.get('model') == 'temp_deck_v1' or \
+                   module.device_info.get('model') == 'temp_deck_v2' else False
+
+
+async def _discover_ports():
+    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
+        for attempt in range(2):
+            # Measure for race condition where port is being switched in
+            # between calls to isdir() and listdir()
+            try:
+                return os.listdir('/dev/modules')
+            except (FileNotFoundError, OSError):
+                pass
+            await asyncio.sleep(2)
+        raise Exception("No /dev/modules found. Try again")
