@@ -83,7 +83,7 @@ api-lib:
 	$(MAKE) -C $(api_lib_dir) wheel
 
 .PHONY: package-deps
-package-deps: clean ui api api-lib
+package-deps: clean lib ui api api-lib
 
 .PHONY: package
 package: package-deps
