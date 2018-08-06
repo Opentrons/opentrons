@@ -43,7 +43,7 @@ function mapPropsToButtonPropsAndMessage (props: Props) {
   if (error) {
     return {
       button: null,
-      message: 'Something when wrong retreiving the update. Pease try restarting the app and trying again. If the problem persists, contact Opentrons support.'
+      message: 'Something went wrong retrieving the update. Please try restarting the app and trying again. If the problem persists, contact Opentrons support.'
     }
   }
 
