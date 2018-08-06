@@ -51,9 +51,8 @@ def load(name, slot):
     return module_instance
 
 
-# Note: this function should be assigned to the robot.register_modules member
-# it cannot be imported and called directly inside the robot class, because
-# of the circular dependency that would create
+# Note: this function should be called outside the robot class, because
+# of the circular dependency that it would create if imported into robot.py
 def discover_and_connect():
     if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')

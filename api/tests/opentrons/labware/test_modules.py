@@ -66,7 +66,7 @@ def test_run_magdeck_connected(
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     magdeck = modules.MagDeck(port='/dev/modules/tty1_magdeck')
     magdeck.connect()
-    robot._modules = [magdeck]
+    robot.modules = [magdeck]
     modules.load('magdeck', '4')
     assert connected
 
@@ -90,6 +90,6 @@ def test_run_tempdeck_connected(
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     tempdeck = modules.TempDeck(port='/dev/modules/tty1_tempdeck')
     tempdeck.connect()
-    robot._modules = [tempdeck]
+    robot.modules = [tempdeck]
     modules.load('tempdeck', '5')
     assert connected

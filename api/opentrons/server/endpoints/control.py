@@ -78,8 +78,10 @@ async def get_attached_modules(request):
         "message": "..."
     }
     """
-    robot.register_modules = modules.discover_and_connect
-    robot.reset()
+    for module in robot.modules:
+        module.disconnect()
+    robot.modules = modules.discover_and_connect()
+
 
     data = {"modules": list(map(lambda md: md.to_dict(), robot.modules))}
     return web.json_response(data, status=200)

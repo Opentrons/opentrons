@@ -22,8 +22,9 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
-        robot.register_modules = modules.discover_and_connect
-        robot.reset()
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -61,8 +62,9 @@ class Session(object):
 
         self.startTime = None
 
-        robot.register_modules = modules.discover_and_connect
-        robot.reset()
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
         self.refresh()
 
     def get_instruments(self):

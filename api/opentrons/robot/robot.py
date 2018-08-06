@@ -99,8 +99,7 @@ class Robot(object):
         """
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-        self._modules = []
-        self.register_modules = lambda: []
+        self.modules = []
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -204,11 +203,6 @@ class Robot(object):
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
 
-        # clean out and re-register connected modules
-        for module in self._modules:
-            module.disconnect()
-        self._modules = self.register_modules()
-
         return self
 
     def cache_instrument_models(self):
@@ -216,10 +210,8 @@ class Robot(object):
         for mount in self.model_by_mount.keys():
             self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
             log.debug("{}: {}".format(mount, self.model_by_mount[mount]))
-        for module in self._modules:
-            self.connected_modules = module.device_info
 
-    # TODO: BC Document the error case where you load a module in a protocol
+    # TODO: BC 2018-08-01 Document the error case where you load a module in a protocol
     # that is currently not connected to the robot as return by the
     # following method and run it without calibrating, it will probably fail
     # silently, though it should probably raise and be shown to the RA user
@@ -407,8 +399,6 @@ class Robot(object):
         """
 
         self._driver.connect(port=port)
-        for module in self._modules:
-            module.connect()
         self.fw_version = self._driver.get_fw_version()
 
         # the below call to `cache_instrument_models` is relied upon by
@@ -614,9 +604,6 @@ class Robot(object):
         if self._driver:
             self._driver.disconnect()
 
-        for module in self._modules:
-            module.disconnect()
-
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -701,10 +688,6 @@ class Robot(object):
     @property
     def deck(self):
         return self._deck
-
-    @property
-    def modules(self):
-        return self._modules
 
     @property
     def fixed_trash(self):
@@ -829,9 +812,6 @@ class Robot(object):
             'left': left_data,
             'right': right_data
         }
-
-    def get_connected_modules(self):
-        return self._modules
 
     def get_serial_ports_list(self):
         ports = []
