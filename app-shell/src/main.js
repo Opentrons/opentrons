@@ -1,13 +1,11 @@
 // electron main entry point
-'use strict'
+import {app, dialog, ipcMain, Menu} from 'electron'
 
-const {app, dialog, ipcMain, Menu} = require('electron')
-
-const createUi = require('./ui')
-const initializeMenu = require('./menu')
-const {initialize: initializeApiUpdate} = require('./api-update')
-const createLogger = require('./log')
-const {getConfig, getStore, getOverrides, registerConfig} = require('./config')
+import createUi from './ui'
+import initializeMenu from './menu'
+import {initialize as initializeApiUpdate} from './api-update'
+import createLogger from './log'
+import {getConfig, getStore, getOverrides, registerConfig} from './config'
 
 const config = getConfig()
 const log = createLogger(__filename)

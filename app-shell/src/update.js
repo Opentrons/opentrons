@@ -1,21 +1,15 @@
 // app updater
-'use strict'
+import {autoUpdater as updater} from 'electron-updater'
 
-const {autoUpdater: updater} = require('electron-updater')
-const {getConfig} = require('./config')
-const log = require('./log')(__filename)
+import createLogger from './log'
+import {getConfig} from './config'
 
-updater.logger = log
+updater.logger = createLogger(__filename)
 updater.autoDownload = false
 
-module.exports = {
-  CURRENT_VERSION: updater.currentVersion,
-  checkForUpdates,
-  downloadUpdate,
-  quitAndInstall
-}
+export const CURRENT_VERSION = updater.currentVersion
 
-function checkForUpdates () {
+export function checkForUpdates () {
   return new Promise((resolve, reject) => {
     updater.once('update-available', handleUpdateAvailable)
     updater.once('update-not-available', handleUpdateNotAvailable)
@@ -46,7 +40,7 @@ function checkForUpdates () {
   })
 }
 
-function downloadUpdate () {
+export function downloadUpdate () {
   return new Promise((resolve, reject) => {
     updater.once('update-downloaded', handleUpdateDownloaded)
     updater.once('error', handleError)
@@ -69,7 +63,7 @@ function downloadUpdate () {
   })
 }
 
-function quitAndInstall () {
+export function quitAndInstall () {
   return updater.quitAndInstall()
 }
 

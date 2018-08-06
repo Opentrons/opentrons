@@ -1,23 +1,18 @@
-// TODO(mc, 2018-03-15): use babel with flow preset
 // api updater
-'use strict'
+import assert from 'assert'
+import fse from 'fs-extra'
+import path from 'path'
 
-const assert = require('assert')
-const fse = require('fs-extra')
-const path = require('path')
+import pkg from '../package.json'
+import createLogger from './log'
 
-const {version: AVAILABLE_UPDATE} = require('../package.json')
-const log = require('./log')(__filename)
+const log = createLogger(__filename)
 
 let updateFiles = []
 
-module.exports = {
-  AVAILABLE_UPDATE,
-  initialize,
-  getUpdateFiles
-}
+export const AVAILABLE_UPDATE = pkg.version
 
-function initialize () {
+export function initialize () {
   updateFiles = [
     // API update
     {
@@ -42,7 +37,7 @@ function initialize () {
   ].map(findUpdateFile)
 }
 
-function getUpdateFiles () {
+export function getUpdateFiles () {
   if (!updateFiles.length || !updateFiles.every(Boolean)) {
     return Promise.reject(new Error('Update files were not all found'))
   }

@@ -6,7 +6,7 @@ const path = require('path')
 jest.mock('electron-updater', () => ({autoUpdater: {}}))
 
 jest.mock(
-  '../../app-shell/lib/log',
+  '../../app-shell/src/log',
   () => require('../src/__mocks__/logger').default
 )
 
@@ -32,7 +32,7 @@ module.exports = {
       if (__mockRemotes[name]) return __mockRemotes[name]
 
       const remote = jest.genMockFromModule(
-        path.join(__dirname, '../../app-shell/lib', name)
+        path.join(__dirname, '../../app-shell/src', name)
       )
 
       __mockRemotes[name] = remote

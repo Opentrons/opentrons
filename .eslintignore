@@ -8,3 +8,6 @@ api/**
 # flow
 **/flow-typed/**
 **/interfaces/**
+
+# compiled
+app-shell/lib/**
