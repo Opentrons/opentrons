@@ -41,6 +41,8 @@ def load(name, slot):
             ]
             if matching_modules:
                 module_instance = matching_modules[0]
+                labware_instance = labware.load(name, slot)
+                module_instance.labware = labware_instance
             else:
                 raise AbsentModuleError(
                     "no module of name {} is currently connected".format(name)
