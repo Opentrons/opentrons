@@ -150,7 +150,6 @@ class MagDeck:
         self.run_flag = Event()
         self.run_flag.set()
 
-        self.simulating = True
         self._connection = None
         self._config = config
 
@@ -165,7 +164,6 @@ class MagDeck:
         reset/reconnection
         '''
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            self.simulating = True
             return ''
         try:
             self.disconnect()
@@ -179,7 +177,6 @@ class MagDeck:
         if self.is_connected():
             self._connection.close()
         self._connection = None
-        self.simulating = True
 
     def is_connected(self) -> bool:
         # Does not detect if the module was physically plugged out
@@ -270,8 +267,6 @@ class MagDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        if self.simulating:
-            return {}
         try:
             return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
         except (MagDeckError, SerialException, SerialNoResponse) as e:
@@ -302,8 +297,7 @@ class MagDeck:
             retries -= 1
             if retries <= 0:
                 raise e
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
+            sleep(DEFAULT_STABILIZE_DELAY)
             if self._connection:
                 self._connection.close()
                 self._connection.open()
@@ -319,10 +313,6 @@ class MagDeck:
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_MAG_DECK_TIMEOUT):
-
-        if self.simulating:
-            return
-
         command_line = command + ' ' + MAG_DECK_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
@@ -344,7 +334,6 @@ class MagDeck:
                 port=port,
                 baudrate=MAG_DECK_BAUDRATE
             )
-            self.simulating = False
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
@@ -383,6 +372,5 @@ class MagDeck:
             retries -= 1
             if retries <= 0:
                 raise MagDeckError(e)
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
+            sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_get_info(retries)

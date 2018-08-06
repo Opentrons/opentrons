@@ -202,6 +202,7 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
+
         return self
 
     def cache_instrument_models(self):
@@ -393,8 +394,6 @@ class Robot(object):
         """
 
         self._driver.connect(port=port)
-        for module in self.modules:
-            module.connect()
         self.fw_version = self._driver.get_fw_version()
 
         # the below call to `cache_instrument_models` is relied upon by
@@ -599,9 +598,6 @@ class Robot(object):
         """
         if self._driver:
             self._driver.disconnect()
-
-        for module in self.modules:
-            module.disconnect()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}

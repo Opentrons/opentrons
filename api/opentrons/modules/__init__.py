@@ -1,205 +1,79 @@
 import os
 import logging
+import re
+from opentrons.modules.magdeck import MagDeck
+from opentrons.modules.tempdeck import TempDeck
 from opentrons import robot, labware
-from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
-from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 
 log = logging.getLogger(__name__)
+
+SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
 
 
 class UnsupportedModuleError(Exception):
     pass
 
 
+class AbsentModuleError(Exception):
+    pass
+
+
 def load(name, slot):
-    if name in SUPPORTED_MODULES.keys():
-        lw = labware.load(name, slot)
-        _cls = SUPPORTED_MODULES.get(name)
-        mod = _cls(lw)
+    # TODO: if robot.is_simulating create class without setting up
+    # it will be out of scope and gc'ed at end of simulation exec
+    # if not simnulating grab from list of modules on robot
+    module_instance = None
+    if name in SUPPORTED_MODULES:
+        if robot.is_simulating():
+            labware_instance = labware.load(name, slot)
+            module_class = SUPPORTED_MODULES.get(name)
+            module_instance = module_class(lw=labware_instance)
+        else:
+            # TODO: BC 2018-08-01 this currently loads the first module of
+            # that type that is on the robot, in the future we should add
+            # support for multiple instances of one module type this
+            # accessor would then load the correct disambiguated module
+            # instance (via nickname?)
+            matching_modules = [
+                module for module in robot.modules if isinstance(
+                    module, SUPPORTED_MODULES.get(name)
+                )
+            ]
+            if matching_modules:
+                module_instance = matching_modules[0]
+            else:
+                raise AbsentModuleError(
+                    "no module of name {} is currently connected".format(name)
+                )
     else:
         raise UnsupportedModuleError("{} is not a valid module".format(name))
-    return mod
+
+    return module_instance
 
 
-def discover_devices(module_prefix):
-    if os.environ.get('RUNNING_ON_PI'):
+# Note: this function should be called outside the robot class, because
+# of the circular dependency that it would create if imported into robot.py
+def discover_and_connect():
+    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
         devices = []
-    matches = filter(
-        lambda x: x.endswith('_{}'.format(module_prefix)), devices)
-    res = list(map(lambda x: '/dev/modules/{}'.format(x), matches))
-    log.debug('Discovered devices for prefix {}: {}'.format(
-        module_prefix, res))
-    return res
 
+    discovered_modules = []
 
-class MagDeck:
-    """
-    Under development. API subject to change without a version bump
-    """
-    def __init__(self, lw):
-        self.labware = lw
-        self.driver = MagDeckDriver()
-        self.connect()
-        self._engaged = False
-        self._device_info = self.driver.get_device_info()
+    module_port_regex = re.compile('|'.join(SUPPORTED_MODULES.keys()), re.I)
+    for port in devices:
+        match = module_port_regex.search(port)
+        if match:
+            module_class = SUPPORTED_MODULES.get(match.group().lower())
+            absolute_port = '/dev/modules/{}'.format(port)
+            discovered_modules.append(module_class(port=absolute_port))
 
-    def calibrate(self):
-        """
-        Calibration involves probing for top plate to get the plate height
-        """
-        if not robot.is_simulating():
-            self.driver.probe_plate()
-            # return if successful or not?
-            self._engaged = False
+    log.debug('Discovered modules: {}'.format(discovered_modules))
+    for module in discovered_modules:
+        try:
+            module.connect()
+        except AttributeError:
+            log.exception('Failed to connect module')
 
-    def engage(self):
-        """
-        Move the magnet to plate top - 1 mm
-        """
-        if not robot.is_simulating():
-            self.driver.move(self.driver.plate_height - 1.0)
-            self._engaged = True
-
-    def disengage(self):
-        """
-        Home the magnet
-        """
-        if not robot.is_simulating():
-            self.driver.home()
-            self._engaged = False
-
-    def connect(self):
-        """
-        Connect to the 'MagDeck' port
-        Planned change- will connect to the correct port in case of multiple
-        MagDecks
-        """
-        if not robot.is_simulating():
-            ports = discover_devices('magdeck')
-            # Connect to the first module. Need more advanced selector to
-            # support more than one of the same type of module
-            port = ports[0] if len(ports) > 0 else None
-            self.driver.connect(port)
-
-    def disconnect(self):
-        """
-        Disconnect the serial connection
-        """
-        if not robot.is_simulating():
-            self.driver.disconnect()
-
-    @property
-    def device_info(self):
-        """
-        Returns a dict:
-        {
-                'serial': '1aa11bb22',
-                'model': '1aa11bb22',
-                'version': '1aa11bb22'
-        }
-        """
-        return self._device_info
-
-    @property
-    def status(self):
-        """
-        Returns a string: 'engaged'/'disengaged'
-        """
-        return 'engaged' if self._engaged else 'disengaged'
-
-
-class TempDeck:
-    """
-    Under development. API subject to change without a version bump
-    """
-    def __init__(self, lw):
-        self.labware = lw
-        self.driver = TempDeckDriver()
-        self.connect()
-        self._device_info = self.driver.get_device_info()
-
-    def set_temperature(self, celsius):
-        """
-        Set temperature in degree Celsius
-        Range: -9 to 99 degree Celsius.
-        The range is limited by the 2-digit temperature display. Any input
-        outside of this range will be clipped to the nearest limit
-        """
-        if not robot.is_simulating():
-            self.driver.set_temperature(celsius)
-
-    def deactivate(self):
-        """
-        Stop heating/cooling and turn off the fan
-        """
-        if not robot.is_simulating():
-            self.driver.disengage()
-
-    def _wait_for_temp(self):
-        """
-        This method exits only if set temperature has reached.Subject to change
-        """
-        if not robot.is_simulating():
-            while self.status != 'holding at target':
-                pass
-
-    def connect(self):
-        """
-        Connect to the 'TempDeck' port
-        Planned change- will connect to the correct port in case of multiple
-        TempDecks
-        """
-        if not robot.is_simulating():
-            ports = discover_devices('tempdeck')
-            # Connect to the first module. Need more advanced selector to
-            # support more than one of the same type of module
-            port = ports[0] if len(ports) > 0 else None
-            self.driver.connect(port)
-
-    def disconnect(self):
-        """
-        Disconnect the serial connection
-        """
-        if not robot.is_simulating():
-            self.driver.disconnect()
-
-    @property
-    def device_info(self):
-        """
-        Returns a dict:
-        {
-                'serial': '1aa11bb22',
-                'model': '1aa11bb22',
-                'version': '1aa11bb22'
-        }
-        """
-        return self._device_info
-
-    @property
-    def temperature(self):
-        """
-        Current temperature in degree celsius
-        """
-        self.driver.update_temperature()
-        return self.driver.temperature
-
-    @property
-    def target(self):
-        """
-        Target temperature in degree celsius.
-        Returns None if no target set
-        """
-        self.driver.update_temperature()
-        return self.driver.target
-
-    @property
-    def status(self):
-        """
-        Returns a string: 'heating'/'cooling'/'holding at target'/'idle'
-        """
-        return self.driver.status
-
-
-SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
+    return discovered_modules

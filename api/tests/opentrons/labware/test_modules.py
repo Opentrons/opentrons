@@ -3,6 +3,7 @@ import pytest
 from opentrons import robot, labware, modules
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons.drivers import serial_communication
 
 
 @pytest.fixture
@@ -54,7 +55,18 @@ def test_run_magdeck_connected(
         nonlocal connected
         connected = True
 
+    def mock_write(command, ack, serial_connection):
+        return 'ok\n\rok\n\r'
+
+    def mock_get_info(self):
+        return {'serial': 'abc123', 'model': '8675309', 'version': '9001'}
+
     monkeypatch.setattr(MagDeckDriver, 'connect', mock_connect)
+    monkeypatch.setattr(MagDeckDriver, 'get_device_info', mock_get_info)
+    monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
+    magdeck = modules.MagDeck(port='/dev/modules/tty1_magdeck')
+    magdeck.connect()
+    robot.modules = [magdeck]
     modules.load('magdeck', '4')
     assert connected
 
@@ -67,6 +79,17 @@ def test_run_tempdeck_connected(
         nonlocal connected
         connected = True
 
+    def mock_write(command, ack, serial_connection):
+        return 'ok\n\rok\n\r'
+
+    def mock_get_info(self):
+        return {'serial': 'abc123', 'model': '8675309', 'version': '9001'}
+
     monkeypatch.setattr(TempDeckDriver, 'connect', mock_connect)
+    monkeypatch.setattr(TempDeckDriver, 'get_device_info', mock_get_info)
+    monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
+    tempdeck = modules.TempDeck(port='/dev/modules/tty1_tempdeck')
+    tempdeck.connect()
+    robot.modules = [tempdeck]
     modules.load('tempdeck', '5')
     assert connected
