@@ -14,6 +14,7 @@ import {checkForShellUpdates, shellMiddleware} from './shell'
 import {healthCheckMiddleware} from './health-check'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
+import {initializeSupport, supportMiddleware} from './support'
 
 import reducer from './reducer'
 
@@ -30,6 +31,7 @@ const middleware = applyMiddleware(
   shellMiddleware,
   healthCheckMiddleware,
   analyticsMiddleware,
+  supportMiddleware,
   routerMiddleware(history)
 )
 
@@ -59,13 +61,12 @@ if (module.hot) {
   module.hot.accept('./components/App', renderApp)
 }
 
-// TODO(mc, 2018-03-29): developer mode in app settings
-if (process.env.NODE_ENV === 'development') {
-  global.store = store
-}
+// attach store to window if devtools are on
+if (store.getState().config.devtools) global.store = store
 
-// initialize analytics after first render
+// initialize analytics and support after first render
 store.dispatch(initializeAnalytics())
+store.dispatch(initializeSupport())
 
 // kickoff an initial update check at launch
 store.dispatch(checkForShellUpdates())
