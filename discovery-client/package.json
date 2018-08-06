@@ -1,0 +1,27 @@
+{
+  "name": "@opentrons/discovery-client",
+  "version": "3.2.0-beta.3",
+  "description": "Node.js client for discovering Opentrons robots on the network",
+  "main": "src/index.js",
+  "bin": {
+    "discovery": "bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Opentrons/opentrons.git"
+  },
+  "author": "Opentrons Labworks <engineering@opentrons.com> (https://opentrons.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "devDependencies": {
+    "flow-bin": "^0.76.0",
+    "flow-typed": "^2.5.1"
+  },
+  "dependencies": {
+    "bonjour": "^3.5.0",
+    "node-fetch": "^2.1.2"
+  }
+}
