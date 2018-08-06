@@ -82,7 +82,6 @@ async def get_attached_modules(request):
         module.disconnect()
     robot.modules = modules.discover_and_connect()
 
-
     data = {"modules": list(map(lambda md: md.to_dict(), robot.modules))}
     return web.json_response(data, status=200)
 
