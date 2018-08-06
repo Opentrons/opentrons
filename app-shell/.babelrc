@@ -1,0 +1,6 @@
+{
+  "extends": "../.babelrc",
+  "presets": [
+    ["env", {"modules": "commonjs"}]
+  ]
+}

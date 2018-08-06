@@ -1,10 +1,11 @@
 // sets up the main window ui
-'use strict'
+import {app, BrowserWindow} from 'electron'
+import path from 'path'
+import {getConfig} from './config'
+import createLogger from './log'
 
-const {app, BrowserWindow} = require('electron')
-const path = require('path')
-const config = require('./config').getConfig('ui')
-const log = require('./log')(__filename)
+const config = getConfig('ui')
+const log = createLogger(__filename)
 
 const urlPath = config.url.protocol === 'file:'
   ? path.join(app.getAppPath(), config.url.path)
@@ -29,7 +30,7 @@ const WINDOW_OPTS = {
   }, config.webPreferences)
 }
 
-module.exports = function createUi () {
+export default function createUi () {
   log.debug('Creating main window', {options: WINDOW_OPTS})
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS)

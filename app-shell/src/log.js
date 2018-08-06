@@ -1,12 +1,12 @@
 // create logger function
-const {app} = require('electron')
-const {inspect} = require('util')
-const fse = require('fs-extra')
-const path = require('path')
-const dateFormat = require('dateformat')
-const winston = require('winston')
+import {app} from 'electron'
+import {inspect} from 'util'
+import fse from 'fs-extra'
+import path from 'path'
+import dateFormat from 'dateformat'
+import winston from 'winston'
 
-const config = require('./config').getConfig('log')
+import {getConfig} from './config'
 
 const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
@@ -22,10 +22,12 @@ const FILE_OPTIONS = {
   tailable: true
 }
 
+let config
 let transports
 let log
 
-module.exports = function getLogger (filename) {
+export default function initializeLogger (filename) {
+  if (!config) config = getConfig('log')
   if (!transports) initializeTransports()
 
   return createLogger(filename)

@@ -1,10 +1,10 @@
 // application menu
-'use strict'
+import {app, Menu} from 'electron'
 
-const {app, Menu} = require('electron')
+import pkg from '../package.json'
+import {getConfig} from './config'
 
-const pkg = require('../package.json')
-const config = require('./config').getConfig()
+const config = getConfig()
 
 // file or application menu
 const firstMenu = {
@@ -89,6 +89,6 @@ const helpMenu = {
 
 const template = [firstMenu, editMenu, viewMenu, windowMenu, helpMenu]
 
-module.exports = function initializeMenu () {
+export default function initializeMenu () {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }

@@ -5,6 +5,11 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+# source and output directories for main process code
+src_dir := src
+lib_dir := lib
+babel := babel $(src_dir) --out-dir $(lib_dir)
+
 # ui directory for production build
 ui_dir := ../app
 
@@ -37,6 +42,13 @@ publish_update := $(OT_TAG)
 
 builder := $(env)=production BUILD_ID=$(build_id) electron-builder -p never
 
+electron := electron . \
+	--devtools \
+	--log.level.console="debug" \
+	--disable_ui.webPreferences.webSecurity \
+	--ui.url.protocol="http:" \
+	--ui.url.path="localhost:$(port)"
+
 # standard targets
 #####################################################################
 
@@ -49,10 +61,14 @@ install:
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	shx rm -rf lib dist
 
 # artifacts
 #####################################################################
+
+.PHONY: lib
+lib:
+	$(babel)
 
 .PHONY: ui
 ui:
@@ -107,10 +123,15 @@ _dist-collect-artifacts:
 #####################################################################
 
 .PHONY: dev
-dev:
-	$(env)=development electron . \
-		--devtools \
-		--log.level.console="debug" \
-		--disable_ui.webPreferences.webSecurity \
-		--ui.url.protocol="http:" \
-		--ui.url.path="localhost:$(port)"
+dev: lib
+	concurrently --no-color --kill-others --names "electron,lib" \
+		"$(MAKE) dev-electron" \
+		"$(MAKE) dev-lib"
+
+.PHONY: dev-electron
+dev-electron:
+	$(env)=development nodemon --watch $(lib_dir) --exec '$(electron)'
+
+.PHONY: dev-lib
+dev-lib:
+	$(babel) --watch
