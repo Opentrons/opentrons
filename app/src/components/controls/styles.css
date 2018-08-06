@@ -22,10 +22,6 @@
   display: block;
 }
 
-label.labeled_control {
-  @apply --clickable;
-}
-
 .labeled_control_label {
   @apply --font-body-1-dark;
 
@@ -45,10 +41,15 @@ label.labeled_control {
   }
 }
 
-.labeled_button {
+.labeled_button,
+.labeled_select {
   float: right;
-  width: 7.5rem;
+  width: 8rem;
   margin-top: 0.25rem;
+}
+
+.labeled_select {
+  @apply --font-body-2-dark;
 }
 
 .control_info {

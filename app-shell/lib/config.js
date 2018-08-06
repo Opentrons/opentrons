@@ -7,6 +7,8 @@ const {getIn} = require('@thi.ng/paths')
 const uuid = require('uuid/v4')
 const yargsParser = require('yargs-parser')
 
+const {version} = require('../package.json')
+
 // make sure all arguments are included in production
 const argv = process.defaultApp
   ? process.argv.slice(2)
@@ -19,10 +21,16 @@ const PARSE_ARGS_OPTS = {
   }
 }
 
-// TODO(mc, 2018-05-25): future config changes will require migration strategy
+// TODO(mc, 2018-05-25): future config changes may require migration strategy
 const DEFAULTS = {
   devtools: false,
+
   modules: false,
+
+  // app update config
+  update: {
+    channel: version.includes('beta') ? 'beta' : 'latest'
+  },
 
   // logging config
   log: {

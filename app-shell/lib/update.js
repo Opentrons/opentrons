@@ -2,6 +2,7 @@
 'use strict'
 
 const {autoUpdater: updater} = require('electron-updater')
+const {getConfig} = require('./config')
 const log = require('./log')(__filename)
 
 updater.logger = log
@@ -19,6 +20,7 @@ function checkForUpdates () {
     updater.once('update-available', handleUpdateAvailable)
     updater.once('update-not-available', handleUpdateNotAvailable)
     updater.once('error', handleError)
+    updater.channel = getConfig('update.channel')
     updater.checkForUpdates()
 
     function handleUpdateAvailable (info) {
