@@ -19,9 +19,6 @@ class AbsentModuleError(Exception):
 
 
 def load(name, slot):
-    # TODO: if robot.is_simulating create class without setting up
-    # it will be out of scope and gc'ed at end of simulation exec
-    # if not simnulating grab from list of modules on robot
     module_instance = None
     if name in SUPPORTED_MODULES:
         if robot.is_simulating():
