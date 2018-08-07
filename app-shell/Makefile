@@ -10,8 +10,10 @@ src_dir := src
 lib_dir := lib
 babel := babel $(src_dir) --out-dir $(lib_dir)
 
-# ui directory for production build
+# dep directories for production build
+# TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
+discovery_client_dir := ../discovery-client
 
 # directories for robot API update bundled in production build
 api_dir := ../api
@@ -70,20 +72,18 @@ clean:
 lib:
 	$(babel)
 
-.PHONY: ui
-ui:
+.PHONY: deps
+deps:
 	$(MAKE) -C $(ui_dir)
+	$(MAKE) -C $(discovery_client_dir)
 
-.PHONY: api
-api:
+.PHONY: api-deps
+api-deps:
 	$(MAKE) -C $(api_dir) wheel
-
-.PHONY: api-lib
-api-lib:
 	$(MAKE) -C $(api_lib_dir) wheel
 
 .PHONY: package-deps
-package-deps: clean lib ui api api-lib
+package-deps: clean lib deps api-deps
 
 .PHONY: package
 package: package-deps
@@ -124,14 +124,4 @@ _dist-collect-artifacts:
 
 .PHONY: dev
 dev: lib
-	concurrently --no-color --kill-others --names "electron,lib" \
-		"$(MAKE) dev-electron" \
-		"$(MAKE) dev-lib"
-
-.PHONY: dev-electron
-dev-electron:
-	$(env)=development nodemon --watch $(lib_dir) --exec '$(electron)'
-
-.PHONY: dev-lib
-dev-lib:
-	$(babel) --watch
+	$(env)=development $(electron)

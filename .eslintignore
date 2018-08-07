@@ -11,3 +11,4 @@ api/**
 
 # compiled
 app-shell/lib/**
+discovery-client/lib/**
