@@ -2,10 +2,10 @@
 // desktop shell module
 import {remote, ipcRenderer} from 'electron'
 import {createSelector, type Selector} from 'reselect'
-
 import createLogger from '../logger'
-
-import type {State, Action, Middleware, ThunkPromiseAction, Error} from '../types'
+import type {RobotService} from '../robot'
+import {makeGetRobotHealth} from '../http-api-client'
+import type {State, Action, Middleware, ThunkPromiseAction, ThunkAction, Error} from '../types'
 
 const {
   CURRENT_VERSION,
@@ -182,4 +182,15 @@ export function getShellConfig () {
 
 function selectShellUpdateState (state: State) {
   return state.shell.update
+}
+
+export function downloadLogs (robot: RobotService): ThunkAction {
+  return (dispatch, getState) => {
+    const health = makeGetRobotHealth()(getState(), robot)
+    const logPaths = health && health.response && health.response.logs
+    if (logPaths) {
+      const logUrls = logPaths.map((p) => `http://${robot.ip}:${robot.port}${p}`)
+      dispatch({type: 'shell:DOWNLOAD_LOGS', payload: {logUrls}, meta: {shell: true}})
+    }
+  }
 }
