@@ -3195,7 +3195,7 @@ dateformat@^3.0.0, dateformat@^3.0.3:
   version "3.0.3"
   resolved "https://registry.npmjs.org/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
 
-debug@2.6.9, debug@^2.1.1, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.6, debug@^2.6.8, debug@^2.6.9:
+debug@2.6.9, debug@^2.1.0, debug@^2.1.1, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.6, debug@^2.6.8, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   dependencies:
@@ -3419,6 +3419,13 @@ dmg-builder@4.1.2:
 dns-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
+
+dns-js@~0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/dns-js/-/dns-js-0.2.1.tgz#5d66629b3c0e6a5eb0e14f0ae701d05f6ea46673"
+  dependencies:
+    debug "^2.1.0"
+    qap "^3.1.2"
 
 dns-packet@^1.0.1:
   version "1.3.1"
@@ -6880,6 +6887,14 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
+mdns-js@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/mdns-js/-/mdns-js-1.0.1.tgz#89a0fd4d85dc6c7630da39d56fc88420bb357867"
+  dependencies:
+    debug "^3.1.0"
+    dns-js "~0.2.1"
+    semver "^5.4.1"
+
 media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
@@ -8680,6 +8695,10 @@ q-i@^1.2.0:
 q@^1.1.2, q@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
+
+qap@^3.1.2:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/qap/-/qap-3.3.1.tgz#11f9e8fa8890fe7cb99210c0f44d0613b7372cac"
 
 qs@6.5.1, qs@^6.5.1, qs@~6.5.1:
   version "6.5.1"

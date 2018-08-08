@@ -3,7 +3,7 @@
 // finds robots on the network via mdns
 
 import EventEmitter from 'events'
-import Bonjour from 'bonjour'
+import mdns from 'mdns-js'
 
 import {poll, stop, type PollRequest} from './poller'
 import {
@@ -18,7 +18,7 @@ import {
   rejectCandidate
 } from './service'
 
-import type {Browser, BrowserService} from 'bonjour'
+import type {Browser, BrowserService} from 'mdns-js'
 import type {
   Candidate,
   Service,
@@ -87,9 +87,8 @@ export class DiscoveryClient extends EventEmitter {
 
   stop (): DiscoveryClient {
     log(this._logger, 'debug', 'stopping discovery client', {})
-    if (this._browser) this._browser.stop()
-    stop(this._pollRequest, this._logger)
-    this._pollRequest = null
+    this._stopBrowser()
+    this._stopPoll()
 
     return this
   }
@@ -141,21 +140,40 @@ export class DiscoveryClient extends EventEmitter {
     )
   }
 
-  _startBrowser (): void {
-    if (this._browser) return this._browser.start()
+  _stopPoll (): void {
+    stop(this._pollRequest, this._logger)
+    this._pollRequest = null
+  }
 
-    // the bonjour browser calls `start` in its constructor
-    this._browser = Bonjour()
-      .find({type: 'http'})
-      .on('up', this._handleUp.bind(this))
-      .on('error', e => this.emit('error', e))
+  _startBrowser (): void {
+    if (this._browser) return this._browser.discover()
+
+    const browser = mdns
+      .createBrowser(mdns.tcp('http'))
+      .once('ready', () => browser.discover())
+      .on('update', service => this._handleUp(service))
+      .on('error', error => this.emit('error', error))
+
+    this._browser = browser
+  }
+
+  _stopBrowser (): void {
+    if (this._browser) {
+      this._browser
+        .removeAllListeners('ready')
+        .removeAllListeners('update')
+        .removeAllListeners('error')
+        .stop()
+
+      this._browser = null
+    }
   }
 
   _handleUp (browserService: BrowserService): void {
     log(this._logger, 'debug', 'mdns service detected', {browserService})
 
     if (
-      this._nameFilter.test(browserService.name) &&
+      this._nameFilter.test(browserService.fullname) &&
       this._allowedPorts.includes(browserService.port)
     ) {
       this._handleService(fromMdnsBrowser(browserService))

@@ -1,9 +1,12 @@
 // @flow
 // create Services from different sources
 import net from 'net'
-import type {BrowserService} from 'bonjour'
+import type {BrowserService, ServiceType} from 'mdns-js'
 
 import type {Service, Candidate, HealthResponse} from './types'
+
+const nameExtractor = (st: ServiceType) =>
+  new RegExp(`^(.+)\\._${st.name}\\._${st.protocol}`)
 
 export const DEFAULT_PORT = 31950
 
@@ -17,13 +20,16 @@ export function makeService (
 }
 
 export function fromMdnsBrowser (browserService: BrowserService): Service {
-  const addresses = browserService.addresses
+  const {addresses, type, port, fullname} = browserService
   let ip = addresses.find(address => net.isIPv4(address))
   if (!ip) ip = addresses.find(address => net.isIP(address))
   if (!ip) ip = browserService.host
   if (net.isIPv6(ip)) ip = `[${ip}]`
 
-  return makeService(browserService.name, ip, browserService.port, null)
+  const nameMatch = type[0] && fullname.match(nameExtractor(type[0]))
+  const name = (nameMatch && nameMatch[1]) || fullname
+
+  return makeService(name, ip, port, null)
 }
 
 export function fromResponse (
