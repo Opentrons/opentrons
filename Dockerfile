@@ -30,6 +30,7 @@ RUN apk add --update \
       dropbear \
       dropbear-scp \
       gnupg \
+      openjdk8 \
       nginx \
       libstdc++ \
       g++ \
