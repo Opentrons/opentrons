@@ -17,15 +17,19 @@ function refresh () {
     watch={state.name}
     refreshing={state.refreshing}
     refresh={refresh}
-    title={`Name: ${state.name}`}
   >
-    <LabeledValue label={'Refreshed at'} value={state.when} />
-    <FlatButton onClick={() => setState({...state, name: 'foo'})}>
-      Name -> "foo"
-    </FlatButton>
-    <FlatButton onClick={() => setState({...state, name: 'bar'})}>
-      Name -> "bar"
-    </FlatButton>
+    <h3 style={{padding:'0.5rem 1rem'}}>Name: {state.name}</h3>
+    <div style={{padding:'1rem'}}>
+      <LabeledValue label={'Refreshed at'} value={state.when} />
+    </div>
+    <div style={{padding:'1rem', textAlign:'right'}}>
+      <OutlineButton onClick={() => setState({...state, name: 'foo'})}>
+        Name -> "foo"
+      </OutlineButton>
+      <OutlineButton onClick={() => setState({...state, name: 'bar'})}>
+        Name -> "bar"
+      </OutlineButton>
+    </div>
   </RefreshCard>
 </div>
 ```
