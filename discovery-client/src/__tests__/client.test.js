@@ -1,35 +1,32 @@
-import Bonjour from 'bonjour'
+import mdns from 'mdns-js'
 import DiscoveryClient from '..'
 import * as poller from '../poller'
 
-jest.mock('bonjour')
+jest.mock('mdns-js')
 jest.mock('../poller')
 
 const BROWSER_SERVICE = {
   addresses: ['192.168.1.42'],
-  name: 'opentrons-dev',
-  fqdn: 'opentrons-dev.local._http._tcp.local',
-  host: 'opentrons-dev.local',
-  referer: {
-    address: '192.168.1.1',
-    family: 'IPv4',
-    port: 5353,
-    size: 514
-  },
+  query: ['_http._tcp.local'],
+  type: [
+    {
+      name: 'http',
+      protocol: 'tcp',
+      subtypes: [],
+      description: 'Web Site'
+    }
+  ],
+  txt: [''],
   port: 31950,
-  type: 'local',
-  protocol: 'http',
-  subtypes: ['tcp'],
-  rawTxt: {'0': 0},
-  txt: {}
+  fullname: 'opentrons-dev._http._tcp.local',
+  host: 'opentrons-dev.local',
+  interfaceIndex: 0,
+  networkInterface: 'en0'
 }
 
 describe('discovery client', () => {
-  let bonjour
-
   beforeEach(() => {
-    Bonjour.__mockReset()
-    bonjour = Bonjour()
+    mdns.__mockReset()
   })
 
   afterEach(() => {
@@ -41,17 +38,18 @@ describe('discovery client', () => {
     const result = client.start()
 
     expect(result).toBe(client)
-    expect(bonjour.find).toHaveBeenCalledWith({type: 'http'})
-    expect(bonjour.__mockBrowser.start).not.toHaveBeenCalled()
+    expect(mdns.createBrowser).toHaveBeenCalledWith(mdns.tcp('http'))
+    expect(mdns.__mockBrowser.discover).not.toHaveBeenCalled()
   })
 
   test('calls start on existing browser', () => {
     const client = DiscoveryClient()
 
     client.start()
-    client.start()
-    expect(bonjour.find).toHaveBeenCalledTimes(1)
-    expect(bonjour.__mockBrowser.start).toHaveBeenCalledTimes(1)
+    expect(mdns.createBrowser).toHaveBeenCalledTimes(1)
+    expect(mdns.__mockBrowser.discover).toHaveBeenCalledTimes(0)
+    mdns.__mockBrowser.emit('ready')
+    expect(mdns.__mockBrowser.discover).toHaveBeenCalledTimes(1)
   })
 
   test('stops browser on client.stop', () => {
@@ -60,7 +58,7 @@ describe('discovery client', () => {
     client.start()
     const result = client.stop()
     expect(result).toBe(client)
-    expect(bonjour.__mockBrowser.stop).toHaveBeenCalled()
+    expect(mdns.__mockBrowser.stop).toHaveBeenCalled()
   })
 
   test(
@@ -80,7 +78,7 @@ describe('discovery client', () => {
         done()
       })
 
-      bonjour.__mockBrowser.emit('up', BROWSER_SERVICE)
+      mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
     },
     10
   )
@@ -97,7 +95,7 @@ describe('discovery client', () => {
         done()
       })
 
-      bonjour.__mockBrowser.emit('up', BROWSER_SERVICE)
+      mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
     },
     10
   )
@@ -117,7 +115,7 @@ describe('discovery client', () => {
         done()
       })
 
-      bonjour.__mockBrowser.emit('up', service)
+      mdns.__mockBrowser.emit('update', service)
     },
     10
   )
@@ -137,7 +135,7 @@ describe('discovery client', () => {
         done()
       })
 
-      bonjour.__mockBrowser.emit('up', service)
+      mdns.__mockBrowser.emit('update', service)
     },
     10
   )
@@ -157,7 +155,7 @@ describe('discovery client', () => {
         done()
       })
 
-      bonjour.__mockBrowser.emit('up', service)
+      mdns.__mockBrowser.emit('update', service)
     },
     10
   )
@@ -369,7 +367,7 @@ describe('discovery client', () => {
       )
     })
 
-    bonjour.__mockBrowser.emit('up', BROWSER_SERVICE)
+    mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
   })
 
   test('services may be removed and removes candidates', () => {
@@ -461,16 +459,22 @@ describe('discovery client', () => {
     })
 
     client.start()
-    bonjour.__mockBrowser.emit('error', mockError)
+    mdns.__mockBrowser.emit('error', mockError)
   })
 
   test('can filter services by name', () => {
     const client = DiscoveryClient({nameFilter: /^OPENTRONS/i})
 
     client.start()
-    bonjour.__mockBrowser.emit('up', BROWSER_SERVICE)
-    bonjour.__mockBrowser.emit('up', {...BROWSER_SERVICE, name: 'Opentrons-2'})
-    bonjour.__mockBrowser.emit('up', {...BROWSER_SERVICE, name: 'fopentrons'})
+    mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
+    mdns.__mockBrowser.emit('update', {
+      ...BROWSER_SERVICE,
+      fullname: 'Opentrons-2._http._tcp.local'
+    })
+    mdns.__mockBrowser.emit('update', {
+      ...BROWSER_SERVICE,
+      fullname: 'fopentrons._http._tcp.local'
+    })
 
     expect(client.services.map(s => s.name)).toEqual([
       'opentrons-dev',
@@ -482,13 +486,17 @@ describe('discovery client', () => {
     const client = DiscoveryClient({allowedPorts: [31950, 31951]})
 
     client.start()
-    bonjour.__mockBrowser.emit('up', BROWSER_SERVICE)
-    bonjour.__mockBrowser.emit('up', {
+    mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
+    mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      name: '2',
+      fullname: '2._http._tcp.local',
       port: 31951
     })
-    bonjour.__mockBrowser.emit('up', {...BROWSER_SERVICE, name: '3', port: 22})
+    mdns.__mockBrowser.emit('update', {
+      ...BROWSER_SERVICE,
+      fullname: '3._http._tcp.local',
+      port: 22
+    })
 
     expect(client.services.map(s => s.port)).toEqual([31950, 31951])
   })

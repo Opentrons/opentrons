@@ -21,7 +21,7 @@
     "flow-typed": "^2.5.1"
   },
   "dependencies": {
-    "bonjour": "^3.5.0",
+    "mdns-js": "^1.0.1",
     "node-fetch": "^2.1.2"
   }
 }
