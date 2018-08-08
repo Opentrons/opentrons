@@ -178,11 +178,16 @@ client.on('error', (error) => console.error(error)
 
 ## cli
 
-`@opentrons/discovery` includes a simple CLI for convenience. It is accessible through the `node_modules` directory of the monorepo. Launch it with:
+`@opentrons/discovery` includes a simple CLI for convenience. After building the project by running `make -C discovery-client`, it is accessible through the `node_modules` directory of the monorepo. Launch it with:
 
 ```shell
-# $NODE_ENV must be set to "test" for correct babel config to be applied
-NODE_ENV=test yarn run discovery
+# prereq: build project before first run or after changes
+make -C discovery-client
+
+# run via yarn run
+yarn run discovery [options]
+# or run from node_modules directly
+node_modules/.bin/discovery [options]
 ```
 
 It will print out robots as it discovers them. It has the same options the API:

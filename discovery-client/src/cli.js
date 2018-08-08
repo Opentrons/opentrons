@@ -1,11 +1,5 @@
-#!/usr/bin/env node
-'use strict'
-
-// TODO(mc, 2018-07-25): actually compile this package; until then,
-// NODE_ENV must be set to "test" for this register to work with "import"
-require('babel-register')
-
-const {default: DiscoveryClient, DEFAULT_POLL_INTERVAL} = require('..')
+// @flow
+import DiscoveryClient, {DEFAULT_POLL_INTERVAL} from '.'
 
 const LOG_LVL = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
   .indexOf(process.env.OT_LOG_LEVEL || 'info')
