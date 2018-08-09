@@ -3,6 +3,7 @@ import os
 import json
 from typing import List
 from opentrons.config import get_config_index
+import logging
 
 """
 There will be 3 directories for json blobs to define labware:
@@ -109,6 +110,7 @@ Notes:
 # on the robot, and fall back to paths relative to this file within the source
 # repository for development purposes
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+log = logging.getLogger(__name__)
 
 
 def default_definition_dir():
@@ -212,19 +214,27 @@ def list_all_labware() -> List[str]:
 def _save_user_definition(path: str, defn: dict) -> bool:
     filename = os.path.join(
         path, '{}.json'.format(defn['metadata']['name']))
-    with open(filename, 'w') as def_file:
-        json.dump(defn, def_file, indent=2)
-    # Once possible failures are understood, catch and return a success code
-    return True
+    try:
+        with open(filename, 'w') as def_file:
+            json.dump(defn, def_file, indent=2)
+        successful = True
+    except OSError:
+        log.exception('Failed to write user definition with exception:')
+        successful = False
+    return successful
 
 
 def _save_offset(path: str, name: str, offset: dict):
     filename = os.path.join(
         path, '{}.json'.format(name))
-    with open(filename, 'w') as offset_file:
-        json.dump(offset, offset_file, indent=2)
-    # Once possible failures are understood, catch and return a success code
-    return True
+    try:
+        with open(filename, 'w') as offset_file:
+            json.dump(offset, offset_file, indent=2)
+        successful = True
+    except OSError:
+        log.exception('Failed to write user definition with exception:')
+        successful = False
+    return successful
 
 
 def save_user_definition(defn: dict) -> bool:
@@ -234,9 +244,14 @@ def save_user_definition(defn: dict) -> bool:
     :return: success code
     """
     defn_dir = user_defn_dir()
-    if not os.path.exists(defn_dir):
-        os.makedirs(defn_dir, exist_ok=True)
-    return _save_user_definition(defn_dir, defn)
+    try:
+        if not os.path.exists(defn_dir):
+            os.makedirs(defn_dir, exist_ok=True)
+        successful = _save_user_definition(defn_dir, defn)
+    except OSError:
+        log.exception('Failed to save user definition with exception:')
+        successful = False
+    return successful
 
 
 def save_labware_offset(name: str, offset: dict) -> bool:
