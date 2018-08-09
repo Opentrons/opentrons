@@ -5,8 +5,7 @@ import {Link} from 'react-router-dom'
 
 import type {ShellUpdate} from '../../shell'
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
-
-import styles from './styles.css'
+import {CardContentHalf} from '../layout'
 
 type Props = {
   update: ShellUpdate,
@@ -28,13 +27,13 @@ export default function AppInfoCard (props: Props) {
       refreshing={checkInProgress}
       refresh={checkForUpdates}
     >
-      <div className={styles.card_content_50}>
+      <CardContentHalf>
         <LabeledValue
           label={VERSION_LABEL}
           value={current}
         />
-      </div>
-      <div className={styles.card_content_50}>
+      </CardContentHalf>
+      <CardContentHalf>
         <OutlineButton
           Component={Link}
           to='/menu/app/update'
@@ -42,7 +41,7 @@ export default function AppInfoCard (props: Props) {
         >
           {available ? 'update' : 'updated'}
         </OutlineButton>
-      </div>
+      </CardContentHalf>
     </RefreshCard>
   )
 }

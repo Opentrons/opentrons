@@ -25,3 +25,15 @@
     margin-right: var(--card_spacing);
   }
 }
+
+.card_content_50 {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 1rem 0 1rem 1rem;
+
+  &:last-child {
+    text-align: right;
+    padding: 1rem;
+  }
+}
