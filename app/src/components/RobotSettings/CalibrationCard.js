@@ -6,7 +6,7 @@ import {push} from 'react-router-redux'
 
 import type {Robot} from '../../robot'
 import {startDeckCalibration} from '../../http-api-client'
-import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
+import {Card, OutlineButton} from '@opentrons/components'
 import {CardContentFlex, CardContentFull} from '../layout'
 
 type OP = Robot
