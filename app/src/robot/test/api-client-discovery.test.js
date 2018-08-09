@@ -58,10 +58,6 @@ describe('api client - discovery', () => {
 
   afterEach(() => delay(EXPECTED_DISCOVERY_MS))
 
-  test('kicks off a discovery run immediately', () => {
-    expect(dispatch).toHaveBeenCalledWith(actions.discover())
-  })
-
   test('searches for HTTP services', () => {
     return sendToClient(notScanningState, actions.discover())
       .then(() => expect(bonjour.find).toHaveBeenCalledWith({type: 'http'}))

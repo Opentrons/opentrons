@@ -36,7 +36,6 @@ export type BaseRobot = {
 
 // robot MDNS service for connectivity
 export type RobotService = BaseRobot & {
-  host: string,
   ip: string,
   port: number,
   wired?: boolean,
