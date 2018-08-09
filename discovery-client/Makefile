@@ -9,6 +9,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 src_dir := src
 lib_dir := lib
 babel := babel $(src_dir) --out-dir $(lib_dir) --ignore '**/__tests__/**'
+flow_copy := flow-copy-source --ignore '**/__tests__/**' $(src_dir) $(lib_dir)
 
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
@@ -33,3 +34,4 @@ clean:
 .PHONY: lib
 lib:
 	$(env)=production $(babel)
+	$(flow_copy)

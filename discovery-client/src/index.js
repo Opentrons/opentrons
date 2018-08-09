@@ -27,6 +27,8 @@ import type {
   Logger
 } from './types'
 
+export * from './types'
+
 type Options = {
   pollInterval?: number,
   services?: Array<Service>,

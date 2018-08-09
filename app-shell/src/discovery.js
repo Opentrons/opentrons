@@ -13,8 +13,9 @@ import DiscoveryClient, {
 import {getConfig} from './config'
 import createLogger from './log'
 
-// TODO(mc, 2018-08-08): figure out type exports thru compilation
-import type {Service} from '@opentrons/discovery-client/src/types'
+import type {Service} from '@opentrons/discovery-client'
+
+// TODO(mc, 2018-08-08): figure out type exports from app
 import type {Action} from '@opentrons/app/src/types'
 import type {DiscoveredRobot, Connection} from '@opentrons/app/src/discovery/types'
 
