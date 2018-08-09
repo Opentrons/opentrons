@@ -4,6 +4,11 @@ exports[`Card renders Card correctly 1`] = `
 <section
   className="card"
 >
+  <h3
+    className="card_title"
+  >
+    title
+  </h3>
   children children children
 </section>
 `;

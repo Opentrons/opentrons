@@ -7,6 +7,8 @@ import cx from 'classnames'
 import styles from './structure.css'
 
 type Props = {
+  /** Title for card, all cards should receive a title. */
+  title?: React.Node,
   /** Card contents */
   children: React.Node,
   /** If card can not be used, gray it out and remove pointer events */
@@ -21,7 +23,7 @@ type Props = {
  * Titles and other children handle thier own styles and layout.
  */
 export default function Card (props: Props) {
-  const {children} = props
+  const {title, children} = props
 
   const style = cx(styles.card, props.className, {
     [styles.disabled]: props.disabled
@@ -29,6 +31,7 @@ export default function Card (props: Props) {
 
   return (
     <section className={style}>
+      {title && (<h3 className={styles.card_title}>{title}</h3>)}
       {children}
     </section>
   )

@@ -14,11 +14,11 @@ function refresh () {
 
 ;<div style={{width: '32rem'}}>
   <RefreshCard
+    title={`Name: ${state.name}`}
     watch={state.name}
     refreshing={state.refreshing}
     refresh={refresh}
   >
-    <h3 style={{padding:'0.5rem 1rem'}}>Name: {state.name}</h3>
     <div style={{padding:'1rem'}}>
       <LabeledValue label={'Refreshed at'} value={state.when} />
     </div>

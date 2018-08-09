@@ -1,0 +1,13 @@
+@import '@opentrons/components';
+
+/*  TODO (ka 2018-8-9): move this style up to layout and implement as layout component */
+.card_content_50 {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 1rem;
+
+  &:last-child {
+    text-align: right;
+  }
+}
