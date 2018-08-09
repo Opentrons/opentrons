@@ -5,9 +5,9 @@ import styles from './styles.css'
 type Props = {
   children: React.Node,
 }
-export default function CardContentHalf (props: Props) {
+export default function CardContentFlex (props: Props) {
   return (
-    <div className={styles.card_content_50}>
+    <div className={styles.card_content_flex}>
       {props.children}
     </div>
   )

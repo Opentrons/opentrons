@@ -17,7 +17,7 @@ import {
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue} from '@opentrons/components'
-
+import {CardContentFull} from '../layout'
 import WifiConnectForm from './WifiConnectForm'
 import WifiConnectModal from './WifiConnectModal'
 
@@ -87,17 +87,19 @@ function ConnectivityCard (props: Props) {
         title={TITLE}
         column
       >
-        <LabeledValue
-          label={CONNECTED_BY_LABEL}
-          value={`${connectedBy} - ${ip}`}
-        />
-        <WifiConnectForm
-          key={name}
-          disabled={configInProgress}
-          activeSsid={activeSsid}
-          networks={listOptions}
-          onSubmit={configure}
-        />
+        <CardContentFull>
+          <LabeledValue
+            label={CONNECTED_BY_LABEL}
+            value={`${connectedBy} - ${ip}`}
+          />
+          <WifiConnectForm
+            key={name}
+            disabled={configInProgress}
+            activeSsid={activeSsid}
+            networks={listOptions}
+            onSubmit={configure}
+          />
+        </CardContentFull>
       </RefreshCard>
       {(!!configError || !!configResponse) && (
         <WifiConnectModal

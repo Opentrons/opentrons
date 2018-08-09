@@ -26,6 +26,13 @@
   }
 }
 
+.card_content_full {
+  width: 100%;
+  overflow-y: auto;
+  padding: 1rem;
+  font-size: var(--fs-body-2);
+}
+
 .card_content_50 {
   display: inline-block;
   vertical-align: top;
@@ -36,4 +43,23 @@
     text-align: right;
     padding: 1rem;
   }
+}
+
+.card_content_25 {
+  display: inline-block;
+  font-size: 0;
+  vertical-align: top;
+  width: calc(25% - 0.5rem);
+  padding: 1rem 0 1rem 1rem;
+
+  &:last-child {
+    text-align: right;
+    padding: 1rem;
+  }
+}
+
+.card_content_flex {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
 }
