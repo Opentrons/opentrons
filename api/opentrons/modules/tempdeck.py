@@ -51,7 +51,8 @@ class TempDeck:
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': 'Temperature Deck',
-            'status': self.status
+            'status': self.status,
+            'data': {'currentTemp': self.temperature, 'targetTemp': self.target}
         }
 
     @property

@@ -19,6 +19,7 @@ class MagDeck:
         self._driver = None
         self._device_info = None
 
+    @commands.publish.both(command=commands.magdeck_calibrate)
     def calibrate(self):
         '''
         Calibration involves probing for top plate to get the plate height
@@ -28,6 +29,7 @@ class MagDeck:
             # return if successful or not?
             self._engaged = False
 
+    @commands.publish.both(command=commands.magdeck_engage)
     def engage(self):
         '''
         Move the magnet to plate top - 1 mm
@@ -36,6 +38,7 @@ class MagDeck:
             self._driver.move(self._driver.plate_height - 1.0)
             self._engaged = True
 
+    @commands.publish.both(command=commands.magdeck_disengage)
     def disengage(self):
         '''
         Home the magnet
@@ -54,7 +57,8 @@ class MagDeck:
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': 'Magnetic Deck',
-            'status': self.status
+            'status': self.status,
+            'data': {'engaged': self._engaged}
         }
 
     @property

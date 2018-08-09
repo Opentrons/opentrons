@@ -250,26 +250,29 @@ def drop_tip(instrument, location):
     )
 
 
-def engage(motor):
-    text = "Engaging Magbead at mosfet #{motor}"
+def magdeck_engage():
+    text = "Engaging Magnetic Deck Module"
     return make_command(
-        name=types.MAGBEAD_ENGAGE,
-        payload={
-            'motor': motor,
-            'text': text
-        }
+        name=types.MAGDECK_ENGAGE,
+        payload={ 'text': text }
     )
 
 
-def disengage(motor):
-    text = "Disengaging Magbead at mosfet #{motor}"
+def magdeck_disengage();
+    text = "Disengaging Magnetic Deck module"
     return make_command(
-        name=types.MAGBEAD_ENGAGE,
-        payload={
-            'motor': motor,
-            'text': text
-        }
+        name=types.MAGDECK_DISENGAGE,
+        payload={ 'text': text }
     )
+
+
+def magdeck_calibrate():
+    text = "Calibrating Magnetic Deck Module"
+    return make_command(
+        name=types.MAGDECK_CALIBRATE,
+        payload={ 'text': text }
+    )
+
 
 
 def delay(seconds, minutes):
