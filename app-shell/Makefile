@@ -8,7 +8,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # source and output directories for main process code
 src_dir := src
 lib_dir := lib
-babel := babel $(src_dir) --out-dir $(lib_dir) --ignore '**/__tests__/**'
+babel := babel $(src_dir) --out-dir $(lib_dir) --ignore '**/__@(tests|mocks)__/**'
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
