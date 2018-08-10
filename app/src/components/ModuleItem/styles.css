@@ -11,7 +11,11 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 1.5rem;
+  padding: 1.5rem 1rem 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
 }
 
 .module_image_wrapper {

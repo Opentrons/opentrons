@@ -16,6 +16,11 @@
 
 .labeled_control_wrapper {
   width: 100%;
+  padding: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
 }
 
 .labeled_control {

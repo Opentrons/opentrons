@@ -3,6 +3,8 @@
 import * as React from 'react'
 import {Card, OutlineButton} from '@opentrons/components'
 
+import styles from './styles.css'
+
 type Props = {
   title: React.Node,
   description: React.Node,
@@ -14,14 +16,17 @@ export default function ResourceCard (props: Props) {
     <Card
       title={props.title}
     >
-      <p>{props.description}</p>
+    <div className={styles.card_content}>
+      <p className={styles.link_label}>{props.description}</p>
       <OutlineButton
         Component="a"
         href={props.url}
         target="_blank"
+        className={styles.link_button}
       >
         View in Browser
       </OutlineButton>
+      </div>
     </Card>
   )
 }

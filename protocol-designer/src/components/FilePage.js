@@ -32,7 +32,7 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
   return (
     <div className={styles.file_page}>
       <Card title='Information'>
-        <form onSubmit={handleSubmit} className={styles.override_card_flex}>
+        <form onSubmit={handleSubmit} className={styles.card_content}>
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
               <InputField placeholder='Untitled' {...formConnector('name')} />
@@ -55,7 +55,7 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
       </Card>
 
       <Card title='Pipettes'>
-        <div className={styles.override_card_flex}>
+        <div className={styles.card_content}>
           <InstrumentGroup {...instruments} showMountLabel />
           <OutlineButton
             onClick={swapPipettes}

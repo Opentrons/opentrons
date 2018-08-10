@@ -12,6 +12,7 @@ import {
 } from '../../robot'
 
 import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
+import {CardContentHalf} from '../layout'
 
 type OwnProps = Robot
 
@@ -38,13 +39,17 @@ function StatusCard (props: Props) {
 
   return (
     <Card title={TITLE}>
-      <LabeledValue
-        label={STATUS_LABEL}
-        value={status}
-      />
-      <OutlineButton onClick={onClick}>
-        {connectButtonText}
-      </OutlineButton>
+      <CardContentHalf>
+        <LabeledValue
+          label={STATUS_LABEL}
+          value={status}
+        />
+      </CardContentHalf>
+      <CardContentHalf>
+        <OutlineButton onClick={onClick}>
+          {connectButtonText}
+        </OutlineButton>
+      </CardContentHalf>
     </Card>
   )
 }
