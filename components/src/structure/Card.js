@@ -20,7 +20,7 @@ type Props = {
 /**
  * Renders a basic card element with a white background, dropshadow, and zero padding.
  *
- * Titles and other children handle thier own styles and layout.
+ * Titles and other children handle their own styles and layout.
  */
 export default function Card (props: Props) {
   const {title, children} = props
