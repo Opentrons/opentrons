@@ -69,7 +69,6 @@ describe('app-shell/discovery', () => {
         expected: [
           {
             name: 'opentrons-dev',
-            ok: true,
             connections: [{ip: '192.168.1.42', port: 31950, ok: true, local: false}]
           }
         ]
@@ -83,14 +82,12 @@ describe('app-shell/discovery', () => {
         expected: [
           {
             name: 'opentrons-1',
-            ok: false,
             connections: [
               {ip: '192.168.1.42', port: 31950, ok: false, local: false}
             ]
           },
           {
             name: 'opentrons-2',
-            ok: true,
             connections: [
               {ip: '169.254.9.8', port: 31950, ok: true, local: true}
             ]
@@ -106,7 +103,6 @@ describe('app-shell/discovery', () => {
         expected: [
           {
             name: 'opentrons-dev',
-            ok: true,
             connections: [
               {ip: '192.168.1.42', port: 31950, ok: true, local: false},
               {ip: '169.254.9.8', port: 31950, ok: true, local: true}

@@ -8,6 +8,5 @@ export type Connection = {
 
 export type DiscoveredRobot = {
   name: string,
-  ok: ?boolean,
   connections: Array<Connection>,
 }

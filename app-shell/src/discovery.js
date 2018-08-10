@@ -63,7 +63,6 @@ function servicesToRobots (services: Array<Service>): Array<DiscoveredRobot> {
 
   return map(servicesByName, (services: Array<Service>, name) => ({
     name,
-    ok: services.reduce((ok, s) => ok || s.ok, null),
     connections: servicesToConnections(services)
   }))
 }
