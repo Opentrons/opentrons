@@ -25,7 +25,7 @@ except ModuleNotFoundError:
 from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
-lock_file_path = 'tmp/resin/resin-updates.lock'
+lock_file_path = '/tmp/resin/resin-updates.lock'
 if os.environ.get('RUNNING_ON_PI'):
     log_file_path = '/data/user_storage/opentrons_data/logs'
 else:
