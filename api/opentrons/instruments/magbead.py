@@ -45,7 +45,7 @@ class Magbead(Instrument):
         """
         self.engaged = True
 
-        @commands.publish.before(command=commands.magbead.engage)
+        # @commands.publish.before(command=commands.magbead.engage)
         def _engage(motor):
             motor.engage()
 
@@ -60,14 +60,14 @@ class Magbead(Instrument):
         """
         self.engaged = False
 
-        @commands.publish.before(command=commands.magbead.disengage)
+        # @commands.publish.before(command=commands.magbead.disengage)
         def _disengage(motor):
             motor.disengage()
 
         _disengage(self.motor)
         return self
 
-    @commands.publish.before(command=commands.magbead.delay)
+    # @commands.publish.before(command=commands.magbead.delay)
     def delay(self, seconds=0, minutes=0):
         """
         Pause the robot for a given number of seconds

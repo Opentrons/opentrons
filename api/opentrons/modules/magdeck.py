@@ -1,5 +1,5 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
-
+from opentrons import commands
 
 class MissingDevicePortError(Exception):
     pass
