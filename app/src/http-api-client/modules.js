@@ -47,6 +47,11 @@ type FetchModulesResponse = {
   modules: Array<Module>,
 }
 
+type FetchModuleDataResponse = {
+  status: string,
+  data: TempDeckData | MagDeckData
+}
+
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
 
 export type ModulesAction =
@@ -66,6 +71,22 @@ export function fetchModules (robot: RobotService): ThunkPromiseAction {
       .then(
         (resp: FetchModulesResponse) => apiSuccess(robot, MODULES, resp),
         (err: ApiRequestError) => apiFailure(robot, MODULES, err)
+      )
+      .then(dispatch)
+  }
+}
+
+const DATA: 'data' = 'data'
+
+export function fetchModuleData (robot: RobotService, serial: string): ThunkPromiseAction {
+  return (dispatch) => {
+    const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+    dispatch(apiRequest(robot, fetchDataPath, null))
+
+    return client(robot, 'GET', fetchDataPath)
+      .then(
+        (resp: FetchModuleDataResponse) => apiSuccess(robot, fetchDataPath, resp),
+        (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
       )
       .then(dispatch)
   }

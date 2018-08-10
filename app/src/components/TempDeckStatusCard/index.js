@@ -7,7 +7,7 @@ import {
   type Robot
 } from '../../robot'
 import type {TempDeckModule} from '../../http-api-client'
-import {fetchModules, makeGetRobotModules} from '../../http-api-client'
+import {fetchModuleData, makeGetRobotModules} from '../../http-api-client'
 import {LabeledValue, IntervalWrapper} from '@opentrons/components'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
@@ -21,13 +21,13 @@ type SP = {
 type DP = {dispatch: Dispatch}
 
 type Props = SP & {
-  fetchModules: () => mixed
+  fetchTempDeckData: () => mixed
 }
 
 export default connect(makeSTP, null, mergeProps)(TempDeckStatusCard)
 
 function TempDeckStatusCard (props: Props) {
-  const {tempDeck, fetchModules} = props
+  const {tempDeck, fetchModuleData} = props
 
   if (!tempDeck) return null
 
@@ -36,7 +36,7 @@ function TempDeckStatusCard (props: Props) {
   const TARGET = `${tempDeck.data.targetTemp} º C`
   return (
     <IntervalWrapper
-      refresh={fetchModules}
+      refresh={fetchModuleData}
       interval={1000}
     >
         <StatusCard title={tempDeck.displayName}>
@@ -70,10 +70,10 @@ function makeSTP (): (state: State) => SP {
 
 function mergeProps (stateProps: SP, dispatchProps: DP): Props {
   const {dispatch} = dispatchProps
-  const {_robot} = stateProps
+  const {_robot, tempDeck} = stateProps
 
   return {
     ...stateProps,
-    fetchModules: () => _robot && dispatch(fetchModules(_robot))
+    fetchTempDeckData: () => false && _robot && dispatch(fetchModuleData(_robot, tempDeck.serial))
   }
 }

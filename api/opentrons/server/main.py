@@ -166,6 +166,8 @@ def init(loop=None):
         '/identify', control.identify)
     server.app.router.add_get(
         '/modules', control.get_attached_modules)
+    server.app.router.add_get(
+        '/modules/{serial}/data', control.get_module_data)
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(

@@ -53,6 +53,11 @@ class TempDeck:
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': 'Temperature Deck',
+            **self.live_data()
+        }
+
+    def live_data(self):
+        return {
             'status': self.status,
             'data': {'currentTemp': self.temperature, 'targetTemp': self.target}
         }
