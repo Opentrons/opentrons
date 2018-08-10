@@ -12,6 +12,10 @@ if [ "$TRAVIS_OS_NAME" = "osx" ]; then
   eval "$(pyenv init -)"
 fi
 
+# upgrade yarn
+curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
+export PATH=$HOME/.yarn/bin:$PATH
+
 # report versions for sanity
 echo "make --version"
 make --version
