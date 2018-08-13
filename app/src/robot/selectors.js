@@ -1,12 +1,20 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
-import sortBy from 'lodash/sortBy'
+import orderBy from 'lodash/orderBy'
 import {createSelector, type Selector} from 'reselect'
+
+import {
+  type ConnectionStatus,
+  _NAME,
+  PIPETTE_MOUNTS,
+  DECK_SLOTS
+} from './constants'
+
+import {getDiscoveredRobotsByName} from '../discovery'
+
 import type {ContextRouter} from 'react-router'
-
 import type {State} from '../types'
-
 import type {
   Mount,
   Pipette,
@@ -18,13 +26,6 @@ import type {
   SessionStatus,
   SessionModule
 } from './types'
-
-import {
-  type ConnectionStatus,
-  _NAME,
-  PIPETTE_MOUNTS,
-  DECK_SLOTS
-} from './constants'
 
 const calibration = (state: State) => state[_NAME].calibration
 const connection = (state: State) => state[_NAME].connection
@@ -46,31 +47,40 @@ export function labwareType (labware: Labware): LabwareType {
     : 'labware'
 }
 
-export function getIsScanning (state: State): boolean {
-  return connection(state).isScanning
-}
+// TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
+export const getDiscovered: Selector<State, void, Array<Robot>> =
+  createSelector(
+    getDiscoveredRobotsByName,
+    (state: State) => connection(state).connectedTo,
+    (discoveredByName, connectedTo) => {
+      const robots = Object.keys(discoveredByName)
+        .map(name => {
+          const robot = discoveredByName[name]
+          const connection = orderBy(
+            robot.connections,
+            ['ok', 'local'],
+            ['desc', 'desc']
+          ).find(c => c.ok)
 
-export function getDiscoveredByName (state: State) {
-  return connection(state).discoveredByName
-}
+          if (!connection) return null
 
-export const getDiscovered = createSelector(
-  (state: State) => connection(state).discovered,
-  getDiscoveredByName,
-  (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo): Robot[] => {
-    const robots = discovered.map((name) => ({
-      ...discoveredByName[name],
-      isConnected: connectedTo === name
-    }))
+          return {
+            name: robot.name,
+            ip: connection.ip,
+            port: connection.port,
+            wired: connection.local,
+            isConnected: connectedTo === name
+          }
+        })
+        .filter(Boolean)
 
-    return sortBy(robots, [
-      (robot) => !robot.isConnected,
-      (robot) => !robot.wired,
-      'name'
-    ])
-  }
-)
+      return orderBy(
+        robots,
+        ['isConnected', 'wired', 'name'],
+        ['desc', 'desc', 'asc']
+      )
+    }
+  )
 
 export function getConnectRequest (state: State) {
   return connection(state).connectRequest

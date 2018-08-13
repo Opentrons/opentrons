@@ -8,34 +8,9 @@ describe('robot reducer - connection', () => {
     const state = reducer(undefined, {})
 
     expect(getState(state)).toEqual({
-      isScanning: false,
-      discovered: [],
-      discoveredByName: {},
       connectedTo: '',
       connectRequest: {inProgress: false, error: null, name: ''},
       disconnectRequest: {inProgress: false, error: null}
-    })
-  })
-
-  test('handles DISCOVER action', () => {
-    const state = {
-      connection: {isScanning: false}
-    }
-    const action = {type: 'robot:DISCOVER'}
-
-    expect(getState(reducer(state, action))).toEqual({
-      isScanning: true
-    })
-  })
-
-  test('handles DISCOVER_FINISH action', () => {
-    const state = {
-      connection: {isScanning: true}
-    }
-    const action = {type: 'robot:DISCOVER_FINISH'}
-
-    expect(getState(reducer(state, action))).toEqual({
-      isScanning: false
     })
   })
 
@@ -157,128 +132,6 @@ describe('robot reducer - connection', () => {
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: '',
       disconnectRequest: {inProgress: false, error: null}
-    })
-  })
-
-  test('handles ADD_DISCOVERED action', () => {
-    const state = {
-      connection: {
-        discovered: ['foo'],
-        discoveredByName: {
-          foo: {host: 'abcdef.local', name: 'foo'}
-        }
-      }
-    }
-    const action = {
-      type: 'robot:ADD_DISCOVERED',
-      payload: {host: '123456.local', name: 'bar'}
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      discovered: ['foo', 'bar'],
-      discoveredByName: {
-        foo: {host: 'abcdef.local', name: 'foo'},
-        bar: {host: '123456.local', name: 'bar'}
-      }
-    })
-  })
-
-  test('handles ADD_DISCOVERED action when robot is already present', () => {
-    const state = {
-      connection: {
-        discovered: ['foo'],
-        discoveredByName: {
-          foo: {host: 'abcdef.local', name: 'foo'}
-        }
-      }
-    }
-    const action = {
-      type: 'robot:ADD_DISCOVERED',
-      payload: {host: 'abcdef.local', name: 'foo'}
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      discovered: ['foo'],
-      discoveredByName: {
-        foo: {host: 'abcdef.local', name: 'foo'}
-      }
-    })
-  })
-
-  test('handles REMOVE_DISCOVERED action', () => {
-    const state = {
-      connection: {
-        discovered: ['foo', 'bar'],
-        discoveredByName: {
-          foo: {host: 'abcdef.local', name: 'foo'},
-          bar: {host: '123456.local', name: 'bar'}
-        }
-      }
-    }
-    const action = {
-      type: 'robot:REMOVE_DISCOVERED',
-      payload: {name: 'foo'}
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      discovered: ['bar'],
-      discoveredByName: {
-        bar: {host: '123456.local', name: 'bar'}
-      }
-    })
-  })
-
-  test('adds wired robot to discovered on /health api:SUCCESS', () => {
-    const state = {
-      connection: {
-        discovered: ['foo'],
-        discoveredByName: {
-          foo: {name: 'foo', host: 'abcdef.local'}
-        }
-      }
-    }
-
-    const action = {
-      type: 'api:SUCCESS',
-      payload: {
-        robot: {name: 'bar', host: 'ghijkl.local', wired: true},
-        path: 'health'
-      }
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      discovered: ['foo', 'bar'],
-      discoveredByName: {
-        foo: {name: 'foo', host: 'abcdef.local'},
-        bar: {name: 'bar', host: 'ghijkl.local', wired: true}
-      }
-    })
-  })
-
-  test('removes wired robot from discovered on /health api:FAILURE', () => {
-    const state = {
-      connection: {
-        discovered: ['foo', 'bar'],
-        discoveredByName: {
-          foo: {name: 'foo', host: 'abcdef.local'},
-          bar: {name: 'bar', host: 'ghijkl.local', wired: true}
-        }
-      }
-    }
-
-    const action = {
-      type: 'api:FAILURE',
-      payload: {
-        robot: {name: 'bar', host: 'ghijkl.local', wired: true},
-        path: 'health'
-      }
-    }
-
-    expect(getState(reducer(state, action))).toEqual({
-      discovered: ['foo'],
-      discoveredByName: {
-        foo: {name: 'foo', host: 'abcdef.local'}
-      }
     })
   })
 })

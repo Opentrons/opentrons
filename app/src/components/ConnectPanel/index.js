@@ -5,10 +5,8 @@ import {connect} from 'react-redux'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions
-} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
+import {startDiscovery, getScanning} from '../../discovery'
 
 import {SidePanel} from '@opentrons/components'
 import RobotList from './RobotList'
@@ -51,12 +49,12 @@ function mapStateToProps (state: State): StateProps {
   return {
     robots,
     found: robots.length > 0,
-    isScanning: robotSelectors.getIsScanning(state)
+    isScanning: getScanning(state)
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
   return {
-    onScanClick: () => dispatch(robotActions.discover())
+    onScanClick: () => dispatch(startDiscovery())
   }
 }

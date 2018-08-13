@@ -75,8 +75,14 @@ describe('api client', () => {
   const STATE = {
     [NAME]: {
       connection: {
-        discoveredByName: {
-          [ROBOT_NAME]: {ip: ROBOT_IP, port: 31950}
+        connectedTo: ''
+      }
+    },
+    discovery: {
+      robotsByName: {
+        [ROBOT_NAME]: {
+          name: ROBOT_NAME,
+          connections: [{ip: ROBOT_IP, port: 31950, ok: true}]
         }
       }
     }

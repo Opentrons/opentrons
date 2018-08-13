@@ -3,9 +3,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import type {State, Dispatch} from '../../types'
-import {actions as robotActions, type Robot} from '../../robot'
-
+import {startDiscovery} from '../../discovery'
 import {
   fetchWifiList,
   configureWifi,
@@ -20,6 +18,9 @@ import {RefreshCard, LabeledValue} from '@opentrons/components'
 import {CardContentFull} from '../layout'
 import WifiConnectForm from './WifiConnectForm'
 import WifiConnectModal from './WifiConnectModal'
+
+import type {State, Dispatch} from '../../types'
+import type {Robot} from '../../robot'
 
 type OwnProps = Robot
 
@@ -137,7 +138,7 @@ function mapDispatchToProps (
   const clearConfigureAction = clearConfigureWifiResponse(ownProps)
   const clearFailedConfigure = () => dispatch(clearConfigureAction)
   const clearSuccessfulConfigure = () => fetchList()
-    .then(() => dispatch(robotActions.discover()))
+    .then(() => dispatch(startDiscovery()))
     .then(() => dispatch(clearConfigureAction))
 
   return {

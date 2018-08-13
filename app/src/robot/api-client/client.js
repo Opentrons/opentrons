@@ -52,7 +52,15 @@ export default function client (dispatch) {
     if (rpcClient) disconnect()
 
     const name = action.payload.name
-    const target = state[constants._NAME].connection.discoveredByName[name]
+    const target = selectors.getDiscovered(state)
+      .find(r => r.name === name)
+
+    if (!target) {
+      return dispatch(
+        actions.connectResponse(new Error(`Robot "${name}" not found`))
+      )
+    }
+
     const {ip, port} = target
 
     RpcClient(`ws://${ip}:${port}`)

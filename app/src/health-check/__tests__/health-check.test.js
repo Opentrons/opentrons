@@ -16,7 +16,9 @@ import {
 jest.mock('../../http-api-client/health')
 
 const name = 'opentrons-dev'
-const robot = {name, ip: '1.2.3.4', port: '1234'}
+const ip = '1.2.3.4'
+const port = '1234'
+const robot = {name, ip, port}
 
 describe('health check', () => {
   let state
@@ -26,8 +28,13 @@ describe('health check', () => {
       robot: {
         connection: {
           connectedTo: name,
-          connectRequest: {name},
-          discoveredByName: {[name]: robot}}
+          connectRequest: {name}
+        }
+      },
+      discovery: {
+        robotsByName: {
+          [name]: {name, connections: [{ip, port, ok: true}]}
+        }
       },
       healthCheck: {
         alreadyRunning: {id: 1, missed: 0},
@@ -149,7 +156,12 @@ describe('health check', () => {
       state.robot.connection.connectedTo = ''
       invoke(robotActions.connectResponse())
       // middleware should pull `robot` from the connection request state
-      expect(store.dispatch).toHaveBeenCalledWith(startHealthCheck(robot))
+      expect(store.dispatch).toHaveBeenCalledWith(
+        startHealthCheck(expect.objectContaining({
+          ip: robot.ip,
+          port: robot.port
+        }))
+      )
     })
 
     test('CONNECT_RESPONSE failure noops', () => {

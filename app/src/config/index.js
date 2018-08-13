@@ -52,6 +52,10 @@ export type Config = {
     name: string,
     email: ?string,
   },
+
+  discovery: {
+    enabled: boolean,
+  },
 }
 
 type UpdateConfigAction = {|

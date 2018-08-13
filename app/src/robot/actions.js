@@ -6,7 +6,6 @@ import type {
   Slot,
   Axis,
   Direction,
-  BaseRobot,
   RobotService,
   ProtocolFile,
   SessionUpdate
@@ -36,7 +35,7 @@ export type AddDiscoveredAction = {|
 
 export type RemoveDiscoveredAction = {|
   type: 'robot:REMOVE_DISCOVERED',
-  payload: BaseRobot,
+  payload: RobotService,
 |}
 
 export type ConnectAction = {|
@@ -236,10 +235,12 @@ export type Action =
   | ClearSessionAction
 
 export const actions = {
+  // TODO(mc, 2018-08-10): remove
   discover (): DiscoverAction {
     return {type: 'robot:DISCOVER', meta: {robotCommand: true}}
   },
 
+  // TODO(mc, 2018-08-10): remove
   discoverFinish (): DiscoverFinishAction {
     return {type: 'robot:DISCOVER_FINISH'}
   },
@@ -274,10 +275,12 @@ export const actions = {
     }
   },
 
+  // TODO(mc, 2018-08-10): remove
   addDiscovered (service: RobotService): AddDiscoveredAction {
     return {type: 'robot:ADD_DISCOVERED', payload: service}
   },
 
+  // TODO(mc, 2018-08-10): remove
   removeDiscovered (service: RobotService): RemoveDiscoveredAction {
     return {type: 'robot:REMOVE_DISCOVERED', payload: service}
   },

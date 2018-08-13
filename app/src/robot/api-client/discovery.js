@@ -8,7 +8,6 @@ import Bonjour from 'bonjour'
 import {fetchHealth} from '../../http-api-client/health'
 
 import {actions} from '../actions'
-import {getIsScanning} from '../selectors'
 
 // mdns discovery constants
 const NAME_RE = /^opentrons/i
@@ -29,8 +28,13 @@ const DIRECT_POLL_INTERVAL_MS = 1000
 const SKIP_WIRED_POLL = process.env.SKIP_WIRED_POLL
 
 export function handleDiscover (dispatch, state, action) {
+  // disable legacy discovery if new discovery feature flag is set
+  if (state.config.discovery.enabled) return
+
   // don't duplicate discovery requests
-  if (getIsScanning(state)) return
+  // TODO(mc, 2018-09-10): did not use selector to avoid circular dependency
+  // this file is getting ditched so ¯\_(ツ)_/¯
+  if (state.discovery.scanning) return
 
   // TODO(mc, 2017-10-26): we're relying right now on the fact that resin
   // advertises an SSH service. Instead, we should be registering an HTTP
@@ -71,8 +75,12 @@ export function handleDiscover (dispatch, state, action) {
   }
 
   function pollDirectConnection () {
-    // fetchHealth is a thunk action, so give it dispatch
-    fetchHealth(DIRECT_SERVICE)(dispatch)
+    fetchHealth(DIRECT_SERVICE)(dispatch).then(result => {
+      const action = result.type === 'api:SUCCESS'
+        ? actions.addDiscovered(DIRECT_SERVICE)
+        : actions.removeDiscovered(DIRECT_SERVICE)
+      dispatch(action)
+    })
   }
 }
 
