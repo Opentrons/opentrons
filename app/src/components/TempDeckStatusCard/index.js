@@ -6,8 +6,8 @@ import {
   selectors as robotSelectors,
   type Robot
 } from '../../robot'
-import type {TempDeckModule} from '../../http-api-client'
-import {fetchModuleData, makeGetRobotModules} from '../../http-api-client'
+import type {TempDeckModule, FetchModuleDataResponse} from '../../http-api-client'
+import {fetchModules, fetchModuleData, makeGetRobotModules, makeGetRobotModuleData} from '../../http-api-client'
 import {LabeledValue, IntervalWrapper} from '@opentrons/components'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
@@ -15,65 +15,93 @@ import StatusItem from './StatusItem'
 
 type SP = {
   _robot: ?Robot,
-  tempDeck: ?TempDeckModule
+  tempdeck: ?TempDeckModule,
+  tempdeckData: ?FetchModuleDataResponse
 }
 
-type DP = {dispatch: Dispatch}
+type DP = {
+  _fetchModules: (?Robot) => mixed,
+  _fetchModuleData: (_robot: ?Robot, serial: ?string) => mixed
+}
 
 type Props = SP & {
-  fetchTempDeckData: () => mixed
+  fetchModules: () => mixed,
+  fetchModuleData: () => mixed
 }
 
-export default connect(makeSTP, null, mergeProps)(TempDeckStatusCard)
+class TempDeckStatusCard extends React.Component<Props> {
+  componentDidMount () {
+    this.props.fetchModules()
+  }
 
-function TempDeckStatusCard (props: Props) {
-  const {tempDeck, fetchModuleData} = props
+  render () {
+    const {tempdeck, tempdeckData, fetchModuleData} = this.props
 
-  if (!tempDeck) return null
+    if (!tempdeck) return null
 
-  const STATUS = tempDeck.status
-  const CURRENT = `${tempDeck.data.currentTemp} º C`
-  const TARGET = `${tempDeck.data.targetTemp} º C`
-  return (
-    <IntervalWrapper
-      refresh={fetchModuleData}
-      interval={1000}
-    >
-        <StatusCard title={tempDeck.displayName}>
-          <CardContentRow>
-            <StatusItem status={STATUS} />
-          </CardContentRow>
-          <CardContentRow>
-            <LabeledValue label='Current Temp' value={CURRENT} />
-            <LabeledValue label='Target Temp' value={TARGET} />
-          </CardContentRow>
-        </StatusCard>
-    </IntervalWrapper>
-  )
+    // TODO: BC: 2018-08-13 we should really only be hitting fetchModuleData
+    // again once we've received the response from the last call
+    const currentTemp = (tempdeckData && tempdeckData.data.currentTemp) || tempdeck.data.currentTemp
+    const targetTemp = (tempdeckData && tempdeckData.data.targetTemp) || tempdeck.data.targetTemp
+    return (
+      <IntervalWrapper refresh={fetchModuleData} interval={5000}>
+          <StatusCard title={tempdeck.displayName}>
+            <CardContentRow>
+              <StatusItem status={(tempdeckData && tempdeckData.status) || tempdeck.status } />
+            </CardContentRow>
+            <CardContentRow>
+              <LabeledValue
+                label='Current Temp'
+                value={`${currentTemp} º C`} />
+              <LabeledValue
+                label='Target Temp'
+                value={targetTemp ? `${targetTemp} º C` : 'None'} />
+            </CardContentRow>
+          </StatusCard>
+      </IntervalWrapper>
+    )
+  }
 }
 
 function makeSTP (): (state: State) => SP {
   const getRobotModules = makeGetRobotModules()
+  const getRobotModuleData = makeGetRobotModuleData()
   return (state) => {
     const _robot = robotSelectors.getConnectedRobot(state)
     const modulesCall = _robot && getRobotModules(state, _robot)
     const modulesResponse = modulesCall && modulesCall.response
     const modules = modulesResponse && modulesResponse.modules
     // TOD0 (ka 2018-7-25): Only supporting 1 temp deck at a time at launch
-    const tempDeck = modules && ((modules.find(m => m.name === 'tempdeck'): any): TempDeckModule)
+    const tempdeck = modules && ((modules.find(m => m.name === 'tempdeck'): any): TempDeckModule)
+    const _serial = tempdeck && tempdeck.serial
+    const tempdeckDataCall = _robot && getRobotModuleData(state, _robot, _serial)
+    const tempdeckData = tempdeckDataCall && tempdeckDataCall.response
     return {
       _robot,
-      tempDeck
+      tempdeck,
+      tempdeckData
     }
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP): Props {
-  const {dispatch} = dispatchProps
-  const {_robot, tempDeck} = stateProps
-
+function mapDTP (dispatch: Dispatch): DP {
   return {
-    ...stateProps,
-    fetchTempDeckData: () => false && _robot && dispatch(fetchModuleData(_robot, tempDeck.serial))
+    _fetchModuleData: (_robot, _serial) => dispatch(fetchModuleData(_robot, _serial)),
+    _fetchModules: (_robot) => dispatch(fetchModules(_robot))
   }
 }
+
+function mergeProps (stateProps: SP, dispatchProps: DP): Props {
+  const {_fetchModules, _fetchModuleData} = dispatchProps
+  const {_robot, tempdeck, tempdeckData} = stateProps
+  const _serial = tempdeck && tempdeck.serial
+
+  return {
+    tempdeck,
+    tempdeckData,
+    fetchModules: () => _robot && _fetchModules(_robot),
+    fetchModuleData: () => _robot && _serial && _fetchModuleData(_robot, _serial)
+  }
+}
+
+export default connect(makeSTP, mapDTP, mergeProps)(TempDeckStatusCard)
