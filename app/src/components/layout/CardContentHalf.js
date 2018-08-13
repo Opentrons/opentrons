@@ -5,7 +5,7 @@ import styles from './styles.css'
 
 type Props = {
   children: React.Node,
-  className: string,
+  className?: string,
 }
 export default function CardContentHalf (props: Props) {
   return (
