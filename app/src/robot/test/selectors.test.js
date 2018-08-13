@@ -4,7 +4,6 @@ import {NAME, selectors, constants} from '../'
 const makeState = (state) => ({[NAME]: state})
 
 const {
-  getIsScanning,
   getDiscovered,
   getConnectionStatus,
   getSessionLoadInProgress,
@@ -32,25 +31,36 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
-  test('getIsScanning', () => {
-    let state = {connection: {isScanning: true}}
-    expect(getIsScanning(makeState(state))).toBe(true)
-
-    state = {connection: {isScanning: false}}
-    expect(getIsScanning(makeState(state))).toBe(false)
-  })
-
   test('getDiscovered', () => {
     const state = {
-      robot: {
-        connection: {
-          connectedTo: 'bar',
-          discovered: ['foo', 'bar', 'baz', 'qux'],
-          discoveredByName: {
-            foo: {host: 'abcdef.local', name: 'foo'},
-            bar: {host: '123456.local', name: 'bar'},
-            baz: {host: 'qwerty.local', name: 'baz'},
-            qux: {host: 'dvorak.local', name: 'qux', wired: true}
+      robot: {connection: {connectedTo: 'bar'}},
+      discovery: {
+        robotsByName: {
+          foo: {
+            name: 'foo',
+            connections: [
+              {ip: '10.10.1.2', port: 31950, ok: true, local: false}
+            ]
+          },
+          bar: {
+            name: 'bar',
+            connections: [
+              {ip: '10.10.3.4', port: 31950, ok: true, local: false},
+              {ip: '169.254.3.4', port: 31950, ok: true, local: true}
+            ]
+          },
+          baz: {
+            name: 'baz',
+            connections: [
+              {ip: '10.10.5.6', port: 31950, ok: true, local: false},
+              {ip: '169.254.5.6', port: 31950, ok: false, local: true}
+            ]
+          },
+          qux: {
+            name: 'qux',
+            connections: [
+              {ip: '169.254.7.8', port: 31950, ok: true, local: true}
+            ]
           }
         }
       }
@@ -59,17 +69,32 @@ describe('robot selectors', () => {
     expect(getDiscovered(state)).toEqual([
       {
         name: 'bar',
-        host: '123456.local',
+        ip: '169.254.3.4',
+        port: 31950,
+        wired: true,
         isConnected: true
       },
       {
         name: 'qux',
-        host: 'dvorak.local',
+        ip: '169.254.7.8',
+        port: 31950,
         isConnected: false,
         wired: true
       },
-      {name: 'baz', host: 'qwerty.local', isConnected: false},
-      {name: 'foo', host: 'abcdef.local', isConnected: false}
+      {
+        name: 'baz',
+        ip: '10.10.5.6',
+        port: 31950,
+        wired: false,
+        isConnected: false
+      },
+      {
+        name: 'foo',
+        ip: '10.10.1.2',
+        port: 31950,
+        wired: false,
+        isConnected: false
+      }
     ])
   })
 

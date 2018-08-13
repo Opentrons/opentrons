@@ -12,7 +12,7 @@ describe('discovery actions', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-    store = mockStore({})
+    store = mockStore({config: {discovery: {enabled: true}}})
   })
 
   afterEach(() => {
@@ -29,5 +29,18 @@ describe('discovery actions', () => {
     expect(store.getActions()).toEqual([expectedStart])
     jest.runTimersToTime(expectedTimeout)
     expect(store.getActions()).toEqual([expectedStart, expectedFinish])
+  })
+
+  // TODO(mc, 2018-08-10): legacy discovery support; remove
+  test('startDiscovery with discovery disabled', () => {
+    store = mockStore({config: {discovery: {enabled: false}}})
+
+    const expectedStart = {
+      type: 'robot:DISCOVER',
+      meta: {robotCommand: true}
+    }
+
+    store.dispatch(startDiscovery())
+    expect(store.getActions()).toEqual([expectedStart])
   })
 })

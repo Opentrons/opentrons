@@ -12,10 +12,7 @@ import createLogger from './logger'
 import {checkForShellUpdates, shellMiddleware} from './shell'
 
 import {healthCheckMiddleware} from './health-check'
-import {
-  apiClientMiddleware as robotApiMiddleware,
-  actions as robotActions
-} from './robot'
+import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
 import {initializeSupport, supportMiddleware} from './support'
 import {startDiscovery} from './discovery'
@@ -78,11 +75,7 @@ store.dispatch(initializeSupport())
 store.dispatch(checkForShellUpdates())
 
 // kickoff a discovery run immediately
-// TODO(mc, 2018-08-09): remove feature flag chack after switchover
-store.dispatch(config.discovery.enabled
-  ? startDiscovery()
-  : robotActions.discover()
-)
+store.dispatch(startDiscovery())
 
 log.info('Rendering app UI')
 renderApp()

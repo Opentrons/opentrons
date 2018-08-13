@@ -3,7 +3,7 @@ import Bonjour from 'bonjour'
 import EventEmitter from 'events'
 
 import {delay as _delay} from '../../util'
-import {fetchHealth, __mockThunk} from '../../http-api-client/health'
+import {fetchHealth, __mockThunk, __setResponse} from '../../http-api-client/health'
 import client from '../api-client/client'
 import {actions} from '../'
 
@@ -23,11 +23,8 @@ const delay = (time) => {
 }
 
 const notScanningState = {
-  robot: {
-    connection: {
-      isScanning: false
-    }
-  }
+  config: {discovery: {enabled: false}},
+  discovery: {scanning: false}
 }
 
 describe('api client - discovery', () => {
@@ -44,8 +41,7 @@ describe('api client - discovery', () => {
     bonjour = {find: jest.fn(() => browser)}
     Bonjour.mockReturnValue(bonjour)
 
-    fetchHealth.mockClear()
-    __mockThunk.mockClear()
+    __setResponse({type: 'api:SUCCESS'})
 
     dispatch = jest.fn()
     const _receive = client(dispatch)
@@ -56,7 +52,11 @@ describe('api client - discovery', () => {
     }
   })
 
-  afterEach(() => delay(EXPECTED_DISCOVERY_MS))
+  afterEach(() => {
+    jest.clearAllMocks()
+    jest.clearAllTimers()
+    delay(EXPECTED_DISCOVERY_MS)
+  })
 
   test('searches for HTTP services', () => {
     return sendToClient(notScanningState, actions.discover())
@@ -185,7 +185,10 @@ describe('api client - discovery', () => {
   })
 
   test('does not start new discovery if already in progress', () => {
-    const state = {robot: {connection: {isScanning: true}}}
+    const state = {
+      config: {discovery: {enabled: false}},
+      discovery: {scanning: true}
+    }
 
     return sendToClient(state, actions.discover())
       .then(() => delay(EXPECTED_DISCOVERY_MS))

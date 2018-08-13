@@ -7,7 +7,7 @@ import type {BaseRobot, RobotService} from '../robot'
 
 // TODO(mc, 2018-02-26): figure out this circular dependency
 import {
-  getDiscoveredByName,
+  getDiscovered,
   getConnectRequest,
   getConnectedRobotName
 } from '../robot/selectors'
@@ -125,7 +125,7 @@ export const healthCheckMiddleware: Middleware =
         if (!action.payload.error) {
           const state = store.getState()
           const name = getConnectRequest(state).name
-          const robot = getDiscoveredByName(state)[name]
+          const robot = getDiscovered(state).find(r => r.name === name)
           if (robot) store.dispatch(startHealthCheck(robot))
         }
         break

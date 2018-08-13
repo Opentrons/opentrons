@@ -20,10 +20,18 @@ describe('analytics events map', () => {
     const state = (name) => ({
       robot: {
         connection: {
-          connectRequest: {name},
-          discoveredByName: {
-            wired: {wired: true},
-            wireless: {}
+          connectRequest: {name}
+        }
+      },
+      discovery: {
+        robotsByName: {
+          wired: {
+            name: 'wired',
+            connections: [{ip: 'foo', port: 123, ok: true, local: true}]
+          },
+          wireless: {
+            name: 'wireless',
+            connections: [{ip: 'bar', port: 456, ok: true, local: false}]
           }
         }
       }
