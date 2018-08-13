@@ -30,7 +30,6 @@
   width: 100%;
   overflow-y: auto;
   padding: 1rem;
-  font-size: var(--fs-body-2);
 }
 
 .card_content_50 {
