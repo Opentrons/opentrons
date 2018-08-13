@@ -57,4 +57,4 @@ dev-mdns:
 .PHONY: dev-shell
 dev-shell:
 	wait-on http-get://localhost:$(port) && \
-	$(MAKE) -C $(shell_dir) dev port=$(port)
+	$(MAKE) -C $(shell_dir) lib dev port=$(port)

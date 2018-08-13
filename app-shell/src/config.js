@@ -65,6 +65,13 @@ const DEFAULTS = {
     createdAt: Math.floor(Date.now() / 1000),
     name: 'Unknown User',
     email: null
+  },
+
+  // robot discovery
+  discovery: {
+    // new discovery client feature flag
+    enabled: false,
+    candidates: []
   }
 }
 

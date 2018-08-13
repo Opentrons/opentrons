@@ -1,5 +1,16 @@
 {
-  "extends": "../.babelrc",
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    },
+    "production": {
+      "plugins": [
+        "unassert"
+      ]
+    }
+  },
   "plugins": [
     "transform-object-rest-spread",
     "transform-class-properties"

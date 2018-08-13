@@ -42,11 +42,10 @@ describe('discovery client', () => {
     expect(mdns.__mockBrowser.discover).not.toHaveBeenCalled()
   })
 
-  test('calls start on existing browser', () => {
+  test('mdns browser started on ready', () => {
     const client = DiscoveryClient()
 
     client.start()
-    expect(mdns.createBrowser).toHaveBeenCalledTimes(1)
     expect(mdns.__mockBrowser.discover).toHaveBeenCalledTimes(0)
     mdns.__mockBrowser.emit('ready')
     expect(mdns.__mockBrowser.discover).toHaveBeenCalledTimes(1)
@@ -59,6 +58,17 @@ describe('discovery client', () => {
     const result = client.stop()
     expect(result).toBe(client)
     expect(mdns.__mockBrowser.stop).toHaveBeenCalled()
+  })
+
+  test('stops browser and creates new one on repeated client.start', () => {
+    const client = DiscoveryClient()
+
+    client.start()
+    expect(mdns.createBrowser).toHaveBeenCalledTimes(1)
+    expect(mdns.__mockBrowser.stop).toHaveBeenCalledTimes(0)
+    client.start()
+    expect(mdns.createBrowser).toHaveBeenCalledTimes(2)
+    expect(mdns.__mockBrowser.stop).toHaveBeenCalledTimes(1)
   })
 
   test(

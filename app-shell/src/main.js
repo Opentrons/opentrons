@@ -7,6 +7,7 @@ import {initialize as initializeApiUpdate} from './api-update'
 import createLogger from './log'
 import {getConfig, getStore, getOverrides, registerConfig} from './config'
 import {registerRobotLogs} from './robot-logs'
+import {registerDiscovery} from './discovery'
 
 const config = getConfig()
 const log = createLogger(__filename)
@@ -45,10 +46,13 @@ function startUp () {
 
   const configHandler = registerConfig(dispatch)
   const downloadHandler = registerRobotLogs(dispatch, mainWindow)
+  const discoveryHandler = registerDiscovery(dispatch)
+
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', {action})
     configHandler(action)
     downloadHandler(action)
+    discoveryHandler(action)
   })
 
   if (config.devtools) {

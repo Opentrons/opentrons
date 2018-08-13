@@ -38,6 +38,9 @@ type Options = {
   logger?: Logger
 }
 
+const log = (logger: ?Logger, level: LogLevel, msg: string, meta?: {}) =>
+  logger && typeof logger[level] === 'function' && logger[level](msg, meta)
+
 export default function DiscoveryClientFactory (options?: Options) {
   return new DiscoveryClient(options || {})
 }
@@ -45,9 +48,7 @@ export default function DiscoveryClientFactory (options?: Options) {
 export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
-
-const log = (logger: ?Logger, level: LogLevel, msg: string, meta?: {}) =>
-  logger && typeof logger[level] === 'function' && logger[level](msg, meta)
+export {DEFAULT_PORT}
 
 export class DiscoveryClient extends EventEmitter {
   services: Array<Service>
@@ -146,7 +147,7 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   _startBrowser (): void {
-    if (this._browser) return this._browser.discover()
+    this._stopBrowser()
 
     const browser = mdns
       .createBrowser(mdns.tcp('http'))
@@ -227,7 +228,7 @@ export class DiscoveryClient extends EventEmitter {
     if (poll) this._poll()
     if (updated.length) {
       updated.forEach(s => this.emit(SERVICE_EVENT, s))
-      log(this._logger, 'debug', 'updated services', {services: this.services})
+      log(this._logger, 'debug', 'updated services', {updated})
     }
   }
 }

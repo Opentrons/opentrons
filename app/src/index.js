@@ -12,9 +12,13 @@ import createLogger from './logger'
 import {checkForShellUpdates, shellMiddleware} from './shell'
 
 import {healthCheckMiddleware} from './health-check'
-import {apiClientMiddleware as robotApiMiddleware} from './robot'
+import {
+  apiClientMiddleware as robotApiMiddleware,
+  actions as robotActions
+} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
 import {initializeSupport, supportMiddleware} from './support'
+import {startDiscovery} from './discovery'
 
 import reducer from './reducer'
 
@@ -61,8 +65,10 @@ if (module.hot) {
   module.hot.accept('./components/App', renderApp)
 }
 
+const {config} = store.getState()
+
 // attach store to window if devtools are on
-if (store.getState().config.devtools) global.store = store
+if (config.devtools) global.store = store
 
 // initialize analytics and support after first render
 store.dispatch(initializeAnalytics())
@@ -70,6 +76,13 @@ store.dispatch(initializeSupport())
 
 // kickoff an initial update check at launch
 store.dispatch(checkForShellUpdates())
+
+// kickoff a discovery run immediately
+// TODO(mc, 2018-08-09): remove feature flag chack after switchover
+store.dispatch(config.discovery.enabled
+  ? startDiscovery()
+  : robotActions.discover()
+)
 
 log.info('Rendering app UI')
 renderApp()

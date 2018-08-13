@@ -2,11 +2,9 @@
 
 export function registerRobotLogs (dispatch, mainWindow) {
   return function handleIncomingAction (action) {
-    const {type, payload: {logUrls}} = action
-    if (type === 'shell:DOWNLOAD_LOGS') {
-      logUrls.forEach((url) => {
-        mainWindow.webContents.downloadURL(url)
-      })
+    if (action.type === 'shell:DOWNLOAD_LOGS') {
+      const {payload: {logUrls}} = action
+      logUrls.forEach(url => mainWindow.webContents.downloadURL(url))
     }
   }
 }

@@ -8,6 +8,7 @@ PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
 API_LIB_DIR := api-server-lib
+DISCOVERY_CLIENT_DIR := discovery-client
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 
@@ -30,6 +31,7 @@ install:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 	yarn
 	$(MAKE) -C $(SHARED_DATA_DIR) build
+	$(MAKE) -C $(DISCOVERY_CLIENT_DIR)
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
