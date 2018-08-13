@@ -3,7 +3,6 @@
 import sys
 import logging
 import os
-import tempfile
 import traceback
 import atexit
 from aiohttp import web
@@ -26,11 +25,7 @@ from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
 lock_file_path = '/tmp/resin/resin-updates.lock'
-if os.environ.get('RUNNING_ON_PI'):
-    log_file_path = '/data/user_storage/opentrons_data/logs'
-else:
-    tmpdir = tempfile.mkdtemp("logs")
-    log_file_path = os.path.abspath(tmpdir)
+log_file_path = environment.get_path('LOG_DIR')
 
 
 def lock_resin_updates():
@@ -66,6 +61,7 @@ def log_init():
     level_value = logging._nameToLevel[ot_log_level]
 
     serial_log_filename = environment.get_path('SERIAL_LOG_FILE')
+    api_log_filename = environment.get_path('LOG_FILE')
 
     logging_config = dict(
         version=1,
@@ -88,31 +84,40 @@ def log_init():
                 'maxBytes': 5000000,
                 'level': logging.DEBUG,
                 'backupCount': 3
+            },
+            'api': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'basic',
+                'filename': api_log_filename,
+                'maxBytes': 1000000,
+                'level': logging.DEBUG,
+                'backupCount': 5
             }
+
         },
         loggers={
             '__main__': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': logging.INFO
             },
             'opentrons.server': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.api': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.instruments': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.robot.robot_configs': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.drivers.smoothie_drivers.driver_3_0': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.drivers.serial_communication': {
