@@ -23,9 +23,9 @@
 
 .plate_outline {
   fill: var(--c-white);
-  stroke: var(--c-black);
+  stroke: var(--c-charcoal);
 }
 
 .tiprack_plate_outline {
-  fill: #d6d6d6;
+  fill: var(--c-plate-bg);
 }

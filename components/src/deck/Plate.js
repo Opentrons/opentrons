@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import map from 'lodash/map'
 import uniq from 'lodash/uniq'
@@ -9,6 +9,7 @@ import { wellNameSplit } from '../utils.js'
 import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
 
 import styles from './Plate.css'
+import Tip from './Tip'
 import Well from './Well'
 import type {SingleWell} from './Well'
 
@@ -17,7 +18,9 @@ const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG s
 
 export type PlateProps = {
   containerType: string,
+  // TODO: Ian 2018-08-13 rename wellContents -> wellPropsByWellName?
   wellContents?: {[string]: ?SingleWell}, // Keyed by wellName, eg 'A1'
+  tipPropsByWellName?: {[string]: ?$Diff<React.ElementProps<typeof Tip>, {wellDef: *}>},
   showLabels?: boolean,
   selectable?: boolean,
   handleMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
@@ -75,30 +78,46 @@ export default class Plate extends React.Component<PlateProps> {
   }
 
   createWell = (wellName: string) => {
-    const { selectable, wellContents, handleMouseExitWell } = this.props
+    const {
+      handleMouseExitWell,
+      selectable,
+      tipPropsByWellName,
+      wellContents
+    } = this.props
     const {allWells, isTiprack} = this.getContainerData()
+    const wellDefFlipped = allWells && allWells[wellName]
     const singleWellContents = wellContents && wellContents[wellName]
 
     // TODO: Ian 2018-06-27 remove scale & transform so this offset isn't needed
+    // Or... this is actually from the labware definitions?? But not tipracks?
     const svgOffset = {
       x: 1,
       y: -3
     }
 
-    const wellLocation = allWells[wellName]
+    const wellDef = {
+      ...wellDefFlipped,
+      y: SLOT_HEIGHT - wellDefFlipped.y // labware Y vs SVG Y is flipped. TODO IMMEDIATELY have fn for this in selector!
+    }
+
+    if (isTiprack) {
+      const tipProps = tipPropsByWellName && tipPropsByWellName[wellName]
+      return (
+        <Tip
+          wellDef={wellDef}
+          {...tipProps}
+        />
+      )
+    }
 
     return <Well
       key={wellName}
-      isTip={isTiprack}
       {...{
         ...singleWellContents,
         wellName,
         selectable,
 
-        wellLocation: {
-          ...wellLocation,
-          y: SLOT_HEIGHT - wellLocation.y // labware Y vs SVG Y is flipped
-        },
+        wellDef,
         svgOffset,
 
         onMouseOver: this.handleMouseOverWell(wellName),
