@@ -3,7 +3,7 @@ from copy import deepcopy
 from opentrons import robot, modules
 from opentrons.server.main import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
-from opentrons.instruments.pipette_config import configs
+from opentrons.instruments import pipette_config
 
 
 async def test_get_pipettes_uncommissioned(
@@ -51,7 +51,7 @@ async def test_get_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = configs[test_model]
+    model = pipette_config.load(test_model)
     expected = {
         'left': {
             'model': model.name,
@@ -110,7 +110,7 @@ async def test_get_cached_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = configs[test_model]
+    model = pipette_config.load(test_model)
     expected = {
         'left': {
             'model': model.name,
@@ -131,7 +131,7 @@ async def test_get_cached_pipettes(
     assert resp.status == 200
     assert json.loads(text) == expected
 
-    model1 = list(configs.values())[1]
+    model1 = pipette_config.load('p10_single_v1.3')
 
     def dummy_model(mount):
         return model1.name
