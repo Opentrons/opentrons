@@ -4,6 +4,11 @@
       "plugins": [
         "transform-es2015-modules-commonjs"
       ]
+    },
+    "production": {
+      "plugins": [
+        "unassert"
+      ]
     }
   },
   "plugins": [
