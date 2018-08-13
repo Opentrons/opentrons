@@ -30,7 +30,7 @@ def load(name, slot):
             # that type that is on the robot, in the future we should add
             # support for multiple instances of one module type this
             # accessor would then load the correct disambiguated module
-            # instance via port
+            # instance via the module's serial
             matching_modules = [
                 module for module in robot.modules if isinstance(
                     module, SUPPORTED_MODULES.get(name)
