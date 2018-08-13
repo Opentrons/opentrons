@@ -24,7 +24,7 @@ except ModuleNotFoundError:
 from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
-lock_file_path = 'tmp/resin/resin-updates.lock'
+lock_file_path = '/tmp/resin/resin-updates.lock'
 log_file_path = environment.get_path('LOG_DIR')
 
 
