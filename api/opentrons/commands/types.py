@@ -6,6 +6,7 @@ COMMAND = 'command'
 def makeRobotCommandName(name):
     return '{}.{}'.format(COMMAND, name)
 
+
 # Robot #
 
 DELAY = makeRobotCommandName('DELAY')

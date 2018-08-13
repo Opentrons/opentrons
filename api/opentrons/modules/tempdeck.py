@@ -1,6 +1,7 @@
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons import commands
 
+
 class MissingDevicePortError(Exception):
     pass
 
@@ -59,7 +60,10 @@ class TempDeck:
     def live_data(self):
         return {
             'status': self.status,
-            'data': {'currentTemp': self.temperature, 'targetTemp': self.target}
+            'data': {
+                'currentTemp': self.temperature,
+                'targetTemp': self.target
+            }
         }
 
     @property
