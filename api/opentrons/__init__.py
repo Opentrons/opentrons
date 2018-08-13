@@ -198,9 +198,6 @@ class InstrumentsWrapper(object):
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
-    def Magbead(self, *args, **kwargs):
-        return inst.Magbead(self.robot, *args, **kwargs)
-
     def _create_pipette_from_config(
             self,
             config,

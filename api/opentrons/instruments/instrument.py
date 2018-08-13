@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class Instrument(object):
     """
     This class represents instrument attached to the :any:`Robot`:
-    :Pipette:, :Magbead:.
+    :Pipette:.
 
     It gives the instruments ability to CRUD their calibration data,
     and gives access to some common methods across instruments
