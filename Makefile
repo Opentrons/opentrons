@@ -10,6 +10,7 @@ API_DIR := api
 API_LIB_DIR := api-server-lib
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
+INSTALL_PYTHON ?= python
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -24,7 +25,7 @@ endif
 # front-end dependecies handled by yarn
 .PHONY: install
 install:
-	pip install pipenv==11.6.8
+	$(INSTALL_PYTHON) -m pip install pipenv==11.6.8
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
