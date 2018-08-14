@@ -10,13 +10,16 @@ import Tip from './Tip'
 import Well from './Well'
 import styles from './Labware.css'
 
+type WellProps = $Diff<React.ElementProps<typeof Well>,
+  {wellDef: *, svgOffset: *}>
+
 export type Props = {
   /** labware type, to get definition from shared-data */
   labwareType: string,
   /** optional getter for tip props by wellName (tipracks only) */
   getTipProps?: (wellName: string) => ?React.ElementProps<typeof Tip>,
   /** optional getter for well props by wellName (non-tiprack labware only ) */
-  getWellProps?: (wellName: string) => ?React.ElementProps<typeof Well>
+  getWellProps?: (wellName: string) => ?WellProps
 }
 
 type LabwareData = {
@@ -86,12 +89,12 @@ function createWell (
   const wellProps = (getWellProps && getWellProps(wellName)) || {}
   return <Well
     key={wellName}
+    wellName={wellName}
+    {...wellProps}
     {...{
-      wellName,
       wellDef,
       svgOffset
     }}
-    {...wellProps}
   />
 }
 
