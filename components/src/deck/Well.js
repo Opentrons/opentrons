@@ -18,7 +18,7 @@ export type SingleWell = {|
 
 type Props = {
   ...SingleWell,
-  selectable: boolean,
+  selectable?: boolean,
   wellDef: WellDefinition,
   // TODO: Ian 2018-08-13 remove svgOffset prop
   svgOffset: {

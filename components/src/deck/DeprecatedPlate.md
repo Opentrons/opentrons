@@ -2,7 +2,7 @@
 
 ```js
 <svg height='200' width='300' viewBox='0 0 125 90'>
-  <Plate
+  <DeprecatedPlate
     containerType='96-flat'
     wellContents={{A1: {fillColor: 'green'}}}
   />
@@ -13,7 +13,7 @@ Tip racks take `tipPropsByWellName` and not `wellContents`.
 
 ```js
 <svg height='200' width='300' viewBox='0 0 125 90'>
-  <Plate
+  <DeprecatedPlate
     containerType='tiprack-200ul'
     tipPropsByWellName={{A1: {empty: true}, B3: {highlighted: true}}}
   />
@@ -24,7 +24,7 @@ Fallback plate for when the `containerType` is not in `default-containers.json`
 
 ```js
 <svg height='200' width='300' viewBox='0 0 125 90'>
-  <Plate
+  <DeprecatedPlate
     containerType='custom-container-not-in-default-containers'
   />
 </svg>

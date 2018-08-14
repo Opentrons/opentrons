@@ -5,16 +5,15 @@ import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 
 import {getLabware, type LabwareDefinition} from '@opentrons/shared-data'
-import { wellNameSplit } from '../utils.js'
-import { SLOT_WIDTH, SLOT_HEIGHT } from './constants.js'
+import {wellNameSplit} from '../utils.js'
+import {SLOT_HEIGHT} from './constants.js'
 
-import styles from './Plate.css'
+import styles from './Labware.css'
 import Tip from './Tip'
 import Well from './Well'
+import FallbackLabware from './FallbackLabware'
+import LabwareOutline from './LabwareOutline'
 import type {SingleWell} from './Well'
-
-const rectStyle = {rx: 6, transform: 'translate(0.8 0.8) scale(0.985)'} // SVG styles not allowed in CSS (round corners) -- also stroke gets cut off so needs to be transformed
-// TODO (Eventually) Ian 2017-12-07 where should non-CSS SVG styles belong?
 
 export type PlateProps = {
   containerType: string,
@@ -27,34 +26,13 @@ export type PlateProps = {
   handleMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed
 }
 
-type PlateOutlineProps = {className?: ?string}
-function PlateOutline (props: PlateOutlineProps) {
-  return <rect {...rectStyle}
-    x='0' y='0'
-    className={cx(styles.plate_outline, props.className)}
-    width={SLOT_WIDTH}
-    height={SLOT_HEIGHT}
-  />
-}
-
-function FallbackPlate () {
-  return (
-    <g>
-      <PlateOutline />
-      <text x='50%' y='50%' textAnchor='middle' className={styles.fallback_plate_text}>
-        Custom Container
-      </text>
-    </g>
-  )
-}
-
 type LabwareData = {
   allWells: $PropertyType<LabwareDefinition, 'wells'>,
   allWellNames: Array<string>,
   isTiprack: boolean
 }
 
-export default class Plate extends React.Component<PlateProps> {
+export default class DeprecatedPlate extends React.Component<PlateProps> {
   getContainerData = (): LabwareData => {
     // TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
     const {containerType} = this.props
@@ -104,6 +82,7 @@ export default class Plate extends React.Component<PlateProps> {
       const tipProps = tipPropsByWellName && tipPropsByWellName[wellName]
       return (
         <Tip
+          key={wellName}
           wellDef={wellDef}
           {...tipProps}
         />
@@ -170,14 +149,14 @@ export default class Plate extends React.Component<PlateProps> {
     const { showLabels, containerType } = this.props
 
     if (!(getLabware(containerType))) {
-      return <FallbackPlate />
+      return <FallbackLabware />
     }
 
     const {allWellNames, isTiprack} = this.getContainerData()
 
     return (
       <g>
-        <PlateOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
+        <LabwareOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
 
         {/* The wells: */}
         {map(allWellNames, this.createWell)}

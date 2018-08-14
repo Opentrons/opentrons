@@ -4,7 +4,7 @@ import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import {
   swatchColors,
-  Plate,
+  DeprecatedPlate,
   MIXED_WELL_COLOR,
   type SingleWell,
   type Channels
@@ -14,7 +14,7 @@ import SelectionRect from '../components/SelectionRect.js'
 import type {ContentsByWell, WellContents} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
-type PlateProps = React.ElementProps<typeof Plate>
+type PlateProps = React.ElementProps<typeof DeprecatedPlate>
 type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
 
 export type Props = {
@@ -73,7 +73,7 @@ export default function SelectablePlate (props: Props) {
     handleMouseExitWell
   } = props
 
-  const plate = <Plate
+  const plate = <DeprecatedPlate
     {...{
       selectable,
       containerType,
