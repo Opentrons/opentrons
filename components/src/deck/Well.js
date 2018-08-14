@@ -2,7 +2,7 @@
 import React from 'react'
 import cx from 'classnames'
 
-import type {WellDefinition} from '@opentrons/shared-data'
+import {wellIsRect, type WellDefinition} from '@opentrons/shared-data'
 import styles from './Well.css'
 import {SELECTABLE_WELL_CLASS} from '../constants.js'
 // import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
@@ -20,11 +20,6 @@ type Props = {
   ...SingleWell,
   selectable?: boolean,
   wellDef: WellDefinition,
-  // TODO: Ian 2018-08-13 remove svgOffset prop
-  svgOffset: {
-    x: number,
-    y: number
-  },
   onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
 }
@@ -37,7 +32,6 @@ export default function Well (props: Props) {
     selected,
     error,
     wellDef,
-    svgOffset,
     onMouseOver,
     onMouseLeave
   } = props
@@ -61,16 +55,15 @@ export default function Well (props: Props) {
     onMouseLeave
   }
 
-  const isCircle = typeof wellDef.diameter === 'number'
-  const isRect = !isCircle
+  const isRect = wellIsRect(wellDef)
+  const isCircle = !isRect
 
   if (isRect) {
-    const baseY = wellDef.y + svgOffset.y
     const rectProps = {
-      x: wellDef.x + svgOffset.x,
-      y: baseY - (wellDef.length || 0), // zero fallback for flow
+      x: wellDef.x,
+      y: wellDef.y - (wellDef.length || 0), // zero fallback for flow
       width: wellDef.width,
-      height: baseY
+      height: wellDef.y
     }
 
     return <g>
@@ -91,8 +84,8 @@ export default function Well (props: Props) {
 
   if (isCircle) {
     const circleProps = {
-      cx: wellDef.x + svgOffset.x,
-      cy: wellDef.y + svgOffset.y,
+      cx: wellDef.x,
+      cy: wellDef.y,
       r: (wellDef.diameter || 0) / 2
     }
 

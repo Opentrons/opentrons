@@ -1,20 +1,5 @@
 @import '@opentrons/components';
 
-.plate_label {
-  pointer-events: none;
-  font-size: var(--fs-tiny);
-  text-anchor: middle;
-}
-
-.tiny_labels {
-  /* For 384 plate */
-  font-size: var(--fs-micro);
-}
-
-.tiny_labels:nth-child(odd) {
-  fill: gray;
-}
-
 .fallback_plate_text {
   font-size: 0.75rem;
   font-style: italic;
@@ -23,9 +8,10 @@
 
 .plate_outline {
   fill: var(--c-white);
-  stroke: var(--c-charcoal);
+  stroke: var(--c-black);
 }
 
 .tiprack_plate_outline {
   fill: var(--c-plate-bg);
+  stroke: var(--c-charcoal);
 }

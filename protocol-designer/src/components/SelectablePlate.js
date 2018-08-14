@@ -4,6 +4,7 @@ import * as React from 'react'
 import {
   swatchColors,
   Labware,
+  LabwareLabels,
   MIXED_WELL_COLOR,
   type Channels
 } from '@opentrons/components'
@@ -70,16 +71,17 @@ export default function SelectablePlate (props: Props) {
     }
   }
 
-  const plate = <Labware
+  const labwareComponent = <Labware
     labwareType={containerType}
     getWellProps={getWellProps}
   />
 
-  if (!selectable) return plate // don't wrap plate with SelectionRect
+  if (!selectable) return labwareComponent // don't wrap labwareComponent with SelectionRect
 
   return (
     <SelectionRect svg {...{onSelectionMove, onSelectionDone}}>
-      {plate}
+      {labwareComponent}
+      <LabwareLabels labwareType={containerType} />
     </SelectionRect>
   )
 }

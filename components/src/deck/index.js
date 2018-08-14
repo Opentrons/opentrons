@@ -2,6 +2,7 @@
 import Deck from './Deck'
 import Labware from './Labware'
 import LabwareContainer from './LabwareContainer'
+import LabwareLabels from './LabwareLabels'
 import Well from './Well'
 import type {SingleWell} from './Well'
 
@@ -18,6 +19,7 @@ export {
   EmptyDeckSlot,
   Labware,
   LabwareContainer,
+  LabwareLabels,
   SlotOverlay,
   Well
 }
