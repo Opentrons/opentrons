@@ -9,6 +9,10 @@ import createLogger from './logger'
 import type {ThunkAction, Middleware} from './types'
 import type {Config} from './config'
 
+// import {
+//   selectors as robotSelectors
+// } from './robot'
+
 type SupportConfig = $PropertyType<Config, 'support'>
 
 const log = createLogger(__filename)
@@ -31,7 +35,16 @@ export function initializeSupport (): ThunkAction {
 export const supportMiddleware: Middleware = (store) => (next) => (action) => {
   // update intercom on page change
   // TODO(mc, 2018-08-02): this is likely to hit intercom throttle limit
-  if (action.type === LOCATION_CHANGE) intercom('update')
+  if (action.type === LOCATION_CHANGE) {
+    intercom('update')
+  }
+
+  if (action.type === 'robot:CONNECT_RESPONSE') {
+    const state = store.getState()
+    const robot = state.robot.connection.connectRequest.name
+    log.debug('Updating intercom data', {robot})
+    intercom('update', {robot})
+  }
 
   return next(action)
 }
