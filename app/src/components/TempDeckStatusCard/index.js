@@ -54,10 +54,10 @@ class TempDeckStatusCard extends React.Component<Props> {
             <CardContentRow>
               <LabeledValue
                 label='Current Temp'
-                value={`${currentTemp} º C`} />
+                value={`${currentTemp} °C`} />
               <LabeledValue
                 label='Target Temp'
-                value={targetTemp ? `${targetTemp} º C` : 'None'} />
+                value={targetTemp ? `${targetTemp} °C` : 'None'} />
             </CardContentRow>
           </StatusCard>
       </IntervalWrapper>
