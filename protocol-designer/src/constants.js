@@ -48,4 +48,4 @@ export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 
-export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
+export const DEFAULT_CHANGE_TIP_OPTION: 'once' = 'once'
