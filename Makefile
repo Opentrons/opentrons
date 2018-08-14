@@ -12,6 +12,11 @@ DISCOVERY_CLIENT_DIR := discovery-client
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 
+# this may be set as an environment variable to select the version of
+# python to run if pyenv is not available. it should always be set to
+# point to a python3.6.
+OT_PYTHON ?= python
+
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
 cover ?= true
@@ -25,7 +30,7 @@ endif
 # front-end dependecies handled by yarn
 .PHONY: install
 install:
-	pip install pipenv==11.6.8
+	$(OT_PYTHON) -m pip install pipenv==11.6.8
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
