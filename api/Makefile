@@ -53,8 +53,9 @@ publish:
 	cd scripts && publish.sh && doc-deploy.sh
 
 .PHONY: dev
+dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	ENABLE_VIRTUAL_SMOOTHIE=true $(python) opentrons/server/main.py -P 31950 opentrons.server.main:init
+	$(python) opentrons/server/main.py -P 31950 opentrons.server.main:init
 
 .PHONY: wheel
 wheel: clean
