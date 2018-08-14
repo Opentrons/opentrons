@@ -32,7 +32,7 @@ updated component library cards after redesign/refactor
 
 .card_row > div {
   display: inline-block;
-  width: 50%;
+  min-width: 50%;
 }
 
 .label {
