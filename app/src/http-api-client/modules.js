@@ -54,6 +54,8 @@ export type FetchModuleDataResponse = {
 
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
 
+type FetchModuleDataCall = ApiCall<null, FetchModuleDataResponse>
+
 export type ModulesAction =
   | ApiAction<'modules', null, FetchModulesResponse>
 
@@ -102,7 +104,7 @@ export function makeGetRobotModules () {
 }
 
 export function makeGetRobotModuleData () {
-  const selector: Selector<State, BaseRobot, FetchModulesCall> = createSelector(
+  const selector: Selector<State, BaseRobot, FetchModuleDataCall> = createSelector(
     (state, robot, _serial) => (getRobotApiState(state, robot)),
     (_state, _robot, serial) => serial,
     (state, serial) => {

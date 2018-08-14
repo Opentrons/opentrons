@@ -20,11 +20,13 @@ type SP = {
 }
 
 type DP = {
-  _fetchModules: (?Robot) => mixed,
-  _fetchModuleData: (_robot: ?Robot, serial: ?string) => mixed
+  _fetchModules: (_robot: Robot) => mixed,
+  _fetchModuleData: (_robot: Robot, serial: string) => mixed
 }
 
-type Props = SP & {
+type Props = {
+  tempdeck: ?TempDeckModule,
+  tempdeckData: ?FetchModuleDataResponse,
   fetchModules: () => mixed,
   fetchModuleData: () => mixed
 }
