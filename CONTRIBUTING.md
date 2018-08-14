@@ -126,7 +126,7 @@ Individual projects may have additional instructions, so be sure to check out th
 Your computer will need the following tools installed to be able to develop with the Opentrons platform:
 
 *   macOS 10.11+, Linux, or Windows 10
-*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux)
+*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
 
     ```shell
     pyenv install 3.6.4
