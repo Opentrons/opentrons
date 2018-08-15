@@ -73,7 +73,7 @@ export function getDiscoveredRobotsByName (state: State) {
 // getShellRobots makes a sync RPC call, so use sparingly
 const initialState: DiscoveryState = {
   scanning: false,
-  robotsByName: flattenRobots(getShellRobots())
+  robotsByName: normalizeRobots(getShellRobots())
 }
 
 // TODO(mc, 2018-08-09): implement this reducer
@@ -121,16 +121,16 @@ export function discoveryReducer (
     case 'discovery:UPDATE_LIST':
       return {
         ...state,
-        robotsByName: flattenRobots(action.payload.robots)
+        robotsByName: normalizeRobots(action.payload.robots)
       }
   }
 
   return state
 }
 
-function flattenRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
+function normalizeRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
   return robots.reduce(
-    (robotsMap, robot) => ({
+    (robotsMap: RobotsMap, robot: DiscoveredRobot) => ({
       ...robotsMap,
       [robot.name]: robot
     }),
