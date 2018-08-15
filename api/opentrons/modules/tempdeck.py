@@ -1,6 +1,9 @@
+from time import sleep
+from threading import Event, Thread
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons import commands
 
+TEMP_POLL_INTERVAL_SECS = 1
 
 class MissingDevicePortError(Exception):
     pass
@@ -18,6 +21,7 @@ class TempDeck:
         self._port = port
         self._driver = None
         self._device_info = None
+        self._poll_start_event = None
 
     @commands.publish.both(command=commands.tempdeck_set_temp)
     def set_temperature(self, celsius):
@@ -82,7 +86,6 @@ class TempDeck:
     @property
     def temperature(self):
         """ Current temperature in degree celsius """
-        self._driver.update_temperature()
         return self._driver.temperature
 
     @property
@@ -91,7 +94,6 @@ class TempDeck:
         Target temperature in degree celsius.
         Returns None if no target set
         """
-        self._driver.update_temperature()
         return self._driver.target
 
     @property
@@ -103,6 +105,15 @@ class TempDeck:
 
     # Internal Methods
 
+# TODO: DEBUG poll method in thread and add back update_temp to status in driver
+    def _poll_temperature(self):
+        self._poll_start_event = Event()
+        self._poll_start_event.set()
+        while True:
+            self._driver and telf._driver.update_temperature()
+            sleep(TEMP_POLL_INTERVAL_SECS)
+            if not self._poll_start_event.wait(0): break
+
     def connect(self):
         """
         Connect to the 'TempDeck' port
@@ -113,6 +124,9 @@ class TempDeck:
             self._driver = TempDeckDriver()
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
+
+            Thread(target=self.poll_temperature).start()
+            self._live_poll.start()
         else:
             # Sanity check Should never happen, because connect should never
             # be called without a port on Module
@@ -124,5 +138,7 @@ class TempDeck:
         '''
         Disconnect from the serial port
         '''
+        if self._poll_start_event:
+            self._poll_start_event.clear()
         if self._driver:
             self._driver.disconnect()

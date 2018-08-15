@@ -222,6 +222,9 @@ class Session(object):
         try:
             self.resume()
             robot.home_z()
+            for module in robot.modules:
+                if hasattr(module, 'calibrate'):
+                    module.calibrate()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
