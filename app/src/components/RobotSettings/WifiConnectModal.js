@@ -8,6 +8,7 @@ import type {
 } from '../../http-api-client'
 
 import {AlertModal} from '@opentrons/components'
+import {Portal} from '../portal'
 import {ErrorModal} from '../modals'
 
 type Props = {
@@ -42,14 +43,17 @@ export default function WifiConnectModal (props: Props) {
   }
 
   return (
-    <AlertModal
-      heading={`${SUCCESS_TITLE} ${response.ssid}`}
-      onCloseClick={close}
-      buttons={[
-        {onClick: close, children: 'close'}
-      ]}
-    >
-      {SUCCESS_MESSAGE}
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        heading={`${SUCCESS_TITLE} ${response.ssid}`}
+        onCloseClick={close}
+        buttons={[
+          {onClick: close, children: 'close'}
+        ]}
+        alertOverlay
+      >
+        {SUCCESS_MESSAGE}
+      </AlertModal>
+    </Portal>
   )
 }
