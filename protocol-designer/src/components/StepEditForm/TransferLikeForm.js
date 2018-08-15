@@ -15,6 +15,7 @@ import {
 } from './formFields'
 
 import WellSelectionInput from './WellSelectionInput'
+import WellOrderInput from './WellOrderInput'
 import type {StepType} from '../../form-types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
@@ -67,10 +68,13 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               }
             </FormGroup>
           </div>
-          <div className={styles.right_settings_column}>
+          <div className={styles.middle_settings_column}>
             <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
-            <FlowRateField />
             <TipPositionField />
+          </div>
+          <div className={styles.right_settings_column}>
+            <WellOrderInput />
+            <FlowRateField />
           </div>
         </div>
       </FormSection>

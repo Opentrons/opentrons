@@ -6,7 +6,7 @@ import i18n from '../../../localization'
 import type {BaseState, Dispatch} from '../../../types'
 import {actions as steplistActions, selectors as steplistSelectors} from '../../../steplist'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
-import styles from '../StepEditForm.css'
+import styles from './WellOrderInput.css'
 
 type Props = {
   name: StepFieldName,

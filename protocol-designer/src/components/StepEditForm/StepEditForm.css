@@ -14,7 +14,11 @@
 }
 
 .left_settings_column {
-  lost-column: 11/16;
+  lost-column: 8/16;
+}
+
+.middle_settings_column {
+  lost-column: 4/16;
 }
 
 .right_settings_column {
