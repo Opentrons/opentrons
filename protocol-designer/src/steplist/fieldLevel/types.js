@@ -12,6 +12,7 @@ export type StepFieldName =
   | 'aspirate_mix_volume'
   | 'aspirate_preWetTip'
   | 'aspirate_touchTip'
+  | 'aspirate_wellOrder'
   | 'aspirate_wells'
   | 'changeTip'
   | 'dispense_blowout_checkbox'

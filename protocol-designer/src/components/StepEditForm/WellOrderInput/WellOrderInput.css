@@ -3,3 +3,17 @@
   width: 30px;
   background-color: rebeccapurple;
 }
+
+.well_order_input {
+  display: flex;
+  flex-direction: row;
+}
+
+.button_row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.default_button {
+  width: 10rem;
+}

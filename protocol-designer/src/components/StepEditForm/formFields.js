@@ -206,3 +206,23 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
       )} />
   )
 }
+
+type WellOrderOptions = 'l2r' | 'r2l' | 't2b' | 'b2t'
+const WELL_ORDER_VALUES: Array<WellOrderOptions> = ['l2r', 'r2l', 't2b', 'b2t']
+
+type WellOrderFieldProps = {name: StepFieldName}
+export const WellOrderField = (props: WellOrderFieldProps) => (
+  <StepField
+    name={props.name}
+    render={({value, updateValue}) => (
+      <DropdownField
+        options={
+          WELL_ORDER_VALUES.map((value) => ({
+            value,
+            name: i18n.t(`step_edit_form.field.well_order.option.${value}`)
+          }))
+        }
+        value={value ? String(value) : null}
+        onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+    )} />
+)
