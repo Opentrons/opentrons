@@ -178,7 +178,7 @@ Whether or not the user has opted into anonymous analytics tracking.
 ##### analytics.seenOptIn
 
 * CLI argument: `--analytics.seenOptIn`
-* Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN
+* Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN`
 * JSON path: `analytics.seenOptIn`
 * Default: `false`
 
