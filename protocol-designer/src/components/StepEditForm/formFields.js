@@ -17,6 +17,7 @@ import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
+import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
 import styles from './StepEditForm.css'
@@ -182,14 +183,13 @@ export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGro
 // this is a placeholder
 export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
 
-type ChangeTipValues = 'always' | 'once' | 'never'
+const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
 export const ChangeTipField = (props: ChangeTipFieldProps) => {
   const {name, stepType} = props
-  let values: Array<ChangeTipValues> = ['always', 'once', 'never']
-  const options = values.map((value) => ({
+  const options = CHANGE_TIP_VALUES.map((value) => ({
     value,
     name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`)
   }))

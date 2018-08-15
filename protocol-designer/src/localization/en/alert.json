@@ -9,7 +9,7 @@
       },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette",
-        "body": "The first time a pipette is used in a protocol the \"Get new tip\" setting must be set to \"For each\" or \"Only the first\"."
+        "body": "The setting \"Get new tip\" cannot be \"Never\" the first time a pipette is used in a protocol"
       }
     },
     "warning": {
