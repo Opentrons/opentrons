@@ -42,6 +42,24 @@ Configuration values will be determined by:
 
 Enables and opens the Chrome devtools.
 
+##### modules
+
+* CLI argument: `--modules` or `--disable_modules`
+* Environment variable: `OT_APP_MODULES`
+* JSON path: `modules`
+* Default: `false`
+
+Enables experimental support for [Opentrons Modules](http://opentrons.com/modules).
+
+##### update.channel
+
+* CLI argument: `--channel`
+* Environment variable: `OT_APP_UPDATE__CHANNEL`
+* JSON path: `update.channel`
+* Default: `"latest"`
+
+Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `alpha` is the least tested/stable, followed by `beta`, followed by `latest`. `alpha` and `beta` get new features earlier than `latest`.
+
 ##### log.level.file
 
 * CLI argument: `--log.level.file`
@@ -104,6 +122,87 @@ Protocol used to fetch the UI's `index.html`. If you want to fetch the UI from t
 * Default: `"ui/index.html"`
 
 Path to `index.html`. If `ui.url.protocol` is `file:`, this path is relative to the [application directory][electron-docs-get-app-path]. This path will be combined with the protocol to get the full path to `index.html`. If you want to fetch the UI from the dev server in [`app`](../app), set this to `localhost:8090`.
+
+##### analytics.appId
+
+* CLI argument: `--analytics.appId`
+* Environment variable: `OT_APP_ANALYTICS__APP_ID`
+* JSON path: `analytics.appId`
+* Default: Random UUID generated at first launch
+
+Random, persistent ID to use for anonymous analytics tracking if opted in.
+
+##### analytics.optedIn
+
+* CLI argument: `--analytics.`
+* Environment variable: `OT_APP_ANALYTICS__OPTED_IN`
+* JSON path: `analytics.optedIn`
+* Default: `false`
+
+Whether or not the user has opted into anonymous analytics tracking.
+
+##### analytics.seenOptIn
+
+* CLI argument: `--analytics.seenOptIn`
+* Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN
+* JSON path: `analytics.seenOptIn`
+* Default: `false`
+
+Whether or not the user has seen the initial analytics description pop-up.
+
+##### support.userId
+
+* CLI argument: `--support.userId`
+* Environment variable: `OT_APP_SUPPORT__USER_ID`
+* JSON path: `support.userId`
+* Default: Random UUID generated at first launch
+
+Random, persistent ID to use for support tracking. Different than `analytics.appId`.
+
+##### support.createdAt
+
+* CLI argument: `--support.createdAt`
+* Environment variable: `OT_APP_SUPPORT__CREATED_AT`
+* JSON path: `support.createdAt`
+* Default: Current Unix time at first launch
+
+Timestamp of first app launch.
+
+##### support.name
+
+* CLI argument: `--support.name`
+* Environment variable: `OT_APP_SUPPORT__NAME`
+* JSON path: `support.name`
+* Default: `"App User"`
+
+Full name of app user to populate "Name" in support conversations.
+
+##### support.email
+
+* CLI argument: `--support.email`
+* Environment variable: `OT_APP_SUPPORT__EMAIL`
+* JSON path: `support.email`
+* Default: `null`
+
+Email of app user to populate "Email" in support conversations.
+
+##### discovery.enabled
+
+* CLI argument: `--discovery.enabled`
+* Environment variable: `OT_APP_DISCOVERY__ENABLED`
+* JSON path: `discovery.enabled`
+* Default: `false`
+
+Enables experimental robot discovery client for improved robot tracking.
+
+##### discovery.candidates
+
+* CLI argument: `--discovery.candidates`
+* Environment variable: `OT_APP_DISCOVERY__CANDIDATES`
+* JSON path: `--discovery.candidates`
+* Default: `[]`
+
+`string` or `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer, you could do `--discovery.candidates=localhost`.
 
 ### logging
 
