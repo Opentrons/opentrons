@@ -4,6 +4,7 @@
   pointer-events: none;
   font-size: var(--fs-tiny);
   text-anchor: middle;
+  dominant-baseline: middle;
 }
 
 .tiny_labels {
@@ -13,19 +14,4 @@
 
 .tiny_labels:nth-child(odd) {
   fill: gray;
-}
-
-.fallback_plate_text {
-  font-size: 0.75rem;
-  font-style: italic;
-  fill: gray;
-}
-
-.plate_outline {
-  fill: var(--c-white);
-  stroke: var(--c-black);
-}
-
-.tiprack_plate_outline {
-  fill: #d6d6d6;
 }

@@ -46,8 +46,8 @@ type DP = {
 type MP = {
   onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
   onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
-  handleMouseOverWell: $PropertyType<Props, 'handleMouseOverWell'>,
-  handleMouseExitWell: $PropertyType<Props, 'handleMouseExitWell'>
+  makeOnMouseOverWell: $PropertyType<Props, 'makeOnMouseOverWell'>,
+  onMouseExitWell: $PropertyType<Props, 'onMouseExitWell'>
 }
 
 type SP = $Diff<Props, MP>
@@ -199,13 +199,13 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
       }
     },
 
-    handleMouseOverWell: (well: string) => (e: SyntheticMouseEvent<*>) => {
+    makeOnMouseOverWell: (well: string) => (e: SyntheticMouseEvent<*>) => {
       if (!e.shiftKey) {
         const hoveredWell = {[well]: well}
         dispatch(highlightWells(_wellsFromSelected(hoveredWell)))
       }
     },
-    handleMouseExitWell: () => dispatch(
+    onMouseExitWell: () => dispatch(
       highlightWells(_wellsFromSelected({})) // TODO more convenient way to de-highlight
     )
   }

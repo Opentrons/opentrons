@@ -14,8 +14,8 @@ import {
   LabwareContainer,
   ContainerNameOverlay,
   EmptyDeckSlot,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
   humanizeLabwareType,
   clickOutside,
   type DeckSlot
@@ -81,7 +81,7 @@ function SlotWithContainer (props: SlotWithContainerProps) {
       {labwareImages[containerType]
         ? <image
           href={labwareImages[containerType]}
-          width={SLOT_WIDTH} height={SLOT_HEIGHT}
+          width={SLOT_WIDTH_MM} height={SLOT_HEIGHT_MM}
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }

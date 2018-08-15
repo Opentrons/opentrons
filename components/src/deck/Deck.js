@@ -6,10 +6,10 @@ import type {DeckSlot} from '../robot-types'
 
 import {
   SLOTNAME_MATRIX,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
-  SLOT_SPACING,
-  SLOT_OFFSET,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
+  SLOT_SPACING_MM,
+  SLOT_OFFSET_MM,
   TRASH_SLOTNAME
 } from './constants'
 import DeckOutline from './DeckOutline'
@@ -36,7 +36,7 @@ export default function Deck (props: Props) {
     <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
       <DeckOutline />
       {/* All containers */}
-      <g transform={`translate(${SLOT_OFFSET} ${SLOT_OFFSET})`}>
+      <g transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
         {renderLabware(LabwareComponent)}
       </g>
     </svg>
@@ -50,10 +50,10 @@ function renderLabware (LabwareComponent): React.Node[] {
       return columns.map((slot: DeckSlot, col: number) => {
         if (slot === TRASH_SLOTNAME) return null
 
-        const props = {slot, width: SLOT_WIDTH, height: SLOT_HEIGHT}
+        const props = {slot, width: SLOT_WIDTH_MM, height: SLOT_HEIGHT_MM}
         const transform = `translate(${[
-          SLOT_WIDTH * col + SLOT_SPACING * (col + 1),
-          SLOT_HEIGHT * row + SLOT_SPACING * (row + 1)
+          SLOT_WIDTH_MM * col + SLOT_SPACING_MM * (col + 1),
+          SLOT_HEIGHT_MM * row + SLOT_SPACING_MM * (row + 1)
         ].join(',')})`
 
         return (

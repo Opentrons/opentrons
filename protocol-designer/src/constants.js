@@ -8,9 +8,9 @@ export const {
   SLOTNAME_MATRIX,
   sortedSlotnames,
   TRASH_SLOTNAME,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
-  SLOT_SPACING,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
+  SLOT_SPACING_MM,
   // STYLE CONSTANTS
   swatchColors,
   // SPECIAL SELECTORS
