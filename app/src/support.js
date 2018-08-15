@@ -22,6 +22,8 @@ const INTERCOM_ID = process.env.OT_APP_INTERCOM_ID
 
 // intercom handler (default noop)
 let intercom = noop
+let userId
+let robot = ''
 
 export function initializeSupport (): ThunkAction {
   return (_, getState) => {
@@ -41,9 +43,9 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
 
   if (action.type === 'robot:CONNECT_RESPONSE') {
     const state = store.getState()
-    const robot = state.robot.connection.connectRequest.name
-    log.debug('Updating intercom data', {robot})
-    intercom('update', {robot})
+    robot = state.robot.connection.connectRequest.name
+    log.debug('Updating intercom data', {user_id: userId, robot})
+    intercom('update', {user_id: userId, 'Robot Name': robot})
   }
 
   return next(action)
@@ -51,13 +53,15 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
 
 function initializeIntercom (config: SupportConfig) {
   if (INTERCOM_ID) {
+    userId = config.userId
+
     const data = {
       app_id: INTERCOM_ID,
-      user_id: config.userId,
+      user_id: userId,
       created_at: config.createdAt,
       name: config.name,
-      email: config.email,
-      'App Version': version
+      'App Version': version,
+      'Robot Name': robot
     }
 
     log.debug('Initializing Intercom', {data})
