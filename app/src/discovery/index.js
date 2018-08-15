@@ -1,35 +1,38 @@
 // @flow
 // robot discovery state
+import {getShellRobots} from '../shell'
+
 import type {State, Action, ThunkAction} from '../types'
 import type {RobotService} from '../robot'
 import type {DiscoveredRobot} from './types'
 
+type RobotsMap = {[name: string]: DiscoveredRobot}
+
 type DiscoveryState = {
   scanning: boolean,
-  robotsByName: {[name: string]: DiscoveredRobot}
+  robotsByName: RobotsMap
 }
 
 type StartAction = {|
   type: 'discovery:START',
-  meta: {| shell: true |},
+  meta: {|shell: true|}
 |}
 
 type FinishAction = {|
   type: 'discovery:FINISH',
-  meta: {| shell: true |},
+  meta: {|shell: true|}
 |}
 
 type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {| robots: Array<DiscoveredRobot> |},
+  payload: {|robots: Array<DiscoveredRobot>|}
 |}
 
-export type DiscoveryAction =
-  | StartAction
-  | FinishAction
-  | UpdateListAction
+export * from './types'
 
-const DISCOVERY_TIMEOUT = 30000
+export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
+
+const DISCOVERY_TIMEOUT = 15000
 
 export function startDiscovery (): ThunkAction {
   const start: StartAction = {type: 'discovery:START', meta: {shell: true}}
@@ -67,9 +70,15 @@ export function getDiscoveredRobotsByName (state: State) {
 //
 // }
 
+// getShellRobots makes a sync RPC call, so use sparingly
+const initialState: DiscoveryState = {
+  scanning: false,
+  robotsByName: normalizeRobots(getShellRobots())
+}
+
 // TODO(mc, 2018-08-09): implement this reducer
 export function discoveryReducer (
-  state: DiscoveryState = {scanning: false, robotsByName: {}},
+  state: DiscoveryState = initialState,
   action: Action
 ): DiscoveryState {
   switch (action.type) {
@@ -89,7 +98,10 @@ export function discoveryReducer (
         ...state,
         robotsByName: {
           ...state.robotsByName,
-          [action.payload.name]: robotServiceToDiscoveredRobot(action.payload, true)
+          [action.payload.name]: robotServiceToDiscoveredRobot(
+            action.payload,
+            true
+          )
         }
       }
 
@@ -99,21 +111,31 @@ export function discoveryReducer (
         ...state,
         robotsByName: {
           ...state.robotsByName,
-          [action.payload.name]: robotServiceToDiscoveredRobot(action.payload, false)
+          [action.payload.name]: robotServiceToDiscoveredRobot(
+            action.payload,
+            false
+          )
         }
       }
 
     case 'discovery:UPDATE_LIST':
       return {
         ...state,
-        robotsByName: action.payload.robots.reduce((robotsMap, robot) => ({
-          ...robotsMap,
-          [robot.name]: robot
-        }), {})
+        robotsByName: normalizeRobots(action.payload.robots)
       }
   }
 
   return state
+}
+
+function normalizeRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
+  return robots.reduce(
+    (robotsMap: RobotsMap, robot: DiscoveredRobot) => ({
+      ...robotsMap,
+      [robot.name]: robot
+    }),
+    {}
+  )
 }
 
 // TODO(mc, 2018-08-10): remove this function when no longer needed
@@ -123,8 +145,6 @@ function robotServiceToDiscoveredRobot (
 ): DiscoveredRobot {
   return {
     name: robot.name,
-    connections: [
-      {ip: robot.ip, port: robot.port, local: !!robot.wired, ok}
-    ]
+    connections: [{ip: robot.ip, port: robot.port, local: !!robot.wired, ok}]
   }
 }

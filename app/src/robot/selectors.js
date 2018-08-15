@@ -6,12 +6,9 @@ import {createSelector, type Selector} from 'reselect'
 
 import {
   type ConnectionStatus,
-  _NAME,
   PIPETTE_MOUNTS,
   DECK_SLOTS
 } from './constants'
-
-import {getDiscoveredRobotsByName} from '../discovery'
 
 import type {ContextRouter} from 'react-router'
 import type {State} from '../types'
@@ -27,9 +24,9 @@ import type {
   SessionModule
 } from './types'
 
-const calibration = (state: State) => state[_NAME].calibration
-const connection = (state: State) => state[_NAME].connection
-const session = (state: State) => state[_NAME].session
+const calibration = (state: State) => state.robot.calibration
+const connection = (state: State) => state.robot.connection
+const session = (state: State) => state.robot.session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
 
@@ -50,8 +47,10 @@ export function labwareType (labware: Labware): LabwareType {
 // TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
 export const getDiscovered: Selector<State, void, Array<Robot>> =
   createSelector(
-    getDiscoveredRobotsByName,
-    (state: State) => connection(state).connectedTo,
+    // TODO(mc, 2018-08-15): not using the selector in discovery right now
+    // because of dependency problem in WebWorker where this selector is used
+    state => state.discovery.robotsByName,
+    state => connection(state).connectedTo,
     (discoveredByName, connectedTo) => {
       const robots = Object.keys(discoveredByName)
         .map(name => {

@@ -110,6 +110,31 @@ describe('discovery client', () => {
     10
   )
 
+  test('new mdns service does not null out ok of existing service', () => {
+    const client = DiscoveryClient()
+
+    client.services = [
+      {
+        name: 'opentrons-dev',
+        ip: '192.168.1.42',
+        port: 31950,
+        ok: true
+      }
+    ]
+
+    client.start()
+    mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
+
+    expect(client.services).toEqual([
+      {
+        name: 'opentrons-dev',
+        ip: '192.168.1.42',
+        port: 31950,
+        ok: true
+      }
+    ])
+  })
+
   test(
     'selects IPv4 as ip from service.addresses',
     done => {

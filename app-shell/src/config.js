@@ -1,3 +1,4 @@
+// @flow
 // app configuration and settings
 import Store from 'electron-store'
 import mergeOptions from 'merge-options'
@@ -8,7 +9,12 @@ import yargsParser from 'yargs-parser'
 import pkg from '../package.json'
 import createLogger from './log'
 
+// TODO(mc, 2018-08-08): figure out type exports from app
+import type {Action} from '@opentrons/app/src/types'
+import type {Config} from '@opentrons/app/src/config'
+
 // make sure all arguments are included in production
+// $FlowFixMe: process.defaultApp exists in electron
 const argv = process.defaultApp
   ? process.argv.slice(2)
   : process.argv.slice(1)
@@ -21,7 +27,7 @@ const PARSE_ARGS_OPTS = {
 }
 
 // TODO(mc, 2018-05-25): future config changes may require migration strategy
-const DEFAULTS = {
+const DEFAULTS: Config = {
   devtools: false,
 
   modules: false,
@@ -84,11 +90,11 @@ const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
 const log = () => _log || (_log = createLogger(__filename))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig (dispatch) {
-  return function handleIncomingAction (action) {
-    const {type, payload} = action
+export function registerConfig (dispatch: Action => void) {
+  return function handleIncomingAction (action: Action) {
+    if (action.type === 'config:UPDATE') {
+      const {payload} = action
 
-    if (type === 'config:UPDATE') {
       log().debug('Handling config:UPDATE', payload)
 
       if (getIn(overrides(), payload.path) != null) {
@@ -106,11 +112,11 @@ export function getStore () {
   return store().store
 }
 
-export function getOverrides () {
-  return overrides()
+export function getOverrides (path?: string) {
+  return getIn(overrides(), path)
 }
 
-export function getConfig (path) {
+export function getConfig (path?: string) {
   const result = store().get(path)
   const over = getIn(overrides(), path)
 

@@ -1,8 +1,31 @@
 // discovery reducer test
 import {discoveryReducer} from '..'
 
+jest.mock('../../shell', () => ({
+  getShellRobots: () => ([
+    {name: 'foo', connections: []},
+    {name: 'bar', connections: []}
+  ])
+}))
+
 describe('discoveryReducer', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   const SPECS = [
+    {
+      name: 'pulls initial robot list from shell and sets scanning to false',
+      action: {},
+      initialState: undefined,
+      expectedState: {
+        scanning: false,
+        robotsByName: {
+          foo: {name: 'foo', connections: []},
+          bar: {name: 'bar', connections: []}
+        }
+      }
+    },
     // TODO(mc, 2018-08-10): legacy; remove when DC enabled by default
     {
       name: 'robot:DISCOVER sets scanning: true',

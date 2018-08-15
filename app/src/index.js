@@ -38,7 +38,7 @@ const middleware = applyMiddleware(
 
 const composeEnhancers = (
   (
-    global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({maxAge: 200})
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({maxAge: 200})
   ) ||
   compose
 )
@@ -65,7 +65,7 @@ if (module.hot) {
 const {config} = store.getState()
 
 // attach store to window if devtools are on
-if (config.devtools) global.store = store
+if (config.devtools) window.store = store
 
 // initialize analytics and support after first render
 store.dispatch(initializeAnalytics())

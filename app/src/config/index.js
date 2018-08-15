@@ -2,6 +2,7 @@
 // config redux module
 import {setIn} from '@thi.ng/paths'
 import {getShellConfig} from '../shell'
+
 import type {State, Action, ThunkAction} from '../types'
 import type {LogLevel} from '../logger'
 
@@ -55,6 +56,7 @@ export type Config = {
 
   discovery: {
     enabled: boolean,
+    candidates: string | Array<string>
   },
 }
 
