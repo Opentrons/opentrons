@@ -1,0 +1,38 @@
+{
+  "consolidate": {
+    "change_tip_option": {
+      "always": "For each dispense",
+      "once": "Only the first aspirate",
+      "never": "Never"
+    }
+  },
+  "distribute": {
+    "change_tip_option": {
+      "always": "For each aspirate",
+      "once": "Only the first aspirate",
+      "never": "Never"
+    }
+  },
+  "mix": {
+    "change_tip_option": {
+      "always": "For each well",
+      "once": "Only the first aspirate",
+      "never": "Never"
+    }
+  },
+  "transfer": {
+    "change_tip_option": {
+      "always": "For each aspirate",
+      "once": "Only the first aspirate",
+      "never": "Never"
+    }
+  },
+  "field": {
+    "change_tip": {
+      "label": "Get new tip"
+    },
+    "well_order": {
+      "label": "Well Order"
+    }
+  }
+}
