@@ -2,6 +2,7 @@
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
 import codecs
 import os
+import shutil
 from setuptools import setup, find_packages
 import json
 
@@ -54,6 +55,18 @@ def read(*parts):
 
 
 if __name__ == "__main__":
+    pipette_config_filename = 'pipette-config.json'
+    config_src = os.path.join(
+        '..', 'shared-data', 'robot-data', pipette_config_filename)
+    config_dst = os.path.join('opentrons', 'config')
+    try:
+        pipette_config_file = os.path.join(config_dst, pipette_config_filename)
+        if os.path.exists(pipette_config_file):
+            os.remove(pipette_config_file)
+        shutil.copy2(config_src, config_dst)
+    except OSError:
+        print('Unable to copy shared data directory due to exception:')
+
     setup(
         python_requires='>=3.6',
         name=DISTNAME,

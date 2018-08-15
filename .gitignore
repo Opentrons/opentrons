@@ -75,6 +75,7 @@ target/
 
 # Testing
 api/tests/opentrons/data/configs/
+api/opentrons/config/*.json
 sample_protocol.py
 
 # Local Calibration Data
