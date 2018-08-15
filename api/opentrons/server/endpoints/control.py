@@ -86,6 +86,23 @@ async def get_attached_modules(request):
     return web.json_response(data, status=200)
 
 
+async def get_module_data(request):
+    """
+    Query a module (by its serial number) for its live data
+    """
+    requested_serial = request.match_info['serial']
+    res = None
+
+    for module in robot.modules:
+        if module.device_info.get('serial') == requested_serial:
+            res = module.live_data() if module.live_data() else None
+
+    if res:
+        return web.json_response(res, status=200)
+    else:
+        return web.json_response({"message": "Module not found"}, status=404)
+
+
 async def get_engaged_axes(request):
     """
     Query driver for engaged state by axis. Response keys will be axes XYZABC

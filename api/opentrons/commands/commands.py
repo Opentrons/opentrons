@@ -250,25 +250,43 @@ def drop_tip(instrument, location):
     )
 
 
-def engage(motor):
-    text = "Engaging Magbead at mosfet #{motor}"
+def magdeck_engage():
+    text = "Engaging magnetic deck module"
     return make_command(
-        name=types.MAGBEAD_ENGAGE,
-        payload={
-            'motor': motor,
-            'text': text
-        }
+        name=types.MAGDECK_ENGAGE,
+        payload={'text': text}
     )
 
 
-def disengage(motor):
-    text = "Disengaging Magbead at mosfet #{motor}"
+def magdeck_disengage():
+    text = "Disengaging magnetic deck module"
     return make_command(
-        name=types.MAGBEAD_ENGAGE,
-        payload={
-            'motor': motor,
-            'text': text
-        }
+        name=types.MAGDECK_DISENGAGE,
+        payload={'text': text}
+    )
+
+
+def magdeck_calibrate():
+    text = "Calibrating magnetic deck module"
+    return make_command(
+        name=types.MAGDECK_CALIBRATE,
+        payload={'text': text}
+    )
+
+
+def tempdeck_set_temp():
+    text = "Setting temperature deck module temperature"
+    return make_command(
+        name=types.TEMPDECK_SET_TEMP,
+        payload={'text': text}
+    )
+
+
+def tempdeck_deactivate():
+    text = "Deactivating temperature deck module"
+    return make_command(
+        name=types.TEMPDECK_DEACTIVATE,
+        payload={'text': text}
     )
 
 
@@ -300,15 +318,6 @@ def resume():
             'text': 'Resuming robot operation'
         }
     )
-
-
-def magbead():
-    pass
-
-
-magbead.engage = engage
-magbead.disengage = disengage
-magbead.delay = delay
 
 
 def publish(before, after, command, meta=None):

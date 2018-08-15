@@ -1,4 +1,5 @@
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons import commands
 
 
 class MissingDevicePortError(Exception):
@@ -18,6 +19,7 @@ class TempDeck:
         self._driver = None
         self._device_info = None
 
+    @commands.publish.both(command=commands.tempdeck_set_temp)
     def set_temperature(self, celsius):
         """
         Set temperature in degree Celsius
@@ -28,6 +30,7 @@ class TempDeck:
         if self._driver and self._driver.is_connected():
             self._driver.set_temperature(celsius)
 
+    @commands.publish.both(command=commands.tempdeck_deactivate)
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         if self._driver and self._driver.is_connected():
@@ -51,7 +54,16 @@ class TempDeck:
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': 'Temperature Deck',
-            'status': self.status
+            **self.live_data()
+        }
+
+    def live_data(self):
+        return {
+            'status': self.status,
+            'data': {
+                'currentTemp': self.temperature,
+                'targetTemp': self.target
+            }
         }
 
     @property

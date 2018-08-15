@@ -47,7 +47,14 @@ type FetchModulesResponse = {
   modules: Array<Module>,
 }
 
+export type FetchModuleDataResponse = {
+  status: string,
+  data: TempDeckData | MagDeckData
+}
+
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
+
+type FetchModuleDataCall = ApiCall<null, FetchModuleDataResponse>
 
 export type ModulesAction =
   | ApiAction<'modules', null, FetchModulesResponse>
@@ -71,43 +78,39 @@ export function fetchModules (robot: RobotService): ThunkPromiseAction {
   }
 }
 
+const DATA: 'data' = 'data'
+
+export function fetchModuleData (robot: RobotService, serial: string): ThunkPromiseAction {
+  return (dispatch) => {
+    const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+    dispatch(apiRequest(robot, fetchDataPath, null))
+
+    return client(robot, 'GET', fetchDataPath)
+      .then(
+        (resp: FetchModuleDataResponse) => apiSuccess(robot, fetchDataPath, resp),
+        (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
+      )
+      .then(dispatch)
+  }
+}
+
 export function makeGetRobotModules () {
   const selector: Selector<State, BaseRobot, FetchModulesCall> = createSelector(
     getRobotApiState,
     (state) => state[MODULES] || {inProgress: false}
-    // TODO(mc, 2018-07-23): DEBUG code; remove soon
-    // () => ({
-    //   inProgress: false,
-    //   error: null,
-    //   request: null,
-    //   response: {
-    //     modules: [
-    //       {
-    //         name: 'tempdeck',
-    //         model: 'temp_deck',
-    //         serial: '123123124',
-    //         fwVersion: '1.2.13',
-    //         status: 'heating',
-    //         displayName: 'Temperature Module',
-    //         data: {
-    //           currentTemp: 60,
-    //           targetTemp: 70
-    //         }
-    //       },
-    //       {
-    //         name: 'magdeck',
-    //         model: 'mag_deck',
-    //         serial: '123123124',
-    //         fwVersion: '1.2.13',
-    //         status: 'disengaged',
-    //         displayName: 'Magnetic Bead Module',
-    //         data: {
-    //           engaged: false
-    //         }
-    //       }
-    //     ]
-    //   }
-    // })
+  )
+
+  return selector
+}
+
+export function makeGetRobotModuleData () {
+  const selector: Selector<State, BaseRobot, FetchModuleDataCall> = createSelector(
+    (state, robot, _serial) => (getRobotApiState(state, robot)),
+    (_state, _robot, serial) => serial,
+    (state, serial) => {
+      const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+      return state[fetchDataPath] || {inProgress: false}
+    }
   )
 
   return selector
