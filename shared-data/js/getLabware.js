@@ -1,7 +1,7 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import definitions from '../build/labware.json'
-import {SLOT_HEIGHT} from './constants'
+import {SLOT_HEIGHT_MM} from './constants'
 import type {LabwareDefinition, WellDefinition} from './types'
 
 export default function getLabware (labwareName: string): ?LabwareDefinition {
@@ -34,6 +34,6 @@ export function getWellDefsForSVG (labwareName: string) {
     ...wellDef,
     x: wellDef.x + xCorrection,
     // flip y axis to match SVG y axis direction
-    y: SLOT_HEIGHT - wellDef.y + yCorrection
+    y: SLOT_HEIGHT_MM - wellDef.y + yCorrection
   }))
 }

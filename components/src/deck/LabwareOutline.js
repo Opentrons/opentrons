@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {SLOT_WIDTH, SLOT_HEIGHT} from './constants.js'
+import {SLOT_WIDTH_MM, SLOT_HEIGHT_MM} from './constants.js'
 import styles from './Labware.css'
 
 type Props = {className?: ?string}
@@ -13,7 +13,7 @@ export default function LabwareOutline (props: Props) {
   return <rect {...rectStyle}
     x='0' y='0'
     className={cx(styles.plate_outline, props.className)}
-    width={SLOT_WIDTH}
-    height={SLOT_HEIGHT}
+    width={SLOT_WIDTH_MM}
+    height={SLOT_HEIGHT_MM}
   />
 }
