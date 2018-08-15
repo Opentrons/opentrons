@@ -1,9 +1,11 @@
 // tests for the app-shell's discovery module
 import EventEmitter from 'events'
+import Store from 'electron-store'
 import DiscoveryClient from '@opentrons/discovery-client'
 import {registerDiscovery} from '../discovery'
-import {getConfig} from '../config'
+import {getConfig, getOverrides} from '../config'
 
+jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
 jest.mock('../log')
 jest.mock('../config')
@@ -23,12 +25,16 @@ describe('app-shell/discovery', () => {
       setPollInterval: jest.fn().mockReturnThis()
     })
 
-    getConfig.mockReturnValue({
-      candidates: []
-    })
+    getConfig.mockReturnValue({candidates: []})
+    getOverrides.mockReturnValue({})
 
     dispatch = jest.fn()
     DiscoveryClient.mockReturnValue(mockClient)
+    Store.__mockReset()
+    Store.__store.get.mockImplementation(key => {
+      if (key === 'services') return []
+      return null
+    })
   })
 
   afterEach(() => {
@@ -40,21 +46,61 @@ describe('app-shell/discovery', () => {
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        nameFilter: /^opentrons/i,
-        pollInterval: 5000,
-        candidates: []
+        pollInterval: expect.any(Number),
+        // support for legacy IPv6 wired robots
+        candidates: ['[fd00:0:cafe:fefe::1]'],
+        services: []
       })
     )
   })
 
-  test('calls client.start on "discovery:START"', () => {
-    registerDiscovery(dispatch)({type: 'discovery:START'})
+  test('calls client.start on discovery registration', () => {
+    registerDiscovery(dispatch)
     expect(mockClient.start).toHaveBeenCalled()
   })
 
-  test('sets client to slow poll on "discovery:FINISH"', () => {
-    registerDiscovery(dispatch)({type: 'discovery:FINISH'})
-    expect(mockClient.setPollInterval).toHaveBeenCalledWith(15000)
+  test('calls client.start on "discovery:START"', () => {
+    registerDiscovery(dispatch)({type: 'discovery:START'})
+    expect(mockClient.start).toHaveBeenCalledTimes(2)
+  })
+
+  test('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
+    const handleAction = registerDiscovery(dispatch)
+
+    handleAction({type: 'discovery:START'})
+    expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
+      expect.any(Number)
+    )
+    handleAction({type: 'discovery:FINISH'})
+    expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
+      expect.any(Number)
+    )
+
+    expect(mockClient.setPollInterval).toHaveBeenCalledTimes(2)
+    const fastPoll = mockClient.setPollInterval.mock.calls[0][0]
+    const slowPoll = mockClient.setPollInterval.mock.calls[1][0]
+    expect(fastPoll).toBeLessThan(slowPoll)
+  })
+
+  test('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
+    mockClient.services = [
+      {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true}
+    ]
+
+    const expected = [
+      {
+        name: 'opentrons-dev',
+        connections: [
+          {ip: '192.168.1.42', port: 31950, ok: true, local: false}
+        ]
+      }
+    ]
+
+    registerDiscovery(dispatch)({type: 'discovery:START'})
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: {robots: expected}
+    })
   })
 
   describe('"service" event handling', () => {
@@ -69,7 +115,9 @@ describe('app-shell/discovery', () => {
         expected: [
           {
             name: 'opentrons-dev',
-            connections: [{ip: '192.168.1.42', port: 31950, ok: true, local: false}]
+            connections: [
+              {ip: '192.168.1.42', port: 31950, ok: true, local: false}
+            ]
           }
         ]
       },
@@ -112,14 +160,100 @@ describe('app-shell/discovery', () => {
       }
     ]
 
-    SPECS.forEach(spec => test(spec.name, () => {
-      mockClient.services = spec.services
+    SPECS.forEach(spec =>
+      test(spec.name, () => {
+        mockClient.services = spec.services
 
-      mockClient.emit('service')
-      expect(dispatch).toHaveBeenCalledWith({
-        type: 'discovery:UPDATE_LIST',
-        payload: {robots: spec.expected}
+        mockClient.emit('service')
+        expect(dispatch).toHaveBeenCalledWith({
+          type: 'discovery:UPDATE_LIST',
+          payload: {robots: spec.expected}
+        })
       })
-    }))
+    )
+  })
+
+  test('stores services to file on service events', () => {
+    registerDiscovery(dispatch)
+    expect(Store).toHaveBeenCalledWith({
+      name: 'discovery',
+      defaults: {services: []}
+    })
+
+    mockClient.services = [{name: 'foo'}, {name: 'bar'}]
+    mockClient.emit('service')
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [
+      {name: 'foo'},
+      {name: 'bar'}
+    ])
+
+    mockClient.services = [{name: 'foo'}]
+    mockClient.emit('serviceRemoved')
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'foo'}])
+  })
+
+  test('loads services from file on client initialization', () => {
+    Store.__store.get.mockImplementation(key => {
+      if (key === 'services') return [{name: 'foo'}]
+      return null
+    })
+
+    registerDiscovery(dispatch)
+    expect(DiscoveryClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        services: [{name: 'foo'}]
+      })
+    )
+  })
+
+  test('loads candidates from config on client initialization', () => {
+    getConfig.mockReturnValue({candidates: ['1.2.3.4']})
+    registerDiscovery(dispatch)
+
+    expect(DiscoveryClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidates: expect.arrayContaining(['1.2.3.4'])
+      })
+    )
+  })
+
+  // ensures config override works with only one candidate specified
+  test('canidates in config can be single value', () => {
+    getConfig.mockReturnValue({candidates: '1.2.3.4'})
+    registerDiscovery(dispatch)
+
+    expect(DiscoveryClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidates: expect.arrayContaining(['1.2.3.4'])
+      })
+    )
+  })
+
+  test('services from overridden canidates are not persisted', () => {
+    getConfig.mockReturnValue({candidates: 'localhost'})
+    getOverrides.mockImplementation(key => {
+      if (key === 'discovery.candidates') return ['1.2.3.4', '5.6.7.8']
+      return null
+    })
+
+    registerDiscovery(dispatch)
+
+    mockClient.services = [{name: 'foo', ip: '5.6.7.8'}, {name: 'bar'}]
+    mockClient.emit('service')
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'bar'}])
+  })
+
+  test('service from overridden single candidate is not persisted', () => {
+    getConfig.mockReturnValue({candidates: 'localhost'})
+    getOverrides.mockImplementation(key => {
+      if (key === 'discovery.candidates') return '1.2.3.4'
+      return null
+    })
+
+    registerDiscovery(dispatch)
+
+    mockClient.services = [{name: 'foo', ip: '1.2.3.4'}, {name: 'bar'}]
+    mockClient.emit('service')
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'bar'}])
   })
 })

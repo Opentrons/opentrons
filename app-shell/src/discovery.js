@@ -4,13 +4,15 @@ import assert from 'assert'
 import groupBy from 'lodash/groupBy'
 import map from 'lodash/map'
 import uniqBy from 'lodash/uniqBy'
+import Store from 'electron-store'
 
 import DiscoveryClient, {
   DEFAULT_PORT,
-  SERVICE_EVENT
+  SERVICE_EVENT,
+  SERVICE_REMOVED_EVENT
 } from '@opentrons/discovery-client'
 
-import {getConfig} from './config'
+import {getConfig, getOverrides} from './config'
 import createLogger from './log'
 
 import type {Service} from '@opentrons/discovery-client'
@@ -21,40 +23,64 @@ import type {DiscoveredRobot, Connection} from '@opentrons/app/src/discovery/typ
 
 const log = createLogger(__filename)
 
-const NAME_FILTER = /^opentrons/i
-
 // TODO(mc, 2018-08-09): values picked arbitrarily and should be researched
-const FAST_POLL_INTERVAL = 5000
+const FAST_POLL_INTERVAL = 3000
 const SLOW_POLL_INTERVAL = 15000
 
 let config
+let store
 let client
 
 export function registerDiscovery (dispatch: Action => void) {
   config = getConfig('discovery')
+  store = new Store({name: 'discovery', defaults: {services: []}})
 
   client = DiscoveryClient({
-    nameFilter: NAME_FILTER,
-    pollInterval: FAST_POLL_INTERVAL,
+    pollInterval: SLOW_POLL_INTERVAL,
     logger: log,
-    candidates: config.candidates
+    candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
+    services: store.get('services')
   })
 
   client
-    .on(SERVICE_EVENT, () => dispatch({
-      type: 'discovery:UPDATE_LIST',
-      payload: {robots: servicesToRobots(client.services)}
-    }))
+    .on(SERVICE_EVENT, handleServices)
+    .on(SERVICE_REMOVED_EVENT, handleServices)
     .on('error', error => log.error('discovery error', {error}))
+    .start()
 
   return function handleIncomingAction (action: Action) {
     log.debug('handling action in discovery', {action})
 
     switch (action.type) {
-      case 'discovery:START': return client.start()
-      case 'discovery:FINISH': return client.setPollInterval(SLOW_POLL_INTERVAL)
+      case 'discovery:START':
+        handleServices()
+        return client.setPollInterval(FAST_POLL_INTERVAL).start()
+      case 'discovery:FINISH':
+        return client.setPollInterval(SLOW_POLL_INTERVAL)
     }
   }
+
+  function handleServices () {
+    store.set('services', filterServicesToPersist(client.services))
+    dispatch({
+      type: 'discovery:UPDATE_LIST',
+      payload: {robots: servicesToRobots(client.services)}
+    })
+  }
+}
+
+export function getRobots () {
+  if (!client) return []
+
+  return servicesToRobots(client.services)
+}
+
+function filterServicesToPersist (services: Array<Service>) {
+  const candidateOverrides = getOverrides('discovery.candidates')
+  if (!candidateOverrides) return client.services
+
+  const blacklist = [].concat(candidateOverrides)
+  return client.services.filter(s => blacklist.every(ip => ip !== s.ip))
 }
 
 // TODO(mc, 2018-08-09): exploring moving this to DiscoveryClient
@@ -88,7 +114,8 @@ function isLocal (ip: string): boolean {
   // TODO(mc, 2018-08-09): remove `fd00` check for legacy IPv6 robots
   return (
     ip.startsWith('169.254') ||
-    ip.startsWith('fe80') ||
-    ip.startsWith('fd00')
+    ip.startsWith('[fe80') ||
+    ip.startsWith('[fd00') ||
+    ip === 'localhost'
   )
 }
