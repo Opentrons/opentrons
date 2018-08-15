@@ -14,7 +14,7 @@ import {
 import {makeGetHealthCheckOk} from '../../health-check'
 
 import {AlertModal} from '@opentrons/components'
-import {Portal} from '../Portal'
+import {Portal} from '../portal'
 import ModalCopy from './ModalCopy'
 
 type StateProps = {
