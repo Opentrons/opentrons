@@ -25,7 +25,7 @@ describe('app-shell/discovery', () => {
       setPollInterval: jest.fn().mockReturnThis()
     })
 
-    getConfig.mockReturnValue({candidates: []})
+    getConfig.mockReturnValue({enabled: true, candidates: []})
     getOverrides.mockReturnValue({})
 
     dispatch = jest.fn()
@@ -207,7 +207,7 @@ describe('app-shell/discovery', () => {
   })
 
   test('loads candidates from config on client initialization', () => {
-    getConfig.mockReturnValue({candidates: ['1.2.3.4']})
+    getConfig.mockReturnValue({enabled: true, candidates: ['1.2.3.4']})
     registerDiscovery(dispatch)
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
@@ -219,7 +219,7 @@ describe('app-shell/discovery', () => {
 
   // ensures config override works with only one candidate specified
   test('canidates in config can be single value', () => {
-    getConfig.mockReturnValue({candidates: '1.2.3.4'})
+    getConfig.mockReturnValue({enabled: true, candidates: '1.2.3.4'})
     registerDiscovery(dispatch)
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
@@ -230,7 +230,7 @@ describe('app-shell/discovery', () => {
   })
 
   test('services from overridden canidates are not persisted', () => {
-    getConfig.mockReturnValue({candidates: 'localhost'})
+    getConfig.mockReturnValue({enabled: true, candidates: 'localhost'})
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return ['1.2.3.4', '5.6.7.8']
       return null
@@ -244,7 +244,7 @@ describe('app-shell/discovery', () => {
   })
 
   test('service from overridden single candidate is not persisted', () => {
-    getConfig.mockReturnValue({candidates: 'localhost'})
+    getConfig.mockReturnValue({enabled: true, candidates: 'localhost'})
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return '1.2.3.4'
       return null
