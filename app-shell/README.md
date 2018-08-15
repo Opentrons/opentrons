@@ -29,6 +29,40 @@ Configuration values will be determined by:
 * For CLI arguments, use `--value` for true, and `--disable_value` for false
 * For environment variables, use `OT_APP_VALUE=1` for true, and `OT_APP_VALUE=0` for false
 
+#### overriding config for end-users
+
+##### macOS
+
+To override config in macOS, launch the app from `Terminal` instead of clicking on `Opentrons.app`.
+
+```shell
+# example: launch with devtools enabled
+/Applications/Opentrons.app/Contents/MacOS/Opentrons --devtools
+```
+
+Replace `/Applications` with whatever directory you have placed `Opentrons.app` in.
+
+##### linux
+
+To override config in Linux, launch the app from the terminal. If you installed the Opentrons `deb` package, you should already have an `opentrons` executable in your `$PATH`.
+
+```shell
+# example: launch with devtools enabled
+opentrons --devtools
+```
+
+##### windows
+
+The easiest way to override config on Windows is to modify the Opentrons desktop shortcut. Create a desktop shortcut to Opentrons if you don't have one already, then:
+
+1. Right click the "Opentrons" shortcut
+2. Select "Properties" and go to the "Shortcut" tab
+3. In the "Target" field, append any desired options
+
+![Add config overrides to Target][win-shortcut-screenshot]
+
+[win-shortcut-screenshot]: https://user-images.githubusercontent.com/2963448/44161086-421e1980-a08a-11e8-939d-768ee809878f.png
+
 <!-- TODO(mc, 2018-05-16): generate this section from lib/config.js -->
 
 #### settings
@@ -134,7 +168,7 @@ Random, persistent ID to use for anonymous analytics tracking if opted in.
 
 ##### analytics.optedIn
 
-* CLI argument: `--analytics.`
+* CLI argument: `--analytics.optedIn`
 * Environment variable: `OT_APP_ANALYTICS__OPTED_IN`
 * JSON path: `analytics.optedIn`
 * Default: `false`
