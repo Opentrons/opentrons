@@ -60,9 +60,10 @@ def test_fail_get_temp_deck_temperature():
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
     res = temp_deck.update_temperature()
-    assert len(res) == 0
 
-    return_string = 'Tx:none C:90'
+    assert temp_deck._temperature == {'current': 90, 'target': None}
+
+    return_string = 'Tx:none C:1'
 
     def _mock_send_command(self, command, timeout=None):
         return return_string
@@ -70,7 +71,7 @@ def test_fail_get_temp_deck_temperature():
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
     res = temp_deck.update_temperature()
-    assert len(res) > 0
+    assert temp_deck._temperature == {'current': 90, 'target': None}
 
 
 def test_set_temp_deck_temperature(monkeypatch):
@@ -113,7 +114,7 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     temp_deck = TempDeck()
     temp_deck.simulating = False
 
-    res = temp_deck.update_temperature()
+    res = temp_deck.set_temperature(-9)
     assert res == error_msg
 
     error_msg = 'Alarm: something alarming happened here'
@@ -125,7 +126,7 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     serial_communication.write_and_return = types.MethodType(
         _raise_error, serial_communication)
 
-    res = temp_deck.update_temperature()
+    res = temp_deck.set_temperature(-9)
     assert res == error_msg
 
 
