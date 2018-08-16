@@ -32,8 +32,9 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
   if (action.type === 'robot:CONNECT_RESPONSE') {
     const state = store.getState()
     const robot = state.robot.connection.connectRequest.name
-    log.debug('Updating intercom data', {user_id: userId, robot})
-    intercom('update', {user_id: userId, 'Robot Name': robot})
+    const data = {user_id: userId, 'Robot Name': robot}
+    log.debug('Updating intercom data', {data})
+    intercom('update', {data})
   }
 
   return next(action)
