@@ -14,6 +14,7 @@ import {
 import {makeGetHealthCheckOk} from '../../health-check'
 
 import {AlertModal} from '@opentrons/components'
+import {Portal} from '../portal'
 import ModalCopy from './ModalCopy'
 
 type StateProps = {
@@ -36,16 +37,18 @@ function LostConnectionAlert (props: Props) {
   const {ok, disconnect} = props
 
   return ok === false && (
-    <AlertModal
-      onCloseClick={disconnect}
-      heading={'Connection to robot lost'}
-      buttons={[
-        {onClick: disconnect, children: 'close'}
-      ]}
-      alertOverlay
-    >
-      <ModalCopy />
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        onCloseClick={disconnect}
+        heading={'Connection to robot lost'}
+        buttons={[
+          {onClick: disconnect, children: 'close'}
+        ]}
+        alertOverlay
+      >
+        <ModalCopy />
+      </AlertModal>
+    </Portal>
   )
 }
 

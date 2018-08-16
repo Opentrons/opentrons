@@ -7,6 +7,7 @@ import {push} from 'react-router-redux'
 
 import {actions as robotActions, type Mount} from '../../robot'
 import {ContinueModal} from '@opentrons/components'
+import {Portal} from '../portal'
 import Contents from './Contents'
 
 type OwnProps = {
@@ -23,12 +24,14 @@ export default connect(null, mapDispatchToProps)(ContinueTipProbeModal)
 
 function ContinueTipProbeModal (props: Props) {
   return (
-    <ContinueModal
-      onContinueClick={props.onContinueClick}
-      onCancelClick={props.onCancelClick}
-    >
-      <Contents />
-    </ContinueModal>
+    <Portal>
+      <ContinueModal
+        onContinueClick={props.onContinueClick}
+        onCancelClick={props.onCancelClick}
+      >
+        <Contents />
+      </ContinueModal>
+    </Portal>
   )
 }
 
