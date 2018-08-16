@@ -5,6 +5,7 @@ from opentrons import commands
 
 TEMP_POLL_INTERVAL_SECS = 1
 
+
 class MissingDevicePortError(Exception):
     pass
 
@@ -105,14 +106,14 @@ class TempDeck:
 
     # Internal Methods
 
-# TODO: DEBUG poll method in thread and add back update_temp to status in driver
     def _poll_temperature(self):
         self._poll_start_event = Event()
         self._poll_start_event.set()
         while True:
-            self._driver and telf._driver.update_temperature()
+            self._driver and self._driver.update_temperature()
             sleep(TEMP_POLL_INTERVAL_SECS)
-            if not self._poll_start_event.wait(0): break
+            if not self._poll_start_event.wait(0):
+                break
 
     def connect(self):
         """
@@ -125,8 +126,7 @@ class TempDeck:
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
 
-            Thread(target=self.poll_temperature).start()
-            self._live_poll.start()
+            Thread(target=self._poll_temperature).start()
         else:
             # Sanity check Should never happen, because connect should never
             # be called without a port on Module

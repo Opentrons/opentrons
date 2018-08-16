@@ -1,6 +1,6 @@
 from os import environ
 import logging
-from threading import Event
+from threading import Event, Thread
 from time import sleep
 
 from serial.serialutil import SerialException
@@ -163,6 +163,7 @@ class TempDeck:
         self._config = config
 
         self._temperature = {'current': 25, 'target': None}
+        self._update_thread = None
 
     def connect(self, port=None) -> str:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
@@ -212,16 +213,17 @@ class TempDeck:
         return ''
 
     def update_temperature(self, default=None) -> str:
-        if default is None:
-            default = self._temperature.copy()
-        updated_temperature = default
-        try:
-            res = self._recursive_update_temperature(
-                DEFAULT_COMMAND_RETRIES)
-            updated_temperature.update(res)
-        except (TempDeckError, SerialException, SerialNoResponse) as e:
-            return str(e)
-        self._temperature.update(updated_temperature)
+        if self._update_thread and self._update_thread.is_alive():
+            updated_temperature = default or self._temperature.copy()
+            self._temperature.update(updated_temperature)
+        else:
+            try:
+                self._update_thread = Thread(
+                    target=self._recursive_update_temperature,
+                    args=[DEFAULT_COMMAND_RETRIES])
+                self._update_thread.start()
+            except (TempDeckError, SerialException, SerialNoResponse) as e:
+                return str(e)
         return ''
 
     @property
@@ -234,7 +236,7 @@ class TempDeck:
 
     @property
     def status(self) -> str:
-        # self.update_temperature()
+        self.update_temperature()
         current = self._temperature.get('current')
         target = self._temperature.get('target')
         delta = 0.7
@@ -348,7 +350,8 @@ class TempDeck:
         try:
             res = self._send_command(GCODES['GET_TEMP'])
             res = _parse_temperature_response(res)
-            return res
+            self._temperature.update(res)
+            return
         except ParseError as e:
             retries -= 1
             if retries <= 0:
