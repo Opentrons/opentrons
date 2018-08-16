@@ -9,17 +9,50 @@ import {
   type TerminalItemId
 } from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
+import {getWellSetForMultichannel} from '../../well-selection/utils'
 
 import type {Selector} from '../../types'
 import type {ElementProps} from 'react'
 import {typeof Labware} from '@opentrons/components'
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
 
+function getTipHighlighted (
+  labwareId: string,
+  wellName: string,
+  commandsAndRobotState: StepGeneration.CommandsAndRobotState
+): boolean {
+  const {commands, robotState} = commandsAndRobotState
+  const commandUsesTip = (c: StepGeneration.Command) => {
+    if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
+      const commandWellName = c.params.well
+      const pipetteId = c.params.pipette
+      const labwareName = StepGeneration.getLabwareType(labwareId, robotState)
+      const channels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+
+      if (!labwareName) {
+        console.error(`Labware ${labwareId} missing labwareName. Could not get tip highlight state`)
+        return false
+      } else if (channels === 1) {
+        return commandWellName === wellName
+      } else if (channels === 8) {
+        const wellSet = getWellSetForMultichannel(labwareName, commandWellName)
+        return Boolean(wellSet && wellSet.includes(wellName))
+      } else {
+        console.error(`Unexpected number of channels: ${channels || '?'}. Could not get tip highlight state`)
+        return false
+      }
+    }
+    return false
+  }
+
+  return commands.some(commandUsesTip)
+}
+
 function getTipEmpty (
   wellName: string,
   labwareId: string,
   robotState: StepGeneration.RobotState
-) {
+): boolean {
   return !(
     robotState.tipState.tipracks[labwareId] &&
     robotState.tipState.tipracks[labwareId][wellName]
@@ -67,10 +100,7 @@ export const makeGetTipsPerStep = (labwareId: string) => {
 
             // show highlights of tips used by current frame
             const highlighted = (currentFrame)
-              ? currentFrame.commands.some(c =>
-                c.command === 'pick-up-tip' &&
-                c.params.labware === labwareId &&
-                c.params.well === wellName)
+              ? getTipHighlighted(labwareId, wellName, currentFrame)
               : false
 
             return {
