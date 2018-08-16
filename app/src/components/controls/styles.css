@@ -57,6 +57,10 @@
   @apply --font-body-2-dark;
 }
 
+.labeled_checkbox {
+  float: right;
+}
+
 .control_info {
   @apply --font-body-1-dark;
 
