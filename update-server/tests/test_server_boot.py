@@ -49,7 +49,7 @@ async def test_bootstrap_fail(monkeypatch, loop, test_client):
         to the system if the self-test passes and the bootstrap endpoint
         tries to actually install the package.
         """
-        return {'message': 'test msg', 'filename': filename}
+        return {'message': 'test msg', 'filename': filename}, 0
 
     monkeypatch.setattr(bootstrap, 'install_update', mock_install)
 
