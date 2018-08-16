@@ -23,6 +23,7 @@
 .highlighted {
   stroke-width: 1;
   stroke: var(--c-highlight);
+  fill: transparent;
 }
 
 .error {
