@@ -70,7 +70,7 @@ def test_fail_get_temp_deck_temperature():
 
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    res = temp_deck.update_temperature()
+    temp_deck.update_temperature()
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
 
