@@ -127,25 +127,25 @@ type Option = {
 
   /**
    * list of extra IP addresses to add to the search list
-   * note that candidates will bypass any name and IP filters
    * default: []
    */
   candidates?: Array<string | Candidate>,
 
   /**
-   * regexp or string (passed to `new RegExp`) to filter mDNS service names
+   * regexp or string (passed to `new RegExp`) to filter services by name
    * default: ''
    */
   nameFilter?: string | RegExp,
 
   /**
-   * starting substring to filter mDNS service IPs
+   * starting substring to filter services by IP
    * default: ''
    */
   ipFilter?: string,
 
   /**
-   * regexp or string (passed to `new RegExp`) to filter mDNS service names
+   * array of numbers to filter services by port
+   * the default port of 31950 is always included
    * default: []
    */
   allowedPorts?: Array<number>,

@@ -174,16 +174,7 @@ export class DiscoveryClient extends EventEmitter {
 
   _handleUp (browserService: BrowserService): void {
     log(this._logger, 'debug', 'mdns service detected', { browserService })
-
-    const service = fromMdnsBrowser(browserService)
-
-    if (
-      this._nameFilter.test(service.name) &&
-      (service.ip || '').startsWith(this._ipFilter) &&
-      this._allowedPorts.includes(browserService.port)
-    ) {
-      this._handleService(service)
-    }
+    this._handleService(fromMdnsBrowser(browserService))
   }
 
   _handleHealth (candidate: Candidate, response: ?HealthResponse): mixed {
@@ -201,7 +192,16 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   _handleService (service: Service): mixed {
-    const { ok } = service
+    const { name, ip, port, ok } = service
+
+    if (
+      !this._nameFilter.test(name) ||
+      !(ip || '').startsWith(this._ipFilter) ||
+      !this._allowedPorts.includes(port)
+    ) {
+      return
+    }
+
     const candidateExists = this.candidates.some(matchCandidate(service))
     const serviceConflicts = this.services.filter(matchConflict(service))
     const prevService =
