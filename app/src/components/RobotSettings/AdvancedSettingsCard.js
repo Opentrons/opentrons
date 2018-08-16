@@ -9,7 +9,6 @@ import type {Robot} from '../../robot'
 import type {Setting, RobotHealth} from '../../http-api-client'
 import {fetchSettings, setSettings, makeGetRobotSettings, makeGetRobotHealth} from '../../http-api-client'
 import {downloadLogs} from '../../shell'
-import {getConfig} from '../../config'
 
 import {RefreshCard} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
@@ -19,7 +18,6 @@ type OP = Robot
 type SP = {
   health: ?RobotHealth,
   settings: Array<Setting>,
-  resetEnabled: boolean,
 }
 
 type DP = {
@@ -63,7 +61,7 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch, download, health, resetEnabled, reset} = props
+  const {name, settings, set, fetch, download, health, reset} = props
   const logsAvailable = health && health.response && health.response.logs
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
@@ -80,18 +78,16 @@ function AdvancedSettingsCard (props: Props) {
       >
         <p>Access logs from this robot.</p>
       </LabeledButton>
-      {resetEnabled && (
-        <LabeledButton
-          label='Factory Reset'
-          buttonProps={{
-            disabled: !logsAvailable,
-            onClick: reset,
-            children: 'Reset'
-          }}
-        >
-          <p>Restore robot to factory configuration</p>
-        </LabeledButton>
-      )}
+      <LabeledButton
+        label='Factory Reset'
+        buttonProps={{
+          disabled: !logsAvailable,
+          onClick: reset,
+          children: 'Reset'
+        }}
+      >
+        <p>Restore robot to factory configuration</p>
+      </LabeledButton>
     </RefreshCard>
   )
 }
@@ -104,12 +100,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const settingsRequest = getRobotSettings(state, ownProps)
     const settings = settingsRequest && settingsRequest.response && settingsRequest.response.settings
     const health = getRobotHealth(state, ownProps)
-    const config = getConfig(state)
 
     return {
       health,
-      settings: settings || [],
-      resetEnabled: config.reset
+      settings: settings || []
     }
   }
 }
