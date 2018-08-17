@@ -94,8 +94,9 @@ async def get_module_data(request):
     res = None
 
     for module in robot.modules:
-        if module.device_info.get('serial') == requested_serial:
-            res = module.live_data() if module.live_data() else None
+        is_serial_match = module.device_info.get('serial') == requested_serial
+        if is_serial_match and hasattr(module, 'live_data'):
+            res = module.live_data()
 
     if res:
         return web.json_response(res, status=200)
