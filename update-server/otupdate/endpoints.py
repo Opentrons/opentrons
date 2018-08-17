@@ -55,8 +55,8 @@ async def bootstrap_update_server(
         log.debug('Bootstrapping update server {} [test mode: {}]'.format(
             filename, test_flag))
 
-        res, python, venv_site_pkgs = await bootstrap.install_sandboxed_update(
-            filename, request.loop)
+        res, python, venv_site_pkgs, venv\
+            = await bootstrap.install_sandboxed_update(filename, request.loop)
         log.debug('Install complete with status: {}'.format(res.get('status')))
 
     if python and res.get('status') != 'failure':
@@ -66,7 +66,7 @@ async def bootstrap_update_server(
         else:
             test_port = 34001
             res = await bootstrap.test_update_server(
-                python, test_port, filename, venv_site_pkgs)
+                python, test_port, filename, venv_site_pkgs, venv)
 
     if res.get('status') == 'failure':
         log.debug('Test failed, not installing update')

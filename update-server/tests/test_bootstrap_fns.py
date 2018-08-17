@@ -18,8 +18,10 @@ wheel_data = namedtuple(
 
 
 async def test_create_virtual_environment(loop):
-    python, _ = await bootstrap.create_virtual_environment(loop=loop)
+    venv_dir, python, _ = await bootstrap.create_virtual_environment(loop=loop)
+    assert os.path.exists(venv_dir)
     assert os.path.exists(python)
+    assert python.startswith(venv_dir)
 
 
 async def test_install_fail(monkeypatch, loop):
@@ -30,7 +32,7 @@ async def test_install_fail(monkeypatch, loop):
 
     monkeypatch.setattr(bootstrap, '_install', mock_install)
 
-    res, python, _ = await bootstrap.install_sandboxed_update(
+    res, python, _, _2 = await bootstrap.install_sandboxed_update(
         test_data, loop=loop)
     assert res.get('status') == 'failure'
 
@@ -43,7 +45,7 @@ async def test_install_sandboxed_update(monkeypatch, loop):
 
     monkeypatch.setattr(bootstrap, '_install', mock_install)
 
-    res, python, _ = await bootstrap.install_sandboxed_update(
+    res, python, _, _2 = await bootstrap.install_sandboxed_update(
         test_data, loop=loop)
     assert res.get('status') == 'success'
 
