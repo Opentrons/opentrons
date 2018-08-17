@@ -21,12 +21,14 @@ type State = {
     inProgress: boolean,
     error: ?{message: string}
   },
+  unexpectedDisconnect: boolean,
 }
 
 const INITIAL_STATE: State = {
   connectedTo: '',
   connectRequest: {inProgress: false, error: null, name: ''},
-  disconnectRequest: {inProgress: false, error: null}
+  disconnectRequest: {inProgress: false, error: null},
+  unexpectedDisconnect: false
 }
 
 export default function connectionReducer (
@@ -50,6 +52,9 @@ export default function connectionReducer (
 
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
+
+    case 'robot:UNEXPECTED_DISCONNECT':
+      return {...state, unexpectedDisconnect: true}
   }
 
   return state
@@ -92,7 +97,8 @@ function handleDisconnectResponse (
   return {
     ...state,
     connectedTo: '',
-    disconnectRequest: {error: null, inProgress: false}
+    disconnectRequest: {error: null, inProgress: false},
+    unexpectedDisconnect: false
   }
 }
 

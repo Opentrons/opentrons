@@ -154,7 +154,7 @@ describe('health check', () => {
 
     test('CONNECT_RESPONSE success dispatches START_HEALTH_CHECK', () => {
       state.robot.connection.connectedTo = ''
-      invoke(robotActions.connectResponse())
+      invoke(robotActions.connectResponse(null, true))
       // middleware should pull `robot` from the connection request state
       expect(store.dispatch).toHaveBeenCalledWith(
         startHealthCheck(expect.objectContaining({
@@ -166,6 +166,12 @@ describe('health check', () => {
 
     test('CONNECT_RESPONSE failure noops', () => {
       invoke(robotActions.connectResponse(new Error('AH')))
+      expect(store.dispatch).toHaveBeenCalledTimes(0)
+    })
+
+    test('CONNECT_RESPONSE with pollHealth: false noops', () => {
+      state.robot.connection.connectedTo = ''
+      invoke(robotActions.connectResponse(null, false))
       expect(store.dispatch).toHaveBeenCalledTimes(0)
     })
 
