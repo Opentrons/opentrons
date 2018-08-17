@@ -13,6 +13,8 @@ import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 
+const POLL_TEMPDECK_INTERVAL_MS = 1000
+
 type SP = {
   _robot: ?Robot,
   tempdeck: ?TempDeckModule,
@@ -46,7 +48,7 @@ class TempDeckStatusCard extends React.Component<Props> {
     const currentTemp = (tempdeckData && tempdeckData.data.currentTemp) || tempdeck.data.currentTemp
     const targetTemp = (tempdeckData && tempdeckData.data.targetTemp) || tempdeck.data.targetTemp
     return (
-      <IntervalWrapper refresh={fetchModuleData} interval={5000}>
+      <IntervalWrapper refresh={fetchModuleData} interval={POLL_TEMPDECK_INTERVAL_MS}>
           <StatusCard title={tempdeck.displayName}>
             <CardContentRow>
               <StatusItem status={(tempdeckData && tempdeckData.status) || tempdeck.status } />
