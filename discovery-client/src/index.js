@@ -196,6 +196,7 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   _handleService (service: Service): mixed {
+    const {ok} = service
     const candidateExists = this.candidates.some(matchCandidate(service))
     const serviceConflicts = this.services.filter(matchConflict(service))
     const prevService =
@@ -208,7 +209,8 @@ export class DiscoveryClient extends EventEmitter {
 
     // update existing services and null out conflics
     nextServices = nextServices.map(s => {
-      if (s === prevService && s.ok !== service.ok) return service
+      // if we have a service already, make sure not to reset ok to null
+      if (s === prevService && s.ok !== ok && ok !== null) return service
       if (serviceConflicts.includes(s)) return {...s, ip: null, ok: null}
       return s
     })

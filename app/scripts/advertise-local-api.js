@@ -1,7 +1,7 @@
 // simple script to advertise a MDNS service for local API
 // TODO(mc, 2017-10-31): remove this file once API can advertise for itself
 const os = require('os')
-const bonjour = require('bonjour')()
+const Bonjour = require('bonjour')
 const request = require('superagent')
 
 const LOCAL_API_POLL_INTERVAL_MS = 5000
@@ -17,18 +17,30 @@ const SERVICE = {
   type: 'http'
 }
 
+let bonjour
+
 startPolling()
 
-process.on('SIGINT', () => {
-  console.log('Unpublishing all dev MDNS services')
-  bonjour.unpublishAll(() => {
-    console.log('All MDNS services unpublished')
-    process.exit(0)
-  })
-})
+process.on('SIGINT', exit)
+process.on('SIGTERM', exit)
 
 function startPolling () {
   setTimeout(pollAndPublish, LOCAL_API_POLL_INTERVAL_MS)
+}
+
+function exit () {
+  if (bonjour) {
+    console.log('Unpublishing all dev MDNS services')
+
+    bonjour.unpublishAll(() => {
+      console.log('All MDNS services unpublished')
+      process.exit(0)
+    })
+
+    setTimeout(() => process.exit(1), 1000)
+  } else {
+    process.exit(0)
+  }
 }
 
 function pollAndPublish () {
@@ -42,6 +54,15 @@ function pollAndPublish () {
 }
 
 function publish () {
+  bonjour = bonjour || Bonjour()
+
+  if (
+    process.env.OT_APP_DISCOVERY__ENABLED &&
+    process.env.OT_APP_DISCOVERY__ENABLED !== '0'
+  ) {
+    return console.log('New discovery enabled; not publishing')
+  }
+
   bonjour.publish(SERVICE)
     .on('up', () => {
       console.log(`Published MDNS service "${NAME}" on ${LOCAL_API_HOST}`)

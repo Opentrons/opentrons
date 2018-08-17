@@ -191,9 +191,9 @@ def _validate_move_data(data):
         error = True
     if target == 'pipette':
         model = data.get('model')
-        if model not in pipette_config.configs.keys():
+        if model not in pipette_config.configs:
             message = "Model '{}' not recognized, must be one " \
-                      "of {}".format(model, pipette_config.configs.keys())
+                      "of {}".format(model, pipette_config.configs)
             error = True
     else:
         model = None

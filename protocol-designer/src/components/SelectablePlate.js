@@ -1,29 +1,25 @@
 // @flow
 // Wrap Plate with a SelectionRect.
 import * as React from 'react'
-import mapValues from 'lodash/mapValues'
 import {
   swatchColors,
-  Plate,
+  Labware,
+  LabwareLabels,
   MIXED_WELL_COLOR,
-  type SingleWell,
   type Channels
 } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
-import type {ContentsByWell, WellContents} from '../labware-ingred/types'
+import type {ContentsByWell} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
-
-type PlateProps = React.ElementProps<typeof Plate>
-type PlateWellContents = $PropertyType<PlateProps, 'wellContents'>
 
 export type Props = {
   wellContents: ContentsByWell,
-  containerType: $PropertyType<PlateProps, 'containerType'>,
+  containerType: string,
 
-  selectable?: $PropertyType<PlateProps, 'selectable'>,
-  handleMouseOverWell?: $PropertyType<PlateProps, 'handleMouseOverWell'>,
-  handleMouseExitWell?: $PropertyType<PlateProps, 'handleMouseExitWell'>,
+  selectable?: boolean,
+  makeOnMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed,
 
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
@@ -31,22 +27,6 @@ export type Props = {
   // used by container
   containerId: string,
   pipetteChannels?: ?Channels
-}
-
-function wellContentsGroupIdsToColor (wc: ContentsByWell): PlateWellContents {
-  return mapValues(
-    wc,
-    (well: WellContents): SingleWell => ({
-      wellName: well.wellName,
-
-      highlighted: well.highlighted,
-      selected: well.selected,
-      error: well.error,
-      maxVolume: well.maxVolume,
-
-      fillColor: getFillColor(well.groupIds)
-    })
-  )
 }
 
 // TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
@@ -69,26 +49,39 @@ export default function SelectablePlate (props: Props) {
     onSelectionMove,
     onSelectionDone,
     selectable,
-    handleMouseOverWell,
-    handleMouseExitWell
+    makeOnMouseOverWell,
+    onMouseExitWell
   } = props
 
-  const plate = <Plate
-    {...{
+  const getWellProps = (wellName) => {
+    const well = wellContents[wellName]
+
+    return {
+      onMouseOver: makeOnMouseOverWell && makeOnMouseOverWell(wellName),
+      onMouseLeave: onMouseExitWell,
       selectable,
-      containerType,
-      handleMouseOverWell,
-      handleMouseExitWell
-    }}
-    showLabels={selectable}
-    wellContents={wellContentsGroupIdsToColor(wellContents)}
+      wellName,
+
+      highlighted: well.highlighted,
+      selected: well.selected,
+      error: well.error,
+      maxVolume: well.maxVolume,
+
+      fillColor: getFillColor(well.groupIds)
+    }
+  }
+
+  const labwareComponent = <Labware
+    labwareType={containerType}
+    getWellProps={getWellProps}
   />
 
-  if (!selectable) return plate // don't wrap plate with SelectionRect
+  if (!selectable) return labwareComponent // don't wrap labwareComponent with SelectionRect
 
   return (
     <SelectionRect svg {...{onSelectionMove, onSelectionDone}}>
-      {plate}
+      {labwareComponent}
+      <LabwareLabels labwareType={containerType} />
     </SelectionRect>
   )
 }
