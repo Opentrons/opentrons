@@ -558,7 +558,7 @@ describe('discovery client', () => {
     const client = DiscoveryClient()
     const result = client.add('localhost').add('localhost')
 
-    const expectedCandidates = [{ ip: 'localhost', port: null }]
+    const expectedCandidates = [{ ip: 'localhost', port: 31950 }]
     expect(result).toBe(client)
     expect(client.candidates).toEqual(expectedCandidates)
     expect(poller.poll).toHaveBeenLastCalledWith(
@@ -571,7 +571,7 @@ describe('discovery client', () => {
 
   test('can change polling interval on the fly', () => {
     const client = DiscoveryClient({ candidates: ['localhost'] })
-    const expectedCandidates = [{ ip: 'localhost', port: null }]
+    const expectedCandidates = [{ ip: 'localhost', port: 31950 }]
 
     let result = client.setPollInterval(1000)
     expect(result).toBe(client)

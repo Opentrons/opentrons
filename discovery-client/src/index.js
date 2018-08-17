@@ -10,6 +10,7 @@ import {
   DEFAULT_PORT,
   fromMdnsBrowser,
   fromResponse,
+  makeCandidate,
   toCandidate,
   matchService,
   matchUnassigned,
@@ -69,7 +70,7 @@ export class DiscoveryClient extends EventEmitter {
 
     // allow strings instead of full {ip: string, port: ?number} object
     this.candidates = (options.candidates || [])
-      .map(c => (typeof c === 'string' ? { ip: c, port: null } : c))
+      .map(c => (typeof c === 'string' ? makeCandidate(c) : c))
       .filter(c => this.services.every(s => s.ip !== c.ip))
 
     this._pollInterval = options.pollInterval || DEFAULT_POLL_INTERVAL
@@ -98,7 +99,7 @@ export class DiscoveryClient extends EventEmitter {
 
   add (ip: string, port?: number): DiscoveryClient {
     if (!this.candidates.some(c => c.ip === ip)) {
-      const candidate = { ip, port: port || null }
+      const candidate = makeCandidate(ip, port)
       log(this._logger, 'debug', 'adding new unique candidate', { candidate })
       this.candidates = this.candidates.concat(candidate)
       this._poll()
@@ -174,7 +175,9 @@ export class DiscoveryClient extends EventEmitter {
 
   _handleUp (browserService: BrowserService): void {
     log(this._logger, 'debug', 'mdns service detected', { browserService })
-    this._handleService(fromMdnsBrowser(browserService))
+    const service = fromMdnsBrowser(browserService)
+
+    if (service) this._handleService(service)
   }
 
   _handleHealth (candidate: Candidate, response: ?HealthResponse): mixed {
@@ -199,6 +202,7 @@ export class DiscoveryClient extends EventEmitter {
       !(ip || '').startsWith(this._ipFilter) ||
       !this._allowedPorts.includes(port)
     ) {
+      log(this._logger, 'debug', 'Ignoring service', service)
       return
     }
 

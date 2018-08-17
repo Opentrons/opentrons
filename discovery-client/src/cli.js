@@ -4,6 +4,8 @@ import DiscoveryClient from '.'
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
 const noop = (...args: Array<*>) => {}
 
+const NORMALIZE_IP_RE = /\[?([a-f0-9.:]+)]?/i
+
 require('yargs')
   .options({
     pollInterval: {
@@ -86,7 +88,7 @@ function find (argv) {
   DiscoveryClient(argv)
     .on('service', s => {
       if (!argv.name || s.name === argv.name) {
-        process.stdout.write(`${s.ip}\n`)
+        process.stdout.write(`${normalizeIp(s.ip)}\n`)
         process.exit(0)
       }
     })
@@ -94,6 +96,12 @@ function find (argv) {
     .start()
 
   argv.logger.warn(`Finding robot with name: "${argv.name || ''}"`)
+}
+
+// remove brackets from IPv6
+function normalizeIp (ip: string): string {
+  const match = ip.match(NORMALIZE_IP_RE)
+  return (match && match[1]) || ''
 }
 
 function addLogger (argv) {

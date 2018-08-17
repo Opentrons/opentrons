@@ -2,13 +2,13 @@
 
 export type Candidate = {
   ip: string,
-  port: ?number
+  port: number
 }
 
 export type Service = {
   name: string,
   ip: ?string,
-  port: ?number,
+  port: number,
   ok: ?boolean
 }
 
