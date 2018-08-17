@@ -30,13 +30,19 @@ endif
 usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
 
 # install all project dependencies
-# front-end dependecies handled by yarn
 .PHONY: install
-install:
+install: install-py install-js
+
+.PHONY: install-py
+install-py:
 	$(OT_PYTHON) -m pip install pipenv==11.6.8
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
+
+# front-end dependecies handled by yarn
+.PHONY: install-js
+install-js:
 	yarn
 	$(MAKE) -C $(SHARED_DATA_DIR) build
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR)
@@ -45,7 +51,7 @@ install:
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: uninstall
 uninstall:
-	lerna clean
+	shx rm -rf '**/node_modules'
 
 # install flow typed definitions for all JS projects that use flow
 # typedefs are commited, so only needs to be run when we want to update
