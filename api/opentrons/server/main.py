@@ -10,7 +10,7 @@ from opentrons import robot, __version__
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
-from opentrons.server.endpoints import (wifi, control)
+from opentrons.server.endpoints import (wifi, control, settings)
 from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
@@ -208,9 +208,13 @@ def init(loop=None):
     server.app.router.add_post(
         '/robot/lights', control.set_rail_lights)
     server.app.router.add_get(
-        '/settings', endp.get_advanced_settings)
+        '/settings', settings.get_advanced_settings)
     server.app.router.add_post(
-        '/settings', endp.set_advanced_setting)
+        '/settings', settings.set_advanced_setting)
+    server.app.router.add_post(
+        '/settings/reset', settings.reset)
+    server.app.router.add_get(
+        '/settings/reset/options', settings.available_resets)
 
     return server.app
 
