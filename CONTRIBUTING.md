@@ -158,6 +158,22 @@ cd opentrons
 make install
 ```
 
+#### git hooks
+
+We use [husky][] to manage git hooks. We have the following hooks installed:
+
+| hook       | script      | skip with              |
+| ---------- | ----------- | ---------------------- |
+| `pre-push` | `make lint` | `git push --no-verify` |
+
+If you don't want these hooks installed, set the `HUSKY_SKIP_INSTALL` environment variable when you install dependencies:
+
+```shell
+make install HUSKY_SKIP_INSTALL=true
+```
+
+[husky]: https://github.com/typicode/husky
+
 ### Testing and Linting
 
 You can tests with:
