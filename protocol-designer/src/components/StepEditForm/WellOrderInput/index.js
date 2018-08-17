@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {FormGroup} from '@opentrons/components'
 import i18n from '../../../localization'
-import StepField from '../StepFormField'
 import styles from './WellOrderInput.css'
 import WellOrderModal from './WellOrderModal'
 
@@ -21,13 +20,7 @@ class WellOrderInput extends React.Component<null, WellOrderInputState> {
         className={styles.well_order_input}
         >
         <WellOrderModal onCloseClick={this.handleClose} isOpen={this.state.isModalOpen} />
-        <StepField
-          name="aspirate_wellOrder"
-          render={({value, updateValue}) => (
-            <div onClick={this.handleOpen} className={styles.well_order_icon}>
-
-            </div>
-          )} />
+        <div onClick={this.handleOpen} className={styles.well_order_icon} />
       </FormGroup>
     )
   }

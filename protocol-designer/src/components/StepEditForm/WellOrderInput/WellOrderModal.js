@@ -6,7 +6,8 @@ import i18n from '../../../localization'
 import {Portal} from '../../portals/MainPageModalPortal'
 import {Modal, OutlineButton, LabeledValue, FormGroup} from '@opentrons/components'
 import modalStyles from '../../modals/modal.css'
-import { WellOrderField } from '../formFields'
+import { WellOrderField } from '../fields'
+import WellOrderViz from './WellOrderViz'
 
 import styles from './WellOrderInput.css'
 
@@ -31,18 +32,20 @@ const WellOrderModal = (props: Props) => {
         <div className={styles.top_row}>
           <LabeledValue
             label={i18n.t('modal.well_order.title')}
-            value={i18n.t('modal.well_order.body')}
-            className={styles.inverted_text}
-          />
+            value={i18n.t('modal.well_order.body')} />
         </div>
-        <FormGroup
-          label={i18n.t('modal.well_order.field_label')}>
-          <div className={styles.field_row}>
-            <WellOrderField name="aspirate_wellOrder_first" />
-            {i18n.t('modal.well_order.then')}
-            <WellOrderField name="aspirate_wellOrder_second" />
-          </div>
-        </FormGroup>
+        <div className={styles.main_row}>
+          <FormGroup label={i18n.t('modal.well_order.field_label')}>
+            <div className={styles.field_row}>
+              <WellOrderField prefix="aspirate" ordinality="first" />
+              <span className={styles.field_spacer}>{i18n.t('modal.well_order.then')}</span>
+              <WellOrderField prefix="aspirate" ordinality="second" />
+            </div>
+          </FormGroup>
+          <FormGroup label={i18n.t('modal.well_order.viz_label')} className={styles.viz_wrapper}>
+            <WellOrderViz firstName="aspirate_wellOrder_first" secondName="aspirate_wellOrder_second" />
+          </FormGroup>
+        </div>
         <div className={styles.button_row}>
           <OutlineButton className={styles.default_button} onClick={handleReset}>
             {i18n.t('button.reset_to_default')}
@@ -53,7 +56,6 @@ const WellOrderModal = (props: Props) => {
         </div>
       </Modal>
     </Portal>
-
   )
 }
 

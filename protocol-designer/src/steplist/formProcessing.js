@@ -19,6 +19,8 @@ import type {
 
 import {
   DEFAULT_CHANGE_TIP_OPTION,
+  DEFAULT_WELL_ORDER_FIRST_OPTION,
+  DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID
 } from '../constants'
 
@@ -56,7 +58,11 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
-      'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION
+      'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
+      'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+      'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+      'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+      'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
     }
   }
 
@@ -65,6 +71,8 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
       ...baseForm,
       'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
       'aspirate_disposalVol_checkbox': true,
+      'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+      'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
       'dispense_blowout_checkbox': true,
       'dispense_blowout_labware': FIXED_TRASH_ID
     }
