@@ -204,12 +204,11 @@ def backup_configuration(config: robot_config, tag=None):
     save_robot_settings(config, tag=tag)
 
 
-def clear():
-    files = [
-        get_config_index().get('deckCalibrationFile'),
-        get_config_index().get('robotSettingsFile')]
-    for filename in files:
-        _clear_file(filename)
+def clear(calibration=True, robot=True):
+    if calibration:
+        _clear_file(get_config_index().get('deckCalibrationFile'))
+    if robot:
+        _clear_file(get_config_index().get('robotSettingsFile'))
 
 
 def _clear_file(filename):

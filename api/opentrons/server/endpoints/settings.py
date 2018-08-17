@@ -1,8 +1,35 @@
 import logging
+import shutil
+import os
 from aiohttp import web
 from opentrons.config import advanced_settings as advs
+from opentrons.robot import robot_configs as rc
+from opentrons.data_storage import database as db
 
 log = logging.getLogger(__name__)
+
+_settings_reset_options = [
+    {
+        'id': 'deckCalibration',
+        'name': 'Deck Calibration',
+        'description': 'Reset calibration of pipette to deck'
+    },
+    {
+        'id': 'tipProbe',
+        'name': 'Tip Probe Calibration',
+        'description': 'Erase tip probe data'
+    },
+    {
+        'id': 'labwareCalibration',
+        'name': 'Labware Calibration',
+        'description': 'Erase custom labware calibration'
+    },
+    {
+        'id': 'bootScripts',
+        'name': 'Boot Scripts',
+        'description': 'Erase custom boot scripts'
+    }
+]
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -43,10 +70,34 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
 async def reset(request: web.Request) -> web.Response:
     """ Execute a reset of the requested parts of the user configuration.
     """
-    return web.json_response({'message': 'Not implemented'}, status=501)
+    data = await request.json()
+    for requested_reset in data.keys():
+        if requested_reset not in [opt['id']
+                                   for opt in _settings_reset_options]:
+            log.error('Bad reset option {} requested'.format(requested_reset))
+            return web.json_response(
+                {'message': '{} is not a valid reset option'
+                 .format(requested_reset)},
+                status=400)
+    log.info("Reset requested for {}".format(', '.join(data.keys())))
+    if data.get('deckCalibration'):
+        rc.clear(calibration=True, robot=False)
+    if data.get('tipProbe'):
+        config = rc.load()
+        config.tip_length.clear()
+        rc.save_robot_settings(config)
+    if data.get('labwareCalibration'):
+        db.reset()
+    if data.get('bootScripts'):
+        if os.environ.get('RUNNING_ON_PI'):
+            if os.path.exists('/data/boot.d'):
+                shutil.rmtree('/data/boot.d')
+        else:
+            log.debug('Not on pi, not removing /data/boot.d')
+    return web.json_response({}, status=200)
 
 
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    return web.json_response({'message': 'Not implemented'}, status=501)
+    return web.json_response(_settings_reset_options, status=200)
