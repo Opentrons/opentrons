@@ -8,6 +8,7 @@ import styles from './forms.css'
 export type DropdownOption = {
   name: string,
   value: string,
+  disabled?: boolean
 }
 
 // TODO(mc, 2018-02-22): disabled prop
@@ -52,7 +53,7 @@ export default function DropdownField (props: Props) {
           disabled={props.disabled}
           className={styles.dropdown}>
           {options.map(opt =>
-            <option key={opt.value} value={opt.value}>
+            <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
               {opt.name}
             </option>
           )}

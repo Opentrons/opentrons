@@ -20,7 +20,8 @@ export const WellOrderField = (props: WellOrderFieldProps) => (
     options={
       WELL_ORDER_VALUES.map((value) => ({
         value,
-        name: i18n.t(`step_edit_form.field.well_order.option.${value}`)
+        name: i18n.t(`step_edit_form.field.well_order.option.${value}`),
+        disabled: props.disabledValues.includes(value)
       }))
     }
     value={props.value ? String(props.value) : null}
@@ -32,11 +33,23 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const {prefix, ordinality} = ownProps
   const _valueName = `${prefix}_wellOrder_${ordinality}`
   const _converseName = `${prefix}_wellOrder_${ordinality === 'first' ? 'second' : 'first'}`
+  const value = formData ? formData[_valueName] : null
+  const converse = formData ? formData[_converseName] : null
+
+  let disabledValues = []
+  if (ordinality === 'second') {
+    if (VERTICAL_VALUES.includes(converse)) {
+      disabledValues = VERTICAL_VALUES
+    } else if (HORIZONTAL_VALUES.includes(converse)) {
+      disabledValues = HORIZONTAL_VALUES
+    }
+  }
   return {
-    _valueName,
+    value,
+    converse,
     _converseName,
-    value: formData ? formData[_valueName] : null,
-    converse: formData ? formData[_converseName] : null
+    _valueName,
+    disabledValues
   }
 }
 
@@ -47,17 +60,20 @@ const mapDTP = (dispatch: Dispatch, ownProps): DP => ({
 })
 
 const mergeProps = (stateProps: SP, dispatchProps: DP, ownProps: OP) => {
-  const { _valueName, _converseName, value, converse } = stateProps
+  const {ordinality} = ownProps
+  const {_valueName, _converseName, value, converse, disabledValues} = stateProps
   const {updateInput} = dispatchProps
   return {
     value,
+    disabledValues,
     updateValue: (value: WellOrderOption) => {
       updateInput(_valueName, value)
-      // default if axes collision
-      if (VERTICAL_VALUES.includes(value) && VERTICAL_VALUES.includes(converse)) {
-        updateInput(_converseName, HORIZONTAL_VALUES[0])
-      } else if (HORIZONTAL_VALUES.includes(value) && HORIZONTAL_VALUES.includes(converse)) {
-        updateInput(_converseName, VERTICAL_VALUES[0])
+      if (ordinality === 'first') {
+        if (VERTICAL_VALUES.includes(value) && VERTICAL_VALUES.includes(converse)) {
+          updateInput(_converseName, HORIZONTAL_VALUES[0])
+        } else if (HORIZONTAL_VALUES.includes(value) && HORIZONTAL_VALUES.includes(converse)) {
+          updateInput(_converseName, VERTICAL_VALUES[0])
+        }
       }
     }
   }
