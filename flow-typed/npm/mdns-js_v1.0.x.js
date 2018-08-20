@@ -28,11 +28,11 @@ declare module 'mdns-js' {
   declare type BrowserService = {
     addresses: Array<string>,
     query: Array<string>,
-    type: Array<ServiceType>,
-    txt: Array<string>,
-    port: number,
-    fullname: string,
-    host: string,
+    type?: Array<ServiceType>,
+    txt?: Array<string>,
+    port?: number,
+    fullname?: string,
+    host?: string,
     interfaceIndex: number,
     networkInterface: string
   }

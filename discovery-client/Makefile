@@ -19,7 +19,7 @@ env := cross-env NODE_ENV
 #####################################################################
 
 .PHONY: all
-all: clean lib
+all: dist
 
 .PHONY: install
 install:
@@ -27,7 +27,7 @@ install:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib
+	shx rm -rf lib dist
 
 # artifacts
 #####################################################################
@@ -36,3 +36,9 @@ clean:
 lib:
 	$(env)=production $(babel)
 	$(flow_copy)
+
+.PHONY: dist
+dist: clean lib
+	@mkdir -p dist
+	npm pack
+	shx mv '*.tgz' dist

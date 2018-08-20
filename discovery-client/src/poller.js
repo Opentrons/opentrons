@@ -4,7 +4,6 @@
 import fetch from 'node-fetch'
 
 import type {Candidate, Logger, HealthResponse} from './types'
-import {DEFAULT_PORT} from './service'
 
 export type PollRequest = {
   id: ?IntervalID
@@ -29,7 +28,7 @@ export function poll (
 
   function pollIp () {
     const next = getNextCandidate()
-    const url = `http://${next.ip}:${next.port || DEFAULT_PORT}/health`
+    const url = `http://${next.ip}:${next.port}/health`
 
     fetch(url)
       .then(response => {
