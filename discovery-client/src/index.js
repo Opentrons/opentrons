@@ -4,6 +4,8 @@
 
 import EventEmitter from 'events'
 import mdns from 'mdns-js'
+import escape from 'escape-string-regexp'
+import toRegex from 'to-regex'
 
 import { poll, stop, type PollRequest } from './poller'
 import {
@@ -34,14 +36,19 @@ type Options = {
   pollInterval?: number,
   services?: Array<Service>,
   candidates?: Array<string | Candidate>,
-  nameFilter?: string | RegExp,
-  ipFilter?: string,
-  allowedPorts?: Array<number>,
+  nameFilter?: Array<string | RegExp>,
+  ipFilter?: Array<string | RegExp>,
+  portFilter?: Array<number>,
   logger?: Logger
 }
 
 const log = (logger: ?Logger, level: LogLevel, msg: string, meta?: {}) =>
   logger && typeof logger[level] === 'function' && logger[level](msg, meta)
+
+const santizeRe = (patterns: ?(Array<string | RegExp>)) => {
+  if (!patterns) return []
+  return patterns.map(p => typeof p === 'string' ? escape(p) : p)
+}
 
 export default function DiscoveryClientFactory (options?: Options) {
   return new DiscoveryClient(options || {})
@@ -52,6 +59,8 @@ export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
 export { DEFAULT_PORT }
 
+const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
+
 export class DiscoveryClient extends EventEmitter {
   services: Array<Service>
   candidates: Array<Candidate>
@@ -59,7 +68,8 @@ export class DiscoveryClient extends EventEmitter {
   _pollRequest: ?PollRequest
   _pollInterval: number
   _nameFilter: RegExp
-  _allowedPorts: Array<number>
+  _ipFilter: RegExp
+  _portFilter: Array<number>
   _logger: ?Logger
 
   constructor (options: Options) {
@@ -74,11 +84,13 @@ export class DiscoveryClient extends EventEmitter {
       .filter(c => this.services.every(s => s.ip !== c.ip))
 
     this._pollInterval = options.pollInterval || DEFAULT_POLL_INTERVAL
-    this._nameFilter = new RegExp(options.nameFilter || '')
-    this._ipFilter = options.ipFilter || ''
-    this._allowedPorts = [DEFAULT_PORT].concat(options.allowedPorts || [])
+    this._nameFilter = toRegex(santizeRe(options.nameFilter), TO_REGEX_OPTS)
+    this._ipFilter = toRegex(santizeRe(options.ipFilter), TO_REGEX_OPTS)
+    this._portFilter = [DEFAULT_PORT].concat(options.portFilter || [])
     this._logger = options.logger
     this._browser = null
+
+    log(this._logger, 'silly', 'Created', this)
   }
 
   start (): DiscoveryClient {
@@ -199,8 +211,8 @@ export class DiscoveryClient extends EventEmitter {
 
     if (
       !this._nameFilter.test(name) ||
-      !(ip || '').startsWith(this._ipFilter) ||
-      !this._allowedPorts.includes(port)
+      !this._ipFilter.test(ip || '') ||
+      !this._portFilter.includes(port)
     ) {
       log(this._logger, 'debug', 'Ignoring service', service)
       return

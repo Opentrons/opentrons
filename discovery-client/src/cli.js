@@ -15,18 +15,18 @@ require('yargs')
       type: 'number'
     },
     nameFilter: {
-      describe: 'Filter mDNS advertisements by name',
+      describe: 'Filter found robots by name',
       alias: 'n',
-      default: '',
-      type: 'string'
+      default: [],
+      type: 'array'
     },
     ipFilter: {
-      describe: 'Filter mDNS advertisements by subnet',
+      describe: 'Filter found robots by IP address',
       alias: 'i',
-      default: '',
-      type: 'string'
+      default: [],
+      type: 'array'
     },
-    allowedPorts: {
+    portFilter: {
       describe: 'Filter mDNS advertisements by port',
       alias: 'a',
       default: [],

@@ -21,8 +21,8 @@ Creates a new `DiscoveryClient`.
 
 ```js
 const options = {
-  nameFilter: /^opentrons/i,
-  allowedPorts: [31950],
+  nameFilter: ['opentrons'],
+  portFilter: [31950],
   pollInterval: 5000,
   candidates: [{ ip: '[fd00:0:cafe:fefe::1]', port: 31950 }, 'localhost']
 }
@@ -132,23 +132,23 @@ type Option = {
   candidates?: Array<string | Candidate>,
 
   /**
-   * regexp or string (passed to `new RegExp`) to filter services by name
+   * RegExps or strings to filter services by name
    * default: ''
    */
-  nameFilter?: string | RegExp,
+  nameFilter?: Array<string | RegExp>,
 
   /**
-   * starting substring to filter services by IP
+   * RegExps or strings to filter services by IP address
    * default: ''
    */
-  ipFilter?: string,
+  ipFilter?: Array<string | RegExp>,
 
   /**
    * array of numbers to filter services by port
    * the default port of 31950 is always included
    * default: []
    */
-  allowedPorts?: Array<number>,
+  portFilter?: Array<number>,
 
   /** optional logger */
   logger?: {
@@ -209,9 +209,9 @@ The CLI's global options are almost completely the same as the API's options, wi
 | -------------------- | ------------------------- | -------- | ---------------- |
 | `-p, --pollInterval` | see `pollInterval` option | `1000`   | `-p 500`         |
 | `-c, --candidates`   | see `candidates` option   | `[]`     | `-c localhost`   |
-| `-n, --nameFilter`   | see `nameFilter` option   | `''`     | `-n opentrons`   |
-| `-i, --ipFilter`     | see `ipFilter` option     | `''`     | `-i 169.254`     |
-| `-a, --allowedPorts` | see `allowedPorts` option | `[]`     | `-a 31951 31952` |
+| `-n, --nameFilter`   | see `nameFilter` option   | `[]`     | `-n opentrons`   |
+| `-i, --ipFilter`     | see `ipFilter` option     | `[]`     | `-i 169.254`     |
+| `-a, --portFilter` | see `portFilter` option | `[]`     | `-a 31951 31952` |
 | `-l, --logLevel`     | log level for printout    | `'info'` | `-l debug`       |
 
 ### `discovery (browse) [options]`
@@ -236,6 +236,10 @@ discovery find opentrons-moon-moon
 
 # example: find the IP address of a link-local wired robot
 discovery find --ipFilter 169.254
+
+# example: find the IP address of a wired robot that may be IPv4 or IPv6
+# (IPv6 means legacy non-mDNS wired configuration)
+discovery find -i "169.254" "fd00" -c "[fd00:0:cafe:fefe::1]"
 ```
 
 #### command specific options
@@ -246,11 +250,14 @@ discovery find --ipFilter 169.254
 
 ### `discovery-ssh [name] [options]`
 
-Calls `discovery find` and using the output to SSH into the robot it finds. Takes all the same arguments and options as `discovery find`.
+Calls `discovery find` and using the output to SSH into the robot it finds. **Takes all the same arguments and options as `discovery find`.**
 
 `discovery-ssh` is a Bash script, so it must be called from a command line with Bash available.
 
 ```shell
 # example: SSH into a link-local wired robot
 discovery-ssh --ipFilter 169.254
+
+# example: SSH into any wired robot, including legacy wired configuration
+discovery-ssh -i "169.254" "fd00" -c "[fd00:0:cafe:fefe::1]"
 ```

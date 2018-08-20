@@ -500,7 +500,7 @@ describe('discovery client', () => {
   })
 
   test('can filter services by name', () => {
-    const client = DiscoveryClient({ nameFilter: /^OPENTRONS/i })
+    const client = DiscoveryClient({ nameFilter: ['OPENTRONS'] })
 
     client.start()
     mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
@@ -510,7 +510,7 @@ describe('discovery client', () => {
     })
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      fullname: 'fopentrons._http._tcp.local'
+      fullname: 'apentrons._http._tcp.local'
     })
 
     expect(client.services.map(s => s.name)).toEqual([
@@ -520,7 +520,7 @@ describe('discovery client', () => {
   })
 
   test('can filter services by ip', () => {
-    const client = DiscoveryClient({ ipFilter: '169.254' })
+    const client = DiscoveryClient({ ipFilter: ['169.254'] })
 
     client.start()
     mdns.__mockBrowser.emit('update', {
@@ -536,7 +536,7 @@ describe('discovery client', () => {
   })
 
   test('can filter services by port', () => {
-    const client = DiscoveryClient({ allowedPorts: [31950, 31951] })
+    const client = DiscoveryClient({ portFilter: [31950, 31951] })
 
     client.start()
     mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
