@@ -13,8 +13,11 @@ import SelectionRect from '../components/SelectionRect.js'
 import type {ContentsByWell} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 
+type LabwareProps = React.ElementProps<typeof Labware>
+
 export type Props = {
   wellContents: ContentsByWell,
+  getTipProps?: $PropertyType<LabwareProps, 'getTipProps'>,
   containerType: string,
 
   selectable?: boolean,
@@ -45,6 +48,7 @@ function getFillColor (groupIds: Array<string>): ?string {
 export default function SelectablePlate (props: Props) {
   const {
     wellContents,
+    getTipProps,
     containerType,
     onSelectionMove,
     onSelectionDone,
@@ -74,6 +78,7 @@ export default function SelectablePlate (props: Props) {
   const labwareComponent = <Labware
     labwareType={containerType}
     getWellProps={getWellProps}
+    getTipProps={getTipProps}
   />
 
   if (!selectable) return labwareComponent // don't wrap labwareComponent with SelectionRect

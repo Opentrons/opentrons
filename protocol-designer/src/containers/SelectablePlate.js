@@ -3,6 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
+import noop from 'lodash/noop'
 
 import SelectablePlate from '../components/SelectablePlate.js'
 
@@ -16,7 +17,7 @@ import {
 } from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
-
+import * as tipContentsSelectors from '../top-selectors/tip-contents'
 import {
   highlightWells,
   selectWells,
@@ -53,6 +54,7 @@ type MP = {
 type SP = $Diff<Props, MP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
+  const {selectable} = ownProps
   const selectedContainerId = selectors.getSelectedContainerId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
@@ -62,7 +64,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       containerId: '',
       wellContents: {},
       containerType: '',
-      selectable: ownProps.selectable
+      selectable: selectable
     }
   }
 
@@ -125,6 +127,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
     // others {[wellName]: wellName}. Use Set instead!
+    // TODO: Ian 2018-08-16 pass getWellProps instead of wellContents,
+    // and make getWellProps a plain old selector (move that logic out of this STP)
     wellContents = (mapValues(
       wellContentsWithoutHighlight,
       (wellContentsForWell: WellContents, well: string): WellContents => ({
@@ -135,11 +139,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     ): ContentsByWell)
   }
 
+  const getTipProps = tipContentsSelectors.getTipsForCurrentStep(state, {labwareId: containerId})
+
   return {
     containerId,
     wellContents,
+    getTipProps: getTipProps || noop,
     containerType: labware.type,
-    selectable: ownProps.selectable
+    selectable
   }
 }
 
