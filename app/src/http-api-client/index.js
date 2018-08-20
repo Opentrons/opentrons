@@ -105,6 +105,8 @@ export {
 
 export * from './modules'
 
+export * from './reset'
+
 export {
   disengagePipetteMotors
 } from './motors'
