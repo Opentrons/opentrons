@@ -14,6 +14,8 @@ import styles from './WellOrderInput.css'
 
 export type WellOrderOrdinality = 'first' | 'second'
 export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
+const DEFAULT_FIRST: WellOrderOption = 't2b'
+const DEFAULT_SECOND: WellOrderOption = 'l2r'
 const VERTICAL_VALUES: Array<WellOrderOption> = ['t2b', 'b2t']
 const HORIZONTAL_VALUES: Array<WellOrderOption> = ['l2r', 'r2l']
 const WELL_ORDER_VALUES: Array<WellOrderOption> = [...VERTICAL_VALUES, ...HORIZONTAL_VALUES]
@@ -23,7 +25,6 @@ type SP = {
   initialSecondValue: WellOrderOption
 }
 type DP = {
-  setDefaults: () => mixed,
   updateValues: (firstValue: WellOrderOption, secondValue: WellOrderOption) => mixed
 }
 
@@ -48,11 +49,20 @@ class WellOrderModal extends React.Component<Props, State> {
       secondValue: props.initialSecondValue
     }
   }
+  applyChanges = () => {
+    this.props.updateValues(this.state.firstValue, this.state.secondValue)
+  }
   handleReset = () => {
-    this.props.setDefaults()
+    this.setState({firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND}, this.applyChanges)
     this.props.closeModal()
   }
   handleClose = () => {
+    const {initialFirstValue, initialSecondValue} = this.props
+    this.setState({firstValue: initialFirstValue, secondValue: initialSecondValue}, this.applyChanges)
+    this.props.closeModal()
+  }
+  handleDone = () => {
+    this.applyChanges()
     this.props.closeModal()
   }
   makeOnChange = (ordinality: 'first' | 'second') => (e: SyntheticEvent<HTMLSelectElement>) => {
@@ -124,7 +134,7 @@ class WellOrderModal extends React.Component<Props, State> {
             <OutlineButton className={styles.default_button} onClick={this.handleReset}>
               {i18n.t('button.reset_to_default')}
             </OutlineButton>
-            <OutlineButton onClick={this.handleClose}>
+            <OutlineButton onClick={this.handleDone}>
               {i18n.t('button.done')}
             </OutlineButton>
           </div>
@@ -137,31 +147,19 @@ class WellOrderModal extends React.Component<Props, State> {
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
   const {prefix} = ownProps
-  const initialFirstValue = formData ? formData[`${prefix}_wellOrder_first`] : null
-  const initialSecondValue = formData ? formData[`${prefix}_wellOrder_second`] : null
   return {
-    initialFirstValue,
-    initialSecondValue
+    initialFirstValue: formData ? formData[`${prefix}_wellOrder_first`] : null,
+    initialSecondValue: formData ? formData[`${prefix}_wellOrder_second`] : null
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps): DP => {
-  const {prefix} = ownProps
-  return {
-    // TODO: BC 2018-08-19 put these defaults in consolidated location
-    setDefaults: () => {
-      dispatch(actions.changeFormInput({update: {
-        [`${prefix}_wellOrder_first`]: 'l2r',
-        [`${prefix}_wellOrder_second`]: 't2b'
-      }}))
-    },
-    updateValues: (firstValue, secondValue) => {
-      dispatch(actions.changeFormInput({update: {
-        [`${prefix}_wellOrder_first`]: firstValue,
-        [`${prefix}_wellOrder_second`]: secondValue
-      }}))
-    }
+const mapDTP = (dispatch: Dispatch, ownProps): DP => ({
+  updateValues: (firstValue, secondValue) => {
+    dispatch(actions.changeFormInput({update: {
+      [`${ownProps.prefix}_wellOrder_first`]: firstValue,
+      [`${ownProps.prefix}_wellOrder_second`]: secondValue
+    }}))
   }
-}
+})
 
 export default connect(mapSTP, mapDTP)(WellOrderModal)
