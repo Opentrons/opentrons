@@ -1,5 +1,5 @@
 // @flow
-import {createSelector} from 'reselect'
+import {createSelector, type Selector} from 'reselect'
 import noop from 'lodash/noop'
 import * as StepGeneration from '../../step-generation'
 import {
@@ -10,10 +10,12 @@ import {
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
-import type {Selector} from '../../types'
+import type {BaseState} from '../../types'
 import type {ElementProps} from 'react'
 import {typeof Labware} from '@opentrons/components'
+
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
+type GetTipSelector = Selector<BaseState, {labwareId: string}, GetTipProps>
 
 function getLabwareIdProp (state, props: {labwareId: string}) {
   return props.labwareId
@@ -62,7 +64,7 @@ function getTipEmpty (
   )
 }
 
-const getInitialTips: Selector<GetTipProps> = createSelector(
+const getInitialTips: GetTipSelector = createSelector(
   fileDataSelectors.getInitialRobotState,
   getLabwareIdProp,
   (initialRobotState, labwareId) =>
@@ -72,7 +74,7 @@ const getInitialTips: Selector<GetTipProps> = createSelector(
     })
 )
 
-const getLastValidTips: Selector<GetTipProps> = createSelector(
+const getLastValidTips: GetTipSelector = createSelector(
   fileDataSelectors.lastValidRobotState,
   getLabwareIdProp,
   (lastValidRobotState, labwareId) =>
@@ -82,7 +84,7 @@ const getLastValidTips: Selector<GetTipProps> = createSelector(
     })
 )
 
-export const getTipsForCurrentStep: Selector<GetTipProps> = createSelector(
+export const getTipsForCurrentStep: GetTipSelector = createSelector(
   steplistSelectors.orderedSteps,
   fileDataSelectors.robotStateTimeline,
   steplistSelectors.getHoveredStepId,
