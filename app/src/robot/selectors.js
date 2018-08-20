@@ -51,7 +51,7 @@ export const getDiscovered: Selector<State, void, Array<Robot>> =
     // because of dependency problem in WebWorker where this selector is used
     state => state.discovery.robotsByName,
     state => connection(state).connectedTo,
-    (discoveredByName, connectedTo) => {
+    (discoveredByName, connectedTo, unexpectedDisconnect) => {
       const robots = Object.keys(discoveredByName)
         .map(name => {
           const robot = discoveredByName[name]
@@ -94,18 +94,21 @@ export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
   (discovered) => discovered.find((r) => r.isConnected)
 )
 
-export const getConnectionStatus = createSelector(
-  getConnectedRobotName,
-  (state: State) => getConnectRequest(state).inProgress,
-  (state: State) => connection(state).disconnectRequest.inProgress,
-  (connectedTo, isConnecting, isDisconnecting): ConnectionStatus => {
-    if (!connectedTo && isConnecting) return 'connecting'
-    if (connectedTo && !isDisconnecting) return 'connected'
-    if (connectedTo && isDisconnecting) return 'disconnecting'
+export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
+  createSelector(
+    getConnectedRobotName,
+    state => getConnectRequest(state).inProgress,
+    state => connection(state).disconnectRequest.inProgress,
+    state => connection(state).unexpectedDisconnect,
+    (connectedTo, isConnecting, isDisconnecting, unexpectedDisconnect) => {
+      if (unexpectedDisconnect) return 'disconnected'
+      if (!connectedTo && isConnecting) return 'connecting'
+      if (connectedTo && !isDisconnecting) return 'connected'
+      if (connectedTo && isDisconnecting) return 'disconnecting'
 
-    return 'disconnected'
-  }
-)
+      return 'disconnected'
+    }
+  )
 
 export function getSessionLoadInProgress (state: State) {
   return sessionRequest(state).inProgress

@@ -97,7 +97,8 @@ async def test_init(session, root):
             'v': {'value': 0}
         },
         'type': serialized_type,
-        '$': {'type': rpc.CONTROL_MESSAGE}}
+        '$': {'type': rpc.CONTROL_MESSAGE, 'monitor': True}
+    }
 
     assert serialized_type['v']['STATIC'] == 'static', \
         'Class attributes are serialized correctly'
@@ -113,7 +114,7 @@ async def test_exception_during_call(session):
         'type': rpc.CALL_NACK_MESSAGE,
         'token': session.token
     }
-    assert res.pop('reason').startswith('TypeError: build_call()')
+    assert res.pop('reason').startswith('TypeError:')
     assert res == {}
 
 
@@ -419,7 +420,7 @@ async def test_concurrent_and_disconnect(loop, root, session, connect):  # noqa 
 
     for res in results:
         # First message is root info
-        assert res.pop(0)['$'] == {'type': 3}
+        assert res.pop(0)['$'] == {'type': 3, 'monitor': True}
         expected = []
         # All acks received
         expected.extend([ack_message(token) for token in tokens])

@@ -68,6 +68,7 @@ export default function client (dispatch) {
         rpcClient = c
         rpcClient
           .on('notification', handleRobotNotification)
+          .on('close', handleUnexpectedDisconnect)
           .on('error', handleClientError)
 
         remote = rpcClient.remote
@@ -86,19 +87,28 @@ export default function client (dispatch) {
           }
         }
 
-        dispatch(actions.connectResponse())
+        // only poll health if RPC is not monitoring itself with ping/pong
+        dispatch(actions.connectResponse(null, !rpcClient.monitoring))
       })
       .catch((e) => dispatch(actions.connectResponse(e)))
   }
 
   function disconnect () {
-    if (rpcClient) rpcClient.close()
+    if (rpcClient) {
+      rpcClient.removeAllListeners('notification')
+      rpcClient.removeAllListeners('error')
+      rpcClient.removeAllListeners('close')
+      rpcClient.close()
+      rpcClient = null
+    }
 
     clearRunTimerInterval()
-    rpcClient = null
     remote = null
-
     dispatch(actions.disconnectResponse())
+  }
+
+  function handleUnexpectedDisconnect () {
+    dispatch(actions.unexpectedDisconnect())
   }
 
   function createSession (state, action) {

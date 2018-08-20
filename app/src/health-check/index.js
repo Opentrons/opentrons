@@ -122,7 +122,7 @@ export const healthCheckMiddleware: Middleware =
         break
 
       case 'robot:CONNECT_RESPONSE':
-        if (!action.payload.error) {
+        if (!action.payload.error && action.payload.pollHealth) {
           const state = store.getState()
           const name = getConnectRequest(state).name
           const robot = getDiscovered(state).find(r => r.name === name)

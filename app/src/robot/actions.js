@@ -51,7 +51,8 @@ export type ConnectAction = {|
 export type ConnectResponseAction = {|
   type: 'robot:CONNECT_RESPONSE',
   payload: {|
-    error: ?{message: string}
+    error: ?{message: string},
+    pollHealth: ?boolean,
   |},
 |}
 
@@ -76,6 +77,10 @@ export type DisconnectAction = {|
 export type DisconnectResponseAction = {|
   type: 'robot:DISCONNECT_RESPONSE',
   payload: {},
+|}
+
+export type UnexpectedDisconnectAction = {|
+  type: 'robot:UNEXPECTED_DISCONNECT',
 |}
 
 export type ConfirmProbedAction = {|
@@ -222,6 +227,7 @@ export type Action =
   | DisconnectAction
   | DisconnectResponseAction
   | ClearConnectResponseAction
+  | UnexpectedDisconnectAction
   | ConfirmProbedAction
   | PipetteCalibrationAction
   | LabwareCalibrationAction
@@ -253,10 +259,10 @@ export const actions = {
     }
   },
 
-  connectResponse (error: ?Error): ConnectResponseAction {
+  connectResponse (error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error}
+      payload: {error, pollHealth}
     }
   },
 
@@ -273,6 +279,10 @@ export const actions = {
       type: 'robot:DISCONNECT_RESPONSE',
       payload: {}
     }
+  },
+
+  unexpectedDisconnect (): UnexpectedDisconnectAction {
+    return {type: 'robot:UNEXPECTED_DISCONNECT'}
   },
 
   // TODO(mc, 2018-08-10): remove
