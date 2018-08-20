@@ -75,8 +75,6 @@ const DEFAULTS: Config = {
 
   // robot discovery
   discovery: {
-    // new discovery client feature flag
-    enabled: false,
     candidates: []
   }
 }

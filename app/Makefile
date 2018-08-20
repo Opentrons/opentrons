@@ -40,19 +40,13 @@ dist:
 
 .PHONY: dev
 dev:
-	concurrently --no-color --kill-others --names "server,mdns,shell"\
+	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server" \
-		"$(MAKE) dev-mdns" \
 		"$(MAKE) dev-shell"
 
 .PHONY: dev-server
 dev-server:
 	$(env)=development PORT=$(port) webpack-dev-server --hot
-
-# TODO(mc, 2017-10-31): remove when API is capable of advertising itself
-.PHONY: dev-mdns
-dev-mdns:
-	$(env)=development node scripts/advertise-local-api.js
 
 .PHONY: dev-shell
 dev-shell:

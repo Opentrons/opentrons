@@ -2,44 +2,6 @@
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
-  test('DISCOVER action', () => {
-    const expected = {
-      type: 'robot:DISCOVER',
-      meta: {robotCommand: true}
-    }
-
-    expect(actions.discover()).toEqual(expected)
-  })
-
-  test('DISCOVER_FINISH action', () => {
-    const expected = {
-      type: 'robot:DISCOVER_FINISH'
-    }
-
-    expect(actions.discoverFinish()).toEqual(expected)
-  })
-
-  test('ADD_DISCOVERED action', () => {
-    const name = 'Opentrons XYZ123'
-    const host = '123456.local'
-    const expected = {
-      type: 'robot:ADD_DISCOVERED',
-      payload: {host, name}
-    }
-
-    expect(actions.addDiscovered({host, name})).toEqual(expected)
-  })
-
-  test('REMOVE_DISCOVERED action', () => {
-    const service = {name: 'ot'}
-    const expected = {
-      type: 'robot:REMOVE_DISCOVERED',
-      payload: service
-    }
-
-    expect(actions.removeDiscovered(service)).toEqual(expected)
-  })
-
   test('CONNECT action', () => {
     const expected = {
       type: 'robot:CONNECT',
