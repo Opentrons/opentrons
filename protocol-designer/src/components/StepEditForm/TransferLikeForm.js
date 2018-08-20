@@ -73,7 +73,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <TipPositionField />
           </div>
           <div className={styles.right_settings_column}>
-            <WellOrderInput />
+            <WellOrderInput prefix="aspirate" />
             <FlowRateField />
           </div>
         </div>

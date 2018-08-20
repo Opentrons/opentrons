@@ -1,7 +1,7 @@
 .well_order_icon {
   height: 30px;
   width: 30px;
-  background-color: rebeccapurple;
+  cursor: pointer;
 }
 
 .main_row {
@@ -25,7 +25,6 @@
   position: relative;
   width: 100px;
   height: 100px;
-  margin:
 }
 
 .button_row {
@@ -35,6 +34,7 @@
 
 .default_button {
   width: 10rem;
+  margin-right: 1rem;
 }
 
 .wells_image {
