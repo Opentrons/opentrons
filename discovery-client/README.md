@@ -21,10 +21,10 @@ Creates a new `DiscoveryClient`.
 
 ```js
 const options = {
-  nameFilter: /^opentrons/i,
-  allowedPorts: [31950],
+  nameFilter: ['opentrons'],
+  portFilter: [31950],
   pollInterval: 5000,
-  candidates: [{ip: '[fd00:0:cafe:fefe::1]', port: 31950}, 'localhost']
+  candidates: [{ ip: '[fd00:0:cafe:fefe::1]', port: 31950 }, 'localhost']
 }
 
 const client = DiscoveryClientFactory(options)
@@ -127,21 +127,28 @@ type Option = {
 
   /**
    * list of extra IP addresses to add to the search list
-   * default: {} + ip/port from all Robots in options.discovered
+   * default: []
    */
   candidates?: Array<string | Candidate>,
 
   /**
-   * regexp or string (passed to `new RegExp`) to filter mDNS service names
+   * RegExps or strings to filter services by name
    * default: ''
    */
-  nameFilter?: string | RegExp,
+  nameFilter?: Array<string | RegExp>,
 
   /**
-   * regexp or string (passed to `new RegExp`) to filter mDNS service names
+   * RegExps or strings to filter services by IP address
    * default: ''
    */
-  allowedPorts?: Array<number>,
+  ipFilter?: Array<string | RegExp>,
+
+  /**
+   * array of numbers to filter services by port
+   * the default port of 31950 is always included
+   * default: []
+   */
+  portFilter?: Array<number>,
 
   /** optional logger */
   logger?: {
@@ -153,7 +160,7 @@ type Option = {
 If you need access to the `DiscoveryClient` class itself for some reason:
 
 ```js
-import {DiscoveryClient} from '@opentrons/discovery-client'
+import { DiscoveryClient } from '@opentrons/discovery-client'
 
 const client = new DiscoveryClient({})
 ```
@@ -185,19 +192,72 @@ client.on('error', (error) => console.error(error)
 make -C discovery-client
 
 # run via yarn run
-yarn run discovery [options]
-# or run from node_modules directly
-node_modules/.bin/discovery [options]
+yarn run discovery [command] [options]
+
+# run via npx
+npx discovery [command] [options]
+
+# run from node_modules directly
+node_modules/.bin/discovery [command] [options]
 ```
 
-It will print out robots as it discovers them. It has the same options the API:
+### global options
 
-| api option     | cli flag             | example                              |
-| -------------- | -------------------- | ------------------------------------ |
-| `pollInterval` | `-p, --pollInterval` | `--pollInterval 1000`                |
-| `services`     | `-s, --services`     | `-s.0.name=foo -s.0.ip=192.168.1.42` |
-| `candidates`   | `-c, --candidates`   | `-c localhost 192.168.1.42`          |
-| `nameFilter`   | `-n, --nameFilter`   | `-n opentrons`                       |
-| `allowedPorts` | `-a, --allowedPorts` | `-a 31951 31952 31953`               |
+The CLI's global options are almost completely the same as the API's options, with the addition of `logLevel`:
 
-`--services` and `--candidates` may be passed multiple times to add more than one service or candidate.
+| flag                 | description               | default  | example          |
+| -------------------- | ------------------------- | -------- | ---------------- |
+| `-p, --pollInterval` | see `pollInterval` option | `1000`   | `-p 500`         |
+| `-c, --candidates`   | see `candidates` option   | `[]`     | `-c localhost`   |
+| `-n, --nameFilter`   | see `nameFilter` option   | `[]`     | `-n opentrons`   |
+| `-i, --ipFilter`     | see `ipFilter` option     | `[]`     | `-i 169.254`     |
+| `-a, --portFilter` | see `portFilter` option | `[]`     | `-a 31951 31952` |
+| `-l, --logLevel`     | log level for printout    | `'info'` | `-l debug`       |
+
+### `discovery (browse) [options]`
+
+Print out robots as it discovers them.
+
+```shell
+# example: browse for robots, including at localhost
+discovery browse -c localhost
+
+# browse is the default command, so you can leave the "browse" out
+discovery --nameFilter moon
+```
+
+### `discovery find [name] [options]`
+
+Find the first robot you can, optionally specifying name or any other global options, and print out the IP address to `stdout` (bypassing any log level settings).
+
+```shell
+# example: find a specific robot
+discovery find opentrons-moon-moon
+
+# example: find the IP address of a link-local wired robot
+discovery find --ipFilter 169.254
+
+# example: find the IP address of a wired robot that may be IPv4 or IPv6
+# (IPv6 means legacy non-mDNS wired configuration)
+discovery find -i "169.254" "fd00" -c "[fd00:0:cafe:fefe::1]"
+```
+
+#### command specific options
+
+| flag            | description                  | default | example    |
+| --------------- | ---------------------------- | ------- | ---------- |
+| `-t, --timeout` | How long to wait for a robot | `5000`  | `-t 10000` |
+
+### `discovery-ssh [name] [options]`
+
+Calls `discovery find` and using the output to SSH into the robot it finds. **Takes all the same arguments and options as `discovery find`.**
+
+`discovery-ssh` is a Bash script, so it must be called from a command line with Bash available.
+
+```shell
+# example: SSH into a link-local wired robot
+discovery-ssh --ipFilter 169.254
+
+# example: SSH into any wired robot, including legacy wired configuration
+discovery-ssh -i "169.254" "fd00" -c "[fd00:0:cafe:fefe::1]"
+```

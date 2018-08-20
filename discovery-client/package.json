@@ -4,7 +4,8 @@
   "description": "Node.js client for discovering Opentrons robots on the network",
   "main": "lib/index.js",
   "bin": {
-    "discovery": "bin/index.js"
+    "discovery": "bin/index.js",
+    "discovery-ssh": "bin/discovery-ssh"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,10 @@
     "flow-typed": "^2.5.1"
   },
   "dependencies": {
+    "escape-string-regexp": "^1.0.5",
     "mdns-js": "^1.0.1",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "to-regex": "^3.0.2",
+    "yargs": "^12.0.1"
   }
 }

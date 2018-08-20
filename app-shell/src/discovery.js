@@ -8,7 +8,6 @@ import uniqBy from 'lodash/uniqBy'
 import Store from 'electron-store'
 
 import DiscoveryClient, {
-  DEFAULT_PORT,
   SERVICE_EVENT,
   SERVICE_REMOVED_EVENT
 } from '@opentrons/discovery-client'
@@ -109,7 +108,7 @@ function serviceToConnection (service: Service): ?Connection {
   return {
     ip: service.ip,
     ok: service.ok,
-    port: service.port || DEFAULT_PORT,
+    port: service.port,
     local: isLocal(service.ip)
   }
 }
