@@ -21,11 +21,34 @@ type DP = {
 type State = {
   deckCalibration: boolean,
   labwareCalibration: boolean,
-  tipCalibration: boolean,
+  tipProbe: boolean,
   bootScripts: boolean,
 }
 
 const TITLE = 'Robot Factory Reset'
+
+const MOCK_RESET_OPTIONS = [
+  {
+    id: 'deckCalibration',
+    title: 'Deck Calibration',
+    description: 'Reset calibration of pipette to deck'
+  },
+  {
+    id: 'tipProbe',
+    title: 'Tip Length',
+    description: 'Erase tip probe data'
+  },
+  {
+    id: 'labwareCalibration',
+    title: 'Labware Calibration',
+    description: 'Erase custom labware calibration'
+  },
+  {
+    id: 'bootScripts',
+    title: 'Boot Scripts',
+    description: 'Erase custom boot scripts'
+  }
+]
 
 class ResetRobotModal extends React.Component<DP, State> {
   constructor (props: DP) {
@@ -34,7 +57,7 @@ class ResetRobotModal extends React.Component<DP, State> {
     this.state = {
       deckCalibration: false,
       labwareCalibration: false,
-      tipCalibration: false,
+      tipProbe: false,
       bootScripts: false
     }
   }
@@ -55,39 +78,15 @@ class ResetRobotModal extends React.Component<DP, State> {
           alertOverlay
         >
         <p>Warning! Clicking <strong>reset</strong> will erase your selected configurations and restore your robot to factory settings. This cannot be undone</p>
-        {/* TODO (ka 2018-8-17): Rebuild toggles with mock data from #1885 */}
-        <LabeledToggle
-          label='Deck Calibration'
-          onClick={this.toggle('deckCalibration')}
-          toggledOn={this.state.deckCalibration}
-        >
-          <p>Reset calibration of pipette to deck</p>
-        </LabeledToggle>
-
-        <LabeledToggle
-          label='Labware'
-          onClick={this.toggle('labwareCalibration')}
-          toggledOn={this.state.labwareCalibration}
-        >
-          <p>Erase custom labware calibration</p>
-        </LabeledToggle>
-
-        <LabeledToggle
-          label='Tip Length'
-          onClick={this.toggle('tipCalibration')}
-          toggledOn={this.state.tipCalibration}
-        >
-          <p>Erase tip probe data</p>
-        </LabeledToggle>
-
-        <LabeledToggle
-          label='Boot Scripts'
-          onClick={this.toggle('bootScripts')}
-          toggledOn={this.state.bootScripts}
-        >
-          <p>Erase custom boot scripts</p>
-        </LabeledToggle>
-
+        {MOCK_RESET_OPTIONS.map(o => (
+          <LabeledToggle
+            label= {o.title}
+            onClick= {this.toggle(o.id)}
+            toggledOn={this.state[o.id]}
+            key={o.id}>
+            <p>{o.description}</p>
+          </LabeledToggle>
+        ))}
         </AlertModal>
       </Portal>
     )
