@@ -10,6 +10,7 @@ from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
 import logging
+import os
 
 SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
@@ -274,5 +275,11 @@ def set_version(version):
         pass
     db_conn = sqlite3.connect(database_path)
     db_queries.set_user_version(db_conn, version)
+
+
+def reset():
+    """ Unmount and remove the sqlite database (used in robot reset) """
+    if os.path.exists(database_path):
+        os.remove(database_path)
 
 # ======================== END Public Functions ======================== #
