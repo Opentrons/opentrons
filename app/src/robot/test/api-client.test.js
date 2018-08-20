@@ -48,6 +48,7 @@ describe('api client', () => {
       // rejection warnings. These warnings are Jest's fault for nextTick stuff
       // http://clarkdave.net/2016/09/node-v6-6-and-asynchronously-handled-promise-rejections/
       on: jest.fn(() => rpcClient),
+      removeAllListeners: jest.fn(() => rpcClient),
       close: jest.fn(),
       remote: {
         session_manager: sessionManager,
@@ -106,7 +107,7 @@ describe('api client', () => {
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
-      const expectedResponse = actions.connectResponse()
+      const expectedResponse = actions.connectResponse(null, true)
 
       expect(RpcClient).toHaveBeenCalledTimes(0)
 
@@ -125,6 +126,18 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+    })
+
+    test('send CONNECT_RESPONSE w pollHealth: false if RPC.monitoring', () => {
+      const expectedResponse = actions.connectResponse(null, false)
+
+      rpcClient.monitoring = true
+
+      return sendConnect()
+        .then(() => {
+          expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
+          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+        })
     })
 
     test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {

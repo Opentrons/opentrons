@@ -10,7 +10,8 @@ describe('robot reducer - connection', () => {
     expect(getState(state)).toEqual({
       connectedTo: '',
       connectRequest: {inProgress: false, error: null, name: ''},
-      disconnectRequest: {inProgress: false, error: null}
+      disconnectRequest: {inProgress: false, error: null},
+      unexpectedDisconnect: false
     })
   })
 
@@ -124,14 +125,16 @@ describe('robot reducer - connection', () => {
     const state = {
       connection: {
         connectedTo: 'ot',
-        disconnectRequest: {inProgress: true, error: null}
+        disconnectRequest: {inProgress: true, error: null},
+        unexpectedDisconnect: true
       }
     }
     const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: '',
-      disconnectRequest: {inProgress: false, error: null}
+      disconnectRequest: {inProgress: false, error: null},
+      unexpectedDisconnect: false
     })
   })
 })

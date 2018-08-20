@@ -57,9 +57,10 @@ function makeMapStateToProps () {
 
   return (state: State) => {
     const robot = robotSelectors.getConnectedRobot(state)
+    const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
     return {
-      ok: robot && getHealthOk(state, robot)
+      ok: robot && !unexpectedDisconnect && getHealthOk(state, robot)
     }
   }
 }
