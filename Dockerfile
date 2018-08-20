@@ -61,6 +61,7 @@ RUN pipenv install /tmp/api-server-lib --system && \
     pipenv install /tmp/api --system && \
     pipenv install /tmp/update-server --system && \
     pip install /tmp/avahi_tools && \
+    echo "export OT_SYSTEM_VERSION=`python -c \"import json; print(json.load(open('/tmp/api/opentrons/package.json'))['version'])\"`" | tee -a /etc/profile.d/opentrons.sh && \
     rm -rf /tmp/api && \
     rm -rf /tmp/api-server-lib && \
     rm -rf /tmp/update-server && \
