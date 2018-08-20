@@ -36,12 +36,9 @@ export default function Tip (props: Props) {
     />
   }
 
-  const outerCircleClassName = cx(
-    styles.tip_border,
-    {
-      [styles.highlighted]: highlighted
-    }
-  )
+  const outerCircleClassName = (highlighted)
+    ? styles.highlighted
+    : styles.tip_border
 
   return (
     <g>

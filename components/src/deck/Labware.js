@@ -15,11 +15,14 @@ import styles from './Labware.css'
 type WellProps = $Diff<React.ElementProps<typeof Well>,
   {wellDef: *, svgOffset: *}>
 
+type TipProps = $Diff<React.ElementProps<typeof Tip>,
+  {wellDef: *, tipVolume: *}>
+
 export type Props = {
   /** labware type, to get definition from shared-data */
   labwareType: string,
   /** optional getter for tip props by wellName (tipracks only) */
-  getTipProps?: (wellName: string) => ?React.ElementProps<typeof Tip>,
+  getTipProps?: (wellName: string) => ?TipProps,
   /** optional getter for well props by wellName (non-tiprack labware only ) */
   getWellProps?: (wellName: string) => ?WellProps
 }
