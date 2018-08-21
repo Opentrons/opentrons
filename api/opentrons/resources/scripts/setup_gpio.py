@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from time import sleep
 
 from opentrons.drivers.rpi_drivers import gpio

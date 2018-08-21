@@ -58,6 +58,10 @@ push-api:
 	$(MAKE) -C $(API_DIR) push
 	$(MAKE) -C $(API_DIR) restart
 
+.PHONY: api-local-container
+api-local-container:
+	docker build --no-cache --build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 --build-arg running_on_pi=0 --build-arg data_mkdir_path_slash_if_none=/data/system .
+
 # all tests
 .PHONY: test
 test: test-py test-js
