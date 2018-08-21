@@ -16,6 +16,7 @@ import {
 } from './formFields'
 
 import WellSelectionInput from './WellSelectionInput'
+import WellOrderInput from './WellOrderInput'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
@@ -58,10 +59,14 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
             <StepCheckboxRow name="touchTip" label='Touch tip' />
           </FormGroup>
         </div>
-        <div className={styles.right_settings_column}>
+
+        <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <FlowRateField />
           <TipPositionField />
+        </div>
+        <div className={styles.right_settings_column}>
+          <WellOrderInput prefix="aspirate" />
+          <FlowRateField />
         </div>
       </div>
     </React.Fragment>

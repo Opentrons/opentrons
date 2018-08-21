@@ -55,7 +55,7 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
     'step-details': ''
   }
 
-  if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
+  if (stepType === 'transfer') {
     return {
       ...baseForm,
       'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
@@ -66,13 +66,22 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
     }
   }
 
+  if (stepType === 'consolidate' || stepType === 'mix') {
+    return {
+      ...baseForm,
+      'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
+      'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+      'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
+    }
+  }
+
   if (stepType === 'distribute') {
     return {
       ...baseForm,
       'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
       'aspirate_disposalVol_checkbox': true,
-      'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
-      'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+      'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+      'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
       'dispense_blowout_checkbox': true,
       'dispense_blowout_labware': FIXED_TRASH_ID
     }
