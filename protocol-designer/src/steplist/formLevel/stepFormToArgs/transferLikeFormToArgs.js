@@ -150,7 +150,7 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeValidationAndEr
       break
   }
 
-  return {errors, stepArguments: Object.values(errors).length > 0 ? null : stepArguments}
+  return {errors, validatedForm: Object.values(errors).length > 0 ? null : stepArguments}
 }
 
 export default transferLikeFormToArgs

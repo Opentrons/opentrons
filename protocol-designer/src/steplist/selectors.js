@@ -132,12 +132,14 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   }
 )
 
-// TODO Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms (eg deck setup steps)
+// TODO Brian 2018-08-21 rename validatedForms -> stepArguments since it should only include
+// the results of translating form data into step generation arguments
 const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelector(
   getSteps,
   getSavedForms,
   orderedStepsSelector,
-  (_steps, _savedStepForms, _orderedSteps) => {
+  labwareIngredSelectors.getLabware,
+  (_steps, _savedStepForms, _orderedSteps, _labware) => {
     return reduce(_orderedSteps, (acc, stepId) => {
       const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
         ? stepFormToArgs(_savedStepForms[stepId])
