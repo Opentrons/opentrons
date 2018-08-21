@@ -26,7 +26,6 @@ import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 
 type SP = {
   showUpdateModal: boolean,
-  connectedName: string,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
@@ -36,7 +35,7 @@ type DP = {dispatch: Dispatch}
 
 type OP = {
   robot: Robot,
-  match: Match
+  match: Match,
 }
 
 type Props = SP & OP & {
@@ -118,10 +117,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
   const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+
   return (state, ownProps) => {
     const {robot} = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
-    const connectedName = robotSelectors.getConnectedRobotName(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const availableUpdate = getAvailableRobotUpdate(state, robot)
@@ -133,7 +132,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     )
 
     return {
-      connectedName,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,

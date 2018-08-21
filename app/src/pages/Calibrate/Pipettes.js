@@ -6,6 +6,8 @@ import {Route, Redirect, type Match} from 'react-router'
 
 import type {State} from '../../types'
 import type {Pipette, Robot} from '../../robot'
+import type {PipettesResponse} from '../../http-api-client'
+
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
 
@@ -19,6 +21,7 @@ import SessionHeader from '../../components/SessionHeader'
 type SP = {
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
+  actualPipettes: ?PipettesResponse,
   _robot: ?Robot,
 }
 
@@ -77,16 +80,14 @@ function makeMapStateToProps (): (State, OP) => SP {
   const getAttachedPipettes = makeGetRobotPipettes()
 
   return (state, props) => {
-    const name = robotSelectors.getConnectedRobotName(state)
     const _robot = robotSelectors.getConnectedRobot(state)
-    const pipettesResponse = getAttachedPipettes(state, {name})
+    const pipettesCall = _robot && getAttachedPipettes(state, _robot)
 
     return {
-      name,
       _robot,
       pipettes: robotSelectors.getPipettes(state),
       currentPipette: getCurrentPipette(state, props),
-      actualPipettes: pipettesResponse.response
+      actualPipettes: pipettesCall && pipettesCall.response
     }
   }
 }

@@ -12,7 +12,6 @@ import {InstrumentGroup, AlertItem} from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
-  name: string,
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesResponse
@@ -23,7 +22,7 @@ const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
 export default function Pipettes (props: Props) {
-  const {name, currentPipette, pipettes, actualPipettes} = props
+  const {currentPipette, pipettes, actualPipettes} = props
   const currentMount = currentPipette && currentPipette.mount
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
@@ -66,7 +65,7 @@ export default function Pipettes (props: Props) {
         />
         <p className={styles.wrong_pipette_message}>
           {'Go to the '}
-          <Link to={`/robots/${name}`}>
+          <Link to='/robots'>
             robot settings
           </Link>
           {` panel to ${alertType} pipette.`}

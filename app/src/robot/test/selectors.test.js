@@ -1,10 +1,13 @@
 // robot selectors test
+import {setIn} from '@thi.ng/paths'
 import {NAME, selectors, constants} from '../'
 
 const makeState = (state) => ({[NAME]: state})
 
 const {
   getDiscovered,
+  getConnectedRobot,
+  getConnectedRobotName,
   getConnectionStatus,
   getSessionLoadInProgress,
   getUploadError,
@@ -31,103 +34,126 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
-  test('getDiscovered', () => {
-    const state = {
-      robot: {connection: {connectedTo: 'bar'}},
-      discovery: {
-        robotsByName: {
-          foo: {
-            name: 'foo',
-            connections: [
-              {ip: '10.10.1.2', port: 31950, ok: true, local: false}
-            ]
-          },
-          bar: {
-            name: 'bar',
-            connections: [
-              {ip: '10.10.3.4', port: 31950, ok: true, local: false},
-              {ip: '169.254.3.4', port: 31950, ok: true, local: true}
-            ]
-          },
-          baz: {
-            name: 'baz',
-            connections: [
-              {ip: '10.10.5.6', port: 31950, ok: true, local: false},
-              {ip: '169.254.5.6', port: 31950, ok: false, local: true}
-            ]
-          },
-          qux: {
-            name: 'qux',
-            connections: [
-              {ip: '169.254.7.8', port: 31950, ok: true, local: true}
-            ]
+  describe('robot list', () => {
+    let state
+
+    beforeEach(() => {
+      state = {
+        robot: {connection: {connectedTo: 'bar'}},
+        discovery: {
+          robotsByName: {
+            foo: {
+              name: 'foo',
+              connections: [
+                {ip: '10.10.1.2', port: 31950, ok: true, local: false}
+              ]
+            },
+            bar: {
+              name: 'bar',
+              connections: [
+                {ip: '10.10.3.4', port: 31950, ok: true, local: false},
+                {ip: '169.254.3.4', port: 31950, ok: true, local: true}
+              ]
+            },
+            baz: {
+              name: 'baz',
+              connections: [
+                {ip: '10.10.5.6', port: 31950, ok: true, local: false},
+                {ip: '169.254.5.6', port: 31950, ok: false, local: true}
+              ]
+            },
+            qux: {
+              name: 'qux',
+              connections: [
+                {ip: '169.254.7.8', port: 31950, ok: true, local: true}
+              ]
+            }
           }
         }
       }
-    }
+    })
 
-    expect(getDiscovered(state)).toEqual([
-      {
+    test('getDiscovered', () => {
+      expect(getDiscovered(state)).toEqual([
+        {
+          name: 'bar',
+          ip: '169.254.3.4',
+          port: 31950,
+          wired: true,
+          isConnected: true
+        },
+        {
+          name: 'qux',
+          ip: '169.254.7.8',
+          port: 31950,
+          isConnected: false,
+          wired: true
+        },
+        {
+          name: 'baz',
+          ip: '10.10.5.6',
+          port: 31950,
+          wired: false,
+          isConnected: false
+        },
+        {
+          name: 'foo',
+          ip: '10.10.1.2',
+          port: 31950,
+          wired: false,
+          isConnected: false
+        }
+      ])
+    })
+
+    test('getConnectedRobot', () => {
+      expect(getConnectedRobot(state)).toEqual({
         name: 'bar',
         ip: '169.254.3.4',
         port: 31950,
         wired: true,
         isConnected: true
-      },
-      {
-        name: 'qux',
-        ip: '169.254.7.8',
-        port: 31950,
-        isConnected: false,
-        wired: true
-      },
-      {
-        name: 'baz',
-        ip: '10.10.5.6',
-        port: 31950,
-        wired: false,
-        isConnected: false
-      },
-      {
-        name: 'foo',
-        ip: '10.10.1.2',
-        port: 31950,
-        wired: false,
-        isConnected: false
-      }
-    ])
-  })
+      })
 
-  test('getConnectionStatus', () => {
-    const state = {
-      connection: {
+      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
+      expect(getConnectedRobot(state)).toBeUndefined()
+    })
+
+    test('getConnectedRobotName', () => {
+      expect(getConnectedRobotName(state)).toEqual('bar')
+      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
+      expect(getConnectedRobotName(state)).toBeUndefined()
+    })
+
+    test('getConnectionStatus', () => {
+      state = setIn(state, 'robot.connection', {
         connectedTo: '',
         connectRequest: {inProgress: false},
         disconnectRequest: {inProgress: false}
-      }
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
+      })
+      expect(getConnectionStatus(state)).toBe(constants.DISCONNECTED)
 
-    state.connection = {
-      connectedTo: '',
-      connectRequest: {inProgress: true},
-      disconnectRequest: {inProgress: false}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: '',
+        connectRequest: {inProgress: true},
+        disconnectRequest: {inProgress: false}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.CONNECTING)
 
-    state.connection = {
-      connectedTo: 'ot',
-      connectRequest: {inProgress: false},
-      disconnectRequest: {inProgress: false}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: 'foo',
+        connectRequest: {inProgress: false},
+        disconnectRequest: {inProgress: false}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.CONNECTED)
 
-    state.connection = {
-      connectedTo: 'ot',
-      connectRequest: {inProgress: false},
-      disconnectRequest: {inProgress: true}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTING)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: 'foo',
+        connectRequest: {inProgress: false},
+        disconnectRequest: {inProgress: true}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.DISCONNECTING)
+    })
   })
 
   test('getSessionLoadInProgress', () => {

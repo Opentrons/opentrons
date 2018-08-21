@@ -17,7 +17,7 @@ import InstrumentSettings from './InstrumentSettings'
 
 type SP = {
   robot: ?Robot,
-  connectedName: string,
+  connectedName: ?string,
 }
 
 type OP = {match: Match}
