@@ -10,10 +10,7 @@ import {
   type NamedIngred
 } from '../steplist'
 
-import {
-  formHasErrors,
-  type ValidFormAndErrors
-} from './formProcessing'
+import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 
 import type {
   SubstepItemData,
@@ -282,8 +279,9 @@ export function generateSubsteps (
     return null
   }
 
+  // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
-  if (!valForm || !valForm.validatedForm || formHasErrors(valForm)) {
+  if (!valForm || !valForm.validatedForm || Object.values(valForm.errors).length > 0) {
     return null
   }
 
