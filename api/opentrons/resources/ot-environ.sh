@@ -16,7 +16,7 @@ if [ -z $OT_ENVIRON_SET_UP ]; then
     # connecting to Host OS services
     export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
     export PYTHONPATH=$PYTHONPATH:/data/packages/usr/local/lib/python3.6/site-packages
-    export PATH=$PATH:/data/packages/usr/local/bin:$OT_CONFIG_PATH/scripts
+    export PATH=/data/packages/usr/local/bin:$OT_CONFIG_PATH/scripts:$PATH
 
     # TODO(seth, 8/15/2018): These are almost certainly unused and should be hardcoded
     # if they are in fact still used
