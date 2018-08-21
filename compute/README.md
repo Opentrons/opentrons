@@ -44,6 +44,10 @@ robot. The script must:
 Scripts in that directory will be executed in alphabetical order. The most straight-forward way to guarantee exectution
 order is to prefix file names with numbers (e.g.: `00-configure-wifi` and `05-do-something-else`).
 
+### System Configuration and Initialization
+The system is organized so as little configuration as possible resides in the Dockerfile; rather, we try and locate configuration and initialization in scripts that are bundled in with the API server wheel, and can therefore be updated without a resin application update. The only configuration absolutely required to be in the container itself is now in `container_setup.sh`. This script detects the first time a container is running on a device and instructs the API server to, among other things documented in the API subproject, to copy its configuration and initialization scripts to `/data/system`.
+
+
 ## More info about Resin
 
 ### Application
@@ -78,9 +82,6 @@ See `/Dockerfile` for details.
 
 Directory structure:
   * `avahi_tools` — avahi D-Bus client to advertise over mdns
-  * `conf` — service configuration files (see `Dockerfile` for destinations on container image)
-  * `scripts` — copied to `/usr/local/bin` on container image
-  * `static` — static pages to support auto-update
 
 Services:
   * `nginx` — serve update page (static/) and proxy `POST` to `/upload`
