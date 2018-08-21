@@ -1,14 +1,27 @@
+@import '@opentrons/components';
+
 .well_order_icon {
   height: 30px;
   width: 30px;
   cursor: pointer;
 }
 
+.well_order_icon:hover {
+  opacity: 0.7;
+}
+
+.modal_header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 5rem;
+}
+
 .main_row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 80px 0;
+  margin: 3rem 0;
 }
 
 .field_row {
@@ -29,12 +42,20 @@
 
 .button_row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
-.default_button {
+.reset_button {
+  width: 10rem;
+}
+
+.cancel_button {
   width: 10rem;
   margin-right: 1rem;
+}
+
+.done_button {
+  width: 10rem;
 }
 
 .wells_image {

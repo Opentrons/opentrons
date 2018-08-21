@@ -5,7 +5,13 @@ import {connect} from 'react-redux'
 
 import i18n from '../../../localization'
 import {Portal} from '../../portals/MainPageModalPortal'
-import {Modal, OutlineButton, LabeledValue, FormGroup, DropdownField} from '@opentrons/components'
+import {
+  Modal,
+  OutlineButton,
+  PrimaryButton,
+  FormGroup,
+  DropdownField
+} from '@opentrons/components'
 import modalStyles from '../../modals/modal.css'
 import {actions, selectors} from '../../../steplist'
 import WellOrderViz from './WellOrderViz'
@@ -56,7 +62,7 @@ class WellOrderModal extends React.Component<Props, State> {
     this.setState({firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND}, this.applyChanges)
     this.props.closeModal()
   }
-  handleClose = () => {
+  handleCancel = () => {
     const {initialFirstValue, initialSecondValue} = this.props
     this.setState({firstValue: initialFirstValue, secondValue: initialSecondValue}, this.applyChanges)
     this.props.closeModal()
@@ -92,11 +98,10 @@ class WellOrderModal extends React.Component<Props, State> {
         <Modal
           className={modalStyles.modal}
           contentsClassName={cx(modalStyles.modal_contents)}
-          onCloseClick={this.handleClose}>
-          <div className={styles.top_row}>
-            <LabeledValue
-              label={i18n.t('modal.well_order.title')}
-              value={i18n.t('modal.well_order.body')} />
+          onCloseClick={this.handleCancel}>
+          <div className={styles.modal_header}>
+              <h4>{i18n.t('modal.well_order.title')}</h4>
+              <p>{i18n.t('modal.well_order.body')}</p>
           </div>
           <div className={styles.main_row}>
             <FormGroup label={i18n.t('modal.well_order.field_label')}>
@@ -123,7 +128,7 @@ class WellOrderModal extends React.Component<Props, State> {
                   } />
               </div>
             </FormGroup>
-            <FormGroup label={i18n.t('modal.well_order.viz_label')} className={styles.viz_wrapper}>
+            <FormGroup label={i18n.t('modal.well_order.viz_label')}>
               <WellOrderViz
                 prefix={this.props.prefix}
                 firstValue={firstValue}
@@ -131,12 +136,17 @@ class WellOrderModal extends React.Component<Props, State> {
             </FormGroup>
           </div>
           <div className={styles.button_row}>
-            <OutlineButton className={styles.default_button} onClick={this.handleReset}>
-              {i18n.t('button.reset_to_default')}
+            <OutlineButton className={styles.reset_button} onClick={this.handleReset}>
+              {i18n.t('button.reset')}
             </OutlineButton>
-            <OutlineButton onClick={this.handleDone}>
-              {i18n.t('button.done')}
-            </OutlineButton>
+            <div>
+              <PrimaryButton className={styles.cancel_button} onClick={this.handleCancel}>
+                {i18n.t('button.cancel')}
+              </PrimaryButton>
+              <PrimaryButton className={styles.done_button} onClick={this.handleDone}>
+                {i18n.t('button.done')}
+              </PrimaryButton>
+            </div>
           </div>
         </Modal>
       </Portal>

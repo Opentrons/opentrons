@@ -73,7 +73,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <TipPositionField />
           </div>
           <div className={styles.right_settings_column}>
-            <WellOrderInput prefix="aspirate" />
+            {stepType !== 'distribute' && <WellOrderInput prefix="aspirate" />}
             <FlowRateField />
           </div>
         </div>
@@ -116,9 +116,12 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               </StepCheckboxRow>
             </FormGroup>
           </div>
-          <div className={styles.right_settings_column}>
-            <FlowRateField />
+          <div className={styles.middle_settings_column}>
             <TipPositionField />
+          </div>
+          <div className={styles.right_settings_column}>
+            {stepType !== 'consolidate' && <WellOrderInput prefix="dispense" />}
+            <FlowRateField />
           </div>
         </div>
       </FormSection>

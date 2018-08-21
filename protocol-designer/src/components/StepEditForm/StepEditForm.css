@@ -7,6 +7,7 @@
  */
 
 .left_settings_column,
+.middle_settings_column,
 .right_settings_column {
   & > * {
     margin: 1rem 0;
@@ -14,15 +15,15 @@
 }
 
 .left_settings_column {
-  lost-column: 8/16;
+  lost-column: 7/16;
 }
 
 .middle_settings_column {
-  lost-column: 4/16;
+  lost-column: 6/16;
 }
 
 .right_settings_column {
-  lost-column: 4/16;
+  lost-column: 3/16;
 }
 
 /* Special fields: default sizes.

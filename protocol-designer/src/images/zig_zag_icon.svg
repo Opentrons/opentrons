@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="23px" viewBox="0 0 20 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 49.2 (51160) - http://www.bohemiancoding.com/sketch -->
-    <title>Widget icon svg</title>
+<svg width="24px" height="21px" viewBox="0 0 24 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Widget-icon-svg" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M14.6537906,6.57142857 L5,6.57142857 L5,9.85714286 L0,4.92857143 L5,0 L5,3.28571429 L17.8676492,3.28571429 L17.9828019,3.16798706 L18.0541897,3.28571429 L20,3.28571429 L20,6.57142857 L19.8702424,6.57142857 L6.47088488,19.7142857 L20,19.7142857 L20,23 L1.66666667,23 L1.66666667,19.7142857 L1.79835606,19.7142857 L14.6537906,6.57142857 Z" id="Combined-Shape" fill="#787878"></path>
+    <g id="Step-form-fields" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Consolidate-Copy-3" transform="translate(-892.000000, -159.000000)" fill="#787878">
+            <path d="M908.653791,164.571429 L899,164.571429 L899,167.857143 L894,162.928571 L899,158 L899,161.285714 L911.867649,161.285714 L911.982802,161.167987 L912.05419,161.285714 L914,161.285714 L914,164.571429 L913.870242,164.571429 L900.470885,177.714286 L914,177.714286 L914,181 L895.666667,181 L895.666667,177.714286 L895.798356,177.714286 L908.653791,164.571429 Z" id="Combined-Shape" transform="translate(904.000000, 169.500000) scale(-1, -1) rotate(-90.000000) translate(-904.000000, -169.500000) "></path>
+        </g>
     </g>
 </svg>
