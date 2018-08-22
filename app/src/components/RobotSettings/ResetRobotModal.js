@@ -157,7 +157,10 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...stateProps,
     closeModal,
-    fetchOptions: () => dispatch(fetchResetOptions(robot)),
+    fetchOptions: () => dispatch(chainActions(
+      clearRestartResponse(robot),
+      fetchResetOptions(robot))
+    ),
     reset: (options) => dispatch(resetRobotData(robot, options)),
     restart: () => dispatch(chainActions(
       restartRobotServer(robot),
