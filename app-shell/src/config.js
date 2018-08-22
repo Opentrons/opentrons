@@ -30,8 +30,6 @@ const PARSE_ARGS_OPTS = {
 const DEFAULTS: Config = {
   devtools: false,
 
-  modules: false,
-
   // app update config
   update: {
     channel: pkg.version.includes('beta') ? 'beta' : 'latest'

@@ -10,7 +10,6 @@ import type {Labware, Robot} from '../../robot'
 
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotSettings} from '../../http-api-client'
-import {getModulesOn} from '../../config'
 
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
@@ -94,10 +93,9 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const calToBottomFlag = settings && settings.find(s => s.id === 'calibrateToBottom')
     const calibrateToBottom = !!calToBottomFlag && calToBottomFlag.value
 
-    const modulesEnabled = getModulesOn(state)
     const modulesRequired = robotSelectors.getModules(state).length > 0
     const modulesReviewed = robotSelectors.getModulesReviewed(state)
-    const reviewModules = modulesEnabled && modulesRequired && !modulesReviewed
+    const reviewModules = modulesRequired && !modulesReviewed
 
     return {
       slot,
