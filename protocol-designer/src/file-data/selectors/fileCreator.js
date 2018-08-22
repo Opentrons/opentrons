@@ -9,6 +9,7 @@ import {selectors as steplistSelectors} from '../../steplist'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
+import executionDefaults from '../../executionDefaults'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
@@ -72,6 +73,8 @@ export const createFile: BaseState => ProtocolFile = createSelector(
         subcategory: null,
         tags: []
       },
+
+      'default-values': executionDefaults,
 
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',

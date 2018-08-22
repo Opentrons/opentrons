@@ -2,13 +2,46 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {
+    "pipette-model": {
+      "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
+      "type": "string",
+      "enum": [
+        "p10_single_v1",
+        "p10_multi_v1",
+        "p50_single_v1",
+        "p50_multi_v1",
+        "p300_single_v1",
+        "p300_multi_v1",
+        "p1000_single_v1",
+        "p1000_multi_v1"
+      ]
+    },
+
     "mm-offset": {
       "description": "Millimeters for pipette location offsets",
       "type": "number"
     },
 
+    "flow-rate-for-pipettes": {
+      "description": "Flow rate in mm/sec for each pipette model used in the protocol",
+      "type": "object",
+      "propertyNames": {"$ref": "#/definitions/pipette-model"},
+      "patternProperties": {".*": {"type": "number"}},
+      "additionalProperties": false
+    },
+
+    "flow-rate-params": {
+      "properties": {
+        "flow-rate": {
+          "description": "Flow rate for aspirate/dispense. If omitted, defaults to the corresponding values in \"default-values\"",
+          "type": "number"
+        }
+      }
+    },
+
     "well-position-params": {
       "description": "Optional params for well position offsets",
+      "type": "object",
       "properties": {
         "position": {
           "required": ["anchor"],
@@ -61,6 +94,7 @@
   "additionalProperties": false,
   "required": [
     "protocol-schema",
+    "default-values",
     "metadata",
     "robot",
     "pipettes",
@@ -118,6 +152,19 @@
       }
     },
 
+    "default-values": {
+      "description": "Default values required for protocol execution",
+      "type": "object",
+      "required": [
+        "aspirate-flow-rate",
+        "dispense-flow-rate"
+      ],
+      "properties": {
+        "aspirate-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
+        "dispense-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"}
+      }
+    },
+
     "designer-application": {
       "description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
       "type": "object",
@@ -163,18 +210,7 @@
               "enum": ["left", "right"]
             },
             "model": {
-              "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
-              "type": "string",
-              "enum": [
-                "p10_single_v1",
-                "p10_multi_v1",
-                "p50_single_v1",
-                "p50_multi_v1",
-                "p300_single_v1",
-                "p300_multi_v1",
-                "p1000_single_v1",
-                "p1000_multi_v1"
-              ]
+              "$ref": "#/definitions/pipette-model"
             }
           }
         }
@@ -232,7 +268,8 @@
           "subprocedure": {
             "type": "array",
             "items": {
-              "anyOf": [{
+              "anyOf": [
+                {
                   "description": "Aspirate / dispense / air gap commands",
                   "type": "object",
                   "required": ["command", "params"],
@@ -243,6 +280,7 @@
                     },
                     "params": {
                       "allOf": [
+                        {"$ref": "#/definitions/flow-rate-params"},
                         {"$ref": "#/definitions/pipette-access-params"},
                         {"$ref": "#/definitions/volume-params"},
                         {"$ref": "#/definitions/well-position-params"}
