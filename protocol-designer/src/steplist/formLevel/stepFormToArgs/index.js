@@ -1,7 +1,7 @@
 // @flow
 
-import type { FormData } from '../form-types'
-import type { CommandCreatorData } from '../step-generation'
+import type { FormData } from '../../../form-types'
+import type { CommandCreatorData } from '../../../step-generation'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import transferLikeFormToArgs from './transferLikeFormToArgs'

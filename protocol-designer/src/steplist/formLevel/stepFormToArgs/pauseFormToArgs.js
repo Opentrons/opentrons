@@ -1,7 +1,7 @@
 // @flow
 
-import type { FormData } from '../form-types'
-import type { PauseFormData } from '../step-generation'
+import type { FormData } from '../../../form-types'
+import type { PauseFormData } from '../../../step-generation'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},

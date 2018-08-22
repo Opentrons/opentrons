@@ -1,8 +1,8 @@
 // @flow
 
-import type { FormData } from '../form-types'
-import type { MixFormData } from '../step-generation'
-import { DEFAULT_CHANGE_TIP_OPTION } from '../constants'
+import type { FormData } from '../../../form-types'
+import type { MixFormData } from '../../../step-generation'
+import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},

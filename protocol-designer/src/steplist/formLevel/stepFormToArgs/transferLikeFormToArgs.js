@@ -1,12 +1,12 @@
 // @flow
 
-import type { FormData } from '../form-types'
+import type { FormData } from '../../../form-types'
 import type {
   ConsolidateFormData,
   DistributeFormData,
   TransferFormData
-} from '../step-generation'
-import { DEFAULT_CHANGE_TIP_OPTION } from '../constants'
+} from '../../../step-generation'
+import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
