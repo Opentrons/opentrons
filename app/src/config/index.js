@@ -55,7 +55,6 @@ export type Config = {
   },
 
   discovery: {
-    enabled: boolean,
     candidates: string | Array<string>
   },
 }

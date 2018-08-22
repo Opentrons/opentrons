@@ -3,7 +3,6 @@
 import assert from 'assert'
 import groupBy from 'lodash/groupBy'
 import map from 'lodash/map'
-import noop from 'lodash/noop'
 import uniqBy from 'lodash/uniqBy'
 import Store from 'electron-store'
 
@@ -33,9 +32,6 @@ let client
 
 export function registerDiscovery (dispatch: Action => void) {
   config = getConfig('discovery')
-
-  if (!config.enabled) return noop
-
   store = new Store({name: 'discovery', defaults: {services: []}})
 
   client = DiscoveryClient({
@@ -73,7 +69,7 @@ export function registerDiscovery (dispatch: Action => void) {
 }
 
 export function getRobots () {
-  if (!client || !config || !config.enabled) return []
+  if (!client) return []
 
   return servicesToRobots(client.services)
 }

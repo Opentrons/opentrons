@@ -6,7 +6,6 @@ import type {
   Slot,
   Axis,
   Direction,
-  RobotService,
   ProtocolFile,
   SessionUpdate
 } from './types'
@@ -16,27 +15,6 @@ const makeRobotActionName = (action) => `${NAME}:${action}`
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}
-
-export type DiscoverAction = {|
-  type: 'robot:DISCOVER',
-  meta: {|
-    robotCommand: true,
-  |},
-|}
-
-export type DiscoverFinishAction = {|
-  type: 'robot:DISCOVER_FINISH',
-|}
-
-export type AddDiscoveredAction = {|
-  type: 'robot:ADD_DISCOVERED',
-  payload: RobotService,
-|}
-
-export type RemoveDiscoveredAction = {|
-  type: 'robot:REMOVE_DISCOVERED',
-  payload: RobotService,
-|}
 
 export type ConnectAction = {|
   type: 'robot:CONNECT',
@@ -218,10 +196,6 @@ export const actionTypes = {
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
-  | DiscoverAction
-  | DiscoverFinishAction
-  | AddDiscoveredAction
-  | RemoveDiscoveredAction
   | ConnectAction
   | ConnectResponseAction
   | DisconnectAction
@@ -241,16 +215,6 @@ export type Action =
   | ClearSessionAction
 
 export const actions = {
-  // TODO(mc, 2018-08-10): remove
-  discover (): DiscoverAction {
-    return {type: 'robot:DISCOVER', meta: {robotCommand: true}}
-  },
-
-  // TODO(mc, 2018-08-10): remove
-  discoverFinish (): DiscoverFinishAction {
-    return {type: 'robot:DISCOVER_FINISH'}
-  },
-
   connect (name: string): ConnectAction {
     return {
       type: 'robot:CONNECT',
@@ -283,16 +247,6 @@ export const actions = {
 
   unexpectedDisconnect (): UnexpectedDisconnectAction {
     return {type: 'robot:UNEXPECTED_DISCONNECT'}
-  },
-
-  // TODO(mc, 2018-08-10): remove
-  addDiscovered (service: RobotService): AddDiscoveredAction {
-    return {type: 'robot:ADD_DISCOVERED', payload: service}
-  },
-
-  // TODO(mc, 2018-08-10): remove
-  removeDiscovered (service: RobotService): RemoveDiscoveredAction {
-    return {type: 'robot:REMOVE_DISCOVERED', payload: service}
   },
 
   // make new session with protocol file

@@ -7,7 +7,6 @@ import RpcClient from '../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
-import {handleDiscover} from './discovery'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
@@ -26,7 +25,6 @@ export default function client (dispatch) {
     const {type} = action
 
     switch (type) {
-      case 'robot:DISCOVER': return handleDiscover(dispatch, state, action)
       case 'robot:CONNECT': return connect(state, action)
       case 'robot:DISCONNECT': return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)

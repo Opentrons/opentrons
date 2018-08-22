@@ -16,8 +16,9 @@ install:
 	pipenv install $(pipenv_opts)
 
 .PHONY: dev
+dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	ENABLE_VIRTUAL_SMOOTHIE=true $(python) -m otupdate --debug --port $(port)
+	$(python) -m otupdate --debug --port $(port)
 
 .PHONY: clean
 clean:

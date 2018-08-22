@@ -220,15 +220,6 @@ Full name of app user to populate "Name" in support conversations.
 
 Email of app user to populate "Email" in support conversations.
 
-##### discovery.enabled
-
-* CLI argument: `--discovery.enabled`
-* Environment variable: `OT_APP_DISCOVERY__ENABLED`
-* JSON path: `discovery.enabled`
-* Default: `false`
-
-Enables experimental robot discovery client for improved robot tracking.
-
 ##### discovery.candidates
 
 * CLI argument: `--discovery.candidates`

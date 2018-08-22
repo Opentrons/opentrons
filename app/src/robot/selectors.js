@@ -85,14 +85,13 @@ export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export function getConnectedRobotName (state: State): string {
-  return connection(state).connectedTo
-}
-
 export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
   getDiscovered,
-  (discovered) => discovered.find((r) => r.isConnected)
+  discovered => discovered.find(r => r.isConnected)
 )
+
+export const getConnectedRobotName: Selector<State, void, ?string> =
+  createSelector(getConnectedRobot, r => r && r.name)
 
 export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
   createSelector(
