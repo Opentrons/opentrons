@@ -46,12 +46,12 @@ type Props = SP & DP
 
 const getErrorContent = (error: CommandCreatorError): AlertContent => ({
   title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
-  body: i18n.t(`alert.timeline.error.${error.type}.body`, '')
+  body: i18n.t(`alert.timeline.error.${error.type}.body`, {defaultValue: ''})
 })
 
 const getWarningContent = (warning: CommandCreatorWarning): AlertContent => ({
   title: i18n.t(`alert.timeline.warning.${warning.type}.title`, warning.message),
-  body: i18n.t(`alert.timeline.warning.${warning.type}.body`, '')
+  body: i18n.t(`alert.timeline.warning.${warning.type}.body`, {defaultValue: ''})
 })
 
 function Alerts (props: Props) {
