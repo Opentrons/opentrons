@@ -44,7 +44,7 @@ RUN pip install --force-reinstall \
 # file, or you will encounter a copy error
 
 COPY ./compute/container_setup.sh /usr/local/bin/container_setup.sh
-
+COPY ./audio/ /etc/audio
 COPY ./shared-data/robot-data /etc/robot-data
 COPY ./shared-data/definitions /etc/labware
 COPY ./api /tmp/api
