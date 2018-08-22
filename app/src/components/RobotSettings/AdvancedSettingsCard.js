@@ -2,7 +2,7 @@
 // app info card with version and updated
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
@@ -24,7 +24,6 @@ type DP = {
   fetch: () => mixed,
   set: (id: string, value: boolean) => mixed,
   download: () => mixed,
-  reset: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -61,13 +60,11 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch, download, health, reset} = props
+  const {name, settings, set, fetch, download, health} = props
   const logsAvailable = health && health.response && health.response.logs
+  const resetUrl = `/robots/${name}/reset`
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
-      {settings.map(s => (
-        <BooleanSettingToggle {...s} key={s.id} set={set} />
-      ))}
       <LabeledButton
         label='Download Logs'
         buttonProps={{
@@ -81,13 +78,16 @@ function AdvancedSettingsCard (props: Props) {
       <LabeledButton
         label='Factory Reset'
         buttonProps={{
-          disabled: !logsAvailable,
-          onClick: reset,
+          component: Link,
+          to: resetUrl,
           children: 'Reset'
         }}
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
+      {settings.map(s => (
+        <BooleanSettingToggle {...s} key={s.id} set={set} />
+      ))}
     </RefreshCard>
   )
 }
@@ -109,12 +109,9 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const resetUrl = `/robots/${ownProps.name}/reset`
-
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
     set: (id, value) => dispatch(setSettings(ownProps, id, value)),
-    download: () => dispatch(downloadLogs(ownProps)),
-    reset: () => dispatch(push(resetUrl))
+    download: () => dispatch(downloadLogs(ownProps))
   }
 }

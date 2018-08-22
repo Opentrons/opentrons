@@ -12,7 +12,6 @@ type Props = {
   checkForUpdates: () => mixed
 }
 
-const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
 
 export default function AppInfoCard (props: Props) {
@@ -23,7 +22,6 @@ export default function AppInfoCard (props: Props) {
 
   return (
     <RefreshCard
-      title={TITLE}
       refreshing={checkInProgress}
       refresh={checkForUpdates}
     >

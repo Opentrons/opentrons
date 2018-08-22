@@ -4,24 +4,32 @@ import {connect} from 'react-redux'
 import {goBack} from 'react-router-redux'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {Option} from '../../http-api-client'
-import {fetchResetOptions, makeGetRobotResetOptions} from '../../http-api-client'
+import type {Option, ResetRobotRequest} from '../../http-api-client'
+import {
+  fetchResetOptions,
+  makeGetRobotResetOptions,
+  resetRobotData,
+  makeGetRobotResetRequest,
+  restartRobotServer
+} from '../../http-api-client'
 import {AlertModal} from '@opentrons/components'
 import {Portal} from '../portal'
-import {LabeledToggle} from '../controls'
+import {LabeledCheckbox} from '../controls'
 
 type OP = {
   robot: Robot
 }
 
 type SP = {
-  options: Array<Option>
+  options: ?Array<Option>,
+  resetRequest: ResetRobotRequest,
 }
 
 type DP = {
   fetchOptions: () => mixed,
-  cancel: () => mixed,
-  reset: () => mixed,
+  close: () => mixed,
+  reset: (options: ResetRobotRequest) => mixed,
+  restart: () => mixed,
 }
 
 type OptionsState = {
@@ -34,29 +42,6 @@ type OptionsState = {
 type Props = SP & DP
 
 const TITLE = 'Robot Factory Reset'
-
-const MOCK_RESET_OPTIONS = [
-  {
-    id: 'deckCalibration',
-    title: 'Deck Calibration',
-    description: 'Reset calibration of pipette to deck'
-  },
-  {
-    id: 'tipProbe',
-    title: 'Tip Length',
-    description: 'Erase tip probe data'
-  },
-  {
-    id: 'labwareCalibration',
-    title: 'Labware Calibration',
-    description: 'Erase custom labware calibration'
-  },
-  {
-    id: 'bootScripts',
-    title: 'Boot Scripts',
-    description: 'Erase custom boot scripts'
-  }
-]
 
 class ResetRobotModal extends React.Component<Props, OptionsState> {
   constructor (props: Props) {
@@ -74,30 +59,52 @@ class ResetRobotModal extends React.Component<Props, OptionsState> {
     return () => this.setState({[name]: !this.state[name]})
   }
 
+  handleReset = () => {
+    const options = this.state
+    return this.props.reset(options)
+  }
+
   componentDidMount () {
     this.props.fetchOptions()
   }
 
   render () {
+    const {resetRequest} = this.props
+    if (resetRequest && resetRequest.response) {
+      return (
+        <Portal>
+          <AlertModal
+            heading={TITLE}
+            buttons={[
+              {onClick: this.props.restart, children: 'restart'}
+            ]}
+            alertOverlay
+          >
+            <p>Restart your robot to finish the reset. It may take several minutes for your robot to restart.</p>
+          </AlertModal>
+        </Portal>
+      )
+    }
     return (
       <Portal>
         <AlertModal
           heading={TITLE}
           buttons={[
-            {onClick: this.props.cancel, children: 'cancel'},
-            {onClick: this.props.reset, children: 'reset'}
+            {onClick: this.props.close, children: 'close'},
+            {onClick: this.handleReset, children: 'reset'}
           ]}
           alertOverlay
         >
         <p>Warning! Clicking <strong>reset</strong> will erase your selected configurations and restore your robot to factory settings. This cannot be undone</p>
-        {this.props.options.map(o => (
-          <LabeledToggle
-            label= {o.title}
-            onClick= {this.toggle(o.id)}
-            toggledOn={this.state[o.id]}
+        {this.props.options && this.props.options.map(o => (
+          <LabeledCheckbox
+            label= {o.name}
+            onChange= {this.toggle(o.id)}
+            name={o.id}
+            value={this.state[o.id]}
             key={o.id}>
             <p>{o.description}</p>
-          </LabeledToggle>
+          </LabeledCheckbox>
         ))}
         </AlertModal>
       </Portal>
@@ -109,12 +116,14 @@ export default connect(makeMapStateToProps, mapDispatchToProps)(ResetRobotModal)
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getResetOptions = makeGetRobotResetOptions()
+  const getResetRequest = makeGetRobotResetRequest()
   return (state, ownProps) => {
     const {robot} = ownProps
     const optionsRequest = getResetOptions(state, robot)
-    const options = optionsRequest && optionsRequest.response && optionsRequest.response.options
+    const resetRequest = getResetRequest(state, robot)
     return {
-      options: options || MOCK_RESET_OPTIONS
+      options: optionsRequest && optionsRequest.response,
+      resetRequest
     }
   }
 }
@@ -123,7 +132,8 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
   return {
     fetchOptions: () => dispatch(fetchResetOptions(robot)),
-    cancel: () => dispatch(goBack()),
-    reset: () => dispatch(goBack())
+    close: () => dispatch(goBack()),
+    reset: (options) => dispatch(resetRobotData(robot, options)),
+    restart: () => dispatch(restartRobotServer(robot))
   }
 }
