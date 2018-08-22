@@ -192,12 +192,20 @@ Be sure to check out the [API `README`][api-readme] for additional instructions.
 
 ```shell
 # run API with virtual robot
-make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
-# run API with robot's motor driver connected via USB to UART cable
 make -C api dev
+# run API with robot's motor driver connected via USB to UART cable
+make -C api dev ENABLE_VIRTUAL_SMOOTHIE=false
 
 # push the current contents of the api directory to robot for testing
+# defaults to currently connected ethernet robot
 make push-api
+# takes optional host variable for other robots
+make push-api host=${some_other_ip_address}
+
+# SSH into the currently connected ethernet robot
+make term
+# takes optional host variable for other robots
+make term host=${some_other_ip_address}
 ```
 
 ### Releasing (for Opentrons developers)

@@ -111,7 +111,6 @@
     "style-loader": "^0.18.2",
     "stylelint": "^8.4.0",
     "stylelint-config-standard": "^18.0.0",
-    "superagent": "^3.8.1",
     "url-loader": "^0.6.2",
     "wait-on": "^2.1.0",
     "webpack": "^3.1.0",

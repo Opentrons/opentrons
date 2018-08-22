@@ -26,6 +26,9 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
+# run at usage (=), not on makefile parse (:=)
+usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+
 # install all project dependencies
 # front-end dependecies handled by yarn
 .PHONY: install
@@ -53,6 +56,7 @@ install-types:
 	flow-typed install --overwrite --flowVersion=0.61.0
 
 .PHONY: push-api
+push-api: export host = $(usb_host)
 push-api:
 	$(MAKE) -C $(API_LIB_DIR) push
 	$(MAKE) -C $(API_DIR) push
@@ -60,7 +64,16 @@ push-api:
 
 .PHONY: api-local-container
 api-local-container:
-	docker build --no-cache --build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 --build-arg running_on_pi=0 --build-arg data_mkdir_path_slash_if_none=/data/system .
+	docker build . \
+		--no-cache \
+		--build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 \
+		--build-arg running_on_pi=0 \
+		--build-arg data_mkdir_path_slash_if_none=/data/system
+
+.PHONY: term
+term: export host = $(usb_host)
+term:
+	$(MAKE) -C $(API_DIR) term
 
 # all tests
 .PHONY: test
