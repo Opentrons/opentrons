@@ -18,7 +18,8 @@ async def health(request: web.Request) -> web.Response:
         'name': NAME,
         'api_version': __version__,
         'fw_version': robot.fw_version,
-        'logs': static_paths
+        'logs': static_paths,
+        'system_version': os.environ.get('OT_SYSTEM_VERSION', 'unknown')
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
