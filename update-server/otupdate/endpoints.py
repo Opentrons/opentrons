@@ -9,14 +9,16 @@ log = logging.getLogger(__name__)
 
 
 def build_health_endpoint(
-        name, update_server_version, api_server_version, smoothie_version):
+        name, update_server_version, api_server_version, smoothie_version,
+        system_version):
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
             {
                 'name': name,
                 'updateServerVersion': update_server_version,
                 'apiServerVersion': api_server_version,
-                'smoothieVersion': smoothie_version
+                'smoothieVersion': smoothie_version,
+                'systemVersion': system_version
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )
