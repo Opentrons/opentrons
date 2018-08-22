@@ -89,13 +89,17 @@ STOPSIGNAL SIGTERM
 # For backward compatibility, udev is enabled by default
 ENV UDEV on
 
-RUN echo "export CONTAINER_ID=$(uuidgen)" | tee -a /etc/profile.d/opentrons.sh
-
 # The one link we have to make in the dockerfile still to make sure we get our
 # environment variables
 COPY ./compute/find_python_module_path.py /usr/local/bin/
+COPY ./compute/find_ot_resources.py /usr/local/bin
 RUN ln -sf /data/system/ot-environ.sh /etc/profile.d/00-persistent-ot-environ.sh &&\
-    ln -sf `find_python_module_path.py opentrons`/resources/ot-environ.sh /etc/profile.d/01-builtin-ot-environ.sh
+    ln -sf `find_ot_resources.py`/ot-environ.sh /etc/profile.d/01-builtin-ot-environ.sh
+
+# Note: the quoting that defines the PATH echo is very specifically set up to
+# get $PATH in the script literally so it is evaluated at container runtime.
+RUN echo "export CONTAINER_ID=$(uuidgen)" | tee -a /etc/profile.d/opentrons.sh\
+    && echo 'export PATH=$PATH:'"`find_ot_resources.py`/scripts" | tee -a /etc/profile.d/opentrons.sh
 
 
 # This configuration is used both by both the build and runtime so it has to
