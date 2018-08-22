@@ -6,11 +6,12 @@ import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
+import type {FetchHealthCall} from '../../http-api-client'
+
 import {
   fetchHealthAndIgnored,
   makeGetRobotHealth,
-  makeGetAvailableRobotUpdate,
-  type RobotHealth
+  makeGetAvailableRobotUpdate
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
@@ -21,7 +22,7 @@ type OwnProps = Robot & {
 }
 
 type StateProps = {
-  healthRequest: RobotHealth,
+  healthRequest: FetchHealthCall,
   availableUpdate: ?string
 }
 

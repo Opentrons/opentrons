@@ -3,7 +3,7 @@
 import {combineReducers} from 'redux'
 import apiReducer from './reducer'
 import {calibrationReducer, type CalibrationAction} from './calibration'
-import {healthReducer, type HealthAction} from './health'
+import type {HealthAction} from './health'
 import type {ModulesAction} from './modules'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
@@ -15,7 +15,6 @@ import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
   calibration: calibrationReducer,
-  health: healthReducer,
   motors: motorsReducer,
   pipettes: pipettesReducer,
   robot: robotReducer,
@@ -43,10 +42,6 @@ export type {
   JogStep,
   DeckCalPoint
 } from './calibration'
-
-export type {
-  RobotHealth
-} from './health'
 
 export type {
   Pipette,
@@ -100,10 +95,7 @@ export {
   makeGetDeckCalibrationCommandState
 } from './calibration'
 
-export {
-  fetchHealth,
-  makeGetRobotHealth
-} from './health'
+export * from './health'
 
 export * from './modules'
 
