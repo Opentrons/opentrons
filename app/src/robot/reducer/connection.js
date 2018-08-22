@@ -1,15 +1,8 @@
 // @flow
 // robot connection state and reducer
-import omit from 'lodash/omit'
-import without from 'lodash/without'
-
 import type {Action} from '../../types'
 
-import type {RobotService} from '../types'
-
 import type {
-  AddDiscoveredAction,
-  RemoveDiscoveredAction,
   ConnectAction,
   ConnectResponseAction,
   ClearConnectResponseAction,
@@ -18,11 +11,6 @@ import type {
 } from '../actions'
 
 type State = {
-  isScanning: boolean,
-  discovered: string[],
-  discoveredByName: {
-    [string]: RobotService
-  },
   connectedTo: string,
   connectRequest: {
     inProgress: boolean,
@@ -33,15 +21,14 @@ type State = {
     inProgress: boolean,
     error: ?{message: string}
   },
+  unexpectedDisconnect: boolean,
 }
 
 const INITIAL_STATE: State = {
-  isScanning: false,
-  discovered: [],
-  discoveredByName: {},
   connectedTo: '',
   connectRequest: {inProgress: false, error: null, name: ''},
-  disconnectRequest: {inProgress: false, error: null}
+  disconnectRequest: {inProgress: false, error: null},
+  unexpectedDisconnect: false
 }
 
 export default function connectionReducer (
@@ -51,18 +38,6 @@ export default function connectionReducer (
   if (state == null) return INITIAL_STATE
 
   switch (action.type) {
-    case 'robot:DISCOVER':
-      return handleDiscover(state)
-
-    case 'robot:DISCOVER_FINISH':
-      return handleDiscoverFinish(state)
-
-    case 'robot:ADD_DISCOVERED':
-      return handleAddDiscovered(state, action)
-
-    case 'robot:REMOVE_DISCOVERED':
-      return handleRemoveDiscovered(state, action)
-
     case 'robot:CONNECT':
       return handleConnect(state, action)
 
@@ -78,81 +53,11 @@ export default function connectionReducer (
     case 'robot:DISCONNECT_RESPONSE':
       return handleDisconnectResponse(state, action)
 
-    case 'api:SUCCESS': {
-      const {robot, path} = action.payload
-      if (path === 'health') {
-        // $FlowFixMe: api:_ actions use BaseRobot, discovery needs RobotService
-        return maybeDiscoverWired(state, robot)
-      }
-
-      break
-    }
-
-    case 'api:FAILURE': {
-      const {robot, path} = action.payload
-      if (path === 'health') {
-        // $FlowFixMe: api:_ actions use BaseRobot, discovery needs RobotService
-        return maybeRemoveWired(state, robot)
-      }
-      break
-    }
+    case 'robot:UNEXPECTED_DISCONNECT':
+      return {...state, unexpectedDisconnect: true}
   }
 
   return state
-}
-
-function handleDiscover (state: State): State {
-  return {
-    ...state,
-    isScanning: true
-  }
-}
-
-function handleDiscoverFinish (state: State): State {
-  return {
-    ...state,
-    isScanning: false
-  }
-}
-
-function handleAddDiscovered (
-  state: State,
-  action: {payload: $PropertyType<AddDiscoveredAction, 'payload'>}
-): State {
-  const {payload} = action
-  const {name} = payload
-  let {discovered, discoveredByName} = state
-
-  if (discovered.indexOf(name) < 0) {
-    discovered = discovered.concat(name)
-  }
-
-  discoveredByName = {
-    ...discoveredByName,
-    [name]: {
-      ...discoveredByName[name],
-      ...payload
-    }
-  }
-
-  return {...state, discovered, discoveredByName}
-}
-
-function handleRemoveDiscovered (
-  state: State,
-  action: {payload: $PropertyType<RemoveDiscoveredAction, 'payload'>}
-): State {
-  if (state.connectedTo === action.payload.name) {
-    return state
-  }
-
-  const {payload: {name}} = action
-
-  return {
-    ...state,
-    discovered: without(state.discovered, name),
-    discoveredByName: omit(state.discoveredByName, name)
-  }
 }
 
 function handleConnect (state: State, action: ConnectAction): State {
@@ -192,7 +97,8 @@ function handleDisconnectResponse (
   return {
     ...state,
     connectedTo: '',
-    disconnectRequest: {error: null, inProgress: false}
+    disconnectRequest: {error: null, inProgress: false},
+    unexpectedDisconnect: false
   }
 }
 
@@ -201,16 +107,4 @@ function handleClearConnectResponse (
   action: ClearConnectResponseAction
 ): State {
   return {...state, connectRequest: INITIAL_STATE.connectRequest}
-}
-
-function maybeDiscoverWired (state: State, robot: RobotService): State {
-  if (!robot.wired) return state
-
-  return handleAddDiscovered(state, {payload: robot})
-}
-
-function maybeRemoveWired (state: State, robot: RobotService): State {
-  if (!robot.wired) return state
-
-  return handleRemoveDiscovered(state, {payload: robot})
 }

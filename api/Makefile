@@ -5,8 +5,6 @@ SHELL := /bin/bash
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# make push host
-host ?= \[fd00:0:cafe:fefe::1\]
 # make push wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
 firmware = $(wildcard smoothie/*.hex)
@@ -55,6 +53,7 @@ publish:
 	cd scripts && publish.sh && doc-deploy.sh
 
 .PHONY: dev
+dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
 	$(python) opentrons/server/main.py -P 31950 opentrons.server.main:init
 
@@ -105,6 +104,7 @@ change-left:
 		-d '{"axes": ["b"]}' \
 		http://$(host):31950/motors/disengage
 
+# User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
 term:
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(host)

@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class Instrument(object):
     """
     This class represents instrument attached to the :any:`Robot`:
-    :Pipette:, :Magbead:.
+    :Pipette:.
 
     It gives the instruments ability to CRUD their calibration data,
     and gives access to some common methods across instruments
@@ -85,8 +85,11 @@ class Instrument(object):
 
         last_persisted_data = self._strip_vector(last_persisted_data)
 
-        with open(self._get_calibration_file_path(), 'w') as f:
-            f.write(json.dumps(last_persisted_data, indent=4))
+        try:
+            with open(self._get_calibration_file_path(), 'w') as f:
+                json.dump(last_persisted_data, f, indent=4)
+        except OSError:
+            log.exception('Failed to save with exception:')
 
     def load_persisted_data(self):
         """
@@ -117,11 +120,15 @@ class Instrument(object):
 
     def _write_blank_calibrations_file(self):
         self._delete_calibration_file()
-        with open(self._get_calibration_file_path(), 'w') as f:
-            f.write(json.dumps({
-                'version': self.calibration_data_version,
-                'data': {}
-            }))
+        try:
+            with open(self._get_calibration_file_path(), 'w') as f:
+                default_data = {
+                    'version': self.calibration_data_version,
+                    'data': {}
+                }
+                json.dump(default_data, f, indent=2)
+        except OSError:
+            log.exception('Failed to write calibrations file with exception:')
 
     def _get_calibration_file_path(self):
         """

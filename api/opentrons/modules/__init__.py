@@ -1,102 +1,78 @@
 import os
 import logging
+import re
+from opentrons.modules.magdeck import MagDeck
+from opentrons.modules.tempdeck import TempDeck
 from opentrons import robot, labware
-from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
-
 
 log = logging.getLogger(__name__)
+
+SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
 
 
 class UnsupportedModuleError(Exception):
     pass
 
 
+class AbsentModuleError(Exception):
+    pass
+
+
 def load(name, slot):
-    if name in SUPPORTED_MODULES.keys():
-        lw = labware.load(name, slot)
-        _cls = SUPPORTED_MODULES.get(name)
-        mod = _cls(lw)
+    module_instance = None
+    if name in SUPPORTED_MODULES:
+        if robot.is_simulating():
+            labware_instance = labware.load(name, slot)
+            module_class = SUPPORTED_MODULES.get(name)
+            module_instance = module_class(lw=labware_instance)
+        else:
+            # TODO: BC 2018-08-01 this currently loads the first module of
+            # that type that is on the robot, in the future we should add
+            # support for multiple instances of one module type this
+            # accessor would then load the correct disambiguated module
+            # instance via the module's serial
+            matching_modules = [
+                module for module in robot.modules if isinstance(
+                    module, SUPPORTED_MODULES.get(name)
+                )
+            ]
+            if matching_modules:
+                module_instance = matching_modules[0]
+                labware_instance = labware.load(name, slot)
+                module_instance.labware = labware_instance
+            else:
+                raise AbsentModuleError(
+                    "no module of name {} is currently connected".format(name)
+                )
     else:
         raise UnsupportedModuleError("{} is not a valid module".format(name))
-    return mod
+
+    return module_instance
 
 
-def discover_devices(module_prefix):
-    if os.environ.get('RUNNING_ON_PI'):
-        devices = os.listdir('/dev')
+# Note: this function should be called outside the robot class, because
+# of the circular dependency that it would create if imported into robot.py
+def discover_and_connect():
+    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
+        devices = os.listdir('/dev/modules')
     else:
         devices = []
-    matches = filter(
-        lambda x: x.startswith('tty{}'.format(module_prefix)), devices)
-    res = list(map(lambda x: '/dev/{}'.format(x), matches))
-    log.debug('Discovered devices for prefix {}: {}'.format(
-        module_prefix, res))
-    return res
 
+    discovered_modules = []
 
-class MagDeck:
-    '''
-    Under development. API subject to change
-    '''
-    def __init__(self, lw):
-        self.labware = lw
-        self.driver = MagDeckDriver()
-        self.connect()
-        self._engaged = False
-        self._device_info = self.driver.get_device_info()
+    module_port_regex = re.compile('|'.join(SUPPORTED_MODULES.keys()), re.I)
+    for port in devices:
+        match = module_port_regex.search(port)
+        if match:
+            module_class = SUPPORTED_MODULES.get(match.group().lower())
+            absolute_port = '/dev/modules/{}'.format(port)
+            discovered_modules.append(module_class(port=absolute_port))
 
-    def calibrate(self):
-        '''
-        Calibration involves probing for top plate to get the plate height
-        '''
-        if not robot.is_simulating():
-            self.driver.probe_plate()
-            # return if successful or not?
-            self._engaged = False
+    log.debug('Discovered modules: {}'.format(discovered_modules))
+    for module in discovered_modules:
+        try:
+            module.connect()
+        except AttributeError:
+            log.exception('Failed to connect module')
 
-    def engage(self):
-        '''
-        Move the magnet to plate top - 1 mm
-        '''
-        if not robot.is_simulating():
-            self.driver.move(self.driver.plate_height - 1.0)
-            self._engaged = True
-
-    def disengage(self):
-        '''
-        Home the magnet
-        '''
-        if not robot.is_simulating():
-            self.driver.home()
-            self._engaged = False
-
-    def disconnect(self):
-        '''
-        Disconnect the serial connection
-        '''
-        if not robot.is_simulating():
-            self.driver.disconnect()
-
-    def connect(self):
-        '''
-        Connect to the 'MagDeck' port
-        Planned change- will connect to the correct port in case of multiple
-        MagDecks
-        '''
-        if not robot.is_simulating():
-            ports = discover_devices('MagDeck')
-            # Connect to the first module. Need more advanced selector to
-            # support more than one of the same type of module
-            port = ports[0] if len(ports) > 0 else None
-            self.driver.connect(port)
-
-    @property
-    def device_info(self):
-        return self._device_info
-
-    @property
-    def status(self):
-        return 'engaged' if self._engaged else 'disengaged'
-
-
-SUPPORTED_MODULES = {'magdeck': MagDeck}
+    return discovered_modules

@@ -1,0 +1,17 @@
+{
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  },
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-class-properties"
+  ],
+  "presets": [
+    "flow",
+    ["env", {"modules": "commonjs"}]
+  ]
+}

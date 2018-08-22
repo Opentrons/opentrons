@@ -7,7 +7,7 @@ import {getAnalyticsSeen, setAnalyticsSeen} from '../../analytics'
 import {Modal} from '@opentrons/components'
 import ModalButton from './ModalButton'
 import AnalyticsToggle from './AnalyticsToggle'
-
+import {Portal} from '../portal'
 import type {State, Dispatch} from '../../types'
 
 type SP = {
@@ -34,12 +34,14 @@ function AnalyticsSettingsModal (props: Props) {
   const {setSeen} = props
 
   return (
-    <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
-      <AnalyticsToggle />
-      <ModalButton onClick={setSeen}>
-        {CONTINUE}
-      </ModalButton>
-    </Modal>
+    <Portal>
+      <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
+        <AnalyticsToggle />
+        <ModalButton onClick={setSeen}>
+          {CONTINUE}
+        </ModalButton>
+      </Modal>
+    </Portal>
   )
 }
 

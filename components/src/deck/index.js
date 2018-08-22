@@ -1,7 +1,8 @@
 // @flow
 import Deck from './Deck'
+import Labware from './Labware'
 import LabwareContainer from './LabwareContainer'
-import Plate from './Plate'
+import LabwareLabels from './LabwareLabels'
 import Well from './Well'
 import type {SingleWell} from './Well'
 
@@ -16,8 +17,9 @@ export {
   Deck,
   ContainerNameOverlay,
   EmptyDeckSlot,
+  Labware,
   LabwareContainer,
-  Plate,
+  LabwareLabels,
   SlotOverlay,
   Well
 }

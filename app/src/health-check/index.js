@@ -1,17 +1,14 @@
 // @flow
 // health check module for keeping tabs on connected robots
+// TODO(mc, 2018-08-21): remove this module in favor of discovery-client and
+// websocket level ping-pong
 import {createSelector} from 'reselect'
 
 import type {Middleware, State, Action} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
 
 // TODO(mc, 2018-02-26): figure out this circular dependency
-import {
-  getDiscoveredByName,
-  getConnectRequest,
-  getConnectedRobotName
-} from '../robot/selectors'
-
+import {getDiscovered, getConnectRequest} from '../robot/selectors'
 import {fetchHealth} from '../http-api-client'
 
 // since middleware triggers before actions are reduced, health check failure
@@ -122,18 +119,24 @@ export const healthCheckMiddleware: Middleware =
         break
 
       case 'robot:CONNECT_RESPONSE':
-        if (!action.payload.error) {
+        if (!action.payload.error && action.payload.pollHealth) {
           const state = store.getState()
           const name = getConnectRequest(state).name
-          const robot = getDiscoveredByName(state)[name]
+          const robot = getDiscovered(state).find(r => r.name === name)
           if (robot) store.dispatch(startHealthCheck(robot))
         }
         break
 
-      case 'robot:DISCONNECT_RESPONSE':
-        const robot = {name: getConnectedRobotName(store.getState())}
-        store.dispatch(stopHealthCheck(robot))
-        store.dispatch(resetHealthCheck(robot))
+      case 'robot:DISCONNECT_RESPONSE': {
+        // selector is not appropriate for this routine for reasons
+        // this module should be considered deprecated and will be removed
+        const robot = store.getState().robot.connection.connectedTo
+
+        if (robot) {
+          store.dispatch(stopHealthCheck({name: robot}))
+          store.dispatch(resetHealthCheck({name: robot}))
+        }
+      }
     }
 
     return next(action)

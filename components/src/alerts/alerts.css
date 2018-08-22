@@ -52,8 +52,8 @@
   border: 1px solid var(--c-warning);
 
   & > .title_bar {
-    background-color: var(--c-bg-warning);
-    color: var(--c-warningdark);
+    background-color: var(--c-warning-light);
+    color: var(--c-warning-dark);
 
     & svg {
       fill: var(--c-warning);

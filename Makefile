@@ -8,8 +8,14 @@ PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
 API_LIB_DIR := api-server-lib
+DISCOVERY_CLIENT_DIR := discovery-client
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
+
+# this may be set as an environment variable to select the version of
+# python to run if pyenv is not available. it should always be set to
+# point to a python3.6.
+OT_PYTHON ?= python
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -20,16 +26,20 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
+# run at usage (=), not on makefile parse (:=)
+usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+
 # install all project dependencies
 # front-end dependecies handled by yarn
 .PHONY: install
 install:
-	pip install pipenv==11.6.8
+	$(OT_PYTHON) -m pip install pipenv==11.6.8
 	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 	yarn
 	$(MAKE) -C $(SHARED_DATA_DIR) build
+	$(MAKE) -C $(DISCOVERY_CLIENT_DIR)
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
@@ -46,10 +56,24 @@ install-types:
 	flow-typed install --overwrite --flowVersion=0.61.0
 
 .PHONY: push-api
+push-api: export host = $(usb_host)
 push-api:
 	$(MAKE) -C $(API_LIB_DIR) push
 	$(MAKE) -C $(API_DIR) push
 	$(MAKE) -C $(API_DIR) restart
+
+.PHONY: api-local-container
+api-local-container:
+	docker build . \
+		--no-cache \
+		--build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 \
+		--build-arg running_on_pi=0 \
+		--build-arg data_mkdir_path_slash_if_none=/data/system
+
+.PHONY: term
+term: export host = $(usb_host)
+term:
+	$(MAKE) -C $(API_DIR) term
 
 # all tests
 .PHONY: test

@@ -16,14 +16,15 @@
 
 .labeled_control_wrapper {
   width: 100%;
+  padding: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
 }
 
 .labeled_control {
   display: block;
-}
-
-label.labeled_control {
-  @apply --clickable;
 }
 
 .labeled_control_label {
@@ -45,10 +46,15 @@ label.labeled_control {
   }
 }
 
-.labeled_button {
+.labeled_button,
+.labeled_select {
   float: right;
-  width: 7.5rem;
+  width: 8rem;
   margin-top: 0.25rem;
+}
+
+.labeled_select {
+  @apply --font-body-2-dark;
 }
 
 .control_info {

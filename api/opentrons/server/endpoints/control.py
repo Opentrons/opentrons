@@ -4,10 +4,9 @@ import json
 import logging
 from aiohttp import web
 from threading import Thread
-from opentrons import robot, instruments
+from opentrons import robot, instruments, modules
 from opentrons.instruments import pipette_config
 from opentrons.trackers import pose_tracker
-from typing import List, Dict
 
 log = logging.getLogger(__name__)
 
@@ -49,17 +48,6 @@ async def get_attached_pipettes(request):
     return web.json_response(robot.get_attached_pipettes())
 
 
-def _discover_modules() -> List[Dict]:
-    """
-    This is a stub, awaiting implementation of module API class. Returns a list
-    of dicts where each dict represents one attached module, and each dict
-    contains the keys "name", "model", "serial", "fwVersion", "status", and
-    "displayName". All values should be strings. If not modules are attached,
-    return an empty list.
-    """
-    return []
-
-
 async def get_attached_modules(request):
     """
     On success (including an empty "modules" list if no modules are detected):
@@ -90,9 +78,30 @@ async def get_attached_modules(request):
         "message": "..."
     }
     """
-    module_list = _discover_modules()
-    data = {"modules": module_list}
+    for module in robot.modules:
+        module.disconnect()
+    robot.modules = modules.discover_and_connect()
+
+    data = {"modules": list(map(lambda md: md.to_dict(), robot.modules))}
     return web.json_response(data, status=200)
+
+
+async def get_module_data(request):
+    """
+    Query a module (by its serial number) for its live data
+    """
+    requested_serial = request.match_info['serial']
+    res = None
+
+    for module in robot.modules:
+        is_serial_match = module.device_info.get('serial') == requested_serial
+        if is_serial_match and hasattr(module, 'live_data'):
+            res = module.live_data()
+
+    if res:
+        return web.json_response(res, status=200)
+    else:
+        return web.json_response({"message": "Module not found"}, status=404)
 
 
 async def get_engaged_axes(request):
@@ -183,9 +192,9 @@ def _validate_move_data(data):
         error = True
     if target == 'pipette':
         model = data.get('model')
-        if model not in pipette_config.configs.keys():
+        if model not in pipette_config.configs:
             message = "Model '{}' not recognized, must be one " \
-                      "of {}".format(model, pipette_config.configs.keys())
+                      "of {}".format(model, pipette_config.configs)
             error = True
     else:
         model = None

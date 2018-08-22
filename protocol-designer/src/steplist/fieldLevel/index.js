@@ -21,8 +21,6 @@ export type {
   StepFieldName
 }
 
-const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
-
 const hydrateLabware = (state, id) => (labwareIngredSelectors.getLabware(state)[id])
 
 type StepFieldHelpers = {
@@ -34,9 +32,6 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'aspirate_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware
-  },
-  'changeTip': {
-    processValue: defaultTo(DEFAULT_CHANGE_TIP_OPTION)
   },
   'dispense_delayMinutes': {
     processValue: composeProcessors(castToNumber, defaultTo(0))

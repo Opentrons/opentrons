@@ -156,7 +156,6 @@ def _parse_instrument_data(smoothie_response):
         # because of how Smoothieware handles GCODE messages
         data = bytearray.fromhex(items[1])
     except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_instrument_data:')
         raise ParseError(
             'Unexpected argument to _parse_instrument_data: {}'.format(
                 smoothie_response))

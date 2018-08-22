@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Plate} from '@opentrons/components'
+import {Labware} from '@opentrons/components'
 import SingleLabware from '../../SingleLabware'
 import styles from './NewFileModal.css'
 
@@ -14,7 +14,7 @@ export default function TiprackDiagram (props: Props) {
 
   return (
     <SingleLabware className={styles.tiprack_labware}>
-      <Plate containerType={containerType} />
+      <Labware labwareType={containerType} />
     </SingleLabware>
   )
 }

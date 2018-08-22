@@ -15,7 +15,7 @@ const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 
 export default function Instructions (props: ChangePipetteProps) {
-  const {wantedPipetteName, actualPipette} = props
+  const {wantedPipetteName, actualPipette, direction, displayName} = props
 
   const titleBar = {
     ...props,
@@ -24,9 +24,14 @@ export default function Instructions (props: ChangePipetteProps) {
       : {Component: Link, to: props.exitUrl, children: 'exit'}
   }
 
+  const heading = `${capitalize(direction)} ${displayName} Pipette`
+
   return (
-    <ModalPage titleBar={titleBar} contentsClassName={styles.modal_contents}>
-      <Title {...props} />
+    <ModalPage
+      titleBar={titleBar}
+      heading={heading}
+      contentsClassName={styles.modal_contents}
+    >
 
       {!actualPipette && !wantedPipetteName && (
         <PipetteSelection onChange={props.onPipetteSelect} />
@@ -41,17 +46,6 @@ export default function Instructions (props: ChangePipetteProps) {
         </div>
       )}
     </ModalPage>
-  )
-}
-
-function Title (props: ChangePipetteProps) {
-  const {direction, displayName} = props
-  const title = `${capitalize(direction)} ${displayName} Pipette`
-
-  return (
-    <h3 className={styles.attach_pipette_title}>
-      {title}
-    </h3>
   )
 }
 

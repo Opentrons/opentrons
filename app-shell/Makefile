@@ -5,8 +5,16 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# ui directory for production build
+# source and output directories for main process code
+src_dir := src
+lib_dir := lib
+src_ignore := "**/__@(tests|mocks)__/**"
+babel := babel $(src_dir) --out-dir $(lib_dir) --ignore $(src_ignore)
+
+# dep directories for production build
+# TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
+discovery_client_dir := ../discovery-client
 
 # directories for robot API update bundled in production build
 api_dir := ../api
@@ -37,6 +45,14 @@ publish_update := $(OT_TAG)
 
 builder := $(env)=production BUILD_ID=$(build_id) electron-builder -p never
 
+electron := electron . \
+	--devtools \
+	--log.level.console="debug" \
+	--disable_ui.webPreferences.webSecurity \
+	--ui.url.protocol="http:" \
+	--ui.url.path="localhost:$(port)" \
+	--discovery.candidates=localhost
+
 # standard targets
 #####################################################################
 
@@ -49,25 +65,27 @@ install:
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	shx rm -rf lib dist
 
 # artifacts
 #####################################################################
 
-.PHONY: ui
-ui:
+.PHONY: lib
+lib:
+	$(babel)
+
+.PHONY: deps
+deps:
 	$(MAKE) -C $(ui_dir)
+	$(MAKE) -C $(discovery_client_dir)
 
-.PHONY: api
-api:
+.PHONY: api-deps
+api-deps:
 	$(MAKE) -C $(api_dir) wheel
-
-.PHONY: api-lib
-api-lib:
 	$(MAKE) -C $(api_lib_dir) wheel
 
 .PHONY: package-deps
-package-deps: clean ui api api-lib
+package-deps: clean lib deps api-deps
 
 .PHONY: package
 package: package-deps
@@ -107,10 +125,5 @@ _dist-collect-artifacts:
 #####################################################################
 
 .PHONY: dev
-dev:
-	$(env)=development electron . \
-		--devtools \
-		--log.level.console="debug" \
-		--disable_ui.webPreferences.webSecurity \
-		--ui.url.protocol="http:" \
-		--ui.url.path="localhost:$(port)"
+dev: lib
+	$(env)=development $(electron)

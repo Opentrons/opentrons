@@ -31,18 +31,3 @@
   margin: 3rem auto;
   width: 4rem;
 }
-
-.upload_warning {
-  margin: 1rem;
-  text-transform: uppercase;
-}
-
-.upload_warning_title {
-  @apply --font-header-dark;
-
-  margin-bottom: 0.5rem;
-}
-
-.upload_warning_body {
-  @apply --font-body-2-dark;
-}

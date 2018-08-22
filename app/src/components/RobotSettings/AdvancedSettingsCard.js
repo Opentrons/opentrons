@@ -5,19 +5,24 @@ import {connect} from 'react-redux'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {Setting} from '../../http-api-client'
-import {fetchSettings, setSettings, makeGetRobotSettings} from '../../http-api-client'
+import type {Setting, RobotHealth} from '../../http-api-client'
+import {fetchSettings, setSettings, makeGetRobotSettings, makeGetRobotHealth} from '../../http-api-client'
+import {downloadLogs} from '../../shell'
 
 import {RefreshCard} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
 
 type OP = Robot
 
-type SP = {settings: Array<Setting>}
+type SP = {
+  health: ?RobotHealth,
+  settings: Array<Setting>,
+}
 
 type DP = {
   fetch: () => mixed,
   set: (id: string, value: boolean) => mixed,
+  download: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -54,8 +59,8 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch} = props
-
+  const {name, settings, set, fetch, download, health} = props
+  const logsAvailable = health && health.response && health.response.logs
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
       {settings.map(s => (
@@ -64,7 +69,8 @@ function AdvancedSettingsCard (props: Props) {
       <LabeledButton
         label='Download Logs'
         buttonProps={{
-          disabled: true,
+          disabled: !logsAvailable,
+          onClick: download,
           children: 'Download'
         }}
       >
@@ -76,14 +82,23 @@ function AdvancedSettingsCard (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
+  const getRobotHealth = makeGetRobotHealth()
 
-  return (state, ownProps) =>
-    getRobotSettings(state, ownProps).response || {settings: []}
+  return (state, ownProps) => {
+    const settingsRequest = getRobotSettings(state, ownProps)
+    const settings = settingsRequest && settingsRequest.response && settingsRequest.response.settings
+    const health = getRobotHealth(state, ownProps)
+    return {
+      health,
+      settings: settings || []
+    }
+  }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
-    set: (id, value) => dispatch(setSettings(ownProps, id, value))
+    set: (id, value) => dispatch(setSettings(ownProps, id, value)),
+    download: () => dispatch(downloadLogs(ownProps))
   }
 }

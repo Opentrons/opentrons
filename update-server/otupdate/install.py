@@ -3,10 +3,34 @@ import sys
 import shutil
 import asyncio
 import logging
+import re
+import traceback
 from aiohttp import web
 
 log = logging.getLogger(__name__)
 VENV_NAME = 'env'
+
+# This regex should match a PEP427 compliant wheel filename and extract its
+# version into separate groups. Groups 1, 2, 3, and 4 should be the major,
+# minor, patch, and tag respectively. The tag capture group is optional
+WHEEL_VERSION_RE = re.compile('^[\w]+-([\d]+).([\d]+).([\d]+)([\w.]+)?-.*\.whl') # noqa
+FIRST_PROVISIONED_VERSION = (3, 3, 0)
+
+
+def _version_less(version_a, version_b):
+    """ Takes two version as (major, minor, patch) tuples and returns a <= b.
+    """
+    if version_a[0] > version_b[0]:
+        return False
+    elif version_a[0] < version_b[0]:
+        return True
+    else:
+        if version_a[1] > version_b[1]:
+            return False
+        elif version_a[1] < version_b[1]:
+            return True
+        else:
+            return version_a[2] < version_b[2]
 
 
 async def _install(python, filename, loop) -> (str, str, int):
@@ -156,6 +180,25 @@ async def install_py(python, data, loop) -> (dict, int):
     return {'message': msg, 'filename': filename}, returncode
 
 
+async def _provision_container(python, loop) -> (str, int):
+    if not os.environ.get('RUNNING_ON_PI'):
+        return {'message': 'Did not provision (not on pi)',
+                'filename': '<provision>'}, 0
+    provision_command = 'provision-api-resources'
+    proc = await asyncio.create_subprocess_shell(
+        provision_command, stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE, loop=loop)
+    sub_stdout = await proc.stdout.read()
+    sub_stderr = await proc.stderr.read()
+    await proc.communicate()
+    rc = proc.returncode
+    if rc != 0:
+        res = sub_stderr.decode().strip()
+    else:
+        res = sub_stdout.decode().strip()
+    return {'message': res, 'filename': '<provision>'}, rc
+
+
 async def update_api(request: web.Request) -> web.Response:
     """
     This handler accepts a POST request with Content-Type: multipart/form-data
@@ -169,10 +212,26 @@ async def update_api(request: web.Request) -> web.Response:
     """
     log.debug('Update request received')
     data = await request.post()
+    # import pdb; pdb.set_trace()
     try:
         res0, rc0 = await install_py(
             sys.executable, data['whl'], request.loop)
         reslist = [res0]
+        filename = os.path.basename(res0['filename'])
+        version_re_res = re.search(WHEEL_VERSION_RE, filename)
+        rcprov = 0
+        if not version_re_res:
+            log.warning("Wheel version regex didn't match {}: won't provision"
+                        .format(filename))
+        elif rc0 == 0:
+            v_maj, v_min, v_pat\
+                = (int(v) for v in version_re_res.group(1, 2, 3))
+            if not _version_less((v_maj, v_min, v_pat),
+                                 FIRST_PROVISIONED_VERSION):
+                # import pdb; pdb.set_trace()
+                resprov, rcprov = await _provision_container(
+                    sys.executable, request.loop)
+                reslist.append(resprov)
         if 'serverlib' in data.keys():
             res1, rc1 = await install_py(
                 sys.executable, data['serverlib'], request.loop)
@@ -189,14 +248,14 @@ async def update_api(request: web.Request) -> web.Response:
             'message': [r['message'] for r in reslist],
             'filename': [r['filename'] for r in reslist]
         }
-        returncode = rc0 + rc1 + rc2
+        returncode = rc0 + rc1 + rc2 + rcprov
         if returncode == 0:
             status = 200
         else:
             status = 400
     except Exception as e:
         res = {'message': 'Exception {} raised by update of {}: {}'.format(
-                type(e), data, e.__traceback__)}
+                type(e), data, traceback.format_tb(e.__traceback__))}
         status = 500
     return web.json_response(res, status=status)
 

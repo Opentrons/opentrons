@@ -7,7 +7,6 @@ import RpcClient from '../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
-import {handleDiscover} from './discovery'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
@@ -21,17 +20,11 @@ export default function client (dispatch) {
   // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
   let runTimerInterval = NO_INTERVAL
 
-  // kickoff a discovery run immediately
-  // dispatching a discover action (rather than calling handleDiscover) ensures
-  // proper state handling (action will run thru the full middleware pipeline)
-  dispatch(actions.discover())
-
   // return an action handler
   return function receive (state = {}, action = {}) {
     const {type} = action
 
     switch (type) {
-      case 'robot:DISCOVER': return handleDiscover(dispatch, state, action)
       case 'robot:CONNECT': return connect(state, action)
       case 'robot:DISCONNECT': return disconnect(state, action)
       case actionTypes.SESSION: return createSession(state, action)
@@ -49,6 +42,7 @@ export default function client (dispatch) {
       case actionTypes.RESUME: return resume(state, action)
       case actionTypes.CANCEL: return cancel(state, action)
       case 'robot:REFRESH_SESSION': return refreshSession(state, action)
+      case 'robot:CLEAR_SESSION': return clearSession(state, action)
     }
   }
 
@@ -56,7 +50,15 @@ export default function client (dispatch) {
     if (rpcClient) disconnect()
 
     const name = action.payload.name
-    const target = state[constants._NAME].connection.discoveredByName[name]
+    const target = selectors.getDiscovered(state)
+      .find(r => r.name === name)
+
+    if (!target) {
+      return dispatch(
+        actions.connectResponse(new Error(`Robot "${name}" not found`))
+      )
+    }
+
     const {ip, port} = target
 
     RpcClient(`ws://${ip}:${port}`)
@@ -64,6 +66,7 @@ export default function client (dispatch) {
         rpcClient = c
         rpcClient
           .on('notification', handleRobotNotification)
+          .on('close', handleUnexpectedDisconnect)
           .on('error', handleClientError)
 
         remote = rpcClient.remote
@@ -82,19 +85,28 @@ export default function client (dispatch) {
           }
         }
 
-        dispatch(actions.connectResponse())
+        // only poll health if RPC is not monitoring itself with ping/pong
+        dispatch(actions.connectResponse(null, !rpcClient.monitoring))
       })
       .catch((e) => dispatch(actions.connectResponse(e)))
   }
 
   function disconnect () {
-    if (rpcClient) rpcClient.close()
+    if (rpcClient) {
+      rpcClient.removeAllListeners('notification')
+      rpcClient.removeAllListeners('error')
+      rpcClient.removeAllListeners('close')
+      rpcClient.close()
+      rpcClient = null
+    }
 
     clearRunTimerInterval()
-    rpcClient = null
     remote = null
-
     dispatch(actions.disconnectResponse())
+  }
+
+  function handleUnexpectedDisconnect () {
+    dispatch(actions.unexpectedDisconnect())
   }
 
   function createSession (state, action) {
@@ -284,6 +296,12 @@ export default function client (dispatch) {
   function refreshSession (state, action) {
     remote.session_manager.session.refresh()
       .catch((error) => dispatch(actions.sessionResponse(error)))
+  }
+
+  function clearSession (state, action) {
+    remote.session_manager.clear()
+      .catch((error) => console.warn('error clearing session', error))
+      .then(() => (remote.session_manager.session = null))
   }
 
   function setRunTimerInterval () {

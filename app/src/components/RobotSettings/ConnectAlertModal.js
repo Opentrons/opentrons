@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import {AlertModal} from '@opentrons/components'
-
+import {Portal} from '../portal'
 type Props = {
   onCloseClick: () => *
 }
@@ -18,17 +18,20 @@ export default function ConnectAlertModal (props: Props) {
   const {onCloseClick} = props
 
   return (
-    <AlertModal
-      heading={HEADING}
-      onCloseClick={onCloseClick}
-      buttons={[
-        {onClick: onCloseClick, children: 'close'}
-      ]}
-    >
-      <p>
-        {TRY_AGAIN_MESSAGE}
-        {CONTACT_SUPPORT_MESSAGE}
-      </p>
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        heading={HEADING}
+        onCloseClick={onCloseClick}
+        buttons={[
+          {onClick: onCloseClick, children: 'close'}
+        ]}
+        alertOverlay
+      >
+        <p>
+          {TRY_AGAIN_MESSAGE}
+          {CONTACT_SUPPORT_MESSAGE}
+        </p>
+      </AlertModal>
+    </Portal>
   )
 }

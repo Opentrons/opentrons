@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import {AlertModal} from '@opentrons/components'
+import {Portal} from '../portal'
 
 type Props = {
   back: () => mixed,
@@ -16,15 +17,17 @@ export default function ExitAlertModal (props: Props) {
   const {back, exit} = props
 
   return (
-    <AlertModal
-      heading={HEADING}
-      buttons={[
-        {children: CANCEL_TEXT, onClick: back},
-        {children: EXIT_TEXT, onClick: exit}
-      ]}
-      alertOverlay
-    >
-      <p>Doing so will exit pipette setup and home your robot.</p>
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        heading={HEADING}
+        buttons={[
+          {children: CANCEL_TEXT, onClick: back},
+          {children: EXIT_TEXT, onClick: exit}
+        ]}
+        alertOverlay
+      >
+        <p>Doing so will exit pipette setup and home your robot.</p>
+      </AlertModal>
+    </Portal>
   )
 }

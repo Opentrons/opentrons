@@ -29,6 +29,40 @@ Configuration values will be determined by:
 * For CLI arguments, use `--value` for true, and `--disable_value` for false
 * For environment variables, use `OT_APP_VALUE=1` for true, and `OT_APP_VALUE=0` for false
 
+#### overriding config for end-users
+
+##### macOS
+
+To override config in macOS, launch the app from `Terminal` instead of clicking on `Opentrons.app`.
+
+```shell
+# example: launch with devtools enabled
+/Applications/Opentrons.app/Contents/MacOS/Opentrons --devtools
+```
+
+Replace `/Applications` with whatever directory you have placed `Opentrons.app` in.
+
+##### linux
+
+To override config in Linux, launch the app from the terminal. If you installed the Opentrons `deb` package, you should already have an `opentrons` executable in your `$PATH`.
+
+```shell
+# example: launch with devtools enabled
+opentrons --devtools
+```
+
+##### windows
+
+The easiest way to override config on Windows is to modify the Opentrons desktop shortcut. Create a desktop shortcut to Opentrons if you don't have one already, then:
+
+1. Right click the "Opentrons" shortcut
+2. Select "Properties" and go to the "Shortcut" tab
+3. In the "Target" field, append any desired options
+
+![Add config overrides to Target][win-shortcut-screenshot]
+
+[win-shortcut-screenshot]: https://user-images.githubusercontent.com/2963448/44161086-421e1980-a08a-11e8-939d-768ee809878f.png
+
 <!-- TODO(mc, 2018-05-16): generate this section from lib/config.js -->
 
 #### settings
@@ -41,6 +75,24 @@ Configuration values will be determined by:
 * Default: `false`
 
 Enables and opens the Chrome devtools.
+
+##### modules
+
+* CLI argument: `--modules` or `--disable_modules`
+* Environment variable: `OT_APP_MODULES`
+* JSON path: `modules`
+* Default: `false`
+
+Enables experimental support for [Opentrons Modules](http://opentrons.com/modules).
+
+##### update.channel
+
+* CLI argument: `--channel`
+* Environment variable: `OT_APP_UPDATE__CHANNEL`
+* JSON path: `update.channel`
+* Default: `"latest"`
+
+Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `alpha` is the least tested/stable, followed by `beta`, followed by `latest`. `alpha` and `beta` get new features earlier than `latest`.
 
 ##### log.level.file
 
@@ -104,6 +156,78 @@ Protocol used to fetch the UI's `index.html`. If you want to fetch the UI from t
 * Default: `"ui/index.html"`
 
 Path to `index.html`. If `ui.url.protocol` is `file:`, this path is relative to the [application directory][electron-docs-get-app-path]. This path will be combined with the protocol to get the full path to `index.html`. If you want to fetch the UI from the dev server in [`app`](../app), set this to `localhost:8090`.
+
+##### analytics.appId
+
+* CLI argument: `--analytics.appId`
+* Environment variable: `OT_APP_ANALYTICS__APP_ID`
+* JSON path: `analytics.appId`
+* Default: Random UUID generated at first launch
+
+Random, persistent ID to use for anonymous analytics tracking if opted in.
+
+##### analytics.optedIn
+
+* CLI argument: `--analytics.optedIn`
+* Environment variable: `OT_APP_ANALYTICS__OPTED_IN`
+* JSON path: `analytics.optedIn`
+* Default: `false`
+
+Whether or not the user has opted into anonymous analytics tracking.
+
+##### analytics.seenOptIn
+
+* CLI argument: `--analytics.seenOptIn`
+* Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN`
+* JSON path: `analytics.seenOptIn`
+* Default: `false`
+
+Whether or not the user has seen the initial analytics description pop-up.
+
+##### support.userId
+
+* CLI argument: `--support.userId`
+* Environment variable: `OT_APP_SUPPORT__USER_ID`
+* JSON path: `support.userId`
+* Default: Random UUID generated at first launch
+
+Random, persistent ID to use for support tracking. Different than `analytics.appId`.
+
+##### support.createdAt
+
+* CLI argument: `--support.createdAt`
+* Environment variable: `OT_APP_SUPPORT__CREATED_AT`
+* JSON path: `support.createdAt`
+* Default: Current Unix time at first launch
+
+Timestamp of first app launch.
+
+##### support.name
+
+* CLI argument: `--support.name`
+* Environment variable: `OT_APP_SUPPORT__NAME`
+* JSON path: `support.name`
+* Default: `"App User"`
+
+Full name of app user to populate "Name" in support conversations.
+
+##### support.email
+
+* CLI argument: `--support.email`
+* Environment variable: `OT_APP_SUPPORT__EMAIL`
+* JSON path: `support.email`
+* Default: `null`
+
+Email of app user to populate "Email" in support conversations.
+
+##### discovery.candidates
+
+* CLI argument: `--discovery.candidates`
+* Environment variable: `OT_APP_DISCOVERY__CANDIDATES`
+* JSON path: `--discovery.candidates`
+* Default: `[]`
+
+`string` or `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer, you could do `--discovery.candidates=localhost`.
 
 ### logging
 

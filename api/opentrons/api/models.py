@@ -1,3 +1,14 @@
+from opentrons.containers import Slot
+
+
+def _get_parent_slot(placeable):
+    if isinstance(placeable, Slot) or not placeable:
+        res = placeable
+    else:
+        res = _get_parent_slot(placeable.parent)
+    return res
+
+
 class Container:
     def __init__(self, container, instruments=None):
         instruments = instruments or []
@@ -6,7 +17,7 @@ class Container:
         self.id = id(container)
         self.name = container.get_name()
         self.type = container.get_type()
-        self.slot = container.parent.get_name()
+        self.slot = _get_parent_slot(container).get_name()
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]

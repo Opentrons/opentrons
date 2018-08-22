@@ -185,7 +185,15 @@ def _generate_base_config(skip_usb=False) -> (str, dict):
     }
     usb_mount_available = os.path.ismount(usb_mount_point)
     if usb_mount_available and not skip_usb:
-        os.makedirs(usb_settings_dir, exist_ok=True)
+        try:
+            # TODO: it's not clear if this is required, or if the makedirs call
+            # TODO: under _move_settings_data is enough. Most of the settings
+            # TODO: covered by this module should be in code and configs should
+            # TODO: only be stored in one place anyway, so this should be
+            # TODO: simplified with that change
+            os.makedirs(usb_settings_dir, exist_ok=True)
+        except OSError:
+            log.exception('Failed to make directories with exception:')
         base_data_dir = usb_settings_dir
         new_cfg = usb_config
 
@@ -200,9 +208,12 @@ def _generate_base_config(skip_usb=False) -> (str, dict):
 
 
 def write_base_config(path: str, config_data: dict):
-    os.makedirs(path, exist_ok=True)
-    with open(os.path.join(path, index_filename), 'w') as base_f:
-        json.dump(config_data, base_f, indent=2)
+    try:
+        os.makedirs(path, exist_ok=True)
+        with open(os.path.join(path, index_filename), 'w') as base_f:
+            json.dump(config_data, base_f, indent=2)
+    except OSError:
+        log.exception("Base config write failed with exception:")
 
 
 # ---- Utility functions ----

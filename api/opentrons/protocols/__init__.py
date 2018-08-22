@@ -65,7 +65,8 @@ def get_pipette(command_params, loaded_pipettes):
     return loaded_pipettes.get(pipetteId)
 
 
-def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
+# C901 code complexity is due to long elif block, ok in this case (Ian+Ben)
+def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: C901 E501
     subprocedures = [
         p.get('subprocedure', [])
         for p in protocol_data.get('procedure', [])]
@@ -102,6 +103,9 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):
 
         elif command_type == 'dispense':
             pipette.dispense(volume, location)
+
+        elif command_type == 'touch-tip':
+            pipette.touch_tip(location)
 
 
 def execute_protocol(protocol):

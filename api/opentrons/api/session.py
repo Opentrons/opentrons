@@ -7,9 +7,10 @@ import json
 
 from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
+from opentrons.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
-from opentrons import robot
+from opentrons import robot, modules
 
 from .models import Container, Instrument, Module
 
@@ -21,6 +22,9 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
 
     def create(self, name, text):
         self.session = Session(name=name, text=text)
@@ -28,7 +32,7 @@ class SessionManager(object):
 
     def clear(self):
         if self.session:
-            self.session.refresh()
+            robot.reset()
         self.session = None
 
     def get_session(self):
@@ -58,6 +62,9 @@ class Session(object):
 
         self.startTime = None
 
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
         self.refresh()
 
     def get_instruments(self):
@@ -214,7 +221,7 @@ class Session(object):
 
         try:
             self.resume()
-            robot.home_z()
+            self._pre_run_hooks()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
@@ -291,6 +298,12 @@ class Session(object):
     def _on_state_changed(self):
         publish(Session.TOPIC, self._snapshot())
 
+    def _pre_run_hooks(self):
+        robot.home_z()
+        for module in robot.modules:
+            if hasattr(module, 'calibrate'):
+                module.calibrate()
+
 
 def _accumulate(iterable):
     return reduce(
@@ -312,6 +325,14 @@ def now():
     return int(time() * 1000)
 
 
+def _get_parent_module(placeable):
+    if isinstance(placeable, ModulePlaceable) or not placeable:
+        res = placeable
+    else:
+        res = _get_parent_module(placeable.parent)
+    return res
+
+
 def _get_labware(command):
     containers = []
     instruments = []
@@ -320,7 +341,14 @@ def _get_labware(command):
 
     location = command.get('location')
     instrument = command.get('instrument')
-    # module = command.get('module')
+
+    placeable = location
+    if (type(location) == tuple):
+        placeable = location[0]
+
+    maybe_module = _get_parent_module(placeable)
+    modules.append(maybe_module)
+
     locations = command.get('locations')
 
     if location:

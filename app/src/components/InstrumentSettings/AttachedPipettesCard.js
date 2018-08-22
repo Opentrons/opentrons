@@ -9,6 +9,7 @@ import type {Pipette} from '../../http-api-client'
 import {makeGetRobotPipettes, fetchPipettes, clearMoveResponse} from '../../http-api-client'
 
 import InstrumentInfo from './InstrumentInfo'
+import {CardContentFlex} from '../layout'
 import {RefreshCard} from '@opentrons/components'
 
 type OP = Robot
@@ -41,8 +42,10 @@ function AttachedPipettesCard (props: Props) {
       refresh={props.fetchPipettes}
       refreshing={props.inProgress}
     >
+      <CardContentFlex>
       <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
       <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
+      </CardContentFlex>
     </RefreshCard>
   )
 }

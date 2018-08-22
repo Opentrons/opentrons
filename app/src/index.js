@@ -14,6 +14,8 @@ import {checkForShellUpdates, shellMiddleware} from './shell'
 import {healthCheckMiddleware} from './health-check'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
+import {initializeSupport, supportMiddleware} from './support'
+import {startDiscovery} from './discovery'
 
 import reducer from './reducer'
 
@@ -30,12 +32,13 @@ const middleware = applyMiddleware(
   shellMiddleware,
   healthCheckMiddleware,
   analyticsMiddleware,
+  supportMiddleware,
   routerMiddleware(history)
 )
 
 const composeEnhancers = (
   (
-    global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({maxAge: 200})
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({maxAge: 200})
   ) ||
   compose
 )
@@ -59,16 +62,20 @@ if (module.hot) {
   module.hot.accept('./components/App', renderApp)
 }
 
-// TODO(mc, 2018-03-29): developer mode in app settings
-if (process.env.NODE_ENV === 'development') {
-  global.store = store
-}
+const {config} = store.getState()
 
-// initialize analytics after first render
+// attach store to window if devtools are on
+if (config.devtools) window.store = store
+
+// initialize analytics and support after first render
 store.dispatch(initializeAnalytics())
+store.dispatch(initializeSupport())
 
 // kickoff an initial update check at launch
 store.dispatch(checkForShellUpdates())
+
+// kickoff a discovery run immediately
+store.dispatch(startDiscovery())
 
 log.info('Rendering app UI')
 renderApp()

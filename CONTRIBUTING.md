@@ -126,7 +126,7 @@ Individual projects may have additional instructions, so be sure to check out th
 Your computer will need the following tools installed to be able to develop with the Opentrons platform:
 
 *   macOS 10.11+, Linux, or Windows 10
-*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux)
+*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
 
     ```shell
     pyenv install 3.6.4
@@ -192,12 +192,20 @@ Be sure to check out the [API `README`][api-readme] for additional instructions.
 
 ```shell
 # run API with virtual robot
-make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
-# run API with robot's motor driver connected via USB to UART cable
 make -C api dev
+# run API with robot's motor driver connected via USB to UART cable
+make -C api dev ENABLE_VIRTUAL_SMOOTHIE=false
 
 # push the current contents of the api directory to robot for testing
+# defaults to currently connected ethernet robot
 make push-api
+# takes optional host variable for other robots
+make push-api host=${some_other_ip_address}
+
+# SSH into the currently connected ethernet robot
+make term
+# takes optional host variable for other robots
+make term host=${some_other_ip_address}
 ```
 
 ### Releasing (for Opentrons developers)

@@ -15,6 +15,7 @@ export default function NoPipetteModal (props: Props) {
       buttons={[
         {children: 'close', Component: Link, to: props.parentUrl}
       ]}
+      alertOverlay
     >
       <p>Please attach a pipette before attempting to calibrate robot.</p>
     </AlertModal>

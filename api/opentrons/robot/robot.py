@@ -202,6 +202,7 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
+
         return self
 
     def cache_instrument_models(self):
@@ -393,8 +394,6 @@ class Robot(object):
         """
 
         self._driver.connect(port=port)
-        for module in self.modules:
-            module.connect()
         self.fw_version = self._driver.get_fw_version()
 
         # the below call to `cache_instrument_models` is relied upon by
@@ -600,9 +599,6 @@ class Robot(object):
         if self._driver:
             self._driver.disconnect()
 
-        for module in self.modules:
-            module.disconnect()
-
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
 
@@ -795,7 +791,7 @@ class Robot(object):
             }
         left_model = left_data.get('model')
         if left_model:
-            tip_length = pipette_config.configs[left_model].tip_length
+            tip_length = pipette_config.load(left_model).tip_length
             left_data.update({'tip_length': tip_length})
 
         right_data = {
@@ -805,7 +801,7 @@ class Robot(object):
             }
         right_model = right_data.get('model')
         if right_model:
-            tip_length = pipette_config.configs[right_model].tip_length
+            tip_length = pipette_config.load(right_model).tip_length
             right_data.update({'tip_length': tip_length})
         return {
             'left': left_data,

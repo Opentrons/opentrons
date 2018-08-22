@@ -79,34 +79,17 @@
 /* Card and card content styles */
 .card {
   position: relative;
+  overflow: auto;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
-  padding: 1rem;
+  font-size: var(--fs-body-2);
 }
 
 .card_title {
   @apply --font-header-dark;
 
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-weight: --fw-regular;
-}
-
-.card_description {
-  @apply --font-body-2-dark;
-
-  margin: 1rem 0;
-}
-
-.card_content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card_column {
-  flex-direction: column;
-  align-items: flex-start;
+  margin: 1rem 1rem 0;
+  font-weight: var(--fw-regular);
+  text-transform: capitalize;
 }
 
 .refresh_card_icon {

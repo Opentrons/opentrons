@@ -22,6 +22,7 @@ CALL_ACK_MESSAGE = 1
 NOTIFICATION_MESSAGE = 2
 CONTROL_MESSAGE = 3
 CALL_NACK_MESSAGE = 4
+PONG_MESSAGE = 5
 
 
 class Server(object):
@@ -147,7 +148,7 @@ class Server(object):
         try:
             log.debug('Sending root info to {0}'.format(client_id))
             await client.send_json({
-                '$': {'type': CONTROL_MESSAGE},
+                '$': {'type': CONTROL_MESSAGE, 'monitor': True},
                 'root': self.call_and_serialize(lambda: self.root),
                 'type': self.call_and_serialize(lambda: type(self.root))
             })
@@ -222,17 +223,23 @@ class Server(object):
         try:
             if message.type == aiohttp.WSMsgType.TEXT:
                 data = json.loads(message.data)
-                meta = data.pop('$')
-                token = meta['token']
+                meta = data.get('$', {})
+                token = meta.get('token')
+                _id = data.get('id')
 
-                # If no id, or id is null/none/undefined assume
-                # a system call to system instance
-                if 'id' not in data or data['id'] is None:
-                    data['id'] = id(self.system)
+                if meta.get('ping'):
+                    return self.send_pong()
+
+                # if id is missing from payload or explicitely set to null,
+                # use the system object
+                if _id is None:
+                    _id = id(self.system)
 
                 try:
-                    _id = data.pop('id', None)
-                    func = self.build_call(_id, **data)
+                    func = self.build_call(
+                        _id=_id,
+                        name=data.get('name'),
+                        args=data.get('args', []))
                     self.send_ack(token)
                 except Exception as e:
                     log.exception("Excption during rpc.Server.process:")
@@ -299,6 +306,13 @@ class Server(object):
             '$': {
                 'token': token,
                 'type': CALL_ACK_MESSAGE
+            }
+        })
+
+    def send_pong(self):
+        self.send({
+            '$': {
+                'type': PONG_MESSAGE
             }
         })
 

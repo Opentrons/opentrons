@@ -17,9 +17,10 @@ import type {
   CommandCreatorData
 } from '../step-generation'
 
-import {FIXED_TRASH_ID} from '../constants'
-
-const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
+import {
+  DEFAULT_CHANGE_TIP_OPTION,
+  FIXED_TRASH_ID
+} from '../constants'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -55,13 +56,14 @@ export const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankFo
   if (stepType === 'transfer' || stepType === 'consolidate' || stepType === 'mix') {
     return {
       ...baseForm,
-      'aspirate_changeTip': 'once'
+      'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION
     }
   }
 
   if (stepType === 'distribute') {
     return {
       ...baseForm,
+      'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
       'aspirate_disposalVol_checkbox': true,
       'dispense_blowout_checkbox': true,
       'dispense_blowout_labware': FIXED_TRASH_ID
@@ -157,7 +159,7 @@ function _vapTransferLike (
     mixInDestination,
     preWetTip: formData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
-    touchTipAfterDispense: false, // TODO Ian 2018-03-01 Not in form
+    touchTipAfterDispense: formData['dispense_touchTip'] || false,
     description: 'description would be here 2018-03-01' // TODO get from form
   }
 

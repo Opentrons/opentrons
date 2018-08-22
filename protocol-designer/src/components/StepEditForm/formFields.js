@@ -10,12 +10,14 @@ import {
   type DropdownOption,
   type HoverTooltipHandlers
 } from '@opentrons/components'
+import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
+import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
 import styles from './StepEditForm.css'
@@ -181,22 +183,26 @@ export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGro
 // this is a placeholder
 export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
 
-const CHANGE_TIP_OPTIONS = [
-  {name: 'Always', value: 'always'},
-  {name: 'Once', value: 'once'},
-  {name: 'Never', value: 'never'}
-]
+const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
+
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
-type ChangeTipFieldProps = {name: StepFieldName}
-export const ChangeTipField = (props: ChangeTipFieldProps) => (
-  <StepField
-    name={props.name}
-    render={({value, updateValue}) => (
-      <FormGroup label='CHANGE TIP'>
-        <DropdownField
-          options={CHANGE_TIP_OPTIONS}
-          value={value ? String(value) : null}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-      </FormGroup>
-    )} />
-)
+type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
+export const ChangeTipField = (props: ChangeTipFieldProps) => {
+  const {name, stepType} = props
+  const options = CHANGE_TIP_VALUES.map((value) => ({
+    value,
+    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`)
+  }))
+  return (
+    <StepField
+      name={name}
+      render={({value, updateValue}) => (
+        <FormGroup label={i18n.t('step_edit_form.field.change_tip.label')}>
+          <DropdownField
+            options={options}
+            value={value ? String(value) : null}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+        </FormGroup>
+      )} />
+  )
+}

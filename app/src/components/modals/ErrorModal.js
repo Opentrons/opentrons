@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 import {AlertModal} from '@opentrons/components'
+import {Portal} from '../portal'
 
 import type {Error} from '../../types'
 
@@ -31,20 +32,22 @@ export default function ErrorModal (props: Props) {
   }
 
   return (
-    <AlertModal
-      heading={heading}
-      buttons={[closeButtonProps]}
-      alertOverlay
-    >
-      <p className={styles.error_modal_message}>
-        {error.message}
-      </p>
-      <p>
-        {description}
-      </p>
-      <p>
-        If you keep getting this message, try restarting your robot. If this does not resolve the issue please contact Opentrons Support.
-      </p>
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        heading={heading}
+        buttons={[closeButtonProps]}
+        alertOverlay
+      >
+        <p className={styles.error_modal_message}>
+          {error.message}
+        </p>
+        <p>
+          {description}
+        </p>
+        <p>
+          If you keep getting this message, try restarting your robot. If this does not resolve the issue please contact Opentrons Support.
+        </p>
+      </AlertModal>
+    </Portal>
   )
 }

@@ -6,9 +6,8 @@ import {push} from 'react-router-redux'
 
 import type {Robot} from '../../robot'
 import {startDeckCalibration} from '../../http-api-client'
-import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
-// TODO (ka 2018-5-14): temporariliy hide last calibrated labeled value without affecting card layout
-import styles from './styles.css'
+import {Card, OutlineButton} from '@opentrons/components'
+import {CardContentFlex, CardContentFull} from '../layout'
 
 type OP = Robot
 
@@ -19,7 +18,7 @@ type DP = {
 type Props = OP & DP
 
 const TITLE = 'Deck Calibration'
-const LAST_RUN_LABEL = 'Last Run'
+// const LAST_RUN_LABEL = 'Last Run'
 const CALIBRATION_MESSAGE = 'Calibrate your robot to initial factory settings to ensure accuracy.'
 
 export default connect(null, mapDispatchToProps)(CalibrationCard)
@@ -27,15 +26,23 @@ export default connect(null, mapDispatchToProps)(CalibrationCard)
 function CalibrationCard (props: Props) {
   const {start} = props
   return (
-    <Card title={TITLE} description={CALIBRATION_MESSAGE}>
-    <LabeledValue
-      label={LAST_RUN_LABEL}
-      value='Never'
-      className={styles.hidden_value}
-    />
-    <OutlineButton onClick={start}>
-      Calibrate
-    </OutlineButton>
+    <Card title={TITLE}>
+      <CardContentFull>
+        <p>{CALIBRATION_MESSAGE}</p>
+      </CardContentFull>
+      <CardContentFlex>
+        <div>
+        {/*
+          <LabeledValue
+            label={LAST_RUN_LABEL}
+            value='Never'
+          />
+        */}
+        </div>
+        <OutlineButton onClick={start}>
+          Calibrate
+        </OutlineButton>
+      </CardContentFlex>
     </Card>
   )
 }

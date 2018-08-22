@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/app-shell",
   "productName": "Opentrons",
-  "version": "3.3.0-beta.0",
+  "version": "3.3.0-beta.1",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
@@ -20,7 +20,15 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
+  "devDependencies": {
+    "flow-bin": "^0.76.0",
+    "flow-typed": "^2.5.1"
+  },
+  "devDependencies": {
+    "@opentrons/app": "3.3.0-beta.1"
+  },
   "dependencies": {
+    "@opentrons/discovery-client": "3.3.0-beta.1",
     "@thi.ng/paths": "^1.3.8",
     "dateformat": "^3.0.3",
     "electron-debug": "^1.1.0",

@@ -9,13 +9,6 @@ async def test_log_endpoints(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    # Test no log file(s) found
-    s0 = await cli.get('/logs/serial.log')
-    assert s0.status == 404
-    #
-    a0 = await cli.get('/logs/api.log')
-    assert a0.status == 404
-
     # # Test that values are set correctly
     serial_name = "serial.log"
     serial_file = os.path.join(main.log_file_path, serial_name)

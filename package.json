@@ -2,15 +2,16 @@
   "name": "opentrons",
   "private": true,
   "workspaces": [
+    "api/opentrons",
+    "api-server-lib/ot2serverlib",
     "app",
     "app-shell",
     "components",
-    "shared-data",
+    "discovery-client",
     "protocol-designer",
-    "webpack-config",
+    "shared-data",
     "update-server/otupdate",
-    "api/opentrons",
-    "api-server-lib/ot2serverlib"
+    "webpack-config"
   ],
   "config": {
     "commitizen": {
@@ -55,12 +56,14 @@
   },
   "devDependencies": {
     "ajv": "^6.2.1",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
     "babel-eslint": "7.2.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-unassert": "^2.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
@@ -82,6 +85,7 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
     "flow-bin": "^0.76.0",
+    "flow-copy-source": "^2.0.2",
     "flow-mono-cli": "^1.3.4",
     "flow-typed": "^2.5.1",
     "glob": "^7.1.2",
@@ -107,7 +111,6 @@
     "style-loader": "^0.18.2",
     "stylelint": "^8.4.0",
     "stylelint-config-standard": "^18.0.0",
-    "superagent": "^3.8.1",
     "url-loader": "^0.6.2",
     "wait-on": "^2.1.0",
     "webpack": "^3.1.0",

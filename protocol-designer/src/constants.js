@@ -8,9 +8,9 @@ export const {
   SLOTNAME_MATRIX,
   sortedSlotnames,
   TRASH_SLOTNAME,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
-  SLOT_SPACING,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
+  SLOT_SPACING_MM,
   // STYLE CONSTANTS
   swatchColors,
   // SPECIAL SELECTORS
@@ -47,3 +47,5 @@ export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
+
+export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
