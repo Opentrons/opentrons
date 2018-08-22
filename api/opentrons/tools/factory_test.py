@@ -13,7 +13,7 @@ PASS = 'PASS'
 
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
 DATA_FOLDER = environment.get_path('APP_DATA_DIR')
-VIDEO_FILEPATH = os.path.join(DATA_FOLDER, './cam_test.mp4')
+VIDEO_FILEPATH = os.path.join(DATA_FOLDER, 'cam_test.mp4')
 AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3'
 
 
@@ -39,7 +39,7 @@ def _find_storage_device():
 
 
 def _this_wifi_ip_address():
-    gw = os.popen("ip -4 route show default").read().split()
+    gw = os.popen('ip -4 route show default').read().split()
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect((gw[2], 0))
     return s.getsockname()[0]
@@ -200,18 +200,20 @@ def copy_to_usb_drive_and_back(filepath):
     print('USB Flash-Drive')
 
     if _find_storage_device():
+        # remove double-quotes
+        filepath = filepath.replace('"', '')
         # move the file to and from it
         name = filepath.split('/')[-1]
         try:
             run_quiet_process(
-                'mv {0} /mnt/usbdrive/{1}'.format(filepath, name))
+                'mv "{0}" "/mnt/usbdrive/{1}"'.format(filepath, name))
         except Exception:
             print(RESULT_SPACE.format(FAIL))
             return
         if os.path.exists('/mnt/usbdrive/{}'.format(name)):
             try:
                 run_quiet_process(
-                    'mv /mnt/usbdrive/{0} {1}'.format(name, filepath))
+                    'mv "/mnt/usbdrive/{0}" "{1}"'.format(name, filepath))
             except Exception:
                 print(RESULT_SPACE.format(FAIL))
                 return
@@ -236,15 +238,18 @@ def start_server(folder, filepath):
         pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    # put quotes around filepaths to allow whitespaces
+    data_folder_quoted = '"{}"'.format(DATA_FOLDER)
+    video_filepath_quoted = '"{}"'.format(VIDEO_FILEPATH)
     atexit.register(_reset_lights)
-    atexit.register(_erase_data, VIDEO_FILEPATH)
+    atexit.register(_erase_data, video_filepath_quoted)
     _reset_lights()
-    _erase_data(VIDEO_FILEPATH)
+    _erase_data(video_filepath_quoted)
     test_smoothie_gpio()
     test_switches_and_lights()
     test_speaker()
-    record_camera(VIDEO_FILEPATH)
-    copy_to_usb_drive_and_back(VIDEO_FILEPATH)
-    start_server(DATA_FOLDER, VIDEO_FILEPATH)
+    record_camera(video_filepath_quoted)
+    copy_to_usb_drive_and_back(video_filepath_quoted)
+    start_server(data_folder_quoted, VIDEO_FILEPATH)
     exit()
