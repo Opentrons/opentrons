@@ -131,7 +131,7 @@ def __wait_and_restart():
     # We can use the default event loop here because this
     # is actually running in a thread. We use aiohttp here because urllib is
     # painful and we don’t have `requests`.
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.run_until_complete(_resin_supervisor_restart())
 
 
