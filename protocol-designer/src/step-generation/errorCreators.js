@@ -34,7 +34,7 @@ export function labwareDoesNotExist (args: {actionName: string, labware: string}
   const {actionName, labware} = args
   console.warn(`Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`)
   return {
-    message: 'This step involves labware that has been deleted',
+    message: 'A step involves labware that has been deleted',
     type: 'LABWARE_DOES_NOT_EXIST'
   }
 }
