@@ -53,6 +53,18 @@ export default function apiReducer (
         }
       }
     }
+
+    case 'api:CLEAR_RESPONSE': {
+      const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+
+      return {
+        ...state,
+        [name]: {
+          ...stateByName,
+          [path]: {...stateByPath, response: null, inProgress: false, error: null}
+        }
+      }
+    }
   }
 
   return state

@@ -7,6 +7,7 @@ import {healthReducer, type HealthAction} from './health'
 import type {ModulesAction} from './modules'
 import {motorsReducer, type MotorsAction} from './motors'
 import {pipettesReducer, type PipettesAction} from './pipettes'
+import type {ResetAction} from './reset'
 import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
 import {settingsReducer, type SettingsAction} from './settings'
@@ -86,6 +87,7 @@ export type Action =
   | ModulesAction
   | MotorsAction
   | PipettesAction
+  | ResetAction
   | RobotAction
   | ServerAction
   | SettingsAction
@@ -138,7 +140,8 @@ export {
   fetchHealthAndIgnored,
   fetchIgnoredUpdate,
   setIgnoredUpdate,
-  makeGetRobotIgnoredUpdateRequest
+  makeGetRobotIgnoredUpdateRequest,
+  clearRestartResponse
 } from './server'
 
 export {

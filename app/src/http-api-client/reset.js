@@ -11,27 +11,21 @@ import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
 import {getRobotApiState} from './reducer'
 import client from './client'
 
-type Id = string
+type OptionId = string
 
-export type Option = {
-  id: Id,
+export type ResetOption = {
+  id: OptionId,
   name: string,
   description: string,
 }
 
-type FetchResetOptionsResponse = Array<Option>
+type FetchResetOptionsResponse = Array<ResetOption>
 
 export type ResetRobotRequest = {
-  [Id]: boolean,
+  [OptionId]: boolean,
 }
 
-type ResetRobotSuccess = {|
-  type: 'api:SERVER_SUCCESS',
-  payload: {|
-    robot: RobotService,
-    path: string,
-  |}
-|}
+type ResetRobotResponse = {}
 
 type FetchResetOptionsCall = ApiCall<null, FetchResetOptionsResponse>
 
@@ -44,6 +38,7 @@ export const RESET_PATH: 'settings/reset' = 'settings/reset'
 
 export type ResetAction =
   | ApiAction<'settings/reset/options', null, FetchResetOptionsResponse>
+  | ApiAction<'settings/reset', ResetRobotRequest, ResetRobotResponse>
 
 export function fetchResetOptions (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {
@@ -74,17 +69,15 @@ export function resetRobotData (robot: RobotService, options: ResetRobotRequest)
 
     return client(robot, 'POST', RESET_PATH, request)
       .then(
-        (resp: ResetRobotSuccess) => apiSuccess(robot, RESET_PATH, resp),
+        (resp: ResetRobotResponse) => apiSuccess(robot, RESET_PATH, resp),
         (err: ApiRequestError) => apiFailure(robot, RESET_PATH, err)
       )
       .then(dispatch)
   }
 }
 
-export function clearResetResponse (robot: RobotService): ThunkPromiseAction {
-  return (dispatch) => {
-    return dispatch(clearApiResponse(robot, RESET_PATH))
-  }
+export function clearResetResponse (robot: RobotService): ResetAction {
+  return clearApiResponse(robot, RESET_PATH)
 }
 
 export function makeGetRobotResetRequest () {

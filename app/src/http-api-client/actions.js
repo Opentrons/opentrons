@@ -7,7 +7,7 @@
 import type {BaseRobot} from '../robot'
 import type {ApiRequestError} from './types'
 
-export type ApiRequestAction<Path: string, Body: ?{}> = {|
+export type ApiRequestAction<Path: string, Body> = {|
   type: 'api:REQUEST',
   payload: {|
     robot: BaseRobot,
@@ -16,7 +16,7 @@ export type ApiRequestAction<Path: string, Body: ?{}> = {|
   |},
 |}
 
-export type ApiSuccessAction<Path: string, Body: {}> = {|
+export type ApiSuccessAction<Path: string, Body> = {|
   type: 'api:SUCCESS',
   payload: {|
     robot: BaseRobot,
@@ -42,13 +42,13 @@ export type ClearApiResponseAction<Path: string> = {|
   |}
 |}
 
-export type ApiAction<Path: string, Request: ?{}, Response: {}> =
+export type ApiAction<Path: string, Request, Response> =
   | ApiRequestAction<Path, Request>
   | ApiSuccessAction<Path, Response>
   | ApiFailureAction<Path>
   | ClearApiResponseAction<Path>
 
-export function apiRequest<Path: string, Body: ?{}> (
+export function apiRequest<Path: string, Body> (
   robot: BaseRobot,
   path: Path,
   request: Body
@@ -56,7 +56,7 @@ export function apiRequest<Path: string, Body: ?{}> (
   return {type: 'api:REQUEST', payload: {robot, path, request}}
 }
 
-export function apiSuccess<Path: string, Body: {}> (
+export function apiSuccess<Path: string, Body> (
   robot: BaseRobot,
   path: Path,
   response: Body
