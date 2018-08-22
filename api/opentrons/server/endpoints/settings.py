@@ -12,22 +12,22 @@ _settings_reset_options = [
     {
         'id': 'deckCalibration',
         'name': 'Deck Calibration',
-        'description': 'Reset calibration of pipette to deck'
+        'description': 'Reset pipette-to-deck alignment calibration'
     },
     {
         'id': 'tipProbe',
-        'name': 'Tip Probe Calibration',
-        'description': 'Erase tip probe data'
+        'name': 'Tip Length',
+        'description': 'Clear tip probe data'
     },
     {
         'id': 'labwareCalibration',
         'name': 'Labware Calibration',
-        'description': 'Erase custom labware calibration'
+        'description': 'Clear labware calibration'
     },
     {
         'id': 'bootScripts',
         'name': 'Boot Scripts',
-        'description': 'Erase custom boot scripts'
+        'description': 'Clear custom boot scripts'
     }
 ]
 
