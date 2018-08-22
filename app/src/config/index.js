@@ -13,7 +13,6 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type Config = {
   devtools: boolean,
-  modules: boolean,
 
   // app update config
   update: {
@@ -104,10 +103,6 @@ export function configReducer (
 
 export function getConfig (state: State): Config {
   return state.config
-}
-
-export function getModulesOn (state: State): boolean {
-  return state.config.modules
 }
 
 export function toggleDevTools (): ThunkAction {

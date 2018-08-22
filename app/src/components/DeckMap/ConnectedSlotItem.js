@@ -12,7 +12,6 @@ import {
   type SessionModule
 } from '../../robot'
 
-import {getModulesOn} from '../../config'
 import type {LabwareComponentProps} from '@opentrons/components'
 import LabwareItem, {type LabwareItemProps} from './LabwareItem'
 import ModuleItem from './ModuleItem'
@@ -61,10 +60,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
   const labware = allLabware.find((lw) => lw.slot === slot)
   const highlighted = slot === selectedSlot
-  const modulesEnabled = getModulesOn(state)
-  const module = modulesEnabled
-    ? robotSelectors.getModulesBySlot(state)[slot]
-    : null
+  const module = robotSelectors.getModulesBySlot(state)[slot]
 
   const stateProps: SP = {}
 
