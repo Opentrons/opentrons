@@ -9,6 +9,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **api:** Fix /server/restart failing in api-server-lib ([#2104](https://github.com/Opentrons/opentrons/issues/2104)) ([5220b4f](https://github.com/Opentrons/opentrons/commit/5220b4f))
 * **api:** Use the resin supervisor restart endpoint to restart ([#2093](https://github.com/Opentrons/opentrons/issues/2093)) ([d47da3c](https://github.com/Opentrons/opentrons/commit/d47da3c)), closes [/docs.resin.io/reference/supervisor/supervisor-api/#post-v1](https://github.com//docs.resin.io/reference/supervisor/supervisor-api//issues/post-v1) [#2092](https://github.com/Opentrons/opentrons/issues/2092)
 
 
