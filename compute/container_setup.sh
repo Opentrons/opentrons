@@ -12,7 +12,7 @@ if [ "$previous_id" != "$current_id" ] ; then
     rm -rf /data/packages/usr/local/lib/python3.6/site-packages/opentrons*
     rm -rf /data/packages/usr/local/lib/python3.6/site-packages/ot2serverlib*
     rm -rf /data/packages/usr/local/lib/python3.6/site-packages/otupdate*
-    provision=`find_python_module_path.py opentrons`/resources/scripts/provision-api-resources
+    provision=`find_ot_resources.py`/scripts/provision-api-resources
     echo "[ $0 ] provisioning with $provision"
     python "$provision"
     echo "$current_id" > /data/id
