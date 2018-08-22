@@ -29,7 +29,7 @@ const CALL_ACK_TIMEOUT = 10000
 
 // ping pong
 const PING_INTERVAL_MS = 3000
-const MISSED_PING_THRESHOLD = 2
+const MISSED_PING_THRESHOLD = 10
 
 // metadata constants
 const REMOTE_TARGET_OBJECT = 0
