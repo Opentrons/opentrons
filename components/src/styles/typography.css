@@ -61,4 +61,11 @@
     font-weight: var(--fw-regular);
     color: var(--c-font-light);
   };
+
+  --font-card-title: {
+    @apply --font-header-dark;
+
+    margin: 0.5rem 1rem;
+    font-weight: var(--fw-regular);
+  };
 }

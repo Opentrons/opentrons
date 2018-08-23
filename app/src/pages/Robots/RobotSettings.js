@@ -23,6 +23,7 @@ import RobotSettings, {
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
+import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 type SP = {
   showUpdateModal: boolean,
@@ -75,6 +76,10 @@ function RobotSettingsPage (props: Props) {
 
         <Route path={`${path}/calibrate-deck`} render={(props) => (
           <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+        )} />
+
+        <Route path={`${path}/reset`} render={(props) => (
+          <ResetRobotModal robot={robot} />
         )} />
 
         <Route exact path={path} render={() => {

@@ -2,6 +2,7 @@
 // app info card with version and updated
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
@@ -61,11 +62,9 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 function AdvancedSettingsCard (props: Props) {
   const {name, settings, set, fetch, download, health} = props
   const logsAvailable = health && health.response && health.response.logs
+  const resetUrl = `/robots/${name}/reset`
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
-      {settings.map(s => (
-        <BooleanSettingToggle {...s} key={s.id} set={set} />
-      ))}
       <LabeledButton
         label='Download Logs'
         buttonProps={{
@@ -76,6 +75,19 @@ function AdvancedSettingsCard (props: Props) {
       >
         <p>Access logs from this robot.</p>
       </LabeledButton>
+      <LabeledButton
+        label='Factory Reset'
+        buttonProps={{
+          Component: Link,
+          to: resetUrl,
+          children: 'Reset'
+        }}
+      >
+        <p>Restore robot to factory configuration</p>
+      </LabeledButton>
+      {settings.map(s => (
+        <BooleanSettingToggle {...s} key={s.id} set={set} />
+      ))}
     </RefreshCard>
   )
 }
@@ -88,6 +100,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const settingsRequest = getRobotSettings(state, ownProps)
     const settings = settingsRequest && settingsRequest.response && settingsRequest.response.settings
     const health = getRobotHealth(state, ownProps)
+
     return {
       health,
       settings: settings || []
