@@ -78,7 +78,7 @@ function AdvancedSettingsCard (props: Props) {
       <LabeledButton
         label='Factory Reset'
         buttonProps={{
-          component: Link,
+          Component: Link,
           to: resetUrl,
           children: 'Reset'
         }}
