@@ -142,7 +142,7 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
   (_steps, _savedStepForms, _orderedSteps, _labware) => {
     return reduce(_orderedSteps, (acc, stepId) => {
       const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
-        ? stepFormToArgs(_savedStepForms[stepId])
+        ? stepFormToArgs(_savedStepForms[stepId], {labware: _labware})
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
         : {
           errors: {'form': ['no saved form for step ' + stepId]},
@@ -322,9 +322,10 @@ export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   formData,
   getSelectedStepId,
   allSteps,
-  (formData, selectedStepId, allSteps) =>
+  labwareIngredSelectors.getLabware,
+  (formData, selectedStepId, allSteps, labware) =>
     ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
-      ? Object.values(stepFormToArgs(formData).errors).length === 0
+      ? Object.values(stepFormToArgs(formData, {labware}).errors).length === 0
       : null
 )
 
