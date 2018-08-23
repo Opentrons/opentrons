@@ -139,7 +139,7 @@ def labware_test_data():
 
 
 # Builds a temp db to allow mutations during testing
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def dummy_db(tmpdir):
     temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
     shutil.copy2(MAIN_TESTER_DB, temp_db_path)

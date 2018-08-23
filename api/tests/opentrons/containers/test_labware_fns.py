@@ -18,7 +18,6 @@ def test_labware_create(dummy_db):
 
     row_a_center = ((n_rows - 1) * y_dist) + radius
     col_1_center = radius
-
     row_d_center = radius
     col_6_center = ((n_cols - 1) * x_dist) + radius
 
