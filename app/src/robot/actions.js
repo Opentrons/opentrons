@@ -146,13 +146,6 @@ export type RefreshSessionAction = {|
   |},
 |}
 
-export type ClearSessionAction = {|
-  type: 'robot:CLEAR_SESSION',
-  meta: {|
-    robotCommand: true
-  |},
-|}
-
 export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
@@ -212,7 +205,6 @@ export type Action =
   | SessionUpdateAction
   | RefreshSessionAction
   | SetModulesReviewedAction
-  | ClearSessionAction
 
 export const actions = {
   connect (name: string): ConnectAction {
@@ -272,10 +264,6 @@ export const actions = {
       type: 'robot:SESSION_UPDATE',
       payload: update
     }
-  },
-
-  clearSession () {
-    return tagForRobotApi({type: 'robot:CLEAR_SESSION'})
   },
 
   setModulesReviewed (payload: boolean) {

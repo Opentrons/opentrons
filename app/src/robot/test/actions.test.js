@@ -87,15 +87,6 @@ describe('robot actions', () => {
     expect(actions.sessionUpdate(update)).toEqual(expected)
   })
 
-  test('CLEAR_SESSION action', () => {
-    const expected = {
-      type: 'robot:CLEAR_SESSION',
-      meta: {robotCommand: true}
-    }
-
-    expect(actions.clearSession()).toEqual(expected)
-  })
-
   test('set modules reviewed action', () => {
     expect(actions.setModulesReviewed(false)).toEqual({
       type: 'robot:SET_MODULES_REVIEWED',
