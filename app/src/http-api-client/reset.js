@@ -55,15 +55,6 @@ export function fetchResetOptions (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function makeGetRobotResetOptions () {
-  const selector: Selector<State, BaseRobot, FetchResetOptionsCall> = createSelector(
-    getRobotApiState,
-    (state) => state[OPTIONS_PATH] || {inProgress: false}
-  )
-
-  return selector
-}
-
 export function resetRobotData (robot: RobotService, options: ResetRobotRequest): ThunkPromiseAction {
   const request: ResetRobotRequest = options
   return (dispatch) => {
@@ -76,6 +67,15 @@ export function resetRobotData (robot: RobotService, options: ResetRobotRequest)
       )
       .then(dispatch)
   }
+}
+
+export function makeGetRobotResetOptions () {
+  const selector: Selector<State, BaseRobot, FetchResetOptionsCall> = createSelector(
+    getRobotApiState,
+    (state) => state[OPTIONS_PATH] || {inProgress: false}
+  )
+
+  return selector
 }
 
 export function makeGetRobotResetRequest () {
