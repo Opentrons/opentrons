@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 import UploadInput from './UploadInput'
+import ConfirmUploadModal from './ConfirmUploadModal'
 
 type Props = {
   sessionLoaded: ?boolean,
   createSession: (file: File) => mixed,
-  confirmUpload: () => mixed,
 }
 
 type State = {
@@ -15,9 +15,7 @@ type State = {
 export default class Upload extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = {
-      uploadedFile: null
-    }
+    this.state = { uploadedFile: null }
   }
 
   onUpload = (
@@ -31,8 +29,7 @@ export default class Upload extends React.Component<Props, State> {
     }
 
     if (this.props.sessionLoaded) {
-      this.setState({uploadedFile: files[0]})
-      this.props.confirmUpload()
+      this.setState({ uploadedFile: files[0] })
     } else {
       this.props.createSession(files[0])
     }
@@ -41,20 +38,32 @@ export default class Upload extends React.Component<Props, State> {
     event.target.value = null
   }
 
-  // TODO (ka 2018-7-30): refactor to consider edge case where robot disconnects while on upload page
-  componentDidUpdate () {
-    const {uploadedFile} = this.state
-    if (uploadedFile && !this.props.sessionLoaded) {
+  confirmUpload = () => {
+    const { uploadedFile } = this.state
+
+    if (uploadedFile) {
       this.props.createSession(uploadedFile)
-      this.setState({uploadedFile: null})
+      this.forgetUpload()
     }
   }
 
+  forgetUpload = () => {
+    this.setState({ uploadedFile: null })
+  }
+
   render () {
+    const { uploadedFile } = this.state
+
     return (
       <React.Fragment>
         <UploadInput onUpload={this.onUpload} isButton />
         <UploadInput onUpload={this.onUpload} />
+        {uploadedFile && (
+          <ConfirmUploadModal
+            confirm={this.confirmUpload}
+            cancel={this.forgetUpload}
+          />
+        )}
       </React.Fragment>
     )
   }
