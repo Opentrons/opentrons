@@ -67,7 +67,7 @@ api-local-container:
 	docker build . \
 		--no-cache \
 		--build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 \
-		--build-arg running_on_pi=0 \
+		--build-arg running_on_pi="" \
 		--build-arg data_mkdir_path_slash_if_none=/data/system
 
 .PHONY: term
