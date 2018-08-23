@@ -15,8 +15,7 @@ import {actionTypes} from '../actions'
 import type {
   Action,
   DisconnectResponseAction,
-  SessionUpdateAction,
-  ClearSessionAction
+  SessionUpdateAction
 } from '../actions'
 
 type Request = {
@@ -102,9 +101,6 @@ export default function sessionReducer (
     case 'robot:SESSION_UPDATE':
       return handleSessionUpdate(state, action)
 
-    case 'robot:CLEAR_SESSION':
-      return handleClearSession(state, action)
-
     case SESSION:
     case 'robot:REFRESH_SESSION':
       return handleSession(state, action)
@@ -127,13 +123,6 @@ export default function sessionReducer (
 function handleDisconnectResponse (
   state: State,
   action: DisconnectResponseAction
-): State {
-  return INITIAL_STATE
-}
-
-function handleClearSession (
-  state: State,
-  action: ClearSessionAction
 ): State {
   return INITIAL_STATE
 }
