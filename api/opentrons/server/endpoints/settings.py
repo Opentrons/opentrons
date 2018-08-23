@@ -100,4 +100,4 @@ async def reset(request: web.Request) -> web.Response:
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    return web.json_response(_settings_reset_options, status=200)
+    return web.json_response({'options': _settings_reset_options}, status=200)

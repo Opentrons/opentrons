@@ -19,7 +19,9 @@ export type ResetOption = {
   description: string,
 }
 
-type FetchResetOptionsResponse = Array<ResetOption>
+type FetchResetOptionsResponse = {
+  options: Array<ResetOption>
+}
 
 export type ResetRobotRequest = {
   [OptionId]: boolean,
@@ -46,7 +48,7 @@ export function fetchResetOptions (robot: RobotService): ThunkPromiseAction {
 
     return client(robot, 'GET', OPTIONS_PATH)
       .then(
-        (resp) => apiSuccess(robot, OPTIONS_PATH, resp),
+        (resp: FetchResetOptionsResponse) => apiSuccess(robot, OPTIONS_PATH, resp),
         (err: ApiRequestError) => apiFailure(robot, OPTIONS_PATH, err)
       )
       .then(dispatch)
@@ -76,14 +78,14 @@ export function resetRobotData (robot: RobotService, options: ResetRobotRequest)
   }
 }
 
-export function clearResetResponse (robot: RobotService): ResetAction {
-  return clearApiResponse(robot, RESET_PATH)
-}
-
 export function makeGetRobotResetRequest () {
   const selector: Selector<State, BaseRobot, ResetRobotRequest> = createSelector(
     getRobotApiState,
     (state) => state[RESET_PATH] || {inProgress: false}
   )
   return selector
+}
+
+export function clearResetResponse (robot: RobotService): ResetAction {
+  return clearApiResponse(robot, RESET_PATH)
 }

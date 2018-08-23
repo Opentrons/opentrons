@@ -33,13 +33,6 @@ type SP = {
 
 type DP = {dispatch: Dispatch}
 
-type OptionsState = {
-  deckCalibration: boolean,
-  labwareCalibration: boolean,
-  tipProbe: boolean,
-  bootScripts: boolean,
-}
-
 type Props = SP & {
   fetchOptions: () => mixed,
   closeModal: () => mixed,
@@ -49,16 +42,11 @@ type Props = SP & {
 
 const TITLE = 'Robot Factory Reset'
 
-class ResetRobotModal extends React.Component<Props, OptionsState> {
+class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
   constructor (props: Props) {
     super(props)
 
-    this.state = {
-      deckCalibration: false,
-      labwareCalibration: false,
-      tipProbe: false,
-      bootScripts: false
-    }
+    this.state = {}
   }
 
   toggle = (name) => {
@@ -133,8 +121,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   return (state, ownProps) => {
     const {robot} = ownProps
     const optionsRequest = getResetOptions(state, robot)
+    const optionsResponse = optionsRequest.response
+    console.log('OPTIONS', {optionsResponse})
     return {
-      options: optionsRequest && optionsRequest.response,
+      options: optionsResponse && optionsResponse.options,
       resetRequest: getResetRequest(state, robot),
       restartRequest: getRobotRestartRequest(state, robot)
     }
@@ -154,13 +144,17 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ))
     : close
 
+  let fetchOptions = restartRequest
+    ? () => dispatch(chainActions(
+      clearRestartResponse(robot),
+      fetchResetOptions(robot)
+    ))
+    : () => dispatch(fetchResetOptions(robot))
+
   return {
     ...stateProps,
     closeModal,
-    fetchOptions: () => dispatch(chainActions(
-      clearRestartResponse(robot),
-      fetchResetOptions(robot))
-    ),
+    fetchOptions,
     reset: (options) => dispatch(resetRobotData(robot, options)),
     restart: () => dispatch(chainActions(
       restartRobotServer(robot),
