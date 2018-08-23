@@ -59,10 +59,19 @@ export type ServerFailureAction = {|
   |}
 |}
 
+export type ClearServerAction = {|
+  type: 'api:CLEAR_SERVER_RESPONSE',
+  payload: {|
+    robot: RobotService,
+    path: RequestPath,
+  |}
+|}
+
 export type ServerAction =
   | ServerRequestAction
   | ServerSuccessAction
   | ServerFailureAction
+  | ClearServerAction
 
 export type RobotServerUpdate = ApiCall<void, ServerUpdateResponse>
 export type RobotServerRestart = ApiCall<void, ServerRestartResponse>
@@ -114,6 +123,10 @@ export function restartRobotServer (
           dispatch(serverFailure(robot, RESTART, error))
       )
   }
+}
+
+export function clearRestartResponse (robot: RobotService): * {
+  return clearServerResponse(robot, RESTART)
 }
 
 export function fetchHealthAndIgnored (robot: RobotService): * {
@@ -196,6 +209,20 @@ export function serverReducer (
           ...state[name],
           [path]: {
             error: action.payload.error,
+            inProgress: false,
+            response: null
+          }
+        }
+      }
+
+    case 'api:CLEAR_SERVER_RESPONSE':
+      ({path, robot: {name}} = action.payload)
+      return {
+        ...state,
+        [name]: {
+          ...state[name],
+          [path]: {
+            error: null,
             inProgress: false,
             response: null
           }
@@ -311,4 +338,11 @@ function serverFailure (
   error: ApiRequestError
 ): ServerFailureAction {
   return {type: 'api:SERVER_FAILURE', payload: {robot, path, error}}
+}
+
+function clearServerResponse (
+  robot: RobotService,
+  path: RequestPath
+): ClearServerAction {
+  return {type: 'api:CLEAR_SERVER_RESPONSE', payload: {robot, path}}
 }

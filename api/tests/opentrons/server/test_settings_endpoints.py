@@ -50,10 +50,11 @@ async def test_available_resets(virtual_smoothie_env, loop, test_client):
 
     resp = await cli.get('/settings/reset/options')
     body = await resp.json()
+    options_list = body.get('options')
     assert resp.status == 200
     for key in ['deckCalibration', 'tipProbe',
                 'labwareCalibration', 'bootScripts']:
-        for opt in body:
+        for opt in options_list:
             if opt['id'] == key:
                 assert 'name' in opt
                 assert 'description' in opt

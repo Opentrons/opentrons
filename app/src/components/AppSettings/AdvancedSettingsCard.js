@@ -37,7 +37,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(AdvancedSettingsCard
 
 function AdvancedSettingsCard (props: Props) {
   return (
-    <Card title={TITLE} column>
+    <Card title={TITLE}>
       <LabeledSelect
         label='Update Channel'
         value={props.channel}
