@@ -3,6 +3,7 @@ from copy import deepcopy
 from opentrons import robot, modules
 from opentrons.server.main import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+from opentrons import instruments
 from opentrons.instruments import pipette_config
 
 
@@ -234,6 +235,51 @@ async def test_home_pipette(virtual_smoothie_env, loop, test_client):
 
     res2 = await cli.post('/robot/home', json=test_data)
     assert res2.status == 200
+
+
+async def test_instrument_reuse(virtual_smoothie_env, loop, test_client,
+                                monkeypatch):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    robot.reset()
+
+    # With no pipette connected before homing pipettes, we should a) not crash
+    # and b) not have any instruments connected afterwards
+
+    test_data = {
+        'target': 'pipette',
+        'mount': 'left'
+    }
+
+    res = await cli.post('/robot/home', json=test_data)
+    assert res.status == 200
+
+    res = await cli.get('/pipettes')
+    data = await res.json()
+    assert data['left']['model'] is None
+
+    # If we do have a pipette connected, if we home we should still have it
+    # connected afterwards
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    instruments.P300_Multi('left')
+
+    res = await cli.get('/pipettes', params=[('refresh', 'true')])
+    data = await res.json()
+
+    assert data['left']['model'] == test_model
+
+    res = await cli.post('/robot/home', json=test_data)
+    assert res.status == 200
+
+    res = await cli.get('/pipettes')
+    data = await res.json()
+    assert data['left']['model'] == test_model
 
 
 async def test_home_robot(virtual_smoothie_env, loop, test_client):
