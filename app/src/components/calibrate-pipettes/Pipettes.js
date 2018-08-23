@@ -14,7 +14,8 @@ import styles from './styles.css'
 type Props = {
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
-  actualPipettes: ?PipettesResponse
+  actualPipettes: ?PipettesResponse,
+  changePipetteUrl: string
 }
 
 const {PIPETTE_MOUNTS} = robotConstants
@@ -22,7 +23,7 @@ const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
 export default function Pipettes (props: Props) {
-  const {currentPipette, pipettes, actualPipettes} = props
+  const {currentPipette, pipettes, actualPipettes, changePipetteUrl} = props
   const currentMount = currentPipette && currentPipette.mount
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
@@ -65,7 +66,7 @@ export default function Pipettes (props: Props) {
         />
         <p className={styles.wrong_pipette_message}>
           {'Go to the '}
-          <Link to='/robots'>
+          <Link to={changePipetteUrl}>
             robot settings
           </Link>
           {` panel to ${alertType} pipette.`}
