@@ -97,17 +97,17 @@ COPY ./compute/find_ot_resources.py /usr/local/bin
 RUN ln -sf /data/system/ot-environ.sh /etc/profile.d/00-persistent-ot-environ.sh &&\
     ln -sf `find_ot_resources.py`/ot-environ.sh /etc/profile.d/01-builtin-ot-environ.sh
 
-# Note: the quoting that defines the PATH echo is very specifically set up to
-# get $PATH in the script literally so it is evaluated at container runtime.
-RUN echo "export CONTAINER_ID=$(uuidgen)" | tee -a /etc/profile.d/opentrons.sh\
-    && echo 'export PATH=$PATH:'"`find_ot_resources.py`/scripts" | tee -a /etc/profile.d/opentrons.sh
-
-
 # This configuration is used both by both the build and runtime so it has to
 # be here. When building a container for local use, set this to 0. If set to
 # 0, ENABLE_VIRTUAL_SMOOTHIE will be set at runtime automatically
-ARG running_on_pi=1
-ENV RUNNING_ON_PI=$running_on_pi
+ARG running_on_pi='export RUNNING_ON_PI=1'
+
+# Note: the quoting that defines the PATH echo is very specifically set up to
+# get $PATH in the script literally so it is evaluated at container runtime.
+RUN echo "export CONTAINER_ID=$(uuidgen)" | tee -a /etc/profile.d/opentrons.sh\
+    && echo 'export PATH=$PATH:'"`find_ot_resources.py`/scripts" | tee -a /etc/profile.d/opentrons.sh\
+    && echo $running_on_pi | tee -a /etc/profile.d/opentrons.sh
+
 
 ARG data_mkdir_path_slash_if_none=/
 RUN mkdir -p $data_mkdir_path_slash_if_none
