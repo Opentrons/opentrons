@@ -22,15 +22,29 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
+        self._session_lock = False
         for module in robot.modules:
             module.disconnect()
         robot.modules = modules.discover_and_connect()
 
     def create(self, name, text):
-        self.session = Session(name=name, text=text)
+        if self._session_lock:
+            raise Exception(
+                'Cannot create session while simulation in progress')
+
+        self._session_lock = True
+        try:
+            self.session = Session(name=name, text=text)
+        finally:
+            self._session_lock = False
+
         return self.session
 
     def clear(self):
+        if self._session_lock:
+            raise Exception(
+                'Cannot clear session while simulation in progress')
+
         if self.session:
             robot.reset()
         self.session = None
