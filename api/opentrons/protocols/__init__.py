@@ -56,8 +56,16 @@ def load_labware(protocol_data):
 
 def get_location(command_params, loaded_labware):
     labwareId = command_params.get('labware')
+    if not labwareId:
+        # not all commands use labware param
+        return None
     well = command_params.get('well')
-    return loaded_labware.get(labwareId, {}).get(well)
+    labware = loaded_labware.get(labwareId)
+    if not labware:
+        raise ValueError(
+            'Command tried to use labware "{}", but that ID does not exist ' +
+            'in protocol\'s "labware" section'.format(labwareId))
+    return labware.wells(well)
 
 
 def get_pipette(command_params, loaded_pipettes):
@@ -82,7 +90,7 @@ def set_flow_rate(
     flow_rate_param = params.get('flow-rate')
 
     if flow_rate_param is not None:
-        if command_type == 'aspirate' and flow_rate_param:
+        if command_type == 'aspirate':
             pipette.set_flow_rate(
                 aspirate=flow_rate_param,
                 dispense=default_dispense)

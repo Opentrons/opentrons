@@ -1,6 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
+import {getPropertyAllPipettes} from '@opentrons/shared-data'
 import {fileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
@@ -9,11 +10,15 @@ import {selectors as steplistSelectors} from '../../steplist'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
-import executionDefaults from '../../executionDefaults'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
 const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
+
+const executionDefaults = {
+  'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
+  'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate')
+}
 
 export const createFile: BaseState => ProtocolFile = createSelector(
   fileMetadata,

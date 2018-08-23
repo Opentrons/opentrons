@@ -13,7 +13,16 @@
         "p300_single_v1",
         "p300_multi_v1",
         "p1000_single_v1",
-        "p1000_multi_v1"
+        "p1000_multi_v1",
+
+        "p10_single_v1.3",
+        "p10_multi_v1.3",
+        "p50_single_v1.3",
+        "p50_multi_v1.3",
+        "p300_single_v1.3",
+        "p300_multi_v1.3",
+        "p1000_single_v1.3",
+        "p1000_multi_v1.3"
       ]
     },
 
