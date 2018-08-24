@@ -11,7 +11,7 @@ import modalStyles from '../../modals/modal.css'
 import styles from './FlowRateField.css'
 
 type Props = {
-  /** When flow rate == null, it means 'use default' */
+  /** When flow rate is falsey (including 0), it means 'use default' */
   flowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   defaultFlowRate: ?number,
@@ -33,7 +33,7 @@ export default class FlowRateField extends React.Component<Props, State> {
     this.state = {
       showModal: false,
       modalFlowRate: props.flowRate,
-      modalUseDefault: props.flowRate == null
+      modalUseDefault: Boolean(props.flowRate)
     }
   }
 
@@ -88,11 +88,21 @@ export default class FlowRateField extends React.Component<Props, State> {
       pipetteModelDisplayName
     } = this.props
 
+    const rangeDescription = `between ${minFlowRate || '?'} and ${maxFlowRate || '?'}`
+    const outOfBounds = (minFlowRate && maxFlowRate && modalFlowRate)
+      ? (
+        minFlowRate > modalFlowRate ||
+        modalFlowRate > maxFlowRate
+      )
+      : false
+
     const FlowRateInput = (
       <InputField
+        numeric
         value={`${modalFlowRate || ''}`}
         units='μL/s'
-        caption={`between ${minFlowRate || '?'} and ${maxFlowRate || '?'}`}
+        caption={rangeDescription}
+        error={outOfBounds ? rangeDescription : null}
         onChange={this.handleChangeNumber}
       />
     )
@@ -119,7 +129,10 @@ export default class FlowRateField extends React.Component<Props, State> {
 
           <RadioGroup
             inline
-            value={modalUseDefault ? 'default' : 'custom'}
+            value={(modalUseDefault || !modalFlowRate)
+              ? 'default'
+              : 'custom'
+            }
             onChange={this.handleChangeRadio}
             options={[
               {name: `${defaultFlowRate || '?'} μL/s (default)`, value: 'default'},
@@ -136,7 +149,7 @@ export default class FlowRateField extends React.Component<Props, State> {
           <InputField
             readOnly
             onClick={this.openModal}
-            value={flowRate != null ? `${flowRate} μL/s` : 'Default'}
+            value={(flowRate) ? `${flowRate} μL/s` : 'Default'}
           />
         </FormGroup>
 
