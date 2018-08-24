@@ -10,10 +10,10 @@ import {
   PipetteField,
   LabwareDropdown,
   ChangeTipField,
-  FlowRateField,
   TipPositionField
 } from './formFields'
 
+import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
 import WellOrderInput from './WellOrderInput'
 import type {StepType} from '../../form-types'
@@ -121,7 +121,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           </div>
           <div className={styles.right_settings_column}>
             {stepType !== 'consolidate' && <WellOrderInput prefix="dispense" />}
-            <FlowRateField />
+            <FlowRateField
+              name='dispense_flowRate'
+              pipetteFieldName='pipette'
+            />
           </div>
         </div>
       </FormSection>

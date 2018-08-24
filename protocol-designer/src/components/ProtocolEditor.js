@@ -38,7 +38,8 @@ export default function ProtocolEditor () {
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />
             <FileUploadErrorModal />
-            {/* TODO: Ian 2018-06-28 All main page modals will go here */}
+            {/* TODO: Ian 2018-06-28 All main page modals will go here,
+              if they can be managed by parent component state */}
             <MainPageModalPortalRoot />
 
             <StepEditForm />
