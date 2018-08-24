@@ -62,9 +62,11 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
+          {/* TODO: Ian 2018-08-24 should there also be a dispense flow rate for Mix? */}
           <FlowRateField
             name="flowRate"
             pipetteFieldName="pipette"
+            flowRateType='aspirate'
           />
           <TipPositionField />
         </div>

@@ -70,6 +70,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           </div>
           <div className={styles.middle_settings_column}>
             <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
+            <FlowRateField
+              name='aspirate_flowRate'
+              pipetteFieldName='pipette'
+              flowRateType='aspirate'
+            />
             <TipPositionField />
           </div>
           <div className={styles.right_settings_column}>
@@ -124,6 +129,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FlowRateField
               name='dispense_flowRate'
               pipetteFieldName='pipette'
+              flowRateType='dispense'
             />
           </div>
         </div>

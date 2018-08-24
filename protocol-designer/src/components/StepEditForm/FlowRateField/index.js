@@ -15,7 +15,8 @@ type Props = React.ElementProps<typeof FlowRateField>
 
 type OP = {
   name: StepFieldName,
-  pipetteFieldName: StepFieldName
+  pipetteFieldName: StepFieldName,
+  flowRateType: $PropertyType<Props, 'flowRateType'>
 }
 
 type DP = {
@@ -25,19 +26,34 @@ type DP = {
 type SP = $Diff<Props, DP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
+  const {flowRateType, pipetteFieldName, name} = ownProps
+
   const formData = steplistSelectors.getUnsavedForm(state)
 
-  const pipetteId = formData && formData[ownProps.pipetteFieldName]
+  const pipetteId = formData ? formData[pipetteFieldName] : null
   const pipette = pipetteId && pipetteSelectors.pipettesById(state)[pipetteId]
   const pipetteConfig = pipette && getPipette(pipette.model)
   const pipetteModelDisplayName = pipetteConfig ? pipetteConfig.displayName : 'pipette'
 
+  let defaultFlowRate = null
+  if (pipetteConfig) {
+    if (flowRateType === 'aspirate') {
+      defaultFlowRate = pipetteConfig.aspirateFlowRate
+    } else if (flowRateType === 'dispense') {
+      defaultFlowRate = pipetteConfig.dispenseFlowRate
+    }
+  } else {
+    console.warn('FlowRateField mapStateToProps expected pipetteConfig', ownProps)
+  }
+
   return {
-    flowRate: formData && formData[ownProps.name],
-    flowRateType: 'aspirate', // TODO IMMEDIATELY
-    defaultFlowRate: 222, // TODO IMMEDIATELY
-    minFlowRate: 123, // TODO IMMEDIATELY
-    maxFlowRate: 1234, // TODO IMMEDIATELY
+    flowRate: formData && formData[name],
+    flowRateType,
+    defaultFlowRate,
+    // HACK since we only have rule-of-thumb
+    minFlowRate: (defaultFlowRate != null) ? defaultFlowRate / 10 : null,
+    // HACK since we only have rule-of-thumb
+    maxFlowRate: (defaultFlowRate != null) ? defaultFlowRate * 10 : null,
     pipetteModelDisplayName
   }
 }

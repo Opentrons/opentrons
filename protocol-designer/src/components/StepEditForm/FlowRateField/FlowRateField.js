@@ -14,9 +14,9 @@ type Props = {
   /** When flow rate == null, it means 'use default' */
   flowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
-  defaultFlowRate: number,
-  minFlowRate: number,
-  maxFlowRate: number,
+  defaultFlowRate: ?number,
+  minFlowRate: ?number,
+  maxFlowRate: ?number,
   updateValue: (flowRate: ?number) => mixed,
   pipetteModelDisplayName: string
 }
@@ -92,7 +92,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       <InputField
         value={`${modalFlowRate || ''}`}
         units='μL/s'
-        caption={`between ${minFlowRate} and ${maxFlowRate}`}
+        caption={`between ${minFlowRate || '?'} and ${maxFlowRate || '?'}`}
         onChange={this.handleChangeNumber}
       />
     )
@@ -122,7 +122,7 @@ export default class FlowRateField extends React.Component<Props, State> {
             value={modalUseDefault ? 'default' : 'custom'}
             onChange={this.handleChangeRadio}
             options={[
-              {name: `${defaultFlowRate} μL/s (default)`, value: 'default'},
+              {name: `${defaultFlowRate || '?'} μL/s (default)`, value: 'default'},
               {name: 'Custom', value: 'custom', 'children': FlowRateInput}
             ]}
           />
