@@ -1544,6 +1544,31 @@ class Pipette:
 
         return volume / self.max_volume
 
+    def _multichannel_transfer(self, s, d):
+        # Helper function for multi-channel use-case
+        # There is also a separate use-case for troughs in which the WellSeries
+        # is only 1 Dimensional but could be formatted as
+        # <WellSeries: <A1>,<A2>
+        # or as <WellSeries: <WellSeries <A1>, <A2> ...
+        if isinstance(s, WellSeries) and not isinstance(s[0], WellSeries):
+            if 'trough' in repr(s[0]):
+                s = s.get_children_list()
+            else:
+                s = [s]
+        if isinstance(s, WellSeries)\
+                and isinstance(s[0], WellSeries) and 'trough' in repr(s[0][0]):
+            s = [well for series in s for well in series]
+        if isinstance(d, WellSeries) and not isinstance(d[0], WellSeries):
+            if 'trough' in repr(d[0]):
+                d = d.get_children_list()
+            else:
+                d = [d]
+        if isinstance(d, WellSeries)\
+                and isinstance(d[0], WellSeries) and 'trough' in repr(d[0][0]):
+            d = [well for series in d for well in series]
+
+        return s, d
+
     def _create_transfer_plan(self, v, s, t, **kwargs):
         # SPECIAL CASE: if using multi-channel pipette,
         # and the source or target is a WellSeries
@@ -1551,10 +1576,7 @@ class Pipette:
         # Else, single channel pipettes will flatten a multi-dimensional
         # WellSeries into a 1 dimensional list of wells
         if self.channels > 1:
-            if isinstance(s, WellSeries) and not isinstance(s[0], WellSeries):
-                s = [s]
-            if isinstance(t, WellSeries) and not isinstance(t[0], WellSeries):
-                t = [t]
+            s, t = self._multichannel_transfer(s, t)
         else:
             if isinstance(s, WellSeries) and isinstance(s[0], WellSeries):
                 s = [well for series in s for well in series]
