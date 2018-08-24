@@ -3,6 +3,7 @@ import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
+import type { WellOrderOption } from '../components/StepEditForm/WellOrderInput/WellOrderModal';
 
 /** Merge 2 adjacent elements of an array when predicate fn is true */
 export function mergeWhen<T> (

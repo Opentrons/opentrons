@@ -1,62 +1,16 @@
 // @flow
 
 import { getLabware } from '@opentrons/shared-data'
-import zipWith from 'lodash/zipWith'
-import uniq from 'lodash/uniq'
-import compact from 'lodash/compact'
-import flatten from 'lodash/flatten'
 import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
 import type { MixFormData } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
-import type { WellOrderOption } from '../../../components/StepEditForm/WellOrderInput/WellOrderModal';
 import type { StepFormContext } from './types'
+import orderWells from './utils'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
   validatedForm: F | null
-}
-
-// TODO: grab the real one from WellOrder central location
-
-const templateColsToRows = (template) => (
-  zipWith(...template, (...col) => (compact(uniq(col))))
-)
-
-const orderWells = (
-  wells: Array<string>,
-  template: Array<Array<string>>,
-  first: WellOrderOption,
-  second: WellOrderOption
-) => {
-  let orderedWells = []
-  if (first === 't2b') {
-    if (second === 'l2r') {
-      orderedWells = template
-    } else if (second === 'r2l') {
-      orderedWells = template.slice().reverse()
-    }
-  } else if (first === 'b2t') {
-    if (second === 'l2r') {
-      orderedWells = template.map(col => col.slice().reverse())
-    } else if (second === 'r2l') {
-      orderedWells = template.slice().reverse().map(col => col.slice().reverse())
-    }
-  } else if (first === 'l2r') {
-    if (second === 't2b') {
-      orderedWells = templateColsToRows(template)
-    } else if (second === 'b2t') {
-      orderedWells = templateColsToRows(template).slice().reverse()
-    }
-  } else if (first === 'r2l') {
-    if (second === 't2b') {
-      orderedWells = templateColsToRows(template).map(col => col.slice().reverse())
-    } else if (second === 'b2t') {
-      orderedWells = templateColsToRows(template).slice().reverse().map(col => col.slice().reverse())
-    }
-  }
-  console.table({ow: flatten(orderedWells), wells, i: intersection(flatten(orderedWells), wells)})
-  return intersection(flatten(orderedWells), wells)
 }
 
 const mixFormToArgs = (formData: FormData, context: StepFormContext): ValidationAndErrors<MixFormData> => {
@@ -73,16 +27,15 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
   const {labware, pipette} = formData
   const touchTip = !!formData['touchTip']
 
-  const wells = formData.wells || []
+  let wells = formData.wells || []
   const orderFirst = formData.aspirate_wellOrder_first
   const orderSecond = formData.aspirate_wellOrder_second
   if (context && context.labware && labware) {
     const labwareById = context.labware
     const labwareType = labwareById[labware].type
     const labwareDef = getLabware(labwareType)
-    const template = labwareDef.ordering
-    const orderedWells = orderWells(wells, template, orderFirst, orderSecond)
-    console.log(orderedWells)
+    const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
+    wells = intersection(allWellsOrdered, wells)
   }
 
   const volume = Number(formData.volume) || 0
