@@ -34,12 +34,10 @@ const FormSection = (props: FormSectionProps) => {
       </div>
 
       {props.collapsed !== undefined && // if doesn't exist in redux
-        <div onClick={props.onCollapseToggle}>
+        <div onClick={props.onCollapseToggle} className={styles.carat}>
           <IconButton
-            width='30px'
             name='settings'
             hover={!props.collapsed}
-            className={styles.carat}
           />
         </div>
       }
