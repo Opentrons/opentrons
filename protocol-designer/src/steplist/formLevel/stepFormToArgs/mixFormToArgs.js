@@ -2,7 +2,6 @@
 
 import { getLabware } from '@opentrons/shared-data'
 import zipWith from 'lodash/zipWith'
-import reverse from 'lodash/reverse'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
@@ -19,7 +18,6 @@ type ValidationAndErrors<F> = {
 }
 
 // TODO: grab the real one from WellOrder central location
-const VERTICAL_OPTIONS = ['t2b', 'b2t']
 
 const templateColsToRows = (template) => (
   zipWith(...template, (...col) => (compact(uniq(col))))
@@ -32,22 +30,29 @@ const orderWells = (
   second: WellOrderOption
 ) => {
   let orderedWells = []
-  if (VERTICAL_OPTIONS.includes(first)) {
-    if (second === 'r2l') {
-      orderedWells = reverse(template)
-      if (first === 'b2t') orderedWells.map(col => reverse(col))
-    } else {
+  if (first === 't2b') {
+    if (second === 'l2r') {
       orderedWells = template
-      if (first === 'b2t') orderedWells = template.map(col => reverse(col))
+    } else if (second === 'r2l') {
+      orderedWells = template.slice().reverse()
     }
-  } else {
-    const templateRows = templateColsToRows(template)
-    if (second === 'b2t') {
-      orderedWells = reverse(template)
-      if (first === 'r2l') orderedWells.map(col => reverse(col))
-    } else {
-      orderedWells = templateRows
-      if (first === 'r2l') orderedWells = template.map(col => reverse(col))
+  } else if (first === 'b2t') {
+    if (second === 'l2r') {
+      orderedWells = template.map(col => col.slice().reverse())
+    } else if (second === 'r2l') {
+      orderedWells = template.slice().reverse().map(col => col.slice().reverse())
+    }
+  } else if (first === 'l2r') {
+    if (second === 't2b') {
+      orderedWells = templateColsToRows(template)
+    } else if (second === 'b2t') {
+      orderedWells = templateColsToRows(template).slice().reverse()
+    }
+  } else if (first === 'r2l') {
+    if (second === 't2b') {
+      orderedWells = templateColsToRows(template).map(col => col.slice().reverse())
+    } else if (second === 'b2t') {
+      orderedWells = templateColsToRows(template).slice().reverse().map(col => col.slice().reverse())
     }
   }
   console.table({ow: flatten(orderedWells), wells, i: intersection(flatten(orderedWells), wells)})
