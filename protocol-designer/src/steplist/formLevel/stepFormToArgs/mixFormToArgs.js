@@ -1,6 +1,12 @@
 // @flow
 
 import { getLabware } from '@opentrons/shared-data'
+import zipWith from 'lodash/zipWith'
+import reverse from 'lodash/reverse'
+import uniq from 'lodash/uniq'
+import compact from 'lodash/compact'
+import flatten from 'lodash/flatten'
+import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
 import type { MixFormData } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
@@ -12,8 +18,12 @@ type ValidationAndErrors<F> = {
   validatedForm: F | null
 }
 
-//TODO: grab the real one from WellOrder central location
-const HORIZONTAL_OPTIONS = ['l2r', 'r2l']
+// TODO: grab the real one from WellOrder central location
+const VERTICAL_OPTIONS = ['t2b', 'b2t']
+
+const templateColsToRows = (template) => (
+  zipWith(...template, (...col) => (compact(uniq(col))))
+)
 
 const orderWells = (
   wells: Array<string>,
@@ -22,23 +32,26 @@ const orderWells = (
   second: WellOrderOption
 ) => {
   let orderedWells = []
-  const firstLength = HORIZONTAL_OPTIONS.includes(first) ? template[0].length : template.length
-  const secondLength = HORIZONTAL_OPTIONS.includes(second) ? template[0].length : template.length
-  const firstStart = (first === 'l2r' || first === 't2b') ? 0 : firstLength
-  const secondStart = (second === 'l2r' || second === 't2b') ? 0 : secondLength
-  const firstInverted = firstStart === firstLength
-  const secondInverted = secondStart === secondLength
-  const firstEnd = firstInverted ? 0 : firstLength
-  const secondEnd = secondInverted ? 0 : secondLength
-  console.table({first, second, firstStart, firstEnd, secondStart, secondEnd})
-  for (let f = firstStart; f < firstEnd; firstInverted ? f-- : f++) {
-    for (let s = secondStart; s < secondEnd; (secondStart === secondLength) ? s-- : s++) {
-      console.log('well: ', template[f][s])
-      if (wells.includes(template[f][s])) {
-        orderedWells = [...orderedWells, template[f][s]]
-      }
+  if (VERTICAL_OPTIONS.includes(first)) {
+    if (second === 'r2l') {
+      orderedWells = reverse(template)
+      if (first === 'b2t') orderedWells.map(col => reverse(col))
+    } else {
+      orderedWells = template
+      if (first === 'b2t') orderedWells = template.map(col => reverse(col))
+    }
+  } else {
+    const templateRows = templateColsToRows(template)
+    if (second === 'b2t') {
+      orderedWells = reverse(template)
+      if (first === 'r2l') orderedWells.map(col => reverse(col))
+    } else {
+      orderedWells = templateRows
+      if (first === 'r2l') orderedWells = template.map(col => reverse(col))
     }
   }
+  console.table({ow: flatten(orderedWells), wells, i: intersection(flatten(orderedWells), wells)})
+  return intersection(flatten(orderedWells), wells)
 }
 
 const mixFormToArgs = (formData: FormData, context: StepFormContext): ValidationAndErrors<MixFormData> => {
@@ -64,6 +77,7 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
     const labwareDef = getLabware(labwareType)
     const template = labwareDef.ordering
     const orderedWells = orderWells(wells, template, orderFirst, orderSecond)
+    console.log(orderedWells)
   }
 
   const volume = Number(formData.volume) || 0
