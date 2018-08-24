@@ -342,8 +342,8 @@ Through the API's call labware.create(), you can create simple grid containers, 
 
     custom_plate = labware.create(
         '3x6_plate',                    # name of you container
-        grid=(3, 6),                    # specify amount of (rows, columns)
-        spacing=(12, 12),               # distances (mm) between each (row, column)
+        grid=(3, 6),                    # specify amount of (columns, rows)
+        spacing=(12, 12),               # distances (mm) between each (column, row)
         diameter=5,                     # diameter (mm) of each well on the plate
         depth=10,                       # depth (mm) of each well on the plate
         volume=200)
