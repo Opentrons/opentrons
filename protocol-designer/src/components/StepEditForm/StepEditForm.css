@@ -9,7 +9,7 @@
 .left_settings_column,
 .middle_settings_column,
 .right_settings_column {
-  & > * {
+  & > * { /* stylelint-disable-line no-descending-specificity */
     margin: 1rem 0;
   }
 }
@@ -60,6 +60,22 @@
   }
 }
 
+.mix {
+  & .left_settings_column,
+  & .middle_settings_column,
+  & .right_settings_column {
+    lost-column: 5/16;
+  }
+
+  & .middle_settings_column {
+    padding-right: 1rem;
+  }
+
+  & .right_settings_column {
+    padding-left: 1rem;
+  }
+}
+
 /* ------------------- */
 
 .field_row {
@@ -82,6 +98,10 @@
   & .full_width {
     lost-column: 8/16;
   }
+}
+
+.repetitions_row {
+  padding: 1.5rem 0;
 }
 
 /* form buttons */

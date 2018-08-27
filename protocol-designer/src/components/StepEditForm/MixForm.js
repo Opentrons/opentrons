@@ -26,7 +26,7 @@ type MixFormProps = {focusHandlers: FocusHandlers}
 const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
   const {focusHandlers} = props
   return (
-    <React.Fragment>
+    <div className={styles.mix}>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
           <LabwareDropdown name="labware" {...focusHandlers} />
@@ -36,7 +36,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
-        <FormGroup label='Repetitions' className={styles.field_row}>
+        <FormGroup label='Repetitions' className={cx(styles.field_row, styles.repetitions_row)}>
           <StepInputField name="volume" units='μL' {...focusHandlers} />
           <StepInputField name="times" units='Times' {...focusHandlers} />
         </FormGroup>
@@ -62,6 +62,9 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
+          <TipPositionField />
+        </div>
+        <div className={styles.right_settings_column}>
           <FlowRateField
             name='aspirate_flowRate'
             label='Aspirate Flow Rate'
@@ -74,14 +77,13 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
             pipetteFieldName='pipette'
             flowRateType='dispense'
           />
-          <TipPositionField />
         </div>
         <div className={styles.right_settings_column}>
           <WellOrderInput prefix="aspirate" />
           <FlowRateField />
         </div>
       </div>
-    </React.Fragment>
+    </div>
   )
 }
 

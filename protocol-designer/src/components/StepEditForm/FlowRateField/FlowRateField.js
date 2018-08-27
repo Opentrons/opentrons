@@ -11,6 +11,7 @@ import modalStyles from '../../modals/modal.css'
 import styles from './FlowRateField.css'
 
 const DEFAULT_LABEL = 'FLOW RATE'
+const DECIMALS_ALLOWED = 1
 
 type Props = {
   /** When flow rate is falsey (including 0), it means 'use default' */
@@ -27,7 +28,8 @@ type Props = {
 type State = {
   showModal: boolean,
   modalFlowRate: ?string,
-  modalUseDefault: boolean
+  modalUseDefault: boolean,
+  pristine: boolean
 }
 
 export default class FlowRateField extends React.Component<Props, State> {
@@ -41,7 +43,8 @@ export default class FlowRateField extends React.Component<Props, State> {
     return {
       showModal: false,
       modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
-      modalUseDefault: !formFlowRate
+      modalUseDefault: !formFlowRate,
+      pristine: true
     }
   }
 
@@ -53,14 +56,19 @@ export default class FlowRateField extends React.Component<Props, State> {
     this.setState({showModal: true})
   }
 
-  saveModal = () => {
+  makeSaveModal = (allowSave: boolean) => () => {
     const {modalUseDefault, modalFlowRate} = this.state
 
     const newFlowRate = modalUseDefault
       ? null
       : Number(modalFlowRate)
 
-    this.setState({showModal: false})
+    if (!allowSave) {
+      this.setState({pristine: false})
+      return
+    }
+
+    this.setState({showModal: false, pristine: false})
     this.props.updateValue(newFlowRate)
   }
 
@@ -86,7 +94,8 @@ export default class FlowRateField extends React.Component<Props, State> {
   render () {
     const {
       showModal,
-      modalUseDefault
+      modalUseDefault,
+      pristine
     } = this.state
 
     const {
@@ -102,18 +111,28 @@ export default class FlowRateField extends React.Component<Props, State> {
     const modalFlowRateNum = Number(this.state.modalFlowRate)
     const rangeDescription = `between ${minFlowRate} and ${maxFlowRate}`
     const outOfBounds = (
-        modalFlowRateNum === 0 ||
-        minFlowRate > modalFlowRateNum ||
-        modalFlowRateNum > maxFlowRate
-      )
-    const allowSave = modalUseDefault || !outOfBounds
+      modalFlowRateNum === 0 ||
+      minFlowRate > modalFlowRateNum ||
+      modalFlowRateNum > maxFlowRate
+    )
+    const correctDecimals = Number(modalFlowRateNum.toFixed(DECIMALS_ALLOWED)) === modalFlowRateNum
+    const allowSave = modalUseDefault || (!outOfBounds && correctDecimals)
+
+    let error = null
+    if (!modalUseDefault && !pristine) {
+      if (outOfBounds) {
+        error = rangeDescription
+      } else if (!correctDecimals) {
+        error = `a max of ${DECIMALS_ALLOWED} decimal places is allowed`
+      }
+    }
 
     const FlowRateInput = (
       <InputField
         value={`${this.state.modalFlowRate || ''}`}
         units='μL/s'
         caption={rangeDescription}
-        error={allowSave ? null : rangeDescription}
+        error={error}
         onChange={this.handleChangeNumber}
       />
     )
@@ -123,8 +142,15 @@ export default class FlowRateField extends React.Component<Props, State> {
         <AlertModal
           className={modalStyles.modal}
           buttons={[
-            {children: 'Cancel', onClick: this.cancelModal},
-            {children: 'Done', onClick: this.saveModal, disabled: !allowSave}
+            {
+              children: 'Cancel',
+              onClick: this.cancelModal
+            },
+            {
+              children: 'Done',
+              onClick: this.makeSaveModal(allowSave),
+              disabled: pristine ? false : !allowSave
+            }
           ]}
         >
           <h3 className={styles.header}>Flow Rate</h3>
