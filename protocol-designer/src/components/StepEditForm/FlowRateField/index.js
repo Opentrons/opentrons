@@ -11,7 +11,9 @@ import {
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
-type Props = React.ElementProps<typeof FlowRateField>
+type Props = React.ElementProps<typeof FlowRateField> & {
+  innerKey: string
+}
 
 type OP = {
   name: StepFieldName,
@@ -24,6 +26,12 @@ type DP = {
 }
 
 type SP = $Diff<Props, DP>
+
+// Add a key to force re-constructing component when values change
+function FlowRateFieldWithKey (props: Props) {
+  const {innerKey, ...otherProps} = props
+  return <FlowRateField key={innerKey} {...otherProps} />
+}
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {flowRateType, pipetteFieldName, name} = ownProps
@@ -46,14 +54,19 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     console.warn('FlowRateField mapStateToProps expected pipetteConfig', ownProps)
   }
 
+  const formFlowRate = formData && formData[name]
+
+  // force each field to have a new instance created when value is changed
+  const innerKey = `${name}:${formFlowRate || 0}`
+
   return {
-    flowRate: formData && formData[name],
+    innerKey,
+    formFlowRate,
     flowRateType,
     defaultFlowRate,
-    // HACK since we only have rule-of-thumb
-    minFlowRate: (defaultFlowRate != null) ? defaultFlowRate / 10 : null,
-    // HACK since we only have rule-of-thumb
-    maxFlowRate: (defaultFlowRate != null) ? defaultFlowRate * 10 : null,
+    minFlowRate: 0,
+    // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
+    maxFlowRate: pipetteConfig ? pipetteConfig.nominalMaxVolumeUl : Infinity,
     pipetteModelDisplayName
   }
 }
@@ -70,4 +83,4 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FlowRateField)
+export default connect(mapStateToProps, mapDispatchToProps)(FlowRateFieldWithKey)

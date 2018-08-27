@@ -12,40 +12,42 @@ import styles from './FlowRateField.css'
 
 type Props = {
   /** When flow rate is falsey (including 0), it means 'use default' */
-  flowRate: ?number,
+  formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   defaultFlowRate: ?number,
-  minFlowRate: ?number,
-  maxFlowRate: ?number,
+  minFlowRate: number,
+  maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
   pipetteModelDisplayName: string
 }
 
 type State = {
   showModal: boolean,
-  modalFlowRate: ?number,
+  modalFlowRate: ?string,
   modalUseDefault: boolean
 }
 
 export default class FlowRateField extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = {
+    this.state = this.getStateFromProps(props)
+  }
+
+  getStateFromProps = (props: Props): State => {
+    const {formFlowRate} = props
+    return {
       showModal: false,
-      modalFlowRate: props.flowRate,
-      modalUseDefault: Boolean(props.flowRate)
+      modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
+      modalUseDefault: !formFlowRate
     }
+  }
+
+  cancelModal = () => {
+    this.setState(this.getStateFromProps(this.props))
   }
 
   openModal = () => {
     this.setState({showModal: true})
-  }
-
-  cancelModal = () => {
-    this.setState({
-      showModal: false,
-      modalFlowRate: this.props.flowRate
-    })
   }
 
   saveModal = () => {
@@ -53,10 +55,10 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     const newFlowRate = modalUseDefault
       ? null
-      : modalFlowRate
+      : Number(modalFlowRate)
 
-    this.props.updateValue(newFlowRate)
     this.setState({showModal: false})
+    this.props.updateValue(newFlowRate)
   }
 
   handleChangeRadio = (e: SyntheticInputEvent<*>) => {
@@ -66,21 +68,26 @@ export default class FlowRateField extends React.Component<Props, State> {
   }
 
   handleChangeNumber = (e: SyntheticInputEvent<*>) => {
-    this.setState({
-      modalFlowRate: Number(e.target.value),
-      modalUseDefault: false
-    })
+    const value = e.target.value
+    if (
+      value === '' ||
+      value === '.' ||
+      !Number.isNaN(Number(value))
+    ) {
+      this.setState({
+        modalFlowRate: value
+      })
+    }
   }
 
   render () {
     const {
       showModal,
-      modalFlowRate,
       modalUseDefault
     } = this.state
 
     const {
-      flowRate,
+      formFlowRate,
       flowRateType,
       defaultFlowRate,
       minFlowRate,
@@ -88,21 +95,21 @@ export default class FlowRateField extends React.Component<Props, State> {
       pipetteModelDisplayName
     } = this.props
 
-    const rangeDescription = `between ${minFlowRate || '?'} and ${maxFlowRate || '?'}`
-    const outOfBounds = (minFlowRate && maxFlowRate && modalFlowRate)
-      ? (
-        minFlowRate > modalFlowRate ||
-        modalFlowRate > maxFlowRate
+    const modalFlowRateNum = Number(this.state.modalFlowRate)
+    const rangeDescription = `between ${minFlowRate} and ${maxFlowRate}`
+    const outOfBounds = (
+        modalFlowRateNum === 0 ||
+        minFlowRate > modalFlowRateNum ||
+        modalFlowRateNum > maxFlowRate
       )
-      : false
+    const allowSave = modalUseDefault || !outOfBounds
 
     const FlowRateInput = (
       <InputField
-        numeric
-        value={`${modalFlowRate || ''}`}
+        value={`${this.state.modalFlowRate || ''}`}
         units='μL/s'
         caption={rangeDescription}
-        error={outOfBounds ? rangeDescription : null}
+        error={allowSave ? null : rangeDescription}
         onChange={this.handleChangeNumber}
       />
     )
@@ -113,7 +120,7 @@ export default class FlowRateField extends React.Component<Props, State> {
           className={modalStyles.modal}
           buttons={[
             {children: 'Cancel', onClick: this.cancelModal},
-            {children: 'Done', onClick: this.saveModal}
+            {children: 'Done', onClick: this.saveModal, disabled: !allowSave}
           ]}
         >
           <h3 className={styles.header}>Flow Rate</h3>
@@ -129,7 +136,7 @@ export default class FlowRateField extends React.Component<Props, State> {
 
           <RadioGroup
             inline
-            value={(modalUseDefault || !modalFlowRate)
+            value={(modalUseDefault)
               ? 'default'
               : 'custom'
             }
@@ -149,7 +156,7 @@ export default class FlowRateField extends React.Component<Props, State> {
           <InputField
             readOnly
             onClick={this.openModal}
-            value={(flowRate) ? `${flowRate} μL/s` : 'Default'}
+            value={(formFlowRate) ? `${formFlowRate} μL/s` : 'Default'}
           />
         </FormGroup>
 
