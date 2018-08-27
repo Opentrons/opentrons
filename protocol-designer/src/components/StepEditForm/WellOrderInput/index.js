@@ -8,12 +8,13 @@ import {selectors} from '../../../steplist'
 import styles from './WellOrderInput.css'
 import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../images/zig_zag_icon.svg'
+import type {BaseState} from '../../../types'
 
 type OP = {prefix: 'aspirate' | 'dispense'}
 type SP = {iconClassNames: Array<string>}
 
 type WellOrderInputState = {isModalOpen: boolean}
-class WellOrderInput extends React.Component<null, WellOrderInputState> {
+class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
   state: WellOrderInputState = {isModalOpen: false}
 
   handleOpen = () => { this.setState({isModalOpen: true}) }
@@ -39,11 +40,14 @@ class WellOrderInput extends React.Component<null, WellOrderInputState> {
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
-  const {prefix} = ownProps
+  // NOTE: not interpolating prefix because breaks flow string enum
+  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
+  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
+
   let iconClassNames = []
   if (formData) {
-    const first = formData[`${prefix}_wellOrder_first`]
-    const second = formData[`${prefix}_wellOrder_second`]
+    const first = formData[firstName]
+    const second = formData[secondName]
     iconClassNames = [styles[`${first}_first`], styles[`${second}_second`]]
   }
   return { iconClassNames }

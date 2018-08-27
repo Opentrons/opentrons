@@ -26,6 +26,8 @@ export type StepFieldName =
   | 'dispense_mix_checkbox'
   | 'dispense_mix_times'
   | 'dispense_mix_volume'
+  | 'dispense_wellOrder_first'
+  | 'dispense_wellOrder_second'
   | 'dispense_wells'
   | 'labware'
   | 'pauseForAmountOfTime'

@@ -105,13 +105,21 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     const labwareById = context.labware
     if (stepType !== 'distribute' && sourceLabware) {
       const sourceLabwareDef = getLabware(labwareById[sourceLabware].type)
-      const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
-      sourceWells = intersection(allWellsOrdered, sourceWells)
+      if (sourceLabwareDef) {
+        const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
+        sourceWells = intersection(allWellsOrdered, sourceWells)
+      } else {
+        console.warn('the specified source labware definition could not be located')
+      }
     }
     if (stepType !== 'consolidate' && destLabware) {
       const destLabwareDef = getLabware(labwareById[destLabware].type)
-      const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
-      destWells = intersection(allWellsOrdered, destWells)
+      if (destLabwareDef) {
+        const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
+        destWells = intersection(allWellsOrdered, destWells)
+      } else {
+        console.warn('the specified destination labware definition could not be located')
+      }
     }
   }
 
@@ -142,41 +150,56 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     errors = {...errors, '_mismatchedWells': 'Single source well and multiple destination wells is required.'}
   }
 
-  let stepArguments = commonFields
+  let stepArguments: TransferLikeValidationAndErrors = {errors, validatedForm: null}
   switch (stepType) {
-    case 'transfer':
-      stepArguments = {
-        ...stepArguments,
-        stepType: 'transfer',
-        sourceWells,
-        destWells,
-        mixBeforeAspirate,
-        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+    case 'transfer': {
+      const transferStepArguments: ValidationAndErrors<TransferFormData> = {
+        errors,
+        validatedForm: Object.values(errors).length === 0 ? {
+          ...commonFields,
+          stepType: 'transfer',
+          sourceWells,
+          destWells,
+          mixBeforeAspirate,
+          name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+        } : null
       }
+      stepArguments = transferStepArguments
       break
-    case 'consolidate':
-      stepArguments = {
-        ...stepArguments,
-        mixFirstAspirate,
-        sourceWells,
-        destWell: destWells[0],
-        stepType: 'consolidate',
-        name: `Consolidate ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+    }
+    case 'consolidate': {
+      const consolidateStepArguments: ValidationAndErrors<ConsolidateFormData> = {
+        errors,
+        validatedForm: Object.values(errors).length === 0 ? {
+          ...commonFields,
+          mixFirstAspirate,
+          sourceWells,
+          destWell: destWells[0],
+          stepType: 'consolidate',
+          name: `Consolidate ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+        } : null
       }
+      stepArguments = consolidateStepArguments
       break
-    case 'distribute':
-      stepArguments = {
-        ...stepArguments,
-        mixBeforeAspirate,
-        sourceWell: sourceWells[0],
-        destWells,
-        stepType: 'distribute',
-        name: `Distribute ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+    }
+    case 'distribute': {
+      const distributeStepArguments: ValidationAndErrors<DistributeFormData> = {
+        errors,
+        validatedForm: Object.values(errors).length === 0 ? {
+          ...commonFields,
+          mixBeforeAspirate,
+          sourceWell: sourceWells[0],
+          destWells,
+          stepType: 'distribute',
+          name: `Distribute ${formData.id}` // TODO Ian 2018-04-03 real name for steps
+        } : null
       }
+      stepArguments = distributeStepArguments
       break
+    }
   }
-
-  return {errors, validatedForm: Object.values(errors).length > 0 ? null : stepArguments}
+  console.log(stepArguments)
+  return stepArguments
 }
 
 export default transferLikeFormToArgs

@@ -96,21 +96,25 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
       value=""
     >
       <option
+        disabled={false}
         value=""
       >
         
       </option>
       <option
+        disabled={false}
         value="dna"
       >
         DNA
       </option>
       <option
+        disabled={false}
         value="rna"
       >
         RNA
       </option>
       <option
+        disabled={false}
         value="protein"
       >
         Protein
@@ -162,16 +166,19 @@ exports[`DropdownField renders correctly with a value 1`] = `
       value="rna"
     >
       <option
+        disabled={false}
         value="dna"
       >
         DNA
       </option>
       <option
+        disabled={false}
         value="rna"
       >
         RNA
       </option>
       <option
+        disabled={false}
         value="protein"
       >
         Protein

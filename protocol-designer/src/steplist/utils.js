@@ -3,7 +3,7 @@ import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import type { WellOrderOption } from '../components/StepEditForm/WellOrderInput/WellOrderModal';
+import type {WellOrderOption} from '../components/StepEditForm/WellOrderInput/types'
 
 /** Merge 2 adjacent elements of an array when predicate fn is true */
 export function mergeWhen<T> (
@@ -53,7 +53,9 @@ export function mergeWhen<T> (
 //   ['A2', 'B2']      === /        ['B1', 'B2']
 // ]                      /       ]
 //
+
 export const orderingColsToRows = (ordering: Array<Array<string>>): Array<Array<string>> => (
+  // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
   zipWith(...ordering, (...col) => (compact(uniq(col))))
 )
 
@@ -66,7 +68,7 @@ export const orderWells = (
   defaultOrdering: Array<Array<string>>,
   first: WellOrderOption,
   second: WellOrderOption
-): Array<Array<string>> => {
+): Array<string> => {
   let orderedWells = []
   if (first === 't2b') {
     if (second === 'l2r') {

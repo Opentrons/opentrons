@@ -14,12 +14,12 @@ import {
 } from '@opentrons/components'
 import modalStyles from '../../modals/modal.css'
 import {actions, selectors} from '../../../steplist'
+import type {BaseState} from '../../../types'
 import WellOrderViz from './WellOrderViz'
+import type {WellOrderOption} from './types'
 
 import styles from './WellOrderInput.css'
 
-export type WellOrderOrdinality = 'first' | 'second'
-export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
 const VERTICAL_VALUES: Array<WellOrderOption> = ['t2b', 'b2t']
@@ -27,24 +27,23 @@ const HORIZONTAL_VALUES: Array<WellOrderOption> = ['l2r', 'r2l']
 const WELL_ORDER_VALUES: Array<WellOrderOption> = [...VERTICAL_VALUES, ...HORIZONTAL_VALUES]
 
 type SP = {
-  initialFirstValue: WellOrderOption,
-  initialSecondValue: WellOrderOption
+  initialFirstValue: ?WellOrderOption,
+  initialSecondValue: ?WellOrderOption
 }
 type DP = {
-  updateValues: (firstValue: WellOrderOption, secondValue: WellOrderOption) => mixed
+  updateValues: (firstValue: ?WellOrderOption, secondValue: ?WellOrderOption) => mixed
 }
 
 type OP = {
   isOpen: boolean,
-  closeModal: (e: SyntheticEvent<*>) => mixed,
-  onSave: () => mixed,
+  closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense'
 }
 
 type Props = OP & SP & DP
 type State = {
-  firstValue: WellOrderOption,
-  secondValue: WellOrderOption,
+  firstValue: ?WellOrderOption,
+  secondValue: ?WellOrderOption
 }
 
 class WellOrderModal extends React.Component<Props, State> {
@@ -156,20 +155,27 @@ class WellOrderModal extends React.Component<Props, State> {
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
-  const {prefix} = ownProps
+  // NOTE: not interpolating prefix because breaks flow string enum
+  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
+  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
   return {
-    initialFirstValue: formData ? formData[`${prefix}_wellOrder_first`] : null,
-    initialSecondValue: formData ? formData[`${prefix}_wellOrder_second`] : null
+    initialFirstValue: formData && formData[firstName],
+    initialSecondValue: formData && formData[secondName]
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps): DP => ({
-  updateValues: (firstValue, secondValue) => {
-    dispatch(actions.changeFormInput({update: {
-      [`${ownProps.prefix}_wellOrder_first`]: firstValue,
-      [`${ownProps.prefix}_wellOrder_second`]: secondValue
-    }}))
+const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
+  // NOTE: not interpolating prefix because breaks flow string enum
+  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
+  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
+  return {
+    updateValues: (firstValue, secondValue) => {
+      dispatch(actions.changeFormInput({update: {
+        [firstName]: firstValue,
+        [secondName]: secondValue
+      }}))
+    }
   }
-})
+}
 
 export default connect(mapSTP, mapDTP)(WellOrderModal)

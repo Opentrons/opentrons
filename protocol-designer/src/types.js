@@ -38,4 +38,4 @@ export type VolumeJson = {
   }
 }
 
-export type Options = Array<{value: string, name: string}>
+export type Options = Array<{value: string, name: string, disabled?: boolean}>

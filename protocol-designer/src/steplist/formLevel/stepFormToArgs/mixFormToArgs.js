@@ -34,8 +34,12 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
     const labwareById = context.labware
     const labwareType = labwareById[labware].type
     const labwareDef = getLabware(labwareType)
-    const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
-    wells = intersection(allWellsOrdered, wells)
+    if (labwareDef) {
+      const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
+      wells = intersection(allWellsOrdered, wells)
+    } else {
+      console.warn('the specified labware definition could not be located')
+    }
   }
 
   const volume = Number(formData.volume) || 0
@@ -65,7 +69,7 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
   }
 
   // TODO: BC 2018-08-21 remove this old validation logic, currently unused
-  const isErrorFree = !Object.values(errors).length > 0
+  const isErrorFree = !(Object.values(errors).length > 0)
 
   return {
     errors,

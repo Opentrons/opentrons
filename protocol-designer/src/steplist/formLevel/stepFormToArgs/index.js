@@ -16,14 +16,14 @@ export type ValidFormAndErrors = {
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 
-const stepFormToArgs = (formData: FormData, context: StepFormContext): * => { // really returns ValidFormAndErrors
+const stepFormToArgs = (formData: FormData, context?: StepFormContext = {}): * => { // really returns ValidFormAndErrors
   switch (formData.stepType) {
     case 'transfer':
     case 'consolidate':
     case 'distribute':
       return transferLikeFormToArgs(formData, context)
     case 'pause':
-      return pauseFormToArgs(formData, context)
+      return pauseFormToArgs(formData)
     case 'mix':
       return mixFormToArgs(formData, context)
     default:
