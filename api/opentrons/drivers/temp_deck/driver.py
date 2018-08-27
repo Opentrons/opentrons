@@ -236,7 +236,6 @@ class TempDeck:
 
     @property
     def status(self) -> str:
-        self.update_temperature()
         current = self._temperature.get('current')
         target = self._temperature.get('target')
         delta = 0.7
