@@ -31,6 +31,9 @@
     "change_tip": {
       "label": "Get new tip"
     },
+    "tip_position": {
+      "label": "Tip Position"
+    },
     "well_order": {
       "label": "Well Order",
       "option": {

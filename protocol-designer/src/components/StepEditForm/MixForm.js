@@ -16,6 +16,7 @@ import {
 } from './formFields'
 
 import WellSelectionInput from './WellSelectionInput'
+import TipPositionInput from './TipPositionInput'
 import WellOrderInput from './WellOrderInput'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
@@ -62,7 +63,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <TipPositionField />
+          <TipPositionInput prefix="aspirate"/>
         </div>
         <div className={styles.right_settings_column}>
           <WellOrderInput prefix="aspirate" />
