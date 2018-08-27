@@ -43,10 +43,10 @@ export function mergeWhen<T> (
 
 // labware definitions in shared-data have an ordering
 // attribute which is an Array of Arrays of wells. Each inner
-// Array represents a vertical column of wells on the labware
+// Array represents a physical column of wells on the labware
 // this function takes that 2d Array of columns and returns
 // the same wells in a 2d Array where each inner Array represents
-// a horizontal row of wells on the labware.
+// a physical row of wells on the labware.
 // e.g.
 // [                      \       [
 //   ['A1', 'B1'],     === \        ['A1', 'A2']
@@ -57,11 +57,16 @@ export const orderingColsToRows = (ordering: Array<Array<string>>): Array<Array<
   zipWith(...ordering, (...col) => (compact(uniq(col))))
 )
 
-// given a default ordering 2d array from labware definitions
+// given a default "ordering" 2d array from labware definitions
+// where each inner array represents a physical column of wells
 // and well order option selections (e.g. 'l2r', 'r2l', 't2b', 'b2t')
 // this function returns a 1d array of wells from the labware
 // ordered by the given traversal technique
-export const orderWells = (defaultOrdering: Array<Array<string>>, first: WellOrderOption, second: WellOrderOption) => {
+export const orderWells = (
+  defaultOrdering: Array<Array<string>>,
+  first: WellOrderOption,
+  second: WellOrderOption
+): Array<Array<string>> => {
   let orderedWells = []
   if (first === 't2b') {
     if (second === 'l2r') {

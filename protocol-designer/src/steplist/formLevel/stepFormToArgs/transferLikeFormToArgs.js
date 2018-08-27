@@ -1,5 +1,7 @@
 // @flow
 
+import { getLabware } from '@opentrons/shared-data'
+import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
 import type {
   ConsolidateFormData,
@@ -7,6 +9,8 @@ import type {
   TransferFormData
 } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
+import type { StepFormContext } from './types'
+import { orderWells } from '../../utils'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
@@ -28,7 +32,7 @@ type TransferLikeValidationAndErrors =
   | ValidationAndErrors<DistributeFormData>
   | ValidationAndErrors<TransferFormData>
 
-const transferLikeFormToArgs = (formData: FormData): TransferLikeValidationAndErrors => {
+const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): TransferLikeValidationAndErrors => {
   const stepType = formData.stepType
   const pipette = formData['pipette']
   const volume = Number(formData['volume'])
@@ -86,8 +90,30 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeValidationAndEr
     description: 'description would be here 2018-03-01' // TODO get from form
   }
 
-  const sourceWells = formData['aspirate_wells'] || []
-  const destWells = formData['dispense_wells'] || []
+  let {
+    aspirate_wells: sourceWells,
+    dispense_wells: destWells,
+    aspirate_wellOrder_first,
+    aspirate_wellOrder_second,
+    dispense_wellOrder_first,
+    dispense_wellOrder_second
+  } = formData
+  sourceWells = sourceWells || []
+  destWells = destWells || []
+
+  if (context && context.labware) {
+    const labwareById = context.labware
+    if (stepType !== 'distribute' && sourceLabware) {
+      const sourceLabwareDef = getLabware(labwareById[sourceLabware].type)
+      const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
+      sourceWells = intersection(allWellsOrdered, sourceWells)
+    }
+    if (stepType !== 'consolidate' && destLabware) {
+      const destLabwareDef = getLabware(labwareById[destLabware].type)
+      const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
+      destWells = intersection(allWellsOrdered, destWells)
+    }
+  }
 
   // TODO: BC 2018-08-21 remove this old validation logic once no longer preventing save
   const requiredFieldErrors = [
