@@ -16,9 +16,9 @@ def transpose_coordinates(wells):
     # Will need to be changed once correct geometry system implemented
     w = 85.48
     for well in wells:
-        curr_x, curr_y, z = well._coordinates
-        offset_y = w-curr_x
-        well._coordinates = Vector(curr_y, offset_y, z)
+        old_x, old_y, z = well._coordinates
+        offset_y = w-old_x
+        well._coordinates = Vector(old_y, offset_y, z)
 
 
 def add_offset(container):
@@ -35,17 +35,11 @@ def add_offset(container):
 
 
 def rotate_container_for_alpha(container):
-    add_offset(container)
+    container = add_offset(container)
     _, _, z = container._coordinates
     # Change container coordinates to be at the origin + top of container
     container._coordinates = Vector(0, 0, z)
-
-    transpose_coordinates(
-        [
-            well
-            for well in container.wells()
-        ]
-    )
+    transpose_coordinates([well for well in container.wells()])
 
     return container
 

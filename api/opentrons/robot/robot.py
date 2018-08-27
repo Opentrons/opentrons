@@ -15,7 +15,6 @@ from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
 
 log = logging.getLogger(__name__)
 
@@ -507,14 +506,6 @@ class Robot(object):
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
 
-        if 'trough' in repr(placeable):
-            # Move the pipette so that a multi-channel pipette is centered in
-            # the trough well to prevent crashing into the side, which would
-            # happen if you send the "A1" tip to the center of the well. See
-            # `robot.calibrate_container_with_instrument` for corresponding
-            # offset and comment.
-            offset = offset + (0, Y_OFFSET_MULTI, 0)
-
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -877,19 +868,6 @@ class Robot(object):
             delta_x = delta[0]
             delta_y = delta[1]
             delta_z = delta[2]
-
-        if 'trough' in container.get_type():
-            # Rather than calibrating troughs to the center of the well, we
-            # calibrate such that a multi-channel would be centered in the
-            # well. We don't differentiate between single- and multi-channel
-            # pipettes here, and we track the tip of a multi-channel pipette
-            # that would go into well A1 of an 8xN plate rather than the axial
-            # center, but the axial center of a well is what we track for
-            # calibration, so we add Y_OFFSET_MULTI in the calibration `move`
-            # command, and then back that value off of the pipette position
-            # here (Y_OFFSET_MULTI is the y-distance from the axial center of
-            # the pipette to the A1 tip).
-            delta_y = delta_y - Y_OFFSET_MULTI
 
         self.poses = calib.calibrate_container_with_delta(
             self.poses,

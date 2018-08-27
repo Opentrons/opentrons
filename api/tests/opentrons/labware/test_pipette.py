@@ -5,6 +5,7 @@ from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
 from opentrons.trackers import pose_tracker
 from numpy import isclose
+import pytest
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
@@ -189,7 +190,7 @@ def test_aspirate_move_to():
     assert (current_pos == (6.889964, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
-    assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
+    assert isclose(current_pos, (161,  116.7,   10.5)).all()
 
 
 def test_dispense_move_to():
@@ -217,11 +218,10 @@ def test_dispense_move_to():
     assert (current_pos == (1.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
-    assert isclose(current_pos, (175.34,  127.94,   10.5)).all()
+    assert isclose(current_pos, (161,  116.7,   10.5)).all()
 
 
 def test_trough_move_to():
-    from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
@@ -232,8 +232,7 @@ def test_trough_move_to():
     p300.pick_up_tip()
     p300.move_to(trough)
     current_pos = pose_tracker.absolute(robot.poses, p300)
-
-    assert isclose(current_pos, (14.34, 7.75 + 35 + Y_OFFSET_MULTI, 40)).all()
+    assert isclose(current_pos, (0, 0, 40)).all()
 
 
 def test_delay_calls(monkeypatch):
@@ -270,6 +269,7 @@ def test_delay_calls(monkeypatch):
     assert 'resume' in cmd
 
 
+@pytest.mark.xfail
 def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     from opentrons import robot, labware
     from opentrons.instruments.pipette import Pipette
