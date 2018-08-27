@@ -122,7 +122,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const {robot} = ownProps
     const optionsRequest = getResetOptions(state, robot)
     const optionsResponse = optionsRequest.response
-    console.log('OPTIONS', {optionsResponse})
     return {
       options: optionsResponse && optionsResponse.options,
       resetRequest: getResetRequest(state, robot),
