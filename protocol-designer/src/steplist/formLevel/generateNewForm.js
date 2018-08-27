@@ -9,6 +9,7 @@ import type {
 
 import {
   DEFAULT_CHANGE_TIP_OPTION,
+  DEFAULT_TIP_POSITION,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID
@@ -38,6 +39,7 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
       return {
         ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
+        'aspirate_tipPosition': DEFAULT_TIP_POSITION,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
       }

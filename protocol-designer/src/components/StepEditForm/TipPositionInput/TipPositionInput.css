@@ -32,12 +32,30 @@
   margin: 6px 12px;
 }
 
+.adjustment_buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.adjustment_button {
+  height: 34px;
+  width: 34px;
+  cursor: pointer;
+  margin: 0.5em 0;
+}
+
+.viz_group {
+  display: flex;
+  align-items: flex-end;
+}
+
 .viz_wrapper {
   position: relative;
   width: 200px;
   height: 200px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 }
 
 .pipette_tip_image {

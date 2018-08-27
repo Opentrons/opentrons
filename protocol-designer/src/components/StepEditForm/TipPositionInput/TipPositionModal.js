@@ -58,6 +58,12 @@ class TipPositionModal extends React.Component<Props, State> {
     const {value} = e.currentTarget
     this.setState({value: value})
   }
+  handleIncrement = () => {
+    this.setState({value: String(Number(this.state.value) + 1)})
+  }
+  handleDecrement = () => {
+    this.setState({value: String(Number(this.state.value) - 1)})
+  }
   render () {
     if (!this.props.isOpen) return null
     const {value} = this.state
@@ -76,9 +82,16 @@ class TipPositionModal extends React.Component<Props, State> {
               <FormGroup label={i18n.t('modal.tip_position.field_label')}>
                 <InputField
                   onChange={this.handleChange}
+                  units="mm"
                   value={value ? String(value) : null} />
               </FormGroup>
-              <TipPositionViz tipPosition={value} />
+              <div className={styles.viz_group}>
+                <div className={styles.adjustment_buttons}>
+                  <OutlineButton className={styles.adjustment_button} onClick={this.handleIncrement}>+</OutlineButton>
+                  <OutlineButton className={styles.adjustment_button} onClick={this.handleDecrement}>-</OutlineButton>
+                </div>
+                <TipPositionViz tipPosition={value} />
+              </div>
             </div>
             <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
           </div>
