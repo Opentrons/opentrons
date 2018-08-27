@@ -31,7 +31,6 @@ export type StepFieldName =
   | 'dispense_wellOrder_first'
   | 'dispense_wellOrder_second'
   | 'dispense_wells'
-  | 'flowRate'
   | 'labware'
   | 'pauseForAmountOfTime'
   | 'pauseHour'

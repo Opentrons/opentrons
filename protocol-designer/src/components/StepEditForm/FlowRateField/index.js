@@ -18,7 +18,8 @@ type Props = React.ElementProps<typeof FlowRateField> & {
 type OP = {
   name: StepFieldName,
   pipetteFieldName: StepFieldName,
-  flowRateType: $PropertyType<Props, 'flowRateType'>
+  flowRateType: $PropertyType<Props, 'flowRateType'>,
+  label?: $PropertyType<Props, 'label'>
 }
 
 type DP = {
@@ -61,9 +62,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   return {
     innerKey,
+    defaultFlowRate,
     formFlowRate,
     flowRateType,
-    defaultFlowRate,
+    label: ownProps.label,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
     maxFlowRate: pipetteConfig ? pipetteConfig.nominalMaxVolumeUl : Infinity,

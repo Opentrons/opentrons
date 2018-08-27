@@ -10,11 +10,14 @@ import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import styles from './FlowRateField.css'
 
+const DEFAULT_LABEL = 'FLOW RATE'
+
 type Props = {
   /** When flow rate is falsey (including 0), it means 'use default' */
+  defaultFlowRate: ?number,
   formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
-  defaultFlowRate: ?number,
+  label: ?string,
   minFlowRate: number,
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
@@ -87,9 +90,10 @@ export default class FlowRateField extends React.Component<Props, State> {
     } = this.state
 
     const {
+      defaultFlowRate,
       formFlowRate,
       flowRateType,
-      defaultFlowRate,
+      label,
       minFlowRate,
       maxFlowRate,
       pipetteModelDisplayName
@@ -152,7 +156,7 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <FormGroup label='FLOW RATE'>
+        <FormGroup label={label || DEFAULT_LABEL}>
           <InputField
             readOnly
             onClick={this.openModal}
