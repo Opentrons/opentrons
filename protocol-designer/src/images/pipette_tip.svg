@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="40px" height="100px" viewBox="0 0 40 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 49.2 (51160) - http://www.bohemiancoding.com/sketch -->
-    <polygon points="0,0 20,0 10,100" style="fill:#39bda7;stroke:#8f8f8f;stroke-width:1"></polygon>
+<svg width="90px" height="191px" viewBox="0 0 90 191" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="advanced-settings-pop-ups" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-2">
+            <path d="M0.5,190 L89.5,190" id="Line-5" stroke="#00C3E6" stroke-linecap="square" stroke-dasharray="2"></path>
+            <g id="Group" transform="translate(28.000000, 0.000000)">
+                <polygon id="Fill-65" fill="#C8C6C7" points="11 69 23 69 23 45 11 45"></polygon>
+                <path d="M23,96.1079283 L18.1838654,187.865253 C18.1571219,188.37477 17.7510808,188.782449 17.2416752,188.811243 C16.6902706,188.842411 16.218002,188.420677 16.1868337,187.869272 L11,96.1079283 L11,45 L23,45 L23,96.1079283 Z" id="Combined-Shape" stroke="#393939"></path>
+                <path d="M11,68 L23,68" id="Stroke-67" stroke="#231F20"></path>
+                <path d="M11.6666667,95 L22.3333333,95" id="Line-6" stroke="#393939" stroke-linecap="round"></path>
+                <polygon id="Fill-77" fill="#000000" points="0 29 34 29 34 0 0 0"></polygon>
+                <polygon id="Fill-78" fill="#000000" points="4 46 30 46 30 26 4 26"></polygon>
+            </g>
+        </g>
+    </g>
 </svg>

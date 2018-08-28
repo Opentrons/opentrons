@@ -19,17 +19,11 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 3rem 0;
+  margin: 3rem 0 2rem;
 }
 
-.field_row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.field_spacer {
-  margin: 6px 12px;
+.position_from_bottom_input {
+  width: 6rem;
 }
 
 .adjustment_buttons {
@@ -41,12 +35,13 @@
   height: 34px;
   width: 34px;
   cursor: pointer;
-  margin: 0.5em 0;
+  margin-top: 0.5em;
 }
 
 .viz_group {
   display: flex;
   align-items: flex-end;
+  min-height: 280px;
 }
 
 .viz_wrapper {
@@ -60,6 +55,20 @@
 
 .pipette_tip_image {
   position: relative;
+}
+
+.well_height_label {
+  font-size: var(--fs-caption);
+  color: var(--c-selected-dark);
+  position: absolute;
+  right: 10px;
+  bottom: 45px;
+  align-self: flex-end;
+}
+
+.well_cross_section_image {
+  position: relative;
+  left: 9px;
 }
 
 .button_row {

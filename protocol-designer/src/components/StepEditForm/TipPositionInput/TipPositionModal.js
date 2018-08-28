@@ -4,6 +4,7 @@ import cx from 'classnames'
 import {connect} from 'react-redux'
 
 import i18n from '../../../localization'
+import {onlyPositiveNumbers} from '../../../steplist/fieldLevel/processing'
 import {Portal} from '../../portals/MainPageModalPortal'
 import {
   Modal,
@@ -22,7 +23,10 @@ import styles from './TipPositionInput.css'
 // TODO: logical default
 const DEFAULT_TIP_POSITION = 0
 
-type SP = { tipPosition: number }
+type SP = {
+  tipPosition: number,
+  wellHeightMM: number
+}
 type DP = { updateValue: (number) => mixed }
 
 type OP = {
@@ -56,10 +60,20 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const {value} = e.currentTarget
-    this.setState({value: value})
+    const valueFloat = parseFloat(value)
+    const maximumHeightMM = (this.props.wellHeightMM * 2)
+    console.table({valueFloat, maximumHeightMM})
+    if (valueFloat >= maximumHeightMM) {
+      this.setState({value: maximumHeightMM})
+    } else {
+      this.setState({value: onlyPositiveNumbers(value) || 0})
+    }
   }
   handleIncrement = () => {
-    this.setState({value: String(Number(this.state.value) + 1)})
+    const valueFloat = parseFloat(this.state.value)
+    if (valueFloat < (this.props.wellHeightMM * 2)) {
+      this.setState({value: String(valueFloat + 1)})
+    }
   }
   handleDecrement = () => {
     this.setState({value: String(Number(this.state.value) - 1)})
@@ -67,6 +81,7 @@ class TipPositionModal extends React.Component<Props, State> {
   render () {
     if (!this.props.isOpen) return null
     const {value} = this.state
+    const {wellHeightMM} = this.props
     return (
       <Portal>
         <Modal
@@ -81,16 +96,27 @@ class TipPositionModal extends React.Component<Props, State> {
             <div className={styles.leftHalf}>
               <FormGroup label={i18n.t('modal.tip_position.field_label')}>
                 <InputField
+                  className={styles.position_from_bottom_input}
                   onChange={this.handleChange}
                   units="mm"
                   value={value ? String(value) : null} />
               </FormGroup>
               <div className={styles.viz_group}>
                 <div className={styles.adjustment_buttons}>
-                  <OutlineButton className={styles.adjustment_button} onClick={this.handleIncrement}>+</OutlineButton>
-                  <OutlineButton className={styles.adjustment_button} onClick={this.handleDecrement}>-</OutlineButton>
+                  <OutlineButton
+                    className={styles.adjustment_button}
+                    disabled={parseFloat(value) >= (wellHeightMM * 2)}
+                    onClick={this.handleIncrement}>
+                    +
+                  </OutlineButton>
+                  <OutlineButton
+                    className={styles.adjustment_button}
+                    disabled={parseFloat(value) <= 0}
+                    onClick={this.handleDecrement}>
+                    -
+                  </OutlineButton>
                 </div>
-                <TipPositionViz tipPosition={value} />
+                <TipPositionViz tipPosition={value} wellHeightMM={wellHeightMM} />
               </div>
             </div>
             <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
@@ -119,7 +145,10 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   // NOTE: not interpolating prefix because breaks flow string enum
   const fieldName = ownProps.prefix === 'aspirate' ? 'aspirate_tipPosition' : 'dispense_tipPosition'
 
-  return {tipPosition: formData && formData[fieldName]}
+  return {
+    tipPosition: formData && formData[fieldName],
+    wellHeightMM: 40 // TODO: get real value
+  }
 }
 
 const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
