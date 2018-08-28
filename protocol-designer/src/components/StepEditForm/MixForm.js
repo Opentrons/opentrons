@@ -26,7 +26,7 @@ type MixFormProps = {focusHandlers: FocusHandlers}
 const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
   const {focusHandlers} = props
   return (
-    <div className={styles.mix}>
+    <React.Fragment>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
           <LabwareDropdown name="labware" {...focusHandlers} />
@@ -71,6 +71,9 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
             pipetteFieldName='pipette'
             flowRateType='aspirate'
           />
+        </div>
+        <div className={styles.right_settings_column}>
+          <WellOrderInput prefix="aspirate" />
           <FlowRateField
             name='dispense_flowRate'
             label='Dispense Flow Rate'
@@ -78,12 +81,8 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
             flowRateType='dispense'
           />
         </div>
-        <div className={styles.right_settings_column}>
-          <WellOrderInput prefix="aspirate" />
-          <FlowRateField />
-        </div>
       </div>
-    </div>
+    </React.Fragment>
   )
 }
 
