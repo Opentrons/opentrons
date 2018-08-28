@@ -2,17 +2,21 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
-
-import i18n from '../../../localization'
-import {onlyPositiveNumbers} from '../../../steplist/fieldLevel/processing'
-import {Portal} from '../../portals/MainPageModalPortal'
 import {
   Modal,
   OutlineButton,
   PrimaryButton,
   FormGroup,
-  InputField
+  InputField,
+  Icon,
+  HandleKeypress
 } from '@opentrons/components'
+import { getLabware } from '@opentrons/shared-data'
+import i18n from '../../../localization'
+import { DEFAULT_MM_FROM_BOTTOM } from '../../../constants'
+import {onlyPositiveNumbers} from '../../../steplist/fieldLevel/processing'
+import {Portal} from '../../portals/MainPageModalPortal'
+import {selectors as labwareIngredsSelectors} from '../../../labware-ingred/reducers'
 import modalStyles from '../../modals/modal.css'
 import {actions, selectors} from '../../../steplist'
 import type {BaseState} from '../../../types'
@@ -43,6 +47,11 @@ class TipPositionModal extends React.Component<Props, State> {
     super(props)
     this.state = { value: props.tipPosition }
   }
+  componentDidUpdate (prevProps) {
+    if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
+      this.setState({value: DEFAULT_MM_FROM_BOTTOM})
+    }
+  }
   applyChanges = () => {
     this.props.updateValue(this.state.value)
   }
@@ -62,7 +71,6 @@ class TipPositionModal extends React.Component<Props, State> {
     const {value} = e.currentTarget
     const valueFloat = parseFloat(value)
     const maximumHeightMM = (this.props.wellHeightMM * 2)
-    console.table({valueFloat, maximumHeightMM})
     if (valueFloat >= maximumHeightMM) {
       this.setState({value: maximumHeightMM})
     } else {
@@ -76,7 +84,8 @@ class TipPositionModal extends React.Component<Props, State> {
     }
   }
   handleDecrement = () => {
-    this.setState({value: String(Number(this.state.value) - 1)})
+    const nextValueFloat = parseFloat(this.state.value) - 1
+    this.setState({value: (nextValueFloat < 0 ? 0 : nextValueFloat)})
   }
   render () {
     if (!this.props.isOpen) return null
@@ -84,57 +93,64 @@ class TipPositionModal extends React.Component<Props, State> {
     const {wellHeightMM} = this.props
     return (
       <Portal>
-        <Modal
-          className={modalStyles.modal}
-          contentsClassName={cx(modalStyles.modal_contents)}
-          onCloseClick={this.handleCancel}>
-          <div className={styles.modal_header}>
-              <h4>{i18n.t('modal.tip_position.title')}</h4>
-              <p>{i18n.t('modal.tip_position.body')}</p>
-          </div>
-          <div className={styles.main_row}>
-            <div className={styles.leftHalf}>
-              <FormGroup label={i18n.t('modal.tip_position.field_label')}>
-                <InputField
-                  className={styles.position_from_bottom_input}
-                  onChange={this.handleChange}
-                  units="mm"
-                  value={value ? String(value) : null} />
-              </FormGroup>
-              <div className={styles.viz_group}>
-                <div className={styles.adjustment_buttons}>
-                  <OutlineButton
-                    className={styles.adjustment_button}
-                    disabled={parseFloat(value) >= (wellHeightMM * 2)}
-                    onClick={this.handleIncrement}>
-                    +
-                  </OutlineButton>
-                  <OutlineButton
-                    className={styles.adjustment_button}
-                    disabled={parseFloat(value) <= 0}
-                    onClick={this.handleDecrement}>
-                    -
-                  </OutlineButton>
+        <HandleKeypress
+                preventDefault
+                handlers={[
+                  {key: 'ArrowUp', shiftKey: false, onPress: this.handleIncrement},
+                  {key: 'ArrowDown', shiftKey: false, onPress: this.handleDecrement}
+                ]}>
+          <Modal
+            className={modalStyles.modal}
+            contentsClassName={cx(modalStyles.modal_contents)}
+            onCloseClick={this.handleCancel}>
+            <div className={styles.modal_header}>
+                <h4>{i18n.t('modal.tip_position.title')}</h4>
+                <p>{i18n.t('modal.tip_position.body')}</p>
+            </div>
+            <div className={styles.main_row}>
+              <div className={styles.leftHalf}>
+                <FormGroup label={i18n.t('modal.tip_position.field_label')}>
+                  <InputField
+                    className={styles.position_from_bottom_input}
+                    onChange={this.handleChange}
+                    units="mm"
+                    value={value ? String(value) : '0'} />
+                </FormGroup>
+                <div className={styles.viz_group}>
+                  <div className={styles.adjustment_buttons}>
+                    <OutlineButton
+                      className={styles.adjustment_button}
+                      disabled={parseFloat(value) >= (wellHeightMM * 2)}
+                      onClick={this.handleIncrement}>
+                      <Icon name="plus" />
+                    </OutlineButton>
+                    <OutlineButton
+                      className={styles.adjustment_button}
+                      disabled={parseFloat(value) <= 0}
+                      onClick={this.handleDecrement}>
+                      <Icon name="minus" />
+                    </OutlineButton>
+                  </div>
+                  <TipPositionViz tipPosition={value} wellHeightMM={wellHeightMM} />
                 </div>
-                <TipPositionViz tipPosition={value} wellHeightMM={wellHeightMM} />
+              </div>
+              <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
+            </div>
+            <div className={styles.button_row}>
+              <OutlineButton className={styles.reset_button} onClick={this.handleReset}>
+                {i18n.t('button.reset')}
+              </OutlineButton>
+              <div>
+                <PrimaryButton className={styles.cancel_button} onClick={this.handleCancel}>
+                  {i18n.t('button.cancel')}
+                </PrimaryButton>
+                <PrimaryButton className={styles.done_button} onClick={this.handleDone}>
+                  {i18n.t('button.done')}
+                </PrimaryButton>
               </div>
             </div>
-            <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
-          </div>
-          <div className={styles.button_row}>
-            <OutlineButton className={styles.reset_button} onClick={this.handleReset}>
-              {i18n.t('button.reset')}
-            </OutlineButton>
-            <div>
-              <PrimaryButton className={styles.cancel_button} onClick={this.handleCancel}>
-                {i18n.t('button.cancel')}
-              </PrimaryButton>
-              <PrimaryButton className={styles.done_button} onClick={this.handleDone}>
-                {i18n.t('button.done')}
-              </PrimaryButton>
-            </div>
-          </div>
-        </Modal>
+          </Modal>
+        </HandleKeypress>
       </Portal>
     )
   }
@@ -143,11 +159,30 @@ class TipPositionModal extends React.Component<Props, State> {
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
   // NOTE: not interpolating prefix because breaks flow string enum
-  const fieldName = ownProps.prefix === 'aspirate' ? 'aspirate_tipPosition' : 'dispense_tipPosition'
+  let fieldName = 'tipPosition'
+  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_tipPosition'
+  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_tipPosition'
 
+  let labwareFieldName = 'labware'
+  if (ownProps.prefix === 'aspirate') labwareFieldName = 'aspirate_labware'
+  else if (ownProps.prefix === 'dispense') labwareFieldName = 'dispense_labware'
+
+  let wellHeightMM = 0
+  if (formData[labwareFieldName]) {
+    const labwareById = labwareIngredsSelectors.getLabware(state)
+    const labwareDef = getLabware(labwareById[formData[labwareFieldName]].type)
+    console.log('def: ', labwareDef)
+    if (labwareDef) {
+      // NOTE: only taking depth of first well in labware, UI not currently equipped for multiple depths
+      const firstWell = labwareDef.wells[Object.keys(labwareDef.wells)[0]]
+      if (firstWell) wellHeightMM = firstWell.depth
+    } else {
+      console.warn('the specified source labware definition could not be located')
+    }
+  }
   return {
     tipPosition: formData && formData[fieldName],
-    wellHeightMM: 40 // TODO: get real value
+    wellHeightMM
   }
 }
 

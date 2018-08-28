@@ -63,7 +63,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <TipPositionInput prefix="aspirate"/>
+          <TipPositionInput />
         </div>
         <div className={styles.right_settings_column}>
           <WellOrderInput prefix="aspirate" />

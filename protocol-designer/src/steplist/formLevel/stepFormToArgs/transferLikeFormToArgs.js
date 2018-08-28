@@ -198,7 +198,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
       break
     }
   }
-  console.log(stepArguments)
   return stepArguments
 }
 

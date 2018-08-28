@@ -21,12 +21,11 @@ const TipPositionViz = (props: Props) => {
       <img
         src={PIPETTE_TIP_IMAGE}
         className={styles.pipette_tip_image}
-        style={{bottom: `${roundedPixelsFromBottom}px`}} />
-      <span className={styles.well_height_label}>{props.wellHeightMM}mm</span>
+        style={{bottom: `${props.wellHeightMM ? roundedPixelsFromBottom : props.tipPosition}px`}} />
+      {props.wellHeightMM !== null && <span className={styles.well_height_label}>{props.wellHeightMM}mm</span>}
       <img
         src={WELL_CROSS_SECTION_IMAGE}
         className={styles.well_cross_section_image} />
-        {/* style={{height: `${WELL_HEIGHT_PIXELS}px`}} /> */}
     </div>
   )
 }

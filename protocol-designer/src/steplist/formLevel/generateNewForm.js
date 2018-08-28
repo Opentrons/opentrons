@@ -31,27 +31,39 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+        'aspirate_tipPosition': DEFAULT_TIP_POSITION,
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
-        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
+        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+        'dispense_tipPosition': DEFAULT_TIP_POSITION
       }
     case 'consolidate':
-    case 'mix':
       return {
         ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_tipPosition': DEFAULT_TIP_POSITION,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
-        'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
+        'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+        'dispense_tipPosition': DEFAULT_TIP_POSITION
+      }
+    case 'mix':
+      return {
+        ...baseForm,
+        'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
+        'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
+        'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+        'tipPosition': DEFAULT_TIP_POSITION
       }
     case 'distribute':
       return {
         ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_disposalVol_checkbox': true,
+        'aspirate_tipPosition': DEFAULT_TIP_POSITION,
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_blowout_checkbox': true,
-        'dispense_blowout_labware': FIXED_TRASH_ID
+        'dispense_blowout_labware': FIXED_TRASH_ID,
+        'dispense_tipPosition': DEFAULT_TIP_POSITION
       }
     default:
       if (stepType !== 'pause') {
