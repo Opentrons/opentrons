@@ -6,7 +6,7 @@ import {selectors as pipetteSelectors} from '../../pipettes'
 import { DEFAULT_MM_FROM_BOTTOM } from '../../constants'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
-import type {GetState} from '../../types'
+import type {BaseState, GetState} from '../../types'
 
 import type {ChangeFormPayload} from './types'
 
@@ -30,132 +30,134 @@ function _getAllWells (
   return uniq(allWells)
 }
 
+// TODO: Ian 2018-08-28 revisit this,
+// maybe remove channels from pipette state and use shared-data?
+// or if not, make this its own selector in pipettes/ atom
+const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
+  const pipettes = pipetteSelectors.pipettesById(state)
+  const pipette = pipettes[pipetteId]
+  if (!pipette) {
+    console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
+    return 1
+  }
+  return pipette.channels
+}
+
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
   const unsavedForm = selectors.formData(baseState)
+  let updateOverrides = {}
 
-  // TODO Ian 2018-05-08 all these transformations should probably be put under
-  // `if (unsavedForm.stepType === 'mix') { handleFormChange_mix(payload, unsavedForm, getState)}
-  // so they don't get jumbled together
+  if (unsavedForm == null) {
+    // pass thru, unchanged
+    return payload
+  }
 
   // Changing labware clears wells selection: source labware
-  if (
-    unsavedForm !== null &&
-    'aspirate_labware' in payload.update
-  ) {
-    return {
-      update: {
-        ...payload.update,
-        'aspirate_wells': null,
-        'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
-      }
+  if ('aspirate_labware' in payload.update) {
+    updateOverrides = {
+      ...updateOverrides,
+      'aspirate_wells': null,
+      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
     }
   }
 
   // Changing labware clears wells selection: dest labware
-  if (
-    unsavedForm !== null &&
-    'dispense_labware' in payload.update
-  ) {
-    return {
-      update: {
-        ...payload.update,
-        'dispense_wells': null,
-        'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
-      }
+  if ('dispense_labware' in payload.update) {
+    updateOverrides = {
+      ...updateOverrides,
+      'dispense_wells': null,
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
     }
   }
 
   // Changing labware clears wells selection: labware (eg, mix)
-  if (
-    unsavedForm !== null &&
-    'labware' in payload.update
-  ) {
-    return {
-      update: {
-        ...payload.update,
-        'wells': null,
-        'mmFromBottom': DEFAULT_MM_FROM_BOTTOM
-      }
+  if ('labware' in payload.update) {
+    updateOverrides = {
+      ...updateOverrides,
+      'wells': null,
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
     }
   }
 
-  // Changing pipette from multi-channel to single-channel (and visa versa) modifies well selection
   if (
-    unsavedForm !== null &&
     unsavedForm.pipette &&
-    'pipette' in payload.update
+    payload.update.pipette
   ) {
-    const prevPipette = unsavedForm.pipette
+    const prevPipette: string = unsavedForm.pipette
+    const prevChannels = getChannels(prevPipette, baseState)
     const nextPipette = payload.update.pipette
 
-    const getChannels = (pipetteId: string): PipetteChannels => {
-      const pipettes = pipetteSelectors.pipettesById(getState())
-      const pipette = pipettes[pipetteId]
-      if (!pipette) {
-        console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
-        return 1
-      }
-      return pipette.channels
+    if (typeof nextPipette !== 'string') {
+      // this should not happen!
+      console.error('no next pipette, could not handleFormChange')
+      return payload
     }
+    const nextChannels = getChannels(nextPipette, baseState)
 
-    if (typeof nextPipette === 'string' && // TODO Ian 2018-05-04 this type check can probably be removed when changeFormInput is typed
-      getChannels(prevPipette) === 1 &&
-      getChannels(nextPipette) === 8
-    ) {
-      // single-channel to multi-channel: clear all selected wells
-      // to avoid carrying over inaccessible wells
+    const singleToMulti = prevChannels === 1 && nextChannels === 8
+    const multiToSingle = prevChannels === 8 && nextChannels === 1
 
-      // steptypes with single set of wells (not source + dest)
-      if (unsavedForm.stepType === 'mix') {
-        return {
-          update: {
-            ...payload.update,
-            wells: null
-          }
+    // *****
+    // set any flow rates to null when pipette is changed
+    // *****
+    if (prevPipette !== nextPipette) {
+      if (unsavedForm.aspirate_flowRate) {
+        updateOverrides = {
+          ...updateOverrides,
+          aspirate_flowRate: null
         }
       }
 
-      // source + dest well steptypes
-      return {
-        update: {
-          ...payload.update,
-          'aspirate_wells': null,
-          'dispense_wells': null
+      if (unsavedForm.dispense_flowRate) {
+        updateOverrides = {
+          ...updateOverrides,
+          dispense_flowRate: null
         }
       }
     }
 
-    if (typeof nextPipette === 'string' &&
-      getChannels(prevPipette) === 8 &&
-      getChannels(nextPipette) === 1
-    ) {
-      // multi-channel to single-channel: convert primary wells to all wells
+    // *****
+    // Changing pipette from multi-channel to single-channel (and visa versa)
+    // modifies well selection
+    // *****
 
-      // steptypes with single set of wells (not source + dest)
-      if (unsavedForm.stepType === 'mix') {
+    // steptypes with single set of wells (not source + dest)
+    if (unsavedForm.stepType === 'mix') {
+      if (singleToMulti) {
+        updateOverrides = {
+          ...updateOverrides,
+          wells: null
+        }
+      } else if (multiToSingle) {
+        // multi-channel to single-channel: convert primary wells to all wells
         const labwareId = unsavedForm.labware
         const labwareType = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId].type
 
-        return {
-          update: {
-            ...payload.update,
-            wells: _getAllWells(unsavedForm.wells, labwareType)
-          }
+        updateOverrides = {
+          ...updateOverrides,
+          wells: _getAllWells(unsavedForm.wells, labwareType)
         }
       }
+    } else {
+      if (singleToMulti) {
+        // source + dest well steptypes
+        updateOverrides = {
+          ...updateOverrides,
+          'aspirate_wells': null,
+          'dispense_wells': null
+        }
+      } else if (multiToSingle) {
+        // multi-channel to single-channel: convert primary wells to all wells
+        const sourceLabwareId = unsavedForm['aspirate_labware']
+        const destLabwareId = unsavedForm['dispense_labware']
 
-      // source + dest well steptypes
-      const sourceLabwareId = unsavedForm['aspirate_labware']
-      const destLabwareId = unsavedForm['dispense_labware']
+        const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
+        const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
 
-      const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
-      const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
-
-      return {
-        update: {
-          ...payload.update,
+        updateOverrides = {
+          ...updateOverrides,
           'aspirate_wells': _getAllWells(unsavedForm['aspirate_wells'], sourceLabwareType),
           'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType)
         }
@@ -163,8 +165,12 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     }
   }
 
-  // fallback, untransformed
-  return payload
+  return {
+    update: {
+      ...payload.update,
+      ...updateOverrides
+    }
+  }
 }
 
 export default handleFormChange
