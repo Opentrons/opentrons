@@ -71,8 +71,6 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
             pipetteFieldName='pipette'
             flowRateType='aspirate'
           />
-        </div>
-        <div className={styles.right_settings_column}>
           <WellOrderInput prefix="aspirate" />
           <FlowRateField
             name='dispense_flowRate'
