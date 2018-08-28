@@ -96,14 +96,16 @@ function transferLikeSubsteps (args: {
     const commandCallArgs = {
       ...validatedForm,
       mixBeforeAspirate: null,
-      mixInDestination: null
+      mixInDestination: null,
+      preWetTip: false
     }
 
     result = transfer(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'distribute') {
     const commandCallArgs = {
       ...validatedForm,
-      mixBeforeAspirate: null
+      mixBeforeAspirate: null,
+      preWetTip: false
     }
 
     result = distribute(commandCallArgs)(robotState)
@@ -111,7 +113,8 @@ function transferLikeSubsteps (args: {
     const commandCallArgs = {
       ...validatedForm,
       mixFirstAspirate: null,
-      mixInDestination: null
+      mixInDestination: null,
+      preWetTip: false
     }
 
     result = consolidate(commandCallArgs)(robotState)
