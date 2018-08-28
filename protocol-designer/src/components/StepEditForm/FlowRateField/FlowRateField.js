@@ -86,7 +86,8 @@ export default class FlowRateField extends React.Component<Props, State> {
       !Number.isNaN(Number(value))
     ) {
       this.setState({
-        modalFlowRate: value
+        modalFlowRate: value,
+        modalUseDefault: false
       })
     }
   }
@@ -118,12 +119,15 @@ export default class FlowRateField extends React.Component<Props, State> {
     const correctDecimals = Number(modalFlowRateNum.toFixed(DECIMALS_ALLOWED)) === modalFlowRateNum
     const allowSave = modalUseDefault || (!outOfBounds && correctDecimals)
 
-    let error = null
-    if (!modalUseDefault && !pristine) {
-      if (outOfBounds) {
-        error = rangeDescription
-      } else if (!correctDecimals) {
-        error = `a max of ${DECIMALS_ALLOWED} decimal places is allowed`
+    let errorMessage = null
+    // validation only happens when "Custom" is selected, not "Default"
+    // and pristinity only masks the outOfBounds error, not the correctDecimals error
+    if (!modalUseDefault) {
+      if (!Number.isNaN(modalFlowRateNum) && !correctDecimals) {
+        errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
+          DECIMALS_ALLOWED > 1 ? 's' : ''} is allowed`
+      } else if (!pristine && outOfBounds) {
+        errorMessage = rangeDescription
       }
     }
 
@@ -132,7 +136,7 @@ export default class FlowRateField extends React.Component<Props, State> {
         value={`${this.state.modalFlowRate || ''}`}
         units='μL/s'
         caption={rangeDescription}
-        error={error}
+        error={errorMessage}
         onChange={this.handleChangeNumber}
       />
     )
