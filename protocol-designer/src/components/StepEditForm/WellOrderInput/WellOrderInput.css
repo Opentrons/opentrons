@@ -30,6 +30,10 @@
   justify-content: space-between;
 }
 
+.well_order_dropdown {
+  width: 9rem;
+}
+
 .field_spacer {
   margin: 6px 12px;
 }
