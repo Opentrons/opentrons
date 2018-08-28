@@ -1,0 +1,9 @@
+{
+  "well_order": {
+    "title": "Well Order",
+    "body": "Change the order in which the robot aspirates from the selected wells",
+    "field_label": "Order",
+    "then": "then",
+    "viz_label": "Pattern"
+  }
+}

@@ -30,6 +30,15 @@
   "field": {
     "change_tip": {
       "label": "Get new tip"
+    },
+    "well_order": {
+      "label": "Well Order",
+      "option": {
+        "l2r": "Left to right",
+        "r2l": "Right to left",
+        "t2b": "Top to bottom",
+        "b2t": "Bottom to top"
+      }
     }
   }
 }

@@ -28,11 +28,6 @@ export const uuid: () => string = uuidv1
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
 
-// $FlowFixMe: Missing type annotation for `U`
-export const transpose = (matrix: Array<Array<mixed>>) => matrix[0].map((_col, i) =>
-  matrix.map(row => row[i])
-)
-
 // These utils are great candidates for unit tests
 export const toWellName = ({rowNum, colNum}: {rowNum: number, colNum: number}) => (
   String.fromCharCode(colNum + 65) + (rowNum + 1)

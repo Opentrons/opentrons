@@ -5,16 +5,19 @@ import {Icon} from '../icons'
 
 import styles from './forms.css'
 
+type RadioOption = {
+  name: string,
+  value: string,
+  disabled?: boolean
+}
+
 type Props = {
   /** change handler */
   onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
-  /** Array of {name, value} data */
-  options?: Array<{
-    name: string,
-    value: string
-  }>,
+  /** Array of {name, value, disabled} data */
+  options?: Array<RadioOption>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply */

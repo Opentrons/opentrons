@@ -6,7 +6,12 @@ import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {getFormWarnings, getFormErrors} from './formLevel'
+import {
+  getFormWarnings,
+  getFormErrors,
+  generateNewForm,
+  stepFormToArgs
+} from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
 import {initialSelectedItemState} from './reducers'
@@ -26,12 +31,7 @@ import type {
   StepIdType
 } from '../form-types'
 
-import {
-  type ValidFormAndErrors,
-  generateNewForm,
-  validateAndProcessForm,
-  formHasErrors
-} from './formProcessing'
+import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 const rootSelector = (state: BaseState): RootState => state.steplist
@@ -132,15 +132,17 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   }
 )
 
-// TODO Ian 2018-02-14 rename validatedForms -> validatedSteps, since not all steps have forms (eg deck setup steps)
+// TODO Brian 2018-08-21 rename validatedForms -> stepArguments since it should only include
+// the results of translating form data into step generation arguments
 const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelector(
   getSteps,
   getSavedForms,
   orderedStepsSelector,
-  (_steps, _savedStepForms, _orderedSteps) => {
+  labwareIngredSelectors.getLabware,
+  (_steps, _savedStepForms, _orderedSteps, _labware) => {
     return reduce(_orderedSteps, (acc, stepId) => {
       const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
-        ? validateAndProcessForm(_savedStepForms[stepId])
+        ? stepFormToArgs(_savedStepForms[stepId], {labware: _labware})
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
         : {
           errors: {'form': ['no saved form for step ' + stepId]},
@@ -246,7 +248,7 @@ const nextStepId: Selector<number> = createSelector( // generates the next step 
 // TODO: remove this when we add in form level validation
 const currentFormErrors: Selector<null | {[errorName: string]: string}> = (state: BaseState) => {
   const form = formData(state)
-  return form && validateAndProcessForm(form).errors // TODO refactor selectors
+  return form && stepFormToArgs(form).errors // TODO refactor selectors
 }
 
 const formLevelWarnings: Selector<Array<FormWarning>> = (state) => {
@@ -315,15 +317,15 @@ const getSelectedStep = createSelector(
   }
 )
 
+// TODO: BC: 2018-08-21 remove this, always allow save
 export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   formData,
   getSelectedStepId,
   allSteps,
-  (formData, selectedStepId, allSteps) =>
+  labwareIngredSelectors.getLabware,
+  (formData, selectedStepId, allSteps, labware) =>
     ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
-      ? !formHasErrors(
-        validateAndProcessForm(formData)
-      )
+      ? Object.values(stepFormToArgs(formData, {labware}).errors).length === 0
       : null
 )
 
