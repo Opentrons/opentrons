@@ -122,6 +122,10 @@ def log_init():
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG
+            },
+            'opentrons.system': {
+                'handlers': ['debug', 'api'],
+                'level': level_value
             }
         }
     )
