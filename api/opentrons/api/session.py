@@ -314,9 +314,6 @@ class Session(object):
 
     def _pre_run_hooks(self):
         robot.home_z()
-        for module in robot.modules:
-            if hasattr(module, 'calibrate'):
-                module.calibrate()
 
 
 def _accumulate(iterable):
