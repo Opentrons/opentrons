@@ -8,15 +8,15 @@ import styles from './TipPositionInput.css'
 
 const WELL_HEIGHT_PIXELS = 48
 type Props = {
-  tipPosition: string,
+  mmFromBottom: string,
   wellHeightMM: number
 }
 
-const TipPositionViz = (props: Props) => {
-  const fractionOfWellHeight = Number(props.tipPosition) / props.wellHeightMM
+const TipPositionZAxisViz = (props: Props) => {
+  const fractionOfWellHeight = Number(props.mmFromBottom) / props.wellHeightMM
   const pixelsFromBottom = (Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS) - WELL_HEIGHT_PIXELS
   const roundedPixelsFromBottom = String(pixelsFromBottom.toFixed(2))
-  const bottomPx = props.wellHeightMM ? roundedPixelsFromBottom : (parseFloat(props.tipPosition) - WELL_HEIGHT_PIXELS)
+  const bottomPx = props.wellHeightMM ? roundedPixelsFromBottom : (parseFloat(props.mmFromBottom) - WELL_HEIGHT_PIXELS)
   return (
     <div className={styles.viz_wrapper}>
       <img
@@ -30,4 +30,4 @@ const TipPositionViz = (props: Props) => {
     </div>
   )
 }
-export default TipPositionViz
+export default TipPositionZAxisViz

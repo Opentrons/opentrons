@@ -16,7 +16,7 @@ import { DEFAULT_MM_FROM_BOTTOM } from '../../../constants'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import {actions} from '../../../steplist'
-import TipPositionViz from './TipPositionViz'
+import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 
@@ -26,7 +26,7 @@ const LARGE_STEP_MM = 10
 type DP = { updateValue: (string) => mixed }
 
 type OP = {
-  tipPosition: number,
+  mmFromBottom: number,
   wellHeightMM: number,
   isOpen: boolean,
   closeModal: () => mixed,
@@ -43,11 +43,11 @@ const formatValue = (value: mixed) => (
 class TipPositionModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = { value: formatValue(props.tipPosition) }
+    this.state = { value: formatValue(props.mmFromBottom) }
   }
   componentDidUpdate (prevProps) {
     if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
-      this.setState({value: formatValue(this.props.tipPosition)})
+      this.setState({value: formatValue(this.props.mmFromBottom)})
     }
   }
   applyChanges = () => {
@@ -58,7 +58,7 @@ class TipPositionModal extends React.Component<Props, State> {
     this.props.closeModal()
   }
   handleCancel = () => {
-    this.setState({value: formatValue(this.props.tipPosition)}, this.applyChanges)
+    this.setState({value: formatValue(this.props.mmFromBottom)}, this.applyChanges)
     this.props.closeModal()
   }
   handleDone = () => {
@@ -136,7 +136,7 @@ class TipPositionModal extends React.Component<Props, State> {
                       <Icon name="minus" />
                     </OutlineButton>
                   </div>
-                  <TipPositionViz tipPosition={value} wellHeightMM={wellHeightMM} />
+                  <TipPositionZAxisViz mmFromBottom={value} wellHeightMM={wellHeightMM} />
                 </div>
               </div>
               <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>

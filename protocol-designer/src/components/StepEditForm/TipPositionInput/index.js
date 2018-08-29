@@ -12,7 +12,7 @@ import type {BaseState} from '../../../types'
 
 type OP = {prefix?: 'aspirate' | 'dispense'}
 type SP = {
-  tipPosition: ?string,
+  mmFromBottom: ?string,
   wellHeightMM: ?number
 }
 
@@ -37,12 +37,12 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
           prefix={this.props.prefix}
           closeModal={this.handleClose}
           wellHeightMM={this.props.wellHeightMM}
-          tipPosition={this.props.tipPosition}
+          mmFromBottom={this.props.mmFromBottom}
           isOpen={this.state.isModalOpen} />
           <InputField
             readOnly
             onClick={this.handleOpen}
-            value={this.props.wellHeightMM ? this.props.tipPosition : null}
+            value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
             units="mm" />
       </FormGroup>
     )
@@ -73,7 +73,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
   return {
     wellHeightMM,
-    tipPosition: formData && formData[fieldName]
+    mmFromBottom: formData && formData[fieldName]
   }
 }
 
