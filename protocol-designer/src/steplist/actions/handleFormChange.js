@@ -3,6 +3,7 @@ import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import {selectors} from '../index'
 import {selectors as pipetteSelectors} from '../../pipettes'
+import { DEFAULT_MM_FROM_BOTTOM } from '../../constants'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {GetState} from '../../types'
@@ -46,7 +47,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     return {
       update: {
         ...payload.update,
-        'aspirate_wells': null
+        'aspirate_wells': null,
+        'aspirate_tipPosition': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }
@@ -59,7 +61,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     return {
       update: {
         ...payload.update,
-        'dispense_wells': null
+        'dispense_wells': null,
+        'dispense_tipPosition': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }
@@ -72,7 +75,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     return {
       update: {
         ...payload.update,
-        'wells': null
+        'wells': null,
+        'tipPosition': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }

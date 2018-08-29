@@ -41,6 +41,7 @@ export type StepFieldName =
   | 'stepDetails'
   | 'stepName'
   | 'times'
+  | 'tipPosition'
   | 'touchTip'
   | 'volume'
   | 'wells'

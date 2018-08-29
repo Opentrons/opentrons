@@ -59,7 +59,8 @@
 
 .well_height_label {
   font-size: var(--fs-caption);
-  color: var(--c-selected-dark);
+  font-weight: var(--fw-semibold);
+  color: var(--c-blue);
   position: absolute;
   right: 10px;
   bottom: 45px;
