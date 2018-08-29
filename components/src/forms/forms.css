@@ -121,6 +121,10 @@
   }
 }
 
+.inline_item {
+  flex: 1;
+}
+
 .dropdown_field {
   position: relative;
 
