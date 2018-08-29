@@ -179,4 +179,8 @@
   & .form_group_label {
     color: var(--c-light-gray);
   }
+
+  & input { /* stylelint-disable no-descending-specificity */
+    color: var(--c-med-gray);
+  }
 }

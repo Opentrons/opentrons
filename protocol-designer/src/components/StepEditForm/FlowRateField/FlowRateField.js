@@ -16,13 +16,14 @@ const DECIMALS_ALLOWED = 1
 type Props = {
   /** When flow rate is falsey (including 0), it means 'use default' */
   defaultFlowRate: ?number,
+  disabled?: boolean,
   formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   label: ?string,
   minFlowRate: number,
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
-  pipetteModelDisplayName: string
+  pipetteModelDisplayName: ?string
 }
 
 type State = {
@@ -101,6 +102,7 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     const {
       defaultFlowRate,
+      disabled,
       formFlowRate,
       flowRateType,
       label,
@@ -141,7 +143,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       />
     )
 
-    const FlowRateModal = (
+    const FlowRateModal = pipetteModelDisplayName && (
       <Portal>
         <AlertModal
           className={modalStyles.modal}
@@ -186,9 +188,10 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <FormGroup label={label || DEFAULT_LABEL}>
+        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
             readOnly
+            disabled={disabled}
             onClick={this.openModal}
             value={(formFlowRate) ? `${formFlowRate} μL/s` : 'Default'}
           />
