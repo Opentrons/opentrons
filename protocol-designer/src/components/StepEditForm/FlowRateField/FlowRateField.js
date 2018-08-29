@@ -112,7 +112,10 @@ export default class FlowRateField extends React.Component<Props, State> {
     } = this.props
 
     const modalFlowRateNum = Number(this.state.modalFlowRate)
-    const rangeDescription = `between ${minFlowRate} and ${maxFlowRate}`
+
+    // show 0.1 not 0 as minimum, since bottom of range is non-inclusive
+    const displayMinFlowRate = minFlowRate || Math.pow(10, -DECIMALS_ALLOWED)
+    const rangeDescription = `between ${displayMinFlowRate} and ${maxFlowRate}`
     const outOfBounds = (
       modalFlowRateNum === 0 ||
       minFlowRate > modalFlowRateNum ||
@@ -129,7 +132,7 @@ export default class FlowRateField extends React.Component<Props, State> {
         errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
           DECIMALS_ALLOWED > 1 ? 's' : ''} is allowed`
       } else if (!pristine && outOfBounds) {
-        errorMessage = rangeDescription
+        errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
       }
     }
 
@@ -190,10 +193,11 @@ export default class FlowRateField extends React.Component<Props, State> {
       <React.Fragment>
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
+            units='μL/s'
             readOnly
             disabled={disabled}
             onClick={this.openModal}
-            value={(formFlowRate) ? `${formFlowRate} μL/s` : 'Default'}
+            value={formFlowRate ? `${formFlowRate}` : 'Default'}
           />
         </FormGroup>
 
