@@ -48,7 +48,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       update: {
         ...payload.update,
         'aspirate_wells': null,
-        'aspirate_tipPosition': DEFAULT_MM_FROM_BOTTOM
+        'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }
@@ -62,7 +62,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       update: {
         ...payload.update,
         'dispense_wells': null,
-        'dispense_tipPosition': DEFAULT_MM_FROM_BOTTOM
+        'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }
@@ -76,7 +76,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       update: {
         ...payload.update,
         'wells': null,
-        'tipPosition': DEFAULT_MM_FROM_BOTTOM
+        'mmFromBottom': DEFAULT_MM_FROM_BOTTOM
       }
     }
   }

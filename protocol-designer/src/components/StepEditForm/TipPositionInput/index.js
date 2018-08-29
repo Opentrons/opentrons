@@ -51,9 +51,9 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
   // NOTE: not interpolating prefix because breaks flow string enum
-  let fieldName = 'tipPosition'
-  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_tipPosition'
-  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_tipPosition'
+  let fieldName = 'mmFromBottom'
+  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_mmFromBottom'
+  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_mmFromBottom'
 
   let labwareFieldName = 'labware'
   if (ownProps.prefix === 'aspirate') labwareFieldName = 'aspirate_labware'

@@ -164,9 +164,9 @@ class TipPositionModal extends React.Component<Props, State> {
 const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
   // NOTE: not interpolating prefix because breaks flow string enum
 
-  let fieldName = 'tipPosition'
-  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_tipPosition'
-  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_tipPosition'
+  let fieldName = 'mmFromBottom'
+  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_mmFromBottom'
+  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_mmFromBottom'
   return {
     updateValue: (value) => {
       dispatch(actions.changeFormInput({update: {[fieldName]: value}}))
