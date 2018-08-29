@@ -10,10 +10,10 @@ import {
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField,
-  FlowRateField
+  ChangeTipField
 } from './formFields'
 
+import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
 import TipPositionInput from './TipPositionInput'
 import WellOrderInput from './WellOrderInput'
@@ -36,7 +36,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
-        <FormGroup label='Repetitions' className={styles.field_row}>
+        <FormGroup label='Repetitions' className={cx(styles.field_row, styles.repetitions_row)}>
           <StepInputField name="volume" units='μL' {...focusHandlers} />
           <StepInputField name="times" units='Times' {...focusHandlers} />
         </FormGroup>
@@ -65,8 +65,19 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
           <TipPositionInput />
         </div>
         <div className={styles.right_settings_column}>
+          <FlowRateField
+            name='aspirate_flowRate'
+            label='Aspirate Flow Rate'
+            pipetteFieldName='pipette'
+            flowRateType='aspirate'
+          />
           <WellOrderInput prefix="aspirate" />
-          <FlowRateField />
+          <FlowRateField
+            name='dispense_flowRate'
+            label='Dispense Flow Rate'
+            pipetteFieldName='pipette'
+            flowRateType='dispense'
+          />
         </div>
       </div>
     </React.Fragment>

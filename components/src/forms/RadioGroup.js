@@ -5,19 +5,17 @@ import {Icon} from '../icons'
 
 import styles from './forms.css'
 
-type RadioOption = {
-  name: string,
-  value: string,
-  disabled?: boolean
-}
-
 type Props = {
   /** change handler */
   onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
-  /** Array of {name, value, disabled} data */
-  options?: Array<RadioOption>,
+  /** Array of {name, value} data with optional children */
+  options?: Array<{
+    name: string,
+    value: string,
+    children?: React.Node
+  }>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply */
@@ -29,10 +27,21 @@ type Props = {
 export default function RadioGroup (props: Props) {
   const error = props.error != null
 
+  const outerClassName = cx({
+    [styles.inline]: props.inline,
+    [styles.error]: error
+  })
+
+  const itemClassName = cx(
+    styles.form_field,
+    props.className,
+    {[styles.inline_item]: props.inline}
+  )
+
   return (
-    <div className={cx({[styles.inline]: props.inline, [styles.error]: error})}>
+    <div className={outerClassName}>
       {props.options && props.options.map(radio =>
-        <label key={radio.value} className={cx(styles.form_field, props.className)}>
+        <label key={radio.value} className={itemClassName}>
           <div className={styles.checkbox_icon}>
             <Icon
               name={radio.value === props.value ? 'radiobox-marked' : 'radiobox-blank'}
@@ -48,6 +57,7 @@ export default function RadioGroup (props: Props) {
             onChange={props.onChange}
           />
           <div className={styles.label_text}>{radio.name}</div>
+          {radio.children}
         </label>
     )}
     </div>

@@ -351,6 +351,17 @@ Through the API's call labware.create(), you can create simple grid containers, 
 When you create your custom container it will return the custom plate. You should only need to run
 this once among all of your protocols for the same custom container because the data is automatically saved on the robot.
 
+**Note** There is some specialty labware that will require you to specify the type within your container name.
+If you are creating a custom tiprack, it must be `tiprack`-REST-OF-CONTAINER-NAME in order for the program to act reliably.
+
+If you would like to delete a container you have already added to the database, you can do the following:
+
+.. code-block:: python
+    from opentrons.data_storage import database
+    database.delete_container('3x6_plate')
+
+This allows you to make changes to the container within the database under the same name.
+
 .. code-block:: python
 
     for well in custom_plate.wells():

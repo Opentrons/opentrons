@@ -71,7 +71,10 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
   )
 }
 
-type StepRadioGroupProps = {name: StepFieldName, options: Options} & FocusHandlers
+type StepRadioGroupProps = {
+  name: StepFieldName,
+  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+} & FocusHandlers
 export const StepRadioGroup = (props: StepRadioGroupProps) => {
   const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
   return (
@@ -174,10 +177,6 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
       )} />
   )
 })
-
-// NOTE 2018-05-31 Flow rate cannot yet be adjusted,
-// this is a placeholder
-export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGroup>
 
 const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
 
