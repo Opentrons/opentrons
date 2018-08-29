@@ -15,7 +15,6 @@ import {
   FIXED_TRASH_ID
 } from '../../constants'
 
-// TODO: type pipette
 const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
   // Add default values to a new step form
   const baseForm = {
@@ -24,21 +23,23 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
     'step-name': startCase(stepType),
     'step-details': ''
   }
+  return {...baseForm, ...getDefaultsForStepType(stepType)}
+}
+
+export const getDefaultsForStepType = (stepType: StepType) => {
   switch (stepType) {
     case 'transfer':
       return {
-        ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
+        'aspirate_tipPosition': DEFAULT_MM_FROM_BOTTOM,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM,
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
-        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
-        'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
+        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
       }
     case 'consolidate':
       return {
-        ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
@@ -47,7 +48,6 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
       }
     case 'mix':
       return {
-        ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
@@ -55,7 +55,6 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
       }
     case 'distribute':
       return {
-        ...baseForm,
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_disposalVol_checkbox': true,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM,
@@ -66,10 +65,7 @@ const generateNewForm = (stepId: StepIdType, stepType: StepType): BlankForm => {
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
       }
     default:
-      if (stepType !== 'pause') {
-        console.warn('generateNewForm: Only transfer, consolidate, & pause forms are supported now. TODO. Got ' + stepType)
-      }
-      return baseForm
+      return {}
   }
 }
 

@@ -3,6 +3,7 @@ import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import type {ActionType, Reducer} from 'redux-actions'
 import omit from 'lodash/omit'
+import mapValues from 'lodash/mapValues'
 
 import {getPDMetadata} from '../file-types'
 
@@ -15,6 +16,7 @@ import type {
 } from './types'
 import type {LoadFileAction} from '../load-file'
 import type {FormData, StepIdType, FormModalFields} from '../form-types'
+import { getDefaultsForStepType } from './formLevel/generateNewForm'
 
 import type {
   AddStepAction,
@@ -133,8 +135,12 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
     [action.payload.id]: action.payload
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
-  LOAD_FILE: (state: SavedStepFormState, action: LoadFileAction): SavedStepFormState =>
-    getPDMetadata(action.payload).savedStepForms
+  LOAD_FILE: (state: SavedStepFormState, action: LoadFileAction): SavedStepFormState => {
+    const loadedStepForms = getPDMetadata(action.payload).savedStepForms
+    return mapValues(loadedStepForms, stepForm => ({
+      ...getDefaultsForStepType(stepForm.stepType), ...stepForm
+    }))
+  }
 }, {})
 
 type CollapsedStepsState = {
