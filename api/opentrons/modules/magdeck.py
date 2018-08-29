@@ -33,10 +33,10 @@ class MagDeck:
     @commands.publish.both(command=commands.magdeck_engage)
     def engage(self):
         '''
-        Move the magnet to plate top - 1 mm
+        Move the magnet to plate top - 0.4 mm
         '''
         if self._driver and self._driver.is_connected():
-            self._driver.move(self._driver.plate_height - 1.0)
+            self._driver.move(self._driver.plate_height - 0.4)
             self._engaged = True
 
     @commands.publish.both(command=commands.magdeck_disengage)

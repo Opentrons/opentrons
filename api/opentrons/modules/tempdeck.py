@@ -1,5 +1,4 @@
-from time import sleep
-from threading import Event, Thread
+from threading import Thread, Event
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons import commands
 
@@ -22,7 +21,7 @@ class TempDeck:
         self._port = port
         self._driver = None
         self._device_info = None
-        self._poll_start_event = None
+        self._poll_stop_event = None
 
     @commands.publish.both(command=commands.tempdeck_set_temp)
     def set_temperature(self, celsius):
@@ -41,7 +40,7 @@ class TempDeck:
         if self._driver and self._driver.is_connected():
             self._driver.disengage()
 
-    def _wait_for_temp(self):
+    def wait_for_temp(self):
         """
         This method exits only if set temperature has reached.Subject to change
         """
@@ -100,20 +99,17 @@ class TempDeck:
     @property
     def status(self):
         """
-        Returns a string: 'heating'/'cooling'/'holding at target'/'idle'
+        Returns a string: 'heating'/'cooling'/'holding at target'/'idle'.
+        NOTE: Depends on _poll_temperature thread to update the temperature to
+        be used to determine the status
         """
         return self._driver and self._driver.status
 
     # Internal Methods
 
     def _poll_temperature(self):
-        self._poll_start_event = Event()
-        self._poll_start_event.set()
-        while True:
+        while not self._poll_stop_event.wait(TEMP_POLL_INTERVAL_SECS):
             self._driver and self._driver.update_temperature()
-            sleep(TEMP_POLL_INTERVAL_SECS)
-            if not self._poll_start_event.wait(0):
-                break
 
     def connect(self):
         """
@@ -126,19 +122,22 @@ class TempDeck:
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
 
+            self._poll_stop_event = Event()
             Thread(target=self._poll_temperature).start()
         else:
             # Sanity check Should never happen, because connect should never
             # be called without a port on Module
             raise MissingDevicePortError(
-                "TempDeck couldnt connect to port {}".format(self._port)
+                "TempDeck couldn't connect to port {}".format(self._port)
             )
 
     def disconnect(self):
         '''
         Disconnect from the serial port
         '''
-        if self._poll_start_event:
-            self._poll_start_event.clear()
+        if self._poll_stop_event:
+            self._poll_stop_event.set()
         if self._driver:
+            if self.status != 'idle':
+                self.deactivate()
             self._driver.disconnect()
