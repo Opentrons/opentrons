@@ -23953,6 +23953,683 @@
                          "total-liquid-volume": 10000
                     }
                }
+          },
+
+          "opentrons-tuberack-15ml": {
+               "origin-offset": {
+                    "x": 34.375,
+                    "y": 13.5
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B1": {
+                         "x": 25,
+                         "y": 0,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "C1": {
+                         "x": 50,
+                         "y": 0,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A2": {
+                         "x": 0,
+                         "y": 25,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B2": {
+                         "x": 25,
+                         "y": 25,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "C2": {
+                         "x": 50,
+                         "y": 25,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A3": {
+                         "x": 0,
+                         "y": 50,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B3": {
+                         "x": 25,
+                         "y": 50,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "C3": {
+                         "x": 50,
+                         "y": 50,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A4": {
+                         "x": 0,
+                         "y": 75,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B4": {
+                         "x": 25,
+                         "y": 75,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "C4": {
+                         "x": 50,
+                         "y": 75,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A5": {
+                         "x": 0,
+                         "y": 100,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B5": {
+                         "x": 25,
+                         "y": 100,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "C5": {
+                         "x": 50,
+                         "y": 100,
+                         "z": 11.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    }
+               }
+          },
+
+          "opentrons-tuberack-50ml": {
+               "origin-offset": {
+                    "x": 39.875,
+                    "y": 37
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B1": {
+                         "x": 35,
+                         "y": 0,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A2": {
+                         "x": 0,
+                         "y": 35,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B2": {
+                         "x": 35,
+                         "y": 35,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "A3": {
+                         "x": 0,
+                         "y": 70,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    },
+                    "B3": {
+                         "x": 35,
+                         "y": 70,
+                         "z": 7.78,
+                         "depth": 117.98,
+                         "diameter": 17,
+                         "total-liquid-volume": 15000
+                    }
+               }
+          },
+
+          "opentrons-tuberack-15_50ml": {
+               "origin-offset": {
+                    "x": 32.75,
+                    "y": 14.875
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "B1": {
+                         "x": 25,
+                         "y": 0,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "C1": {
+                         "x": 50,
+                         "y": 0,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "A2": {
+                         "x": 0,
+                         "y": 25,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "B2": {
+                         "x": 25,
+                         "y": 25,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "C2": {
+                         "x": 50,
+                         "y": 25,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 14.5,
+                         "total-liquid-volume": 15000
+                    },
+                    "A3": {
+                         "x": 18.25,
+                         "y": 57.5,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 26.45,
+                         "total-liquid-volume": 50000
+                    },
+                    "B3": {
+                         "x": 53.25,
+                         "y": 57.5,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 26.45,
+                         "total-liquid-volume": 50000
+                    },
+                    "A4": {
+                         "x": 18.25,
+                         "y": 92.5,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 26.45,
+                         "total-liquid-volume": 50000
+                    },
+                    "B4": {
+                         "x": 53.25,
+                         "y": 92.5,
+                         "z": 10.78,
+                         "depth": 120,
+                         "diameter": 26.45,
+                         "total-liquid-volume": 50000
+                    }
+               }
+          },
+
+       "opentrons-tuberack-2ml-eppendorf": {
+               "origin-offset": {
+                    "x": 21.07,
+                    "y": 18.21
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B1": {
+                         "x": 19.28,
+                         "y": 0,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C1": {
+                         "x": 38.56,
+                         "y": 0,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D1": {
+                         "x": 57.84,
+                         "y": 0,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "A2": {
+                         "x": 0,
+                         "y": 19.89,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B2": {
+                         "x": 19.28,
+                         "y": 19.89,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C2": {
+                         "x": 38.56,
+                         "y": 19.89,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D2": {
+                         "x": 57.84,
+                         "y": 19.89,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "A3": {
+                         "x": 0,
+                         "y": 39.78,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B3": {
+                         "x": 19.28,
+                         "y": 39.78,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C3": {
+                         "x": 38.56,
+                         "y": 39.78,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D3": {
+                         "x": 57.84,
+                         "y": 39.78,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "A4": {
+                         "x": 0,
+                         "y": 59.67,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B4": {
+                         "x": 19.28,
+                         "y": 59.67,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C4": {
+                         "x": 38.56,
+                         "y": 59.67,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D4": {
+                         "x": 57.84,
+                         "y": 59.67,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "A5": {
+                         "x": 0,
+                         "y": 79.56,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B5": {
+                         "x": 19.28,
+                         "y": 79.56,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C5": {
+                         "x": 38.56,
+                         "y": 79.56,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D5": {
+                         "x": 57.84,
+                         "y": 79.56,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "A6": {
+                         "x": 0,
+                         "y": 99.45,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "B6": {
+                         "x": 19.28,
+                         "y": 99.45,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "C6": {
+                         "x": 38.56,
+                         "y": 99.45,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    },
+                    "D6": {
+                         "x": 57.84,
+                         "y": 99.45,
+                         "z": 43.3,
+                         "depth": 38.5,
+                         "diameter": 9,
+                         "total-liquid-volume": 2000
+                    }
+               }
+          },
+
+          "opentrons-tuberack-2ml-screwcap": {
+               "origin-offset": {
+                    "x": 21.07,
+                    "y": 18.21
+               },
+               "locations": {
+                    "A1": {
+                         "x": 0,
+                         "y": 0,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B1": {
+                         "x": 19.28,
+                         "y": 0,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C1": {
+                         "x": 38.56,
+                         "y": 0,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D1": {
+                         "x": 57.84,
+                         "y": 0,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "A2": {
+                         "x": 0,
+                         "y": 19.89,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B2": {
+                         "x": 19.28,
+                         "y": 19.89,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C2": {
+                         "x": 38.56,
+                         "y": 19.89,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D2": {
+                         "x": 57.84,
+                         "y": 19.89,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "A3": {
+                         "x": 0,
+                         "y": 39.78,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B3": {
+                         "x": 19.28,
+                         "y": 39.78,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C3": {
+                         "x": 38.56,
+                         "y": 39.78,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D3": {
+                         "x": 57.84,
+                         "y": 39.78,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "A4": {
+                         "x": 0,
+                         "y": 59.67,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B4": {
+                         "x": 19.28,
+                         "y": 59.67,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C4": {
+                         "x": 38.56,
+                         "y": 59.67,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D4": {
+                         "x": 57.84,
+                         "y": 59.67,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "A5": {
+                         "x": 0,
+                         "y": 79.56,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B5": {
+                         "x": 19.28,
+                         "y": 79.56,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C5": {
+                         "x": 38.56,
+                         "y": 79.56,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D5": {
+                         "x": 57.84,
+                         "y": 79.56,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "A6": {
+                         "x": 0,
+                         "y": 99.45,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "B6": {
+                         "x": 19.28,
+                         "y": 99.45,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "C6": {
+                         "x": 38.56,
+                         "y": 99.45,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    },
+                    "D6": {
+                         "x": 57.84,
+                         "y": 99.45,
+                         "z": 45.2,
+                         "depth": 42,
+                         "diameter": 8.5,
+                         "total-liquid-volume": 2000
+                    }
+               }
           }
      }
 }
