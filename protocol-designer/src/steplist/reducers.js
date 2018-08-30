@@ -138,7 +138,8 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   LOAD_FILE: (state: SavedStepFormState, action: LoadFileAction): SavedStepFormState => {
     const loadedStepForms = getPDMetadata(action.payload).savedStepForms
     return mapValues(loadedStepForms, stepForm => ({
-      ...getDefaultsForStepType(stepForm.stepType), ...stepForm
+      ...getDefaultsForStepType(stepForm.stepType),
+      ...stepForm
     }))
   }
 }, {})
