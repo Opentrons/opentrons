@@ -7,8 +7,7 @@ import {
   InputField,
   DropdownField,
   RadioGroup,
-  type DropdownOption,
-  type HoverTooltipHandlers
+  type DropdownOption
 } from '@opentrons/components'
 import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
@@ -32,17 +31,18 @@ type StepCheckboxRowProps = {
   children?: ?React.Node,
   className?: string,
   disabled?: boolean,
-  hoverTooltipHandlers?: HoverTooltipHandlers,
+  tooltipComponent?: React.Node,
 }
 export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
   <StepField
     name={props.name}
-    render={({value, updateValue}) => (
+    tooltipComponent={props.tooltipComponent}
+    render={({value, updateValue, hoverTooltipHandlers}) => (
       <div className={styles.field_row}>
         <CheckboxField
           label={props.label}
+          hoverTooltipHandlers={hoverTooltipHandlers}
           disabled={props.disabled}
-          hoverTooltipHandlers={props.hoverTooltipHandlers}
           className={props.className}
           value={!!value}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
@@ -54,12 +54,13 @@ export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
 type StepInputFieldProps = {name: StepFieldName} & FocusHandlers
 export const StepInputField = (props: StepInputFieldProps & React.ElementProps<typeof InputField>) => {
   const {name, focusedField, dirtyFields, onFieldFocus, onFieldBlur, ...inputProps} = props
+  console.log('step input', props)
   return (
     <StepField
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue, errorToShow}) => (
+      render={({value, updateValue, errorToShow, hoverTooltipHandlers}) => (
         <InputField
           {...inputProps}
           error={errorToShow}
@@ -99,14 +100,14 @@ type DispenseDelayFieldsProps = {
   focusHandlers: FocusHandlers,
   label?: string,
   disabled?: boolean,
-  hoverTooltipHandlers?: HoverTooltipHandlers,
+  tooltipComponent?: React.Node,
 }
 export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
-  const {label = 'Delay', focusHandlers, hoverTooltipHandlers, disabled} = props
+  const {label = 'Delay', focusHandlers, tooltipComponent, disabled} = props
   return (
     <StepCheckboxRow
       disabled={disabled}
-      hoverTooltipHandlers={hoverTooltipHandlers}
+      tooltipComponent={tooltipComponent}
       name="dispense_delay_checkbox"
       label={label}>
       <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delayMinutes" units='m' />
@@ -133,8 +134,8 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     name={props.name}
     focusedField={props.focusedField}
     dirtyFields={props.dirtyFields}
-    render={({value, updateValue}) => (
-      <FormGroup label='Pipette:' className={styles.pipette_field}>
+    render={({value, updateValue, hoverTooltipHandlers}) => (
+      <FormGroup label='Pipette:' className={styles.pipette_field} hoverTooltipHandlers={hoverTooltipHandlers}>
         <DropdownField
           options={props.pipetteOptions}
           value={value ? String(value) : null}
@@ -191,8 +192,11 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
   return (
     <StepField
       name={name}
-      render={({value, updateValue}) => (
-        <FormGroup label={i18n.t('step_edit_form.field.change_tip.label')}>
+      render={({value, updateValue, hoverTooltipHandlers}) => (
+        <FormGroup
+          label={i18n.t('step_edit_form.field.change_tip.label')}
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
           <DropdownField
             options={options}
             value={value ? String(value) : null}

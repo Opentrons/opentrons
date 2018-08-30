@@ -15,11 +15,11 @@ export type HoverTooltipHandlers = {
 }
 type PopperProps = React.ElementProps<typeof Popper>
 type Props = {
-  tooltipComponent: React.Node,
+  tooltipComponent?: React.Node,
   placement?: $PropertyType<PopperProps, 'placement'>,
   positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
   modifiers?: $PropertyType<PopperProps, 'modifiers'>,
-  children: (HoverTooltipHandlers) => React.Node
+  children: (?HoverTooltipHandlers) => React.Node
 }
 type State = {isOpen: boolean}
 class HoverTooltip extends React.Component<Props, State> {
@@ -43,6 +43,8 @@ class HoverTooltip extends React.Component<Props, State> {
   }
 
   render () {
+    if (!this.props.tooltipComponent) return this.props.children()
+
     return (
       <Manager>
         <Reference>

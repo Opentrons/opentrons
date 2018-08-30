@@ -1,5 +1,5 @@
 {
-  "not_in_beta": "This feature is not available in Beta",
+  "not_in_beta": "ⓘ Coming Soon",
 
   "step_description": {
     "transfer": "Move liquid from wells to an equal number of wells",
@@ -7,5 +7,28 @@
     "consolidate": "Multiple wells to one well",
     "mix": "Mix content of wells",
     "pause": "OT-2 will pause before proceeding"
+  },
+
+  "step_fields": {
+    "defaults": {
+      "aspirate_flowRate": "The speed at which the pipette aspirates",
+      "dispense_flowRate": "The speed at which the pipette dispenses",
+      "aspirate_mix_checkbox": "Pipette up and down before aspirating",
+      "dispense_mix_checkbox": "Pipette up and down after dispensing",
+      "aspirate_tipPosition": "Where in the well the pipette aspirates from",
+      "dispense_tipPosition": "Where in the well the pipette dispenses to",
+
+      "changeTip": "Choose when the robot picks up fresh tips",
+      "blowout_checkbox": "Where to dispose of remaining volume in tip",
+      "disposalVol_checkbox": "Aspirate extra volume that is disposed of after a distribute is complete. 20% of tip capacity recommended.",
+      "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
+      "touchTip": "Touch tip to 4 sides of the well",
+
+      "volume": "Volume to dispense in each well"
+    },
+
+    "consolidate": {
+      "volume": "Volume to aspirate from each well"
+    }
   }
 }
