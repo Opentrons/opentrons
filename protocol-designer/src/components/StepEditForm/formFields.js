@@ -178,10 +178,6 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
   )
 })
 
-// NOTE 2018-05-31 Tip position cannot yet be adjusted,
-// this is a placeholder
-export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
-
 const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed

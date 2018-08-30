@@ -497,6 +497,26 @@ exports[`icons menu-down renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons minus renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19,13H5V11H19V13Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-arrow-down renders correctly 1`] = `
 <svg
   aria-hidden="true"

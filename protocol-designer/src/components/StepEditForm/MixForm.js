@@ -10,12 +10,12 @@ import {
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField,
-  TipPositionField
+  ChangeTipField
 } from './formFields'
 
 import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
+import TipPositionInput from './TipPositionInput'
 import WellOrderInput from './WellOrderInput'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'
@@ -62,7 +62,7 @@ const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <TipPositionField />
+          <TipPositionInput />
         </div>
         <div className={styles.right_settings_column}>
           <FlowRateField
