@@ -62,6 +62,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   let wellHeightMM = null
   if (formData && formData[labwareFieldName]) {
     const labwareById = labwareIngredsSelectors.getLabware(state)
+    // TODO: BC 2018-08-29 protect for the case where selected labware gets deleted
     const labwareDef = getLabware(labwareById[formData[labwareFieldName]].type)
     if (labwareDef) {
       // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
