@@ -54,7 +54,6 @@ export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
 type StepInputFieldProps = {name: StepFieldName} & FocusHandlers
 export const StepInputField = (props: StepInputFieldProps & React.ElementProps<typeof InputField>) => {
   const {name, focusedField, dirtyFields, onFieldFocus, onFieldBlur, ...inputProps} = props
-  console.log('step input', props)
   return (
     <StepField
       name={name}
