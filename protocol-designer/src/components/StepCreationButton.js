@@ -1,56 +1,55 @@
 // @flow
 import * as React from 'react'
 import styles from './StepCreationButton.css'
+import i18n from '../localization'
 
-import {PrimaryButton} from '@opentrons/components'
+import {HoverTooltip, PrimaryButton} from '@opentrons/components'
 import {stepIconsByType, type StepType} from '../form-types'
 
-type StepCreationButtonProps = {
+type Props = {
   onStepClick?: StepType => (event?: SyntheticEvent<*>) => mixed,
   onExpandClick?: (event?: SyntheticEvent<*>) => mixed,
-  onClickAway?: (event?: MouseEvent | SyntheticEvent<*>) => mixed, // TODO is there away around this 2-event union?
+  onClickAway?: (event?: SyntheticEvent<*>) => mixed,
   expanded?: boolean
 }
 
-class StepCreationButton extends React.Component<StepCreationButtonProps> {
-  ref: ?HTMLDivElement
-  handleAllClicks = (e: MouseEvent) => {
-    // TODO Ian 2018-03-23 this isn't working correctly now,
-    // but should onMouseLeave take care of this behavior instead, anyway?
-    if (this.ref && (e.currentTarget instanceof HTMLElement) && !this.ref.contains(e.currentTarget)) {
-      this.props.expanded && this.props.onClickAway && this.props.onClickAway(e)
-    }
-  }
+function StepCreationButton (props: Props) {
+  const {expanded, onExpandClick, onStepClick, onClickAway} = props
+  const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause']
 
-  componentDidMount () {
-    document.addEventListener('click', this.handleAllClicks, true)
-  }
+  const buttons = expanded && supportedSteps.map(stepType =>
+    <HoverTooltip
+      key={stepType}
+      placement='right'
+      modifiers={{preventOverflow: {enabled: false}}}
+      positionFixed
+      tooltipComponent={i18n.t(`tooltip.step_description.${stepType}`)}
+    >
+      {(hoverTooltipHandlers) => (
+      <PrimaryButton
+        hoverTooltipHandlers={hoverTooltipHandlers}
+        onClick={onStepClick && onStepClick(stepType)}
+        iconName={stepIconsByType[stepType]}
+      >
+        {stepType}
+      </PrimaryButton>
+    )}
+  </HoverTooltip>
+  )
 
-  componentWillUnmount () {
-    document.removeEventListener('click', this.handleAllClicks, true)
-  }
+  return (
+    <div className={styles.step_creation_button} onMouseLeave={onClickAway}>
+      <PrimaryButton
+        onClick={expanded ? onClickAway : onExpandClick}
+      >
+        {i18n.t('button.add_step')}
+      </PrimaryButton>
 
-  render () {
-    const {expanded, onExpandClick, onStepClick, onClickAway} = this.props
-    const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause']
-
-    return (
-      <div className={styles.step_creation_button} ref={ref => { this.ref = ref }} onMouseLeave={onClickAway}>
-        <PrimaryButton onClick={expanded ? onClickAway : onExpandClick}>+ Add Step</PrimaryButton>
-        <div className={styles.buttons_popover}>
-          {expanded && supportedSteps.map(stepType =>
-            <PrimaryButton
-              key={stepType}
-              onClick={onStepClick && onStepClick(stepType)}
-              iconName={stepIconsByType[stepType]}
-            >
-              {stepType}
-            </PrimaryButton>
-          )}
-        </div>
+      <div className={styles.buttons_popover}>
+        {buttons}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default StepCreationButton
