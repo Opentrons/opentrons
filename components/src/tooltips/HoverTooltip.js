@@ -17,6 +17,8 @@ type PopperProps = React.ElementProps<typeof Popper>
 type Props = {
   tooltipComponent: React.Node,
   placement?: $PropertyType<PopperProps, 'placement'>,
+  positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
+  modifiers?: $PropertyType<PopperProps, 'modifiers'>,
   children: (HoverTooltipHandlers) => React.Node
 }
 type State = {isOpen: boolean}
@@ -48,7 +50,11 @@ class HoverTooltip extends React.Component<Props, State> {
         </Reference>
         {
           this.state.isOpen &&
-          <Popper placement={this.props.placement} modifiers={{offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`}}}>
+          <Popper
+            placement={this.props.placement}
+            modifiers={{offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`}, ...this.props.modifiers}}
+            positionFixed={this.props.positionFixed}
+          >
             {({ref, style, placement}) => (
               <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
                 {this.props.tooltipComponent}
