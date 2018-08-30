@@ -66,7 +66,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
     const labwareDef = getLabware(labwareById[formData[labwareFieldName]].type)
     if (labwareDef) {
       // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-      const firstWell = labwareDef.wells[Object.keys(labwareDef.wells)[0]]
+      const firstWell = labwareDef.wells['A1']
       if (firstWell) wellHeightMM = firstWell.depth
     } else {
       console.warn('the specified source labware definition could not be located')

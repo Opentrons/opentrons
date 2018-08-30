@@ -1,3 +1,11 @@
 {
-  "not_in_beta": "This feature is not available in Beta"
+  "not_in_beta": "This feature is not available in Beta",
+
+  "step_description": {
+    "transfer": "Move liquid from wells to an equal number of wells",
+    "distribute": "One well to multiple wells",
+    "consolidate": "Multiple wells to one well",
+    "mix": "Mix content of wells",
+    "pause": "OT-2 will pause before proceeding"
+  }
 }

@@ -51,7 +51,7 @@ class TipPositionModal extends React.Component<Props, State> {
     }
   }
   applyChanges = () => {
-    this.props.updateValue(formatValue(this.state.value))
+    this.props.updateValue(formatValue(this.state.value || 0))
   }
   handleReset = () => {
     this.setState({value: formatValue(DEFAULT_MM_FROM_BOTTOM)}, this.applyChanges)
@@ -70,9 +70,11 @@ class TipPositionModal extends React.Component<Props, State> {
     const valueFloat = formatValue(value)
     const maximumHeightMM = (this.props.wellHeightMM * 2)
 
-    if (Number(valueFloat) > maximumHeightMM) {
+    if (!value) {
+      this.setState({value})
+    } else if (Number(valueFloat) > maximumHeightMM) {
       this.setState({value: formatValue(maximumHeightMM)})
-    } else if (Number(valueFloat) > 0) {
+    } else if (Number(valueFloat) >= 0) {
       const numericValue = value.replace(/[^.0-9]/, '')
       this.setState({value: numericValue.replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1)})
     } else {
@@ -81,12 +83,12 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   makeHandleIncrement = (step: number) => () => {
     const {value} = this.state
-    const incrementedValue = parseFloat(value) + step
+    const incrementedValue = parseFloat(value || 0) + step
     const maximumHeightMM = (this.props.wellHeightMM * 2)
     this.setState({value: formatValue(Math.min(incrementedValue, maximumHeightMM))})
   }
   makeHandleDecrement = (step: number) => () => {
-    const nextValueFloat = parseFloat(this.state.value) - step
+    const nextValueFloat = parseFloat(this.state.value || 0) - step
     this.setState({value: formatValue(nextValueFloat < 0 ? 0 : nextValueFloat)})
   }
   render () {
@@ -119,7 +121,7 @@ class TipPositionModal extends React.Component<Props, State> {
                     className={styles.position_from_bottom_input}
                     onChange={this.handleChange}
                     units="mm"
-                    value={value ? String(value) : '0'} />
+                    value={value } />
                 </FormGroup>
                 <div className={styles.viz_group}>
                   <div className={styles.adjustment_buttons}>

@@ -281,5 +281,9 @@ def reset():
     """ Unmount and remove the sqlite database (used in robot reset) """
     if os.path.exists(database_path):
         os.remove(database_path)
+    # Not an os.path.join because it is a suffix to the full filename
+    journal_path = database_path + '-journal'
+    if os.path.exists(journal_path):
+        os.remove(journal_path)
 
 # ======================== END Public Functions ======================== #

@@ -31,12 +31,12 @@ export const getDefaultsForStepType = (stepType: StepType) => {
     case 'transfer':
       return {
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
-        'aspirate_tipPosition': DEFAULT_MM_FROM_BOTTOM,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM,
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
-        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION
+        'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
+        'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
       }
     case 'consolidate':
       return {
