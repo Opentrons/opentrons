@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {actions, selectors} from '../../navigation'
 import {selectors as fileDataSelectors} from '../../file-data'
-import {actions as loadFileActions} from '../../load-file'
+import {actions as loadFileActions, selectors as loadFileSelectors} from '../../load-file'
 import FileSidebar from './FileSidebar'
 import type {BaseState, ThunkDispatch} from '../../types'
 
@@ -14,7 +14,8 @@ type SP = {
 }
 
 type MP = {
-  _canCreateNew: ?boolean
+  _canCreateNew: ?boolean,
+  _hasUnsavedChanges: ?boolean
 }
 
 export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
@@ -32,19 +33,22 @@ function mapStateToProps (state: BaseState): SP & MP {
       }
       : null,
     // Ignore clicking 'CREATE NEW' button in these cases
-    _canCreateNew: !selectors.newProtocolModal(state)
+    _canCreateNew: !selectors.newProtocolModal(state),
+    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state)
   }
 }
 
 function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatch<*>}): Props {
-  const {_canCreateNew, downloadData} = stateProps
+  const {_canCreateNew, _hasUnsavedChanges, downloadData} = stateProps
   const {dispatch} = dispatchProps
   return {
     downloadData,
-    loadFile: (fileChangeEvent) => dispatch(loadFileActions.loadProtocolFile(fileChangeEvent)),
-    createNewFile: _canCreateNew
-      ? () => dispatch(actions.toggleNewProtocolModal(true))
-      : undefined,
+    loadFile: (fileChangeEvent) => {
+      if (!_hasUnsavedChanges || confirm('TEST')) {
+        dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+      }
+    },
+    createNewFile: _canCreateNew ? () => dispatch(actions.toggleNewProtocolModal(true)) : undefined,
     onDownload: () => dispatch(loadFileActions.saveProtocolFile())
   }
 }
