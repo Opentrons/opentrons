@@ -85,7 +85,7 @@ export default function TitledList (props: ListProps) {
         {collapsible && (
           <div
             onClick={handleCollapseToggle}
-            className={cx(styles.title_bar_carat, {[styles.hoverable_carat]: !props.selected})}
+            className={styles.title_bar_carat}
           >
             <Icon
               className={styles.title_bar_icon}
