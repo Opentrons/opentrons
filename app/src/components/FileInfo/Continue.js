@@ -10,6 +10,7 @@ import {makeGetRobotPipettes, makeGetRobotModules} from '../../http-api-client'
 import {getPipette} from '@opentrons/shared-data'
 
 import ContinueButtonGroup from './ContinueButtonGroup'
+
 type Props = {
   pipettesMatch: boolean,
   modulesMatch: boolean,
