@@ -16,13 +16,14 @@ const DECIMALS_ALLOWED = 1
 type Props = {
   /** When flow rate is falsey (including 0), it means 'use default' */
   defaultFlowRate: ?number,
+  disabled?: boolean,
   formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   label: ?string,
   minFlowRate: number,
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
-  pipetteModelDisplayName: string
+  pipetteModelDisplayName: ?string
 }
 
 type State = {
@@ -101,6 +102,7 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     const {
       defaultFlowRate,
+      disabled,
       formFlowRate,
       flowRateType,
       label,
@@ -110,7 +112,10 @@ export default class FlowRateField extends React.Component<Props, State> {
     } = this.props
 
     const modalFlowRateNum = Number(this.state.modalFlowRate)
-    const rangeDescription = `between ${minFlowRate} and ${maxFlowRate}`
+
+    // show 0.1 not 0 as minimum, since bottom of range is non-inclusive
+    const displayMinFlowRate = minFlowRate || Math.pow(10, -DECIMALS_ALLOWED)
+    const rangeDescription = `between ${displayMinFlowRate} and ${maxFlowRate}`
     const outOfBounds = (
       modalFlowRateNum === 0 ||
       minFlowRate > modalFlowRateNum ||
@@ -127,7 +132,7 @@ export default class FlowRateField extends React.Component<Props, State> {
         errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
           DECIMALS_ALLOWED > 1 ? 's' : ''} is allowed`
       } else if (!pristine && outOfBounds) {
-        errorMessage = rangeDescription
+        errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
       }
     }
 
@@ -141,7 +146,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       />
     )
 
-    const FlowRateModal = (
+    const FlowRateModal = pipetteModelDisplayName && (
       <Portal>
         <AlertModal
           className={modalStyles.modal}
@@ -186,11 +191,13 @@ export default class FlowRateField extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <FormGroup label={label || DEFAULT_LABEL}>
+        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
+            units='μL/s'
             readOnly
+            disabled={disabled}
             onClick={this.openModal}
-            value={(formFlowRate) ? `${formFlowRate} μL/s` : 'Default'}
+            value={formFlowRate ? `${formFlowRate}` : 'Default'}
           />
         </FormGroup>
 

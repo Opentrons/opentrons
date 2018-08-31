@@ -44,15 +44,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const pipetteConfig = pipette && getPipette(pipette.model)
   const pipetteModelDisplayName = pipetteConfig ? pipetteConfig.displayName : 'pipette'
 
-  let defaultFlowRate = null
+  let defaultFlowRate
   if (pipetteConfig) {
     if (flowRateType === 'aspirate') {
       defaultFlowRate = pipetteConfig.aspirateFlowRate
     } else if (flowRateType === 'dispense') {
       defaultFlowRate = pipetteConfig.dispenseFlowRate
     }
-  } else {
-    console.warn('FlowRateField mapStateToProps expected pipetteConfig', ownProps)
   }
 
   const formFlowRate = formData && formData[name]
@@ -63,6 +61,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     innerKey,
     defaultFlowRate,
+    disabled: pipette == null,
     formFlowRate,
     flowRateType,
     label: ownProps.label,
