@@ -29,11 +29,9 @@ export default withRouter(
 )
 
 function mapStateToProps (state: State, ownProps: OP): SP {
-  const robots = robotSelectors.getDiscovered(state)
-  const connectedName = robotSelectors.getConnectedRobotName(state)
-  const robot = robots.find(r => r.name === connectedName)
+  const connectedRobot = robotSelectors.getConnectedRobot(state)
   return {
-    robot: robot,
+    robot: connectedRobot,
     name: robotSelectors.getSessionName(state),
     uploadInProgress: robotSelectors.getSessionLoadInProgress(state),
     uploadError: robotSelectors.getUploadError(state),
