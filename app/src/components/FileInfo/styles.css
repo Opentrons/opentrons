@@ -1,0 +1,5 @@
+@import '@opentrons/components';
+
+.align_left:last-child {
+  text-align: left;
+}

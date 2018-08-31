@@ -13,6 +13,7 @@ import Upload from './Upload'
 
 type Props = {
   sessionLoaded: ?boolean,
+  uploadError: ? {message: string},
   confirmUpload: () => mixed,
   createSession: () => mixed,
 }
@@ -29,7 +30,8 @@ function UploadPanel (props: Props) {
 
 function mapStateToProps (state) {
   return {
-    sessionLoaded: robotSelectors.getSessionIsLoaded(state)
+    sessionLoaded: robotSelectors.getSessionIsLoaded(state),
+    uploadError: robotSelectors.getUploadError(state)
   }
 }
 
