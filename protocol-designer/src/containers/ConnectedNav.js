@@ -31,15 +31,15 @@ function Nav (props: Props) {
           onClick={props.handleClick('steplist')} />
       </div>
       <div className={styles.bottom_buttons}>
+        <OutsideLinkButton
+          iconName='help-circle'
+          title={i18n.t('nav.help')}
+          to={KNOWLEDGEBASE_ROOT_URL} />
         <NavButton
           iconName='settings'
           title={i18n.t('nav.settings')}
           selected={props.currentPage === 'settings'}
           onClick={props.handleClick('settings')} />
-        <OutsideLinkButton
-          iconName='help-circle'
-          title={i18n.t('nav.help')}
-          to={KNOWLEDGEBASE_ROOT_URL} />
       </div>
     </VerticalNavBar>
   )

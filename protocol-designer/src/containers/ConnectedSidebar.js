@@ -6,6 +6,7 @@ import {selectors} from '../navigation'
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
 import FileSidebar from '../components/FileSidebar'
+import { SettingsSidebar } from '../components/SettingsPage'
 
 import type {BaseState} from '../types'
 import type {Page} from '../navigation'
@@ -22,9 +23,10 @@ function Sidebar (props: Props) {
     case 'ingredient-detail':
       return <IngredientsList />
     case 'file-splash':
-      return <FileSidebar />
     case 'file-detail':
       return <FileSidebar />
+    case 'settings':
+      return <SettingsSidebar />
   }
   return null
 }
