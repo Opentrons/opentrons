@@ -1,5 +1,71 @@
 @import '@opentrons/components';
 
+.info_section {
+  border-bottom: 1px solid var(--c-light-gray);
+}
+
+.title {
+  @apply --font-header-dark;
+
+  margin: 1rem 0;
+  font-weight: var(--fw-regular);
+  text-transform: capitalize;
+}
+
 .align_left:last-child {
   text-align: left;
+}
+
+.instrument_item,
+.instrument_warning {
+  @apply --font-body-1-dark;
+
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+}
+
+.warning_text {
+  display: block;
+  font-size: var(--fs-caption);
+}
+
+.status_icon {
+  width: 1.5rem;
+  margin-right: 1rem;
+}
+
+.instrument_button {
+  width: 100%;
+}
+
+.labware_table {
+  @apply --font-body-1-dark;
+
+  width: 100%;
+  margin: 1rem 0;
+
+  & th {
+    font-weight: var(--fw-semibold);
+    text-align: left;
+  }
+}
+
+.labware_table th,
+.labware_table td {
+  width: 40%;
+  padding: 0.25rem 0;
+}
+
+.button_group {
+  text-align: right;
+}
+
+.continue_button {
+  display: inline-block;
+  width: 14rem;
+
+  &:last-child {
+    margin-left: 1rem;
+  }
 }

@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import {Card, LabeledValue} from '@opentrons/components'
-import {CardContentHalf} from '../layout'
+import {LabeledValue} from '@opentrons/components'
+import InfoSection from './InfoSection'
+import {SectionContentHalf} from '../layout'
 
 import styles from './styles.css'
 
@@ -19,13 +20,13 @@ export default function InformationCard (props: Props) {
   }
 
   return (
-    <Card title={TITLE}>
-      <CardContentHalf>
+    <InfoSection title={TITLE}>
+      <SectionContentHalf>
         <LabeledValue label={'Protocol Name'} value={name} />
-      </CardContentHalf>
-      <CardContentHalf className={styles.align_left}>
+      </SectionContentHalf>
+      <SectionContentHalf className={styles.align_left}>
         <LabeledValue label={'Creation Method'} value={createdBy} />
-      </CardContentHalf>
-    </Card>
+      </SectionContentHalf>
+    </InfoSection>
   )
 }

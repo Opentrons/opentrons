@@ -43,7 +43,7 @@ export type MagDeckModule = {|
 
 export type Module = MagDeckModule | TempDeckModule
 
-type FetchModulesResponse = {
+export type FetchModulesResponse = {
   modules: Array<Module>,
 }
 

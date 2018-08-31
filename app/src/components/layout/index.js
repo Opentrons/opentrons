@@ -5,5 +5,17 @@ import CardContentFull from './CardContentFull'
 import CardContentHalf from './CardContentHalf'
 import CardContentQuarter from './CardContentQuarter'
 import CardContentFlex from './CardContentFlex'
+import SectionContentFull from './SectionContentFull'
+import SectionContentHalf from './SectionContentHalf'
 
-export {CardContainer, CardRow, CardColumn, CardContentFull, CardContentHalf, CardContentQuarter, CardContentFlex}
+export {
+  CardContainer,
+  CardRow,
+  CardColumn,
+  CardContentFull,
+  CardContentHalf,
+  CardContentQuarter,
+  CardContentFlex,
+  SectionContentFull,
+  SectionContentHalf
+}
