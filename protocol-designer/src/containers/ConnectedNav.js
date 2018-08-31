@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 
 import {KNOWLEDGEBASE_ROOT_URL} from '../components/KnowledgeBaseLink'
 import {NavButton, VerticalNavBar, OutsideLinkButton} from '@opentrons/components'
+import i18n from '../localization'
 import {type Page, actions, selectors} from '../navigation'
 import styles from './NavBar.css'
 
@@ -18,23 +19,28 @@ function Nav (props: Props) {
     <VerticalNavBar className={styles.nav_bar}>
       <NavButton
         iconName='ot-file'
-        title='FILE'
+        title={i18n.t('nav.file')}
         selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
         onClick={props.handleClick('file-detail')} />
 
       <NavButton
         iconName='ot-design'
-        title='DESIGN'
+        title={i18n.t('nav.design')}
         disabled={props.currentPage === 'file-splash'}
         selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
         onClick={props.handleClick('steplist')} />
 
+      <NavButton
+        iconName='settings'
+        title={i18n.t('nav.settings')}
+        selected={props.currentPage === 'settings'}
+        onClick={props.handleClick('settings')} />
+
       <OutsideLinkButton
         iconName='help-circle'
-        title='HELP'
+        title={i18n.t('nav.help')}
         isBottom
-        to={KNOWLEDGEBASE_ROOT_URL}
-      />
+        to={KNOWLEDGEBASE_ROOT_URL} />
     </VerticalNavBar>
   )
 }
