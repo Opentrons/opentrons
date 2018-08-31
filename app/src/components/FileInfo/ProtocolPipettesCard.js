@@ -42,9 +42,7 @@ function ProtocolPipettesCard (props: Props) {
   } = props
 
   const pipetteInfo = pipettes.map((p) => {
-    const pipetteConfig = p
-      ? getPipette(p.name)
-      : null
+    const pipetteConfig = getPipette(p.name)
     const displayName = !pipetteConfig
       ? 'N/A'
       : pipetteConfig.displayName
