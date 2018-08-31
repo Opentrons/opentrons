@@ -3,7 +3,7 @@ import InformationCard from './InformationCard'
 import ProtocolPipettesCard from './ProtocolPipettesCard'
 import ProtocolModulesCard from './ProtocolModulesCard'
 import ProtocolLabwareCard from './ProtocolLabwareCard'
-import ContinueButtonGroup from './ContinueButtonGroup'
+import Continue from './Continue'
 import {CardContainer, CardRow} from '../layout'
 
 export default function FileInfo (props) {
@@ -22,7 +22,7 @@ export default function FileInfo (props) {
         <ProtocolLabwareCard />
       </CardRow>
       <CardRow>
-        <ContinueButtonGroup />
+        <Continue />
       </CardRow>
     </CardContainer>
   )
