@@ -1,6 +1,12 @@
+// @flow
 import * as React from 'react'
 import styles from './styles.css'
-export default function LabwareTable (props) {
+
+type Props = {
+  children: React.Node,
+}
+
+export default function LabwareTable (props: Props) {
   return (
     <table className={styles.labware_table}>
       <tbody>
