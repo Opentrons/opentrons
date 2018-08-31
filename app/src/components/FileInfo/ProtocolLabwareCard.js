@@ -13,6 +13,7 @@ import LabwareTable from './LabwareTable'
 type Props = {
   labware: Array<Labware>,
 }
+
 const TITLE = 'Required Labware'
 
 export default connect(mapStateToProps, null)(ProtocolLabwareCard)

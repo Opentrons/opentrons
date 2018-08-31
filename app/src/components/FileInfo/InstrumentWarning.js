@@ -5,10 +5,12 @@ import {Icon, OutlineButton} from '@opentrons/components'
 
 import styles from './styles.css'
 import {SectionContentHalf} from '../layout'
+
 type Props = {
   instrumentType: string,
   url: string,
 }
+
 export default function InstrumentWarning (props: Props) {
   const {instrumentType, url} = props
   return (
