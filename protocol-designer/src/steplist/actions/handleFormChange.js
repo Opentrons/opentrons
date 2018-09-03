@@ -3,7 +3,10 @@ import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import {selectors} from '../index'
 import {selectors as pipetteSelectors} from '../../pipettes'
-import { DEFAULT_MM_FROM_BOTTOM } from '../../constants'
+import {
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE
+} from '../../constants'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
@@ -59,7 +62,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'aspirate_wells': null,
-      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
+      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE
     }
   }
 
@@ -68,7 +71,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'dispense_wells': null,
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
     }
   }
 
@@ -77,7 +80,9 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'wells': null,
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM
+      // TODO: Ian 2018-09-03 should we have both asp/disp for Mix?
+      // if not, is dispense the right choice vs aspirate?
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
     }
   }
 

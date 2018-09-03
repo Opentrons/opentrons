@@ -21,6 +21,44 @@ def test_load_pipettes():
     assert pipette == loaded_pipettes['leftPipetteHere']
 
 
+def test_get_location():
+    robot.reset()
+
+    command_type = 'aspirate'
+    plate = labware.load("96-flat", 1)
+    well = "B2"
+
+    default_values = {
+        'aspirate-mm-from-bottom': 2
+    }
+
+    loaded_labware = {
+        "someLabwareId": plate
+    }
+
+    # test with nonzero and with zero command-specific offset
+    for offset in [5, 0]:
+        command_params = {
+            "labware": "someLabwareId",
+            "well": well,
+            "offset-from-bottom-mm": offset
+        }
+        result = protocols.get_location(
+            loaded_labware, command_type, command_params, default_values)
+        assert result == plate.well(well).bottom(offset)
+
+    command_params = {
+        "labware": "someLabwareId",
+        "well": well
+    }
+
+    # no command-specific offset, use default
+    result = protocols.get_location(
+        loaded_labware, command_type, command_params, default_values)
+    assert result == plate.well(well).bottom(
+        default_values['aspirate-mm-from-bottom'])
+
+
 def test_load_labware():
     robot.reset()
     data = {

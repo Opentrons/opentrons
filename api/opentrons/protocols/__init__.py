@@ -54,18 +54,31 @@ def load_labware(protocol_data):
     return loaded_labware
 
 
-def get_location(command_params, loaded_labware):
-    labwareId = command_params.get('labware')
+def get_location(loaded_labware, command_type, params, default_values):
+    labwareId = params.get('labware')
     if not labwareId:
         # not all commands use labware param
         return None
-    well = command_params.get('well')
+    well = params.get('well')
     labware = loaded_labware.get(labwareId)
     if not labware:
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
-    return labware.wells(well)
+
+    # default offset from bottom for aspirate/dispense commands
+    offset_default = default_values.get(
+        '{}-mm-from-bottom'.format(command_type))
+
+    # optional command-specific value, fallback to default
+    offset_from_bottom = params.get(
+        'offset-from-bottom-mm', offset_default)
+
+    if offset_from_bottom is None:
+        # not all commands use offsets
+        return labware.wells(well)
+
+    return labware.wells(well).bottom(offset_from_bottom)
 
 
 def get_pipette(command_params, loaded_pipettes):
@@ -126,7 +139,8 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             .get(params.get('pipette'), {})\
             .get('model')
 
-        location = get_location(params, loaded_labware)
+        location = get_location(
+            loaded_labware, command_type, params, default_values)
         volume = params.get('volume')
 
         if pipette:

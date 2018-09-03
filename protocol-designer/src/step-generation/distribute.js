@@ -37,6 +37,11 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
     }
   }
 
+  const {
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm
+  } = data
+
   // TODO error on negative data.disposalVolume?
   const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
     ? data.disposalVolume
@@ -86,7 +91,8 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
               pipette,
               volume: data.volume,
               labware: data.destLabware,
-              well: destWell
+              well: destWell,
+              offsetFromBottomMm: dispenseOffsetFromBottomMm
             }),
             ...touchTipAfterDispenseCommand
           ]
@@ -124,7 +130,9 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
           data.sourceLabware,
           data.sourceWell,
           data.mixBeforeAspirate.volume,
-          data.mixBeforeAspirate.times
+          data.mixBeforeAspirate.times,
+          aspirateOffsetFromBottomMm,
+          dispenseOffsetFromBottomMm
         )
         : []
 
@@ -135,7 +143,8 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
           pipette,
           volume: data.volume * destWellChunk.length + disposalVolume,
           labware: data.sourceLabware,
-          well: data.sourceWell
+          well: data.sourceWell,
+          offsetFromBottomMm: aspirateOffsetFromBottomMm
         }),
         ...touchTipAfterAspirateCommand,
 

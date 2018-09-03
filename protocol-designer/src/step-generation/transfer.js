@@ -41,6 +41,11 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     }
   }
 
+  const {
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm
+  } = data
+
   // TODO error on negative data.disposalVolume?
   const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
     ? data.disposalVolume
@@ -75,7 +80,15 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               : []
 
           const preWetTipCommands = (data.preWetTip && chunkIdx === 0)
-            ? mixUtil(data.pipette, data.sourceLabware, sourceWell, Math.max(subTransferVol), 1)
+            ? mixUtil(
+              data.pipette,
+              data.sourceLabware,
+              sourceWell,
+              Math.max(subTransferVol),
+              1,
+              aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm
+            )
             : []
 
           const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
@@ -84,7 +97,9 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               data.sourceLabware,
               sourceWell,
               data.mixBeforeAspirate.volume,
-              data.mixBeforeAspirate.times
+              data.mixBeforeAspirate.times,
+              aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm
             )
             : []
 
@@ -110,7 +125,9 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               data.destLabware,
               destWell,
               data.mixInDestination.volume,
-              data.mixInDestination.times
+              data.mixInDestination.times,
+              aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm
             )
             : []
 
@@ -122,14 +139,16 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               pipette: data.pipette,
               volume: subTransferVol,
               labware: data.sourceLabware,
-              well: sourceWell
+              well: sourceWell,
+              offsetFromBottomMm: aspirateOffsetFromBottomMm
             }),
             ...touchTipAfterAspirateCommands,
             dispense({
               pipette: data.pipette,
               volume: subTransferVol,
               labware: data.destLabware,
-              well: destWell
+              well: destWell,
+              offsetFromBottomMm: dispenseOffsetFromBottomMm
             }),
             ...touchTipAfterDispenseCommands,
             ...mixInDestinationCommands
