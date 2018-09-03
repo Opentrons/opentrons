@@ -2,15 +2,15 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-import type {BaseState} from '../types'
+import type {BaseState} from '../../types'
 import {selectors, type Page} from '../../navigation'
 import Privacy from './Privacy'
 
 export {default as SettingsSidebar} from './SettingsSidebar'
 
-type Props = {currentPage: Page}
+type SP = {currentPage: Page}
 
-const SettingsPage = (props: Props) => {
+const SettingsPage = (props: SP) => {
   switch (props.currentPage) {
     case 'settings-features': {
       // TODO: BC 2018-09-01 when we have feature flags put them here
@@ -22,7 +22,7 @@ const SettingsPage = (props: Props) => {
   }
 }
 
-const STP = (state: BaseState) => ({
+const STP = (state: BaseState): SP => ({
   currentPage: selectors.currentPage(state)
 })
 

@@ -4,12 +4,9 @@ import React from 'react'
 import i18n from '../../localization'
 import {Card, ToggleButton} from '@opentrons/components'
 // import type {BaseState} from '../types'
-// import {selectors, type Page} from '../navigation'
 import styles from './SettingsPage.css'
 
-type Props = {currentPage: Page}
-
-class Privacy extends React.Component<Props> {
+class Privacy extends React.Component<*> {
   toggleAnalyticsOptInValue = () => {
     // TODO: BC 2018-09-01 replace with actual localStorage setting
     console.info('attempted to toggle analytic opt in value')
