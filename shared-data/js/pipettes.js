@@ -1,4 +1,5 @@
 // @flow
+import mapValues from 'lodash/mapValues'
 import pipetteConfigByModel from '../robot-data/pipette-config.json'
 
 export type PipetteChannels = 1 | 8
@@ -93,4 +94,8 @@ function comparePipettes (sortBy: Array<SortableProps>) {
 
     return 0
   }
+}
+
+export function getPropertyAllPipettes (propertyName: $Keys<PipetteConfig>) {
+  return mapValues(pipetteConfigByModel, config => config[propertyName])
 }

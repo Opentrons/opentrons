@@ -70,6 +70,7 @@ def test_blank_protocol():
 def test_dispatch_commands(monkeypatch):
     robot.reset()
     cmd = []
+    flow_rates = []
 
     def mock_sleep(seconds):
         cmd.append(("sleep", seconds))
@@ -79,6 +80,9 @@ def test_dispatch_commands(monkeypatch):
 
     def mock_dispense(volume, location):
         cmd.append(("dispense", volume, location))
+
+    def mock_set_flow_rate(aspirate, dispense):
+        flow_rates.append((aspirate, dispense))
 
     pipette = instruments.P10_Single('left')
 
@@ -96,9 +100,24 @@ def test_dispatch_commands(monkeypatch):
 
     monkeypatch.setattr(pipette, 'aspirate', mock_aspirate)
     monkeypatch.setattr(pipette, 'dispense', mock_dispense)
+    monkeypatch.setattr(pipette, 'set_flow_rate', mock_set_flow_rate)
     monkeypatch.setattr(protocols, '_sleep', mock_sleep)
 
     protocol_data = {
+        "default-values": {
+            "aspirate-flow-rate": {
+                "p300_single_v1": 101
+            },
+            "dispense-flow-rate": {
+                "p300_single_v1": 102
+            }
+        },
+        "pipettes": {
+            "pipetteId": {
+                "mount": "left",
+                "model": "p300_single_v1"
+            }
+        },
         "procedure": [
             {
                 "subprocedure": [
@@ -108,7 +127,8 @@ def test_dispatch_commands(monkeypatch):
                             "pipette": "pipetteId",
                             "labware": "sourcePlateId",
                             "well": "A1",
-                            "volume": 5
+                            "volume": 5,
+                            "flow-rate": 123
                         }
                     },
                     {
@@ -138,4 +158,9 @@ def test_dispatch_commands(monkeypatch):
         ("aspirate", 5, source_plate['A1']),
         ("sleep", 42),
         ("dispense", 4.5, dest_plate['B1'])
+    ]
+
+    assert flow_rates == [
+        (123, 102),
+        (101, 102)
     ]
