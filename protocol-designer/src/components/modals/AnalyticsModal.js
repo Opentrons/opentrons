@@ -5,18 +5,38 @@ import { AlertModal } from '@opentrons/components'
 import i18n from '../../localization'
 import modalStyles from './modal.css'
 import settingsStyles from '../SettingsPage/SettingsPage.css'
+import {
+  initializeAnalytics,
+  shutdownAnalytics,
+  optIn,
+  optOut
+} from '../../analytics'
 
-const AnalyticsModal = () => {
+type Props = {onClose: () => void}
+
+const AnalyticsModal = (props: Props) => {
   return (
     <AlertModal
       className={cx(modalStyles.modal)}
       buttons={[
-        {onClick: () => { console.log('no') }, children: i18n.t('button.no')},
-        {onClick: () => { console.log('yes') }, children: i18n.t('button.yes')}
+        {
+          onClick: () => {
+            props.onClose()
+            optOut()
+            shutdownAnalytics() // sanity check, there shouldn't be an analytics instance yet
+          },
+          children: i18n.t('button.no')
+        },
+        {
+          onClick: () => {
+            props.onClose()
+            optIn()
+            initializeAnalytics()
+          },
+          children: i18n.t('button.yes')
+        }
       ]}>
-      <div>
-        <p className={settingsStyles.toggle_label}>{i18n.t('card.toggle.share_session')}</p>
-      </div>
+      <h3>{i18n.t('card.toggle.share_session')}</h3>
       <div className={settingsStyles.body_wrapper}>
         <p className={settingsStyles.card_body}>{i18n.t('card.body.reason_for_collecting_data')}</p>
         <ul className={settingsStyles.card_point_list}>

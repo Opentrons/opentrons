@@ -1,6 +1,11 @@
 // @flow
 import * as React from 'react'
 
+import {
+  getHasOptedIn,
+  initializeAnalytics,
+  shutdownAnalytics
+} from '../analytics'
 import TimelineAlerts from '../components/steplist/TimelineAlerts'
 import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
@@ -25,9 +30,17 @@ type State = {isAnalyticsModalOpen: boolean}
 class ProtocolEditor extends React.Component<*, State> {
   constructor (props) {
     super(props)
-    // TODO: BC 2018-09-03 get this value from localStorage (if key exists)
-    const hasOpted = false
-    this.state = {isAnalyticsModalOpen: !hasOpted}
+    const hasOptedIn = getHasOptedIn()
+    let initialState = {isAnalyticsModalOpen: false}
+    if (hasOptedIn === null) { // NOTE: only null if never set
+      initialState = {isAnalyticsModalOpen: true}
+    } else if (hasOptedIn === true) {
+      initializeAnalytics()
+    } else {
+      // sanity check: there shouldn't be an analytics session, but shutdown just in case if user opted out
+      shutdownAnalytics()
+    }
+    this.state = initialState
   }
   handleCloseAnalyticsModal = (e: SyntheticEvent<*>) => {
     this.setState({isAnalyticsModalOpen: false})
@@ -46,7 +59,7 @@ class ProtocolEditor extends React.Component<*, State> {
             <Hints />
 
             <div className={styles.main_page_content}>
-              {this.state.isAnalyticsModalOpen && <AnalyticsModal />}
+              {this.state.isAnalyticsModalOpen && <AnalyticsModal onClose={this.handleCloseAnalyticsModal} />}
               <ConnectedNewFileModal />
               <ConnectedMoreOptionsModal />
               <ConnectedWellSelectionModal />

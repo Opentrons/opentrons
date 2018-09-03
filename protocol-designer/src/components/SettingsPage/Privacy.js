@@ -5,16 +5,24 @@ import i18n from '../../localization'
 import {Card, ToggleButton} from '@opentrons/components'
 // import type {BaseState} from '../types'
 import styles from './SettingsPage.css'
+import {
+  optIn,
+  optOut,
+  getHasOptedIn,
+  shutdownAnalytics,
+  initializeAnalytics
+} from '../../analytics'
 
 class Privacy extends React.Component<*> {
   toggleAnalyticsOptInValue = () => {
-    // TODO: BC 2018-09-01 replace with actual localStorage setting
-    console.info('attempted to toggle analytic opt in value')
-    return true
-  }
-
-  getAnalyticsOptInValue = () => {
-    // TODO: BC 2018-09-01 replace with actual localStorage value
+    const hasOptedIn = getHasOptedIn()
+    if (hasOptedIn) {
+      shutdownAnalytics()
+      optOut()
+    } else {
+      initializeAnalytics()
+      optIn()
+    }
     return true
   }
 
@@ -26,7 +34,7 @@ class Privacy extends React.Component<*> {
             <p className={styles.toggle_label}>{i18n.t('card.toggle.share_session')}</p>
             <ToggleButton
               className={styles.toggle_button}
-              toggledOn={this.getAnalyticsOptInValue()}
+              toggledOn={getHasOptedIn()}
               onClick={this.toggleAnalyticsOptInValue} />
           </div>
           <div className={styles.body_wrapper}>
