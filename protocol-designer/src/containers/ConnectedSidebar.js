@@ -25,7 +25,8 @@ function Sidebar (props: Props) {
     case 'file-splash':
     case 'file-detail':
       return <FileSidebar />
-    case 'settings':
+    case 'settings-features':
+    case 'settings-privacy':
       return <SettingsSidebar />
   }
   return null

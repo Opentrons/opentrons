@@ -1,0 +1,73 @@
+@import '../index.css';
+
+:root {
+  --mw-labeled-toggle: 25rem;
+}
+
+/* Toggle Button */
+.toggled_on {
+  fill: #0ec9eb;
+  color: #0ec9eb;
+}
+
+.toggled_off {
+  fill: var(--c-dark-gray);
+}
+
+.labeled_control_wrapper {
+  width: 100%;
+  padding: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
+}
+
+.labeled_control {
+  display: block;
+}
+
+.labeled_control_label {
+  @apply --font-body-1-dark;
+
+  max-width: var(--mw-labeled-toggle);
+  display: inline-block;
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_toggle_button {
+  float: right;
+  width: 2rem;
+  margin-right: 1rem;
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.labeled_button,
+.labeled_select {
+  float: right;
+  width: 8rem;
+  margin-top: 0.25rem;
+}
+
+.labeled_select {
+  @apply --font-body-2-dark;
+}
+
+.labeled_checkbox {
+  float: right;
+}
+
+.control_info {
+  @apply --font-body-1-dark;
+
+  max-width: var(--mw-labeled-toggle);
+
+  & > p {
+    margin: 0.375rem 0 0.625rem;
+    line-height: 1.5;
+  }
+}

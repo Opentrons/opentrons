@@ -11,6 +11,7 @@ export * from './utils'
 // Components
 export * from './alerts'
 export * from './buttons'
+export * from './controls'
 export * from './CenteredTextSvg'
 export * from './deck'
 export * from './forms'

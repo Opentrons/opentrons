@@ -21,7 +21,7 @@ function MainPanel (props: Props) {
       return <Splash />
     case 'file-detail':
       return <ConnectedFilePage />
-    case 'settings':
+    case 'settings-privacy':
       return <SettingsPage />
     default:
       return <ConnectedDeckSetup />

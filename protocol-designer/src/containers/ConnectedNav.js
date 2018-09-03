@@ -38,8 +38,8 @@ function Nav (props: Props) {
         <NavButton
           iconName='settings'
           title={i18n.t('nav.settings')}
-          selected={props.currentPage === 'settings'}
-          onClick={props.handleClick('settings')} />
+          selected={props.currentPage === 'settings-privacy'}
+          onClick={props.handleClick('settings-privacy')} />
       </div>
     </VerticalNavBar>
   )
