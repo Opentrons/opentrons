@@ -18,10 +18,12 @@
       "aspirate_tipPosition": "Where in the well the pipette aspirates from",
       "dispense_tipPosition": "Where in the well the pipette dispenses to",
 
-      "changeTip": "Choose when the robot picks up fresh tips",
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "disposalVol_checkbox": "Aspirate extra volume that is disposed of after a distribute is complete. 20% of tip capacity recommended.",
+
+      "changeTip": "Choose when the robot picks up fresh tips",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
+      "tipPosition": "Distance from the bottom of the well",
       "touchTip": "Touch tip to 4 sides of the well",
 
       "volume": "Volume to dispense in each well"

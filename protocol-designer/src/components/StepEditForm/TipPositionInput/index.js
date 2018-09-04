@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {FormGroup, InputField} from '@opentrons/components'
+import {HoverTooltip, FormGroup, InputField} from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
 import {selectors as labwareIngredsSelectors} from '../../../labware-ingred/reducers'
 import i18n from '../../../localization'
@@ -29,22 +29,29 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
 
   render () {
     return (
-      <FormGroup
-        label={i18n.t('step_edit_form.field.tip_position.label')}
-        disabled={!this.props.wellHeightMM}
-        className={styles.well_order_input}>
-        <TipPositionModal
-          prefix={this.props.prefix}
-          closeModal={this.handleClose}
-          wellHeightMM={this.props.wellHeightMM}
-          mmFromBottom={this.props.mmFromBottom}
-          isOpen={this.state.isModalOpen} />
-          <InputField
-            readOnly
-            onClick={this.handleOpen}
-            value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
-            units="mm" />
-      </FormGroup>
+      <HoverTooltip
+        tooltipComponent={i18n.t('tooltip.step_fields.defaults.tipPosition')}
+      >{(hoverTooltipHandlers) => (
+        <FormGroup
+          label={i18n.t('step_edit_form.field.tip_position.label')}
+          disabled={!this.props.wellHeightMM}
+          className={styles.well_order_input}
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
+          <TipPositionModal
+            prefix={this.props.prefix}
+            closeModal={this.handleClose}
+            wellHeightMM={this.props.wellHeightMM}
+            mmFromBottom={this.props.mmFromBottom}
+            isOpen={this.state.isModalOpen} />
+            <InputField
+              readOnly
+              onClick={this.handleOpen}
+              value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
+              units="mm" />
+        </FormGroup>
+      )}
+    </HoverTooltip>
     )
   }
 }
