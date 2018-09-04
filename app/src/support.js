@@ -1,7 +1,5 @@
 // @flow
 // user support module
-import noop from 'lodash/noop'
-
 import {version} from './../package.json'
 import createLogger from './logger'
 
@@ -15,9 +13,16 @@ const log = createLogger(__filename)
 // pulled in from environment at build time
 const INTERCOM_ID = process.env.OT_APP_INTERCOM_ID
 
-// intercom handler (default noop)
-let intercom = noop
+// intercom user ID
 let userId
+
+// intercom handler (default noop)
+const intercom = (...args) => {
+  if (INTERCOM_ID && global.Intercom) {
+    log.debug('Sending to Intercom', {args})
+    global.Intercom(...args)
+  }
+}
 
 export function initializeSupport (): ThunkAction {
   return (_, getState) => {
@@ -32,9 +37,8 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
   if (action.type === 'robot:CONNECT_RESPONSE') {
     const state = store.getState()
     const robot = state.robot.connection.connectRequest.name
-    const data = {user_id: userId, 'Robot Name': robot}
-    log.debug('Updating intercom data', {data})
-    intercom('update', {data})
+
+    intercom('update', {user_id: userId, 'Robot Name': robot})
   }
 
   return next(action)
@@ -44,16 +48,12 @@ function initializeIntercom (config: SupportConfig) {
   if (INTERCOM_ID) {
     userId = config.userId
 
-    const data = {
+    intercom('boot', {
       app_id: INTERCOM_ID,
       user_id: userId,
       created_at: config.createdAt,
       name: config.name,
       'App Version': version
-    }
-
-    log.debug('Initializing Intercom', {data})
-    intercom = global.Intercom || intercom
-    intercom('boot', data)
+    })
   }
 }
