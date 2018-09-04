@@ -4,7 +4,7 @@ import tempfile
 import asyncio
 import pytest
 from aiohttp import web
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
 from opentrons import modules

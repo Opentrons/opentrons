@@ -1,326 +1,12 @@
-#!/usr/bin/env python
-
-import asyncio
-import sys
-import logging
-import os
-import traceback
-import re
-from aiohttp import web
-from opentrons import robot, __version__, HERE
-from opentrons.api import MainRouter
-from opentrons.server.rpc import Server
-from opentrons.server import endpoints as endp
-from opentrons.server.endpoints import (wifi, control, settings, update)
-from opentrons.config import feature_flags as ff
-from opentrons.util import environment
-from opentrons.deck_calibration import endpoints as dc_endp
-from logging.config import dictConfig
-from opentrons.server.endpoints import serverlib_fallback as endpoints
-
+import opentrons.server as server
 from argparse import ArgumentParser
 
-log = logging.getLogger(__name__)
-lock_file_path = '/tmp/resin/resin-updates.lock'
-log_file_path = environment.get_path('LOG_DIR')
 
-
-def lock_resin_updates():
-    if os.environ.get('RUNNING_ON_PI'):
-        import fcntl
-
-        try:
-            with open(lock_file_path, 'w') as fd:
-                fd.write('a')
-                fcntl.flock(fd, fcntl.LOCK_EX)
-                fd.close()
-        except OSError:
-            log.warning('Unable to create resin-update lock file')
-
-
-def unlock_resin_updates():
-    if os.environ.get('RUNNING_ON_PI') and os.path.exists(lock_file_path):
-        os.remove(lock_file_path)
-
-
-def log_init():
-    """
-    Function that sets log levels and format strings. Checks for the
-    OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
-    """
-    fallback_log_level = 'INFO'
-    ot_log_level = robot.config.log_level
-    if ot_log_level not in logging._nameToLevel:
-        log.info("OT Log Level {} not found. Defaulting to {}".format(
-            ot_log_level, fallback_log_level))
-        ot_log_level = fallback_log_level
-
-    level_value = logging._nameToLevel[ot_log_level]
-
-    serial_log_filename = environment.get_path('SERIAL_LOG_FILE')
-    api_log_filename = environment.get_path('LOG_FILE')
-
-    logging_config = dict(
-        version=1,
-        formatters={
-            'basic': {
-                'format':
-                '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
-            }
-        },
-        handlers={
-            'debug': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'basic',
-                'level': level_value
-            },
-            'serial': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'basic',
-                'filename': serial_log_filename,
-                'maxBytes': 5000000,
-                'level': logging.DEBUG,
-                'backupCount': 3
-            },
-            'api': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'basic',
-                'filename': api_log_filename,
-                'maxBytes': 1000000,
-                'level': logging.DEBUG,
-                'backupCount': 5
-            }
-
-        },
-        loggers={
-            '__main__': {
-                'handlers': ['debug', 'api'],
-                'level': logging.INFO
-            },
-            'opentrons.server': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.api': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.instruments': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.robot.robot_configs': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.drivers.smoothie_drivers.driver_3_0': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.drivers.serial_communication': {
-                'handlers': ['serial'],
-                'level': logging.DEBUG
-            },
-            'opentrons.system': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            }
-        }
-    )
-    dictConfig(logging_config)
-
-
-@web.middleware
-async def error_middleware(request, handler):
-    try:
-        response = await handler(request)
-    except web.HTTPNotFound:
-        log.exception("Exception handler for request {}".format(request))
-        data = {
-            'message': 'File was not found at {}'.format(request)
-        }
-        response = web.json_response(data, status=404)
-    except Exception as e:
-        log.exception("Exception in handler for request {}".format(request))
-        data = {
-            'message': 'An unexpected error occured - {}'.format(e),
-            'traceback': traceback.format_exc()
-        }
-        response = web.json_response(data, status=500)
-
-    return response
-
-
-# Support for running using aiohttp CLI.
-# See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli  # NOQA
-def init(loop=None):
-    """
-    Builds an application including the RPC server, and also configures HTTP
-    routes for methods defined in opentrons.server.endpoints
-    """
-    server = Server(MainRouter(), loop=loop, middlewares=[error_middleware])
-
-    server.app.router.add_get(
-        '/health', endp.health)
-    server.app.router.add_get(
-        '/wifi/list', wifi.list_networks)
-    server.app.router.add_post(
-        '/wifi/configure', wifi.configure)
-    server.app.router.add_get(
-        '/wifi/status', wifi.status)
-    server.app.router.add_post('/wifi/keys', wifi.add_key)
-    server.app.router.add_get('/wifi/keys', wifi.list_keys)
-    server.app.router.add_delete('/wifi/keys/{key_uuid}', wifi.remove_key)
-    server.app.router.add_get(
-        '/wifi/eap-options', wifi.eap_options)
-    server.app.router.add_post(
-        '/identify', control.identify)
-    server.app.router.add_get(
-        '/modules', control.get_attached_modules)
-    server.app.router.add_get(
-        '/modules/{serial}/data', control.get_module_data)
-    server.app.router.add_post(
-        '/camera/picture', control.take_picture)
-    server.app.router.add_post(
-        '/server/update', endpoints.update_api)
-    server.app.router.add_post(
-        '/server/update/firmware', endpoints.update_firmware)
-    server.app.router.add_post(
-        '/modules/{serial}/update', update.update_module_firmware)
-    server.app.router.add_get(
-        '/server/update/ignore', endpoints.get_ignore_version)
-    server.app.router.add_post(
-        '/server/update/ignore', endpoints.set_ignore_version)
-    server.app.router.add_static(
-        '/logs', log_file_path, show_index=True)
-    server.app.router.add_post(
-        '/server/restart', endpoints.restart)
-    server.app.router.add_post(
-        '/calibration/deck/start', dc_endp.start)
-    server.app.router.add_post(
-        '/calibration/deck', dc_endp.dispatch)
-    server.app.router.add_get(
-        '/pipettes', control.get_attached_pipettes)
-    server.app.router.add_get(
-        '/motors/engaged', control.get_engaged_axes)
-    server.app.router.add_post(
-        '/motors/disengage', control.disengage_axes)
-    server.app.router.add_get(
-        '/robot/positions', control.position_info)
-    server.app.router.add_post(
-        '/robot/move', control.move)
-    server.app.router.add_post(
-        '/robot/home', control.home)
-    server.app.router.add_get(
-        '/robot/lights', control.get_rail_lights)
-    server.app.router.add_post(
-        '/robot/lights', control.set_rail_lights)
-    server.app.router.add_get(
-        '/settings', settings.get_advanced_settings)
-    server.app.router.add_post(
-        '/settings', settings.set_advanced_setting)
-    server.app.router.add_post(
-        '/settings/reset', settings.reset)
-    server.app.router.add_get(
-        '/settings/reset/options', settings.available_resets)
-
-    return server.app
-
-
-def setup_udev_rules_file():
-    """
-    Copy the udev rules file for Opentrons Modules to opentrons_data directory
-    and trigger the new rules.
-    This rules file in opentrons_data is symlinked into udev rules directory
-    NOTE: This setup can also be run after python package install (which would
-    mean that it is performed only once, which might be sufficient)
-    instead of running it every time on server boot. Revisit this once the
-    redundant api-server-lib setup has been fixed
-    """
-    import shutil
-    import subprocess
-    import opentrons
-
-    rules_file = os.path.join(
-        os.path.abspath(os.path.dirname(opentrons.__file__)),
-        'config', 'modules', '95-opentrons-modules.rules')
-
-    shutil.copy2(
-        rules_file,
-        '/data/user_storage/opentrons_data/95-opentrons-modules.rules')
-
-    res0 = subprocess.run('udevadm control --reload-rules',
-                          shell=True, stdout=subprocess.PIPE).stdout.decode()
-    if res0 is not '':
-        log.warning(res0.strip())
-
-    res1 = subprocess.run('udevadm trigger',
-                          shell=True, stdout=subprocess.PIPE).stdout.decode()
-    if res1 is not '':
-        log.warning(res1.strip())
-
-
-def _find_smoothie_file():
-    resources = os.listdir(os.path.join(HERE, 'resources'))
-    for fi in resources:
-        matches = re.search('smoothie-(.*).hex', fi)
-        if matches:
-            branch_plus_ref = matches.group(1)
-            return os.path.join(HERE, 'resources', fi), branch_plus_ref
-    raise OSError("Could not find smoothie firmware file in {}"
-                  .format(os.path.join(HERE, 'resources')))
-
-
-def _sync_do_smoothie_install(explicit_modeset, filename):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(update._update_firmware(filename,
-                                                    loop,
-                                                    explicit_modeset))
-
-
-def initialize_robot():
-    packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
-    try:
-        robot.connect()
-    except Exception as e:
-        # The most common reason for this exception (aside from hardware
-        # failures such as a disconnected smoothie) is that the smoothie
-        # is in programming mode. If it is, then we still want to update
-        # it (so it can boot again), but we don’t have to do the GPIO
-        # manipulations that _put_ it in programming mode
-        log.exception("Error while connecting to motor driver: {}".format(e))
-        explicit_modeset = False
-        fw_version = None
-    else:
-        explicit_modeset = True
-        fw_version = robot.fw_version
-
-    if fw_version != packed_smoothie_fw_ver:
-        log.info("Executing smoothie update: current vers {}, packed vers {}"
-                 .format(fw_version, packed_smoothie_fw_ver))
-        _sync_do_smoothie_install(explicit_modeset, packed_smoothie_fw_file)
-
-        if robot.is_connected():
-            robot.fw_version = robot._driver.get_fw_version()
-            log.info("FW Update complete!")
-        else:
-            raise RuntimeError(
-                "Could not connect to motor driver after fw update")
-
-    else:
-        log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
-
-
-def main():
-    """
-    This application creates and starts the server for both the RPC routes
-    handled by opentrons.server.rpc and HTTP endpoints defined here
-    """
-    log_init()
-
+def build_arg_parser():
     arg_parser = ArgumentParser(
-        description="Opentrons application server",
-        prog="opentrons.server.main"
+            description="Opentrons application server",
+            prog="opentrons.server.main",
+            add_help=False
     )
     arg_parser.add_argument(
         "-H", "--hostname",
@@ -338,32 +24,35 @@ def main():
         help="Unix file system path to serve on. Specifying a path will cause "
              "hostname and port arguments to be ignored.",
     )
-    args, _ = arg_parser.parse_known_args(sys.argv[1:])
+    return arg_parser
 
-    if args.path:
-        log.debug("Starting Opentrons server application on {}".format(
-            args.path))
-        path, host, port = args.path, None, None
+
+def main():
+    arg_parser = build_arg_parser()
+    # System 3.0 server startup is:
+    # python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH
+    # opentrons.server.main:init
+    # In which case, we add a mock argument specifically to indicate that
+    # this is a system 3.0 init path. This argument otherwise has no meaning
+    arg_parser.add_argument(
+        'patch_old_init',
+        metavar='OLD_STYLE_INIT',
+        nargs='?',
+        default=None,
+        help="The old-style way to initialize the server with a function name."
+             " Use to force the system to start with opentrons.main "
+             "instead of server.main"
+    )
+    args = arg_parser.parse_args()
+
+    # If running system 3.0, then redirect to new 3.4 entrypoint
+    # in opentrons.main
+    if args.patch_old_init is not None:
+        import opentrons.main
+        opentrons.main.run(**vars(args))
     else:
-        log.debug("Starting Opentrons server application on {}:{}".format(
-            args.hostname, args.port))
-        path, host, port = None, args.hostname, args.port
-
-    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot()
-
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            robot.home_z()
-        setup_udev_rules_file()
-
-    log.info("API server version:  {}".format(__version__))
-    log.info("Smoothie FW version: {}".format(robot.fw_version))
-
-    # Explicitly unlock resin updates in case a prior server left them locked
-    unlock_resin_updates()
-    web.run_app(init(), host=host, port=port, path=path)
-    arg_parser.exit(message="Stopped\n")
+        server.run(args.hostname, args.port, args.path)
+        arg_parser.exit(message="Stopped\n")
 
 
 if __name__ == "__main__":
