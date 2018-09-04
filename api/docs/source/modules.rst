@@ -15,6 +15,7 @@ Just like labware, you will also need to load in your module in order to use it
 within a protocol. To do this, you call:
 
 .. code-block:: python
+
     from opentrons import modules
 
     module = modules.load('Module Name', slot)
@@ -25,6 +26,7 @@ Above, `Module Name` represents either `tempdeck` or `magdeck`.
 To add a labware onto a given module, you will need to use the `share=True` call-out
 
 .. code-block:: python
+
    from opentrons import labware
 
    labware = labware.load('96-flat', slot, share=True)
@@ -39,7 +41,9 @@ If you plug in a module with the app open and connected to your robot already, y
 
 If you are running a program outside of the app, you will need to initiate robot connection to the module. This can
 be done like the following:
+
 .. code-block:: python
+
     from opentrons import modules, robot
 
     robot.connect()
@@ -53,7 +57,9 @@ be done like the following:
 Checking the status of your Module
 ==================================
 Both modules have the ability to check what state they are currently in. To do this run the following:
+
 .. code-block:: python
+
     from opentrons import modules
 
     module = modules.load('Module Name', slot)
@@ -77,6 +83,7 @@ Set Temperature
 To set the temperature module to a given temperature in degrees celsius do the following:
 
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('tempdeck', slot)
@@ -91,6 +98,7 @@ Wait Until Setpoint Reached
 This function will pause your protocol until your target temperature is reached.
 
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('tempdeck', slot)
@@ -109,7 +117,9 @@ an indefinite loop.
 Read the Current Temperature
 ============================
 You can read the current real-time temperature of the module by the following:
+
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('tempdeck', slot)
@@ -122,7 +132,9 @@ This will return a float of the temperature in celsius.
 Read the Target Temperature
 ===========================
 We can read the target temperature of the module by the following:
+
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('tempdeck', slot)
@@ -138,6 +150,7 @@ You would still be able to call `set_temperature()` function to initiate a heati
 or cooling phase again.
 
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('tempdeck', slot)
@@ -150,7 +163,9 @@ or cooling phase again.
 
     module.deactivate()
 
-** Note** You can also deactivate your temperature module through our Run App by
+
+** Note**
+You can also deactivate your temperature module through our Run App by
 clicking on the `Pipettes & Modules` tab. Your temperature module will automatically
 deactivate if another protocol is uploaded to the app. Your temperature module will
 not deactivate automatically upon protocol end, cancel or re-setting a protocol.
@@ -159,34 +174,22 @@ not deactivate automatically upon protocol end, cancel or re-setting a protocol.
 Magnetic Module
 **********
 
-The magnetic module has three actions:
+The magnetic module has two actions:
 
-- calibration: The magnetic stage probes for the bottom of the labware you placed on top
-- engage: The magnetic stage rises to the calibrated height (flush with the bottom of the labware)
+- engage: The magnetic stage rises to a default height unless otherwise specified
 - disengage: The magnetic stage moves down to its home position
 
-At the start of a protocol run within our Run App, the module is auto-calibrated so please
-ensure that your module has the labware you will be utilizing on top of it before a run.
-
-If you are running a program outside of our App you can use the calibration function below.
-
-The magnetic module is currently compatible with normal PCR well plates.
+The magnetic module is currently compatible with normal PCR well plates. The magnets will default
+to an engaged height of about 4.3 mm from the bottom of the well. This is roughly 30% of the well depth.
+This engaged height has been tested for an elution volume of 40ul.
 
 In the future, we will have adapters to support tuberacks as well as deep well plates.
 
-Calibrate
-=========
-.. code-block:: python
-    from opentrons import modules, labware
-
-    module = modules.load('magdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
-
-    module.calibrate()
 
 Engage
 ======
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('magdeck', slot)
@@ -194,9 +197,21 @@ Engage
 
     module.engage()
 
+If you deem that the default engage height is not ideal for your applications,
+you can include an offset in mm for the magnet to move to. The engage function
+will take in a value (positive or negative) to move the magnets from the **current**
+offset position.
+
+To move the magnets higher than the default position you would input a positive mm value such as:
+``module.engage(4)``
+
+To move the magnets lower than the default position you would input a negative mm value such as:
+``module.engage(-4)``
+
 Disengage
 =========
 .. code-block:: python
+
     from opentrons import modules, labware
 
     module = modules.load('magdeck', slot)

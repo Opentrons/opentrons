@@ -323,7 +323,7 @@ using our `set_flow_rate` function. This can be called at any time during the pr
     pipette.set_flow_rate(aspirate=50, dispense=100)
 
 You can also choose to only update aspirate OR dispense depending on the application.
-Pipette liquid handling speed is in `ul/mm`.
+Pipette liquid handling speed is in `ul/s`.
 
 **Note** The dispense speed also controls the speed of `blow_out`.
 
