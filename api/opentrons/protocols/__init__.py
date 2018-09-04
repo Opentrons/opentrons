@@ -72,7 +72,7 @@ def get_location(loaded_labware, command_type, params, default_values):
 
     # optional command-specific value, fallback to default
     offset_from_bottom = params.get(
-        'offset-from-bottom-mm', offset_default)
+        'offsetFromBottomMm', offset_default)
 
     if offset_from_bottom is None:
         # not all commands use offsets

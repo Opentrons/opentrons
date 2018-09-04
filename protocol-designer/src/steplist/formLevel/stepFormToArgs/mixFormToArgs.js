@@ -44,6 +44,10 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
 
   const volume = Number(formData.volume) || 0
   const times = Number(formData.times) || 0
+  // NOTE: for mix, there is only one tip offset field,
+  // and it applies to both aspirate and dispense
+  const aspirateOffsetFromBottomMm = Number(formData['mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(formData['mmFromBottom'])
 
   // It's radiobutton, so one should always be selected.
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
@@ -86,7 +90,9 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
         delay,
         changeTip,
         blowout,
-        pipette
+        pipette,
+        aspirateOffsetFromBottomMm,
+        dispenseOffsetFromBottomMm
       }
       : null
   }

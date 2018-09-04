@@ -48,12 +48,11 @@
       }
     },
 
-    "offset-from-bottom-mm": {
+    "offsetFromBottomMm": {
       "description": "Offset from bottom of well in millimeters",
       "properties": {
-        "offset-from-bottom-mm": {"$ref": "#/definitions/mm-offset"}
-      },
-      "additionalProperties": false
+        "offsetFromBottomMm": {"$ref": "#/definitions/mm-offset"}
+      }
     },
 
     "pipette-access-params": {
@@ -276,7 +275,7 @@
                         {"$ref": "#/definitions/flow-rate-params"},
                         {"$ref": "#/definitions/pipette-access-params"},
                         {"$ref": "#/definitions/volume-params"},
-                        {"$ref": "#/definitions/offset-from-bottom-mm"}
+                        {"$ref": "#/definitions/offsetFromBottomMm"}
                       ]
                     }
                   }

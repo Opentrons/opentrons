@@ -40,8 +40,8 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const destLabware = formData['dispense_labware']
   const blowout = formData['dispense_blowout_labware']
 
-  const aspirateOffsetFromBottomMm = formData['aspirate_mmFromBottom']
-  const dispenseOffsetFromBottomMm = formData['dispense_mmFromBottom']
+  const aspirateOffsetFromBottomMm = Number(formData['aspirate_mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(formData['dispense_mmFromBottom'])
 
   const delayAfterDispense = formData['dispense_delay_checkbox']
     ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
