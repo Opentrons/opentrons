@@ -18,6 +18,11 @@
       "path": "cz-conventional-changelog"
     }
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "make lint"
+    }
+  },
   "jest": {
     "moduleNameMapper": {
       "\\.(css)$": "identity-obj-proxy"
@@ -92,6 +97,7 @@
     "handlebars": "^4.0.11",
     "handlebars-loader": "^1.6.0",
     "html-webpack-plugin": "^2.28.0",
+    "husky": "^1.0.0-rc.13",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
     "lerna": "^3.0.0-beta.21",
