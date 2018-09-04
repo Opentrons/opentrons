@@ -28,8 +28,8 @@ const SelectorDebugger = process.env.NODE_ENV === 'development'
 
 type State = {isAnalyticsModalOpen: boolean}
 class ProtocolEditor extends React.Component<*, State> {
-  constructor (props) {
-    super(props)
+  constructor () {
+    super()
     const hasOptedIn = getHasOptedIn()
     let initialState = {isAnalyticsModalOpen: false}
     if (hasOptedIn === null) { // NOTE: only null if never set
@@ -42,7 +42,7 @@ class ProtocolEditor extends React.Component<*, State> {
     }
     this.state = initialState
   }
-  handleCloseAnalyticsModal = (e: SyntheticEvent<*>) => {
+  handleCloseAnalyticsModal = () => {
     this.setState({isAnalyticsModalOpen: false})
   }
   render () {

@@ -13,15 +13,18 @@ import {
   initializeAnalytics
 } from '../../analytics'
 
-class Privacy extends React.Component<*> {
+type State = {optInToggleValue: boolean}
+class Privacy extends React.Component<*, State> {
+  state: State = {optInToggleValue: getHasOptedIn()}
   toggleAnalyticsOptInValue = () => {
     const hasOptedIn = getHasOptedIn()
     if (hasOptedIn) {
       shutdownAnalytics()
-      optOut()
+      if (optOut()) this.setState({optInToggleValue: false})
     } else {
       initializeAnalytics()
       optIn()
+      if (optIn()) this.setState({optInToggleValue: true})
     }
     return true
   }
@@ -34,7 +37,7 @@ class Privacy extends React.Component<*> {
             <p className={styles.toggle_label}>{i18n.t('card.toggle.share_session')}</p>
             <ToggleButton
               className={styles.toggle_button}
-              toggledOn={getHasOptedIn()}
+              toggledOn={this.state.optInToggleValue}
               onClick={this.toggleAnalyticsOptInValue} />
           </div>
           <div className={styles.body_wrapper}>

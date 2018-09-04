@@ -1,5 +1,3 @@
-// @flow
-
 /* eslint-disable */
 
 window['_fs_debug'] = false;
@@ -22,15 +20,28 @@ export const initializeAnalytics = () => {
 }
 
 export const shutdownAnalytics = () => {
-  if (window.FS) { window.FS.shutdown() }
+  if (window[window['_fs_namespace']]) { window.FS.shutdown() }
+  delete window[window['_fs_namespace']]
 }
 
 export const optIn = () => {
-  window.localStorage.setItem('optedInToAnalytics', true)
+  try {
+    window.localStorage.setItem('optedInToAnalytics', true)
+  } catch(e) {
+    console.error('attempted to persist analytics preference in localStorage, but failed with error: ', e)
+    return false
+  }
+  return true
 }
 
 export const optOut = () => {
-  window.localStorage.setItem('optedInToAnalytics', false)
+  try {
+    window.localStorage.setItem('optedInToAnalytics', false)
+  } catch(e) {
+    console.error('attempted to persist analytics preference in localStorage, but failed with error: ', e)
+    return false
+  }
+  return true
 }
 
 export const getHasOptedIn = () => (
