@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import {Icon} from '../icons'
 import styles from './forms.css'
+import type {HoverTooltipHandlers} from '../tooltips'
 
 type Props = {
   /** text label */
@@ -14,7 +15,9 @@ type Props = {
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
   error?: ?string,
   /** enable disabled style. Overridden by truthy `error` */
-  disabled?: ?boolean
+  disabled?: ?boolean,
+  /** handlers for HoverTooltipComponent */
+  hoverTooltipHandlers?: ?HoverTooltipHandlers
 }
 
 export default function FormGroup (props: Props) {
@@ -29,7 +32,7 @@ export default function FormGroup (props: Props) {
 
   return (
     <div className={className}>
-      <div className={styles.form_group_label}>
+      <div {...props.hoverTooltipHandlers} className={styles.form_group_label}>
         {error &&
           <div className={styles.error_icon}>
             <Icon name='alert' />

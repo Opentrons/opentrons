@@ -13,6 +13,7 @@ import {
 } from './formFields'
 
 import TipPositionInput from './TipPositionInput'
+import getTooltipForField from './getTooltipForField'
 import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
 import WellOrderInput from './WellOrderInput'
@@ -50,13 +51,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FormGroup label='TECHNIQUE'>
               <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
               <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
-              <HoverTooltip tooltipComponent={i18n.t('tooltip.not_in_beta')}>
-                {(hoverTooltipHandlers) => (
-                  <StepCheckboxRow disabled hoverTooltipHandlers={hoverTooltipHandlers} name="aspirate_airGap_checkbox" label="Air Gap">
-                    <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
-                  </StepCheckboxRow>
-                )}
-              </HoverTooltip>
+
+              <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
+              </StepCheckboxRow>
+
               <StepCheckboxRow name="aspirate_mix_checkbox" label='Mix'>
                 <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
                 <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
@@ -93,10 +92,23 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             labwareFieldName="dispense_labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
-          {(stepType === 'transfer' || stepType === 'distribute') &&
-            <FormGroup label='Volume:' className={styles.volume_field}>
-              <StepInputField name="volume" units="μL" {...focusHandlers} />
-            </FormGroup>}
+          {(stepType === 'transfer' || stepType === 'distribute') && (
+            // TODO: Ian 2018-08-30 make volume field not be a one-off
+            <HoverTooltip
+              tooltipComponent={getTooltipForField(stepType, 'volume')}
+              placement='top-start'
+            >
+              {(hoverTooltipHandlers) =>
+                <FormGroup
+                  label='Volume:'
+                  className={styles.volume_field}
+                  hoverTooltipHandlers={hoverTooltipHandlers}
+                >
+                  <StepInputField name="volume" units="μL" {...focusHandlers} />
+                </FormGroup>
+              }
+            </HoverTooltip>
+          )}
         </div>
 
         <div className={formStyles.row_wrapper}>
@@ -107,14 +119,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <HoverTooltip tooltipComponent={i18n.t('tooltip.not_in_beta')}>
-                {(hoverTooltipHandlers) => (
-                  <DispenseDelayFields
-                    disabled
-                    hoverTooltipHandlers={hoverTooltipHandlers}
-                    focusHandlers={focusHandlers} />
-                )}
-              </HoverTooltip>
+              <DispenseDelayFields
+                disabled
+                tooltipComponent={i18n.t('tooltip.not_in_beta')}
+                focusHandlers={focusHandlers} />
               <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
               </StepCheckboxRow>
