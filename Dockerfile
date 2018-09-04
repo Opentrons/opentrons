@@ -50,20 +50,17 @@ COPY ./shared-data/definitions /etc/labware
 COPY ./api /tmp/api
 # Make our shared data available for the api setup.py
 COPY ./shared-data /tmp/shared-data
-COPY ./api-server-lib /tmp/api-server-lib
 COPY ./update-server /tmp/update-server
 COPY ./compute/avahi_tools /tmp/avahi_tools
 
 # When adding more python packages make sure to use setuptools to keep
 # packaging consistent across environments
 ENV PIPENV_VENV_IN_PROJECT=true
-RUN pipenv install /tmp/api-server-lib --system && \
-    pipenv install /tmp/api --system && \
+RUN pipenv install /tmp/api --system && \
     pipenv install /tmp/update-server --system && \
     pip install /tmp/avahi_tools && \
     echo "export OT_SYSTEM_VERSION=`python -c \"import json; print(json.load(open('/tmp/api/opentrons/package.json'))['version'])\"`" | tee -a /etc/profile.d/opentrons.sh && \
     rm -rf /tmp/api && \
-    rm -rf /tmp/api-server-lib && \
     rm -rf /tmp/update-server && \
     rm -rf /tmp/shared-data && \
     rm -rf /tmp/avahi_tools

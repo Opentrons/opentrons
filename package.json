@@ -3,7 +3,6 @@
   "private": true,
   "workspaces": [
     "api/opentrons",
-    "api-server-lib/ot2serverlib",
     "app",
     "app-shell",
     "components",

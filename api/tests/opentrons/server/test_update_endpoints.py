@@ -4,8 +4,7 @@ import tempfile
 from aiohttp import web
 from opentrons.server.main import init
 from opentrons.server.endpoints import update
-import ot2serverlib
-from ot2serverlib import ignore_update
+from opentrons.server.endpoints import serverlib_fallback
 
 
 async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
@@ -13,7 +12,7 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_restart(request):
         return web.json_response(test_data)
-    monkeypatch.setattr(ot2serverlib.endpoints, 'restart', mock_restart)
+    monkeypatch.setattr(serverlib_fallback, 'restart', mock_restart)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
@@ -37,7 +36,7 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
     async def mock_install(filename, loop):
         return msg
-    monkeypatch.setattr(ot2serverlib, '_install', mock_install)
+    monkeypatch.setattr(serverlib_fallback, '_install', mock_install)
     monkeypatch.setattr(update, '_update_firmware', mock_install)
 
     app = init(loop)
@@ -66,18 +65,17 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 async def test_ignore_updates(
         virtual_smoothie_env, loop, test_client):
+    tmpdir = tempfile.mkdtemp("files")
+    ignore_name = "testy_ignore.json"
+    serverlib_fallback.filepath = os.path.join(tmpdir, ignore_name)
     app = init(loop)
     cli = await loop.create_task(test_client(app))
-
     # Test no ignore file found
     r0 = await cli.get('/server/update/ignore')
     r0body = await r0.text()
     assert json.loads(r0body) == {'version': None}
 
     # Test that values are set correctly
-    ignore_name = "testy_ignore.json"
-    tmpdir = tempfile.mkdtemp("files")
-    ignore_update.filepath = os.path.join(tmpdir, ignore_name)
 
     ignore = {'version': '3.1.3'}
     r1 = await cli.post('server/update/ignore', json=ignore)

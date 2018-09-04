@@ -14,11 +14,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
-try:
-    from ot2serverlib import endpoints
-except ModuleNotFoundError:
-    print("Module ot2serverlib not found--using fallback implementation")
-    from opentrons.server.endpoints import serverlib_fallback as endpoints
+from opentrons.server.endpoints import serverlib_fallback as endpoints
 
 from argparse import ArgumentParser
 

@@ -18,7 +18,6 @@ discovery_client_dir := ../discovery-client
 
 # directories for robot API update bundled in production build
 api_dir := ../api
-api_lib_dir := ../api-server-lib
 
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
@@ -82,7 +81,6 @@ deps:
 .PHONY: api-deps
 api-deps:
 	$(MAKE) -C $(api_dir) wheel
-	$(MAKE) -C $(api_lib_dir) wheel
 
 .PHONY: package-deps
 package-deps: clean lib deps api-deps

@@ -27,4 +27,4 @@ coverage = "==4.4.2"
 [packages]
 
 "e1839a8" = {path = ".", editable = true}
-"f7933a7" = {path = "../api-server-lib", editable = true}
+pytest = "*"
