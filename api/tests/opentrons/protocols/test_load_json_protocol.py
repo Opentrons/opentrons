@@ -41,7 +41,7 @@ def test_get_location():
         command_params = {
             "labware": "someLabwareId",
             "well": well,
-            "offset-from-bottom-mm": offset
+            "offsetFromBottomMm": offset
         }
         result = protocols.get_location(
             loaded_labware, command_type, command_params, default_values)
