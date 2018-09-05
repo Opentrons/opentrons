@@ -24,6 +24,16 @@ const intercom = (...args) => {
   }
 }
 
+// intercom api calls
+const BOOT = 'boot'
+const UPDATE = 'update'
+
+// custom intercom properties
+const APP_VERSION = 'App Version'
+const ROBOT_NAME = 'Robot Name'
+const PIPETTE_MODEL_LEFT = 'Pipette Model Left'
+const PIPETTE_MODEL_RIGHT = 'Pipette Model Right'
+
 export function initializeSupport (): ThunkAction {
   return (_, getState) => {
     const config = getState().config.support
@@ -34,12 +44,27 @@ export function initializeSupport (): ThunkAction {
 }
 
 export const supportMiddleware: Middleware = (store) => (next) => (action) => {
+  let update
+
   if (action.type === 'robot:CONNECT_RESPONSE') {
     const state = store.getState()
     const robot = state.robot.connection.connectRequest.name
 
-    intercom('update', {user_id: userId, 'Robot Name': robot})
+    update = {[ROBOT_NAME]: robot}
+  } else if (action.type === 'api:PIPETTES_SUCCESS') {
+    const state = store.getState()
+
+    if (state.robot.connection.connectedTo === action.payload.robot.name) {
+      const {left, right} = action.payload.pipettes
+
+      update = {
+        [PIPETTE_MODEL_LEFT]: left.model,
+        [PIPETTE_MODEL_RIGHT]: right.model
+      }
+    }
   }
+
+  if (update) intercom(UPDATE, {user_id: userId, ...update})
 
   return next(action)
 }
@@ -48,12 +73,12 @@ function initializeIntercom (config: SupportConfig) {
   if (INTERCOM_ID) {
     userId = config.userId
 
-    intercom('boot', {
+    intercom(BOOT, {
       app_id: INTERCOM_ID,
       user_id: userId,
       created_at: config.createdAt,
       name: config.name,
-      'App Version': version
+      [APP_VERSION]: version
     })
   }
 }
