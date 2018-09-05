@@ -62,7 +62,7 @@ async def test_wifi_configure(
 
     msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
-    async def mock_configure(ssid, security_type=None, psk=None):
+    async def mock_configure(ssid, security_type=None, psk=None, hidden=False):
         # Command: nmcli device wifi connect "{ssid}" password "{psk}"
         return True, msg
 
