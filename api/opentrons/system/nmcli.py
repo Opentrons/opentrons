@@ -170,7 +170,7 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
     if psk:
         configure_cmd += ['wifi-sec.psk', psk]
     if hidden:
-        configure_cmd += ['hidden', 'true']
+        configure_cmd += ['wifi.hidden', 'true']
     res, err = await _call(configure_cmd)
     # nmcli connection add returns a string that looks like
     # "Connection ’connection-name’ (connection-uuid) successfully added."

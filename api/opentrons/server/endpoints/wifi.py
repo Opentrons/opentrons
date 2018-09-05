@@ -41,6 +41,8 @@ async def configure(request):
                        - psk is also not specified: assumed to be 'none'
                        - psk is specified: assumed to be 'wpa2-psk'
     psk: str Optional. The password for the network, if there is one.
+    hidden: bool Optional. True if the network is not broadcasting its
+                           SSID. If not specified, assumed to be False.
     """
     result = {}
 
@@ -48,6 +50,7 @@ async def configure(request):
         body = await request.json()
         ssid = body.get('ssid')
         psk = body.get('psk')
+        hidden = body.get('hidden')
         security = body.get('security_type')
 
         if ssid is None:
@@ -56,7 +59,8 @@ async def configure(request):
         else:
             ok, message = await nmcli.configure(ssid,
                                                 security_type=security,
-                                                psk=psk)
+                                                psk=psk,
+                                                hidden=hidden)
             status = 201 if ok else 401
             result['ssid'] = ssid
 
