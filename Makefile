@@ -7,7 +7,6 @@ SHELL := /bin/bash
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
-API_LIB_DIR := api-server-lib
 DISCOVERY_CLIENT_DIR := discovery-client
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
@@ -36,7 +35,6 @@ install: install-py install-js
 .PHONY: install-py
 install-py:
 	$(OT_PYTHON) -m pip install pipenv==11.6.8
-	$(MAKE) -C $(API_LIB_DIR) install
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 
@@ -64,7 +62,6 @@ install-types:
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
-	$(MAKE) -C $(API_LIB_DIR) push
 	$(MAKE) -C $(API_DIR) push
 	$(MAKE) -C $(API_DIR) restart
 
@@ -97,7 +94,6 @@ test: test-py test-js
 test-py:
 #	lerna exec --scope @opentrons/update-server --since origin/edge -- $(MAKE) -C .. test
 	$(MAKE) -C api test
-	$(MAKE) -C api-server-lib test
 
 .PHONY: test-js
 test-js:
@@ -114,7 +110,6 @@ lint: lint-py lint-js lint-css
 .PHONY: lint-py
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
-	$(MAKE) -C $(API_LIB_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
 .PHONY: lint-js

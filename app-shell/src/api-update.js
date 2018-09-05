@@ -21,13 +21,6 @@ export function initialize () {
       ext: '.whl'
     },
 
-    // API server lib update
-    {
-      id: 'serverlib',
-      directory: path.join(__dirname, '../../api-server-lib/dist'),
-      ext: '.whl'
-    },
-
     // firmware update
     {
       id: 'fw',

@@ -55,7 +55,7 @@ publish:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) opentrons/server/main.py -P 31950 opentrons.server.main:init
+	$(python) opentrons/server/main.py -P 31950
 
 .PHONY: wheel
 wheel: clean
