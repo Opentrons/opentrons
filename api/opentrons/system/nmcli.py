@@ -169,6 +169,7 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
                      'ifname', 'wlan0',
                      'type', 'wifi',
                      'con-name', ssid,
+                     'wifi.cloned-mac-address', 'permanent',
                      'wifi.ssid', ssid]
     if security_type:
         configure_cmd += ['wifi-sec.key-mgmt', security_type]
