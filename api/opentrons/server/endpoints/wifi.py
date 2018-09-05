@@ -84,17 +84,28 @@ async def status(request):
     Get request will return the status of the wifi connection from the
     RaspberryPi to the internet.
 
-    Options are:
+    The body of the response is a json dict containing
+
+    'status': connectivity status, where the options are:
       "none" - no connection to router or network
       "portal" - device behind a captive portal and cannot reach full internet
       "limited" - connection to router but not internet
       "full" - connection to router and internet
       "unknown" - an exception occured while trying to determine status
-
+    'ipAddress': the ip address, if it exists (null otherwise); this also
+                 contains the subnet mask in CIDR notation, e.g. 10.2.12.120/16
+    'macAddress': the mac address
+    'gatewayAddress': the address of the current gateway, if it exists (null
+                      otherwise)
     """
-    connectivity = {"status": "unknown"}
+    connectivity = {'status': 'none',
+                    'ipAddress': None,
+                    'macAddress': 'unknown',
+                    'gatewayAddress': None}
     try:
         connectivity['status'] = await nmcli.is_connected()
+        net_info = await nmcli.iface_info('wlan0')
+        connectivity.update(net_info)
         log.debug("Connectivity: {}".format(connectivity['status']))
         status = 200
     except subprocess.CalledProcessError as e:

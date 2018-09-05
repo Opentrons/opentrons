@@ -1,7 +1,5 @@
 import json
-import pytest
 from opentrons.server.main import init
-from opentrons.server.endpoints import wifi
 from opentrons.system import nmcli
 
 """
@@ -9,24 +7,42 @@ All mocks in this test suite represent actual output from nmcli commands
 """
 
 
-@pytest.mark.xfail
 async def test_wifi_status(
         virtual_smoothie_env, loop, test_client, monkeypatch):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    def mock_subprocess(cmd):
+    async def mock_call(cmd):
         # Command: `nmcli networking connectivity`
-        res = "full"
-        return res, ''
+        if 'connectivity' in cmd:
+            return 'full', ''
+        else:
+            res = '''B8:27:EB:5F:A6:89
+192.168.1.137/24
+192.168.1.1
+100 (connected)'''
+            return res, ''
 
-    monkeypatch.setattr(wifi, '_subprocess', mock_subprocess)
+    monkeypatch.setattr(nmcli, '_call', mock_call)
 
-    expected = json.dumps({'status': 'full'})
+    expected = json.dumps({'status': 'full',
+                           'ipAddress': '192.168.1.137/24',
+                           'macAddress': 'B8:27:EB:5F:A6:89',
+                           'gatewayAddress': '192.168.1.1'})
     resp = await cli.get('/wifi/status')
     text = await resp.text()
     assert resp.status == 200
     assert text == expected
+
+    async def mock_call(cmd):
+        if 'connectivity' in cmd:
+            return 'full', ''
+        else:
+            return '', 'this is a dummy error'
+
+    monkeypatch.setattr(nmcli, '_call', mock_call)
+    resp = await cli.get('/wifi/status')
+    assert resp.status == 500
 
 
 async def test_wifi_list(virtual_smoothie_env, loop, test_client, monkeypatch):
