@@ -19,8 +19,13 @@ from asyncio import subprocess as as_subprocess
 
 log = logging.getLogger(__name__)
 
-SUPPORTED_SECURITY_TYPES = ('none', 'wpa2-psk')
+# These supported security types are passed directly to nmcli; they should
+# match the security types allowed in the network-manager settings for
+# 802-11-wireless-security.key-mgmt
+SUPPORTED_SECURITY_TYPES = ('none', 'wpa-psk')
 
+# These connection types are used to parse nmcli results and should be valid
+# results for the last element when splitting connection.type by ’-’
 CONNECTION_TYPES = ('wireless', 'ethernet')
 
 
@@ -137,14 +142,14 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
     that doesn't exist will get a False and a message; a system where nmcli
     is not found will raise a CalledProcessError.
 
-    The ssid is mandatory. If security_type is 'wpa2-psk', the psk must be
+    The ssid is mandatory. If security_type is 'wpa-psk', the psk must be
     specified; if security_type is 'none', the psk will be ignored.
 
     If security_type is not specified, it will be inferred from the specified
     arguments.
     """
     if None is security_type and None is not psk:
-        security_type = 'wpa2-psk'
+        security_type = 'wpa-psk'
     if security_type and security_type not in SUPPORTED_SECURITY_TYPES:
         message = 'Only security types {} are supported'\
             .format(SUPPORTED_SECURITY_TYPES)

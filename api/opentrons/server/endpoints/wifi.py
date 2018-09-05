@@ -36,10 +36,10 @@ async def configure(request):
 
     Fields in the body are:
     ssid: str Required. The SSID to connect to.
-    security_type: str Optional. one of 'none', 'wpa2-psk'.
+    security_type: str Optional. one of 'none', 'wpa-psk'.
                        If not specified and
                        - psk is also not specified: assumed to be 'none'
-                       - psk is specified: assumed to be 'wpa2-psk'
+                       - psk is specified: assumed to be 'wpa-psk'
     psk: str Optional. The password for the network, if there is one.
     """
     result = {}
