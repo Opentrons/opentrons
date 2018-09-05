@@ -23,6 +23,8 @@ SUPPORTED_SECURITY_TYPES = ('none', 'wpa2-psk')
 
 CONNECTION_TYPES = ('wireless', 'ethernet')
 
+IFACE_NAMES = ('wlan0', 'eth0')
+
 
 async def available_ssids():
     """ List the visible (broadcasting SSID) wireless networks.
@@ -212,6 +214,46 @@ async def remove(ssid=None, name=None) -> (bool, str):
             return False, err
     else:
         return False, 'No connection for ssid {}'.format(ssid)
+
+
+async def iface_info(which_iface):
+    """ Get the basic network configuration of an interface.
+
+    Returns a dict containing the info:
+    {
+      'ipAddress': 'xx.xx.xx.xx/yy' (ip4 addr with subnet as CIDR) or None
+      'macAddress': 'aa:bb:cc:dd:ee:ff' or None
+      'gatewayAddress: 'zz.zz.zz.zz' or None
+    }
+
+    which_iface should be a string in IFACE_NAMES.
+    """
+    if which_iface not in IFACE_NAMES:
+        raise ValueError('Bad interface name {}, not in {}'
+                         .format(which_iface, IFACE_NAMES))
+    default_res = {'ipAddress': None,
+                   'macAddress': None,
+                   'gatewayAddress': None}
+    fields = ['GENERAL.HWADDR', 'IP4.ADDRESS', 'IP4.GATEWAY', 'GENERAL.STATE']
+    # Note on this specific command: Most nmcli commands default to a tabular
+    # output mode, where if there are multiple things to pull a couple specific
+    # fields from it you’ll get a table where rows are, say, connections, and
+    # columns are field name. However, specifically ‘con show <con-name>‘ and
+    # ‘dev show <dev-name>’ default to a multiline representation, and even if
+    # explicitly ask for it to be tabular, it’s not quite the same as the other
+    # commands. So we have to special-case the parsing.
+    res, err = await _call(['--mode', 'tabular',
+                            '--escape', 'no',
+                            '--terse', '--fields', ','.join(fields),
+                            'dev', 'show', which_iface])
+    values = res.split('\n')
+    if len(fields) != len(values):
+        # We failed
+        raise ValueError("Bad result from nmcli: {}".format(err))
+    default_res['macAddress'] = values[0]
+    default_res['ipAddress'] = values[1]
+    default_res['gatewayAddress'] = values[2]
+    return default_res
 
 
 async def _call(cmd) -> (str, str):
