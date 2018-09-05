@@ -6,6 +6,7 @@ window['_fs_org'] = 'EM1CA';
 window['_fs_namespace'] = 'FS';
 
 export const initializeAnalytics = () => {
+  // NOTE: this code snippet is distributed by FullStory
   (function(m,n,e,t,l,o,g,y){
       if (e in m) {if(m.console && m.console.log) { m.console.log('FullStory namespace conflict. Please set window["_fs_namespace"].');} return;}
       g=m[e]=function(a,b){g.q?g.q.push([a,b]):g._api(a,b);};g.q=[];
