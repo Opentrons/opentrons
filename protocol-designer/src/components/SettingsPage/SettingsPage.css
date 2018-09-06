@@ -30,7 +30,7 @@
 }
 
 .toggle_label {
-  @apply --font-body-1-dark;
+  @apply --font-body-2-dark;
 
   max-width: var(--mw-labeled-toggle);
   display: inline-block;

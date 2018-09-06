@@ -19,12 +19,12 @@ const SettingsSidebar = (props: SP & DP) => (
       selected={props.currentPage === 'settings-privacy'}
       onClick={props.makeNavigateToPage('settings-privacy')}
       title={i18n.t('nav.privacy')}/>
-    <PDTitledList
+    {/* <PDTitledList
       disabled
       className={styles.sidebar_item}
       onClick={props.makeNavigateToPage('settings-features')}
       selected={props.currentPage === 'settings-features'}
-      title={i18n.t('nav.feature_flags')}/>
+      title={i18n.t('nav.feature_flags')}/> */}
   </SidePanel>
 )
 
