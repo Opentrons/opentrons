@@ -57,6 +57,8 @@ class TipPositionModal extends React.Component<Props, State> {
     this.props.updateValue(formatValue(this.state.value || 0))
   }
   handleReset = () => {
+    // NOTE: when `prefix` isn't set (eg in the Mix form), we'll use
+    // the value `DEFAULT_MM_FROM_BOTTOM_DISPENSE` (since we gotta pick something :/)
     const defaultMm = this.props.prefix === 'aspirate'
       ? DEFAULT_MM_FROM_BOTTOM_ASPIRATE
       : DEFAULT_MM_FROM_BOTTOM_DISPENSE
