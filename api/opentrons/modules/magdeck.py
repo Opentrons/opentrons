@@ -1,6 +1,9 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons import commands
 
+LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
+MAX_ENGAGE_HEIGHT = 45  # mm from home position
+
 
 class MissingDevicePortError(Exception):
     pass
@@ -31,12 +34,33 @@ class MagDeck:
             self._engaged = False
 
     @commands.publish.both(command=commands.magdeck_engage)
-    def engage(self):
+    def engage(self, **kwargs):
         '''
-        Move the magnet to plate top - 0.4 mm
+        Move the magnet to either:
+            the default height for the labware loaded on magdeck
+            [engage()]
+        or  a +/- 'offset' from the default height for the labware
+            [engage(offset=2)]
+        or  a 'height' value specified as mm from magdeck home position
+            [engage(height=20)]
         '''
+        if 'height' in kwargs:
+            height = kwargs.get('height')
+        else:
+            height = LABWARE_ENGAGE_HEIGHT.get(
+                self.labware.get_children_list()[1].get_name())
+            if not height:
+                raise ValueError(
+                    'No engage height definition found for {}. Provide a'
+                    'custom height instead'.format(
+                        self.labware.get_children_list()[1].get_name()))
+            if 'offset' in kwargs:
+                height += kwargs.get('offset')
+        if height > MAX_ENGAGE_HEIGHT or height < 0:
+            raise ValueError('Invalid engage height. Should be 0 to {}'.format(
+                MAX_ENGAGE_HEIGHT))
         if self._driver and self._driver.is_connected():
-            self._driver.move(self._driver.plate_height - 0.4)
+            self._driver.move(height)
             self._engaged = True
 
     @commands.publish.both(command=commands.magdeck_disengage)
