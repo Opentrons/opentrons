@@ -22,21 +22,17 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     return {errors}
   }
 
-  const params: {offsetFromBottomMm?: number} & AspirateDispenseArgs = {
-    pipette,
-    volume,
-    labware,
-    well
-  }
-
-  if (offsetFromBottomMm != null) {
-    // only include 'offsetFromBottomMm' key if value is not void
-    params.offsetFromBottomMm = offsetFromBottomMm
-  }
-
   const commands = [{
     command: 'dispense',
-    params
+    params: {
+      pipette,
+      volume,
+      labware,
+      well,
+      offsetFromBottomMm: offsetFromBottomMm == null
+        ? undefined
+        : offsetFromBottomMm
+    }
   }]
 
   return {

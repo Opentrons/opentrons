@@ -43,7 +43,7 @@ def test_get_location():
             "well": well,
             "offsetFromBottomMm": offset
         }
-        result = protocols.get_location(
+        result = protocols._get_location(
             loaded_labware, command_type, command_params, default_values)
         assert result == plate.well(well).bottom(offset)
 
@@ -53,7 +53,7 @@ def test_get_location():
     }
 
     # no command-specific offset, use default
-    result = protocols.get_location(
+    result = protocols._get_location(
         loaded_labware, command_type, command_params, default_values)
     assert result == plate.well(well).bottom(
         default_values['aspirate-mm-from-bottom'])

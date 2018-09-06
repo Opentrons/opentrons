@@ -54,7 +54,7 @@ def load_labware(protocol_data):
     return loaded_labware
 
 
-def get_location(loaded_labware, command_type, params, default_values):
+def _get_location(loaded_labware, command_type, params, default_values):
     labwareId = params.get('labware')
     if not labwareId:
         # not all commands use labware param
@@ -81,14 +81,14 @@ def get_location(loaded_labware, command_type, params, default_values):
     return labware.wells(well).bottom(offset_from_bottom)
 
 
-def get_pipette(command_params, loaded_pipettes):
+def _get_pipette(command_params, loaded_pipettes):
     pipetteId = command_params.get('pipette')
     return loaded_pipettes.get(pipetteId)
 
 
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
 # flow rate value (eg as an argument in aspirate/dispense fns), remove this
-def set_flow_rate(
+def _set_flow_rate(
         pipette_model, pipette, command_type, params, default_values):
     """
     Set flow rate in uL/mm, to value obtained from command's params,
@@ -133,13 +133,13 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
         command_type = command_item.get('command')
         params = command_item.get('params', {})
 
-        pipette = get_pipette(params, loaded_pipettes)
+        pipette = _get_pipette(params, loaded_pipettes)
         pipette_model = protocol_data\
             .get('pipettes', {})\
             .get(params.get('pipette'), {})\
             .get('model')
 
-        location = get_location(
+        location = _get_location(
             loaded_labware, command_type, params, default_values)
         volume = params.get('volume')
 
@@ -148,7 +148,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             # which use pipettes right now.
             # Flow rate is persisted inside the Pipette object
             # and is settable but not easily gettable
-            set_flow_rate(
+            _set_flow_rate(
                 pipette_model, pipette, command_type, params, default_values)
 
         if command_type == 'delay':
