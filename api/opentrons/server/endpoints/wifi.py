@@ -1,17 +1,48 @@
 import json
 import logging
 import subprocess
+from typing import Dict, Tuple, Any, List
 from aiohttp import web
 from opentrons.system import nmcli
 
 log = logging.getLogger(__name__)
 
 
-async def list_networks(request):
+EAP_CONFIG_SHAPE = {
+    'options': [
+        {
+            'name': 'eapType',
+            'friendlyName': 'EAP Type',
+            'required': True,
+            'type': 'choice',
+            'choices': [t.qualified_name() for t in nmcli.EAP_TYPES]
+        },
+        {
+            'name': 'hidden',
+            'friendlyName': 'Hidden Network',
+            'required': False,
+            'type': 'bool'
+        }
+    ],
+    'methods': [
+        {'name': method.qualified_name(),
+         'options': [{k: v for k, v in arg.items()
+                      if k in ['name',
+                               'friendlyName',
+                               'required',
+                               'type',
+                               'choices',
+                               'fileType']}
+                     for arg in method.args()]}
+        for method in nmcli.EAP_TYPES]
+}
+
+
+async def list_networks(request: web.Request) -> web.Response:
     """
     Get request will return a list of discovered ssids.
     """
-    res = {"list": []}
+    res: Dict[str, List[str]] = {"list": []}
 
     try:
         networks = await nmcli.available_ssids()
@@ -28,7 +59,7 @@ async def list_networks(request):
     return web.json_response(res, status=status)
 
 
-async def configure(request):
+async def configure(request: web.Request) -> web.Response:
     """
     Post request should include a json body specifying config information
     (see below). Robot will attempt to connect to this network and respond
@@ -45,23 +76,39 @@ async def configure(request):
                            SSID. If not specified, assumed to be False.
     """
     result = {}
-
+    sec_translation = {
+        'wpa-psk': nmcli.SECURITY_TYPES.WPA_PSK,
+        'none': nmcli.SECURITY_TYPES.NONE,
+        None: nmcli.SECURITY_TYPES.NONE
+    }
     try:
         body = await request.json()
         ssid = body.get('ssid')
         psk = body.get('psk')
         hidden = body.get('hidden')
         security = body.get('security_type')
+        status = 200
 
         if ssid is None:
             status = 400
             message = 'Error: "ssid" string is required'
-        else:
-            ok, message = await nmcli.configure(ssid,
-                                                security_type=security,
-                                                psk=psk,
-                                                hidden=hidden)
-            status = 201 if ok else 401
+        try:
+            checked_sec = sec_translation[security]
+        except KeyError:
+            status = 400
+            message = 'Error: security type "{}" is invalid'.format(security)
+
+        if status == 200:
+            try:
+                ok, message = await nmcli.configure(ssid,
+                                                    security_type=checked_sec,
+                                                    psk=psk,
+                                                    hidden=hidden)
+            except ValueError as ve:
+                status = 400
+                message = str(ve)
+            else:
+                status = 201 if ok else 401
             result['ssid'] = ssid
 
     except json.JSONDecodeError as e:
@@ -79,7 +126,7 @@ async def configure(request):
     return web.json_response(data=result, status=status)
 
 
-async def status(request):
+async def status(request: web.Request) -> web.Response:
     """
     Get request will return the status of the wifi connection from the
     RaspberryPi to the internet.
@@ -104,7 +151,7 @@ async def status(request):
                     'gatewayAddress': None}
     try:
         connectivity['status'] = await nmcli.is_connected()
-        net_info = await nmcli.iface_info('wlan0')
+        net_info = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
         connectivity.update(net_info)
         log.debug("Connectivity: {}".format(connectivity['status']))
         status = 200
