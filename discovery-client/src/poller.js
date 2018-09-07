@@ -3,7 +3,13 @@
 
 import fetch from 'node-fetch'
 
-import type {Candidate, Logger, HealthResponse} from './types'
+import type { Candidate, Logger, HealthResponse } from './types'
+
+type HealthHandler = (
+  candidate: Candidate,
+  apiResponse: ?HealthResponse,
+  serverResponse: ?HealthResponse
+) => mixed
 
 export type PollRequest = {
   id: ?IntervalID
@@ -12,41 +18,26 @@ export type PollRequest = {
 export function poll (
   candidates: Array<Candidate>,
   interval: number,
-  onHealth: (candidate: Candidate, response: ?HealthResponse) => mixed,
+  onHealth: HealthHandler,
   log: ?Logger
 ): PollRequest {
-  if (!candidates.length) return {id: null}
+  if (!candidates.length) return { id: null }
 
-  log && log.debug('poller start', {interval, candidates: candidates.length})
+  log && log.debug('poller start', { interval, candidates: candidates.length })
 
   const subInterval = interval / candidates.length
   const id = setInterval(pollIp, subInterval)
-  const request = {id}
+  const request = { id }
   let current = -1
 
   return request
 
   function pollIp () {
     const next = getNextCandidate()
-    const url = `http://${next.ip}:${next.port}/health`
 
-    fetch(url)
-      .then(response => {
-        if (!response.ok) return null
-        return response.json()
-      })
-      .catch(error => {
-        if (log) {
-          const {message, type, code} = error
-          log.debug('fetch failed', {url, message, type, code})
-        }
-
-        return null
-      })
-      .then(body => {
-        log && log.http('GET', {url, body})
-        onHealth(next, body)
-      })
+    fetchHealth(next, log).then(([apiRes, serverRes]) =>
+      onHealth(next, apiRes, serverRes)
+    )
   }
 
   function getNextCandidate () {
@@ -65,6 +56,30 @@ export function stop (request: ?PollRequest, log: ?Logger) {
 
   if (id) {
     clearInterval(id)
-    log && log.debug('poller stop', {id})
+    log && log.debug('poller stop', { id })
   }
+}
+
+function fetchHealth (cand: Candidate, log: ?Logger) {
+  const apiHealthUrl = `http://${cand.ip}:${cand.port}/health`
+  const serverHealthUrl = `http://${cand.ip}:${cand.port}/server/health`
+
+  return Promise.all([
+    fetchAndParseBody(apiHealthUrl, log),
+    fetchAndParseBody(serverHealthUrl, log)
+  ])
+}
+
+function fetchAndParseBody (url, log: ?Logger) {
+  return fetch(url)
+    .then(response => (response.ok ? response.json() : null))
+    .then(body => {
+      log && log.silly('GET', { url, body })
+      return body
+    })
+    .catch(error => {
+      const { message, type, code } = error
+      log && log.http('GET failed', { url, message, type, code })
+      return null
+    })
 }
