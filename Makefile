@@ -62,6 +62,7 @@ install-types:
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
+	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push
 	$(MAKE) -C $(API_DIR) restart
 
@@ -76,6 +77,7 @@ api-local-container:
 .PHONY: term
 term: export host = $(usb_host)
 term:
+	$(if $(host),@echo "Connecting to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) term
 
 # all tests
