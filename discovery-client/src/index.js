@@ -208,7 +208,10 @@ export class DiscoveryClient extends EventEmitter {
     // else, response was not ok, so unset ok flag in all matching ips
     const { ip } = candidate
     const nextServices = this.services.map(
-      s => (s.ip === ip && s.ok !== false ? { ...s, ok: false } : s)
+      s =>
+        s.ip === ip && (s.ok !== false || s.serverOk !== false)
+          ? { ...s, ok: false, serverOk: false }
+          : s
     )
 
     this._updateServiceList(nextServices)

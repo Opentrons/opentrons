@@ -383,6 +383,35 @@ describe('discovery client', () => {
   )
 
   test(
+    'if both polls comes back bad, oks should be flagged false',
+    done => {
+      const client = DiscoveryClient({
+        services: [
+          {
+            name: 'opentrons-dev',
+            ip: '192.168.1.42',
+            port: 31950,
+            ok: null,
+            serverOk: null
+          }
+        ]
+      })
+
+      client.once('service', () => {
+        expect(client.services).toHaveLength(1)
+        expect(client.services[0].ok).toBe(false)
+        expect(client.services[0].serverOk).toBe(false)
+        done()
+      })
+
+      client.start()
+      const onHealth = poller.poll.mock.calls[0][2]
+      onHealth({ ip: '192.168.1.42', port: 31950 }, null, null)
+    },
+    10
+  )
+
+  test(
     'if names come back conflicting, prefer /server and set ok to false',
     done => {
       const client = DiscoveryClient({
