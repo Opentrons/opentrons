@@ -27,6 +27,9 @@
 .toggle_row {
   width: 100%;
   padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .toggle_label {

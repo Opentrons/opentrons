@@ -1,11 +1,6 @@
 // @flow
 import * as React from 'react'
 
-import {
-  getHasOptedIn,
-  initializeAnalytics,
-  shutdownAnalytics
-} from '../analytics'
 import TimelineAlerts from '../components/steplist/TimelineAlerts'
 import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
@@ -26,56 +21,34 @@ const SelectorDebugger = process.env.NODE_ENV === 'development'
   ? require('../containers/SelectorDebugger').default
   : () => null
 
-type State = {isAnalyticsModalOpen: boolean}
-class ProtocolEditor extends React.Component<*, State> {
-  constructor () {
-    super()
-    const hasOptedIn = getHasOptedIn()
-    let initialState = {isAnalyticsModalOpen: false}
-    if (hasOptedIn === null) { // NOTE: only null if never set
-      initialState = {isAnalyticsModalOpen: true}
-    } else if (hasOptedIn === true) {
-      initializeAnalytics()
-    } else {
-      // sanity check: there shouldn't be an analytics session, but shutdown just in case if user opted out
-      shutdownAnalytics()
-    }
-    this.state = initialState
-  }
-  handleCloseAnalyticsModal = () => {
-    this.setState({isAnalyticsModalOpen: false})
-  }
-  render () {
-    return (
-      <div>
-        <SelectorDebugger />
+export default function ProtocolEditor () {
+  return (
+    <div>
+      <SelectorDebugger />
 
-        <div className={styles.wrapper}>
-          <ConnectedNav />
-          <ConnectedSidebar />
-          <div className={styles.main_page_wrapper}>
-            <ConnectedTitleBar />
-            <TimelineAlerts />
-            <Hints />
+      <div className={styles.wrapper}>
+        <ConnectedNav />
+        <ConnectedSidebar />
+        <div className={styles.main_page_wrapper}>
+          <ConnectedTitleBar />
+          <TimelineAlerts />
+          <Hints />
 
-            <div className={styles.main_page_content}>
-              {this.state.isAnalyticsModalOpen && <AnalyticsModal onClose={this.handleCloseAnalyticsModal} />}
-              <ConnectedNewFileModal />
-              <ConnectedMoreOptionsModal />
-              <ConnectedWellSelectionModal />
-              <FileUploadErrorModal />
-              {/* TODO: Ian 2018-06-28 All main page modals will go here */}
-              <MainPageModalPortalRoot />
+          <div className={styles.main_page_content}>
+            <AnalyticsModal />
+            <ConnectedNewFileModal />
+            <ConnectedMoreOptionsModal />
+            <ConnectedWellSelectionModal />
+            <FileUploadErrorModal />
+            {/* TODO: Ian 2018-06-28 All main page modals will go here */}
+            <MainPageModalPortalRoot />
 
-              <StepEditForm />
+            <StepEditForm />
 
-              <ConnectedMainPanel />
-            </div>
+            <ConnectedMainPanel />
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
-
-export default ProtocolEditor
