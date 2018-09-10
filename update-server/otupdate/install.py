@@ -212,7 +212,6 @@ async def update_api(request: web.Request) -> web.Response:
     """
     log.debug('Update request received')
     data = await request.post()
-    # import pdb; pdb.set_trace()
     try:
         res0, rc0 = await install_py(
             sys.executable, data['whl'], request.loop)
@@ -228,7 +227,6 @@ async def update_api(request: web.Request) -> web.Response:
                 = (int(v) for v in version_re_res.group(1, 2, 3))
             if not _version_less((v_maj, v_min, v_pat),
                                  FIRST_PROVISIONED_VERSION):
-                # import pdb; pdb.set_trace()
                 resprov, rcprov = await _provision_container(
                     sys.executable, request.loop)
                 reslist.append(resprov)
