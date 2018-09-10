@@ -246,7 +246,7 @@
       "top": 19.5,
       "bottom": 3,
       "blowOut": 1,
-      "dropTip": -5
+      "dropTip": -2.2
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
@@ -255,7 +255,7 @@
     "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
-    "dropTipCurrent": 0.5,
+    "dropTipCurrent": 0.7,
     "maxVolume": 1000,
     "tipLength": 76.7
   },
@@ -266,7 +266,7 @@
       "top": 19.5,
       "bottom": 2.5,
       "blowOut": -0.5,
-      "dropTip": -4
+      "dropTip": -3.7
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
@@ -275,7 +275,7 @@
     "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
-    "dropTipCurrent": 0.5,
+    "dropTipCurrent": 0.7,
     "maxVolume": 1000,
     "tipLength": 76.7
   }
