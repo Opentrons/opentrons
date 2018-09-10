@@ -15,11 +15,13 @@ export function mixUtil (
   labware: string,
   well: string,
   volume: number,
-  times: number
+  times: number,
+  aspirateOffsetFromBottomMm?: ?number,
+  dispenseOffsetFromBottomMm?: ?number
 ): Array<CommandCreator> {
   return repeatArray([
-    aspirate({pipette, volume, labware, well}),
-    dispense({pipette, volume, labware, well})
+    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm})
   ], times)
 }
 
@@ -36,7 +38,16 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
     * 'never': reuse the tip from the last step
   */
   const actionName = 'mix'
-  const {pipette, labware, wells, volume, times, changeTip} = data
+  const {
+    pipette,
+    labware,
+    wells,
+    volume,
+    times,
+    changeTip,
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm
+  } = data
 
   // Errors
   if (!prevRobotState.instruments[pipette]) {
@@ -77,7 +88,15 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
       })]
       : []
 
-      const mixCommands = mixUtil(pipette, labware, well, volume, times)
+      const mixCommands = mixUtil(
+        pipette,
+        labware,
+        well,
+        volume,
+        times,
+        aspirateOffsetFromBottomMm,
+        dispenseOffsetFromBottomMm
+      )
 
       return [
         ...tipCommands,

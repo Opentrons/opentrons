@@ -48,31 +48,10 @@
       }
     },
 
-    "well-position-params": {
-      "description": "Optional params for well position offsets",
-      "type": "object",
+    "offsetFromBottomMm": {
+      "description": "Offset from bottom of well in millimeters",
       "properties": {
-        "position": {
-          "required": ["anchor"],
-          "additionalProperties": false,
-          "properties": {
-            "anchor": {
-              "description": "The anchor, or origin point at which the offsets are applied. (It's always in the X/Y center of the well, but varies the Z)",
-              "type": "string",
-              "enum": ["top", "bottom", "center"]
-            },
-            "offset": {
-              "description": "Optional x, y, and z offsets from the anchor point in millimeters. Negative values are allowed",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "x": {"$ref": "#/definitions/mm-offset"},
-                "y": {"$ref": "#/definitions/mm-offset"},
-                "z": {"$ref": "#/definitions/mm-offset"}
-              }
-            }
-          }
-        }
+        "offsetFromBottomMm": {"$ref": "#/definitions/mm-offset"}
       }
     },
 
@@ -166,11 +145,15 @@
       "type": "object",
       "required": [
         "aspirate-flow-rate",
-        "dispense-flow-rate"
+        "dispense-flow-rate",
+        "aspirate-mm-from-bottom",
+        "dispense-mm-from-bottom"
       ],
       "properties": {
         "aspirate-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
-        "dispense-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"}
+        "dispense-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
+        "aspirate-mm-from-bottom": {"$ref": "#/definitions/mm-offset"},
+        "dispense-mm-from-bottom": {"$ref": "#/definitions/mm-offset"}
       }
     },
 
@@ -292,7 +275,7 @@
                         {"$ref": "#/definitions/flow-rate-params"},
                         {"$ref": "#/definitions/pipette-access-params"},
                         {"$ref": "#/definitions/volume-params"},
-                        {"$ref": "#/definitions/well-position-params"}
+                        {"$ref": "#/definitions/offsetFromBottomMm"}
                       ]
                     }
                   }
@@ -309,8 +292,7 @@
                     },
                     "params": {
                       "allOf": [
-                        {"$ref": "#/definitions/pipette-access-params"},
-                        {"$ref": "#/definitions/well-position-params"}
+                        {"$ref": "#/definitions/pipette-access-params"}
                       ]
                     }
                   }

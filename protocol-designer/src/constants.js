@@ -49,6 +49,7 @@ export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
-export const DEFAULT_MM_FROM_BOTTOM: 1 = 1
+export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
+export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'

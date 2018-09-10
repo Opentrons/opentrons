@@ -5,7 +5,7 @@ import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseAr
 
 /** Aspirate with given args. Requires tip. */
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {
-  const {pipette, volume, labware, well} = args
+  const {pipette, volume, labware, well, offsetFromBottomMm} = args
 
   const actionName = 'aspirate'
   let errors: Array<CommandCreatorError> = []
@@ -38,7 +38,10 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
       pipette,
       volume,
       labware,
-      well
+      well,
+      offsetFromBottomMm: offsetFromBottomMm == null
+        ? undefined
+        : offsetFromBottomMm
     }
   }]
 

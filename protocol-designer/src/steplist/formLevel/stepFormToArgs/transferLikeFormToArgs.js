@@ -40,6 +40,9 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const destLabware = formData['dispense_labware']
   const blowout = formData['dispense_blowout_labware']
 
+  const aspirateOffsetFromBottomMm = Number(formData['aspirate_mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(formData['dispense_mmFromBottom'])
+
   const delayAfterDispense = formData['dispense_delay_checkbox']
     ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
       (Number(formData['dispense_delaySeconds'] || 0))
@@ -78,6 +81,9 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
 
     sourceLabware,
     destLabware,
+
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm,
 
     blowout, // TODO allow user to blowout
     changeTip,

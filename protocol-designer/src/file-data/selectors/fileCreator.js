@@ -7,6 +7,10 @@ import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../steplist'
+import {
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE
+} from '../../constants'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
@@ -17,7 +21,9 @@ const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 
 const executionDefaults = {
   'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
-  'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate')
+  'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
+  'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
 }
 
 export const createFile: BaseState => ProtocolFile = createSelector(

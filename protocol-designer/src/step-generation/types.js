@@ -38,6 +38,8 @@ export type TransferLikeFormDataFields = {
   changeTip: ChangeTipOptions,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: ?number,
+  /** offset from bottom of well in mm */
+  aspirateOffsetFromBottomMm?: ?number,
 
   // ===== DISPENSE SETTINGS =====
   /** Touch tip in destination well after dispense */
@@ -45,7 +47,9 @@ export type TransferLikeFormDataFields = {
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
   /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string // TODO LATER LabwareId export type here instead of string?
+  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** offset from bottom of well in mm */
+  dispenseOffsetFromBottomMm?: ?number
 }
 
 export type ConsolidateFormData = {
@@ -99,7 +103,10 @@ export type MixFormData = {
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
   /** If given, blow out in the specified labware after mixing each well */
-  blowout?: string
+  blowout?: string,
+  /** offset from bottom of well in mm */
+  aspirateOffsetFromBottomMm?: ?number,
+  dispenseOffsetFromBottomMm?: ?number,
 }
 
 export type PauseFormData = {|
@@ -194,7 +201,8 @@ export type PipetteLabwareFields = {|
 
 export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
-  volume: number
+  volume: number,
+  offsetFromBottomMm?: ?number
 |}
 
 export type Command = {|
