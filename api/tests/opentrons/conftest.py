@@ -6,6 +6,7 @@ import asyncio
 import os
 import re
 import shutil
+import tempfile
 import json
 from collections import namedtuple
 from functools import partial
@@ -19,6 +20,7 @@ from opentrons import config
 from opentrons.config import advanced_settings as advs
 from opentrons.server.main import init
 from opentrons.deck_calibration import endpoints
+from opentrons.util import environment
 
 # Uncomment to enable logging during tests
 
@@ -101,6 +103,15 @@ def clear_feature_flags():
     yield
     if os.path.exists(ff_file):
         os.remove(ff_file)
+
+
+@pytest.fixture
+def wifi_keys_tempdir():
+    old_wifi_keys = environment.settings['WIFI_KEYS_DIR']
+    with tempfile.TemporaryDirectory() as td:
+        environment.settings['WIFI_KEYS_DIR'] = td
+        yield td
+        environment.settings['WIFI_KEYS_DIR'] = old_wifi_keys
 
 
 @pytest.fixture(autouse=True)

@@ -13,7 +13,7 @@ from subprocess itself, only parsing nmcli output.
 
 import logging
 import re
-from typing import Optional, List, Tuple, Dict, Any, Callable, NamedTuple
+from typing import Optional, List, Tuple, Dict, Callable, Any
 import enum
 
 from shlex import quote
@@ -169,10 +169,6 @@ def _build_con_add_cmd(ssid: str, security_type: SECURITY_TYPES,
         configure_cmd += ['wifi-sec.psk', psk]
     elif security_type == SECURITY_TYPES.NONE:
         pass
-    elif security_type == SECURITY_TYPES.WPA_EAP:
-        if eap_args is None:
-            raise ValueError("wpa-eap security type requires eap_args")
-        configure_cmd += _add_eap_args(eap_args)
 
     return configure_cmd
 
@@ -181,7 +177,6 @@ async def configure(ssid: str,
                     security_type: Optional[SECURITY_TYPES] = None,
                     psk: Optional[str] = None,
                     hidden: Optional[bool] = False,
-                    eap_args: Optional[Dict[str, str]] = None,
                     up_retries: int = 3) -> Tuple[bool, str]:
     """ Configure a connection but do not bring it up (though it is configured
     for autoconnect).
@@ -207,7 +202,6 @@ async def configure(ssid: str,
         else:
             security_type = SECURITY_TYPES.WPA_PSK
 
-    hidden = bool(hidden)
     already = await connection_exists(ssid)
     if already:
         # TODO(seth, 8/29/2018): We may need to do connection modifies
@@ -216,7 +210,7 @@ async def configure(ssid: str,
         _1, _2 = await _call(['connection', 'delete', already])
 
     configure_cmd = _build_con_add_cmd(
-        ssid, security_type, psk, hidden, eap_args)
+        ssid, security_type, psk, hidden)
     res, err = await _call(configure_cmd)
 
     # nmcli connection add returns a string that looks like

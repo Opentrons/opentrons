@@ -1,41 +1,15 @@
+import hashlib
 import json
 import logging
+import os
+import shutil
 import subprocess
-from typing import Dict, Tuple, Any, List
+from typing import Dict, List
 from aiohttp import web
 from opentrons.system import nmcli
+from opentrons.util import environment
 
 log = logging.getLogger(__name__)
-
-
-EAP_CONFIG_SHAPE = {
-    'options': [
-        {
-            'name': 'eapType',
-            'friendlyName': 'EAP Type',
-            'required': True,
-            'type': 'choice',
-            'choices': [t.qualified_name() for t in nmcli.EAP_TYPES]
-        },
-        {
-            'name': 'hidden',
-            'friendlyName': 'Hidden Network',
-            'required': False,
-            'type': 'bool'
-        }
-    ],
-    'methods': [
-        {'name': method.qualified_name(),
-         'options': [{k: v for k, v in arg.items()
-                      if k in ['name',
-                               'friendlyName',
-                               'required',
-                               'type',
-                               'choices',
-                               'fileType']}
-                     for arg in method.args()]}
-        for method in nmcli.EAP_TYPES]
-}
 
 
 async def list_networks(request: web.Request) -> web.Response:
@@ -59,7 +33,8 @@ async def list_networks(request: web.Request) -> web.Response:
     return web.json_response(res, status=status)
 
 
-async def configure(request: web.Request) -> web.Response:
+async def configure(request: web.Request) -> web.Response: # noqa(C901)
+    # Skipping complexity test due to planned work
     """
     Post request should include a json body specifying config information
     (see below). Robot will attempt to connect to this network and respond
@@ -163,3 +138,133 @@ async def status(request: web.Request) -> web.Response:
         status = 500
 
     return web.json_response(connectivity, status=status)
+
+
+async def add_key(request: web.Request) -> web.Response:
+    """ Add a key file (for later use in EAP config) to the system.
+
+    ```
+    POST /wifi/keys Content-Type: multipart/form-data,
+    Body:
+        file field named 'key'
+    ```
+    returns
+    ```
+    201 Created
+    {
+     uri: '/wifi/keys/some-hex-digest',
+     id: 'some-hex-digest',
+     name: 'keyfile.pem'
+    }
+    ```
+
+    If a file with the same hash (regardless of filename) has already been
+    uploaded, returns
+    ```
+    200 OK
+    {
+     uri: '/wifi/keys/some-hex-digest',
+     id: 'some-hex-digest',
+     name: 'keyfile.pem',
+     message: "Key file already present"
+    }
+    ```
+    """
+    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    if not request.can_read_body:
+        return web.json_response({'message': "Must upload key file"},
+                                 status=400)
+    data = await request.post()
+    keyfile = data.get('key')
+    if not keyfile:
+        return web.json_response(
+            {'message': "No key 'key' in request"}, status=400)
+    hasher = hashlib.sha256()
+    key_contents = keyfile.file.read()
+    hasher.update(key_contents)
+    key_hash = hasher.hexdigest()
+    if key_hash in os.listdir(keys_dir):
+        files = os.listdir(os.path.join(keys_dir, key_hash))
+        if files:
+            return web.json_response(
+                {'message': 'Key file already present',
+                 'uri': '/wifi/keys/{}'.format(key_hash),
+                 'id': key_hash,
+                 'name': files[0]},
+                status=200)
+        else:
+            log.warning(
+                "Key directory with nothing in it: {}"
+                .format(key_hash))
+            os.rmdir(os.path.join(keys_dir, key_hash))
+    key_hash_path = os.path.join(keys_dir, key_hash)
+    os.mkdir(key_hash_path)
+    with open(os.path.join(key_hash_path,
+                           os.path.basename(keyfile.filename)), 'wb') as f:
+        f.write(key_contents)
+    return web.json_response(
+        {'uri': '/wifi/keys/{}'.format(key_hash),
+         'id': key_hash,
+         'name': os.path.basename(keyfile.filename)},
+        status=201)
+
+
+async def list_keys(request: web.Request) -> web.Response:
+    """ List the key files installed in the system.
+
+    This responds with a list of the same objects as key:
+
+    ```
+    GET /wifi/keys -> 200 OK
+    { keys: [
+         {
+          uri: '/wifi/keys/some-hex-digest',
+          id: 'some-hex-digest',
+          name: 'keyfile.pem'
+         },
+         ...
+       ]
+    }
+    ```
+    """
+    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    response: List[Dict[str, str]] = []
+    for path in os.listdir(keys_dir):
+        full_path = os.path.join(keys_dir, path)
+        if os.path.isdir(full_path):
+            in_path = os.listdir(full_path)
+            if len(in_path) > 1:
+                log.warning("Garbage in key dir for key {}".format(path))
+            response.append(
+                {'uri': '/wifi/keys/{}'.format(path),
+                 'id': path,
+                 'name': os.path.basename(in_path[0])})
+        else:
+            log.warning("Garbage in wifi keys dir: {}".format(full_path))
+    return web.json_response(response, status=200)
+
+
+async def remove_key(request: web.Request) -> web.Response:
+    """ Remove a key.
+
+    ```
+    DELETE /wifi/keys/:id
+
+    -> 200 OK
+    {message: 'Removed key keyfile.pem'}
+    ```
+    """
+    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    available_keys = os.listdir(keys_dir)
+    requested_hash = request.match_info['key_uuid']
+    if requested_hash not in available_keys:
+        return web.json_response(
+            {'message': 'No such key file {}'
+             .format(requested_hash)},
+            status=404)
+    key_path = os.path.join(keys_dir, requested_hash)
+    name = os.listdir(key_path)[0]
+    shutil.rmtree(key_path)
+    return web.json_response(
+        {'message': 'Key file {} deleted'.format(name)},
+        status=200)
