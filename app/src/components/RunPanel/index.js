@@ -6,10 +6,10 @@ import {
   actions as robotActions,
   selectors as robotSelectors
 } from '../../robot'
-
 import {SidePanel, SidePanelGroup} from '@opentrons/components'
 import RunTimer from './RunTimer'
 import RunControls from './RunControls'
+import TempDeckStatusCard from '../TempDeckStatusCard'
 
 const mapStateToProps = (state) => ({
   isRunning: robotSelectors.getIsRunning(state),
@@ -34,12 +34,11 @@ const mapDispatchToProps = (dispatch) => ({
 function RunPanel (props) {
   return (
     <SidePanel title='Execute Run'>
-      <div>
-        <SidePanelGroup>
-          <RunTimer startTime={props.startTime} runTime={props.runTime} />
-          <RunControls {...props} />
-        </SidePanelGroup>
-      </div>
+      <SidePanelGroup>
+        <RunTimer startTime={props.startTime} runTime={props.runTime} />
+        <RunControls {...props} />
+      </SidePanelGroup>
+      <TempDeckStatusCard />
     </SidePanel>
   )
 }

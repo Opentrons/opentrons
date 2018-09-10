@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# usage:
+# discovery-ssh                    # ssh into first robot we can find
+# discovery-ssh name               # ssh into the named robot
+# discovery-ssh --nameFilter moon  # ssh into first robot that matches filter
+#
+# all arguments are passed directly to `discovery find`
+
+dir=`dirname "$0"`
+host=`$dir/discovery find $*`
+
+if [[ -z "$host" ]]; then
+  echo "No robot found"
+  exit 1
+fi;
+
+echo "SSH'ing into $host"
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$host"

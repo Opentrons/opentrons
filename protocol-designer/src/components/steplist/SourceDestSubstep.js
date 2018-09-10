@@ -32,12 +32,12 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
           rowGroup={rowGroup}
           onMouseEnter={() => onSelectSubstep({
             stepId: substeps.parentStepId,
-            substepId: groupKey
+            substepIndex: groupKey
           })}
           onMouseLeave={() => onSelectSubstep(null)}
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&
-            hoveredSubstep.substepId === groupKey
+            hoveredSubstep.substepIndex === groupKey
           }
         />
       )}
@@ -45,20 +45,20 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
   }
 
   // single-channel row item
-  return substeps.rows.map((row, substepId) =>
+  return substeps.rows.map((row, substepIndex) =>
     <SubstepRow
-      key={substepId}
+      key={substepIndex}
       className={cx(
         styles.step_subitem,
         {[styles.highlighted]:
           !!hoveredSubstep &&
           hoveredSubstep.stepId === substeps.parentStepId &&
-          substepId === hoveredSubstep.substepId
+          substepIndex === hoveredSubstep.substepIndex
         }
       )}
       onMouseEnter={() => onSelectSubstep({
         stepId: substeps.parentStepId,
-        substepId
+        substepIndex
       })}
       onMouseLeave={() => onSelectSubstep(null)}
       volume={row.volume}

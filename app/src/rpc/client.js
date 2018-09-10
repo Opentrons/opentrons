@@ -13,7 +13,8 @@ import {
   ACK,
   NACK,
   NOTIFICATION,
-  CONTROL_MESSAGE
+  CONTROL_MESSAGE,
+  PONG
 } from './message-types'
 
 // TODO(mc, 2017-08-29): see note about uuid above
@@ -25,6 +26,10 @@ const HANDSHAKE_TIMEOUT = 10000
 const RECEIVE_CONTROL_TIMEOUT = 10000
 const CALL_ACK_TIMEOUT = 10000
 // const CALL_RESULT_TIMEOUT = 240000
+
+// ping pong
+const PING_INTERVAL_MS = 3000
+const MISSED_PING_THRESHOLD = 10
 
 // metadata constants
 const REMOTE_TARGET_OBJECT = 0
@@ -44,6 +49,10 @@ class RpcContext extends EventEmitter {
     this._ws = ws
     this._resultTypes = new Map()
     this._typeObjectCache = new Map()
+    this._pingInterval = null
+    this._missedPings = 0
+
+    this.monitoring = false
     this.remote = null
     // default max listeners is 10, we need more than that
     // keeping this at a finite number just in case we get a leak later
@@ -51,7 +60,7 @@ class RpcContext extends EventEmitter {
 
     ws.on('error', this._handleError.bind(this))
     ws.on('message', this._handleMessage.bind(this))
-    ws.on('close', this._handleClose.bind(this))
+    ws.once('close', this.close.bind(this))
   }
 
   callRemote (id, name, args = []) {
@@ -137,11 +146,16 @@ class RpcContext extends EventEmitter {
     return this.callRemote(null, 'get_object_by_id', [typeId])
   }
 
-  // remove all event listeners and close the websocket
+  // close the websocket and cleanup self
   close () {
-    this.removeAllListeners()
+    clearInterval(this._pingInterval)
     this._ws.removeAllListeners()
     this._ws.close()
+    this.eventNames()
+      .filter(n => n !== 'close')
+      .forEach(n => this.removeAllListeners(n))
+
+    this.emit('close')
   }
 
   // cache required metadata from call results
@@ -169,13 +183,25 @@ class RpcContext extends EventEmitter {
     }
   }
 
+  _startMonitoring () {
+    this.monitoring = true
+    this._pingInterval = setInterval(this._ping.bind(this), PING_INTERVAL_MS)
+  }
+
+  _ping () {
+    if (this._missedPings > MISSED_PING_THRESHOLD) return this.close()
+
+    this._send({$: {ping: true}})
+    this._missedPings = this._missedPings + 1
+  }
+
+  _handlePong () {
+    this._missedPings = 0
+  }
+
   _send (message) {
     // log.debug('Sending: %j', message)
     this._ws.send(message)
-  }
-
-  _handleClose () {
-    this.emit('close')
   }
 
   _handleError (error) {
@@ -184,8 +210,6 @@ class RpcContext extends EventEmitter {
 
   // TODO(mc): split this method up
   _handleMessage (message) {
-    // log.debug('Received message %j', message)
-
     const {$: meta, data} = message
     const type = meta.type
 
@@ -197,6 +221,8 @@ class RpcContext extends EventEmitter {
         // then cache its type object
         this._cacheCallResultMetadata(root)
         this._cacheCallResultMetadata(rootType)
+
+        if (meta.monitor) this._startMonitoring()
 
         RemoteObject(this, root)
           .then((remote) => {
@@ -232,6 +258,10 @@ class RpcContext extends EventEmitter {
           .then((remote) => this.emit('notification', remote))
           // .catch((e) => log.error('Error creating notification remote', e))
 
+        break
+
+      case PONG:
+        this._handlePong()
         break
 
       default:

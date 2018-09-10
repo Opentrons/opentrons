@@ -55,14 +55,14 @@ export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<Comm
 
 export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
   getTimelineWarningsPerStep,
-  steplistSelectors.selectedStepId,
+  steplistSelectors.getSelectedStepId,
   (warningsPerStep, stepId) =>
     (typeof stepId === 'number' && warningsPerStep[stepId]) || []
 )
 
 export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
   getDismissedFormWarnings,
-  steplistSelectors.selectedStepId,
+  steplistSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) => (typeof stepId === 'number' && dismissedWarnings[stepId]) || []
 )
 

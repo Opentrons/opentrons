@@ -1,12 +1,17 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
-import sortBy from 'lodash/sortBy'
-import {createSelector} from 'reselect'
+import orderBy from 'lodash/orderBy'
+import {createSelector, type Selector} from 'reselect'
+
+import {
+  type ConnectionStatus,
+  PIPETTE_MOUNTS,
+  DECK_SLOTS
+} from './constants'
+
 import type {ContextRouter} from 'react-router'
-
 import type {State} from '../types'
-
 import type {
   Mount,
   Pipette,
@@ -15,19 +20,13 @@ import type {
   LabwareCalibrationStatus,
   LabwareType,
   Robot,
-  SessionStatus
+  SessionStatus,
+  SessionModule
 } from './types'
 
-import {
-  type ConnectionStatus,
-  _NAME,
-  PIPETTE_MOUNTS,
-  DECK_SLOTS
-} from './constants'
-
-const calibration = (state: State) => state[_NAME].calibration
-const connection = (state: State) => state[_NAME].connection
-const session = (state: State) => state[_NAME].session
+const calibration = (state: State) => state.robot.calibration
+const connection = (state: State) => state.robot.connection
+const session = (state: State) => state.robot.session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
 
@@ -45,57 +44,70 @@ export function labwareType (labware: Labware): LabwareType {
     : 'labware'
 }
 
-export function getIsScanning (state: State): boolean {
-  return connection(state).isScanning
-}
+// TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
+export const getDiscovered: Selector<State, void, Array<Robot>> =
+  createSelector(
+    // TODO(mc, 2018-08-15): not using the selector in discovery right now
+    // because of dependency problem in WebWorker where this selector is used
+    state => state.discovery.robotsByName,
+    state => connection(state).connectedTo,
+    (discoveredByName, connectedTo, unexpectedDisconnect) => {
+      const robots = Object.keys(discoveredByName)
+        .map(name => {
+          const robot = discoveredByName[name]
+          const connection = orderBy(
+            robot.connections,
+            ['ok', 'local'],
+            ['desc', 'desc']
+          ).find(c => c.ok)
 
-export function getDiscoveredByName (state: State) {
-  return connection(state).discoveredByName
-}
+          if (!connection) return null
 
-export const getDiscovered = createSelector(
-  (state: State) => connection(state).discovered,
-  getDiscoveredByName,
-  (state: State) => connection(state).connectedTo,
-  (discovered, discoveredByName, connectedTo): Robot[] => {
-    const robots = discovered.map((name) => ({
-      ...discoveredByName[name],
-      isConnected: connectedTo === name
-    }))
+          return {
+            name: robot.name,
+            ip: connection.ip,
+            port: connection.port,
+            wired: connection.local,
+            isConnected: connectedTo === name
+          }
+        })
+        .filter(Boolean)
 
-    return sortBy(robots, [
-      (robot) => !robot.isConnected,
-      (robot) => !robot.wired,
-      'name'
-    ])
-  }
-)
+      return orderBy(
+        robots,
+        ['isConnected', 'wired', 'name'],
+        ['desc', 'desc', 'asc']
+      )
+    }
+  )
 
 export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export function getConnectedRobotName (state: State) {
-  return connection(state).connectedTo
-}
-
-export const getConnectedRobot = createSelector(
+export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
   getDiscovered,
-  (discovered) => discovered.find((r) => r.isConnected)
+  discovered => discovered.find(r => r.isConnected)
 )
 
-export const getConnectionStatus = createSelector(
-  getConnectedRobotName,
-  (state: State) => getConnectRequest(state).inProgress,
-  (state: State) => connection(state).disconnectRequest.inProgress,
-  (connectedTo, isConnecting, isDisconnecting): ConnectionStatus => {
-    if (!connectedTo && isConnecting) return 'connecting'
-    if (connectedTo && !isDisconnecting) return 'connected'
-    if (connectedTo && isDisconnecting) return 'disconnecting'
+export const getConnectedRobotName: Selector<State, void, ?string> =
+  createSelector(getConnectedRobot, r => r && r.name)
 
-    return 'disconnected'
-  }
-)
+export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
+  createSelector(
+    getConnectedRobotName,
+    state => getConnectRequest(state).inProgress,
+    state => connection(state).disconnectRequest.inProgress,
+    state => connection(state).unexpectedDisconnect,
+    (connectedTo, isConnecting, isDisconnecting, unexpectedDisconnect) => {
+      if (unexpectedDisconnect) return 'disconnected'
+      if (!connectedTo && isConnecting) return 'connecting'
+      if (connectedTo && !isDisconnecting) return 'connected'
+      if (connectedTo && isDisconnecting) return 'disconnecting'
+
+      return 'disconnected'
+    }
+  )
 
 export function getSessionLoadInProgress (state: State) {
   return sessionRequest(state).inProgress
@@ -313,6 +325,19 @@ export const getPipettesCalibrated = createSelector(
   )
 )
 
+export function getModulesBySlot (state: State): {[string]: ?SessionModule} {
+  return session(state).modulesBySlot
+}
+
+export const getModules: Selector<State, void, Array<SessionModule>> =
+  createSelector(
+    getModulesBySlot,
+    modulesBySlot => Object
+      .keys(modulesBySlot)
+      .map(slot => modulesBySlot[slot])
+      .filter(Boolean)
+  )
+
 export function getLabwareBySlot (state: State) {
   return session(state).labwareBySlot
 }
@@ -375,6 +400,10 @@ export const getLabware = createSelector(
       })
   }
 )
+
+export function getModulesReviewed (state: State) {
+  return calibration(state).modulesReviewed
+}
 
 export function getDeckPopulated (state: State) {
   return calibration(state).deckPopulated

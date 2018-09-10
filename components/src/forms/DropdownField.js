@@ -8,6 +8,7 @@ import styles from './forms.css'
 export type DropdownOption = {
   name: string,
   value: string,
+  disabled?: boolean
 }
 
 // TODO(mc, 2018-02-22): disabled prop
@@ -27,7 +28,9 @@ type Props = {
   /** optional caption. hidden when `error` is given */
   caption?: string,
   /** if included, DropdownField will use error style and display error instead of caption */
-  error?: ?string
+  error?: ?string,
+  /** dropdown is disabled if value is true */
+  disabled?: boolean,
 }
 
 export default function DropdownField (props: Props) {
@@ -37,7 +40,7 @@ export default function DropdownField (props: Props) {
     : [{name: '', value: ''}, ...props.options]
 
   const error = props.error != null
-  const className = cx(props.className, {[styles.error]: error})
+  const className = cx(props.className, {[styles.error]: error, [styles.dropdown_disabled]: props.disabled})
 
   return (
     <div className={className}>
@@ -47,9 +50,10 @@ export default function DropdownField (props: Props) {
           onChange={props.onChange}
           onBlur={props.onBlur}
           onFocus={props.onFocus}
+          disabled={props.disabled}
           className={styles.dropdown}>
           {options.map(opt =>
-            <option key={opt.value} value={opt.value}>
+            <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
               {opt.name}
             </option>
           )}

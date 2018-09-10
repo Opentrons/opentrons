@@ -4,27 +4,23 @@ import sys
 import logging
 import os
 import traceback
-import atexit
 from aiohttp import web
 from opentrons import robot, __version__
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
-from opentrons.server.endpoints import (wifi, control)
+from opentrons.server.endpoints import (wifi, control, settings)
 from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
-try:
-    from ot2serverlib import endpoints
-except ModuleNotFoundError:
-    print("Module ot2serverlib not found--using fallback implementation")
-    from opentrons.server.endpoints import serverlib_fallback as endpoints
+from opentrons.server.endpoints import serverlib_fallback as endpoints
 
 from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
-lock_file_path = 'tmp/resin/resin-updates.lock'
+lock_file_path = '/tmp/resin/resin-updates.lock'
+log_file_path = environment.get_path('LOG_DIR')
 
 
 def lock_resin_updates():
@@ -60,6 +56,7 @@ def log_init():
     level_value = logging._nameToLevel[ot_log_level]
 
     serial_log_filename = environment.get_path('SERIAL_LOG_FILE')
+    api_log_filename = environment.get_path('LOG_FILE')
 
     logging_config = dict(
         version=1,
@@ -82,36 +79,49 @@ def log_init():
                 'maxBytes': 5000000,
                 'level': logging.DEBUG,
                 'backupCount': 3
+            },
+            'api': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'basic',
+                'filename': api_log_filename,
+                'maxBytes': 1000000,
+                'level': logging.DEBUG,
+                'backupCount': 5
             }
+
         },
         loggers={
             '__main__': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': logging.INFO
             },
             'opentrons.server': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.api': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.instruments': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.robot.robot_configs': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.drivers.smoothie_drivers.driver_3_0': {
-                'handlers': ['debug'],
+                'handlers': ['debug', 'api'],
                 'level': level_value
             },
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG
+            },
+            'opentrons.system': {
+                'handlers': ['debug', 'api'],
+                'level': level_value
             }
         }
     )
@@ -122,6 +132,12 @@ def log_init():
 async def error_middleware(request, handler):
     try:
         response = await handler(request)
+    except web.HTTPNotFound:
+        log.exception("Exception handler for request {}".format(request))
+        data = {
+            'message': 'File was not found at {}'.format(request)
+        }
+        response = web.json_response(data, status=404)
     except Exception as e:
         log.exception("Exception in handler for request {}".format(request))
         data = {
@@ -154,6 +170,8 @@ def init(loop=None):
         '/identify', control.identify)
     server.app.router.add_get(
         '/modules', control.get_attached_modules)
+    server.app.router.add_get(
+        '/modules/{serial}/data', control.get_module_data)
     server.app.router.add_post(
         '/camera/picture', control.take_picture)
     server.app.router.add_post(
@@ -164,6 +182,8 @@ def init(loop=None):
         '/server/update/ignore', endpoints.get_ignore_version)
     server.app.router.add_post(
         '/server/update/ignore', endpoints.set_ignore_version)
+    server.app.router.add_static(
+        '/logs', log_file_path, show_index=True)
     server.app.router.add_post(
         '/server/restart', endpoints.restart)
     server.app.router.add_post(
@@ -187,11 +207,48 @@ def init(loop=None):
     server.app.router.add_post(
         '/robot/lights', control.set_rail_lights)
     server.app.router.add_get(
-        '/settings', endp.get_advanced_settings)
+        '/settings', settings.get_advanced_settings)
     server.app.router.add_post(
-        '/settings', endp.set_advanced_setting)
+        '/settings', settings.set_advanced_setting)
+    server.app.router.add_post(
+        '/settings/reset', settings.reset)
+    server.app.router.add_get(
+        '/settings/reset/options', settings.available_resets)
 
     return server.app
+
+
+def setup_udev_rules_file():
+    """
+    Copy the udev rules file for Opentrons Modules to opentrons_data directory
+    and trigger the new rules.
+    This rules file in opentrons_data is symlinked into udev rules directory
+    NOTE: This setup can also be run after python package install (which would
+    mean that it is performed only once, which might be sufficient)
+    instead of running it every time on server boot. Revisit this once the
+    redundant api-server-lib setup has been fixed
+    """
+    import shutil
+    import subprocess
+    import opentrons
+
+    rules_file = os.path.join(
+        os.path.abspath(os.path.dirname(opentrons.__file__)),
+        'config', 'modules', '95-opentrons-modules.rules')
+
+    shutil.copy2(
+        rules_file,
+        '/data/user_storage/opentrons_data/95-opentrons-modules.rules')
+
+    res0 = subprocess.run('udevadm control --reload-rules',
+                          shell=True, stdout=subprocess.PIPE).stdout.decode()
+    if res0 is not '':
+        log.warning(res0.strip())
+
+    res1 = subprocess.run('udevadm trigger',
+                          shell=True, stdout=subprocess.PIPE).stdout.decode()
+    if res1 is not '':
+        log.warning(res1.strip())
 
 
 def main():
@@ -242,8 +299,10 @@ def main():
         log.info("Homing Z axes")
         robot.home_z()
 
-    atexit.register(unlock_resin_updates)
-    lock_resin_updates()
+    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        setup_udev_rules_file()
+    # Explicitly unlock resin updates in case a prior server left them locked
+    unlock_resin_updates()
     web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
     arg_parser.exit(message="Stopped\n")
 

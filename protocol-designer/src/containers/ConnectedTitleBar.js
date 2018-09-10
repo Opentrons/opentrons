@@ -3,23 +3,51 @@ import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 
-import {TitleBar, humanizeLabwareType} from '@opentrons/components'
-import {DECK_SETUP_TITLE} from '../constants'
+import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/components'
+import styles from './TitleBar.css'
+import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../steplist'
+import {
+  selectors as steplistSelectors,
+  END_TERMINAL_ITEM_ID,
+  START_TERMINAL_ITEM_ID
+} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
-
+import {stepIconsByType} from '../form-types'
 import {selectors, type Page} from '../navigation'
+import {closeWellSelectionModal} from '../well-selection/actions'
+
 import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 type SP = $Diff<Props, DP> & {_page: Page}
 
+type TitleWithIconProps = {
+  iconName?: ?IconName,
+  text?: ?string
+}
+
+function TitleWithIcon (props: TitleWithIconProps) {
+  const {iconName, text} = props
+  return (
+    <div>
+      {iconName &&
+        <Icon className={styles.icon} name={iconName} />}
+      <div className={styles.icon_inline_text}>{text}</div>
+    </div>
+  )
+}
+
 function mapStateToProps (state: BaseState): SP {
   const _page = selectors.currentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
+  const selectedStep = steplistSelectors.getSelectedStep(state)
+  const selectedTerminalId = steplistSelectors.getSelectedTerminalItemId(state)
+  const labware = labwareIngredSelectors.getSelectedContainer(state)
+  const labwareNames = labwareIngredSelectors.getLabwareNames(state)
+  const labwareNickname = labware && labware.id && labwareNames[labware.id]
 
   switch (_page) {
     case 'file-splash':
@@ -27,31 +55,33 @@ function mapStateToProps (state: BaseState): SP {
     case 'file-detail':
       return {_page, title: fileName, subtitle: 'FILE DETAILS'}
     case 'ingredient-detail': {
-      const labware = labwareIngredSelectors.getSelectedContainer(state)
-      const labwareNames = labwareIngredSelectors.getLabwareNames(state)
-      const labwareId = labware && labware.id
       return {
         _page,
-        title: labwareId && labwareNames[labwareId],
+        title: labwareNickname,
         subtitle: labware && humanizeLabwareType(labware.type),
         backButtonLabel: 'Deck'
       }
     }
     case 'well-selection-modal':
-      // TODO: Ian 2018-02-23 well selection modal's title bar
-      return { _page, title: 'TODO: Well selection modal' }
+      return {
+        _page,
+        title: <TitleWithIcon
+          iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
+          text={selectedStep && selectedStep.title}
+        />,
+        subtitle: labwareNickname
+      }
     case 'steplist':
     default: {
       // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
-      const selectedStep = steplistSelectors.selectedStep(state)
-      // TODO: Ian 2018-02-22 add in icon, you need to make it inline and of the correct height
-      // <Icon name={stepIconsByType[selectedStep]} /> */
       let subtitle
-      if (selectedStep) {
-        subtitle = selectedStep.stepType === 'deck-setup'
-          ? DECK_SETUP_TITLE
-          : selectedStep.title
+      if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
+        subtitle = START_TERMINAL_TITLE
+      } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
+        subtitle = END_TERMINAL_TITLE
+      } else if (selectedStep) {
+        subtitle = selectedStep.title
       }
       return { _page: 'steplist', title: fileName, subtitle }
     }
@@ -69,7 +99,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   }
 
   if (_page === 'well-selection-modal') {
-    onBackClick = () => console.warn('TODO: leave well selection modal') // TODO: LATER Ian 2018-02-22
+    onBackClick = () => dispatch(closeWellSelectionModal())
   }
 
   return {

@@ -6,24 +6,23 @@ import type {FormData, StepIdType, StepType, TransferLikeStepType} from '../form
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
 export type FormSectionNames = 'aspirate' | 'dispense'
 
-export const END_STEP: '__end__' = '__end__' // Special ID of "End" pseudo-step.
-// NOTE: explicit type annotation so that typeof END_STEP is `'__end__'` and not `string`
+// timeline start and end
+export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
+export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
+export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,
-  substepId: number
+  substepIndex: number
 |} | null
 
 export type NamedIngred = {|
-  id: number,
+  id: string,
   name: string
 |}
 
-export type NamedIngredsByLabware = {[labwareId: string]: {[well: string]: Array<NamedIngred>}}
-export type NamedIngredsByLabwareAllSteps = Array<NamedIngredsByLabware>
-
 export type StepItemSourceDestRow = {|
-  substepId?: number, // TODO should this be a string or is this ID properly a number?
+  substepIndex?: number,
   sourceIngredients?: Array<NamedIngred>,
   destIngredients?: Array<NamedIngred>,
   sourceWell?: ?string,
@@ -57,7 +56,7 @@ export type SourceDestSubstepItemMultiChannel = {|
 
 export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
 
-export type StepSubItemData =
+export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseFormData // Pause substep uses same data as processed form
 
@@ -69,6 +68,4 @@ export type StepItemData = {
   formData: ?FormData
 }
 
-export type SubSteps = {[StepIdType]: StepSubItemData | null}
-
-export type StepIdTypeWithEnd = StepIdType | typeof END_STEP
+export type SubSteps = {[StepIdType]: ?SubstepItemData}

@@ -24,7 +24,7 @@ async def create_virtual_environment(loop=None) -> (str, str):
     directory, which should contain a "bin" directory with the `python` and
     `pip` binaries that can be used to a test install of a software package.
 
-    :return: the path to python in the new virtual environment
+    :return: the path to the virtual environment, its python, and its site pkgs
     """
     tmp_dir = tempfile.mkdtemp()
     venv_dir = os.path.join(tmp_dir, VENV_NAME)
@@ -39,7 +39,7 @@ async def create_virtual_environment(loop=None) -> (str, str):
 
     log.info("Created virtual environment at {}".format(venv_dir))
 
-    return python, venv_site_pkgs
+    return venv_dir, python, venv_site_pkgs
 
 
 def install_dependencies(python) -> str:
@@ -105,7 +105,8 @@ def install_dependencies(python) -> str:
     return venv_site_pkgs
 
 
-async def _start_server(python, port, venv_site_pkgs=None) -> sp.Popen:
+async def _start_server(python, port,
+                        venv_site_pkgs=None, cwd=None) -> sp.Popen:
     """
     Starts an update server sandboxed in the virtual env, and attempts to read
     the health endpoint with retries to determine when the server is available.
@@ -119,7 +120,7 @@ async def _start_server(python, port, venv_site_pkgs=None) -> sp.Popen:
         python = 'PYTHONPATH={} {}'.format(venv_site_pkgs, python)
     cmd = [python, '-m', 'otupdate', '--debug', '--test', '--port', str(port)]
     log.debug('cmd: {}'.format(' '.join(cmd)))
-    proc = sp.Popen(' '.join(cmd), shell=True)
+    proc = sp.Popen(' '.join(cmd), shell=True, cwd=cwd)
     atexit.register(lambda: _stop_server(proc))
 
     n_retries = 3
@@ -149,7 +150,8 @@ async def install_sandboxed_update(filename, loop) -> (dict, str, str):
     :return: a result dict and the path to python in the virtual environment
     """
     log.debug("Creating virtual environment")
-    python, venv_site_pkgs = await create_virtual_environment(loop=loop)
+    venv_dir, python, venv_site_pkgs\
+        = await create_virtual_environment(loop=loop)
     log.debug("Installing update server into virtual environment")
     out, err, returncode = await _install(python, filename, loop)
     if err or returncode != 0:
@@ -158,7 +160,7 @@ async def install_sandboxed_update(filename, loop) -> (dict, str, str):
     else:
         log.debug("Install successful")
         res = {'status': 'success'}
-    return res, python, venv_site_pkgs
+    return res, python, venv_site_pkgs, venv_dir
 
 
 async def install_update(filename, loop) -> (dict, int):
@@ -177,7 +179,7 @@ async def install_update(filename, loop) -> (dict, int):
 
 
 async def test_update_server(
-        python, test_port, filename, venv_site_pkgs=None) -> dict:
+        python, test_port, filename, venv_site_pkgs=None, cwd=None) -> dict:
     """
     Starts a test server using the virtual environment, and then runs tests
     against that server
@@ -187,7 +189,7 @@ async def test_update_server(
     log.debug('Testing update server on port {}'.format(test_port))
 
     # Start the server on the test port, and then make health and update reqs
-    server_proc = await _start_server(python, test_port, venv_site_pkgs)
+    server_proc = await _start_server(python, test_port, venv_site_pkgs, cwd)
     test_result = await selftest.run_self_test(test_port, filename)
     _stop_server(server_proc)
 

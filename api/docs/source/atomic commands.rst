@@ -301,6 +301,32 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
 
     pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])
 
+Controlling Speed
+=================
+
+You can change the speed at which you aspirate or dispense liquid by either changing the
+defaults in the pipette constructor (more info under the `Creating a Pipette` section) or
+using our `set_flow_rate` function. This can be called at any time during the protocol.
+
+.. code-block:: python
+
+    from opentrons import labware, instruments, robot
+
+    '''
+    Examples in this section expect the following
+    '''
+    tiprack = labware.load('tiprack-200ul', '1')
+    plate = labware.load('96-flat', '2')
+
+    pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])
+
+    pipette.set_flow_rate(aspirate=50, dispense=100)
+
+You can also choose to only update aspirate OR dispense depending on the application.
+Pipette liquid handling speed is in `ul/s`.
+
+**Note** The dispense speed also controls the speed of `blow_out`.
+
 ******
 Moving
 ******

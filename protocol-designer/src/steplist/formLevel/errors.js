@@ -1,5 +1,5 @@
 // @flow
-
+import * as React from 'react'
 import {canPipetteUseLabware} from '@opentrons/shared-data'
 import type {StepFieldName} from '../fieldLevel'
 
@@ -12,30 +12,37 @@ export type FormErrorKey = 'INCOMPATIBLE_ASPIRATE_LABWARE'
   | 'WELL_RATIO_TRANSFER'
   | 'WELL_RATIO_CONSOLIDATE'
   | 'WELL_RATIO_DISTRIBUTE'
-export type FormError = {message: string, dependentFields: Array<StepFieldName>, title?: string}
+
+export type FormError = {
+  title: string,
+  body?: React.Node,
+  dependentFields: Array<StepFieldName>,
+}
+
 const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   INCOMPATIBLE_ASPIRATE_LABWARE: {
-    message: 'Selected aspirate labware may be incompatible with selected pipette',
+    title: 'Selected aspirate labware may be incompatible with selected pipette',
     dependentFields: ['aspirate_labware', 'pipette']
   },
   INCOMPATIBLE_DISPENSE_LABWARE: {
-    message: 'Selected dispense labware may be incompatible with selected pipette',
+    title: 'Selected dispense labware may be incompatible with selected pipette',
     dependentFields: ['dispense_labware', 'pipette']
   },
   INCOMPATIBLE_LABWARE: {
-    message: 'Selected labware may be incompatible with selected pipette',
+    title: 'Selected labware may be incompatible with selected pipette',
     dependentFields: ['labware', 'pipette']
   },
   WELL_RATIO_TRANSFER: {
-    message: 'In transfer actions the number of source and destination wells must match',
+    title: 'In transfer actions the number of source and destination wells must match',
+    body: 'You may want to use a Distribute or Consolidate instead of Transfer',
     dependentFields: ['aspirate_wells', 'dispense_wells']
   },
   WELL_RATIO_CONSOLIDATE: {
-    message: 'In consolidate actions there must be multiple source wells and one destination well',
+    title: 'In consolidate actions there must be multiple source wells and one destination well',
     dependentFields: ['aspirate_wells', 'dispense_wells']
   },
   WELL_RATIO_DISTRIBUTE: {
-    message: 'In distribute actions there must be one source well and multiple destination wells',
+    title: 'In distribute actions there must be one source well and multiple destination wells',
     dependentFields: ['aspirate_wells', 'dispense_wells']
   }
 }

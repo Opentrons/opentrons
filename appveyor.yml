@@ -36,7 +36,7 @@ install:
   - ps: $env:nodejs_version = (Get-Content -Path .nvmrc)[0]
   - ps: Install-Product node $env:nodejs_version x64
   # install dev dependencies
-  - cmd: '%MAKE% install'
+  - cmd: '%MAKE% -j 2 install'
 
 # do not run MSBuild
 build: false

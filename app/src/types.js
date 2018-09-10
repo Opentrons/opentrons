@@ -14,6 +14,7 @@ import type {HealthCheckAction} from './health-check'
 import type {Action as HttpApiAction} from './http-api-client'
 import type {ShellAction} from './shell'
 import type {ConfigAction} from './config'
+import type {DiscoveryAction} from './discovery'
 
 export type State = $Call<reducer>
 
@@ -26,6 +27,7 @@ export type Action =
   | ShellAction
   | ConfigAction
   | RouterAction
+  | DiscoveryAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 

@@ -204,17 +204,17 @@ def backup_configuration(config: robot_config, tag=None):
     save_robot_settings(config, tag=tag)
 
 
-def clear(filename=None):
-    if filename:
-        files = [filename]
-    else:
-        dc_filename = get_config_index().get('deckCalibrationFile')
-        rs_filename = get_config_index().get('robotSettingsFile')
-        files = [dc_filename, rs_filename]
-    log.info('Deleting config file: {}'.format(filename))
-    for file in files:
-        if os.path.exists(file):
-            os.remove(file)
+def clear(calibration=True, robot=True):
+    if calibration:
+        _clear_file(get_config_index().get('deckCalibrationFile'))
+    if robot:
+        _clear_file(get_config_index().get('robotSettingsFile'))
+
+
+def _clear_file(filename):
+    log.debug('Deleting {}'.format(filename))
+    if os.path.exists(filename):
+        os.remove(filename)
 
 
 def _load_json(filename) -> dict:
@@ -232,7 +232,10 @@ def _load_json(filename) -> dict:
 
 def _save_json(data, filename):
     # print("Saving json file at {}".format(filename))
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, 'w') as file:
-        json.dump(data, file, sort_keys=True, indent=4)
-    return data
+    try:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, 'w') as file:
+            json.dump(data, file, sort_keys=True, indent=4)
+        return data
+    except OSError:
+        log.exception('Write failed with exception:')

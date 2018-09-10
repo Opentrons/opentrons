@@ -7,6 +7,7 @@
  */
 
 .left_settings_column,
+.middle_settings_column,
 .right_settings_column {
   & > * {
     margin: 1rem 0;
@@ -14,10 +15,15 @@
 }
 
 .left_settings_column {
-  lost-column: 11/16;
+  lost-column: 6/16;
+}
+
+.middle_settings_column {
+  lost-column: 4/16;
 }
 
 .right_settings_column {
+  lost-offset: 1/16;
   lost-column: 4/16;
 }
 
@@ -77,6 +83,10 @@
   & .full_width {
     lost-column: 8/16;
   }
+}
+
+.repetitions_row {
+  padding: 1.5rem 0;
 }
 
 /* form buttons */

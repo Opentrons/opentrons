@@ -4,6 +4,7 @@ import type {
   Command,
   StatePipette,
   StateLabware,
+  SessionModule,
   Mount,
   Slot,
   SessionStatus
@@ -31,13 +32,16 @@ export type State = {
   // TODO(mc, 2018-01-11): command IDs should be strings
   protocolCommands: number[],
   protocolCommandsById: {
-    [number]: Command
+    [number]: Command,
   },
   pipettesByMount: {
-    [Mount]: StatePipette
+    [Mount]: StatePipette,
   },
   labwareBySlot: {
-    [Slot]: StateLabware
+    [Slot]: StateLabware,
+  },
+  modulesBySlot: {
+    [Slot]: SessionModule,
   },
   runRequest: Request,
   pauseRequest: Request,
@@ -75,6 +79,7 @@ const INITIAL_STATE: State = {
   // deck setup from protocol
   pipettesByMount: {},
   labwareBySlot: {},
+  modulesBySlot: {},
 
   // running a protocol
   runRequest: {inProgress: false, error: null},

@@ -23,10 +23,10 @@ import RobotSettings, {
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
+import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 type SP = {
   showUpdateModal: boolean,
-  connectedName: string,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
@@ -36,7 +36,7 @@ type DP = {dispatch: Dispatch}
 
 type OP = {
   robot: Robot,
-  match: Match
+  match: Match,
 }
 
 type Props = SP & OP & {
@@ -76,6 +76,10 @@ function RobotSettingsPage (props: Props) {
 
         <Route path={`${path}/calibrate-deck`} render={(props) => (
           <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+        )} />
+
+        <Route path={`${path}/reset`} render={(props) => (
+          <ResetRobotModal robot={robot} />
         )} />
 
         <Route exact path={path} render={() => {
@@ -118,10 +122,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
   const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+
   return (state, ownProps) => {
     const {robot} = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
-    const connectedName = robotSelectors.getConnectedRobotName(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const availableUpdate = getAvailableRobotUpdate(state, robot)
@@ -133,7 +137,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     )
 
     return {
-      connectedName,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,

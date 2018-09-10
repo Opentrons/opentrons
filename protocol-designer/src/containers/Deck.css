@@ -3,6 +3,7 @@
 .deck {
   padding: 1rem;
   max-width: 100%;
+  width: 100vh;
 }
 
 .deck_header {
@@ -10,4 +11,8 @@
 
   text-align: center;
   padding-top: 1rem;
+}
+
+.deck_row {
+  @apply --center-children;
 }

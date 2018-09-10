@@ -1,3 +1,5 @@
 // @flow
 
-// NOTE: no pipettes/ actions for now!
+export const swapPipettes = () => ({
+  type: 'SWAP_PIPETTES'
+})

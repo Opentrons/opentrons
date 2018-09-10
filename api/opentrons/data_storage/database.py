@@ -2,7 +2,7 @@
 import sqlite3
 # import warnings
 from typing import List
-from opentrons.containers.placeable import Container, Well
+from opentrons.containers.placeable import Container, Well, Module
 from opentrons.data_storage import database_queries as db_queries
 from opentrons.util import environment
 from opentrons.util.vector import Vector
@@ -10,6 +10,9 @@ from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
 from opentrons.config import feature_flags as fflags
 import logging
+import os
+
+SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
 log = logging.getLogger(__file__)
 database_path = environment.get_path('DATABASE_FILE')
@@ -67,7 +70,11 @@ def _load_container_object_from_db(db, container_name: str):
             .format(container_name)
         )
 
-    container = Container()
+    if container_name in SUPPORTED_MODULES:
+        container = Module()
+    else:
+        container = Container()
+
     container.properties['type'] = container_type
     container._coordinates = Vector(rel_coords)
     log.debug("Loading {} with coords {}".format(rel_coords, container_type))
@@ -268,5 +275,15 @@ def set_version(version):
         pass
     db_conn = sqlite3.connect(database_path)
     db_queries.set_user_version(db_conn, version)
+
+
+def reset():
+    """ Unmount and remove the sqlite database (used in robot reset) """
+    if os.path.exists(database_path):
+        os.remove(database_path)
+    # Not an os.path.join because it is a suffix to the full filename
+    journal_path = database_path + '-journal'
+    if os.path.exists(journal_path):
+        os.remove(journal_path)
 
 # ======================== END Public Functions ======================== #

@@ -1,0 +1,14 @@
+{
+  "tip_position": {
+    "title": "Tip Positioning",
+    "body": "Change from where in the well the robot aspirates",
+    "field_label": "Distance from bottom of well"
+  },
+  "well_order": {
+    "title": "Well Order",
+    "body": "Change the order in which the robot aspirates from the selected wells",
+    "field_label": "Order",
+    "then": "then",
+    "viz_label": "Pattern"
+  }
+}

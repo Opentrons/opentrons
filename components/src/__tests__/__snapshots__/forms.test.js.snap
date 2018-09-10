@@ -89,27 +89,32 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
   >
     <select
       className="dropdown"
+      disabled={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
       value=""
     >
       <option
+        disabled={false}
         value=""
       >
         
       </option>
       <option
+        disabled={false}
         value="dna"
       >
         DNA
       </option>
       <option
+        disabled={false}
         value="rna"
       >
         RNA
       </option>
       <option
+        disabled={false}
         value="protein"
       >
         Protein
@@ -154,22 +159,26 @@ exports[`DropdownField renders correctly with a value 1`] = `
   >
     <select
       className="dropdown"
+      disabled={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
       value="rna"
     >
       <option
+        disabled={false}
         value="dna"
       >
         DNA
       </option>
       <option
+        disabled={false}
         value="rna"
       >
         RNA
       </option>
       <option
+        disabled={false}
         value="protein"
       >
         Protein

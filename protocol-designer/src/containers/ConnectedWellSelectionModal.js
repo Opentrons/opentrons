@@ -2,8 +2,7 @@
 import * as React from 'react'
 import WellSelectionModal from '../components/WellSelectionModal'
 import {connect} from 'react-redux'
-import type {BaseState} from '../types'
-import type {Dispatch} from 'redux'
+import type {BaseState, ThunkDispatch} from '../types'
 import wellSelectionSelectors from '../well-selection/selectors'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {
@@ -11,13 +10,12 @@ import {
   saveWellSelectionModal
 } from '../well-selection/actions'
 
-type Props = React.ElementProps<typeof WellSelectionModal>
-type HideModal = {hideModal: true}
-
-export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionModalWrapper)
+type Props = {
+  ...React.ElementProps<typeof WellSelectionModal>,
+  hideModal?: boolean
+}
 
 function WellSelectionModalWrapper (props: Props) {
-  // $FlowFixMe: property `hideModal` is missing in `Props`
   if (props.hideModal) {
     return null
   }
@@ -31,7 +29,7 @@ type DP = {
 
 type SP = $Diff<Props, DP>
 
-function mapStateToProps (state: BaseState): SP | HideModal {
+function mapStateToProps (state: BaseState): SP {
   const wellSelectionModalData = wellSelectionSelectors.wellSelectionModalData(state)
 
   if (!wellSelectionModalData) {
@@ -47,9 +45,11 @@ function mapStateToProps (state: BaseState): SP | HideModal {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<any>): DP { // TODO Ian 2018-04-18 properly type dispatch
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     onSave: () => dispatch(saveWellSelectionModal()),
     onCloseClick: () => dispatch(closeWellSelectionModal())
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionModalWrapper)

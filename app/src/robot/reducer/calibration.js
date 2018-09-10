@@ -12,7 +12,8 @@ import type {
   PipetteCalibrationAction,
   LabwareCalibrationAction,
   CalibrationSuccessAction,
-  CalibrationFailureAction
+  CalibrationFailureAction,
+  SetModulesReviewedAction
 } from '../actions'
 
 // calibration request types
@@ -28,6 +29,7 @@ type CalibrationRequestType =
   | 'DROP_TIP_AND_HOME'
   | 'CONFIRM_TIPRACK'
   | 'UPDATE_OFFSET'
+  | 'SET_MODULES_REVIEWED'
 
 type CalibrationRequest = {
   type: CalibrationRequestType,
@@ -39,6 +41,7 @@ type CalibrationRequest = {
 
 export type State = {
   +deckPopulated: ?boolean,
+  +modulesReviewed: ?boolean,
 
   +probedByMount: {[Mount]: boolean},
   +tipOnByMount: {[Mount]: boolean},
@@ -61,6 +64,7 @@ const {
 
 const INITIAL_STATE: State = {
   deckPopulated: null,
+  modulesReviewed: null,
 
   // TODO(mc, 2018-01-22): combine these into subreducer
   probedByMount: {},
@@ -139,6 +143,9 @@ export default function calibrationReducer (
     case 'robot:REFRESH_SESSION':
       return handleSession(state, action)
 
+    case 'robot:SET_MODULES_REVIEWED':
+      return handleSetModulesReviewed(state, action)
+
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
@@ -167,6 +174,13 @@ function handleSetDeckPopulated (state: State, action: any): State {
   return {...state, deckPopulated: action.payload}
 }
 
+function handleSetModulesReviewed (
+  state: State,
+  action: SetModulesReviewedAction
+): State {
+  return {...state, modulesReviewed: action.payload}
+}
+
 function handleMoveToFront (state: State, action: any): State {
   if (!action.payload || !action.payload.mount) return state
 
@@ -175,6 +189,7 @@ function handleMoveToFront (state: State, action: any): State {
   return {
     ...state,
     deckPopulated: false,
+    modulesReviewed: false,
     calibrationRequest: {
       type: 'MOVE_TO_FRONT',
       inProgress: true,
@@ -251,6 +266,7 @@ function handleMoveTo (state: State, action: LabwareCalibrationAction): State {
   return {
     ...state,
     deckPopulated: true,
+    modulesReviewed: true,
     calibrationRequest: {
       type: 'MOVE_TO',
       inProgress: true,
@@ -306,6 +322,7 @@ function handlePickupAndHome (
   return {
     ...state,
     deckPopulated: true,
+    modulesReviewed: true,
     calibrationRequest: {
       type: 'PICKUP_AND_HOME',
       inProgress: true,

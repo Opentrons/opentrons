@@ -11,7 +11,7 @@ import {
   selectors as robotSelectors,
   constants as robotConstants
 } from '../../robot'
-import {getAnyRobotUpdateAvailable, fetchPipettes} from '../../http-api-client'
+import {getAnyRobotUpdateAvailable} from '../../http-api-client'
 import {getShellUpdate} from '../../shell'
 
 import {NavButton} from '@opentrons/components'
@@ -26,9 +26,7 @@ type SP = Props & {
   _robot: ?RobotService,
 }
 
-type DP = {dispatch: Dispatch}
-
-export default withRouter(connect(mapStateToProps, null, mergeProps)(NavButton))
+export default withRouter(connect(mapStateToProps)(NavButton))
 
 function mapStateToProps (state: State, ownProps: OP): SP {
   const {name} = ownProps
@@ -77,16 +75,4 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   }
 
   return {...NAV_ITEM_BY_NAME[name], _robot}
-}
-
-function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {dispatch} = dispatchProps
-  const {_robot, url, disabled} = stateProps
-  let props: Props = {...ownProps, ...stateProps}
-
-  if (_robot && url === '/calibrate' && !disabled) {
-    props = {...props, onClick: () => dispatch(fetchPipettes(_robot))}
-  }
-
-  return props
 }

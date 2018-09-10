@@ -8,15 +8,13 @@ import type {Module} from '../../http-api-client'
 import type {Robot} from '../../robot'
 
 import {RefreshCard} from '@opentrons/components'
-import {getModulesOn} from '../../config'
 import {fetchModules, makeGetRobotModules} from '../../http-api-client'
 import ModulesCardContents from './ModulesCardContents'
 
 type OP = Robot
 
 type SP = {
-  modulesFlag: ?boolean,
-  modules: Array<Module>,
+  modules: ?Array<Module>,
   refreshing: boolean
 }
 
@@ -26,42 +24,20 @@ type Props = OP & SP & DP
 
 const TITLE = 'Modules'
 
-const STUBBED_MODULE_DATA = [
-  {
-    name: 'temp_deck',
-    model: 'temp_deck',
-    serial: '123123124',
-    fwVersion: '1.2.13',
-    status: '86',
-    displayName: 'Temperature Module'
-  },
-  {
-    name: 'mag_deck',
-    model: 'mag_deck',
-    serial: '123123124',
-    fwVersion: '1.2.13',
-    status: 'disengaged',
-    displayName: 'Magnetic Bead Module'
-  }
-]
 export default connect(makeSTP, DTP)(AttachedModulesCard)
 
-// TODO (ka 2018-6-29): change this to a refresh card once we have endpoints
 function AttachedModulesCard (props: Props) {
-  if (props.modulesFlag) {
-    return (
-      <RefreshCard
-        title={TITLE}
-        watch={props.name}
-        refreshing={props.refreshing}
-        refresh={props.refresh}
-        column
-      >
-        <ModulesCardContents modules={props.modules} />
-      </RefreshCard>
-    )
-  }
-  return null
+  return (
+    <RefreshCard
+      title={TITLE}
+      watch={props.name}
+      refreshing={props.refreshing}
+      refresh={props.refresh}
+      column
+    >
+      <ModulesCardContents modules={props.modules} />
+    </RefreshCard>
+  )
 }
 
 function makeSTP (): (state: State, ownProps: OP) => SP {
@@ -73,8 +49,7 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
     const modules = modulesResponse && modulesResponse.modules
 
     return {
-      modulesFlag: getModulesOn(state),
-      modules: modules || STUBBED_MODULE_DATA,
+      modules: modules,
       refreshing: modulesCall.inProgress
     }
   }

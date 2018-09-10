@@ -47,10 +47,11 @@
   }
 
   &.error {
-    color: var(--c-mustard);
+    color: var(--c-warning-dark);
   }
 }
 
+.dropdown_disabled,
 .checkbox_disabled {
   opacity: 0.5;
 }
@@ -103,6 +104,7 @@
 .input_caption {
   padding-top: 0.25rem;
   font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   min-height: var(--fs-caption);
   color: var(--c-med-gray);
 
@@ -117,6 +119,10 @@
   & .label_text {
     padding-right: 1.5rem;
   }
+}
+
+.inline_item {
+  flex: 1;
 }
 
 .dropdown_field {
@@ -151,15 +157,12 @@
 
 .error div,
 .error span {
-  color: var(--c-mustard);
+  color: var(--c-warning-dark);
 }
 
-.error select {
-  background-color: var(--c-mustard);
-}
-
+.error select,
 .error .input_field {
-  background-color: var(--c-mustard);
+  background-color: var(--c-warning-light);
 }
 
 .error_icon {
@@ -175,5 +178,9 @@
 
   & .form_group_label {
     color: var(--c-light-gray);
+  }
+
+  & input { /* stylelint-disable no-descending-specificity */
+    color: var(--c-med-gray);
   }
 }

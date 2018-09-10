@@ -4,7 +4,6 @@ import tempfile
 from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import database
 from opentrons.config import get_config_index
-
 file_dir = os.path.abspath(os.path.dirname(__file__))
 
 defn_dir = os.path.abspath(

@@ -10,7 +10,9 @@ async def test_health(virtual_smoothie_env, loop, test_client):
     expected = json.dumps({
         'name': 'opentrons-dev',
         'api_version': __version__,
-        'fw_version': 'Virtual Smoothie'
+        'fw_version': 'Virtual Smoothie',
+        'logs': ['/logs/serial.log', '/logs/api.log'],
+        'system_version': 'unknown'
     })
     resp = await cli.get('/health')
     text = await resp.text()

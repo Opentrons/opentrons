@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import {OutlineButton, type ButtonProps} from '@opentrons/components'
-import ControlInfo from './ControlInfo'
+import LabeledControl from './LabeledControl'
 import styles from './styles.css'
 
 type Props = {
@@ -17,16 +17,13 @@ export default function LabeledButton (props: Props) {
   const buttonClass = cx(styles.labeled_button, buttonProps.className)
 
   return (
-    <div className={styles.labeled_control_wrapper}>
-      <div className={styles.labeled_control}>
-        <p className={styles.labeled_control_label}>
-          {label}
-        </p>
+    <LabeledControl
+      label={label}
+      control={(
         <OutlineButton {...buttonProps} className={buttonClass} />
-      </div>
-      <ControlInfo>
-        {props.children}
-      </ControlInfo>
-    </div>
+      )}
+    >
+      {props.children}
+    </LabeledControl>
   )
 }

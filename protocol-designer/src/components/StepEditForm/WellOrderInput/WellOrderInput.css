@@ -1,0 +1,113 @@
+@import '@opentrons/components';
+
+.well_order_icon {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+
+.well_order_icon:hover {
+  opacity: 0.7;
+}
+
+.modal_header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 5rem;
+}
+
+.main_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 3rem 0;
+}
+
+.field_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.well_order_dropdown {
+  width: 9rem;
+}
+
+.field_spacer {
+  margin: 6px 12px;
+}
+
+.viz_wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.button_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reset_button {
+  width: 10rem;
+}
+
+.cancel_button {
+  width: 10rem;
+  margin-right: 1rem;
+}
+
+.done_button {
+  width: 10rem;
+}
+
+.wells_image {
+  height: 100px;
+  width: 100px;
+  position: relative;
+}
+
+.path_image {
+  height: 60px;
+  width: 60px;
+  position: relative;
+  left: 20px;
+  top: -80px;
+}
+
+.b2t_first.l2r_second {
+  /* default orientation */
+}
+
+.l2r_first.t2b_second {
+  transform: rotate(90deg);
+}
+
+.t2b_first.r2l_second {
+  transform: rotate(180deg);
+}
+
+.r2l_first.b2t_second {
+  transform: rotate(270deg);
+}
+
+.b2t_first.r2l_second {
+  filter: FlipH;
+  transform: scaleX(-1);
+}
+
+.l2r_first.b2t_second {
+  filter: FlipH;
+  transform: scaleX(-1) rotate(270deg);
+}
+
+.t2b_first.l2r_second {
+  filter: FlipH;
+  transform: scaleX(-1) rotate(180deg);
+}
+
+.r2l_first.t2b_second {
+  filter: FlipH;
+  transform: scaleX(-1) rotate(90deg);
+}

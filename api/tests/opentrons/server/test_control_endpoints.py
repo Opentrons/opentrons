@@ -1,10 +1,10 @@
 import json
 from copy import deepcopy
-from opentrons import robot
+from opentrons import robot, modules
 from opentrons.server.main import init
-from opentrons.server.endpoints import control
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
-from opentrons.instruments.pipette_config import configs
+from opentrons import instruments
+from opentrons.instruments import pipette_config
 
 
 async def test_get_pipettes_uncommissioned(
@@ -52,7 +52,7 @@ async def test_get_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = configs[test_model]
+    model = pipette_config.load(test_model)
     expected = {
         'left': {
             'model': model.name,
@@ -76,30 +76,19 @@ async def test_get_pipettes(
 
 async def test_get_modules(
         virtual_smoothie_env, loop, test_client, monkeypatch):
-    test_module_data = {
-        "name": "magdeck",
-        "model": "magdeck_v1",
-        "serial": "12ab",
-        "fwVersion": "1.0.0",
-        "status": "engaged",
-        "displayName": "Magbead Module"
-    }
+    test_module = modules.MagDeck(port="/dev/modules/tty1_magdeck")
 
-    def dummy_discover_modules():
-        return [
-            test_module_data
-        ]
+    def stub_discover_modules():
+        return [test_module]
 
-    # Note: once modules API object is implemented, it will probably be better
-    # to mock a lower-level function so this test will be more realistic
-    monkeypatch.setattr(control, "_discover_modules", dummy_discover_modules)
+    monkeypatch.setattr(modules, "discover_and_connect", stub_discover_modules)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
     expected = {
         "modules": [
-            test_module_data
+            test_module.to_dict()
         ]
     }
 
@@ -122,7 +111,7 @@ async def test_get_cached_pipettes(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
 
-    model = configs[test_model]
+    model = pipette_config.load(test_model)
     expected = {
         'left': {
             'model': model.name,
@@ -143,7 +132,7 @@ async def test_get_cached_pipettes(
     assert resp.status == 200
     assert json.loads(text) == expected
 
-    model1 = list(configs.values())[1]
+    model1 = pipette_config.load('p10_single_v1.3')
 
     def dummy_model(mount):
         return model1.name
@@ -246,6 +235,51 @@ async def test_home_pipette(virtual_smoothie_env, loop, test_client):
 
     res2 = await cli.post('/robot/home', json=test_data)
     assert res2.status == 200
+
+
+async def test_instrument_reuse(virtual_smoothie_env, loop, test_client,
+                                monkeypatch):
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+
+    robot.reset()
+
+    # With no pipette connected before homing pipettes, we should a) not crash
+    # and b) not have any instruments connected afterwards
+
+    test_data = {
+        'target': 'pipette',
+        'mount': 'left'
+    }
+
+    res = await cli.post('/robot/home', json=test_data)
+    assert res.status == 200
+
+    res = await cli.get('/pipettes')
+    data = await res.json()
+    assert data['left']['model'] is None
+
+    # If we do have a pipette connected, if we home we should still have it
+    # connected afterwards
+    test_model = 'p300_multi_v1'
+
+    def dummy_read_model(mount):
+        return test_model
+
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    instruments.P300_Multi('left')
+
+    res = await cli.get('/pipettes', params=[('refresh', 'true')])
+    data = await res.json()
+
+    assert data['left']['model'] == test_model
+
+    res = await cli.post('/robot/home', json=test_data)
+    assert res.status == 200
+
+    res = await cli.get('/pipettes')
+    data = await res.json()
+    assert data['left']['model'] == test_model
 
 
 async def test_home_robot(virtual_smoothie_env, loop, test_client):

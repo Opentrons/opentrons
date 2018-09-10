@@ -60,6 +60,42 @@ The values are in microliters/seconds, and have varying defaults depending on th
         dispense_flow_rate=600)
 
 
+The given defaults for every pipette model is the following:
+p10_Single
+==========
+Aspirate Default: 5ul/sec
+Dispense Default: 10ul/sec
+
+p10_Multi
+=========
+Aspirate Default: 5ul/sec
+Dispense Default: 10ul/sec
+
+p50_Single
+==========
+Aspirate Default: 25ul/sec
+Dispense Default: 50ul/sec
+
+p50_Multi
+=========
+Aspirate Default: 25ul/sec
+Dispense Default: 50ul/sec
+
+p300_Single
+===========
+Aspirate Default: 150
+Dispense Default: 300
+
+p300_Multi
+==========
+Aspirate Default: 150
+Dispense Default: 300
+
+p1000_Single
+============
+Aspirate Default: 500
+Dispense Default: 1000
+
 
 Old Pipette Constructor
 =======================

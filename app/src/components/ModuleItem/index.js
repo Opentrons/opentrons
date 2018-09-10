@@ -10,16 +10,17 @@ import NoModulesMessage from './NoModulesMessage'
 
 import styles from './styles.css'
 
-type Props = Module & {
+type Props = {
+  module: Module,
   availableUpdate?: ?string
 }
 
 export default function ModuleItem (props: Props) {
+  const {module} = props
   return (
     <div className={styles.module_item}>
-      <ModuleImage name={props.name}/>
-      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
-      <ModuleInfo {...props}/>
+      <ModuleImage name={module.name}/>
+      <ModuleInfo module={module}/>
       <ModuleUpdate availableUpdate={props.availableUpdate}/>
     </div>
   )

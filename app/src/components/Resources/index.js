@@ -3,26 +3,25 @@
 import * as React from 'react'
 
 import ResourceCard from './ResourceCard'
-
-import styles from './styles.css'
+import {CardContainer, CardRow} from '../layout'
 
 export default function Resources () {
   return (
-    <div className={styles.resources_page}>
-      <div className={styles.row}>
+    <CardContainer>
+      <CardRow>
         <ResourceCard
           title='Support Articles'
           description='Visit our walkthroughs and FAQs'
           url={'https://support.opentrons.com/ot-2'}
         />
-      </div>
-      <div className={styles.row}>
+      </CardRow>
+      <CardRow>
         <ResourceCard
           title='Protocol Library'
           description='Download a protocol to run on your robot'
           url={'https://protocols.opentrons.com/'}
         />
-      </div>
-    </div>
+      </CardRow>
+    </CardContainer>
   )
 }

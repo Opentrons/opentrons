@@ -1,0 +1,17 @@
+@import '@opentrons/components';
+
+.plate_label {
+  pointer-events: none;
+  font-size: var(--fs-tiny);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.tiny_labels {
+  /* For 384 plate */
+  font-size: var(--fs-micro);
+}
+
+.tiny_labels:nth-child(odd) {
+  fill: gray;
+}

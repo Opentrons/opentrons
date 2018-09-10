@@ -8,7 +8,7 @@
 }
 
 .deck {
-  max-height: 90vh;
+  overflow: visible;
 }
 
 .deck_outline {

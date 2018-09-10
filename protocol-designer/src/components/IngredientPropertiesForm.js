@@ -33,12 +33,13 @@ type FieldProps = {|
   label?: string,
   units?: string,
   error?: ?string,
+  caption?: ?string,
   placeholder?: string,
   className?: string
 |}
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
-  (props: FieldProps) => { /* otherProps */
+  function InputFieldFactory (props: FieldProps) { /* otherProps */
     const {setSubstate, getSubstate} = args
     const {accessor, numeric, type, placeholder, className} = props
 
@@ -48,6 +49,7 @@ const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstat
         label={props.label}
         units={props.units}
         error={props.error}
+        caption={props.caption}
         placeholder={placeholder}
         value={(getSubstate(accessor) || '').toString()}
         onChange={(e: SyntheticInputEvent<HTMLInputElement>) =>
@@ -110,8 +112,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         name: null,
         volume: null,
         description: null,
-        individualize: false,
-        serializeName: null
+        individualize: false
       },
       commonIngredGroupId: null
     }
@@ -142,7 +143,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
-      const {name, volume, description, individualize, serializeName} = this.state.input
+      const {name, volume, description, individualize} = this.state.input
       const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,
@@ -150,8 +151,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: newIngredFields.name || name,
           volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
-          individualize: newIngredFields.individualize || individualize,
-          serializeName: newIngredFields.serializeName || serializeName
+          individualize: newIngredFields.individualize || individualize
         }
       }, cb)
     } else {
@@ -166,13 +166,13 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: null,
           volume: null,
           description: null,
-          individualize: false,
-          serializeName: null
+          individualize: false
         }
       }, cb)
     }
   }
 
+  // TODO(mc, 2018-07-24): use a different lifecycle hook
   componentWillReceiveProps (nextProps: Props) {
     const nextEditingId = nextProps.commonSelectedIngred
     const prevEditingId = this.props.commonSelectedIngred
@@ -251,7 +251,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const {
       onCancel,
       allIngredientNamesIds,
-      selectedWells
+      selectedWells,
+      selectedWellsMaxVolume
     } = this.props
 
     const {commonIngredGroupId} = this.state
@@ -280,7 +281,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       <div className={formStyles.form}>
         <form className={styles.form_content}>
           <div className={formStyles.row_wrapper}>
-              <FormGroup label='Ingredient title:' className={styles.ingred_title_field}>
+              <FormGroup label='Liquid title:' className={styles.ingred_title_field}>
                 <Field
                   error={visibleErrors.name}
                   accessor='name'
@@ -289,19 +290,13 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
               <FormGroup
                 label={'\u00A0'} // non-breaking space
-                className={styles.serialize_name}
+                className={styles.individualize}
               >
                 <Field
                   label='Serialize'
                   accessor='individualize'
                   type='checkbox'
                 />
-                {/* TODO: Ian 2018-06-01 remove all remnants of this text field see issue #1294
-                  {individualize && <Field
-                  accessor='serializeName'
-                  placeholder='i.e. sample'
-                  className={styles.serialize_name_field}
-                />} */}
               </FormGroup>
 
             {showIngredientDropdown && <FormGroup label={ingredDropdownLabel} className={styles.existing_ingred_field}>
@@ -325,6 +320,9 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                 numeric
                 accessor='volume'
                 units='µL'
+                caption={Number.isFinite(selectedWellsMaxVolume)
+                  ? `max ${selectedWellsMaxVolume}`
+                  : null}
                 error={visibleErrors.volume}
               />
             </FormGroup>

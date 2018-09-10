@@ -7,11 +7,12 @@ import json
 
 from opentrons.broker import publish, subscribe
 from opentrons.containers import get_container, location_to_list
+from opentrons.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
-from opentrons import robot
+from opentrons import robot, modules
 
-from .models import Container, Instrument
+from .models import Container, Instrument, Module
 
 log = logging.getLogger(__name__)
 
@@ -21,10 +22,32 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 class SessionManager(object):
     def __init__(self, loop=None):
         self.session = None
+        self._session_lock = False
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
 
     def create(self, name, text):
-        self.session = Session(name=name, text=text)
+        if self._session_lock:
+            raise Exception(
+                'Cannot create session while simulation in progress')
+
+        self._session_lock = True
+        try:
+            self.session = Session(name=name, text=text)
+        finally:
+            self._session_lock = False
+
         return self.session
+
+    def clear(self):
+        if self._session_lock:
+            raise Exception(
+                'Cannot clear session while simulation in progress')
+
+        if self.session:
+            robot.reset()
+        self.session = None
 
     def get_session(self):
         return self.session
@@ -44,13 +67,18 @@ class Session(object):
 
         self._containers = []
         self._instruments = []
+        self._modules = []
         self._interactions = []
 
         self.instruments = None
         self.containers = None
+        self.modules = None
 
         self.startTime = None
 
+        for module in robot.modules:
+            module.disconnect()
+        robot.modules = modules.discover_and_connect()
         self.refresh()
 
     def get_instruments(self):
@@ -79,6 +107,12 @@ class Session(object):
             for container in self._containers
         ]
 
+    def get_modules(self):
+        return [
+            Module(module=module)
+            for module in self._modules
+        ]
+
     def clear_logs(self):
         self.command_log.clear()
         self.errors.clear()
@@ -92,6 +126,7 @@ class Session(object):
 
         self._containers.clear()
         self._instruments.clear()
+        self._modules.clear()
         self._interactions.clear()
 
         def on_command(message):
@@ -134,12 +169,12 @@ class Session(object):
             robot.connect()
             unsubscribe()
 
-            # Accumulate containers, instruments, interactions from commands
-            instruments, containers, interactions = _accumulate(
+            instruments, containers, modules, interactions = _accumulate(
                 [_get_labware(command) for command in commands])
 
             self._containers.extend(_dedupe(containers))
             self._instruments.extend(_dedupe(instruments))
+            self._modules.extend(_dedupe(modules))
             self._interactions.extend(_dedupe(interactions))
 
         return res
@@ -160,6 +195,7 @@ class Session(object):
 
         self.containers = self.get_containers()
         self.instruments = self.get_instruments()
+        self.modules = self.get_modules()
         self.startTime = None
 
         self.set_state('loaded')
@@ -199,6 +235,7 @@ class Session(object):
 
         try:
             self.resume()
+            self._pre_run_hooks()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
@@ -275,12 +312,15 @@ class Session(object):
     def _on_state_changed(self):
         publish(Session.TOPIC, self._snapshot())
 
+    def _pre_run_hooks(self):
+        robot.home_z()
+
 
 def _accumulate(iterable):
     return reduce(
         lambda x, y: tuple([x + y for x, y in zip(x, y)]),
         iterable,
-        ([], [], []))
+        ([], [], [], []))
 
 
 def _dedupe(iterable):
@@ -296,13 +336,30 @@ def now():
     return int(time() * 1000)
 
 
+def _get_parent_module(placeable):
+    if isinstance(placeable, ModulePlaceable) or not placeable:
+        res = placeable
+    else:
+        res = _get_parent_module(placeable.parent)
+    return res
+
+
 def _get_labware(command):
     containers = []
     instruments = []
+    modules = []
     interactions = []
 
     location = command.get('location')
     instrument = command.get('instrument')
+
+    placeable = location
+    if (type(location) == tuple):
+        placeable = location[0]
+
+    maybe_module = _get_parent_module(placeable)
+    modules.append(maybe_module)
+
     locations = command.get('locations')
 
     if location:
@@ -314,10 +371,11 @@ def _get_labware(command):
             [get_container(location) for location in list_of_locations])
 
     containers = [c for c in containers if c is not None]
+    modules = [m for m in modules if m is not None]
 
     if instrument:
         instruments.append(instrument)
         interactions.extend(
             [(instrument, container) for container in containers])
 
-    return instruments, containers, interactions
+    return instruments, containers, modules, interactions

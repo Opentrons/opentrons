@@ -2,44 +2,6 @@
 import {actions, actionTypes} from '../'
 
 describe('robot actions', () => {
-  test('DISCOVER action', () => {
-    const expected = {
-      type: 'robot:DISCOVER',
-      meta: {robotCommand: true}
-    }
-
-    expect(actions.discover()).toEqual(expected)
-  })
-
-  test('DISCOVER_FINISH action', () => {
-    const expected = {
-      type: 'robot:DISCOVER_FINISH'
-    }
-
-    expect(actions.discoverFinish()).toEqual(expected)
-  })
-
-  test('ADD_DISCOVERED action', () => {
-    const name = 'Opentrons XYZ123'
-    const host = '123456.local'
-    const expected = {
-      type: 'robot:ADD_DISCOVERED',
-      payload: {host, name}
-    }
-
-    expect(actions.addDiscovered({host, name})).toEqual(expected)
-  })
-
-  test('REMOVE_DISCOVERED action', () => {
-    const service = {name: 'ot'}
-    const expected = {
-      type: 'robot:REMOVE_DISCOVERED',
-      payload: service
-    }
-
-    expect(actions.removeDiscovered(service)).toEqual(expected)
-  })
-
   test('CONNECT action', () => {
     const expected = {
       type: 'robot:CONNECT',
@@ -123,6 +85,18 @@ describe('robot actions', () => {
     const expected = {type: 'robot:SESSION_UPDATE', payload: update}
 
     expect(actions.sessionUpdate(update)).toEqual(expected)
+  })
+
+  test('set modules reviewed action', () => {
+    expect(actions.setModulesReviewed(false)).toEqual({
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: false
+    })
+
+    expect(actions.setModulesReviewed(true)).toEqual({
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: true
+    })
   })
 
   test('set deck populated action', () => {

@@ -1,9 +1,10 @@
 // @flow
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
-import {getPipetteModels, getPipette} from '@opentrons/shared-data'
+import get from 'lodash/get'
+import {getPipetteModels, getPipette, getLabware} from '@opentrons/shared-data'
 
-import type {BaseState, Selector, Options} from '../types'
+import type {BaseState, Selector} from '../types'
 import type {DropdownOption} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
 
@@ -32,30 +33,23 @@ function _getPipetteName (pipetteData): string {
   return pipette ? pipette.displayName : '???'
 }
 
-function _makePipetteOption (
-  byId: PipettesById,
-  pipetteId: ?string,
-  idPrefix: 'left' | 'right'
-): Options {
-  if (!pipetteId || !byId[pipetteId]) {
-    return []
-  }
-  const pipetteData = byId[pipetteId]
-  const name = _getPipetteName(pipetteData)
-  return [{
-    name,
-    value: `${idPrefix}:${pipetteData.model}`
-  }]
-}
-
 export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
   rootSelector,
   pipettes => {
     const byId = pipettes.byId
-    const leftOption = _makePipetteOption(byId, pipettes.byMount.left, 'left')
-    const rightOption = _makePipetteOption(byId, pipettes.byMount.right, 'right')
 
-    return [...leftOption, ...rightOption]
+    const pipetteIds: Array<?string> = [pipettes.byMount.left, pipettes.byMount.right]
+    return pipetteIds.reduce((acc: Array<DropdownOption>, pipetteId: ?string): Array<DropdownOption> =>
+      (pipetteId && byId[pipetteId])
+        ? [
+          ...acc,
+          {
+            name: _getPipetteName(byId[pipetteId]),
+            value: pipetteId
+          }
+        ]
+        : acc,
+      [])
   }
 )
 
@@ -82,12 +76,14 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
 
     if (!pipetteData) return acc
 
+    const tipVolume = pipetteData.tiprackModel && get(getLabware(pipetteData.tiprackModel), 'metadata.tipVolume')
+
     const pipetteForInstrumentGroup = {
       mount: pipetteData.mount,
       channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
-      tipType: `${pipetteData.maxVolume} μL`
+      tiprackModel: tipVolume && `${tipVolume} µl`// TODO: BC 2018-07-23 tiprack displayName
     }
 
     return [...acc, pipetteForInstrumentGroup]

@@ -11,8 +11,7 @@ export const stepIconsByType: {[string]: IconName} = {
   'distribute': 'ot-distribute',
   'consolidate': 'ot-consolidate',
   'mix': 'ot-mix',
-  'pause': 'pause',
-  'deck-setup': 'flask-outline'
+  'pause': 'pause'
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
@@ -70,6 +69,7 @@ export type TransferLikeForm = {|
   'volume'?: string,
   'dispense_labware'?: string,
   'dispense_wells'?: Array<string>,
+  'dispense_touchTip'?: boolean,
   'dispense_mix_checkbox'?: boolean,
   'dispense_mix_volume'?: string,
   'dispense_mix_times'?: string

@@ -11,14 +11,14 @@
 import React from 'react'
 import cx from 'classnames'
 import {
-  CenteredTextSvg,
   LabwareContainer,
   ContainerNameOverlay,
   EmptyDeckSlot,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
   humanizeLabwareType,
-  clickOutside
+  clickOutside,
+  type DeckSlot
 } from '@opentrons/components'
 import {getLabware} from '@opentrons/shared-data'
 import styles from './labware.css'
@@ -26,6 +26,7 @@ import styles from './labware.css'
 import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
+import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
 
 const EnhancedNameThisLabwareOverlay = clickOutside(NameThisLabwareOverlay)
 
@@ -36,25 +37,26 @@ function OccupiedDeckSlotOverlay ({
   containerType,
   containerName,
   openIngredientSelector,
-  setCopyLabwareMode,
+  setMoveLabwareMode,
   deleteContainer
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
-        <ClickableText onClick={() => openIngredientSelector(containerId)}
-          iconName='pen' y='25%' text='Name & Liquids' />
+        <ClickableText
+          onClick={() => openIngredientSelector(containerId)}
+          iconName='pencil' y='15%' text='Name & Liquids' />
       }
-      <ClickableText onClick={() => setCopyLabwareMode(containerId)}
-        iconName='cursor-move' y='50%' text='Copy' />
-      {/* TODO Ian 2018-02-16 Move labware, not copy labware. */}
-
-      <ClickableText onClick={() =>
+      <ClickableText
+        onClick={() => setMoveLabwareMode(slot)}
+        iconName='cursor-move' y='40%' text='Move' />
+      <ClickableText
+        onClick={() => (
           window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
           deleteContainer({containerId, slot, containerType})
-      }
-        iconName='close' y='75%' text='Delete' />
+        )}
+        iconName='close' y='65%' text='Delete' />
     </g>
   )
 }
@@ -79,7 +81,7 @@ function SlotWithContainer (props: SlotWithContainerProps) {
       {labwareImages[containerType]
         ? <image
           href={labwareImages[containerType]}
-          width={SLOT_WIDTH} height={SLOT_HEIGHT}
+          width={SLOT_WIDTH_MM} height={SLOT_HEIGHT_MM}
         />
         : <SelectablePlate containerId={containerId} cssFillParent />
       }
@@ -89,7 +91,7 @@ function SlotWithContainer (props: SlotWithContainerProps) {
 }
 
 type LabwareOnDeckProps = {
-  slot: string,
+  slot: DeckSlot,
 
   containerId: string,
   containerType: string,
@@ -101,22 +103,22 @@ type LabwareOnDeckProps = {
   activeModals: {
     ingredientSelection: ?{
       containerName: ?string,
-      slot: ?string
+      slot: ?DeckSlot
     },
     labwareSelection: boolean
   },
   openIngredientSelector: (containerId: string) => void,
 
   // createContainer: ({slot: string, containerType: string}) => mixed,
-  deleteContainer: ({containerId: string, slot: string, containerType: string}) => void,
+  deleteContainer: ({containerId: string, slot: DeckSlot, containerType: string}) => void,
   modifyContainer: ({containerId: string, modify: {[field: string]: mixed}}) => void, // eg modify = {name: 'newName'}
 
-  openLabwareSelector: ({slot: string}) => void,
+  openLabwareSelector: ({slot: DeckSlot}) => void,
   // closeLabwareSelector: ({slot: string}) => mixed,
 
-  setCopyLabwareMode: (containerId: string) => void,
-  labwareToCopy: string | false,
-  copyLabware: (slot: string) => void,
+  setMoveLabwareMode: (slot: ?DeckSlot) => void,
+  slotToMoveFrom: ?DeckSlot,
+  moveLabware: (slot: DeckSlot) => void,
 
   height?: number,
   width?: number,
@@ -146,9 +148,9 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     openLabwareSelector,
     // closeLabwareSelector,
 
-    setCopyLabwareMode,
-    labwareToCopy,
-    copyLabware,
+    setMoveLabwareMode,
+    slotToMoveFrom,
+    moveLabware,
 
     height,
     width,
@@ -173,6 +175,14 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     modify: {name: null}
   })
 
+  const handleSelectMoveDestination = (e: SyntheticEvent<*>) => {
+    e.preventDefault()
+    moveLabware(slot)
+  }
+  const cancelMove = () => {
+    setMoveLabwareMode()
+  }
+
   return (
     <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
       {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
@@ -181,26 +191,29 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
         : <EmptyDeckSlot {...{height, width, slot}} />
       }
 
-      {(!deckSetupMode || (!slotIsOccupied && activeModals.labwareSelection))
+      {(!deckSetupMode || activeModals.labwareSelection)
         // "Add Labware" labware selection dropdown menu
         ? null
-        : (labwareToCopy
+        : (slotToMoveFrom
             // Mouseover empty slot -- Add (or Copy if in copy mode)
             ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.overlay_panel} onClick={() => copyLabware(slot)} />
-              <CenteredTextSvg className={cx(styles.pass_thru_mouse, styles.clickable_text)} text='Place Copy' />
+              <rect className={styles.overlay_panel} onClick={() => moveLabware(slot)} />
+              <ClickableText onClick={handleSelectMoveDestination} iconName='cursor-move' y='40%' text='Place Here' />
             </g>
             : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
               <rect className={styles.overlay_panel} />
               <ClickableText onClick={e => openLabwareSelector({slot})}
-                iconName='plus' y='40%' text='Add Labware' />
+                iconName='plus' y='30%' text='Add Labware' />
               <ClickableText onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
-                iconName='content-copy' y='65%' text='Add Copy' />
+                iconName='content-copy' y='55%' text='Add Copy' />
             </g>
         )
       }
 
-      {deckSetupMode && slotIsOccupied && !showNameOverlay &&
+      {slotToMoveFrom === slot &&
+        <DisabledSelectSlotOverlay onClickOutside={cancelMove} setMoveLabwareMode={setMoveLabwareMode} />}
+
+      {deckSetupMode && slotIsOccupied && !slotToMoveFrom && !showNameOverlay &&
         <OccupiedDeckSlotOverlay {...{
           canAddIngreds,
           containerId,
@@ -208,18 +221,21 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           containerType,
           containerName,
           openIngredientSelector,
-          setCopyLabwareMode,
+          setMoveLabwareMode,
           deleteContainer
-        }} />}
+        }} />
+      }
 
-      {deckSetupMode && showNameOverlay && <EnhancedNameThisLabwareOverlay {...{
-        containerType,
-        containerId,
-        slot,
-        modifyContainer,
-        deleteContainer
-      }}
-      onClickOutside={setDefaultLabwareName} />}
+      {deckSetupMode && showNameOverlay &&
+        <EnhancedNameThisLabwareOverlay {...{
+          containerType,
+          containerId,
+          slot,
+          modifyContainer,
+          deleteContainer
+        }}
+        onClickOutside={setDefaultLabwareName} />
+      }
     </LabwareContainer>
   )
 }

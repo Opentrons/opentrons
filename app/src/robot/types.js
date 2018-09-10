@@ -36,7 +36,6 @@ export type BaseRobot = {
 
 // robot MDNS service for connectivity
 export type RobotService = BaseRobot & {
-  host: string,
   ip: string,
   port: number,
   wired?: boolean,
@@ -131,6 +130,17 @@ export type Labware = StateLabware & {
 }
 
 export type LabwareType = 'tiprack' | 'labware'
+
+export type ModuleType = 'magdeck' | 'tempdeck'
+
+export type SessionModule = {
+  // resource ID
+  _id: number,
+  // slot module is installed in
+  slot: Slot,
+  // name identifier of the module
+  name: ModuleType,
+}
 
 export type SessionStatus =
   | ''

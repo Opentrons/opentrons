@@ -1,19 +1,24 @@
-// TODO(mc, 2018-02-08): enable flow when react-router decides to chill out
-//   ContextRouter exact type seems to mess with things, see (I think):
-//   https://github.com/digiaonline/react-flow-types/issues/12 and
-//   https://github.com/facebook/flow/issues/2405
+// @flow
 import React from 'react'
 
 import {Deck} from '@opentrons/components'
-import ConnectedLabwareItem from './ConnectedLabwareItem'
+import ConnectedSlotItem from './ConnectedSlotItem'
+import ModuleItem from './ModuleItem'
+import LabwareItem from './LabwareItem'
+import ModuleNameOverlay from './ModuleNameOverlay'
 
 import styles from './styles.css'
 
 export default function DeckMap () {
   return (
     <Deck
-      LabwareComponent={ConnectedLabwareItem}
+      // $FlowFixMe: I think ReactRouter type is causing problems here?
+      LabwareComponent={ConnectedSlotItem}
       className={styles.deck}
     />
   )
 }
+
+export {LabwareItem, ModuleItem, ModuleNameOverlay}
+export type {LabwareItemProps} from './LabwareItem'
+export type {ModuleItemProps} from './ModuleItem'

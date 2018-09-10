@@ -20,14 +20,26 @@ type Props = {
   /** checkbox is disabled if value is true */
   disabled?: boolean,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: HoverTooltipHandlers
+  hoverTooltipHandlers?: ?HoverTooltipHandlers
 }
 
 export default function CheckboxField (props: Props) {
   const error = props.error != null
+  const labelClassName = cx(
+    styles.form_field,
+    props.className,
+    {[styles.checkbox_disabled]: props.disabled})
+
+  const innerClassName = cx(
+    styles.checkbox_icon,
+    {
+      [styles.error]: error,
+      [styles.checkbox_disabled]: props.disabled
+    })
+
   return (
-    <label {...props.hoverTooltipHandlers} className={cx(styles.form_field, props.className, {[styles.checkbox_disabled]: props.disabled})}>
-      <div className={cx(styles.checkbox_icon, {[styles.error]: error, [styles.checkbox_disabled]: props.disabled})}>
+    <label className={labelClassName}>
+      <div className={innerClassName}>
         <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
       </div>
       <input
@@ -37,7 +49,9 @@ export default function CheckboxField (props: Props) {
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div className={styles.label_text}>{props.label}</div>
+      <div {...props.hoverTooltipHandlers} className={styles.label_text}>
+        {props.label}
+      </div>
     </label>
   )
 }

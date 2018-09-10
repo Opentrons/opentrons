@@ -2,18 +2,21 @@
 import * as React from 'react'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 
+import i18n from '../../localization'
 import {
   StepInputField,
   StepCheckboxRow,
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField,
-  FlowRateField,
-  TipPositionField
+  ChangeTipField
 } from './formFields'
 
+import TipPositionInput from './TipPositionInput'
+import getTooltipForField from './getTooltipForField'
+import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
+import WellOrderInput from './WellOrderInput'
 import type {StepType} from '../../form-types'
 import formStyles from '../forms.css'
 import styles from './StepEditForm.css'
@@ -48,13 +51,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FormGroup label='TECHNIQUE'>
               <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
               <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
-              <HoverTooltip tooltipComponent="This feature is not available in Beta">
-                {(hoverTooltipHandlers) => (
-                  <StepCheckboxRow disabled hoverTooltipHandlers={hoverTooltipHandlers} name="aspirate_airGap_checkbox" label="Air Gap">
-                    <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
-                  </StepCheckboxRow>
-                )}
-              </HoverTooltip>
+
+              <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
+              </StepCheckboxRow>
+
               <StepCheckboxRow name="aspirate_mix_checkbox" label='Mix'>
                 <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
                 <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
@@ -66,10 +67,17 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
               }
             </FormGroup>
           </div>
+          <div className={styles.middle_settings_column}>
+            <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
+            <TipPositionInput prefix="aspirate" />
+          </div>
           <div className={styles.right_settings_column}>
-            <ChangeTipField name="aspirate_changeTip" />
-            <FlowRateField />
-            <TipPositionField />
+            {stepType !== 'distribute' && <WellOrderInput prefix="aspirate" />}
+            <FlowRateField
+              name='aspirate_flowRate'
+              pipetteFieldName='pipette'
+              flowRateType='aspirate'
+            />
           </div>
         </div>
       </FormSection>
@@ -84,35 +92,52 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             labwareFieldName="dispense_labware"
             pipetteFieldName="pipette"
             {...focusHandlers} />
-          {(stepType === 'transfer' || stepType === 'distribute') &&
-            <FormGroup label='Volume:' className={styles.volume_field}>
-              <StepInputField name="volume" units="μL" {...focusHandlers} />
-            </FormGroup>}
+          {(stepType === 'transfer' || stepType === 'distribute') && (
+            // TODO: Ian 2018-08-30 make volume field not be a one-off
+            <HoverTooltip
+              tooltipComponent={getTooltipForField(stepType, 'volume')}
+              placement='top-start'
+            >
+              {(hoverTooltipHandlers) =>
+                <FormGroup
+                  label='Volume:'
+                  className={styles.volume_field}
+                  hoverTooltipHandlers={hoverTooltipHandlers}
+                >
+                  <StepInputField name="volume" units="μL" {...focusHandlers} />
+                </FormGroup>
+              }
+            </HoverTooltip>
+          )}
         </div>
 
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
+              <StepCheckboxRow name="dispense_touchTip" label="Touch tip" />
               <StepCheckboxRow name="dispense_mix_checkbox" label='Mix'>
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <HoverTooltip tooltipComponent="This feature is not available in Beta">
-                {(hoverTooltipHandlers) => (
-                  <DispenseDelayFields
-                    disabled
-                    hoverTooltipHandlers={hoverTooltipHandlers}
-                    focusHandlers={focusHandlers} />
-                )}
-              </HoverTooltip>
+              <DispenseDelayFields
+                disabled
+                tooltipComponent={i18n.t('tooltip.not_in_beta')}
+                focusHandlers={focusHandlers} />
               <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
                 <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
               </StepCheckboxRow>
             </FormGroup>
           </div>
+          <div className={styles.middle_settings_column}>
+            <TipPositionInput prefix="dispense" />
+          </div>
           <div className={styles.right_settings_column}>
-            <FlowRateField />
-            <TipPositionField />
+            {stepType !== 'consolidate' && <WellOrderInput prefix="dispense" />}
+            <FlowRateField
+              name='dispense_flowRate'
+              pipetteFieldName='pipette'
+              flowRateType='dispense'
+            />
           </div>
         </div>
       </FormSection>

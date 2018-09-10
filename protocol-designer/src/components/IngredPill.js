@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react'
-import {Pill, MIXED_WELL_COLOR} from '@opentrons/components'
+import {Pill, swatchColors, MIXED_WELL_COLOR} from '@opentrons/components'
 import type {NamedIngred} from '../steplist/types'
-import {swatchColors} from '../constants.js'
 
 type Props = {
   ingreds: ?Array<NamedIngred>
@@ -17,7 +16,7 @@ function IngredPill (props: Props) {
   }
 
   const color = (ingreds.length === 1)
-    ? swatchColors(ingreds[0].id)
+    ? swatchColors(Number(ingreds[0].id))
     : MIXED_WELL_COLOR
 
   return <Pill color={color}>{

@@ -94,7 +94,8 @@ describe('DELETE_INGREDIENT action', () => {
   test.skip('delete ingredient by ingredient group id, when id does exist', () => {})
 })
 
-describe('COPY_LABWARE action', () => {
+// TODO: BC 2018-7-24 test MOVE_LABWARE instead
+describe.skip('COPY_LABWARE action', () => {
   test('copy ingredient locations from cloned container', () => {
     const copyLabwareAction = {
       type: 'COPY_LABWARE',
@@ -165,7 +166,6 @@ describe('COPY_LABWARE action', () => {
 describe('EDIT_INGREDIENT action', () => {
   const ingredFields = {
     name: 'Cool Ingredient',
-    serializeName: null,
     volume: 250,
     description: 'far out!',
     individualize: false
@@ -210,7 +210,6 @@ describe('EDIT_INGREDIENT action', () => {
       type: 'EDIT_INGREDIENT',
       payload: {
         name: 'Cool Ingredient',
-        serializeName: false,
         volume: 250,
         description: 'far out!',
         individualize: false,

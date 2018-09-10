@@ -1,33 +1,13 @@
 @import '@opentrons/components';
 
-.ingredient_titled_list {
-  & > ol > :last-child {
-    padding-bottom: 0;
-    border: none;
+.close_icon {
+  & > svg {
+    width: 100%;
+    max-height: 1rem;
   }
 
-  margin-bottom: 0.5rem;
-}
-
-/* --------- */
-
-.ingredient_row,
-.ingredient_row_header {
-  lost-utility: clearfix;
-  padding: 0.25rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 2px solid var(--c-light-gray);
-
-  & > * {
-    lost-column: 1/4;
-
-    /* Space out empty divs too */
-    min-height: 1px;
-  }
-
-  & *:first-child {
-    /* Well name */
-    padding-left: 1rem;
+  &:hover {
+    color: var(--c-red);
   }
 }
 

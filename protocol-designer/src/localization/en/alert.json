@@ -1,0 +1,26 @@
+{
+  "field": {},
+  "form": {},
+  "timeline": {
+    "error": {
+      "INSUFFICIENT_TIPS": {
+        "title": "Not enough tips to complete action",
+        "body": "Add another tip rack to an empty slot in Starting Deck State"
+      },
+      "NO_TIP_ON_PIPETTE": {
+        "title": "No tip on pipette",
+        "body": "The setting \"Get new tip\" cannot be \"Never\" the first time a pipette is used in a protocol"
+      }
+    },
+    "warning": {
+      "ASPIRATE_MORE_THAN_WELL_CONTENTS": {
+        "title": "Not enough liquid in well(s)",
+        "body": "You are trying to aspirate more than the current volume of one of your well(s)"
+      },
+      "ASPIRATE_FROM_PRISTINE_WELL": {
+        "title": "Source well is empty",
+        "body": "The well(s) you're trying to aspirate from are empty. Hover over labware in Starting Deck State to add liquids."
+      }
+    }
+  }
+}

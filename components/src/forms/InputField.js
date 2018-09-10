@@ -5,8 +5,9 @@ import {Icon} from '../icons'
 // import globalStyles from '../styles/index.css'
 import styles from './forms.css'
 
-// TODO(mc, 2018-02-22): disabled prop
 type Props = {
+  /** field is disabled if value is true */
+  disabled?: boolean,
   /** change handler */
   onChange?: (event: SyntheticInputEvent<*>) => mixed,
   /** classes to apply */
@@ -22,9 +23,9 @@ type Props = {
   /** if included, InputField will use error style and display error instead of caption */
   error?: ?string,
   /** optional caption. hidden when `error` is given */
-  caption?: string,
+  caption?: ?string,
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string,
+  secondaryCaption?: ?string,
   /** optional input type (default "text") */
   type?: 'text' | 'password',
   /** mouse click handler */
@@ -40,7 +41,8 @@ type Props = {
 export default function InputField (props: Props) {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
-    [styles.error]: error
+    [styles.error]: error,
+    [styles.disabled]: props.disabled
   })
 
   if (!props.label) {
@@ -77,10 +79,10 @@ function Input (props: Props) {
           type={props.type || 'text'}
           value={props.value || ''}
           placeholder={props.placeholder}
-          onChange={props.onChange}
-          onFocus={props.onFocus}
+          onChange={props.disabled ? undefined : props.onChange}
+          onFocus={props.disabled ? undefined : props.onFocus}
           onBlur={props.onBlur}
-          onClick={props.onClick}
+          onClick={props.disabled ? undefined : props.onClick}
           readOnly={props.readOnly}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}

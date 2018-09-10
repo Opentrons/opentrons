@@ -46,7 +46,7 @@ before_install:
   - source scripts/travis-install.sh
 
 install:
-  - make install
+  - make -j 2 install
 
 before_script:
   # Get all branches to allow comparison for mono-repo management tools

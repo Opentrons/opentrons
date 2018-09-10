@@ -18,6 +18,9 @@ import {
 } from './warnings'
 import type {StepType} from '../../form-types'
 
+export {default as generateNewForm} from './generateNewForm'
+export {default as stepFormToArgs} from './stepFormToArgs'
+
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
 const stepFormHelperMap: {[StepType]: FormHelpers} = {
   mix: {getErrors: composeErrors(incompatibleLabware)},

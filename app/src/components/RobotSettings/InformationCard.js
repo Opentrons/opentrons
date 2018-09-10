@@ -14,6 +14,7 @@ import {
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
+import {CardContentQuarter} from '../layout'
 
 type OwnProps = Robot & {
   updateUrl: string
@@ -59,24 +60,32 @@ function InformationCard (props: Props) {
       refreshing={inProgress}
       title={TITLE}
     >
-      <LabeledValue
-        label={NAME_LABEL}
-        value={realName}
-      />
-      <LabeledValue
-        label={SERVER_VERSION_LABEL}
-        value={version}
-      />
-      <LabeledValue
-        label={FIRMWARE_VERSION_LABEL}
-        value={firmwareVersion}
-      />
-      <OutlineButton
-        Component={Link}
-        to={updateUrl}
-      >
-        {updateText}
-      </OutlineButton>
+      <CardContentQuarter>
+        <LabeledValue
+          label={NAME_LABEL}
+          value={realName}
+        />
+      </CardContentQuarter>
+      <CardContentQuarter>
+        <LabeledValue
+          label={SERVER_VERSION_LABEL}
+          value={version}
+        />
+      </CardContentQuarter>
+      <CardContentQuarter>
+        <LabeledValue
+          label={FIRMWARE_VERSION_LABEL}
+          value={firmwareVersion}
+        />
+      </CardContentQuarter>
+      <CardContentQuarter>
+        <OutlineButton
+          Component={Link}
+          to={updateUrl}
+        >
+          {updateText}
+        </OutlineButton>
+      </CardContentQuarter>
     </RefreshCard>
   )
 }

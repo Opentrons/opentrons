@@ -1,11 +1,13 @@
 // robot selectors test
+import {setIn} from '@thi.ng/paths'
 import {NAME, selectors, constants} from '../'
 
 const makeState = (state) => ({[NAME]: state})
 
 const {
-  getIsScanning,
   getDiscovered,
+  getConnectedRobot,
+  getConnectedRobotName,
   getConnectionStatus,
   getSessionLoadInProgress,
   getUploadError,
@@ -26,81 +28,132 @@ const {
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
-  makeGetCurrentPipette
+  makeGetCurrentPipette,
+  getModulesBySlot,
+  getModules
 } = selectors
 
 describe('robot selectors', () => {
-  test('getIsScanning', () => {
-    let state = {connection: {isScanning: true}}
-    expect(getIsScanning(makeState(state))).toBe(true)
+  describe('robot list', () => {
+    let state
 
-    state = {connection: {isScanning: false}}
-    expect(getIsScanning(makeState(state))).toBe(false)
-  })
-
-  test('getDiscovered', () => {
-    const state = {
-      robot: {
-        connection: {
-          connectedTo: 'bar',
-          discovered: ['foo', 'bar', 'baz', 'qux'],
-          discoveredByName: {
-            foo: {host: 'abcdef.local', name: 'foo'},
-            bar: {host: '123456.local', name: 'bar'},
-            baz: {host: 'qwerty.local', name: 'baz'},
-            qux: {host: 'dvorak.local', name: 'qux', wired: true}
+    beforeEach(() => {
+      state = {
+        robot: {connection: {connectedTo: 'bar'}},
+        discovery: {
+          robotsByName: {
+            foo: {
+              name: 'foo',
+              connections: [
+                {ip: '10.10.1.2', port: 31950, ok: true, local: false}
+              ]
+            },
+            bar: {
+              name: 'bar',
+              connections: [
+                {ip: '10.10.3.4', port: 31950, ok: true, local: false},
+                {ip: '169.254.3.4', port: 31950, ok: true, local: true}
+              ]
+            },
+            baz: {
+              name: 'baz',
+              connections: [
+                {ip: '10.10.5.6', port: 31950, ok: true, local: false},
+                {ip: '169.254.5.6', port: 31950, ok: false, local: true}
+              ]
+            },
+            qux: {
+              name: 'qux',
+              connections: [
+                {ip: '169.254.7.8', port: 31950, ok: true, local: true}
+              ]
+            }
           }
         }
       }
-    }
+    })
 
-    expect(getDiscovered(state)).toEqual([
-      {
+    test('getDiscovered', () => {
+      expect(getDiscovered(state)).toEqual([
+        {
+          name: 'bar',
+          ip: '169.254.3.4',
+          port: 31950,
+          wired: true,
+          isConnected: true
+        },
+        {
+          name: 'qux',
+          ip: '169.254.7.8',
+          port: 31950,
+          isConnected: false,
+          wired: true
+        },
+        {
+          name: 'baz',
+          ip: '10.10.5.6',
+          port: 31950,
+          wired: false,
+          isConnected: false
+        },
+        {
+          name: 'foo',
+          ip: '10.10.1.2',
+          port: 31950,
+          wired: false,
+          isConnected: false
+        }
+      ])
+    })
+
+    test('getConnectedRobot', () => {
+      expect(getConnectedRobot(state)).toEqual({
         name: 'bar',
-        host: '123456.local',
+        ip: '169.254.3.4',
+        port: 31950,
+        wired: true,
         isConnected: true
-      },
-      {
-        name: 'qux',
-        host: 'dvorak.local',
-        isConnected: false,
-        wired: true
-      },
-      {name: 'baz', host: 'qwerty.local', isConnected: false},
-      {name: 'foo', host: 'abcdef.local', isConnected: false}
-    ])
-  })
+      })
 
-  test('getConnectionStatus', () => {
-    const state = {
-      connection: {
+      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
+      expect(getConnectedRobot(state)).toBeUndefined()
+    })
+
+    test('getConnectedRobotName', () => {
+      expect(getConnectedRobotName(state)).toEqual('bar')
+      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
+      expect(getConnectedRobotName(state)).toBeUndefined()
+    })
+
+    test('getConnectionStatus', () => {
+      state = setIn(state, 'robot.connection', {
         connectedTo: '',
         connectRequest: {inProgress: false},
         disconnectRequest: {inProgress: false}
-      }
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTED)
+      })
+      expect(getConnectionStatus(state)).toBe(constants.DISCONNECTED)
 
-    state.connection = {
-      connectedTo: '',
-      connectRequest: {inProgress: true},
-      disconnectRequest: {inProgress: false}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTING)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: '',
+        connectRequest: {inProgress: true},
+        disconnectRequest: {inProgress: false}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.CONNECTING)
 
-    state.connection = {
-      connectedTo: 'ot',
-      connectRequest: {inProgress: false},
-      disconnectRequest: {inProgress: false}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.CONNECTED)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: 'foo',
+        connectRequest: {inProgress: false},
+        disconnectRequest: {inProgress: false}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.CONNECTED)
 
-    state.connection = {
-      connectedTo: 'ot',
-      connectRequest: {inProgress: false},
-      disconnectRequest: {inProgress: true}
-    }
-    expect(getConnectionStatus(makeState(state))).toBe(constants.DISCONNECTING)
+      state = setIn(state, 'robot.connection', {
+        connectedTo: 'foo',
+        connectRequest: {inProgress: false},
+        disconnectRequest: {inProgress: true}
+      })
+      expect(getConnectionStatus(state)).toBe(constants.DISCONNECTING)
+    })
   })
 
   test('getSessionLoadInProgress', () => {
@@ -504,6 +557,44 @@ describe('robot selectors', () => {
     expect(getPipettesCalibrated(twoPipettesCalibrated)).toBe(true)
     expect(getPipettesCalibrated(twoPipettesNotCalibrated)).toBe(false)
     expect(getPipettesCalibrated(onePipetteCalibrated)).toBe(true)
+  })
+
+  describe('module selectors', () => {
+    let state
+
+    beforeEach(() => {
+      state = makeState({
+        session: {
+          modulesBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              name: 'tempdeck'
+            }
+          }
+        }
+      })
+    })
+
+    test('get modules by slot', () => {
+      expect(getModulesBySlot(state)).toEqual({
+        1: {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck'
+        }
+      })
+    })
+
+    test('get modules', () => {
+      expect(getModules(state)).toEqual([
+        {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck'
+        }
+      ])
+    })
   })
 
   describe('labware selectors', () => {

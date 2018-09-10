@@ -5,25 +5,33 @@
   --round-slot: {
     clip-path: url(#roundSlotClipPath);
   };
-
-  --slot-overlay: {
-    @apply --round-slot;
-
-    fill: black;
-  };
 }
 
 .slot_overlay {
-  @apply --slot-overlay;
+  @apply --round-slot;
 
-  & text {
-    font-size: var(--fs-caption);
-  }
+  fill: var(--c-black);
+}
 
-  & .overlay_panel {
-    width: 100%;
-    height: 100%;
-  }
+.slot_overlay.disabled {
+  fill: var(--c-light-gray);
+}
+
+.overlay_panel {
+  width: 100%;
+  height: 100%;
+}
+
+.slot_overlay.disabled .overlay_panel {
+  opacity: 0.9;
+}
+
+.slot_overlay text {
+  font-size: var(--fs-caption);
+}
+
+.slot_overlay.disabled text {
+  color: var(--c-font-dark);
 }
 
 .pass_thru_mouse {
@@ -32,27 +40,28 @@
 
 .appear_on_mouseover {
   opacity: 0;
-}
 
-.appear_on_mouseover:hover {
-  opacity: 0.75;
+  &:hover {
+    opacity: 0.75;
+  }
 }
 
 .clickable_text {
-  color: var(--c-med-gray);
   fill: currentColor;
+  color: var(--c-white);
   cursor: pointer;
   transform: translate(20%, 0);
   text-transform: uppercase;
+  dominant-baseline: text-before-edge;
 
   & .icon {
-    transform: translate(-60%, -12%);
+    transform: translate(-60%, 0);
   }
+}
 
-  &:hover {
-    color: white;
-    fill: currentColor;
-  }
+.clickable_area {
+  cursor: pointer;
+  fill: transparent;
 }
 
 .name_input {

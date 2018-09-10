@@ -1,16 +1,5 @@
 @import '@opentrons/components';
 
-.modal {
-  @apply --modal;
-
-  flex-direction: column;
-  padding: 2rem;
-}
-
-.modal * {
-  z-index: 1;
-}
-
 .prompt {
   max-width: 32rem;
   margin: 0 0 0.5rem;

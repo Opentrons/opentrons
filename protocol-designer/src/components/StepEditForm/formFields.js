@@ -7,15 +7,16 @@ import {
   InputField,
   DropdownField,
   RadioGroup,
-  type DropdownOption,
-  type HoverTooltipHandlers
+  type DropdownOption
 } from '@opentrons/components'
+import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
+import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
 import styles from './StepEditForm.css'
@@ -30,17 +31,18 @@ type StepCheckboxRowProps = {
   children?: ?React.Node,
   className?: string,
   disabled?: boolean,
-  hoverTooltipHandlers?: HoverTooltipHandlers,
+  tooltipComponent?: React.Node,
 }
 export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
   <StepField
     name={props.name}
-    render={({value, updateValue}) => (
+    tooltipComponent={props.tooltipComponent}
+    render={({value, updateValue, hoverTooltipHandlers}) => (
       <div className={styles.field_row}>
         <CheckboxField
           label={props.label}
+          hoverTooltipHandlers={hoverTooltipHandlers}
           disabled={props.disabled}
-          hoverTooltipHandlers={props.hoverTooltipHandlers}
           className={props.className}
           value={!!value}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
@@ -57,7 +59,7 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue, errorToShow}) => (
+      render={({value, updateValue, errorToShow, hoverTooltipHandlers}) => (
         <InputField
           {...inputProps}
           error={errorToShow}
@@ -69,7 +71,10 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
   )
 }
 
-type StepRadioGroupProps = {name: StepFieldName, options: Options} & FocusHandlers
+type StepRadioGroupProps = {
+  name: StepFieldName,
+  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+} & FocusHandlers
 export const StepRadioGroup = (props: StepRadioGroupProps) => {
   const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
   return (
@@ -94,14 +99,14 @@ type DispenseDelayFieldsProps = {
   focusHandlers: FocusHandlers,
   label?: string,
   disabled?: boolean,
-  hoverTooltipHandlers?: HoverTooltipHandlers,
+  tooltipComponent?: React.Node,
 }
 export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
-  const {label = 'Delay', focusHandlers, hoverTooltipHandlers, disabled} = props
+  const {label = 'Delay', focusHandlers, tooltipComponent, disabled} = props
   return (
     <StepCheckboxRow
       disabled={disabled}
-      hoverTooltipHandlers={hoverTooltipHandlers}
+      tooltipComponent={tooltipComponent}
       name="dispense_delay_checkbox"
       label={label}>
       <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delayMinutes" units='m' />
@@ -128,8 +133,8 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     name={props.name}
     focusedField={props.focusedField}
     dirtyFields={props.dirtyFields}
-    render={({value, updateValue}) => (
-      <FormGroup label='Pipette:' className={styles.pipette_field}>
+    render={({value, updateValue, hoverTooltipHandlers}) => (
+      <FormGroup label='Pipette:' className={styles.pipette_field} hoverTooltipHandlers={hoverTooltipHandlers}>
         <DropdownField
           options={props.pipetteOptions}
           value={value ? String(value) : null}
@@ -173,30 +178,29 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
   )
 })
 
-// NOTE 2018-05-31 Flow rate cannot yet be adjusted,
-// this is a placeholder
-export const FlowRateField = () => <FormGroup label='FLOW RATE'>Default</FormGroup>
+const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
 
-// NOTE 2018-05-31 Tip position cannot yet be adjusted,
-// this is a placeholder
-export const TipPositionField = () => <FormGroup label='TIP POSITION'>Bottom, center</FormGroup>
-
-const CHANGE_TIP_OPTIONS = [
-  {name: 'Always', value: 'always'},
-  {name: 'Once', value: 'once'},
-  {name: 'Never', value: 'never'}
-]
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
-type ChangeTipFieldProps = {name: StepFieldName}
-export const ChangeTipField = (props: ChangeTipFieldProps) => (
-  <StepField
-    name={props.name}
-    render={({value, updateValue}) => (
-      <FormGroup label='CHANGE TIP'>
-        <DropdownField
-          options={CHANGE_TIP_OPTIONS}
-          value={value ? String(value) : null}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-      </FormGroup>
-    )} />
-)
+type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
+export const ChangeTipField = (props: ChangeTipFieldProps) => {
+  const {name, stepType} = props
+  const options = CHANGE_TIP_VALUES.map((value) => ({
+    value,
+    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`)
+  }))
+  return (
+    <StepField
+      name={name}
+      render={({value, updateValue, hoverTooltipHandlers}) => (
+        <FormGroup
+          label={i18n.t('step_edit_form.field.change_tip.label')}
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
+          <DropdownField
+            options={options}
+            value={value ? String(value) : null}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+        </FormGroup>
+      )} />
+  )
+}

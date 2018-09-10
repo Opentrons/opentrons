@@ -7,16 +7,21 @@ import type {RootState as DismissRoot} from './dismiss'
 
 type MsSinceEpoch = number
 type VersionString = string // eg '1.0.0'
+type PipetteModel = string // TODO Ian 2018-05-11 use pipette-definitions model types enum
 
 export type FilePipette = {
   mount: Mount,
-  model: string // TODO Ian 2018-05-11 use pipette-definitions model types
+  model: PipetteModel
 }
 
 export type FileLabware = {
   slot: DeckSlot,
   model: string,
   'display-name': string
+}
+
+export type FlowRateForPipettes = {
+  [PipetteModel]: number
 }
 
 export type PDMetadata = {
@@ -46,6 +51,11 @@ export type ProtocolFile = {
     category: string | null,
     subcategory: string | null,
     tags: Array<string>
+  },
+
+  'default-values': {
+    'aspirate-flow-rate': FlowRateForPipettes,
+    'dispense-flow-rate': FlowRateForPipettes
   },
 
   'designer-application': {

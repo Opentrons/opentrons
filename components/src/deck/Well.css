@@ -10,7 +10,7 @@
 
 .well_border {
   stroke-width: 0.4;
-  stroke: black;
+  stroke: var(--c-black);
   fill: transparent;
 }
 
@@ -23,9 +23,26 @@
 .highlighted {
   stroke-width: 1;
   stroke: var(--c-highlight);
+  fill: transparent;
 }
 
 .error {
   stroke-width: 1;
   stroke: var(--c-red);
+}
+
+/* Tip-specific */
+
+.tip_border {
+  stroke-width: 0.6;
+  stroke: var(--c-near-black);
+  fill: transparent;
+}
+
+.empty_tip {
+  fill: color(var(--c-charcoal) alpha(40%));
+}
+
+.tip_fill {
+  fill: var(--c-white);
 }

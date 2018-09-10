@@ -3,33 +3,51 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {selectors as robotSelectors} from '../../robot'
+import {selectors as robotSelectors, type SessionModule} from '../../robot'
 
 import type {LabwareComponentProps} from '@opentrons/components'
-import LabwareItem, {type LabwareItemProps} from '../DeckMap/LabwareItem'
+import type {LabwareItemProps} from '../DeckMap'
 
-type OwnProps = LabwareComponentProps
+import {LabwareItem, ModuleItem} from '../DeckMap'
 
-type StateProps = {
-  labware?: $PropertyType<LabwareItemProps, 'labware'>
+type OP = LabwareComponentProps
+
+type SP = {
+  labware: ?$PropertyType<LabwareItemProps, 'labware'>,
+  module: ?SessionModule
 }
 
-type Props = OwnProps & StateProps
+type Props = OP & SP
 
 export default connect(mapStateToProps)(LabwareComponent)
 
 function LabwareComponent (props: Props) {
+  const {labware, module} = props
+
   return (
-    // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
-    <LabwareItem {...props} />
+    <React.Fragment>
+      {module && (
+        <ModuleItem module={module} />
+      )}
+      {labware && (
+        <LabwareItem
+          slot={props.slot}
+          width={props.width}
+          height={props.height}
+          labware={labware}
+          module={module}
+        />
+      )}
+    </React.Fragment>
   )
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
+function mapStateToProps (state, ownProps: OP): SP {
+  const {slot} = ownProps
   const allLabware = robotSelectors.getLabware(state)
-  const labware = allLabware.find((lw) => lw.slot === ownProps.slot)
 
-  if (!labware) return {}
-
-  return {labware: {...labware}}
+  return {
+    labware: allLabware.find((lw) => lw.slot === slot),
+    module: robotSelectors.getModulesBySlot(state)[slot]
+  }
 }

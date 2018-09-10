@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type {ShellUpdate} from '../../shell'
 import {Icon, AlertModal, type ButtonProps} from '@opentrons/components'
+import {Portal} from '../portal'
 
 type Props = {
   update: ShellUpdate,
@@ -23,17 +24,19 @@ export default function AppUpdateModal (props: Props) {
     : 'not now'
 
   return (
-    <AlertModal
-      heading={`App Version ${props.update.available || ''} Available`}
-      onCloseClick={close}
-      buttons={[
-        {onClick: close, children: closeButtonChildren},
-        button
-      ]}
-      alertOverlay
-    >
-      {message}
-    </AlertModal>
+    <Portal>
+      <AlertModal
+        heading={`App Version ${props.update.available || ''} Available`}
+        onCloseClick={close}
+        buttons={[
+          {onClick: close, children: closeButtonChildren},
+          button
+        ]}
+        alertOverlay
+      >
+        {message}
+      </AlertModal>
+    </Portal>
   )
 }
 
@@ -43,7 +46,7 @@ function mapPropsToButtonPropsAndMessage (props: Props) {
   if (error) {
     return {
       button: null,
-      message: 'Something when wrong retreiving the update. Pease try restarting the app and trying again. If the problem persists, contact Opentrons support.'
+      message: 'Something went wrong retrieving the update. Please try restarting the app and trying again. If the problem persists, contact Opentrons support.'
     }
   }
 

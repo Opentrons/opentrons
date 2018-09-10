@@ -19,7 +19,8 @@ export default function makeEvent (state: State, action: Action): ?Event {
 
     case 'robot:CONNECT_RESPONSE':
       const name = state.robot.connection.connectRequest.name
-      const robot = state.robot.connection.discoveredByName[name]
+      const robot = robotSelectors.getDiscovered(state)
+        .find(r => r.name === name)
 
       if (!robot) {
         log.warn('No robot found for connect response')

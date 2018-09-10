@@ -15,98 +15,11 @@ from opentrons.robot.mover import Mover
 from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-from opentrons.instruments.pipette_config import Y_OFFSET_MULTI
 
 log = logging.getLogger(__name__)
 
 TIP_CLEARANCE_DECK = 20    # clearance when moving between different labware
 TIP_CLEARANCE_LABWARE = 5  # clearance when staying within a single labware
-
-
-class InstrumentMosfet(object):
-    """
-    Provides access to MagBead's MOSFET.
-    """
-
-    def __init__(self, this_robot, mosfet_index):
-        self.robot = this_robot
-        self.mosfet_index = mosfet_index
-
-    def engage(self):
-        """
-        Engages the MOSFET.
-        """
-        self.robot._driver.set_mosfet(self.mosfet_index, True)
-
-    def disengage(self):
-        """
-        Disengages the MOSFET.
-        """
-        self.robot._driver.set_mosfet(self.mosfet_index, False)
-
-    def wait(self, seconds):
-        """
-        Pauses protocol execution.
-
-        Parameters
-        ----------
-        seconds : int
-            Number of seconds to pause for.
-        """
-        self.robot._driver.wait(seconds)
-
-
-class InstrumentMotor(object):
-    """
-    Provides access to Robot's head motor.
-    """
-
-    def __init__(self, this_robot, axis):
-        self.robot = this_robot
-        self.axis = axis
-
-    def move(self, value, mode='absolute'):
-        """
-        Move plunger motor.
-
-        Parameters
-        ----------
-        value : int
-            A one-dimensional coordinate to move to.
-        mode : {'absolute', 'relative'}
-        """
-        kwargs = {self.axis: value}
-        self.robot._driver.move_plunger(
-            mode=mode, **kwargs
-        )
-
-    def home(self):
-        """
-        Home plunger motor.
-        """
-        self.robot._driver.home(self.axis)
-
-    def wait(self, seconds):
-        """
-        Wait.
-
-        Parameters
-        ----------
-        seconds : int
-            Number of seconds to pause for.
-        """
-        self.robot._driver.wait(seconds)
-
-    def speed(self, rate):
-        """
-        Set motor speed.
-
-        Parameters
-        ----------
-        rate : int
-        """
-        self.robot._driver.set_plunger_speed(rate, self.axis)
-        return self
 
 
 def _setup_container(container_name):
@@ -142,14 +55,6 @@ def _setup_container(container_name):
         container_z)
 
     return container
-
-
-# NOTE: modules are stored in the Containers db table
-def _setup_module(module):
-    x, y, z = database.load_module(module.name)
-    from opentrons.util.vector import Vector
-    module._coordinates = Vector(x, y, z)
-    return module
 
 
 class Robot(object):
@@ -214,7 +119,11 @@ class Robot(object):
             location = self._deck[placement]
         elif getattr(placement, 'stackable', False):
             location = placement
-        return location
+
+        # Look for any module placed in the given slot
+        # If there is, then the labware will be placed on the module
+        module = location.get_module()
+        return location if not module else module
 
     def _is_available_slot(self, location, share, slot, container_name):
         if pose_tracker.has_children(self.poses, location) and not share:
@@ -292,6 +201,7 @@ class Robot(object):
             for mover in mount.values():
                 self.poses = mover.update_pose_from_driver(self.poses)
         self.cache_instrument_models()
+
         return self
 
     def cache_instrument_models(self):
@@ -454,24 +364,6 @@ class Robot(object):
         """
         return list(self._runtime_warnings)
 
-    def get_motor(self, axis):
-        """
-        Get robot's head motor.
-
-        Parameters
-        ----------
-        axis : {'a', 'b'}
-            Axis name. Please check stickers on robot's gantry for the name.
-        """
-        instr_type = 'instrument'
-        key = (instr_type, axis)
-
-        motor_obj = self.INSTRUMENT_DRIVERS_CACHE.get(key)
-        if not motor_obj:
-            motor_obj = InstrumentMotor(self, axis)
-            self.INSTRUMENT_DRIVERS_CACHE[key] = motor_obj
-        return motor_obj
-
     def connect(self, port=None, options=None):
         """
         Connects the robot to a serial port.
@@ -501,8 +393,6 @@ class Robot(object):
         """
 
         self._driver.connect(port=port)
-        for module in self.modules:
-            module.connect()
         self.fw_version = self._driver.get_fw_version()
 
         # the below call to `cache_instrument_models` is relied upon by
@@ -616,14 +506,6 @@ class Robot(object):
         # this checks if coordinates doesn't equal top
         offset = subtract(coordinates, placeable.top()[1])
 
-        if 'trough' in repr(placeable):
-            # Move the pipette so that a multi-channel pipette is centered in
-            # the trough well to prevent crashing into the side, which would
-            # happen if you send the "A1" tip to the center of the well. See
-            # `robot.calibrate_container_with_instrument` for corresponding
-            # offset and comment.
-            offset = offset + (0, Y_OFFSET_MULTI, 0)
-
         if isinstance(placeable, containers.WellSeries):
             placeable = placeable[0]
 
@@ -707,9 +589,6 @@ class Robot(object):
         """
         if self._driver:
             self._driver.disconnect()
-
-        for module in self.modules:
-            module.disconnect()
 
         self.axis_homed = {
             'x': False, 'y': False, 'z': False, 'a': False, 'b': False}
@@ -834,17 +713,6 @@ class Robot(object):
             self.max_deck_height.cache_clear()
         return container
 
-    def add_module(self, module, slot, label=None):
-        module = _setup_module(module)
-        location = self._get_placement_location(slot)
-        location.add(module, label or module.__class__.__name__)
-        self.modules.append(module)
-        self.poses = pose_tracker.add(
-            self.poses,
-            module,
-            location,
-            pose_tracker.Point(*module._coordinates))
-
     def add_container_to_pose_tracker(self, location, container: Container):
         """
         Add container and child wells to pose tracker. Sets container.parent
@@ -914,7 +782,7 @@ class Robot(object):
             }
         left_model = left_data.get('model')
         if left_model:
-            tip_length = pipette_config.configs[left_model].tip_length
+            tip_length = pipette_config.load(left_model).tip_length
             left_data.update({'tip_length': tip_length})
 
         right_data = {
@@ -924,7 +792,7 @@ class Robot(object):
             }
         right_model = right_data.get('model')
         if right_model:
-            tip_length = pipette_config.configs[right_model].tip_length
+            tip_length = pipette_config.load(right_model).tip_length
             right_data.update({'tip_length': tip_length})
         return {
             'left': left_data,
@@ -1000,19 +868,6 @@ class Robot(object):
             delta_x = delta[0]
             delta_y = delta[1]
             delta_z = delta[2]
-
-        if 'trough' in container.get_type():
-            # Rather than calibrating troughs to the center of the well, we
-            # calibrate such that a multi-channel would be centered in the
-            # well. We don't differentiate between single- and multi-channel
-            # pipettes here, and we track the tip of a multi-channel pipette
-            # that would go into well A1 of an 8xN plate rather than the axial
-            # center, but the axial center of a well is what we track for
-            # calibration, so we add Y_OFFSET_MULTI in the calibration `move`
-            # command, and then back that value off of the pipette position
-            # here (Y_OFFSET_MULTI is the y-distance from the axial center of
-            # the pipette to the A1 tip).
-            delta_y = delta_y - Y_OFFSET_MULTI
 
         self.poses = calib.calibrate_container_with_delta(
             self.poses,

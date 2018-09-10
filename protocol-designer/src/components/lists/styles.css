@@ -1,0 +1,39 @@
+@import '@opentrons/components';
+
+.pd_titled_list {
+  margin: 0.4rem 0.125rem;
+  color: var(--c-dark-gray);
+  box-shadow: var(--shadow-lvl-1);
+
+  & > div {
+    /* title of the titled list */
+    min-height: 3.5rem;
+  }
+}
+
+.pd_list_item {
+  min-height: 2.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: var(--fs-body-1);
+
+  & > * {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.border {
+  border-top: var(--bd-light);
+}
+
+.hoverable {
+  &:hover {
+    @apply --outline-highlight;
+  }
+}

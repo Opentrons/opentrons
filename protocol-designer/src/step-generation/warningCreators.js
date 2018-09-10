@@ -7,3 +7,10 @@ export function aspirateMoreThanWellContents (): CommandCreatorWarning {
     message: 'Not enough liquid in well(s)'
   }
 }
+
+export function aspirateFromPristineWell (): CommandCreatorWarning {
+  return {
+    type: 'ASPIRATE_FROM_PRISTINE_WELL',
+    message: 'Aspirating from a pristine well. No liquids were ever added to this well'
+  }
+}

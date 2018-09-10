@@ -48,7 +48,7 @@
       "blowOut": -1,
       "dropTip": -4
     },
-    "pickUpCurrent": 0.2,
+    "pickUpCurrent": 0.4,
     "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
@@ -68,7 +68,7 @@
       "blowOut": -2.5,
       "dropTip": -5.5
     },
-    "pickUpCurrent": 0.2,
+    "pickUpCurrent": 0.4,
     "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
@@ -128,7 +128,7 @@
       "blowOut": 2,
       "dropTip": -3.5
     },
-    "pickUpCurrent": 0.3,
+    "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
@@ -148,7 +148,7 @@
       "blowOut": 0.5,
       "dropTip": -5
     },
-    "pickUpCurrent": 0.3,
+    "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
@@ -208,7 +208,7 @@
       "blowOut": 3,
       "dropTip": -2
     },
-    "pickUpCurrent": 0.3,
+    "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
@@ -228,7 +228,7 @@
       "blowOut": 1.5,
       "dropTip": -3.5
     },
-    "pickUpCurrent": 0.3,
+    "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,

@@ -10,6 +10,7 @@ import More from '../pages/More'
 import Upload from '../pages/Upload'
 import Calibrate from '../pages/Calibrate'
 import Run from '../pages/Run'
+import {PortalRoot as ModalPortalRoot} from './portal'
 
 import './App.global.css'
 import styles from './App.css'
@@ -29,6 +30,7 @@ export default function App () {
           <Route path='/calibrate' component={Calibrate} />
           <Route path='/run' component={Run} />
         </Switch>
+        <ModalPortalRoot />
       </PageWrapper>
     </div>
   )

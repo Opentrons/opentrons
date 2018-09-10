@@ -3,15 +3,15 @@ import * as React from 'react'
 import ForeignDiv from '../../components/ForeignDiv.js'
 import ClickableText from './ClickableText'
 import styles from './labware.css'
-import type {ClickOutsideInterface} from '@opentrons/components'
+import type {ClickOutsideInterface, DeckSlot} from '@opentrons/components'
 
 type Props = {
   containerType: string,
   containerId: string,
-  slot: string,
+  slot: DeckSlot,
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   modifyContainer: (args: {containerId: string, modify: {[field: string]: mixed}}) => void,
-  deleteContainer: (args: {containerId: string, slot: string, containerType: string}) => void
+  deleteContainer: (args: {containerId: string, slot: DeckSlot, containerType: string}) => void
 } & ClickOutsideInterface
 
 type State = {

@@ -34,6 +34,11 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     }
   }
 
+  const {
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm
+  } = data
+
   // TODO error on negative data.disposalVolume?
   const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
     ? data.disposalVolume
@@ -63,7 +68,8 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
             pipette: data.pipette,
             volume: data.volume + (isFirstWellInChunk ? disposalVolume : 0),
             labware: data.sourceLabware,
-            well: sourceWell
+            well: sourceWell,
+            offsetFromBottomMm: aspirateOffsetFromBottomMm
           }),
           ...touchTipAfterAspirateCommand
         ]
@@ -102,7 +108,9 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           data.sourceLabware,
           sourceWellChunk[0],
           data.mixFirstAspirate.volume,
-          data.mixFirstAspirate.times
+          data.mixFirstAspirate.times,
+          aspirateOffsetFromBottomMm,
+          dispenseOffsetFromBottomMm
         )
         : []
 
@@ -113,7 +121,9 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           data.sourceLabware,
           sourceWellChunk[0],
           data.volume,
-          1
+          1,
+          aspirateOffsetFromBottomMm,
+          dispenseOffsetFromBottomMm
         )
         : []
 
@@ -123,7 +133,9 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           data.destLabware,
           data.destWell,
           data.mixInDestination.volume,
-          data.mixInDestination.times
+          data.mixInDestination.times,
+          aspirateOffsetFromBottomMm,
+          dispenseOffsetFromBottomMm
         )
         : []
 
@@ -146,7 +158,8 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           pipette: data.pipette,
           volume: data.volume * sourceWellChunk.length,
           labware: data.destLabware,
-          well: data.destWell
+          well: data.destWell,
+          offsetFromBottomMm: dispenseOffsetFromBottomMm
         }),
         ...touchTipAfterDispenseCommands,
         ...trashTheDisposalVol,

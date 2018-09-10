@@ -14,10 +14,10 @@ import {
   openLabwareSelector,
   closeLabwareSelector,
 
-  setCopyLabwareMode,
-  copyLabware
+  setMoveLabwareMode,
+  moveLabware
 } from '../labware-ingred/actions'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
 
 import {LabwareOnDeck} from '../components/labware'
 import type {BaseState} from '../types'
@@ -39,8 +39,8 @@ type DispatchProps = {
 
   closeLabwareSelector: mixed,
 
-  setCopyLabwareMode: mixed,
-  copyLabware: mixed
+  setMoveLabwareMode: mixed,
+  moveLabware: mixed
 }
 
 type StateProps = $Diff<Props, DispatchProps>
@@ -56,7 +56,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   const selectedContainer = selectors.getSelectedContainer(state)
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
-  const deckSetupMode = steplistSelectors.deckSetupMode(state)
+  const deckSetupMode = steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
   const labwareHasName = container && selectors.getSavedLabware(state)[container.id]
   const labwareData = container && getLabware(container.type)
   // TODO: Ian 2018-07-10 use shared-data accessor
@@ -68,7 +68,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
     showNameOverlay: container && !isTiprack && !labwareHasName,
     canAdd: selectors.canAdd(state),
     activeModals: selectors.activeModals(state),
-    labwareToCopy: selectors.labwareToCopy(state),
+    slotToMoveFrom: selectors.slotToMoveFrom(state),
     highlighted: (deckSetupMode)
       // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
       // or when targeted by an open "Add Labware" modal
@@ -79,7 +79,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
   }
 }
 
-const dispatchObj = {
+const mapDispatchToProps = {
   createContainer,
   deleteContainer,
   modifyContainer,
@@ -89,8 +89,8 @@ const dispatchObj = {
 
   closeLabwareSelector,
 
-  setCopyLabwareMode,
-  copyLabware
+  setMoveLabwareMode,
+  moveLabware
 }
 
-export default connect(mapStateToProps, dispatchObj)(LabwareOnDeck)
+export default connect(mapStateToProps, mapDispatchToProps)(LabwareOnDeck)

@@ -3,14 +3,21 @@
 
 :root {
   --resources_card_spacing: 0.75rem;
+  --mw-labeled-button: 25rem;
 }
 
-.resources_page {
-  padding: 1.5rem;
-  font-size: var(--fs-body-1);
+.card_content {
+  padding: 1rem;
 }
 
-.row {
-  width: 100%;
-  margin-bottom: var(--resources_card_spacing);
+.link_label {
+  @apply --font-body-1-dark;
+
+  max-width: var(--mw-labeled-button);
+  display: inline-block;
+  line-height: 2.25rem;
+}
+
+.link_button {
+  float: right;
 }

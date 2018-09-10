@@ -44,17 +44,20 @@ def get_app(
     api_server_version = get_version(api_package)
     update_server_version = get_version(update_package)
     device_name = get_name()
+    system_version = os.environ.get('OT_SYSTEM_VERSION', 'unknown')
     log.info("  Device name:            {}".format(device_name))
     log.info("  Update server version:  {}".format(update_server_version))
     log.info("  API server version:     {}".format(api_server_version))
     log.info("  Smoothie FW version:    {}".format(smoothie_version))
+    log.info("  System Version:         {}".format(system_version))
     log.info("  Test mode:              {}".format(test))
 
     health = bootstrap_endp.build_health_endpoint(
         name=device_name,
         update_server_version=update_server_version,
         api_server_version=api_server_version,
-        smoothie_version=smoothie_version
+        smoothie_version=smoothie_version,
+        system_version=system_version
     )
     bootstrap_fn = partial(
         bootstrap_endp.bootstrap_update_server, test_flag=test)

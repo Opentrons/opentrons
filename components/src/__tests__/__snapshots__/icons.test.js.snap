@@ -437,6 +437,26 @@ exports[`icons flask-outline renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons help-circle renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M15.07,11.25L14.17,12.17C13.45,12.89 13,13.5 13,15H11V14.5C11,13.39 11.45,12.39 12.17,11.67L13.41,10.41C13.78,10.05 14,9.55 14,9C14,7.89 13.1,7 12,7A2,2 0 0,0 10,9H8A4,4 0 0,1 12,5A4,4 0 0,1 16,9C16,9.88 15.64,10.67 15.07,11.25M13,19H11V17H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons information renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -472,6 +492,26 @@ exports[`icons menu-down renders correctly 1`] = `
 >
   <path
     d="M7,10L12,15L17,10H7Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons minus renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M19,13H5V11H19V13Z"
     fillRule="evenodd"
   />
 </svg>
@@ -877,6 +917,26 @@ exports[`icons pen renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons pencil renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons plus renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -972,6 +1032,26 @@ exports[`icons settings renders correctly 1`] = `
 >
   <path
     d="M23.933 10.489v3.022c-1.177.356-2.333.711-3.51 1.045-.09.022-.134.066-.156.155-.156.422-.334.822-.511 1.245-.045.088-.045.133 0 .222a213.885 213.885 0 0 0 1.688 3.11c.045.09.045.134-.022.2-.666.668-1.31 1.312-1.978 1.979-.022.022-.044.044-.088.066-.045-.022-.067-.044-.112-.066-1.022-.556-2.066-1.111-3.088-1.667-.067-.044-.134-.044-.223 0l-1.266.533a.2.2 0 0 0-.134.134c-.244.844-.51 1.689-.755 2.533-.09.333-.2.644-.29.978h-2.866c-.11 0-.155-.022-.2-.156-.333-1.133-.666-2.244-1-3.378a.2.2 0 0 0-.133-.133c-.422-.178-.867-.355-1.289-.533-.067-.022-.111-.045-.2 0l-1.6.866c-.533.29-1.089.578-1.6.867l-2.156-2.155a.486.486 0 0 0 .067-.112c.556-1.022 1.111-2.066 1.667-3.088a.167.167 0 0 0 0-.2c-.178-.423-.356-.845-.534-1.29a.2.2 0 0 0-.133-.133c-1.133-.333-2.267-.689-3.4-1.022C.044 13.49 0 13.467 0 13.378v-2.822c0-.09.022-.112.111-.134C1.244 10.09 2.4 9.756 3.533 9.4a.268.268 0 0 0 .111-.111c.178-.422.356-.867.556-1.311a.245.245 0 0 0 0-.178c-.356-.667-.733-1.333-1.089-2.022-.222-.4-.444-.8-.644-1.2l.044-.045L4.556 2.49c.066-.067.11-.045.155 0 1.045.555 2.089 1.133 3.133 1.689a.167.167 0 0 0 .2 0c.423-.178.823-.356 1.245-.511.089-.023.133-.067.155-.156.356-1.178.69-2.333 1.045-3.511h3.022a298.91 298.91 0 0 1 1.045 3.511.299.299 0 0 0 .133.156l1.267.533a.245.245 0 0 0 .177 0c.445-.244.911-.489 1.356-.733.622-.334 1.267-.69 1.867-1.023.71.712 1.444 1.423 2.155 2.156-.022.022-.044.067-.067.111-.555 1.022-1.11 2.067-1.666 3.089-.045.089-.045.133 0 .222.178.4.355.822.51 1.222.045.09.068.134.179.156 1.133.4 2.31.756 3.466 1.089zm-7.4 1.533a4.605 4.605 0 0 0-4.577-4.6c-2.512 0-4.578 2.045-4.6 4.578 0 2.533 2.044 4.6 4.577 4.6 2.556.022 4.6-2.044 4.6-4.578z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons swap-horizontal renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M21,9L17,5V8H10V10H17V13M7,11L3,15L7,19V16H14V14H7V11Z"
     fillRule="evenodd"
   />
 </svg>

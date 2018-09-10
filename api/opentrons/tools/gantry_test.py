@@ -9,11 +9,13 @@ Author: Carlos Fernandez
 """
 
 from opentrons import robot
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
+from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+    SmoothieError, DEFAULT_AXES_SPEED
 
 
 def setup_motor_current():
     # only set the current, keeping all other settings at the driver's default
+    robot._driver.set_speed(DEFAULT_AXES_SPEED)
     x_current = robot.config.high_current['X'] * 0.85
     y_current = robot.config.high_current['Y'] * 0.85
     robot._driver.set_active_current(
@@ -54,7 +56,7 @@ def test_axis(axis, tolerance):
     # expected_point = home_position + retract
     # safe distance from switch?
     robot._driver.push_speed()
-    robot._driver.set_speed(10)
+    robot._driver.set_speed(8)
     try:
         robot._driver.move({axis: points[0]})
     except SmoothieError:

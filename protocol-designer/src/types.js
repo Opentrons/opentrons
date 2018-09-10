@@ -6,6 +6,7 @@ import type {RootState as LoadFile} from './load-file'
 import type {RootState as Navigation} from './navigation'
 import type {RootState as Pipettes} from './pipettes'
 import type {RootState as StepList} from './steplist'
+import type {RootState as Tutorial} from './tutorial'
 import type {RootState as WellSelection} from './well-selection/reducers'
 export type BaseState = {
   dismiss: Dismiss,
@@ -15,6 +16,7 @@ export type BaseState = {
   navigation: Navigation,
   pipettes: Pipettes,
   steplist: StepList,
+  tutorial: Tutorial,
   wellSelection: WellSelection
 }
 
@@ -36,4 +38,4 @@ export type VolumeJson = {
   }
 }
 
-export type Options = Array<{value: string, name: string}>
+export type Options = Array<{value: string, name: string, disabled?: boolean}>

@@ -20,8 +20,7 @@ function getModuleImg (name: string) {
   return MODULE_IMGS[name]
 }
 
-// TODO (ka 2018-7-10): replace with design assets onces available
 const MODULE_IMGS = {
-  'temp_deck': require('./images/module-temp@3x.png'),
-  'mag_deck': require('./images/module-mag@3x.png')
+  tempdeck: require('./images/module-temp@3x.png'),
+  magdeck: require('./images/module-mag@3x.png')
 }

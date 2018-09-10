@@ -40,3 +40,16 @@
     content: counter(step-counter) ") ";
   }
 }
+
+.mount_fields_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mount_column {
+  flex-grow: 1;
+}
+
+.mount_column:first-child {
+  margin-right: 0.5rem;
+}

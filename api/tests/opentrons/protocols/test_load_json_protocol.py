@@ -21,6 +21,44 @@ def test_load_pipettes():
     assert pipette == loaded_pipettes['leftPipetteHere']
 
 
+def test_get_location():
+    robot.reset()
+
+    command_type = 'aspirate'
+    plate = labware.load("96-flat", 1)
+    well = "B2"
+
+    default_values = {
+        'aspirate-mm-from-bottom': 2
+    }
+
+    loaded_labware = {
+        "someLabwareId": plate
+    }
+
+    # test with nonzero and with zero command-specific offset
+    for offset in [5, 0]:
+        command_params = {
+            "labware": "someLabwareId",
+            "well": well,
+            "offsetFromBottomMm": offset
+        }
+        result = protocols._get_location(
+            loaded_labware, command_type, command_params, default_values)
+        assert result == plate.well(well).bottom(offset)
+
+    command_params = {
+        "labware": "someLabwareId",
+        "well": well
+    }
+
+    # no command-specific offset, use default
+    result = protocols._get_location(
+        loaded_labware, command_type, command_params, default_values)
+    assert result == plate.well(well).bottom(
+        default_values['aspirate-mm-from-bottom'])
+
+
 def test_load_labware():
     robot.reset()
     data = {
@@ -70,6 +108,7 @@ def test_blank_protocol():
 def test_dispatch_commands(monkeypatch):
     robot.reset()
     cmd = []
+    flow_rates = []
 
     def mock_sleep(seconds):
         cmd.append(("sleep", seconds))
@@ -79,6 +118,9 @@ def test_dispatch_commands(monkeypatch):
 
     def mock_dispense(volume, location):
         cmd.append(("dispense", volume, location))
+
+    def mock_set_flow_rate(aspirate, dispense):
+        flow_rates.append((aspirate, dispense))
 
     pipette = instruments.P10_Single('left')
 
@@ -96,9 +138,24 @@ def test_dispatch_commands(monkeypatch):
 
     monkeypatch.setattr(pipette, 'aspirate', mock_aspirate)
     monkeypatch.setattr(pipette, 'dispense', mock_dispense)
+    monkeypatch.setattr(pipette, 'set_flow_rate', mock_set_flow_rate)
     monkeypatch.setattr(protocols, '_sleep', mock_sleep)
 
     protocol_data = {
+        "default-values": {
+            "aspirate-flow-rate": {
+                "p300_single_v1": 101
+            },
+            "dispense-flow-rate": {
+                "p300_single_v1": 102
+            }
+        },
+        "pipettes": {
+            "pipetteId": {
+                "mount": "left",
+                "model": "p300_single_v1"
+            }
+        },
         "procedure": [
             {
                 "subprocedure": [
@@ -108,7 +165,8 @@ def test_dispatch_commands(monkeypatch):
                             "pipette": "pipetteId",
                             "labware": "sourcePlateId",
                             "well": "A1",
-                            "volume": 5
+                            "volume": 5,
+                            "flow-rate": 123
                         }
                     },
                     {
@@ -138,4 +196,9 @@ def test_dispatch_commands(monkeypatch):
         ("aspirate", 5, source_plate['A1']),
         ("sleep", 42),
         ("dispense", 4.5, dest_plate['B1'])
+    ]
+
+    assert flow_rates == [
+        (123, 102),
+        (101, 102)
     ]

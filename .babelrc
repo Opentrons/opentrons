@@ -16,6 +16,7 @@
     "transform-class-properties"
   ],
   "presets": [
+    "flow",
     "react",
     ["env", {"modules": false}]
   ]

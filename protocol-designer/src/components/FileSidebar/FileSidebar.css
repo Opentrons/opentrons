@@ -1,23 +1,16 @@
 @import '@opentrons/components';
 
-.bottom_button,
-.download_button {
-  margin: 1rem 3rem;
-  width: calc(100% - 3rem * 2);
+.file_sidebar {
+  padding: 2rem 4.5rem 0;
 }
 
-.upload_button {
-  display: block;
-
-  & input {
-    position: fixed;
-    clip: rect(1px 1px 1px 1px);
-  }
-}
-
-.divider {
-  display: block;
+.upload_button,
+.button {
+  margin: 0.75rem 0;
   width: 100%;
-  height: 2px;
-  background-color: var(--c-light-gray);
+}
+
+.upload_button input {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
 }

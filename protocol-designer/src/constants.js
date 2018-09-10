@@ -8,9 +8,9 @@ export const {
   SLOTNAME_MATRIX,
   sortedSlotnames,
   TRASH_SLOTNAME,
-  SLOT_WIDTH,
-  SLOT_HEIGHT,
-  SLOT_SPACING,
+  SLOT_WIDTH_MM,
+  SLOT_HEIGHT_MM,
+  SLOT_SPACING_MM,
   // STYLE CONSTANTS
   swatchColors,
   // SPECIAL SELECTORS
@@ -45,4 +45,11 @@ export function getAllWellsForLabware (labwareType: string): Array<string> {
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
-export const DECK_SETUP_TITLE = 'LABWARE & LIQUIDS'
+export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
+export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
+
+export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
+export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
+export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
+export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'

@@ -19,6 +19,21 @@ We’ve designed it in a way we hope is accessible to anyone with basic computer
 
 __ https://github.com/Opentrons/opentrons
 
+
+Adding the API to your local computer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Our new API no longer uses pypi and thus `pip install opentrons` will only give you
+software from OT 1. To install on your computer please follow instructions either from
+our `contributing guide`__
+
+__ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#development-setup
+
+or this `support article`__
+
+__ https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer
+
+
 **********************
 
 How it Looks

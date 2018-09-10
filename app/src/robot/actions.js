@@ -6,8 +6,6 @@ import type {
   Slot,
   Axis,
   Direction,
-  BaseRobot,
-  RobotService,
   ProtocolFile,
   SessionUpdate
 } from './types'
@@ -17,27 +15,6 @@ const makeRobotActionName = (action) => `${NAME}:${action}`
 const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}
-
-export type DiscoverAction = {|
-  type: 'robot:DISCOVER',
-  meta: {|
-    robotCommand: true,
-  |},
-|}
-
-export type DiscoverFinishAction = {|
-  type: 'robot:DISCOVER_FINISH',
-|}
-
-export type AddDiscoveredAction = {|
-  type: 'robot:ADD_DISCOVERED',
-  payload: RobotService,
-|}
-
-export type RemoveDiscoveredAction = {|
-  type: 'robot:REMOVE_DISCOVERED',
-  payload: BaseRobot,
-|}
 
 export type ConnectAction = {|
   type: 'robot:CONNECT',
@@ -52,7 +29,8 @@ export type ConnectAction = {|
 export type ConnectResponseAction = {|
   type: 'robot:CONNECT_RESPONSE',
   payload: {|
-    error: ?{message: string}
+    error: ?{message: string},
+    pollHealth: ?boolean,
   |},
 |}
 
@@ -77,6 +55,10 @@ export type DisconnectAction = {|
 export type DisconnectResponseAction = {|
   type: 'robot:DISCONNECT_RESPONSE',
   payload: {},
+|}
+
+export type UnexpectedDisconnectAction = {|
+  type: 'robot:UNEXPECTED_DISCONNECT',
 |}
 
 export type ConfirmProbedAction = {|
@@ -168,6 +150,11 @@ export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
 
+export type SetModulesReviewedAction = {
+  type: 'robot:SET_MODULES_REVIEWED',
+  payload: boolean
+}
+
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
@@ -202,15 +189,12 @@ export const actionTypes = {
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
-  | DiscoverAction
-  | DiscoverFinishAction
-  | AddDiscoveredAction
-  | RemoveDiscoveredAction
   | ConnectAction
   | ConnectResponseAction
   | DisconnectAction
   | DisconnectResponseAction
   | ClearConnectResponseAction
+  | UnexpectedDisconnectAction
   | ConfirmProbedAction
   | PipetteCalibrationAction
   | LabwareCalibrationAction
@@ -220,16 +204,9 @@ export type Action =
   | SetJogDistanceAction
   | SessionUpdateAction
   | RefreshSessionAction
+  | SetModulesReviewedAction
 
 export const actions = {
-  discover (): DiscoverAction {
-    return {type: 'robot:DISCOVER', meta: {robotCommand: true}}
-  },
-
-  discoverFinish (): DiscoverFinishAction {
-    return {type: 'robot:DISCOVER_FINISH'}
-  },
-
   connect (name: string): ConnectAction {
     return {
       type: 'robot:CONNECT',
@@ -238,10 +215,10 @@ export const actions = {
     }
   },
 
-  connectResponse (error: ?Error): ConnectResponseAction {
+  connectResponse (error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error}
+      payload: {error, pollHealth}
     }
   },
 
@@ -260,12 +237,8 @@ export const actions = {
     }
   },
 
-  addDiscovered (service: RobotService): AddDiscoveredAction {
-    return {type: 'robot:ADD_DISCOVERED', payload: service}
-  },
-
-  removeDiscovered (service: RobotService): RemoveDiscoveredAction {
-    return {type: 'robot:REMOVE_DISCOVERED', payload: service}
+  unexpectedDisconnect (): UnexpectedDisconnectAction {
+    return {type: 'robot:UNEXPECTED_DISCONNECT'}
   },
 
   // make new session with protocol file
@@ -291,6 +264,10 @@ export const actions = {
       type: 'robot:SESSION_UPDATE',
       payload: update
     }
+  },
+
+  setModulesReviewed (payload: boolean) {
+    return {type: 'robot:SET_MODULES_REVIEWED', payload}
   },
 
   setDeckPopulated (payload: boolean) {

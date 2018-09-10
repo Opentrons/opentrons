@@ -1,0 +1,2 @@
+KERNEL=="ttyACM[0-9]*" SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee93", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_tempdeck"
+KERNEL=="ttyACM[0-9]*" SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee90", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_magdeck"

@@ -1,7 +1,6 @@
 // @flow
 // analytics module
 import noop from 'lodash/noop'
-import {LOCATION_CHANGE} from 'react-router-redux'
 import mixpanel from 'mixpanel-browser'
 
 import type {State, ThunkAction, Middleware} from '../types'
@@ -17,7 +16,6 @@ type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 const log = createLogger(__filename)
 
 // pulled in from environment at build time
-const INTERCOM_ID = process.env.OT_APP_INTERCOM_ID
 const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID
 
 const MIXPANEL_OPTS = {
@@ -29,8 +27,7 @@ const MIXPANEL_OPTS = {
   track_pageview: false
 }
 
-// intercom and mixpanel.track handlers (noop)
-let intercom = noop
+// mixpanel.track handler (default noop)
 let track = noop
 
 export function initializeAnalytics (): ThunkAction {
@@ -38,7 +35,6 @@ export function initializeAnalytics (): ThunkAction {
     const config = getState().config.analytics
 
     log.debug('Analytics config', {config})
-    initializeIntercom(config)
     initializeMixpanel(config)
   }
 }
@@ -64,11 +60,6 @@ export const analyticsMiddleware: Middleware =
       track(event.name, event.properties)
     }
 
-    // update intercom on page change
-    if (action.type === LOCATION_CHANGE) {
-      intercom('update')
-    }
-
     // enable mixpanel tracking if optedIn goes to true
     if (
       action.type === 'config:SET' &&
@@ -92,17 +83,6 @@ export function getAnalyticsOptedIn (state: State) {
 
 export function getAnalyticsSeen (state: State) {
   return state.config.analytics.seenOptIn
-}
-
-function initializeIntercom (config: AnalyticsConfig) {
-  if (INTERCOM_ID) {
-    log.debug('Initializing Intercom')
-
-    const data = {app_id: INTERCOM_ID, 'App Version': version}
-
-    intercom = global.Intercom || intercom
-    intercom('boot', data)
-  }
 }
 
 function initializeMixpanel (config: AnalyticsConfig) {

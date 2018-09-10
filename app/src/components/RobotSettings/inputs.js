@@ -20,7 +20,7 @@ export type FormProps = {
 export type InputProps<T> = {
   name: T,
   value: ?string,
-  disabled: ?boolean,
+  disabled?: boolean,
   onChange: ({[name: T]: string}) => *,
   className?: string,
 }

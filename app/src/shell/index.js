@@ -2,10 +2,12 @@
 // desktop shell module
 import {remote, ipcRenderer} from 'electron'
 import {createSelector, type Selector} from 'reselect'
-
 import createLogger from '../logger'
-
-import type {State, Action, Middleware, ThunkPromiseAction, Error} from '../types'
+import {makeGetRobotHealth} from '../http-api-client'
+import type {State, Action, Middleware, ThunkPromiseAction, ThunkAction, Error} from '../types'
+import type {RobotService} from '../robot'
+import type {Config} from '../config'
+import type {DiscoveredRobot} from '../discovery'
 
 const {
   CURRENT_VERSION,
@@ -17,6 +19,10 @@ const {
 const {
   getConfig
 } = remote.require('./config')
+
+const {
+  getRobots
+} = remote.require('./discovery')
 
 const log = createLogger(__filename)
 
@@ -176,10 +182,26 @@ export const getShellUpdate: Selector<State, void, ShellUpdate> =
   )
 
 // getShellConfig makes a sync RPC call, so use sparingly
-export function getShellConfig () {
+export function getShellConfig (): Config {
   return getConfig()
+}
+
+// getShellRobots makes a sync RPC call, so use sparingly
+export function getShellRobots (): Array<DiscoveredRobot> {
+  return getRobots()
 }
 
 function selectShellUpdateState (state: State) {
   return state.shell.update
+}
+
+export function downloadLogs (robot: RobotService): ThunkAction {
+  return (dispatch, getState) => {
+    const health = makeGetRobotHealth()(getState(), robot)
+    const logPaths = health && health.response && health.response.logs
+    if (logPaths) {
+      const logUrls = logPaths.map((p) => `http://${robot.ip}:${robot.port}${p}`)
+      dispatch({type: 'shell:DOWNLOAD_LOGS', payload: {logUrls}, meta: {shell: true}})
+    }
+  }
 }

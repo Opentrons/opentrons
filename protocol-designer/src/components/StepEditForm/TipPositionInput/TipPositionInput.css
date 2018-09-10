@@ -1,0 +1,91 @@
+@import '@opentrons/components';
+
+.modal_header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 5rem;
+}
+
+.left_half {
+  flex: 1;
+}
+
+.right_half {
+  flex: 1;
+}
+
+.main_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 3rem 0 2rem;
+}
+
+.position_from_bottom_input {
+  width: 6rem;
+}
+
+.adjustment_buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.adjustment_button {
+  height: 34px;
+  width: 34px;
+  cursor: pointer;
+  margin-top: 0.5em;
+}
+
+.viz_group {
+  display: flex;
+  align-items: flex-end;
+  min-height: 280px;
+}
+
+.viz_wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.pipette_tip_image {
+  position: relative;
+}
+
+.well_height_label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--c-blue);
+  position: absolute;
+  right: 10px;
+  bottom: 45px;
+  align-self: flex-end;
+}
+
+.well_cross_section_image {
+  position: relative;
+  left: 9px;
+}
+
+.button_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reset_button {
+  width: 10rem;
+}
+
+.cancel_button {
+  width: 10rem;
+  margin-right: 1rem;
+}
+
+.done_button {
+  width: 10rem;
+}

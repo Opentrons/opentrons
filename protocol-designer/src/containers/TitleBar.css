@@ -1,0 +1,10 @@
+.icon {
+  vertical-align: middle;
+  height: 1.25rem;
+  margin-right: 2rem;
+}
+
+.icon_inline_text {
+  display: inline-block;
+  vertical-align: middle;
+}

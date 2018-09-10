@@ -24,7 +24,7 @@ export default function ModalPage (props: Props) {
       <TitleBar {...titleBar} className={styles.title_bar} />
       <div className={cx(styles.modal_page_contents, props.contentsClassName)}>
         {heading && (
-          <h3 className={styles.modal_page_heading}>{heading}</h3>
+          <h3 className={styles.modal_heading}>{heading}</h3>
         )}
         {props.children}
       </div>

@@ -11,11 +11,11 @@ type Props = {
     wellName: string,
 
     concentration?: string,
-    ingredientNum?: number,
-    serializeName?: string
+    ingredientNum?: number
   }
 }
 
+// TODO: Ian 2018-07-02 use or lose this component!
 export default function WellToolTip (props: Props) {
   const wellContent = props.wellContent
   return (
@@ -26,7 +26,7 @@ export default function WellToolTip (props: Props) {
           {wellContent.wellName}
         </div>
         {wellContent.individualize && <div className={styles.instance_name}>
-          {wellContent.serializeName || 'Sample'} {wellContent.ingredientNum}
+          {wellContent.name || ''} {wellContent.ingredientNum}
         </div>}
         <div>
           {wellContent.volume} uL

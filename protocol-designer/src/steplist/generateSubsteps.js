@@ -1,26 +1,25 @@
 // @flow
-import mapValues from 'lodash/mapValues'
+import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
+import mapValues from 'lodash/mapValues'
 
+import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
-import {utils as steplistUtils} from '../steplist'
-
 import {
-  formHasErrors,
-  type ValidFormAndErrors
-} from './formProcessing'
+  utils as steplistUtils,
+  type NamedIngred
+} from '../steplist'
+
+import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 
 import type {
-  NamedIngredsByLabwareAllSteps,
-  SubSteps,
+  SubstepItemData,
   SourceDestSubstepItem,
   StepItemSourceDestRow,
   StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel,
-  NamedIngred
+  SourceDestSubstepItemSingleChannel
 } from './types'
 
-import type {StepIdType} from '../form-types'
 import {
   consolidate,
   distribute,
@@ -30,8 +29,7 @@ import {
 
 import type {
   AspirateDispenseArgs,
-  Timeline
-  // CommandCreator
+  RobotState
 } from '../step-generation'
 
 import type {
@@ -44,10 +42,10 @@ import type {
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
-type AllLabwareTypes = {[labwareId: string]: string}
 type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
 type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
-type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
+
+export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
 type AspDispCommandType = {
@@ -58,21 +56,23 @@ type AspDispCommandType = {
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
-  stepId: StepIdType,
-  prevStepId: StepIdType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  robotStateTimeline: Timeline
+  robotState: RobotState,
+  stepId: number
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
     allPipetteData,
-    stepId,
-    prevStepId,
     getIngreds,
     getLabwareType,
-    robotStateTimeline
+    stepId
   } = args
+
+  // Add tips to pipettes, since this is just a "simulation"
+  // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
+  const robotState = cloneDeep(args.robotState)
+  robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
 
   const {
     pipette: pipetteId
@@ -83,15 +83,6 @@ function transferLikeSubsteps (args: {
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
     console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
-  }
-
-  const robotState = (
-    robotStateTimeline.timeline[prevStepId] &&
-    robotStateTimeline.timeline[prevStepId].robotState
-  )
-
-  if (!robotState) {
-    return null
   }
 
   // if false, show aspirate vol instead
@@ -105,21 +96,25 @@ function transferLikeSubsteps (args: {
     const commandCallArgs = {
       ...validatedForm,
       mixBeforeAspirate: null,
-      mixInDestination: null
+      mixInDestination: null,
+      preWetTip: false
     }
 
     result = transfer(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'distribute') {
     const commandCallArgs = {
       ...validatedForm,
-      mixBeforeAspirate: null
+      mixBeforeAspirate: null,
+      preWetTip: false
     }
 
     result = distribute(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'consolidate') {
     const commandCallArgs = {
       ...validatedForm,
-      mixBeforeAspirate: null
+      mixFirstAspirate: null,
+      mixInDestination: null,
+      preWetTip: false
     }
 
     result = consolidate(commandCallArgs)(robotState)
@@ -132,6 +127,7 @@ function transferLikeSubsteps (args: {
   }
 
   if (result.errors) {
+    console.warn('Could not get substep, had errors:', result)
     return null
   }
 
@@ -204,7 +200,10 @@ function transferLikeSubsteps (args: {
   }
 }
 
-function commandToRows (command: AspDispCommandType, getIngreds: GetIngreds): ?StepItemSourceDestRow {
+function commandToRows (
+  command: AspDispCommandType,
+  getIngreds: GetIngreds
+): ?StepItemSourceDestRow {
   if (command.command === 'aspirate') {
     const {well, volume, labware} = command.params
     return {
@@ -230,7 +229,7 @@ function commandToMultiRows (
   command: AspDispCommandType,
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
-  channels: *
+  channels: Channels
 ): ?Array<StepItemSourceDestRowMulti> {
   const labwareId = command.params.labware
   const labwareType = getLabwareType(labwareId)
@@ -268,70 +267,51 @@ function commandToMultiRows (
   })
 }
 
-const getIngredsFactory = (
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  stepId: StepIdType
-): GetIngreds => (labware, well) => {
-  return (namedIngredsByLabwareAllSteps &&
-    namedIngredsByLabwareAllSteps[stepId] &&
-    namedIngredsByLabwareAllSteps[stepId][labware] &&
-    namedIngredsByLabwareAllSteps[stepId][labware][well]) || []
-}
-
-const getLabwareTypeFactory = (allLabwareTypes: AllLabwareTypes): GetLabwareType => (labwareId) => {
-  return allLabwareTypes && allLabwareTypes[labwareId]
-}
-
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
-  validatedForms: {[StepIdType]: ValidFormAndErrors},
+  valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
-  allLabwareTypes: AllLabwareTypes,
-  namedIngredsByLabwareAllSteps: NamedIngredsByLabwareAllSteps,
-  orderedSteps: Array<StepIdType>,
-  robotStateTimeline: Timeline
-): SubSteps {
-  return mapValues(validatedForms, (valForm: ValidFormAndErrors, stepId: StepIdType) => {
-    const validatedForm = valForm.validatedForm
-    const prevStepId = steplistUtils.getPrevStepId(orderedSteps, stepId)
-
-    // Don't try to render with errors. TODO LATER: presentational error state of substeps?
-    if (validatedForm === null || formHasErrors(valForm)) {
-      return null
-    }
-
-    if (validatedForm.stepType === 'deck-setup') {
-      // No substeps for Deck Setup
-      return null
-    }
-
-    if (validatedForm.stepType === 'pause') {
-      // just returns formData
-      const formData: PauseFormData = validatedForm
-      return formData
-    }
-
-    if (
-      validatedForm.stepType === 'consolidate' ||
-      validatedForm.stepType === 'distribute' ||
-      validatedForm.stepType === 'transfer' ||
-      validatedForm.stepType === 'mix'
-    ) {
-      const getIngreds = getIngredsFactory(namedIngredsByLabwareAllSteps, prevStepId)
-      const getLabwareType = getLabwareTypeFactory(allLabwareTypes)
-
-      return transferLikeSubsteps({
-        validatedForm,
-        allPipetteData,
-        stepId,
-        prevStepId,
-        getIngreds,
-        getLabwareType,
-        robotStateTimeline
-      })
-    }
-
-    console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
+  getLabwareType: GetLabwareType,
+  getIngreds: GetIngreds,
+  robotState: ?RobotState,
+  stepId: number // stepId is used only for substeps to reference parent step
+): ?SubstepItemData {
+  if (!robotState) {
+    console.info(`No robot state, could not generate substeps for step ${stepId}.` +
+      `There was probably an upstream error.`)
     return null
-  })
+  }
+
+  // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
+  // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
+  if (!valForm || !valForm.validatedForm || Object.values(valForm.errors).length > 0) {
+    return null
+  }
+
+  const validatedForm = valForm.validatedForm
+
+  if (validatedForm.stepType === 'pause') {
+    // just returns formData
+    const formData: PauseFormData = validatedForm
+    return formData
+  }
+
+  if (
+    validatedForm.stepType === 'consolidate' ||
+    validatedForm.stepType === 'distribute' ||
+    validatedForm.stepType === 'transfer' ||
+    validatedForm.stepType === 'mix'
+  ) {
+    return transferLikeSubsteps({
+      validatedForm,
+      allPipetteData,
+      getIngreds,
+      getLabwareType,
+      robotState,
+      stepId
+    })
+  }
+
+  console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
+  return null
 }

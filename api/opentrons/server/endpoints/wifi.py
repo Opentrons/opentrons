@@ -1,8 +1,8 @@
 import json
 import logging
 import subprocess
-from shlex import quote
 from aiohttp import web
+from opentrons.system import nmcli
 
 log = logging.getLogger(__name__)
 
@@ -14,15 +14,7 @@ async def list_networks(request):
     res = {"list": []}
 
     try:
-        cmd = [
-            "nmcli",
-            "--terse",
-            "--fields",
-            "ssid,signal,active",
-            "device",
-            "wifi",
-            "list"]
-        out, err = _subprocess(' '.join(cmd))
+        networks = await nmcli.available_ssids()
     except subprocess.CalledProcessError as e:
         res = "CalledProcessError: {}".format(e.stdout)
         status = 500
@@ -30,20 +22,7 @@ async def list_networks(request):
         res = "FileNotFoundError: {}".format(e)
         status = 500
     else:
-        log.debug("'nmcli device wifi list' stdout: {}".format(out))
-        if len(err) > 0:
-            log.error("'nmcli device wifi list' stderr: {}".format(err))
-
-        lines = out.split("\n")
-        networks = [x.split(":") for x in lines]
-        res["list"] = [
-            {
-                "ssid": n[0],
-                "signal": int(n[1]) if n[1].isdigit() else None,
-                "active": n[2].lower() == "yes"
-            }
-            for n in networks if len(n) >= 3
-        ]
+        res["list"] = networks
         status = 200
 
     return web.json_response(res, status=status)
@@ -51,10 +30,19 @@ async def list_networks(request):
 
 async def configure(request):
     """
-    Post request should include a json body with fields "ssid" (required) and
-    "psk" (optional) for network name and password respectively. Robot will
-    attempt to connect to this network and respond with Ok if successful or an
-    error code if not.
+    Post request should include a json body specifying config information
+    (see below). Robot will attempt to connect to this network and respond
+    with Ok if successful or an error code if not.
+
+    Fields in the body are:
+    ssid: str Required. The SSID to connect to.
+    security_type: str Optional. one of 'none', 'wpa-psk'.
+                       If not specified and
+                       - psk is also not specified: assumed to be 'none'
+                       - psk is specified: assumed to be 'wpa-psk'
+    psk: str Optional. The password for the network, if there is one.
+    hidden: bool Optional. True if the network is not broadcasting its
+                           SSID. If not specified, assumed to be False.
     """
     result = {}
 
@@ -62,20 +50,18 @@ async def configure(request):
         body = await request.json()
         ssid = body.get('ssid')
         psk = body.get('psk')
+        hidden = body.get('hidden')
+        security = body.get('security_type')
 
         if ssid is None:
             status = 400
             message = 'Error: "ssid" string is required'
         else:
-            cmd = 'nmcli device wifi connect {}'.format(quote(ssid))
-            password = ' password {}'.format(quote(psk)) if psk else ''
-            # some nmcli errors go to stdout (e.g. bad psk), while others go to
-            # stderr (e.g. bad ssid), so we put both outputs together
-            res, err = _subprocess(cmd + password)
-            message = (res + err).split("\r")[-1]
-            log.debug("nmcli device wifi connect -> {}".format(message))
-
-            status = 401 if 'Error:' in message else 201
+            ok, message = await nmcli.configure(ssid,
+                                                security_type=security,
+                                                psk=psk,
+                                                hidden=hidden)
+            status = 201 if ok else 401
             result['ssid'] = ssid
 
     except json.JSONDecodeError as e:
@@ -98,20 +84,29 @@ async def status(request):
     Get request will return the status of the wifi connection from the
     RaspberryPi to the internet.
 
-    Options are:
+    The body of the response is a json dict containing
+
+    'status': connectivity status, where the options are:
       "none" - no connection to router or network
       "portal" - device behind a captive portal and cannot reach full internet
       "limited" - connection to router but not internet
       "full" - connection to router and internet
       "unknown" - an exception occured while trying to determine status
-
+    'ipAddress': the ip address, if it exists (null otherwise); this also
+                 contains the subnet mask in CIDR notation, e.g. 10.2.12.120/16
+    'macAddress': the mac address
+    'gatewayAddress': the address of the current gateway, if it exists (null
+                      otherwise)
     """
-    connectivity = {"status": "unknown"}
+    connectivity = {'status': 'none',
+                    'ipAddress': None,
+                    'macAddress': 'unknown',
+                    'gatewayAddress': None}
     try:
-        cmd = ["nmcli", "networking", "connectivity"]
-        res, _ = _subprocess(' '.join(cmd))
-        log.debug("Connectivity: {}".format(res))
-        connectivity["status"] = res
+        connectivity['status'] = await nmcli.is_connected()
+        net_info = await nmcli.iface_info('wlan0')
+        connectivity.update(net_info)
+        log.debug("Connectivity: {}".format(connectivity['status']))
         status = 200
     except subprocess.CalledProcessError as e:
         log.error("CalledProcessError: {}".format(e.stdout))
@@ -121,17 +116,3 @@ async def status(request):
         status = 500
 
     return web.json_response(connectivity, status=status)
-
-
-def _subprocess(cmd: str) -> (str, str):
-    """
-    Runs the command in a subprocess shell (use the string form of command,
-    not the list of strings) and returns the captured stdout output.
-    :param cmd: a command string to execute in a subprocess shell
-    :return: (stdout, stderr)
-    """
-    proc = subprocess.run(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out = proc.stdout.decode().strip()
-    err = proc.stderr.decode().strip()
-    return out, err

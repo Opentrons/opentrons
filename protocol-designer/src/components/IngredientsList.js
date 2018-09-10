@@ -2,12 +2,13 @@
 // TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
 import React from 'react'
 
-import {IconButton, SidePanel, TitledList} from '@opentrons/components'
+import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
+import {sortWells} from '../utils'
+import {PDTitledList, PDListItem} from './lists'
 import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
-import {swatchColors} from '../constants.js'
 import styles from './IngredientsList.css'
-import type {IngredientGroups, PersistedIngredInputFields} from '../labware-ingred/types'
+import type {IngredientGroups, IngredientInstance} from '../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
@@ -22,7 +23,7 @@ type CommonProps = {|
 
 type CardProps = {|
   groupId: string,
-  ingredGroup: PersistedIngredInputFields,
+  ingredGroup: IngredientInstance,
   labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps
 |}
@@ -48,11 +49,12 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       groupId,
       labwareWellContents
     } = this.props
-    const {serializeName, individualize, description, name} = ingredGroup
+    const {individualize, description, name} = ingredGroup
     const {isExpanded} = this.state
 
-    const wellsWithIngred = Object.keys(labwareWellContents).filter(well =>
-      labwareWellContents[well][groupId])
+    const wellsWithIngred = Object.keys(labwareWellContents)
+      .sort(sortWells)
+      .filter(well => labwareWellContents[well][groupId])
 
     if (wellsWithIngred.length < 1) {
       // do not show ingred card if it has no instances for this labware
@@ -60,10 +62,9 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
     }
 
     return (
-      <TitledList
+      <PDTitledList
         title={name || 'Unnamed Ingredient'}
-        className={styles.ingredient_titled_list}
-        iconProps={{style: {fill: swatchColors(parseInt(groupId))}}}
+        iconProps={{style: {fill: swatchColors(Number(groupId))}}}
         iconName='circle'
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}
@@ -71,12 +72,13 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         onClick={() => editModeIngredientGroup({groupId, wellName: null})}
         description={<StepDescription description={description} header='Description:' />}
       >
-        <div className={styles.ingredient_row_header}>
+        <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>
-          <span>Volume</span>
+          <span>μL</span>
           <span>Name</span>
           <span />
-        </div>
+        </PDListItem>
+
         {wellsWithIngred.map((well, i) => {
           const wellIngredForCard = labwareWellContents[well][groupId]
           const volume = wellIngredForCard && wellIngredForCard.volume
@@ -89,7 +91,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
 
           return <IngredIndividual key={well}
             name={individualize
-              ? `${serializeName || 'Sample'} ${i + 1}` // TODO IMMED SORT AND NUMBER
+              ? `${ingredGroup.name || ''} ${i + 1}`
               : ''
             }
             wellName={well}
@@ -100,7 +102,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
             deleteIngredient={deleteIngredient}
           />
         })}
-      </TitledList>
+      </PDTitledList>
     )
   }
 }
@@ -128,18 +130,18 @@ function IngredIndividual (props: IndividProps) {
   } = props
 
   return (
-    <div
-      className={styles.ingredient_row}
-    >
-      <div>{wellName}</div>
-      <div>{volume ? volume + ' μL' : '-'}</div>
-      <div>{name}</div>
-      {canDelete && <IconButton name='close'
+    <PDListItem border hoverable>
+      <span>{wellName}</span>
+      <span>{volume ? volume + ' μL' : '-'}</span>
+      <span>{name}</span>
+      {canDelete && <IconButton
+        className={styles.close_icon}
+        name='close'
         onClick={
           () => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
           deleteIngredient({wellName, groupId})
         } />}
-    </div>
+    </PDListItem>
   )
 }
 
@@ -164,12 +166,12 @@ export default function IngredientsList (props: Props) {
   } = props
 
   return (
-    <SidePanel title='Ingredients'>
+    <SidePanel title='Name & Liquids'>
         {/* Labware Name "button" to open LabwareNameEditForm */}
-        <TitledList
+        <PDTitledList
           className={stepItemStyles.step_item}
           title='labware name'
-          iconName='pen'
+          iconName='pencil'
           selected={renameLabwareFormMode}
           onClick={openRenameLabwareForm}
         />

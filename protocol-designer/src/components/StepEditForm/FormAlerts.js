@@ -37,17 +37,19 @@ class FormAlerts extends React.Component<FormAlertsProps> {
           <AlertItem
             type="warning"
             key={index}
-            title={error.title || error.message}>
-            {error.title ? error.message : null}
+            title={error.title}
+          >
+            {error.body}
           </AlertItem>
         ))}
         {this.props.warnings.map((warning, index) => (
           <AlertItem
             type="warning"
             key={index}
-            title={warning.title || warning.message}
-            onCloseClick={this.makeHandleCloseWarning(warning)}>
-            {warning.title ? warning.message : null}
+            title={warning.title}
+            onCloseClick={this.makeHandleCloseWarning(warning)}
+          >
+            {warning.body}
           </AlertItem>
         ))}
       </React.Fragment>
@@ -73,7 +75,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return {
     errors: filteredErrors,
     warnings: visibleWarnings,
-    stepId: steplistSelectors.selectedStepId(state)
+    stepId: steplistSelectors.getSelectedStepId(state)
   }
 }
 

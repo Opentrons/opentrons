@@ -1,26 +1,24 @@
 // @flow
 import * as React from 'react'
-import {TitledList} from '@opentrons/components'
+import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
-
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
-import {stepIconsByType} from '../../form-types'
+import {stepIconsByType, type StepIdType} from '../../form-types'
 
 import type {
   SubstepIdentifier,
   StepItemData,
-  StepSubItemData,
-  StepIdTypeWithEnd
+  SubstepItemData
 } from '../../steplist/types'
 
 type StepItemProps = {
-  stepId: StepIdTypeWithEnd,
+  stepId: StepIdType,
   step: ?StepItemData,
-  substeps: ?StepSubItemData,
+  substeps: ?SubstepItemData,
 
   collapsed?: boolean,
   error?: ?boolean,
@@ -38,7 +36,6 @@ type StepItemProps = {
 
 export default function StepItem (props: StepItemProps) {
   const {
-    stepId,
     step,
 
     collapsed,
@@ -52,19 +49,12 @@ export default function StepItem (props: StepItemProps) {
     onStepHover
   } = props
 
-  const iconName = stepId === '__end__'
-    ? 'check'
-    : (step && stepIconsByType[step.stepType])
-
-  const title = stepId === '__end__'
-    ? 'END'
-    : (step && step.title)
-
+  const iconName = step && stepIconsByType[step.stepType]
+  const title = step && step.title
   const Description = <StepDescription description={step && step.description} />
 
   return (
-    <TitledList
-      className={styles.step_item}
+    <PDTitledList
       description={Description}
       iconName={error ? 'alert-circle' : iconName}
       iconProps={{className: error ? styles.error_icon : ''}}
@@ -76,7 +66,7 @@ export default function StepItem (props: StepItemProps) {
       {...{selected, collapsed, hovered}}
     >
       {getStepItemContents(props)}
-    </TitledList>
+    </PDTitledList>
   )
 }
 

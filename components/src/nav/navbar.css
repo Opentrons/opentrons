@@ -41,7 +41,6 @@ revisit once we have a need for more than one icon aligned to bottom.
   border-top: var(--bd-light);
 
   & > .title {
-    margin-top: -1rem;
     margin-bottom: 0.5rem;
   }
 }
@@ -71,4 +70,9 @@ revisit once we have a need for more than one icon aligned to bottom.
 
 .notification {
   color: var(--c-orange);
+}
+
+.no_link {
+  text-decoration: none;
+  color: inherit;
 }
