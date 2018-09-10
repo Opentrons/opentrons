@@ -31,8 +31,8 @@ DEFAULT_DISPENSE_SPEED = 10
 DEFAULT_TIP_PRESS_MM = 10
 DEFAULT_PLUNGE_CURRENT = 0.1
 
-SHAKE_OFF_TIPS_SPEED = 25
-SHAKE_OFF_TIPS_DISTANCE = 2
+SHAKE_OFF_TIPS_SPEED = 50
+SHAKE_OFF_TIPS_DISTANCE = 2.25
 
 
 def _sleep(seconds):
@@ -940,6 +940,8 @@ class Pipette:
             self._add_tip(
                 length=self._tip_length
             )
+            self._shake_off_tips(location)
+            self._shake_off_tips(location)
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
@@ -1027,7 +1029,6 @@ class Pipette:
                 x=pos_drop_tip
             )
             self._shake_off_tips(location)
-
             if home_after:
                 self._home_after_drop_tip()
 
