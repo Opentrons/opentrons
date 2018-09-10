@@ -77,6 +77,7 @@ def load(pipette_model: str) -> pipette_config:
                 'drop_tip': plunger_pos.get('dropTip'),
             },
             pick_up_current=cfg.get('pickUpCurrent'),
+            pick_up_distance=cfg.get('pickUpDistance'),
             aspirate_flow_rate=cfg.get('aspirateFlowRate'),
             dispense_flow_rate=cfg.get('dispenseFlowRate'),
             channels=cfg.get('channels'),
