@@ -2,15 +2,18 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {SessionModule} from '../../robot'
+import {Icon} from '../icons'
+import LabwareContainer from './LabwareContainer'
+import {CenteredTextSvg} from '../CenteredTextSvg'
+import styles from './Module.css'
 
-import {Icon, LabwareContainer, CenteredTextSvg} from '@opentrons/components'
-import styles from './styles.css'
+export type ModuleType = 'magdeck' | 'tempdeck'
 
-export type ModuleItemProps = {
-  module: SessionModule,
-  review?: boolean,
-  present?: boolean,
+export type Props = {
+  /** name of module, eg 'magdeck' or 'tempdeck' */
+  name: ModuleType,
+  /** display mode: blank/default, 'present', 'missing', or 'info' */
+  mode?: 'present' | 'missing' | 'info'
 }
 
 const DIMENSIONS = {
@@ -20,7 +23,7 @@ const DIMENSIONS = {
   height: 90.5
 }
 
-export default function ModuleItem (props: ModuleItemProps) {
+export default function Module (props: Props) {
   return (
     <LabwareContainer {...DIMENSIONS}>
       <rect
@@ -36,8 +39,9 @@ export default function ModuleItem (props: ModuleItemProps) {
   )
 }
 
-function ModuleItemContents (props: ModuleItemProps) {
-  if (!props.review) {
+function ModuleItemContents (props: Props) {
+  if (!props.mode) {
+    // generic/empty display - just show USB icon
     return (
       <Icon
         className={styles.module_icon}
@@ -50,19 +54,26 @@ function ModuleItemContents (props: ModuleItemProps) {
   }
 
   // TODO(mc, 2018-07-23): displayName?
-  const {present, module: {name}} = props
-  const message = present
-    ? (<tspan x='55%'>{name}</tspan>)
-    : (
+  const {mode, name} = props
+  const message = (mode === 'missing')
+    ? (
       <React.Fragment>
         <tspan x='55%' dy='-6'>Missing:</tspan>
         <tspan x='55%' dy='12'>{name}</tspan>
       </React.Fragment>
     )
+    : (<tspan x='55%'>{name}</tspan>)
 
   const iconClassName = cx(styles.module_review_icon, {
-    [styles.module_review_icon_present]: present
+    [styles.module_review_icon_missing]: mode === 'missing',
+    [styles.module_review_icon_present]: mode === 'present'
   })
+
+  const iconNameByMode = {
+    'missing': 'alert-circle',
+    'present': 'check-circle',
+    'info': 'usb'
+  }
 
   return (
     <React.Fragment>
@@ -71,7 +82,7 @@ function ModuleItemContents (props: ModuleItemProps) {
         x='8'
         y='0'
         width='16'
-        name={present ? 'check-circle' : 'alert-circle'}
+        name={iconNameByMode[mode]}
       />
       <CenteredTextSvg className={styles.module_review_text} text={message} />
     </React.Fragment>
