@@ -62,7 +62,7 @@ export function stop (request: ?PollRequest, log: ?Logger) {
 
 function fetchHealth (cand: Candidate, log: ?Logger) {
   const apiHealthUrl = `http://${cand.ip}:${cand.port}/health`
-  const serverHealthUrl = `http://${cand.ip}:${cand.port}/server/health`
+  const serverHealthUrl = `http://${cand.ip}:${cand.port}/server/update/health`
 
   return Promise.all([
     fetchAndParseBody(apiHealthUrl, log),

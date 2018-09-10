@@ -79,9 +79,9 @@ describe('discovery poller', () => {
     expect(fetch).toHaveBeenCalledWith(`http://foo:31950/health`)
     expect(fetch).toHaveBeenCalledWith(`http://bar:31950/health`)
     expect(fetch).toHaveBeenCalledWith(`http://baz:31950/health`)
-    expect(fetch).toHaveBeenCalledWith(`http://foo:31950/server/health`)
-    expect(fetch).toHaveBeenCalledWith(`http://bar:31950/server/health`)
-    expect(fetch).toHaveBeenCalledWith(`http://baz:31950/server/health`)
+    expect(fetch).toHaveBeenCalledWith(`http://foo:31950/server/update/health`)
+    expect(fetch).toHaveBeenCalledWith(`http://bar:31950/server/update/health`)
+    expect(fetch).toHaveBeenCalledWith(`http://baz:31950/server/update/health`)
   })
 
   test(
