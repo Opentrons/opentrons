@@ -3,9 +3,12 @@
 // TODO(mc, 2018-07-02): these generic actions, along with a generic API
 // reducer should handle all API state, as opposed to bespoke reducers
 // in each API client submodule
+import client from './client'
 
-import type {BaseRobot} from '../robot'
+import type {ThunkPromiseAction} from '../types'
+import type {BaseRobot, RobotService} from '../robot'
 import type {ApiRequestError} from './types'
+import type {Method} from './client'
 
 export type ApiRequestAction<Path: string, Body: ?{}> = {|
   type: 'api:REQUEST',
@@ -47,6 +50,23 @@ export type ApiAction<Path: string, Request: ?{}, Response: {}> =
   | ApiSuccessAction<Path, Response>
   | ApiFailureAction<Path>
   | ClearApiResponseAction<Path>
+
+type RequestMaker = (robot: RobotService, request: ?{}) => ThunkPromiseAction
+
+// thunk action creator creator (sorry) for making API calls
+// e.g. export const fetchHealth = buildRequestMaker('GET', 'health')
+export function buildRequestMaker (method: Method, path: string): RequestMaker {
+  return (robot, request = null) => (dispatch) => {
+    dispatch(apiRequest(robot, path, request))
+
+    return client(robot, method, path, request)
+      .then(
+        response => apiSuccess(robot, path, response),
+        error => apiFailure(robot, path, error)
+      )
+      .then(dispatch)
+  }
+}
 
 export function apiRequest<Path: string, Body: ?{}> (
   robot: BaseRobot,
