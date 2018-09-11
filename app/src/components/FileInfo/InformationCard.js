@@ -15,7 +15,7 @@ export default function InformationCard (props: Props) {
   const {name} = props
 
   let createdBy = 'Opentrons API'
-  if (name.includes('json')) {
+  if (name.endsWith('.json')) {
     createdBy = 'Protocol Designer'
   }
 
