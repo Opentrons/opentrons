@@ -20,7 +20,7 @@ class AnalyticsModal extends React.Component<*, State> {
     super()
     const hasOptedIn = getHasOptedIn()
     let initialState = {isAnalyticsModalOpen: false}
-    if (hasOptedIn === null) { // NOTE: only null if never set
+    if (!!process.env.OT_PD_FULLSTORY_ORG && hasOptedIn === null) { // NOTE: only null if never set and has env variable
       initialState = {isAnalyticsModalOpen: true}
     } else if (hasOptedIn === true) {
       initializeAnalytics()
