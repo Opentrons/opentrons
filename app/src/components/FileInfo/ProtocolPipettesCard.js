@@ -70,7 +70,7 @@ function ProtocolPipettesCard (props: Props) {
       <InfoSection title={TITLE}>
         <SectionContentHalf>
           {pipetteInfo.map((p) => (
-            <InstrumentItem key={p.mount} match={p.pipettesMatch}>{p.displayName} </InstrumentItem>
+            <InstrumentItem key={p.mount} match={p.pipettesMatch}>{p.mount.toUpperCase()} &nbsp; {p.displayName} </InstrumentItem>
           ))}
         </SectionContentHalf>
         {!pipettesMatch && (
