@@ -13,6 +13,9 @@ venv/
 env/
 .env/
 
+# MyPy caches
+.mypy_cache
+
 build/
 api/docs/build/
 develop-eggs/
