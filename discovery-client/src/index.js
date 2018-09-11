@@ -45,9 +45,9 @@ type Options = {
 const log = (logger: ?Logger, level: LogLevel, msg: string, meta?: {}) =>
   logger && typeof logger[level] === 'function' && logger[level](msg, meta)
 
-const santizeRe = (patterns: ?(Array<string | RegExp>)) => {
+const santizeRe = (patterns: ?Array<string | RegExp>) => {
   if (!patterns) return []
-  return patterns.map(p => typeof p === 'string' ? escape(p) : p)
+  return patterns.map(p => (typeof p === 'string' ? escape(p) : p))
 }
 
 export default function DiscoveryClientFactory (options?: Options) {
@@ -59,7 +59,7 @@ export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
 export { DEFAULT_PORT }
 
-const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
+const TO_REGEX_OPTS = { contains: true, nocase: true, safe: true }
 
 export class DiscoveryClient extends EventEmitter {
   services: Array<Service>
@@ -76,7 +76,11 @@ export class DiscoveryClient extends EventEmitter {
     super()
 
     // null out ok flag for pre-populated services
-    this.services = (options.services || []).map(s => ({ ...s, ok: null }))
+    this.services = (options.services || []).map(s => ({
+      ...s,
+      ok: null,
+      serverOk: null
+    }))
 
     // allow strings instead of full {ip: string, port: ?number} object
     this.candidates = (options.candidates || [])
@@ -192,27 +196,32 @@ export class DiscoveryClient extends EventEmitter {
     if (service) this._handleService(service)
   }
 
-  _handleHealth (candidate: Candidate, response: ?HealthResponse): mixed {
-    const service = fromResponse(candidate, response)
+  _handleHealth (
+    candidate: Candidate,
+    apiResponse: ?HealthResponse,
+    serverResponse: ?HealthResponse
+  ): mixed {
+    const service = fromResponse(candidate, apiResponse, serverResponse)
 
     if (service) return this._handleService(service)
 
     // else, response was not ok, so unset ok flag in all matching ips
     const { ip } = candidate
     const nextServices = this.services.map(
-      s => (s.ip === ip && s.ok !== false ? { ...s, ok: false } : s)
+      s =>
+        s.ip === ip && (s.ok !== false || s.serverOk !== false)
+          ? { ...s, ok: false, serverOk: false }
+          : s
     )
 
     this._updateServiceList(nextServices)
   }
 
   _handleService (service: Service): mixed {
-    const { name, ip, port, ok } = service
-
     if (
-      !this._nameFilter.test(name) ||
-      !this._ipFilter.test(ip || '') ||
-      !this._portFilter.includes(port)
+      !this._nameFilter.test(service.name) ||
+      !this._ipFilter.test(service.ip || '') ||
+      !this._portFilter.includes(service.port)
     ) {
       log(this._logger, 'debug', 'Ignoring service', service)
       return
@@ -230,10 +239,19 @@ export class DiscoveryClient extends EventEmitter {
 
     // update existing services and null out conflics
     nextServices = nextServices.map(s => {
-      // if we have a service already, make sure not to reset ok to null
-      if (s === prevService && s.ok !== ok && ok !== null) return service
-      if (serviceConflicts.includes(s)) return { ...s, ip: null, ok: null }
-      return s
+      // if we have a service already, make sure not to reset oks to null
+      if (s === prevService) {
+        const newOk = s.ok == null ? service.ok : s.ok
+        const newServerOk = s.serverOk == null ? service.serverOk : s.serverOk
+
+        return newOk !== s.ok || newServerOk !== s.serverOk
+          ? { ...service, ok: newOk, serverOk: newServerOk }
+          : s
+      }
+
+      return serviceConflicts.includes(s)
+        ? { ...s, ip: null, ok: null, serverOk: null }
+        : s
     })
 
     // promote candidates and update service list

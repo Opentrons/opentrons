@@ -14,9 +14,16 @@ export function makeService (
   name: string,
   ip: ?string,
   port: ?number,
-  ok: ?boolean
+  ok: ?boolean,
+  serverOk: ?boolean
 ): Service {
-  return { name, ip: ip || null, port: port || DEFAULT_PORT, ok: ok || null }
+  return {
+    name,
+    ip: ip || null,
+    port: port || DEFAULT_PORT,
+    ok: ok != null ? ok : null,
+    serverOk: serverOk != null ? serverOk : null
+  }
 }
 
 export function makeCandidate (ip: string, port: ?number): Candidate {
@@ -36,16 +43,34 @@ export function fromMdnsBrowser (browserService: BrowserService): ?Service {
   const nameMatch = type[0] && fullname.match(nameExtractor(type[0]))
   const name = (nameMatch && nameMatch[1]) || fullname
 
-  return makeService(name, ip, port, null)
+  return makeService(name, ip, port)
 }
 
 export function fromResponse (
   candidate: Candidate,
-  response: ?HealthResponse
+  response: ?HealthResponse,
+  serverResponse: ?HealthResponse
 ): ?Service {
-  if (!response) return null
+  const apiName = response && response.name
+  const serverName = serverResponse && serverResponse.name
+  let apiOk = apiName != null
+  let name = apiName || serverName
 
-  return makeService(response.name, candidate.ip, candidate.port, true)
+  if (!name) return null
+
+  // in case of name mismatch, prefer /server/health name and flag not ok
+  if (apiName != null && serverName != null && apiName !== serverName) {
+    name = serverName
+    apiOk = false
+  }
+
+  return makeService(
+    name,
+    candidate.ip,
+    candidate.port,
+    apiOk,
+    serverName != null
+  )
 }
 
 export function toCandidate (service: Service): ?Candidate {
