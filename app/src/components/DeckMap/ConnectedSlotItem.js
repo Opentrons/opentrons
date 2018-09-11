@@ -39,7 +39,7 @@ function SlotItem (props: Props) {
   return (
     <React.Fragment>
       {module && (
-        <ModuleItem name={module.name} />
+        <ModuleItem name={module.name} mode='default' />
       )}
       {labware && (
         <LabwareItem

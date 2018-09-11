@@ -12,8 +12,8 @@ export type ModuleType = 'magdeck' | 'tempdeck'
 export type Props = {
   /** name of module, eg 'magdeck' or 'tempdeck' */
   name: ModuleType,
-  /** display mode: blank/default, 'present', 'missing', or 'info' */
-  mode?: 'present' | 'missing' | 'info'
+  /** display mode: 'default', 'present', 'missing', or 'info' */
+  mode: 'default' | 'present' | 'missing' | 'info'
 }
 
 const DIMENSIONS = {
@@ -40,7 +40,10 @@ export default function Module (props: Props) {
 }
 
 function ModuleItemContents (props: Props) {
-  if (!props.mode) {
+  // TODO(mc, 2018-07-23): displayName?
+  const {mode, name} = props
+
+  if (!mode || mode === 'default') {
     // generic/empty display - just show USB icon
     return (
       <Icon
@@ -53,8 +56,6 @@ function ModuleItemContents (props: Props) {
     )
   }
 
-  // TODO(mc, 2018-07-23): displayName?
-  const {mode, name} = props
   const message = (mode === 'missing')
     ? (
       <React.Fragment>
