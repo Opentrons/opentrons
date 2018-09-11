@@ -1,6 +1,8 @@
 {
+  "add_step": "+ Add Step",
   "cancel": "cancel",
   "done": "done",
+  "no": "no",
   "reset": "reset",
-  "add_step": "+ Add Step"
+  "yes": "yes"
 }

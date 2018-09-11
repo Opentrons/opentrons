@@ -1,0 +1,15 @@
+{
+  "body": {
+    "data_collected_is_internal": "We never share sessions outside of Opentrons",
+    "data_only_from_pd": "We don’t record or store anything happening outside of your open Protocol Designer tab",
+    "opt_out_of_data_collection": "You can choose to opt in or out in Settings > Privacy",
+    "reason_for_collecting_data": "We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement."
+
+  },
+  "title": {
+    "privacy": "Privacy"
+  },
+  "toggle": {
+    "share_session": "Share sessions with the Opentrons Product Team"
+  }
+}

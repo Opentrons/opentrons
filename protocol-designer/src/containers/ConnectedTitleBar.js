@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 
 import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/components'
 import styles from './TitleBar.css'
+import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
@@ -70,6 +71,13 @@ function mapStateToProps (state: BaseState): SP {
           text={selectedStep && selectedStep.title}
         />,
         subtitle: labwareNickname
+      }
+    case 'settings-features':
+    case 'settings-privacy':
+      return {
+        _page,
+        title: i18n.t('nav.title.settings'),
+        subtitle: i18n.t(`nav.subtitle.${_page}`)
       }
     case 'steplist':
     default: {

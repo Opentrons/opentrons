@@ -1,0 +1,14 @@
+{
+  "design": "DESIGN",
+  "file": "FILE",
+  "feature_flags": "Feature Flags",
+  "help": "HELP",
+  "settings": "SETTINGS",
+  "privacy": "PRIVACY",
+  "title": {
+    "settings": "Opentrons Beta"
+  },
+  "subtitle": {
+    "settings-privacy": "Privacy"
+  }
+}
