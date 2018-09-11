@@ -63,6 +63,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -75,6 +77,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -83,6 +87,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -95,6 +101,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -103,6 +111,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -115,6 +125,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -123,6 +135,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -135,6 +149,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -143,6 +159,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -155,6 +173,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -163,6 +183,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -175,6 +197,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -183,6 +207,8 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
@@ -195,6 +221,8 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
+            min_volume=min_volume,
+            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
             dispense_flow_rate=dispense_flow_rate)
 
@@ -204,13 +232,20 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
+            min_volume=None,
+            max_volume=None,
             aspirate_flow_rate=None,
             dispense_flow_rate=None):
 
-        if aspirate_flow_rate:
+        if aspirate_flow_rate is not None:
             config = config._replace(aspirate_flow_rate=aspirate_flow_rate)
-        if dispense_flow_rate:
+        if dispense_flow_rate is not None:
             config = config._replace(dispense_flow_rate=dispense_flow_rate)
+
+        if min_volume is not None:
+            config._replace(min_volume=min_volume)
+        if max_volume is not None:
+            config._replace(max_volume=max_volume)
 
         p = self.Pipette(
             model_offset=config.model_offset,
@@ -221,6 +256,7 @@ class InstrumentsWrapper(object):
             channels=config.channels,
             aspirate_flow_rate=config.aspirate_flow_rate,
             dispense_flow_rate=config.dispense_flow_rate,
+            min_volume=config.min_volume,
             max_volume=config.max_volume,
             plunger_current=config.plunger_current,
             drop_tip_current=config.drop_tip_current,

@@ -21,6 +21,7 @@ pipette_config = namedtuple(
         'model_offset',
         'plunger_current',
         'drop_tip_current',
+        'min_volume',
         'max_volume',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
@@ -84,6 +85,7 @@ def load(pipette_model: str) -> pipette_config:
             model_offset=cfg.get('modelOffset'),
             plunger_current=cfg.get('plungerCurrent'),
             drop_tip_current=cfg.get('dropTipCurrent'),
+            min_volume=cfg.get('minVolume'),
             max_volume=cfg.get('maxVolume'),
             tip_length=cfg.get('tipLength')
         )
