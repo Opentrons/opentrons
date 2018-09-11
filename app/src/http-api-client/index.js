@@ -10,7 +10,7 @@ import {pipettesReducer, type PipettesAction} from './pipettes'
 import type {ResetAction} from './reset'
 import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
-import {settingsReducer, type SettingsAction} from './settings'
+import type {SettingsAction} from './settings'
 import {wifiReducer, type WifiAction} from './wifi'
 
 export const reducer = combineReducers({
@@ -19,7 +19,6 @@ export const reducer = combineReducers({
   pipettes: pipettesReducer,
   robot: robotReducer,
   server: serverReducer,
-  settings: settingsReducer,
   wifi: wifiReducer,
   // TODO(mc, 2018-07-09): api subreducer will become the sole reducer
   api: apiReducer
@@ -62,10 +61,6 @@ export type {
 } from './server'
 
 export type {
-  Setting
-} from './settings'
-
-export type {
   WifiListResponse,
   WifiStatusResponse,
   WifiConfigureResponse,
@@ -101,6 +96,8 @@ export * from './modules'
 
 export * from './reset'
 
+export * from './settings'
+
 export {
   disengagePipetteMotors
 } from './motors'
@@ -135,12 +132,6 @@ export {
   makeGetRobotIgnoredUpdateRequest,
   clearRestartResponse
 } from './server'
-
-export {
-  fetchSettings,
-  setSettings,
-  makeGetRobotSettings
-} from './settings'
 
 export {
   fetchWifiList,

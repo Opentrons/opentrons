@@ -51,11 +51,15 @@ export type ApiAction<Path: string, Request: ?{}, Response: {}> =
   | ApiFailureAction<Path>
   | ClearApiResponseAction<Path>
 
-type RequestMaker = (robot: RobotService, request: ?{}) => ThunkPromiseAction
+export type RequestMaker<Request: ?{} = void> =
+  (robot: RobotService, request: Request) => ThunkPromiseAction
 
 // thunk action creator creator (sorry) for making API calls
 // e.g. export const fetchHealth = buildRequestMaker('GET', 'health')
-export function buildRequestMaker (method: Method, path: string): RequestMaker {
+export function buildRequestMaker<Request: ?{}> (
+  method: Method,
+  path: string
+): RequestMaker<Request> {
   return (robot, request = null) => (dispatch) => {
     dispatch(apiRequest(robot, path, request))
 

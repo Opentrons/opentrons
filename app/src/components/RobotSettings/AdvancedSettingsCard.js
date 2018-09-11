@@ -111,7 +111,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
-    set: (id, value) => dispatch(setSettings(ownProps, id, value)),
+    set: (id, value) => dispatch(setSettings(ownProps, {id, value})),
     download: () => dispatch(downloadLogs(ownProps))
   }
 }
