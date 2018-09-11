@@ -9,7 +9,7 @@
   },
   "name": "protocol-library-kludge",
   "private": true,
-  "version": "3.3.0",
+  "version": "3.3.1-beta.0",
   "description": "Protocol library stuff (WIP)",
   "main": "src/index.js",
   "bugs": {
