@@ -47,7 +47,7 @@ const pipetteOptionsWithInvalid = [
 // and also auto-select tiprack if there's only one compatible tiprack for a pipette
 const tiprackOptions = [
   {name: '10 μL', value: 'tiprack-10ul'},
-  {name: '200 μL', value: 'tiprack-200ul'},
+  {name: '300 μL', value: 'opentrons-tiprack-300ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
   {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'}
   // {name: '300 μL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
