@@ -33,6 +33,11 @@
   margin: 0.25rem 0;
 }
 
+.mount_label {
+  min-width: 3rem;
+  font-weight: var(--fw-semibold);
+}
+
 .instrument_warning {
   margin-top: 0.5rem;
   font-size: var(--fs-caption);

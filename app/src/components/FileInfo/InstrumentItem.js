@@ -5,6 +5,7 @@ import styles from './styles.css'
 
 type Props = {
   match: boolean,
+  mount?: string,
   children: React.Node,
 }
 
@@ -12,6 +13,11 @@ export default function ModuleItem (props: Props) {
   return (
     <div className={styles.instrument_item}>
       <StatusIcon match={props.match}/>
+      {props.mount && (
+        <span className={styles.mount_label}>
+          {props.mount.toUpperCase()}
+        </span>
+      )}
       {props.children}
     </div>
   )
