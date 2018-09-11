@@ -23,7 +23,6 @@ class Privacy extends React.Component<*, State> {
       if (optOut()) this.setState({optInToggleValue: false})
     } else {
       initializeAnalytics()
-      optIn()
       if (optIn()) this.setState({optInToggleValue: true})
     }
     return true
