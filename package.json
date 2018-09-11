@@ -8,6 +8,7 @@
     "components",
     "discovery-client",
     "protocol-designer",
+    "protocol-library-kludge",
     "shared-data",
     "update-server/otupdate",
     "webpack-config"
