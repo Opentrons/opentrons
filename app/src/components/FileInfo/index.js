@@ -8,7 +8,9 @@ import ProtocolPipettesCard from './ProtocolPipettesCard'
 import ProtocolModulesCard from './ProtocolModulesCard'
 import ProtocolLabwareCard from './ProtocolLabwareCard'
 import Continue from './Continue'
-import {CardContainer, CardRow} from '../layout'
+import {CardRow} from '../layout'
+
+import styles from './styles.css'
 
 type Props = {
   name: string,
@@ -17,7 +19,7 @@ type Props = {
 
 export default function FileInfo (props: Props) {
   return (
-    <CardContainer>
+    <div className={styles.file_info_container}>
       <CardRow>
         <InformationCard {...props}/>
       </CardRow>
@@ -33,6 +35,6 @@ export default function FileInfo (props: Props) {
       <CardRow>
         <Continue />
       </CardRow>
-    </CardContainer>
+    </div>
   )
 }

@@ -1,5 +1,10 @@
 @import '@opentrons/components';
 
+.file_info_container {
+  overflow-y: auto;
+  padding: 0 1.5rem;
+}
+
 .info_section {
   border-bottom: 1px solid var(--c-light-gray);
 }
@@ -12,12 +17,15 @@
   text-transform: capitalize;
 }
 
-.align_left:last-child {
+.align_left {
   text-align: left;
 }
 
-.instrument_item,
-.instrument_warning {
+.align_center {
+  text-align: center;
+}
+
+.instrument_item {
   @apply --font-body-1-dark;
 
   display: flex;
@@ -25,9 +33,10 @@
   margin: 0.25rem 0;
 }
 
-.warning_text {
-  display: block;
+.instrument_warning {
+  margin-top: 0.5rem;
   font-size: var(--fs-caption);
+  color: var(--c-warning);
 }
 
 .status_icon {
@@ -36,36 +45,40 @@
 }
 
 .instrument_button {
-  width: 100%;
+  width: auto;
 }
 
 .labware_table {
   @apply --font-body-1-dark;
 
-  width: 100%;
+  width: 60%;
   margin: 1rem 0;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
+  border-collapse: collapse;
+}
 
-  & th {
-    font-weight: var(--fw-semibold);
-    text-align: left;
+.labware_table th {
+  font-weight: var(--fw-semibold);
+  text-align: left;
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+
+.labware_table td {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--c-light-gray);
+
+  &:first-child {
+    width: 80%;
   }
 }
 
-.labware_table th,
-.labware_table td {
-  width: 40%;
-  padding: 0.25rem 0;
-}
-
-.button_group {
+.continue {
   text-align: right;
 }
 
 .continue_button {
   display: inline-block;
-  width: 14rem;
-
-  &:last-child {
-    margin-left: 1rem;
-  }
+  width: 16.5rem;
+  margin-top: 1rem;
 }

@@ -12,7 +12,7 @@ import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
 import {getPipette} from '@opentrons/shared-data'
 import InstrumentItem from './InstrumentItem'
 import {RefreshWrapper} from '../Page'
-import {SectionContentFull} from '../layout'
+import {SectionContentHalf} from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
@@ -68,11 +68,11 @@ function ProtocolPipettesCard (props: Props) {
       refresh={fetchPipettes}
     >
       <InfoSection title={TITLE}>
-        <SectionContentFull>
+        <SectionContentHalf>
           {pipetteInfo.map((p) => (
             <InstrumentItem key={p.mount} match={p.pipettesMatch}>{p.displayName} </InstrumentItem>
           ))}
-        </SectionContentFull>
+        </SectionContentHalf>
         {!pipettesMatch && (
           <InstrumentWarning instrumentType='pipette' url={changePipetteUrl}/>
         )}

@@ -7,7 +7,6 @@ import forEach from 'lodash/forEach'
 import type {State} from '../../types'
 import type {Labware} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
-import InfoSection from './InfoSection'
 import LabwareTable from './LabwareTable'
 
 type Props = {
@@ -24,22 +23,23 @@ function ProtocolLabwareCard (props: Props) {
   let labwareList = []
 
   forEach(labwareCount, function (value, key) {
+    const quantity = value > 1
+      ? `x${value}`
+      : ''
     return (
       labwareList.push(
         <tr key={key}>
           <td>{key}</td>
-          <td>x{value}</td>
+          <td>{quantity}</td>
         </tr>
       )
     )
   })
 
   return (
-    <InfoSection title={TITLE}>
-      <LabwareTable>
-        {labwareList}
-      </LabwareTable>
-    </InfoSection>
+    <LabwareTable title={TITLE}>
+      {labwareList}
+    </LabwareTable>
   )
 }
 function mapStateToProps (state: State): Props {

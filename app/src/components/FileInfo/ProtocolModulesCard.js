@@ -11,7 +11,7 @@ import {makeGetRobotModules, fetchModules, type FetchModulesResponse} from '../.
 
 import {RefreshWrapper} from '../Page'
 import InfoSection from './InfoSection'
-import {SectionContentFull} from '../layout'
+import {SectionContentHalf} from '../layout'
 import InstrumentItem from './InstrumentItem'
 import InstrumentWarning from './InstrumentWarning'
 
@@ -67,11 +67,11 @@ function ProtocolModulesCard (props: Props) {
       refresh={fetchModules}
     >
     <InfoSection title={TITLE}>
-      <SectionContentFull>
+      <SectionContentHalf>
         {moduleInfo.map((m) => (
           <InstrumentItem key={m.slot} match={m.modulesMatch}>{m.displayName} </InstrumentItem>
         ))}
-      </SectionContentFull>
+      </SectionContentHalf>
       {!modulesMatch && (
         <InstrumentWarning instrumentType='module' url={attachModulesUrl}/>
       )}
