@@ -22,5 +22,10 @@
         "body": "The well(s) you're trying to aspirate from are empty. Hover over labware in Starting Deck State to add liquids."
       }
     }
+  },
+  "window": {
+    "confirm_create_new": "Are you sure you want to create a new file? Any unsaved changes will be discarded.",
+    "confirm_import": "Are you sure you want to import this file? You will lose any current unsaved changes.",
+    "confirm_leave": "Are you sure you want to leave? You will lose any unsaved changes."
   }
 }
