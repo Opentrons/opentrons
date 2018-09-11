@@ -152,9 +152,15 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
                 pipette_model, pipette, command_type, params, default_values)
 
         if command_type == 'delay':
-            wait = params.get('wait', 0)
-            if wait is True:
-                # TODO Ian 2018-05-14 pass message
+            wait = params.get('wait')
+            if wait is None:
+                raise ValueError('Delay cannot be null')
+            elif wait is True:
+                # TODO: Ian 2018-09-11 this causes Run App command list to
+                # indent, un-comment when there's a path to fix:
+
+                # message = params.get('message', 'Pausing until user resumes')
+                # robot.comment(message)
                 robot.pause()
             else:
                 _sleep(wait)
