@@ -12,9 +12,9 @@ import {
   type SessionModule
 } from '../../robot'
 
+import {Module as ModuleItem} from '@opentrons/components'
 import type {LabwareComponentProps} from '@opentrons/components'
 import LabwareItem, {type LabwareItemProps} from './LabwareItem'
-import ModuleItem from './ModuleItem'
 
 type OP = LabwareComponentProps & {match: Match}
 
@@ -39,7 +39,7 @@ function SlotItem (props: Props) {
   return (
     <React.Fragment>
       {module && (
-        <ModuleItem module={module} />
+        <ModuleItem name={module.name} mode='default' />
       )}
       {labware && (
         <LabwareItem

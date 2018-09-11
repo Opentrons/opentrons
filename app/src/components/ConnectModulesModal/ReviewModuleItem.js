@@ -5,7 +5,7 @@ import countBy from 'lodash/countBy'
 
 import {makeGetRobotModules} from '../../http-api-client'
 import {selectors as robotSelectors} from '../../robot'
-import {ModuleItem} from '../DeckMap'
+import {Module as ModuleItem} from '@opentrons/components'
 
 import type {LabwareComponentProps} from '@opentrons/components'
 import type {State} from '../../types'
@@ -24,7 +24,7 @@ function ReviewModuleItem (props: Props) {
   if (!props.module) return null
 
   return (
-    <ModuleItem module={props.module} present={props.present} review />
+    <ModuleItem name={props.module.name} mode={props.present ? 'present' : 'missing'} />
   )
 }
 

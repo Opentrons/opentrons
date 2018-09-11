@@ -1,7 +1,7 @@
 // @flow
 // common robot types
 import type {PipetteChannels} from '@opentrons/shared-data'
-import type {Mount} from '@opentrons/components'
+import type {ModuleType, Mount} from '@opentrons/components'
 import typeof reducer from './reducer'
 
 export type State = $Call<reducer>
@@ -130,8 +130,6 @@ export type Labware = StateLabware & {
 }
 
 export type LabwareType = 'tiprack' | 'labware'
-
-export type ModuleType = 'magdeck' | 'tempdeck'
 
 export type SessionModule = {
   // resource ID
