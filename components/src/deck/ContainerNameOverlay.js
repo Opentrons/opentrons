@@ -5,7 +5,7 @@ import styles from './LabwareContainer.css'
 
 type Props = {
   title: string,
-  subtitle?: string,
+  subtitle?: ?string,
 }
 
 export function ContainerNameOverlay (props: Props) {
