@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import i18n from '../../localization'
 import {actions, selectors} from '../../navigation'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {actions as loadFileActions, selectors as loadFileSelectors} from '../../load-file'
@@ -44,7 +45,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
   return {
     downloadData,
     loadFile: (fileChangeEvent) => {
-      if (!_hasUnsavedChanges || confirm('TEST')) {
+      if (!_hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_import'))) {
         dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
       }
     },

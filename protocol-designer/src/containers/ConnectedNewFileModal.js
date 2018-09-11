@@ -3,6 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import type {BaseState} from '../types'
+import i18n from '../localization'
 import {selectors, actions as navigationActions} from '../navigation'
 import {actions as fileActions, selectors as loadFileSelectors} from '../load-file'
 import type {NewProtocolFields} from '../load-file'
@@ -41,7 +42,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP): Props {
     hideModal: stateProps.hideModal,
     onCancel: dispatchProps.onCancel,
     onSave: (fields) => {
-      if (!stateProps._hasUnsavedChanges || confirm('TEST')) {
+      if (!stateProps._hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_create_new'))) {
         dispatchProps._createNewProtocol(fields)
       }
     }
