@@ -8,6 +8,7 @@ import {
 } from './errors'
 import {
   castToNumber,
+  castToFloat,
   onlyPositiveNumbers,
   onlyIntegers,
   defaultTo,
@@ -29,10 +30,12 @@ type StepFieldHelpers = {
   hydrate?: (state: BaseState, id: string) => mixed
 }
 const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
+  'aspirate_airGap_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'aspirate_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware
   },
+  'aspirate_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'dispense_delayMinutes': {
     processValue: composeProcessors(castToNumber, defaultTo(0))
   },
@@ -43,12 +46,13 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware
   },
+  'dispense_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'dispense_wells': {
     getErrors: composeErrors(minimumWellCount(1)),
     processValue: defaultTo([])
   },
   'aspirate_disposalVol_volume': {
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers)
+    processValue: composeProcessors(castToFloat, onlyPositiveNumbers)
   },
   'labware': {
     getErrors: composeErrors(requiredField),
@@ -73,7 +77,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'volume': {
     getErrors: composeErrors(requiredField),
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, defaultTo(0))
+    processValue: composeProcessors(castToFloat, onlyPositiveNumbers, defaultTo(0))
   },
   'wells': {
     getErrors: composeErrors(minimumWellCount(1)),
