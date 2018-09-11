@@ -1,6 +1,9 @@
 {
   "field": {},
   "form": {},
+  "hint": {
+    "go_to": "Go to "
+  },
   "timeline": {
     "error": {
       "INSUFFICIENT_TIPS": {

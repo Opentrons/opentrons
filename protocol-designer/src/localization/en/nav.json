@@ -8,6 +8,7 @@
   "title": {
     "settings": "Opentrons Beta"
   },
+  "starting_deck_state": "Starting Deck State",
   "subtitle": {
     "settings-privacy": "Privacy"
   }
