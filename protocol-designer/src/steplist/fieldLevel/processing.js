@@ -19,11 +19,11 @@ export const castToNumber = (rawValue: mixed): ?number => {
 }
 
 const DEFAULT_DECIMAL_PLACES = 1
-export const castToFloat = (rawValue: mixed): ?number => {
+export const castToFloat = (rawValue: mixed): ?mixed => {
   if (!rawValue) return Number(rawValue)
   const rawNumericValue = typeof rawValue === 'string' ? rawValue.replace(/[^.0-9]/, '') : String(rawValue)
   const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${DEFAULT_DECIMAL_PLACES}})(\\d*)`)
-  return Number(rawNumericValue.replace(trimRegex, (match, group1) => group1))
+  return rawNumericValue.replace(trimRegex, (match, group1) => group1)
 }
 
 /*********************
