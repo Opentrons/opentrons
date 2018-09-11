@@ -47,7 +47,7 @@ function ProtocolModulesCard (props: Props) {
 
     const actualModel = actualModules && actualModules.modules.find((m) => m.name === module.name)
     let modulesMatch = true
-    if (module && actualModel !== module.name) {
+    if (actualModel && (actualModel.name !== module.name)) {
       modulesMatch = false
     }
 
