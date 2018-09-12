@@ -6,7 +6,7 @@ import styles from './upload-panel.css'
 
 type Props = {
   onUpload: (SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => void,
-  isButton?: boolean
+  isButton?: boolean,
 }
 
 export default function UploadInput (props: Props) {

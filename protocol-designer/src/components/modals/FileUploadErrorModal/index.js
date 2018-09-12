@@ -9,20 +9,20 @@ import type {BaseState} from '../../../types'
 type Props = React.ElementProps<typeof FileUploadErrorModal>
 
 type SP = {
-  error: $PropertyType<Props, 'error'>
+  error: $PropertyType<Props, 'error'>,
 }
 
 type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    error: loadFileSelectors.getFileLoadErrors(state)
+    error: loadFileSelectors.getFileLoadErrors(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   return {
-    dismissModal: () => dispatch(loadFileActions.fileErrors(null))
+    dismissModal: () => dispatch(loadFileActions.fileErrors(null)),
   }
 }
 

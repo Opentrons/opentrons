@@ -8,7 +8,7 @@ const FORMAT_METADATA = {
   '96-standard': {multichannelAccess: true},
   '384-standard': {multichannelAccess: true},
   'trough': {multichannelAccess: true},
-  'irregular': {multichannelAccess: false}
+  'irregular': {multichannelAccess: false},
 }
 const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?boolean => {
   const labware = getLabware(labwareModel)

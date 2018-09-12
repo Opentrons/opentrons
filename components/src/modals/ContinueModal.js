@@ -24,7 +24,7 @@ export default function ContinueModal (props: ContinueModalProps) {
   const {className, onCancelClick, onContinueClick} = props
   const buttons = [
     {title: CANCEL, children: CANCEL, onClick: onCancelClick},
-    {title: CONTINUE, children: CONTINUE, onClick: onContinueClick}
+    {title: CONTINUE, children: CONTINUE, onClick: onContinueClick},
   ]
 
   return (

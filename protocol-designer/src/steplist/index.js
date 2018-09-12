@@ -11,7 +11,7 @@ export * from './types'
 export type {
   RootState,
   FormWarning,
-  FormWarningType
+  FormWarningType,
 }
 export {
   actions,
@@ -19,5 +19,5 @@ export {
   selectors,
   getFieldErrors,
   processField,
-  utils
+  utils,
 }

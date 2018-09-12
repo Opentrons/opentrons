@@ -8,7 +8,7 @@ type Props = {
   title: string,
   confirmed: boolean,
   className?: string,
-  children: React.Node
+  children: React.Node,
 }
 
 export default function CalibrationInfoBox (props: Props) {

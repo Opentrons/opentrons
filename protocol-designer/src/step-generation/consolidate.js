@@ -30,13 +30,13 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
   if (!pipetteData) {
     // bail out before doing anything else
     return {
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
     }
   }
 
   const {
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm
+    dispenseOffsetFromBottomMm,
   } = data
 
   // TODO error on negative data.disposalVolume?
@@ -59,7 +59,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           ? [touchTip({
             pipette: data.pipette,
             labware: data.sourceLabware,
-            well: sourceWell
+            well: sourceWell,
           })]
           : []
 
@@ -69,9 +69,9 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
             volume: data.volume + (isFirstWellInChunk ? disposalVolume : 0),
             labware: data.sourceLabware,
             well: sourceWell,
-            offsetFromBottomMm: aspirateOffsetFromBottomMm
+            offsetFromBottomMm: aspirateOffsetFromBottomMm,
           }),
-          ...touchTipAfterAspirateCommand
+          ...touchTipAfterAspirateCommand,
         ]
       })
 
@@ -88,7 +88,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         ? [touchTip({
           pipette: data.pipette,
           labware: data.destLabware,
-          well: data.destWell
+          well: data.destWell,
         })]
         : []
 
@@ -97,8 +97,8 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           blowout({
             pipette: data.pipette,
             labware: FIXED_TRASH_ID,
-            well: 'A1'
-          })
+            well: 'A1',
+          }),
         ]
         : []
 
@@ -144,8 +144,8 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           blowout({
             pipette: data.pipette,
             labware: data.blowout, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-            well: 'A1' // TODO LATER: should user be able to specify the blowout well?
-          })
+            well: 'A1', // TODO LATER: should user be able to specify the blowout well?
+          }),
         ]
         : []
 
@@ -159,12 +159,12 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
           volume: data.volume * sourceWellChunk.length,
           labware: data.destLabware,
           well: data.destWell,
-          offsetFromBottomMm: dispenseOffsetFromBottomMm
+          offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
         ...touchTipAfterDispenseCommands,
         ...trashTheDisposalVol,
         ...mixAfterCommands,
-        ...blowoutCommand
+        ...blowoutCommand,
       ]
     }
   )

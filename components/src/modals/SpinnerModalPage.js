@@ -13,7 +13,7 @@ type Props = {
   /** Additional/Override style */
   contentsClassName?: string,
   /** Optional message to display as italic text below spinner */
-  message?: string
+  message?: string,
 }
 
 /**

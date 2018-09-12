@@ -17,7 +17,7 @@ export type AlertProps = {
   /** optional handler to show close button/clear alert  */
   onCloseClick?: () => mixed,
   /** Override the default Alert Icon */
-  icon?: IconProps
+  icon?: IconProps,
 }
 
 /**
@@ -28,16 +28,16 @@ export type AlertProps = {
 const ALERT_PROPS_BY_TYPE = {
   success: {
     icon: {name: 'check-circle'},
-    className: styles.success
+    className: styles.success,
   },
   warning: {
     icon: {name: 'alert-circle'},
-    className: styles.warning
+    className: styles.warning,
   },
   info: {
     icon: {name: 'information'},
-    className: styles.info
-  }
+    className: styles.info,
+  },
 }
 
 export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
@@ -55,7 +55,7 @@ export default function AlertItem (props: AlertProps) {
 
   const iconProps = {
     ...icon,
-    className: styles.icon
+    className: styles.icon,
   }
 
   return (

@@ -12,13 +12,13 @@ type Props = React.ElementProps<typeof LabwareSelectionModal>
 
 type SP = {
   slot: $PropertyType<Props, 'slot'>,
-  permittedTipracks: $PropertyType<Props, 'permittedTipracks'>
+  permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
 }
 
 function mapStateToProps (state: BaseState): SP {
   return {
     slot: labwareIngredSelectors.canAdd(state) || null,
-    permittedTipracks: pipetteSelectors.permittedTipracks(state)
+    permittedTipracks: pipetteSelectors.permittedTipracks(state),
   }
 }
 
@@ -34,7 +34,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
       if (stateProps.slot) {
         dispatch(createContainer({slot: stateProps.slot, containerType}))
       }
-    }
+    },
   }
 }
 

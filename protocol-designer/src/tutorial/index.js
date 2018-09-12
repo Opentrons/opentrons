@@ -9,10 +9,10 @@ export {
   actions,
   rootReducer,
   selectors,
-  hintManifest
+  hintManifest,
 }
 
 export type {
   RootState,
-  HintKey
+  HintKey,
 }

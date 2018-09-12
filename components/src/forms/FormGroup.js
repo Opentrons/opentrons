@@ -17,7 +17,7 @@ type Props = {
   /** enable disabled style. Overridden by truthy `error` */
   disabled?: ?boolean,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
 export default function FormGroup (props: Props) {
@@ -26,7 +26,7 @@ export default function FormGroup (props: Props) {
     props.className,
     {
       [styles.error]: error,
-      [styles.disabled]: !error && props.disabled
+      [styles.disabled]: !error && props.disabled,
     }
   )
 

@@ -38,7 +38,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     _selectedLabwareId: formData && formData[ownProps.labwareFieldName],
     _wellFieldErrors: getFieldErrors(ownProps.name, selectedWells) || [],
     primaryWellCount: selectedWells && selectedWells.length,
-    isMulti
+    isMulti,
   }
 }
 
@@ -62,7 +62,7 @@ function mergeProps (
         openWellSelectionModal({
           pipetteId: _pipetteId,
           labwareId: _selectedLabwareId,
-          formFieldAccessor: ownProps.name
+          formFieldAccessor: ownProps.name,
         })
       )
     }
@@ -74,7 +74,7 @@ function mergeProps (
     isMulti: stateProps.isMulti,
     primaryWellCount: stateProps.primaryWellCount,
     errorToShow: showErrors ? _wellFieldErrors[0] : null,
-    onClick
+    onClick,
   }
 }
 

@@ -7,14 +7,14 @@ describe('discovery selectors', () => {
       name: 'getScanning when true',
       selector: discovery.getScanning,
       state: {discovery: {scanning: true}},
-      expected: true
+      expected: true,
     },
     {
       name: 'getScanning when false',
       selector: discovery.getScanning,
       state: {discovery: {scanning: false}},
-      expected: false
-    }
+      expected: false,
+    },
   ]
 
   SPECS.forEach(spec => {

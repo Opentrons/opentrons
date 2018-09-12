@@ -8,7 +8,7 @@ import styles from './styles.css'
 const LABEL = 'Select the pipette you wish to attach:'
 
 export type PipetteSelectionProps = {
-  onChange: $PropertyType<React.ElementProps<typeof DropdownField>, 'onChange'>
+  onChange: $PropertyType<React.ElementProps<typeof DropdownField>, 'onChange'>,
 }
 
 const OPTIONS = getPipetteNames().map(name => ({name, value: name}))

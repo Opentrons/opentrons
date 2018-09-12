@@ -13,7 +13,7 @@ import {
   reducer,
   makeGetRobotMove,
   makeGetRobotHome,
-  makeGetRobotLights
+  makeGetRobotLights,
 } from '..'
 
 jest.mock('../client')
@@ -44,9 +44,9 @@ describe('robot/*', () => {
         change_pipette: {
           target: 'mount',
           left: [1, 2, 3],
-          right: [4, 5, 6]
-        }
-      }
+          right: [4, 5, 6],
+        },
+      },
     }
     const response = {message: 'we did it'}
 
@@ -54,7 +54,7 @@ describe('robot/*', () => {
       const expected = {
         target: 'mount',
         mount: 'left',
-        point: [1, 2, 3]
+        point: [1, 2, 3],
       }
 
       client.__setMockResponse(mockPositionsResponse, response)
@@ -62,14 +62,14 @@ describe('robot/*', () => {
       return store.dispatch(moveRobotTo(robot, request))
       .then(() => expect(client.mock.calls).toEqual([
         [robot, 'GET', 'robot/positions'],
-        [robot, 'POST', 'robot/move', expected]
+        [robot, 'POST', 'robot/move', expected],
       ]))
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(mockPositionsResponse, response)
@@ -82,7 +82,7 @@ describe('robot/*', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -94,7 +94,7 @@ describe('robot/*', () => {
     test('clearMoveResponse action creator', () => {
       expect(clearMoveResponse(robot)).toEqual({
         type: 'api:CLEAR_RESPONSE',
-        payload: {robot, path}
+        payload: {robot, path},
       })
     })
   })
@@ -127,7 +127,7 @@ describe('robot/*', () => {
       const request = {target: 'pipette', mount: 'left'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -141,7 +141,7 @@ describe('robot/*', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -153,7 +153,7 @@ describe('robot/*', () => {
     test('clearHomeResponse action creator', () => {
       expect(clearHomeResponse(robot)).toEqual({
         type: 'api:CLEAR_RESPONSE',
-        payload: {robot, path}
+        payload: {robot, path},
       })
     })
   })
@@ -174,7 +174,7 @@ describe('robot/*', () => {
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -187,7 +187,7 @@ describe('robot/*', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -215,7 +215,7 @@ describe('robot/*', () => {
       const request = {on: true}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -229,7 +229,7 @@ describe('robot/*', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -243,18 +243,18 @@ describe('robot/*', () => {
     {
       path: 'robot/move',
       request: {target: 'mount', mount: 'left', point: [1, 2, 3]},
-      response: {message: 'we did it!'}
+      response: {message: 'we did it!'},
     },
     {
       path: 'robot/home',
       request: {target: 'pipette', mount: 'left'},
-      response: {message: 'we did it!'}
+      response: {message: 'we did it!'},
     },
     {
       path: 'robot/lights',
       request: null,
-      response: {on: true}
-    }
+      response: {on: true},
+    },
   ]
 
   REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
@@ -268,7 +268,7 @@ describe('robot/*', () => {
       test('handles api:REQUEST', () => {
         const action = {
           type: 'api:REQUEST',
-          payload: {path, robot, request}
+          payload: {path, robot, request},
         }
 
         expect(reducer(state, action).robot).toEqual({
@@ -277,16 +277,16 @@ describe('robot/*', () => {
               request,
               inProgress: true,
               error: null,
-              response: null
-            }
-          }
+              response: null,
+            },
+          },
         })
       })
 
       test('handles api:SUCCESS', () => {
         const action = {
           type: 'api:SUCCESS',
-          payload: {path, robot, response}
+          payload: {path, robot, response},
         }
 
         state.robot[NAME] = {
@@ -294,8 +294,8 @@ describe('robot/*', () => {
             request,
             inProgress: true,
             error: null,
-            response: null
-          }
+            response: null,
+          },
         }
 
         expect(reducer(state, action).robot).toEqual({
@@ -304,9 +304,9 @@ describe('robot/*', () => {
               request,
               response,
               inProgress: false,
-              error: null
-            }
-          }
+              error: null,
+            },
+          },
         })
       })
 
@@ -314,7 +314,7 @@ describe('robot/*', () => {
         const error = {message: 'we did not do it!'}
         const action = {
           type: 'api:FAILURE',
-          payload: {path, robot, error}
+          payload: {path, robot, error},
         }
 
         state.robot[NAME] = {
@@ -322,8 +322,8 @@ describe('robot/*', () => {
             request,
             inProgress: true,
             error: null,
-            response: null
-          }
+            response: null,
+          },
         }
 
         expect(reducer(state, action).robot).toEqual({
@@ -332,9 +332,9 @@ describe('robot/*', () => {
               request,
               error,
               response: null,
-              inProgress: false
-            }
-          }
+              inProgress: false,
+            },
+          },
         })
       })
     })
@@ -350,7 +350,7 @@ describe('robot/*', () => {
     PATHS.forEach(path => test(`with ${path}`, () => {
       const action = {
         type: 'api:CLEAR_RESPONSE',
-        payload: {robot, path}
+        payload: {robot, path},
       }
 
       state.robot[NAME] = {
@@ -358,15 +358,15 @@ describe('robot/*', () => {
           inProgress: false,
           request: {},
           response: 'foo',
-          error: 'bar'
-        }
+          error: 'bar',
+        },
       }
 
       expect(reducer(state, action).robot[NAME][path]).toEqual({
         inProgress: false,
         request: {},
         response: null,
-        error: null
+        error: null,
       })
     }))
   })
@@ -376,7 +376,7 @@ describe('robot/*', () => {
       state.api.robot[NAME] = {
         'robot/home': {inProgress: true},
         'robot/move': {inProgress: true},
-        'robot/lights': {inProgress: true}
+        'robot/lights': {inProgress: true},
       }
     })
 

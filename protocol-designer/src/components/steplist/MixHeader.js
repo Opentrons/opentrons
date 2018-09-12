@@ -6,7 +6,7 @@ import styles from './StepItem.css'
 type Props = {
   volume: ?string,
   times: ?string,
-  labwareName: ?string
+  labwareName: ?string,
 }
 
 export default function MixHeader (props: Props) {

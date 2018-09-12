@@ -9,7 +9,7 @@ import styles from './TipPositionInput.css'
 const WELL_HEIGHT_PIXELS = 48
 type Props = {
   mmFromBottom: string,
-  wellHeightMM: number
+  wellHeightMM: number,
 }
 
 const TipPositionZAxisViz = (props: Props) => {

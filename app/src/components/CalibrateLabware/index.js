@@ -7,7 +7,7 @@ import DeckMap from '../DeckMap'
 import InfoBox from './InfoBox'
 
 type Props = {
-  labware: ?Labware
+  labware: ?Labware,
 }
 export default withRouter(CalibrateLabware)
 

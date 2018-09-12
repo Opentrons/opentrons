@@ -5,13 +5,13 @@ import type {FileError, LoadFileAction, NewProtocolFields} from './types'
 
 export const fileErrors = (payload: FileError) => ({
   type: 'FILE_ERRORS',
-  payload
+  payload,
 })
 
 // expects valid, parsed JSON protocol.
 const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
-  payload
+  payload,
 })
 
 // load file thunk, handles file loading errors
@@ -32,7 +32,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
 
     if (!file.name.endsWith('.json')) {
       fileError({
-        errorType: 'INVALID_FILE_TYPE'
+        errorType: 'INVALID_FILE_TYPE',
       })
     } else {
       reader.onload = readEvent => {
@@ -43,7 +43,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
         } catch (error) {
           fileError({
             errorType: 'INVALID_JSON_FILE',
-            message: error.message
+            message: error.message,
           })
         }
       }
@@ -53,9 +53,9 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
 
 export const createNewProtocol = (payload: NewProtocolFields) => ({
   type: 'CREATE_NEW_PROTOCOL',
-  payload
+  payload,
 })
 
 export const saveProtocolFile = () => ({
-  type: 'SAVE_PROTOCOL_FILE'
+  type: 'SAVE_PROTOCOL_FILE',
 })

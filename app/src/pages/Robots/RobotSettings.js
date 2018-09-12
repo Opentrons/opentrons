@@ -11,7 +11,7 @@ import {
   makeGetRobotHome,
   clearHomeResponse,
   makeGetRobotIgnoredUpdateRequest,
-  makeGetAvailableRobotUpdate
+  makeGetAvailableRobotUpdate,
 } from '../../http-api-client'
 
 import {SpinnerModalPage} from '@opentrons/components'
@@ -19,7 +19,7 @@ import {ErrorModal} from '../../components/modals'
 import Page from '../../components/Page'
 import RobotSettings, {
   ConnectAlertModal,
-  UpdateModal
+  UpdateModal,
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
@@ -57,7 +57,7 @@ function RobotSettingsPage (props: Props) {
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
-    match: {path, url}
+    match: {path, url},
   } = props
 
   const titleBarProps = {title: robot.name}
@@ -140,7 +140,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
-      showConnectAlert: !connectRequest.inProgress && !!connectRequest.error
+      showConnectAlert: !connectRequest.inProgress && !!connectRequest.error,
     }
   }
 }
@@ -151,13 +151,13 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const props = {
     ...stateProps,
     ...ownProps,
-    closeConnectAlert: () => dispatch(robotActions.clearConnectResponse())
+    closeConnectAlert: () => dispatch(robotActions.clearConnectResponse()),
   }
 
   if (robot) {
     return {
       ...props,
-      closeHomeAlert: () => dispatch(clearHomeResponse(robot))
+      closeHomeAlert: () => dispatch(clearHomeResponse(robot)),
     }
   }
 

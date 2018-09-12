@@ -15,7 +15,7 @@ import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 wh
 type Props = React.ElementProps<typeof StepItem>
 
 type OP = {
-  stepId: $PropertyType<Props, 'stepId'>
+  stepId: $PropertyType<Props, 'stepId'>,
 }
 
 type SP = {|
@@ -26,7 +26,7 @@ type SP = {|
   selected: $PropertyType<Props, 'selected'>,
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  getLabwareName: $PropertyType<Props, 'getLabwareName'>
+  getLabwareName: $PropertyType<Props, 'getLabwareName'>,
 |}
 
 type DP = $Diff<$Diff<Props, SP>, OP>
@@ -60,7 +60,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId]
+    getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId],
   }
 }
 
@@ -73,7 +73,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     onStepClick: () => dispatch(selectStep(stepId)),
     onStepItemCollapseToggle: () => dispatch(toggleStepCollapsed(stepId)),
     onStepHover: () => dispatch(hoverOnStep(stepId)),
-    onStepMouseLeave: () => dispatch(hoverOnStep(null))
+    onStepMouseLeave: () => dispatch(hoverOnStep(null)),
   }
 }
 

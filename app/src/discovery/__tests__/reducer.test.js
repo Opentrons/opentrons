@@ -4,8 +4,8 @@ import {discoveryReducer} from '..'
 jest.mock('../../shell', () => ({
   getShellRobots: () => ([
     {name: 'foo', connections: []},
-    {name: 'bar', connections: []}
-  ])
+    {name: 'bar', connections: []},
+  ]),
 }))
 
 describe('discoveryReducer', () => {
@@ -22,21 +22,21 @@ describe('discoveryReducer', () => {
         scanning: false,
         robotsByName: {
           foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []}
-        }
-      }
+          bar: {name: 'bar', connections: []},
+        },
+      },
     },
     {
       name: 'discovery:START sets scanning: true',
       action: {type: 'discovery:START'},
       initialState: {scanning: false},
-      expectedState: {scanning: true}
+      expectedState: {scanning: true},
     },
     {
       name: 'discovery:FINISH sets scanning: false',
       action: {type: 'discovery:FINISH'},
       initialState: {scanning: true},
-      expectedState: {scanning: false}
+      expectedState: {scanning: false},
     },
     {
       name: 'discovery:UPDATE_LIST resets discovered list',
@@ -45,18 +45,18 @@ describe('discoveryReducer', () => {
         payload: {
           robots: [
             {name: 'foo', connections: []},
-            {name: 'bar', connections: []}
-          ]
-        }
+            {name: 'bar', connections: []},
+          ],
+        },
       },
       initialState: {robotsByName: {}},
       expectedState: {
         robotsByName: {
           foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []}
-        }
-      }
-    }
+          bar: {name: 'bar', connections: []},
+        },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

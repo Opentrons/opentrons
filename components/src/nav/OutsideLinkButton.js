@@ -24,7 +24,7 @@ type Props = {
   /** Display a notification dot */
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
-  selected?: boolean
+  selected?: boolean,
 }
 
 /** Very much like NavButton, but used for opening external links in a new tab/window */
@@ -36,7 +36,7 @@ export default function OutsideLinkButton (props: Props) {
     {
       [styles.disabled]: props.disabled,
       [styles.bottom]: props.isBottom,
-      [styles.active]: props.selected
+      [styles.active]: props.selected,
     }
   )
   return (

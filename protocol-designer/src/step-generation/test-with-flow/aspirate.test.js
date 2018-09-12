@@ -4,7 +4,7 @@ import {
   createRobotStateFixture,
   createRobotState,
   commandCreatorHasErrors,
-  commandCreatorNoErrors
+  commandCreatorNoErrors,
 } from './fixtures'
 import updateLiquidState from '../aspirateUpdateLiquidState'
 
@@ -16,7 +16,7 @@ const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
 const mockLiquidReturnValue = {
   // using strings instead of properly-shaped objects for easier assertions
   liquidState: 'expected liquid state',
-  warnings: 'expected warnings'
+  warnings: 'expected warnings',
 }
 
 beforeEach(() => {
@@ -34,14 +34,14 @@ describe('aspirate', () => {
       destPlateType: '96-flat',
       fillPipetteTips: false,
       fillTiprackTips: true,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
     robotStateWithTip = createRobotState({
       sourcePlateType: 'trough-12row',
       destPlateType: '96-flat',
       fillPipetteTips: true,
       fillTiprackTips: true,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
   })
 
@@ -51,7 +51,7 @@ describe('aspirate', () => {
     destPlateType: '96-flat',
     fillPipetteTips: true,
     fillTiprackTips: true,
-    tipracks: [200, 200]
+    tipracks: [200, 200],
   })
 
   test('aspirate with tip', () => {
@@ -59,7 +59,7 @@ describe('aspirate', () => {
       pipette: 'p300SingleId',
       volume: 50,
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.commands).toEqual([{
@@ -68,8 +68,8 @@ describe('aspirate', () => {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
-        well: 'A1'
-      }
+        well: 'A1',
+      },
     }])
 
     expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
@@ -80,12 +80,12 @@ describe('aspirate', () => {
       pipette: 'p300SingleId',
       volume: 10000,
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_VOLUME_EXCEEDED'
+      type: 'PIPETTE_VOLUME_EXCEEDED',
     })
   })
 
@@ -94,12 +94,12 @@ describe('aspirate', () => {
       pipette: 'badPipette',
       volume: 50,
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_DOES_NOT_EXIST'
+      type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })
 
@@ -108,12 +108,12 @@ describe('aspirate', () => {
       pipette: 'p300SingleId',
       volume: 50,
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(initialRobotState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'NO_TIP_ON_PIPETTE'
+      type: 'NO_TIP_ON_PIPETTE',
     })
   })
 
@@ -122,12 +122,12 @@ describe('aspirate', () => {
       pipette: 'p300SingleId',
       volume: 50,
       labware: 'problematicLabwareId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'LABWARE_DOES_NOT_EXIST'
+      type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
 
@@ -137,7 +137,7 @@ describe('aspirate', () => {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
-        volume: 152
+        volume: 152,
       })(robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
@@ -147,7 +147,7 @@ describe('aspirate', () => {
           volume: 152,
           well: 'A1',
           labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.instruments.p300SingleId
+          pipetteData: robotStateWithTip.instruments.p300SingleId,
         },
         robotStateWithTip.liquidState
       )

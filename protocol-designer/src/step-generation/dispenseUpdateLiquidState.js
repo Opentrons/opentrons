@@ -14,7 +14,7 @@ export default function updateLiquidState (
     volume: number,
     labwareId: string,
     labwareType: string,
-    well: string
+    well: string,
   },
   prevLiquidState: LiquidState
 ): LiquidState {
@@ -55,21 +55,21 @@ export default function updateLiquidState (
       [wellForTip]: mergeLiquid(
         splitLiquidStates[`${tipIdx}`].dest,
         prevLiquidState.labware[labwareId][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
-      )
+      ),
     }
   }, {})
 
   return {
     pipettes: {
       ...prevLiquidState.pipettes,
-      [pipetteId]: mapValues(splitLiquidStates, 'source')
+      [pipetteId]: mapValues(splitLiquidStates, 'source'),
     },
     labware: {
       ...prevLiquidState.labware,
       [labwareId]: {
         ...prevLiquidState.labware[labwareId],
-        ...labwareLiquidState
-      }
-    }
+        ...labwareLiquidState,
+      },
+    },
   }
 }

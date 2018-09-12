@@ -8,7 +8,7 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
   type Mount,
-  type Labware
+  type Labware,
 } from '../../robot'
 
 import {Modal} from '../modals'
@@ -51,7 +51,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
     _calibratorMount: currentLabware && (
       currentLabware.calibratorMount ||
       robotSelectors.getCalibratorMount(state)
-    )
+    ),
   }
 }
 
@@ -68,6 +68,6 @@ function mergeProps (
       if (currentLabware && _calibratorMount) {
         dispatch(robotActions.moveTo(_calibratorMount, currentLabware.slot))
       }
-    }
+    },
   }
 }

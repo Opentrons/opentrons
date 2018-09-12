@@ -4,7 +4,7 @@ import {
   createRobotState,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
-  commandFixtures as cmd
+  commandFixtures as cmd,
 } from './fixtures'
 import type {MixFormData} from '../types'
 const mix = commandCreatorNoErrors(_mix)
@@ -19,7 +19,7 @@ beforeEach(() => {
     destPlateType: '96-flat',
     tipracks: [200],
     fillPipetteTips: true,
-    fillTiprackTips: true
+    fillTiprackTips: true,
   })
 
   mixinArgs = {
@@ -31,7 +31,7 @@ beforeEach(() => {
     labware: 'sourcePlateId',
 
     delay: null,
-    touchTip: false
+    touchTip: false,
   }
 })
 
@@ -43,7 +43,7 @@ describe('mix: change tip', () => {
     volume,
     times,
     wells: ['A1', 'B1', 'C1'],
-    changeTip
+    changeTip,
   })
   test('changeTip="always"', () => {
     const args = makeArgs('always')
@@ -69,7 +69,7 @@ describe('mix: change tip', () => {
       cmd.dispense('C1', volume),
 
       cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume)
+      cmd.dispense('C1', volume),
     ])
   })
 
@@ -95,7 +95,7 @@ describe('mix: change tip', () => {
       cmd.dispense('C1', volume),
 
       cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume)
+      cmd.dispense('C1', volume),
     ])
   })
 
@@ -120,7 +120,7 @@ describe('mix: change tip', () => {
       cmd.dispense('C1', volume),
 
       cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume)
+      cmd.dispense('C1', volume),
     ])
   })
 })
@@ -137,7 +137,7 @@ describe('mix: advanced options', () => {
       times,
       changeTip: 'always',
       touchTip: true,
-      wells: ['A1', 'B1', 'C1']
+      wells: ['A1', 'B1', 'C1'],
     }
 
     const result = mix(args)(robotInitialState)
@@ -165,7 +165,7 @@ describe('mix: advanced options', () => {
 
       cmd.aspirate('C1', volume),
       cmd.dispense('C1', volume),
-      cmd.touchTip('C1')
+      cmd.touchTip('C1'),
     ])
   })
 
@@ -176,7 +176,7 @@ describe('mix: advanced options', () => {
       times,
       changeTip: 'always',
       blowout: blowoutLabwareId,
-      wells: ['A1', 'B1', 'C1']
+      wells: ['A1', 'B1', 'C1'],
     }
 
     const result = mix(args)(robotInitialState)
@@ -204,7 +204,7 @@ describe('mix: advanced options', () => {
 
       cmd.aspirate('C1', volume),
       cmd.dispense('C1', volume),
-      cmd.blowout(blowoutLabwareId)
+      cmd.blowout(blowoutLabwareId),
     ])
   })
 
@@ -216,7 +216,7 @@ describe('mix: advanced options', () => {
       changeTip: 'always',
       touchTip: true,
       blowout: blowoutLabwareId,
-      wells: ['A1', 'B1', 'C1']
+      wells: ['A1', 'B1', 'C1'],
     }
 
     const result = mix(args)(robotInitialState)
@@ -247,7 +247,7 @@ describe('mix: advanced options', () => {
       cmd.aspirate('C1', volume),
       cmd.dispense('C1', volume),
       cmd.blowout(blowoutLabwareId),
-      cmd.touchTip('C1')
+      cmd.touchTip('C1'),
     ])
   })
 
@@ -262,30 +262,30 @@ describe('mix: errors', () => {
       volume: 8,
       times: 2,
       changeTip: 'once',
-      wells: ['A1', 'A2']
+      wells: ['A1', 'A2'],
     }
   })
   test('invalid labware', () => {
     const args: MixFormData = {
       ...errorArgs,
-      labware: 'invalidLabwareId'
+      labware: 'invalidLabwareId',
     }
     const result = mixWithErrors(args)(robotInitialState)
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'LABWARE_DOES_NOT_EXIST'
+      type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
 
   test('invalid pipette', () => {
     const args: MixFormData = {
       ...errorArgs,
-      pipette: 'invalidPipetteId'
+      pipette: 'invalidPipetteId',
     }
     const result = mixWithErrors(args)(robotInitialState)
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_DOES_NOT_EXIST'
+      type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })
 

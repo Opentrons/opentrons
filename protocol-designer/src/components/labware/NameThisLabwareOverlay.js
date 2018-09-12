@@ -11,12 +11,12 @@ type Props = {
   slot: DeckSlot,
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   modifyContainer: (args: {containerId: string, modify: {[field: string]: mixed}}) => void,
-  deleteContainer: (args: {containerId: string, slot: DeckSlot, containerType: string}) => void
+  deleteContainer: (args: {containerId: string, slot: DeckSlot, containerType: string}) => void,
 } & ClickOutsideInterface
 
 type State = {
   pristine: boolean,
-  inputValue: string
+  inputValue: string,
 }
 
 const NICKNAME_PROMPT = 'Add a nickname?'
@@ -26,14 +26,14 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
     super(props)
     this.state = {
       pristine: true,
-      inputValue: ''
+      inputValue: '',
     }
   }
 
   handleChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     this.setState({
       pristine: false,
-      inputValue: e.target.value
+      inputValue: e.target.value,
     })
   }
 
@@ -49,7 +49,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
 
     modifyContainer({
       containerId,
-      modify: { name: containerName }
+      modify: { name: containerName },
     })
   }
 
@@ -59,7 +59,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
       containerId,
       slot,
       deleteContainer,
-      passRef
+      passRef,
     } = this.props
 
     return (

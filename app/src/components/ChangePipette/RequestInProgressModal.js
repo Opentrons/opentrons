@@ -23,8 +23,8 @@ export default function RequestInProgressModal (props: ChangePipetteProps) {
         title: props.title,
         subtitle: props.subtitle,
         back: {
-          disabled: true
-        }
+          disabled: true,
+        },
       }}
 
       message={message}

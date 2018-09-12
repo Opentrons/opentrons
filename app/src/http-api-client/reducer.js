@@ -23,8 +23,8 @@ export default function apiReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, request, inProgress: true, error: null}
-        }
+          [path]: {...stateByPath, request, inProgress: true, error: null},
+        },
       }
     }
 
@@ -36,8 +36,8 @@ export default function apiReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response, inProgress: false, error: null},
+        },
       }
     }
 
@@ -49,8 +49,8 @@ export default function apiReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
+          [path]: {...stateByPath, error, inProgress: false},
+        },
       }
     }
 
@@ -61,8 +61,8 @@ export default function apiReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response: null, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response: null, inProgress: false, error: null},
+        },
       }
     }
   }

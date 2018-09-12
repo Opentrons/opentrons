@@ -34,6 +34,6 @@ export function getWellDefsForSVG (labwareName: string) {
     ...wellDef,
     x: wellDef.x + xCorrection,
     // flip y axis to match SVG y axis direction
-    y: SLOT_HEIGHT_MM - wellDef.y + yCorrection
+    y: SLOT_HEIGHT_MM - wellDef.y + yCorrection,
   }))
 }

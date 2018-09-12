@@ -14,13 +14,13 @@ type Props = {
 const missingAlertProps = {
   type: 'warning',
   title: 'Module Missing',
-  className: styles.alert
+  className: styles.alert,
 }
 
 const connectedAlertProps = {
   type: 'success',
   title: 'Module succesfully detected.',
-  className: styles.alert
+  className: styles.alert,
 }
 
 export default function Prompt (props: Props) {

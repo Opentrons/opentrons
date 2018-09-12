@@ -25,7 +25,7 @@ export default function RunControls (props: RunProps) {
     onRunClick,
     onPauseClick,
     onResumeClick,
-    onResetClick
+    onResetClick,
   } = props
 
   const onPauseResumeClick = isPaused

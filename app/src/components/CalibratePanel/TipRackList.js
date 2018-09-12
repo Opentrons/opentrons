@@ -7,7 +7,7 @@ import LabwareListItem from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions
+  actions as robotActions,
 } from '../../robot'
 
 export default withRouter(
@@ -36,7 +36,7 @@ function mapStateToProps (state) {
     _tipracks: robotSelectors.getTipracks(state),
     disabled: robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
-    _deckPopulated: robotSelectors.getDeckPopulated(state)
+    _deckPopulated: robotSelectors.getDeckPopulated(state),
   }
 }
 
@@ -52,12 +52,12 @@ function mergeProps (stateProps, dispatchProps) {
         if (_deckPopulated && calibrator) {
           dispatch(robotActions.moveTo(calibrator, tr.slot))
         }
-      }
+      },
     }
   })
 
   return {
     tipracks,
-    disabled
+    disabled,
   }
 }

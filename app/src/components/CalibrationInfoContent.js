@@ -4,7 +4,7 @@ import styles from './calibration-info.css'
 
 type Props = {
   leftChildren?: React.Node,
-  rightChildren?: React.Node
+  rightChildren?: React.Node,
 }
 
 export default function CalibrationInfoContent (props: Props) {

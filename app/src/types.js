@@ -3,7 +3,7 @@
 // application types
 import type {
   Store as ReduxStore,
-  Dispatch as ReduxDispatch
+  Dispatch as ReduxDispatch,
 } from 'redux'
 
 import type {RouterAction} from 'react-router-redux'
@@ -46,7 +46,7 @@ export type Middleware = (s: MwStore) => (n: PlainDispatch) => PlainDispatch
 
 type MwStore = {
   getState: GetState,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 }
 
 type PlainDispatch = ReduxDispatch<Action>

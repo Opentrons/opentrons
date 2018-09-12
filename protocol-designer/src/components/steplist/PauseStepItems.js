@@ -4,7 +4,7 @@ import type {PauseFormData} from '../../step-generation'
 import {PDListItem} from '../lists'
 
 type Props = {
-  substeps: PauseFormData
+  substeps: PauseFormData,
 }
 
 export default function PauseStepItems (props: Props) {

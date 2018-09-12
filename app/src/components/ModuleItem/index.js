@@ -12,7 +12,7 @@ import styles from './styles.css'
 
 type Props = {
   module: Module,
-  availableUpdate?: ?string
+  availableUpdate?: ?string,
 }
 
 export default function ModuleItem (props: Props) {

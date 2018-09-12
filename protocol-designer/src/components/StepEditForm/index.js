@@ -24,26 +24,26 @@ const STEP_FORM_MAP: {[StepType]: StepForm} = {
   pause: PauseForm,
   transfer: TransferLikeForm,
   consolidate: TransferLikeForm,
-  distribute: TransferLikeForm
+  distribute: TransferLikeForm,
 }
 
 export type FocusHandlers = {
   focusedField: StepFieldName,
   dirtyFields: Array<StepFieldName>,
   onFieldFocus: (StepFieldName) => void,
-  onFieldBlur: (StepFieldName) => void
+  onFieldBlur: (StepFieldName) => void,
 }
 
 type SP = {
   formData?: ?FormData,
-  isNewStep?: boolean
+  isNewStep?: boolean,
 }
 type DP = { deleteStep: () => mixed }
 
 type StepEditFormState = {
   showConfirmDeleteModal: boolean,
   focusedField: StepFieldName | null,
-  dirtyFields: Array<StepFieldName>
+  dirtyFields: Array<StepFieldName>,
 }
 
 type Props = SP & DP
@@ -54,7 +54,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     this.state = {
       showConfirmDeleteModal: false,
       focusedField: null,
-      dirtyFields: [] // TODO: initialize to dirty if not new form
+      dirtyFields: [], // TODO: initialize to dirty if not new form
     }
   }
 
@@ -77,13 +77,13 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     this.setState((prevState) => ({
       ...prevState,
       focusedField: (fieldName === prevState.focusedField) ? null : prevState.focusedField,
-      dirtyFields: prevState.dirtyFields.includes(fieldName) ? prevState.dirtyFields : [...prevState.dirtyFields, fieldName]
+      dirtyFields: prevState.dirtyFields.includes(fieldName) ? prevState.dirtyFields : [...prevState.dirtyFields, fieldName],
     }))
   }
 
   toggleConfirmDeleteModal = () => {
     this.setState({
-      showConfirmDeleteModal: !this.state.showConfirmDeleteModal
+      showConfirmDeleteModal: !this.state.showConfirmDeleteModal,
     })
   }
 
@@ -112,7 +112,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
               focusedField: this.state.focusedField,
               dirtyFields: this.state.dirtyFields,
               onFieldFocus: this.onFieldFocus,
-              onFieldBlur: this.onFieldBlur
+              onFieldBlur: this.onFieldBlur,
             }} />
           <ButtonRow onDelete={this.toggleConfirmDeleteModal}/>
         </div>
@@ -123,11 +123,11 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  isNewStep: selectors.isNewStepForm(state)
+  isNewStep: selectors.isNewStepForm(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  deleteStep: () => dispatch(actions.deleteStep())
+  deleteStep: () => dispatch(actions.deleteStep()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(StepEditForm)

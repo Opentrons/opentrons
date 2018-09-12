@@ -7,7 +7,7 @@ import styles from './modals.css'
 type OverlayProps = {
   /** optional onClick handler */
   onClick?: (event: SyntheticEvent<>) => mixed,
-  alertOverlay?: boolean
+  alertOverlay?: boolean,
 }
 
 /**
@@ -20,7 +20,7 @@ export default function Overlay (props: OverlayProps) {
 
   const className = cx(styles.overlay, {
     [styles.clickable]: onClick,
-    [styles.alert_modal_overlay]: alertOverlay
+    [styles.alert_modal_overlay]: alertOverlay,
   })
 
   return (

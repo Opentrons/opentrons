@@ -4,7 +4,7 @@ import {
   createRobotState,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
-  commandFixtures as cmd
+  commandFixtures as cmd,
 } from './fixtures'
 import _transfer from '../transfer'
 import {FIXED_TRASH_ID} from '../../constants'
@@ -33,7 +33,7 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowout: null
+    blowout: null,
   }
 
   robotInitialState = createRobotState({
@@ -41,7 +41,7 @@ beforeEach(() => {
     destPlateType: '96-flat',
     tipracks: [200],
     fillPipetteTips: true,
-    fillTiprackTips: true
+    fillTiprackTips: true,
   })
 })
 
@@ -51,7 +51,7 @@ describe('pick up tip if no tip on pipette', () => {
       ...transferArgs,
       sourceWells: ['A1'],
       destWells: ['B2'],
-      volume: 30
+      volume: 30,
     }
 
     // no tip on pipette
@@ -64,7 +64,7 @@ describe('pick up tip if no tip on pipette', () => {
     test(`...${changeTip}`, () => {
       transferArgs = {
         ...transferArgs,
-        changeTip
+        changeTip,
       }
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -78,14 +78,14 @@ describe('pick up tip if no tip on pipette', () => {
   test('...never (should not pick up tip, and fail)', () => {
     transferArgs = {
       ...transferArgs,
-      changeTip: 'never'
+      changeTip: 'never',
     }
 
     const result = transferWithErrors(transferArgs)(robotInitialState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'NO_TIP_ON_PIPETTE'
+      type: 'NO_TIP_ON_PIPETTE',
     })
   })
 })
@@ -96,7 +96,7 @@ test('single transfer: 1 source & 1 dest', () => {
     sourceWells: ['A1'],
     destWells: ['B2'],
     changeTip: 'never',
-    volume: 30
+    volume: 30,
   }
 
   robotInitialState.liquidState.labware.sourcePlateId.A1 = {'0': {volume: 200}}
@@ -104,7 +104,7 @@ test('single transfer: 1 source & 1 dest', () => {
   const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
     cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, {labware: 'destPlateId'})
+    cmd.dispense('B2', 30, {labware: 'destPlateId'}),
   ])
 
   expect(result.robotState.liquidState).toEqual(merge(
@@ -113,11 +113,11 @@ test('single transfer: 1 source & 1 dest', () => {
     {
       labware: {
         sourcePlateId: {A1: {'0': {volume: 200 - 30}}},
-        destPlateId: {B2: {'0': {volume: 30}}}
+        destPlateId: {B2: {'0': {volume: 30}}},
       },
       pipettes: {
-        p300SingleId: {'0': {'0': {volume: 0}}} // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
-      }
+        p300SingleId: {'0': {'0': {volume: 0}}}, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
+      },
     }
   ))
 })
@@ -128,7 +128,7 @@ test('transfer with multiple sets of wells', () => {
     sourceWells: ['A1', 'A2'],
     destWells: ['B2', 'C2'],
     changeTip: 'never',
-    volume: 30
+    volume: 30,
   }
   const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
@@ -136,7 +136,7 @@ test('transfer with multiple sets of wells', () => {
     cmd.dispense('B2', 30, {labware: 'destPlateId'}),
 
     cmd.aspirate('A2', 30),
-    cmd.dispense('C2', 30, {labware: 'destPlateId'})
+    cmd.dispense('C2', 30, {labware: 'destPlateId'}),
   ])
 
   // TODO Ian 2018-04-02 robotState, liquidState checks
@@ -145,14 +145,14 @@ test('transfer with multiple sets of wells', () => {
 test('invalid pipette ID should throw error', () => {
   transferArgs = {
     ...transferArgs,
-    pipette: 'no-such-pipette-id-here'
+    pipette: 'no-such-pipette-id-here',
   }
 
   const result = transferWithErrors(transferArgs)(robotInitialState)
 
   expect(result.errors).toHaveLength(1)
   expect(result.errors[0]).toMatchObject({
-    type: 'PIPETTE_DOES_NOT_EXIST'
+    type: 'PIPETTE_DOES_NOT_EXIST',
   })
 })
 
@@ -162,7 +162,7 @@ describe('single transfer exceeding pipette max', () => {
       ...transferArgs,
       sourceWells: ['A1'],
       destWells: ['B2'],
-      volume: 350
+      volume: 350,
     }
     // tip setup: tiprack's A1 has tip, pipette has no tip
     robotInitialState.tipState.tipracks.tiprack1Id.A1 = true
@@ -174,7 +174,7 @@ describe('single transfer exceeding pipette max', () => {
   test('changeTip="once"', () => {
     transferArgs = {
       ...transferArgs,
-      changeTip: 'once'
+      changeTip: 'once',
     }
 
     const result = transfer(transferArgs)(robotInitialState)
@@ -183,7 +183,7 @@ describe('single transfer exceeding pipette max', () => {
       cmd.aspirate('A1', 300),
       cmd.dispense('B2', 300, {labware: 'destPlateId'}),
       cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'})
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
     ])
 
     expect(result.robotState.liquidState).toEqual(merge(
@@ -192,11 +192,11 @@ describe('single transfer exceeding pipette max', () => {
       {
         labware: {
           sourcePlateId: {A1: {'0': {volume: 400 - 350}}},
-          destPlateId: {B2: {'0': {volume: 350}}}
+          destPlateId: {B2: {'0': {volume: 350}}},
         },
         pipettes: {
-          p300SingleId: {'0': {'0': {volume: 0}}} // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
-        }
+          p300SingleId: {'0': {'0': {volume: 0}}}, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
+        },
       }
     ))
   })
@@ -204,7 +204,7 @@ describe('single transfer exceeding pipette max', () => {
   test('changeTip="always"', () => {
     transferArgs = {
       ...transferArgs,
-      changeTip: 'always'
+      changeTip: 'always',
     }
 
     const result = transfer(transferArgs)(robotInitialState)
@@ -219,7 +219,7 @@ describe('single transfer exceeding pipette max', () => {
       cmd.pickUpTip('B1'),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'})
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
     ])
 
     expect(result.robotState.liquidState).toEqual(merge(
@@ -229,11 +229,11 @@ describe('single transfer exceeding pipette max', () => {
         labware: {
           sourcePlateId: {A1: {'0': {volume: 400 - 350}}},
           destPlateId: {B2: {'0': {volume: 350}}},
-          [FIXED_TRASH_ID]: result.robotState.liquidState.labware[FIXED_TRASH_ID] // Ignore liquid contents of trash. TODO LATER make this more elegant
+          [FIXED_TRASH_ID]: result.robotState.liquidState.labware[FIXED_TRASH_ID], // Ignore liquid contents of trash. TODO LATER make this more elegant
         },
         pipettes: {
-          p300SingleId: {'0': {'0': {volume: 0}}} // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
-        }
+          p300SingleId: {'0': {'0': {volume: 0}}}, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
+        },
       }
     ))
   })
@@ -241,7 +241,7 @@ describe('single transfer exceeding pipette max', () => {
   test('changeTip="never"', () => {
     transferArgs = {
       ...transferArgs,
-      changeTip: 'never'
+      changeTip: 'never',
     }
     // begin with tip on pipette
     robotInitialState.tipState.pipettes.p300SingleId = true
@@ -253,7 +253,7 @@ describe('single transfer exceeding pipette max', () => {
       cmd.dispense('B2', 300, {labware: 'destPlateId'}),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'})
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
     ])
 
     expect(result.robotState.liquidState).toEqual(merge(
@@ -262,11 +262,11 @@ describe('single transfer exceeding pipette max', () => {
       {
         labware: {
           sourcePlateId: {A1: {'0': {volume: 400 - 350}}},
-          destPlateId: {B2: {'0': {volume: 350}}}
+          destPlateId: {B2: {'0': {volume: 350}}},
         },
         pipettes: {
-          p300SingleId: {'0': {'0': {volume: 0}}} // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
-        }
+          p300SingleId: {'0': {'0': {volume: 0}}}, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
+        },
       }
     ))
   })
@@ -278,7 +278,7 @@ describe('advanced options', () => {
       ...transferArgs,
       sourceWells: ['A1'],
       destWells: ['B1'],
-      changeTip: 'never'
+      changeTip: 'never',
     }
   })
   describe('...aspirate options', () => {
@@ -286,7 +286,7 @@ describe('advanced options', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,
-        preWetTip: true
+        preWetTip: true,
       }
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -300,7 +300,7 @@ describe('advanced options', () => {
         cmd.dispense('B1', 300, {labware: 'destPlateId'}),
 
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'})
+        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
       ])
     })
 
@@ -308,7 +308,7 @@ describe('advanced options', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,
-        touchTipAfterAspirate: true
+        touchTipAfterAspirate: true,
       }
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -319,7 +319,7 @@ describe('advanced options', () => {
 
         cmd.aspirate('A1', 50),
         cmd.touchTip('A1'),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'})
+        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
       ])
     })
 
@@ -327,7 +327,7 @@ describe('advanced options', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,
-        touchTipAfterDispense: true
+        touchTipAfterDispense: true,
       }
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -338,7 +338,7 @@ describe('advanced options', () => {
 
         cmd.aspirate('A1', 50),
         cmd.dispense('B1', 50, {labware: 'destPlateId'}),
-        cmd.touchTip('B1', {labware: 'destPlateId'})
+        cmd.touchTip('B1', {labware: 'destPlateId'}),
       ])
     })
 
@@ -348,8 +348,8 @@ describe('advanced options', () => {
         volume: 350,
         mixBeforeAspirate: {
           volume: 250,
-          times: 2
-        }
+          times: 2,
+        },
       }
 
       // written here for less verbose `commands` below
@@ -359,7 +359,7 @@ describe('advanced options', () => {
         cmd.dispense('A1', 250),
         // mix 2
         cmd.aspirate('A1', 250),
-        cmd.dispense('A1', 250)
+        cmd.dispense('A1', 250),
       ]
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -370,7 +370,7 @@ describe('advanced options', () => {
 
         ...mixCommands,
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'})
+        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
       ])
     })
     test('air gap => ???') // TODO determine behavior
@@ -384,8 +384,8 @@ describe('advanced options', () => {
         volume: 350,
         mixInDestination: {
           volume: 250,
-          times: 2
-        }
+          times: 2,
+        },
       }
 
       // written here for less verbose `commands` below
@@ -395,7 +395,7 @@ describe('advanced options', () => {
         cmd.dispense('B1', 250, {labware: 'destPlateId'}),
         // mix 2
         cmd.aspirate('B1', 250, {labware: 'destPlateId'}),
-        cmd.dispense('B1', 250, {labware: 'destPlateId'})
+        cmd.dispense('B1', 250, {labware: 'destPlateId'}),
       ]
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -406,7 +406,7 @@ describe('advanced options', () => {
 
         cmd.aspirate('A1', 50),
         cmd.dispense('B1', 50, {labware: 'destPlateId'}),
-        ...mixCommands
+        ...mixCommands,
       ])
     })
 
@@ -414,7 +414,7 @@ describe('advanced options', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,
-        delayAfterDispense: 100
+        delayAfterDispense: 100,
       }
 
       const result = transfer(transferArgs)(robotInitialState)
@@ -423,8 +423,8 @@ describe('advanced options', () => {
         command: 'delay',
         params: {
           wait: 100,
-          message: null
-        }
+          message: null,
+        },
       }
 
       expect(result.commands).toEqual([
@@ -433,14 +433,14 @@ describe('advanced options', () => {
           labware: 'sourcePlateId',
           pipette: 'p300SingleId',
           volume: 300,
-          well: 'A1'
+          well: 'A1',
         },
         {
           command: 'dispense',
           labware: 'destPlateId',
           pipette: 'p300SingleId',
           volume: 300,
-          well: 'B1'
+          well: 'B1',
         },
         delayCommand,
 
@@ -449,16 +449,16 @@ describe('advanced options', () => {
           labware: 'sourcePlateId',
           pipette: 'p300SingleId',
           volume: 50,
-          well: 'A1'
+          well: 'A1',
         },
         {
           command: 'dispense',
           labware: 'destPlateId',
           pipette: 'p300SingleId',
           volume: 50,
-          well: 'B1'
+          well: 'B1',
         },
-        delayCommand
+        delayCommand,
       ])
     })
     test('blowout should blowout in specified labware after each dispense') // TODO

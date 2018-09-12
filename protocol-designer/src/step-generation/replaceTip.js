@@ -20,7 +20,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   if (!nextTiprack) {
     // no valid next tip / tiprack, bail out
     return {
-      errors: [insufficientTips()]
+      errors: [insufficientTips()],
     }
   }
 
@@ -39,9 +39,9 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
       params: {
         pipette: pipetteData.id,
         labware: nextTiprack.tiprackId,
-        well: nextTiprack.well
-      }
-    }
+        well: nextTiprack.well,
+      },
+    },
   ]
 
   // pipette now has tip
@@ -50,7 +50,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   // update tiprack-to-pipette assignment
   robotState.tiprackAssignment = {
     ...robotState.tiprackAssignment,
-    [nextTiprack.tiprackId]: pipetteId
+    [nextTiprack.tiprackId]: pipetteId,
   }
 
   // remove tips from tiprack
@@ -70,7 +70,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
 
   return {
     commands,
-    robotState
+    robotState,
   }
 }
 

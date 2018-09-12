@@ -4,7 +4,7 @@ import capitalize from 'lodash/capitalize'
 
 import {
   ListItem,
-  type IconName
+  type IconName,
 } from '@opentrons/components'
 
 import type {Mount, Pipette} from '../../robot'
@@ -13,7 +13,7 @@ import styles from './styles.css'
 type Props = {
   isRunning: boolean,
   mount: Mount,
-  pipette: ?Pipette
+  pipette: ?Pipette,
 }
 
 export default function PipetteListItem (props: Props) {

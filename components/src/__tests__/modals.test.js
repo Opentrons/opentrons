@@ -87,7 +87,7 @@ describe('modals', () => {
         onCloseClick={() => {}}
         buttons={[
           {onClick: () => {}, children: 'a'},
-          {onClick: () => {}, children: 'b'}
+          {onClick: () => {}, children: 'b'},
         ]}
       >
         children
@@ -126,8 +126,8 @@ describe('modals', () => {
           subtitle: 'Subtitle',
           back: {
             children: 'back',
-            onClick: () => alert('back button clicked')
-          }
+            onClick: () => alert('back button clicked'),
+          },
         }}
       >
         children
@@ -144,8 +144,8 @@ describe('modals', () => {
           title: 'Title',
           subtitle: 'Subtitle',
           back: {
-            disabled: true
-          }
+            disabled: true,
+          },
         }}
       >
         children

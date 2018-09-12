@@ -12,14 +12,14 @@ import {formConnectorFactory, type FormConnector} from '../utils'
 type SP = {
   instruments: $PropertyType<FilePageProps, 'instruments'>,
   isFormAltered: $PropertyType<FilePageProps, 'isFormAltered'>,
-  _values: {[accessor: FileMetadataFieldAccessors]: string}
+  _values: {[accessor: FileMetadataFieldAccessors]: string},
 }
 
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
   _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: string}) => mixed,
   goToDesignPage: $PropertyType<FilePageProps, 'goToDesignPage'>,
-  swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>
+  swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>,
 }
 
 const mapStateToProps = (state: BaseState): SP => {
@@ -29,8 +29,8 @@ const mapStateToProps = (state: BaseState): SP => {
     isFormAltered: fileSelectors.isUnsavedMetadatFormAltered(state),
     instruments: {
       left: pipetteData.find(i => i.mount === 'left'),
-      right: pipetteData.find(i => i.mount === 'right')
-    }
+      right: pipetteData.find(i => i.mount === 'right'),
+    },
   }
 }
 
@@ -38,7 +38,7 @@ const mapDispatchToProps: DP = {
   _updateFileMetadataFields: actions.updateFileMetadataFields,
   _saveFileMetadata: actions.saveFileMetadata,
   goToDesignPage: () => navActions.navigateToPage('steplist'),
-  swapPipettes: pipetteActions.swapPipettes
+  swapPipettes: pipetteActions.swapPipettes,
 }
 
 const mergeProps = (
@@ -61,7 +61,7 @@ const mergeProps = (
     instruments,
     goToDesignPage,
     saveFileMetadata: () => _saveFileMetadata(_values),
-    swapPipettes
+    swapPipettes,
   }
 }
 

@@ -15,7 +15,7 @@ import {
   closeLabwareSelector,
 
   setMoveLabwareMode,
-  moveLabware
+  moveLabware,
 } from '../labware-ingred/actions'
 import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
 
@@ -24,7 +24,7 @@ import type {BaseState} from '../types'
 import type {DeckSlot} from '@opentrons/components'
 
 type OwnProps = {
-  slot: DeckSlot
+  slot: DeckSlot,
 }
 
 type Props = React.ElementProps<typeof LabwareOnDeck>
@@ -40,7 +40,7 @@ type DispatchProps = {
   closeLabwareSelector: mixed,
 
   setMoveLabwareMode: mixed,
-  moveLabware: mixed
+  moveLabware: mixed,
 }
 
 type StateProps = $Diff<Props, DispatchProps>
@@ -75,7 +75,7 @@ function mapStateToProps (state: BaseState, ownProps: OwnProps): StateProps {
       ? (isSelectedSlot || selectors.canAdd(state) === slot)
       // outside of deckSetupMode, labware is highlighted when step/substep is hovered
       : steplistSelectors.hoveredStepLabware(state).includes(container && container.id),
-    deckSetupMode
+    deckSetupMode,
   }
 }
 
@@ -90,7 +90,7 @@ const mapDispatchToProps = {
   closeLabwareSelector,
 
   setMoveLabwareMode,
-  moveLabware
+  moveLabware,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LabwareOnDeck)

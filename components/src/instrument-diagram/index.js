@@ -9,9 +9,9 @@ export {
   InstrumentDiagram,
   InstrumentGroup,
   InstrumentInfo,
-  InfoItem
+  InfoItem,
 }
 
 export type {
-  InstrumentInfoProps
+  InstrumentInfoProps,
 }

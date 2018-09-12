@@ -17,7 +17,7 @@ import type {Selector} from '../../types'
 import type {
   WellContents,
   WellContentsByLabware,
-  ContentsByWell
+  ContentsByWell,
 } from '../../labware-ingred/types'
 
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
@@ -42,7 +42,7 @@ function _wellContentsForWell (
     error: false,
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
-    groupIds: ingredGroupIdsWithContent
+    groupIds: ingredGroupIdsWithContent,
   }
 }
 
@@ -61,7 +61,7 @@ export function _wellContentsForLabware (
         ...wellAcc,
         [well]: wellHasContents
           ? _wellContentsForWell(labwareLiquids[well], well)
-          : {}
+          : {},
       }
     },
     {}

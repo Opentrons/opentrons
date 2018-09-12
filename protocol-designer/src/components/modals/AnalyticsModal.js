@@ -10,7 +10,7 @@ import {
   shutdownAnalytics,
   optIn,
   optOut,
-  getHasOptedIn
+  getHasOptedIn,
 } from '../../analytics'
 
 type State = {isAnalyticsModalOpen: boolean}
@@ -45,7 +45,7 @@ class AnalyticsModal extends React.Component<*, State> {
               optOut()
               shutdownAnalytics() // sanity check, there shouldn't be an analytics instance yet
             },
-            children: i18n.t('button.no')
+            children: i18n.t('button.no'),
           },
           {
             onClick: () => {
@@ -53,8 +53,8 @@ class AnalyticsModal extends React.Component<*, State> {
               optIn()
               initializeAnalytics()
             },
-            children: i18n.t('button.yes')
-          }
+            children: i18n.t('button.yes'),
+          },
         ]}>
         <h3>{i18n.t('card.toggle.share_session')}</h3>
         <div className={settingsStyles.body_wrapper}>

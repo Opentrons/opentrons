@@ -5,7 +5,7 @@ import {push} from 'react-router-redux'
 import {AlertModal} from '@opentrons/components'
 
 import {
-  actions as robotActions
+  actions as robotActions,
 } from '../../robot'
 
 type Props = {
@@ -25,7 +25,7 @@ const mapDispatchToProps = (dispatch) => ({
   cancel: () => {
     dispatch(robotActions.cancel())
     dispatch(push('/run'))
-  }
+  },
 })
 
 function ExitAlertModal (props: Props) {
@@ -36,7 +36,7 @@ function ExitAlertModal (props: Props) {
       heading={HEADING}
       buttons={[
         {children: BACK_TEXT, onClick: back},
-        {children: CANCEL_TEXT, onClick: cancel}
+        {children: CANCEL_TEXT, onClick: cancel},
       ]}
       alertOverlay
     >

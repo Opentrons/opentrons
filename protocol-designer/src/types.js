@@ -17,7 +17,7 @@ export type BaseState = {
   pipettes: Pipettes,
   steplist: StepList,
   tutorial: Tutorial,
-  wellSelection: WellSelection
+  wellSelection: WellSelection,
 }
 
 export type GetState = () => BaseState
@@ -29,13 +29,13 @@ export type ThunkAction<A> = (dispatch: ThunkDispatch<A>, getState: GetState) =>
 export type WellVolumes = {[wellName: string]: number}
 // TODO LATER Ian 2018-02-19 type for containers.json
 export type JsonWellData = {
-  'total-liquid-volume': number
+  'total-liquid-volume': number,
   // missing rest of fields, todo later
 }
 export type VolumeJson = {
   locations: {
-    [wellName: string]: JsonWellData
-  }
+    [wellName: string]: JsonWellData,
+  },
 }
 
 export type Options = Array<{value: string, name: string, disabled?: boolean}>

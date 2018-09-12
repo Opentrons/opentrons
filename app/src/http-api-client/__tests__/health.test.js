@@ -26,11 +26,11 @@ describe('health', () => {
             [path]: {
               inProgress: true,
               error: null,
-              response: {name, api_version: '1.2.3', fw_version: '4.5.6'}
-            }
-          }
-        }
-      }
+              response: {name, api_version: '1.2.3', fw_version: '4.5.6'},
+            },
+          },
+        },
+      },
     }
 
     const getRobotHealth = makeGetRobotHealth()
@@ -38,7 +38,7 @@ describe('health', () => {
     expect(getRobotHealth(state, {name})).toEqual({
       inProgress: true,
       error: null,
-      response: {name, api_version: '1.2.3', fw_version: '4.5.6'}
+      response: {name, api_version: '1.2.3', fw_version: '4.5.6'},
     })
   })
 
@@ -46,9 +46,9 @@ describe('health', () => {
     const state = {
       api: {
         api: {
-          health: {}
-        }
-      }
+          health: {},
+        },
+      },
     }
 
     const getRobotHealth = makeGetRobotHealth()
@@ -68,7 +68,7 @@ describe('health', () => {
     const store = mockStore({})
     const expectedActions = [
       {type: 'api:REQUEST', payload: {robot, path, request: null}},
-      {type: 'api:SUCCESS', payload: {robot, path, response}}
+      {type: 'api:SUCCESS', payload: {robot, path, response}},
     ]
 
     client.__setMockResponse(response)
@@ -82,7 +82,7 @@ describe('health', () => {
     const store = mockStore({})
     const expectedActions = [
       {type: 'api:REQUEST', payload: {robot, path, request: null}},
-      {type: 'api:FAILURE', payload: {robot, path, error}}
+      {type: 'api:FAILURE', payload: {robot, path, error}},
     ]
 
     client.__setMockError(error)
