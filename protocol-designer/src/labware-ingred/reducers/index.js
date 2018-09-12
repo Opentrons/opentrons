@@ -14,7 +14,7 @@ import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils'
 
 import type {DeckSlot} from '@opentrons/components'
-import {getLabware as getLabwareDef} from '@opentrons/shared-data'
+import {getIsTiprack} from '@opentrons/shared-data'
 
 import type {LabwareLiquidState} from '../../step-generation'
 
@@ -326,8 +326,7 @@ const labwareOptions: Selector<Options> = createSelector(
   getLabware,
   getLabwareNames,
   (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
-    const labwareDef = getLabwareDef(labware[labwareId].type)
-    const isTiprack = labwareDef && labwareDef.metadata.isTiprack
+    const isTiprack = getIsTiprack(labware[labwareId].type)
     if (!labware.type || isTiprack) {
       return acc
     }

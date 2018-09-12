@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
-import { getLabware } from '@opentrons/shared-data'
+import { getIsTiprack } from '@opentrons/shared-data'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
@@ -69,9 +69,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        const labwareDef = getLabware(labware[labwareId].type)
-        const isTiprack = labwareDef && labwareDef.metadata.isTiprack
-
+        const isTiprack = getIsTiprack(labware[labwareId].type)
         if (labwareData.type && isTiprack) {
           return {
             ...acc,
