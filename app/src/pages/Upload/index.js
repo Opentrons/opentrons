@@ -5,7 +5,10 @@ import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 import type {State} from '../../types'
 import type {Robot} from '../../robot'
+
 import {selectors as robotSelectors} from '../../robot'
+import {getProtocolFilename} from '../../protocol'
+
 import {Splash, SpinnerModal} from '@opentrons/components'
 import Page from '../../components/Page'
 import UploadStatus from './UploadStatus'
@@ -13,7 +16,7 @@ import FileInfo from './FileInfo'
 
 type SP = {
   robot: ?Robot,
-  name: string,
+  name: ?string,
   uploadInProgress: boolean,
   uploadError: ?{message: string},
   protocolRunning: boolean,
@@ -32,7 +35,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   const connectedRobot = robotSelectors.getConnectedRobot(state)
   return {
     robot: connectedRobot,
-    name: robotSelectors.getSessionName(state),
+    name: getProtocolFilename(state),
     uploadInProgress: robotSelectors.getSessionLoadInProgress(state),
     uploadError: robotSelectors.getUploadError(state),
     protocolRunning: robotSelectors.getIsRunning(state),
@@ -43,8 +46,9 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 function UploadPage (props: Props) {
   const {robot, name, uploadInProgress, uploadError, match: {path}} = props
   if (!robot) return (<Redirect to='/robots' />)
-  if (!name && !uploadInProgress && !uploadError) return (<Page><Splash /></Page>)
+  if (!name) return (<Page><Splash /></Page>)
   if (uploadInProgress) return (<Page><SpinnerModal message='Upload in Progress'/></Page>)
+
   return (
     <Switch>
       <Route
@@ -53,7 +57,7 @@ function UploadPage (props: Props) {
       />
       <Route
         path={path}
-        render={() => (<UploadStatus {...props}/>)}
+        render={() => (<UploadStatus name={name} uploadError={uploadError} />)}
       />
     </Switch>
   )

@@ -61,10 +61,13 @@ describe('analytics events map', () => {
     })
   })
 
-  test('robot:SESSION_RESPONSE error -> protocolUpload event', () => {
+  test('robot:SESSION_RESPONSE/ERROR -> protocolUpload event', () => {
     const state = {}
-    const success = {type: 'robot:SESSION_RESPONSE'}
-    const failure = {type: 'robot:SESSION_RESPONSE', error: new Error('AH')}
+    const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
+    const failure = {
+      type: 'robot:SESSION_ERROR',
+      payload: {error: new Error('AH')},
+    }
 
     expect(makeEvent(state, success)).toEqual({
       name: 'protocolUpload',

@@ -38,6 +38,9 @@ export type PDMetadata = {
 }
 
 // A JSON protocol
+// corresponds to shared-data/protocol-json-schema/protocol-schema.json
+// TODO(mc, 2018-09-05): fix up schema or this typedef so they align
+// see type Protocol in app/src/protocol/types.js for a start
 export type ProtocolFile = {
   'protocol-schema': VersionString,
 

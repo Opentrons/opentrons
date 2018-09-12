@@ -15,6 +15,7 @@ import type {Action as HttpApiAction} from './http-api-client'
 import type {ShellAction} from './shell'
 import type {ConfigAction} from './config'
 import type {DiscoveryAction} from './discovery'
+import type {ProtocolAction} from './protocol'
 
 export type State = $Call<reducer>
 
@@ -28,6 +29,7 @@ export type Action =
   | ConfigAction
   | RouterAction
   | DiscoveryAction
+  | ProtocolAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 

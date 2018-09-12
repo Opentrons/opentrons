@@ -3,11 +3,10 @@
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
 
+import type {Action} from '../../types'
 import type {Mount, Slot} from '../types'
 import {actionTypes} from '../actions'
 import type {
-  Action,
-  DisconnectResponseAction,
   ConfirmProbedAction,
   PipetteCalibrationAction,
   LabwareCalibrationAction,
@@ -53,7 +52,6 @@ export type State = {
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
-  SESSION,
   SET_DECK_POPULATED,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
@@ -80,6 +78,11 @@ export default function calibrationReducer (
   action: Action
 ): State {
   switch (action.type) {
+    case 'robot:DISCONNECT_RESPONSE':
+    case 'robot:REFRESH_SESSION':
+    case 'protocol:UPLOAD':
+      return INITIAL_STATE
+
     case 'robot:CONFIRM_PROBED':
       return handleConfirmProbed(state, action)
 
@@ -137,17 +140,10 @@ export default function calibrationReducer (
     case 'robot:UPDATE_OFFSET_FAILURE':
       return handleUpdateOffsetFailure(state, action)
 
-    case 'robot:DISCONNECT_RESPONSE':
-      return handleDisconnectResponse(state, action)
-
-    case 'robot:REFRESH_SESSION':
-      return handleSession(state, action)
-
     case 'robot:SET_MODULES_REVIEWED':
       return handleSetModulesReviewed(state, action)
 
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
-    case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
@@ -157,17 +153,6 @@ export default function calibrationReducer (
   }
 
   return state
-}
-
-function handleDisconnectResponse (
-  state: State,
-  action: DisconnectResponseAction
-): State {
-  return INITIAL_STATE
-}
-
-function handleSession (state: State, action: any): State {
-  return INITIAL_STATE
 }
 
 function handleSetDeckPopulated (state: State, action: any): State {
