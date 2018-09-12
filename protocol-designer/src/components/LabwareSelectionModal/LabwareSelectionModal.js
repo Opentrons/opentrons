@@ -24,6 +24,7 @@ type Props = {
 const hardcodedLabware = {
   'Tip Rack': [
     ['tiprack-10ul', '10µL Tip Rack', 'Tiprack-10ul'],
+    ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
     ['opentrons-tiprack-300ul', '300µL Tip Rack', 'Tiprack-200ul'],
     ['tiprack-1000ul', '1000µL Tip Rack', 'Tiprack-200ul'],
     ['tiprack-1000ul-chem', '10x10 1000µL Chem-Tip Rack', 'Tiprack-1000ul-chem']

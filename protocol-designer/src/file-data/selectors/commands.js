@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
+import { getLabware } from '@opentrons/shared-data'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
@@ -68,9 +69,10 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        // TODO Ian 2018-05-18 have a more robust way of designating labware types
-        // as tiprack or not
-        if (labwareData.type && labwareData.type.startsWith('tiprack')) {
+        const labwareDef = getLabware(labware[labwareId].type)
+        const isTiprack = labwareDef && labwareDef.metadata.isTiprack
+
+        if (labwareData.type && isTiprack) {
           return {
             ...acc,
             // TODO LATER Ian 2018-05-18 use shared-data wells instead of assuming 96 tips?
