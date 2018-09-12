@@ -63,10 +63,10 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p10_single')
@@ -77,20 +77,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P10_Multi(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p10_multi')
@@ -101,20 +101,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P50_Single(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p50_single')
@@ -125,20 +125,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P50_Multi(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p50_multi')
@@ -149,20 +149,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P300_Single(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p300_single')
@@ -173,20 +173,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P300_Multi(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p300_multi')
@@ -197,20 +197,20 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def P1000_Single(
             self,
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         pipette_model_version = self._retrieve_version_number(
             mount, 'p1000_single')
@@ -221,10 +221,10 @@ class InstrumentsWrapper(object):
             mount=mount,
             trash_container=trash_container,
             tip_racks=tip_racks,
-            min_volume=min_volume,
-            max_volume=max_volume,
             aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate)
+            dispense_flow_rate=dispense_flow_rate,
+            min_volume=min_volume,
+            max_volume=max_volume)
 
     def _create_pipette_from_config(
             self,
@@ -232,10 +232,10 @@ class InstrumentsWrapper(object):
             mount,
             trash_container='',
             tip_racks=[],
-            min_volume=None,
-            max_volume=None,
             aspirate_flow_rate=None,
-            dispense_flow_rate=None):
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
 
         if aspirate_flow_rate is not None:
             config = config._replace(aspirate_flow_rate=aspirate_flow_rate)
@@ -243,9 +243,9 @@ class InstrumentsWrapper(object):
             config = config._replace(dispense_flow_rate=dispense_flow_rate)
 
         if min_volume is not None:
-            config._replace(min_volume=min_volume)
+            config = config._replace(min_volume=min_volume)
         if max_volume is not None:
-            config._replace(max_volume=max_volume)
+            config = config._replace(max_volume=max_volume)
 
         p = self.Pipette(
             model_offset=config.model_offset,
