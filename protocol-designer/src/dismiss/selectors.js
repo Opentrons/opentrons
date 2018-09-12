@@ -47,7 +47,7 @@ export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<Comm
 
         return {
           ...stepAcc,
-          [stepId]: visibleWarnings
+          [stepId]: visibleWarnings,
         }
       }, {})
   }

@@ -22,7 +22,7 @@ export function makeService (
     ip: ip || null,
     port: port || DEFAULT_PORT,
     ok: ok != null ? ok : null,
-    serverOk: serverOk != null ? serverOk : null
+    serverOk: serverOk != null ? serverOk : null,
   }
 }
 

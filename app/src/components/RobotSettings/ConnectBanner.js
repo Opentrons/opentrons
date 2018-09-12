@@ -4,7 +4,7 @@ import {type Robot} from '../../robot'
 import {AlertItem} from '@opentrons/components'
 
 type State = {
-  dismissed: boolean
+  dismissed: boolean,
 }
 
 export default class ConnectBanner extends React.Component <Robot, State> {
@@ -12,7 +12,7 @@ export default class ConnectBanner extends React.Component <Robot, State> {
     super(props)
 
     this.state = {
-      dismissed: false
+      dismissed: false,
     }
   }
 

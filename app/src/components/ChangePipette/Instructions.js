@@ -21,7 +21,7 @@ export default function Instructions (props: ChangePipetteProps) {
     ...props,
     back: wantedPipetteName
       ? {onClick: props.back}
-      : {Component: Link, to: props.exitUrl, children: 'exit'}
+      : {Component: Link, to: props.exitUrl, children: 'exit'},
   }
 
   const heading = `${capitalize(direction)} ${displayName} Pipette`

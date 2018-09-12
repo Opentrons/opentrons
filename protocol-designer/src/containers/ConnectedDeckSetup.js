@@ -19,7 +19,7 @@ const DECK_HEADER = 'Tell the robot where labware and liquids start on the deck'
 
 type StateProps = {
   deckSetupMode: boolean,
-  ingredSelectionMode: boolean
+  ingredSelectionMode: boolean,
 }
 type DispatchProps = {cancelMoveLabwareMode: () => mixed}
 
@@ -28,11 +28,11 @@ const mapStateToProps = (state: BaseState): StateProps => ({
     steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
   ),
   // TODO SOON remove all uses of the `activeModals` selector
-  ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state))
+  ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state)),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
-  cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode())
+  cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode()),
 })
 
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor

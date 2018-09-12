@@ -7,7 +7,7 @@ import {connect} from 'react-redux'
 import i18n from '../../localization'
 import {
   actions as dismissActions,
-  selectors as dismissSelectors
+  selectors as dismissSelectors,
 } from '../../dismiss'
 import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
@@ -15,22 +15,22 @@ import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../../types'
 import type {
   CommandCreatorError,
-  CommandCreatorWarning
+  CommandCreatorWarning,
 } from '../../step-generation'
 
 type AlertContent = {
   title: string,
-  body?: React.Node
+  body?: React.Node,
 }
 
 type SP = {
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
-  _stepId: ?number
+  _stepId: ?number,
 }
 
 type DP = {
-  onDismiss: (CommandCreatorWarning) => () => mixed
+  onDismiss: (CommandCreatorWarning) => () => mixed,
 }
 
 type Props = SP & DP
@@ -46,12 +46,12 @@ type Props = SP & DP
 
 const getErrorContent = (error: CommandCreatorError): AlertContent => ({
   title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
-  body: i18n.t(`alert.timeline.error.${error.type}.body`, {defaultValue: ''})
+  body: i18n.t(`alert.timeline.error.${error.type}.body`, {defaultValue: ''}),
 })
 
 const getWarningContent = (warning: CommandCreatorWarning): AlertContent => ({
   title: i18n.t(`alert.timeline.warning.${warning.type}.title`, warning.message),
-  body: i18n.t(`alert.timeline.warning.${warning.type}.body`, {defaultValue: ''})
+  body: i18n.t(`alert.timeline.warning.${warning.type}.body`, {defaultValue: ''}),
 })
 
 function Alerts (props: Props) {
@@ -100,7 +100,7 @@ function mapStateToProps (state: BaseState): SP {
   return {
     errors,
     warnings,
-    _stepId
+    _stepId,
   }
 }
 
@@ -110,12 +110,12 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   const onDismiss = (warning: CommandCreatorWarning) =>
     () => dispatch(dismissActions.dismissTimelineWarning({
       warning,
-      stepId
+      stepId,
     }))
 
   return {
     ...stateProps,
-    onDismiss
+    onDismiss,
   }
 }
 

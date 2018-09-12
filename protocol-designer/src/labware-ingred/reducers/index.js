@@ -23,7 +23,7 @@ import type {
   AllIngredGroupFields,
   IngredientInstance,
   Labware,
-  LabwareTypeById
+  LabwareTypeById,
 } from '../types'
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
@@ -50,14 +50,14 @@ const modeLabwareSelection = handleActions({
   OPEN_LABWARE_SELECTOR: (state, action: ActionType<typeof actions.openLabwareSelector>) =>
       action.payload.slot,
   CLOSE_LABWARE_SELECTOR: () => false,
-  CREATE_CONTAINER: () => false
+  CREATE_CONTAINER: () => false,
 }, false)
 
 // If falsey, we aren't moving labware. Else, value should be the containerID we're
 // ready to move.
 const moveLabwareMode = handleActions({
   SET_MOVE_LABWARE_MODE: (state, action: ActionType<typeof actions.setMoveLabwareMode>) => action.payload,
-  MOVE_LABWARE: (state, action: MoveLabware) => false // leave move mode after performing a move action
+  MOVE_LABWARE: (state, action: MoveLabware) => false, // leave move mode after performing a move action
 }, false)
 
 type SelectedContainerId = string | null
@@ -68,7 +68,7 @@ const selectedContainerId = handleActions({
   // $FlowFixMe: Cannot get `action.payload` because property `payload` is missing in function
   OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId =>
    action.payload.labwareId,
-  CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null
+  CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null,
 }, null)
 
 type RenameLabwareFormModeState = boolean
@@ -77,11 +77,11 @@ const renameLabwareFormMode = handleActions({
 
   CLOSE_RENAME_LABWARE_FORM: () => false,
   CLOSE_INGREDIENT_SELECTOR: () => false,
-  EDIT_MODE_INGREDIENT_GROUP: () => false
+  EDIT_MODE_INGREDIENT_GROUP: () => false,
 }, false)
 
 type ContainersState = {
-  [id: string]: Labware
+  [id: string]: Labware,
 }
 
 const initialLabwareState: ContainersState = {
@@ -90,8 +90,8 @@ const initialLabwareState: ContainersState = {
     type: 'fixed-trash',
     disambiguationNumber: 1,
     name: 'Trash',
-    slot: '12'
-  }
+    slot: '12',
+  },
 }
 
 function getNextDisambiguationNumber (allContainers: ContainersState, labwareType: string): number {
@@ -114,8 +114,8 @@ export const containers = handleActions({
         type: action.payload.containerType,
         disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
         id,
-        name: null // create with null name, so we force explicit naming.
-      }
+        name: null, // create with null name, so we force explicit naming.
+      },
     }
   },
   DELETE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.deleteContainer>) => pickBy(
@@ -137,7 +137,7 @@ export const containers = handleActions({
     return {
       ...state,
       ...fromContainers,
-      ...toContainers
+      ...toContainers,
     }
   },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
@@ -155,11 +155,11 @@ export const containers = handleActions({
           id,
           type: fileLabware.model,
           name: fileLabware['display-name'],
-          disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model)
-        }
+          disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model),
+        },
       }
     }, {})
-  }
+  },
 }, initialLabwareState)
 
 type SavedLabwareState = {[labwareId: string]: boolean}
@@ -167,15 +167,15 @@ type SavedLabwareState = {[labwareId: string]: boolean}
 export const savedLabware = handleActions({
   DELETE_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.deleteContainer>) => ({
     ...state,
-    [action.payload.containerId]: false
+    [action.payload.containerId]: false,
   }),
   MODIFY_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.modifyContainer>) => ({
     ...state,
-    [action.payload.containerId]: true
+    [action.payload.containerId]: true,
   }),
   LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
     mapValues(action.payload.labware, () => true)
-  )
+  ),
 }, {})
 
 type IngredientsState = IngredientGroups
@@ -185,12 +185,12 @@ export const ingredients = handleActions({
     const ingredFields: IngredientInstance = {
       description,
       individualize,
-      name
+      name,
     }
 
     return {
       ...state,
-      [groupId]: ingredFields
+      [groupId]: ingredFields,
     }
   },
   // Remove the deleted group (referenced by array index)
@@ -203,7 +203,7 @@ export const ingredients = handleActions({
       : omit(state, [groupId])
   },
   LOAD_FILE: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
-    getPDMetadata(action.payload).ingredients
+    getPDMetadata(action.payload).ingredients,
 }, {})
 
 type LocationsState = LabwareLiquidState
@@ -217,9 +217,9 @@ export const ingredLocations = handleActions({
         ...acc,
         [well]: {
           [groupId]: {
-            volume: action.payload.volume
-          }
-        }
+            volume: action.payload.volume,
+          },
+        },
       }
     }
 
@@ -227,8 +227,8 @@ export const ingredLocations = handleActions({
       ...state,
       [containerId]: {
         ...state[containerId],
-        ...action.payload.wells.reduce(wellsWithVol, {})
-      }
+        ...action.payload.wells.reduce(wellsWithVol, {}),
+      },
     }
   },
   // TODO: Ian 2018-06-07
@@ -242,8 +242,8 @@ export const ingredLocations = handleActions({
       return {
         ...state,
         [containerId]: {
-          ...omit(state[containerId], wellName)
-        }
+          ...omit(state[containerId], wellName),
+        },
       }
     }
     // deleting entire ingred group
@@ -252,7 +252,7 @@ export const ingredLocations = handleActions({
     return state
   },
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
-    getPDMetadata(action.payload).ingredLocations
+    getPDMetadata(action.payload).ingredLocations,
 }, {})
 
 export type RootState = {|
@@ -263,7 +263,7 @@ export type RootState = {|
   savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
   ingredLocations: LocationsState,
-  renameLabwareFormMode: RenameLabwareFormModeState
+  renameLabwareFormMode: RenameLabwareFormModeState,
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
@@ -275,7 +275,7 @@ const rootReducer = combineReducers({
   savedLabware,
   ingredients,
   ingredLocations,
-  renameLabwareFormMode
+  renameLabwareFormMode,
 })
 
 // SELECTORS
@@ -333,8 +333,8 @@ const labwareOptions: Selector<Options> = createSelector(
       ...acc,
       {
         name: names[labwareId],
-        value: labwareId
-      }
+        value: labwareId,
+      },
     ]
   }, [])
 )
@@ -363,7 +363,7 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
     (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
       ...acc,
       // NOTE: containerId added in so you still have a reference
-      [containerObj.slot]: {...containerObj, containerId}
+      [containerObj.slot]: {...containerObj, containerId},
     }),
     {})
 )
@@ -372,8 +372,8 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
 type IngredGroupFields = {
   [ingredGroupId: string]: {
     groupId: string,
-    ...IngredInputFields
-  }
+    ...IngredInputFields,
+  },
 }
 const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
   getIngredientGroups,
@@ -381,7 +381,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
     ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
       ...acc,
-      [ingredGroupId]: ingredGroup
+      [ingredGroupId]: ingredGroup,
     }), {})
 )
 
@@ -397,8 +397,8 @@ type ActiveModals = {
   labwareSelection: boolean,
   ingredientSelection: ?{
     slot: ?DeckSlot,
-    containerName: ?string
-  }
+    containerName: ?string,
+  },
 }
 
 const activeModals: Selector<ActiveModals> = createSelector(
@@ -411,8 +411,8 @@ const activeModals: Selector<ActiveModals> = createSelector(
       labwareSelection: state.modeLabwareSelection !== false,
       ingredientSelection: {
         slot: selectedContainer ? selectedContainer.slot : null,
-        containerName: selectedContainer && selectedContainer.type
-      }
+        containerName: selectedContainer && selectedContainer.type,
+      },
     })
   }
 )
@@ -448,7 +448,7 @@ export const selectors = {
   containersBySlot,
   canAdd,
   labwareOptions,
-  hasLiquid
+  hasLiquid,
 }
 
 export default rootReducer

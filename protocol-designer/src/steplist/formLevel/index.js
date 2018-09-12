@@ -7,14 +7,14 @@ import {
   wellRatioTransfer,
   wellRatioConsolidate,
   wellRatioDistribute,
-  type FormError
+  type FormError,
 } from './errors'
 import {
   composeWarnings,
   maxDispenseWellVolume,
   minDisposalVolume,
   type FormWarning,
-  type FormWarningType
+  type FormWarningType,
 } from './warnings'
 import type {StepType} from '../../form-types'
 
@@ -27,16 +27,16 @@ const stepFormHelperMap: {[StepType]: FormHelpers} = {
   pause: {getErrors: composeErrors(incompatibleLabware)},
   transfer: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
-    getWarnings: composeWarnings(maxDispenseWellVolume)
+    getWarnings: composeWarnings(maxDispenseWellVolume),
   },
   consolidate: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioConsolidate),
-    getWarnings: composeWarnings(maxDispenseWellVolume)
+    getWarnings: composeWarnings(maxDispenseWellVolume),
   },
   distribute: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioDistribute),
-    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume)
-  }
+    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume),
+  },
 }
 
 export type {FormError, FormWarning, FormWarningType}

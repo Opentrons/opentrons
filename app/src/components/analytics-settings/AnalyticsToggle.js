@@ -7,11 +7,11 @@ import {toggleAnalyticsOptedIn, getAnalyticsOptedIn} from '../../analytics'
 import {LabeledToggle} from '../controls'
 
 type SP = {
-  optedIn: boolean
+  optedIn: boolean,
 }
 
 type DP = {
-  toggleOptedIn: () => mixed
+  toggleOptedIn: () => mixed,
 }
 
 type Props = SP & DP
@@ -37,12 +37,12 @@ function AnalyticsToggle (props: Props) {
 
 function mapStateToProps (state: State): SP {
   return {
-    optedIn: getAnalyticsOptedIn(state)
+    optedIn: getAnalyticsOptedIn(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
-    toggleOptedIn: () => dispatch(toggleAnalyticsOptedIn())
+    toggleOptedIn: () => dispatch(toggleAnalyticsOptedIn()),
   }
 }

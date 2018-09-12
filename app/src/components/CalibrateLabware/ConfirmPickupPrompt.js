@@ -10,7 +10,7 @@ import styles from './styles.css'
 type Props = Labware & {
   calibrator: Pipette,
   onNoClick: () => void,
-  onYesClick: () => void
+  onYesClick: () => void,
 }
 
 export default function ConfirmPickedUpPrompt (props: Props) {

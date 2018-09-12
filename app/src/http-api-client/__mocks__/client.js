@@ -3,7 +3,7 @@
 
 const {
   mockResolvedValueOnce,
-  mockRejectedValueOnce
+  mockRejectedValueOnce,
 } = require('../../../__util__/mock-promise')
 
 const client = module.exports = jest.fn()

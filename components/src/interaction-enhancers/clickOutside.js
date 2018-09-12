@@ -4,11 +4,11 @@ import * as React from 'react'
 type WrapperRefType = ?Element
 
 export type ClickOutsideInterface = {
-  passRef: WrapperRefType => mixed
+  passRef: WrapperRefType => mixed,
 }
 
 type HocProps = {
-  onClickOutside: ?(MouseEvent => mixed)
+  onClickOutside: ?(MouseEvent => mixed),
 }
 
 export default function clickOutside<
@@ -65,7 +65,7 @@ export default function clickOutside<
 // TODO: BC 2018-7-25 deprecate HOC version (clickOutside) and move to just ClickOutside FOC
 type ClickOutsideProps = {
   onClickOutside: ?(MouseEvent => mixed),
-  children: ({ref: React.Ref<*>}) => React.Element<*>
+  children: ({ref: React.Ref<*>}) => React.Element<*>,
 }
 export class ClickOutside extends React.Component<ClickOutsideProps> {
   wrapperRef: ?Element

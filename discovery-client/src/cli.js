@@ -12,38 +12,38 @@ require('yargs')
       describe: 'How often the health poller hits every IP address',
       alias: 'p',
       default: 1000,
-      type: 'number'
+      type: 'number',
     },
     nameFilter: {
       describe: 'Filter found robots by name',
       alias: 'n',
       default: [],
-      type: 'array'
+      type: 'array',
     },
     ipFilter: {
       describe: 'Filter found robots by IP address',
       alias: 'i',
       default: [],
-      type: 'array'
+      type: 'array',
     },
     portFilter: {
       describe: 'Filter mDNS advertisements by port',
       alias: 'a',
       default: [],
-      type: 'array'
+      type: 'array',
     },
     candidates: {
       describe: 'Extra IP addresses to poll outside of mDNS',
       alias: 'c',
       default: [],
-      type: 'array'
+      type: 'array',
     },
     logLevel: {
       describe: 'Log level',
       alias: 'l',
       choices: [...LOG_LVLS, 'off'],
-      default: 'info'
-    }
+      default: 'info',
+    },
   })
   .env('OT_DC')
   .middleware([addLogger, addHandleError, logArgv])
@@ -54,13 +54,13 @@ require('yargs')
     yargs => {
       yargs.positional('name', {
         describe: 'Name of robot to find; if omitted will find first robot',
-        type: 'string'
+        type: 'string',
       })
       yargs.option('timeout', {
         describe: 'How long to wait for a robot',
         alias: 't',
         default: 5000,
-        type: 'number'
+        type: 'number',
       })
     },
     find
@@ -114,7 +114,7 @@ function addLogger (argv) {
     http: level >= 3 ? console.debug : noop,
     verbose: level >= 4 ? console.debug : noop,
     debug: level >= 5 ? console.debug : noop,
-    silly: level >= 6 ? console.debug : noop
+    silly: level >= 6 ? console.debug : noop,
   }
 }
 

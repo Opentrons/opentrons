@@ -11,12 +11,12 @@ import type {BaseState, ThunkDispatch} from '../../types'
 type Props = React.ElementProps<typeof FileSidebar>
 
 type SP = {
-  downloadData: $PropertyType<Props, 'downloadData'>
+  downloadData: $PropertyType<Props, 'downloadData'>,
 }
 
 type MP = {
   _canCreateNew: ?boolean,
-  _hasUnsavedChanges: ?boolean
+  _hasUnsavedChanges: ?boolean,
 }
 
 export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
@@ -30,12 +30,12 @@ function mapStateToProps (state: BaseState): SP & MP {
     downloadData: (canDownload)
       ? {
         fileContents: JSON.stringify(fileData, null, 4),
-        fileName: protocolName + '.json'
+        fileName: protocolName + '.json',
       }
       : null,
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.newProtocolModal(state),
-    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state)
+    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state),
   }
 }
 
@@ -50,6 +50,6 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatc
       }
     },
     createNewFile: _canCreateNew ? () => dispatch(actions.toggleNewProtocolModal(true)) : undefined,
-    onDownload: () => dispatch(loadFileActions.saveProtocolFile())
+    onDownload: () => dispatch(loadFileActions.saveProtocolFile()),
   }
 }

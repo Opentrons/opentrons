@@ -70,7 +70,7 @@ function AdvancedSettingsCard (props: Props) {
         buttonProps={{
           disabled: !logsAvailable,
           onClick: download,
-          children: 'Download'
+          children: 'Download',
         }}
       >
         <p>Access logs from this robot.</p>
@@ -80,7 +80,7 @@ function AdvancedSettingsCard (props: Props) {
         buttonProps={{
           Component: Link,
           to: resetUrl,
-          children: 'Reset'
+          children: 'Reset',
         }}
       >
         <p>Restore robot to factory configuration</p>
@@ -103,7 +103,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
     return {
       health,
-      settings: settings || []
+      settings: settings || [],
     }
   }
 }
@@ -112,6 +112,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
     set: (id, value) => dispatch(setSettings(ownProps, {id, value})),
-    download: () => dispatch(downloadLogs(ownProps))
+    download: () => dispatch(downloadLogs(ownProps)),
   }
 }

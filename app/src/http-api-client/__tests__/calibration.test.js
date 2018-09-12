@@ -8,7 +8,7 @@ import {
   startDeckCalibration,
   deckCalibrationCommand,
   makeGetDeckCalibrationStartState,
-  makeGetDeckCalibrationCommandState
+  makeGetDeckCalibrationCommandState,
 } from '..'
 
 jest.mock('../client')
@@ -35,7 +35,7 @@ describe('/calibration/**', () => {
     const path = 'calibration/deck/start'
     const response = {
       token: 'token',
-      pipette: {mount: 'left', model: 'p300_single_v1'}
+      pipette: {mount: 'left', model: 'p300_single_v1'},
     }
 
     test('calls POST /calibration/deck/start', () => {
@@ -70,7 +70,7 @@ describe('/calibration/**', () => {
       const request = {force: false}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -84,7 +84,7 @@ describe('/calibration/**', () => {
       const error = {name: 'ResponseError', status: 409, message: ''}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -102,7 +102,7 @@ describe('/calibration/**', () => {
 
     beforeEach(() => {
       state.api.calibration[NAME] = {
-        'calibration/deck/start': {response: {token}}
+        'calibration/deck/start': {response: {token}},
       }
     })
 
@@ -121,7 +121,7 @@ describe('/calibration/**', () => {
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -134,7 +134,7 @@ describe('/calibration/**', () => {
       const error = {name: 'ResponseError', message: 'AH'}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -148,10 +148,10 @@ describe('/calibration/**', () => {
       const expectedActions = [
         {
           type: 'api:CLEAR_RESPONSE',
-          payload: {robot, path: 'calibration/deck/start'}
+          payload: {robot, path: 'calibration/deck/start'},
         },
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -172,14 +172,14 @@ describe('/calibration/**', () => {
         request: {},
         response: {
           token: 'token',
-          pipette: {mount: 'left', model: 'p300_single_v1'}
-        }
+          pipette: {mount: 'left', model: 'p300_single_v1'},
+        },
       },
       {
         path: 'calibration/deck',
         request: {command: 'save transform'},
-        response: {message: 'saved'}
-      }
+        response: {message: 'saved'},
+      },
     ]
 
     REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
@@ -189,7 +189,7 @@ describe('/calibration/**', () => {
         test('handles api:REQUEST', () => {
           const action = {
             type: 'api:REQUEST',
-            payload: {path, robot, request}
+            payload: {path, robot, request},
           }
 
           expect(reducer(state, action).calibration).toEqual({
@@ -198,16 +198,16 @@ describe('/calibration/**', () => {
                 request,
                 inProgress: true,
                 error: null,
-                response: null
-              }
-            }
+                response: null,
+              },
+            },
           })
         })
 
         test('handles api:SUCCESS', () => {
           const action = {
             type: 'api:SUCCESS',
-            payload: {path, robot, response}
+            payload: {path, robot, response},
           }
 
           state.calibration[NAME] = {
@@ -215,8 +215,8 @@ describe('/calibration/**', () => {
               request,
               inProgress: true,
               error: null,
-              response: null
-            }
+              response: null,
+            },
           }
 
           expect(reducer(state, action).calibration).toEqual({
@@ -225,9 +225,9 @@ describe('/calibration/**', () => {
                 request,
                 response,
                 inProgress: false,
-                error: null
-              }
-            }
+                error: null,
+              },
+            },
           })
         })
 
@@ -235,7 +235,7 @@ describe('/calibration/**', () => {
           const error = {message: 'we did not do it!'}
           const action = {
             type: 'api:FAILURE',
-            payload: {path, robot, error}
+            payload: {path, robot, error},
           }
 
           state.calibration[NAME] = {
@@ -243,8 +243,8 @@ describe('/calibration/**', () => {
               request,
               inProgress: true,
               error: null,
-              response: null
-            }
+              response: null,
+            },
           }
 
           expect(reducer(state, action).calibration).toEqual({
@@ -253,9 +253,9 @@ describe('/calibration/**', () => {
                 request,
                 error,
                 response: null,
-                inProgress: false
-              }
-            }
+                inProgress: false,
+              },
+            },
           })
         })
       })
@@ -273,15 +273,15 @@ describe('/calibration/**', () => {
         inProgress: false,
         request: {},
         response: 'foo',
-        error: 'bar'
-      }
+        error: 'bar',
+      },
     }
 
     expect(reducer(state, action).calibration[NAME][path]).toEqual({
       inProgress: false,
       request: {},
       response: null,
-      error: null
+      error: null,
     })
   })
 
@@ -289,7 +289,7 @@ describe('/calibration/**', () => {
     beforeEach(() => {
       state.api.calibration[NAME] = {
         'calibration/deck': {inProgress: true},
-        'calibration/deck/start': {inProgress: true}
+        'calibration/deck/start': {inProgress: true},
       }
     })
 
@@ -300,7 +300,7 @@ describe('/calibration/**', () => {
         .toEqual(state.api.calibration[NAME]['calibration/deck/start'])
 
       expect(getStartState(state, {name: 'foo'})).toEqual({
-        inProgress: false
+        inProgress: false,
       })
     })
 
@@ -311,7 +311,7 @@ describe('/calibration/**', () => {
         .toEqual(state.api.calibration[NAME]['calibration/deck'])
 
       expect(getCommandState(state, {name: 'foo'})).toEqual({
-        inProgress: false
+        inProgress: false,
       })
     })
   })

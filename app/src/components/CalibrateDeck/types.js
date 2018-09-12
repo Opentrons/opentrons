@@ -19,14 +19,14 @@ export type SP = {
   pipetteProps: ?{
     mount: Mount,
     pipette: ?PipetteConfig,
-  }
+  },
 }
 
 export type DP = {
   forceStart: () => mixed,
   jog: Jog,
   exit: () => mixed,
-  back: () => mixed
+  back: () => mixed,
 }
 
 export type CalibrateDeckProps = OP & SP & DP

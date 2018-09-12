@@ -6,18 +6,18 @@ import {connect} from 'react-redux'
 import {
   actions as robotActions,
   type Labware,
-  type Pipette
+  type Pipette,
 } from '../../robot'
 
 import ConfirmPickupPrompt from './ConfirmPickupPrompt'
 
 type OwnProps = Labware & {
-  calibrator: Pipette
+  calibrator: Pipette,
 }
 
 type DispatchProps = {
   onNoClick: () => void,
-  onYesClick: () => void
+  onYesClick: () => void,
 }
 
 export default connect(null, mapDispatchToProps)(ConfirmPickupPrompt)
@@ -34,6 +34,6 @@ function mapDispatchToProps (
     },
     onYesClick: () => {
       dispatch(robotActions.confirmTiprack(mount, slot))
-    }
+    },
   }
 }

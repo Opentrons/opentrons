@@ -6,7 +6,7 @@ import {
   CheckboxField,
   DropdownField,
   InputField,
-  FormGroup
+  FormGroup,
 } from '@opentrons/components'
 
 import styles from './IngredientPropertiesForm.css'
@@ -16,7 +16,7 @@ import type {EditIngredientPayload} from '../labware-ingred/actions'
 import type {
   IngredInputs,
   IngredGroupAccessor as Accessor,
-  AllIngredGroupFields
+  AllIngredGroupFields,
 } from '../labware-ingred/types'
 
 type SetStateCallback = (...args: Array<*>) => *
@@ -35,7 +35,7 @@ type FieldProps = {|
   error?: ?string,
   caption?: ?string,
   placeholder?: string,
-  className?: string
+  className?: string,
 |}
 
 const makeInputField = (args: {setSubstate: SetSubstate, getSubstate: GetSubstate}) =>
@@ -89,13 +89,13 @@ type Props = {
   commonSelectedVolume: ?number,
 
   allIngredientGroupFields: ?AllIngredGroupFields,
-  allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>
+  allIngredientNamesIds: Array<{ingredientId: string, name: ?string}>,
 }
 
 type State = {
   input: IngredInputs,
   commonIngredGroupId: ?string,
-  pristine: {[string]: boolean}
+  pristine: {[string]: boolean},
 }
 
 class IngredientPropertiesForm extends React.Component<Props, State> {
@@ -106,15 +106,15 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     this.state = {
       pristine: {
         name: true,
-        volume: true
+        volume: true,
       },
       input: {
         name: null,
         volume: null,
         description: null,
-        individualize: false
+        individualize: false,
       },
-      commonIngredGroupId: null
+      commonIngredGroupId: null,
     }
 
     // TODO: Ian 2018-06-07 don't use makeInputField or this.Field, it's weird & bad
@@ -124,10 +124,10 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           input: {...this.state.input, [inputKey]: inputValue},
           commonIngredGroupId: (inputKey === 'name')
             ? null // unset commonIngredGroupId if user changes 'name' field
-            : this.state.commonIngredGroupId
+            : this.state.commonIngredGroupId,
         })
       },
-      getSubstate: (inputKey) => this.state.input[inputKey]
+      getSubstate: (inputKey) => this.state.input[inputKey],
     })
   }
 
@@ -151,8 +151,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: newIngredFields.name || name,
           volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
-          individualize: newIngredFields.individualize || individualize
-        }
+          individualize: newIngredFields.individualize || individualize,
+        },
       }, cb)
     } else {
       // No/invalid ingredGroupId, set inputs to "blank" state
@@ -160,14 +160,14 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         ...this.state,
         pristine: {
           name: true,
-          volume: true
+          volume: true,
         },
         input: {
           name: null,
           volume: null,
           description: null,
-          individualize: false
-        }
+          individualize: false,
+        },
       }, cb)
     }
   }
@@ -186,9 +186,9 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         ...this.state,
         input: {
           ...this.state.input,
-          volume: nextProps.commonSelectedVolume
+          volume: nextProps.commonSelectedVolume,
         },
-        commonIngredGroupId: nextEditingId
+        commonIngredGroupId: nextEditingId,
       }))
     }
   }
@@ -197,7 +197,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     // Used to populate ingred fields from dropdown
     this.resetInputState(ingredGroupId, undefined, () => this.setState({
       ...this.state,
-      commonIngredGroupId: ingredGroupId
+      commonIngredGroupId: ingredGroupId,
     }))
   }
 
@@ -241,7 +241,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         // actually save only when valid
         this.props.onSave({
           ...this.state.input,
-          groupId: this.state.commonIngredGroupId
+          groupId: this.state.commonIngredGroupId,
         })
       }
     })
@@ -252,7 +252,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
       onCancel,
       allIngredientNamesIds,
       selectedWells,
-      selectedWellsMaxVolume
+      selectedWellsMaxVolume,
     } = this.props
 
     const {commonIngredGroupId} = this.state
@@ -307,8 +307,8 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
                   {name: '', value: ''},
                   ...allIngredientNamesIds.map(({ingredientId, name}) => ({
                     name: name || `(unnamed: ${ingredientId})`,
-                    value: ingredientId
-                  }))
+                    value: ingredientId,
+                  })),
                 ]}
               />
             </FormGroup>}

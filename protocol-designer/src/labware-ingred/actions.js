@@ -55,7 +55,7 @@ export const createContainer = createAction(
   'CREATE_CONTAINER',
   (args: {|
     slot: DeckSlot,
-    containerType: string
+    containerType: string,
   |}) => args
 )
 
@@ -64,7 +64,7 @@ export const deleteContainer = createAction(
   (args: {|
     containerId: string,
     slot: DeckSlot,
-    containerType: string
+    containerType: string,
   |}) => args
 )
 
@@ -74,8 +74,8 @@ export const modifyContainer = createAction(
     containerId: string,
     modify: {
       // TODO Ian 2018-02-20: `field` is some 'LabwareField' type
-      [field: string]: mixed // eg modify = {name: 'newName'}
-    }
+      [field: string]: mixed, // eg modify = {name: 'newName'}
+    },
   |}) => args
 )
 
@@ -95,8 +95,8 @@ export type MoveLabware = {
   type: 'MOVE_LABWARE',
   payload: {
     fromSlot: DeckSlot,
-    toSlot: DeckSlot
-  }
+    toSlot: DeckSlot,
+  },
 }
 
 export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
@@ -105,21 +105,21 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
   if (fromSlot) {
     return dispatch({
       type: 'MOVE_LABWARE',
-      payload: {fromSlot, toSlot}
+      payload: {fromSlot, toSlot},
     })
   }
 }
 
 type DeleteIngredientPrepayload = {
   wellName?: string,
-  groupId: string
+  groupId: string,
 }
 
 export type DeleteIngredient = {|
   type: 'DELETE_INGREDIENT',
   payload: {
-    containerId: string
-  } & DeleteIngredientPrepayload
+    containerId: string,
+  } & DeleteIngredientPrepayload,
 |}
 
 export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
@@ -133,8 +133,8 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
     type: 'DELETE_INGREDIENT',
     payload: {
       ...payload,
-      containerId: container.id
-    }
+      containerId: container.id,
+    },
   })
 }
 
@@ -146,12 +146,12 @@ export type EditIngredient = {
     containerId: string,
     groupId: string,
     wells: Array<string>,
-  }
+  },
 }
 
 export type EditIngredientPayload = {
   ...IngredInputFields,
-  groupId: string | null // null indicates new ingredient is being created
+  groupId: string | null, // null indicates new ingredient is being created
 }
 
 export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
@@ -173,8 +173,8 @@ export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dis
         ...inputFields,
         groupId: groupId,
         containerId: container.id,
-        wells: wellSelectionSelectors.selectedWellNames(state)
-      }
+        wells: wellSelectionSelectors.selectedWellNames(state),
+      },
     })
   }
 
@@ -188,7 +188,7 @@ export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dis
       // if it matches the name of the clone parent, append "copy" to that name
       containerId: container.id,
       groupId: nextGroupId,
-      wells: wellSelectionSelectors.selectedWellNames(state)
-    }
+      wells: wellSelectionSelectors.selectedWellNames(state),
+    },
   })
 }

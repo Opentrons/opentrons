@@ -6,7 +6,7 @@ import {
   DropdownField,
   FormGroup,
   InputField,
-  type Mount
+  type Mount,
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
@@ -22,7 +22,7 @@ type State = NewProtocolFields
 type Props = {
   hideModal: boolean,
   onCancel: () => mixed,
-  onSave: (NewProtocolFields) => mixed
+  onSave: (NewProtocolFields) => mixed,
 }
 
 // 'USER_HAS_NOT_SELECTED' state is just a concern of these dropdowns,
@@ -34,12 +34,12 @@ const USER_HAS_NOT_SELECTED = 'USER_HAS_NOT_SELECTED'
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
-  ...pipetteOptions
+  ...pipetteOptions,
 ]
 
 const pipetteOptionsWithInvalid = [
   {name: '', value: USER_HAS_NOT_SELECTED},
-  ...pipetteOptionsWithNone
+  ...pipetteOptionsWithNone,
 ]
 
 // TODO: Ian 2018-06-22 get this programatically from shared-data labware defs
@@ -49,14 +49,14 @@ const tiprackOptions = [
   {name: '10 μL', value: 'tiprack-10ul'},
   {name: '200 μL', value: 'tiprack-200ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
-  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'}
+  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'},
   // {name: '300 μL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
 ]
 
 const initialState = {
   name: '',
   left: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
-  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null}
+  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
 }
 
 export default class NewFileModal extends React.Component<Props, State> {
@@ -106,7 +106,7 @@ export default class NewFileModal extends React.Component<Props, State> {
         className={cx(modalStyles.modal, styles.new_file_modal)}
         buttons={[
           {onClick: this.props.onCancel, children: 'Cancel'},
-          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
+          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'},
         ]}>
         <form className={modalStyles.modal_contents}>
           <h2>Create New Protocol</h2>
@@ -138,7 +138,7 @@ export default class NewFileModal extends React.Component<Props, State> {
 type MountFieldsProps = {
   mount: Mount,
   values: {pipetteModel: string, tiprackModel: ?string},
-  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void
+  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void,
 }
 const MountFields = (props: MountFieldsProps) => (
   <div className={styles.mount_column}>

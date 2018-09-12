@@ -32,7 +32,7 @@ export type SettingsAction =
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 
 export type RobotSettingsState = {
-  settings?: RobotSettingsCall
+  settings?: RobotSettingsCall,
 }
 
 const SETTINGS: 'settings' = 'settings'

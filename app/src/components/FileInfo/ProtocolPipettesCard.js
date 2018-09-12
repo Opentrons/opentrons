@@ -26,7 +26,7 @@ type DP = {dispatch: Dispatch}
 
 type Props = SP & {
   fetchPipettes: () => mixed,
-  changePipetteUrl: string
+  changePipetteUrl: string,
 }
 
 const TITLE = 'Required Pipettes'
@@ -38,7 +38,7 @@ function ProtocolPipettesCard (props: Props) {
     pipettes,
     actualPipettes,
     fetchPipettes,
-    changePipetteUrl
+    changePipetteUrl,
   } = props
 
   const pipetteInfo = pipettes.map((p) => {
@@ -57,7 +57,7 @@ function ProtocolPipettesCard (props: Props) {
     return {
       ...p,
       displayName,
-      pipettesMatch
+      pipettesMatch,
     }
   })
 
@@ -91,7 +91,7 @@ function makeMapStateToProps (): (state: State) => SP {
     return {
       _robot,
       pipettes: robotSelectors.getPipettes(state),
-      actualPipettes: pipettesCall && pipettesCall.response
+      actualPipettes: pipettesCall && pipettesCall.response,
     }
   }
 }
@@ -104,6 +104,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP): Props {
   return {
     ...stateProps,
     changePipetteUrl,
-    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot))
+    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot)),
   }
 }

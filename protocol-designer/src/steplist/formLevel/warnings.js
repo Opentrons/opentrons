@@ -17,13 +17,13 @@ export type FormWarning = {
   type: FormWarningType,
   title: string,
   body?: React.Node,
-  dependentFields: Array<StepFieldName>
+  dependentFields: Array<StepFieldName>,
 }
 const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
   OVER_MAX_WELL_VOLUME: {
     type: 'OVER_MAX_WELL_VOLUME',
     title: 'Dispense volume will overflow a destination well',
-    dependentFields: ['dispense_labware', 'dispense_wells', 'volume']
+    dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
   },
   BELOW_MIN_DISPOSAL_VOLUME: {
     type: 'BELOW_MIN_DISPOSAL_VOLUME',
@@ -35,8 +35,8 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
         Read more <KnowledgeBaseLink to='distribute'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
-    dependentFields: ['aspirate_disposalVol_volume', 'pipette']
-  }
+    dependentFields: ['aspirate_disposalVol_volume', 'pipette'],
+  },
 }
 export type WarningChecker = (mixed) => ?FormWarning
 

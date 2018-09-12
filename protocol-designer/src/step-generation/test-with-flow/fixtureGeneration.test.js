@@ -6,7 +6,7 @@ describe('createEmptyLiquidState fixture generator', () => {
     const result = createEmptyLiquidState({
       sourcePlateType: '96-flat',
       destPlateType: 'trough-12row',
-      pipettes: {}
+      pipettes: {},
     })
 
     expect(Object.keys(result.labware)).toHaveLength(3) // 3 labwares: source, dest, trash
@@ -14,7 +14,7 @@ describe('createEmptyLiquidState fixture generator', () => {
     expect(result.labware.sourcePlateId).toMatchObject({
       A1: {},
       B1: {},
-      A2: {}
+      A2: {},
     })
 
     expect(Object.keys(result.labware.sourcePlateId)).toHaveLength(96)
@@ -31,7 +31,7 @@ describe('createEmptyLiquidState fixture generator', () => {
       A9: {},
       A10: {},
       A11: {},
-      A12: {}
+      A12: {},
     })
 
     expect(result.labware.trashId).toEqual({A1: {}})
@@ -49,7 +49,7 @@ describe('createRobotState fixture generator', () => {
           destPlateType: '96-flat',
           fillPipetteTips: false,
           fillTiprackTips,
-          tipracks: [200, 200]
+          tipracks: [200, 200],
         })
 
         const tiprackIds = ['tiprack1Id', 'tiprack2Id']
@@ -70,7 +70,7 @@ describe('createRobotState fixture generator', () => {
           destPlateType: '96-flat',
           fillPipetteTips,
           fillTiprackTips: true,
-          tipracks: [200, 200]
+          tipracks: [200, 200],
         })
 
         const pipetteIds = ['p300SingleId', 'p300MultiId']

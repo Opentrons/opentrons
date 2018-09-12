@@ -6,12 +6,12 @@ import {
   ContainerNameOverlay,
   Deck,
   Labware,
-  Module
+  Module,
 } from '@opentrons/components'
 import type {
   DeckSlot,
   LabwareComponentProps,
-  ModuleType
+  ModuleType,
 } from '@opentrons/components'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
@@ -19,12 +19,12 @@ type UrlData = {
   labware: {
     [DeckSlot]: {
       labwareType: string,
-      name: ?string
-    }
+      name: ?string,
+    },
   },
   modules: {
-    [DeckSlot]: ModuleType
-  }
+    [DeckSlot]: ModuleType,
+  },
 }
 
 function getDataFromUrl (): ?UrlData {

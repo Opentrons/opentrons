@@ -18,7 +18,7 @@ import {
   SLOT_HEIGHT_MM,
   humanizeLabwareType,
   clickOutside,
-  type DeckSlot
+  type DeckSlot,
 } from '@opentrons/components'
 import {getLabware} from '@opentrons/shared-data'
 import styles from './labware.css'
@@ -38,7 +38,7 @@ function OccupiedDeckSlotOverlay ({
   containerName,
   openIngredientSelector,
   setMoveLabwareMode,
-  deleteContainer
+  deleteContainer,
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
@@ -64,13 +64,13 @@ function OccupiedDeckSlotOverlay ({
 // Including a labware type in `labwareImages` will use that image instead of an SVG
 const IMG_TRASH = require('../../images/labware/Trash.png')
 const labwareImages = {
-  'trash-box': IMG_TRASH
+  'trash-box': IMG_TRASH,
 }
 
 type SlotWithContainerProps = {
   containerType: string,
   displayName: string,
-  containerId: string
+  containerId: string,
 }
 
 function SlotWithContainer (props: SlotWithContainerProps) {
@@ -103,9 +103,9 @@ type LabwareOnDeckProps = {
   activeModals: {
     ingredientSelection: ?{
       containerName: ?string,
-      slot: ?DeckSlot
+      slot: ?DeckSlot,
     },
-    labwareSelection: boolean
+    labwareSelection: boolean,
   },
   openIngredientSelector: (containerId: string) => void,
 
@@ -124,7 +124,7 @@ type LabwareOnDeckProps = {
   width?: number,
   highlighted: boolean,
 
-  deckSetupMode: boolean
+  deckSetupMode: boolean,
 }
 
 export default function LabwareOnDeck (props: LabwareOnDeckProps) {
@@ -156,7 +156,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
     width,
     highlighted,
 
-    deckSetupMode
+    deckSetupMode,
   } = props
 
   const slotIsOccupied = !!containerType
@@ -172,7 +172,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
 
   const setDefaultLabwareName = () => modifyContainer({
     containerId,
-    modify: {name: null}
+    modify: {name: null},
   })
 
   const handleSelectMoveDestination = (e: SyntheticEvent<*>) => {
@@ -222,7 +222,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           containerName,
           openIngredientSelector,
           setMoveLabwareMode,
-          deleteContainer
+          deleteContainer,
         }} />
       }
 
@@ -232,7 +232,7 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
           containerId,
           slot,
           modifyContainer,
-          deleteContainer
+          deleteContainer,
         }}
         onClickOutside={setDefaultLabwareName} />
       }

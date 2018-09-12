@@ -9,7 +9,7 @@ import type {RobotService} from '../../robot'
 
 import {
   selectors as robotSelectors,
-  constants as robotConstants
+  constants as robotConstants,
 } from '../../robot'
 import {getAnyRobotUpdateAvailable} from '../../http-api-client'
 import {getShellUpdate} from '../../shell'
@@ -19,7 +19,7 @@ import {NavButton} from '@opentrons/components'
 type Props = React.ElementProps<typeof NavButton>
 
 type OP = {
-  name: string
+  name: string,
 }
 
 type SP = Props & {
@@ -45,33 +45,33 @@ function mapStateToProps (state: State, ownProps: OP): SP {
       iconName: 'ot-connect',
       title: 'robot',
       url: '/robots',
-      notification: robotNotification
+      notification: robotNotification,
     },
     upload: {
       disabled: !isConnected || isProtocolRunning,
       iconName: 'ot-file',
       title: 'protocol',
-      url: '/upload'
+      url: '/upload',
     },
     setup: {
       disabled: !isProtocolLoaded || isProtocolRunning || isProtocolDone,
       iconName: 'ot-calibrate',
       title: 'calibrate',
-      url: '/calibrate'
+      url: '/calibrate',
     },
     run: {
       disabled: !isProtocolLoaded,
       iconName: 'ot-run',
       title: 'run',
-      url: '/run'
+      url: '/run',
     },
     more: {
       iconName: 'dots-horizontal',
       isBottom: true,
       title: 'more',
       url: '/menu',
-      notification: moreNotification
-    }
+      notification: moreNotification,
+    },
   }
 
   return {...NAV_ITEM_BY_NAME[name], _robot}

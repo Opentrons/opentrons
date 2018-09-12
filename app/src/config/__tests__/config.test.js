@@ -2,7 +2,7 @@
 import {
   updateConfig,
   configReducer,
-  getConfig
+  getConfig,
 } from '..'
 
 import * as mockShell from '../../shell'
@@ -18,8 +18,8 @@ describe('config', () => {
     state = {
       config: {
         foo: {bar: 'baz'},
-        qux: 'fizzbuzz'
-      }
+        qux: 'fizzbuzz',
+      },
     }
   })
 
@@ -29,7 +29,7 @@ describe('config', () => {
       expect(updateConfig('foo.bar', false)).toEqual({
         type: 'config:UPDATE',
         payload: {path: 'foo.bar', value: false},
-        meta: {shell: true}
+        meta: {shell: true},
       })
     })
   })
@@ -48,12 +48,12 @@ describe('config', () => {
     test('handles config:SET', () => {
       const action = {
         type: 'config:SET',
-        payload: {path: 'foo.bar', value: 'xyz'}
+        payload: {path: 'foo.bar', value: 'xyz'},
       }
 
       expect(configReducer(state, action)).toEqual({
         foo: {bar: 'xyz'},
-        qux: 'fizzbuzz'
+        qux: 'fizzbuzz',
       })
     })
   })

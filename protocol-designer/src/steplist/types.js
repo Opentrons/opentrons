@@ -13,12 +13,12 @@ export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,
-  substepIndex: number
+  substepIndex: number,
 |} | null
 
 export type NamedIngred = {|
   id: string,
-  name: string
+  name: string,
 |}
 
 export type StepItemSourceDestRow = {|
@@ -27,12 +27,12 @@ export type StepItemSourceDestRow = {|
   destIngredients?: Array<NamedIngred>,
   sourceWell?: ?string,
   destWell?: ?string,
-  volume?: ?number
+  volume?: ?number,
 |}
 
 export type StepItemSourceDestRowMulti = {
   ...StepItemSourceDestRow,
-  channelId: number
+  channelId: number,
 }
 
 export type SourceDestSubstepItemSingleChannel = {|
@@ -41,8 +41,8 @@ export type SourceDestSubstepItemSingleChannel = {|
   parentStepId: StepIdType,
   rows: Array<{|
     ...StepItemSourceDestRow,
-    volume?: number
-  |}>
+    volume?: number,
+  |}>,
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
@@ -50,7 +50,7 @@ export type SourceDestSubstepItemMultiChannel = {|
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
   volume?: ?number, // uniform volume for all steps
-  multiRows: Array<Array<StepItemSourceDestRowMulti>> // Array of arrays.
+  multiRows: Array<Array<StepItemSourceDestRowMulti>>, // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
@@ -65,7 +65,7 @@ export type StepItemData = {
   title: string,
   stepType: StepType,
   description?: ?string,
-  formData: ?FormData
+  formData: ?FormData,
 }
 
 export type SubSteps = {[StepIdType]: ?SubstepItemData}

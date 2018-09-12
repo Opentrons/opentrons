@@ -34,7 +34,7 @@ function Robots (props: Props) {
   const {
     robot,
     connectedName,
-    match: {path, url, params: {name}}
+    match: {path, url, params: {name}},
   } = props
 
   if (name && !robot) {
@@ -71,6 +71,6 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 
   return {
     robot,
-    connectedName
+    connectedName,
   }
 }

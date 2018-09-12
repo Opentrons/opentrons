@@ -7,9 +7,9 @@ export * from './types'
 export {
   actions,
   rootReducer,
-  selectors
+  selectors,
 }
 
 export type {
-  RootState
+  RootState,
 }

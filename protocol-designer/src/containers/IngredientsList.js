@@ -13,7 +13,7 @@ type Props = React.ElementProps<typeof IngredientsList>
 type DP = {
   editModeIngredientGroup: $ElementType<Props, 'editModeIngredientGroup'>,
   deleteIngredient: $ElementType<Props, 'deleteIngredient'>,
-  openRenameLabwareForm: $ElementType<Props, 'openRenameLabwareForm'>
+  openRenameLabwareForm: $ElementType<Props, 'openRenameLabwareForm'>,
 }
 
 type SP = $Diff<Props, DP>
@@ -26,7 +26,7 @@ function mapStateToProps (state: BaseState): SP {
     ingredientGroups: selectors.getIngredientGroups(state),
     labwareWellContents: (container && selectors.getIngredientLocations(state)[container.id]) || {},
     selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsCommonIngredId(state),
-    selected: false
+    selected: false,
   }
 }
 
@@ -34,7 +34,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     editModeIngredientGroup: (args) => dispatch(editModeIngredientGroup(args)),
     deleteIngredient: (args) => dispatch(deleteIngredient(args)),
-    openRenameLabwareForm: () => dispatch(openRenameLabwareForm())
+    openRenameLabwareForm: () => dispatch(openRenameLabwareForm()),
   }
 }
 

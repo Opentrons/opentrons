@@ -8,13 +8,13 @@ import styles from './instrument.css'
 type Props = {
   showMountLabel?: ?boolean,
   left?: InstrumentInfoProps,
-  right?: InstrumentInfoProps
+  right?: InstrumentInfoProps,
 }
 
 const EMPTY_INSTRUMENT_PROPS = {
   description: 'None',
   tiprackModel: 'N/A',
-  isDisabled: false
+  isDisabled: false,
 }
 
 /**

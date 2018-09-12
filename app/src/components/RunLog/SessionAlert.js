@@ -6,7 +6,7 @@ import type {SessionStatus} from '../../robot'
 type Props = {
   sessionStatus: SessionStatus,
   className?: string,
-  onResetClick: () => mixed
+  onResetClick: () => mixed,
 }
 
 export default function SessionAlert (props: Props) {

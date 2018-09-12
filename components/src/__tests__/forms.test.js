@@ -7,7 +7,7 @@ import {
   DropdownField,
   FormGroup,
   InputField,
-  RadioGroup
+  RadioGroup,
 } from '..'
 
 describe('CheckboxField', () => {
@@ -44,7 +44,7 @@ describe('DropdownField', () => {
         options={[
           {name: 'DNA', value: 'dna'},
           {name: 'RNA', value: 'rna'},
-          {name: 'Protein', value: 'protein'}
+          {name: 'Protein', value: 'protein'},
         ]}
       />
     ).toJSON()
@@ -60,7 +60,7 @@ describe('DropdownField', () => {
         options={[
           {name: 'DNA', value: 'dna'},
           {name: 'RNA', value: 'rna'},
-          {name: 'Protein', value: 'protein'}
+          {name: 'Protein', value: 'protein'},
         ]}
       />
     ).toJSON()
@@ -107,7 +107,7 @@ describe('RadioGroup', () => {
         options={[
           {name: 'Hazelnut', value: 'hazelnut'},
           {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'}
+          {name: 'Ginger', value: 'ginger'},
         ]}
       />
     ).toJSON()
@@ -122,7 +122,7 @@ describe('RadioGroup', () => {
         options={[
           {name: 'Hazelnut', value: 'hazelnut'},
           {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'}
+          {name: 'Ginger', value: 'ginger'},
         ]}
       />
     ).toJSON()
@@ -137,7 +137,7 @@ describe('RadioGroup', () => {
         options={[
           {name: 'Hazelnut', value: 'hazelnut'},
           {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'}
+          {name: 'Ginger', value: 'ginger'},
         ]}
       />
     ).toJSON()

@@ -11,7 +11,7 @@ import styles from './NavBar.css'
 
 type Props = {
   currentPage: Page,
-  handleClick: Page => (e: ?SyntheticEvent<>) => void
+  handleClick: Page => (e: ?SyntheticEvent<>) => void,
 }
 
 function Nav (props: Props) {
@@ -47,13 +47,13 @@ function Nav (props: Props) {
 
 function mapStateToProps (state: BaseState) {
   return {
-    currentPage: selectors.currentPage(state)
+    currentPage: selectors.currentPage(state),
   }
 }
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
-    handleClick: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName))
+    handleClick: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName)),
   }
 }
 

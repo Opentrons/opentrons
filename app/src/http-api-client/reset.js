@@ -20,7 +20,7 @@ export type ResetOption = {
 }
 
 type FetchResetOptionsResponse = {
-  options: Array<ResetOption>
+  options: Array<ResetOption>,
 }
 
 export type ResetRobotRequest = {

@@ -5,14 +5,14 @@ import {
   splitLiquid,
   mergeLiquid,
   AIR,
-  repeatArray
+  repeatArray,
 } from '../utils'
 
 // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
 type CountState = {count: number}
 const addCreator: any = (num: number) => (prevState: CountState) => ({
   commands: [`command: add ${num}`],
-  robotState: {count: prevState.count + num}
+  robotState: {count: prevState.count + num},
 })
 
 const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
@@ -22,14 +22,14 @@ const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
     ...result,
     warnings: [{
       type: 'ADD_WARNING',
-      message: `adding ${num} with warning example`
-    }]
+      message: `adding ${num} with warning example`,
+    }],
   }
 }
 
 const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
   commands: [`command: multiply by ${num}`],
-  robotState: {count: prevState.count * num}
+  robotState: {count: prevState.count * num},
 })
 
 const divideCreator: any = (num: number) => (prevState: CountState) => {
@@ -37,14 +37,14 @@ const divideCreator: any = (num: number) => (prevState: CountState) => {
     return {
       errors: [{
         message: 'Cannot divide by zero',
-        type: 'DIVIDE_BY_ZERO'
-      }]
+        type: 'DIVIDE_BY_ZERO',
+      }],
     }
   }
 
   return {
     commands: [`command: divide by ${num}`],
-    robotState: {count: prevState.count / num}
+    robotState: {count: prevState.count / num},
   }
 }
 
@@ -53,14 +53,14 @@ describe('reduceCommandCreators', () => {
     const initialState: any = {count: 0}
     const result: any = reduceCommandCreators([
       addCreator(1),
-      multiplyCreator(2)
+      multiplyCreator(2),
     ])(initialState)
 
     expect(result.robotState).toEqual({count: 2})
 
     expect(result.commands).toEqual([
       'command: add 1',
-      'command: multiply by 2'
+      'command: multiply by 2',
     ])
   })
 
@@ -69,7 +69,7 @@ describe('reduceCommandCreators', () => {
     const result = reduceCommandCreators([
       addCreator(4),
       divideCreator(0),
-      multiplyCreator(3)
+      multiplyCreator(3),
     ])(initialState)
 
     expect(result).toEqual({
@@ -77,10 +77,10 @@ describe('reduceCommandCreators', () => {
       commands: ['command: add 4'], // last valid set of commands before division error
       errors: [{
         message: 'Cannot divide by zero',
-        type: 'DIVIDE_BY_ZERO'
+        type: 'DIVIDE_BY_ZERO',
       }],
       errorStep: 1, // divide step passed the error
-      warnings: []
+      warnings: [],
     })
   })
 
@@ -89,7 +89,7 @@ describe('reduceCommandCreators', () => {
     const result = reduceCommandCreators([
       addCreatorWithWarning(3),
       multiplyCreator(2),
-      addCreatorWithWarning(1)
+      addCreatorWithWarning(1),
     ])(initialState)
 
     expect(result).toEqual({
@@ -97,12 +97,12 @@ describe('reduceCommandCreators', () => {
       commands: [
         'command: add 3',
         'command: multiply by 2',
-        'command: add 1'
+        'command: add 1',
       ],
       warnings: [
         {type: 'ADD_WARNING', message: 'adding 3 with warning example'},
-        {type: 'ADD_WARNING', message: 'adding 1 with warning example'}
-      ]
+        {type: 'ADD_WARNING', message: 'adding 1 with warning example'},
+      ],
     })
   })
 })
@@ -113,7 +113,7 @@ describe('commandCreatorsTimeline', () => {
     const result = commandCreatorsTimeline([
       addCreatorWithWarning(4),
       divideCreator(0),
-      multiplyCreator(3)
+      multiplyCreator(3),
     ])(initialState)
 
     expect(result).toEqual({
@@ -121,8 +121,8 @@ describe('commandCreatorsTimeline', () => {
       errors: [
         {
           message: 'Cannot divide by zero',
-          type: 'DIVIDE_BY_ZERO'
-        }
+          type: 'DIVIDE_BY_ZERO',
+        },
       ],
 
       timeline: [
@@ -131,11 +131,11 @@ describe('commandCreatorsTimeline', () => {
           robotState: {count: 5 + 4},
           commands: ['command: add 4'],
           warnings: [
-            {type: 'ADD_WARNING', message: 'adding 4 with warning example'}
-          ]
-        }
+            {type: 'ADD_WARNING', message: 'adding 4 with warning example'},
+          ],
+        },
         // no more steps in the timeline, stopped by error
-      ]
+      ],
     })
   })
 
@@ -144,7 +144,7 @@ describe('commandCreatorsTimeline', () => {
     const result = commandCreatorsTimeline([
       addCreatorWithWarning(3),
       multiplyCreator(2),
-      addCreatorWithWarning(1)
+      addCreatorWithWarning(1),
     ])(initialState)
 
     expect(result.timeline).toEqual([
@@ -153,13 +153,13 @@ describe('commandCreatorsTimeline', () => {
         robotState: {count: 8},
         commands: ['command: add 3'],
         warnings: [
-          {type: 'ADD_WARNING', message: 'adding 3 with warning example'}
-        ]
+          {type: 'ADD_WARNING', message: 'adding 3 with warning example'},
+        ],
       },
       // multiply by 2
       {
         robotState: {count: 16},
-        commands: ['command: multiply by 2']
+        commands: ['command: multiply by 2'],
         // no warnings -> no `warnings` key
       },
       // add 1 w/ warning
@@ -167,21 +167,21 @@ describe('commandCreatorsTimeline', () => {
         robotState: {count: 17},
         commands: ['command: add 1'],
         warnings: [
-          {type: 'ADD_WARNING', message: 'adding 1 with warning example'}
-        ]
-      }
+          {type: 'ADD_WARNING', message: 'adding 1 with warning example'},
+        ],
+      },
     ])
   })
 })
 
 describe('splitLiquid', () => {
   const singleIngred = {
-    ingred1: {volume: 100}
+    ingred1: {volume: 100},
   }
 
   const twoIngred = {
     ingred1: {volume: 100},
-    ingred2: {volume: 300}
+    ingred2: {volume: 300},
   }
 
   test('simple split with 1 ingredient in source', () => {
@@ -190,7 +190,7 @@ describe('splitLiquid', () => {
       singleIngred
     )).toEqual({
       source: {ingred1: {volume: 40}},
-      dest: {ingred1: {volume: 60}}
+      dest: {ingred1: {volume: 60}},
     })
   })
 
@@ -200,7 +200,7 @@ describe('splitLiquid', () => {
       singleIngred
     )).toEqual({
       source: {ingred1: {volume: 0}},
-      dest: {ingred1: {volume: 100}}
+      dest: {ingred1: {volume: 100}},
     })
   })
 
@@ -211,12 +211,12 @@ describe('splitLiquid', () => {
     )).toEqual({
       source: {
         ingred1: {volume: 95},
-        ingred2: {volume: 285}
+        ingred2: {volume: 285},
       },
       dest: {
         ingred1: {volume: 5},
-        ingred2: {volume: 15}
-      }
+        ingred2: {volume: 15},
+      },
     })
   })
 
@@ -227,9 +227,9 @@ describe('splitLiquid', () => {
     )).toEqual({
       source: {
         ingred1: {volume: 0},
-        ingred2: {volume: 0}
+        ingred2: {volume: 0},
       },
-      dest: twoIngred
+      dest: twoIngred,
     })
   })
 
@@ -241,8 +241,8 @@ describe('splitLiquid', () => {
       source: twoIngred,
       dest: {
         ingred1: {volume: 0},
-        ingred2: {volume: 0}
-      }
+        ingred2: {volume: 0},
+      },
     })
   })
 
@@ -251,17 +251,17 @@ describe('splitLiquid', () => {
       50,
       {
         ingred1: {volume: 200},
-        ingred2: {volume: 0}
+        ingred2: {volume: 0},
       }
     )).toEqual({
       source: {
         ingred1: {volume: 150},
-        ingred2: {volume: 0}
+        ingred2: {volume: 0},
       },
       dest: {
         ingred1: {volume: 50},
-        ingred2: {volume: 0}
-      }
+        ingred2: {volume: 0},
+      },
     })
   })
 
@@ -272,12 +272,12 @@ describe('splitLiquid', () => {
     )).toEqual({
       source: {
         ingred1: {volume: 100 - (0.25 * 1000 / 3)},
-        ingred2: {volume: 50}
+        ingred2: {volume: 50},
       },
       dest: {
         ingred1: {volume: 0.25 * 1000 / 3},
-        ingred2: {volume: 250}
-      }
+        ingred2: {volume: 250},
+      },
     })
   })
 
@@ -286,7 +286,7 @@ describe('splitLiquid', () => {
       splitLiquid(100, {})
     ).toEqual({
       source: {},
-      dest: {[AIR]: {volume: 100}}
+      dest: {[AIR]: {volume: 100}},
     })
   })
 
@@ -295,7 +295,7 @@ describe('splitLiquid', () => {
       splitLiquid(100, {ingred1: {volume: 0}})
     ).toEqual({
       source: {ingred1: {volume: 0}},
-      dest: {[AIR]: {volume: 100}}
+      dest: {[AIR]: {volume: 100}},
     })
   })
 
@@ -304,7 +304,7 @@ describe('splitLiquid', () => {
       splitLiquid(100, {ingred1: {volume: 50}, ingred2: {volume: 20}})
     ).toEqual({
       source: {ingred1: {volume: 0}, ingred2: {volume: 0}},
-      dest: {ingred1: {volume: 50}, ingred2: {volume: 20}, [AIR]: {volume: 30}}
+      dest: {ingred1: {volume: 50}, ingred2: {volume: 20}, [AIR]: {volume: 30}},
     })
   })
 
@@ -321,32 +321,32 @@ describe('mergeLiquid', () => {
     expect(mergeLiquid(
       {
         ingred1: {volume: 30},
-        ingred2: {volume: 40}
+        ingred2: {volume: 40},
       },
       {
         ingred2: {volume: 15},
-        ingred3: {volume: 25}
+        ingred3: {volume: 25},
       }
     )).toEqual({
       ingred1: {volume: 30},
       ingred2: {volume: 55},
-      ingred3: {volume: 25}
+      ingred3: {volume: 25},
     })
   })
 
   test('merge ingreds 3 with 1 2 to get 1 2 3', () => {
     expect(mergeLiquid(
       {
-        ingred3: {volume: 25}
+        ingred3: {volume: 25},
       },
       {
         ingred1: {volume: 30},
-        ingred2: {volume: 40}
+        ingred2: {volume: 40},
       }
     )).toEqual({
       ingred1: {volume: 30},
       ingred2: {volume: 40},
-      ingred3: {volume: 25}
+      ingred3: {volume: 25},
     })
   })
 })
@@ -356,7 +356,7 @@ describe('repeatArray', () => {
     expect(repeatArray([{a: 1}, {b: 2}, {c: 3}], 3)).toEqual([
       {a: 1}, {b: 2}, {c: 3},
       {a: 1}, {b: 2}, {c: 3},
-      {a: 1}, {b: 2}, {c: 3}
+      {a: 1}, {b: 2}, {c: 3},
     ])
   })
 
@@ -365,7 +365,7 @@ describe('repeatArray', () => {
       [1, 2], [3, 4],
       [1, 2], [3, 4],
       [1, 2], [3, 4],
-      [1, 2], [3, 4]
+      [1, 2], [3, 4],
     ])
   })
 })

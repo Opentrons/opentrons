@@ -28,24 +28,24 @@ console.log('PD version: ' + (process.env.OT_PD_VERSION || OT_PD_VERSION || 'UNK
 
 module.exports = {
   entry: [
-    './src/index.js'
+    './src/index.js',
   ],
 
   output: {
     filename: 'bundle.js',
-    path: path.join(__dirname, 'dist')
+    path: path.join(__dirname, 'dist'),
   },
 
   module: {
     rules: [
       rules.js,
       rules.localCss,
-      rules.images
-    ]
+      rules.images,
+    ],
   },
 
   devServer: {
-    historyApiFallback: true
+    historyApiFallback: true,
   },
 
   devtool: DEV ? 'eval-source-map' : 'source-map',
@@ -56,9 +56,9 @@ module.exports = {
     new ExtractTextPlugin({
       filename: 'bundle.css',
       disable: DEV,
-      ignoreOrder: true
-    })
-  ]
+      ignoreOrder: true,
+    }),
+  ],
 }
 
 if (DEV) {

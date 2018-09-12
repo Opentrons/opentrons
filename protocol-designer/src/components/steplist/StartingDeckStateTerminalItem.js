@@ -9,7 +9,7 @@ import {START_TERMINAL_ITEM_ID} from '../../steplist'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 
 type Props = {
-  showHint: boolean
+  showHint: boolean,
 }
 
 function StartingDeckStateTerminalItem (props: Props) {

@@ -15,7 +15,7 @@ const log = createLogger(__filename)
 log.debug('App config', {
   config,
   store: getStore(),
-  overrides: getOverrides()
+  overrides: getOverrides(),
 })
 
 if (config.devtools) {
@@ -78,7 +78,7 @@ function installAndOpenExtensions () {
   const install = devtools.default
   const extensions = [
     'REACT_DEVELOPER_TOOLS',
-    'REDUX_DEVTOOLS'
+    'REDUX_DEVTOOLS',
   ]
 
   return Promise
@@ -89,7 +89,7 @@ function installAndOpenExtensions () {
       Menu
         .buildFromTemplate([{
           label: 'Inspect element',
-          click: () => mainWindow.inspectElement(x, y)
+          click: () => mainWindow.inspectElement(x, y),
         }])
         .popup(mainWindow)
     }))

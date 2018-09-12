@@ -17,5 +17,5 @@ export {
   CardContentQuarter,
   CardContentFlex,
   SectionContentFull,
-  SectionContentHalf
+  SectionContentHalf,
 }

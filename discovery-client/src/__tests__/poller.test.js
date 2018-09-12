@@ -34,7 +34,7 @@ describe('discovery poller', () => {
       [
         { ip: 'foo', port: 31950 },
         { ip: 'bar', port: 31950 },
-        { ip: 'baz', port: 31950 }
+        { ip: 'baz', port: 31950 },
       ],
       6000,
       jest.fn()
@@ -68,7 +68,7 @@ describe('discovery poller', () => {
       [
         { ip: 'foo', port: 31950 },
         { ip: 'bar', port: 31950 },
-        { ip: 'baz', port: 31950 }
+        { ip: 'baz', port: 31950 },
       ],
       6000,
       jest.fn()
@@ -89,7 +89,7 @@ describe('discovery poller', () => {
     done => {
       fetch.__setMockResponse({
         ok: true,
-        json: () => Promise.resolve({ name: 'foo' })
+        json: () => Promise.resolve({ name: 'foo' }),
       })
 
       poll(
@@ -113,7 +113,7 @@ describe('discovery poller', () => {
     done => {
       fetch.__setMockResponse({
         ok: false,
-        json: () => Promise.resolve({ message: 'oh no!' })
+        json: () => Promise.resolve({ message: 'oh no!' }),
       })
 
       poll(
@@ -158,7 +158,7 @@ describe('discovery poller', () => {
     done => {
       fetch.__setMockResponse({
         ok: true,
-        json: () => Promise.reject(new Error('oh no!'))
+        json: () => Promise.reject(new Error('oh no!')),
       })
 
       poll(

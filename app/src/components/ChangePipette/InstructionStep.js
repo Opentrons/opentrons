@@ -31,46 +31,46 @@ const DIAGRAMS: {[Direction]: {[Mount]: {[Channels]: {[Diagram]: string}}}} = {
     left: {
       'single': {
         screws: require('./images/attach-left-single-screws@3x.png'),
-        tab: require('./images/attach-left-single-tab@3x.png')
+        tab: require('./images/attach-left-single-tab@3x.png'),
       },
       'multi': {
         screws: require('./images/attach-left-multi-screws@3x.png'),
-        tab: require('./images/attach-left-multi-tab@3x.png')
-      }
+        tab: require('./images/attach-left-multi-tab@3x.png'),
+      },
     },
     right: {
       'single': {
         screws: require('./images/attach-right-single-screws@3x.png'),
-        tab: require('./images/attach-right-single-tab@3x.png')
+        tab: require('./images/attach-right-single-tab@3x.png'),
       },
       'multi': {
         screws: require('./images/attach-right-multi-screws@3x.png'),
-        tab: require('./images/attach-right-multi-tab@3x.png')
-      }
-    }
+        tab: require('./images/attach-right-multi-tab@3x.png'),
+      },
+    },
   },
   detach: {
     left: {
       'single': {
         screws: require('./images/detach-left-single-screws@3x.png'),
-        tab: require('./images/detach-left-single-tab@3x.png')
+        tab: require('./images/detach-left-single-tab@3x.png'),
       },
       'multi': {
         screws: require('./images/detach-left-multi-screws@3x.png'),
-        tab: require('./images/detach-left-multi-tab@3x.png')
-      }
+        tab: require('./images/detach-left-multi-tab@3x.png'),
+      },
     },
     right: {
       'single': {
         screws: require('./images/detach-right-single-screws@3x.png'),
-        tab: require('./images/detach-right-single-tab@3x.png')
+        tab: require('./images/detach-right-single-tab@3x.png'),
       },
       'multi': {
         screws: require('./images/detach-right-multi-screws@3x.png'),
-        tab: require('./images/detach-right-multi-tab@3x.png')
-      }
-    }
-  }
+        tab: require('./images/detach-right-multi-tab@3x.png'),
+      },
+    },
+  },
 }
 
 export default function InstructionStep (props: Props) {

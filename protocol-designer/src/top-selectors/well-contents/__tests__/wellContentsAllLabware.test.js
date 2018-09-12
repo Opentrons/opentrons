@@ -5,30 +5,30 @@ const baseIngredFields = {
   groupId: '0',
   name: 'Some Ingred',
   description: null,
-  individualize: false
+  individualize: false,
 }
 
 const containerState = {
   'FIXED_TRASH_ID': {
     type: 'trash-box',
     name: 'Trash',
-    slot: '12'
+    slot: '12',
   },
   container1Id: {
     slot: '10',
     type: '96-flat',
-    name: 'Labware 1'
+    name: 'Labware 1',
   },
   container2Id: {
     slot: '8',
     type: '96-deep-well',
-    name: 'Labware 2'
+    name: 'Labware 2',
   },
   container3Id: {
     slot: '9',
     type: 'tube-rack-2ml',
-    name: 'Labware 3'
-  }
+    name: 'Labware 3',
+  },
 }
 
 const ingredsByLabwareXXSingleIngred = {
@@ -37,18 +37,18 @@ const ingredsByLabwareXXSingleIngred = {
       ...baseIngredFields,
       wells: {
         A1: {volume: 100},
-        B1: {volume: 150}
-      }
-    }
+        B1: {volume: 150},
+      },
+    },
   },
   'container2Id': {},
   'container3Id': {},
-  'FIXED_TRASH_ID': {}
+  'FIXED_TRASH_ID': {},
 }
 
 const defaultWellContents = {
   highlighted: false,
-  selected: false
+  selected: false,
 }
 
 const container1MaxVolume = 400
@@ -80,35 +80,35 @@ describe('wellContentsAllLabware', () => {
       singleIngredResult
     ).toMatchObject({
       'FIXED_TRASH_ID': {
-        A1: defaultWellContents
+        A1: defaultWellContents,
       },
       container2Id: {
-        A1: defaultWellContents
+        A1: defaultWellContents,
       },
       container3Id: {
-        A1: defaultWellContents
+        A1: defaultWellContents,
       },
 
       container1Id: {
         A1: {
           ...defaultWellContents,
           selected: true,
-          maxVolume: container1MaxVolume
+          maxVolume: container1MaxVolume,
         },
         A2: {
           ...defaultWellContents,
-          maxVolume: container1MaxVolume
+          maxVolume: container1MaxVolume,
         },
         B1: {
           ...defaultWellContents,
           selected: true,
-          maxVolume: container1MaxVolume
+          maxVolume: container1MaxVolume,
         },
         B2: {
           ...defaultWellContents,
-          maxVolume: container1MaxVolume
-        }
-      }
+          maxVolume: container1MaxVolume,
+        },
+      },
     })
   })
 })

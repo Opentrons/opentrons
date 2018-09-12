@@ -7,7 +7,7 @@ import {
   InputField,
   DropdownField,
   RadioGroup,
-  type DropdownOption
+  type DropdownOption,
 } from '@opentrons/components'
 import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
@@ -73,7 +73,7 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
 
 type StepRadioGroupProps = {
   name: StepFieldName,
-  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
 } & FocusHandlers
 export const StepRadioGroup = (props: StepRadioGroupProps) => {
   const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
@@ -121,12 +121,12 @@ type PipetteFieldDP = {updateDisposalVolume: (?mixed) => void}
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP & PipetteFieldDP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
   pipetteOptions: pipetteSelectors.equippedPipetteOptions(state),
-  getHydratedPipette: (value) => hydrateField(state, ownProps.name, value)
+  getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
 })
 const PipetteFieldDTP = (dispatch: ThunkDispatch<*>): PipetteFieldDP => ({
   updateDisposalVolume: (disposalVolume: ?mixed) => {
     dispatch(actions.changeFormInput({update: {aspirate_disposalVol_volume: disposalVolume}}))
-  }
+  },
 })
 export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: PipetteFieldProps) => (
   <StepField
@@ -156,7 +156,7 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
 type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
-  labwareOptions: labwareIngredSelectors.labwareOptions(state)
+  labwareOptions: labwareIngredSelectors.labwareOptions(state),
 })
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
@@ -186,7 +186,7 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
   const {name, stepType} = props
   const options = CHANGE_TIP_VALUES.map((value) => ({
     value,
-    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`)
+    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`),
   }))
   return (
     <StepField

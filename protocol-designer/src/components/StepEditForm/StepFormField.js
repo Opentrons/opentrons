@@ -11,14 +11,14 @@ type FieldRenderProps = {
   value: ?mixed,
   updateValue: (?mixed) => void,
   errorToShow: ?string,
-  hoverTooltipHandlers?: ?HoverTooltipHandlers
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 type OP = {
   name: StepFieldName,
   render: (FieldRenderProps) => React.Node, // TODO: type StepField
   dirtyFields?: Array<StepFieldName>,
   focusedField?: StepFieldName,
-  tooltipComponent?: React.Node
+  tooltipComponent?: React.Node,
 }
 type SP = {value?: ?mixed, stepType: ?string}
 type DP = {updateValue: (?mixed) => void}
@@ -32,7 +32,7 @@ const StepField = (props: StepFieldProps) => {
     value,
     updateValue,
     focusedField,
-    dirtyFields
+    dirtyFields,
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
@@ -59,7 +59,7 @@ const STP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
   return {
     value: formData ? formData[ownProps.name] : null,
-    stepType: formData ? formData.stepType : null
+    stepType: formData ? formData.stepType : null,
   }
 }
 
@@ -67,7 +67,7 @@ const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValue: (value: mixed) => {
     const processedValue = processField(ownProps.name, value)
     dispatch(actions.changeFormInput({update: {[ownProps.name]: processedValue}}))
-  }
+  },
 })
 
 const ConnectedStepField = connect(STP, DTP)(StepField)

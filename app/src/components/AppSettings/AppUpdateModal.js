@@ -10,7 +10,7 @@ type Props = {
   update: ShellUpdate,
   downloadUpdate: () => mixed,
   quitAndInstall: () => mixed,
-  close: () => mixed
+  close: () => mixed,
 }
 
 // TODO(mc, 2018-03-19): prop or component for text-height icons
@@ -30,7 +30,7 @@ export default function AppUpdateModal (props: Props) {
         onCloseClick={close}
         buttons={[
           {onClick: close, children: closeButtonChildren},
-          button
+          button,
         ]}
         alertOverlay
       >
@@ -46,7 +46,7 @@ function mapPropsToButtonPropsAndMessage (props: Props) {
   if (error) {
     return {
       button: null,
-      message: 'Something went wrong retrieving the update. Please try restarting the app and trying again. If the problem persists, contact Opentrons support.'
+      message: 'Something went wrong retrieving the update. Please try restarting the app and trying again. If the problem persists, contact Opentrons support.',
     }
   }
 

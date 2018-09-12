@@ -35,6 +35,6 @@ function ProtocolLabwareCard (props: Props) {
 }
 function mapStateToProps (state: State): Props {
   return {
-    labware: robotSelectors.getLabware(state)
+    labware: robotSelectors.getLabware(state),
   }
 }

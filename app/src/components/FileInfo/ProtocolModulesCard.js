@@ -37,7 +37,7 @@ function ProtocolModulesCard (props: Props) {
     modules,
     actualModules,
     fetchModules,
-    attachModulesUrl
+    attachModulesUrl,
   } = props
 
   const moduleInfo = modules.map((module) => {
@@ -51,7 +51,7 @@ function ProtocolModulesCard (props: Props) {
     return {
       ...module,
       displayName,
-      modulesMatch
+      modulesMatch,
     }
   })
 
@@ -87,7 +87,7 @@ function makeMapStateToProps (): (state: State) => SP {
     return {
       _robot,
       modules: robotSelectors.getModules(state),
-      actualModules: modulesCall && modulesCall.response
+      actualModules: modulesCall && modulesCall.response,
     }
   }
 }
@@ -100,6 +100,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP): Props {
   return {
     ...stateProps,
     attachModulesUrl,
-    fetchModules: () => _robot && dispatch(fetchModules(_robot))
+    fetchModules: () => _robot && dispatch(fetchModules(_robot)),
   }
 }

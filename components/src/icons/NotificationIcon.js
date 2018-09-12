@@ -8,7 +8,7 @@ type Props = IconProps & {
   /** name constant of the optional notifcation icon to display */
   childName: ?IconName,
   /** classes to apply (e.g. for color) to notification icon */
-  childClassName?: string
+  childClassName?: string,
 }
 
 const SCALE_FACTOR = 3

@@ -84,7 +84,7 @@ describe('ListItem', () => {
   test('creates a linked list item from props', () => {
     const linkItemProps = {
       url: '/foo/bar',
-      isDisabled: false
+      isDisabled: false,
     }
 
     const root = Renderer.create(

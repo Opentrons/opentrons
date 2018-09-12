@@ -8,7 +8,7 @@ import Store from 'electron-store'
 
 import DiscoveryClient, {
   SERVICE_EVENT,
-  SERVICE_REMOVED_EVENT
+  SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
 
 import {getConfig, getOverrides} from './config'
@@ -38,7 +38,7 @@ export function registerDiscovery (dispatch: Action => void) {
     pollInterval: SLOW_POLL_INTERVAL,
     logger: log,
     candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
-    services: store.get('services')
+    services: store.get('services'),
   })
 
   client
@@ -63,7 +63,7 @@ export function registerDiscovery (dispatch: Action => void) {
     store.set('services', filterServicesToPersist(client.services))
     dispatch({
       type: 'discovery:UPDATE_LIST',
-      payload: {robots: servicesToRobots(client.services)}
+      payload: {robots: servicesToRobots(client.services)},
     })
   }
 }
@@ -88,7 +88,7 @@ function servicesToRobots (services: Array<Service>): Array<DiscoveredRobot> {
 
   return map(servicesByName, (services: Array<Service>, name) => ({
     name,
-    connections: servicesToConnections(services)
+    connections: servicesToConnections(services),
   }))
 }
 
@@ -105,7 +105,7 @@ function serviceToConnection (service: Service): ?Connection {
     ip: service.ip,
     ok: service.ok,
     port: service.port,
-    local: isLocal(service.ip)
+    local: isLocal(service.ip),
   }
 }
 

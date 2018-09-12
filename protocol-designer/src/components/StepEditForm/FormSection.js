@@ -18,7 +18,7 @@ type FormSectionProps = {
   className?: string,
   /** if defined, carat shows */
   onCollapseToggle?: (event: SyntheticEvent<>) => mixed,
-  collapsed?: boolean
+  collapsed?: boolean,
 }
 
 const FormSection = (props: FormSectionProps) => {
@@ -46,10 +46,10 @@ const FormSection = (props: FormSectionProps) => {
 }
 
 const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
-  collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName]
+  collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName],
 })
 const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
-  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName))
+  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName)),
 })
 const ConnectedFormSection = connect(FormSectionSTP, FormSectionDTP)(FormSection)
 

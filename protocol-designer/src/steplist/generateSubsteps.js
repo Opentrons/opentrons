@@ -7,7 +7,7 @@ import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
 import {
   utils as steplistUtils,
-  type NamedIngred
+  type NamedIngred,
 } from '../steplist'
 
 import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
@@ -17,19 +17,19 @@ import type {
   SourceDestSubstepItem,
   StepItemSourceDestRow,
   StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel
+  SourceDestSubstepItemSingleChannel,
 } from './types'
 
 import {
   consolidate,
   distribute,
   transfer,
-  mix
+  mix,
 } from '../step-generation'
 
 import type {
   AspirateDispenseArgs,
-  RobotState
+  RobotState,
 } from '../step-generation'
 
 import type {
@@ -38,7 +38,7 @@ import type {
   DistributeFormData,
   MixFormData,
   PauseFormData,
-  TransferFormData
+  TransferFormData,
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
@@ -50,7 +50,7 @@ type GetLabwareType = (labwareId: string) => ?string
 
 type AspDispCommandType = {
   command: 'aspirate' | 'dispense',
-  params: AspirateDispenseArgs
+  params: AspirateDispenseArgs,
 }
 
 function transferLikeSubsteps (args: {
@@ -59,14 +59,14 @@ function transferLikeSubsteps (args: {
   getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
-  stepId: number
+  stepId: number,
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
     allPipetteData,
     getIngreds,
     getLabwareType,
-    stepId
+    stepId,
   } = args
 
   // Add tips to pipettes, since this is just a "simulation"
@@ -75,7 +75,7 @@ function transferLikeSubsteps (args: {
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
 
   const {
-    pipette: pipetteId
+    pipette: pipetteId,
   } = validatedForm
 
   const pipette = allPipetteData[pipetteId]
@@ -97,7 +97,7 @@ function transferLikeSubsteps (args: {
       ...validatedForm,
       mixBeforeAspirate: null,
       mixInDestination: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
     result = transfer(commandCallArgs)(robotState)
@@ -105,7 +105,7 @@ function transferLikeSubsteps (args: {
     const commandCallArgs = {
       ...validatedForm,
       mixBeforeAspirate: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
     result = distribute(commandCallArgs)(robotState)
@@ -114,7 +114,7 @@ function transferLikeSubsteps (args: {
       ...validatedForm,
       mixFirstAspirate: null,
       mixInDestination: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
     result = consolidate(commandCallArgs)(robotState)
@@ -156,7 +156,7 @@ function transferLikeSubsteps (args: {
           ...nextMultiRow[channel],
           volume: showDispenseVol
             ? nextMultiRow[channel].volume
-            : currentMultiRow[channel].volume
+            : currentMultiRow[channel].volume,
         }))
       }
     )
@@ -165,7 +165,7 @@ function transferLikeSubsteps (args: {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: mergedMultiRows
+      multiRows: mergedMultiRows,
     }
   }
 
@@ -188,7 +188,7 @@ function transferLikeSubsteps (args: {
       ...currentRow,
       volume: showDispenseVol
         ? nextRow.volume
-        : currentRow.volume
+        : currentRow.volume,
     })
   )
 
@@ -196,7 +196,7 @@ function transferLikeSubsteps (args: {
     multichannel: false,
     stepType: validatedForm.stepType,
     parentStepId: stepId,
-    rows: mergedRows
+    rows: mergedRows,
   }
 }
 
@@ -209,7 +209,7 @@ function commandToRows (
     return {
       sourceIngredients: getIngreds(labware, well),
       sourceWell: well,
-      volume
+      volume,
     }
   }
 
@@ -218,7 +218,7 @@ function commandToRows (
     return {
       destIngredients: getIngreds(labware, well),
       destWell: well,
-      volume
+      volume,
     }
   }
 
@@ -250,7 +250,7 @@ function commandToMultiRows (
         channelId: channel,
         sourceIngredients: ingreds,
         sourceWell: well,
-        volume
+        volume,
       }
     }
     if (command.command !== 'dispense') {
@@ -262,7 +262,7 @@ function commandToMultiRows (
       channelId: channel,
       destIngredients: ingreds,
       destWell: well,
-      volume
+      volume,
     }
   })
 }
@@ -308,7 +308,7 @@ export function generateSubsteps (
       getIngreds,
       getLabwareType,
       robotState,
-      stepId
+      stepId,
     })
   }
 

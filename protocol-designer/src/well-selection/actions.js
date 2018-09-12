@@ -38,7 +38,7 @@ export type OpenWellSelectionModalPayload = {
   pipetteId: string,
   formFieldAccessor: StepFieldName, // TODO: BC rename this 'name'
   pipetteChannels?: ?Channels,
-  labwareName?: string
+  labwareName?: string,
 }
 
 function _wellArrayToObj (wells: ?Array<string>): Wells {
@@ -47,7 +47,7 @@ function _wellArrayToObj (wells: ?Array<string>): Wells {
   }
   return wells.reduce((acc: Wells, well: string) => ({
     ...acc,
-    [well]: well
+    [well]: well,
   }), {})
 }
 
@@ -72,14 +72,14 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       payload: {
         ...payload,
         pipetteChannels: pipettes && pipettes[payload.pipetteId] && pipettes[payload.pipetteId].channels,
-        labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type
-      }
+        labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type,
+      },
     })
   }
 
 export const closeWellSelectionModal = (): * => ({
   type: 'CLOSE_WELL_SELECTION_MODAL',
-  payload: null
+  payload: null,
 })
 
 export const saveWellSelectionModal = () =>
@@ -91,8 +91,8 @@ export const saveWellSelectionModal = () =>
     if (wellSelectionModalData) {
       dispatch(changeFormInput({
         update: {
-          [wellSelectionModalData.formFieldAccessor]: selectors.selectedWellNames(state)
-        }
+          [wellSelectionModalData.formFieldAccessor]: selectors.selectedWellNames(state),
+        },
       }))
     } else {
       console.warn('No well selection modal data in state')

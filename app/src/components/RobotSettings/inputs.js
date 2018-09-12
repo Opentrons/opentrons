@@ -7,7 +7,7 @@ import * as React from 'react'
 import {
   InputField,
   DropdownField,
-  type DropdownOption
+  type DropdownOption,
 } from '@opentrons/components'
 
 export type FormProps = {
@@ -26,11 +26,11 @@ export type InputProps<T> = {
 }
 
 type SelectProps<T> = InputProps<T> & {
-  options: Array<DropdownOption>
+  options: Array<DropdownOption>,
 }
 
 type TextInputProps<T> = InputProps<T> & {
-  type: 'text' | 'password'
+  type: 'text' | 'password',
 }
 
 export class Form extends React.Component<FormProps> {
@@ -56,7 +56,7 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
   onChange = (event: SyntheticInputEvent<>) => {
     if (!this.props.disabled) {
       this.props.onChange({
-        [this.props.name]: event.target.value
+        [this.props.name]: event.target.value,
       })
     }
   }
@@ -80,7 +80,7 @@ export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
   onChange = (event: SyntheticInputEvent<>) => {
     if (!this.props.disabled) {
       this.props.onChange({
-        [this.props.name]: event.target.value
+        [this.props.name]: event.target.value,
       })
     }
   }

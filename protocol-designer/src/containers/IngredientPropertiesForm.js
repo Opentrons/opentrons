@@ -5,7 +5,7 @@ import {
   editIngredient,
   editModeIngredientGroup,
   deleteIngredient,
-  type EditIngredientPayload
+  type EditIngredientPayload,
 } from '../labware-ingred/actions'
 import {selectors} from '../labware-ingred/reducers'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
@@ -30,7 +30,7 @@ function mapStateToProps (state: BaseState): SP {
     selectedWells: Object.keys(wellSelectionSelectors.getSelectedWells(state)),
     selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
     allIngredientNamesIds: selectors.allIngredientNamesIds(state),
-    allIngredientGroupFields: selectors.allIngredientGroupFields(state)
+    allIngredientGroupFields: selectors.allIngredientGroupFields(state),
   }
 }
 
@@ -38,7 +38,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     onSave: (payload: EditIngredientPayload) => dispatch(editIngredient(payload)),
     onCancel: () => dispatch(editModeIngredientGroup(null)),
-    onDelete: (groupId: string) => dispatch(deleteIngredient({groupId}))
+    onDelete: (groupId: string) => dispatch(deleteIngredient({groupId})),
   }
 }
 

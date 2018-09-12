@@ -20,7 +20,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  onScanClick: () => mixed
+  onScanClick: () => mixed,
 }
 
 type Props = StateProps & DispatchProps
@@ -49,12 +49,12 @@ function mapStateToProps (state: State): StateProps {
   return {
     robots,
     found: robots.length > 0,
-    isScanning: getScanning(state)
+    isScanning: getScanning(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
   return {
-    onScanClick: () => dispatch(startDiscovery())
+    onScanClick: () => dispatch(startDiscovery()),
   }
 }

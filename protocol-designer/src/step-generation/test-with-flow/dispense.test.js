@@ -2,7 +2,7 @@
 import {
   createRobotState,
   commandCreatorNoErrors,
-  commandCreatorHasErrors
+  commandCreatorHasErrors,
 } from './fixtures'
 import _dispense from '../dispense'
 
@@ -22,7 +22,7 @@ describe('dispense', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
 
     robotStateWithTip = {
@@ -31,9 +31,9 @@ describe('dispense', () => {
         ...initialRobotState.tipState,
         pipettes: {
           ...initialRobotState.tipState.pipettes,
-          p300SingleId: true
-        }
-      }
+          p300SingleId: true,
+        },
+      },
     }
 
     // $FlowFixMe: mock methods
@@ -48,7 +48,7 @@ describe('dispense', () => {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
-        well: 'A1'
+        well: 'A1',
       })(robotStateWithTip)
 
       expect(result.commands).toEqual([{
@@ -57,8 +57,8 @@ describe('dispense', () => {
           pipette: 'p300SingleId',
           volume: 50,
           labware: 'sourcePlateId',
-          well: 'A1'
-        }
+          well: 'A1',
+        },
       }])
     })
 
@@ -67,12 +67,12 @@ describe('dispense', () => {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
-        well: 'A1'
+        well: 'A1',
       })(initialRobotState)
 
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toMatchObject({
-        type: 'NO_TIP_ON_PIPETTE'
+        type: 'NO_TIP_ON_PIPETTE',
       })
     })
 
@@ -81,12 +81,12 @@ describe('dispense', () => {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'someBadLabwareId',
-        well: 'A1'
+        well: 'A1',
       })(robotStateWithTip)
 
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toMatchObject({
-        type: 'LABWARE_DOES_NOT_EXIST'
+        type: 'LABWARE_DOES_NOT_EXIST',
       })
     })
 
@@ -108,7 +108,7 @@ describe('dispense', () => {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
-        volume: 152
+        volume: 152,
       })(robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
@@ -118,7 +118,7 @@ describe('dispense', () => {
           volume: 152,
           well: 'A1',
           labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.instruments.p300SingleId
+          pipetteData: robotStateWithTip.instruments.p300SingleId,
         },
         robotStateWithTip.liquidState
       )

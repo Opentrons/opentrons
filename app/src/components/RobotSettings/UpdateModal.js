@@ -12,7 +12,7 @@ import {
   makeGetAvailableRobotUpdate,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  setIgnoredUpdate
+  setIgnoredUpdate,
 } from '../../http-api-client'
 
 import {AlertModal, Icon} from '@opentrons/components'
@@ -78,7 +78,7 @@ function UpdateModal (props: Props) {
       heading={heading}
       buttons={[
         {onClick: ignoreUpdate, children: closeButtonText},
-        button
+        button,
       ]}
       alertOverlay
     >
@@ -95,7 +95,7 @@ function makeMapStateToProps (): (State, OP) => SP {
   return (state, ownProps) => ({
     availableUpdate: getAvailableRobotUpdate(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
-    restartRequest: getRobotRestartRequest(state, ownProps)
+    restartRequest: getRobotRestartRequest(state, ownProps),
   })
 }
 
@@ -113,6 +113,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     ignoreUpdate,
     update: () => dispatch(updateRobotServer(ownProps)),
-    restart: () => dispatch(restartRobotServer(ownProps)).then(close)
+    restart: () => dispatch(restartRobotServer(ownProps)).then(close),
   }
 }

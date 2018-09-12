@@ -7,7 +7,7 @@ import {AnalyticsSettingsModal} from '../analytics-settings'
 import styles from './styles.css'
 
 type Props = {
-  children: React.Node
+  children: React.Node,
 }
 export default function PageWrapper (props: Props) {
   return (

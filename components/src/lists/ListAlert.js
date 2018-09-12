@@ -8,7 +8,7 @@ type ListAlertProps = {
   /** additional classes to apply */
   className?: string,
   /** contents of ListAlert (usually plain text) */
-  children?: React.Node
+  children?: React.Node,
 }
 
 /**

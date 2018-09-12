@@ -14,7 +14,7 @@ type Props = {
   /** If card can not be used, gray it out and remove pointer events */
   disabled?: boolean,
   /** Additional class names */
-  className?: string
+  className?: string,
 }
 
 /**
@@ -26,7 +26,7 @@ export default function Card (props: Props) {
   const {title, children} = props
 
   const style = cx(styles.card, props.className, {
-    [styles.disabled]: props.disabled
+    [styles.disabled]: props.disabled,
   })
 
   return (

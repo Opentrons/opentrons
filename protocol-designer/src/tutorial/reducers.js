@@ -9,24 +9,24 @@ type HintReducerState = Array<HintKey>
 const hints = handleActions({
   ADD_HINT: (state: HintReducerState, action: AddHintAction): HintReducerState => (
     uniq([...state, action.payload.hint])
-  )
+  ),
 }, [])
 
 type DismissedHintReducerState = Array<HintKey>
 const dismissedHints = handleActions({
   REMOVE_HINT: (state: DismissedHintReducerState, action: RemoveHintAction): DismissedHintReducerState => (
     uniq([...state, action.payload.hint])
-  )
+  ),
 }, [])
 
 const _allReducers = {
   hints,
-  dismissedHints
+  dismissedHints,
 }
 
 export type RootState = {
   hints: HintReducerState,
-  dismissedHints: DismissedHintReducerState
+  dismissedHints: DismissedHintReducerState,
 }
 
 export const rootReducer = combineReducers(_allReducers)

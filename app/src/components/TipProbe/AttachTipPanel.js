@@ -11,17 +11,17 @@ import attachMulti from '../../img/attach_tip_multi.png'
 import {
   actions as robotActions,
   type Mount,
-  type Channels
+  type Channels,
 } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
   channels: Channels,
-  volume: number
+  volume: number,
 }
 
 type DispatchProps = {
-  onProbeTipClick: () => void
+  onProbeTipClick: () => void,
 }
 
 export default connect(null, mapDispatchToProps)(AttachTipPanel)
@@ -63,6 +63,6 @@ function mapDispatchToProps (
   const mount = ownProps.mount
 
   return {
-    onProbeTipClick: () => { dispatch(robotActions.probeTip(mount)) }
+    onProbeTipClick: () => { dispatch(robotActions.probeTip(mount)) },
   }
 }

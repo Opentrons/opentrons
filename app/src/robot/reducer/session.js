@@ -7,7 +7,7 @@ import type {
   SessionModule,
   Mount,
   Slot,
-  SessionStatus
+  SessionStatus,
 } from '../types'
 
 import {actionTypes} from '../actions'
@@ -15,12 +15,12 @@ import {actionTypes} from '../actions'
 import type {
   Action,
   DisconnectResponseAction,
-  SessionUpdateAction
+  SessionUpdateAction,
 } from '../actions'
 
 type Request = {
   inProgress: boolean,
-  error: ?{message: string}
+  error: ?{message: string},
 }
 
 export type State = {
@@ -63,7 +63,7 @@ const {
   RESUME_RESPONSE,
   CANCEL,
   CANCEL_RESPONSE,
-  TICK_RUN_TIME
+  TICK_RUN_TIME,
 } = actionTypes
 
 const INITIAL_STATE: State = {
@@ -87,7 +87,7 @@ const INITIAL_STATE: State = {
   resumeRequest: {inProgress: false, error: null},
   cancelRequest: {inProgress: false, error: null},
   startTime: null,
-  runTime: 0
+  runTime: 0,
 }
 
 export default function sessionReducer (
@@ -137,12 +137,12 @@ function handleSessionUpdate (
   if (lastCommand) {
     const command = {
       ...protocolCommandsById[lastCommand.id],
-      ...lastCommand
+      ...lastCommand,
     }
 
     protocolCommandsById = {
       ...protocolCommandsById,
-      [lastCommand.id]: command
+      [lastCommand.id]: command,
     }
   }
 
@@ -154,7 +154,7 @@ function handleSession (state: State, action: any): State {
     ...state,
     runTime: 0,
     startTime: null,
-    sessionRequest: {inProgress: true, error: null}
+    sessionRequest: {inProgress: true, error: null},
   }
 
   if (action.payload && action.payload.file && action.payload.file.name) {
@@ -174,7 +174,7 @@ function handleSessionResponse (state: State, action: any): State {
   return {
     ...state,
     sessionRequest: {inProgress: false, error: null},
-    ...payload
+    ...payload,
   }
 }
 

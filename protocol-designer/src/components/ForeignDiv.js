@@ -7,7 +7,7 @@ type Props = {
   x?: string | number,
   y?: string | number,
   children?: React.Node,
-  className?: string
+  className?: string,
 }
 
 export default function ForeignDiv (props: Props) {
