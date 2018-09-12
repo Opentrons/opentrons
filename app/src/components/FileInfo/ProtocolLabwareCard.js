@@ -3,7 +3,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import countBy from 'lodash/countBy'
-import forEach from 'lodash/forEach'
 import type {State} from '../../types'
 import type {Labware} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
@@ -20,18 +19,13 @@ export default connect(mapStateToProps, null)(ProtocolLabwareCard)
 function ProtocolLabwareCard (props: Props) {
   const {labware} = props
   const labwareCount = countBy(labware, 'name')
-  let labwareList = []
 
-  forEach(labwareCount, function (value, key) {
-    return (
-      labwareList.push(
-        <tr key={key}>
-          <td>{key}</td>
-          <td>x{value}</td>
-        </tr>
-      )
-    )
-  })
+  const labwareList = Object.keys(labwareCount).map(type => (
+    <tr key={type}>
+      <td>{type}</td>
+      <td>{`x${labwareCount[type]}`}</td>
+    </tr>
+  ))
 
   return (
     <LabwareTable title={TITLE}>

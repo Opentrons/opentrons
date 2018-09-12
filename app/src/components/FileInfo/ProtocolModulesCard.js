@@ -46,10 +46,7 @@ function ProtocolModulesCard (props: Props) {
       : 'Magnetic Bead Module'
 
     const actualModel = actualModules && actualModules.modules.find((m) => m.name === module.name)
-    let modulesMatch = false
-    if (actualModel && actualModel.name === module.name) {
-      modulesMatch = true
-    }
+    const modulesMatch = actualModel != null && actualModel.name === module.name
 
     return {
       ...module,
