@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-aluminum-block-96-PCR-plate"
+    "name": "opentrons-aluminum-block-96-PCR-plate",
+    "format": "96-standard",
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [

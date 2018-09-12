@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-tuberack-15_50ml"
+    "name": "opentrons-tuberack-15_50ml",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

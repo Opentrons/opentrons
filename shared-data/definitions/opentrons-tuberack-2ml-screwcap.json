@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-tuberack-2ml-screwcap"
+    "name": "opentrons-tuberack-2ml-screwcap",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

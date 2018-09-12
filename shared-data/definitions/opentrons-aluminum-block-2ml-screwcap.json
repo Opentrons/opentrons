@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-aluminum-block-2ml-screwcap"
+    "name": "opentrons-aluminum-block-2ml-screwcap",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [

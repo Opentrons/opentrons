@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-aluminum-block-2ml-eppendorf"
+    "name": "opentrons-aluminum-block-2ml-eppendorf",
+    "format": "irregular",
+    "displayCategory": "tube-rack"
   },
   "ordering": [
     [
