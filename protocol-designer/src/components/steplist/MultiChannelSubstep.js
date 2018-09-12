@@ -14,32 +14,32 @@ type MultiChannelSubstepProps = {|
   rowGroup: Array<StepItemSourceDestRowMulti>,
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 |}
 
 type MultiChannelSubstepState = {
-  collapsed: boolean
+  collapsed: boolean,
 }
 
 export default class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, MultiChannelSubstepState> {
   constructor (props: MultiChannelSubstepProps) {
     super(props)
     this.state = {
-      collapsed: DEFAULT_COLLAPSED_STATE
+      collapsed: DEFAULT_COLLAPSED_STATE,
     }
   }
 
   handleToggleCollapsed = () => {
     this.setState({
       ...this.state,
-      collapsed: !this.state.collapsed
+      collapsed: !this.state.collapsed,
     })
   }
 
   render () {
     const {
       rowGroup,
-      highlighted
+      highlighted,
     } = this.props
 
     const collapsed = this.state.collapsed

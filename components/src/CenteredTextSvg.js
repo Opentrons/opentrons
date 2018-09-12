@@ -3,7 +3,7 @@ import * as React from 'react'
 
 type CenteredTextSvgProps = {
   text: React.Node,
-  className?: string
+  className?: string,
 }
 
 export function CenteredTextSvg (props: CenteredTextSvgProps) {

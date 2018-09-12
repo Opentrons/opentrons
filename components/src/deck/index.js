@@ -24,10 +24,10 @@ export {
   LabwareLabels,
   Module,
   SlotOverlay,
-  Well
+  Well,
 }
 
 export type {
   SingleWell,
-  ModuleType
+  ModuleType,
 }

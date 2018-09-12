@@ -64,6 +64,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchPipettes: () => dispatch(fetchPipettes(ownProps)),
-    clearMove: () => dispatch(clearMoveResponse(ownProps))
+    clearMove: () => dispatch(clearMoveResponse(ownProps)),
   }
 }

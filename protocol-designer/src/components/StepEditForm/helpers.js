@@ -4,7 +4,7 @@ import difference from 'lodash/difference'
 export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> (args: {
   focusedField: ?Field,
   dirtyFields: Array<Field>,
-  alerts: Array<Alert>
+  alerts: Array<Alert>,
 }): Array<Alert> {
   const {focusedField, dirtyFields, alerts} = args
   return alerts.filter(alert => (

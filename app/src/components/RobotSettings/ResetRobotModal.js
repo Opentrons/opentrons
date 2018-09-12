@@ -13,7 +13,7 @@ import {
   makeGetRobotRestartRequest,
   restartRobotServer,
   clearResetResponse,
-  clearRestartResponse
+  clearRestartResponse,
 } from '../../http-api-client'
 import {chainActions} from '../../util'
 
@@ -22,7 +22,7 @@ import {Portal} from '../portal'
 import {LabeledCheckbox} from '../controls'
 
 type OP = {
-  robot: Robot
+  robot: Robot,
 }
 
 type SP = {
@@ -69,12 +69,12 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
     if (restartRequest.response) {
       message = 'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
       buttons = [
-        {onClick: this.props.closeModal, children: 'close'}
+        {onClick: this.props.closeModal, children: 'close'},
       ]
     } else if (resetRequest.response) {
       message = 'Restart your robot to finish the reset. It may take several minutes for your robot to restart'
       buttons = [
-        {onClick: this.props.restart, children: 'restart'}
+        {onClick: this.props.restart, children: 'restart'},
       ]
     } else {
       message = (
@@ -94,7 +94,7 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
       )
       buttons = [
         {onClick: this.props.closeModal, children: 'close'},
-        {onClick: this.handleReset, children: 'reset'}
+        {onClick: this.handleReset, children: 'reset'},
       ]
     }
 
@@ -125,7 +125,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     return {
       options: optionsResponse && optionsResponse.options,
       resetRequest: getResetRequest(state, robot),
-      restartRequest: getRobotRestartRequest(state, robot)
+      restartRequest: getRobotRestartRequest(state, robot),
     }
   }
 }
@@ -158,6 +158,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     restart: () => dispatch(chainActions(
       restartRobotServer(robot),
       clearResetResponse(robot)
-    ))
+    )),
   }
 }

@@ -40,7 +40,7 @@ export function getTiprackTipstate (filled: ?boolean): WellTipState {
 export function getTipColumn<T> (index: number, filled: T): {[well: string]: T} {
   return Array.from('ABCDEFGH').map(wellLetter => `${wellLetter}${index}`).reduce((acc, well) => ({
     ...acc,
-    [well]: filled
+    [well]: filled,
   }), {})
 }
 
@@ -49,7 +49,7 @@ export const all8ChTipIds = range(8)
 export function createTipLiquidState<T> (channels: number, contents: T): {[tipId: string]: T} {
   return range(channels).reduce((tipIdAcc, tipId) => ({
     ...tipIdAcc,
-    [tipId]: contents
+    [tipId]: contents,
   }), {})
 }
 
@@ -67,7 +67,7 @@ export const p300Single = {
   mount: 'right',
   model: 'p300_single_v1',
   maxVolume: 300,
-  channels: 1
+  channels: 1,
 }
 
 export const p300Multi = {
@@ -75,7 +75,7 @@ export const p300Multi = {
   mount: 'left',
   model: 'p300_multi_v1',
   maxVolume: 300,
-  channels: 8
+  channels: 8,
 }
 
 export function getWellsForLabware (labwareType: string) {
@@ -92,7 +92,7 @@ export function getWellsForLabware (labwareType: string) {
 export function createEmptyLiquidState (args: {
   sourcePlateType?: string,
   destPlateType?: string,
-  pipettes: $PropertyType<RobotState, 'instruments'>
+  pipettes: $PropertyType<RobotState, 'instruments'>,
 }) {
   const {sourcePlateType, destPlateType, pipettes} = args
 
@@ -111,13 +111,13 @@ export function createEmptyLiquidState (args: {
       pipettes,
       (acc, pipetteData: PipetteData, pipetteId: string) => ({
         ...acc,
-        [pipetteId]: createTipLiquidState(pipetteData.channels, {})
+        [pipetteId]: createTipLiquidState(pipetteData.channels, {}),
       }), {}),
     labware: {
       ...sourceLabware,
       ...destLabware,
-      trashId: {A1: {}}
-    }
+      trashId: {A1: {}},
+    },
   }
 }
 
@@ -129,7 +129,7 @@ type CreateRobotArgs = {
   destPlateType?: string,
   tipracks: Array<10 | 200 | 1000>,
   fillPipetteTips?: boolean,
-  fillTiprackTips?: boolean
+  fillTiprackTips?: boolean,
 }
 /** RobotState with empty liquid state */
 export function createRobotState (args: CreateRobotArgs): RobotState {
@@ -141,8 +141,8 @@ export function createRobotState (args: CreateRobotArgs): RobotState {
     tipState,
     liquidState: createEmptyLiquidState({
       ...args,
-      pipettes: {p300SingleId: p300Single, p300MultiId: p300Multi}
-    })
+      pipettes: {p300SingleId: p300Single, p300MultiId: p300Multi},
+    }),
   }
 }
 
@@ -158,7 +158,7 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
 
   const instruments = {
     p300SingleId: p300Single,
-    p300MultiId: p300Multi
+    p300MultiId: p300Multi,
   }
 
   const destLabware = args.destPlateType
@@ -166,8 +166,8 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
       destPlateId: {
         slot: '11',
         type: args.destPlateType,
-        name: 'Destination Plate'
-      }
+        name: 'Destination Plate',
+      },
     }
     : {}
 
@@ -176,13 +176,13 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
     sourcePlateId: {
       slot: '10',
       type: args.sourcePlateType,
-      name: 'Source Plate'
+      name: 'Source Plate',
     },
     trashId: {
       slot: '12',
       type: 'fixed-trash',
-      name: 'Trash'
-    }
+      name: 'Trash',
+    },
   }
 
   const occupiedSlots = map(baseLabware, (labwareData: LabwareData, labwareId) => labwareData.slot)
@@ -192,8 +192,8 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
     [`tiprack${tiprackIndex + 1}Id`]: {
       slot: _getTiprackSlot(tiprackIndex, occupiedSlots),
       type: `tiprack-${tiprackVolume}ul`,
-      name: `Tip rack ${tiprackIndex + 1}`
-    }
+      name: `Tip rack ${tiprackIndex + 1}`,
+    },
   }), {})
 
   return {
@@ -201,18 +201,18 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
 
     labware: {
       ...baseLabware,
-      ...tiprackLabware
+      ...tiprackLabware,
     },
 
     tipState: {
       tipracks: Object.keys(tiprackLabware).reduce((acc, tiprackId) => ({
         ...acc,
-        [tiprackId]: getTiprackTipstate(args.fillTiprackTips)
+        [tiprackId]: getTiprackTipstate(args.fillTiprackTips),
       }), {}),
       pipettes: {
         p300SingleId: !!args.fillPipetteTips,
-        p300MultiId: !!args.fillPipetteTips
-      }
-    }
+        p300MultiId: !!args.fillPipetteTips,
+      },
+    },
   }
 }

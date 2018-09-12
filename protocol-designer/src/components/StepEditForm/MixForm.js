@@ -10,7 +10,7 @@ import {
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField
+  ChangeTipField,
 } from './formFields'
 
 import FlowRateField from './FlowRateField'

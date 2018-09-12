@@ -13,14 +13,14 @@ export type Props = {
   /** name of module, eg 'magdeck' or 'tempdeck' */
   name: ModuleType,
   /** display mode: 'default', 'present', 'missing', or 'info' */
-  mode: 'default' | 'present' | 'missing' | 'info'
+  mode: 'default' | 'present' | 'missing' | 'info',
 }
 
 const DIMENSIONS = {
   x: -28.3,
   y: -2.5,
   width: 158.6,
-  height: 90.5
+  height: 90.5,
 }
 
 export default function Module (props: Props) {
@@ -67,13 +67,13 @@ function ModuleItemContents (props: Props) {
 
   const iconClassName = cx(styles.module_review_icon, {
     [styles.module_review_icon_missing]: mode === 'missing',
-    [styles.module_review_icon_present]: mode === 'present'
+    [styles.module_review_icon_present]: mode === 'present',
   })
 
   const iconNameByMode = {
     'missing': 'alert-circle',
     'present': 'check-circle',
-    'info': 'usb'
+    'info': 'usb',
   }
 
   return (

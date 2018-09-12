@@ -27,7 +27,7 @@ type SubstepRowProps = {|
   toggleCollapsed?: (e: SyntheticMouseEvent<*>) => mixed,
 
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 |}
 
 const VOLUME_DIGITS = 1

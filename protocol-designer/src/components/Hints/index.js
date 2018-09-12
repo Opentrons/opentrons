@@ -33,10 +33,10 @@ class Hints extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  hints: selectors.getHints(state)
+  hints: selectors.getHints(state),
 })
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
-  removeHint: (hint) => dispatch(actions.removeHint(hint))
+  removeHint: (hint) => dispatch(actions.removeHint(hint)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Hints)

@@ -15,11 +15,11 @@ type SP = {
   nextPipette: Pipette,
   labware: Array<Labware>,
   nextLabware: Labware,
-  isTipsProbed: boolean
+  isTipsProbed: boolean,
 }
 
 type Props = SP & {
-  match: Match
+  match: Match,
 }
 
 export default connect(mapStateToProps)(Calibrate)
@@ -47,7 +47,7 @@ function mapStateToProps (state: State): SP {
     nextPipette: robotSelectors.getNextPipette(state),
     labware: robotSelectors.getNotTipracks(state),
     nextLabware: robotSelectors.getNextLabware(state),
-    isTipsProbed: robotSelectors.getPipettesCalibrated(state)
+    isTipsProbed: robotSelectors.getPipettesCalibrated(state),
   }
 }
 
@@ -56,7 +56,7 @@ function getRedirectUrl (props: Props) {
     nextPipette,
     labware,
     nextLabware,
-    isTipsProbed
+    isTipsProbed,
   } = props
 
   if (!isTipsProbed && nextPipette) {

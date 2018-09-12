@@ -37,13 +37,13 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
   if (!pipetteData) {
     // bail out before doing anything else
     return {
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
     }
   }
 
   const {
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm
+    dispenseOffsetFromBottomMm,
   } = data
 
   // TODO error on negative data.disposalVolume?
@@ -107,7 +107,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ? [touchTip({
               pipette: data.pipette,
               labware: data.sourceLabware,
-              well: sourceWell
+              well: sourceWell,
             })]
             : []
 
@@ -115,7 +115,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ? [touchTip({
               pipette: data.pipette,
               labware: data.destLabware,
-              well: destWell
+              well: destWell,
             })]
             : []
 
@@ -140,7 +140,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               volume: subTransferVol,
               labware: data.sourceLabware,
               well: sourceWell,
-              offsetFromBottomMm: aspirateOffsetFromBottomMm
+              offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
             dispense({
@@ -148,10 +148,10 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               volume: subTransferVol,
               labware: data.destLabware,
               well: destWell,
-              offsetFromBottomMm: dispenseOffsetFromBottomMm
+              offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommands,
-            ...mixInDestinationCommands
+            ...mixInDestinationCommands,
           ]
         }
       )

@@ -7,7 +7,7 @@ import {SectionContentHalf} from '../layout'
 import styles from './styles.css'
 
 type Props = {
-  name: string
+  name: string,
 }
 const TITLE = 'Information'
 

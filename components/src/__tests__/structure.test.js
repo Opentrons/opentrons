@@ -10,7 +10,7 @@ import {
   RefreshCard,
   LabeledValue,
   Splash,
-  Pill
+  Pill,
 } from '..'
 
 describe('TitleBar', () => {
@@ -71,7 +71,7 @@ describe('PageTabs', () => {
   test('renders h3 links for each page', () => {
     const pages = [
       {title: 'Page1', href: '/page1', isActive: false, isDisabled: false},
-      {title: 'Page2', href: '/page2', isActive: false, isDisabled: false}
+      {title: 'Page2', href: '/page2', isActive: false, isDisabled: false},
     ]
 
     const root = Renderer.create(
@@ -92,7 +92,7 @@ describe('PageTabs', () => {
 
   test('does not create a link if disabled', () => {
     const pages = [
-      {title: 'Page1', href: '/page1', isActive: false, isDisabled: true}
+      {title: 'Page1', href: '/page1', isActive: false, isDisabled: true},
     ]
 
     const notLink = Renderer.create(
@@ -106,7 +106,7 @@ describe('PageTabs', () => {
 
   test('adds active class if active', () => {
     const pages = [
-      {title: 'Page1', href: '/page1', isActive: true, isDisabled: false}
+      {title: 'Page1', href: '/page1', isActive: true, isDisabled: false},
     ]
 
     const link = Renderer.create(
@@ -121,7 +121,7 @@ describe('PageTabs', () => {
   test('renders PageTabs correctly', () => {
     const pages = [
       {title: 'Page1', href: '/page1', isActive: true, isDisabled: false},
-      {title: 'Page2', href: '/page2', isActive: false, isDisabled: true}
+      {title: 'Page2', href: '/page2', isActive: false, isDisabled: true},
     ]
 
     const tree = Renderer.create(

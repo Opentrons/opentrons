@@ -9,7 +9,7 @@ import {
   selectors as robotSelectors,
   actions as robotActions,
   type Mount,
-  type SessionModule
+  type SessionModule,
 } from '../../robot'
 
 import {Module as ModuleItem} from '@opentrons/components'
@@ -21,7 +21,7 @@ type OP = LabwareComponentProps & {match: Match}
 type SP = {
   _calibrator?: ?Mount,
   _labware?: $PropertyType<LabwareItemProps, 'labware'>,
-  module?: SessionModule
+  module?: SessionModule,
 }
 
 type DP = {dispatch: Dispatch}
@@ -79,7 +79,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
       showName: highlighted || confirmed,
       showUnconfirmed: true,
       showSpinner: highlighted && labware.calibration === 'moving-to-slot',
-      url: `/calibrate/labware/${slot}`
+      url: `/calibrate/labware/${slot}`,
     }
   }
 
@@ -100,7 +100,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
         if (_calibrator && (!_labware.isTiprack || !_labware.confirmed)) {
           dispatch(robotActions.moveTo(_calibrator, _labware.slot))
         }
-      }
+      },
     }
   }
 

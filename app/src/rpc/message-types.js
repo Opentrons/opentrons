@@ -12,5 +12,5 @@ export const PONG = 5
 // statuses
 export const statuses = {
   SUCCESS: 'success',
-  FAILURE: 'error'
+  FAILURE: 'error',
 }

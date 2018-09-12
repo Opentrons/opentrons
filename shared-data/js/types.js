@@ -8,7 +8,7 @@ export type WellDefinition = {
   x: number,
   y: number,
   z: number,
-  'total-liquid-volume': number
+  'total-liquid-volume': number,
 }
 
 // NOTE: must be continually synced with JSON Schema in schema.js
@@ -22,14 +22,14 @@ export type LabwareDefinition = {
     displayCategory?: string,
     isValidSource?: boolean,
     isTiprack?: boolean,
-    tipVolume?: number
+    tipVolume?: number,
   },
   ordering: Array<Array<string>>,
   wells: {
-    [well: string]: WellDefinition
-  }
+    [well: string]: WellDefinition,
+  },
 }
 
 export type AllLabwareDefinitions = {
-  [name: string]: LabwareDefinition
+  [name: string]: LabwareDefinition,
 }

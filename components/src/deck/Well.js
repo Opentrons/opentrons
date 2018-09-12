@@ -13,7 +13,7 @@ export type SingleWell = {|
   selected?: ?boolean,
   error?: ?boolean,
   maxVolume?: number,
-  fillColor?: ?string
+  fillColor?: ?string,
 |}
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
   selectable?: boolean,
   wellDef: WellDefinition,
   onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed
+  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 }
 
 export default function Well (props: Props) {
@@ -33,7 +33,7 @@ export default function Well (props: Props) {
     error,
     wellDef,
     onMouseOver,
-    onMouseLeave
+    onMouseLeave,
   } = props
 
   const fillColor = props.fillColor || 'transparent'
@@ -45,14 +45,14 @@ export default function Well (props: Props) {
       [styles.selected]: selected,
       [styles.selected_overlay]: selected,
       [styles.highlighted]: highlighted,
-      [styles.error]: error
+      [styles.error]: error,
     }
   )
 
   const selectionProps = {
     'data-wellname': wellName,
     onMouseOver,
-    onMouseLeave
+    onMouseLeave,
   }
 
   const isRect = wellIsRect(wellDef)
@@ -63,7 +63,7 @@ export default function Well (props: Props) {
       x: wellDef.x,
       y: wellDef.y - (wellDef.length || 0), // zero fallback for flow
       width: wellDef.width,
-      height: wellDef.y
+      height: wellDef.y,
     }
 
     return <g>
@@ -86,7 +86,7 @@ export default function Well (props: Props) {
     const circleProps = {
       cx: wellDef.x,
       cy: wellDef.y,
-      r: (wellDef.diameter || 0) / 2
+      r: (wellDef.diameter || 0) / 2,
     }
 
     return <g>

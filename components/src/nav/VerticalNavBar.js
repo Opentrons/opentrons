@@ -5,7 +5,7 @@ import styles from './navbar.css'
 
 type NavProps= {
   className?: string,
-  children: React.Node
+  children: React.Node,
 }
 
 export default function VerticalNavBar (props: NavProps) {

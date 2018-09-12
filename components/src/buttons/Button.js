@@ -29,7 +29,7 @@ export type ButtonProps = {
   /** custom element or component to use instead of `<button>` */
   Component?: React.ElementType,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
 // props to strip if using a custom component
@@ -57,7 +57,7 @@ export default function Button (props: ButtonProps) {
     : {
       ...omit(props, STRIP_PROPS),
       className: cx(className, {[styles.disabled]: disabled}),
-      onClick
+      onClick,
     }
 
   return (

@@ -10,7 +10,7 @@ type Props = {
   height: number,
   width: number,
   highlighted?: boolean,
-  children?: React.Node
+  children?: React.Node,
 }
 
 export default function LabwareContainer (props: Props) {

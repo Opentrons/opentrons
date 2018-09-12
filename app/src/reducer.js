@@ -28,5 +28,5 @@ export default combineReducers({
   discovery: discoveryReducer,
   healthCheck: healthCheckReducer,
   shell: shellReducer,
-  router: routerReducer
+  router: routerReducer,
 })

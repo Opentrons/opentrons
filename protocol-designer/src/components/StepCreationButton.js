@@ -10,7 +10,7 @@ type Props = {
   onStepClick?: StepType => (event?: SyntheticEvent<*>) => mixed,
   onExpandClick?: (event?: SyntheticEvent<*>) => mixed,
   onClickAway?: (event?: SyntheticEvent<*>) => mixed,
-  expanded?: boolean
+  expanded?: boolean,
 }
 
 function StepCreationButton (props: Props) {

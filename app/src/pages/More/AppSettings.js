@@ -12,7 +12,7 @@ import {
   checkForShellUpdates,
   downloadShellUpdate,
   quitAndInstallShellUpdate,
-  setUpdateSeen
+  setUpdateSeen,
 } from '../../shell'
 
 import Page from '../../components/Page'
@@ -63,7 +63,7 @@ function AppSettingsPage (props: Props) {
 
 function mapStateToProps (state: State): SP {
   return {
-    update: getShellUpdate(state)
+    update: getShellUpdate(state),
   }
 }
 
@@ -75,6 +75,6 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
     closeUpdateModal: () => {
       dispatch(setUpdateSeen())
       dispatch(push('/menu/app'))
-    }
+    },
   }
 }

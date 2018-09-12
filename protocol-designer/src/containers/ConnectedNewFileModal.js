@@ -16,24 +16,24 @@ type Props = React.ElementProps<typeof NewFileModal>
 
 type SP = {
   hideModal: $PropertyType<Props, 'hideModal'>,
-  _hasUnsavedChanges: ?boolean
+  _hasUnsavedChanges: ?boolean,
 }
 type DP = {
   onCancel: () => mixed,
-  _createNewProtocol: (NewProtocolFields) => mixed
+  _createNewProtocol: (NewProtocolFields) => mixed,
 }
 
 function mapStateToProps (state: BaseState): SP {
   return {
     hideModal: !selectors.newProtocolModal(state),
-    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state)
+    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
-    _createNewProtocol: fields => { dispatch(fileActions.createNewProtocol(fields)) }
+    _createNewProtocol: fields => { dispatch(fileActions.createNewProtocol(fields)) },
   }
 }
 
@@ -45,6 +45,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP): Props {
       if (!stateProps._hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_create_new'))) {
         dispatchProps._createNewProtocol(fields)
       }
-    }
+    },
   }
 }

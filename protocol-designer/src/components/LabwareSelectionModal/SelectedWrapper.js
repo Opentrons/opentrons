@@ -4,8 +4,8 @@ import * as React from 'react'
 type Props = {
   render: ({
     selected: ?string,
-    select: (?string) => mixed
-  }) => React.Node
+    select: (?string) => mixed,
+  }) => React.Node,
 }
 type State = {selected: ?string}
 

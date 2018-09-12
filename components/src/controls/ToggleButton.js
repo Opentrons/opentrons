@@ -6,14 +6,14 @@ import {IconButton, type ButtonProps} from '@opentrons/components'
 import styles from './styles.css'
 
 type ToggleProps = ButtonProps & {
-  toggledOn: boolean
+  toggledOn: boolean,
 }
 
 export default function ToggleButton (props: ToggleProps) {
   const {toggledOn} = props
   const className = cx(styles.robot_item_icon, props.className, {
     [styles.toggled_on]: toggledOn,
-    [styles.toggled_off]: !toggledOn
+    [styles.toggled_off]: !toggledOn,
   })
 
   const toggleIcon = toggledOn

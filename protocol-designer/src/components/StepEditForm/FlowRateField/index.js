@@ -6,24 +6,24 @@ import {getPipette} from '@opentrons/shared-data'
 import {selectors as pipetteSelectors} from '../../../pipettes'
 import {
   actions as steplistActions,
-  selectors as steplistSelectors
+  selectors as steplistSelectors,
 } from '../../../steplist'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
 type Props = React.ElementProps<typeof FlowRateField> & {
-  innerKey: string
+  innerKey: string,
 }
 
 type OP = {
   name: StepFieldName,
   pipetteFieldName: StepFieldName,
   flowRateType: $PropertyType<Props, 'flowRateType'>,
-  label?: $PropertyType<Props, 'label'>
+  label?: $PropertyType<Props, 'label'>,
 }
 
 type DP = {
-  updateValue: $PropertyType<Props, 'updateValue'>
+  updateValue: $PropertyType<Props, 'updateValue'>,
 }
 
 type SP = $Diff<Props, DP>
@@ -68,7 +68,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
     maxFlowRate: pipetteConfig ? pipetteConfig.nominalMaxVolumeUl : Infinity,
-    pipetteModelDisplayName
+    pipetteModelDisplayName,
   }
 }
 
@@ -77,10 +77,10 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     updateValue: (flowRate: ?number) => dispatch(
       steplistActions.changeFormInput({
         update: {
-          [ownProps.name]: flowRate
-        }
+          [ownProps.name]: flowRate,
+        },
       })
-    )
+    ),
   }
 }
 

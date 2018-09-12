@@ -11,7 +11,7 @@ export const stepIconsByType: {[string]: IconName} = {
   'distribute': 'ot-distribute',
   'consolidate': 'ot-consolidate',
   'mix': 'ot-mix',
-  'pause': 'pause'
+  'pause': 'pause',
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
@@ -20,18 +20,18 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 export type FormModalFields = {|
   'step-name': string,
-  'step-details': string
+  'step-details': string,
 |}
 
 export type DelayFields = {|
   'dispense_delay_checkbox'?: boolean,
   'dispense_delayMinutes'?: string,
-  'dispense_delaySeconds'?: string
+  'dispense_delaySeconds'?: string,
 |}
 
 export type BlowoutFields = {|
   'dispense_blowout_checkbox'?: boolean,
-  'dispense_blowout_labware'?: string
+  'dispense_blowout_labware'?: string,
 |}
 
 export type ChangeTipFields = {|
@@ -39,7 +39,7 @@ export type ChangeTipFields = {|
 |}
 
 export type TouchTipFields = {|
-  'aspirate_touchTip'?: boolean
+  'aspirate_touchTip'?: boolean,
 |}
 
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
@@ -72,7 +72,7 @@ export type TransferLikeForm = {|
   'dispense_touchTip'?: boolean,
   'dispense_mix_checkbox'?: boolean,
   'dispense_mix_volume'?: string,
-  'dispense_mix_times'?: string
+  'dispense_mix_times'?: string,
 |}
 
 export type MixForm = {|
@@ -89,7 +89,7 @@ export type MixForm = {|
   'times'?: string,
   'volume'?: string,
   'wells'?: Array<string>,
-  'touch-tip'?: boolean
+  'touch-tip'?: boolean,
 |}
 
 export type PauseForm = {|
@@ -101,7 +101,7 @@ export type PauseForm = {|
   'pauseHour'?: string,
   'pauseMinute'?: string,
   'pauseSecond'?: string,
-  'pauseMessage'?: string
+  'pauseMessage'?: string,
 |}
 
 // TODO: separate field values from from metadata
@@ -110,7 +110,7 @@ export type FormData = {
   id: StepIdType,
   'step-name'?: string,
   'step-details'?: string,
-  [StepFieldName]: any // TODO: form value processing to ensure type
+  [StepFieldName]: any, // TODO: form value processing to ensure type
 }
 //  | MixForm
 //  | PauseForm
@@ -119,5 +119,5 @@ export type FormData = {
 export type BlankForm = {
   ...FormModalFields,
   stepType: StepType,
-  id: StepIdType
+  id: StepIdType,
 }

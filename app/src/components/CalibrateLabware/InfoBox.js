@@ -11,7 +11,7 @@ import {
   actions as robotActions,
   type Mount,
   type Labware,
-  type LabwareType
+  type LabwareType,
 } from '../../robot'
 
 import {PrimaryButton} from '@opentrons/components'
@@ -22,17 +22,17 @@ import CalibrationInfoContent from '../CalibrationInfoContent'
 // import ConfirmCalibrationPrompt from '../deck/ConfirmCalibrationPrompt'
 
 type OwnProps = {
-  labware: ?Labware
+  labware: ?Labware,
 }
 
 type StateProps = {
   _buttonTarget: ?Labware,
   _buttonTargetIsNext: boolean,
-  _calibratorMount: ?Mount
+  _calibratorMount: ?Mount,
 }
 
 type DispatchProps = {
-  dispatch: Dispatch<*>
+  dispatch: Dispatch<*>,
 }
 
 type Props = OwnProps & {
@@ -41,7 +41,7 @@ type Props = OwnProps & {
     isNext: boolean,
     isConfirmed: ?boolean,
     onClick: () => void,
-  }
+  },
 }
 
 export default connect(mapStateToProps, null, mergeProps)(InfoBox)
@@ -114,7 +114,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
     _buttonTargetIsNext: (
       _buttonTarget != null &&
       _buttonTarget === _nextLabware
-    )
+    ),
   }
 }
 
@@ -142,7 +142,7 @@ function mergeProps (
           dispatch(robotActions.returnTip(_calibratorMount))
           dispatch(push(`/run`))
         }
-      }
+      },
     }
   }
 

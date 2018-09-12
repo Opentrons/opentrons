@@ -19,7 +19,7 @@ describe('blowout', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
 
     robotStateWithTip = {
@@ -28,9 +28,9 @@ describe('blowout', () => {
         ...initialRobotState.tipState,
         pipettes: {
           ...initialRobotState.tipState.pipettes,
-          p300SingleId: true
-        }
-      }
+          p300SingleId: true,
+        },
+      },
     }
 
     // $FlowFixMe: mock methods
@@ -43,7 +43,7 @@ describe('blowout', () => {
     const result = blowout({
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.commands).toEqual([{
@@ -51,8 +51,8 @@ describe('blowout', () => {
       params: {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
-        well: 'A1'
-      }
+        well: 'A1',
+      },
     }])
 
     expect(result.robotState).toEqual(robotStateWithTip)
@@ -62,12 +62,12 @@ describe('blowout', () => {
     const result = blowoutWithErrors({
       pipette: 'badPipette',
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_DOES_NOT_EXIST'
+      type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })
 
@@ -75,12 +75,12 @@ describe('blowout', () => {
     const result = blowoutWithErrors({
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
-      well: 'A1'
+      well: 'A1',
     })(initialRobotState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'NO_TIP_ON_PIPETTE'
+      type: 'NO_TIP_ON_PIPETTE',
     })
   })
 
@@ -95,7 +95,7 @@ describe('blowout', () => {
       const result = blowout({
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
-        well: 'A1'
+        well: 'A1',
       })(robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith({
@@ -104,7 +104,7 @@ describe('blowout', () => {
         volume: 300, // pipette's max vol
         well: 'A1',
         labwareType: 'trough-12row',
-        pipetteData: robotStateWithTip.instruments.p300SingleId
+        pipetteData: robotStateWithTip.instruments.p300SingleId,
       }, robotStateWithTip.liquidState)
 
       expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)

@@ -4,7 +4,7 @@ import {
   createEmptyLiquidState,
   createTipLiquidState,
   p300Single,
-  p300Multi
+  p300Multi,
 } from './fixtures'
 
 import updateLiquidState from '../aspirateUpdateLiquidState'
@@ -16,8 +16,8 @@ function getBlankLiquidState (sourcePlateType: ?string) {
     sourcePlateType: sourcePlateType || '96-flat',
     pipettes: {
       p300SingleId: p300Single,
-      p300MultiId: p300Multi
-    }
+      p300MultiId: p300Multi,
+    },
   })
 }
 // TODO Ian 2018-03-14 also do tests for tips that contain air
@@ -33,7 +33,7 @@ describe('...single-channel pipette', () => {
       pipetteId: 'p300SingleId',
       pipetteData: p300Single,
       volume: 50,
-      well: 'A1'
+      well: 'A1',
     }
   })
   describe('...fresh tip', () => {
@@ -41,8 +41,8 @@ describe('...single-channel pipette', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
         ingred1: {
-          volume: 200
-        }
+          volume: 200,
+        },
       }
 
       const result = updateLiquidState(
@@ -53,16 +53,16 @@ describe('...single-channel pipette', () => {
       expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 50}}
-          }
+            '0': {ingred1: {volume: 50}},
+          },
         },
         labware: {
           sourcePlateId: {
             A1: {ingred1: {volume: 150}},
             A2: {},
-            B1: {}
-          }
-        }
+            B1: {},
+          },
+        },
       })
     })
 
@@ -71,13 +71,13 @@ describe('...single-channel pipette', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
         ingred1: {
-          volume: 200
-        }
+          volume: 200,
+        },
       }
 
       const args = {
         ...aspirateSingleCh50FromA1Args,
-        volume: 300
+        volume: 300,
       }
 
       const result = updateLiquidState(
@@ -88,16 +88,16 @@ describe('...single-channel pipette', () => {
       expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}}
-          }
+            '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}},
+          },
         },
         labware: {
           sourcePlateId: {
             A1: {ingred1: {volume: 0}},
             A2: {},
-            B1: {}
-          }
-        }
+            B1: {},
+          },
+        },
       })
     })
 
@@ -105,12 +105,12 @@ describe('...single-channel pipette', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
         ingred1: {volume: 200},
-        ingred2: {volume: 100}
+        ingred2: {volume: 100},
       }
 
       const args = {
         ...aspirateSingleCh50FromA1Args,
-        volume: 60
+        volume: 60,
       }
 
       const result = updateLiquidState(args, initialLiquidState)
@@ -118,14 +118,14 @@ describe('...single-channel pipette', () => {
       expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 40}, ingred2: {volume: 20}}
-          }
+            '0': {ingred1: {volume: 40}, ingred2: {volume: 20}},
+          },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 200 - 40}, ingred2: {volume: 100 - 20}}
-          }
-        }
+            A1: {ingred1: {volume: 200 - 40}, ingred2: {volume: 100 - 20}},
+          },
+        },
       })
     })
 
@@ -133,12 +133,12 @@ describe('...single-channel pipette', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
         ingred1: {volume: 60},
-        ingred2: {volume: 70}
+        ingred2: {volume: 70},
       }
 
       const args = {
         ...aspirateSingleCh50FromA1Args,
-        volume: 150
+        volume: 150,
       }
 
       const result = updateLiquidState(args, initialLiquidState)
@@ -146,14 +146,14 @@ describe('...single-channel pipette', () => {
       expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}}
-          }
+            '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}},
+          },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 0}, ingred2: {volume: 0}}
-          }
-        }
+            A1: {ingred1: {volume: 0}, ingred2: {volume: 0}},
+          },
+        },
       })
     })
   })
@@ -162,10 +162,10 @@ describe('...single-channel pipette', () => {
     test('aspirate from single-ingredient well', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
-        ingred1: {volume: 200}
+        ingred1: {volume: 200},
       }
       initialLiquidState.pipettes.p300SingleId['0'] = {
-        ingred1: {volume: 30}
+        ingred1: {volume: 30},
       }
 
       const result = updateLiquidState(aspirateSingleCh50FromA1Args, initialLiquidState)
@@ -173,14 +173,14 @@ describe('...single-channel pipette', () => {
       expect(result.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 30 + 50}}
-          }
+            '0': {ingred1: {volume: 30 + 50}},
+          },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 150}}
-          }
-        }
+            A1: {ingred1: {volume: 150}},
+          },
+        },
       })
     })
   })
@@ -196,7 +196,7 @@ describe('...8-channel pipette', () => {
       pipetteId: 'p300MultiId',
       pipetteData: p300Multi,
       volume: 50,
-      well: 'A1'
+      well: 'A1',
     }
   })
 
@@ -207,7 +207,7 @@ describe('...8-channel pipette', () => {
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
       A1: {ingred1: {volume: 200}},
-      B1: {ingred1: {volume: 150}}
+      B1: {ingred1: {volume: 150}},
     }
     // all pipette tips start with 30 of ingred 1
     initialLiquidState.pipettes.p300MultiId = createTipLiquidState(
@@ -222,15 +222,15 @@ describe('...8-channel pipette', () => {
         p300MultiId: {
           ...createTipLiquidState(8, {[AIR]: {volume: 50}, ingred1: {volume: 30}}),
           '0': {ingred1: {volume: 50 + 30}},
-          '1': {ingred1: {volume: 50 + 30}}
-        }
+          '1': {ingred1: {volume: 50 + 30}},
+        },
       },
       labware: {
         sourcePlateId: {
           A1: {ingred1: {volume: 200 - 50}},
-          B1: {ingred1: {volume: 150 - 50}}
-        }
-      }
+          B1: {ingred1: {volume: 150 - 50}},
+        },
+      },
     })
   })
 
@@ -241,12 +241,12 @@ describe('...8-channel pipette', () => {
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
       A1: {ingred1: {volume: 200}},
-      B1: {ingred1: {volume: 150}}
+      B1: {ingred1: {volume: 150}},
     }
 
     const args = {
       ...aspirate8Ch50FromA1Args,
-      volume: 250
+      volume: 250,
     }
 
     const result = updateLiquidState(args, initialLiquidState)
@@ -256,15 +256,15 @@ describe('...8-channel pipette', () => {
         p300MultiId: {
           ...createTipLiquidState(8, {[AIR]: {volume: 250}}),
           '0': {ingred1: {volume: 200}, [AIR]: {volume: 50}},
-          '1': {ingred1: {volume: 150}, [AIR]: {volume: 100}}
-        }
+          '1': {ingred1: {volume: 150}, [AIR]: {volume: 100}},
+        },
       },
       labware: {
         sourcePlateId: {
           A1: {ingred1: {volume: 0}},
-          B1: {ingred1: {volume: 0}}
-        }
-      }
+          B1: {ingred1: {volume: 0}},
+        },
+      },
     })
   })
 
@@ -276,13 +276,13 @@ describe('...8-channel pipette', () => {
 
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
-      A1: {ingred1: {volume: initialSourceVolume}}
+      A1: {ingred1: {volume: initialSourceVolume}},
     }
 
     const args = {
       ...aspirate8Ch50FromA1Args,
       labwareType: 'trough-12row',
-      volume: aspirateVolume
+      volume: aspirateVolume,
     }
 
     const result = updateLiquidState(args, initialLiquidState)
@@ -291,14 +291,14 @@ describe('...8-channel pipette', () => {
       pipettes: {
         p300MultiId: {
           // aspirate volume divided among the 8 tips
-          ...createTipLiquidState(8, {ingred1: {volume: aspirateVolume}})
-        }
+          ...createTipLiquidState(8, {ingred1: {volume: aspirateVolume}}),
+        },
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: initialSourceVolume - (aspirateVolume * 8)}}
-        }
-      }
+          A1: {ingred1: {volume: initialSourceVolume - (aspirateVolume * 8)}},
+        },
+      },
     })
   })
 

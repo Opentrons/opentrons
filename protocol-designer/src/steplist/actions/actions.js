@@ -12,14 +12,14 @@ import handleFormChange from './handleFormChange'
 
 export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
-  payload: ChangeFormPayload
+  payload: ChangeFormPayload,
 }
 
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
     dispatch({
       type: 'CHANGE_FORM_INPUT',
-      payload: handleFormChange(payload, getState)
+      payload: handleFormChange(payload, getState),
     })
   }
 
@@ -27,7 +27,7 @@ export const changeFormInput = (payload: ChangeFormPayload) =>
 
 export type PopulateFormAction = {
   type: 'POPULATE_FORM',
-  payload: FormData
+  payload: FormData,
 }
 
 // Create new step
@@ -36,12 +36,12 @@ export type AddStepAction = {
   type: 'ADD_STEP',
   payload: {
     id: StepIdType,
-    stepType: StepType
-  }
+    stepType: StepType,
+  },
 }
 
 type NewStepPayload = {
-  stepType: StepType
+  stepType: StepType,
 }
 
 // addStep thunk adds an incremental integer ID for Step reducers.
@@ -53,8 +53,8 @@ export const addStep = (payload: NewStepPayload) =>
       type: 'ADD_STEP',
       payload: {
         ...payload,
-        id: stepId
-      }
+        id: stepId,
+      },
     })
     const deckHasLiquid = labwareIngredsSelectors.hasLiquid(state)
     const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
@@ -66,56 +66,56 @@ export const addStep = (payload: NewStepPayload) =>
 
 export type DeleteStepAction = {
   type: 'DELETE_STEP',
-  payload: StepIdType
+  payload: StepIdType,
 }
 
 export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'DELETE_STEP',
-    payload: selectors.getSelectedStepId(getState())
+    payload: selectors.getSelectedStepId(getState()),
   })
 }
 
 type ExpandAddStepButtonAction = {
   type: 'EXPAND_ADD_STEP_BUTTON',
-  payload: boolean
+  payload: boolean,
 }
 
 export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction => ({
   type: 'EXPAND_ADD_STEP_BUTTON',
-  payload
+  payload,
 })
 
 type ToggleStepCollapsedAction = {
   type: 'TOGGLE_STEP_COLLAPSED',
-  payload: StepIdType
+  payload: StepIdType,
 }
 
 export const toggleStepCollapsed = (stepId: StepIdType): ToggleStepCollapsedAction => ({
   type: 'TOGGLE_STEP_COLLAPSED',
-  payload: stepId
+  payload: stepId,
 })
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',
-  payload: StepIdType
+  payload: StepIdType,
 }
 
 export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
   type: 'HOVER_ON_SUBSTEP',
-  payload: payload
+  payload: payload,
 })
 
 export type SelectTerminalItemAction = {
   type: 'SELECT_TERMINAL_ITEM',
-  payload: TerminalItemId
+  payload: TerminalItemId,
 }
 
 export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const selectTerminalItemAction: SelectTerminalItemAction = {
       type: 'SELECT_TERMINAL_ITEM',
-      payload: terminalId
+      payload: terminalId,
     }
 
     dispatch(cancelStepForm())
@@ -126,33 +126,33 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
-      payload: stepId
+      payload: stepId,
     }
 
     dispatch(selectStepAction)
 
     dispatch({
       type: 'POPULATE_FORM',
-      payload: selectors.selectedStepFormData(getState())
+      payload: selectors.selectedStepFormData(getState()),
     })
   }
 
 // TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
 export const hoverOnStep = (stepId: ?StepIdType) => ({
   type: 'HOVER_ON_STEP',
-  payload: stepId
+  payload: stepId,
 })
 
 export const hoverOnTerminalItem = (terminalId: ?TerminalItemId) => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
-  payload: terminalId
+  payload: terminalId,
 })
 
 export type SaveStepFormAction = {
   type: 'SAVE_STEP_FORM',
   payload: {
-    id: StepIdType
-  }
+    id: StepIdType,
+  },
 }
 
 export const saveStepForm = () =>
@@ -162,7 +162,7 @@ export const saveStepForm = () =>
     if (selectors.currentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
-        payload: selectors.formData(state)
+        payload: selectors.formData(state),
       })
     }
   }
@@ -170,7 +170,7 @@ export const saveStepForm = () =>
 export function cancelStepForm () {
   return {
     type: 'CANCEL_STEP_FORM',
-    payload: null
+    payload: null,
   }
 }
 
@@ -178,7 +178,7 @@ export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload:
 export function collapseFormSection (payload: FormSectionNames): CollapseFormSectionAction {
   return {
     type: 'COLLAPSE_FORM_SECTION',
-    payload
+    payload,
   }
 }
 
@@ -188,38 +188,38 @@ export function collapseFormSection (payload: FormSectionNames): CollapseFormSec
 // Populate newly-opened options modal with fields from unsaved form
 export type OpenMoreOptionsModal = {
   type: 'OPEN_MORE_OPTIONS_MODAL',
-  payload: FormModalFields
+  payload: FormModalFields,
 }
 export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: selectors.formData(getState()) // TODO only pull in relevant fields?
+    payload: selectors.formData(getState()), // TODO only pull in relevant fields?
   })
 }
 
 export const cancelMoreOptionsModal = () => ({
   type: 'CANCEL_MORE_OPTIONS_MODAL',
-  payload: null
+  payload: null,
 })
 
 export type ChangeMoreOptionsModalInputAction = {
   type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload: ChangeFormPayload
+  payload: ChangeFormPayload,
 }
 
 export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeMoreOptionsModalInputAction => ({
   type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload
+  payload,
 })
 
 export type SaveMoreOptionsModal = {
   type: 'SAVE_MORE_OPTIONS_MODAL',
-  payload: any // TODO
+  payload: any, // TODO
 }
 
 export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: selectors.formModalData(getState())
+    payload: selectors.formModalData(getState()),
   })
 }

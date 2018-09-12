@@ -9,22 +9,22 @@ type RobotsMap = {[name: string]: DiscoveredRobot}
 
 type DiscoveryState = {
   scanning: boolean,
-  robotsByName: RobotsMap
+  robotsByName: RobotsMap,
 }
 
 type StartAction = {|
   type: 'discovery:START',
-  meta: {|shell: true|}
+  meta: {|shell: true|},
 |}
 
 type FinishAction = {|
   type: 'discovery:FINISH',
-  meta: {|shell: true|}
+  meta: {|shell: true|},
 |}
 
 type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {|robots: Array<DiscoveredRobot>|}
+  payload: {|robots: Array<DiscoveredRobot>|},
 |}
 
 export * from './types'
@@ -67,7 +67,7 @@ export function getDiscoveredRobotsByName (state: State) {
 // getShellRobots makes a sync RPC call, so use sparingly
 const initialState: DiscoveryState = {
   scanning: false,
-  robotsByName: normalizeRobots(getShellRobots())
+  robotsByName: normalizeRobots(getShellRobots()),
 }
 
 export function discoveryReducer (
@@ -84,7 +84,7 @@ export function discoveryReducer (
     case 'discovery:UPDATE_LIST':
       return {
         ...state,
-        robotsByName: normalizeRobots(action.payload.robots)
+        robotsByName: normalizeRobots(action.payload.robots),
       }
   }
 
@@ -95,7 +95,7 @@ function normalizeRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
   return robots.reduce(
     (robotsMap: RobotsMap, robot: DiscoveredRobot) => ({
       ...robotsMap,
-      [robot.name]: robot
+      [robot.name]: robot,
     }),
     {}
   )

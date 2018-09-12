@@ -10,7 +10,7 @@ import {PageTabs} from '@opentrons/components'
 
 type Props = {
   pipettes: Array<Pipette>,
-  currentPipette: ?Pipette
+  currentPipette: ?Pipette,
 }
 
 export default function PipetteTabs (props: Props) {
@@ -20,7 +20,7 @@ export default function PipetteTabs (props: Props) {
     title: mount,
     href: `./${mount}`,
     isActive: currentPipette != null && mount === currentPipette.mount,
-    isDisabled: !pipettes.some((pipette) => pipette.mount === mount)
+    isDisabled: !pipettes.some((pipette) => pipette.mount === mount),
   }))
 
   return (

@@ -12,7 +12,7 @@ import {stepIconsByType, type StepIdType} from '../../form-types'
 import type {
   SubstepIdentifier,
   StepItemData,
-  SubstepItemData
+  SubstepItemData,
 } from '../../steplist/types'
 
 type StepItemProps = {
@@ -46,7 +46,7 @@ export default function StepItem (props: StepItemProps) {
     onStepMouseLeave,
     onStepClick,
     onStepItemCollapseToggle,
-    onStepHover
+    onStepHover,
   } = props
 
   const iconName = step && stepIconsByType[step.stepType]
@@ -76,7 +76,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     substeps,
     getLabwareName,
     hoveredSubstep,
-    handleSubstepHover
+    handleSubstepHover,
   } = stepItemProps
 
   const formData = step && step.formData

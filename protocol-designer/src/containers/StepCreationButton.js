@@ -11,14 +11,14 @@ import type {BaseState, ThunkDispatch} from '../types'
 type Props = React.ElementProps<typeof StepCreationButton>
 
 type StateProps = {
-  expanded: $PropertyType<Props, 'expanded'>
+  expanded: $PropertyType<Props, 'expanded'>,
 }
 
 type DispatchProps = $Diff<Props, StateProps>
 
 function mapStateToProps (state: BaseState): StateProps {
   return ({
-    expanded: selectors.stepCreationButtonExpanded(state)
+    expanded: selectors.stepCreationButtonExpanded(state),
   })
 }
 
@@ -26,7 +26,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DispatchProps {
   return {
     onStepClick: (stepType: StepType) => () => dispatch(addStep({stepType})),
     onExpandClick: () => dispatch(expandAddStepButton(true)),
-    onClickAway: () => dispatch(expandAddStepButton(false))
+    onClickAway: () => dispatch(expandAddStepButton(false)),
   }
 }
 

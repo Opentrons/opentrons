@@ -6,7 +6,7 @@ import JogControls from '../JogControls'
 import Instructions from './Instructions'
 
 type Props = CalibrateDeckStartedProps & {
-  proceed: () => mixed
+  proceed: () => mixed,
 }
 
 export default function ConfirmPosition (props: Props) {

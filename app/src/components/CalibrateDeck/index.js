@@ -16,7 +16,7 @@ import {
   startDeckCalibration,
   deckCalibrationCommand,
   makeGetDeckCalibrationCommandState,
-  makeGetDeckCalibrationStartState
+  makeGetDeckCalibrationStartState,
 } from '../../http-api-client'
 
 import {ErrorModal} from '../modals'
@@ -42,7 +42,7 @@ function CalibrateDeck (props: CalibrateDeckProps) {
     commandRequest,
     pipetteProps,
     parentUrl,
-    match: {path}
+    match: {path},
   } = props
 
   if (pipetteProps && !pipetteProps.pipette) {
@@ -109,7 +109,7 @@ function CalibrateDeck (props: CalibrateDeckProps) {
           exitUrl,
           pipette: pipetteProps.pipette,
           mount: pipetteProps.mount,
-          calibrationStep: step
+          calibrationStep: step,
         }
 
         return (
@@ -144,7 +144,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     return {
       startRequest,
       pipetteProps,
-      commandRequest: getDeckCalCommand(state, robot)
+      commandRequest: getDeckCalCommand(state, robot),
     }
   }
 }
@@ -164,6 +164,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
       home(robot)
     )),
     // cancel button click in exit alert modal
-    back: () => dispatch(goBack())
+    back: () => dispatch(goBack()),
   }
 }

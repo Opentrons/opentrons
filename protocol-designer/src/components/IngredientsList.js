@@ -18,18 +18,18 @@ type EditModeIngredientGroup = (args: {|groupId: string, wellName: ?string|}) =>
 type CommonProps = {|
   editModeIngredientGroup: EditModeIngredientGroup,
   deleteIngredient: DeleteIngredient,
-  selected?: boolean
+  selected?: boolean,
 |}
 
 type CardProps = {|
   groupId: string,
   ingredGroup: IngredientInstance,
   labwareWellContents: SingleLabwareLiquidState,
-  ...CommonProps
+  ...CommonProps,
 |}
 
 type CardState = {|
-  isExpanded: boolean
+  isExpanded: boolean,
 |}
 
 class IngredGroupCard extends React.Component<CardProps, CardState> {
@@ -47,7 +47,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       deleteIngredient,
       selected,
       groupId,
-      labwareWellContents
+      labwareWellContents,
     } = this.props
     const {individualize, description, name} = ingredGroup
     const {isExpanded} = this.state
@@ -115,7 +115,7 @@ type IndividProps = {|
   canDelete: boolean,
   groupId: string,
   editModeIngredientGroup: EditModeIngredientGroup,
-  deleteIngredient: DeleteIngredient
+  deleteIngredient: DeleteIngredient,
 |}
 
 function IngredIndividual (props: IndividProps) {
@@ -126,7 +126,7 @@ function IngredIndividual (props: IndividProps) {
     // concentration, // TODO LATER Ian 2018-02-22: concentration is removed from MVP. Remove all traces of it, or add it back in
     canDelete,
     groupId,
-    deleteIngredient
+    deleteIngredient,
   } = props
 
   return (
@@ -151,7 +151,7 @@ type Props = {
   labwareWellContents: SingleLabwareLiquidState,
   selectedIngredientGroupId: ?string,
   renameLabwareFormMode: boolean,
-  openRenameLabwareForm: () => mixed
+  openRenameLabwareForm: () => mixed,
 }
 
 export default function IngredientsList (props: Props) {
@@ -162,7 +162,7 @@ export default function IngredientsList (props: Props) {
     deleteIngredient,
     selectedIngredientGroupId,
     renameLabwareFormMode,
-    openRenameLabwareForm
+    openRenameLabwareForm,
   } = props
 
   return (

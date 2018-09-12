@@ -31,7 +31,7 @@ export type Direction = -1 | 1
 
 // minimum robot for actions/reducers/middleware to work
 export type BaseRobot = {
-  name: string
+  name: string,
 }
 
 // robot MDNS service for connectivity
@@ -43,7 +43,7 @@ export type RobotService = BaseRobot & {
 
 // robot from getDiscovered selector
 export type Robot = RobotService & {
-  isConnected: boolean
+  isConnected: boolean,
 }
 
 // protocol file (browser File object)
@@ -104,7 +104,7 @@ export type StatePipette = {
 export type Pipette = StatePipette & {
   calibration: PipetteCalibrationStatus,
   probed: boolean,
-  tipOn: boolean
+  tipOn: boolean,
 }
 
 // labware as stored in redux state
@@ -120,13 +120,13 @@ export type StateLabware = {
   // whether or not the labware is a tiprack (implied from type)
   isTiprack: boolean,
   // intrument mount to use as the calibrator if isTiprack is true
-  calibratorMount: ?Mount
+  calibratorMount: ?Mount,
 }
 
 export type Labware = StateLabware & {
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
-  isMoving: boolean
+  isMoving: boolean,
 }
 
 export type LabwareType = 'tiprack' | 'labware'

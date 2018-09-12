@@ -16,7 +16,7 @@ function getChannels (pipetteModel: ?string): ?number {
 
 type Props = {
   leftPipette: ?string,
-  rightPipette: ?string
+  rightPipette: ?string,
 }
 export default function PipetteDiagram (props: Props) {
   const {leftPipette, rightPipette} = props

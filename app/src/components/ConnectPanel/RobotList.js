@@ -5,7 +5,7 @@ import * as React from 'react'
 import {
   ListItem,
   NotificationIcon,
-  Icon
+  Icon,
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
@@ -13,13 +13,13 @@ import {ToggleButton} from '../controls'
 import styles from './connect-panel.css'
 
 type ListProps = {
-  children: React.Node
+  children: React.Node,
 }
 
 type ItemProps = Robot & {
   availableUpdate: ?string,
   connect: () => mixed,
-  disconnect: () => mixed
+  disconnect: () => mixed,
 }
 
 export default function RobotList (props: ListProps) {

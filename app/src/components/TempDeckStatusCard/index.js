@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import type {State} from '../../types'
 import {
   selectors as robotSelectors,
-  type Robot
+  type Robot,
 } from '../../robot'
 import type {TempDeckModule, FetchModuleDataResponse} from '../../http-api-client'
 import {fetchModules, fetchModuleData, makeGetRobotModules, makeGetRobotModuleData} from '../../http-api-client'
@@ -18,19 +18,19 @@ const POLL_TEMPDECK_INTERVAL_MS = 1000
 type SP = {
   _robot: ?Robot,
   tempdeck: ?TempDeckModule,
-  tempdeckData: ?FetchModuleDataResponse
+  tempdeckData: ?FetchModuleDataResponse,
 }
 
 type DP = {
   _fetchModules: (_robot: Robot) => mixed,
-  _fetchModuleData: (_robot: Robot, serial: string) => mixed
+  _fetchModuleData: (_robot: Robot, serial: string) => mixed,
 }
 
 type Props = {
   tempdeck: ?TempDeckModule,
   tempdeckData: ?FetchModuleDataResponse,
   fetchModules: () => mixed,
-  fetchModuleData: () => mixed
+  fetchModuleData: () => mixed,
 }
 
 class TempDeckStatusCard extends React.Component<Props> {
@@ -83,7 +83,7 @@ function makeSTP (): (state: State) => SP {
     return {
       _robot,
       tempdeck,
-      tempdeckData
+      tempdeckData,
     }
   }
 }
@@ -91,7 +91,7 @@ function makeSTP (): (state: State) => SP {
 function mapDTP (dispatch: Dispatch): DP {
   return {
     _fetchModuleData: (_robot, _serial) => dispatch(fetchModuleData(_robot, _serial)),
-    _fetchModules: (_robot) => dispatch(fetchModules(_robot))
+    _fetchModules: (_robot) => dispatch(fetchModules(_robot)),
   }
 }
 
@@ -104,7 +104,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP): Props {
     tempdeck,
     tempdeckData,
     fetchModules: () => _robot && _fetchModules(_robot),
-    fetchModuleData: () => _robot && _serial && _fetchModuleData(_robot, _serial)
+    fetchModuleData: () => _robot && _serial && _fetchModuleData(_robot, _serial),
   }
 }
 

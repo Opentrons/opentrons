@@ -10,8 +10,8 @@ const config = getConfig()
 const firstMenu = {
   label: 'File',
   submenu: [
-    {role: 'quit'}
-  ]
+    {role: 'quit'},
+  ],
 }
 
 if (process.platform === 'darwin') {
@@ -27,8 +27,8 @@ if (process.platform === 'darwin') {
       {role: 'hideothers'},
       {role: 'unhide'},
       {type: 'separator'},
-      ...firstMenu.submenu
-    ]
+      ...firstMenu.submenu,
+    ],
   })
 }
 
@@ -38,15 +38,15 @@ const editMenu = {
     {role: 'cut'},
     {role: 'copy'},
     {role: 'paste'},
-    {role: 'selectall'}
-  ]
+    {role: 'selectall'},
+  ],
 }
 
 const viewMenu = {
   label: 'View',
   submenu: [
-    {role: 'togglefullscreen'}
-  ]
+    {role: 'togglefullscreen'},
+  ],
 }
 
 if (config.devtools) {
@@ -55,8 +55,8 @@ if (config.devtools) {
       {role: 'reload'},
       {role: 'forcereload'},
       {type: 'separator'},
-      ...viewMenu.submenu
-    ]
+      ...viewMenu.submenu,
+    ],
   })
 }
 
@@ -65,8 +65,8 @@ const windowMenu = {
   submenu: [
     {role: 'minimize'},
     {type: 'separator'},
-    {role: 'front'}
-  ]
+    {role: 'front'},
+  ],
 }
 
 const helpMenu = {
@@ -76,15 +76,15 @@ const helpMenu = {
       label: 'Learn More',
       click: () => {
         require('electron').shell.openExternal('https://opentrons.com/')
-      }
+      },
     },
     {
       label: 'Report an Issue',
       click: () => {
         require('electron').shell.openExternal(pkg.bugs.url)
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 const template = [firstMenu, editMenu, viewMenu, windowMenu, helpMenu]

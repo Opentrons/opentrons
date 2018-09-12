@@ -14,7 +14,7 @@ export default function FileInfoPage (props: Props) {
     <Page
       titleBarProps = {{
         title: props.name,
-        subtitle: 'overview'
+        subtitle: 'overview',
       }}
     >
       <FileInfo {...props} />

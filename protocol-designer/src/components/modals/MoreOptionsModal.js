@@ -4,7 +4,7 @@ import {
   FlatButton,
   FormGroup,
   InputField,
-  Modal
+  Modal,
 } from '@opentrons/components'
 
 import type {FormModalFields} from '../../form-types'
@@ -17,7 +17,7 @@ type Props = {
   onSave: (event: SyntheticEvent<>) => void,
   handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
   formData: FormModalFields,
-  hideModal: boolean
+  hideModal: boolean,
 }
 
 export default function MoreOptionsModal (props: Props) {

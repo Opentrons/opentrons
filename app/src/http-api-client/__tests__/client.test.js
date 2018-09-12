@@ -29,12 +29,12 @@ describe('http api client', () => {
   test('GET request', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockResolve({
       ok: true,
-      json: () => Promise.resolve({foo: 'bar'})
+      json: () => Promise.resolve({foo: 'bar'}),
     })
 
     return expect(client(robot, 'GET', 'foo')).resolves
@@ -44,7 +44,7 @@ describe('http api client', () => {
         {
           method: 'GET',
           headers: {},
-          body: undefined
+          body: undefined,
         }
       ))
   })
@@ -52,47 +52,47 @@ describe('http api client', () => {
   test('GET request failure', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockResolve({
       ok: false,
       status: 400,
       statusText: 'Bad Request',
-      json: () => Promise.resolve({message: 'You tried'})
+      json: () => Promise.resolve({message: 'You tried'}),
     })
 
     return expect(client(robot, 'GET', 'foo')).rejects
       .toEqual(expect.objectContaining({
         status: 400,
         statusText: 'Bad Request',
-        message: 'You tried'
+        message: 'You tried',
       }))
   })
 
   test('GET request error', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockReject(new Error('AH'))
 
     return expect(client(robot, 'GET', 'foo')).rejects
       .toEqual(expect.objectContaining({
-        message: 'AH'
+        message: 'AH',
       }))
   })
 
   test('POST request', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockResolve({
       ok: true,
-      json: () => Promise.resolve({foo: 'bar'})
+      json: () => Promise.resolve({foo: 'bar'}),
     })
 
     return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).resolves
@@ -102,7 +102,7 @@ describe('http api client', () => {
         {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({bar: 'baz'})
+          body: JSON.stringify({bar: 'baz'}),
         }
       ))
   })
@@ -110,35 +110,35 @@ describe('http api client', () => {
   test('POST request failure', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockResolve({
       ok: false,
       status: 400,
       statusText: 'Bad Request',
-      json: () => Promise.resolve({message: 'You tried'})
+      json: () => Promise.resolve({message: 'You tried'}),
     })
 
     return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
       .toEqual(expect.objectContaining({
         status: 400,
         statusText: 'Bad Request',
-        message: 'You tried'
+        message: 'You tried',
       }))
   })
 
   test('POST request error', () => {
     const robot = {
       ip: '1.2.3.4',
-      port: 8080
+      port: 8080,
     }
 
     global.fetch = mockReject(new Error('AH'))
 
     return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
       .toEqual(expect.objectContaining({
-        message: 'AH'
+        message: 'AH',
       }))
   })
 })

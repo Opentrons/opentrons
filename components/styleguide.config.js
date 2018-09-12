@@ -16,16 +16,16 @@ module.exports = {
       rules: [
         rules.js,
         rules.localCss,
-        rules.images
-      ]
+        rules.images,
+      ],
     },
     plugins: [
       new ExtractTextPlugin({
         filename: CSS_OUTPUT_NAME,
         disable: DEV,
-        ignoreOrder: true
-      })
-    ]
+        ignoreOrder: true,
+      }),
+    ],
   },
   showUsage: true,
   showCode: true,
@@ -33,52 +33,52 @@ module.exports = {
   sections: [
     {
       name: 'Alerts',
-      components: 'src/alerts/[A-Z]*.js'
+      components: 'src/alerts/[A-Z]*.js',
     },
     {
       name: 'Nav',
-      components: 'src/nav/[A-Z]*.js'
+      components: 'src/nav/[A-Z]*.js',
     },
     {
       name: 'Buttons',
-      components: 'src/buttons/[A-Z]*.js'
+      components: 'src/buttons/[A-Z]*.js',
     },
     {
       name: 'Form Components',
-      components: 'src/forms/[A-Z]*.js'
+      components: 'src/forms/[A-Z]*.js',
     },
     {
       name: 'Icons',
-      components: 'src/icons/[A-Z]*.js'
+      components: 'src/icons/[A-Z]*.js',
     },
     {
       name: 'Interaction Enhancers',
-      components: 'src/interaction-enhancers/[A-Z]*.js'
+      components: 'src/interaction-enhancers/[A-Z]*.js',
     },
     {
       name: 'Lists',
-      components: 'src/lists/[A-Z]*.js'
+      components: 'src/lists/[A-Z]*.js',
     },
     {
       name: 'Modals',
-      components: 'src/modals/[A-Z]*.js'
+      components: 'src/modals/[A-Z]*.js',
     },
     {
       name: 'Deck',
-      components: 'src/deck/[A-Z]*.js'
+      components: 'src/deck/[A-Z]*.js',
     },
     {
       name: 'Instrument Diagram',
-      components: 'src/instrument-diagram/[A-Z]*.js'
+      components: 'src/instrument-diagram/[A-Z]*.js',
     },
     {
       name: 'Structure',
-      components: 'src/structure/[A-Z]*.js'
+      components: 'src/structure/[A-Z]*.js',
     },
     {
       name: 'Tooltips',
-      components: 'src/tooltips/[A-Z]*.js'
-    }
+      components: 'src/tooltips/[A-Z]*.js',
+    },
   ],
   getComponentPathLine (componentPath) {
     const name = path.basename(componentPath, '.js')
@@ -88,50 +88,50 @@ module.exports = {
   styles: {
     StyleGuide: {
       '@global body': {
-        fontFamily: "'Open Sans', sans-serif"
+        fontFamily: "'Open Sans', sans-serif",
       },
       '@global .display-block': {
-        display: 'block'
+        display: 'block',
       },
 
       '@global .icon-showcase': {
         display: 'grid',
-        gridTemplateColumns: 'auto auto auto'
+        gridTemplateColumns: 'auto auto auto',
       },
       '@global .icon-showcase span': {
         display: 'flex',
         height: '2rem',
         alignItems: 'center',
-        margin: '0.25rem'
+        margin: '0.25rem',
       },
       '@global .icon-showcase > span > svg': {
-        height: '100%'
+        height: '100%',
       },
       '@global .icon-showcase > span > span': {
-        paddingLeft: '1rem'
+        paddingLeft: '1rem',
       },
 
       '@global .width-auto': {
-        width: 'auto !important'
+        width: 'auto !important',
       },
       '@global .width-3-rem': {
-        width: '3rem !important'
+        width: '3rem !important',
       },
       '@global .height-3-rem': {
-        height: '3rem !important'
+        height: '3rem !important',
       },
       '@global .height-40-rem': {
-        height: '40rem !important'
+        height: '40rem !important',
       },
       '@global .dark_background': {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)'
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
       },
       '@global .dark_gray': {
-        color: '#4a4a4a'
+        color: '#4a4a4a',
       },
       '@global .orange': {
-        color: '#f5a623'
-      }
-    }
-  }
+        color: '#f5a623',
+      },
+    },
+  },
 }

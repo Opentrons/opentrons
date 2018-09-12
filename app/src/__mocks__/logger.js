@@ -8,6 +8,6 @@ export default function createLogger (filename) {
     get (_, level) {
       return (message, meta) =>
         console.log(`[${label}] ${level}: ${message} %j`, meta)
-    }
+    },
   })
 }

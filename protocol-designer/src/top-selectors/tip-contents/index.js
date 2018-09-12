@@ -5,7 +5,7 @@ import * as StepGeneration from '../../step-generation'
 import {
   selectors as steplistSelectors,
   START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID
+  END_TERMINAL_ITEM_ID,
 } from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
@@ -70,7 +70,7 @@ const getInitialTips: GetTipSelector = createSelector(
   (initialRobotState, labwareId) =>
     (wellName: string) => ({
       empty: getTipEmpty(wellName, labwareId, initialRobotState),
-      highlighted: false
+      highlighted: false,
     })
 )
 
@@ -80,7 +80,7 @@ const getLastValidTips: GetTipSelector = createSelector(
   (lastValidRobotState, labwareId) =>
     (wellName: string) => ({
       empty: getTipEmpty(wellName, labwareId, lastValidRobotState),
-      highlighted: false
+      highlighted: false,
     })
 )
 
@@ -133,7 +133,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
 
       return {
         empty,
-        highlighted
+        highlighted,
       }
     }
   }

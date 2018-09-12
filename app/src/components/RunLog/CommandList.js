@@ -33,8 +33,8 @@ export default class CommandList extends Component {
         className: cx(style, {
           [styles.executed]: handledAt,
           [styles.current]: isCurrent,
-          [styles.last_current]: isLast
-        })
+          [styles.last_current]: isLast,
+        }),
       }
 
       if (isLast) liProps.ref = 'ensureVisible'
@@ -58,7 +58,7 @@ export default class CommandList extends Component {
     )
 
     const wrapperStyle = cx(styles.run_log_wrapper, {
-      [styles.alert_visible]: showAlert
+      [styles.alert_visible]: showAlert,
     })
 
     return (
@@ -81,5 +81,5 @@ export default class CommandList extends Component {
 
 CommandList.propTypes = {
   // TODO(mc, 2017-08-23): use PropTypes.shape instead of object
-  commands: PropTypes.arrayOf(PropTypes.object).isRequired
+  commands: PropTypes.arrayOf(PropTypes.object).isRequired,
 }

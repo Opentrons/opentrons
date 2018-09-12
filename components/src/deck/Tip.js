@@ -9,14 +9,14 @@ type Props = {
   wellDef: WellDefinition,
   tipVolume: ?number,
   empty?: ?boolean,
-  highlighted?: ?boolean
+  highlighted?: ?boolean,
 }
 
 export default function Tip (props: Props) {
   const {wellDef, empty, highlighted, tipVolume} = props
   const circleProps = {
     cx: wellDef.x,
-    cy: wellDef.y
+    cy: wellDef.y,
   }
 
   // TODO: Ian 2018-08-13 refine tip sizes for different tip racks

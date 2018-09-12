@@ -7,7 +7,7 @@ import {createSelector, type Selector} from 'reselect'
 import {
   type ConnectionStatus,
   PIPETTE_MOUNTS,
-  DECK_SLOTS
+  DECK_SLOTS,
 } from './constants'
 
 import type {ContextRouter} from 'react-router'
@@ -21,7 +21,7 @@ import type {
   LabwareType,
   Robot,
   SessionStatus,
-  SessionModule
+  SessionModule,
 } from './types'
 
 const calibration = (state: State) => state.robot.calibration
@@ -68,7 +68,7 @@ export const getDiscovered: Selector<State, void, Array<Robot>> =
             ip: connection.ip,
             port: connection.port,
             wired: connection.local,
-            isConnected: connectedTo === name
+            isConnected: connectedTo === name,
           }
         })
         .filter(Boolean)
@@ -178,7 +178,7 @@ function traverseCommands (commandsById, parentIsCurrent) {
       handledAt,
       isCurrent,
       isLast,
-      children: children.map(traverseCommands(commandsById, isCurrent))
+      children: children.map(traverseCommands(commandsById, isCurrent)),
     }
   }
 }
@@ -286,7 +286,7 @@ export const getPipettes = createSelector(
           ...pipette,
           calibration,
           probed,
-          tipOn
+          tipOn,
         }
       })
   }

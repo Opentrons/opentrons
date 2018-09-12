@@ -8,16 +8,16 @@ const DEV = process.env.NODE_ENV !== 'production'
 const CSS_LOADER = {
   loader: 'css-loader',
   options: {
-    importLoaders: 1
-  }
+    importLoaders: 1,
+  },
 }
 
 const CSS_MODULE_LOADER = Object.assign({}, CSS_LOADER, {
   options: Object.assign({}, CSS_LOADER.options, {
     modules: true,
     sourceMap: true,
-    localIdentName: '[name]__[local]__[hash:base64:5]'
-  })
+    localIdentName: '[name]__[local]__[hash:base64:5]',
+  }),
 })
 
 const POSTCSS_LOADER = {
@@ -27,9 +27,9 @@ const POSTCSS_LOADER = {
     plugins: (loader) => [
       require('postcss-import')({root: loader.resourcePath}),
       require('postcss-cssnext')(),
-      require('lost')
-    ]
-  }
+      require('lost'),
+    ],
+  },
 }
 
 module.exports = {
@@ -40,9 +40,9 @@ module.exports = {
     use: {
       loader: 'babel-loader',
       options: {
-        cacheDirectory: true
-      }
-    }
+        cacheDirectory: true,
+      },
+    },
   },
 
   // worker loader for inline webworkers
@@ -53,9 +53,9 @@ module.exports = {
       loader: 'worker-loader',
       options: {
         inline: true,
-        fallback: false
-      }
-    }
+        fallback: false,
+      },
+    },
   },
 
   // global CSS files
@@ -66,9 +66,9 @@ module.exports = {
       : ExtractTextPlugin.extract({
         use: [
           CSS_LOADER,
-          POSTCSS_LOADER
-        ]
-      })
+          POSTCSS_LOADER,
+        ],
+      }),
   },
 
   // local CSS (CSS module) files
@@ -79,27 +79,27 @@ module.exports = {
       : ExtractTextPlugin.extract({
         use: [
           CSS_MODULE_LOADER,
-          POSTCSS_LOADER
-        ]
-      })
+          POSTCSS_LOADER,
+        ],
+      }),
   },
 
   // handlebars HTML templates
   handlebars: {
     test: /\.hbs$/,
-    use: 'handlebars-loader'
+    use: 'handlebars-loader',
   },
 
   // fonts
   // TODO(mc, 2017-09-12): Add other font-types to the regex if we need them
   fonts: {
     test: /\.(?:ttf|woff2?(?:\?v=\d+\.\d+\.\d+)?)$/,
-    use: 'url-loader'
+    use: 'url-loader',
   },
 
   // common image formats (url loader)
   images: {
     test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
-    use: 'url-loader'
-  }
+    use: 'url-loader',
+  },
 }

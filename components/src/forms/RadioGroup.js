@@ -14,14 +14,14 @@ type Props = {
   options?: Array<{
     name: string,
     value: string,
-    children?: React.Node
+    children?: React.Node,
   }>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply */
   className?: string,
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
-  error?: ?string
+  error?: ?string,
 }
 
 export default function RadioGroup (props: Props) {
@@ -29,7 +29,7 @@ export default function RadioGroup (props: Props) {
 
   const outerClassName = cx({
     [styles.inline]: props.inline,
-    [styles.error]: error
+    [styles.error]: error,
   })
 
   const itemClassName = cx(

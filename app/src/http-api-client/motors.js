@@ -29,7 +29,7 @@ type MotorsRequestAction = {|
     robot: RobotService,
     path: RequestPath,
     request: MotorsRequest,
-  |}
+  |},
 |}
 
 type MotorsSuccessAction = {|
@@ -38,7 +38,7 @@ type MotorsSuccessAction = {|
     robot: RobotService,
     path: RequestPath,
     response: MotorsResponse,
-  |}
+  |},
 |}
 
 type MotorsFailureAction = {|
@@ -47,7 +47,7 @@ type MotorsFailureAction = {|
     robot: RobotService,
     path: RequestPath,
     error: ApiRequestError,
-  |}
+  |},
 |}
 
 export type MotorsAction =
@@ -108,7 +108,7 @@ function motorsSuccess (
 ): MotorsSuccessAction {
   return {
     type: 'api:MOTORS_SUCCESS',
-    payload: {robot, path, response}
+    payload: {robot, path, response},
   }
 }
 

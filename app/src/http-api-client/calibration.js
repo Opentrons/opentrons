@@ -20,7 +20,7 @@ export type DeckCalPoint = '1' | '2' | '3'
 export type DeckCalMovePoint = 'attachTip' | 'safeZ' | DeckCalPoint
 
 type DeckStartRequest = {|
-  force?: boolean
+  force?: boolean,
 |}
 
 type DeckStartResponse = {
@@ -142,8 +142,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {request, inProgress: true, response: null, error: null}
-        }
+          [path]: {request, inProgress: true, response: null, error: null},
+        },
       }
     }
 
@@ -158,8 +158,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response, inProgress: false, error: null},
+        },
       }
     }
 
@@ -174,8 +174,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
+          [path]: {...stateByPath, error, inProgress: false},
+        },
       }
     }
 
@@ -190,8 +190,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error: null, response: null}
-        }
+          [path]: {...stateByPath, error: null, response: null},
+        },
       }
     }
   }

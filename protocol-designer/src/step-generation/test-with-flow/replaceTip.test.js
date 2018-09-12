@@ -5,7 +5,7 @@ import {
   getTiprackTipstate,
   getTipColumn,
   commandCreatorNoErrors,
-  commandFixtures as cmd
+  commandFixtures as cmd,
 } from './fixtures'
 import _replaceTip from '../replaceTip'
 
@@ -26,14 +26,14 @@ describe('replaceTip', () => {
   beforeEach(() => {
     labwareTypes1 = {
       sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat'
+      destPlateType: '96-flat',
     }
 
     robotInitialState = createRobotState({
       ...labwareTypes1,
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
 
     // $FlowFixMe: mock methods
@@ -47,7 +47,7 @@ describe('replaceTip', () => {
       const result = replaceTip(p300SingleId)(robotInitialState)
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip(0)
+        cmd.pickUpTip(0),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -57,13 +57,13 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A1: false
-              }
+                A1: false,
+              },
             },
             pipettes: {
-              p300SingleId: true
-            }
-          }
+              p300SingleId: true,
+            },
+          },
         }
       ))
     })
@@ -76,18 +76,18 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A1: false
-              }
+                A1: false,
+              },
             },
             pipettes: {
-              p300SingleId: false
-            }
-          }
+              p300SingleId: false,
+            },
+          },
         }
       ))
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip(1)
+        cmd.pickUpTip(1),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -98,13 +98,13 @@ describe('replaceTip', () => {
             tipracks: {
               [tiprack1Id]: {
                 A1: false,
-                B1: false
-              }
+                B1: false,
+              },
             },
             pipettes: {
-              p300SingleId: true
-            }
-          }
+              p300SingleId: true,
+            },
+          },
         }
       ))
     })
@@ -116,19 +116,19 @@ describe('replaceTip', () => {
         {
           tipState: {
             tipracks: {
-              [tiprack1Id]: getTipColumn(1, false)
+              [tiprack1Id]: getTipColumn(1, false),
             },
             pipettes: {
-              p300SingleId: false
-            }
-          }
+              p300SingleId: false,
+            },
+          },
         }
       )
 
       const result = replaceTip(p300SingleId)(initialTestRobotState)
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip('A2')
+        cmd.pickUpTip('A2'),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -138,13 +138,13 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A2: false
-              }
+                A2: false,
+              },
             },
             pipettes: {
-              p300SingleId: true
-            }
-          }
+              p300SingleId: true,
+            },
+          },
         }
       ))
     })
@@ -157,13 +157,13 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A1: false
-              }
+                A1: false,
+              },
             },
             pipettes: {
-              p300SingleId: true
-            }
-          }
+              p300SingleId: true,
+            },
+          },
         }
       )
 
@@ -171,7 +171,7 @@ describe('replaceTip', () => {
 
       expect(result.commands).toEqual([
         cmd.dropTip('A1'),
-        cmd.pickUpTip('B1')
+        cmd.pickUpTip('B1'),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -181,10 +181,10 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                B1: false
-              }
-            }
-          }
+                B1: false,
+              },
+            },
+          },
         }
       ))
     })
@@ -196,19 +196,19 @@ describe('replaceTip', () => {
         {
           tipState: {
             tipracks: {
-              [tiprack1Id]: getTiprackTipstate(false)
+              [tiprack1Id]: getTiprackTipstate(false),
             },
             pipettes: {
-              p300SingleId: false
-            }
-          }
+              p300SingleId: false,
+            },
+          },
         }
       )
 
       const result = replaceTip(p300SingleId)(initialTestRobotState)
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip('A1', {labware: tiprack2Id})
+        cmd.pickUpTip('A1', {labware: tiprack2Id}),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -218,13 +218,13 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack2Id]: {
-                A1: false
-              }
+                A1: false,
+              },
             },
             pipettes: {
-              p300SingleId: true
-            }
-          }
+              p300SingleId: true,
+            },
+          },
         }
       ))
     })
@@ -235,7 +235,7 @@ describe('replaceTip', () => {
       const result = replaceTip(p300MultiId)(robotInitialState)
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip('A1', {pipette: p300MultiId})
+        cmd.pickUpTip('A1', {pipette: p300MultiId}),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -244,12 +244,12 @@ describe('replaceTip', () => {
         {
           tipState: {
             tipracks: {
-              [tiprack1Id]: getTipColumn(1, false)
+              [tiprack1Id]: getTipColumn(1, false),
             },
             pipettes: {
-              p300MultiId: true
-            }
-          }
+              p300MultiId: true,
+            },
+          },
         }
       ))
     })
@@ -261,15 +261,15 @@ describe('replaceTip', () => {
           ...robotInitialState.tipState,
           tipracks: {
             [tiprack1Id]: {...getTiprackTipstate(true), A1: false},
-            [tiprack2Id]: getTiprackTipstate(true)
-          }
-        }
+            [tiprack2Id]: getTiprackTipstate(true),
+          },
+        },
       }
 
       const result = replaceTip(p300MultiId)(robotStateWithTipA1Missing)
 
       expect(result.commands).toEqual([
-        cmd.pickUpTip('A2', {pipette: p300MultiId})
+        cmd.pickUpTip('A2', {pipette: p300MultiId}),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -288,13 +288,13 @@ describe('replaceTip', () => {
                 E2: false,
                 F2: false,
                 G2: false,
-                H2: false
-              }
+                H2: false,
+              },
             },
             pipettes: {
-              p300MultiId: true
-            }
-          }
+              p300MultiId: true,
+            },
+          },
         }
       ))
     })
@@ -305,14 +305,14 @@ describe('replaceTip', () => {
         tipState: {
           ...robotInitialState.tipState,
           pipettes: {
-            p300MultiId: true
-          }
-        }
+            p300MultiId: true,
+          },
+        },
       }
       const result = replaceTip(p300MultiId)(robotStateWithTipsOnMulti)
       expect(result.commands).toEqual([
         cmd.dropTip('A1', {pipette: p300MultiId}),
-        cmd.pickUpTip('A1', {pipette: p300MultiId})
+        cmd.pickUpTip('A1', {pipette: p300MultiId}),
       ])
 
       expect(result.robotState).toMatchObject(merge(
@@ -323,14 +323,14 @@ describe('replaceTip', () => {
             tipracks: {
               [tiprack1Id]: {
                 ...getTiprackTipstate(true),
-                ...getTipColumn(1, false)
+                ...getTipColumn(1, false),
               },
-              [tiprack2Id]: getTiprackTipstate(true)
+              [tiprack2Id]: getTiprackTipstate(true),
             },
             pipettes: {
-              p300MultiId: true
-            }
-          }
+              p300MultiId: true,
+            },
+          },
         }
       ))
     })
@@ -342,12 +342,12 @@ describe('replaceTip', () => {
 
     beforeEach(() => {
       firstTiprackAssignedState = {
-        [tiprack1Id]: p300MultiId
+        [tiprack1Id]: p300MultiId,
       }
 
       twoTipracksAssignedState = {
         [tiprack1Id]: p300MultiId,
-        [tiprack2Id]: p300MultiId
+        [tiprack2Id]: p300MultiId,
       }
     })
 
@@ -359,7 +359,7 @@ describe('replaceTip', () => {
       expect(result.commands[0].params).toEqual({
         labware: tiprack1Id,
         pipette: p300MultiId,
-        well: 'A1'
+        well: 'A1',
       })
     })
 
@@ -373,7 +373,7 @@ describe('replaceTip', () => {
       expect(result.commands[0].params).toEqual({
         labware: tiprack1Id,
         pipette: p300MultiId,
-        well: 'A1'
+        well: 'A1',
       })
     })
 
@@ -390,7 +390,7 @@ describe('replaceTip', () => {
       expect(result.commands[0].params).toEqual({
         labware: tiprack2Id,
         pipette: p300MultiId,
-        well: 'A1'
+        well: 'A1',
       })
     })
 
@@ -401,13 +401,13 @@ describe('replaceTip', () => {
 
       expect(result.robotState.tiprackAssignment).toEqual({
         ...firstTiprackAssignedState,
-        [tiprack2Id]: p300SingleId
+        [tiprack2Id]: p300SingleId,
       })
 
       expect(result.commands[0].params).toEqual({
         labware: tiprack2Id,
         pipette: p300SingleId,
-        well: 'A1'
+        well: 'A1',
       })
     })
   })

@@ -11,9 +11,9 @@ beforeEach(() => {
       A1: {'ingred1': {volume: 115}},
       A2: {'ingred1': {volume: 111}},
       A3: {'ingred2': {volume: 155}},
-      A4: {'ingred2': {volume: 105}, 'ingred1': {volume: 10}}
+      A4: {'ingred2': {volume: 105}, 'ingred1': {volume: 10}},
       // rest empty
-    }
+    },
   }
 })
 

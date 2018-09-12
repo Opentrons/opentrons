@@ -21,7 +21,7 @@ const LEVELS: Array<LogLevel> = [
   'http',
   'verbose',
   'debug',
-  'silly'
+  'silly',
 ]
 
 export default function createLogger (filename: string): Logger {
@@ -29,7 +29,7 @@ export default function createLogger (filename: string): Logger {
 
   return LEVELS.reduce((result, level) => ({
     ...result,
-    [level]: (message, meta) => log(level, message, label, meta)
+    [level]: (message, meta) => log(level, message, label, meta),
   }), {})
 }
 

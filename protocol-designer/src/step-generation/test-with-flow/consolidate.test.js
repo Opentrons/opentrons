@@ -7,7 +7,7 @@ import {
   getTiprackTipstate,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
-  commandFixtures as cmd
+  commandFixtures as cmd,
 } from './fixtures'
 import _consolidate from '../consolidate'
 
@@ -26,7 +26,7 @@ function tripleMix (well: string, volume: number, labware: string) {
     cmd.aspirate(well, volume, params),
     cmd.dispense(well, volume, params),
     cmd.aspirate(well, volume, params),
-    cmd.dispense(well, volume, params)
+    cmd.dispense(well, volume, params),
   ]
 }
 
@@ -35,13 +35,13 @@ const robotInitialStateNoLiquidState = createRobotStateFixture({
   destPlateType: '96-flat',
   fillTiprackTips: true,
   fillPipetteTips: false,
-  tipracks: [200, 200]
+  tipracks: [200, 200],
 })
 
 const emptyLiquidState = createEmptyLiquidState({
   sourcePlateType: 'trough-12row',
   destPlateType: '96-flat',
-  pipettes: robotInitialStateNoLiquidState.instruments
+  pipettes: robotInitialStateNoLiquidState.instruments,
 })
 
 const robotStatePickedUpOneTipNoLiquidState = merge(
@@ -50,12 +50,12 @@ const robotStatePickedUpOneTipNoLiquidState = merge(
   {
     tipState: {
       tipracks: {
-        tiprack1Id: {A1: false}
+        tiprack1Id: {A1: false},
       },
       pipettes: {
-        p300SingleId: true
-      }
-    }
+        p300SingleId: true,
+      },
+    },
   }
 )
 
@@ -65,12 +65,12 @@ const robotStatePickedUpMultiTipsNoLiquidState = merge(
   {
     tipState: {
       tipracks: {
-        tiprack1Id: getTipColumn(1, false)
+        tiprack1Id: getTipColumn(1, false),
       },
       pipettes: {
-        p300MultiId: true
-      }
-    }
+        p300MultiId: true,
+      },
+    },
   }
 )
 
@@ -100,7 +100,7 @@ describe('consolidate single-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowout: null
+    blowout: null,
   }
 
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
@@ -108,7 +108,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       sourceWells: ['A1', 'A2'],
       volume: 50,
-      changeTip: 'once'
+      changeTip: 'once',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -119,7 +119,7 @@ describe('consolidate single-channel', () => {
       cmd.pickUpTip('A1'),
       cmd.aspirate('A1', 50),
       cmd.aspirate('A2', 50),
-      dispense('B1', 100)
+      dispense('B1', 100),
     ])
   })
 
@@ -128,7 +128,7 @@ describe('consolidate single-channel', () => {
     const data = {
       ...baseData,
       volume: 150,
-      changeTip: 'once'
+      changeTip: 'once',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -141,7 +141,7 @@ describe('consolidate single-channel', () => {
 
       cmd.aspirate('A3', 150),
       cmd.aspirate('A4', 150),
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -151,7 +151,7 @@ describe('consolidate single-channel', () => {
     const data = {
       ...baseData,
       volume: 150,
-      changeTip: 'always'
+      changeTip: 'always',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -166,7 +166,7 @@ describe('consolidate single-channel', () => {
       cmd.pickUpTip('B1'),
       cmd.aspirate('A3', 150),
       cmd.aspirate('A4', 150),
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
 
     expect(result.robotState).toMatchObject({
@@ -174,13 +174,13 @@ describe('consolidate single-channel', () => {
       tipState: {
         tipracks: {
           ...robotInitialState.tipState.tipracks,
-          tiprack1Id: {...getTiprackTipstate(true), A1: false, B1: false}
+          tiprack1Id: {...getTiprackTipstate(true), A1: false, B1: false},
         },
         pipettes: {
           ...robotInitialState.tipState.pipettes,
-          p300SingleId: true
-        }
-      }
+          p300SingleId: true,
+        },
+      },
     })
   })
 
@@ -188,7 +188,7 @@ describe('consolidate single-channel', () => {
     const data = {
       ...baseData,
       volume: 150,
-      changeTip: 'once'
+      changeTip: 'once',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -201,7 +201,7 @@ describe('consolidate single-channel', () => {
 
       cmd.aspirate('A3', 150),
       cmd.aspirate('A4', 150),
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -211,7 +211,7 @@ describe('consolidate single-channel', () => {
     const data = {
       ...baseData,
       volume: 150,
-      changeTip: 'never'
+      changeTip: 'never',
     }
 
     const result = consolidate(data)(robotStatePickedUpOneTip)
@@ -223,7 +223,7 @@ describe('consolidate single-channel', () => {
 
       cmd.aspirate('A3', 150),
       cmd.aspirate('A4', 150),
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
@@ -234,7 +234,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       volume: 100,
       changeTip: 'once',
-      disposalVolume: 50
+      disposalVolume: 50,
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -249,7 +249,7 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A3', 150), // disposalVolume included
       cmd.aspirate('A4', 100),
       dispense('B1', 200),
-      cmd.blowout() // Trash the disposal volume
+      cmd.blowout(), // Trash the disposal volume
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -259,7 +259,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       volume: 100,
       changeTip: 'once',
-      mixFirstAspirate: {times: 3, volume: 50}
+      mixFirstAspirate: {times: 3, volume: 50},
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -277,7 +277,7 @@ describe('consolidate single-channel', () => {
       ...tripleMix('A4', 50, 'sourcePlateId'),
 
       cmd.aspirate('A4', 100),
-      dispense('B1', 100)
+      dispense('B1', 100),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -288,7 +288,7 @@ describe('consolidate single-channel', () => {
       volume: 125,
       disposalVolume: 30,
       changeTip: 'once',
-      mixFirstAspirate: {times: 3, volume: 50}
+      mixFirstAspirate: {times: 3, volume: 50},
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -323,7 +323,7 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A4', 125),
       dispense('B1', 250),
       // Trash the disposal volume
-      cmd.blowout()
+      cmd.blowout(),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -333,7 +333,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       volume: 100,
       changeTip: 'once',
-      mixInDestination: {times: 3, volume: 53}
+      mixInDestination: {times: 3, volume: 53},
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -350,7 +350,7 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A4', 100),
       dispense('B1', 100),
 
-      ...tripleMix('B1', 53, 'destPlateId')
+      ...tripleMix('B1', 53, 'destPlateId'),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -361,7 +361,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: {times: 3, volume: 54},
-      blowout: 'trashId'
+      blowout: 'trashId',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -380,7 +380,7 @@ describe('consolidate single-channel', () => {
 
       ...tripleMix('B1', 54, 'destPlateId'),
 
-      cmd.blowout()
+      cmd.blowout(),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -392,7 +392,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       disposalVolume: 30,
-      mixInDestination: {times: 3, volume: 52}
+      mixInDestination: {times: 3, volume: 52},
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -414,7 +414,7 @@ describe('consolidate single-channel', () => {
       cmd.blowout(),
 
       // Mix in the dest well
-      ...tripleMix('B1', 52, 'destPlateId')
+      ...tripleMix('B1', 52, 'destPlateId'),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -426,7 +426,7 @@ describe('consolidate single-channel', () => {
       volume: 150,
       changeTip: 'once',
       preWetTip: true,
-      sourceWells: ['A1', 'A2', 'A3', 'A4']
+      sourceWells: ['A1', 'A2', 'A3', 'A4'],
     }
 
     const preWetVol = data.volume // NOTE same as volume above... for now
@@ -451,7 +451,7 @@ describe('consolidate single-channel', () => {
 
       cmd.aspirate('A3', 150),
       cmd.aspirate('A4', 150),
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -461,7 +461,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       volume: 150,
       changeTip: 'once',
-      touchTipAfterAspirate: true
+      touchTipAfterAspirate: true,
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -483,7 +483,7 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A4', 150),
       cmd.touchTip('A4'),
 
-      dispense('B1', 300)
+      dispense('B1', 300),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -493,7 +493,7 @@ describe('consolidate single-channel', () => {
       ...baseData,
       volume: 150,
       changeTip: 'once',
-      touchTipAfterDispense: true
+      touchTipAfterDispense: true,
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -511,7 +511,7 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A4', 150),
 
       dispense('B1', 300),
-      cmd.touchTip('B1', {labware: 'destPlateId'})
+      cmd.touchTip('B1', {labware: 'destPlateId'}),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -522,7 +522,7 @@ describe('consolidate single-channel', () => {
       sourceWells: ['A1', 'A2'],
       volume: 150,
       changeTip: 'once',
-      pipette: 'no-such-pipette-id-here'
+      pipette: 'no-such-pipette-id-here',
     }
 
     const result = consolidateWithErrors(data)(robotInitialState)
@@ -565,14 +565,14 @@ describe('consolidate multi-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowout: null
+    blowout: null,
   }
 
   test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
     const data = {
       ...baseData,
       volume: 140,
-      changeTip: 'once'
+      changeTip: 'once',
     }
     const result = consolidate(data)(robotInitialState)
 
@@ -584,7 +584,7 @@ describe('consolidate multi-channel', () => {
 
       cmd.aspirate('A3', 140, multiParams),
       cmd.aspirate('A4', 140, multiParams),
-      multiDispense('A12', 280)
+      multiDispense('A12', 280),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpMultiTipsNoLiquidState)
   })

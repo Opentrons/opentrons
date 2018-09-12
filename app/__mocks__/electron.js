@@ -37,15 +37,15 @@ module.exports = {
 
       __mockRemotes[name] = remote
       return remote
-    })
+    }),
   },
 
   app: {
-    getPath: () => '__mock-app-path__'
+    getPath: () => '__mock-app-path__',
   },
 
   ipcRenderer: {
     on: jest.fn(),
-    send: jest.fn()
-  }
+    send: jest.fn(),
+  },
 }

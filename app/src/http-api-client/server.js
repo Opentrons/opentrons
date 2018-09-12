@@ -38,7 +38,7 @@ export type ServerRequestAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-  |}
+  |},
 |}
 
 export type ServerSuccessAction = {|
@@ -47,7 +47,7 @@ export type ServerSuccessAction = {|
     robot: RobotService,
     path: RequestPath,
     response: ServerResponse,
-  |}
+  |},
 |}
 
 export type ServerFailureAction = {|
@@ -56,7 +56,7 @@ export type ServerFailureAction = {|
     robot: RobotService,
     path: RequestPath,
     error: ApiRequestError,
-  |}
+  |},
 |}
 
 export type ClearServerAction = {|
@@ -64,7 +64,7 @@ export type ClearServerAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-  |}
+  |},
 |}
 
 export type ServerAction =
@@ -85,7 +85,7 @@ export type RobotServerState = {
 }
 
 type ServerState = {
-  [robotName: string]: ?RobotServerState
+  [robotName: string]: ?RobotServerState,
 }
 
 const UPDATE: RequestPath = 'update'
@@ -181,8 +181,8 @@ export function serverReducer (
         ...state,
         [name]: {
           ...state[name],
-          [path]: {inProgress: true, response: null, error: null}
-        }
+          [path]: {inProgress: true, response: null, error: null},
+        },
       }
 
     case 'api:SERVER_SUCCESS':
@@ -195,9 +195,9 @@ export function serverReducer (
           [path]: {
             response: action.payload.response,
             inProgress: false,
-            error: null
-          }
-        }
+            error: null,
+          },
+        },
       }
 
     case 'api:SERVER_FAILURE':
@@ -210,9 +210,9 @@ export function serverReducer (
           [path]: {
             error: action.payload.error,
             inProgress: false,
-            response: null
-          }
-        }
+            response: null,
+          },
+        },
       }
 
     case 'api:CLEAR_SERVER_RESPONSE':
@@ -224,9 +224,9 @@ export function serverReducer (
           [path]: {
             error: null,
             inProgress: false,
-            response: null
-          }
-        }
+            response: null,
+          },
+        },
       }
 
     // TODO(mc, 2018-07-05): this logic should live in a selector
@@ -328,7 +328,7 @@ function serverSuccess (
 ): ServerSuccessAction {
   return {
     type: 'api:SERVER_SUCCESS',
-    payload: {robot, path, response}
+    payload: {robot, path, response},
   }
 }
 

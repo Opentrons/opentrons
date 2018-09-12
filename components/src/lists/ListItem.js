@@ -22,7 +22,7 @@ type ListItemProps = {
   isDisabled?: boolean,
   /** name constant of the icon to display */
   iconName?: IconName,
-  children: React.Node
+  children: React.Node,
 }
 
 /**
@@ -37,7 +37,7 @@ export default function ListItem (props: ListItemProps) {
 
   const className = classnames(props.className, styles.list_item, {
     [styles.disabled]: isDisabled,
-    [styles.clickable]: onClick
+    [styles.clickable]: onClick,
   })
 
   const itemIcon = iconName && (

@@ -6,7 +6,7 @@ import multiSrc from './pipetteMulti.png'
 
 type Props = {
   channels?: number,
-  className?: string
+  className?: string,
 }
 
 export default function InstrumentDiagram (props: Props) {

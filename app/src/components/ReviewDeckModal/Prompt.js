@@ -8,7 +8,7 @@ import {OutlineButton} from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = Labware & {
-  onClick: () => void
+  onClick: () => void,
 }
 
 export default function Prompt (props: Props) {

@@ -10,7 +10,7 @@ import {
   RadioGroup,
   Icon,
   HandleKeypress,
-  type IconName
+  type IconName,
 } from '@opentrons/components'
 
 import styles from './styles.css'
@@ -35,7 +35,7 @@ const JOG_ICONS_BY_NAME = {
   back: 'ot-arrow-up',
   forward: 'ot-arrow-down',
   up: 'ot-arrow-up',
-  down: 'ot-arrow-down'
+  down: 'ot-arrow-down',
 }
 
 const JOG_PARAMS_BY_NAME = {
@@ -44,7 +44,7 @@ const JOG_PARAMS_BY_NAME = {
   back: ['y', 1],
   forward: ['y', -1],
   up: ['z', 1],
-  down: ['z', -1]
+  down: ['z', -1],
 }
 
 const STEPS: Array<JogStep> = [0.1, 1, 10]
@@ -76,7 +76,7 @@ export default class JogControls extends React.Component<Props, State> {
 
     return JOG_BUTTON_NAMES.reduce((result, name) => ({
       ...result,
-      [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step)
+      [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step),
     }), {})
   }
 
@@ -97,7 +97,7 @@ export default class JogControls extends React.Component<Props, State> {
           {key: '-', onPress: this.decreaseStepSize},
           {key: '_', onPress: this.decreaseStepSize},
           {key: '=', onPress: this.increaseStepSize},
-          {key: '+', onPress: this.increaseStepSize}
+          {key: '+', onPress: this.increaseStepSize},
         ]}
       >
         {JOG_BUTTON_NAMES.map(name => (

@@ -116,7 +116,7 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	eslint '**/*.js'
+	eslint '.*.js' '**/*.js'
 	flow $(if $(CI),check,status)
 
 .PHONY: lint-css

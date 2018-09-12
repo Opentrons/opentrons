@@ -13,7 +13,7 @@ const TRASH_OUTLINE_PROPS = {
   y: '0',
   width: '216',
   height: '152',
-  rx: '11'
+  rx: '11',
 }
 
 export default function DeckOutline () {

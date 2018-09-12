@@ -4,7 +4,7 @@ import {FormGroup} from '@opentrons/components'
 
 import {
   StepInputField,
-  StepRadioGroup
+  StepRadioGroup,
 } from './formFields'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms.css'

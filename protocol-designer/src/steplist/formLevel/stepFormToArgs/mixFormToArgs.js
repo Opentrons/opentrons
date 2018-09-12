@@ -10,7 +10,7 @@ import { orderWells } from '../../utils'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
-  validatedForm: F | null
+  validatedForm: F | null,
 }
 
 const mixFormToArgs = (formData: FormData, context: StepFormContext): ValidationAndErrors<MixFormData> => {
@@ -92,9 +92,9 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
         blowout,
         pipette,
         aspirateOffsetFromBottomMm,
-        dispenseOffsetFromBottomMm
+        dispenseOffsetFromBottomMm,
       }
-      : null
+      : null,
   }
 }
 

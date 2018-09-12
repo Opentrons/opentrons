@@ -24,7 +24,7 @@ describe('pipettes', () => {
     robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
     pipettes = {
       left: {model: 'p300_single', mount_axis: 'z', plunger_axis: 'b'},
-      right: {model: 'p10_multi', mount_axis: 'a', plunger_axis: 'c'}
+      right: {model: 'p10_multi', mount_axis: 'a', plunger_axis: 'c'},
     }
 
     state = {api: {pipettes: {}}}
@@ -51,7 +51,7 @@ describe('pipettes', () => {
     test('fetchPipettes dispatches PIPETTES_REQUEST + SUCCESS', () => {
       const expectedActions = [
         {type: 'api:PIPETTES_REQUEST', payload: {robot}},
-        {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}}
+        {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}},
       ]
 
       client.__setMockResponse(pipettes)
@@ -64,7 +64,7 @@ describe('pipettes', () => {
       const error = new Error('AH')
       const expectedActions = [
         {type: 'api:PIPETTES_REQUEST', payload: {robot}},
-        {type: 'api:PIPETTES_FAILURE', payload: {robot, error}}
+        {type: 'api:PIPETTES_FAILURE', payload: {robot, error}},
       ]
 
       client.__setMockError(error)
@@ -83,7 +83,7 @@ describe('pipettes', () => {
       const action = {type: 'api:PIPETTES_REQUEST', payload: {robot}}
 
       expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: true, error: null}
+        [NAME]: {inProgress: true, error: null},
       })
     })
 
@@ -91,13 +91,13 @@ describe('pipettes', () => {
       state.pipettes[NAME] = {
         inProgress: false,
         error: new Error('AH'),
-        response: pipettes
+        response: pipettes,
       }
 
       const action = {type: 'api:PIPETTES_REQUEST', payload: {robot}}
 
       expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: true, error: null, response: pipettes}
+        [NAME]: {inProgress: true, error: null, response: pipettes},
       })
     })
 
@@ -105,13 +105,13 @@ describe('pipettes', () => {
       state.pipettes[NAME] = {
         inProgress: true,
         error: null,
-        response: null
+        response: null,
       }
 
       const action = {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}}
 
       expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: false, error: null, response: pipettes}
+        [NAME]: {inProgress: false, error: null, response: pipettes},
       })
     })
 
@@ -119,14 +119,14 @@ describe('pipettes', () => {
       state.pipettes[NAME] = {
         inProgress: true,
         error: null,
-        response: pipettes
+        response: pipettes,
       }
 
       const error = new Error('AH')
       const action = {type: 'api:PIPETTES_FAILURE', payload: {robot, error}}
 
       expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: false, response: pipettes, error}
+        [NAME]: {inProgress: false, response: pipettes, error},
       })
     })
   })
@@ -137,7 +137,7 @@ describe('pipettes', () => {
       const robotPipettes = {
         inProgress: false,
         error: null,
-        response: pipettes
+        response: pipettes,
       }
 
       state.api.pipettes[NAME] = robotPipettes
@@ -150,7 +150,7 @@ describe('pipettes', () => {
       expect(getRobotPipettes(state, robot)).toEqual({
         inProgress: false,
         error: null,
-        response: null
+        response: null,
       })
     })
   })

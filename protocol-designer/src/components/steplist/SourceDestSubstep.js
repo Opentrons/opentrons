@@ -8,17 +8,17 @@ import styles from './StepItem.css'
 
 import type {
   SourceDestSubstepItem,
-  SubstepIdentifier
+  SubstepIdentifier,
 } from '../../steplist/types'
 
 export type StepSubItemProps = {|
-  substeps: SourceDestSubstepItem
+  substeps: SourceDestSubstepItem,
 |}
 
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
   onSelectSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier
+  hoveredSubstep: ?SubstepIdentifier,
 |}
 
 export default function SourceDestSubstep (props: SourceDestSubstepProps) {
@@ -32,7 +32,7 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
           rowGroup={rowGroup}
           onMouseEnter={() => onSelectSubstep({
             stepId: substeps.parentStepId,
-            substepIndex: groupKey
+            substepIndex: groupKey,
           })}
           onMouseLeave={() => onSelectSubstep(null)}
           highlighted={!!hoveredSubstep &&
@@ -53,12 +53,12 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
         {[styles.highlighted]:
           !!hoveredSubstep &&
           hoveredSubstep.stepId === substeps.parentStepId &&
-          substepIndex === hoveredSubstep.substepIndex
+          substepIndex === hoveredSubstep.substepIndex,
         }
       )}
       onMouseEnter={() => onSelectSubstep({
         stepId: substeps.parentStepId,
-        substepIndex
+        substepIndex,
       })}
       onMouseLeave={() => onSelectSubstep(null)}
       volume={row.volume}

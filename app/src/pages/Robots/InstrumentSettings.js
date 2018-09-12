@@ -17,7 +17,7 @@ type Props = {
 export default function InstrumentSettingsPage (props: Props) {
   const {
     robot,
-    match: {path, url}
+    match: {path, url},
   } = props
   const titleBarProps = {title: robot.name}
 
