@@ -23,14 +23,11 @@ function ProtocolLabwareCard (props: Props) {
   let labwareList = []
 
   forEach(labwareCount, function (value, key) {
-    const quantity = value > 1
-      ? `x${value}`
-      : ''
     return (
       labwareList.push(
         <tr key={key}>
           <td>{key}</td>
-          <td>{quantity}</td>
+          <td>x{value}</td>
         </tr>
       )
     )
