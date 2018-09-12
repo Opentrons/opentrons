@@ -5,7 +5,7 @@ import type { PauseFormData } from '../../../step-generation'
 
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
-  validatedForm: F | null
+  validatedForm: F | null,
 }
 
 const pauseFormToArgs = (formData: FormData): ValidationAndErrors<PauseFormData> => {
@@ -41,9 +41,9 @@ const pauseFormToArgs = (formData: FormData): ValidationAndErrors<PauseFormData>
         meta: {
           hours,
           minutes,
-          seconds
-        }
-      }
+          seconds,
+        },
+      },
   }
 }
 

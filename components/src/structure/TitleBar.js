@@ -26,7 +26,7 @@ export default function TitleBar (props: TitleBarProps) {
     className,
     onBackClick,
     backClickDisabled,
-    backButtonLabel
+    backButtonLabel,
   } = props
   let {back} = props
 
@@ -48,7 +48,7 @@ export default function TitleBar (props: TitleBarProps) {
       onClick: onBackClick,
       disabled: backClickDisabled,
       title: backButtonLabel || 'Back',
-      children: backButtonLabel || 'back'
+      children: backButtonLabel || 'back',
     }
   }
 

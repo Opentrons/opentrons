@@ -19,7 +19,7 @@ type Props = {
   /** optional classes to apply */
   className?: string,
   /** lightens overlay (alert modal over existing modal)**/
-  alertOverlay?: boolean
+  alertOverlay?: boolean,
 }
 
 /**

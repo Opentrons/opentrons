@@ -22,8 +22,8 @@ const argv = process.defaultApp
 const PARSE_ARGS_OPTS = {
   envPrefix: 'OT_APP',
   configuration: {
-    'negation-prefix': 'disable_'
-  }
+    'negation-prefix': 'disable_',
+  },
 }
 
 // TODO(mc, 2018-05-25): future config changes may require migration strategy
@@ -32,15 +32,15 @@ const DEFAULTS: Config = {
 
   // app update config
   update: {
-    channel: pkg.version.includes('beta') ? 'beta' : 'latest'
+    channel: pkg.version.includes('beta') ? 'beta' : 'latest',
   },
 
   // logging config
   log: {
     level: {
       file: 'debug',
-      console: 'info'
-    }
+      console: 'info',
+    },
   },
 
   // ui and browser config
@@ -49,18 +49,18 @@ const DEFAULTS: Config = {
     height: 768,
     url: {
       protocol: 'file:',
-      path: 'ui/index.html'
+      path: 'ui/index.html',
     },
     webPreferences: {
-      webSecurity: true
-    }
+      webSecurity: true,
+    },
   },
 
   // analytics (mixpanel)
   analytics: {
     appId: uuid(),
     optedIn: false,
-    seenOptIn: false
+    seenOptIn: false,
   },
 
   // user support (intercom)
@@ -68,13 +68,13 @@ const DEFAULTS: Config = {
     userId: uuid(),
     createdAt: Math.floor(Date.now() / 1000),
     name: 'Unknown User',
-    email: null
+    email: null,
   },
 
   // robot discovery
   discovery: {
-    candidates: []
-  }
+    candidates: [],
+  },
 }
 
 // lazy load store, overrides, and log because of config/log interdependency

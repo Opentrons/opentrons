@@ -6,9 +6,9 @@ import * as selectors from './selectors'
 export {
   actions,
   rootReducer,
-  selectors
+  selectors,
 }
 
 export type {
-  RootState
+  RootState,
 }

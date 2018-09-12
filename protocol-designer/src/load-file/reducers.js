@@ -5,7 +5,7 @@ import type {FileError} from './types'
 
 // Keep track of file upload errors
 const fileErrors = handleActions({
-  FILE_ERRORS: (state, action: {payload: FileError}) => action.payload
+  FILE_ERRORS: (state, action: {payload: FileError}) => action.payload,
 }, null)
 
 // NOTE: whenever we add or change any of the action types that indicate
@@ -37,12 +37,12 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
 
 export const _allReducers = {
   fileErrors,
-  unsavedChanges
+  unsavedChanges,
 }
 
 export type RootState = {
   fileErrors: FileError,
-  unsavedChanges: boolean
+  unsavedChanges: boolean,
 }
 
 const rootReducer = combineReducers(_allReducers)

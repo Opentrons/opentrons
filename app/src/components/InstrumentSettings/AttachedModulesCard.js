@@ -15,7 +15,7 @@ type OP = Robot
 
 type SP = {
   modules: ?Array<Module>,
-  refreshing: boolean
+  refreshing: boolean,
 }
 
 type DP = {refresh: () => mixed}
@@ -50,13 +50,13 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
 
     return {
       modules: modules,
-      refreshing: modulesCall.inProgress
+      refreshing: modulesCall.inProgress,
     }
   }
 }
 
 function DTP (dispatch: Dispatch, ownProps: OP): DP {
   return {
-    refresh: () => dispatch(fetchModules(ownProps))
+    refresh: () => dispatch(fetchModules(ownProps)),
   }
 }

@@ -38,18 +38,18 @@ function createPipette (
     mount,
     maxVolume: pipetteData.nominalMaxVolumeUl,
     channels: pipetteData.channels,
-    tiprackModel
+    tiprackModel,
   }
 }
 
 export type PipetteReducerState = {
   byMount: {|
     left: ?string,
-    right: ?string
+    right: ?string,
   |},
   byId: {
-    [pipetteId: string]: PipetteData
-  }
+    [pipetteId: string]: PipetteData,
+  },
 }
 
 const pipettes = handleActions({
@@ -62,7 +62,7 @@ const pipettes = handleActions({
     return {
       byMount: {
         left: pipetteIds.find(id => pipettes[id].mount === 'left'),
-        right: pipetteIds.find(id => pipettes[id].mount === 'right')
+        right: pipetteIds.find(id => pipettes[id].mount === 'right'),
       },
       byId: reduce(
         pipettes,
@@ -71,7 +71,7 @@ const pipettes = handleActions({
           return newPipette
             ? {...acc, [id]: newPipette}
             : acc
-        }, {})
+        }, {}),
     }
   },
   CREATE_NEW_PROTOCOL: (
@@ -93,19 +93,19 @@ const pipettes = handleActions({
         if (!pipette) return acc
         return {
           ...acc,
-          [pipette.id]: pipette
+          [pipette.id]: pipette,
         }
       }, {})
 
     return {
       byMount: {
         left: leftPipette ? leftPipette.id : state.byMount.left,
-        right: rightPipette ? rightPipette.id : state.byMount.right
+        right: rightPipette ? rightPipette.id : state.byMount.right,
       },
       byId: {
         ...state.byId,
-        ...newPipettes
-      }
+        ...newPipettes,
+      },
     }
   },
   SWAP_PIPETTES: (
@@ -114,25 +114,25 @@ const pipettes = handleActions({
   ): PipetteReducerState => {
     const byId = mapValues(state.byId, (pipette: PipetteData): PipetteData => ({
       ...pipette,
-      mount: (pipette.mount === 'left') ? 'right' : 'left'
+      mount: (pipette.mount === 'left') ? 'right' : 'left',
     }))
 
     return ({
       byMount: {
         left: state.byMount.right,
-        right: state.byMount.left
+        right: state.byMount.left,
       },
-      byId
+      byId,
     })
-  }
+  },
 }, {byMount: {left: null, right: null}, byId: {}})
 
 const _allReducers = {
-  pipettes
+  pipettes,
 }
 
 export type RootState = {
-  pipettes: PipetteReducerState
+  pipettes: PipetteReducerState,
 }
 
 export const rootReducer = combineReducers(_allReducers)

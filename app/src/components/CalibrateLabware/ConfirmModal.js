@@ -32,7 +32,7 @@ export default function ConfirmModal (props: Props) {
   const titleBar = {
     title: 'Calibrate Deck',
     subtitle: labware.type,
-    back: {onClick: onBackClick, disabled: backClickDisabled}
+    back: {onClick: onBackClick, disabled: backClickDisabled},
   }
 
   return (

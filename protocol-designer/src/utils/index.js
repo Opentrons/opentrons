@@ -20,7 +20,7 @@ export const formConnectorFactory = (
   // Uses single accessor string to pass onChange & value into form fields
   // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
   onChange: handleChange(accessor),
-  value: formData[accessor] || ''
+  value: formData[accessor] || '',
 })
 
 export const uuid: () => string = uuidv1
@@ -61,7 +61,7 @@ export function clientRectToBoundingRect (rect: ClientRect): BoundingRect {
     x: rect.left,
     y: rect.top,
     width: rect.width,
-    height: rect.height
+    height: rect.height,
   }
 }
 
@@ -73,7 +73,7 @@ export const getCollidingWells = (rectPositions: GenericRect, selectableClassnam
     x: Math.min(x0, x1),
     y: Math.min(y0, y1),
     width: Math.abs(x1 - x0),
-    height: Math.abs(y1 - y0)
+    height: Math.abs(y1 - y0),
   }
 
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter

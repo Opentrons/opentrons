@@ -7,7 +7,7 @@ import type {FileError} from '../../../load-file'
 
 type Props = {
   error: ?FileError,
-  dismissModal: (SyntheticEvent<*>) => mixed
+  dismissModal: (SyntheticEvent<*>) => mixed,
 }
 
 export default function FileUploadErrorModal (props: Props) {

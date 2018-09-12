@@ -9,10 +9,10 @@ export const PANEL_PROPS_BY_NAME = {
   upload: {title: 'Open Protocol'},
   setup: {title: 'Prepare for Run'},
   run: {title: 'Execute Run'},
-  more: {title: 'Menu'}
+  more: {title: 'Menu'},
 }
 
 export const PANELS = PANEL_NAMES.map((name) => ({
   name,
-  ...PANEL_PROPS_BY_NAME[name]
+  ...PANEL_PROPS_BY_NAME[name],
 }))

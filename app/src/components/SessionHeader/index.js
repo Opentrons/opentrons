@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 
 import {
-  selectors as robotSelectors
+  selectors as robotSelectors,
 } from '../../robot'
 
 export default connect(mapStateToProps)(SessionHeader)
@@ -18,6 +18,6 @@ function SessionHeader (props) {
 
 function mapStateToProps (state) {
   return {
-    sessionName: robotSelectors.getSessionName(state)
+    sessionName: robotSelectors.getSessionName(state),
   }
 }

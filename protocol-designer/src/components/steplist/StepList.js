@@ -13,7 +13,7 @@ import type {StepIdType} from '../../form-types'
 
 type StepListProps = {
   orderedSteps: Array<StepIdType>,
-  handleStepHoverById?: (?StepIdType) => (event?: SyntheticEvent<>) => mixed
+  handleStepHoverById?: (?StepIdType) => (event?: SyntheticEvent<>) => mixed,
 }
 
 export default function StepList (props: StepListProps) {

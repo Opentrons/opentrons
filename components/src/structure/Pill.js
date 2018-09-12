@@ -11,7 +11,7 @@ type Props = {
   /** additional class name */
   className?: string,
   /** contents of the pill */
-  children?: React.Node
+  children?: React.Node,
   // TODO LATER Ian 2018-04-11 mouse event handlers (eg for triggering tooltip)
 }
 

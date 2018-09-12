@@ -38,5 +38,5 @@ export type ChangePipetteProps = {
   moveToFront: () => mixed,
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   checkPipette: () => mixed,
-  confirmPipette: () => mixed
+  confirmPipette: () => mixed,
 }

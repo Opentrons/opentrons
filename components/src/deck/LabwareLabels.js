@@ -7,7 +7,7 @@ import {wellNameSplit} from '../utils'
 import styles from './LabwareLabels.css'
 
 type Props = {
-  labwareType: string
+  labwareType: string,
 }
 
 // TODO: Ian 2018-08-14 change these offsets to negative numbers to place outside of Labware

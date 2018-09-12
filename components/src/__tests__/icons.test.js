@@ -4,7 +4,7 @@ import Renderer from 'react-test-renderer'
 
 import {
   Icon,
-  NotificationIcon
+  NotificationIcon,
 } from '..'
 
 import IconData from '../icons/icon-data'

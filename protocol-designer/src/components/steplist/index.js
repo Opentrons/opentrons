@@ -4,5 +4,5 @@ import StepList from './StepList'
 
 export {
   StepItem,
-  StepList
+  StepList,
 }

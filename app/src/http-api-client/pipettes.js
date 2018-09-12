@@ -24,8 +24,8 @@ export type PipettesResponse = {
 export type PipettesRequestAction = {|
   type: 'api:PIPETTES_REQUEST',
   payload: {|
-    robot: RobotService
-  |}
+    robot: RobotService,
+  |},
 |}
 
 export type PipettesSuccessAction = {|
@@ -33,7 +33,7 @@ export type PipettesSuccessAction = {|
   payload: {|
     robot: RobotService,
     pipettes: PipettesResponse,
-  |}
+  |},
 |}
 
 export type PipettesFailureAction = {|
@@ -41,7 +41,7 @@ export type PipettesFailureAction = {|
   payload: {|
     robot: RobotService,
     error: ApiRequestError,
-  |}
+  |},
 |}
 
 export type PipettesAction =
@@ -52,7 +52,7 @@ export type PipettesAction =
 export type RobotPipettes = ApiCall<void, PipettesResponse>
 
 type PipettesState = {
-  [robotName: string]: ?RobotPipettes
+  [robotName: string]: ?RobotPipettes,
 }
 
 export function fetchPipettes (
@@ -89,21 +89,21 @@ export function pipettesReducer (
       ({robot: {name}} = action.payload)
       return {
         ...state,
-        [name]: {...state[name], error: null, inProgress: true}
+        [name]: {...state[name], error: null, inProgress: true},
       }
 
     case 'api:PIPETTES_SUCCESS':
       ({pipettes, robot: {name}} = action.payload)
       return {
         ...state,
-        [name]: {error: null, response: pipettes, inProgress: false}
+        [name]: {error: null, response: pipettes, inProgress: false},
       }
 
     case 'api:PIPETTES_FAILURE':
       ({error, robot: {name}} = action.payload)
       return {
         ...state,
-        [name]: {...state[name], error, inProgress: false}
+        [name]: {...state[name], error, inProgress: false},
       }
   }
 

@@ -5,7 +5,7 @@ import {selectors} from '../index'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
@@ -62,7 +62,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'aspirate_wells': null,
-      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     }
   }
 
@@ -71,7 +71,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'dispense_wells': null,
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     }
   }
 
@@ -82,7 +82,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       'wells': null,
       // TODO: Ian 2018-09-03 should we have both asp/disp for Mix?
       // if not, is dispense the right choice vs aspirate?
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     }
   }
 
@@ -111,14 +111,14 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       if (unsavedForm.aspirate_flowRate) {
         updateOverrides = {
           ...updateOverrides,
-          aspirate_flowRate: null
+          aspirate_flowRate: null,
         }
       }
 
       if (unsavedForm.dispense_flowRate) {
         updateOverrides = {
           ...updateOverrides,
-          dispense_flowRate: null
+          dispense_flowRate: null,
         }
       }
     }
@@ -133,7 +133,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       if (singleToMulti) {
         updateOverrides = {
           ...updateOverrides,
-          wells: null
+          wells: null,
         }
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
@@ -142,7 +142,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
 
         updateOverrides = {
           ...updateOverrides,
-          wells: _getAllWells(unsavedForm.wells, labwareType)
+          wells: _getAllWells(unsavedForm.wells, labwareType),
         }
       }
     } else {
@@ -151,7 +151,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
         updateOverrides = {
           ...updateOverrides,
           'aspirate_wells': null,
-          'dispense_wells': null
+          'dispense_wells': null,
         }
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
@@ -164,7 +164,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
         updateOverrides = {
           ...updateOverrides,
           'aspirate_wells': _getAllWells(unsavedForm['aspirate_wells'], sourceLabwareType),
-          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType)
+          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType),
         }
       }
     }
@@ -173,8 +173,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   return {
     update: {
       ...payload.update,
-      ...updateOverrides
-    }
+      ...updateOverrides,
+    },
   }
 }
 

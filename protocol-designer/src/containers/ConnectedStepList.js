@@ -10,7 +10,7 @@ type Props = React.ElementProps<typeof StepList>
 
 function mapStateToProps (state: BaseState): Props {
   return {
-    orderedSteps: selectors.orderedSteps(state)
+    orderedSteps: selectors.orderedSteps(state),
   }
 }
 

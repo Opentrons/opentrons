@@ -23,7 +23,7 @@ function ResponseError (
     message,
     status,
     statusText,
-    url
+    url,
   }
 }
 
@@ -45,7 +45,7 @@ export default function client<T, U> (
     method,
     headers: {},
     // to make flow happy...
-    body: undefined
+    body: undefined,
   }
 
   if (body instanceof FormData) {

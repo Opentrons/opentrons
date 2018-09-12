@@ -15,20 +15,20 @@ type Props = {
   labwareName: ?string,
 
   onCancel: (event: SyntheticMouseEvent<*>) => mixed,
-  onSaveName: (name: ?string) => (event: SyntheticMouseEvent<*>) => mixed
+  onSaveName: (name: ?string) => (event: SyntheticMouseEvent<*>) => mixed,
 }
 
 type SP = {
   renameLabwareFormMode: $ElementType<Props, 'renameLabwareFormMode'>,
-  labwareName: $ElementType<Props, 'labwareName'>
+  labwareName: $ElementType<Props, 'labwareName'>,
 }
 
 type MP = {
-  _selectedLabwareId: ?string
+  _selectedLabwareId: ?string,
 }
 
 type State = {
-  name: ?string
+  name: ?string,
 }
 
 class LabwareNameEditForm extends React.Component<Props, State> {
@@ -77,7 +77,7 @@ function mapStateToProps (state: BaseState): SP & MP {
     labwareName: _selectedLabwareId && labwareIngredSelectors.getLabwareNames(state)[_selectedLabwareId],
     renameLabwareFormMode: labwareIngredSelectors.getRenameLabwareFormMode(state),
 
-    _selectedLabwareId
+    _selectedLabwareId,
   }
 }
 
@@ -94,7 +94,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: Dispatch<*>}
       if (_selectedLabwareId) {
         dispatch(modifyContainer({
           containerId: _selectedLabwareId,
-          modify: {name}
+          modify: {name},
         }))
 
         dispatch(closeRenameLabwareForm())
@@ -102,7 +102,7 @@ function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: Dispatch<*>}
         // TODO Ian 2018-05-30 use assert
         console.warn('Tried to save labware name with no selected labware')
       }
-    }
+    },
   }
 }
 

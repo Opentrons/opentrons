@@ -5,7 +5,7 @@ import styles from './styles.css'
 export type StepProps = {
   step: 'one' | 'two',
   children: React.Node,
-  diagram: string
+  diagram: string,
 }
 
 export default function InstructionStep (props: StepProps) {

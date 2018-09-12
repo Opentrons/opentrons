@@ -8,7 +8,7 @@ import {selectors} from '../steplist'
 import {
   cancelMoreOptionsModal,
   changeMoreOptionsModalInput,
-  saveMoreOptionsModal
+  saveMoreOptionsModal,
 } from '../steplist/actions'
 
 import type {BaseState, ThunkDispatch} from '../types'
@@ -17,7 +17,7 @@ function mapStateToProps (state: BaseState) {
   const formModalData = selectors.formModalData(state)
   return {
     hideModal: formModalData === null,
-    formData: formModalData
+    formData: formModalData,
   }
 }
 
@@ -31,7 +31,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
       dispatch(changeMoreOptionsModalInput({update: {[accessor]: e.target.value}}))
     },
 
-    onClickAway: () => dispatch(cancelMoreOptionsModal())
+    onClickAway: () => dispatch(cancelMoreOptionsModal()),
   }
 }
 

@@ -14,14 +14,14 @@ import type {BaseState} from '../../types'
 type SP = {
   errors: Array<FormError>,
   warnings: Array<FormWarning>,
-  stepId: ?(StepIdType | string)
+  stepId: ?(StepIdType | string),
 }
 type DP = {
-  dismissWarning: (FormWarning, $PropertyType<SP, 'stepId'>) => mixed
+  dismissWarning: (FormWarning, $PropertyType<SP, 'stepId'>) => mixed,
 }
 type OP = {
   focusedField: ?StepFieldName,
-  dirtyFields: Array<StepFieldName>
+  dirtyFields: Array<StepFieldName>,
 }
 type FormAlertsProps = SP & DP
 
@@ -62,20 +62,20 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const visibleWarnings = getVisibleAlerts({
     focusedField,
     dirtyFields,
-    alerts: dismissSelectors.getFormWarningsForSelectedStep(state)
+    alerts: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
 
   const errors = steplistSelectors.formLevelErrors(state)
   const filteredErrors = getVisibleAlerts({
     focusedField,
     dirtyFields,
-    alerts: errors
+    alerts: errors,
   })
 
   return {
     errors: filteredErrors,
     warnings: visibleWarnings,
-    stepId: steplistSelectors.getSelectedStepId(state)
+    stepId: steplistSelectors.getSelectedStepId(state),
   }
 }
 
@@ -91,7 +91,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
       return
     }
     dispatch(dismissActions.dismissFormWarning({warning, stepId}))
-  }
+  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormAlerts)

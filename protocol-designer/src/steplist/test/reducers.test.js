@@ -6,7 +6,7 @@ const {
   collapsedSteps,
   orderedSteps,
   selectedItem,
-  stepCreationButtonExpanded
+  stepCreationButtonExpanded,
 } = _allReducers
 
 describe('steps reducer', () => {
@@ -14,15 +14,15 @@ describe('steps reducer', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 123, stepType: 'transfer'}
+      payload: {id: 123, stepType: 'transfer'},
     }
 
     expect(steps(state, action)).toEqual({
       '123': {
         id: 123,
         stepType: 'transfer',
-        title: 'transfer' // title gets added
-      }
+        title: 'transfer', // title gets added
+      },
     })
   })
 
@@ -31,25 +31,25 @@ describe('steps reducer', () => {
       '333': {
         id: 333,
         stepType: 'mix',
-        title: 'mix'
-      }
+        title: 'mix',
+      },
     }
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 123, stepType: 'transfer'}
+      payload: {id: 123, stepType: 'transfer'},
     }
 
     expect(steps(state, action)).toEqual({
       '333': {
         id: 333,
         stepType: 'mix',
-        title: 'mix'
+        title: 'mix',
       },
       '123': {
         id: 123,
         stepType: 'transfer',
-        title: 'transfer'
-      }
+        title: 'transfer',
+      },
     })
   })
 })
@@ -59,10 +59,10 @@ describe('collapsedSteps reducer', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 1, stepType: 'transfer'}
+      payload: {id: 1, stepType: 'transfer'},
     }
     expect(collapsedSteps(state, action)).toEqual({
-      '1': false // default is false: not collapsed
+      '1': false, // default is false: not collapsed
     })
   })
 
@@ -71,17 +71,17 @@ describe('collapsedSteps reducer', () => {
       '1': true,
       '2': false,
       '3': true,
-      '4': true
+      '4': true,
     }
     const action = {
       type: 'TOGGLE_STEP_COLLAPSED',
-      payload: 3
+      payload: 3,
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': true,
       '2': false,
       '3': false,
-      '4': true
+      '4': true,
     })
   })
 
@@ -90,17 +90,17 @@ describe('collapsedSteps reducer', () => {
       '1': true,
       '2': false,
       '3': true,
-      '4': true
+      '4': true,
     }
     const action = {
       type: 'TOGGLE_STEP_COLLAPSED',
-      payload: 2
+      payload: 2,
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': true,
       '2': true,
       '3': true,
-      '4': true
+      '4': true,
     })
   })
 })
@@ -110,7 +110,7 @@ describe('orderedSteps reducer', () => {
     const state = []
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 123, stepType: 'transfer'}
+      payload: {id: 123, stepType: 'transfer'},
     }
     expect(orderedSteps(state, action)).toEqual([123])
   })
@@ -119,7 +119,7 @@ describe('orderedSteps reducer', () => {
     const state = [123]
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 22, stepType: 'transfer'}
+      payload: {id: 22, stepType: 'transfer'},
     }
     expect(orderedSteps(state, action)).toEqual([123, 22])
   })
@@ -130,11 +130,11 @@ describe('selectedItem reducer', () => {
     const stepId = 123
     const action = {
       type: 'SELECT_STEP',
-      payload: stepId
+      payload: stepId,
     }
     expect(selectedItem(null, action)).toEqual({
       isStep: true,
-      id: stepId
+      id: stepId,
     })
   })
 
@@ -142,11 +142,11 @@ describe('selectedItem reducer', () => {
     const terminalId = 'test'
     const action = {
       type: 'SELECT_TERMINAL_ITEM',
-      payload: terminalId
+      payload: terminalId,
     }
     expect(selectedItem(null, action)).toEqual({
       isStep: false,
-      id: terminalId
+      id: terminalId,
     })
   })
 })
@@ -155,7 +155,7 @@ describe('stepCreationButtonExpanded reducer', () => {
   test('close (or stay closed) on newly added step', () => {
     const action = {
       type: 'ADD_STEP',
-      payload: {id: 123, stepType: 'transfer'}
+      payload: {id: 123, stepType: 'transfer'},
     }
     expect(stepCreationButtonExpanded(true, action)).toEqual(false)
     expect(stepCreationButtonExpanded(false, action)).toEqual(false)
@@ -164,12 +164,12 @@ describe('stepCreationButtonExpanded reducer', () => {
   test('update with EXPAND_ADD_STEP_BUTTON action payload', () => {
     expect(stepCreationButtonExpanded(false, {
       type: 'EXPAND_ADD_STEP_BUTTON',
-      payload: true
+      payload: true,
     })).toEqual(true)
 
     expect(stepCreationButtonExpanded(true, {
       type: 'EXPAND_ADD_STEP_BUTTON',
-      payload: false
+      payload: false,
     })).toEqual(false)
   })
 })

@@ -4,7 +4,7 @@ import type {Command} from '../../types'
 
 export const replaceTipCommands = (tip: number | string): Array<Command> => [
   dropTip('A1'),
-  pickUpTip(tip)
+  pickUpTip(tip),
 ]
 
 export const dropTip = (
@@ -16,8 +16,8 @@ export const dropTip = (
     pipette: 'p300SingleId',
     labware: 'trashId',
     well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip],
-    ...params
-  }
+    ...params,
+  },
 })
 
 export const pickUpTip = (
@@ -29,8 +29,8 @@ export const pickUpTip = (
     pipette: 'p300SingleId',
     labware: 'tiprack1Id',
     ...params,
-    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip]
-  }
+    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip],
+  },
 })
 
 export const touchTip = (
@@ -42,8 +42,8 @@ export const touchTip = (
     labware: 'sourcePlateId',
     pipette: 'p300SingleId',
     ...params,
-    well
-  }
+    well,
+  },
 })
 
 export const aspirate = (
@@ -51,7 +51,7 @@ export const aspirate = (
   volume: number,
   params?: {|
     pipette?: string,
-    labware?: string
+    labware?: string,
   |}
 ): Command => ({
   command: 'aspirate',
@@ -60,8 +60,8 @@ export const aspirate = (
     labware: 'sourcePlateId',
     ...params,
     volume,
-    well
-  }
+    well,
+  },
 })
 
 export const dispense = (
@@ -69,7 +69,7 @@ export const dispense = (
   volume: number,
   params?: {|
     pipette?: string,
-    labware?: string
+    labware?: string,
   |}
 ): Command => ({
   command: 'dispense',
@@ -78,8 +78,8 @@ export const dispense = (
     labware: 'sourcePlateId',
     ...params,
     volume,
-    well
-  }
+    well,
+  },
 })
 
 export const blowout = (
@@ -91,6 +91,6 @@ export const blowout = (
     pipette: 'p300SingleId',
     well: 'A1',
     labware: labware || 'trashId',
-    ...params
-  }
+    ...params,
+  },
 })

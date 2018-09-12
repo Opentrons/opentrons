@@ -9,7 +9,7 @@ const INVALID_FILE_TYPE: ModalContents = {
   body: <React.Fragment>
     <p>Only JSON files created in the Protocol Designer can be imported.</p>
     <p>At this time Python protocol files are not supported.</p>
-  </React.Fragment>
+  </React.Fragment>,
 }
 
 const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
@@ -23,7 +23,7 @@ const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
       <p>Error message:</p>
       <p className={styles.error_text}>{errorMessage}</p>
     </div>
-  </React.Fragment>
+  </React.Fragment>,
 })
 
 export default function getModalContents (

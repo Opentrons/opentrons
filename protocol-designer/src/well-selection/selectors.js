@@ -42,7 +42,7 @@ function _primaryToAllWells (
 
   return reduce(wells, (acc: Wells, well: string): Wells => ({
     ...acc,
-    ...wellSetToWellObj(computeWellAccess(labwareName, well))
+    ...wellSetToWellObj(computeWellAccess(labwareName, well)),
   }), {})
 }
 
@@ -67,5 +67,5 @@ export default {
   selectedWellNames,
   getSelectedWells,
   getHighlightedWells,
-  wellSelectionModalData
+  wellSelectionModalData,
 }

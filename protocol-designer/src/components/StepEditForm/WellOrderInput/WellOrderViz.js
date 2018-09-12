@@ -12,7 +12,7 @@ import styles from './WellOrderInput.css'
 type Props = {
   prefix: 'aspirate' | 'dispense',
   firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption
+  secondValue: ?WellOrderOption,
 }
 
 const WellOrderViz = (props: Props) => (

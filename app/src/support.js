@@ -59,7 +59,7 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
 
       update = {
         [PIPETTE_MODEL_LEFT]: left.model,
-        [PIPETTE_MODEL_RIGHT]: right.model
+        [PIPETTE_MODEL_RIGHT]: right.model,
       }
     }
   }
@@ -78,7 +78,7 @@ function initializeIntercom (config: SupportConfig) {
       user_id: userId,
       created_at: config.createdAt,
       name: config.name,
-      [APP_VERSION]: version
+      [APP_VERSION]: version,
     })
   }
 }

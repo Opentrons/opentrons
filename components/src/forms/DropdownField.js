@@ -8,7 +8,7 @@ import styles from './forms.css'
 export type DropdownOption = {
   name: string,
   value: string,
-  disabled?: boolean
+  disabled?: boolean,
 }
 
 // TODO(mc, 2018-02-22): disabled prop

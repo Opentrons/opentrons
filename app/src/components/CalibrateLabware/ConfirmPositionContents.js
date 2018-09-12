@@ -53,6 +53,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     jog: (axis, direction, step) => {
       dispatch(robotActions.jog(mount, axis, direction, step))
     },
-    onConfirmClick: () => dispatch(onConfirmAction)
+    onConfirmClick: () => dispatch(onConfirmAction),
   }
 }

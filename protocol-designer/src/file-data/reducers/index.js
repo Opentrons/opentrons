@@ -4,7 +4,7 @@ import {handleActions, type ActionType} from 'redux-actions'
 
 import {
   saveFileMetadata,
-  updateFileMetadataFields
+  updateFileMetadataFields,
 } from '../actions'
 import type {FileMetadataFields} from '../types'
 import type {LoadFileAction, NewProtocolFields} from '../../load-file'
@@ -12,7 +12,7 @@ import type {LoadFileAction, NewProtocolFields} from '../../load-file'
 const defaultFields = {
   name: '',
   author: '',
-  description: ''
+  description: '',
 }
 
 const updateMetadataFields = (
@@ -23,7 +23,7 @@ const updateMetadataFields = (
   return {
     author: metadata.author,
     description: metadata.description,
-    name: metadata['protocol-name']
+    name: metadata['protocol-name'],
   }
 }
 
@@ -33,7 +33,7 @@ function newProtocolMetadata (
 ): FileMetadataFields {
   return {
     ...defaultFields,
-    name: action.payload.name || ''
+    name: action.payload.name || '',
   }
 }
 
@@ -42,12 +42,12 @@ const unsavedMetadataForm = handleActions({
   CREATE_NEW_PROTOCOL: newProtocolMetadata,
   UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>): FileMetadataFields => ({
     ...state,
-    ...action.payload
+    ...action.payload,
   }),
   SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
-    ...action.payload
-  })
+    ...action.payload,
+  }),
 }, defaultFields)
 
 const fileMetadata = handleActions({
@@ -55,18 +55,18 @@ const fileMetadata = handleActions({
   CREATE_NEW_PROTOCOL: newProtocolMetadata,
   SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
-    ...action.payload
-  })
+    ...action.payload,
+  }),
 }, defaultFields)
 
 export type RootState = {
   unsavedMetadataForm: FileMetadataFields,
-  fileMetadata: FileMetadataFields
+  fileMetadata: FileMetadataFields,
 }
 
 const _allReducers = {
   unsavedMetadataForm,
-  fileMetadata
+  fileMetadata,
 }
 
 export const rootReducer = combineReducers(_allReducers)

@@ -15,7 +15,7 @@ type Props = {
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesResponse,
-  changePipetteUrl: string
+  changePipetteUrl: string,
 }
 
 const {PIPETTE_MOUNTS} = robotConstants
@@ -39,7 +39,7 @@ export default function Pipettes (props: Props) {
       : {
         description: pipetteConfig.displayName,
         tipType: `${pipetteConfig.nominalMaxVolumeUl} ul`,
-        channels: pipetteConfig.channels
+        channels: pipetteConfig.channels,
       }
 
     const actualModel = actualPipettes && actualPipettes[mount].model
@@ -82,8 +82,8 @@ export default function Pipettes (props: Props) {
         children,
         className: cx(styles.instrument, styles[mount]),
         infoClassName: styles.instrument_info,
-        ...details
-      }
+        ...details,
+      },
     }
   }, {})
 

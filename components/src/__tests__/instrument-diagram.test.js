@@ -30,7 +30,7 @@ describe('InstrumentGroup', () => {
           description: 'p300 8-Channel',
           tipType: '150',
           channels: 8,
-          className: 'foo'
+          className: 'foo',
         }}
         right={{
           mount: 'right',
@@ -38,7 +38,7 @@ describe('InstrumentGroup', () => {
           tipType: '10',
           channels: 1,
           isDisabled: true,
-          className: 'blah'
+          className: 'blah',
         }}
       />
     ).toJSON()

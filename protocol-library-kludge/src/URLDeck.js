@@ -1,31 +1,92 @@
 // @flow
 import React from 'react'
+import startCase from 'lodash/startCase'
+import styles from './URLDeck.css'
 import {
+  ContainerNameOverlay,
   Deck,
   Labware,
-  type LabwareComponentProps
+  Module,
+} from '@opentrons/components'
+import type {
+  DeckSlot,
+  LabwareComponentProps,
+  ModuleType,
 } from '@opentrons/components'
 
-// Expects slot: labwareType URL params, eg `?11=96-flat&10=tiprack-200ul`
+// URI-encoded JSON expected as URL param "data" (eg `?data=...`)
+type UrlData = {
+  labware: {
+    [DeckSlot]: {
+      labwareType: string,
+      name: ?string,
+    },
+  },
+  modules: {
+    [DeckSlot]: ModuleType,
+  },
+}
+
+function getDataFromUrl (): ?UrlData {
+  try {
+    const urlData = JSON.parse(new URLSearchParams(window.location.search).get('data'))
+    return urlData
+  } catch (e) {
+    console.error('Failed to parse "data" URL param.', e)
+    return null
+  }
+}
+
 export default class URLDeck extends React.Component<{}> {
-  urlParams: ?URLSearchParams
+  urlData: ?UrlData
 
   constructor () {
     super()
-    this.urlParams = new URLSearchParams(window.location.search)
+    this.urlData = getDataFromUrl()
   }
 
-  getLabware = (args: LabwareComponentProps) => {
+  getLabwareComponent = (args: LabwareComponentProps) => {
     const {slot} = args
-    const labwareType = this.urlParams && this.urlParams.get(slot)
-    return (labwareType)
-      ? <Labware labwareType={labwareType} />
-      : null
+    const {urlData} = this
+    if (!urlData) return null
+
+    const labwareData = urlData.labware && urlData.labware[slot]
+    const moduleData = urlData.modules && urlData.modules[slot]
+    let labware = null
+    let module = null
+
+    if (labwareData) {
+      const {name, labwareType} = labwareData
+      const displayLabwareType = startCase(labwareType)
+      labware = (
+        <React.Fragment>
+          <Labware labwareType={labwareType} />
+          <ContainerNameOverlay
+            title={name || displayLabwareType}
+            subtitle={name ? displayLabwareType : null}
+          />
+        </React.Fragment>
+      )
+    }
+
+    if (moduleData) {
+      module = <Module mode='default' name='tempdeck' />
+    }
+
+    return (
+      <React.Fragment>
+        {module}
+        {labware}
+      </React.Fragment>
+    )
   }
 
   render () {
     return (
-      <Deck LabwareComponent={this.getLabware} />
+      <Deck
+        className={styles.url_deck}
+        LabwareComponent={this.getLabwareComponent}
+      />
     )
   }
 }

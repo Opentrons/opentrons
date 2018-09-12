@@ -8,7 +8,7 @@ import type {Robot} from '../../robot'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions
+  actions as robotActions,
 } from '../../robot'
 
 import {makeGetHealthCheckOk} from '../../health-check'
@@ -19,11 +19,11 @@ import ModalCopy from './ModalCopy'
 
 type StateProps = {
   robot: ?Robot,
-  ok: ?boolean
+  ok: ?boolean,
 }
 
 type DispatchProps = {
-  disconnect: () => mixed
+  disconnect: () => mixed,
 }
 
 type Props = StateProps & DispatchProps
@@ -42,7 +42,7 @@ function LostConnectionAlert (props: Props) {
         onCloseClick={disconnect}
         heading={'Connection to robot lost'}
         buttons={[
-          {onClick: disconnect, children: 'close'}
+          {onClick: disconnect, children: 'close'},
         ]}
         alertOverlay
       >
@@ -60,7 +60,7 @@ function makeMapStateToProps () {
     const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
     return {
-      ok: robot && !unexpectedDisconnect && getHealthOk(state, robot)
+      ok: robot && !unexpectedDisconnect && getHealthOk(state, robot),
     }
   }
 }
@@ -70,6 +70,6 @@ function mapDispatchToProps (dispatch: Dispatch) {
     disconnect: () => {
       dispatch(push('/robots'))
       dispatch(robotActions.disconnect())
-    }
+    },
   }
 }

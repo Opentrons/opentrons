@@ -10,7 +10,7 @@ import {
   ContainerNameOverlay,
   LabwareContainer,
   Labware as LabwareComponent,
-  humanizeLabwareType
+  humanizeLabwareType,
 } from '@opentrons/components'
 
 import LabwareSpinner from './LabwareSpinner'
@@ -23,7 +23,7 @@ export type LabwareItemProps = LabwareComponentProps & {
     disabled?: boolean,
     showSpinner?: boolean,
     onClick?: () => void,
-    url?: string
+    url?: string,
   },
   module: ?SessionModule,
 }
@@ -38,7 +38,7 @@ export default function LabwareItem (props: LabwareItemProps) {
     disabled,
     showSpinner,
     onClick,
-    url
+    url,
   } = labware
 
   const labwareClass = cx({[styles.disabled]: disabled})

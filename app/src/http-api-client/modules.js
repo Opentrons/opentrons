@@ -43,13 +43,13 @@ export type MagDeckModule = {|
 
 export type Module = MagDeckModule | TempDeckModule
 
-type FetchModulesResponse = {
+export type FetchModulesResponse = {
   modules: Array<Module>,
 }
 
 export type FetchModuleDataResponse = {
   status: string,
-  data: TempDeckData | MagDeckData
+  data: TempDeckData | MagDeckData,
 }
 
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
@@ -60,7 +60,7 @@ export type ModulesAction =
   | ApiAction<'modules', null, FetchModulesResponse>
 
 export type ModulesState = {
-  modules?: FetchModulesCall
+  modules?: FetchModulesCall,
 }
 
 const MODULES: 'modules' = 'modules'

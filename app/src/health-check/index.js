@@ -22,14 +22,14 @@ export type StartHealthCheckAction = {|
   type: 'api:START_HEALTH_CHECK',
   payload: {|
     robot: RobotService,
-  |}
+  |},
 |}
 
 export type StopHealthCheckAction = {|
   type: 'api:STOP_HEALTH_CHECK',
   payload: {|
     robot: BaseRobot,
-  |}
+  |},
 |}
 
 export type SetHealthCheckIdAction = {|
@@ -50,8 +50,8 @@ export type ClearHealthCheckIdAction = {|
 export type ResetHealthCheckAction = {|
   type: 'api:RESET_HEALTH_CHECK',
   payload: {|
-    robot: BaseRobot
-  |}
+    robot: BaseRobot,
+  |},
 |}
 
 type RobotHealthCheck = {
@@ -60,7 +60,7 @@ type RobotHealthCheck = {
 }
 
 type HealthCheckState = {
-  [robotName: string]: ?RobotHealthCheck
+  [robotName: string]: ?RobotHealthCheck,
 }
 
 export type HealthCheckAction =
@@ -73,14 +73,14 @@ export type HealthCheckAction =
 export function startHealthCheck (robot: RobotService): StartHealthCheckAction {
   return {
     type: 'api:START_HEALTH_CHECK',
-    payload: {robot}
+    payload: {robot},
   }
 }
 
 export function stopHealthCheck (robot: BaseRobot): StopHealthCheckAction {
   return {
     type: 'api:STOP_HEALTH_CHECK',
-    payload: {robot}
+    payload: {robot},
   }
 }
 

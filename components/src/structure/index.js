@@ -19,5 +19,5 @@ export {
   RefreshCard,
   Splash,
   LabeledValue,
-  Pill
+  Pill,
 }

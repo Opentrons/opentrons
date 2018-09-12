@@ -7,7 +7,7 @@ import type {
   RobotState,
   PipetteData,
   SingleLabwareLiquidState,
-  CommandCreatorWarning
+  CommandCreatorWarning,
 } from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
@@ -21,7 +21,7 @@ export default function updateLiquidState (
     volume: number,
     labwareId: string,
     labwareType: string,
-    well: string
+    well: string,
   },
   prevLiquidState: LiquidState
 ): LiquidStateAndWarnings {
@@ -32,7 +32,7 @@ export default function updateLiquidState (
   // to update liquid state in all pipette tips
   type PipetteLiquidStateAcc = {
     pipetteLiquidState: SingleLabwareLiquidState,
-    pipetteWarnings: Array<CommandCreatorWarning>
+    pipetteWarnings: Array<CommandCreatorWarning>,
   }
   const {pipetteLiquidState, pipetteWarnings} = range(pipetteData.channels).reduce(
     (acc: PipetteLiquidStateAcc, tipIndex) => {
@@ -57,9 +57,9 @@ export default function updateLiquidState (
           [tipIndex]: mergeLiquid(
             prevTipLiquidState,
             newLiquidFromWell
-          )
+          ),
         },
-        pipetteWarnings: [...acc.pipetteWarnings, ...nextWarnings]
+        pipetteWarnings: [...acc.pipetteWarnings, ...nextWarnings],
       }
     }, {pipetteLiquidState: {}, pipetteWarnings: []})
 
@@ -73,23 +73,23 @@ export default function updateLiquidState (
         // When multiple tips aspirate from 1 well,
         // that volume is sequentially removed, tip by tip
         acc[well] || prevLiquidState.labware[labwareId][well]
-      ).source
-    }), {})
+      ).source,
+    }), {}),
   }
 
   const nextLiquidState = {
     pipettes: {
       ...prevLiquidState.pipettes,
-      [pipetteId]: pipetteLiquidState
+      [pipetteId]: pipetteLiquidState,
     },
     labware: {
       ...prevLiquidState.labware,
-      [labwareId]: labwareLiquidState
-    }
+      [labwareId]: labwareLiquidState,
+    },
   }
 
   return {
     liquidState: nextLiquidState,
-    warnings: pipetteWarnings
+    warnings: pipetteWarnings,
   }
 }

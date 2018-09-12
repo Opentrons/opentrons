@@ -6,8 +6,8 @@ export type DismissAction<ActionType, WarningType> = {
   type: ActionType,
   payload: {
     warning: WarningType,
-    stepId: ?number
-  }
+    stepId: ?number,
+  },
 }
 
 export type DismissFormWarning = DismissAction<'DISMISS_FORM_WARNING', FormWarning>
@@ -17,12 +17,12 @@ export const dismissFormWarning = (
   payload: $PropertyType<DismissFormWarning, 'payload'>
 ): DismissFormWarning => ({
   type: 'DISMISS_FORM_WARNING',
-  payload
+  payload,
 })
 
 export const dismissTimelineWarning = (
   payload: $PropertyType<DismissTimelineWarning, 'payload'>
 ): DismissTimelineWarning => ({
   type: 'DISMISS_TIMELINE_WARNING',
-  payload
+  payload,
 })

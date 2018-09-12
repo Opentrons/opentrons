@@ -4,7 +4,7 @@ import * as React from 'react'
 import styles from './styles.css'
 
 type Props = {
-  name: string
+  name: string,
 }
 
 export default function ModuleImage (props: Props) {
@@ -22,5 +22,5 @@ function getModuleImg (name: string) {
 
 const MODULE_IMGS = {
   tempdeck: require('./images/module-temp@3x.png'),
-  magdeck: require('./images/module-mag@3x.png')
+  magdeck: require('./images/module-mag@3x.png'),
 }

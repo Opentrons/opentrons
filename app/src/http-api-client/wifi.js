@@ -19,7 +19,7 @@ type Status = 'none' | 'portal' | 'limited' | 'full' | 'unknown' | 'testing'
 type NetworkList = Array<{
   ssid: Ssid,
   signal: ?number,
-  active: boolean
+  active: boolean,
 }>
 
 export type WifiListResponse = {
@@ -52,7 +52,7 @@ export type WifiRequestAction = {|
   payload: {|
     robot: RobotService,
     path: RequestPath,
-  |}
+  |},
 |}
 
 export type WifiSuccessAction = {|
@@ -61,7 +61,7 @@ export type WifiSuccessAction = {|
     robot: RobotService,
     path: RequestPath,
     response: WifiResponse,
-  |}
+  |},
 |}
 
 export type WifiFailureAction = {|
@@ -70,14 +70,14 @@ export type WifiFailureAction = {|
     robot: RobotService,
     path: RequestPath,
     error: ApiRequestError,
-  |}
+  |},
 |}
 
 export type ClearConfigureWifiResponseAction = {|
   type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
   payload: {|
-    robot: RobotService
-  |}
+    robot: RobotService,
+  |},
 |}
 
 export type WifiAction =
@@ -98,7 +98,7 @@ type RobotWifiState = {
 }
 
 type WifiState = {
-  [robotName: string]: ?RobotWifiState
+  [robotName: string]: ?RobotWifiState,
 }
 
 const LIST: RequestPath = 'list'
@@ -188,8 +188,8 @@ export const makeGetRobotWifiList = () => createSelector(
       ...listState,
       response: {
         ...listState.response,
-        list: dedupeNetworkList(listState.response.list)
-      }
+        list: dedupeNetworkList(listState.response.list),
+      },
     }
   }
 )
@@ -237,7 +237,7 @@ function wifiSuccess (
 ): WifiSuccessAction {
   return {
     type: 'api:WIFI_SUCCESS',
-    payload: {robot, path, response}
+    payload: {robot, path, response},
   }
 }
 
@@ -261,8 +261,8 @@ function reduceWifiRequest (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {...stateByNameByPath, error: null, inProgress: true}
-    }
+      [path]: {...stateByNameByPath, error: null, inProgress: true},
+    },
   }
 }
 
@@ -284,8 +284,8 @@ function reduceWifiSuccess (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {response, request, error: null, inProgress: false}
-    }
+      [path]: {response, request, error: null, inProgress: false},
+    },
   }
 }
 
@@ -301,8 +301,8 @@ function reduceWifiFailure (
     ...state,
     [name]: {
       ...stateByName,
-      [path]: {...stateByNameByPath, error, inProgress: false}
-    }
+      [path]: {...stateByNameByPath, error, inProgress: false},
+    },
   }
 }
 
@@ -318,7 +318,7 @@ function reduceClearConfigureWifiAction (
     ...state,
     [name]: {
       ...stateByName,
-      configure: {...configureState, response: null, error: null}
-    }
+      configure: {...configureState, response: null, error: null},
+    },
   }
 }

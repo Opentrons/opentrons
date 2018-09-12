@@ -10,5 +10,5 @@ import calibrationReducer from './calibration'
 export default combineReducers({
   connection: connectionReducer,
   session: sessionReducer,
-  calibration: calibrationReducer
+  calibration: calibrationReducer,
 })

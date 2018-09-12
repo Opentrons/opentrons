@@ -10,7 +10,7 @@ import {
   SLOT_HEIGHT_MM,
   SLOT_SPACING_MM,
   SLOT_OFFSET_MM,
-  TRASH_SLOTNAME
+  TRASH_SLOTNAME,
 } from './constants'
 import DeckOutline from './DeckOutline'
 import {EmptyDeckSlot} from './EmptyDeckSlot'
@@ -20,12 +20,12 @@ import styles from './Deck.css'
 export type LabwareComponentProps = {
   slot: DeckSlot,
   width: number,
-  height: number
+  height: number,
 }
 
 type Props = {
   className?: string,
-  LabwareComponent?: React.ComponentType<LabwareComponentProps>
+  LabwareComponent?: React.ComponentType<LabwareComponentProps>,
 }
 
 export default function Deck (props: Props) {
@@ -53,7 +53,7 @@ function renderLabware (LabwareComponent): React.Node[] {
         const props = {slot, width: SLOT_WIDTH_MM, height: SLOT_HEIGHT_MM}
         const transform = `translate(${[
           SLOT_WIDTH_MM * col + SLOT_SPACING_MM * (col + 1),
-          SLOT_HEIGHT_MM * row + SLOT_SPACING_MM * (row + 1)
+          SLOT_HEIGHT_MM * row + SLOT_SPACING_MM * (row + 1),
         ].join(',')})`
 
         return (

@@ -12,11 +12,11 @@ import type {BaseState} from '../types'
 type Selector = (BaseState) => mixed
 
 type Props = {
-  selectors: {[string]: Selector}
+  selectors: {[string]: Selector},
 }
 
 type State = {
-  collapsed: boolean
+  collapsed: boolean,
 }
 
 class SelectorDebugger extends React.Component<Props, State> {
@@ -32,7 +32,7 @@ class SelectorDebugger extends React.Component<Props, State> {
   render () {
     const collapsedDims = {
       width: '20px',
-      height: '20px'
+      height: '20px',
     }
     const baseStyle = {
       position: 'absolute',
@@ -42,7 +42,7 @@ class SelectorDebugger extends React.Component<Props, State> {
       zIndex: '999999990',
       backgroundColor: '#3f3f3f',
       color: '#d9d9d9',
-      fontSize: '1.25rem'
+      fontSize: '1.25rem',
     }
 
     return (
@@ -71,8 +71,8 @@ function mapStateToProps (state: BaseState): Props {
     selectors: {
       fileData: callSelectors(fileDataSelectors, state),
       steplist: callSelectors(steplist, state),
-      labwareIngred: callSelectors(labwareIngred, state)
-    }
+      labwareIngred: callSelectors(labwareIngred, state),
+    },
   }
 }
 

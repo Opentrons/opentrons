@@ -10,7 +10,7 @@ import type {
   ApiRequestAction,
   ApiSuccessAction,
   ApiFailureAction,
-  ClearApiResponseAction
+  ClearApiResponseAction,
 } from './actions'
 
 import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
@@ -58,11 +58,11 @@ type RobotHomeResponse = {
 }
 
 type RobotLightsRequest = ?{
-  on: boolean
+  on: boolean,
 }
 
 type RobotLightsResponse = {
-  on: boolean
+  on: boolean,
 }
 
 type RobotPath =
@@ -224,8 +224,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {request, inProgress: true, response: null, error: null}
-        }
+          [path]: {request, inProgress: true, response: null, error: null},
+        },
       }
     }
 
@@ -240,8 +240,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response, inProgress: false, error: null},
+        },
       }
     }
 
@@ -256,8 +256,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
+          [path]: {...stateByPath, error, inProgress: false},
+        },
       }
     }
 
@@ -272,8 +272,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response: null, error: null}
-        }
+          [path]: {...stateByPath, response: null, error: null},
+        },
       }
     }
   }

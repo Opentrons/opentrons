@@ -11,7 +11,7 @@ import {
   reducer,
   makeGetRobotWifiStatus,
   makeGetRobotWifiList,
-  makeGetRobotWifiConfigure
+  makeGetRobotWifiConfigure,
 } from '..'
 
 jest.mock('../client')
@@ -31,10 +31,10 @@ describe('wifi', () => {
           opentrons: {
             status: {inProgress: false},
             list: {inProgress: false},
-            configure: {inProgress: false}
-          }
-        }
-      }
+            configure: {inProgress: false},
+          },
+        },
+      },
     }
 
     test('makeGetRobotWifiStatus', () => {
@@ -46,7 +46,7 @@ describe('wifi', () => {
       expect(getStatus(state, {name: 'foo'})).toEqual({
         inProgress: false,
         error: null,
-        response: null
+        response: null,
       })
     })
 
@@ -57,7 +57,7 @@ describe('wifi', () => {
       expect(getList(state, {name: 'foo'})).toEqual({
         inProgress: false,
         error: null,
-        response: null
+        response: null,
       })
     })
 
@@ -73,18 +73,18 @@ describe('wifi', () => {
                   list: [
                     {ssid: 'foo'},
                     {ssid: 'foo', active: true},
-                    {ssid: 'bar'}
-                  ]
-                }
-              }
-            }
-          }
-        }
+                    {ssid: 'bar'},
+                  ],
+                },
+              },
+            },
+          },
+        },
       }
 
       expect(getList(state, robot).response.list).toEqual([
         {ssid: 'foo', active: true},
-        {ssid: 'bar'}
+        {ssid: 'bar'},
       ])
     })
 
@@ -97,7 +97,7 @@ describe('wifi', () => {
         inProgress: false,
         error: null,
         request: null,
-        response: null
+        response: null,
       })
     })
   })
@@ -106,7 +106,7 @@ describe('wifi', () => {
     const list = [
       {ssid: 'ssid-1', signal: 42, active: true},
       {ssid: 'ssid-2', signa: 43, active: false},
-      {ssid: 'ssid-3', signal: null, active: false}
+      {ssid: 'ssid-3', signal: null, active: false},
     ]
 
     test('calls GET /wifi/list', () => {
@@ -123,7 +123,7 @@ describe('wifi', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'list'}},
-        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'list'}}
+        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'list'}},
       ]
 
       client.__setMockResponse(response)
@@ -137,7 +137,7 @@ describe('wifi', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'list'}},
-        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'list'}}
+        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'list'}},
       ]
 
       client.__setMockError(error)
@@ -164,7 +164,7 @@ describe('wifi', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'status'}},
-        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'status'}}
+        {type: 'api:WIFI_SUCCESS', payload: {robot, response, path: 'status'}},
       ]
 
       client.__setMockResponse(response)
@@ -178,7 +178,7 @@ describe('wifi', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'status'}},
-        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'status'}}
+        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'status'}},
       ]
 
       client.__setMockError(error)
@@ -191,7 +191,7 @@ describe('wifi', () => {
   test('clearConfigureWifiResponse action creator', () => {
     const expected = {
       type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
-      payload: {robot}
+      payload: {robot},
     }
 
     expect(clearConfigureWifiResponse(robot)).toEqual(expected)
@@ -222,8 +222,8 @@ describe('wifi', () => {
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
         {
           type: 'api:WIFI_SUCCESS',
-          payload: {robot, response, path: 'configure'}
-        }
+          payload: {robot, response, path: 'configure'},
+        },
       ]
 
       client.__setMockResponse(response)
@@ -237,7 +237,7 @@ describe('wifi', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'api:WIFI_REQUEST', payload: {robot, path: 'configure'}},
-        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'configure'}}
+        {type: 'api:WIFI_FAILURE', payload: {robot, error, path: 'configure'}},
       ]
 
       client.__setMockError(error)
@@ -258,10 +258,10 @@ describe('wifi', () => {
               request: null,
               inProgress: false,
               error: new Error('AH'),
-              response: {list: ['ssid-1']}
-            }
-          }
-        }
+              response: {list: ['ssid-1']},
+            },
+          },
+        },
       }
       const action = {type: 'api:WIFI_REQUEST', payload: {path, robot}}
 
@@ -271,9 +271,9 @@ describe('wifi', () => {
             request: null,
             inProgress: true,
             error: null,
-            response: {list: ['ssid-1']}
-          }
-        }
+            response: {list: ['ssid-1']},
+          },
+        },
       })
     })
 
@@ -285,14 +285,14 @@ describe('wifi', () => {
               request: null,
               inProgress: true,
               error: null,
-              response: {list: ['ssid-1']}
-            }
-          }
-        }
+              response: {list: ['ssid-1']},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_SUCCESS',
-        payload: {robot, path, response: {list: ['ssid-1', 'ssid-2']}}
+        payload: {robot, path, response: {list: ['ssid-1', 'ssid-2']}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -301,9 +301,9 @@ describe('wifi', () => {
             request: null,
             inProgress: false,
             error: null,
-            response: {list: ['ssid-1', 'ssid-2']}
-          }
-        }
+            response: {list: ['ssid-1', 'ssid-2']},
+          },
+        },
       })
     })
 
@@ -315,14 +315,14 @@ describe('wifi', () => {
               request: null,
               inProgress: true,
               error: null,
-              response: {list: ['ssid-1']}
-            }
-          }
-        }
+              response: {list: ['ssid-1']},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_FAILURE',
-        payload: {robot, path, error: {name: 'ResponseError'}}
+        payload: {robot, path, error: {name: 'ResponseError'}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -331,9 +331,9 @@ describe('wifi', () => {
             request: null,
             inProgress: false,
             error: {name: 'ResponseError'},
-            response: {list: ['ssid-1']}
-          }
-        }
+            response: {list: ['ssid-1']},
+          },
+        },
       })
     })
   })
@@ -349,10 +349,10 @@ describe('wifi', () => {
               request: null,
               inProgress: false,
               error: new Error('AH'),
-              response: {status: 'limited'}
-            }
-          }
-        }
+              response: {status: 'limited'},
+            },
+          },
+        },
       }
       const action = {type: 'api:WIFI_REQUEST', payload: {robot, path}}
 
@@ -362,9 +362,9 @@ describe('wifi', () => {
             request: null,
             inProgress: true,
             error: null,
-            response: {status: 'limited'}
-          }
-        }
+            response: {status: 'limited'},
+          },
+        },
       })
     })
 
@@ -376,14 +376,14 @@ describe('wifi', () => {
               request: null,
               inProgress: true,
               error: null,
-              response: {status: 'limited'}
-            }
-          }
-        }
+              response: {status: 'limited'},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_SUCCESS',
-        payload: {robot, path, response: {status: 'full'}}
+        payload: {robot, path, response: {status: 'full'}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -392,9 +392,9 @@ describe('wifi', () => {
             request: null,
             inProgress: false,
             error: null,
-            response: {status: 'full'}
-          }
-        }
+            response: {status: 'full'},
+          },
+        },
       })
     })
 
@@ -406,14 +406,14 @@ describe('wifi', () => {
               request: null,
               inProgress: true,
               error: null,
-              response: {status: 'limited'}
-            }
-          }
-        }
+              response: {status: 'limited'},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_FAILURE',
-        payload: {robot, path, error: {name: 'ResponseError'}}
+        payload: {robot, path, error: {name: 'ResponseError'}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -422,9 +422,9 @@ describe('wifi', () => {
             request: null,
             inProgress: false,
             error: {name: 'ResponseError'},
-            response: {status: 'limited'}
-          }
-        }
+            response: {status: 'limited'},
+          },
+        },
       })
     })
   })
@@ -440,15 +440,15 @@ describe('wifi', () => {
               request: {ssid: 'baz', psk: ''},
               inProgress: false,
               error: new Error('AH'),
-              response: {ssid: 'foo', message: 'bar'}
-            }
-          }
-        }
+              response: {ssid: 'foo', message: 'bar'},
+            },
+          },
+        },
       }
 
       const action = {
         type: 'api:CLEAR_CONFIGURE_WIFI_RESPONSE',
-        payload: {robot}
+        payload: {robot},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -457,9 +457,9 @@ describe('wifi', () => {
             request: {ssid: 'baz', psk: ''},
             inProgress: false,
             error: null,
-            response: null
-          }
-        }
+            response: null,
+          },
+        },
       })
     })
 
@@ -471,10 +471,10 @@ describe('wifi', () => {
               request: {ssid: 'baz', psk: 'qux'},
               inProgress: false,
               error: new Error('AH'),
-              response: {ssid: 'foo', message: 'bar'}
-            }
-          }
-        }
+              response: {ssid: 'foo', message: 'bar'},
+            },
+          },
+        },
       }
       const action = {type: 'api:WIFI_REQUEST', payload: {robot, path}}
 
@@ -484,9 +484,9 @@ describe('wifi', () => {
             request: {ssid: 'baz', psk: 'qux'},
             inProgress: true,
             error: null,
-            response: {ssid: 'foo', message: 'bar'}
-          }
-        }
+            response: {ssid: 'foo', message: 'bar'},
+          },
+        },
       })
     })
 
@@ -498,14 +498,14 @@ describe('wifi', () => {
               request: {ssid: 'baz', psk: 'qux'},
               inProgress: true,
               error: null,
-              response: {ssid: 'foo', message: 'bar'}
-            }
-          }
-        }
+              response: {ssid: 'foo', message: 'bar'},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_SUCCESS',
-        payload: {robot, path, response: {ssid: 'baz', message: 'qux'}}
+        payload: {robot, path, response: {ssid: 'baz', message: 'qux'}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -514,9 +514,9 @@ describe('wifi', () => {
             request: {ssid: 'baz', psk: ''},
             inProgress: false,
             error: null,
-            response: {ssid: 'baz', message: 'qux'}
-          }
-        }
+            response: {ssid: 'baz', message: 'qux'},
+          },
+        },
       })
     })
 
@@ -528,14 +528,14 @@ describe('wifi', () => {
               request: {ssid: 'baz', psk: 'qux'},
               inProgress: true,
               error: null,
-              response: {ssid: 'foo', message: 'bar'}
-            }
-          }
-        }
+              response: {ssid: 'foo', message: 'bar'},
+            },
+          },
+        },
       }
       const action = {
         type: 'api:WIFI_FAILURE',
-        payload: {robot, path, error: {name: 'ResponseError'}}
+        payload: {robot, path, error: {name: 'ResponseError'}},
       }
 
       expect(reducer(state, action).wifi).toEqual({
@@ -544,9 +544,9 @@ describe('wifi', () => {
             request: {ssid: 'baz', psk: 'qux'},
             inProgress: false,
             error: {name: 'ResponseError'},
-            response: {ssid: 'foo', message: 'bar'}
-          }
-        }
+            response: {ssid: 'foo', message: 'bar'},
+          },
+        },
       })
     })
   })

@@ -12,7 +12,7 @@ import {CardContentFlex, CardContentFull} from '../layout'
 type OP = Robot
 
 type DP = {
-  start: () => mixed
+  start: () => mixed,
 }
 
 type Props = OP & DP
@@ -53,6 +53,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
 
   return {
     start: () => dispatch(startDeckCalibration(ownProps))
-      .then(() => dispatch(push(deckCalUrl)))
+      .then(() => dispatch(push(deckCalUrl))),
   }
 }

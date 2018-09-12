@@ -7,7 +7,7 @@ type Props = {
   selectLabware: (containerType: string) => mixed,
   containerType: string,
   displayName: string,
-  labwareImgUrl?: ?string
+  labwareImgUrl?: ?string,
 }
 
 export default function LabwareItem (props: Props) {

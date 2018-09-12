@@ -7,9 +7,9 @@ type Props = {
   captions: {[warningOrErrorType: string]: string},
   alerts: Array<CommandCreatorError | {
     ...CommandCreatorWarning,
-    dismissId?: string // presence of dismissId allows alert to be dismissed
+    dismissId?: string, // presence of dismissId allows alert to be dismissed
   }>,
-  onDismiss: (id: string) => () => mixed
+  onDismiss: (id: string) => () => mixed,
 }
 // TODO: BC 2018-07-09 refactor this to class component using FormAlerts as a model
 

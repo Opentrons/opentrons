@@ -19,7 +19,7 @@ import {
   disengagePipetteMotors,
   makeGetRobotMove,
   makeGetRobotHome,
-  makeGetRobotPipettes
+  makeGetRobotPipettes,
 } from '../../http-api-client'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
@@ -111,7 +111,7 @@ function ChangePipetteRouter (props: ChangePipetteProps) {
     cancelText: 'cancel',
     continueText: 'move pipette to front',
     parentUrl: props.parentUrl,
-    onContinueClick: props.moveToFront
+    onContinueClick: props.moveToFront,
   }
   if (!moveRequest.inProgress && !moveRequest.response) {
     return (
@@ -180,7 +180,7 @@ function makeMapStateToProps () {
       attachedWrong,
       displayName,
       moveRequest: getRobotMove(state, ownProps.robot),
-      homeRequest: getRobotHome(state, ownProps.robot)
+      homeRequest: getRobotHome(state, ownProps.robot),
     }
   }
 }
@@ -199,8 +199,8 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     onPipetteSelect: (evt) => dispatch(push(`${baseUrl}/${evt.target.value}`)),
     moveToFront: () => dispatch(moveRobotTo(robot, {
       mount,
-      position: 'change_pipette'
+      position: 'change_pipette',
     })).then(disengage),
-    confirmPipette: () => checkPipette().then(() => dispatch(push(confirmUrl)))
+    confirmPipette: () => checkPipette().then(() => dispatch(push(confirmUrl))),
   }
 }

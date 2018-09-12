@@ -22,7 +22,7 @@ describe('app-shell/discovery', () => {
       stop: jest.fn().mockReturnThis(),
       add: jest.fn().mockReturnThis(),
       remove: jest.fn().mockReturnThis(),
-      setPollInterval: jest.fn().mockReturnThis()
+      setPollInterval: jest.fn().mockReturnThis(),
     })
 
     getConfig.mockReturnValue({enabled: true, candidates: []})
@@ -49,7 +49,7 @@ describe('app-shell/discovery', () => {
         pollInterval: expect.any(Number),
         // support for legacy IPv6 wired robots
         candidates: ['[fd00:0:cafe:fefe::1]'],
-        services: []
+        services: [],
       })
     )
   })
@@ -84,22 +84,22 @@ describe('app-shell/discovery', () => {
 
   test('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
     mockClient.services = [
-      {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true}
+      {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
     ]
 
     const expected = [
       {
         name: 'opentrons-dev',
         connections: [
-          {ip: '192.168.1.42', port: 31950, ok: true, local: false}
-        ]
-      }
+          {ip: '192.168.1.42', port: 31950, ok: true, local: false},
+        ],
+      },
     ]
 
     registerDiscovery(dispatch)({type: 'discovery:START'})
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
-      payload: {robots: expected}
+      payload: {robots: expected},
     })
   })
 
@@ -110,54 +110,54 @@ describe('app-shell/discovery', () => {
       {
         name: 'dispatches discovery:UPDATE_LIST on "service" event',
         services: [
-          {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true}
-        ],
-        expected: [
-          {
-            name: 'opentrons-dev',
-            connections: [
-              {ip: '192.168.1.42', port: 31950, ok: true, local: false}
-            ]
-          }
-        ]
-      },
-      {
-        name: 'handles multiple services',
-        services: [
-          {name: 'opentrons-1', ip: '192.168.1.42', port: 31950, ok: false},
-          {name: 'opentrons-2', ip: '169.254.9.8', port: 31950, ok: true}
-        ],
-        expected: [
-          {
-            name: 'opentrons-1',
-            connections: [
-              {ip: '192.168.1.42', port: 31950, ok: false, local: false}
-            ]
-          },
-          {
-            name: 'opentrons-2',
-            connections: [
-              {ip: '169.254.9.8', port: 31950, ok: true, local: true}
-            ]
-          }
-        ]
-      },
-      {
-        name: 'combines multiple services into one robot',
-        services: [
           {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
-          {name: 'opentrons-dev', ip: '169.254.9.8', port: 31950, ok: true}
         ],
         expected: [
           {
             name: 'opentrons-dev',
             connections: [
               {ip: '192.168.1.42', port: 31950, ok: true, local: false},
-              {ip: '169.254.9.8', port: 31950, ok: true, local: true}
-            ]
-          }
-        ]
-      }
+            ],
+          },
+        ],
+      },
+      {
+        name: 'handles multiple services',
+        services: [
+          {name: 'opentrons-1', ip: '192.168.1.42', port: 31950, ok: false},
+          {name: 'opentrons-2', ip: '169.254.9.8', port: 31950, ok: true},
+        ],
+        expected: [
+          {
+            name: 'opentrons-1',
+            connections: [
+              {ip: '192.168.1.42', port: 31950, ok: false, local: false},
+            ],
+          },
+          {
+            name: 'opentrons-2',
+            connections: [
+              {ip: '169.254.9.8', port: 31950, ok: true, local: true},
+            ],
+          },
+        ],
+      },
+      {
+        name: 'combines multiple services into one robot',
+        services: [
+          {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
+          {name: 'opentrons-dev', ip: '169.254.9.8', port: 31950, ok: true},
+        ],
+        expected: [
+          {
+            name: 'opentrons-dev',
+            connections: [
+              {ip: '192.168.1.42', port: 31950, ok: true, local: false},
+              {ip: '169.254.9.8', port: 31950, ok: true, local: true},
+            ],
+          },
+        ],
+      },
     ]
 
     SPECS.forEach(spec =>
@@ -167,7 +167,7 @@ describe('app-shell/discovery', () => {
         mockClient.emit('service')
         expect(dispatch).toHaveBeenCalledWith({
           type: 'discovery:UPDATE_LIST',
-          payload: {robots: spec.expected}
+          payload: {robots: spec.expected},
         })
       })
     )
@@ -177,14 +177,14 @@ describe('app-shell/discovery', () => {
     registerDiscovery(dispatch)
     expect(Store).toHaveBeenCalledWith({
       name: 'discovery',
-      defaults: {services: []}
+      defaults: {services: []},
     })
 
     mockClient.services = [{name: 'foo'}, {name: 'bar'}]
     mockClient.emit('service')
     expect(Store.__store.set).toHaveBeenCalledWith('services', [
       {name: 'foo'},
-      {name: 'bar'}
+      {name: 'bar'},
     ])
 
     mockClient.services = [{name: 'foo'}]
@@ -201,7 +201,7 @@ describe('app-shell/discovery', () => {
     registerDiscovery(dispatch)
     expect(DiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        services: [{name: 'foo'}]
+        services: [{name: 'foo'}],
       })
     )
   })
@@ -212,7 +212,7 @@ describe('app-shell/discovery', () => {
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        candidates: expect.arrayContaining(['1.2.3.4'])
+        candidates: expect.arrayContaining(['1.2.3.4']),
       })
     )
   })
@@ -224,7 +224,7 @@ describe('app-shell/discovery', () => {
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        candidates: expect.arrayContaining(['1.2.3.4'])
+        candidates: expect.arrayContaining(['1.2.3.4']),
       })
     )
   })

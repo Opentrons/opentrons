@@ -12,7 +12,7 @@ type HealthHandler = (
 ) => mixed
 
 export type PollRequest = {
-  id: ?IntervalID
+  id: ?IntervalID,
 }
 
 export function poll (
@@ -66,7 +66,7 @@ function fetchHealth (cand: Candidate, log: ?Logger) {
 
   return Promise.all([
     fetchAndParseBody(apiHealthUrl, log),
-    fetchAndParseBody(serverHealthUrl, log)
+    fetchAndParseBody(serverHealthUrl, log),
   ])
 }
 

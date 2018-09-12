@@ -11,17 +11,17 @@ import type {State, Dispatch} from '../../types'
 import type {UpdateChannel} from '../../config'
 
 type OP = {
-  checkForUpdates: () => mixed
+  checkForUpdates: () => mixed,
 }
 
 type SP = {
   devToolsOn: boolean,
-  channel: UpdateChannel
+  channel: UpdateChannel,
 }
 
 type DP = {
   toggleDevTools: () => mixed,
-  handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed
+  handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 }
 type Props = SP & DP
 
@@ -30,7 +30,7 @@ const TITLE = 'Advanced Settings'
 // TODO(mc, 2018-08-03): enable "alpha" option
 const CHANNEL_OPTIONS = [
   {name: 'Stable', value: (('latest': UpdateChannel): string)},
-  {name: 'Beta', value: (('beta': UpdateChannel): string)}
+  {name: 'Beta', value: (('beta': UpdateChannel): string)},
 ]
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdvancedSettingsCard)
@@ -71,7 +71,7 @@ function mapStateToProps (state: State): SP {
 
   return {
     devToolsOn: config.devtools,
-    channel: config.update.channel
+    channel: config.update.channel,
   }
 }
 
@@ -84,6 +84,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP) {
       // TODO(mc, 2018-08-03): refactor app update interface to be more
       // reactive and teach it to re-check on release channel change
       setTimeout(ownProps.checkForUpdates, 500)
-    }
+    },
   }
 }

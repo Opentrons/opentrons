@@ -22,7 +22,7 @@ describe('chainActions utility', () => {
     const actions = [
       {type: 'foo'},
       {type: 'bar'},
-      {type: 'baz'}
+      {type: 'baz'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -36,7 +36,7 @@ describe('chainActions utility', () => {
     const actions = [
       {type: 'foo'},
       {type: 'bar'},
-      {type: 'baz'}
+      {type: 'baz'},
     ]
     const thunks = actions.map(a => dispatch => dispatch(a))
 
@@ -51,7 +51,7 @@ describe('chainActions utility', () => {
     const actions = [
       {type: 'foo'},
       {type: 'bar'},
-      {type: 'baz'}
+      {type: 'baz'},
     ]
     const thunks = actions.map(a => dispatch => Promise.resolve(dispatch(a)))
 
@@ -66,12 +66,12 @@ describe('chainActions utility', () => {
     const actions = [
       {type: 'foo'},
       {type: 'bar'},
-      {type: 'baz'}
+      {type: 'baz'},
     ]
     const thunks = [
       (dispatch) => dispatch(actions[0]),
       (dispatch) => Promise.resolve(dispatch(actions[1])),
-      actions[2]
+      actions[2],
     ]
 
     return store.dispatch(chainActions(...thunks))
@@ -84,7 +84,7 @@ describe('chainActions utility', () => {
   test('bails out early if a plain action has an error', () => {
     const actions = [
       {type: 'foo', error: new Error('AH')},
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -98,7 +98,7 @@ describe('chainActions utility', () => {
     const errorAction = {type: 'foo', error: new Error('AH')}
     const actions = [
       (dispatch) => dispatch(errorAction),
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -112,7 +112,7 @@ describe('chainActions utility', () => {
     const errorAction = {type: 'foo', error: new Error('AH')}
     const actions = [
       (dispatch) => Promise.resolve(dispatch(errorAction)),
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -125,7 +125,7 @@ describe('chainActions utility', () => {
   test('bails out early if a plain action has an error in the payload', () => {
     const actions = [
       {type: 'foo', payload: {error: new Error('AH')}},
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -139,7 +139,7 @@ describe('chainActions utility', () => {
     const errorAction = {type: 'foo', payload: {error: new Error('AH')}}
     const actions = [
       (dispatch) => dispatch(errorAction),
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -153,7 +153,7 @@ describe('chainActions utility', () => {
     const errorAction = {type: 'foo', payload: {error: new Error('AH')}}
     const actions = [
       (dispatch) => Promise.resolve(dispatch(errorAction)),
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))
@@ -166,7 +166,7 @@ describe('chainActions utility', () => {
   test('bails out early if a thunk promise rejects', () => {
     const actions = [
       (dispatch) => Promise.reject(new Error('AH')),
-      {type: 'bar'}
+      {type: 'bar'},
     ]
 
     return store.dispatch(chainActions(...actions))

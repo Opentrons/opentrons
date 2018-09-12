@@ -20,7 +20,7 @@ export default function getTooltipForField (stepType: ?string, name: string): ?s
     `tooltip.step_fields.${stepType}.${nameWithoutPrefix}`,
     `tooltip.step_fields.defaults.${name}`,
     `tooltip.step_fields.defaults.${nameWithoutPrefix}`,
-    ''
+    '',
   ])
 
   return text || null

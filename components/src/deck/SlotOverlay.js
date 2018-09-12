@@ -8,7 +8,7 @@ import styles from './SlotOverlay.css'
 type SlotOverlayProps = {
   text?: string,
   icon?: IconName,
-  className?: string
+  className?: string,
 }
 
 export function SlotOverlay (props: SlotOverlayProps) {

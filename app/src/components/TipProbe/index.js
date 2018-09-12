@@ -12,18 +12,18 @@ import RemoveTipPanel from './RemoveTipPanel'
 import ContinuePanel from './ContinuePanel'
 
 type Props = Pipette & {
-  confirmTipProbeUrl: string
+  confirmTipProbeUrl: string,
 }
 
 const PANEL_BY_CALIBRATION: {
-  [PipetteCalibrationStatus]: React.ComponentType<Props>
+  [PipetteCalibrationStatus]: React.ComponentType<Props>,
 } = {
   'unprobed': UnprobedPanel,
   'preparing-to-probe': InstrumentMovingPanel,
   'ready-to-probe': AttachTipPanel,
   'probing': InstrumentMovingPanel,
   'probed-tip-on': RemoveTipPanel,
-  'probed': ContinuePanel
+  'probed': ContinuePanel,
 }
 
 export default function TipProbe (props: Props) {

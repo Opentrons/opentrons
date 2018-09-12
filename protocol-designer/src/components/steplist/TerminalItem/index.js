@@ -6,7 +6,7 @@ import type {BaseState, ThunkDispatch} from '../../../types'
 import {
   actions as steplistActions,
   selectors as steplistSelectors,
-  type TerminalItemId
+  type TerminalItemId,
 } from '../../../steplist'
 
 import {PDTitledList} from '../../lists'
@@ -16,12 +16,12 @@ type Props = React.ElementProps<typeof PDTitledList>
 type OP = {
   id: TerminalItemId,
   title: string,
-  children?: React.Node
+  children?: React.Node,
 }
 
 type SP = {
   hovered: $ElementType<Props, 'hovered'>,
-  selected: $ElementType<Props, 'selected'>
+  selected: $ElementType<Props, 'selected'>,
 }
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
@@ -30,7 +30,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selected = steplistSelectors.getSelectedTerminalItemId(state) === id
   return {
     hovered,
-    selected
+    selected,
   }
 }
 
@@ -44,7 +44,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}
     children,
     onClick: () => dispatch(steplistActions.selectTerminalItem(id)),
     onMouseEnter: () => dispatch(steplistActions.hoverOnTerminalItem(id)),
-    onMouseLeave: () => dispatch(steplistActions.hoverOnTerminalItem(null))
+    onMouseLeave: () => dispatch(steplistActions.hoverOnTerminalItem(null)),
   }
 }
 

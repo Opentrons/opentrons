@@ -6,7 +6,7 @@ import {withRouter} from 'react-router'
 import {
   constants as robotConstants,
   selectors as robotSelectors,
-  type Pipette
+  type Pipette,
 } from '../../robot'
 
 import {TitledList} from '@opentrons/components'
@@ -41,6 +41,6 @@ function PipetteList (props: Props) {
 function mapStateToProps (state): Props {
   return {
     pipettes: robotSelectors.getPipettes(state),
-    isRunning: robotSelectors.getIsRunning(state)
+    isRunning: robotSelectors.getIsRunning(state),
   }
 }

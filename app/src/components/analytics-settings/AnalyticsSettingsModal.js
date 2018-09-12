@@ -47,12 +47,12 @@ function AnalyticsSettingsModal (props: Props) {
 
 function mapStateToProps (state: State): SP {
   return {
-    seen: getAnalyticsSeen(state)
+    seen: getAnalyticsSeen(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
-    setSeen: () => dispatch(setAnalyticsSeen())
+    setSeen: () => dispatch(setAnalyticsSeen()),
   }
 }

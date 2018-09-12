@@ -13,7 +13,7 @@ import type {BaseState} from '../../../types'
 type OP = {prefix?: 'aspirate' | 'dispense'}
 type SP = {
   mmFromBottom: ?string,
-  wellHeightMM: ?number
+  wellHeightMM: ?number,
 }
 
 type TipPositionInputState = {isModalOpen: boolean}
@@ -81,7 +81,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
   return {
     wellHeightMM,
-    mmFromBottom: formData && formData[fieldName]
+    mmFromBottom: formData && formData[fieldName],
   }
 }
 

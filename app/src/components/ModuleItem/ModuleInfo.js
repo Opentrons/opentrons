@@ -8,7 +8,7 @@ import {LabeledValue} from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
-  module: Module
+  module: Module,
 }
 
 export default function ModuleInfo (props: Props) {

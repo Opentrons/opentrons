@@ -11,7 +11,7 @@ export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' // TODO: add other po
 
 const FIELD_ERRORS: {[FieldError]: string} = {
   REQUIRED: 'This field is required',
-  UNDER_WELL_MINIMUM: 'or more wells are required'
+  UNDER_WELL_MINIMUM: 'or more wells are required',
 }
 
 // TODO: test these

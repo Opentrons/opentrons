@@ -40,7 +40,7 @@ export function getLabwareType (labwareId: string, robotState: RobotState): ?str
 
 export function _getNextTip (
   pipetteChannels: Channels,
-  tiprackWellsState: {[wellName: string]: boolean
+  tiprackWellsState: {[wellName: string]: boolean,
 }): string | null {
   /** Given a tiprack's wells state, return the well of the next available tip
     NOTE: expects 96-well tiprack
@@ -108,7 +108,7 @@ export function getNextTiprack (pipette: PipetteData, robotState: RobotState): N
   if (firstAvailableTiprack && nextTip) {
     return {
       tiprackId: firstAvailableTiprack,
-      well: nextTip
+      well: nextTip,
     }
   }
   // No available tipracks (for given pipette channels)

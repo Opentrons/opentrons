@@ -31,7 +31,7 @@ type OP = {match: Match}
 
 type Props = SP & OP & {
   fetchPipettes: () => mixed,
-  changePipetteUrl: string
+  changePipetteUrl: string,
 }
 
 export default connect(makeMapStateToProps, null, mergeProps)(CalibratePipettesPage)
@@ -42,7 +42,7 @@ function CalibratePipettesPage (props: Props) {
     currentPipette,
     fetchPipettes,
     match: {url, params},
-    changePipetteUrl
+    changePipetteUrl,
   } = props
   const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
@@ -91,7 +91,7 @@ function makeMapStateToProps (): (State, OP) => SP {
       _robot,
       pipettes: robotSelectors.getPipettes(state),
       currentPipette: getCurrentPipette(state, props),
-      actualPipettes: pipettesCall && pipettesCall.response
+      actualPipettes: pipettesCall && pipettesCall.response,
     }
   }
 }
@@ -105,6 +105,6 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...stateProps,
     ...ownProps,
     changePipetteUrl,
-    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot))
+    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot)),
   }
 }

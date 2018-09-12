@@ -9,7 +9,7 @@ const definitionsGlobPath = path.join(__dirname, '../../definitions/*.json')
 
 const ajv = new Ajv({
   allErrors: true,
-  jsonPointers: true
+  jsonPointers: true,
 })
 
 const validate = ajv.compile(schema)
@@ -19,7 +19,7 @@ describe('test the schema against a minimalist fixture', () => {
     const minimalLabwareDef = {
       metadata: {
         name: 'test-labware',
-        format: 'trough'
+        format: 'trough',
       },
       ordering: [['A1']],
       wells: {
@@ -31,9 +31,9 @@ describe('test the schema against a minimalist fixture', () => {
           width: 7,
           x: 10.84,
           y: 7.75,
-          z: 0
-        }
-      }
+          z: 0,
+        },
+      },
     }
     const valid = validate(minimalLabwareDef)
     const validationErrors = validate.errors
@@ -46,7 +46,7 @@ describe('test the schema against a minimalist fixture', () => {
     const badDef = {
       metadata: {name: 'bad'},
       ordering: ['A1'], // array of strings not array of arrays
-      wells: {}
+      wells: {},
     }
     const valid = validate(badDef)
     const validationErrors = validate.errors
@@ -54,7 +54,7 @@ describe('test the schema against a minimalist fixture', () => {
     expect(
       validationErrors.find(err => err.dataPath === '/ordering/0')
     ).toMatchObject({
-      message: 'should be array'
+      message: 'should be array',
     })
     expect(valid).toBe(false)
   })
