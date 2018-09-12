@@ -2,13 +2,17 @@
   "field": {},
   "form": {},
   "hint": {
-    "go_to": "Go to "
+    "go_to": "Go to ",
+    "add_liquids_and_labware": {
+      "directions": " and hover over labware to specify where liquids start before the robot starts moving.",
+      "title": "Add Liquids to Deck"
+    }
   },
   "timeline": {
     "error": {
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
-        "body": "Add another tip rack to an empty slot in Starting Deck State"
+        "body": "Add another tip rack to an empty slot in ",
       },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette",

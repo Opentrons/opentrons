@@ -2,17 +2,15 @@
 import * as actions from './actions'
 import {rootReducer, type RootState} from './reducers'
 import * as selectors from './selectors'
-import hintManifest from './hintManifest'
-import type {HintKey} from './hintManifest'
+
+export type HintKey = 'add_liquids_and_labware'
 
 export {
   actions,
   rootReducer,
-  selectors,
-  hintManifest
+  selectors
 }
 
 export type {
-  RootState,
-  HintKey
+  RootState
 }
