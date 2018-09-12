@@ -38,7 +38,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const volume = Number(formData['volume'])
   const sourceLabware = formData['aspirate_labware']
   const destLabware = formData['dispense_labware']
-  const blowout = formData['dispense_blowout_labware']
+  const blowout = formData['dispense_blowout_checkbox'] ? formData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = Number(formData['aspirate_mmFromBottom'])
   const dispenseOffsetFromBottomMm = Number(formData['dispense_mmFromBottom'])
