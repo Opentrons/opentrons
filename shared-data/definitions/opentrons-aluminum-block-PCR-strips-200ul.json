@@ -1,6 +1,10 @@
 {
   "metadata": {
+<<<<<<< HEAD:shared-data/definitions/opentrons-aluminum-block-PCR-strips-200ul.json
     "name": "opentrons-aluminum-block-PCR-strips",
+=======
+    "name": "opentrons-aluminum-block-96-PCR-plate",
+>>>>>>> Add metadata fields to definition:shared-data/definitions/opentrons-aluminum-block-96-PCR-plate.json
     "format": "96-standard",
     "displayCategory": "well-plate"
   },

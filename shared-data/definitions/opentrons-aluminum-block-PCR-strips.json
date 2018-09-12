@@ -1,6 +1,8 @@
 {
   "metadata": {
-    "name": "opentrons-aluminum-block-PCR-strips"
+    "name": "opentrons-aluminum-block-PCR-strips",
+    "format": "96-standard",
+    "displayCategory": "well-plate"
   },
   "ordering": [
     [
