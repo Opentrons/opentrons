@@ -10,7 +10,7 @@ import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import styles from './FlowRateField.css'
 
-const DEFAULT_LABEL = 'FLOW RATE'
+const DEFAULT_LABEL = 'Flow Rate'
 const DECIMALS_ALLOWED = 1
 
 type Props = {

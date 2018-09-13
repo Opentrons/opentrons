@@ -15,15 +15,14 @@
 }
 
 .left_settings_column {
-  lost-column: 6/16;
+  lost-column: 7/16;
 }
 
 .middle_settings_column {
-  lost-column: 4/16;
+  lost-column: 5/16;
 }
 
 .right_settings_column {
-  lost-offset: 1/16;
   lost-column: 4/16;
 }
 
@@ -102,4 +101,15 @@
 
 .cancel_button {
   lost-offset: 2/6;
+}
+
+.sub_select_label {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  flex: 0 0 auto;
+  padding: 0 0.5rem;
+  margin: 0.5em 0 0.5em 20px;
 }
