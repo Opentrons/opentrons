@@ -7,6 +7,7 @@ import modal from './modal.json'
 import nav from './nav.json'
 import step_edit_form from './step_edit_form.json'
 import tooltip from './tooltip.json'
+import well_selection_instructions from './well_selection_instructions.json'
 
 export default {
   translation: {
@@ -17,5 +18,6 @@ export default {
     nav,
     step_edit_form,
     tooltip,
+    well_selection_instructions,
   },
 }
