@@ -13,6 +13,7 @@ import type {
   CommandCreatorWarning
 } from '../../step-generation'
 import Alerts from './Alerts'
+import type {AlertLevel} from './types'
 
 type SP = {
   errors: Array<CommandCreatorError>,
@@ -20,7 +21,12 @@ type SP = {
   _stepId: ?number
 }
 
-type MP = SP & {dismissWarning: (CommandCreatorWarning) => mixed}
+type MP = {
+  errors: Array<CommandCreatorError>,
+  warnings: Array<CommandCreatorWarning>,
+  dismissWarning: (CommandCreatorWarning) => mixed,
+  level: AlertLevel
+}
 
 /** Errors and Warnings from step-generation are written for developers
   * who are using step-generation as an API for writing Opentrons protocols.

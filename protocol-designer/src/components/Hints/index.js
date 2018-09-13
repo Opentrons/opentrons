@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import i18n from '../../localization'
 import {
@@ -12,7 +11,7 @@ import {
 import {actions, selectors} from '../../tutorial'
 import type {HintKey} from '../../tutorial'
 import {AlertItem} from '@opentrons/components'
-import type {BaseState} from '../../types'
+import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './Hints.css'
 
 type SP = {hints: Array<HintKey>}
@@ -64,7 +63,7 @@ class Hints extends React.Component<Props> {
 const mapStateToProps = (state: BaseState): SP => ({
   hints: selectors.getHints(state)
 })
-const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   removeHint: (hint) => dispatch(actions.removeHint(hint)),
   selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId))
 })

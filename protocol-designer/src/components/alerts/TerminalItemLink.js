@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
+import type {ThunkDispatch} from '../../types'
 import {
   actions as steplistActions,
   type TerminalItemId
@@ -29,7 +29,7 @@ class TerminalItemLink extends React.Component<OP & DP> {
   }
 }
 
-const mapDTP = (dispatch: Dispatch): DP => ({
+const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId))
 })
 export default connect(null, mapDTP)(TerminalItemLink)

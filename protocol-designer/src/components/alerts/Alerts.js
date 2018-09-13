@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {AlertItem} from '@opentrons/components'
 import i18n from '../../localization'
-import type {CommandCreatorError, CommandCreatorWarning} from '../step-generation'
+import type {CommandCreatorError, CommandCreatorWarning} from '../../step-generation'
 import ErrorContents from './ErrorContents'
 import WarningContents from './WarningContents'
 
@@ -15,11 +15,11 @@ type Props = {
   level: 'timeline' | 'form',
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
-  dismissWarning: (CommandCreatorWarning) => () => mixed
+  dismissWarning: (CommandCreatorWarning) => mixed
 }
 
 class Alerts extends React.Component<Props> {
-  makeHandleCloseWarning = (warning: FormWarning) => () => {
+  makeHandleCloseWarning = (warning: CommandCreatorWarning) => () => {
     this.props.dismissWarning(warning)
   }
 
