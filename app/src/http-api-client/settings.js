@@ -26,8 +26,7 @@ type SettingsRequest = ?{id: Id, value: Value}
 
 type SettingsResponse = {settings: Array<Setting>}
 
-export type SettingsAction =
-  ApiAction<'settings', SettingsRequest, SettingsResponse>
+export type SettingsAction = ApiAction<'settings', SettingsRequest, SettingsResponse>
 
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 

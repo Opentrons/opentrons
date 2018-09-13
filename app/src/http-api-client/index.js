@@ -4,9 +4,9 @@ import {combineReducers} from 'redux'
 import apiReducer from './reducer'
 import {calibrationReducer, type CalibrationAction} from './calibration'
 import type {HealthAction} from './health'
+import type {PipettesAction} from './pipettes'
 import type {ModulesAction} from './modules'
 import {motorsReducer, type MotorsAction} from './motors'
-import {pipettesReducer, type PipettesAction} from './pipettes'
 import type {ResetAction} from './reset'
 import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
@@ -16,7 +16,6 @@ import {wifiReducer, type WifiAction} from './wifi'
 export const reducer = combineReducers({
   calibration: calibrationReducer,
   motors: motorsReducer,
-  pipettes: pipettesReducer,
   robot: robotReducer,
   server: serverReducer,
   wifi: wifiReducer,
@@ -41,12 +40,6 @@ export type {
   JogStep,
   DeckCalPoint,
 } from './calibration'
-
-export type {
-  Pipette,
-  PipettesResponse,
-  RobotPipettes,
-} from './pipettes'
 
 export type {
   RobotMove,
@@ -98,14 +91,11 @@ export * from './reset'
 
 export * from './settings'
 
+export * from './pipettes'
+
 export {
   disengagePipetteMotors,
 } from './motors'
-
-export {
-  fetchPipettes,
-  makeGetRobotPipettes,
-} from './pipettes'
 
 export {
   home,
