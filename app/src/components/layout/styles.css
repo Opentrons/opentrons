@@ -66,12 +66,10 @@
 .section_content_full {
   width: 100%;
   overflow-y: auto;
-  padding-bottom: 1rem;
 }
 
 .section_content_50 {
   display: inline-block;
   vertical-align: top;
   width: 50%;
-  padding-bottom: 1rem;
 }

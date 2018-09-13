@@ -1,23 +1,36 @@
 // @flow
 import * as React from 'react'
-import type {Robot} from '../../robot'
+
+import {SpinnerModal} from '@opentrons/components'
 import Page from '../../components/Page'
 import FileInfo from '../../components/FileInfo'
 
+import type {Robot} from '../../robot'
+
 type Props = {
-  name: string,
   robot: Robot,
+  filename: string,
+  uploadInProgress: boolean,
+  uploadError: ?{message: string},
+  sessionLoaded: boolean,
 }
 
 export default function FileInfoPage (props: Props) {
+  const {robot, filename, uploadInProgress, uploadError, sessionLoaded} = props
+
   return (
     <Page
-      titleBarProps = {{
-        title: props.name,
+      titleBarProps={{
+        title: filename,
         subtitle: 'overview',
       }}
     >
-      <FileInfo {...props} />
+      <FileInfo
+        robot={robot}
+        sessionLoaded={sessionLoaded}
+        uploadError={uploadError}
+      />
+      {uploadInProgress && <SpinnerModal message="Upload in Progress" />}
     </Page>
   )
 }

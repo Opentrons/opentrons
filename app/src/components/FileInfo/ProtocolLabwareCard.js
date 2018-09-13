@@ -3,10 +3,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import countBy from 'lodash/countBy'
+
+import {selectors as robotSelectors} from '../../robot'
+import InfoSection from './InfoSection'
+import LabwareTable from './LabwareTable'
+
 import type {State} from '../../types'
 import type {Labware} from '../../robot'
-import {selectors as robotSelectors} from '../../robot'
-import LabwareTable from './LabwareTable'
 
 type Props = {
   labware: Array<Labware>,
@@ -14,12 +17,14 @@ type Props = {
 
 const TITLE = 'Required Labware'
 
-export default connect(mapStateToProps, null)(ProtocolLabwareCard)
+export default connect(mapStateToProps)(ProtocolLabwareCard)
 
 function ProtocolLabwareCard (props: Props) {
   const {labware} = props
-  const labwareCount = countBy(labware, 'name')
 
+  if (labware.length === 0) return null
+
+  const labwareCount = countBy(labware, 'name')
   const labwareList = Object.keys(labwareCount).map(type => (
     <tr key={type}>
       <td>{type}</td>
@@ -28,9 +33,9 @@ function ProtocolLabwareCard (props: Props) {
   ))
 
   return (
-    <LabwareTable title={TITLE}>
-      {labwareList}
-    </LabwareTable>
+    <InfoSection title={TITLE}>
+      <LabwareTable>{labwareList}</LabwareTable>
+    </InfoSection>
   )
 }
 function mapStateToProps (state: State): Props {
