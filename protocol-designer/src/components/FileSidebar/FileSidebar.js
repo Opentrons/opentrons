@@ -4,7 +4,7 @@ import cx from 'classnames'
 import {
   PrimaryButton,
   OutlineButton,
-  SidePanel
+  SidePanel,
 } from '@opentrons/components'
 import styles from './FileSidebar.css'
 
@@ -13,9 +13,9 @@ type Props = {
   createNewFile?: () => mixed,
   downloadData: ?{
     fileContents: string,
-    fileName: string
+    fileName: string,
   },
-  onDownload: (event: SyntheticEvent<*>) => mixed
+  onDownload: (event: SyntheticEvent<*>) => mixed,
 }
 
 export default function FileSidebar (props: Props) {

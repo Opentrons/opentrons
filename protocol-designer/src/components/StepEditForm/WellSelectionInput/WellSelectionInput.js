@@ -10,7 +10,7 @@ type Props = {
   disabled: boolean,
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
   errorToShow: ?string,
-  isMulti: ?boolean
+  isMulti: ?boolean,
 }
 
 export default function WellSelectionInput (props: Props) {

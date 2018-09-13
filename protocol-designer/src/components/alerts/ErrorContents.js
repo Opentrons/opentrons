@@ -7,7 +7,7 @@ import TerminalItemLink from './TerminalItemLink'
 
 type ErrorContentsProps = {
   errorType: string,
-  level: AlertLevel
+  level: AlertLevel,
 }
 const ErrorContents = (props: ErrorContentsProps) => {
   if (props.level === 'timeline') {

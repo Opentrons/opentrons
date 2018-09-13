@@ -3,14 +3,14 @@ import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {
   actions as dismissActions,
-  selectors as dismissSelectors
+  selectors as dismissSelectors,
 } from '../../dismiss'
 import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
 import type {BaseState} from '../../types'
 import type {
   CommandCreatorError,
-  CommandCreatorWarning
+  CommandCreatorWarning,
 } from '../../step-generation'
 import Alerts from './Alerts'
 import type {AlertLevel} from './types'
@@ -18,14 +18,14 @@ import type {AlertLevel} from './types'
 type SP = {
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
-  _stepId: ?number
+  _stepId: ?number,
 }
 
 type MP = {
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
   dismissWarning: (CommandCreatorWarning) => mixed,
-  level: AlertLevel
+  level: AlertLevel,
 }
 
 /** Errors and Warnings from step-generation are written for developers
@@ -46,7 +46,7 @@ function mapStateToProps (state: BaseState): SP {
   return {
     errors,
     warnings,
-    _stepId
+    _stepId,
   }
 }
 
@@ -57,7 +57,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): MP
     level: 'timeline',
     dismissWarning: (warning: CommandCreatorWarning) => {
       dispatch(dismissActions.dismissTimelineWarning({warning, stepId: stateProps._stepId}))
-    }
+    },
   }
 }
 

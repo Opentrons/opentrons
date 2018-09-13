@@ -24,12 +24,12 @@ const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'
 
 const entry = [
-  JS_BUNDLE_ENTRY
+  JS_BUNDLE_ENTRY,
 ]
 
 const output = {
   path: OUTPUT_PATH,
-  filename: JS_OUTPUT_NAME
+  filename: JS_OUTPUT_NAME,
 }
 
 const rules = [
@@ -39,7 +39,7 @@ const rules = [
   namedRules.localCss,
   namedRules.handlebars,
   namedRules.fonts,
-  namedRules.images
+  namedRules.images,
 ]
 
 const target = 'electron-renderer'
@@ -47,14 +47,14 @@ const target = 'electron-renderer'
 const plugins = [
   new webpack.EnvironmentPlugin(
     Object.keys(process.env).filter(v => v.startsWith('OT_APP')).concat([
-      'NODE_ENV'
+      'NODE_ENV',
     ])
   ),
 
   new ExtractTextPlugin({
     filename: CSS_OUTPUT_NAME,
     disable: DEV,
-    ignoreOrder: true
+    ignoreOrder: true,
   }),
 
   new HtmlWebpackPlugin({
@@ -62,12 +62,12 @@ const plugins = [
     template: './src/index.hbs',
     description,
     author,
-    intercomId: process.env.OT_APP_INTERCOM_ID
+    intercomId: process.env.OT_APP_INTERCOM_ID,
   }),
 
   new ScriptExtHtmlWebpackPlugin({
-    defaultAttribute: 'defer'
-  })
+    defaultAttribute: 'defer',
+  }),
 ]
 
 let devtool = 'source-map'
@@ -107,6 +107,6 @@ module.exports = {
   devtool,
   devServer,
   node: {
-    __filename: true
-  }
+    __filename: true,
+  },
 }

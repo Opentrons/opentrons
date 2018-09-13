@@ -8,31 +8,31 @@ beforeEach(() => {
     'FIXED_TRASH_ID': {
       type: 'fixed-trash',
       name: 'Trash',
-      slot: '12'
+      slot: '12',
     },
     wellPlateId: {
       slot: '10',
       type: '96-flat',
-      name: 'Labware 1'
+      name: 'Labware 1',
     },
     troughId: {
       slot: '8',
       type: 'trough-12row',
-      name: 'Labware 2'
-    }
+      name: 'Labware 2',
+    },
   }
 
   ingredLocs = {
     wellPlateId: {
       A1: {'0': {volume: 100}},
-      B1: {'0': {volume: 150}}
+      B1: {'0': {volume: 150}},
     },
     troughId: {
       A1: {'0': {volume: 105}},
       A2: {'0': {volume: 155}},
       A3: {'1': {volume: 115}},
-      A6: {'1': {volume: 111}}
-    }
+      A6: {'1': {volume: 111}},
+    },
   }
 })
 

@@ -3,17 +3,16 @@
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
 
+import type {Action} from '../../types'
 import type {Mount, Slot} from '../types'
 import {actionTypes} from '../actions'
 import type {
-  Action,
-  DisconnectResponseAction,
   ConfirmProbedAction,
   PipetteCalibrationAction,
   LabwareCalibrationAction,
   CalibrationSuccessAction,
   CalibrationFailureAction,
-  SetModulesReviewedAction
+  SetModulesReviewedAction,
 } from '../actions'
 
 // calibration request types
@@ -48,18 +47,17 @@ export type State = {
 
   +confirmedBySlot: {[Slot]: boolean},
 
-  +calibrationRequest: CalibrationRequest
+  +calibrationRequest: CalibrationRequest,
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
-  SESSION,
   SET_DECK_POPULATED,
   MOVE_TO_FRONT,
   MOVE_TO_FRONT_RESPONSE,
   PROBE_TIP,
   PROBE_TIP_RESPONSE,
-  CONFIRM_LABWARE
+  CONFIRM_LABWARE,
 } = actionTypes
 
 const INITIAL_STATE: State = {
@@ -72,7 +70,7 @@ const INITIAL_STATE: State = {
 
   confirmedBySlot: {},
 
-  calibrationRequest: {type: '', inProgress: false, error: null}
+  calibrationRequest: {type: '', inProgress: false, error: null},
 }
 
 export default function calibrationReducer (
@@ -80,6 +78,11 @@ export default function calibrationReducer (
   action: Action
 ): State {
   switch (action.type) {
+    case 'robot:DISCONNECT_RESPONSE':
+    case 'robot:REFRESH_SESSION':
+    case 'protocol:UPLOAD':
+      return INITIAL_STATE
+
     case 'robot:CONFIRM_PROBED':
       return handleConfirmProbed(state, action)
 
@@ -137,17 +140,10 @@ export default function calibrationReducer (
     case 'robot:UPDATE_OFFSET_FAILURE':
       return handleUpdateOffsetFailure(state, action)
 
-    case 'robot:DISCONNECT_RESPONSE':
-      return handleDisconnectResponse(state, action)
-
-    case 'robot:REFRESH_SESSION':
-      return handleSession(state, action)
-
     case 'robot:SET_MODULES_REVIEWED':
       return handleSetModulesReviewed(state, action)
 
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
-    case SESSION: return handleSession(state, action)
     case SET_DECK_POPULATED: return handleSetDeckPopulated(state, action)
     case MOVE_TO_FRONT: return handleMoveToFront(state, action)
     case MOVE_TO_FRONT_RESPONSE: return handleMoveToFrontResponse(state, action)
@@ -157,17 +153,6 @@ export default function calibrationReducer (
   }
 
   return state
-}
-
-function handleDisconnectResponse (
-  state: State,
-  action: DisconnectResponseAction
-): State {
-  return INITIAL_STATE
-}
-
-function handleSession (state: State, action: any): State {
-  return INITIAL_STATE
 }
 
 function handleSetDeckPopulated (state: State, action: any): State {
@@ -194,8 +179,8 @@ function handleMoveToFront (state: State, action: any): State {
       type: 'MOVE_TO_FRONT',
       inProgress: true,
       error: null,
-      mount
-    }
+      mount,
+    },
   }
 }
 
@@ -209,8 +194,8 @@ function handleMoveToFrontResponse (state: State, action: any): State {
       inProgress: false,
       error: error
         ? payload
-        : null
-    }
+        : null,
+    },
   }
 }
 
@@ -225,12 +210,12 @@ function handleProbeTip (state: State, action: any) {
       type: 'PROBE_TIP',
       mount: mount,
       inProgress: true,
-      error: null
+      error: null,
     },
     probedByMount: {
       ...state.probedByMount,
-      [mount]: false
-    }
+      [mount]: false,
+    },
   }
 }
 
@@ -244,9 +229,9 @@ function handleProbeTipResponse (state: State, action: any) {
       inProgress: false,
       error: error
         ? payload
-        : null
+        : null,
     },
-    confirmedBySlot: {}
+    confirmedBySlot: {},
   }
 }
 
@@ -256,7 +241,7 @@ function handleConfirmProbed (
 ): State {
   return {
     ...state,
-    probedByMount: {...state.probedByMount, [action.payload]: true}
+    probedByMount: {...state.probedByMount, [action.payload]: true},
   }
 }
 
@@ -272,8 +257,8 @@ function handleMoveTo (state: State, action: LabwareCalibrationAction): State {
       inProgress: true,
       error: null,
       mount,
-      slot
-    }
+      slot,
+    },
   }
 }
 
@@ -289,8 +274,8 @@ function handleMoveToSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
-    }
+      error: null,
+    },
   }
 }
 
@@ -308,8 +293,8 @@ function handleMoveToFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: error
-    }
+      error: error,
+    },
   }
 }
 
@@ -328,8 +313,8 @@ function handlePickupAndHome (
       inProgress: true,
       error: null,
       mount,
-      slot
-    }
+      slot,
+    },
   }
 }
 
@@ -345,13 +330,13 @@ function handlePickupAndHomeSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
+      error: null,
     },
     // assume that only one tip can be on at a time
     tipOnByMount: {
       ...mapValues(state.tipOnByMount, (value: boolean, key: Mount) => false),
-      [mount]: true
-    }
+      [mount]: true,
+    },
   }
 }
 
@@ -369,8 +354,8 @@ function handlePickupAndHomeFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error
-    }
+      error,
+    },
   }
 }
 
@@ -387,8 +372,8 @@ function handleDropTipAndHome (
       inProgress: true,
       error: null,
       mount,
-      slot
-    }
+      slot,
+    },
   }
 }
 
@@ -404,12 +389,12 @@ function handleDropTipAndHomeSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
+      error: null,
     },
     tipOnByMount: {
       ...state.tipOnByMount,
-      [mount]: false
-    }
+      [mount]: false,
+    },
   }
 }
 
@@ -427,8 +412,8 @@ function handleDropTipAndHomeFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error
-    }
+      error,
+    },
   }
 }
 
@@ -445,8 +430,8 @@ function handleConfirmTiprack (
       inProgress: true,
       error: null,
       mount,
-      slot
-    }
+      slot,
+    },
   }
 }
 
@@ -464,16 +449,16 @@ function handleConfirmTiprackSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
+      error: null,
     },
     tipOnByMount: {
       ...state.tipOnByMount,
-      [mount]: tipOn
+      [mount]: tipOn,
     },
     confirmedBySlot: {
       ...state.confirmedBySlot,
-      [slot]: true
-    }
+      [slot]: true,
+    },
   }
 }
 
@@ -491,8 +476,8 @@ function handleConfirmTiprackFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error
-    }
+      error,
+    },
   }
 }
 
@@ -507,8 +492,8 @@ function handleJog (state: State, action: PipetteCalibrationAction): State {
       type: 'JOG',
       inProgress: true,
       error: null,
-      mount
-    }
+      mount,
+    },
   }
 }
 
@@ -521,8 +506,8 @@ function handleJogSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
-    }
+      error: null,
+    },
   }
 }
 
@@ -537,8 +522,8 @@ function handleJogFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error
-    }
+      error,
+    },
   }
 }
 
@@ -555,8 +540,8 @@ function handleUpdateOffset (
       inProgress: true,
       error: null,
       mount,
-      slot
-    }
+      slot,
+    },
   }
 }
 
@@ -572,12 +557,12 @@ function handleUpdateOffsetSuccess (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: null
+      error: null,
     },
     confirmedBySlot: {
       ...state.confirmedBySlot,
-      [slot]: true
-    }
+      [slot]: true,
+    },
   }
 }
 
@@ -595,8 +580,8 @@ function handleUpdateOffsetFailure (
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error
-    }
+      error,
+    },
   }
 }
 
@@ -607,6 +592,6 @@ function handleConfirmLabware (state, action: any) {
 
   return {
     ...state,
-    confirmedBySlot: {...state.confirmedBySlot, [slot]: true}
+    confirmedBySlot: {...state.confirmedBySlot, [slot]: true},
   }
 }

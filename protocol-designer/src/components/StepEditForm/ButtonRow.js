@@ -33,7 +33,7 @@ const STP = (state: BaseState): SP => ({ canSave: selectors.currentFormCanBeSave
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onCancel: () => dispatch(actions.cancelStepForm()),
   onSave: () => dispatch(actions.saveStepForm()),
-  onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal())
+  onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),
 })
 
 export default connect(STP, DTP)(ButtonRow)

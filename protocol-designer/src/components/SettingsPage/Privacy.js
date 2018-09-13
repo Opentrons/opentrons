@@ -10,7 +10,7 @@ import {
   optOut,
   getHasOptedIn,
   shutdownAnalytics,
-  initializeAnalytics
+  initializeAnalytics,
 } from '../../analytics'
 
 type State = {optInToggleValue: boolean}

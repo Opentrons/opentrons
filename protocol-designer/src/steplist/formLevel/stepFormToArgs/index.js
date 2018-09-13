@@ -9,7 +9,7 @@ import type { StepFormContext } from './types'
 
 export type ValidFormAndErrors = {
   errors: {[string]: string},
-  validatedForm: CommandCreatorData | null // TODO: incompleteData field when this is null?
+  validatedForm: CommandCreatorData | null, // TODO: incompleteData field when this is null?
 }
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
@@ -29,7 +29,7 @@ const stepFormToArgs = (formData: FormData, context?: StepFormContext = {}): * =
     default:
       return {
         errors: {_form: `Unsupported step type: ${formData.stepType}`},
-        validatedForm: null
+        validatedForm: null,
       }
   }
 }

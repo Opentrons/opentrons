@@ -5,7 +5,7 @@ const EventEmitter = require('events')
 
 const __mockBrowser = Object.assign(new EventEmitter(), {
   discover: jest.fn(),
-  stop: jest.fn()
+  stop: jest.fn(),
 })
 
 const createBrowser = jest.fn()

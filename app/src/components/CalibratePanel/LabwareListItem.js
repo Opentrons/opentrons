@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 type LabwareItemProps = {
   isDisabled: boolean,
-  onClick?: () => void
+  onClick?: () => void,
 }
 
 type Props = Labware & LabwareItemProps
@@ -21,7 +21,7 @@ export default function LabwareListItem (props: Props) {
     isTiprack,
     confirmed,
     isDisabled,
-    onClick
+    onClick,
   } = props
 
   const url = `/calibrate/labware/${slot}`

@@ -15,7 +15,7 @@ type OP = LabwareComponentProps
 
 type Props = {
   module: ?SessionModule,
-  present: boolean
+  present: boolean,
 }
 
 export default connect(makeMapStateToProps)(ReviewModuleItem)

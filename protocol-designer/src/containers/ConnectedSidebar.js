@@ -12,7 +12,7 @@ import type {BaseState} from '../types'
 import type {Page} from '../navigation'
 
 type Props = {
-  page: Page
+  page: Page,
 }
 
 function Sidebar (props: Props) {
@@ -36,7 +36,7 @@ function mapStateToProps (state: BaseState): Props {
   const page = selectors.currentPage(state)
 
   return {
-    page
+    page,
   }
 }
 

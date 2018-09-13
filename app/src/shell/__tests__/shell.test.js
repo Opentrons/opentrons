@@ -5,7 +5,7 @@ import electron from 'electron'
 
 import {
   mockResolvedValue,
-  mockRejectedValue
+  mockRejectedValue,
 } from '../../../__util__/mock-promise'
 
 import {
@@ -15,7 +15,7 @@ import {
   shellReducer,
   shellMiddleware,
   getShellUpdate,
-  getShellConfig
+  getShellConfig,
 } from '..'
 
 jest.mock('../../logger')
@@ -25,7 +25,7 @@ const middlewares = [thunk, shellMiddleware]
 const mockStore = configureMockStore(middlewares)
 const {
   './update': mockUpdate,
-  './config': mockConfig
+  './config': mockConfig,
 } = electron.__mockRemotes
 
 describe('app shell module', () => {
@@ -42,9 +42,9 @@ describe('app shell module', () => {
           available: null,
           downloaded: false,
           error: null,
-          seen: false
-        }
-      }
+          seen: false,
+        },
+      },
     }
   })
 
@@ -62,8 +62,8 @@ describe('app shell module', () => {
         {type: 'shell:START_UPDATE_CHECK'},
         {
           type: 'shell:FINISH_UPDATE_CHECK',
-          payload: {available: '42.0.0', error: null}
-        }
+          payload: {available: '42.0.0', error: null},
+        },
       ]
 
       mockResolvedValue(
@@ -84,8 +84,8 @@ describe('app shell module', () => {
         {type: 'shell:START_UPDATE_CHECK'},
         {
           type: 'shell:FINISH_UPDATE_CHECK',
-          payload: {available: null, error: null}
-        }
+          payload: {available: null, error: null},
+        },
       ]
 
       mockResolvedValue(
@@ -106,8 +106,8 @@ describe('app shell module', () => {
         {type: 'shell:START_UPDATE_CHECK'},
         {
           type: 'shell:FINISH_UPDATE_CHECK',
-          payload: {error: new Error('AH')}
-        }
+          payload: {error: new Error('AH')},
+        },
       ]
 
       mockRejectedValue(mockUpdate.checkForUpdates, new Error('AH'))
@@ -125,7 +125,7 @@ describe('app shell module', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'shell:START_DOWNLOAD'},
-        {type: 'shell:FINISH_DOWNLOAD', payload: {error: null}}
+        {type: 'shell:FINISH_DOWNLOAD', payload: {error: null}},
       ]
 
       mockResolvedValue(mockUpdate.downloadUpdate, null)
@@ -141,7 +141,7 @@ describe('app shell module', () => {
       const store = mockStore({})
       const expectedActions = [
         {type: 'shell:START_DOWNLOAD'},
-        {type: 'shell:FINISH_DOWNLOAD', payload: {error: new Error('AH')}}
+        {type: 'shell:FINISH_DOWNLOAD', payload: {error: new Error('AH')}},
       ]
 
       mockRejectedValue(mockUpdate.downloadUpdate, new Error('AH'))
@@ -173,8 +173,8 @@ describe('app shell module', () => {
           available: null,
           downloaded: false,
           error: null,
-          seen: false
-        }
+          seen: false,
+        },
       })
     })
 
@@ -184,7 +184,7 @@ describe('app shell module', () => {
 
       const action = {
         type: 'shell:FINISH_UPDATE_CHECK',
-        payload: {available: '42.0.0', error: null}
+        payload: {available: '42.0.0', error: null},
       }
 
       expect(shellReducer(state, action)).toEqual({
@@ -194,8 +194,8 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: false,
           error: null,
-          seen: false
-        }
+          seen: false,
+        },
       })
     })
 
@@ -205,7 +205,7 @@ describe('app shell module', () => {
 
       const action = {
         type: 'shell:FINISH_UPDATE_CHECK',
-        payload: {error: new Error('AH')}
+        payload: {error: new Error('AH')},
       }
 
       expect(shellReducer(state, action)).toEqual({
@@ -215,8 +215,8 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: false,
           error: new Error('AH'),
-          seen: false
-        }
+          seen: false,
+        },
       })
     })
 
@@ -232,8 +232,8 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: false,
           error: null,
-          seen: true
-        }
+          seen: true,
+        },
       })
     })
 
@@ -244,7 +244,7 @@ describe('app shell module', () => {
 
       const action = {
         type: 'shell:FINISH_DOWNLOAD',
-        payload: {error: null}
+        payload: {error: null},
       }
 
       expect(shellReducer(state, action)).toEqual({
@@ -254,8 +254,8 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: true,
           error: null,
-          seen: false
-        }
+          seen: false,
+        },
       })
     })
 
@@ -265,7 +265,7 @@ describe('app shell module', () => {
 
       const action = {
         type: 'shell:FINISH_DOWNLOAD',
-        payload: {error: new Error('AH')}
+        payload: {error: new Error('AH')},
       }
 
       expect(shellReducer(state, action)).toEqual({
@@ -275,15 +275,15 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: false,
           error: new Error('AH'),
-          seen: false
-        }
+          seen: false,
+        },
       })
     })
 
     test('handles SET_UPDATE_SEEN', () => {
       state.update.available = '42.0.0'
       const action = {
-        type: 'shell:SET_UPDATE_SEEN'
+        type: 'shell:SET_UPDATE_SEEN',
       }
       expect(shellReducer(state, action)).toEqual({
         update: {
@@ -292,8 +292,8 @@ describe('app shell module', () => {
           available: '42.0.0',
           downloaded: false,
           error: null,
-          seen: true
-        }
+          seen: true,
+        },
       })
     })
   })
@@ -329,7 +329,7 @@ describe('app shell module', () => {
     test('getShellUpdate selector', () => {
       expect(getShellUpdate(state)).toEqual({
         ...state.shell.update,
-        current: mockUpdate.CURRENT_VERSION
+        current: mockUpdate.CURRENT_VERSION,
       })
     })
   })

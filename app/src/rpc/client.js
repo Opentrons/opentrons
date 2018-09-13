@@ -14,7 +14,7 @@ import {
   NACK,
   NOTIFICATION,
   CONTROL_MESSAGE,
-  PONG
+  PONG,
 } from './message-types'
 
 // TODO(mc, 2017-08-29): see note about uuid above

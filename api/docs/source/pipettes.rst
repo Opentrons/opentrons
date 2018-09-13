@@ -60,42 +60,79 @@ The values are in microliters/seconds, and have varying defaults depending on th
         dispense_flow_rate=600)
 
 
+Minimum and Maximum Volume
+==================
+
+The minimum and maximum volume of the pipette may be set using
+``min_volume`` and ``max_volume``. The values are in microliters and have
+varying defaults depending on the model.
+
+
+.. code-block:: python
+
+    pipette = instruments.P10_Single(
+        mount='right',
+        min_volume=2,
+        max_volume=8)
+
+
 The given defaults for every pipette model is the following:
-p10_Single
+
+P10_Single
 ==========
-Aspirate Default: 5ul/sec
-Dispense Default: 10ul/sec
 
-p10_Multi
+- Aspirate Default: 5 μl/s
+- Dispense Default: 10 μl/s
+- Minimum Volume: 1 μl
+- Maximum Volume: 10 μl
+
+P10_Multi
 =========
-Aspirate Default: 5ul/sec
-Dispense Default: 10ul/sec
 
-p50_Single
+- Aspirate Default: 5 μl/s
+- Dispense Default: 10 μl/s
+- Minimum Volume: 1 μl
+- Maximum Volume: 10 μl
+
+P50_Single
 ==========
-Aspirate Default: 25ul/sec
-Dispense Default: 50ul/sec
 
-p50_Multi
+- Aspirate Default: 25 μl/s
+- Dispense Default: 50 μl/s
+- Minimum Volume: 5 μl
+- Maximum Volume: 50 μl
+
+P50_Multi
 =========
-Aspirate Default: 25ul/sec
-Dispense Default: 50ul/sec
 
-p300_Single
+- Aspirate Default: 25 μl/s
+- Dispense Default: 50 μl/s
+- Minimum Volume: 5 μl
+- Maximum Volume: 50 μl
+
+P300_Single
 ===========
-Aspirate Default: 150
-Dispense Default: 300
 
-p300_Multi
+- Aspirate Default: 150 μl/s
+- Dispense Default: 300 μl/s
+- Minimum Volume: 30 μl
+- Maximum Volume: 300 μl
+
+P300_Multi
 ==========
-Aspirate Default: 150
-Dispense Default: 300
 
-p1000_Single
+- Aspirate Default: 150 μl/s
+- Dispense Default: 300 μl/s
+- Minimum Volume: 30 μl
+- Maximum Volume: 300 μl
+
+P1000_Single
 ============
-Aspirate Default: 500
-Dispense Default: 1000
 
+- Aspirate Default: 500 μl/s
+- Dispense Default: 1000 μl/s
+- Minimum Volume: 100 μl
+- Maximum Volume: 1000 μl
 
 Old Pipette Constructor
 =======================

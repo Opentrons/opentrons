@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   getLabware,
   getWellDefsForSVG,
-  getIsTiprack
+  getIsTiprack,
 } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
@@ -24,7 +24,7 @@ export type Props = {
   /** optional getter for tip props by wellName (tipracks only) */
   getTipProps?: (wellName: string) => ?TipProps,
   /** optional getter for well props by wellName (non-tiprack labware only ) */
-  getWellProps?: (wellName: string) => ?WellProps
+  getWellProps?: (wellName: string) => ?WellProps,
 }
 
 // TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
@@ -60,7 +60,7 @@ function createWell (
   // Or... this is actually from the labware definitions?? But not tipracks?
   const svgOffset = {
     x: 1,
-    y: -3
+    y: -3,
   }
 
   if (isTiprack) {
@@ -82,7 +82,7 @@ function createWell (
     {...wellProps}
     {...{
       wellDef,
-      svgOffset
+      svgOffset,
     }}
   />
 }

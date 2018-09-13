@@ -3,16 +3,15 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 
-import {
-  actions as robotActions,
-  selectors as robotSelectors
-} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
+import {openProtocol} from '../../protocol'
 
 import {SidePanel} from '@opentrons/components'
 import Upload from './Upload'
 
 type Props = {
   sessionLoaded: ?boolean,
+  uploadError: ? {message: string},
   confirmUpload: () => mixed,
   createSession: () => mixed,
 }
@@ -29,13 +28,14 @@ function UploadPanel (props: Props) {
 
 function mapStateToProps (state) {
   return {
-    sessionLoaded: robotSelectors.getSessionIsLoaded(state)
+    sessionLoaded: robotSelectors.getSessionIsLoaded(state),
+    uploadError: robotSelectors.getUploadError(state),
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
     confirmUpload: () => dispatch(push('/upload/confirm')),
-    createSession: (file) => dispatch(robotActions.session(file))
+    createSession: (file) => dispatch(openProtocol(file)),
   }
 }

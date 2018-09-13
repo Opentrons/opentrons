@@ -18,15 +18,15 @@ export function initialize () {
     {
       id: 'whl',
       directory: path.join(__dirname, '../../api/dist'),
-      ext: '.whl'
+      ext: '.whl',
     },
 
     // firmware update
     {
       id: 'fw',
       directory: path.join(__dirname, '../../api/smoothie'),
-      ext: '.hex'
-    }
+      ext: '.hex',
+    },
   ].map(findUpdateFile)
 }
 

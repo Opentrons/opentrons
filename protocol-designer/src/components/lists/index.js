@@ -4,5 +4,5 @@ import PDTitledList from './PDTitledList'
 
 export {
   PDListItem,
-  PDTitledList
+  PDTitledList,
 }

@@ -25,7 +25,7 @@ type NavButtonProps= {
   /** Display a notification dot */
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
-  selected?: boolean
+  selected?: boolean,
 }
 
 export default function NavButton (props: NavButtonProps) {
@@ -36,14 +36,14 @@ export default function NavButton (props: NavButtonProps) {
     {
       [styles.disabled]: props.disabled,
       [styles.bottom]: props.isBottom,
-      [styles.active]: props.selected
+      [styles.active]: props.selected,
     }
   )
 
   let buttonProps = {
     className: className,
     disabled: props.disabled,
-    onClick: props.onClick
+    onClick: props.onClick,
   }
 
   if (url) {
@@ -51,7 +51,7 @@ export default function NavButton (props: NavButtonProps) {
       ...buttonProps,
       Component: NavLink,
       to: url,
-      activeClassName: styles.active
+      activeClassName: styles.active,
     }
   }
 

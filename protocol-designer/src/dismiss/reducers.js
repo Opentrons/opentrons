@@ -4,7 +4,7 @@ import {handleActions} from 'redux-actions'
 import omit from 'lodash/omit'
 import type {
   DismissFormWarning,
-  DismissTimelineWarning
+  DismissTimelineWarning,
 } from './actions'
 import {getPDMetadata} from '../file-types'
 import type {BaseState} from '../types'
@@ -16,7 +16,7 @@ import type {DeleteStepAction} from '../steplist/actions'
 export type DismissedWarningsAllSteps<WarningType> = {[stepId: number]: ?Array<WarningType>}
 export type DismissedWarningState = {
   form: DismissedWarningsAllSteps<FormWarning>,
-  timeline: DismissedWarningsAllSteps<CommandCreatorWarning>
+  timeline: DismissedWarningsAllSteps<CommandCreatorWarning>,
 }
 const dismissedWarnings = handleActions({
   DISMISS_FORM_WARNING: (
@@ -35,9 +35,9 @@ const dismissedWarnings = handleActions({
         ...state.form,
         [stepId]: [
           ...(state.form[stepId] || []),
-          warning
-        ]
-      }
+          warning,
+        ],
+      },
     }
   },
   DISMISS_TIMELINE_WARNING: (
@@ -55,9 +55,9 @@ const dismissedWarnings = handleActions({
         ...state.timeline,
         [stepId]: [
           ...(state.timeline[stepId] || []),
-          warning
-        ]
-      }
+          warning,
+        ],
+      },
     }
   },
   DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction): DismissedWarningState => {
@@ -65,19 +65,19 @@ const dismissedWarnings = handleActions({
     const stepId = action.payload.toString(10)
     return {
       form: omit(state.form, stepId),
-      timeline: omit(state.timeline, stepId)
+      timeline: omit(state.timeline, stepId),
     }
   },
   LOAD_FILE: (state: DismissedWarningState, action: LoadFileAction): DismissedWarningState =>
-    getPDMetadata(action.payload).dismissedWarnings
+    getPDMetadata(action.payload).dismissedWarnings,
 }, {form: {}, timeline: {}})
 
 export const _allReducers = {
-  dismissedWarnings
+  dismissedWarnings,
 }
 
 export type RootState = {
-  dismissedWarnings: DismissedWarningState
+  dismissedWarnings: DismissedWarningState,
 }
 
 const rootReducer = combineReducers(_allReducers)

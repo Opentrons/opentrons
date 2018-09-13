@@ -16,6 +16,6 @@ export default {
     modal,
     nav,
     step_edit_form,
-    tooltip
-  }
+    tooltip,
+  },
 }

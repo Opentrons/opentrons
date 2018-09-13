@@ -19,7 +19,7 @@ export default function ExitAlertModal (props: Props) {
       heading={HEADING}
       buttons={[
         {children: CANCEL_TEXT, onClick: back},
-        {children: EXIT_TEXT, onClick: exit}
+        {children: EXIT_TEXT, onClick: exit},
       ]}
       alertOverlay
     >

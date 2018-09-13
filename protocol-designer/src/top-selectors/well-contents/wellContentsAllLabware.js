@@ -11,7 +11,7 @@ import type {Selector} from '../../types'
 import type {
   Wells,
   ContentsByWell,
-WellContentsByLabware
+WellContentsByLabware,
   } from '../../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../../step-generation'
 
@@ -47,8 +47,8 @@ const _getWellContents = (
         highlighted: highlightedWells ? (wellName in highlightedWells) : false,
         selected: selectedWells ? wellName in selectedWells : false,
         maxVolume: well['total-liquid-volume'] || Infinity,
-        groupIds
-      }
+        groupIds,
+      },
     }
   }, {})
 }
@@ -75,7 +75,7 @@ const wellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
           // Only give _getWellContents the selection data if it's a selected container
           isSelectedLabware ? _selectedWells : null,
           isSelectedLabware ? _highlightedWells : null
-        )
+        ),
       }
     }, {})
   }

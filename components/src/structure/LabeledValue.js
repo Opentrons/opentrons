@@ -12,7 +12,7 @@ type Props = {
   /** Value */
   value: React.Node,
   /** Additional className */
-  className?: string
+  className?: string,
 }
 
 export default function LabeledValue (props: Props) {

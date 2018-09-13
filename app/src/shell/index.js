@@ -13,15 +13,15 @@ const {
   CURRENT_VERSION,
   checkForUpdates,
   downloadUpdate,
-  quitAndInstall
+  quitAndInstall,
 } = remote.require('./update')
 
 const {
-  getConfig
+  getConfig,
 } = remote.require('./config')
 
 const {
-  getRobots
+  getRobots,
 } = remote.require('./discovery')
 
 const log = createLogger(__filename)
@@ -34,7 +34,7 @@ type ShellState = {
     available: ?string,
     downloaded: boolean,
     error: ?Error,
-    seen: boolean
+    seen: boolean,
   },
 }
 
@@ -45,12 +45,12 @@ const INITIAL_STATE: ShellState = {
     available: null,
     downloaded: false,
     error: null,
-    seen: false
-  }
+    seen: false,
+  },
 }
 
 type StartUpdateCheckAction = {|
-  type: 'shell:START_UPDATE_CHECK'
+  type: 'shell:START_UPDATE_CHECK',
 |}
 
 type FinishUpdateCheckAction = {|
@@ -58,22 +58,22 @@ type FinishUpdateCheckAction = {|
   payload: {|
     available: ?string,
     error: ?Error,
-  |}
+  |},
 |}
 
 type StartDownloadAction = {|
-  type: 'shell:START_DOWNLOAD'
+  type: 'shell:START_DOWNLOAD',
 |}
 
 type SeenUpdateAction = {|
-  type: 'shell:SET_UPDATE_SEEN'
+  type: 'shell:SET_UPDATE_SEEN',
 |}
 
 type FinishDownloadAction = {|
   type: 'shell:FINISH_DOWNLOAD',
   payload: {|
     error: ?Error,
-  |}
+  |},
 |}
 
 export type ShellAction =
@@ -90,12 +90,12 @@ export function checkForShellUpdates (): ThunkPromiseAction {
     return checkForUpdates()
       .then((info: {updateAvailable: boolean, version: string}) => ({
         available: info.updateAvailable ? info.version : null,
-        error: null
+        error: null,
       }))
       .catch((error: Error) => ({error}))
       .then((payload) => dispatch({
         type: 'shell:FINISH_UPDATE_CHECK',
-        payload
+        payload,
       }))
   }
 }
@@ -148,8 +148,8 @@ export function shellReducer (
           ...state.update,
           ...action.payload,
           downloadInProgress: false,
-          downloaded: !action.payload.error
-        }
+          downloaded: !action.payload.error,
+        },
       }
   }
 
@@ -172,7 +172,7 @@ export const shellMiddleware: Middleware = (store) => {
 }
 
 export type ShellUpdate = $PropertyType<ShellState, 'update'> & {
-  current: string
+  current: string,
 }
 
 export const getShellUpdate: Selector<State, void, ShellUpdate> =

@@ -6,7 +6,7 @@ import {
   InputField,
   InstrumentGroup,
   OutlineButton,
-  PrimaryButton
+  PrimaryButton,
 } from '@opentrons/components'
 import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
@@ -19,7 +19,7 @@ export type FilePageProps = {
   instruments: React.ElementProps<typeof InstrumentGroup>,
   goToDesignPage: () => mixed,
   saveFileMetadata: () => mixed,
-  swapPipettes: () => mixed
+  swapPipettes: () => mixed,
 }
 
 const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage, swapPipettes}: FilePageProps) => {

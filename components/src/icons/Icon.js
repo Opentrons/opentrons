@@ -44,7 +44,7 @@ export default function Icon (props: IconProps) {
 
   const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
   const className = classnames(props.className, {
-    [styles.spin]: props.spin
+    [styles.spin]: props.spin,
   })
 
   return (

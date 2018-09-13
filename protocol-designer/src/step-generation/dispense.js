@@ -31,8 +31,8 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
       well,
       offsetFromBottomMm: offsetFromBottomMm == null
         ? undefined
-        : offsetFromBottomMm
-    }
+        : offsetFromBottomMm,
+    },
   }]
 
   return {
@@ -45,9 +45,9 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
         labwareId: labware,
         labwareType: prevRobotState.labware[labware].type,
         volume,
-        well
-      }, prevRobotState.liquidState)
-    }
+        well,
+      }, prevRobotState.liquidState),
+    },
   }
 }
 

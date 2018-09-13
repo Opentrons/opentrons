@@ -7,7 +7,7 @@ describe('rpc remote object factory', () => {
   beforeEach(() => {
     context = {
       resolveTypeValues: jest.fn(),
-      callRemote: jest.fn()
+      callRemote: jest.fn(),
     }
   })
 
@@ -101,7 +101,7 @@ describe('rpc remote object factory', () => {
         expect(remote).toEqual({
           _id: 1,
           foo: 'bar',
-          children: [{_id: 3, baz: 'qux'}, {_id: 2, fizz: 'buzz'}]
+          children: [{_id: 3, baz: 'qux'}, {_id: 2, fizz: 'buzz'}],
         })
       })
   })
@@ -122,7 +122,7 @@ describe('rpc remote object factory', () => {
         expect(remote).toEqual({
           _id: 34,
           parent1: {_id: 32, c: {_id: 31, foo: 'foo'}},
-          parent2: {_id: 33, c: {_id: 31, foo: 'foo'}}
+          parent2: {_id: 33, c: {_id: 31, foo: 'foo'}},
         })
       })
   })

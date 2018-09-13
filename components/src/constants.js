@@ -14,7 +14,7 @@ export const swatchColors = (n: number): string => {
     '#ff6161',
     '#065596',
     '#2a97dc',
-    '#d24193'
+    '#d24193',
   ]
   if (!Number.isInteger(n)) {
     // TODO: Ian 2018-07-20 use assert

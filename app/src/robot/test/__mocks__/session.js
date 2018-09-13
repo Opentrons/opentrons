@@ -17,6 +17,6 @@ export default function MockSession () {
     pause: jest.fn(),
     resume: jest.fn(),
     stop: jest.fn(),
-    refresh: jest.fn()
+    refresh: jest.fn(),
   }
 }

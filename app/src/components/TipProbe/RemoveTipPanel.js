@@ -12,21 +12,21 @@ import removeMulti from '../../img/remove_tip_multi.png'
 import {
   actions as robotActions,
   type Channels,
-  type Mount
+  type Mount,
 } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
-  channels: Channels
+  channels: Channels,
 }
 
 type DispatchProps = {
-  onConfirmClick: () => void
+  onConfirmClick: () => void,
 }
 
 type RemoveTipProps = {
   channels: Channels,
-  onConfirmClick: () => void
+  onConfirmClick: () => void,
 }
 
 export default connect(null, mapDispatchToProps)(RemoveTipPanel)
@@ -62,6 +62,6 @@ function mapDispatchToProps (
   const {mount} = ownProps
 
   return {
-    onConfirmClick: () => { dispatch(robotActions.confirmProbed(mount)) }
+    onConfirmClick: () => { dispatch(robotActions.confirmProbed(mount)) },
   }
 }

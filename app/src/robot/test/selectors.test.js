@@ -11,7 +11,6 @@ const {
   getConnectionStatus,
   getSessionLoadInProgress,
   getUploadError,
-  getSessionName,
   getSessionIsLoaded,
   getCommands,
   getRunProgress,
@@ -30,7 +29,7 @@ const {
   getNextLabware,
   makeGetCurrentPipette,
   getModulesBySlot,
-  getModules
+  getModules,
 } = selectors
 
 describe('robot selectors', () => {
@@ -45,31 +44,31 @@ describe('robot selectors', () => {
             foo: {
               name: 'foo',
               connections: [
-                {ip: '10.10.1.2', port: 31950, ok: true, local: false}
-              ]
+                {ip: '10.10.1.2', port: 31950, ok: true, local: false},
+              ],
             },
             bar: {
               name: 'bar',
               connections: [
                 {ip: '10.10.3.4', port: 31950, ok: true, local: false},
-                {ip: '169.254.3.4', port: 31950, ok: true, local: true}
-              ]
+                {ip: '169.254.3.4', port: 31950, ok: true, local: true},
+              ],
             },
             baz: {
               name: 'baz',
               connections: [
                 {ip: '10.10.5.6', port: 31950, ok: true, local: false},
-                {ip: '169.254.5.6', port: 31950, ok: false, local: true}
-              ]
+                {ip: '169.254.5.6', port: 31950, ok: false, local: true},
+              ],
             },
             qux: {
               name: 'qux',
               connections: [
-                {ip: '169.254.7.8', port: 31950, ok: true, local: true}
-              ]
-            }
-          }
-        }
+                {ip: '169.254.7.8', port: 31950, ok: true, local: true},
+              ],
+            },
+          },
+        },
       }
     })
 
@@ -80,29 +79,29 @@ describe('robot selectors', () => {
           ip: '169.254.3.4',
           port: 31950,
           wired: true,
-          isConnected: true
+          isConnected: true,
         },
         {
           name: 'qux',
           ip: '169.254.7.8',
           port: 31950,
           isConnected: false,
-          wired: true
+          wired: true,
         },
         {
           name: 'baz',
           ip: '10.10.5.6',
           port: 31950,
           wired: false,
-          isConnected: false
+          isConnected: false,
         },
         {
           name: 'foo',
           ip: '10.10.1.2',
           port: 31950,
           wired: false,
-          isConnected: false
-        }
+          isConnected: false,
+        },
       ])
     })
 
@@ -112,7 +111,7 @@ describe('robot selectors', () => {
         ip: '169.254.3.4',
         port: 31950,
         wired: true,
-        isConnected: true
+        isConnected: true,
       })
 
       state = setIn(state, 'robot.connection.connectedTo', 'not-found')
@@ -129,28 +128,28 @@ describe('robot selectors', () => {
       state = setIn(state, 'robot.connection', {
         connectedTo: '',
         connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: false}
+        disconnectRequest: {inProgress: false},
       })
       expect(getConnectionStatus(state)).toBe(constants.DISCONNECTED)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: '',
         connectRequest: {inProgress: true},
-        disconnectRequest: {inProgress: false}
+        disconnectRequest: {inProgress: false},
       })
       expect(getConnectionStatus(state)).toBe(constants.CONNECTING)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: 'foo',
         connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: false}
+        disconnectRequest: {inProgress: false},
       })
       expect(getConnectionStatus(state)).toBe(constants.CONNECTED)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: 'foo',
         connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: true}
+        disconnectRequest: {inProgress: true},
       })
       expect(getConnectionStatus(state)).toBe(constants.DISCONNECTING)
     })
@@ -172,12 +171,6 @@ describe('robot selectors', () => {
     expect(getUploadError(state)).toEqual(new Error('AH'))
   })
 
-  test('getSessionName', () => {
-    const state = makeState({session: {name: 'foobar.py'}})
-
-    expect(getSessionName(state)).toBe('foobar.py')
-  })
-
   test('getSessionIsLoaded', () => {
     let state = makeState({session: {state: constants.LOADED}})
     expect(getSessionIsLoaded(state)).toBe(true)
@@ -193,7 +186,7 @@ describe('robot selectors', () => {
       error: false,
       finished: false,
       stopped: false,
-      paused: false
+      paused: false,
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
@@ -211,7 +204,7 @@ describe('robot selectors', () => {
       error: false,
       finished: false,
       stopped: false,
-      paused: true
+      paused: true,
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
@@ -228,7 +221,7 @@ describe('robot selectors', () => {
       error: false,
       finished: false,
       stopped: false,
-      paused: true
+      paused: true,
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
@@ -245,7 +238,7 @@ describe('robot selectors', () => {
       error: true,
       finished: true,
       stopped: true,
-      paused: false
+      paused: false,
     }
 
     Object.keys(expectedStates).forEach((sessionState) => {
@@ -265,9 +258,9 @@ describe('robot selectors', () => {
       [NAME]: {
         session: {
           startTime: null,
-          runTime: 42
-        }
-      }
+          runTime: 42,
+        },
+      },
     }
 
     expect(getRunTime(state)).toEqual('00:00:00')
@@ -279,9 +272,9 @@ describe('robot selectors', () => {
         [NAME]: {
           session: {
             startTime: 42,
-            runTime: 42 + (1000 * seconds)
-          }
-        }
+            runTime: 42 + (1000 * seconds),
+          },
+        },
       }
 
       expect(getRunTime(stateWithRunTime)).toEqual(expected)
@@ -306,34 +299,34 @@ describe('robot selectors', () => {
             id: 0,
             description: 'foo',
             handledAt: 42,
-            children: [1]
+            children: [1],
           },
           1: {
             id: 1,
             description: 'bar',
             handledAt: 43,
-            children: [2, 3]
+            children: [2, 3],
           },
           2: {
             id: 2,
             description: 'baz',
             handledAt: 44,
-            children: []
+            children: [],
           },
           3: {
             id: 3,
             description: 'qux',
             handledAt: null,
-            children: []
+            children: [],
           },
           4: {
             id: 4,
             description: 'fizzbuzz',
             handledAt: null,
-            children: []
-          }
-        }
-      }
+            children: [],
+          },
+        },
+      },
     })
 
     test('getRunProgress', () => {
@@ -343,7 +336,7 @@ describe('robot selectors', () => {
 
     test('getRunProgress with no commands', () => {
       const state = makeState({
-        session: {protocolCommands: [], protocolCommandsById: {}}
+        session: {protocolCommands: [], protocolCommandsById: {}},
       })
 
       expect(getRunProgress(state)).toEqual(0)
@@ -371,7 +364,7 @@ describe('robot selectors', () => {
                   handledAt: 44,
                   isCurrent: true,
                   isLast: true,
-                  children: []
+                  children: [],
                 },
                 {
                   id: 3,
@@ -379,11 +372,11 @@ describe('robot selectors', () => {
                   handledAt: null,
                   isCurrent: false,
                   isLast: false,
-                  children: []
-                }
-              ]
-            }
-          ]
+                  children: [],
+                },
+              ],
+            },
+          ],
         },
         {
           id: 4,
@@ -391,8 +384,8 @@ describe('robot selectors', () => {
           handledAt: null,
           isCurrent: false,
           isLast: false,
-          children: []
-        }
+          children: [],
+        },
       ])
     })
   })
@@ -405,23 +398,23 @@ describe('robot selectors', () => {
         session: {
           pipettesByMount: {
             left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-            right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
-          }
+            right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+          },
         },
         calibration: {
           calibrationRequest: {
             type: 'PROBE_TIP',
             mount: 'left',
             inProgress: true,
-            error: null
+            error: null,
           },
           probedByMount: {
-            left: true
+            left: true,
           },
           tipOnByMount: {
-            right: true
-          }
-        }
+            right: true,
+          },
+        },
       })
     })
 
@@ -435,7 +428,7 @@ describe('robot selectors', () => {
           volume: 200,
           calibration: constants.PROBING,
           probed: true,
-          tipOn: false
+          tipOn: false,
         },
         {
           mount: 'right',
@@ -444,8 +437,8 @@ describe('robot selectors', () => {
           volume: 50,
           calibration: constants.UNPROBED,
           probed: false,
-          tipOn: true
-        }
+          tipOn: true,
+        },
       ])
     })
 
@@ -460,7 +453,7 @@ describe('robot selectors', () => {
         volume: 200,
         calibration: constants.PROBING,
         probed: true,
-        tipOn: false
+        tipOn: false,
       })
 
       props = {match: {params: {mount: 'right'}}}
@@ -471,7 +464,7 @@ describe('robot selectors', () => {
         volume: 50,
         calibration: constants.UNPROBED,
         probed: false,
-        tipOn: true
+        tipOn: true,
       })
 
       props = {match: {params: {}}}
@@ -484,28 +477,28 @@ describe('robot selectors', () => {
       session: {
         pipettesByMount: {
           left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
-        }
+          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+        },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {},
-        tipOnByMount: {left: true}
-      }
+        tipOnByMount: {left: true},
+      },
     })
 
     const rightState = makeState({
       session: {
         pipettesByMount: {
           left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50}
-        }
+          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+        },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {},
-        tipOnByMount: {right: true}
-      }
+        tipOnByMount: {right: true},
+      },
     })
 
     expect(getCalibratorMount(leftState)).toBe('left')
@@ -517,41 +510,41 @@ describe('robot selectors', () => {
       session: {
         pipettesByMount: {
           left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
-        }
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+        },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {left: true, right: true},
-        tipOnByMount: {}
-      }
+        tipOnByMount: {},
+      },
     })
 
     const twoPipettesNotCalibrated = makeState({
       session: {
         pipettesByMount: {
           left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
-        }
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+        },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {left: false, right: false},
-        tipOnByMount: {}
-      }
+        tipOnByMount: {},
+      },
     })
 
     const onePipetteCalibrated = makeState({
       session: {
         pipettesByMount: {
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
-        }
+          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+        },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {right: true},
-        tipOnByMount: {}
-      }
+        tipOnByMount: {},
+      },
     })
 
     expect(getPipettesCalibrated(twoPipettesCalibrated)).toBe(true)
@@ -569,10 +562,10 @@ describe('robot selectors', () => {
             1: {
               _id: 1,
               slot: '1',
-              name: 'tempdeck'
-            }
-          }
-        }
+              name: 'tempdeck',
+            },
+          },
+        },
       })
     })
 
@@ -581,8 +574,8 @@ describe('robot selectors', () => {
         1: {
           _id: 1,
           slot: '1',
-          name: 'tempdeck'
-        }
+          name: 'tempdeck',
+        },
       })
     })
 
@@ -591,8 +584,8 @@ describe('robot selectors', () => {
         {
           _id: 1,
           slot: '1',
-          name: 'tempdeck'
-        }
+          name: 'tempdeck',
+        },
       ])
     })
   })
@@ -608,40 +601,40 @@ describe('robot selectors', () => {
               slot: '1',
               type: 's',
               isTiprack: true,
-              calibratorMount: 'right'
+              calibratorMount: 'right',
             },
             2: {
               slot: '2',
               type: 'm',
               isTiprack: true,
-              calibratorMount: 'left'
+              calibratorMount: 'left',
             },
             5: {slot: '5', type: 'a', isTiprack: false},
-            9: {slot: '9', type: 'b', isTiprack: false}
+            9: {slot: '9', type: 'b', isTiprack: false},
           },
           pipettesByMount: {
             left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-            right: {name: 'p50', mount: 'right', channels: 1, volume: 50}
-          }
+            right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+          },
         },
         calibration: {
           labwareBySlot: {
             1: constants.UNCONFIRMED,
-            5: constants.OVER_SLOT
+            5: constants.OVER_SLOT,
           },
           confirmedBySlot: {
             1: false,
-            5: true
+            5: true,
           },
           calibrationRequest: {
             type: 'MOVE_TO',
             inProgress: true,
             slot: '1',
-            mount: 'left'
+            mount: 'left',
           },
           probedByMount: {},
-          tipOnByMount: {right: true}
-        }
+          tipOnByMount: {right: true},
+        },
       })
     })
 
@@ -655,7 +648,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: false,
-          calibratorMount: 'left'
+          calibratorMount: 'left',
         },
         // then single channel tiprack
         {
@@ -665,7 +658,7 @@ describe('robot selectors', () => {
           isMoving: true,
           calibration: 'moving-to-slot',
           confirmed: false,
-          calibratorMount: 'right'
+          calibratorMount: 'right',
         },
         // then other labware by slot
         {
@@ -674,7 +667,7 @@ describe('robot selectors', () => {
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
-          confirmed: true
+          confirmed: true,
         },
         {
           slot: '9',
@@ -682,8 +675,8 @@ describe('robot selectors', () => {
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
-          confirmed: false
-        }
+          confirmed: false,
+        },
       ])
     })
 
@@ -696,7 +689,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: false,
-          calibratorMount: 'left'
+          calibratorMount: 'left',
         },
         {
           slot: '1',
@@ -705,8 +698,8 @@ describe('robot selectors', () => {
           isMoving: true,
           calibration: 'moving-to-slot',
           confirmed: false,
-          calibratorMount: 'right'
-        }
+          calibratorMount: 'right',
+        },
       ])
     })
 
@@ -719,7 +712,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: false,
-          calibratorMount: 'left'
+          calibratorMount: 'left',
         },
         {
           slot: '1',
@@ -728,7 +721,7 @@ describe('robot selectors', () => {
           isMoving: true,
           calibration: 'moving-to-slot',
           confirmed: false,
-          calibratorMount: 'right'
+          calibratorMount: 'right',
         },
         {
           slot: '9',
@@ -736,8 +729,8 @@ describe('robot selectors', () => {
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
-          confirmed: false
-        }
+          confirmed: false,
+        },
       ])
     })
 
@@ -749,7 +742,7 @@ describe('robot selectors', () => {
         isMoving: false,
         calibration: 'unconfirmed',
         confirmed: false,
-        calibratorMount: 'left'
+        calibratorMount: 'left',
       })
 
       const nextState = {
@@ -760,10 +753,10 @@ describe('robot selectors', () => {
             confirmedBySlot: {
               ...state[NAME].calibration.confirmedBySlot,
               1: true,
-              2: true
-            }
-          }
-        }
+              2: true,
+            },
+          },
+        },
       }
 
       expect(getNextLabware(nextState)).toEqual({
@@ -772,7 +765,7 @@ describe('robot selectors', () => {
         isTiprack: false,
         isMoving: false,
         calibration: 'unconfirmed',
-        confirmed: false
+        confirmed: false,
       })
     })
   })

@@ -9,7 +9,7 @@ import {CardContentHalf} from '../layout'
 
 type Props = {
   update: ShellUpdate,
-  checkForUpdates: () => mixed
+  checkForUpdates: () => mixed,
 }
 const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
@@ -17,7 +17,7 @@ const VERSION_LABEL = 'Software Version'
 export default function AppInfoCard (props: Props) {
   const {
     checkForUpdates,
-    update: {current, available, checkInProgress}
+    update: {current, available, checkInProgress},
   } = props
 
   return (

@@ -22,29 +22,29 @@ export type FormError = {
 const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   INCOMPATIBLE_ASPIRATE_LABWARE: {
     title: 'Selected aspirate labware may be incompatible with selected pipette',
-    dependentFields: ['aspirate_labware', 'pipette']
+    dependentFields: ['aspirate_labware', 'pipette'],
   },
   INCOMPATIBLE_DISPENSE_LABWARE: {
     title: 'Selected dispense labware may be incompatible with selected pipette',
-    dependentFields: ['dispense_labware', 'pipette']
+    dependentFields: ['dispense_labware', 'pipette'],
   },
   INCOMPATIBLE_LABWARE: {
     title: 'Selected labware may be incompatible with selected pipette',
-    dependentFields: ['labware', 'pipette']
+    dependentFields: ['labware', 'pipette'],
   },
   WELL_RATIO_TRANSFER: {
     title: 'In transfer actions the number of source and destination wells must match',
     body: 'You may want to use a Distribute or Consolidate instead of Transfer',
-    dependentFields: ['aspirate_wells', 'dispense_wells']
+    dependentFields: ['aspirate_wells', 'dispense_wells'],
   },
   WELL_RATIO_CONSOLIDATE: {
     title: 'In consolidate actions there must be multiple source wells and one destination well',
-    dependentFields: ['aspirate_wells', 'dispense_wells']
+    dependentFields: ['aspirate_wells', 'dispense_wells'],
   },
   WELL_RATIO_DISTRIBUTE: {
     title: 'In distribute actions there must be one source well and multiple destination wells',
-    dependentFields: ['aspirate_wells', 'dispense_wells']
-  }
+    dependentFields: ['aspirate_wells', 'dispense_wells'],
+  },
 }
 export type FormErrorChecker = (mixed) => ?FormError
 

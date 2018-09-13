@@ -4,7 +4,7 @@ import {Pill, swatchColors, MIXED_WELL_COLOR} from '@opentrons/components'
 import type {NamedIngred} from '../steplist/types'
 
 type Props = {
-  ingreds: ?Array<NamedIngred>
+  ingreds: ?Array<NamedIngred>,
 }
 
 function IngredPill (props: Props) {

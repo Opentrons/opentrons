@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import type {ThunkDispatch} from '../../types'
 import {
   actions as steplistActions,
-  type TerminalItemId
+  type TerminalItemId,
 } from '../../steplist'
 import i18n from '../../localization'
 import styles from './styles.css'
@@ -30,6 +30,6 @@ class TerminalItemLink extends React.Component<OP & DP> {
 }
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
-  selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId))
+  selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId)),
 })
 export default connect(null, mapDTP)(TerminalItemLink)

@@ -12,7 +12,7 @@ type Props = {
   titleBar: TitleBarProps,
   contentsClassName?: string,
   heading?: string,
-  children?: React.Node
+  children?: React.Node,
 }
 
 export default function ModalPage (props: Props) {

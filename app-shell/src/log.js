@@ -19,7 +19,7 @@ const FILE_OPTIONS = {
   // keep 10 backups at most
   maxFiles: 10,
   // roll filenames in accending order (larger the number, older the log)
-  tailable: true
+  tailable: true,
 }
 
 let config
@@ -59,13 +59,13 @@ function createTransports () {
     // error file log
     new winston.transports.File(Object.assign({
       level: 'error',
-      filename: ERROR_LOG
+      filename: ERROR_LOG,
     }, FILE_OPTIONS)),
 
     // regular combined file log
     new winston.transports.File(Object.assign({
       level: config.level.file,
-      filename: COMBINED_LOG
+      filename: COMBINED_LOG,
     }, FILE_OPTIONS)),
 
     // console log
@@ -82,8 +82,8 @@ function createTransports () {
 
           return print
         })
-      )
-    })
+      ),
+    }),
   ]
 }
 
@@ -94,8 +94,8 @@ function createLogger (filename) {
     winston.format.timestamp(),
     winston.format.metadata({
       key: 'meta',
-      fillExcept: ['level', 'message', 'timestamp', 'label']
-    })
+      fillExcept: ['level', 'message', 'timestamp', 'label'],
+    }),
   ]
 
   if (filename) {
@@ -109,6 +109,6 @@ function createLogger (filename) {
 
   return winston.createLogger({
     transports,
-    format: winston.format.combine(...formats)
+    format: winston.format.combine(...formats),
   })
 }

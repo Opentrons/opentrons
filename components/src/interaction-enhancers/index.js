@@ -9,5 +9,5 @@ export {
   clickOutside,
   ClickOutside,
   HandleKeypress,
-  IntervalWrapper
+  IntervalWrapper,
 }

@@ -11,11 +11,11 @@ type TabProps = {
   title: string,
   href: string,
   isActive: boolean,
-  isDisabled: boolean
+  isDisabled: boolean,
 }
 
 export type PageTabProps = {
-  pages: Array<TabProps>
+  pages: Array<TabProps>,
 }
 
 export default function PageTabs (props: PageTabProps) {
@@ -31,7 +31,7 @@ export default function PageTabs (props: PageTabProps) {
 function Tab (props: TabProps) {
   const {isDisabled} = props
   const tabLinkClass = classnames(styles.tab_link, {
-    [styles.active_tab_link]: props.isActive
+    [styles.active_tab_link]: props.isActive,
   })
 
   // TODO(mc, 2017-12-14): make a component for proper disabling of links

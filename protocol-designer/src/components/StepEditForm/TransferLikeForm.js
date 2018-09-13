@@ -9,7 +9,7 @@ import {
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField
+  ChangeTipField,
 } from './formFields'
 
 import TipPositionInput from './TipPositionInput'

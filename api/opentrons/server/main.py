@@ -283,9 +283,11 @@ def main():
     if args.path:
         log.debug("Starting Opentrons server application on {}".format(
             args.path))
+        path, host, port = args.path, None, None
     else:
         log.debug("Starting Opentrons server application on {}:{}".format(
             args.hostname, args.port))
+        path, host, port = None, args.hostname, args.port
 
     try:
         robot.connect()
@@ -303,7 +305,7 @@ def main():
         setup_udev_rules_file()
     # Explicitly unlock resin updates in case a prior server left them locked
     unlock_resin_updates()
-    web.run_app(init(), host=args.hostname, port=args.port, path=args.path)
+    web.run_app(init(), host=host, port=port, path=path)
     arg_parser.exit(message="Stopped\n")
 
 

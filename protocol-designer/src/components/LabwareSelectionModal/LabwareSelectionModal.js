@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   ClickOutside,
   OutlineButton,
-  type DeckSlot
+  type DeckSlot,
 } from '@opentrons/components'
 import {PDTitledList} from '../lists'
 import SelectedWrapper from './SelectedWrapper'
@@ -16,7 +16,7 @@ type Props = {
   slot: ?DeckSlot,
   permittedTipracks: Array<string>,
   select: (?string) => mixed,
-  selectedSection: ?string
+  selectedSection: ?string,
 }
 
 // TODO: Ian 2017-07-26 use shared-data labware, need displayName
@@ -26,13 +26,13 @@ const hardcodedLabware = {
     ['tiprack-10ul', '10uL Tip Rack', 'Tiprack-10ul'],
     ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
     ['tiprack-1000ul', '1000uL Tip Rack', 'Tiprack-200ul'],
-    ['tiprack-1000ul-chem', '10x10 1000uL Chem-Tip Rack', 'Tiprack-1000ul-chem']
+    ['tiprack-1000ul-chem', '10x10 1000uL Chem-Tip Rack', 'Tiprack-1000ul-chem'],
   ],
   'Tube Rack': [
     ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
     ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
     ['24-vial-rack', '3.5mL Tube Rack'],
-    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml']
+    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
@@ -41,18 +41,18 @@ const hardcodedLabware = {
     ['96-PCR-tall', '96 Well PCR Plate (Tall)', '96-PCR-Tall'],
     ['384-plate', '384 Well Plate', '384-plate'],
     ['12-well-plate', '12 Well Plate'],
-    ['24-well-plate', '24 Well Plate']
+    ['24-well-plate', '24 Well Plate'],
     // ['rigaku-compact-crystallization-plate', 'Rigaku Compact Crystallization Plate']
   ],
   'Trough': [
-    ['trough-12row', '12-row Trough', 'Trough-12row']
+    ['trough-12row', '12-row Trough', 'Trough-12row'],
   ],
   // 'PCR Strip': [
   //   ['PCR-strip-tall', 'PCR Strip Tall', '96-PCR-Strip']
   // ],
   'Trash': [
-    ['trash-box', 'Trash Box'] // no container img
-  ]
+    ['trash-box', 'Trash Box'], // no container img
+  ],
 }
 
 const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
@@ -60,7 +60,7 @@ const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
   'Tube Rack',
   'Well Plate',
   'Trough',
-  'Trash'
+  'Trash',
 ]
 
 class LabwareDropdown extends React.Component <Props> {

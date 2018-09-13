@@ -4,14 +4,14 @@ import * as React from 'react'
 export const KNOWLEDGEBASE_ROOT_URL = 'https://intercom.help/opentrons-protocol-designer/beta-help-center'
 
 export const links = {
-  'distribute': `${KNOWLEDGEBASE_ROOT_URL}/protocol-steps/distribute`
+  'distribute': `${KNOWLEDGEBASE_ROOT_URL}/protocol-steps/distribute`,
 }
 
 type Link = $Keys<typeof links>
 
 type Props = {
   to: Link,
-  children: React.Node
+  children: React.Node,
 }
 
 /** Link which opens a page on the knowledge base to a new tab/window */

@@ -1,13 +1,13 @@
 module.exports = {
   extends: [
-    'stylelint-config-standard'
+    'stylelint-config-standard',
   ],
 
   ignoreFiles: [
     'api/**',
     '**/dist/**',
     '**/coverage/**',
-    '**/venv/**'
+    '**/venv/**',
   ],
 
   rules: {
@@ -20,7 +20,7 @@ module.exports = {
         'import',
         'global',
         'local',
-      ]
+      ],
     }],
 
     'property-no-unknown': [ true, {
@@ -44,8 +44,8 @@ module.exports = {
         'lost-row',
         'lost-unit',
         'lost-utility',
-        'lost-waffle'
-      ]
+        'lost-waffle',
+      ],
     }],
 
     'at-rule-no-unknown': [ true, {
@@ -56,8 +56,8 @@ module.exports = {
         // lost grid (http://lostgrid.org/docs.html)
         // TODO(mc, 2018-02-09): use stylelint-config-lost once stylelint-
         // config-css-modules at-rule-no-unknown no longer conflicts
-        'lost'
-      ]
-    }]
-  }
+        'lost',
+      ],
+    }],
+  },
 }

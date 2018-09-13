@@ -29,11 +29,11 @@ const SettingsSidebar = (props: SP & DP) => (
 )
 
 const STP = (state: BaseState): SP => ({
-  currentPage: selectors.currentPage(state)
+  currentPage: selectors.currentPage(state),
 })
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
-  makeNavigateToPage: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName))
+  makeNavigateToPage: (pageName: Page) => () => dispatch(actions.navigateToPage(pageName)),
 })
 
 export default connect(STP, DTP)(SettingsSidebar)

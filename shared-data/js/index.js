@@ -16,5 +16,5 @@ export {
   getLabware,
   getWellDefsForSVG,
   getIsTiprack,
-  labwareList
+  labwareList,
 }

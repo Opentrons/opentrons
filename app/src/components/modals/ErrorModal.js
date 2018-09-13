@@ -27,7 +27,7 @@ export default function ErrorModal (props: Props) {
     closeButtonProps = {
       ...closeButtonProps,
       Component: Link,
-      to: props.closeUrl
+      to: props.closeUrl,
     }
   }
 

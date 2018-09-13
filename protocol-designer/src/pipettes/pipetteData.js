@@ -11,7 +11,7 @@ const supportedPipetteModels = [
   'p50_multi_v1.3',
   'p300_single_v1.3',
   'p300_multi_v1.3',
-  'p1000_single_v1.3'
+  'p1000_single_v1.3',
 ]
 
 // TODO: should a version of pipetteOptions be moved to shared-data,

@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import {
   actions as robotActions,
-  selectors as robotSelectors
+  selectors as robotSelectors,
 } from '../../robot'
 import {SidePanel, SidePanelGroup} from '@opentrons/components'
 import RunTimer from './RunTimer'
@@ -21,14 +21,14 @@ const mapStateToProps = (state) => ({
     !robotSelectors.getSessionIsLoaded(state) ||
     robotSelectors.getCancelInProgress(state) ||
     robotSelectors.getSessionLoadInProgress(state)
-  )
+  ),
 })
 
 const mapDispatchToProps = (dispatch) => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
   onResumeClick: () => dispatch(robotActions.resume()),
-  onResetClick: () => dispatch(robotActions.refreshSession())
+  onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
 function RunPanel (props) {

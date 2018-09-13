@@ -13,15 +13,15 @@ const BROWSER_SERVICE = {
       name: 'http',
       protocol: 'tcp',
       subtypes: [],
-      description: 'Web Site'
-    }
+      description: 'Web Site',
+    },
   ],
   txt: [''],
   port: 31950,
   fullname: 'opentrons-dev._http._tcp.local',
   host: 'opentrons-dev.local',
   interfaceIndex: 0,
-  networkInterface: 'en0'
+  networkInterface: 'en0',
 }
 
 describe('discovery client', () => {
@@ -83,7 +83,7 @@ describe('discovery client', () => {
           ip: '192.168.1.42',
           port: 31950,
           ok: null,
-          serverOk: null
+          serverOk: null,
         })
 
         done()
@@ -120,8 +120,8 @@ describe('discovery client', () => {
         ip: '192.168.1.42',
         port: 31950,
         ok: true,
-        serverOk: true
-      }
+        serverOk: true,
+      },
     ]
 
     client.start()
@@ -133,8 +133,8 @@ describe('discovery client', () => {
         ip: '192.168.1.42',
         port: 31950,
         ok: true,
-        serverOk: true
-      }
+        serverOk: true,
+      },
     ])
   })
 
@@ -144,7 +144,7 @@ describe('discovery client', () => {
       const client = DiscoveryClient()
       const service = {
         ...BROWSER_SERVICE,
-        addresses: ['fe80::caf4:6db4:4652:e975', ...BROWSER_SERVICE.addresses]
+        addresses: ['fe80::caf4:6db4:4652:e975', ...BROWSER_SERVICE.addresses],
       }
 
       client.start()
@@ -164,7 +164,7 @@ describe('discovery client', () => {
       const client = DiscoveryClient()
       const service = {
         ...BROWSER_SERVICE,
-        addresses: ['fe80::caf4:6db4:4652:e975']
+        addresses: ['fe80::caf4:6db4:4652:e975'],
       }
 
       client.start()
@@ -184,7 +184,7 @@ describe('discovery client', () => {
       const client = DiscoveryClient()
       const service = {
         ...BROWSER_SERVICE,
-        addresses: []
+        addresses: [],
       }
 
       client.start()
@@ -206,10 +206,10 @@ describe('discovery client', () => {
           ip: '192.168.1.42',
           port: 31950,
           ok: true,
-          serverOk: true
-        }
+          serverOk: true,
+        },
       ],
-      candidates: [{ ip: '192.168.1.43', port: 31950 }]
+      candidates: [{ ip: '192.168.1.43', port: 31950 }],
     })
 
     expect(client.services).toEqual([
@@ -219,8 +219,8 @@ describe('discovery client', () => {
         port: 31950,
         // ok flags should be nulled out
         ok: null,
-        serverOk: null
-      }
+        serverOk: null,
+      },
     ])
     expect(client.candidates).toEqual([{ ip: '192.168.1.43', port: 31950 }])
   })
@@ -233,10 +233,10 @@ describe('discovery client', () => {
           ip: '192.168.1.42',
           port: 31950,
           ok: true,
-          serverOk: true
-        }
+          serverOk: true,
+        },
       ],
-      candidates: [{ ip: '192.168.1.42', port: 31950 }]
+      candidates: [{ ip: '192.168.1.42', port: 31950 }],
     })
 
     expect(client.candidates).toEqual([])
@@ -248,10 +248,10 @@ describe('discovery client', () => {
         {
           name: 'opentrons-dev',
           ip: 'foo',
-          port: 1
-        }
+          port: 1,
+        },
       ],
-      candidates: [{ ip: 'bar', port: 2 }, { ip: 'baz', port: 3 }]
+      candidates: [{ ip: 'bar', port: 2 }, { ip: 'baz', port: 3 }],
     })
 
     client.start()
@@ -266,7 +266,7 @@ describe('discovery client', () => {
   test('client should have configurable poll interval', () => {
     const client = DiscoveryClient({
       pollInterval: 1000,
-      candidates: [{ ip: 'foo', port: 31950 }]
+      candidates: [{ ip: 'foo', port: 31950 }],
     })
 
     client.start()
@@ -297,9 +297,9 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: null,
-            serverOk: null
-          }
-        ]
+            serverOk: null,
+          },
+        ],
       })
 
       client.once('service', () => {
@@ -330,9 +330,9 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: null,
-            serverOk: null
-          }
-        ]
+            serverOk: null,
+          },
+        ],
       })
 
       client.once('service', () => {
@@ -344,7 +344,7 @@ describe('discovery client', () => {
       client.start()
       const onHealth = poller.poll.mock.calls[0][2]
       onHealth({ ip: '192.168.1.42', port: 31950 }, null, {
-        name: 'opentrons-dev'
+        name: 'opentrons-dev',
       })
     },
     10
@@ -360,9 +360,9 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: null,
-            serverOk: null
-          }
-        ]
+            serverOk: null,
+          },
+        ],
       })
 
       client.once('service', () => {
@@ -392,9 +392,9 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: null,
-            serverOk: null
-          }
-        ]
+            serverOk: null,
+          },
+        ],
       })
 
       client.once('service', () => {
@@ -421,9 +421,9 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: null,
-            serverOk: null
-          }
-        ]
+            serverOk: null,
+          },
+        ],
       })
 
       client.once('service', () => {
@@ -447,7 +447,7 @@ describe('discovery client', () => {
     'if health comes back for a candidate, it should be promoted',
     done => {
       const client = DiscoveryClient({
-        candidates: [{ ip: '192.168.1.42', port: 31950 }]
+        candidates: [{ ip: '192.168.1.42', port: 31950 }],
       })
 
       client.once('service', () => {
@@ -458,8 +458,8 @@ describe('discovery client', () => {
             ip: '192.168.1.42',
             port: 31950,
             ok: true,
-            serverOk: true
-          }
+            serverOk: true,
+          },
         ])
         done()
       })
@@ -479,7 +479,7 @@ describe('discovery client', () => {
     'if health comes back with IP conflict, null out old service',
     done => {
       const client = DiscoveryClient({
-        services: [{ name: 'bar', ip: 'foo', port: 31950 }]
+        services: [{ name: 'bar', ip: 'foo', port: 31950 }],
       })
 
       client.once('service', () => {
@@ -490,8 +490,8 @@ describe('discovery client', () => {
             ip: 'foo',
             port: 31950,
             ok: true,
-            serverOk: true
-          }
+            serverOk: true,
+          },
         ])
         done()
       })
@@ -539,14 +539,14 @@ describe('discovery client', () => {
         {
           name: 'opentrons-dev',
           ip: '192.168.1.42',
-          port: 31950
+          port: 31950,
         },
         {
           name: 'opentrons-dev',
           ip: '[fd00:0:cafe:fefe::1]',
-          port: 31950
-        }
-      ]
+          port: 31950,
+        },
+      ],
     })
 
     client.start()
@@ -562,9 +562,9 @@ describe('discovery client', () => {
         {
           name: 'opentrons-dev',
           ip: '192.168.1.42',
-          port: 31950
-        }
-      ]
+          port: 31950,
+        },
+      ],
     })
 
     poller.poll.mockReturnValueOnce({ id: 1234 })
@@ -588,15 +588,15 @@ describe('discovery client', () => {
           ip: '192.168.1.42',
           port: 31950,
           ok: null,
-          serverOk: null
+          serverOk: null,
         },
         {
           name: 'opentrons-dev',
           ip: '[fd00:0:cafe:fefe::1]',
           port: 31950,
           ok: null,
-          serverOk: null
-        }
+          serverOk: null,
+        },
       ]
 
       const client = DiscoveryClient({ services })
@@ -634,16 +634,16 @@ describe('discovery client', () => {
     mdns.__mockBrowser.emit('update', BROWSER_SERVICE)
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      fullname: 'Opentrons-2._http._tcp.local'
+      fullname: 'Opentrons-2._http._tcp.local',
     })
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      fullname: 'apentrons._http._tcp.local'
+      fullname: 'apentrons._http._tcp.local',
     })
 
     expect(client.services.map(s => s.name)).toEqual([
       'opentrons-dev',
-      'Opentrons-2'
+      'Opentrons-2',
     ])
   })
 
@@ -653,11 +653,11 @@ describe('discovery client', () => {
     client.start()
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      addresses: ['169.254.1.2']
+      addresses: ['169.254.1.2'],
     })
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
-      addresses: ['192.168.3.4']
+      addresses: ['192.168.3.4'],
     })
 
     expect(client.services.map(s => s.ip)).toEqual(['169.254.1.2'])
@@ -671,12 +671,12 @@ describe('discovery client', () => {
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
       fullname: '2._http._tcp.local',
-      port: 31951
+      port: 31951,
     })
     mdns.__mockBrowser.emit('update', {
       ...BROWSER_SERVICE,
       fullname: '3._http._tcp.local',
-      port: 22
+      port: 22,
     })
 
     expect(client.services.map(s => s.port)).toEqual([31950, 31951])

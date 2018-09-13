@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 type TimeProps = {
   startTime: ?number,
-  runTime: string
+  runTime: string,
 }
 
 export default function RunTimer (props: TimeProps) {

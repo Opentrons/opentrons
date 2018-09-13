@@ -8,7 +8,7 @@ import type {Mount} from '../../robot'
 import {
   LabeledValue,
   OutlineButton,
-  InstrumentDiagram
+  InstrumentDiagram,
 } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -24,7 +24,7 @@ const RE_CHANNELS = /p\d+_(single|multi)/
 
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
-  right: 'Right pipette'
+  right: 'Right pipette',
 }
 
 export default function PipetteInfo (props: Props) {
@@ -39,7 +39,7 @@ export default function PipetteInfo (props: Props) {
   const url = `/robots/${name}/instruments/pipettes/${mount}`
 
   const className = cx(styles.pipette_card, {
-    [styles.right]: props.mount === 'right'
+    [styles.right]: props.mount === 'right',
   })
 
   return (

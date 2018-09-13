@@ -17,8 +17,7 @@ type FetchHealthResponse = {
   logs: ?Array<string>,
 }
 
-export type HealthAction =
-  | ApiAction<'health', null, FetchHealthResponse>
+export type HealthAction = ApiAction<'health', null, FetchHealthResponse>
 
 export type FetchHealthCall = ApiCall<void, FetchHealthResponse>
 

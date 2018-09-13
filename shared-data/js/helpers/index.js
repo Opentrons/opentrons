@@ -9,5 +9,5 @@ export {
   canPipetteUseLabware,
   computeWellAccess,
   getWellTotalVolume,
-  wellIsRect
+  wellIsRect,
 }

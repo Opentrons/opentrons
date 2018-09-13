@@ -6,7 +6,7 @@ import i18n from '../../localization'
 import {
   actions as steplistActions,
   START_TERMINAL_ITEM_ID,
-  type TerminalItemId
+  type TerminalItemId,
 } from '../../steplist'
 import {actions, selectors} from '../../tutorial'
 import type {HintKey} from '../../tutorial'
@@ -17,7 +17,7 @@ import styles from './Hints.css'
 type SP = {hints: Array<HintKey>}
 type DP = {
   removeHint: (HintKey) => mixed,
-  selectTerminalItem: (TerminalItemId) => mixed
+  selectTerminalItem: (TerminalItemId) => mixed,
 }
 type Props = SP & DP
 
@@ -61,11 +61,11 @@ class Hints extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  hints: selectors.getHints(state)
+  hints: selectors.getHints(state),
 })
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   removeHint: (hint) => dispatch(actions.removeHint(hint)),
-  selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId))
+  selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Hints)

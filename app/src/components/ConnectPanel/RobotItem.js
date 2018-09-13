@@ -13,12 +13,12 @@ import {RobotListItem} from './RobotList.js'
 type OP = Robot
 
 type SP = {
-  availableUpdate: ?string
+  availableUpdate: ?string,
 }
 
 type DP = {
   connect: () => mixed,
-  disconnect: () => mixed
+  disconnect: () => mixed,
 }
 
 export default withRouter(
@@ -29,13 +29,13 @@ function makeMapStateToProps () {
   const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
 
   return (state: State, ownProps: OP): SP => ({
-    availableUpdate: getAvailableRobotUpdate(state, ownProps)
+    availableUpdate: getAvailableRobotUpdate(state, ownProps),
   })
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     connect: () => dispatch(robotActions.connect(ownProps.name)),
-    disconnect: () => dispatch(robotActions.disconnect())
+    disconnect: () => dispatch(robotActions.disconnect()),
   }
 }

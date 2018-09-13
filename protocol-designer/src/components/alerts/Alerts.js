@@ -15,7 +15,7 @@ type Props = {
   level: 'timeline' | 'form',
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
-  dismissWarning: (CommandCreatorWarning) => mixed
+  dismissWarning: (CommandCreatorWarning) => mixed,
 }
 
 class Alerts extends React.Component<Props> {

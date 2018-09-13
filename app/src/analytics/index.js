@@ -24,7 +24,7 @@ const MIXPANEL_OPTS = {
   // user details are persisted in our own config store
   disable_persistence: true,
   // pageviews tracked manually via react-router-redux events
-  track_pageview: false
+  track_pageview: false,
 }
 
 // mixpanel.track handler (default noop)

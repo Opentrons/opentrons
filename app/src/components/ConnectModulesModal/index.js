@@ -17,17 +17,17 @@ import type {RobotService, SessionModule} from '../../robot'
 import type {Module} from '../../http-api-client'
 
 type OP = {
-  robot: RobotService
+  robot: RobotService,
 }
 
 type SP = {
   modulesRequired: boolean,
-  modulesMissing: boolean
+  modulesMissing: boolean,
 }
 
 type DP = {
   setReviewed: () => mixed,
-  fetchModules: () => mixed
+  fetchModules: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -64,7 +64,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
     return {
       modulesRequired: sessionModules.length !== 0,
-      modulesMissing: checkModulesMissing(sessionModules, actualModules)
+      modulesMissing: checkModulesMissing(sessionModules, actualModules),
     }
   }
 }
@@ -72,7 +72,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     setReviewed: () => dispatch(robotActions.setModulesReviewed(true)),
-    fetchModules: () => dispatch(fetchModules(ownProps.robot))
+    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
 }
 

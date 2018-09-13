@@ -24,8 +24,8 @@ describe('/motors/**', () => {
     state = {
       api: {
         pipettes: {},
-        motors: {}
-      }
+        motors: {},
+      },
     }
 
     store = mockStore(state)
@@ -35,7 +35,7 @@ describe('/motors/**', () => {
     const path = 'disengage'
     const mockPipettesResponse = {
       left: {mount_axis: 'z', plunger_axis: 'b'},
-      right: {mount_axis: 'a', plunger_axis: 'c'}
+      right: {mount_axis: 'a', plunger_axis: 'c'},
     }
     const response = {message: 'we did it'}
 
@@ -48,7 +48,7 @@ describe('/motors/**', () => {
       return store.dispatch(disengagePipetteMotors(robot, 'right'))
         .then(() => expect(client.mock.calls).toEqual([
           [robot, 'GET', 'pipettes'],
-          [robot, 'POST', 'motors/disengage', expected]
+          [robot, 'POST', 'motors/disengage', expected],
         ]))
     })
 
@@ -61,7 +61,7 @@ describe('/motors/**', () => {
       // use mock.calls to verify call order
       return store.dispatch(disengagePipetteMotors(robot, 'left'))
         .then(() => expect(client.mock.calls).toEqual([
-          [robot, 'POST', 'motors/disengage', expected]
+          [robot, 'POST', 'motors/disengage', expected],
         ]))
     })
 
@@ -69,7 +69,7 @@ describe('/motors/**', () => {
       const request = {mounts: ['left', 'right']}
       const expectedActions = [
         {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_SUCCESS', payload: {robot, response, path}}
+        {type: 'api:MOTORS_SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(mockPipettesResponse, response)
@@ -83,7 +83,7 @@ describe('/motors/**', () => {
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
         {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_FAILURE', payload: {robot, error, path}}
+        {type: 'api:MOTORS_FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)

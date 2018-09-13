@@ -7,7 +7,7 @@ import TerminalItemLink from './TerminalItemLink'
 
 type WarningContentsProps = {
   warningType: string,
-  level: AlertLevel
+  level: AlertLevel,
 }
 const WarningContents = (props: WarningContentsProps) => {
   if (props.level === 'timeline') {

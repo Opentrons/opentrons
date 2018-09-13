@@ -21,7 +21,7 @@ export function mixUtil (
 ): Array<CommandCreator> {
   return repeatArray([
     aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
-    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm})
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm}),
   ], times)
 }
 
@@ -46,20 +46,20 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
     times,
     changeTip,
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm
+    dispenseOffsetFromBottomMm,
   } = data
 
   // Errors
   if (!prevRobotState.instruments[pipette]) {
     // bail out before doing anything else
     return {
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})]
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})],
     }
   }
 
   if (!prevRobotState.labware[labware]) {
     return {
-      errors: [errorCreators.labwareDoesNotExist({actionName, labware})]
+      errors: [errorCreators.labwareDoesNotExist({actionName, labware})],
     }
   }
 
@@ -84,7 +84,7 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
       ? [blowout({
         pipette,
         labware: data.blowout,
-        well: 'A1'
+        well: 'A1',
       })]
       : []
 
@@ -102,7 +102,7 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
         ...tipCommands,
         ...mixCommands,
         ...blowoutCommands,
-        ...touchTipCommands
+        ...touchTipCommands,
       ]
     }
   )

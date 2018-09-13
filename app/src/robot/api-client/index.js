@@ -6,6 +6,8 @@ import Worker from './worker'
 
 const log = createLogger(__filename)
 
+const shouldProcess = a => a.meta && (a.meta.robot || a.meta.robotCommand)
+
 export default function apiClientMiddleware () {
   const worker = new Worker()
 
@@ -34,12 +36,8 @@ export default function apiClientMiddleware () {
     worker.postMessage({})
 
     return (next) => (action) => {
-      const {meta} = action
-
-      if (meta && meta.robotCommand) {
-        const state = getState()
-
-        worker.postMessage({state, action})
+      if (shouldProcess(action)) {
+        worker.postMessage({action, state: getState()})
       }
 
       return next(action)

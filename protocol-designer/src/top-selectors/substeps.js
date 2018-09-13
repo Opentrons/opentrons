@@ -9,7 +9,7 @@ import {allWellContentsForSteps} from './well-contents'
 
 import {
   generateSubsteps,
-  type GetIngreds
+  type GetIngreds,
 } from '../steplist/generateSubsteps' // TODO Ian 2018-04-11 move generateSubsteps closer to this substeps.js file?
 
 import type {Selector} from '../types'
@@ -27,7 +27,7 @@ const getIngredsFactory = (
 
   return wellContents.groupIds.map(id => ({
     id: id,
-    name: ingredNames[id]
+    name: ingredNames[id],
   })) || []
 }
 
@@ -64,7 +64,7 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
       )
       return {
         ...acc,
-        [stepId]: substeps
+        [stepId]: substeps,
       }
     }, {})
   }

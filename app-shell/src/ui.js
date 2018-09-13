@@ -26,8 +26,8 @@ const WINDOW_OPTS = {
     // TODO(mc, 2018-05-15): disable nodeIntegration in renderer thread
     nodeIntegration: true,
     // node integration needed for mdns robot discovery in webworker
-    nodeIntegrationInWorker: true
-  }, config.webPreferences)
+    nodeIntegrationInWorker: true,
+  }, config.webPreferences),
 }
 
 export default function createUi () {

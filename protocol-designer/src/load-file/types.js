@@ -7,12 +7,12 @@ export type FileUploadErrorType =
 
 export type FileError = {
     errorType: FileUploadErrorType,
-    message?: string
+    message?: string,
   } | null
 
 export type LoadFileAction = {
   type: 'LOAD_FILE',
-  payload: ProtocolFile
+  payload: ProtocolFile,
 }
 
 export type PipetteFields = {pipetteModel: string, tiprackModel: ?string}
@@ -20,5 +20,5 @@ export type PipetteFields = {pipetteModel: string, tiprackModel: ?string}
 export type NewProtocolFields = {
   name: ?string,
   left: PipetteFields,
-  right: PipetteFields
+  right: PipetteFields,
 }
