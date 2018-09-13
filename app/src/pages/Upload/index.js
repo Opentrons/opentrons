@@ -11,7 +11,7 @@ import {getProtocolFilename} from '../../protocol'
 
 import {Splash, SpinnerModal} from '@opentrons/components'
 import Page from '../../components/Page'
-import UploadStatus from './UploadStatus'
+import UploadError from '../../components/UploadError'
 import FileInfo from './FileInfo'
 
 type SP = {
@@ -45,19 +45,25 @@ function mapStateToProps (state: State, ownProps: OP): SP {
 
 function UploadPage (props: Props) {
   const {robot, name, uploadInProgress, uploadError, match: {path}} = props
+  const fileInfoPath = `${path}/file-info`
+
   if (!robot) return (<Redirect to='/robots' />)
   if (!name) return (<Page><Splash /></Page>)
-  if (uploadInProgress) return (<Page><SpinnerModal message='Upload in Progress'/></Page>)
+
+  if (uploadInProgress) {
+    return (<Page><SpinnerModal message='Upload in Progress'/></Page>)
+  }
+
+  if (uploadError) {
+    return (<Page><UploadError name={name} uploadError={uploadError}/></Page>)
+  }
 
   return (
     <Switch>
+      <Redirect exact from={path} to={fileInfoPath} />
       <Route
-        path={`${path}/file-info`}
+        path={fileInfoPath}
         render={props => (<FileInfo name={name} robot={robot} />)}
-      />
-      <Route
-        path={path}
-        render={() => (<UploadStatus name={name} uploadError={uploadError} />)}
       />
     </Switch>
   )
