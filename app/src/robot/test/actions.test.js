@@ -50,30 +50,17 @@ describe('robot actions', () => {
     expect(actions.disconnectResponse()).toEqual(success)
   })
 
-  test('session action', () => {
-    const file = {name: '/foo/bar/baz.py'}
-    const expected = {
-      type: actionTypes.SESSION,
-      payload: {file},
-      meta: {robotCommand: true},
-    }
-
-    expect(actions.session(file)).toEqual(expected)
-  })
-
   test('session response', () => {
     const session = {state: 'READY'}
     const error = new Error('AH')
 
     const success = {
-      type: actionTypes.SESSION_RESPONSE,
+      type: 'robot:SESSION_RESPONSE',
       payload: session,
-      error: false,
     }
     const failure = {
-      type: actionTypes.SESSION_RESPONSE,
-      payload: error,
-      error: true,
+      type: 'robot:SESSION_ERROR',
+      payload: {error},
     }
 
     expect(actions.sessionResponse(null, session)).toEqual(success)

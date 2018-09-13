@@ -11,7 +11,6 @@ const {
   getConnectionStatus,
   getSessionLoadInProgress,
   getUploadError,
-  getSessionName,
   getSessionIsLoaded,
   getCommands,
   getRunProgress,
@@ -170,12 +169,6 @@ describe('robot selectors', () => {
 
     state = makeState({session: {sessionRequest: {error: new Error('AH')}}})
     expect(getUploadError(state)).toEqual(new Error('AH'))
-  })
-
-  test('getSessionName', () => {
-    const state = makeState({session: {name: 'foobar.py'}})
-
-    expect(getSessionName(state)).toBe('foobar.py')
   })
 
   test('getSessionIsLoaded', () => {

@@ -46,11 +46,6 @@ export type Robot = RobotService & {
   isConnected: boolean,
 }
 
-// protocol file (browser File object)
-export type ProtocolFile = {
-  name: string,
-}
-
 // TODO(mc, 2018-01-22): pay attention to this when deprecating status contants
 //   in constants.js. Also re-evaluate the need for this logic / type
 export type PipetteCalibrationStatus =

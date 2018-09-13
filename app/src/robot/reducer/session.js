@@ -1,5 +1,9 @@
 // @flow
 // robot session (protocol) state and reducer
+import omit from 'lodash/omit'
+import {actionTypes} from '../actions'
+
+import type {Action} from '../../types'
 import type {
   Command,
   StatePipette,
@@ -10,13 +14,7 @@ import type {
   SessionStatus,
 } from '../types'
 
-import {actionTypes} from '../actions'
-
-import type {
-  Action,
-  DisconnectResponseAction,
-  SessionUpdateAction,
-} from '../actions'
+import type {DisconnectResponseAction, SessionUpdateAction} from '../actions'
 
 type Request = {
   inProgress: boolean,
@@ -25,12 +23,10 @@ type Request = {
 
 export type State = {
   sessionRequest: Request,
-  name: string,
   state: SessionStatus,
-  errors: {}[],
-  protocolText: string,
+  errors: Array<{}>,
   // TODO(mc, 2018-01-11): command IDs should be strings
-  protocolCommands: number[],
+  protocolCommands: Array<number>,
   protocolCommandsById: {
     [number]: Command,
   },
@@ -53,8 +49,6 @@ export type State = {
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
-  SESSION,
-  SESSION_RESPONSE,
   RUN,
   RUN_RESPONSE,
   PAUSE,
@@ -69,10 +63,8 @@ const {
 const INITIAL_STATE: State = {
   // loading a protocol
   sessionRequest: {inProgress: false, error: null},
-  name: '',
   state: '',
   errors: [],
-  protocolText: '',
   protocolCommands: [],
   protocolCommandsById: {},
 
@@ -101,11 +93,14 @@ export default function sessionReducer (
     case 'robot:SESSION_UPDATE':
       return handleSessionUpdate(state, action)
 
-    case SESSION:
+    case 'protocol:UPLOAD':
     case 'robot:REFRESH_SESSION':
-      return handleSession(state, action)
+      return handleSessionInProgress(state)
 
-    case SESSION_RESPONSE: return handleSessionResponse(state, action)
+    case 'robot:SESSION_RESPONSE':
+    case 'robot:SESSION_ERROR':
+      return handleSessionResponse(state, action)
+
     case RUN: return handleRun(state, action)
     case RUN_RESPONSE: return handleRunResponse(state, action)
     case PAUSE: return handlePause(state, action)
@@ -149,32 +144,31 @@ function handleSessionUpdate (
   return {...state, state: sessionState, startTime, protocolCommandsById}
 }
 
-function handleSession (state: State, action: any): State {
-  let nextState = {
+function handleSessionInProgress (state: State): State {
+  return {
     ...state,
     runTime: 0,
     startTime: null,
     sessionRequest: {inProgress: true, error: null},
   }
-
-  if (action.payload && action.payload.file && action.payload.file.name) {
-    return {...nextState, name: action.payload.file.name}
-  }
-
-  return nextState
 }
 
 function handleSessionResponse (state: State, action: any): State {
-  const {error, payload} = action
+  const {payload} = action
 
-  if (error) {
-    return {...state, sessionRequest: {inProgress: false, error: payload}}
+  if (payload.error) {
+    return {
+      ...state,
+      sessionRequest: {inProgress: false, error: payload.error},
+    }
   }
+
+  const session = omit(payload, ['name', 'protocolText'])
 
   return {
     ...state,
     sessionRequest: {inProgress: false, error: null},
-    ...payload,
+    ...session,
   }
 }
 

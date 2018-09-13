@@ -15,10 +15,8 @@ describe('robot reducer - session', () => {
     expect(state.session).toEqual({
       // loading a protocol
       sessionRequest: {inProgress: false, error: null},
-      name: '',
       state: '',
       errors: [],
-      protocolText: '',
       protocolCommands: [],
       protocolCommandsById: {},
 
@@ -45,23 +43,21 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual(expected)
   })
 
-  test('handles SESSION action', () => {
+  test('handles protocol:UPLOAD action', () => {
     const state = {
       session: {
         sessionRequest: {inProgress: false, error: new Error('AH')},
-        name: '',
         startTime: 40,
         runTime: 42,
       },
     }
     const action = {
-      type: actionTypes.SESSION,
-      payload: {file: {name: '/path/to/foo.py'}},
+      type: 'protocol:UPLOAD',
+      payload: {},
     }
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: {inProgress: true, error: null},
-      name: '/path/to/foo.py',
       startTime: null,
       runTime: 0,
     })
@@ -84,20 +80,19 @@ describe('robot reducer - session', () => {
     })
   })
 
-  test('handles SESSION_RESPONSE success', () => {
+  test('handles SESSION_RESPONSE', () => {
     const state = {
       session: {
         sessionRequest: {inProgress: true, error: null},
-        name: '/path/to/foo.py',
       },
     }
     const action = {
-      type: actionTypes.SESSION_RESPONSE,
-      error: false,
+      type: 'robot:SESSION_RESPONSE',
       payload: {
+        name: '/path/to/foo.py',
+        protocolText: 'protocol woo',
         state: 'running',
         errors: [],
-        protocolText: 'protocol woo',
         protocolCommands: [],
         protocolCommandsById: {},
       },
@@ -105,31 +100,26 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: {inProgress: false, error: null},
-      name: '/path/to/foo.py',
       state: 'running',
       errors: [],
-      protocolText: 'protocol woo',
       protocolCommands: [],
       protocolCommandsById: {},
     })
   })
 
-  test('handles SESSION_RESPONSE failure', () => {
+  test('handles SESSION_ERROR', () => {
     const state = {
       session: {
         sessionRequest: {inProgress: true, error: null},
-        name: '/path/to/foo.py',
       },
     }
     const action = {
-      type: actionTypes.SESSION_RESPONSE,
-      error: true,
-      payload: new Error('AH'),
+      type: 'robot:SESSION_ERROR',
+      payload: {error: new Error('AH')},
     }
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: {inProgress: false, error: new Error('AH')},
-      name: '/path/to/foo.py',
     })
   })
 

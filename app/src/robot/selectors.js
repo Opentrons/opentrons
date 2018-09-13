@@ -117,10 +117,6 @@ export function getUploadError (state: State): ?{message: string} {
   return sessionRequest(state).error
 }
 
-export function getSessionName (state: State): string {
-  return session(state).name
-}
-
 export function getSessionStatus (state: State): SessionStatus {
   return session(state).state
 }

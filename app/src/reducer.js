@@ -21,12 +21,16 @@ import {configReducer} from './config'
 // discovery state
 import {discoveryReducer} from './discovery'
 
+// protocol state
+import {protocolReducer} from './protocol'
+
 export default combineReducers({
   robot: robotReducer,
   api: httpApiReducer,
   config: configReducer,
   discovery: discoveryReducer,
   healthCheck: healthCheckReducer,
+  protocol: protocolReducer,
   shell: shellReducer,
   router: routerReducer,
 })

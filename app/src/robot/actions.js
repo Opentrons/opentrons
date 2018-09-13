@@ -6,7 +6,6 @@ import type {
   Slot,
   Axis,
   Direction,
-  ProtocolFile,
   SessionUpdate,
 } from './types'
 
@@ -134,6 +133,20 @@ export type CalibrationFailureAction = {|
   payload: Error,
 |}
 
+export type SessionResponseAction = {|
+  type: 'robot:SESSION_RESPONSE',
+  // TODO(mc, 2018-09-06): this payload is incomplete
+  payload: {|
+    name: string,
+    protocolText: string,
+  |},
+|}
+
+export type SessionErrorAction = {|
+  type: 'robot:SESSION_ERROR',
+  payload: {|error: Error|},
+|}
+
 export type SessionUpdateAction = {|
   type: 'robot:SESSION_UPDATE',
   payload: SessionUpdate,
@@ -158,10 +171,6 @@ export type SetModulesReviewedAction = {
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
-  // protocol loading
-  SESSION: makeRobotActionName('SESSION'),
-  SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
-
   // calibration
   SET_DECK_POPULATED: makeRobotActionName('SET_DECK_POPULATED'),
   // TODO(mc, 2018-01-10): rename MOVE_TO_FRONT to PREPARE_TO_PROBE?
@@ -202,6 +211,8 @@ export type Action =
   | CalibrationFailureAction
   | ReturnTipResponseAction
   | SetJogDistanceAction
+  | SessionResponseAction
+  | SessionErrorAction
   | SessionUpdateAction
   | RefreshSessionAction
   | SetModulesReviewedAction
@@ -241,22 +252,14 @@ export const actions = {
     return {type: 'robot:UNEXPECTED_DISCONNECT'}
   },
 
-  // make new session with protocol file
-  session (file: ProtocolFile) {
-    return tagForRobotApi({type: actionTypes.SESSION, payload: {file}})
-  },
+  sessionResponse (
+    error: ?Error,
+    // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
+    session: any
+  ): SessionResponseAction | SessionErrorAction {
+    if (error) return {type: 'robot:SESSION_ERROR', payload: {error}}
 
-  // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
-  sessionResponse (error: ?Error, session: any) {
-    const didError = error != null
-
-    return {
-      type: actionTypes.SESSION_RESPONSE,
-      error: didError,
-      payload: !didError
-        ? session
-        : error,
-    }
+    return {type: 'robot:SESSION_RESPONSE', payload: session}
   },
 
   sessionUpdate (update: SessionUpdate): SessionUpdateAction {

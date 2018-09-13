@@ -38,12 +38,12 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
-  test('handles SESSION', () => {
+  test('handles protocol:UPLOAD', () => {
     const expected = reducer(undefined, {}).calibration
     const state = {calibration: {dummy: 'state'}}
     const action = {
-      type: actionTypes.SESSION,
-      payload: {file: {name: 'foobar.py'}},
+      type: 'protocol:UPLOAD',
+      payload: {},
     }
 
     expect(reducer(state, action).calibration).toEqual(expected)
