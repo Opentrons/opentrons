@@ -11,6 +11,10 @@ import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
 
+/* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
+* see #1814 for reference
+*/
+
 type SP = {
   errors: Array<FormError>,
   warnings: Array<FormWarning>,

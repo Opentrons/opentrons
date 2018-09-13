@@ -12,7 +12,7 @@
     "error": {
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
-        "body": "Add another tip rack to an empty slot in ",
+        "body": "Add another tip rack to an empty slot in "
       },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette",
@@ -26,7 +26,7 @@
       },
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
-        "body": "The well(s) you're trying to aspirate from are empty. Hover over labware in Starting Deck State to add liquids."
+        "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
       }
     }
   },

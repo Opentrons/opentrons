@@ -34,7 +34,7 @@ class Hints extends React.Component<Props> {
             <a
               className={styles.hint_nav_link}
               onClick={() => this.props.selectTerminalItem(START_TERMINAL_ITEM_ID)}>
-              {i18n.t('nav.starting_deck_state')}
+              {i18n.t(`nav.terminal_item.${START_TERMINAL_ITEM_ID}`)}
             </a>
             {i18n.t('alert.hint.add_liquids_and_labware.directions')}
           </React.Fragment>
