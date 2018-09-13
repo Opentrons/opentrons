@@ -23,10 +23,11 @@ type Props = {
 // [labware type, display name, and optional image url]
 const hardcodedLabware = {
   'Tip Rack': [
-    ['tiprack-10ul', '10uL Tip Rack', 'Tiprack-10ul'],
+    ['tiprack-10ul', '10µL Tip Rack', 'Tiprack-10ul'],
     ['tiprack-200ul', '200uL Tip Rack', 'Tiprack-200ul'],
-    ['tiprack-1000ul', '1000uL Tip Rack', 'Tiprack-200ul'],
-    ['tiprack-1000ul-chem', '10x10 1000uL Chem-Tip Rack', 'Tiprack-1000ul-chem'],
+    ['opentrons-tiprack-300ul', '300µL Tip Rack', 'Tiprack-200ul'],
+    ['tiprack-1000ul', '1000µL Tip Rack', 'Tiprack-200ul'],
+    ['tiprack-1000ul-chem', '10x10 1000µL Chem-Tip Rack', 'Tiprack-1000ul-chem'],
   ],
   'Tube Rack': [
     ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],

@@ -14,6 +14,7 @@ import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils'
 
 import type {DeckSlot} from '@opentrons/components'
+import {getIsTiprack} from '@opentrons/shared-data'
 
 import type {LabwareLiquidState} from '../../step-generation'
 
@@ -325,8 +326,8 @@ const labwareOptions: Selector<Options> = createSelector(
   getLabware,
   getLabwareNames,
   (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
-    // TODO Ian 2018-02-16 more robust way to filter out tipracks?
-    if (!labware.type || labware.type.startsWith('tiprack')) {
+    const isTiprack = getIsTiprack(labware.type)
+    if (!labware.type || isTiprack) {
       return acc
     }
     return [
