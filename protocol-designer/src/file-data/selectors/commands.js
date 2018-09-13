@@ -69,7 +69,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        const isTiprack = getIsTiprack(labware[labwareId].type)
+        const isTiprack = getIsTiprack(labwareData.type)
         if (labwareData.type && isTiprack) {
           return {
             ...acc,

@@ -326,7 +326,7 @@ const labwareOptions: Selector<Options> = createSelector(
   getLabware,
   getLabwareNames,
   (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
-    const isTiprack = getIsTiprack(labware[labwareId].type)
+    const isTiprack = getIsTiprack(labware.type)
     if (!labware.type || isTiprack) {
       return acc
     }
