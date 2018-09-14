@@ -13,25 +13,45 @@ from subprocess itself, only parsing nmcli output.
 
 import logging
 import re
+from typing import Optional, List, Tuple, Dict, Callable, Any
+import enum
+
 from shlex import quote
 from asyncio import subprocess as as_subprocess
 
 
 log = logging.getLogger(__name__)
 
-# These supported security types are passed directly to nmcli; they should
-# match the security types allowed in the network-manager settings for
-# 802-11-wireless-security.key-mgmt
-SUPPORTED_SECURITY_TYPES = ('none', 'wpa-psk')
 
-# These connection types are used to parse nmcli results and should be valid
-# results for the last element when splitting connection.type by ’-’
-CONNECTION_TYPES = ('wireless', 'ethernet')
+class SECURITY_TYPES(enum.Enum):
+    """ The types of security that this module supports.
+    """
 
-IFACE_NAMES = ('wlan0', 'eth0')
+    # The string values of these supported security types are passed
+    # directly to nmcli; they should match the security types allowed
+    # in the network-manager settings for 802-11-wireless-security.key-mgmt
+    NONE = 'none'
+    WPA_PSK = 'wpa-psk'
 
 
-async def available_ssids():
+class CONNECTION_TYPES(enum.Enum):
+    """ Types of connection (used to parse nmcli results)
+    """
+
+    # These connection types are used to parse nmcli results and should be
+    # valid results for the last element when splitting connection.type by ’-’
+    WIRELESS = 'wireless'
+    ETHERNET = 'ethernet'
+
+
+class NETWORK_IFACES(enum.Enum):
+    """ Network interface names that we manage here.
+    """
+    WIFI = 'wlan0'
+    ETH_LL = 'eth0'
+
+
+async def available_ssids() -> List[Dict[str, Any]]:
     """ List the visible (broadcasting SSID) wireless networks.
 
     Returns a list of the SSIDs. They may contain spaces and should be escaped
@@ -51,13 +71,14 @@ async def available_ssids():
                       'active': lambda s: s.lower() == 'yes'})
 
 
-async def is_connected():
+async def is_connected() -> str:
     """ Return nmcli's connection measure: none/portal/limited/full/unknown"""
     res, _ = await _call(['networking', 'connectivity'])
     return res
 
 
-async def connections(for_type=None):
+async def connections(
+        for_type: Optional[CONNECTION_TYPES] = None) -> List[Dict[str, str]]:
     """ Return the list of configured connections.
 
     This is all connections that nmcli knows about and manages.
@@ -79,19 +100,16 @@ async def connections(for_type=None):
                       'active': lambda s: s.lower() == 'yes'}
     )
     if for_type is not None:
-        if for_type not in CONNECTION_TYPES:
-            raise ValueError('typename {} not in valid connections types {}'
-                             .format(for_type, CONNECTION_TYPES))
         should_return = []
         for c in found:
-            if c['type'] == for_type:
+            if c['type'] == for_type.value:
                 should_return.append(c)
         return should_return
     else:
         return found
 
 
-async def connection_exists(ssid):
+async def connection_exists(ssid: str) -> Optional[str]:
     """ If there is already a connection for this ssid, return the name of
     the connection; if there is not, return None.
     """
@@ -106,7 +124,8 @@ async def connection_exists(ssid):
     return None
 
 
-async def _trim_old_connections(new_name, con_type):
+async def _trim_old_connections(
+        new_name: str, con_type: CONNECTION_TYPES) -> Tuple[bool, str]:
     """ Delete all connections of con_type but the one specified.
     """
     existing_cons = await connections(for_type=con_type)
@@ -127,13 +146,38 @@ async def _trim_old_connections(new_name, con_type):
     return ok, ';'.join(res)
 
 
-async def configure(ssid, # noqa(C901) There is a lot of work that will be done
-                          # here for EAP configuration, let’s address
-                          # complexity then
-                    security_type=None,
-                    psk=None,
-                    hidden=False,
-                    up_retries=3):
+def _build_con_add_cmd(ssid: str, security_type: SECURITY_TYPES,
+                       psk: Optional[str], hidden: bool) -> List[str]:
+    """ Build the nmcli connection add command to configure the new network.
+
+    The parameters are the same as configure but without the defaults; this
+    should be called only by configure.
+    """
+    configure_cmd = ['connection', 'add',
+                     'save', 'yes',
+                     'autoconnect', 'yes',
+                     'ifname', 'wlan0',
+                     'type', 'wifi',
+                     'con-name', ssid,
+                     'wifi.ssid', ssid]
+    if hidden:
+        configure_cmd += ['wifi.hidden', 'true']
+    if security_type == SECURITY_TYPES.WPA_PSK:
+        configure_cmd += ['wifi-sec.key-mgmt', security_type.value]
+        if psk is None:
+            raise ValueError('wpa-psk security type requires psk')
+        configure_cmd += ['wifi-sec.psk', psk]
+    elif security_type == SECURITY_TYPES.NONE:
+        pass
+
+    return configure_cmd
+
+
+async def configure(ssid: str,
+                    security_type: Optional[SECURITY_TYPES] = None,
+                    psk: Optional[str] = None,
+                    hidden: Optional[bool] = False,
+                    up_retries: int = 3) -> Tuple[bool, str]:
     """ Configure a connection but do not bring it up (though it is configured
     for autoconnect).
 
@@ -150,14 +194,13 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
     If security_type is not specified, it will be inferred from the specified
     arguments.
     """
-    if None is security_type and None is not psk:
-        security_type = 'wpa-psk'
-    if security_type and security_type not in SUPPORTED_SECURITY_TYPES:
-        message = 'Only security types {} are supported'\
-            .format(SUPPORTED_SECURITY_TYPES)
-        log.error("Specified security type <{}> is not supported"
-                  .format(security_type))
-        return False, message
+
+    if None is security_type:
+        # Infer from arguments what kind of security this is
+        if None is psk:
+            security_type = SECURITY_TYPES.NONE
+        else:
+            security_type = SECURITY_TYPES.WPA_PSK
 
     already = await connection_exists(ssid)
     if already:
@@ -165,20 +208,11 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
         # here for EAP configuration if e.g. we’re passing a keyfile in a
         # different http request
         _1, _2 = await _call(['connection', 'delete', already])
-    configure_cmd = ['connection', 'add',
-                     'save', 'yes',
-                     'autoconnect', 'yes',
-                     'ifname', 'wlan0',
-                     'type', 'wifi',
-                     'con-name', ssid,
-                     'wifi.ssid', ssid]
-    if security_type:
-        configure_cmd += ['wifi-sec.key-mgmt', security_type]
-    if psk:
-        configure_cmd += ['wifi-sec.psk', psk]
-    if hidden:
-        configure_cmd += ['wifi.hidden', 'true']
+
+    configure_cmd = _build_con_add_cmd(
+        ssid, security_type, psk, hidden)
     res, err = await _call(configure_cmd)
+
     # nmcli connection add returns a string that looks like
     # "Connection ’connection-name’ (connection-uuid) successfully added."
     # This unfortunately doesn’t respect the --terse flag, so we need to
@@ -196,13 +230,14 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
             # If we successfully added the connection, remove other wifi
             # connections so they don’t accumulate over time
 
-            _1, _2 = await _trim_old_connections(name, 'wireless')
+            _3, _4 = await _trim_old_connections(name,
+                                                 CONNECTION_TYPES.WIRELESS)
             return True, res
     else:
         return False, err.split('\r')[-1]
 
 
-async def remove(ssid=None, name=None) -> (bool, str):
+async def remove(ssid: str = None, name: str = None) -> Tuple[bool, str]:
     """ Remove a network. Depending on what is known, specify either ssid
     (in which case this function will call ``connection_exists`` to get the
     nmcli connection name) or the nmcli connection name directly.
@@ -221,7 +256,7 @@ async def remove(ssid=None, name=None) -> (bool, str):
         return False, 'No connection for ssid {}'.format(ssid)
 
 
-async def iface_info(which_iface):
+async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     """ Get the basic network configuration of an interface.
 
     Returns a dict containing the info:
@@ -233,12 +268,9 @@ async def iface_info(which_iface):
 
     which_iface should be a string in IFACE_NAMES.
     """
-    if which_iface not in IFACE_NAMES:
-        raise ValueError('Bad interface name {}, not in {}'
-                         .format(which_iface, IFACE_NAMES))
-    default_res = {'ipAddress': None,
-                   'macAddress': None,
-                   'gatewayAddress': None}
+    default_res: Dict[str, Optional[str]] = {'ipAddress': None,
+                                             'macAddress': None,
+                                             'gatewayAddress': None}
     fields = ['GENERAL.HWADDR', 'IP4.ADDRESS', 'IP4.GATEWAY', 'GENERAL.STATE']
     # Note on this specific command: Most nmcli commands default to a tabular
     # output mode, where if there are multiple things to pull a couple specific
@@ -250,7 +282,7 @@ async def iface_info(which_iface):
     res, err = await _call(['--mode', 'tabular',
                             '--escape', 'no',
                             '--terse', '--fields', ','.join(fields),
-                            'dev', 'show', which_iface])
+                            'dev', 'show', which_iface.value])
     values = res.split('\n')
     if len(fields) != len(values):
         # We failed
@@ -261,7 +293,7 @@ async def iface_info(which_iface):
     return default_res
 
 
-async def _call(cmd) -> (str, str):
+async def _call(cmd: List[str]) -> Tuple[str, str]:
     """
     Runs the command in a subprocess and returns the captured stdout output.
     :param cmd: a list of arguments to nmcli. Should not include nmcli itself.
@@ -286,7 +318,7 @@ async def _call(cmd) -> (str, str):
     return out_str, err_str
 
 
-def sanitize_args(cmd) -> (str, str):
+def sanitize_args(cmd: List[str]) -> List[str]:
     """ Filter the command so that it no longer contains passwords
     """
     sanitized = []
@@ -298,7 +330,11 @@ def sanitize_args(cmd) -> (str, str):
     return sanitized
 
 
-def _dict_from_terse_tabular(names, inp, transformers={}):
+def _dict_from_terse_tabular(
+        names: List[str],
+        inp: str,
+        transformers: Dict[str, Callable[[str], Any]] = {})\
+        -> List[Dict[str, Any]]:
     """ Parse NMCLI terse tabular output into a list of Python dict.
 
     ``names`` is a list of strings of field names to apply to the input data,

@@ -1,4 +1,7 @@
 import json
+import os
+import random
+import tempfile
 from opentrons.server.main import init
 from opentrons.system import nmcli
 
@@ -91,3 +94,86 @@ async def test_wifi_configure(
     body = await resp.json()
     assert resp.status == 201
     assert body == expected
+
+
+async def test_list_keys(loop, test_client, wifi_keys_tempdir):
+    dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    empty_resp = await cli.get('/wifi/keys')
+    assert empty_resp.status == 200
+    empty_body = await empty_resp.json()
+    assert empty_body == []
+
+    for dn in dummy_names:
+        os.mkdir(os.path.join(wifi_keys_tempdir, dn))
+        open(os.path.join(wifi_keys_tempdir, dn, 'test.pem'), 'w').write('hi')
+
+    resp = await cli.get('/wifi/keys')
+    assert resp.status == 200
+    body = await resp.json()
+    assert len(body) == 3
+    for dn in dummy_names:
+        for keyfile in body:
+            if keyfile['id'] == dn:
+                assert keyfile['name'] == 'test.pem'
+                assert keyfile['uri'] == '/wifi/keys/{}'.format(dn)
+                break
+        else:
+            raise KeyError(dn)
+
+
+async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
+    with tempfile.TemporaryDirectory() as source_td:
+        app = init(loop)
+        cli = await loop.create_task(test_client(app))
+        empty_resp = await cli.get('/wifi/keys')
+        assert empty_resp.status == 200
+        empty_body = await empty_resp.json()
+        assert empty_body == []
+
+        results = {}
+        # We should be able to add multiple keys
+        for fn in ['test1.pem', 'test2.pem', 'test3.pem']:
+            path = os.path.join(source_td, fn)
+            with open(path, 'w') as f:
+                f.write(str(random.getrandbits(2048)))
+            upload_resp = await cli.post('/wifi/keys',
+                                         data={'key': open(path, 'rb')})
+            assert upload_resp.status == 201
+            upload_body = await upload_resp.json()
+            assert 'uri' in upload_body
+            assert 'id' in upload_body
+            assert 'name' in upload_body
+            assert upload_body['name'] == os.path.basename(fn)
+            assert upload_body['uri'] == '/wifi/keys/'\
+                + upload_body['id']
+            results[fn] = upload_body
+
+        # We should not be able to upload a duplicate
+        dup_resp = await cli.post(
+            '/wifi/keys',
+            data={'key': open(os.path.join(source_td, 'test1.pem'))})
+        assert dup_resp.status == 200
+        dup_body = await dup_resp.json()
+        assert 'message' in dup_body
+
+        # We should be able to see them all
+        list_resp = await cli.get('/wifi/keys')
+        assert list_resp.status == 200
+        list_body = await list_resp.json()
+        assert len(list_body) == 3
+        for elem in list_body:
+            assert elem['id'] in [r['id'] for r in results.values()]
+
+        for fn, data in results.items():
+            del_resp = await cli.delete(data['uri'])
+            assert del_resp.status == 200
+            del_body = await del_resp.json()
+            assert 'message' in del_body
+            del_list_resp = await cli.get('/wifi/keys')
+            del_list_body = await del_list_resp.json()
+            assert data['id'] not in [k['id'] for k in del_list_body]
+
+        dup_del_resp = await cli.delete(results['test1.pem']['uri'])
+        assert dup_del_resp.status == 404

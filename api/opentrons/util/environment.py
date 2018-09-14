@@ -62,6 +62,7 @@ def refresh():
         'DATABASE_FILE':
             os.path.join(APP_DATA_DIR, 'opentrons.db'),
         'APP_IS_ALIVE_URL': 'http://localhost:31950',
+        'WIFI_KEYS_DIR': os.path.join(APP_DATA_DIR, 'network_keys')
     })
 
     return settings
