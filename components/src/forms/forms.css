@@ -74,9 +74,14 @@
     flex: 1 1 auto;
     color: var(--c-dark-gray);
     width: 100%;
+    font-size: 1rem;
 
-    /* add 1px padding that is present in chrome but not ff */
-    padding: 1px;
+    /* TODO: Ian 2018-09-14 Firefox has 1px padding on input element,
+    * but I can't figure out how to fix it in Firefox without breaking it in Chrome.
+    * Better CSS reset for inputs needed?
+    */
+
+    /* padding: 1px; */
   }
 
   & input:focus {
