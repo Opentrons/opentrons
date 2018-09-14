@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import TimelineAlerts from '../components/steplist/TimelineAlerts'
+import TimelineAlerts from '../components/alerts/TimelineAlerts'
 import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
