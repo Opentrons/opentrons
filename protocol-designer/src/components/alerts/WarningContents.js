@@ -3,7 +3,7 @@ import * as React from 'react'
 import i18n from '../../localization'
 import {START_TERMINAL_ITEM_ID} from '../../steplist'
 import type { AlertLevel } from './types'
-import TerminalItemLink from './TerminalItemLink'
+import {TerminalItemLink} from '../steplist/TerminalItem'
 
 type WarningContentsProps = {
   warningType: string,

@@ -12,7 +12,7 @@ import {actions, selectors} from '../../tutorial'
 import type {HintKey} from '../../tutorial'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState, ThunkDispatch} from '../../types'
-import styles from './Hints.css'
+import {TerminalItemLink} from '../steplist/TerminalItem'
 
 type SP = {hints: Array<HintKey>}
 type DP = {
@@ -30,11 +30,7 @@ class Hints extends React.Component<Props> {
         return (
           <React.Fragment>
             {i18n.t('alert.hint.go_to')}
-            <a
-              className={styles.hint_nav_link}
-              onClick={() => this.props.selectTerminalItem(START_TERMINAL_ITEM_ID)}>
-              {i18n.t(`nav.terminal_item.${START_TERMINAL_ITEM_ID}`)}
-            </a>
+            <TerminalItemLink terminalId={START_TERMINAL_ITEM_ID} />
             {i18n.t('alert.hint.add_liquids_and_labware.directions')}
           </React.Fragment>
         )

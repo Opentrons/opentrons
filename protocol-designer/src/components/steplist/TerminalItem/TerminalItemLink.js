@@ -2,12 +2,12 @@
 
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {ThunkDispatch} from '../../types'
+import type {ThunkDispatch} from '../../../types'
 import {
   actions as steplistActions,
   type TerminalItemId,
-} from '../../steplist'
-import i18n from '../../localization'
+} from '../../../steplist'
+import i18n from '../../../localization'
 import styles from './styles.css'
 
 type OP = { terminalId: TerminalItemId }
