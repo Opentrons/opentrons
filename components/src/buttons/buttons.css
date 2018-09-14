@@ -41,8 +41,8 @@
     }
 
     /* stylelint-disable no-descending-specificity */
-    &:hover,
     &:focus,
+    &:hover,
     &.hover {
       background-color: color(var(--c-bg-light) shade(5%));
     }
@@ -64,6 +64,7 @@
     }
 
     /* stylelint-disable no-descending-specificity */
+    &:focus,
     &:hover,
     &.hover {
       background-color: color(var(--c-bg-dark) tint(5%));
@@ -86,6 +87,7 @@
     0 0 2px rgba(0, 0, 0, 0.12),
     0 2px 2px rgba(0, 0, 0, 0.24);
 
+  &:focus,
   &:hover,
   &.hover {
     background-color: color(var(--c-bg-dark) shade(30%));
@@ -105,6 +107,7 @@
     background-color: var(--c-bg-light);
     color: var(--c-font-dark);
 
+    &:focus,
     &:hover,
     &.hover {
       background-color: color(var(--c-bg-light) shade(5%));

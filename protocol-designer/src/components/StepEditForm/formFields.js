@@ -153,6 +153,31 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     )} />
 ))
 
+type DisposalLabwareDropdownOP = FocusHandlers
+type DisposalLabwareDropdownSP = {options: Options}
+const DisposalLabwareDropdownSTP = (state: BaseState): DisposalLabwareDropdownSP => ({
+  options: labwareIngredSelectors.disposalLabwareOptions(state),
+})
+export const DisposalLabwareDropdown = connect(DisposalLabwareDropdownSTP)((props: DisposalLabwareDropdownOP & DisposalLabwareDropdownSP) => {
+  const {options, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
+  return (
+    // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue}) => (
+        <DropdownField
+          className={className}
+          options={[...options, {name: 'Source Well', value: 'source_well'}]}
+          onBlur={() => { onFieldBlur(name) }}
+          onFocus={() => { onFieldFocus(name) }}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+      )} />
+  )
+})
+
 type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({

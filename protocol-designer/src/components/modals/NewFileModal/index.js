@@ -173,34 +173,6 @@ export default class NewFileModal extends React.Component<Props, State> {
   }
 }
 
-type MountFieldsProps = {
-  mount: Mount,
-  values: {pipetteModel: string, tiprackModel: ?string},
-  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void,
-}
-const MountFields = (props: MountFieldsProps) => (
-  <div className={styles.mount_column}>
-    <FormGroup key={`${props.mount}PipetteModel`} label={`${startCase(props.mount)} Pipette*`}>
-      <DropdownField
-        tabIndex={props.mount === 'left' ? 2 : 4}
-        options={props.values.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
-        value={props.values.pipetteModel}
-        onFocus={(e) => {e.target.size = pipetteOptionsWithNone}}
-        onBlur={(e) => {e.target.size = "0"}}
-        onChange={props.makeOnChange(props.mount, 'pipetteModel')} />
-    </FormGroup>
-
-    <FormGroup disabled={isEmpty(props.values.pipetteModel)} key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
-      <DropdownField
-        tabIndex={props.mount === 'left' ? 3 : 5}
-        disabled={isEmpty(props.values.pipetteModel)}
-        options={tiprackOptions}
-        value={props.values.tiprackModel}
-        onChange={props.makeOnChange(props.mount, 'tiprackModel')} />
-    </FormGroup>
-  </div>
-)
-
 const BetaRestrictions = () => (
   <React.Fragment>
     <h3>Beta Pipette Restrictions:</h3>
