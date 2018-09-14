@@ -51,15 +51,16 @@ export const supportMiddleware: Middleware = (store) => (next) => (action) => {
     const robot = state.robot.connection.connectRequest.name
 
     update = {[ROBOT_NAME]: robot}
-  } else if (action.type === 'api:PIPETTES_SUCCESS') {
+  } else if (action.type === 'api:SUCCESS') {
     const state = store.getState()
-
     if (state.robot.connection.connectedTo === action.payload.robot.name) {
-      const {left, right} = action.payload.pipettes
+      if (action.payload.path === 'pipettes') {
+        const {left, right} = action.payload.response
 
-      update = {
-        [PIPETTE_MODEL_LEFT]: left.model,
-        [PIPETTE_MODEL_RIGHT]: right.model,
+        update = {
+          [PIPETTE_MODEL_LEFT]: left.model,
+          [PIPETTE_MODEL_RIGHT]: right.model,
+        }
       }
     }
   }
