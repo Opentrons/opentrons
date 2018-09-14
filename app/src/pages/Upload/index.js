@@ -9,53 +9,55 @@ import type {Robot} from '../../robot'
 import {selectors as robotSelectors} from '../../robot'
 import {getProtocolFilename} from '../../protocol'
 
-import {Splash, SpinnerModal} from '@opentrons/components'
+import {Splash} from '@opentrons/components'
 import Page from '../../components/Page'
-import UploadError from '../../components/UploadError'
 import FileInfo from './FileInfo'
 
 type SP = {
   robot: ?Robot,
-  name: ?string,
+  filename: ?string,
   uploadInProgress: boolean,
   uploadError: ?{message: string},
-  protocolRunning: boolean,
-  protocolDone: boolean,
+  sessionLoaded: boolean,
 }
 
 type OP = {match: Match}
 
 type Props = SP & OP
 
-export default withRouter(
-  connect(mapStateToProps)(UploadPage)
-)
+export default withRouter(connect(mapStateToProps)(UploadPage))
 
 function mapStateToProps (state: State, ownProps: OP): SP {
   const connectedRobot = robotSelectors.getConnectedRobot(state)
+
   return {
     robot: connectedRobot,
-    name: getProtocolFilename(state),
+    filename: getProtocolFilename(state),
     uploadInProgress: robotSelectors.getSessionLoadInProgress(state),
     uploadError: robotSelectors.getUploadError(state),
-    protocolRunning: robotSelectors.getIsRunning(state),
-    protocolDone: robotSelectors.getIsDone(state),
+    sessionLoaded: robotSelectors.getSessionIsLoaded(state),
   }
 }
 
 function UploadPage (props: Props) {
-  const {robot, name, uploadInProgress, uploadError, match: {path}} = props
+  const {
+    robot,
+    filename,
+    uploadInProgress,
+    uploadError,
+    sessionLoaded,
+    match: {path},
+  } = props
+
   const fileInfoPath = `${path}/file-info`
 
-  if (!robot) return (<Redirect to='/robots' />)
-  if (!name) return (<Page><Splash /></Page>)
-
-  if (uploadInProgress) {
-    return (<Page><SpinnerModal message='Upload in Progress'/></Page>)
-  }
-
-  if (uploadError) {
-    return (<Page><UploadError name={name} uploadError={uploadError}/></Page>)
+  if (!robot) return <Redirect to="/robots" />
+  if (!filename) {
+    return (
+      <Page>
+        <Splash />
+      </Page>
+    )
   }
 
   return (
@@ -63,7 +65,15 @@ function UploadPage (props: Props) {
       <Redirect exact from={path} to={fileInfoPath} />
       <Route
         path={fileInfoPath}
-        render={props => (<FileInfo name={name} robot={robot} />)}
+        render={props => (
+          <FileInfo
+            robot={robot}
+            filename={filename}
+            uploadInProgress={uploadInProgress}
+            uploadError={uploadError}
+            sessionLoaded={sessionLoaded}
+          />
+        )}
       />
     </Switch>
   )

@@ -109,7 +109,7 @@ export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
     }
   )
 
-export function getSessionLoadInProgress (state: State) {
+export function getSessionLoadInProgress (state: State): boolean {
   return sessionRequest(state).inProgress
 }
 
