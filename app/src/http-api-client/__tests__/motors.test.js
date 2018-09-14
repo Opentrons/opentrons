@@ -23,8 +23,12 @@ describe('/motors/**', () => {
     robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
     state = {
       api: {
-        pipettes: {},
-        motors: {},
+        api: {
+          [NAME]: {
+            pipettes: {},
+            motors: {},
+          },
+        },
       },
     }
 
@@ -55,7 +59,7 @@ describe('/motors/**', () => {
     test('skips GET /pipettes call if axes are in state', () => {
       const expected = {axes: ['z', 'b']}
 
-      state.api.pipettes = {[NAME]: {response: mockPipettesResponse}}
+      state.api.api[NAME].pipettes = {response: mockPipettesResponse}
       client.__setMockResponse(response)
 
       // use mock.calls to verify call order

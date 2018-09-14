@@ -62,7 +62,7 @@ export function disengagePipetteMotors (
   ...mounts: Array<Mount>
 ): ThunkPromiseAction {
   return (dispatch, getState) => {
-    const pipettesState = getState().api.pipettes[robot.name]
+    const pipettesState = getState().api.api[robot.name].pipettes
 
     dispatch(motorsRequest(robot, DISENGAGE, {mounts}))
 

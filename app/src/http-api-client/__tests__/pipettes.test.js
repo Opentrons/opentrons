@@ -3,7 +3,7 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import client from '../client'
-import {reducer, fetchPipettes, makeGetRobotPipettes} from '..'
+import {fetchPipettes, makeGetRobotPipettes} from '..'
 
 jest.mock('../client')
 
@@ -27,7 +27,7 @@ describe('pipettes', () => {
       right: {model: 'p10_multi', mount_axis: 'a', plunger_axis: 'c'},
     }
 
-    state = {api: {pipettes: {}}}
+    state = {api: {api: {}}}
     store = mockStore(state)
   })
 
@@ -48,110 +48,41 @@ describe('pipettes', () => {
           .toHaveBeenCalledWith(robot, 'GET', 'pipettes?refresh=true'))
     })
 
-    test('fetchPipettes dispatches PIPETTES_REQUEST + SUCCESS', () => {
+    test('dispatches api:REQUEST and api:SUCCESS', () => {
+      const path = 'pipettes'
+      const request = null
+      const response = {pipettes}
       const expectedActions = [
-        {type: 'api:PIPETTES_REQUEST', payload: {robot}},
-        {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}},
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
-      client.__setMockResponse(pipettes)
+      client.__setMockResponse(response)
 
       return store.dispatch(fetchPipettes(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-
-    test('fetchPipettes dispatches PIPETTES_REQUEST + FAILURE', () => {
-      const error = new Error('AH')
-      const expectedActions = [
-        {type: 'api:PIPETTES_REQUEST', payload: {robot}},
-        {type: 'api:PIPETTES_FAILURE', payload: {robot, error}},
-      ]
-
-      client.__setMockError(error)
-
-      return store.dispatch(fetchPipettes(robot))
-        .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-  })
-
-  describe('reducer', () => {
-    beforeEach(() => {
-      state = state.api
-    })
-
-    test('handles PIPETTE_REQUEST with new robot', () => {
-      const action = {type: 'api:PIPETTES_REQUEST', payload: {robot}}
-
-      expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: true, error: null},
-      })
-    })
-
-    test('handles PIPETTE_REQUEST with existing robot', () => {
-      state.pipettes[NAME] = {
-        inProgress: false,
-        error: new Error('AH'),
-        response: pipettes,
-      }
-
-      const action = {type: 'api:PIPETTES_REQUEST', payload: {robot}}
-
-      expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: true, error: null, response: pipettes},
-      })
-    })
-
-    test('handles PIPETTE_SUCCESS', () => {
-      state.pipettes[NAME] = {
-        inProgress: true,
-        error: null,
-        response: null,
-      }
-
-      const action = {type: 'api:PIPETTES_SUCCESS', payload: {robot, pipettes}}
-
-      expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: false, error: null, response: pipettes},
-      })
-    })
-
-    test('handles PIPETTES_FAILURE', () => {
-      state.pipettes[NAME] = {
-        inProgress: true,
-        error: null,
-        response: pipettes,
-      }
-
-      const error = new Error('AH')
-      const action = {type: 'api:PIPETTES_FAILURE', payload: {robot, error}}
-
-      expect(reducer(state, action).pipettes).toEqual({
-        [NAME]: {inProgress: false, response: pipettes, error},
-      })
     })
   })
 
   describe('selectors', () => {
-    test('makeGetRobotPipettes with exiting robot', () => {
-      const getRobotPipettes = makeGetRobotPipettes()
-      const robotPipettes = {
-        inProgress: false,
-        error: null,
-        response: pipettes,
+    beforeEach(() => {
+      state.api.api[NAME] = {
+        pipettes: {inProgress: true},
       }
+    })
 
-      state.api.pipettes[NAME] = robotPipettes
-      expect(getRobotPipettes(state, robot)).toEqual(robotPipettes)
+    test('makeGetRobotPipettes with existing robot', () => {
+      const getRobotPipettes = makeGetRobotPipettes()
+
+      expect(getRobotPipettes(state, robot))
+        .toEqual(state.api.api[NAME].pipettes)
+      expect(getRobotPipettes(state, {name: 'foo'})).toEqual({inProgress: false})
     })
 
     test('makeGetRobotPipettes with non-existent robot', () => {
       const getRobotPipettes = makeGetRobotPipettes()
 
-      expect(getRobotPipettes(state, robot)).toEqual({
-        inProgress: false,
-        error: null,
-        response: null,
-      })
+      expect(getRobotPipettes(state, 'foo')).toEqual({inProgress: false})
     })
   })
 })
