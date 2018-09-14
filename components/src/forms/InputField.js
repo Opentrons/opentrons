@@ -36,6 +36,8 @@ type Props = {
   onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean,
+  /** html tabindex property */
+  tabIndex?: number,
 }
 
 export default function InputField (props: Props) {
@@ -84,6 +86,8 @@ function Input (props: Props) {
           onBlur={props.onBlur}
           onClick={props.disabled ? undefined : props.onClick}
           readOnly={props.readOnly}
+          tabIndex={props.tabIndex}
+          autoFocus={props.autoFocus}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>

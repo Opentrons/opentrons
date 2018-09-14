@@ -42,6 +42,7 @@
 
     /* stylelint-disable no-descending-specificity */
     &:hover,
+    &:focus,
     &.hover {
       background-color: color(var(--c-bg-light) shade(5%));
     }
