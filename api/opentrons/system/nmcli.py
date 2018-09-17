@@ -235,7 +235,7 @@ async def available_ssids() -> List[Dict[str, Any]]:
     Returns a list of the SSIDs. They may contain spaces and should be escaped
     if later passed to a shell.
     """
-    fields = ['ssid', 'signal', 'active']
+    fields = ['ssid', 'signal', 'active', 'security']
     cmd = ['--terse',
            '--fields',
            ','.join(fields),
