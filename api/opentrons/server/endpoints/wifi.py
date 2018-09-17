@@ -32,7 +32,27 @@ class ConfigureArgsError(Exception):
 
 async def list_networks(request: web.Request) -> web.Response:
     """
-    Get request will return a list of discovered ssids.
+    Get request will return a list of discovered ssids:
+
+    GET /wifi/list
+
+    200 OK
+    { "list": [
+        {
+           ssid: string // e.g. "linksys", name to connect to
+           signal: int // e.g. 100; arbitrary signal strength, more is better
+           active: boolean // e.g. true; whether there is a connection active
+           security: str // e.g. "WPA2 802.1X" raw nmcli security type output
+           securityType: str // e.g. "wpa-eap"; see blow
+        }
+      ]
+    }
+
+    The securityType field contains a value suitable for passing to the
+    securityType argument of /configure, or 'unsupported'. The security
+    field is mostly useful for debugging if you are unable to connect to
+    the network even though you think you are using the correct security
+    type.
     """
     try:
         networks = await nmcli.available_ssids()
