@@ -3,13 +3,13 @@
 import * as React from 'react'
 
 import {
-  ListItem,
   NotificationIcon,
   Icon,
 } from '@opentrons/components'
 
 import type {Robot} from '../../robot'
 import {ToggleButton} from '../controls'
+import RobotLink from './RobotLink'
 import styles from './connect-panel.css'
 
 type ListProps = {
@@ -37,43 +37,41 @@ export function RobotListItem (props: ItemProps) {
     : connect
 
   return (
-    <ol className={styles.robot_group}>
-    <ListItem
-      url={`/robots/${name}`}
-      className={styles.robot_item}
-      activeClassName={styles.active}
-      exact
-    >
-      <NotificationIcon
-        name={wired ? 'usb' : 'wifi'}
-        className={styles.robot_item_icon}
-        childName={availableUpdate ? 'circle' : null}
-        childClassName={styles.notification}
-      />
+    <li className={styles.robot_group}>
+      <RobotLink
+        url={`/robots/${name}`}
+        className={styles.robot_item}
+        exact
+      >
+        <NotificationIcon
+          name={wired ? 'usb' : 'wifi'}
+          className={styles.robot_item_icon}
+          childName={availableUpdate ? 'circle' : null}
+          childClassName={styles.notification}
+        />
 
-      <p className={styles.robot_name}>
-        {name}
-      </p>
+        <p className={styles.link_text}>
+          {name}
+        </p>
 
-      <ToggleButton
-        toggledOn={isConnected}
-        onClick={onClick}
-        className={styles.robot_item_icon}
-      />
-    </ListItem>
-    <ListItem
-      url={`/robots/${name}/instruments`}
-      className={styles.instrument_item}
-      activeClassName={styles.active}
-    >
-      <p className={styles.robot_name}>
-        Pipettes & Modules
-      </p>
-      <Icon
-        name='chevron-right'
-        className={styles.robot_item_icon}
-      />
-    </ListItem>
-    </ol>
+        <ToggleButton
+          toggledOn={isConnected}
+          onClick={onClick}
+          className={styles.robot_item_icon}
+        />
+      </RobotLink>
+      <RobotLink
+        url={`/robots/${name}/instruments`}
+        className={styles.instrument_item}
+      >
+        <p className={styles.link_text}>
+          Pipettes & Modules
+        </p>
+        <Icon
+          name='chevron-right'
+          className={styles.robot_item_icon}
+        />
+      </RobotLink>
+    </li>
   )
 }
