@@ -59,3 +59,5 @@ export default function computeWellAccess (labwareName: string, topWellName: str
 
   return wellsAccessed
 }
+
+window.computeWellAccess = computeWellAccess

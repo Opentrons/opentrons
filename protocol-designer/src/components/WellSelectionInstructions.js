@@ -8,8 +8,8 @@ export default function WellSelectionInstructions () {
     <div className={styles.wrapper}>
       <Icon className={styles.click_drag_icon} name='ot-click-and-drag' />
       <div className={styles.instructional_text}>
-        <p>{i18n.t('well_selection_instructions.instructions1')}</p>
-        <p>{i18n.t('well_selection_instructions.instructions2')}</p>
+        <p>{i18n.t('well_selection.select_instructions')}</p>
+        <p>{i18n.t('well_selection.deselect_instructions')}</p>
       </div>
     </div>
   )
