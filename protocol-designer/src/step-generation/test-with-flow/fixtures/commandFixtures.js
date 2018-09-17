@@ -58,7 +58,6 @@ export const aspirate = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
-    offsetFromBottomMm: undefined,
     ...params,
     volume,
     well,
@@ -77,7 +76,6 @@ export const dispense = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
-    offsetFromBottomMm: undefined,
     ...params,
     volume,
     well,
@@ -94,6 +92,5 @@ export const blowout = (
     well: 'A1',
     labware: labware || 'trashId',
     ...params,
-    offsetFromBottomMm: undefined,
   },
 })
