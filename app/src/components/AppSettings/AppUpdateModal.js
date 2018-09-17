@@ -2,14 +2,15 @@
 // AlertModal for updating to newest app version
 import * as React from 'react'
 
-import type {ShellUpdate} from '../../shell'
+import type {ShellUpdateState} from '../../shell'
 import {Icon, AlertModal, type ButtonProps} from '@opentrons/components'
 import {Portal} from '../portal'
 
 type Props = {
-  update: ShellUpdate,
+  update: ShellUpdateState,
+  availableVersion: ?string,
   downloadUpdate: () => mixed,
-  quitAndInstall: () => mixed,
+  applyUpdate: () => mixed,
   close: () => mixed,
 }
 
@@ -17,16 +18,16 @@ type Props = {
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
 export default function AppUpdateModal (props: Props) {
-  const {close, update: {error, downloadInProgress}} = props
+  const {close, availableVersion, update: {error, downloading}} = props
   const {button, message} = mapPropsToButtonPropsAndMessage(props)
-  const closeButtonChildren = error || downloadInProgress
+  const closeButtonChildren = error || downloading
     ? 'close'
     : 'not now'
 
   return (
     <Portal>
       <AlertModal
-        heading={`App Version ${props.update.available || ''} Available`}
+        heading={`App Version ${availableVersion || ''} Available`}
         onCloseClick={close}
         buttons={[
           {onClick: close, children: closeButtonChildren},
@@ -41,7 +42,7 @@ export default function AppUpdateModal (props: Props) {
 }
 
 function mapPropsToButtonPropsAndMessage (props: Props) {
-  const {error, downloaded, checkInProgress, downloadInProgress} = props.update
+  const {error, downloaded, checking, downloading} = props.update
 
   if (error) {
     return {
@@ -50,8 +51,8 @@ function mapPropsToButtonPropsAndMessage (props: Props) {
     }
   }
 
-  const disabled = error || checkInProgress || downloadInProgress
-  const onClick = downloaded ? props.quitAndInstall : props.downloadUpdate
+  const disabled = error || checking || downloading
+  const onClick = downloaded ? props.applyUpdate : props.downloadUpdate
 
   let message
   let button: ButtonProps = {onClick, disabled}
@@ -59,7 +60,7 @@ function mapPropsToButtonPropsAndMessage (props: Props) {
   if (downloaded) {
     message = 'Restart the app to finish the update'
     button.children = 'Restart'
-  } else if (downloadInProgress) {
+  } else if (downloading) {
     message = 'Update is downloading.'
     button.children = (<Spinner />)
   } else {

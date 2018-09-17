@@ -1,17 +1,18 @@
 // @flow
 // app status panel with connect button
 import * as React from 'react'
-import type {ShellUpdate} from '../../shell'
+
 import {AnalyticsSettingsCard} from '../analytics-settings'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import AppInfoCard from './AppInfoCard'
 import AppUpdateModal from './AppUpdateModal'
-
 import {CardContainer, CardRow} from '../layout'
 
+import type {ShellUpdateState} from '../../shell'
+
 type Props = {
-  update: ShellUpdate,
-  checkForUpdates: () => mixed,
+  update: ShellUpdateState,
+  checkUpdate: () => mixed,
 }
 
 export default function AppSettings (props: Props) {
@@ -24,7 +25,7 @@ export default function AppSettings (props: Props) {
         <AnalyticsSettingsCard {...props} />
       </CardRow>
       <CardRow>
-        <AdvancedSettingsCard checkForUpdates={props.checkForUpdates} />
+        <AdvancedSettingsCard checkUpdate={props.checkUpdate} />
       </CardRow>
     </CardContainer>
   )
