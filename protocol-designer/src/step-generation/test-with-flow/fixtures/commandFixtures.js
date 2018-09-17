@@ -58,6 +58,7 @@ export const aspirate = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
+    offsetFromBottomMm: undefined,
     ...params,
     volume,
     well,
@@ -76,6 +77,7 @@ export const dispense = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
+    offsetFromBottomMm: undefined,
     ...params,
     volume,
     well,
@@ -84,7 +86,7 @@ export const dispense = (
 
 export const blowout = (
   labware?: string,
-  params?: {| pipette?: string |}
+  params?: {| pipette?: string, well?: string |}
 ): Command => ({
   command: 'blowout',
   params: {
@@ -92,5 +94,6 @@ export const blowout = (
     well: 'A1',
     labware: labware || 'trashId',
     ...params,
+    offsetFromBottomMm: undefined,
   },
 })

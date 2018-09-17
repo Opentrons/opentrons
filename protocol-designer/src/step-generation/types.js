@@ -46,8 +46,6 @@ export type TransferLikeFormDataFields = {
   touchTipAfterDispense: boolean,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm?: ?number,
 }
@@ -58,6 +56,8 @@ export type ConsolidateFormData = {
   sourceWells: Array<string>,
   destWell: string,
 
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -70,6 +70,8 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -81,6 +83,9 @@ export type DistributeFormData = {
 
   sourceWell: string,
   destWells: Array<string>,
+
+  /** Disposal destination is final blowout destination of disposalVolume contents (e.g. trash, source well ...) */
+  disposalDestination: ?string,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
@@ -196,13 +201,13 @@ export type PipetteLabwareFields = {|
   pipette: string,
   labware: string,
   well: string,
+  offsetFromBottomMm?: ?number,
   /* TODO optional uL/sec (or uL/minute???) speed here */
 |}
 
 export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
   volume: number,
-  offsetFromBottomMm?: ?number,
 |}
 
 export type Command = {|

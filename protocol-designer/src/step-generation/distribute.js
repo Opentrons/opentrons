@@ -63,6 +63,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,
         mixInDestination: null,
+        blowout: null,
       }
       return transfer(transferData)
     })
@@ -109,8 +110,6 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
       }
 
       let blowoutCommands = []
-      const {disposalVolume, disposalDestination} = data
-      console.log({disposalDestination, disposalVolume})
       if (data.disposalVolume && data.disposalDestination === 'source_well') {
         blowoutCommands = [blowout({
           pipette: data.pipette,
@@ -125,7 +124,6 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
           well: 'A1',
         })]
       }
-
 
       const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
         ? [

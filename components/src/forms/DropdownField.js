@@ -33,6 +33,8 @@ type Props = {
   disabled?: boolean,
   /** html tabindex property */
   tabIndex?: number,
+  /** automatically focus field on render */
+  autoFocus?: boolean,
 }
 
 export default function DropdownField (props: Props) {

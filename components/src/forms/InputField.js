@@ -38,6 +38,8 @@ type Props = {
   readOnly?: ?boolean,
   /** html tabindex property */
   tabIndex?: number,
+  /** automatically focus field on render */
+  autoFocus?: boolean,
 }
 
 export default function InputField (props: Props) {

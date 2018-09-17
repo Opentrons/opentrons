@@ -153,7 +153,7 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     )} />
 ))
 
-type DisposalDestinationDropdownOP = FocusHandlers
+type DisposalDestinationDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type DisposalDestinationDropdownSP = {options: Options}
 const DisposalDestinationDropdownSTP = (state: BaseState): DisposalDestinationDropdownSP => ({
   options: labwareIngredSelectors.disposalLabwareOptions(state),

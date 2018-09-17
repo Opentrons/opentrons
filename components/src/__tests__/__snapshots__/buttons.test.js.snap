@@ -5,6 +5,7 @@ exports[`buttons Button renders correctly 1`] = `
   className="c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -17,6 +18,7 @@ exports[`buttons Button with iconName renders correctly 1`] = `
   className="c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -46,6 +48,7 @@ exports[`buttons FlatButton renders correctly 1`] = `
   className="button_flat c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -58,6 +61,7 @@ exports[`buttons FlatButton with iconName renders correctly 1`] = `
   className="button_flat c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -87,6 +91,7 @@ exports[`buttons IconButton renders correctly 1`] = `
   className="button_flat button_icon c"
   disabled={true}
   onClick={undefined}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -115,6 +120,7 @@ exports[`buttons Inverted OutlineButton renders correctly 1`] = `
   className="button_outline c inverted"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -127,6 +133,7 @@ exports[`buttons OutlineButton renders correctly 1`] = `
   className="button_outline c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -139,6 +146,7 @@ exports[`buttons OutlineButton with iconName renders correctly 1`] = `
   className="button_outline c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -168,6 +176,7 @@ exports[`buttons PrimaryButton renders correctly 1`] = `
   className="button_primary c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >
@@ -180,6 +189,7 @@ exports[`buttons PrimaryButton with iconName renders correctly 1`] = `
   className="button_primary c"
   disabled={undefined}
   onClick={[Function]}
+  tabIndex={undefined}
   title="t"
   type="button"
 >

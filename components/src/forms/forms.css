@@ -125,6 +125,16 @@
   flex: 1;
 }
 
+.error div,
+.error span {
+  color: var(--c-warning-dark);
+}
+
+.error select,
+.error .input_field {
+  background-color: var(--c-warning-light);
+}
+
 .dropdown_field {
   position: relative;
 
@@ -140,6 +150,7 @@
     width: 100%;
     appearance: none;
     overflow: hidden;
+
     &:focus {
       background-color: var(--c-white);
       box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
@@ -157,16 +168,6 @@
       color: var(--c-dark-gray);
     }
   }
-}
-
-.error div,
-.error span {
-  color: var(--c-warning-dark);
-}
-
-.error select,
-.error .input_field {
-  background-color: var(--c-warning-light);
 }
 
 .error_icon {
