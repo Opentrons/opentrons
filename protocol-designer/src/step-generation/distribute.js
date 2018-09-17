@@ -108,11 +108,24 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         tipCommands = [replaceTip(data.pipette)]
       }
 
-      const blowoutCommands = data.blowout ? [blowout({
-        pipette: data.pipette,
-        labware: data.blowout,
-        well: 'A1',
-      })] : []
+      let blowoutCommands = []
+      const {disposalVolume, disposalDestination} = data
+      console.log({disposalDestination, disposalVolume})
+      if (data.disposalVolume && data.disposalDestination === 'source_well') {
+        blowoutCommands = [blowout({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: data.sourceWell,
+        })]
+      } else if (data.disposalVolume && data.disposalDestination) {
+        // if disposalDestination is not 'source_well' assume it is a labware (e.g. fixed-trash)
+        blowoutCommands = [blowout({
+          pipette: data.pipette,
+          labware: data.disposalDestination,
+          well: 'A1',
+        })]
+      }
+
 
       const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
         ? [

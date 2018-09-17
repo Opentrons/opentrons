@@ -340,7 +340,7 @@ const labwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
-const DISPOSAL_LABWARE_TYPES = ['trash-box', FIXED_TRASH_ID]
+const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 const disposalLabwareOptions: Selector<Options> = createSelector(
   getLabware,

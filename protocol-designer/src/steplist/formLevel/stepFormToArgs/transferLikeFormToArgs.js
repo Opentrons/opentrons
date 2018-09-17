@@ -69,9 +69,12 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     'dispense_mix_times'
   )
 
-  const disposalVolume = formData['aspirate_disposalVol_checkbox']
-    ? Number('aspirate_disposal-vol_volume') // TODO handle unparseable
-    : null
+  let disposalVolume = null
+  let disposalDestination = null
+  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
+    disposalDestination = formData['aspirate_disposalVol_destination']
+  }
 
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
@@ -193,6 +196,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalDestination,
           mixBeforeAspirate,
           sourceWell: sourceWells[0],
           destWells,

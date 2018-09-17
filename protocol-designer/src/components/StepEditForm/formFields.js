@@ -153,15 +153,14 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     )} />
 ))
 
-type DisposalLabwareDropdownOP = FocusHandlers
-type DisposalLabwareDropdownSP = {options: Options}
-const DisposalLabwareDropdownSTP = (state: BaseState): DisposalLabwareDropdownSP => ({
+type DisposalDestinationDropdownOP = FocusHandlers
+type DisposalDestinationDropdownSP = {options: Options}
+const DisposalDestinationDropdownSTP = (state: BaseState): DisposalDestinationDropdownSP => ({
   options: labwareIngredSelectors.disposalLabwareOptions(state),
 })
-export const DisposalLabwareDropdown = connect(DisposalLabwareDropdownSTP)((props: DisposalLabwareDropdownOP & DisposalLabwareDropdownSP) => {
+export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownSTP)((props: DisposalDestinationDropdownOP & DisposalDestinationDropdownSP) => {
   const {options, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
   return (
-    // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
     <StepField
       name={name}
       focusedField={focusedField}

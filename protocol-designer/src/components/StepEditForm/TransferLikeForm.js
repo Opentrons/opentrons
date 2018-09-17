@@ -8,7 +8,7 @@ import {
   StepCheckboxRow,
   DispenseDelayFields,
   PipetteField,
-  DisposalLabwareDropdown,
+  DisposalDestinationDropdown,
   LabwareDropdown,
   ChangeTipField,
 } from './formFields'
@@ -82,7 +82,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                       {value
                         ? <div className={styles.field_row}>
                             <div className={styles.sub_select_label}>Blowout</div>
-                            <DisposalLabwareDropdown name="aspirate_disposalVol_labware" className={styles.full_width} {...focusHandlers} />
+                            <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
                           </div>
                         : null
                       }
