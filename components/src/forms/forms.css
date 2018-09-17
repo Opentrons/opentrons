@@ -102,6 +102,7 @@
     flex: 1 0;
     font-weight: var(--fw-semibold);
     text-align: right;
+    align-self: center;
     color: var(--c-dark-gray);
   }
 }
