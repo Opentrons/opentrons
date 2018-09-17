@@ -201,21 +201,27 @@ export type PipetteLabwareFields = {|
   pipette: string,
   labware: string,
   well: string,
-  offsetFromBottomMm?: ?number,
   /* TODO optional uL/sec (or uL/minute???) speed here */
 |}
 
 export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
   volume: number,
+  offsetFromBottomMm?: ?number,
 |}
 
 export type Command = {|
   command: 'aspirate' | 'dispense',
   params: AspirateDispenseArgs,
 |} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'blowout' | 'touch-tip',
+  command: 'pick-up-tip' | 'drop-tip' | 'touch-tip',
   params: PipetteLabwareFields,
+|} | {|
+  command: 'blowout',
+  params: {|
+    ...PipetteLabwareFields,
+    offsetFromBottomMm?: ?number,
+  |}
 |} | {|
   command: 'delay',
   /** number of seconds to delay (fractional values OK),
