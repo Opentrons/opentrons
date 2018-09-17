@@ -176,41 +176,43 @@ def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
                                  .format(','.join(sec_translation.keys())))
 
 
-def _check_configure_args(**kwargs) -> Dict[str, Any]:
+def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
     """ Check the arguments passed to configure.
 
     Raises an exception on failure. On success, returns a dict of
-    kwargs with any necessary mutations.
+    configure_args with any necessary mutations.
     """
     # SSID must always be present
-    if not kwargs.get('ssid') or not isinstance(kwargs['ssid'], str):
+    if not configure_args.get('ssid')\
+       or not isinstance(configure_args['ssid'], str):
         raise ConfigureArgsError("SSID must be specified")
     # If specified, hidden must be a bool
-    if not kwargs.get('hidden'):
-        kwargs['hidden'] = False
-    elif not isinstance(kwargs['hidden'], bool):
+    if not configure_args.get('hidden'):
+        configure_args['hidden'] = False
+    elif not isinstance(configure_args['hidden'], bool):
         raise ConfigureArgsError('If specified, hidden must be a bool')
 
-    kwargs['securityType'] = _deduce_security(kwargs)
+    configure_args['securityType'] = _deduce_security(configure_args)
 
     # If we have wpa2-personal, we need a psk
-    if kwargs['securityType'] == nmcli.SECURITY_TYPES.WPA_PSK:
-        if not kwargs.get('psk'):
+    if configure_args['securityType'] == nmcli.SECURITY_TYPES.WPA_PSK:
+        if not configure_args.get('psk'):
             raise ConfigureArgsError(
                 'If securityType is wpa-psk, psk must be specified')
-        return kwargs
+        return configure_args
 
     # If we have wpa2-enterprise, we need eap config, and we need to check
     # it
-    if kwargs['securityType'] == nmcli.SECURITY_TYPES.WPA_EAP:
-        if not kwargs.get('eapConfig'):
+    if configure_args['securityType'] == nmcli.SECURITY_TYPES.WPA_EAP:
+        if not configure_args.get('eapConfig'):
             raise ConfigureArgsError(
                 'If securityType is wpa-eap, eapConfig must be specified')
-        kwargs['eapConfig'] = _eap_check_config(kwargs['eapConfig'])
-        return kwargs
+        configure_args['eapConfig']\
+            = _eap_check_config(configure_args['eapConfig'])
+        return configure_args
 
     # If we’re still here we have no security and we’re done
-    return kwargs
+    return configure_args
 
 
 async def configure(request: web.Request) -> web.Response:
@@ -249,17 +251,19 @@ async def configure(request: web.Request) -> web.Response:
         return web.json_response({'message': e.msg}, status=400)
 
     try:
-        configure_kwargs = _check_configure_args(**body)
+        configure_kwargs = _check_configure_args(body)
     except ConfigureArgsError as e:
         return web.json_response({'message': e.msg}, status=400)
-    except TypeError as te:  # Indicates an unexpected kwarg
-        return web.json_response({'message': str(te)}, status=400)
 
     try:
         ok, message = await nmcli.configure(**configure_kwargs)
         log.debug("Wifi configure result: {}".format(message))
     except ValueError as ve:
         return web.json_response({'message': str(ve)}, status=400)
+    except TypeError as te:
+        # Indicates an unexpected kwarg; check is done here to avoid keeping
+        # the _check_configure_args signature up to date with nmcli.configure
+        return web.json_response({'message': str(te)}, status=400)
 
     if ok:
         return web.json_response({'message': message,

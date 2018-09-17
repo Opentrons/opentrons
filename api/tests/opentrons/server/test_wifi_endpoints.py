@@ -97,6 +97,12 @@ async def test_wifi_configure(
     assert resp.status == 201
     assert body == expected
 
+    resp = await cli.post(
+        '/wifi/configure', json={'ssid': 'asasd', 'foo': 'bar'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert 'message' in body
+
 
 def test_deduce_security():
     with pytest.raises(wifi.ConfigureArgsError):
