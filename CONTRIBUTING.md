@@ -160,7 +160,7 @@ make install
 
 ### Testing and Linting
 
-You can tests with:
+You can test with:
 
 ```shell
 # run all tests
